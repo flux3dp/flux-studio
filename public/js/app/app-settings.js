@@ -3,8 +3,8 @@ define(function() {
 
     return {
         i18n : {
-            active_lang : 'en',
-            supported_lang : {
+            default_lang : 'en',
+            supported_langs : {
                 'en' : 'English',
                 'zh-tw' : '繁體中文'
             }
