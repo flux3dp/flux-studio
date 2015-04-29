@@ -1,8 +1,9 @@
 define([
     'jquery',
     'react',
+    'app/actions/wifi-set-printer',
     'css!cssHome/pages/wifi'
-], function($, React) {
+], function($, React, actions) {
     'use strict';
 
     return function(args) {
@@ -21,14 +22,14 @@ define([
                                     <p>
                                         <label>
                                             {lang.wifi.set_printer.printer_name}
-                                            <input type="text" name="printer-name"
+                                            <input type="text" className="required" name="printer-name"
                                             placeholder={lang.wifi.set_printer.printer_name_placeholder}/>
                                         </label>
                                     </p>
                                     <p>
                                         <label>
                                             {lang.wifi.set_printer.password}
-                                            <input type="password" name="printer-name"
+                                            <input type="password" name="printer-password"
                                             placeholder={lang.wifi.set_printer.password_placeholder}/>
                                         </label>
                                     </p>
@@ -37,7 +38,7 @@ define([
                                     </p>
                                 </div>
                                 <div>
-                                    <a href="#" className="btn">{lang.wifi.set_printer.next}</a>
+                                    <a href="#" className="btn" id="btn-next">{lang.wifi.set_printer.next}</a>
                                 </div>
                             </div>
                         </div>
@@ -45,6 +46,9 @@ define([
                 },
                 getInitialState: function() {
                     return args.state;
+                },
+                componentDidMount: function() {
+                    actions();
                 }
 
             });
