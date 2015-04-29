@@ -8,8 +8,11 @@ require.config({
         react: 'lib/react/react-with-addons.min',
         JSXTransformer: 'lib/react/JSXTransformer',
         views: 'app/views',
+        pages: 'app/pages',
+        widgets: 'app/widgets',
         three: 'lib/three',
-        threejs: 'lib/three/three.min'
+        threejs: 'lib/three/three.min',
+        cssHome: '../css'
     },
 
     jsx: {
