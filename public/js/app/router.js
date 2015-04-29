@@ -55,6 +55,7 @@ function(React, $, Backbone, localStorage, i18n, Observe) {
                     'ask'          : 'Wifi-Home',
                     'select'       : 'Wifi-Select',
                     'spot'         : 'Wifi-Spot',
+                    'set-printer'  : 'Wifi-Set-Printer',
                     'set-password' : 'Wifi-Set-Password',
                     'success'      : 'Wifi-Success',
                     'failure'      : 'Wifi-Failure'
