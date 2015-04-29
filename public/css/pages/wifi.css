@@ -1,0 +1,20 @@
+.wifi .wifi-list {
+    border: #ccc 1px solid;
+    cursor: pointer;
+    margin: 20px auto;
+    padding: 10px;
+    width: 60%;
+}
+
+.wifi .wifi-list li {
+    line-height: 2rem;
+}
+
+.wifi .wifi-list a {
+    text-decoration: none;
+}
+
+.wifi .fa {
+    float: right;
+    width: 50px;
+}

@@ -34,7 +34,8 @@ function(React, $, Backbone, localStorage, i18n, Observe) {
     return Backbone.Router.extend({
 
         routes: {
-            '': 'home'
+            '': 'home',
+            'initize/wifi(/:step)' : 'wifi',
         },
 
         home: function() {
@@ -46,6 +47,26 @@ function(React, $, Backbone, localStorage, i18n, Observe) {
                     };
 
                 display(view, args);
+            });
+        },
+
+        wifi : function(step, serial) {
+            var map = {
+                    'ask'          : 'Wifi-Home',
+                    'select'       : 'Wifi-Select',
+                    'spot'         : 'Wifi-Spot',
+                    'set-password' : 'Wifi-Set-Password',
+                    'success'      : 'Wifi-Success',
+                    'failure'      : 'Wifi-Failure'
+                },
+                view_name = 'Wifi-Home';
+
+            if (true === map.hasOwnProperty(step)) {
+                view_name = map[step];
+            }
+
+            require(['jsx!pages/' + view_name], function(view) {
+                display(view);
             });
         }
 

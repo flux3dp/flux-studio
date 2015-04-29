@@ -15,7 +15,7 @@ define([
             HomeView = React.createClass({
                 render : function() {
                     return (
-                        <div className="welcome absolute-center">
+                        <div className="welcome initialization absolute-center">
                             <h1>{this.state.lang.brand_name}</h1>
                             <div className="brand-image"></div>
                             <div>
@@ -25,7 +25,7 @@ define([
                                     <SelectView id="select-lang" options={options}/>
                                 </div>
                                 <div>
-                                    <a href="#" className="btn">{this.state.lang.welcome.start}</a>
+                                    <a href="#initize/wifi/ask" className="btn">{this.state.lang.welcome.start}</a>
                                 </div>
                             </div>
                         </div>
