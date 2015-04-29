@@ -1,0 +1,11 @@
+.welcome {
+    height: 80%;
+    text-align: center;
+    width: 80%;
+}
+
+.welcome h1 {
+    background: #ccc;
+    padding: 5px 10px;
+    text-align: left;
+}
