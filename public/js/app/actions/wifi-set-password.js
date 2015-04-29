@@ -9,6 +9,17 @@ define([
             var $pass = $('#text-password');
 
             // TODO: go to success or failure page
+            // TODO: remove fake process
+            var Dt = new Date();
+
+            if (0 === Dt.getMilliseconds() % 2) {
+                console.log('success');
+                location.href = '#initialize/wifi/success';
+            }
+            else {
+                console.log('failure');
+                location.href = '#initialize/wifi/failure';
+            }
         });
     };
 });
