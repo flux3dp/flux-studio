@@ -37,6 +37,15 @@ define(function() {
                 caption: '連線失敗',
                 line1: '請確認你的 Wi-Fi 是否正常運作後，再重新連線',
                 next: '重新連線'
+            },
+            set_printer: {
+                caption: '為你的 FLUX3D Printer 設定名稱與密碼',
+                printer_name: '名稱',
+                printer_name_placeholder: '設定名稱',
+                password: '密碼',
+                password_placeholder: '設定密碼',
+                notice: '設定密碼，可以確保你的 FLUX 只有知道密碼的人可以操作',
+                next: '下一步'
             }
         }
     };
