@@ -20,12 +20,10 @@ function(React, $, Backbone, localStorage, i18n, Observe) {
 
         // watching state and auto update
         new Observe(args.state, function(changes){
-            setTimeout(function() {
-                currentView.setState(args.state);
-            }, 1000);
+            currentView.setState(args.state);
         });
 
-        view = React.createFactory(view(args.state));
+        view = React.createFactory(view(args));
         view = view();
 
         view.props = args.props;
@@ -36,12 +34,39 @@ function(React, $, Backbone, localStorage, i18n, Observe) {
     return Backbone.Router.extend({
 
         routes: {
-            '': 'home'
+            '': 'home',
+            'initialize/wifi(/:step)' : 'wifi',
         },
 
         home: function() {
-            require(['jsx!views/Home'], function(View) {
-                display(View);
+            require(['jsx!pages/Home', 'app/app-settings'], function(view, settings) {
+                var args = {
+                        props : {
+                            supported_langs : settings.i18n.supported_langs
+                        }
+                    };
+
+                display(view, args);
+            });
+        },
+
+        wifi : function(step) {
+            var map = {
+                    'ask'          : 'Wifi-Home',
+                    'select'       : 'Wifi-Select',
+                    'spot'         : 'Wifi-Spot',
+                    'set-password' : 'Wifi-Set-Password',
+                    'success'      : 'Wifi-Success',
+                    'failure'      : 'Wifi-Failure'
+                },
+                view_name = 'Wifi-Home';
+
+            if (true === map.hasOwnProperty(step)) {
+                view_name = map[step];
+            }
+
+            require(['jsx!pages/' + view_name], function(view) {
+                display(view);
             });
         }
 
