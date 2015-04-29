@@ -27,6 +27,16 @@ define(function() {
                 line2: '」無線網路的連線密碼',
                 cancel: '取消',
                 join: '加入',
+            },
+            success: {
+                caption: '太棒了，連線成功!',
+                line1: '接下來，我們將為你的機器做一些簡單的設定。',
+                next: '下一步'
+            },
+            failure: {
+                caption: '連線失敗',
+                line1: '請確認你的 Wi-Fi 是否正常運作後，再重新連線',
+                next: '重新連線'
             }
         }
     };
