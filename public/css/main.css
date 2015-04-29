@@ -112,3 +112,8 @@ body {
     padding: 5px 10px;
     text-align: left;
 }
+
+.error {
+    box-sizing: border-box;
+    border: 2px solid #F00;
+}
