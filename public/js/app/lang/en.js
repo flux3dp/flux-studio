@@ -11,15 +11,23 @@ define(function() {
             header2: 'We are getting started from your language',
             start: 'Start'
         },
-        wifi : {
+        wifi: {
             home: {
                 line1: 'Do you have available wifi could be able access?',
                 line2: 'We are helping your FLUX to connecting to wifi',
                 select: 'Yes',
                 no_available_wifi: 'No, I haven\'t'
             },
-            choose_wifi: 'Please choose wifi what you wanna connect',
-            no_wifi_available: 'There is no available wifi'
+            select: {
+                choose_wifi: 'Please choose wifi what you wanna connect',
+                no_wifi_available: 'There is no available wifi'
+            },
+            set_password: {
+                line1: '請輸入「',
+                line2: '」無線網路的連線密碼',
+                cancel: '取消',
+                join: '加入',
+            }
         }
     };
 });

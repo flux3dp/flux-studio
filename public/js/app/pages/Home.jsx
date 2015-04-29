@@ -25,7 +25,7 @@ define([
                                     <SelectView id="select-lang" options={options}/>
                                 </div>
                                 <div>
-                                    <a href="#initize/wifi/ask" className="btn">{this.state.lang.welcome.start}</a>
+                                    <a href="#initialize/wifi/ask" className="btn">{this.state.lang.welcome.start}</a>
                                 </div>
                             </div>
                         </div>

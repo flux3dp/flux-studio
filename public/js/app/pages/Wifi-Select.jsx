@@ -26,7 +26,7 @@ define([
                     var state = this.state,
                         items = this.props.items.map(function(opt, i) {
                             return (<li data-wifi-id={opt.id} data-wifi-name={opt.name}>
-                                <a href="#initize/wifi/set-password/">
+                                <a href="#initialize/wifi/set-password">
                                     <span>{opt.name}</span>
                                     <span className="fa fa-wifi"></span>
                                     <span className="fa fa-lock"></span>

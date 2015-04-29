@@ -35,7 +35,7 @@ function(React, $, Backbone, localStorage, i18n, Observe) {
 
         routes: {
             '': 'home',
-            'initize/wifi(/:step)' : 'wifi',
+            'initialize/wifi(/:step)' : 'wifi',
         },
 
         home: function() {
@@ -50,7 +50,7 @@ function(React, $, Backbone, localStorage, i18n, Observe) {
             });
         },
 
-        wifi : function(step, serial) {
+        wifi : function(step) {
             var map = {
                     'ask'          : 'Wifi-Home',
                     'select'       : 'Wifi-Select',

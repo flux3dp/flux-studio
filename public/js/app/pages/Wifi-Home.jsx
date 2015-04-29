@@ -18,10 +18,10 @@ define([
                                 <h2>{this.state.lang.wifi.home.line1}</h2>
                                 <p>{this.state.lang.wifi.home.line2}</p>
                                 <div>
-                                    <a href="#initize/wifi/select" className="btn">{this.state.lang.wifi.home.select}</a>
+                                    <a href="#initialize/wifi/select" className="btn">{this.state.lang.wifi.home.select}</a>
                                 </div>
                                 <div>
-                                    <a href="#initize/wifi">{this.state.lang.wifi.home.no_available_wifi}</a>
+                                    <a href="#initialize/wifi">{this.state.lang.wifi.home.no_available_wifi}</a>
                                 </div>
                             </div>
                         </div>

@@ -3,8 +3,13 @@ define(['jquery'], function($) {
 
     var url = 'ws://localhost:8080/ws/';
 
-    return function(method) {
-        var ws = new WebSocket(url + method);
+    return function(method, onmessage) {
+        var ws = new WebSocket(url + method),
+            _onmessage = onmessage || function() {};
+
+        ws.onmessage = function(result) {
+            _onmessage(result);
+        };
 
         ws.onclose = function(v) {
             // TODO: do something
@@ -13,10 +18,11 @@ define(['jquery'], function($) {
         };
 
         return {
-            send : function(data) {
+            send : function(data, onmessage) {
+                _onmessage = onmessage || _onmessage || function() {};
+
                 var wait = 0,
                     retry_times = 1000,
-                    $deferred = $.Deferred(),
                     timer = setInterval(function() {
                         // waiting for connected
                         retry_times--;
@@ -40,12 +46,6 @@ define(['jquery'], function($) {
                         wait = 100;
 
                     }, wait);
-
-                ws.onmessage = function(result) {
-                    $deferred.resolve(result);
-                };
-
-                return $deferred.promise();
             },
             close : function() {
                 if (null !== ws) {

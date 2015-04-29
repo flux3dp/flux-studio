@@ -21,6 +21,12 @@ define(function() {
             select: {
                 choose_wifi: '請選擇你要連線的 Wi-Fi',
                 no_wifi_available: '暫時找不到可以連線的 Wi-Fi'
+            },
+            set_password: {
+                line1: '請輸入「',
+                line2: '」無線網路的連線密碼',
+                cancel: '取消',
+                join: '加入',
             }
         }
     };

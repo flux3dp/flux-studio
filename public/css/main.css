@@ -49,15 +49,17 @@ body {
 
 .btn {
     background: -webkit-linear-gradient(top, rgba(30, 87, 153, 1) 0%, rgba(30, 87, 153, .5) 100%);
+    border: none;
     border-radius: 5px;
     box-sizing: border-box;
     color: #fff;
     cursor: pointer;
     display: inline-block;
+    margin: 5px;
     outline: none;
     padding: 20px;
-    text-decoration: none;
     position: relative;
+    text-decoration: none;
 }
 
 .btn:hover::after {
@@ -99,8 +101,8 @@ body {
 .initialization {
     background-color: #fff;
     height: 80%;
-    text-align: center;
     overflow: scroll;
+    text-align: center;
     width: 80%;
 }
 
@@ -110,5 +112,3 @@ body {
     padding: 5px 10px;
     text-align: left;
 }
-
-

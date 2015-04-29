@@ -13,7 +13,7 @@ define([
                 $clicked_el = $me.parents('li');
 
                 localStorage.set(
-                    'active-wifi',
+                    'setting-wifi',
                     {
                         id: $clicked_el.data('wifi-id'),
                         name: $clicked_el.data('wifi-name'),
