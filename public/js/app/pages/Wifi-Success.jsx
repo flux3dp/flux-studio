@@ -19,7 +19,7 @@ define([
                                 <h2>{lang.wifi.success.caption}</h2>
                                 <p>{lang.wifi.success.line1}</p>
                                 <div>
-                                    <a href="#" className="btn">{lang.wifi.success.next}</a>
+                                    <a href="#initialize/wifi/set-printer" className="btn">{lang.wifi.success.next}</a>
                                 </div>
                             </div>
                         </div>
