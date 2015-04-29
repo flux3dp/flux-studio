@@ -11,6 +11,7 @@ body {
 }
 body {
     font-size: 16px;
+    position: relative;
 }
 
 .clearfix:after,
@@ -45,6 +46,46 @@ body {
     box-sizing: border-box;
 }
 
+a {
+    text-decoration: none;
+}
+
+.btn {
+    background: -webkit-linear-gradient(top, rgba(30, 87, 153, 1) 0%, rgba(30, 87, 153, .5) 100%);
+    border-radius: 5px;
+    box-sizing: border-box;
+    color: #fff;
+    cursor: pointer;
+    display: inline-block;
+    outline: none;
+    padding: 20px;
+    position: relative;
+}
+
+.btn:hover::after {
+    background: rgba(255, 255, 255, .1);
+    border-radius: 5px;
+    content: "";
+    display: block;
+    height: 100%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 100%;
+}
+
+.btn:active {
+    background: -webkit-linear-gradient(top, rgba(30, 87, 153, .5) 0%, rgba(30, 87, 153, 1) 100%);
+}
+
+.absolute-center {
+    bottom: 0;
+    left: 0;
+    margin: auto;
+    position: absolute;
+    right: 0;
+    top: 0;
+}
 /**
  * structure
  */
