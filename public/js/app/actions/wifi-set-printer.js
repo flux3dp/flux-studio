@@ -1,6 +1,7 @@
 define([
-    'jquery'
-], function($) {
+    'jquery',
+    'helpers/local-storage'
+], function($, localStorage) {
     'use strict';
 
     return function() {
@@ -9,7 +10,8 @@ define([
 
             // TODO: do validation?
             var $me = $(e.target),
-                $required_fields = $('.required');
+                $required_fields = $('.required'),
+                is_vaild = true;
 
             $('.error').removeClass('error');
 
@@ -18,8 +20,14 @@ define([
 
                 if ('' === $el.val()) {
                     $el.addClass('error');
+                    is_vaild = false;
                 }
             });
+
+            if (true === is_vaild) {
+                localStorage.set('printer-is-ready', true);
+                location.href = '#studio/print';
+            }
         });
     };
 });
