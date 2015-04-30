@@ -3,9 +3,8 @@ define([
     'react',
     'helpers/i18n',
     'jsx!widgets/Select',
-    'app/actions/welcome',
     'css!cssHome/pages/welcome'
-], function($, React, i18n, SelectView, welcomeEvents) {
+], function($, React, i18n, SelectView) {
     'use strict';
 
     return function(args) {
@@ -33,10 +32,6 @@ define([
                 },
                 getInitialState: function() {
                     return args.state;
-                },
-
-                componentDidMount : function() {
-                    welcomeEvents(args);
                 }
 
             });
