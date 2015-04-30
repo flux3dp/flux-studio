@@ -62,7 +62,8 @@ define(function() {
                 printer: '印表機'
             },
             language: '語言',
-            notifications: '通知'
+            notifications: '通知',
+            close: '關閉'
         }
     };
 });

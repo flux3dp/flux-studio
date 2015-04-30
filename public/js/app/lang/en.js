@@ -62,7 +62,8 @@ define(function() {
                 printer: 'Printer'
             },
             language: 'Language',
-            notifications: 'Notifications'
+            notifications: 'Notifications',
+            close: 'Close'
         }
     };
 });
