@@ -90,10 +90,93 @@ body {
 /**
  * structure
  */
+.wrapper {
+    height: 100%;
+}
+
+.sidebar,
+.content {
+    position: fixed;
+}
+
+.sidebar {
+    bottom: 0;
+    display: none;
+    left: 0;
+    margin: 0;
+    position: fixed;
+    top: 0;
+    width: 100px;
+    z-index: 9999;
+}
+
+.content {
+    bottom: 0;
+    height: 100%;
+    left: 0;
+    right: 0;
+    top: 0;
+}
+
+.is-ready .sidebar {
+    display: block;
+}
+
+.is-ready .content {
+    background: #fff;
+    bottom: 0;
+    height: 100%;
+    left: 100px;
+    right: 0;
+    top: 0;
+}
+
+.menu {
+    background: #ddd;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.menu .brand-name {
+    background: #000;
+    color: #fff;
+}
+
+.menu .cog {
+    background: #333;
+    color: #fff;
+}
+
+.menu .fa-cog::before {
+    color: #fff;
+    font-size: 3rem;
+}
+
+.menu .menu-item {
+    height: 100px;
+    line-height: 100px;
+    text-align: center;
+    width: 100%;
+}
+
+.menu .menu-item a {
+    color: #000;
+    display: block;
+    height: 100%;
+    line-height: 100px;
+    text-decoration: none;
+}
+
+.horizontal-menu .menu-item {
+    float: left;
+    width: auto;
+}
 
 /**
  * general style
  */
+
 .pure-list {
     list-style: none;
 }
@@ -114,6 +197,11 @@ body {
 }
 
 .error {
-    box-sizing: border-box;
     border: 2px solid #F00;
+    box-sizing: border-box;
+}
+
+.sticky-bottom {
+    bottom: 0;
+    position: absolute;
 }
