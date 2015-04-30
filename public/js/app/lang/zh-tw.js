@@ -47,6 +47,22 @@ define(function() {
                 notice: '設定密碼，可以確保你的 FLUX 只有知道密碼的人可以操作',
                 next: '下一步'
             }
+        },
+        menu: {
+            print: '列印',
+            laser: 'Laser',
+            scan: 'Scan',
+            usb: 'USB'
+        },
+        settings: {
+            caption: '設定',
+            tabs: {
+                general: '一般',
+                flux_cloud: 'FLUX Could',
+                printer: '印表機'
+            },
+            language: '語言',
+            notifications: '通知'
         }
     };
 });
