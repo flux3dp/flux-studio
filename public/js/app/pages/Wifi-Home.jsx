@@ -21,7 +21,7 @@ define([
                                     <a href="#initialize/wifi/select" className="btn">{this.state.lang.wifi.home.select}</a>
                                 </div>
                                 <div>
-                                    <a href="#initialize/wifi">{this.state.lang.wifi.home.no_available_wifi}</a>
+                                    <a href="#initialize/wifi/ask">{this.state.lang.wifi.home.no_available_wifi}</a>
                                 </div>
                             </div>
                         </div>
