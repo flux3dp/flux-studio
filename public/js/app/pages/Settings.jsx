@@ -49,6 +49,9 @@ define([
                                     </div>
                                 </div>
                             </div>
+                            <footer className="sticky-bottom">
+                                <a className="btn" href="#studio/print">{lang.settings.close}</a>
+                            </footer>
                         </div>
                     )
                 },
