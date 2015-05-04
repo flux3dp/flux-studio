@@ -104,17 +104,54 @@ function(React, $, Backbone, localStorage, i18n, Observe, globalEvents) {
             });
         },
 
-        studio: function() {
+        studio: function(page, params) {
+            var map = {
+                    'settings': this.settings
+                },
+                func = this.settings;
+
+            if (true === map.hasOwnProperty(page)) {
+                func = map[page];
+            }
+
+            func(params);
+
             this.appendSideBar();
+        },
+
+        settings: function(child) {
 
             require(['jsx!pages/Settings', 'app/app-settings'], function(view, settings) {
-                var args = {
-                    props: {
-                        supported_langs: settings.i18n.supported_langs
-                    }
-                };
+                child = (child || '').toLowerCase();
 
-                display(view, args, $('.content')[0]);
+                var childView;
+
+                switch (child) {
+                case 'flux-cloud':
+                    childView = 'Setting-Flux-Cloud';
+                    break;
+
+                case 'printer':
+                    childView = 'Setting-Printer';
+                    break;
+
+                default:
+                    childView = 'Setting-General';
+                    break;
+                }
+
+                display(view, {}, $('.content')[0]);
+
+                // show child view
+                require(['jsx!views/' + childView], function(view) {
+                    var args = {
+                        props: {
+                            supported_langs: settings.i18n.supported_langs
+                        },
+                        child: child
+                    };
+                    display(view, args, $('.tab-container')[0]);
+                });
             });
         },
 
