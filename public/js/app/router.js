@@ -140,7 +140,7 @@ function(React, $, Backbone, localStorage, i18n, Observe, globalEvents) {
                     break;
                 }
 
-                display(view, {}, $('.content')[0]);
+                display(view, {child: child}, $('.content')[0]);
 
                 // show child view
                 require(['jsx!views/' + childView], function(view) {
