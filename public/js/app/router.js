@@ -106,9 +106,10 @@ function(React, $, Backbone, localStorage, i18n, Observe, globalEvents) {
 
         studio: function(page, params) {
             var map = {
+                    'print': this.print,
                     'settings': this.settings
                 },
-                func = this.settings;
+                func = this.print;
 
             if (true === map.hasOwnProperty(page)) {
                 func = map[page];
@@ -117,6 +118,12 @@ function(React, $, Backbone, localStorage, i18n, Observe, globalEvents) {
             func(params);
 
             this.appendSideBar();
+        },
+
+        print: function() {
+            require(['jsx!pages/Print'], function(view) {
+                display(view, {}, $('.content')[0]);
+            });
         },
 
         settings: function(child) {
