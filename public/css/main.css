@@ -70,6 +70,7 @@ body {
 }
 
 .btn:hover::after {
+    pointer-events: none;
     background: rgba(255, 255, 255, .1);
     border-radius: 5px;
     content: "";
@@ -221,6 +222,24 @@ body {
  * general style
  */
 
+.hide {
+    display: none;
+}
+
+.file-importer {
+    position: relative;
+}
+
+.file-importer input[type="file"] {
+    bottom: 0;
+    display: block;
+    left: 0;
+    opacity: 0;
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
 .pure-list {
     list-style: none;
 }
@@ -248,4 +267,14 @@ body {
 .sticky-bottom {
     bottom: 0;
     position: absolute;
+}
+
+.studio-container {
+    padding: 25px;
+}
+
+.model-displayer {
+    width: 100%;
+    height: 500px;
+    background: #000;
 }
