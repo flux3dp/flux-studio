@@ -74,6 +74,12 @@ define(function() {
                 advanced: '進階',
                 join_other_network: '加入其它網路',
                 disconnect_with_this_printer: '中斷這台印表機的連線'
+            },
+            flux_cloud: {
+                caption: 'Get FLUX 3D Printer be remote!',
+                line1: 'Control your FLUX 3D Printer with FLUX Cloud in anywhere you are',
+                start_to_use: 'Start to Use',
+                i_have_an_account: 'I have an account'
             }
         }
     };

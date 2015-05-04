@@ -74,6 +74,12 @@ define(function() {
                 advanced: 'Advanced',
                 join_other_network: 'Join Other Network',
                 disconnect_with_this_printer: 'Disconnect With This Printer'
+            },
+            flux_cloud: {
+                caption: 'Get FLUX 3D Printer be remote!',
+                line1: 'Control your FLUX 3D Printer with FLUX Cloud in anywhere you are',
+                start_to_use: 'Start to Use',
+                i_have_an_account: 'I have an account'
             }
         }
     };
