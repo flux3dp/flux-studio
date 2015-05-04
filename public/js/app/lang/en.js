@@ -81,6 +81,63 @@ define(function() {
                 start_to_use: 'Start to Use',
                 i_have_an_account: 'I have an account'
             }
+        },
+        print: {
+            import: 'Import',
+            go_home: 'Go home',
+            save: 'Save',
+            normal_preview: 'Normal Preview',
+            beginner: 'Beginner',
+            expert: 'Expert',
+            start_print: 'Print',
+            advanced: 'Advanced',
+            params: {
+                basic: {
+                    print_speed: {
+                        text: 'Print Speed',
+                        options: [
+                            {
+                                value: 'slow',
+                                label: 'Slow',
+                                selected: true
+                            }
+                        ]
+                    },
+                    meterial: {
+                        text: 'Meterial',
+                        options: [
+                            {
+                                value: 'pla',
+                                label: 'PLA',
+                                selected: true
+                            }
+                        ]
+                    },
+                    support: {
+                        text: 'Support',
+                        options: [
+                            {
+                                value: 'everywhere',
+                                label: 'Everywhere',
+                                selected: true
+                            }
+                        ]
+                    },
+                    platform: {
+                        text: 'Platform',
+                        options: [
+                            {
+                                value: 'raft',
+                                label: 'Raft',
+                                selected: true
+                            }
+                        ]
+                    }
+                },
+                advanced: {
+
+                }
+            }
         }
     };
 });
