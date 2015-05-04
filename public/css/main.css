@@ -62,6 +62,13 @@ body {
     text-decoration: none;
 }
 
+.btn-link {
+    background: none;
+    color: rgba(30, 87, 153, 1);
+    text-decoration: underline;
+    padding: 0;
+}
+
 .btn:hover::after {
     background: rgba(255, 255, 255, .1);
     border-radius: 5px;
@@ -171,6 +178,43 @@ body {
 .horizontal-menu .menu-item {
     float: left;
     width: auto;
+}
+
+.row-fluid {
+    margin: 10px 0;
+}
+
+.row-fluid .col {
+    float: left;
+}
+
+.span3 {
+    margin: 0 10px;
+    width: calc(100% / 12 * 3 - 20px);
+}
+
+.span4 {
+    margin: 0 10px;
+    width: calc(100% / 12 * 4 - 20px);
+}
+
+.span6 {
+    margin: 0 10px;
+    width: calc(100% / 12 * 6 - 20px);
+}
+
+.span8 {
+    margin: 0 10px;
+    width: calc(100% / 12 * 8 - 20px);
+}
+
+.span9 {
+    margin: 0 10px;
+    width: calc(100% / 12 * 9 - 20px);
+}
+
+.span12 {
+    width: 100%;
 }
 
 /**
