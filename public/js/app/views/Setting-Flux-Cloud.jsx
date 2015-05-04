@@ -17,20 +17,10 @@ define([
 
                     return (
                         <div className="form">
-                            <div>
-                                <label>
-                                    {lang.settings.language}
-                                    <SelectView id="select-lang" options={options}/>
-                                </label>
-                            </div>
-                            <div>
-                                <label>
-                                    {lang.settings.notifications}
-                                    <select>
-                                        <option>None</option>
-                                    </select>
-                                </label>
-                            </div>
+                            <h1>{lang.settings.flux_cloud.caption}</h1>
+                            <h2>{lang.settings.flux_cloud.line1}</h2>
+                            <button className="btn">{lang.settings.flux_cloud.start_to_use}</button>
+                            <button className="btn btn-link">{lang.settings.flux_cloud.i_have_an_account}</button>
                         </div>
                     )
                 },
