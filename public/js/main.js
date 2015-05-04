@@ -10,8 +10,9 @@ require.config({
         views: 'app/views',
         pages: 'app/pages',
         widgets: 'app/widgets',
-        three: 'lib/three',
         threejs: 'lib/three/three.min',
+        threeTransformControls: 'lib/three/controls/TransformControls',
+        threeSTLLoader: 'lib/three/loaders/STLLoader',
         cssHome: '../css'
     },
 
@@ -46,6 +47,18 @@ require.config({
         },
         underscore: {
             exports: '_'
+        },
+        threeTransformControls: {
+            deps: [
+                'threejs'
+            ],
+            exports: 'TransformControls'
+        },
+        threeSTLLoader: {
+            deps: [
+                'threejs'
+            ],
+            exports: 'STLLoader'
         }
     }
 });
