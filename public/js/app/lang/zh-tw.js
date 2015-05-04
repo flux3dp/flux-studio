@@ -63,7 +63,18 @@ define(function() {
             },
             language: '語言',
             notifications: '通知',
-            close: '關閉'
+            close: '關閉',
+            printer: {
+                new_printer: '新增印表機',
+                name: '印表機名稱',
+                current_password: '目前密碼',
+                set_password: '設定密碼',
+                security_notice: '你可以用密碼保護你的印表機',
+                connected_wi_fi: 'Wi-Fi 連線',
+                advanced: '進階',
+                join_other_network: '加入其它網路',
+                disconnect_with_this_printer: '中斷這台印表機的連線'
+            }
         }
     };
 });

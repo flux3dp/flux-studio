@@ -63,7 +63,18 @@ define(function() {
             },
             language: 'Language',
             notifications: 'Notifications',
-            close: 'Close'
+            close: 'Close',
+            printer: {
+                new_printer: 'Add new printer',
+                name: 'Printer Name',
+                current_password: 'Current Password',
+                set_password: 'Set Password',
+                security_notice: 'You can protect your printer with password',
+                connected_wi_fi: 'Connected Wi-Fi',
+                advanced: 'Advanced',
+                join_other_network: 'Join Other Network',
+                disconnect_with_this_printer: 'Disconnect With This Printer'
+            }
         }
     };
 });
