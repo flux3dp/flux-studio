@@ -26,7 +26,7 @@ define([
                                 <a href="#studio/usb">{lang.menu.usb}</a>
                             </li>
                             <li className="menu-item cog sticky-bottom">
-                                <a className="fa fa-cog" href="#studio/settings"></a>
+                                <a className="fa fa-cog" href="#studio/settings/general"></a>
                             </li>
                         </ul>
                     );
