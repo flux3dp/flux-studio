@@ -8,8 +8,12 @@ require.config({
         react: 'lib/react/react-with-addons.min',
         JSXTransformer: 'lib/react/JSXTransformer',
         views: 'app/views',
-        three: 'lib/three',
-        threejs: 'lib/three/three.min'
+        pages: 'app/pages',
+        widgets: 'app/widgets',
+        threejs: 'lib/three/three.min',
+        threeTransformControls: 'lib/three/controls/TransformControls',
+        threeSTLLoader: 'lib/three/loaders/STLLoader',
+        cssHome: '../css'
     },
 
     jsx: {
@@ -43,6 +47,18 @@ require.config({
         },
         underscore: {
             exports: '_'
+        },
+        threeTransformControls: {
+            deps: [
+                'threejs'
+            ],
+            exports: 'TransformControls'
+        },
+        threeSTLLoader: {
+            deps: [
+                'threejs'
+            ],
+            exports: 'STLLoader'
         }
     }
 });

@@ -1,0 +1,28 @@
+.settings header {
+    background: #DDD;
+    padding: 25px;
+    padding-bottom: 0;
+}
+
+.settings header h1 {
+    margin-top: 0;
+}
+
+.settings .menu {
+    margin: 0 auto;
+    width: 60%;
+}
+
+.settings .menu .menu-item {
+    width: calc(100% / 3);
+}
+
+.settings .tabs .active {
+    background: rgba(255, 255, 255, 0.7);
+}
+
+.settings .form {
+    margin: 0 auto;
+    padding: 25px;
+    width: 80%;
+}
