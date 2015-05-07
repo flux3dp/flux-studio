@@ -1,8 +1,10 @@
 define([
     'jquery',
     'react',
-    'app/actions/print'
-], function($, React, printEvents) {
+    'helpers/display',
+    'app/actions/print',
+    'jsx!widgets/Radio-Group'
+], function($, React, display, printEvents, RadioGroupView) {
     'use strict';
 
     return function(args) {
@@ -22,8 +24,9 @@ define([
                                 <button className="btn fa fa-home">{lang.print.go_home}</button>
                                 <button className="btn fa fa-floppy-o">{lang.print.save}</button>
                                 <button className="btn fa fa-eye">{lang.print.normal_preview}</button>
-                                <button className="btn">{lang.print.beginner}</button>
+                                <RadioGroupView className="btn" name="print-mode" options={lang.print.mode}/>
                             </header>
+                            <div id="operating-panel" className="operating-panel"></div>
                             <div id="model-displayer" className="model-displayer"></div>
                         </div>
                     )
@@ -32,7 +35,7 @@ define([
                     return args.state;
                 },
                 componentDidMount: function() {
-                    printEvents();
+                    printEvents(args);
                 }
 
             });
