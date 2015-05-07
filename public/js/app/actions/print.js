@@ -1,9 +1,10 @@
 define([
     'jquery',
     'helpers/file-system',
+    'helpers/display',
     'threeTransformControls',
     'threeSTLLoader'
-], function($, fileSystem) {
+], function($, fileSystem, display) {
     'use strict';
 
     var container, stats;
@@ -48,7 +49,7 @@ define([
         scene = new THREE.Scene();
 
         // grid helper
-        var gridHelper = new THREE.GridHelper( 500, 10 );
+        var gridHelper = new THREE.GridHelper( 500, 50 );
         scene.add( gridHelper );
 
         // Lights
@@ -113,13 +114,12 @@ define([
             },
             false
         );
-        renderer.domElement.addEventListener( 'mousemove', onDocumentMouseDown, false );
     }
 
     function addShadowedLight(x, y, z, color, intensity) {
 
         var directionalLight = new THREE.DirectionalLight(color, intensity);
-        directionalLight.position.set(x, y, z)
+        directionalLight.position.set(x, y, z);
         scene.add(directionalLight);
 
         directionalLight.castShadow = true;
@@ -143,7 +143,6 @@ define([
     }
 
     function animate() {
-        // scene.rotation.y += .01;
         requestAnimationFrame(animate);
 
         render();
@@ -151,13 +150,7 @@ define([
     }
 
     function render() {
-        // camera.lookAt(cameraTarget);
-
         control.update();
-        // objects.forEach(function(e, k) {
-        //     e.position.y = 1;
-        // });
-
         renderer.render(scene, camera);
     }
 
@@ -172,7 +165,6 @@ define([
     }
 
     function onDocumentMouseDown(event) {
-        // console.log(event);
         event.preventDefault();
 
         var selected;
@@ -197,14 +189,27 @@ define([
         return selected;
     }
 
-    return function() {
+    return function(args) {
         init();
         animate();
 
-        // appendModel('filesystem:http://localhost/temporary/Green_dragon_body.stl');
-
         var $uploader = $('#uploader'),
             $uploader_file_control = $uploader.find('[type="file"]'),
+            $print_mode = $('[name="print-mode"]'),
+            toggleMode = function() {
+                switch ($('[name="print-mode"]:checked').val()) {
+                case 'expert':
+                    require(['jsx!views/print-operating-panels/Expert'], function(view) {
+                        display(view, args, $('#operating-panel')[0]);
+                    });
+                    break;
+                case 'beginner':
+                    require(['jsx!views/print-operating-panels/Beginner'], function(view) {
+                        display(view, args, $('#operating-panel')[0]);
+                    });
+                    break;
+                }
+            },
             readfiles = function(files) {
                 for (var i = 0; i < files.length; i++) {
                     fileSystem.writeFile(
@@ -212,12 +217,13 @@ define([
                         {
                             onComplete: function(e, fileEntry) {
                                 appendModel(fileEntry.toURL());
-                                // console.log(fileEntry.toURL());
                             }
                         }
                     );
 
                 }
+
+                toggleMode();
             };
 
         $uploader_file_control.on('change', function(e) {
@@ -231,6 +237,10 @@ define([
         $uploader.on('drop', function(e) {
             e.preventDefault();
             readfiles(e.originalEvent.dataTransfer.files);
+        });
+
+        $print_mode.on('click', function(e) {
+            toggleMode();
         });
     };
 });
