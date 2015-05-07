@@ -65,18 +65,18 @@ body {
 .btn-link {
     background: none;
     color: rgba(30, 87, 153, 1);
-    text-decoration: underline;
     padding: 0;
+    text-decoration: underline;
 }
 
 .btn:hover::after {
-    pointer-events: none;
     background: rgba(255, 255, 255, .1);
     border-radius: 5px;
     content: "";
     display: block;
     height: 100%;
     left: 0;
+    pointer-events: none;
     position: absolute;
     top: 0;
     width: 100%;
@@ -215,6 +215,7 @@ body {
 }
 
 .span12 {
+    margin: 0;
     width: 100%;
 }
 
@@ -236,8 +237,8 @@ body {
     left: 0;
     opacity: 0;
     position: absolute;
-    top: 0;
     right: 0;
+    top: 0;
 }
 
 .pure-list {
@@ -270,11 +271,33 @@ body {
 }
 
 .studio-container {
+    height: 100%;
     padding: 25px;
+    position: relative;
 }
 
 .model-displayer {
-    width: 100%;
-    height: 500px;
     background: #000;
+    height: 90%;
+    width: 100%;
+}
+
+.operating-panel {
+    background: rgba(255, 255, 255, .7);
+    position: absolute;
+    width: 300px;
+}
+
+.operating-panel .panel {
+    padding: 10px;
+}
+
+.operating-panel .param-icon {
+    color: #777;
+    font-size: 2rem;
+    line-height: 5rem;
+}
+
+.operating-panel .param {
+    height: 5rem;
 }
