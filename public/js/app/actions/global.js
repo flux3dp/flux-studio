@@ -2,7 +2,6 @@ define([
     'jquery',
     'helpers/i18n',
     'helpers/local-storage'
-
 ], function($, i18n, localStorage) {
     'use strict';
 
