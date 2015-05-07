@@ -87,18 +87,31 @@ define(function() {
             go_home: 'Go home',
             save: 'Save',
             normal_preview: 'Normal Preview',
-            beginner: 'Beginner',
-            expert: 'Expert',
             start_print: 'Print',
             advanced: 'Advanced',
+            mode: [
+                {
+                    value: 'beginner',
+                    label: 'Beginner',
+                    checked: true
+                },
+                {
+                    value: 'expert',
+                    label: 'Expert'
+                }
+            ],
             params: {
-                basic: {
+                beginner: {
                     print_speed: {
                         text: 'Print Speed',
                         options: [
                             {
                                 value: 'slow',
-                                label: 'Slow',
+                                label: '心則慢'
+                            },
+                            {
+                                value: 'fast',
+                                label: '世界越快',
                                 selected: true
                             }
                         ]
@@ -119,7 +132,11 @@ define(function() {
                             {
                                 value: 'everywhere',
                                 label: 'Everywhere',
-                                selected: true
+                                checked: true
+                            },
+                            {
+                                value: 'nowhere',
+                                label: 'nowhere'
                             }
                         ]
                     },
@@ -134,8 +151,46 @@ define(function() {
                         ]
                     }
                 },
-                advanced: {
-
+                expert: {
+                    layer_height: {
+                        text: 'Layer Height',
+                        value: 0.3,
+                        unit: 'mm'
+                    },
+                    print_speed: {
+                        text: 'Print Speed',
+                        value: 50,
+                        unit: 'mm/s'
+                    },
+                    temperature: {
+                        text: 'Temperature',
+                        value: 231,
+                        unit: '°C'
+                    },
+                    support: {
+                        text: 'Support',
+                        options: [
+                            {
+                                value: 'everywhere',
+                                label: 'Everywhere',
+                                checked: true
+                            },
+                            {
+                                value: 'nowhere',
+                                label: 'nowhere'
+                            }
+                        ]
+                    },
+                    platform: {
+                        text: 'Platform',
+                        options: [
+                            {
+                                value: 'raft',
+                                label: 'Raft',
+                                checked: true
+                            }
+                        ]
+                    }
                 }
             }
         }
