@@ -2,38 +2,18 @@ define([
     'react',
     'jquery',
     'backbone',
-    'helpers/local-storage',
-    'helpers/i18n',
-    'helpers/observe',
-    'app/actions/global',
+    'helpers/display',
+    'app/actions/global'
 ],
-function(React, $, Backbone, localStorage, i18n, Observe, globalEvents) {
+function(React, $, Backbone, display, globalEvents) {
     'use strict';
-    var display = function(view, args, el) {
+
+    var _display = function(view, args) {
         args = args || {};
-        args.props = args.props || {};
-        args.state = args.state || {};
-        el = el || $('.content')[0];
-
-        args.state.lang = i18n.get();
-
-        var currentView;
-
-        // watching state and auto update
-        new Observe(args.state, function(changes) {
-            currentView.setState(args.state);
-        });
-
-        view = React.createFactory(view(args));
-        view = view();
-
-        view.props = args.props;
-
-        currentView = React.render(view, el);
 
         // WARNING: this function includes GLOBAL LIVE EVENTS.
         // DO NOT use non-uniqle selector here (e.g. class, tag name, attribute...etc.)
-        globalEvents(args);
+        display(view, args, $('.content')[0], globalEvents);
     };
 
     return Backbone.Router.extend({
@@ -73,7 +53,7 @@ function(React, $, Backbone, localStorage, i18n, Observe, globalEvents) {
                     }
                 };
 
-                display(view, args);
+                _display(view, args);
             });
         },
 
@@ -94,7 +74,7 @@ function(React, $, Backbone, localStorage, i18n, Observe, globalEvents) {
             }
 
             require(['jsx!pages/' + view_name], function(view) {
-                display(view);
+                _display(view);
             });
         },
 
@@ -122,7 +102,7 @@ function(React, $, Backbone, localStorage, i18n, Observe, globalEvents) {
 
         print: function() {
             require(['jsx!pages/Print'], function(view) {
-                display(view, {}, $('.content')[0]);
+                _display(view);
             });
         },
 
@@ -147,7 +127,7 @@ function(React, $, Backbone, localStorage, i18n, Observe, globalEvents) {
                     break;
                 }
 
-                display(view, {child: child}, $('.content')[0]);
+                _display(view, {child: child});
 
                 // show child view
                 require(['jsx!views/' + childView], function(view) {
