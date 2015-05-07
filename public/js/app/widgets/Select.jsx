@@ -45,6 +45,7 @@ define(['react'], function(React){
                         multiple={this.props.multiple}
                         name={this.props.name}
                         id={this.props.id}
+                        className={this.props.className}
                     >
                         {options}
                     </select>;
