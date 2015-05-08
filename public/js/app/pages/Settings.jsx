@@ -3,8 +3,9 @@ define([
     'react',
     'helpers/i18n',
     'jsx!widgets/Select',
+    'helpers/display',
     'css!cssHome/pages/settings'
-], function($, React, i18n, SelectView) {
+], function($, React, i18n, SelectView, display) {
     'use strict';
 
     return function(args) {
@@ -37,7 +38,7 @@ define([
                                     </li>
                                 </ul>
                             </header>
-                            <div className="tab-container"></div>
+                            <div className="tab-container"/>
                             <footer className="sticky-bottom">
                                 <a className="btn" href="#studio/print">{lang.settings.close}</a>
                             </footer>
@@ -47,8 +48,35 @@ define([
 
                 getInitialState: function() {
                     return args.state;
-                }
+                },
 
+                componentDidMount: function() {
+                    var childView;
+
+                    switch (args.child) {
+                    case 'flux-cloud':
+                        childView = 'Setting-Flux-Cloud';
+                        break;
+
+                    case 'printer':
+                        childView = 'Setting-Printer';
+                        break;
+
+                    default:
+                        childView = 'Setting-General';
+                        break;
+                    }
+
+                    // show child view
+                    require(['jsx!views/settings/' + childView, 'app/app-settings'], function(view, settings) {
+                        var args = {
+                            props: {
+                                supported_langs: settings.i18n.supported_langs
+                            }
+                        };
+                        display(view, args, $('.tab-container')[0]);
+                    });
+                }
             });
 
         return HomeView;
