@@ -22,7 +22,7 @@ define([
                             <button className="btn">{lang.settings.flux_cloud.start_to_use}</button>
                             <button className="btn btn-link">{lang.settings.flux_cloud.i_have_an_account}</button>
                         </div>
-                    )
+                    );
                 },
 
                 getInitialState: function() {

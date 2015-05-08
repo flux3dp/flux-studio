@@ -62,6 +62,10 @@ body {
     text-decoration: none;
 }
 
+.btn-warning {
+    background: -webkit-linear-gradient(top, rgba(123, 0, 0, 1.0) 0%, rgba(123, 0, 0, .5) 100%);
+}
+
 .btn-link {
     background: none;
     color: rgba(30, 87, 153, 1);
@@ -115,7 +119,6 @@ body {
     position: fixed;
     top: 0;
     width: 100px;
-    z-index: 9999;
 }
 
 .content {
@@ -137,6 +140,10 @@ body {
     left: 100px;
     right: 0;
     top: 0;
+}
+
+.is-ready .popup-window {
+    display: none;
 }
 
 .menu {
@@ -215,7 +222,8 @@ body {
 }
 
 .span12 {
-    margin: 0;
+    margin-left: 0;
+    margin-right: 0;
     width: 100%;
 }
 
@@ -289,7 +297,9 @@ body {
 }
 
 .operating-panel .panel {
+    background: #DDD;
     padding: 10px;
+    position: fixed;
 }
 
 .operating-panel .param-icon {
@@ -300,4 +310,16 @@ body {
 
 .operating-panel .param {
     height: 5rem;
+}
+
+.popup-window {
+    background: rgba(0, 0, 0, 0.5);
+    bottom: 0;
+    height: 100%;
+    left: 0;
+    position: fixed;
+    right: 0;
+    top: 0;
+    width: 100%;
+    z-index: 9999;
 }
