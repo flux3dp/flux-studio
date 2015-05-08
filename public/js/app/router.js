@@ -8,12 +8,13 @@ define([
 function(React, $, Backbone, display, globalEvents) {
     'use strict';
 
-    var _display = function(view, args) {
+    var _display = function(view, args, el) {
         args = args || {};
+        el = el || $('.content')[0];
 
         // WARNING: this function includes GLOBAL LIVE EVENTS.
         // DO NOT use non-uniqle selector here (e.g. class, tag name, attribute...etc.)
-        display(view, args, $('.content')[0], globalEvents);
+        display(view, args, el, globalEvents);
     };
 
     return Backbone.Router.extend({
@@ -53,7 +54,7 @@ function(React, $, Backbone, display, globalEvents) {
                     }
                 };
 
-                _display(view, args);
+                _display(view, args, $('.popup-window')[0]);
             });
         },
 
@@ -74,7 +75,7 @@ function(React, $, Backbone, display, globalEvents) {
             }
 
             require(['jsx!pages/' + view_name], function(view) {
-                _display(view);
+                _display(view, {}, $('.popup-window')[0]);
             });
         },
 
@@ -84,8 +85,12 @@ function(React, $, Backbone, display, globalEvents) {
             });
         },
 
-        studio: function(page, params) {
-            var map = {
+        studio: function(page, args) {
+            args = args || '';
+
+            var requests = args.split('/'),
+                child_view = requests.splice(0, 1)[0],
+                map = {
                     'print': this.print,
                     'settings': this.settings
                 },
@@ -95,7 +100,7 @@ function(React, $, Backbone, display, globalEvents) {
                 func = map[page];
             }
 
-            func(params);
+            func(child_view, requests);
 
             this.appendSideBar();
         },
@@ -106,39 +111,17 @@ function(React, $, Backbone, display, globalEvents) {
             });
         },
 
-        settings: function(child) {
-
+        settings: function(child, requests) {
             require(['jsx!pages/Settings', 'app/app-settings'], function(view, settings) {
                 child = (child || '').toLowerCase();
 
-                var childView;
-
-                switch (child) {
-                case 'flux-cloud':
-                    childView = 'Setting-Flux-Cloud';
-                    break;
-
-                case 'printer':
-                    childView = 'Setting-Printer';
-                    break;
-
-                default:
-                    childView = 'Setting-General';
-                    break;
-                }
-
-                _display(view, {child: child});
-
-                // show child view
-                require(['jsx!views/' + childView], function(view) {
-                    var args = {
-                        props: {
-                            supported_langs: settings.i18n.supported_langs
-                        },
-                        child: child
+                var childView,
+                    args = {
+                        child: child,
+                        requests: requests
                     };
-                    display(view, args, $('.tab-container')[0]);
-                });
+
+                _display(view, args);
             });
         },
 
