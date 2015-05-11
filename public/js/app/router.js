@@ -92,7 +92,8 @@ function(React, $, Backbone, display, globalEvents) {
                 child_view = requests.splice(0, 1)[0],
                 map = {
                     'print': this.print,
-                    'settings': this.settings
+                    'settings': this.settings,
+                    'laser': this.laser
                 },
                 func = this.print;
 
@@ -122,6 +123,12 @@ function(React, $, Backbone, display, globalEvents) {
                     };
 
                 _display(view, args);
+            });
+        },
+
+        laser: function() {
+            require(['jsx!pages/Laser'], function(view) {
+                _display(view);
             });
         },
 

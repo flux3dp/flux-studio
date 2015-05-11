@@ -27,8 +27,9 @@ define(function() {
          *     onError: firing when error occurred
          */
         requestFileSystem = function(options, callback) {
+            var requestFileSystem = window.requestFileSystem || window.webkitRequestFileSystem;
 
-            window.webkitRequestFileSystem(
+            requestFileSystem(
                 window.TEMPORARY,
                 options.size || defaults.size,
                 function(fileSystem) {
@@ -58,6 +59,10 @@ define(function() {
                             fileWriter.onwriteend = function(e) {
                                 options.onComplete(e, fileEntry);
                             };
+
+                            if (true === options.append) {
+                                fileWriter.seek(fileWriter.length);
+                            }
 
                             fileWriter.onerror = options.onError;
 

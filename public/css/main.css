@@ -196,6 +196,11 @@ body {
     float: left;
 }
 
+.span2 {
+    margin: 0 10px;
+    width: calc(100% / 12 * 2 - 20px);
+}
+
 .span3 {
     margin: 0 10px;
     width: calc(100% / 12 * 3 - 20px);
@@ -206,9 +211,19 @@ body {
     width: calc(100% / 12 * 4 - 20px);
 }
 
+.span5 {
+    margin: 0 10px;
+    width: calc(100% / 12 * 5 - 20px);
+}
+
 .span6 {
     margin: 0 10px;
     width: calc(100% / 12 * 6 - 20px);
+}
+
+.span7 {
+    margin: 0 10px;
+    width: calc(100% / 12 * 7 - 20px);
 }
 
 .span8 {
@@ -239,6 +254,11 @@ body {
     position: relative;
 }
 
+.laser-studio .file-importer {
+    height: 100%;
+    text-align: center;
+}
+
 .file-importer input[type="file"] {
     bottom: 0;
     display: block;
@@ -247,6 +267,7 @@ body {
     position: absolute;
     right: 0;
     top: 0;
+    width: 100%;
 }
 
 .pure-list {
@@ -285,19 +306,21 @@ body {
 }
 
 .model-displayer {
-    background: #000;
     height: 90%;
     width: 100%;
 }
 
+.print-studio .model-displayer {
+    background: #000;
+}
+
 .operating-panel {
-    background: rgba(255, 255, 255, .7);
     position: absolute;
     width: 300px;
 }
 
 .operating-panel .panel {
-    background: #DDD;
+    background: rgba(255, 255, 255, .7);
     padding: 10px;
     position: fixed;
 }
@@ -310,6 +333,24 @@ body {
 
 .operating-panel .param {
     height: 5rem;
+}
+
+.object-params {
+    right: 25px;
+    width: 22%;
+}
+
+.laser-object {
+    border: 1px solid #DDD;
+    border-radius: 50%;
+    bottom: 0;
+    height: 400px;
+    left: 0;
+    margin: auto;
+    position: fixed;
+    right: 0;
+    top: 0;
+    width: 400px;
 }
 
 .popup-window {

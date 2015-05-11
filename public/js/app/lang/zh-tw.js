@@ -193,6 +193,54 @@ define(function() {
                     }
                 }
             }
+        },
+        laser: {
+            import: 'Import',
+            save: 'Save',
+            acceptable_files: 'JPG, PNG, PDF, AI',
+            drop_files_to_import: 'Drop your file here or click "import" to upload your file',
+            change_setup: 'Change Setup',
+            start_laser: 'Start',
+            print_params: {
+                method: {
+                    text: 'Method',
+                    options: {
+                        engrave: 'Engrave'
+                    }
+                },
+                meterial: {
+                    text: 'Meterial',
+                    options: [
+                        {
+                            value: 'wood',
+                            label: 'Wood',
+                            selected: true
+                        }
+                    ]
+                },
+                object_height: {
+                    text: 'Object Height',
+                    unit: 'mm'
+                }
+            },
+            object_params: {
+                position: {
+                    text: 'POSITION'
+                },
+                size: {
+                    text: 'SIZE',
+                    unit: {
+                        width: 'Width',
+                        height: 'Height'
+                    }
+                },
+                rotate: {
+                    text: 'ROTATE'
+                },
+                unit: {
+                    text: 'Unit'
+                }
+            }
         }
     };
 });
