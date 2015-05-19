@@ -26,7 +26,8 @@ define([
 
             if (true === is_vaild) {
                 localStorage.set('printer-is-ready', true);
-                location.href = '#studio/print';
+                //location.href = '#studio/print';
+                location.href='#initialize/wifi/setup-complete'
             }
         });
     };
