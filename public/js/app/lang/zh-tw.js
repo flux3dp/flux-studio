@@ -241,6 +241,72 @@ define(function() {
                     text: 'Unit'
                 }
             }
+        },
+        scan: {
+            start_scan: 'Scan',
+            rescan: 'Rescan',
+            export: 'Export',
+            share: 'Share',
+            print_with_flux: 'Print with FLUX',
+            convert_to_3d_model: 'Convert to 3D model...',
+            complete: 'Complete',
+            save_as: 'Save as',
+            do_save: 'Save',
+            save_mode: [
+                {
+                    value: 'stl',
+                    label: 'STL',
+                    checked: true
+                },
+                {
+                    value: 'pcd',
+                    label: 'PCD'
+                },
+            ],
+            scan_params: {
+                scan_speed: {
+                    text: 'Scan Speed',
+                    options: [
+                        {
+                            value: 'fast',
+                            label: 'Fast Scan',
+                            selected: true
+                        },
+                        {
+                            value: 'slow',
+                            label: 'Slow Scan'
+                        }
+                    ]
+                },
+                object: {
+                    text: 'Object',
+                    options: [
+                        {
+                            value: 'auto',
+                            label: 'Auto',
+                            selected: true
+                        },
+                        {
+                            value: 'manually',
+                            label: 'Manually'
+                        }
+                    ],
+                    tooltip: {
+                        text: '依據你的物件狀態，你可以選擇不同的亮度',
+                        items: [
+                            {
+                                label: 'Light'
+                            },
+                            {
+                                label: 'Normal'
+                            },
+                            {
+                                label: 'Dark'
+                            }
+                        ]
+                    }
+                }
+            }
         }
     };
 });
