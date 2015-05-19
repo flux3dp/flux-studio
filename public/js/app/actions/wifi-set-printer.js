@@ -46,6 +46,9 @@ define([
                     localStorage.set('printer-is-ready', true);
                     location.href = '#studio/print';
                 }
+
+                localStorage.set('printer-is-ready', true);
+                location.href='#initialize/wifi/setup-complete';
             }
         });
     };

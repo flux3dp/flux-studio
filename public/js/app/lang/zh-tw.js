@@ -46,6 +46,23 @@ define(function() {
                 password_placeholder: '設定密碼',
                 notice: '設定密碼，可以確保你的 FLUX 只有知道密碼的人可以操作',
                 next: '下一步'
+            },
+            setup_complete: {
+                caption: '現在我們已經完成髓有的設定了！',
+                description: '快點開始進行你的第一次列印吧！',
+                start: '開始使用FLUX'
+            },
+            flux_as_wifi_1: {
+                caption: '我們正在讓你的FLUX變成一個無線基地台...',
+                description: '如此一來，你就可以透過內部的網路來控制你的FLUX',
+                next: '下一步',
+                footer: '我想要改回使用Wifi連線'
+            },
+            flux_as_wifi_2: {
+                caption: '你的FLUX已經成為一個無線基地台',
+                description: '只剩下為你的FLUX做一些單的設定就可以開始使用了 :)',
+                next: '下一步',
+                footer: '我想要改回使用Wifi連線'
             }
         },
         menu: {

@@ -27,7 +27,7 @@ function(React, $, Backbone, display, globalEvents) {
                     [/^.*$/, 'e404', this.e404],
                     // initialize Flux Printer
                     [
-                        /^initialize\/wifi\/?(ask|select|spot|set-printer|set-password|success|failure)?/,
+                        /^initialize\/wifi\/?(ask|select|spot|set-printer|set-password|flux-as-wifi-1|flux-as-wifi-2|setup-complete|success|failure)?/,
                         'initial',
                         this.initial
                     ],
@@ -65,6 +65,9 @@ function(React, $, Backbone, display, globalEvents) {
                     'spot': 'Wifi-Spot',
                     'set-printer': 'Wifi-Set-Printer',
                     'set-password': 'Wifi-Set-Password',
+                    'setup-complete': 'Wifi-Setup-Complete',
+                    'flux-as-wifi-1': 'Wifi-Flux-As-Wifi-1',
+                    'flux-as-wifi-2': 'Wifi-Flux-As-Wifi-2',
                     'success': 'Wifi-Success',
                     'failure': 'Wifi-Failure'
                 },

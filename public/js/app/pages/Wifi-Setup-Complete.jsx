@@ -15,6 +15,9 @@ define([
                 return args.state;
             },
 
+            componentDidMount: function() {
+            },
+
             render : function() {
                 var lang = this.state.lang;
 
@@ -22,11 +25,14 @@ define([
                     <div className="wifi initialization absolute-center">
                         <h1>{lang.brand_name}</h1>
                         <div>
-                            <h2>{lang.wifi.success.caption}</h2>
-                            <p>{lang.wifi.success.line1}</p>
-                            <div>
-                                <a href="#initialize/wifi/set-printer" className="btn">{lang.wifi.success.next}</a>
-                            </div>
+                            <img src="http://placehold.it/350x150" />
+                        </div>
+                        <div>
+                            <h2>{lang.wifi.setup_complete.caption}</h2>
+                            <span>{lang.wifi.setup_complete.description}</span>
+                        </div>
+                        <div>
+                            <button className="btn">{lang.wifi.setup_complete.start}</button>
                         </div>
                     </div>
                 )
