@@ -9,6 +9,8 @@ define([
 ], function(React, $, i18n, Observe) {
     'use strict';
 
+    var views = [];
+
     return function(view, args, el, callback) {
         callback = callback || function() {};
         args = args || {};
@@ -17,11 +19,11 @@ define([
 
         args.state.lang = i18n.get();
 
-        var currentView;
-
         // watching state and auto update
         new Observe(args.state, function(changes) {
-            currentView.setState(args.state);
+            views.forEach(function(view, key) {
+                view.setState(args.state);
+            });
         });
 
         view = React.createFactory(view(args));
@@ -29,7 +31,7 @@ define([
 
         view.props = args.props;
 
-        currentView = React.render(view, el);
+        views.push(React.render(view, el));
 
         callback(args);
     };

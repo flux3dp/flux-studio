@@ -62,6 +62,10 @@ body {
     text-decoration: none;
 }
 
+.btn-warning {
+    background: -webkit-linear-gradient(top, rgba(123, 0, 0, 1.0) 0%, rgba(123, 0, 0, .5) 100%);
+}
+
 .btn-link {
     background: none;
     color: rgba(30, 87, 153, 1);
@@ -86,15 +90,6 @@ body {
     background: -webkit-linear-gradient(top, rgba(30, 87, 153, .5) 0%, rgba(30, 87, 153, 1) 100%);
 }
 
-.absolute-center {
-    bottom: 0;
-    left: 0;
-    margin: auto;
-    position: absolute;
-    right: 0;
-    top: 0;
-}
-
 /**
  * structure
  */
@@ -115,7 +110,6 @@ body {
     position: fixed;
     top: 0;
     width: 100px;
-    z-index: 9999;
 }
 
 .content {
@@ -137,6 +131,10 @@ body {
     left: 100px;
     right: 0;
     top: 0;
+}
+
+.is-ready .popup-window {
+    display: none;
 }
 
 .menu {
@@ -189,6 +187,13 @@ body {
     float: left;
 }
 
+/* cols width */
+
+.span2 {
+    margin: 0 10px;
+    width: calc(100% / 12 * 2 - 20px);
+}
+
 .span3 {
     margin: 0 10px;
     width: calc(100% / 12 * 3 - 20px);
@@ -199,9 +204,19 @@ body {
     width: calc(100% / 12 * 4 - 20px);
 }
 
+.span5 {
+    margin: 0 10px;
+    width: calc(100% / 12 * 5 - 20px);
+}
+
 .span6 {
     margin: 0 10px;
     width: calc(100% / 12 * 6 - 20px);
+}
+
+.span7 {
+    margin: 0 10px;
+    width: calc(100% / 12 * 7 - 20px);
 }
 
 .span8 {
@@ -215,9 +230,90 @@ body {
 }
 
 .span12 {
-    margin: 0;
+    margin-left: 0;
+    margin-right: 0;
     width: 100%;
 }
+
+/* position */
+.absolute-center {
+    bottom: 0;
+    left: 0;
+    margin: auto;
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+
+/**
+ * helper style
+ */
+.tooltip {
+    display: inline-block;
+}
+
+.tooltip::before {
+    border: 1px solid #ccc;
+    border-radius: 50%;
+    content: "?";
+    cursor: pointer;
+    display: inline-block;
+    height: 20px;
+    line-height: 20px;
+    text-align: center;
+    width: 20px;
+}
+
+.tooltip:hover .tooltip-content {
+    background: rgba(0, 0, 0, .7);
+    height: auto;
+    min-width: 400px;
+    overflow: visible;
+    padding: 10px;
+    width: auto;
+}
+
+.tooltip .tooltip-content {
+    background: rgba(0, 0, 0, 0);
+    color: #eee;
+    display: inline-block;
+    height: 0;
+    left: 100%;
+    overflow: hidden;
+    position: absolute;
+    -o-transition: all .3s ease-out;
+    -webkit-transition: all .3s ease-out;
+    transition: all .3s ease-out;
+    width: 0;
+    z-index: 9999;
+}
+
+.tooltip:hover .tooltip-content::before {
+    border: 10px solid transparent;
+    border-right: 10px solid rgba(0, 0, 0, .7);
+    left: -20px;
+}
+
+.tooltip .tooltip-content::before {
+    border: 5px solid transparent;
+    border-right: 5px solid rgba(0, 0, 0, 0);
+    content: "";
+    left: 0;
+    position: absolute;
+    top: 1px;
+    -o-transition: all .3s ease-out;
+    -webkit-transition: all .3s ease-out;
+    transition: all .3s ease-out;
+}
+
+.invisible {
+    visibility: hidden;
+}
+
+.visible {
+    visibility: visible;
+}
+
 
 /**
  * general style
@@ -231,6 +327,11 @@ body {
     position: relative;
 }
 
+.laser-studio .file-importer {
+    height: 100%;
+    text-align: center;
+}
+
 .file-importer input[type="file"] {
     bottom: 0;
     display: block;
@@ -239,6 +340,7 @@ body {
     position: absolute;
     right: 0;
     top: 0;
+    width: 100%;
 }
 
 .pure-list {
@@ -277,19 +379,24 @@ body {
 }
 
 .model-displayer {
-    background: #000;
     height: 90%;
     width: 100%;
 }
 
+.print-studio .model-displayer {
+    background: #000;
+}
+
 .operating-panel {
-    background: rgba(255, 255, 255, .7);
     position: absolute;
     width: 300px;
 }
 
 .operating-panel .panel {
+    background: rgba(212, 212, 212, 0.7);
     padding: 10px;
+    position: fixed;
+    z-index: 999;
 }
 
 .operating-panel .param-icon {
@@ -300,4 +407,94 @@ body {
 
 .operating-panel .param {
     height: 5rem;
+}
+
+.object-params {
+    right: 25px;
+    width: 22%;
+}
+
+.laser-object {
+    border: 1px solid #DDD;
+    border-radius: 50%;
+    bottom: 0;
+    height: 400px;
+    left: 0;
+    margin: auto;
+    position: fixed;
+    right: 0;
+    top: 0;
+    width: 400px;
+}
+
+.popup-window {
+    background: rgba(0, 0, 0, 0.5);
+    bottom: 0;
+    height: 100%;
+    left: 0;
+    position: fixed;
+    right: 0;
+    top: 0;
+    width: 100%;
+    z-index: 9999;
+}
+
+.popup-window .popup-background {
+    bottom: 0;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+
+.scan-studio .section-container,
+.scan-studio .starting-section {
+    height: 100%;
+    width: 100%;
+}
+
+.scan-studio .starting-section {
+    position: relative;
+}
+
+.scan-studio .launch-img {
+    display: block;
+    height: 193px;
+    width: 280px;
+}
+
+.scan-studio .operating-section {
+    height: 100%;
+    position: relative;
+    width: 100%;
+}
+
+.scan-progress {
+    background: #eee;
+    border-radius: 5px;
+    height: 150px;
+    padding: 10px;
+    width: 60%;
+}
+
+.scan-progress .progress {
+    height: 20px;
+}
+
+.scan-progress .progress-bar {
+    background-color: #5BC0DE;
+    background-image: -webkit-linear-gradient(45deg,rgba(255, 255, 255, 0.15) 25%,rgba(0, 0, 0, 0) 25%,rgba(0, 0, 0, 0) 50%,rgba(255, 255, 255, 0.15) 50%,rgba(255, 255, 255, 0.15) 75%,rgba(0, 0, 0, 0) 75%,rgba(0, 0, 0, 0));
+    background-image: -o-linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);
+    background-image: linear-gradient(45deg,rgba(255, 255, 255, 0.15) 25%,rgba(0, 0, 0, 0) 25%,rgba(0, 0, 0, 0) 50%,rgba(255, 255, 255, 0.15) 50%,rgba(255, 255, 255, 0.15) 75%,rgba(0, 0, 0, 0) 75%,rgba(0, 0, 0, 0));
+    -webkit-background-size: 40px 40px;
+    background-size: 40px 40px;
+    height: 100%;
+}
+
+.scan-model-save-as {
+    background: #eee;
+    border-radius: 5px;
+    height: 150px;
+    padding: 10px;
+    width: 60%;
 }

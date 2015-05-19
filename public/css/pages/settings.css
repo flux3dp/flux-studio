@@ -26,3 +26,8 @@
     padding: 25px;
     width: 80%;
 }
+
+.settings .printer-list ul {
+    list-style: none;
+    padding: 0;
+}
