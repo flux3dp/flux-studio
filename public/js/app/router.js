@@ -93,7 +93,8 @@ function(React, $, Backbone, display, globalEvents) {
                 map = {
                     'print': this.print,
                     'settings': this.settings,
-                    'laser': this.laser
+                    'laser': this.laser,
+                    'scan': this.scan
                 },
                 func = this.print;
 
@@ -104,6 +105,12 @@ function(React, $, Backbone, display, globalEvents) {
             func(child_view, requests);
 
             this.appendSideBar();
+        },
+
+        scan: function() {
+            require(['jsx!pages/Scan'], function(view) {
+                _display(view);
+            });
         },
 
         print: function() {
