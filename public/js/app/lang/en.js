@@ -46,6 +46,23 @@ define(function() {
                 password_placeholder: '設定密碼',
                 notice: '設定密碼，可以確保你的 FLUX 只有知道密碼的人可以操作',
                 next: '下一步'
+            },
+            setup_complete: {
+                caption: 'We have completed all settings！',
+                description: 'Lets start your first printing experience！',
+                start: 'Start Using FLUX'
+            },
+            flux_as_wifi_1: {
+                caption: 'We\'re configuring your FLUX as a wifi station',
+                description: 'so you can control your FLUX through wifi network',
+                next: 'next',
+                footer: 'I want to swtich back to wifi connection'
+            },
+            flux_as_wifi_2: {
+                caption: 'Your FLUX is now a wifi station',
+                description: 'you can start using it after few simple setting',
+                next: 'next',
+                footer: 'I want to swtich back to wifi connection'
             }
         },
         menu: {
