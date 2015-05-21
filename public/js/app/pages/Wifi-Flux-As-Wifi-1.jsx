@@ -10,18 +10,14 @@ define([
         args = args || {};
 
         var Page = React.createClass({
-
             getInitialState: function() {
                 return args.state;
             },
-
             componentDidMount : function() {
             },
-
             _next: function() {
                 location.href = "#initialize/wifi/flux-as-wifi-2";
             },
-
             render : function() {
                 var lang = this.state.lang;
 
@@ -36,7 +32,7 @@ define([
                             <span>{lang.wifi.flux_as_wifi_1.description}</span>
                         </div>
                         <div>
-                            <buttononClick={thisModule._next}  className="btn">{lang.wifi.flux_as_wifi_1.next}</button>
+                            <button onClick={thisModule._next}  className="btn">{lang.wifi.flux_as_wifi_1.next}</button>
                         </div>
                         <div>
                             <span>{lang.wifi.flux_as_wifi_1.footer}</span>

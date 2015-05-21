@@ -10,14 +10,11 @@ define([
         args = args || {};
 
         var Page = React.createClass({
-
             getInitialState: function() {
                 return args.state;
             },
-
             componentDidMount: function() {
             },
-
             _handleSetPassword: function(e) {
                 e.preventDefault();
                 var password = this.refs.password.getDOMNode().value;
@@ -35,7 +32,6 @@ define([
                     location.href = '#initialize/wifi/failure';
                 }
             },
-
             render : function() {
                 var wifi_settings = localStorage.get('setting-wifi'),
                     state = this.state;
@@ -58,7 +54,7 @@ define([
                             </div>
                         </div>
                     </div>
-                )
+                );
             }
         });
 

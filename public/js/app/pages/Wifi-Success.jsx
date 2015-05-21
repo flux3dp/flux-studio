@@ -10,11 +10,9 @@ define([
         args = args || {};
 
         var Page = React.createClass({
-
             getInitialState: function() {
                 return args.state;
             },
-
             render : function() {
                 var lang = this.state.lang;
 
@@ -29,7 +27,7 @@ define([
                             </div>
                         </div>
                     </div>
-                )
+                );
             }
         });
 

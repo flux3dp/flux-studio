@@ -21,43 +21,42 @@ define([
         }
 
         var Page = React.createClass({
-                render : function() {
+            getInitialState: function() {
+                return args.state;
+            },
 
-                    var state = this.state,
-                        items = this.props.items.map(function(opt, i) {
-                            return (<li data-wifi-id={opt.id} data-wifi-name={opt.name}>
-                                <a href="#initialize/wifi/set-password">
-                                    <span>{opt.name}</span>
-                                    <span className="fa fa-wifi"></span>
-                                    <span className="fa fa-lock"></span>
-                                </a>
-                            </li>);
-                        }, this);
+            componentDidMount : function() {
+                wifiSelect();
+            },
+            render : function() {
 
-                    return (
-                        <div className="wifi initialization absolute-center">
-                            <h1>{state.lang.brand_name}</h1>
+                var state = this.state,
+                    items = this.props.items.map(function(opt, i) {
+                        return (<li data-wifi-id={opt.id} data-wifi-name={opt.name}>
+                            <a href="#initialize/wifi/set-password">
+                                <span>{opt.name}</span>
+                                <span className="fa fa-wifi"></span>
+                                <span className="fa fa-lock"></span>
+                            </a>
+                        </li>);
+                    }, this);
+
+                return (
+                    <div className="wifi initialization absolute-center">
+                        <h1>{state.lang.brand_name}</h1>
+                        <div>
+                            <h2>{state.lang.wifi.select.choose_wifi}</h2>
+                            <ul className="pure-list wifi-list clearfix">
+                                {items}
+                            </ul>
                             <div>
-                                <h2>{state.lang.wifi.select.choose_wifi}</h2>
-                                <ul className="pure-list wifi-list clearfix">
-                                    {items}
-                                </ul>
-                                <div>
-                                    <a href="#">{state.lang.wifi.select.no_wifi_available}</a>
-                                </div>
+                                <a href="#">{state.lang.wifi.select.no_wifi_available}</a>
                             </div>
                         </div>
-                    )
-                },
-                getInitialState: function() {
-                    return args.state;
-                },
-
-                componentDidMount : function() {
-                    wifiSelect();
-                }
-
-            });
+                    </div>
+                );
+            }
+        });
 
         return Page;
     };

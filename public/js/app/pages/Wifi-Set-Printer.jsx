@@ -9,14 +9,11 @@ define([
         args = args || {};
 
         var Page = React.createClass({
-
             getInitialState: function() {
                 return args.state;
             },
-
             componentDidMount: function() {
             },
-
             _handleSetPrinter: function(e) {
                 e.preventDefault();
 
@@ -39,10 +36,9 @@ define([
                 if (true === is_vaild) {
                     localStorage.set('printer-is-ready', true);
                     //location.href = '#studio/print';
-                    location.href='#initialize/wifi/setup-complete'
+                    location.href='#initialize/wifi/setup-complete';
                 }
             },
-
             render : function() {
                 var lang = this.state.lang,
                     cx = React.addons.classSet;
@@ -78,7 +74,6 @@ define([
                     </div>
                 );
             }
-
         });
 
         return Page;
