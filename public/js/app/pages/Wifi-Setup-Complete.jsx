@@ -15,6 +15,9 @@ define([
             },
             componentDidMount: function() {
             },
+            _handleStartClick: function() {
+                location.href = '#studio/print';
+            },
             render : function() {
                 var lang = this.state.lang;
 
@@ -29,7 +32,7 @@ define([
                             <span>{lang.wifi.setup_complete.description}</span>
                         </div>
                         <div>
-                            <button className="btn">{lang.wifi.setup_complete.start}</button>
+                            <button className="btn" onClick={this._handleStartClick}>{lang.wifi.setup_complete.start}</button>
                         </div>
                     </div>
                 );
