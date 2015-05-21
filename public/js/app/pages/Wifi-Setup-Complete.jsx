@@ -10,14 +10,11 @@ define([
         args = args || {};
 
         var Page = React.createClass({
-
             getInitialState: function() {
                 return args.state;
             },
-
             componentDidMount: function() {
             },
-
             render : function() {
                 var lang = this.state.lang;
 
@@ -35,7 +32,7 @@ define([
                             <button className="btn">{lang.wifi.setup_complete.start}</button>
                         </div>
                     </div>
-                )
+                );
             }
         });
 

@@ -11,30 +11,31 @@ define([
         args = args || {};
 
         var options = [],
-            HomeView = React.createClass({
-                render : function() {
-                    return (
-                        <div className="welcome initialization absolute-center">
-                            <h1>{this.state.lang.brand_name}</h1>
-                            <div className="brand-image"></div>
+            HomeView;
+
+        HomeView = React.createClass({
+            getInitialState: function() {
+                return args.state;
+            },
+            render : function() {
+                return (
+                    <div className="welcome initialization absolute-center">
+                        <h1>{this.state.lang.brand_name}</h1>
+                        <div className="brand-image"></div>
+                        <div>
+                            <h2>{this.state.lang.welcome.header1}</h2>
+                            <p>{this.state.lang.welcome.header2}</p>
                             <div>
-                                <h2>{this.state.lang.welcome.header1}</h2>
-                                <p>{this.state.lang.welcome.header2}</p>
-                                <div>
-                                    <SelectView id="select-lang" options={options}/>
-                                </div>
-                                <div>
-                                    <a href="#initialize/wifi/ask" className="btn">{this.state.lang.welcome.start}</a>
-                                </div>
+                                <SelectView id="select-lang" options={options}/>
+                            </div>
+                            <div>
+                                <a href="#initialize/wifi/ask" className="btn">{this.state.lang.welcome.start}</a>
                             </div>
                         </div>
-                    )
-                },
-                getInitialState: function() {
-                    return args.state;
-                }
-
-            });
+                    </div>
+                );
+            }
+        });
 
         for (var lang_code in args.props.supported_langs) {
             options.push({
