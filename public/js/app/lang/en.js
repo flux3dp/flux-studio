@@ -261,6 +261,7 @@ define(function() {
         },
         scan: {
             start_scan: 'Scan',
+            start_multiscan: 'Start to Multiscan',
             rescan: 'Rescan',
             export: 'Export',
             share: 'Share',
