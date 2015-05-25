@@ -10,14 +10,11 @@ define([
         args = args || {};
 
         var Page = React.createClass({
-
             getInitialState: function() {
                 return args.state;
             },
-
             componentDidMount : function() {
             },
-
             render : function() {
                 var lang = this.state.lang,
                     thisModule = this;
