@@ -286,13 +286,13 @@ define(function() {
                     text: 'Scan Speed',
                     options: [
                         {
-                            value: 'fast',
+                            value: '400',
                             label: 'Fast Scan',
                             selected: true
                         },
                         {
-                            value: 'slow',
-                            label: 'Slow Scan'
+                            value: '800',
+                            label: 'Delegate Scan'
                         }
                     ]
                 },
