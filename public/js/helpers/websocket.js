@@ -41,7 +41,6 @@ define(function($) {
                 _ws.onclose = function(result) {
                     // TODO: logging
                     options.onClose(result);
-                    console.log('close');
 
                     if (true === options.autoReconnect) {
                         received_data = [];
