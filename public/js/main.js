@@ -13,6 +13,7 @@ require.config({
         threejs: 'lib/three/three.min',
         threeTransformControls: 'lib/three/controls/TransformControls',
         threeSTLLoader: 'lib/three/loaders/STLLoader',
+        threeTrackball: 'lib/three/controls/TrackballControls',
         cssHome: '../css'
     },
 
