@@ -16,7 +16,7 @@ define([
                             <div className="progress">
                                 <div className="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100"/>
                             </div>
-                            <p>{lang.scan.complete}<span>100</span>%</p>
+                            <p>{lang.scan.complete}<span>{this.state.progressPercentage}</span>%</p>
                         </div>
                     );
                 },

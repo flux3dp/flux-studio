@@ -110,9 +110,12 @@ function(React, $, Backbone, display, globalEvents) {
             this.appendSideBar();
         },
 
-        scan: function() {
+        scan: function(step) {
             require(['jsx!pages/Scan'], function(view) {
-                _display(view);
+                var args = {
+                    step: step
+                };
+                _display(view, args);
             });
         },
 

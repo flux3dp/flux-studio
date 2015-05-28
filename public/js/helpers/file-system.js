@@ -49,7 +49,7 @@ define(function() {
                 fileSystem.root.getFile(
                     options.file.name,
                     {
-                        create: options.append || true  // **true** will create a new file or overwrite existing file
+                        create: true
                     },
                     function(fileEntry) {
                         // Do something with fileEntry.
@@ -67,10 +67,11 @@ define(function() {
                             fileWriter.onerror = options.onError;
 
                             fr.onloadend = function(e) {
-                                var contentBlob = new Blob([fr.result]);
+                                var contentBlob = new Blob([fr.result], { type: options.file.type || 'text/plain' });
                                 fileWriter.write(contentBlob);
                             };
 
+                            console.log(options);
                             fr.onerror = options.onError;
                             fr.readAsArrayBuffer(options.file);
 
@@ -102,29 +103,22 @@ define(function() {
             options.append = false;
             options.onComplete = options.onComplete || defaults.onComplete;
 
-            // console.log(options);
             requestFileSystem(options, function(fileSystem) {
-                // console.log(fileSystem);
                 fileSystem.root.getFile(
                     options.file.name,
                     {},
                     function(fileEntry) {
-                        console.log(fileEntry.toURL());
                         // Do something with fileEntry.
                         fileEntry.file(function(file) {
-                            console.log(file);
                             var fileReader = new FileReader();
 
                             fileReader.onloadend = function(e) {
-                                // var contentBlob = new Blob([fileReader.result]);
-                                // console.log(contentBlob);
-                                console.log('aa');
+                                var contentBlob = new Blob([fileReader.result]);
                                 options.onComplete(e);
                             };
 
                             fileReader.onerror = options.onError;
                             fileReader.readAsArrayBuffer(file);
-                            // fileReader.readAsText(file);
 
                         }, options.onError);
                     },

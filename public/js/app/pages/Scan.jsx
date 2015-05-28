@@ -4,7 +4,11 @@ define([
     'jsx!widgets/Popup',
     'jsx!widgets/Select',
     'jsx!widgets/List',
-], function($, React, popup, SelectView, ListView) {
+    'helpers/websocket',
+    'app/actions/scaned-model',
+    'helpers/file-system',
+    'threejs'
+], function($, React, popup, SelectView, ListView, WebSocket, scanedModel, fileSystem) {
     'use strict';
 
     return function(args) {
@@ -12,13 +16,24 @@ define([
 
         var View = React.createClass({
                 // counter
-                scan_times: 0,
+                scan_times: ('start' === args.step ? 1 : 0),
+
+                // web socket
+                ws: null,
 
                 getInitialState: function() {
+                    this.ws = new WebSocket({
+                        // TODO: To get available device
+                        method: '3d-scan-control/5ZMPBF415VH67ARLGGFWNKCSP',
+                        onMessage: function(result) {
+                            var data = result.data;
+                        }
+                    });
                     return args.state;
                 },
 
                 componentDidMount: function() {
+                    scanedModel.init();
                 },
 
                 // ui events
@@ -28,6 +43,8 @@ define([
                     this.setState({
                         scan_times : this.scan_times
                     });
+
+                    location.hash = 'studio/scan/';
                 },
 
                 _saveAs: function(e) {
@@ -42,33 +59,87 @@ define([
                 },
 
                 _startScan: function(e) {
-                    this.scan_times = 1;
-
-                    this.setState({
-                        scan_times : this.scan_times
-                    });
+                    location.hash = 'studio/scan/start';
                 },
 
                 _handleScan: function(e) {
-                    var self = this;
+                    var self = this,
+                        ws = self.ws,
+                        model_blobs = [],
+                        image_blobs = [],
+                        scan_speed = parseInt(this.refs.scan_speed.getDOMNode().value, 10),
+                        popup_window,
+                        gettingCameraImage = function(result) {
+                            var data = result.data,
+                                file;
 
-                    require(['jsx!views/scan/Progress-Bar'], function(view) {
-                        var popup_window;
+                            if ('object' === typeof data) {
+                                image_blobs.push(result.data);
+                            }
+                            else if ('finished' === data) {
+                                // TODO: get image from camera
+                                file = new File(
+                                    image_blobs,
+                                    'scan.png'
+                                );
+                                fileSystem.writeFile(file);
+                                ws.send('start').onMessage(gettingScanedModel);
+                            }
+                        },
+                        gettingScanedModel = function(result) {
+                            var data = result.data;
 
-                        args.disabledEscapeOnBackground = true;
+                            if ('object' === typeof data) {
+                                model_blobs.push(data);
 
-                        popup_window = popup(view, args);
-                        popup_window.open();
+                                // update progress percentage
+                                args.state.progressPercentage = (model_blobs.length / scan_speed * 100).toString().substr(0, 5);
+                            }
+                            else if ('finished' === data) {
+                                var fileReader = new FileReader();
 
-                        // TODO: scan complete
-                        setTimeout(function() {
+                                fileReader.onload  = function(progressEvent) {
+                                    var typedArray = new Float32Array(this.result);
+
+                                    renderringModel(typedArray);
+                                };
+
+                                var blob = new Blob(model_blobs, {type: 'text/plain'});
+                                fileReader.readAsArrayBuffer(blob);
+                            }
+                        },
+                        renderringModel = function(views) {
                             popup_window.close();
+
                             self.scan_times = self.scan_times + 1;
 
                             self.setState({
                                 scan_times : self.scan_times
                             });
-                        }, 1000);
+
+                            // TODO: store created model but don't use global variable
+                            window.meshs = window.meshs || [];
+                            window.meshs.push(scanedModel.appendModel(views));
+
+                            // disconnect
+                            ws.send('quit');
+                        };
+
+                    require(['jsx!views/scan/Progress-Bar'], function(view) {
+
+                        args.disabledEscapeOnBackground = true;
+                        args.state.progressPercentage = 0;
+
+                        popup_window = popup(view, args);
+                        popup_window.open();
+
+                        if ('connected' === ws.fetchLastResponse()) {
+                            ws.send('image').onMessage(gettingCameraImage);
+                        }
+                        else {
+                            // TODO: error occurs
+                        }
+
                     });
                 },
 
@@ -81,7 +152,7 @@ define([
                         starting_section,
                         operating_section;
 
-                    state.scan_times = state.scan_times || 0;
+                    state.scan_times = state.scan_times || this.scan_times || 0;
 
                     start_scan_text = (
                         1 < state.scan_times
@@ -133,7 +204,7 @@ define([
                                                             {lang.scan.scan_params.scan_speed.text}
                                                         </h4>
                                                         <p>
-                                                            <SelectView className="span12" options={lang.scan.scan_params.scan_speed.options}/>
+                                                            <SelectView ref="scan_speed" className="span12" options={lang.scan.scan_params.scan_speed.options}/>
                                                         </p>
                                                     </div>
                                                 </div>
