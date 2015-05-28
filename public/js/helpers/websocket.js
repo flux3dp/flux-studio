@@ -1,45 +1,63 @@
 define(function($) {
     'use strict';
 
-    var defaultOptions = {
-            hostname: location.hostname,
-            method: '',
-            port: '8000',
-            onMessage: function(result) {},
-            onClose: function(result) {}
-        },
-        origanizeOptions = function(opts) {
-            for (var name in defaultOptions) {
-                if (false === opts.hasOwnProperty(name)) {
-                    opts[name] = defaultOptions[name];
-                }
-            }
-
-            return opts;
-        };
-
     // options:
-    //      hostname  - host name (Default: localhost)
-    //      port      - what protocol uses (Default: 8000)
-    //      method    - method be called
-    //      onMessage - fired on receive message
-    //      onClose   - fired on connection closed
+    //      hostname      - host name (Default: localhost)
+    //      port          - what protocol uses (Default: 8000)
+    //      method        - method be called
+    //      autoReconnect - auto reconnect on close
+    //      onMessage     - fired on receive message
+    //      onClose       - fired on connection closed
     return function(options) {
+
+        var defaultOptions = {
+                hostname: location.hostname,
+                method: '',
+                port: '8000',
+                autoReconnect: true,
+                onMessage: function(result) {},
+                onClose: function(result) {}
+            },
+            received_data = [],
+            origanizeOptions = function(opts) {
+                for (var name in defaultOptions) {
+                    if (false === opts.hasOwnProperty(name)) {
+                        opts[name] = defaultOptions[name];
+                    }
+                }
+
+                return opts;
+            },
+            createWebSocket = function(options) {
+                var url = 'ws://' + options.hostname + ':' + options.port + '/ws/' + options.method,
+                    _ws = new WebSocket(url);
+
+                _ws.onmessage = function(result) {
+                    // TODO: logging
+                    received_data.push(result.data);
+                    options.onMessage(result);
+                };
+
+                _ws.onclose = function(result) {
+                    // TODO: logging
+                    options.onClose(result);
+                    console.log('close');
+
+                    if (true === options.autoReconnect) {
+                        received_data = [];
+                        ws = createWebSocket(options);
+                    }
+                    else {
+                        ws = null;  // release
+                    }
+                };
+
+                return _ws;
+            },
+            ws = null;
+
         options = origanizeOptions(options);
-
-        var url = 'ws://' + options.hostname + ':' + options.port + '/ws/' + options.method,
-            ws = new WebSocket(url);
-
-        ws.onmessage = function(result) {
-            // TODO: logging
-            options.onMessage(result);
-        };
-
-        ws.onclose = function(result) {
-            // TODO: logging
-            options.onClose(result);
-            ws = null;  // release
-        };
+        ws = createWebSocket(options);
 
         return {
             send: function(data) {
@@ -72,6 +90,14 @@ define(function($) {
                 return this;
             },
 
+            fetchData: function() {
+                return received_data;
+            },
+
+            fetchLastResponse: function() {
+                return this.fetchData()[received_data.length - 1];
+            },
+
             close: function() {
                 if (null !== ws) {
                     ws.close();
@@ -80,7 +106,6 @@ define(function($) {
 
             // events
             onMessage: function(callback) {
-                console.log('callback');
                 options.onMessage = callback;
 
                 return this;
