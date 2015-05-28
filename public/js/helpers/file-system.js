@@ -110,7 +110,6 @@ define(function() {
                     function(fileEntry) {
                         // Do something with fileEntry.
                         fileEntry.file(function(file) {
-                            console.log(file);
                             var fileReader = new FileReader();
 
                             fileReader.onloadend = function(e) {
