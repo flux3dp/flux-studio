@@ -7,6 +7,7 @@ define([
 
     return function(view, args) {
         args = args || {};
+        args.disabledEscapeOnBackground = args.disabledEscapeOnBackground || false;
 
         var View = view(args),
             $root = $('.popup-window'),
