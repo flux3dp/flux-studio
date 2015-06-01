@@ -15,27 +15,24 @@ define([
             },
             componentDidMount : function() {
             },
-            _next: function() {
-                location.href = "#initialize/wifi/flux-as-wifi-2";
-            },
             render : function() {
                 var lang = this.state.lang;
 
                 return (
-                    <div className="wifi initialization absolute-center">
-                        <h1>{lang.brand_name}</h1>
-                            <div>
-                                <img src="http://placehold.it/350x150" />
-                            </div>
-                        <div>
+                    <div className="wifi initialization absolute-center text-center">
+                        <h1>{lang.welcome_headline}</h1>
+                        <img className="wifi-symbol" src="/img/img-flux-ap.png" />
+                        <div className="wifi-form">
                             <h2>{lang.wifi.flux_as_wifi_1.caption}</h2>
-                            <span>{lang.wifi.flux_as_wifi_1.description}</span>
-                        </div>
-                        <div>
-                            <button onClick={thisModule._next}  className="btn">{lang.wifi.flux_as_wifi_1.next}</button>
-                        </div>
-                        <div>
-                            <span>{lang.wifi.flux_as_wifi_1.footer}</span>
+                            <p>{lang.wifi.flux_as_wifi_1.description}</p>
+                            <div>
+                                <a href="#initialize/wifi/flux-as-wifi-2" className="btn btn-large">
+                                    {lang.wifi.flux_as_wifi_1.next}
+                                </a>
+                            </div>
+                            <div>
+                                <a href="#initialize/wifi/ask">{lang.wifi.flux_as_wifi_1.footer}</a>
+                            </div>
                         </div>
                     </div>
                 );

@@ -42,8 +42,8 @@ define([
                     }, this);
 
                 return (
-                    <div className="wifi initialization absolute-center">
-                        <h1>{state.lang.brand_name}</h1>
+                    <div className="wifi initialization absolute-center text-center">
+                        <h1>{state.lang.welcome_headline}</h1>
                         <div>
                             <h2>{state.lang.wifi.select.choose_wifi}</h2>
                             <ul className="pure-list wifi-list clearfix">

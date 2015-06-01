@@ -15,25 +15,28 @@ define([
             },
             componentDidMount : function() {
             },
+            _next: function(e) {
+                // TODO: call api
+                location.href = '#initialize/wifi/set-printer';
+            },
             render : function() {
-                var lang = this.state.lang,
-                    thisModule = this;
+                var lang = this.state.lang;
 
                 return (
-                    <div className="wifi initialization absolute-center">
-                        <h1>{lang.brand_name}</h1>
-                            <div>
-                                <img src="http://placehold.it/350x150" />
-                            </div>
-                        <div>
+                    <div className="wifi initialization absolute-center text-center">
+                        <h1>{lang.welcome_headline}</h1>
+                        <img className="wifi-symbol" src="/img/img-flux-ap-success.png" />
+                        <div className="wifi-form">
                             <h2>{lang.wifi.flux_as_wifi_2.caption}</h2>
-                            <span>{lang.wifi.flux_as_wifi_2.description}</span>
-                        </div>
-                        <div>
-                            <button className="btn">{lang.wifi.flux_as_wifi_2.next}</button>
-                        </div>
-                        <div>
-                            <span>{lang.wifi.flux_as_wifi_2.footer}</span>
+                            <p>{lang.wifi.flux_as_wifi_2.description}</p>
+                            <div>
+                                <button className="btn btn-large" onClick={this._next}>
+                                    {lang.wifi.flux_as_wifi_2.next}
+                                </button>
+                            </div>
+                            <div>
+                                <a href="#initialize/wifi/ask">{lang.wifi.flux_as_wifi_2.footer}</a>
+                            </div>
                         </div>
                     </div>
                 );
