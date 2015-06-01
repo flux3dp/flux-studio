@@ -16,13 +16,14 @@ define([
                 var lang = this.state.lang;
 
                 return (
-                    <div className="wifi initialization absolute-center">
-                        <h1>{lang.brand_name}</h1>
-                        <div>
+                    <div className="wifi initialization absolute-center text-center">
+                        <h1>{lang.welcome_headline}</h1>
+                        <img className="wifi-symbol" src="/img/img-wifi-unlock.png"/>
+                        <div className="wifi-form">
                             <h2>{lang.wifi.failure.caption}</h2>
                             <p>{lang.wifi.failure.line1}</p>
                             <div>
-                                <a href="#initialize/wifi/select" className="btn">{lang.wifi.failure.next}</a>
+                                <a href="#initialize/wifi/select" className="btn btn-large">{lang.wifi.failure.next}</a>
                             </div>
                         </div>
                     </div>

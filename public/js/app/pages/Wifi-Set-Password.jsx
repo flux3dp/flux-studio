@@ -3,7 +3,7 @@ define([
     'react',
     'helpers/local-storage',
     'css!cssHome/pages/wifi'
-], function($, React, localStorage, actions) {
+], function($, React, localStorage) {
     'use strict';
 
     return function(args) {
@@ -34,23 +34,25 @@ define([
             },
             render : function() {
                 var wifi_settings = localStorage.get('setting-wifi'),
-                    state = this.state;
+                    lang = this.state.lang;
 
                 return (
-                    <div className="wifi initialization absolute-center">
-                        <h1>{state.lang.brand_name}</h1>
-                        <div>
+                    <div className="wifi initialization absolute-center text-center">
+                        <h1>{lang.welcome_headline}</h1>
+                        <img className="wifi-symbol" src="/img/img-wifi-lock.png"/>
+                        <div className="wifi-form">
                             <h2>
-                                {state.lang.wifi.set_password.line1}
+                                {lang.wifi.set_password.line1}
                                 {wifi_settings.name}
-                                {state.lang.wifi.set_password.line2}
+                                {lang.wifi.set_password.line2}
                             </h2>
                             <div>
-                                <input ref="password" type="password" id="text-password"/>
+                                <input ref="password" type="password" id="text-password"
+                                placeholder={lang.wifi.set_password.password_placeholder} defaultValue=""/>
                             </div>
-                            <div>
-                                <a href="#initialize/wifi/select" className="btn">{state.lang.wifi.set_password.cancel}</a>
-                                <button id="btn-access-wifi" onClick={this._handleSetPassword} className="btn">{state.lang.wifi.set_password.join}</button>
+                            <div className="btn-group">
+                                <a href="#initialize/wifi/select" className="btn btn-default">{lang.wifi.set_password.cancel}</a>
+                                <button id="btn-access-wifi" onClick={this._handleSetPassword} className="btn">{lang.wifi.set_password.join}</button>
                             </div>
                         </div>
                     </div>

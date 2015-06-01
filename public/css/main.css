@@ -4,11 +4,13 @@
 
 html,
 body {
+    font-family: Arial, Helvetica, sans-serif, "Microsoft JhengHei", "微軟正黑體";
     height: 100%;
     margin: 0;
     min-height: 100%;
     padding: 0;
 }
+
 body {
     background-color: #777;
     font-size: 16px;
@@ -47,29 +49,47 @@ body {
     box-sizing: border-box;
 }
 
+a {
+    color: #000;
+    font-size: 12px;
+    font-weight: lighter;
+    text-decoration: underline;
+}
+
 .btn {
-    background: -webkit-linear-gradient(top, rgba(30, 87, 153, 1) 0%, rgba(30, 87, 153, .5) 100%);
+    background: #00C853;
     border: none;
-    border-radius: 5px;
     box-sizing: border-box;
     color: #fff;
     cursor: pointer;
     display: inline-block;
-    margin: 5px;
+    font-size: 15px;
+    letter-spacing: .5px;
+    line-height: 44px;
+    margin: 0;
+    min-width: 99px;
     outline: none;
-    padding: 20px;
+    padding: 0;
     position: relative;
     text-decoration: none;
 }
 
+.btn-default {
+    background: #fff;
+    border: 1px solid #bdbdbd;
+    color: #424242;
+}
+
+.btn-default:hover {
+    border: 1px solid #424242;
+}
+
 .btn-warning {
-    background: -webkit-linear-gradient(top, rgba(123, 0, 0, 1.0) 0%, rgba(123, 0, 0, .5) 100%);
+    background: #f00;
 }
 
 .btn-link {
-    background: none;
-    color: rgba(30, 87, 153, 1);
-    padding: 0;
+    color: #000;
     text-decoration: underline;
 }
 
@@ -86,8 +106,18 @@ body {
     width: 100%;
 }
 
-.btn:active {
-    background: -webkit-linear-gradient(top, rgba(30, 87, 153, .5) 0%, rgba(30, 87, 153, 1) 100%);
+/* btn size */
+.btn-large {
+    width: 270px;
+}
+
+/* btn group */
+.btn-group .btn {
+    margin: 0 0 0 24px;
+}
+
+.btn-group .btn:first-child {
+    margin: 0;
 }
 
 /**
@@ -248,6 +278,18 @@ body {
 /**
  * helper style
  */
+.text-center {
+    text-align: center;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.text-left {
+    text-align: left;
+}
+
 .tooltip {
     display: inline-block;
 }
@@ -347,16 +389,19 @@ body {
 
 .initialization {
     background-color: #fff;
-    height: 80%;
+    height: 508px;
     overflow: scroll;
-    text-align: center;
-    width: 80%;
+    width: 700px;
 }
 
 .initialization h1 {
-    background: #ccc;
-    margin-top: 0;
-    padding: 5px 10px;
+    background: #272727;
+    color: #fafafa;
+    font-size: 1rem;
+    letter-spacing: 1px;
+    line-height: 40px;
+    margin: 0;
+    padding: 0 16px;
     text-align: left;
 }
 
@@ -484,9 +529,9 @@ body {
     background-image: -webkit-linear-gradient(45deg,rgba(255, 255, 255, 0.15) 25%,rgba(0, 0, 0, 0) 25%,rgba(0, 0, 0, 0) 50%,rgba(255, 255, 255, 0.15) 50%,rgba(255, 255, 255, 0.15) 75%,rgba(0, 0, 0, 0) 75%,rgba(0, 0, 0, 0));
     background-image: -o-linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);
     background-image: linear-gradient(45deg,rgba(255, 255, 255, 0.15) 25%,rgba(0, 0, 0, 0) 25%,rgba(0, 0, 0, 0) 50%,rgba(255, 255, 255, 0.15) 50%,rgba(255, 255, 255, 0.15) 75%,rgba(0, 0, 0, 0) 75%,rgba(0, 0, 0, 0));
-    -webkit-background-size: 40px 40px;
     background-size: 40px 40px;
     height: 100%;
+    -webkit-background-size: 40px 40px;
 }
 
 .scan-model-save-as {

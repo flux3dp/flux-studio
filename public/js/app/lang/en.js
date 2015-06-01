@@ -3,6 +3,7 @@ define(function() {
 
     return {
         brand_name : 'FLUX',
+        welcome_headline : 'Welcome to FLUX',
         app : {
             name : 'Flux Studio - en'
         },
@@ -25,6 +26,7 @@ define(function() {
             set_password: {
                 line1: '請輸入「',
                 line2: '」無線網路的連線密碼',
+                password_placeholder: '請輸入 Wi-Fi 密碼',
                 cancel: '取消',
                 join: '加入',
             },
