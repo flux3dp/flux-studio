@@ -19,9 +19,9 @@ define([
             },
             render : function() {
                 return (
-                    <div className="welcome initialization absolute-center">
-                        <h1>{this.state.lang.brand_name}</h1>
-                        <div className="brand-image"></div>
+                    <div className="welcome initialization absolute-center text-center">
+                        <h1>{this.state.lang.welcome_headline}</h1>
+                        <img className="brand-image" src="/img/wel-flux-logo.png"/>
                         <div>
                             <h2>{this.state.lang.welcome.header1}</h2>
                             <p>{this.state.lang.welcome.header2}</p>
@@ -29,7 +29,7 @@ define([
                                 <SelectView id="select-lang" options={options}/>
                             </div>
                             <div>
-                                <a href="#initialize/wifi/ask" className="btn">{this.state.lang.welcome.start}</a>
+                                <a href="#initialize/wifi/ask" className="btn btn-large">{this.state.lang.welcome.start}</a>
                             </div>
                         </div>
                     </div>
