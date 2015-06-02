@@ -97,7 +97,8 @@ function(React, $, Backbone, display, globalEvents) {
                     'print': this.print,
                     'settings': this.settings,
                     'laser': this.laser,
-                    'scan': this.scan
+                    'scan': this.scan,
+                    'usb': this.usb
                 },
                 func = this.print;
 
@@ -121,6 +122,12 @@ function(React, $, Backbone, display, globalEvents) {
 
         print: function() {
             require(['jsx!pages/Print'], function(view) {
+                _display(view);
+            });
+        },
+
+        usb: function() {
+            require(['jsx!pages/usb'], function(view) {
                 _display(view);
             });
         },

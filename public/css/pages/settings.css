@@ -1,3 +1,19 @@
+.is-ready .content {
+    background-color: #F5F5F5;
+}
+
+.settings {
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    margin: auto;
+    position: absolute;
+    width: 800px;
+    height: 600px;
+    box-shadow: 0px 0px 12px 0px rgba(50%,50%,50%,0.8);
+}
+
 .settings header {
     background: #DDD;
     padding: 25px;

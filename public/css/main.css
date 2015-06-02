@@ -12,7 +12,7 @@ body {
 }
 
 body {
-    background-color: #777;
+    background-color: #FAFAFA;
     font-size: 16px;
     position: relative;
 }
@@ -72,6 +72,12 @@ a {
     padding: 0;
     position: relative;
     text-decoration: none;
+    background-image: none;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-transition: opacity .1s ease,background-color .1s ease,color .1s ease,box-shadow .1s ease,background .1s ease;
+    transition: opacity .1s ease,background-color .1s ease,color .1s ease,box-shadow .1s ease,background .1s ease;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .btn-default {
@@ -93,17 +99,18 @@ a {
     text-decoration: underline;
 }
 
-.btn:hover::after {
-    background: rgba(255, 255, 255, .1);
-    border-radius: 5px;
-    content: "";
-    display: block;
-    height: 100%;
-    left: 0;
-    pointer-events: none;
-    position: absolute;
-    top: 0;
-    width: 100%;
+.btn:hover {
+    background-color: #e8e8e8;
+    background-image: none;
+    box-shadow: '';
+    color: rgba(0,0,0,.8);
+}
+
+.btn:active {
+    background-color: #ccc;
+    background-image: '';
+    color: rgba(0,0,0,.8);
+    box-shadow: 0 0 0 1px transparent inset,0 1px 4px 0 rgba(39,41,43,.15);
 }
 
 /* btn size */
@@ -222,16 +229,19 @@ a {
 .span2 {
     margin: 0 10px;
     width: calc(100% / 12 * 2 - 20px);
+    display: inline-block;
 }
 
 .span3 {
     margin: 0 10px;
     width: calc(100% / 12 * 3 - 20px);
+    display: inline-block;
 }
 
 .span4 {
     margin: 0 10px;
     width: calc(100% / 12 * 4 - 20px);
+    display: inline-block;
 }
 
 .span5 {
@@ -242,6 +252,7 @@ a {
 .span6 {
     margin: 0 10px;
     width: calc(100% / 12 * 6 - 20px);
+    display: inline-block;
 }
 
 .span7 {
@@ -252,17 +263,20 @@ a {
 .span8 {
     margin: 0 10px;
     width: calc(100% / 12 * 8 - 20px);
+    display: inline-block;
 }
 
 .span9 {
     margin: 0 10px;
     width: calc(100% / 12 * 9 - 20px);
+    display: inline-block;
 }
 
 .span12 {
     margin-left: 0;
     margin-right: 0;
     width: 100%;
+    display: inline-block;
 }
 
 /* position */
@@ -323,7 +337,6 @@ a {
     left: 100%;
     overflow: hidden;
     position: absolute;
-    -o-transition: background .3s ease-out;
     -webkit-transition: background .3s ease-out;
     transition: background .3s ease-out;
     width: 0;
@@ -527,7 +540,6 @@ a {
 .scan-progress .progress-bar {
     background-color: #5BC0DE;
     background-image: -webkit-linear-gradient(45deg,rgba(255, 255, 255, 0.15) 25%,rgba(0, 0, 0, 0) 25%,rgba(0, 0, 0, 0) 50%,rgba(255, 255, 255, 0.15) 50%,rgba(255, 255, 255, 0.15) 75%,rgba(0, 0, 0, 0) 75%,rgba(0, 0, 0, 0));
-    background-image: -o-linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);
     background-image: linear-gradient(45deg,rgba(255, 255, 255, 0.15) 25%,rgba(0, 0, 0, 0) 25%,rgba(0, 0, 0, 0) 50%,rgba(255, 255, 255, 0.15) 50%,rgba(255, 255, 255, 0.15) 75%,rgba(0, 0, 0, 0) 75%,rgba(0, 0, 0, 0));
     background-size: 40px 40px;
     height: 100%;
