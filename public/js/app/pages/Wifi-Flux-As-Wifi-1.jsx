@@ -32,7 +32,7 @@ define([
                             <span>{lang.wifi.flux_as_wifi_1.description}</span>
                         </div>
                         <div>
-                            <button onClick={thisModule._next}  className="btn">{lang.wifi.flux_as_wifi_1.next}</button>
+                            <button onClick={this._next}  className="btn">{lang.wifi.flux_as_wifi_1.next}</button>
                         </div>
                         <div>
                             <span>{lang.wifi.flux_as_wifi_1.footer}</span>

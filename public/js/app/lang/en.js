@@ -90,7 +90,10 @@ define(function() {
                 connected_wi_fi: 'Connected Wi-Fi',
                 advanced: 'Advanced',
                 join_other_network: 'Join Other Network',
-                disconnect_with_this_printer: 'Disconnect With This Printer'
+                disconnect_with_this_printer: 'Disconnect With This Printer',
+                your_password: 'Your Password',
+                confirm_password: 'Confirm Password',
+                save_password: 'Save Password'
             },
             flux_cloud: {
                 caption: 'Get FLUX 3D Printer be remote!',

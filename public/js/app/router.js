@@ -90,7 +90,8 @@ function(React, $, Backbone, display, globalEvents) {
         studio: function(page, params) {
             var map = {
                     'print': this.print,
-                    'settings': this.settings
+                    'settings': this.settings,
+                    'usb': this.usb
                 },
                 func = this.print;
 
@@ -109,8 +110,14 @@ function(React, $, Backbone, display, globalEvents) {
             });
         },
 
-        settings: function(child) {
+        usb: function() {
+            require(['jsx!pages/usb'], function(view) {
+                _display(view);
+            });
+        },
 
+        settings: function(child) {
+            console.log(child);
             require(['jsx!pages/Settings', 'app/app-settings'], function(view, settings) {
                 child = (child || '').toLowerCase();
 

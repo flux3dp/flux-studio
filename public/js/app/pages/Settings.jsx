@@ -16,7 +16,7 @@ define([
         HomeView = React.createClass({
             getInitialState: function() {
                 return args.state;
-            }
+            },
             render : function() {
                 var lang = this.state.lang,
                     menu_item = 'menu-item',
