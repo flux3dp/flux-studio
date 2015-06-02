@@ -14,13 +14,72 @@ define([
 
         var options = [],
             View = React.createClass({
+                getInitialState: function() {
+                    var printers = localStorage.get('printers');
+
+                    args.state.printers = printers;
+                    args.state.first_printer = printers[0];
+
+                    return {
+                        displayPassword: false
+                    }
+                },
+                _handleDisplayPasswordSection: function() {
+                    this.setState({
+                        displayPassword: true
+                    });
+                },
+                _handleSetPassword: function() {
+                    this.setState({
+                        displayPassword: false
+                    });
+                },
                 render : function() {
-                    var lang = this.state.lang,
-                        PrintersGroup = this.state.printers.map(function(printer, i) {
+                    var PrintersGroup = args.state.printers.map(function(printer, i) {
                             return (
                                 <li><button className="btn btn-link print-item" data-name={printer.name}>{printer.name}</button></li>
                             );
-                        }, this);
+                        }, this),
+                        lang = args.state.lang,
+                        passwordConsole,
+                        passwordSection;
+
+                    passwordConsole =
+                        <div className="row-fluid">
+                            <label className="col span3">{lang.settings.printer.current_password}</label>
+                            <div className="col span9">
+                                <button className="btn" onClick={this._handleDisplayPasswordSection}>{lang.settings.printer.set_password}</button>
+                                <span>{lang.settings.printer.security_notice}</span>
+                            </div>
+                        </div>;
+
+                    passwordSection =
+                        <div>
+                            <div className="row-fluid">
+                                <label className="col span3">{lang.settings.printer.your_password}</label>
+                                <div className="col span9">
+                                    <input type="password" />
+                                </div>
+                            </div>
+                            <div className="row-fluid">
+                                <label className="col span3">{lang.settings.printer.confirm_password}</label>
+                                <div className="col span9">
+                                    <input type="password" />
+                                </div>
+                            </div>
+                            <div className="row-fluid">
+                                <label className="col span3">&nbsp;</label>
+                                <div className="col span9">
+                                    <button className="btn" onClick={this._handleSetPassword}>{lang.settings.printer.save_password}</button>
+                                </div>
+                            </div>
+                        </div>;
+
+                    if(!this.state.displayPassword) {
+                        passwordSection = <div></div>
+                    } else {
+                        passwordConsole = <div></div>
+                    }
 
                     return (
                         <div className="form horizontal-form row-fluid clearfix">
@@ -33,15 +92,13 @@ define([
                             <div className="col span9">
                                 <div className="row-fluid">
                                     <label className="col span3">{lang.settings.printer.name}</label>
-                                    <h2 className="col span9">{this.state.first_printer.name}</h2>
+                                    <h2 className="col span9">{args.state.first_printer.name}</h2>
                                 </div>
-                                <div className="row-fluid">
-                                    <label className="col span3">{lang.settings.printer.current_password}</label>
-                                    <div className="col span9">
-                                        <button className="btn">{lang.settings.printer.set_password}</button>
-                                        <span>{lang.settings.printer.security_notice}</span>
-                                    </div>
-                                </div>
+
+                                {passwordConsole}
+
+                                {passwordSection}
+
                                 <div className="row-fluid">
                                     <label className="col span3">{lang.settings.printer.connected_wi_fi}</label>
                                     <div className="col span9">
@@ -56,37 +113,7 @@ define([
                             </div>
                         </div>
                     )
-                },
-
-                getInitialState: function() {
-                    var printers = localStorage.get('printers');
-
-                    args.state.printers = printers;
-                    args.state.first_printer = printers[0];
-
-                    return args.state;
-                },
-
-                componentDidMount: function() {
-                    var self = this;
-
-                    $('#btn-new-printer').on('click', function(e) {
-                        $('.popup-window').show();
-                    });
-
-                    $('.print-item').on('click', function(e) {
-                        var $me = $(e.currentTarget),
-                            printer_name = $me.data('name'),
-                            choosen_printer = self.state.printers.filter(function(printer) {
-                                return printer_name === printer.name;
-                            })[0];
-
-                        self.state.first_printer = choosen_printer;
-                        console.log(choosen_printer);
-                        self.setState(self.state);
-                    });
                 }
-
             });
 
         for (var lang_code in args.props.supported_langs) {

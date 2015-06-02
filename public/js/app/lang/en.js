@@ -3,6 +3,7 @@ define(function() {
 
     return {
         brand_name : 'FLUX',
+        welcome_headline : 'Welcome to FLUX',
         app : {
             name : 'Flux Studio - en'
         },
@@ -25,6 +26,7 @@ define(function() {
             set_password: {
                 line1: '請輸入「',
                 line2: '」無線網路的連線密碼',
+                password_placeholder: '請輸入 Wi-Fi 密碼',
                 cancel: '取消',
                 join: '加入',
             },
@@ -90,7 +92,10 @@ define(function() {
                 connected_wi_fi: 'Connected Wi-Fi',
                 advanced: 'Advanced',
                 join_other_network: 'Join Other Network',
-                disconnect_with_this_printer: 'Disconnect With This Printer'
+                disconnect_with_this_printer: 'Disconnect With This Printer',
+                your_password: 'Your Password',
+                confirm_password: 'Confirm Password',
+                save_password: 'Save Password'
             },
             flux_cloud: {
                 caption: 'Get FLUX 3D Printer be remote!',
@@ -261,6 +266,7 @@ define(function() {
         },
         scan: {
             start_scan: 'Scan',
+            start_multiscan: 'Start to Multiscan',
             rescan: 'Rescan',
             export: 'Export',
             share: 'Share',
@@ -285,13 +291,13 @@ define(function() {
                     text: 'Scan Speed',
                     options: [
                         {
-                            value: 'fast',
+                            value: '400',
                             label: 'Fast Scan',
                             selected: true
                         },
                         {
-                            value: 'slow',
-                            label: 'Slow Scan'
+                            value: '800',
+                            label: 'Delegate Scan'
                         }
                     ]
                 },

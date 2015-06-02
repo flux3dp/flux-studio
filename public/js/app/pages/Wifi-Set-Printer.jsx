@@ -9,76 +9,84 @@ define([
         args = args || {};
 
         var Page = React.createClass({
-
             getInitialState: function() {
-                return args.state;
+                return {
+                    validPrinterName    : true,
+                    validPrinterPassword: true
+                }
             },
-
             componentDidMount: function() {
             },
-
             _handleSetPrinter: function(e) {
                 e.preventDefault();
 
-                // TODO: do validation?
-                var $me = $(e.target),
-                    $required_fields = $('.required'),
-                    is_vaild = true;
+                var name        = this.refs.name.getDOMNode().value,
+                    password    = this.refs.password.getDOMNode().value,
+                    isValid;
 
-                $('.error').removeClass('error');
-
-                $required_fields.each(function(k, el) {
-                    var $el = $(el);
-
-                    if ('' === $el.val()) {
-                        $el.addClass('error');
-                        is_vaild = false;
-                    }
+                this.setState({
+                    validPrinterName    : name !== '',
                 });
 
-                if (true === is_vaild) {
-                    localStorage.set('printer-is-ready', true);
-                    //location.href = '#studio/print';
-                    location.href='#initialize/wifi/setup-complete'
+                isValid = (name !== '');
+
+                if (isValid) {
+                    location.href='#initialize/wifi/setup-complete';
                 }
             },
-
             render : function() {
-                var lang = this.state.lang,
-                    cx = React.addons.classSet;
+                var lang = args.state.lang,
+                    cx = React.addons.classSet,
+                    printerNameClass,
+                    printerPasswordClass;
+
+                printerNameClass = cx({
+                    'required'  : true,
+                    'error'     : !this.state.validPrinterName
+                });
+
+                printerPasswordClass = cx({
+                    'required'  : true,
+                    'error'     : !this.state.validPrinterPassword
+                });
 
                 return (
-                    <div className="wifi initialization absolute-center">
-                        <h1>{lang.brand_name}</h1>
+                    <div className="wifi initialization absolute-center text-center">
+                        <h1>{lang.welcome_headline}</h1>
                         <div>
                             <h2>{lang.wifi.set_printer.caption}</h2>
-                            <div className="form">
-                                <p>
-                                    <label>
-                                        {lang.wifi.set_printer.printer_name}
-                                        <input type="text" className="required" name="printer-name"
+                            <div className="wifi-form row-fluid clearfix">
+                                <div className="col span5 flux-printer">
+                                    <img src="/img/img-flux-printer.png"/>
+                                </div>
+                                <div className="col span7 text-left">
+                                    <p>
+                                        <label for="printer-name">
+                                            {lang.wifi.set_printer.printer_name}
+                                        </label>
+                                        <input ref="name" id="printer-name" type="text" className={printerNameClass}
                                         placeholder={lang.wifi.set_printer.printer_name_placeholder}/>
-                                    </label>
-                                </p>
-                                <p>
-                                    <label>
-                                        {lang.wifi.set_printer.password}
-                                        <input type="password" name="printer-password"
+                                    </p>
+                                    <p>
+                                        <label for="printer-password">
+                                            {lang.wifi.set_printer.password}
+                                        </label>
+                                        <input ref="password" for="printer-password" type="password" className={printerPasswordClass}
                                         placeholder={lang.wifi.set_printer.password_placeholder}/>
-                                    </label>
-                                </p>
-                                <p>
-                                {lang.wifi.set_printer.notice}
-                                </p>
+                                    </p>
+                                    <p className="notice">
+                                        {lang.wifi.set_printer.notice}
+                                    </p>
+                                </div>
                             </div>
                             <div>
-                                <a href="#initialize/wifi/setup-complete" className="btn" id="btn-next" onClick={this._handleSetPrinter}>{lang.wifi.set_printer.next}</a>
+                                <a href="#initialize/wifi/setup-complete" className="btn btn-large" id="btn-next" onClick={this._handleSetPrinter}>
+                                    {lang.wifi.set_printer.next}</a>
                             </div>
                         </div>
                     </div>
                 );
             }
-
         });
 
         return Page;

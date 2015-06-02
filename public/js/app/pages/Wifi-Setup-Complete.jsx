@@ -1,8 +1,9 @@
 define([
     'jquery',
     'react',
+    'helpers/local-storage',
     'css!cssHome/pages/wifi'
-], function($, React) {
+], function($, React, localStorage) {
     'use strict';
 
     return function(args) {
@@ -10,32 +11,31 @@ define([
         args = args || {};
 
         var Page = React.createClass({
-
             getInitialState: function() {
                 return args.state;
             },
-
             componentDidMount: function() {
             },
-
+            _handleStartClick: function() {
+                localStorage.set('printer-is-ready', true);
+                location.href = '#studio/print';
+            },
             render : function() {
                 var lang = this.state.lang;
 
                 return (
-                    <div className="wifi initialization absolute-center">
-                        <h1>{lang.brand_name}</h1>
-                        <div>
-                            <img src="http://placehold.it/350x150" />
-                        </div>
-                        <div>
+                    <div className="wifi initialization absolute-center text-center">
+                        <h1>{lang.welcome_headline}</h1>
+                        <img className="wifi-symbol" src="/img/img-done.png" />
+                        <div className="wifi-form">
                             <h2>{lang.wifi.setup_complete.caption}</h2>
-                            <span>{lang.wifi.setup_complete.description}</span>
-                        </div>
-                        <div>
-                            <button className="btn">{lang.wifi.setup_complete.start}</button>
+                            <p>{lang.wifi.setup_complete.description}</p>
+                            <div>
+                                <button className="btn btn-large" onClick={this._handleStartClick}>{lang.wifi.setup_complete.start}</button>
+                            </div>
                         </div>
                     </div>
-                )
+                );
             }
         });
 

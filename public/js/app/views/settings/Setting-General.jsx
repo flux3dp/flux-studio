@@ -17,19 +17,35 @@ define([
 
                     return (
                         <div className="form">
+
                             <div className="row-fluid">
-                                <label>
-                                    {lang.settings.language}
+
+                                <div className="span2">
+                                    <label>
+                                        {lang.settings.language}
+                                    </label>
+                                </div>
+
+                                <div className="span8">
                                     <SelectView id="select-lang" options={options}/>
-                                </label>
+                                </div>
+
                             </div>
+
                             <div className="row-fluid">
-                                <label>
-                                    {lang.settings.notifications}
+
+                                <div className="span2">
+                                    <label>
+                                        {lang.settings.notifications}
+                                    </label>
+                                </div>
+
+                                <div className="span8">
                                     <select>
                                         <option>None</option>
                                     </select>
-                                </label>
+                                </div>
+
                             </div>
                         </div>
                     )

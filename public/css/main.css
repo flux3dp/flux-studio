@@ -4,13 +4,15 @@
 
 html,
 body {
+    font-family: Arial, Helvetica, sans-serif, "Microsoft JhengHei", "微軟正黑體";
     height: 100%;
     margin: 0;
     min-height: 100%;
     padding: 0;
 }
+
 body {
-    background-color: #777;
+    background-color: #FAFAFA;
     font-size: 16px;
     position: relative;
 }
@@ -47,47 +49,82 @@ body {
     box-sizing: border-box;
 }
 
+a {
+    color: #000;
+    font-size: 12px;
+    font-weight: lighter;
+    text-decoration: underline;
+}
+
 .btn {
-    background: -webkit-linear-gradient(top, rgba(30, 87, 153, 1) 0%, rgba(30, 87, 153, .5) 100%);
+    background: #00C853;
     border: none;
-    border-radius: 5px;
     box-sizing: border-box;
     color: #fff;
     cursor: pointer;
     display: inline-block;
-    margin: 5px;
+    font-size: 15px;
+    letter-spacing: .5px;
+    line-height: 44px;
+    margin: 0;
+    min-width: 99px;
     outline: none;
-    padding: 20px;
+    padding: 0;
     position: relative;
     text-decoration: none;
+    background-image: none;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-transition: opacity .1s ease,background-color .1s ease,color .1s ease,box-shadow .1s ease,background .1s ease;
+    transition: opacity .1s ease,background-color .1s ease,color .1s ease,box-shadow .1s ease,background .1s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.btn-default {
+    background: #fff;
+    border: 1px solid #bdbdbd;
+    color: #424242;
+}
+
+.btn-default:hover {
+    border: 1px solid #424242;
 }
 
 .btn-warning {
-    background: -webkit-linear-gradient(top, rgba(123, 0, 0, 1.0) 0%, rgba(123, 0, 0, .5) 100%);
+    background: #f00;
 }
 
 .btn-link {
-    background: none;
-    color: rgba(30, 87, 153, 1);
-    padding: 0;
+    color: #000;
     text-decoration: underline;
 }
 
-.btn:hover::after {
-    background: rgba(255, 255, 255, .1);
-    border-radius: 5px;
-    content: "";
-    display: block;
-    height: 100%;
-    left: 0;
-    pointer-events: none;
-    position: absolute;
-    top: 0;
-    width: 100%;
+.btn:hover {
+    background-color: #e8e8e8;
+    background-image: none;
+    box-shadow: '';
+    color: rgba(0,0,0,.8);
 }
 
 .btn:active {
-    background: -webkit-linear-gradient(top, rgba(30, 87, 153, .5) 0%, rgba(30, 87, 153, 1) 100%);
+    background-color: #ccc;
+    background-image: '';
+    color: rgba(0,0,0,.8);
+    box-shadow: 0 0 0 1px transparent inset,0 1px 4px 0 rgba(39,41,43,.15);
+}
+
+/* btn size */
+.btn-large {
+    width: 270px;
+}
+
+/* btn group */
+.btn-group .btn {
+    margin: 0 0 0 24px;
+}
+
+.btn-group .btn:first-child {
+    margin: 0;
 }
 
 /**
@@ -192,16 +229,19 @@ body {
 .span2 {
     margin: 0 10px;
     width: calc(100% / 12 * 2 - 20px);
+    display: inline-block;
 }
 
 .span3 {
     margin: 0 10px;
     width: calc(100% / 12 * 3 - 20px);
+    display: inline-block;
 }
 
 .span4 {
     margin: 0 10px;
     width: calc(100% / 12 * 4 - 20px);
+    display: inline-block;
 }
 
 .span5 {
@@ -212,6 +252,7 @@ body {
 .span6 {
     margin: 0 10px;
     width: calc(100% / 12 * 6 - 20px);
+    display: inline-block;
 }
 
 .span7 {
@@ -222,17 +263,20 @@ body {
 .span8 {
     margin: 0 10px;
     width: calc(100% / 12 * 8 - 20px);
+    display: inline-block;
 }
 
 .span9 {
     margin: 0 10px;
     width: calc(100% / 12 * 9 - 20px);
+    display: inline-block;
 }
 
 .span12 {
     margin-left: 0;
     margin-right: 0;
     width: 100%;
+    display: inline-block;
 }
 
 /* position */
@@ -248,6 +292,18 @@ body {
 /**
  * helper style
  */
+.text-center {
+    text-align: center;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.text-left {
+    text-align: left;
+}
+
 .tooltip {
     display: inline-block;
 }
@@ -281,9 +337,8 @@ body {
     left: 100%;
     overflow: hidden;
     position: absolute;
-    -o-transition: all .3s ease-out;
-    -webkit-transition: all .3s ease-out;
-    transition: all .3s ease-out;
+    -webkit-transition: background .3s ease-out;
+    transition: background .3s ease-out;
     width: 0;
     z-index: 9999;
 }
@@ -291,19 +346,17 @@ body {
 .tooltip:hover .tooltip-content::before {
     border: 10px solid transparent;
     border-right: 10px solid rgba(0, 0, 0, .7);
-    left: -20px;
 }
 
 .tooltip .tooltip-content::before {
-    border: 5px solid transparent;
-    border-right: 5px solid rgba(0, 0, 0, 0);
+    border-right: 10px solid rgba(0, 0, 0, 0);
     content: "";
-    left: 0;
+    left: -20px;
     position: absolute;
     top: 1px;
-    -o-transition: all .3s ease-out;
-    -webkit-transition: all .3s ease-out;
-    transition: all .3s ease-out;
+    -o-transition: border-right .3s ease-out;
+    -webkit-transition: border-right .3s ease-out;
+    transition: border-right .3s ease-out;
 }
 
 .invisible {
@@ -349,16 +402,19 @@ body {
 
 .initialization {
     background-color: #fff;
-    height: 80%;
+    height: 508px;
     overflow: scroll;
-    text-align: center;
-    width: 80%;
+    width: 700px;
 }
 
 .initialization h1 {
-    background: #ccc;
-    margin-top: 0;
-    padding: 5px 10px;
+    background: #272727;
+    color: #fafafa;
+    font-size: 1rem;
+    letter-spacing: 1px;
+    line-height: 40px;
+    margin: 0;
+    padding: 0 16px;
     text-align: left;
 }
 
@@ -484,11 +540,10 @@ body {
 .scan-progress .progress-bar {
     background-color: #5BC0DE;
     background-image: -webkit-linear-gradient(45deg,rgba(255, 255, 255, 0.15) 25%,rgba(0, 0, 0, 0) 25%,rgba(0, 0, 0, 0) 50%,rgba(255, 255, 255, 0.15) 50%,rgba(255, 255, 255, 0.15) 75%,rgba(0, 0, 0, 0) 75%,rgba(0, 0, 0, 0));
-    background-image: -o-linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);
     background-image: linear-gradient(45deg,rgba(255, 255, 255, 0.15) 25%,rgba(0, 0, 0, 0) 25%,rgba(0, 0, 0, 0) 50%,rgba(255, 255, 255, 0.15) 50%,rgba(255, 255, 255, 0.15) 75%,rgba(0, 0, 0, 0) 75%,rgba(0, 0, 0, 0));
-    -webkit-background-size: 40px 40px;
     background-size: 40px 40px;
     height: 100%;
+    -webkit-background-size: 40px 40px;
 }
 
 .scan-model-save-as {

@@ -3,13 +3,14 @@ define(function() {
 
     return {
         brand_name : 'FLUX',
+        welcome_headline : 'Welcome to FLUX',
         app : {
             name : 'Flux Studio - zh-tw'
         },
         welcome: {
-            header1: 'Hello! 歡迎使用 FLUX，請選擇你想使用的語言',
-            header2: '我們即將開始為你的 FLUX 進行設定 :)',
-            start: '開始'
+            header1: 'Hello! 歡迎使用 FLUX，快點來實現你的點子',
+            header2: '請選擇你想使用的語言，我們即將開始為 FLUX 進行設定 :)',
+            start: '開始設定 '
         },
         wifi: {
             home: {
@@ -25,6 +26,7 @@ define(function() {
             set_password: {
                 line1: '請輸入「',
                 line2: '」無線網路的連線密碼',
+                password_placeholder: '請輸入 Wi-Fi 密碼',
                 cancel: '取消',
                 join: '加入',
             },
@@ -48,9 +50,9 @@ define(function() {
                 next: '下一步'
             },
             setup_complete: {
-                caption: '現在我們已經完成髓有的設定了！',
-                description: '快點開始進行你的第一次列印吧！',
-                start: '開始使用FLUX'
+                caption: '已經完成所有的設定了！',
+                description: '快點開始進行你的第一次列印',
+                start: '開始使用'
             },
             flux_as_wifi_1: {
                 caption: '我們正在讓你的FLUX變成一個無線基地台...',
@@ -60,7 +62,7 @@ define(function() {
             },
             flux_as_wifi_2: {
                 caption: '你的FLUX已經成為一個無線基地台',
-                description: '只剩下為你的FLUX做一些單的設定就可以開始使用了 :)',
+                description: '只剩下為你的FLUX做一些簡單的設定就可以開始使用了 :)',
                 next: '下一步',
                 footer: '我想要改回使用Wifi連線'
             }
@@ -261,6 +263,7 @@ define(function() {
         },
         scan: {
             start_scan: 'Scan',
+            start_multiscan: 'Start to Multiscan',
             rescan: 'Rescan',
             export: 'Export',
             share: 'Share',
@@ -285,13 +288,13 @@ define(function() {
                     text: 'Scan Speed',
                     options: [
                         {
-                            value: 'fast',
+                            value: '400',
                             label: 'Fast Scan',
                             selected: true
                         },
                         {
-                            value: 'slow',
-                            label: 'Slow Scan'
+                            value: '800',
+                            label: 'Delegate Scan'
                         }
                     ]
                 },

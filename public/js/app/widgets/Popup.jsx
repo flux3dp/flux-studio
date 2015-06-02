@@ -7,29 +7,37 @@ define([
 
     return function(view, args) {
         args = args || {};
+        args.disabledEscapeOnBackground = args.disabledEscapeOnBackground || false;
 
         var View = view(args),
             $root = $('.popup-window'),
             PopupComponent = React.createClass({
+                getInitialState: function() {
+                    return args.state;
+                },
+
+                componentDidMount: function() {
+                    $root.show();
+                },
+
                 render : function() {
                     var lang = this.state.lang;
 
                     return (
                         <div>
-                            <div className="popup-background"/>
+                            <div className="popup-background" onClick={this._closeOnBackground}/>
                             <View/>
                         </div>
                     );
                 },
-                getInitialState: function() {
-                    return args.state;
-                },
-                componentDidMount: function() {
-                    $root.show();
 
-                    $(this.getDOMNode()).find('.popup-background').one('click', function(e) {
+                // ui events
+                _closeOnBackground: function(e) {
+                    if ('boolean' === typeof args.disabledEscapeOnBackground
+                        && false === args.disabledEscapeOnBackground
+                    ) {
                         methods.close();
-                    });
+                    }
                 }
 
             }),

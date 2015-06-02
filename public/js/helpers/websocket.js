@@ -1,26 +1,65 @@
-define(['jquery'], function($) {
+define(function($) {
     'use strict';
 
-    var url = 'ws://localhost:8080/ws/';
+    // options:
+    //      hostname      - host name (Default: localhost)
+    //      port          - what protocol uses (Default: 8000)
+    //      method        - method be called
+    //      autoReconnect - auto reconnect on close
+    //      onMessage     - fired on receive message
+    //      onClose       - fired on connection closed
+    return function(options) {
 
-    return function(method, onmessage) {
-        var ws = new WebSocket(url + method),
-            _onmessage = onmessage || function() {};
+        var defaultOptions = {
+                hostname: location.hostname,
+                method: '',
+                port: '8000',
+                autoReconnect: true,
+                onMessage: function(result) {},
+                onClose: function(result) {}
+            },
+            received_data = [],
+            origanizeOptions = function(opts) {
+                for (var name in defaultOptions) {
+                    if (false === opts.hasOwnProperty(name)) {
+                        opts[name] = defaultOptions[name];
+                    }
+                }
 
-        ws.onmessage = function(result) {
-            _onmessage(result);
-        };
+                return opts;
+            },
+            createWebSocket = function(options) {
+                var url = 'ws://' + options.hostname + ':' + options.port + '/ws/' + options.method,
+                    _ws = new WebSocket(url);
 
-        ws.onclose = function(v) {
-            // TODO: do something
-            console.log('CONNECTION CLOSED');
-            ws = null;  // release
-        };
+                _ws.onmessage = function(result) {
+                    // TODO: logging
+                    received_data.push(result.data);
+                    options.onMessage(result);
+                };
+
+                _ws.onclose = function(result) {
+                    // TODO: logging
+                    options.onClose(result);
+
+                    if (true === options.autoReconnect) {
+                        received_data = [];
+                        ws = createWebSocket(options);
+                    }
+                    else {
+                        ws = null;  // release
+                    }
+                };
+
+                return _ws;
+            },
+            ws = null;
+
+        options = origanizeOptions(options);
+        ws = createWebSocket(options);
 
         return {
-            send : function(data, onmessage) {
-                _onmessage = onmessage || _onmessage || function() {};
-
+            send: function(data) {
                 var wait = 0,
                     retry_times = 1000,
                     timer = setInterval(function() {
@@ -36,7 +75,7 @@ define(['jquery'], function($) {
                             }
                         }
                         catch (ex) {
-                            // TODO: do something
+                            // TODO: logging
                         }
 
                         if (retry_times <= 0) {
@@ -46,11 +85,35 @@ define(['jquery'], function($) {
                         wait = 100;
 
                     }, wait);
+
+                return this;
             },
-            close : function() {
+
+            fetchData: function() {
+                return received_data;
+            },
+
+            fetchLastResponse: function() {
+                return this.fetchData()[received_data.length - 1];
+            },
+
+            close: function() {
                 if (null !== ws) {
                     ws.close();
                 }
+            },
+
+            // events
+            onMessage: function(callback) {
+                options.onMessage = callback;
+
+                return this;
+            },
+
+            onClose: function(callback) {
+                options.onclose = callback;
+
+                return this;
             }
         };
     };
