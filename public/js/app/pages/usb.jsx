@@ -9,12 +9,6 @@ define([
         args = args || {};
 
         var view = React.createClass({
-            getInitialState: function() {
-                return {};
-            },
-            componentDidMount: function() {
-                
-            },
             _handleSlideToggle: function(e) {
                 var _target = e.target.attributes["data-target"].value;
                 $('#' + _target).slideToggle();

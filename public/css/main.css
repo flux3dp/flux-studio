@@ -47,18 +47,6 @@ body {
 }
 
 .btn {
-    /*background: -webkit-linear-gradient(top, rgba(30, 87, 153, 1) 0%, rgba(30, 87, 153, .5) 100%);
-    border: none;
-    border-radius: 5px;
-    box-sizing: border-box;
-    color: #fff;
-    cursor: pointer;
-    display: inline-block;
-    margin: 5px;
-    outline: none;
-    padding: 20px;
-    position: relative;
-    text-decoration: none;*/
     cursor: pointer;
     display: inline-block;
     min-height: 1em;
@@ -98,16 +86,6 @@ body {
 }
 
 .btn:hover {
-    /*background: rgba(255, 255, 255, .1);
-    border-radius: 5px;
-    content: "";
-    display: block;
-    height: 100%;
-    left: 0;
-    pointer-events: none;
-    position: absolute;
-    top: 0;
-    width: 100%;*/
     background-color: #e8e8e8;
     background-image: none;
     box-shadow: '';
@@ -115,7 +93,6 @@ body {
 }
 
 .btn:active {
-    /*background: -webkit-linear-gradient(top, rgba(30, 87, 153, .5) 0%, rgba(30, 87, 153, 1) 100%);*/
     background-color: #ccc;
     background-image: '';
     color: rgba(0,0,0,.8);
