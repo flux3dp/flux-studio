@@ -12,21 +12,23 @@ define([
 
         var options = [],
             View = React.createClass({
+
                 render : function() {
-                    var lang = this.state.lang;
+                    var lang = args.state.lang;
 
                     return (
-                        <div className="form">
-                            <h1>{lang.settings.flux_cloud.caption}</h1>
-                            <h2>{lang.settings.flux_cloud.line1}</h2>
-                            <button className="btn">{lang.settings.flux_cloud.start_to_use}</button>
-                            <button className="btn btn-link">{lang.settings.flux_cloud.i_have_an_account}</button>
+                        <div className="form cloud">
+                            <img src="/img/img-cloud.png" width="320" />
+                            <div className="description">
+                                <div className="font1">{lang.settings.flux_cloud.caption}</div>
+                                <div className="font2">{lang.settings.flux_cloud.line1}</div>
+                                <div className="actions">
+                                    <div><a className="btn btn-default-dark btn-start">{lang.settings.flux_cloud.start_to_use}</a></div>
+                                    <div><a href="javascript:void(0);" className="font4 link-account">{lang.settings.flux_cloud.i_have_an_account}</a></div>
+                                </div>
+                            </div>
                         </div>
                     );
-                },
-
-                getInitialState: function() {
-                    return args.state;
                 }
 
             });

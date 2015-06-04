@@ -102,6 +102,16 @@ define(function() {
                 line1: 'Control your FLUX 3D Printer with FLUX Cloud in anywhere you are',
                 start_to_use: 'Start to Use',
                 i_have_an_account: 'I have an account'
+            },
+            cancel: 'CANCEL',
+            done: 'DONE',
+            create_account: {
+                create: 'Create new account',
+                your_email: 'Your Email',
+                password: 'Your Password',
+                confirm_password: 'Confirm Password',
+                signup: 'Sign Up',
+                not_now: 'not now'
             }
         },
         print: {

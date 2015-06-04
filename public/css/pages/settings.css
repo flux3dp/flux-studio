@@ -11,39 +11,244 @@
     position: absolute;
     width: 800px;
     height: 600px;
+    background-color: #FFF;
     box-shadow: 0px 0px 12px 0px rgba(50%,50%,50%,0.8);
 }
 
 .settings header {
-    background: #DDD;
-    padding: 25px;
-    padding-bottom: 0;
+    height: 47px;
+    padding-top: 30px;
 }
 
-.settings header h1 {
-    margin-top: 0;
+.settings .btn-default-dark {
+    background-color: #424242;
+    font-size: 14px;
+    color: #FFF;
 }
 
-.settings .menu {
+.settings .btn-defaul-darkt:hover {
+    border: 1px #4A4A4A solid;
+}
+
+.settings .btn-default-light {
+    background-color: #FFFFFF;
+    border: 1px #E0E0E0 solid;
+    font-size: 14px;
+    color: #000;
+    text-align: center;
+}
+
+.settings .btn-defaul-light:hover {
+    background-color: #000;
+}
+
+.settings ul.nav {
+    list-style-type: none;
+    padding: 0;
     margin: 0 auto;
-    width: 60%;
+    width: 70%;
+    background-color: #FFF;
+    text-align: center;
 }
 
-.settings .menu .menu-item {
-    width: calc(100% / 3);
+.settings .nav li.nav-item {
+    width: 165px;
+    height: 47px;
+    line-height: 47px;
+    display: inline;
+    float: left;
+    border-bottom: 2px #E0E0E0 solid;
+}
+
+.settings .nav li.active {
+    border-bottom: 2px #424242 solid;
+}
+
+.settings .nav a {
+    font-size: 16px;
+    letter-spacing: 0.3px;
+    color: #777777;
+    text-decoration: none;
 }
 
 .settings .tabs .active {
     background: rgba(255, 255, 255, 0.7);
 }
 
+.settings .tab-container {
+    margin-top: 40px;
+    display: inline-block;
+    width: 100%;
+}
+
+.settings .tab-container.no-top-margin {
+    margin-top: 0px;
+}
+
 .settings .form {
+    width: 70%;
     margin: 0 auto;
-    padding: 25px;
-    width: 80%;
+}
+
+.settings .form .no-left-margin {
+    margin-left: 0;
 }
 
 .settings .printer-list ul {
     list-style: none;
     padding: 0;
+}
+
+.settings .general .row-fluid {
+    margin: 0 0 20px 0;
+}
+
+.settings .general select {
+    width: 240px;
+    height: 32px;
+    overflow: hidden;;
+    border: 1px solid #ccc;
+    background-color: #FFFFFF;
+}
+
+.settings footer {
+    width: 100%;
+    height: 100px;
+    border-top: 1px #E0E0E0 solid;
+    text-align: center;
+}
+
+.settings footer .actions {
+    padding-top: 30px;
+}
+
+.settings footer .actions a {
+    margin: 0 13px;
+}
+
+.settings footer .actions .btn-cancel {
+    background-color: #FFFFFF;
+    border: 1px #E0E0E0 solid;
+    font-size: 14px;
+    color: #000;
+}
+
+.settings footer .actions .btn-cancel:hover {
+    border: 1px #4A4A4A solid;
+}
+
+.settings footer .actions .btn-done {
+    background-color: #424242;
+    font-size: 14px;
+    color: #FFF;
+}
+
+.settings footer .actions .btn-done:hover {
+    background-color: #000;
+}
+
+.settings .font1 {
+    font-size: 18px;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    color: #424242;
+}
+
+.settings .font2 {
+    font-size: 15px;
+    letter-spacing: 0.3px;
+    color: #777777;
+}
+
+.settings .font3 {
+    font-size: 14px;
+    letter-spacing: 0.3px;
+    color: #424242;
+}
+
+.settings .font4 {
+    font-size: 13px;
+    letter-spacing: 0.3px;
+    color: #777777;
+}
+
+
+/*for cloud*/
+
+
+.settings .cloud {
+    text-align: center;
+}
+
+.settings .cloud .description {
+    padding-top: 20px;
+}
+
+.settings .cloud .description div {
+    padding-bottom: 10px;
+}
+
+.settings .cloud .description .actions {
+    padding-top: 10px;
+}
+
+.settings .cloud .btn-start {
+    padding: 0 40px;
+    height: 38px;
+    line-height: 38px;
+}
+
+/*create account*/
+
+.settings .create-account .top-nav {
+    margin-top: 20px;
+    overflow: auto;
+}
+
+.settings .create-account .back {
+    float: left;
+    margin-left: 20px;
+}
+
+.settings .create-account .cancel {
+    float: right;
+    margin-right: 20px;
+}
+
+.settings .create-account .account-info {
+    width: 240px;
+    margin: 0 auto;
+}
+
+.settings .create-account h2 {
+    margin-top: 58px;
+    margin-bottom: 32px;
+    font-size: 24px;
+    color: #424242;
+    font-weight: 500;
+}
+
+.settings .create-account .account-info input {
+    width: 100%;
+    margin-top: 5px;
+    font-size: 14px;
+    color: #BDBDBD;
+    height: 35px;
+}
+
+.settings .create-account .form-group {
+    margin-bottom: 20px;
+}
+
+.settings .create-account .actions {
+    text-align: center;
+}
+
+.settings .create-account .btn-default-dark {
+    width: 100%;
+    margin: 10px 0;
+}
+
+.settings .create-account .btn-default-dark:hover {
+    background-color: #000000;
 }

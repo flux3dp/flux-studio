@@ -99,6 +99,16 @@ define(function() {
                 line1: 'Control your FLUX 3D Printer with FLUX Cloud in anywhere you are',
                 start_to_use: 'Start to Use',
                 i_have_an_account: 'I have an account'
+            },
+            cancel: '取消',
+            done: '完成',
+            create_account: {
+                create_account: '建立新帳號',
+                your_email: '電子郵件',
+                password: '密碼',
+                confirm_password: '確認密碼',
+                signup: '建立帳號',
+                not_now: '目前先跳過'
             }
         },
         print: {

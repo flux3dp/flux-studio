@@ -16,32 +16,32 @@ define([
                     var lang = this.state.lang;
 
                     return (
-                        <div className="form">
+                        <div className="form general">
 
                             <div className="row-fluid">
 
-                                <div className="span2">
-                                    <label>
+                                <div className="span3 no-left-margin">
+                                    <label className="font2">
                                         {lang.settings.language}
                                     </label>
                                 </div>
 
                                 <div className="span8">
-                                    <SelectView id="select-lang" options={options}/>
+                                    <SelectView id="select-lang" className="font3" options={options}/>
                                 </div>
 
                             </div>
 
                             <div className="row-fluid">
 
-                                <div className="span2">
-                                    <label>
+                                <div className="span3 no-left-margin">
+                                    <label className="font2">
                                         {lang.settings.notifications}
                                     </label>
                                 </div>
 
                                 <div className="span8">
-                                    <select>
+                                    <select className="font3">
                                         <option>None</option>
                                     </select>
                                 </div>
