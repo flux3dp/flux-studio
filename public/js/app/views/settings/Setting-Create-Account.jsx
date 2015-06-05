@@ -2,10 +2,11 @@ define([
     'jquery',
     'react',
     'helpers/i18n',
+    'jsx!views/settings/Setting-Menuless-Top-Nav',
     'css!cssHome/pages/settings'
-], function($, React, i18n) {
+], function($, React, i18n, TopNav) {
     'use strict';
-
+    console.log(TopNav);
     return function(args) {
         args = args || {};
 
@@ -16,35 +17,28 @@ define([
 
                     return (
                         <div className="create-account">
-                            <div className="top-nav">
-                                <div className="back">
-                                    <img src="http://placehold.it/40x40" />
-                                </div>
-                                <div className="cancel">
-                                    <a className="btn btn-default-light">{lang.settings.cancel}</a>
-                                </div>
-                            </div>
+                            <TopNav lang={lang}/>
                             <div className="account-info">
                                 <h2>Create new account</h2>
                                 <div className="form-group">
                                     <label className="font2">{lang.settings.create_account.create}</label>
-                                    <input type="text" placeholder="mail@flux.com" />
+                                    <input className="font3" type="text" placeholder="mail@flux.com" />
                                 </div>
                                 <div className="form-group">
                                     <label className="font2">{lang.settings.create_account.password}</label>
-                                    <input type="text" placeholder="" />
+                                    <input className="font3" type="password" placeholder="" />
                                 </div>
                                 <div className="form-group">
                                     <label className="font2">{lang.settings.create_account.confirm_password}</label>
-                                    <input type="text" placeholder="" />
+                                    <input className="font3" type="password" placeholder="" />
                                 </div>
                                 <div className="actions">
-                                    <div><a className="btn btn-default-dark">{lang.settings.create_account.signup}</a></div>
+                                    <div><a href="#studio/settings/setting-activation-notice" className="btn btn-default-dark">{lang.settings.create_account.signup}</a></div>
                                     <div><a className="font4" href="#">{lang.settings.create_account.not_now}</a></div>
                                 </div>
                             </div>
                         </div>
-                    )
+                    );
                 }
 
             });

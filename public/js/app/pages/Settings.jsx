@@ -29,6 +29,13 @@ define([
                 switch (args.child) {
                     case 'flux-cloud':
                         childView = 'Setting-Flux-Cloud';
+                        this.setState({
+                            displayFooter: false
+                        });
+                        break;
+
+                    case 'flux-cloud-setup':
+                        childView = 'Setting-Flux-Cloud-Setup';
                         break;
 
                     case 'printer':
@@ -66,7 +73,7 @@ define([
                         {active: 'general' === args.child}),
                     fluxCloudClass = classNames(
                         menu_item,
-                        {active: 'flux-cloud' === args.child}),
+                        {active: 'flux-cloud' === args.child || 'flux-cloud-setup' === args.child}),
                     printerClass = classNames(
                         menu_item,
                         {active: 'printer' === args.child}),

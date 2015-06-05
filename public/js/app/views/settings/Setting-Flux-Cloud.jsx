@@ -17,15 +17,32 @@ define([
                     var lang = args.state.lang;
 
                     return (
-                        <div className="form cloud">
-                            <img src="/img/img-cloud.png" width="320" />
-                            <div className="description">
-                                <div className="font1">{lang.settings.flux_cloud.caption}</div>
-                                <div className="font2">{lang.settings.flux_cloud.line1}</div>
-                                <div className="actions">
-                                    <div><a className="btn btn-default-dark btn-start">{lang.settings.flux_cloud.start_to_use}</a></div>
-                                    <div><a href="javascript:void(0);" className="font4 link-account">{lang.settings.flux_cloud.i_have_an_account}</a></div>
+                        <div className="form main cloud">
+                            <div className="row-fluid">
+                                <div className="span3 label font2">{lang.settings.flux_cloud.email}</div>
+                                <div className="span9 controls">user@flux3dp.com</div>
+                            </div>
+                            <div className="row-fluid">
+                                <div className="span3 label font2">{lang.settings.flux_cloud.password}</div>
+                                <div className="span9 controls">
+                                    <a className="btn btn-default-light font3">{lang.settings.flux_cloud.change_password}</a>
                                 </div>
+                            </div>
+                            <div className="row-fluid">
+                                <div className="span3 label font2 connected-printer">{lang.settings.flux_cloud.connected_printer}</div>
+                                <div className="span9 font3">
+                                    <div className="row-fluid">
+                                        <div className="span6 name">user@flux3dp.com</div>
+                                        <div className="span6 actions"><a className="fa fa-times"></a></div>
+                                    </div>
+                                    <div className="row-fluid">
+                                        <div className="span6 name">user@flux3dp.com</div>
+                                        <div className="span6 actions"><a>connect</a></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="row-fluid footer">
+                                <a className="btn btn-default-dark btn-long">{lang.settings.done}</a>
                             </div>
                         </div>
                     );

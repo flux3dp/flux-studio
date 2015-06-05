@@ -20,17 +20,22 @@
     padding-top: 30px;
 }
 
-.settings .btn-default-dark {
+.settings a {
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.settings .btn.btn-default-dark {
     background-color: #424242;
     font-size: 14px;
     color: #FFF;
 }
 
-.settings .btn-defaul-darkt:hover {
-    border: 1px #4A4A4A solid;
+.settings .btn.btn-default-dark:hover {
+    background-color: #000000;
 }
 
-.settings .btn-default-light {
+.settings .btn.btn-default-light {
     background-color: #FFFFFF;
     border: 1px #E0E0E0 solid;
     font-size: 14px;
@@ -38,8 +43,14 @@
     text-align: center;
 }
 
-.settings .btn-defaul-light:hover {
-    background-color: #000;
+.settings .btn-long {
+    width: 240px;
+    height: 38px;
+    line-height: 38px;
+}
+
+.settings .btn.btn-default-light:hover {
+    border: 1px #4A4A4A solid;
 }
 
 .settings ul.nav {
@@ -198,19 +209,69 @@
     line-height: 38px;
 }
 
+.settings .cloud .label {
+    text-align: right;
+    padding-right: 10px;
+}
+
+.settings .cloud .controls {
+    text-align: left;
+    padding-left: 10px;
+    font-size: 14px;
+    color: #BDBDBD;
+    letter-spacing: 0.3px
+}
+
+.settings .main.cloud {
+    width:90%;
+}
+
+.settings .main.cloud .btn-default-light {
+    width: 145px;
+    height: 34px;
+    line-height: 34px;
+    text-align: center;
+}
+
+.settings .main.cloud .row-fluid {
+    padding-bottom: 10px;
+}
+
+.settings .main.cloud .connected-printer {
+    margin-top: 10px;
+    display: inline-block;
+    vertical-align: top;
+}
+
+.settings .main.cloud .name {
+    display: inline-block;
+    text-align: left;
+}
+
+.settings .main.cloud .actions {
+    display: inline-block;
+    text-align: left;
+}
+
+.settings .main.cloud .footer {
+    width:90%;
+    position: absolute;
+    bottom: 60px;
+}
+
 /*create account*/
 
-.settings .create-account .top-nav {
+.settings .top-nav {
     margin-top: 20px;
     overflow: auto;
 }
 
-.settings .create-account .back {
+.settings .top-nav .back {
     float: left;
     margin-left: 20px;
 }
 
-.settings .create-account .cancel {
+.settings .top-nav .cancel {
     float: right;
     margin-right: 20px;
 }
@@ -249,6 +310,69 @@
     margin: 10px 0;
 }
 
-.settings .create-account .btn-default-dark:hover {
-    background-color: #000000;
+/*activation info*/
+
+.settings .activation-notice .notice-info {
+    text-align: center;
+    margin-top: 70px;
+}
+
+.settings .activation-notice .notice-info .title {
+    margin-top: 44px;
+}
+
+.settings .activation-notice .notice-info .description {
+    margin-top: 5px;
+}
+
+.settings .activation-notice .btn-default-dark {
+    margin-top: 20px;
+}
+
+/*connect printer*/
+
+.settings .connection-list {
+    padding-top: 50px;
+    margin: 0 auto;
+    width: 40%;
+}
+
+.settings .connection-list .title {
+    font-size: 26px;
+    color: #424242;
+}
+
+.settings .connection-list .connections {
+    margin-top: 30px;
+}
+
+.settings .connection-list .connection {
+    overflow: auto;
+    height: 60px;
+    border-bottom: 1px #777777 dashed;
+}
+
+.settings .connection-list .name {
+    float: left;
+    margin-top: 20px;
+}
+
+.settings .connection-list .select {
+    width:30px;
+    height: 30px;
+    background-image: url('/img/icon-select.png');
+    float: right;
+    margin-top: 15px;
+    cursor: pointer;
+}
+
+.settings .connection-list .select.active {
+    background-image: url('/img/icon-selected.png');
+}
+
+.settings .connection-list .actions {
+    text-align: center;
+    position: absolute;
+    width: 40%;
+    bottom: 60px;
 }

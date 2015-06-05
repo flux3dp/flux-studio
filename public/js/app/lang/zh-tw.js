@@ -98,7 +98,12 @@ define(function() {
                 caption: 'Get FLUX 3D Printer be remote!',
                 line1: 'Control your FLUX 3D Printer with FLUX Cloud in anywhere you are',
                 start_to_use: 'Start to Use',
-                i_have_an_account: 'I have an account'
+                i_have_an_account: 'I have an account',
+                email: '電子信箱',
+                password: '密碼',
+                change_password: '變更密碼',
+                connected_printer: '已連接印表機',
+                connect: '連接'
             },
             cancel: '取消',
             done: '完成',
@@ -109,6 +114,14 @@ define(function() {
                 confirm_password: '確認密碼',
                 signup: '建立帳號',
                 not_now: '目前先跳過'
+            },
+            activate_info:  {
+                almost_there: '最後一步了!',
+                description: '到Email帳號裡面使用連結啟動帳號',
+                got_it: '瞭解了！'
+            },
+            connect_printer: {
+                title: '選擇連接印表機'
             }
         },
         print: {

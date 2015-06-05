@@ -247,6 +247,7 @@ a {
 .span5 {
     margin: 0 10px;
     width: calc(100% / 12 * 5 - 20px);
+    display: inline-block;
 }
 
 .span6 {
@@ -258,6 +259,7 @@ a {
 .span7 {
     margin: 0 10px;
     width: calc(100% / 12 * 7 - 20px);
+    display: inline-block;
 }
 
 .span8 {

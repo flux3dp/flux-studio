@@ -101,7 +101,12 @@ define(function() {
                 caption: 'Get FLUX 3D Printer be remote!',
                 line1: 'Control your FLUX 3D Printer with FLUX Cloud in anywhere you are',
                 start_to_use: 'Start to Use',
-                i_have_an_account: 'I have an account'
+                i_have_an_account: 'I have an account',
+                email: 'Email',
+                password: 'Password',
+                change_password: 'Change Password',
+                connected_printer: 'Connected Printer',
+                connect: 'Connect'
             },
             cancel: 'CANCEL',
             done: 'DONE',
@@ -112,6 +117,14 @@ define(function() {
                 confirm_password: 'Confirm Password',
                 signup: 'Sign Up',
                 not_now: 'not now'
+            },
+            activate_info:  {
+                almost_there: 'Almost there!',
+                description: 'Go to your email inbox and activate your account',
+                got_it: 'Got it'
+            },
+            connect_printer: {
+                title: 'Connect with your printer'
             }
         },
         print: {
