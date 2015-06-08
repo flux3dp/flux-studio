@@ -25,6 +25,10 @@
     cursor: pointer;
 }
 
+.settings .center {
+    text-align: center;
+}
+
 .settings .btn.btn-default-dark {
     background-color: #424242;
     font-size: 14px;
@@ -375,4 +379,142 @@
     position: absolute;
     width: 40%;
     bottom: 60px;
+}
+
+/*printer setting*/
+
+.settings .form.printer {
+    width: 100%;
+    font-size: 14px;
+    letter-spacing: 0.3px;
+    color: #424242;
+    height: 360px;
+    overflow-x: auto;
+    overflow-y: auto;
+}
+
+.settings .form.printer {
+    font-size: 14px;
+    letter-spacing: 0.3;
+    color: #777;
+}
+
+.settings .printer .name {
+    font-size: 15px;
+    letter-spacing: 0.3px;
+    color: #4A4A4A;
+}
+
+.settings .printer .btn-default-light {
+    width: 145px;
+    height: 34px;
+    border: 1px #E0E0E0 solid;
+    line-height: 34px;
+}
+
+.settings .printer .printer-list {
+    margin: 0 0 0 30px;
+    width: 200px;
+}
+
+.settings .printer i {
+    margin-right: 10px
+}
+
+.settings .printer-list ul > li {
+    margin: 15px 0;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.settings .printer .printer-name {
+    margin-top: 0;
+}
+
+.settings .printer .printer-name div {
+    border-bottom: 1px #DDD solid;
+    padding: 10px 0;
+}
+
+.settings .printer .set-password {
+    margin-top: 26px;
+}
+
+.settings .printer .set-password .password {
+    margin: 10px 0;
+}
+
+.settings .printer .set-password span {
+    font-size: 12px;
+    letter-spacing: 0.3px;
+    color: #9B9B9B;
+}
+
+.settings .printer .password td:nth-child(2) {
+    padding-left: 20px;
+}
+
+.settings .printer .wifi {
+    margin-top: 26px;
+}
+
+.settings .printer .wifi .join-network {
+    margin: 10px 0;
+}
+
+.settings .printer .remove-printer {
+    padding: 30px 0 0 101px;
+}
+
+.settings .printer .reset-password {
+    overflow: auto;
+}
+
+.settings .printer .reset-password .row-fluid {
+    margin-top: 20px;
+}
+
+.settings .printer .reset-password .entry {
+    padding-top: 10px;
+}
+
+.settings .printer .reset-password input {
+    width: 100%;
+}
+
+.settings .printer .reset-password button {
+    float: right;
+}
+
+.settings .printer .remove-printer a {
+    text-decoration: underline;
+}
+
+/*setting up new wifi*/
+
+.settings .detect-wifi img {
+    padding-top: 20px;
+    width: 400px;
+}
+
+.settings .detect-wifi .line1 {
+    margin-top: 10px;
+}
+
+.settings .detect-wifi .line2 {
+    margin-top: 10px;
+}
+
+.settings .detect-wifi .line3 {
+    margin-top: 30px;
+}
+
+.settings .detect-wifi .line3 .btn {
+    width: 270px;
+    height: 44px;
+    line-height: 44px;
+}
+
+.settings .detect-wifi .line4 {
+    margin-top: 20px;
 }

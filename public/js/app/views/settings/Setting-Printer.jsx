@@ -16,6 +16,11 @@ define([
             View = React.createClass({
                 getInitialState: function() {
                     var printers = localStorage.get('printers');
+                    printers = [
+                        {name: 'FLUX 3D Printer Li'},
+                        {name: 'FLUX 3D Printer Si'},
+                        {name: 'FLUX 3D Printer Cu'},
+                    ]
 
                     args.state.printers = printers;
                     args.state.first_printer = printers[0];
@@ -35,45 +40,79 @@ define([
                     });
                 },
                 render : function() {
-                    var PrintersGroup = args.state.printers.map(function(printer, i) {
+                    var printerList = args.state.printers.map(function(printer, i) {
                             return (
-                                <li><button className="btn btn-link print-item" data-name={printer.name}>{printer.name}</button></li>
+                                <li><span className="print-item" data-name={printer.name}>{printer.name}</span></li>
                             );
                         }, this),
                         lang = args.state.lang,
+                        printer,
                         passwordConsole,
-                        passwordSection;
+                        passwordSection,
+                        wifiSection;
 
-                    passwordConsole =
-                        <div className="row-fluid">
-                            <label className="col span3">{lang.settings.printer.current_password}</label>
-                            <div className="col span9">
-                                <button className="btn" onClick={this._handleDisplayPasswordSection}>{lang.settings.printer.set_password}</button>
-                                <span>{lang.settings.printer.security_notice}</span>
+                    printer = (
+                        <div className="row-fluid printer-name">
+                            <label className="label">{lang.settings.printer.name}</label>
+                            <div className="name">{args.state.first_printer.name}</div>
+                        </div>
+                    );
+
+                    passwordConsole = (
+                        <div className="row-fluid set-password">
+                            <label className="label">{lang.settings.printer.current_password}</label>
+                            <div className="password">
+                                <table>
+                                    <tr>
+                                        <td>
+                                            <button className="btn btn-default-light font3" onClick={this._handleDisplayPasswordSection}>{lang.settings.printer.set_password}</button></td>
+                                        <td>
+                                            <span>{lang.settings.printer.security_notice}</span></td>
+                                    </tr>
+                                </table>
                             </div>
-                        </div>;
+                        </div>
+                    );
 
-                    passwordSection =
-                        <div>
+                    passwordSection = (
+                        <div className="reset-password">
                             <div className="row-fluid">
-                                <label className="col span3">{lang.settings.printer.your_password}</label>
-                                <div className="col span9">
+                                <label className="label">{lang.settings.printer.your_password}</label>
+                                <div className="entry">
                                     <input type="password" />
                                 </div>
                             </div>
                             <div className="row-fluid">
-                                <label className="col span3">{lang.settings.printer.confirm_password}</label>
-                                <div className="col span9">
+                                <label className="label">{lang.settings.printer.confirm_password}</label>
+                                <div className="entry">
                                     <input type="password" />
                                 </div>
                             </div>
                             <div className="row-fluid">
-                                <label className="col span3">&nbsp;</label>
-                                <div className="col span9">
-                                    <button className="btn" onClick={this._handleSetPassword}>{lang.settings.printer.save_password}</button>
+                                <div className="">
+                                    <button className="btn btn-default-light" onClick={this._handleSetPassword}>{lang.settings.printer.save_password}</button>
                                 </div>
                             </div>
-                        </div>;
+                        </div>
+                    );
+
+                    wifiSection = (
+                        <div className="row-fluid wifi">
+                            <label className="">{lang.settings.printer.connected_wi_fi}</label>
+                            <div>
+                                <div className="join-network">
+                                    <span className="name">Flux Studio</span>
+                                    <a className="pull-right">{lang.settings.printer.advanced} &gt;</a>
+                                </div>
+                                <div>
+                                    <button className="btn btn-default-light">{lang.settings.printer.join_other_network}</button>
+                                </div>
+                                <div className="remove-printer">
+                                    <a>{lang.settings.printer.disconnect_with_this_printer}</a>
+                                </div>
+                            </div>
+                        </div>
+                    );
 
                     if(!this.state.displayPassword) {
                         passwordSection = <div></div>
@@ -82,34 +121,23 @@ define([
                     }
 
                     return (
-                        <div className="form horizontal-form row-fluid clearfix">
+                        <div className="form horizontal-form printer row-fluid clearfix">
                             <div className="col span3 printer-list">
-                                <a href="#initialize/wifi/ask" id="btn-new-printer" className="btn">+{lang.settings.printer.new_printer}</a>
+                                <a href="#initialize/wifi/ask" id="btn-new-printer" className="add-printer">
+                                <i className="fa fa-plus"></i>
+                                {lang.settings.printer.new_printer}</a>
                                 <ul>
-                                    {PrintersGroup}
+                                    {printerList}
                                 </ul>
                             </div>
-                            <div className="col span9">
-                                <div className="row-fluid">
-                                    <label className="col span3">{lang.settings.printer.name}</label>
-                                    <h2 className="col span9">{args.state.first_printer.name}</h2>
-                                </div>
+                            <div className="col span6">
+                                {printer}
 
                                 {passwordConsole}
 
                                 {passwordSection}
 
-                                <div className="row-fluid">
-                                    <label className="col span3">{lang.settings.printer.connected_wi_fi}</label>
-                                    <div className="col span9">
-                                        <p>
-                                            <span>Flux Studi</span>
-                                            <button className="btn btn-link">{lang.settings.printer.advanced} &gt;</button>
-                                        </p>
-                                        <button className="btn">{lang.settings.printer.join_other_network}</button>
-                                        <button className="btn btn-warning span12">{lang.settings.printer.disconnect_with_this_printer}</button>
-                                    </div>
-                                </div>
+                                {wifiSection}
                             </div>
                         </div>
                     )

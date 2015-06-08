@@ -6,7 +6,7 @@ define([
     'css!cssHome/pages/settings'
 ], function($, React, i18n, TopNav) {
     'use strict';
-    console.log(TopNav);
+
     return function(args) {
         args = args || {};
 
