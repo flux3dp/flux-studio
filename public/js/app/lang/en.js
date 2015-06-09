@@ -27,8 +27,9 @@ define(function() {
                 line1: '請輸入「',
                 line2: '」無線網路的連線密碼',
                 password_placeholder: '請輸入 Wi-Fi 密碼',
-                cancel: '取消',
-                join: '加入',
+                back: 'Back',
+                join: 'Join',
+                connecting: 'Connecting'
             },
             success: {
                 caption: '太棒了，連線成功!',
@@ -54,13 +55,13 @@ define(function() {
                 description: 'Lets start your first printing experience！',
                 start: 'Start Using FLUX'
             },
-            flux_as_wifi_1: {
+            configuring_flux: {
                 caption: 'We\'re configuring your FLUX as a wifi station',
                 description: 'so you can control your FLUX through wifi network',
                 next: 'next',
                 footer: 'I want to swtich back to wifi connection'
             },
-            flux_as_wifi_2: {
+            configured_flux: {
                 caption: 'Your FLUX is now a wifi station',
                 description: 'you can start using it after few simple setting',
                 next: 'next',

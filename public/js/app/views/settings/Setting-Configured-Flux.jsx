@@ -3,10 +3,10 @@ define([
     'react',
     'helpers/i18n',
     'jsx!views/settings/Setting-Menuless-Top-Nav',
-    'jsx!views/wifi/Detect-Wifi',
+    'jsx!views/wifi/Configured-Flux',
     'css!cssHome/pages/settings',
     'css!cssHome/pages/wifi'
-], function($, React, i18n, TopNav, DetectWifi) {
+], function($, React, i18n, TopNav, ConfiguredFlux) {
     'use strict';
 
     return function(args) {
@@ -15,24 +15,18 @@ define([
         var options = [],
             View = React.createClass({
                 componentDidMount: function() {
-                    $('#btn-start').addClass('btn-default-dark');
+                    $('#btn-next').addClass('btn-default-dark');
                 },
-                _handleStartDetect: function() {
-                    location.href = '#studio/settings/setting-select-wifi';
-                },
-                _handleCancel: function() {
-
+                _handleNext: function() {
+                    location.href = '#studio/settings/setting-set-printer';
                 },
                 render : function() {
                     var lang = args.state.lang;
 
                     return (
-                        <div className="detect-wifi">
-                            <TopNav lang={lang} hideBack={true} />
-                            <DetectWifi
-                                lang={lang}
-                                onStartDetect={this._handleStartDetect}
-                                onCancel={this._handleCancel} />
+                        <div className="wifi-connected wifi center">
+                            <TopNav lang={lang} hideBack={true}/>
+                            <ConfiguredFlux lang={lang} />
                         </div>
                     )
                 }

@@ -27,8 +27,9 @@ define(function() {
                 line1: '請輸入「',
                 line2: '」無線網路的連線密碼',
                 password_placeholder: '請輸入 Wi-Fi 密碼',
-                cancel: '取消',
+                back: '上一步',
                 join: '加入',
+                connecting: '連線中'
             },
             success: {
                 caption: '太棒了，連線成功!',
@@ -54,13 +55,13 @@ define(function() {
                 description: '快點開始進行你的第一次列印',
                 start: '開始使用'
             },
-            flux_as_wifi_1: {
+            configuring_flux: {
                 caption: '我們正在讓你的FLUX變成一個無線基地台...',
                 description: '如此一來，你就可以透過內部的網路來控制你的FLUX',
                 next: '下一步',
                 footer: '我想要改回使用Wifi連線'
             },
-            flux_as_wifi_2: {
+            configured_flux: {
                 caption: '你的FLUX已經成為一個無線基地台',
                 description: '只剩下為你的FLUX做一些簡單的設定就可以開始使用了 :)',
                 next: '下一步',

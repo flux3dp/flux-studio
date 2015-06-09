@@ -241,6 +241,22 @@
     padding-bottom: 10px;
 }
 
+.settings .main.cloud .label {
+    vertical-align: top;
+}
+
+.settings .main.cloud .reset-password .row-fluid {
+    margin: 0;
+}
+
+.settings .main.cloud .reset-password .entry {
+    margin: 5px 0 10px 0;
+}
+
+.settings .main.cloud .reset-password input {
+    width: 100%;
+}
+
 .settings .main.cloud .connected-printer {
     margin-top: 10px;
     display: inline-block;
@@ -490,31 +506,45 @@
     text-decoration: underline;
 }
 
-/*setting up new wifi*/
 
-.settings .detect-wifi img {
-    padding-top: 20px;
-    width: 400px;
-}
+/*detect new wifi*/
 
-.settings .detect-wifi .line1 {
-    margin-top: 10px;
-}
-
-.settings .detect-wifi .line2 {
-    margin-top: 10px;
-}
-
-.settings .detect-wifi .line3 {
+.settings .wifi .btn.btn-default-dark {
     margin-top: 30px;
 }
 
-.settings .detect-wifi .line3 .btn {
-    width: 270px;
-    height: 44px;
-    line-height: 44px;
+.settings .wifi img.loading {
+    margin: 15px 0;
 }
 
-.settings .detect-wifi .line4 {
-    margin-top: 20px;
+/*select wifi*/
+
+.settings .select-wifi .caption {
+    margin-top: 50px;
+}
+
+.settings .select-wifi .footer-message a {
+    text-decoration: underline;
+}
+
+.settings .select-wifi li {
+    text-align: left;
+    line-height: 40px;
+}
+
+.settings .select-wifi li .fa {
+    width: 20px;
+    padding-left: 10px;
+}
+
+/*set wifi password*/
+
+.settings .wifi .wifi-symbol {
+    margin-top: 0px;
+}
+
+/*set wifi printer*/
+
+.settings .set-printer .flux-printer img {
+    width: 125px;
 }

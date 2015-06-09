@@ -12,9 +12,51 @@ define([
 
         var options = [],
             View = React.createClass({
-
+                getInitialState: function() {
+                    return {
+                        showPasswordconfiguration: false
+                    };
+                },
+                _renderChangePasswordSection: function(lang) {
+                    return (
+                        <div className="reset-password">
+                            <div className="row-fluid">
+                                <div>
+                                    <label className="label font3">{lang.settings.printer.your_password}</label>
+                                </div>
+                                <div className="entry span9">
+                                    <input type="password" />
+                                </div>
+                            </div>
+                            <div className="row-fluid">
+                                <div>
+                                    <label className="label font3">{lang.settings.printer.confirm_password}</label>
+                                </div>
+                                <div className="entry span9">
+                                    <input type="password" />
+                                </div>
+                            </div>
+                            <div className="row-fluid">
+                                <div className="entry span9">
+                                    <button className="btn btn-default-light pull-right" onClick={this._handleSetPassword}>{lang.settings.printer.save_password}</button>
+                                </div>
+                            </div>
+                        </div>
+                    );
+                },
+                _handleConfigPassword: function() {
+                    this.setState({ showPasswordconfiguration: true });
+                },
+                _handleSetPassword: function() {
+                    this.setState({ showPasswordconfiguration: false });
+                },
                 render : function() {
-                    var lang = args.state.lang;
+                    var lang = args.state.lang,
+                        passwordSection = this._renderChangePasswordSection(lang);
+
+                    if(!this.state.showPasswordconfiguration) {
+                        passwordSection = (<a className="btn btn-default-light font3" onClick={this._handleConfigPassword}>{lang.settings.flux_cloud.change_password}</a>);
+                    }
 
                     return (
                         <div className="form main cloud">
@@ -25,7 +67,7 @@ define([
                             <div className="row-fluid">
                                 <div className="span3 label font2">{lang.settings.flux_cloud.password}</div>
                                 <div className="span9 controls">
-                                    <a className="btn btn-default-light font3">{lang.settings.flux_cloud.change_password}</a>
+                                    {passwordSection}
                                 </div>
                             </div>
                             <div className="row-fluid">

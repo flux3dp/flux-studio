@@ -13,7 +13,7 @@ define([
         var options = [],
             View = React.createClass({
                 render : function() {
-                    var lang = this.state.lang;
+                    var lang = args.state.lang;
 
                     return (
                         <div className="form general">

@@ -3,10 +3,10 @@ define([
     'react',
     'helpers/i18n',
     'jsx!views/settings/Setting-Menuless-Top-Nav',
-    'jsx!views/wifi/Detect-Wifi',
+    'jsx!views/wifi/Set-Printer',
     'css!cssHome/pages/settings',
     'css!cssHome/pages/wifi'
-], function($, React, i18n, TopNav, DetectWifi) {
+], function($, React, i18n, TopNav, SetPrinter) {
     'use strict';
 
     return function(args) {
@@ -15,24 +15,19 @@ define([
         var options = [],
             View = React.createClass({
                 componentDidMount: function() {
-                    $('#btn-start').addClass('btn-default-dark');
+                    $('#btn-set-printer').addClass('btn-default-dark');
                 },
-                _handleStartDetect: function() {
-                    location.href = '#studio/settings/setting-select-wifi';
-                },
-                _handleCancel: function() {
-
+                _handleSetPrinter: function(name, password) {
+                    console.log(name, password);
+                    location.href = '#studio/settings/setting-configuring-flux';
                 },
                 render : function() {
-                    var lang = args.state.lang;
+                    var lang = args.state.lang
 
                     return (
-                        <div className="detect-wifi">
-                            <TopNav lang={lang} hideBack={true} />
-                            <DetectWifi
-                                lang={lang}
-                                onStartDetect={this._handleStartDetect}
-                                onCancel={this._handleCancel} />
+                        <div className="set-printer wifi center">
+                            <TopNav lang={lang} hideBack={true}/>
+                            <SetPrinter lang={lang} onSetPrinter={this._handleSetPrinter} />
                         </div>
                     )
                 }

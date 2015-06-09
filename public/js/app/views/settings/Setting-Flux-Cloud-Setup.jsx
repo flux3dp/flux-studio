@@ -12,7 +12,6 @@ define([
 
         var options = [],
             View = React.createClass({
-
                 render : function() {
                     var lang = args.state.lang;
 
