@@ -260,7 +260,18 @@ define(function() {
                     text: 'ROTATE'
                 },
                 unit: {
-                    text: 'Unit'
+                    text: 'Unit',
+                    options: [
+                        {
+                            value: 'mm',
+                            label: 'mm',
+                            checked: true
+                        },
+                        {
+                            value: 'inches',
+                            label: 'inches'
+                        }
+                    ]
                 }
             }
         },
