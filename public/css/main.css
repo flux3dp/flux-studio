@@ -477,10 +477,23 @@ a {
     height: 400px;
     left: 0;
     margin: auto;
+    overflow: hidden;
     position: fixed;
     right: 0;
     top: 0;
     width: 400px;
+}
+
+.laser-object .ft-container {
+    z-index: 1;
+}
+
+.laser-object .image-active {
+    box-shadow: 0 0 10px 3px rgba(0, 0, 0, 0.5);
+}
+
+.laser-object .ft-widget {
+    cursor: move;
 }
 
 .popup-window {
