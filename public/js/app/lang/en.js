@@ -162,7 +162,7 @@ define(function() {
                             }
                         ]
                     },
-                    meterial: {
+                    material: {
                         text: 'Meterial',
                         options: [
                             {
@@ -176,8 +176,8 @@ define(function() {
                         text: 'Support',
                         options: [
                             {
-                                value: 'everywhere',
-                                label: 'Everywhere',
+                                value: 'Touching',
+                                label: 'Touching',
                                 checked: true
                             },
                             {
@@ -238,7 +238,8 @@ define(function() {
                         ]
                     }
                 }
-            }
+            },
+            quick_print: 'Quick Print'
         },
         laser: {
             import: 'Import',

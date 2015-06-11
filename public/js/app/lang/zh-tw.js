@@ -235,7 +235,8 @@ define(function() {
                         ]
                     }
                 }
-            }
+            },
+            quick_print: 'Quick Print'
         },
         laser: {
             import: 'Import',
@@ -251,7 +252,7 @@ define(function() {
                         engrave: 'Engrave'
                     }
                 },
-                meterial: {
+                material: {
                     text: 'Meterial',
                     options: [
                         {

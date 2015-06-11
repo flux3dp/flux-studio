@@ -134,7 +134,7 @@ function(React, $, Backbone, display, globalEvents) {
 
         settings: function(child, requests) {
             require(['jsx!pages/Settings', 'app/app-settings'], function(view, settings) {
-                child = (child || '').toLowerCase();
+                child = (child || 'general').toLowerCase();
 
                 var childView,
                     args = {
