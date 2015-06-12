@@ -439,6 +439,11 @@ a {
     width: 100%;
 }
 
+.model-displayer .camera-image {
+    height: 100%;
+    width: 100%;
+}
+
 .print-studio .model-displayer {
     background: #000;
 }
