@@ -17,8 +17,52 @@
     vertical-align: middle;
 }
 
+.studio-container header div.pull-right {
+    padding: 24px 0px;
+    border-left: 1px #CCC solid;
+    cursor: pointer;
+}
+
+.studio-container header .pull-right {
+    position: relative;
+}
+
+.studio-container header .preview {
+    position: absolute;
+    background-color: #FFF;
+    margin-top: 24px;
+    list-style-type: none;
+    text-align: left;
+    width: 212px;
+    left: -45px;
+    padding: 0;
+}
+
+.studio-container header li {
+    font-size: 14px;
+    color: #4A4A4A;
+    cursor: pointer;
+}
+
+.studio-container header li:hover {
+    background-color: #F0F0F0;
+}
+
+.studio-container header li div {
+    padding: 15px 20px;
+    font-size: 14px;
+    color: #4A4A4A;
+    cursor: pointer;
+}
+
 .studio-container .inline {
     display: inline-block
+}
+
+.studio-container .verticle-middle {
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%);
 }
 
 .studio-container .btn {
@@ -36,9 +80,17 @@
     padding-left: 20px;
 }
 
-.studio-container .pull-right {
-    padding: 24px 0px;
-    border-left: 1px #CCC solid;
+.studio-container #uploader .fa.fa-plus {
+    -moz-transition: all 0.1s linear;
+    -webkit-transition: all 0.1s linear;
+    transition: all 0.1s linear;
+}
+
+.studio-container #uploader .fa.fa-plus.rotate {
+    -ms-transform:rotate(90deg);
+    -moz-transform:rotate(90deg);
+    -webkit-transform:rotate(90deg);
+    transform:rotate(90deg);
 }
 
 .studio-container .pull-right i {
@@ -136,11 +188,19 @@
     background-image: url('/img/icon-scale-a.png');
 }
 
+.operating-panel .operation.command .scale.active {
+    background-image: url('/img/icon-scale-a.png');
+}
+
 .operating-panel .operation.command .rotate {
     background-image: url('/img/icon-rotate.png');
 }
 
 .operating-panel .operation.command .rotate:hover {
+    background-image: url('/img/icon-rotate-a.png');
+}
+
+.operating-panel .operation.command .rotate.active {
     background-image: url('/img/icon-rotate-a.png');
 }
 
@@ -196,12 +256,30 @@
 
 .studio-container .setup-panel {
     position: absolute;
-    width: 182px;
-    background-color: #FFF;
     margin-top: 20px;
     margin-left: 20px;
+}
+
+.studio-container .setup-panel .main {
+    width: 182px;
+    background-color: #FFF;
     border-radius: 3px;
-    height: 400px;
+    height: 320px;
+}
+
+.studio-container .setup-panel .btn-print {
+    width: 182px;
+    background-color: #FFF;
+    border-radius: 3px;
+    height: 100;
+    text-align: center;
+    background-color: #00C853;
+    color: #FFF;
+    margin-top: 10px;
+}
+
+.studio-container .setup-panel .btn-print:hover {
+    background-color: #33D375;
 }
 
 .studio-container .setup-panel .main .time {
@@ -216,6 +294,15 @@
     margin-bottom: 20px
 }
 
+.studio-container .setup-panel .main .setup .btn {
+    font-size: 13px;
+    letter-spacing: 0.3px;
+}
+
+.studio-container .setup-panel .main .setup .btn:hover {
+    border-color: #000;
+}
+
 .studio-container .setup-panel .main .setup > div {
     display: inline-block;
 }
@@ -224,6 +311,13 @@
     margin-left: 16px;
     vertical-align: top;
     width: 65%;
+}
+
+.studio-container .setup-panel .main .setup .btn {
+    width: 100%;
+    text-align: center;
+    height: 36px;
+    line-height: 33px
 }
 
 .studio-container .setup-panel .icon {
@@ -357,4 +451,99 @@ input.switch:checked ~ label:after
 {
     margin-left: 1.6em;
     margin-top: 0.05em;
+}
+
+/*scale panel*/
+
+.studio-container .control-bottom {
+    position: absolute;
+    bottom: 40px;
+    width: 100%;
+}
+
+.studio-container .control-bottom > div {
+    position: relative;
+    margin-left: auto;
+    margin-right: auto;
+    width: 688px;
+    height: 70px;
+    background-color: #FFF;
+}
+
+.studio-container .panel .container {
+
+}
+
+.studio-container .panel .container > div {
+    display: inline-block;
+    margin-left: 20px;
+}
+
+.studio-container .panel .controls > label {
+    font-size: 13px;
+    font-weight: 500;
+    color: #4A4A4A;
+}
+
+.studio-container .panel .controls > input {
+    width: 70px;
+    margin-left: 10px;
+}
+
+.studio-container .panel .container .lock-container {
+    vertical-align: middle;
+}
+
+.studio-container .panel .container .lock-container > div {
+    background-size: 36px 36px;
+    background-repeat: no-repeat;
+    width: 36px;
+    height: 36px;
+    cursor: pointer;
+}
+
+.studio-container .panel .lock {
+    background-image: url('/img/icon-m-lock.png');
+}
+
+.studio-container .panel .unlock {
+    background-image: url('/img/icon-m-unlock.png');
+}
+
+.studio-container .panel .btn {
+    text-align: center;
+    height: 30px;
+    line-height: 28px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #4A4A4A;
+    margin-left: 30px;
+}
+
+.studio-container .panel .btn:hover {
+    border-color: #000;
+}
+
+/*rotate panel*/
+
+/*rotate knob*/
+.studio-container .panel .controls div {
+    margin-left: 10px;
+}
+
+.studio-container .panel .controls div > canvas {
+    vertical-align: middle;
+    margin-top: 152px;
+}
+
+/*rotate knob input*/
+.studio-container .panel .controls div > input {
+    margin-top: 168px !important;
+}
+
+/*reset button*/
+.studio-container .panel .controls.pull-right {
+    position: relative;
+    top: 160px;
+    right: 20px;
 }

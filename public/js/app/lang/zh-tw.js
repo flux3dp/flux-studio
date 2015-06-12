@@ -130,6 +130,7 @@ define(function() {
             go_home: 'Go home',
             save: 'Save',
             normal_preview: 'Normal Preview',
+            support_view: 'Support Preview',
             start_print: 'Print',
             advanced: 'Advanced',
             mode: [
@@ -236,7 +237,9 @@ define(function() {
                     }
                 }
             },
-            quick_print: 'Quick Print'
+            quick_print: 'Quick Print',
+            scale: '比例',
+            reset: '重設'
         },
         laser: {
             import: 'Import',

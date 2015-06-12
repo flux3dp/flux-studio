@@ -133,6 +133,7 @@ define(function() {
             go_home: 'Go home',
             save: 'Save',
             normal_preview: 'Normal Preview',
+            support_preview: 'Support Preview',
             start_print: 'Print',
             advanced: 'Advanced',
             mode: [
@@ -239,7 +240,9 @@ define(function() {
                     }
                 }
             },
-            quick_print: 'Quick Print'
+            quick_print: 'Quick Print',
+            scale: 'Scale',
+            reset: 'Reset'
         },
         laser: {
             import: 'Import',

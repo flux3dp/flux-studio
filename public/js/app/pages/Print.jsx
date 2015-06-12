@@ -4,8 +4,14 @@ define([
     'helpers/display',
     'app/actions/print',
     'jsx!widgets/Radio-Group',
+    'plugins/classnames/index',
+    'jsx!views/print-operating-panels/Operation',
+    'jsx!views/print-operating-panels/Setting',
+    'jsx!views/print-operating-panels/Scale',
+    'jsx!views/print-operating-panels/Rotation',
+    'plugins/knob/jquery.knob.min',
     'css!cssHome/pages/print'
-], function($, React, display, printEvents, RadioGroupView) {
+], function($, React, display, printEvents, RadioGroupView, ClassNames, OperatingPanel, SettingPanel, ScalePanel, RotationPanel) {
     'use strict';
 
     return function(args) {
@@ -15,15 +21,80 @@ define([
             view = React.createClass({
                 getInitialState: function() {
                     return ({
-                        checked: false
+                        checked             : false,
+                        locked              : true,
+                        operation           : 'scale',
+                        previewMode         : 'normal',
+                        showPreviewModeList     : false
                     });
                 },
                 componentDidMount: function() {
                     printEvents(args);
+                    $('#uploader').find('.btn').hover(function(e) {
+                        $(this).find('.fa-plus').toggleClass('rotate');
+                    });
                 },
-                _handleCheck: function(e) {
+                _handlePreviewModeChange: function(mode, e) {
+                    this.setState({
+                        previewMode: mode,
+                        showPreviewModeList: false
+                    });
+                },
+                _handleShowPreviewSelection: function(e) {
+                    this.setState({ showPreviewModeList: !this.state.showPreviewModeList });
+                },
+                _handleNavUp: function() {
+                    console.log('up');
+                },
+                _handleNavRight: function() {
+                    console.log('right');
+                },
+                _handleNavDown: function() {
+                    console.log('down');
+                },
+                _handleNavLeft: function() {
+                    console.log('left');
+                },
+                _handleNavHome: function() {
+                    console.log('home');
+                },
+                _handleZoomIn: function() {
+                    console.log('zoom in');
+                },
+                _handleZoomOut: function() {
+                    console.log('zoom out');
+                },
+                _handleOperationChange: function(operation) {
+                    console.log('operation is', operation);
+                    this.setState({ operation: operation });
+                },
+                _handlePlatformClick: function(state) {
+                    console.log('platform clicked', state)
+                },
+                _handleSupportClick: function(state) {
+                    console.log('support clicked', state);
+                },
+                _handleShowAdvancedSetting: function() {
+                    console.log('show advanced setting');
+                },
+                _handlePrintStart: function() {
+                    console.log('start printing');
+                },
+                _handleResetRotation: function() {
+                    'rotation resetted'
+                },
+                _handleResetScale: function() {
+                    console.log('reset scale');
+                },
+                _handleScaleToggleLock: function(state) {
+                    console.log('lock', state);
                 },
                 _renderHeader: function() {
+                    var currentMode     = this.state.previewMode === 'normal' ? lang.print.normal_preview : lang.print.support_preview,
+                        normalClass     = ClassNames('fa', 'fa-check', 'pull-right', {hide: this.state.previewMode !== 'normal'}),
+                        supportClass    = ClassNames('fa', 'fa-check', 'pull-right', {hide: this.state.previewMode !== 'support'}),
+                        previewClass    = ClassNames('preview', {hide: !this.state.showPreviewModeList});
+
                     return (
                         <header>
                             <div id="uploader">
@@ -39,118 +110,57 @@ define([
                                 <i className="fa fa-caret-down"></i>
                             </div>
 
-                            <div className="pull-right">
+                            <div className="pull-right" onClick={this._handleShowPreviewSelection}>
                                 <i className="fa fa-eye"></i>
-                                <span>{lang.print.normal_preview}</span>
+                                <span>{currentMode}</span>
                                 <i className="fa fa-caret-down"></i>
+                                <ul className={previewClass}>
+                                    <li onClick={this._handlePreviewModeChange.bind(null, 'support')}>
+                                        <div>
+                                            {lang.print.support_preview} <i className={supportClass}></i>
+                                        </div></li>
+                                    <li onClick={this._handlePreviewModeChange.bind(null, 'normal')}>
+                                        <div>
+                                            {lang.print.normal_preview} <i className={normalClass}></i>
+                                        </div></li>
+                                </ul>
                             </div>
                         </header>
                     );
                 },
-                _renderOperatingPanel: function() {
-                    return (
-                        <div id="operating-panel" className="operating-panel">
-                            <div className="panel">
-                                <div className="operation up"><img src="/img/icon-3d-arrow-up.png" /></div>
-                                <div className="operation right"><img src="/img/icon-3d-arrow-right.png" /></div>
-                                <div className="operation down"><img src="/img/icon-3d-arrow-down.png" /></div>
-                                <div className="operation left"><img src="/img/icon-3d-arrow-left.png" /></div>
-                                <div className="operation home"><img src="/img/icon-home-s.png" /></div>
-                                <div className="operation command">
-                                    <div className="scale"></div>
-                                    <div className="rotate"></div>
-                                    <div className="center"></div>
-                                    <div className="delete"></div>
-                                </div>
-                            </div>
-                            <div className="panel">
-                                <div className="zoom">
-                                    <div className="out"><img src="/img/icon-zoomout.png" /></div>
-                                    <div className="divider"></div>
-                                    <div className="in"><img src="/img/icon-zoomin.png" /></div>
-                                </div>
-                            </div>
-                        </div>
-                    );
-                },
-                _renderSetupPanel: function() {
-                    var printSpeedOptions,
-                        materialOptions;
-
-                    printSpeedOptions = lang.print.params.beginner.print_speed.options.map(function(o) {
-                        return (<option>{o.label}</option>);
-                    });
-
-                    materialOptions = lang.print.params.beginner.material.options.map(function(o) {
-                        return (<option>{o.label}</option>);
-                    });
-
-                    // console.log(materialOptions);
-
-                    return (
-                        <div id="setup-panel" className="setup-panel">
-                            <div className="main">
-                                <div className="time">1 HR 30 MIN</div>
-                                <div className="setup">
-                                    <div className="icon print-speed"></div>
-                                    <div className="controls">
-                                        <div className="label">{lang.print.params.beginner.print_speed.text}</div>
-                                        <div className="control">
-                                            <select>
-                                                {printSpeedOptions}
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="setup">
-                                    <div className="icon material"></div>
-                                    <div className="controls">
-                                        <div className="label">{lang.print.params.beginner.material.text}</div>
-                                        <div className="control">
-                                            <select>
-                                                {materialOptions}
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="setup">
-                                    <div className="icon platform"></div>
-                                    <div className="controls">
-                                        <div className="label">{lang.print.params.beginner.platform.text}</div>
-                                        <div className="control">
-                                            <label>{lang.print.params.beginner.platform.options[0].label}</label>
-                                            <div className="switchContainer">
-                                                <input type="checkbox" id="platformSwtich" name="platformSwtich" className="switch" onClick={this._handleCheck} />
-                                                <label htmlFor="platformSwtich">&nbsp;</label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="setup">
-                                    <div className="icon support"></div>
-                                    <div className="controls">
-                                        <div className="label">{lang.print.params.beginner.support.text}</div>
-                                        <div className="control">
-                                            <label>{lang.print.params.beginner.support.options[0].label}</label>
-                                            <div className="switchContainer">
-                                                <input type="checkbox" id="supportSwitch" name="supportSwitch" className="switch" onClick={this._handleCheck} />
-                                                <label htmlFor="supportSwitch">&nbsp;</label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            {/*<div className="action">
-                                <a className="btn"><img src="/img/icon-goprint.png" />{lang.menu.print}</a>
-                            </div>*/}
-                        </div>
-                    );
-                },
                 render : function() {
-                    var lang = this.state.lang,
-                        header = this._renderHeader(),
-                        operatingPanel = this._renderOperatingPanel(),
-                        setupPanel = this._renderSetupPanel();
+                    var header          = this._renderHeader(),
+                        operatingPanel,
+                        settingPanel,
+                        bottomPanel;
+
+                    operatingPanel = <OperatingPanel
+                                        lang                = {lang}
+                                        onNavUp             = {this._handleNavUp}
+                                        onNavRight          = {this._handleNavRight}
+                                        onNavDown           = {this._handleNavDown}
+                                        onNavLeft           = {this._handleNavLeft}
+                                        onNavHome           = {this._handleNavHome}
+                                        onZoomIn            = {this._handleZoomIn}
+                                        onZoomOut           = {this._handleZoomOut}
+                                        onOperationChange   = {this._handleOperationChange} />;
+
+
+                    settingPanel = <SettingPanel
+                                        lang                    = {lang}
+                                        onPlatformClick         = {this._handlePlatformClick}
+                                        onSupportClick          = {this._handleSupportClick}
+                                        onShowAdvancedSetting   = {this._handleShowAdvancedSetting}
+                                        onPrintStart            = {this._handlePrintStart} />;
+
+                    switch(this.state.operation) {
+                        case 'rotate':
+                            bottomPanel = <RotationPanel lang={lang} onReset={this._handleResetRotation} />
+                            break;
+                        default:
+                            bottomPanel = <ScalePanel lang={lang} onReset={this._handleResetScale} onToggleLock={this._handleScaleToggleLock} />
+                            break;
+                    }
 
                     return (
                         <div className="studio-container print-studio">
@@ -159,7 +169,9 @@ define([
 
                             {operatingPanel}
 
-                            {setupPanel}
+                            {settingPanel}
+
+                            {bottomPanel}
 
                             <div id="model-displayer" className="model-displayer"></div>
                         </div>

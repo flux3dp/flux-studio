@@ -6,7 +6,7 @@ define([
     'helpers/display',
     'plugins/classnames/index',
     'css!cssHome/pages/settings'
-], function($, React, i18n, SelectView, display, classNames) {
+], function($, React, i18n, SelectView, Display, ClassNames) {
     'use strict';
 
     return function(args) {
@@ -61,23 +61,23 @@ define([
                             supported_langs: settings.i18n.supported_langs
                         }
                     };
-                    display(view, args, $('.tab-container')[0]);
+                    Display(view, args, $('.tab-container')[0]);
                 });
             },
 
             render : function() {
                 var lang = args.state.lang,
                     menu_item = 'nav-item',
-                    generalClass = classNames(
+                    generalClass = ClassNames(
                         menu_item,
                         {active: 'general' === args.child}),
-                    fluxCloudClass = classNames(
+                    fluxCloudClass = ClassNames(
                         menu_item,
                         {active: 'flux-cloud' === args.child || 'flux-cloud-setup' === args.child}),
-                    printerClass = classNames(
+                    printerClass = ClassNames(
                         menu_item,
                         {active: 'printer' === args.child}),
-                    tabContainerClass = classNames(
+                    tabContainerClass = ClassNames(
                         'tab-container',
                         {'no-top-margin': !this.state.displayMenu}),
                     header,
