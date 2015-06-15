@@ -5,6 +5,7 @@ define([
     'use strict';
 
     var THREE = window.THREE || {},
+        geometry = new THREE.BufferGeometry(),
         container, camera, scene, renderer, controls;
 
     function init() {
@@ -38,7 +39,7 @@ define([
         animate();
     }
 
-    function appendModel(model_data) {
+    function setupGeometry(model_data) {
         var SET_ELEM_NUMBER = 6,
             X = 0,
             Y = 1,
@@ -49,10 +50,7 @@ define([
             number_sets = model_data.length / SET_ELEM_NUMBER,
             vertices = new Float32Array( number_sets * 3 ), // three components per vertex
             colors = new Float32Array( number_sets * 3 ),
-            color = new THREE.Color(),
-            geometry, material, mesh;
-
-        geometry = new THREE.BufferGeometry();
+            color = new THREE.Color();
 
         // components of the position vector for each vertex are stored
         // contiguously in the buffer.
@@ -75,7 +73,16 @@ define([
         geometry.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
         geometry.addAttribute( 'color', new THREE.BufferAttribute(colors, 3));
 
+        geometry.dynamic = true;
         geometry.computeBoundingBox();
+
+        return geometry;
+    }
+
+    function appendModel(model_data) {
+        var material, geometry, mesh;
+
+        geometry = setupGeometry(model_data);
 
         material = new THREE.PointCloudMaterial({
             size: 0.01,
@@ -84,6 +91,16 @@ define([
 
         mesh = new THREE.PointCloud( geometry, material );
         scene.add( mesh );
+
+        return mesh;
+    }
+
+    function updateMesh(mesh, model_data) {
+        mesh.geometry = setupGeometry(model_data);
+
+        // refs: https://github.com/mrdoob/three.js/wiki/Migration#r56--r57
+        mesh.geometry.attributes.position.needsUpdate = true;
+        mesh.geometry.attributes.color.needsUpdate = true;
 
         return mesh;
     }
@@ -168,6 +185,7 @@ define([
 
     return {
         init: init,
-        appendModel: appendModel
+        appendModel: appendModel,
+        updateMesh: updateMesh
     };
 });
