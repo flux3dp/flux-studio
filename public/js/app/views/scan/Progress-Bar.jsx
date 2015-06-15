@@ -8,13 +8,16 @@ define([
 
         var Widget = React.createClass({
                 render : function() {
-                    var lang = this.state.lang;
+                    var lang = this.state.lang,
+                        style = {
+                            width: this.state.progressPercentage + '%'
+                        };
 
                     return (
                         <div className="scan-progress absolute-center">
                             <h4>{lang.scan.convert_to_3d_model}</h4>
                             <div className="progress">
-                                <div className="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100"/>
+                                <div className="progress-bar progress-bar-striped active" style={style}/>
                             </div>
                             <p>{lang.scan.complete}<span>{this.state.progressPercentage}</span>%</p>
                         </div>

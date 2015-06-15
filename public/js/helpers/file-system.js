@@ -71,7 +71,6 @@ define(function() {
                                 fileWriter.write(contentBlob);
                             };
 
-                            console.log(options);
                             fr.onerror = options.onError;
                             fr.readAsArrayBuffer(options.file);
 

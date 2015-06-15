@@ -12,7 +12,7 @@ define([
 
         var view = React.createClass({
                 render : function() {
-                    var lang = this.state.lang;
+                    var lang = args.state.lang;
 
                     return (
                         <div className="studio-container laser-studio">
@@ -52,9 +52,9 @@ define([
                                                     <span className="param-icon fa fa-bullseye"></span>
                                                 </div>
                                                 <div className="param col span9">
-                                                    <h4>{lang.laser.print_params.meterial.text}</h4>
+                                                    <h4>{lang.laser.print_params.material.text}</h4>
                                                     <p>
-                                                        <SelectView className="span12" options={lang.laser.print_params.meterial.options}/>
+                                                        <SelectView className="span12" name="material" options={lang.laser.print_params.material.options}/>
                                                     </p>
                                                 </div>
                                             </div>
@@ -75,11 +75,10 @@ define([
                                             </div>
                                         </div>
                                         <div>
-                                            <button className="btn span12">{lang.laser.start_laser}</button>
+                                            <button id="btn-start" className="btn span12">{lang.laser.start_laser}</button>
                                         </div>
                                     </div>
-                                    <div className="laser-object">
-                                    </div>
+                                    <div className="laser-object"/>
                                     <div className="panel object-params">
                                         <div className="param">
                                             <h4>{lang.laser.object_params.position.text}</h4>
@@ -95,20 +94,20 @@ define([
                                             <p>
                                                 <input type="number" min="0" name="object-size-w" className="span4" defaultValue=""/>
                                                 <span>{lang.laser.object_params.size.unit.width}</span>
-                                                <input type="number" min="0" name="object-size-y" className="span4" defaultValue=""/>
+                                                <input type="number" min="0" name="object-size-h" className="span4" defaultValue=""/>
                                                 <span>{lang.laser.object_params.size.unit.height}</span>
                                             </p>
                                         </div>
                                         <div className="param">
                                             <h4>{lang.laser.object_params.rotate.text}</h4>
                                             <p>
-                                                <input type="number" min="0" name="object-angle" className="span4" defaultValue=""/>
+                                                <input type="number" min="-180" name="object-angle" className="span4" defaultValue=""/>
                                             </p>
                                         </div>
                                         <div className="param">
                                             <h4>{lang.laser.object_params.unit.text}</h4>
                                             <p>
-                                                <input type="number" min="0" name="object-unit" className="span4" defaultValue=""/>
+                                                <RadioGroupView name="object-unit" options={lang.laser.object_params.unit.options}/>
                                             </p>
                                         </div>
                                     </div>
