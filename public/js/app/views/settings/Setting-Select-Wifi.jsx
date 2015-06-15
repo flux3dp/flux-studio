@@ -15,6 +15,7 @@ define([
 
         args.props.items = [];
         for (var i = 0; i < 10; i++) {
+            // todo
             args.props.items.push({
                 id: i,
                 name: 'test-' + i,

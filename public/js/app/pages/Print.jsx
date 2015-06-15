@@ -91,8 +91,8 @@ define([
                 },
                 _renderHeader: function() {
                     var currentMode     = this.state.previewMode === 'normal' ? lang.print.normal_preview : lang.print.support_preview,
-                        normalClass     = ClassNames('fa', 'fa-check', 'pull-right', {hide: this.state.previewMode !== 'normal'}),
-                        supportClass    = ClassNames('fa', 'fa-check', 'pull-right', {hide: this.state.previewMode !== 'support'}),
+                        normalClass     = ClassNames('fa', 'fa-check', 'icon', 'pull-right', {hide: this.state.previewMode !== 'normal'}),
+                        supportClass    = ClassNames('fa', 'fa-check', 'icon', 'pull-right', {hide: this.state.previewMode !== 'support'}),
                         previewClass    = ClassNames('preview', {hide: !this.state.showPreviewModeList});
 
                     return (
@@ -100,40 +100,40 @@ define([
                             <div id="uploader" className="actions">
                                 <div>
                                     <button className="btn btn-default-light">
-                                        <i className="fa fa-plus"></i>
+                                        <span className="fa fa-plus"></span>
                                         {lang.print.import}
                                     </button>
                                 </div>
                                 <div>
                                     <button className="btn btn-default-light tip" data-tip={lang.print.go_home}>
-                                        <i className="fa fa-home"></i>
+                                        <span className="fa fa-home"></span>
                                     </button>
                                 </div>
                                 <div>
                                     <button className="btn btn-default-light tip" data-tip={lang.print.save}>
-                                        <i className="fa fa-floppy-o"></i>
+                                        <span className="fa fa-floppy-o"></span>
                                     </button>
                                 </div>
                             </div>
 
                             <div className="pull-right">
-                                <i></i>
+                                <span className="fa fa-print icon"></span>
                                 <span>{lang.print.quick_print}</span>
-                                <i className="fa fa-caret-down"></i>
+                                <span className="fa fa-caret-down icon"></span>
                             </div>
 
                             <div className="pull-right preview-container" onClick={this._handleShowPreviewSelection}>
-                                <i className="fa fa-eye"></i>
+                                <span className="fa fa-eye icon"></span>
                                 <span>{currentMode}</span>
-                                <i className="fa fa-caret-down"></i>
+                                <span className="fa fa-caret-down icon"></span>
                                 <ul className={previewClass}>
                                     <li onClick={this._handlePreviewModeChange.bind(null, 'support')}>
                                         <div>
-                                            {lang.print.support_preview} <i className={supportClass}></i>
+                                            {lang.print.support_preview} <span className={supportClass}></span>
                                         </div></li>
                                     <li onClick={this._handlePreviewModeChange.bind(null, 'normal')}>
                                         <div>
-                                            {lang.print.normal_preview} <i className={normalClass}></i>
+                                            {lang.print.normal_preview} <span className={normalClass}></span>
                                         </div></li>
                                 </ul>
                             </div>

@@ -21,7 +21,7 @@ define([
                     location.href = '#studio/settings/setting-select-wifi';
                 },
                 _handleCancel: function() {
-
+                    // todo
                 },
                 render : function() {
                     var lang = args.state.lang;

@@ -261,7 +261,7 @@ define(function() {
                         engrave: 'Engrave'
                     }
                 },
-                meterial: {
+                material: {
                     text: 'Meterial',
                     options: [
                         {

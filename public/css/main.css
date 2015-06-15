@@ -211,15 +211,6 @@ a {
     margin-top: 8px;
 }
 
-.menu .sticky-bottom {
-    background-color: #000000;
-    cursor: pointer;
-}
-
-.menu .sticky-bottom:hover {
-    background-color: #999;
-}
-
 .menu .menu-item.brand-name img,
 .menu .sticky-bottom img {
     margin-top: 15px;

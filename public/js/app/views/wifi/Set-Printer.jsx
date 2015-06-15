@@ -21,27 +21,23 @@ define([
             var name     = this.refs.name.getDOMNode().value,
                 password = this.refs.password.getDOMNode().value;
 
-            this.setState({ validPrinterName: (name !== '')});
-            this.setState({ validPrinterPassword: (password !== '')});
+            this.setState({
+                validPrinterName: (name !== ''),
+                validPrinterPassword: (password !== '')
+            });
 
-            if(name != "" && password != "") {
+            if(name != "") {
                 this.props.onSetPrinter(name, password);
             }
         },
         render : function() {
             var lang = this.props.lang,
                 cx = React.addons.classSet,
-                printerNameClass,
-                printerPasswordClass;
+                printerNameClass;
 
             printerNameClass = cx({
                 'required'  : true,
                 'error'     : !this.state.validPrinterName
-            });
-
-            printerPasswordClass = cx({
-                'required'  : true,
-                'error'     : !this.state.validPrinterPassword
             });
 
             return (
@@ -64,7 +60,7 @@ define([
                                     <label for="printer-password">
                                         {lang.wifi.set_printer.password}
                                     </label>
-                                    <input ref="password" type="password" className={printerPasswordClass}
+                                    <input ref="password" type="password"
                                     placeholder={lang.wifi.set_printer.password_placeholder}/>
                                 </p>
                                 <p className="notice">

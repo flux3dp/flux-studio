@@ -223,7 +223,7 @@
     padding-left: 10px;
     font-size: 14px;
     color: #BDBDBD;
-    letter-spacing: 0.3px
+    letter-spacing: 0.3px;
 }
 
 .settings .main.cloud {
@@ -263,11 +263,7 @@
     vertical-align: top;
 }
 
-.settings .main.cloud .name {
-    display: inline-block;
-    text-align: left;
-}
-
+.settings .main.cloud .name,
 .settings .main.cloud .actions {
     display: inline-block;
     text-align: left;
@@ -378,7 +374,7 @@
 }
 
 .settings .connection-list .select {
-    width:30px;
+    width: 30px;
     height: 30px;
     background-image: url('/img/icon-select.png');
     float: right;
@@ -407,9 +403,6 @@
     height: 360px;
     overflow-x: auto;
     overflow-y: auto;
-}
-
-.settings .form.printer {
     font-size: 14px;
     letter-spacing: 0.3;
     color: #777;
@@ -433,11 +426,11 @@
     width: 200px;
 }
 
-.settings .printer i {
+.settings .printer .fa {
     margin-right: 10px
 }
 
-.settings .printer-list ul > li {
+.settings .printer-list li {
     margin: 15px 0;
     cursor: pointer;
     font-weight: 500;

@@ -86,7 +86,6 @@
     white-space: nowrap;
     top: 50px;
     background: rgba(0,0,0,.8);
-    -moz-border-radius: 3px;
     -webkit-border-radius: 3px;
     border-radius: 3px;
     color: #FFF;
@@ -95,10 +94,6 @@
     z-index: 1;
     height: 24px;
     line-height: 24px;
-}
-
-.print-studio .inline {
-    display: inline-block
 }
 
 .print-studio .verticle-middle {
@@ -123,19 +118,16 @@
 }
 
 .print-studio #uploader .fa.fa-plus {
-    -moz-transition: all 0.1s linear;
     -webkit-transition: all 0.1s linear;
     transition: all 0.1s linear;
 }
 
 .print-studio #uploader .fa.fa-plus.rotate {
-    -ms-transform:rotate(90deg);
-    -moz-transform:rotate(90deg);
     -webkit-transform:rotate(90deg);
     transform:rotate(90deg);
 }
 
-.print-studio .pull-right i {
+.studio-container .pull-right .icon {
     padding: 0 12px;
 }
 
@@ -213,16 +205,14 @@
 }
 
 .operating-panel .operation.command > div {
-    background-repeat: no-repeat;
     background-color: #FFF;
-    background-position: center;
     width: 48px;
     height: 48px;
     border-radius: 5px;
     margin-top: 8px;
 }
 
-.operating-panel .operation.command > div > button:hover:before {
+.operating-panel .operation.command button:hover:before {
     display: block;
     position: absolute;
     content: attr(data-tip);
@@ -231,7 +221,6 @@
     white-space: nowrap;
     top: 15px;
     background: rgba(0,0,0,.8);
-    -moz-border-radius: 3px;
     -webkit-border-radius: 3px;
     border-radius: 3px;
     color: #FFF;
@@ -346,7 +335,6 @@
     width: 182px;
     background-color: #FFF;
     border-radius: 3px;
-    height: 100;
     text-align: center;
     background-color: #00C853;
     color: #FFF;
@@ -415,7 +403,6 @@
     letter-spacing: 0.3px;
     font-size: 14px;
     -webkit-appearance: none;
-    -moz-appearance: none;
     appearance: none;
 }
 
@@ -478,8 +465,6 @@ input.switch:empty ~ label
     margin: 0.2em 0;
     cursor: pointer;
     -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
     user-select: none;
 }
 
@@ -558,11 +543,11 @@ input.switch:checked ~ label:after
     margin-left: 10px;
 }
 
-.print-studio .panel .container .lock-container {
+.print-studio .panel .lock-container {
     vertical-align: middle;
 }
 
-.print-studio .panel .container .lock-container > div {
+.print-studio .panel .lock-container > div {
     background-size: 36px 36px;
     background-repeat: no-repeat;
     width: 36px;
@@ -601,12 +586,11 @@ input.switch:checked ~ label:after
 
 .print-studio .panel .controls div > canvas {
     vertical-align: middle;
-    margin-top: 152px;
 }
 
 /*reset button*/
 .print-studio .panel .controls.pull-right {
     position: relative;
-    top: 160px;
+    top: 10px;
     right: 20px;
 }
