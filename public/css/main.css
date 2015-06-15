@@ -4,7 +4,7 @@
 
 html,
 body {
-    font-family: Arial, Helvetica, sans-serif, "Microsoft JhengHei", "微軟正黑體";
+    font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif, "Microsoft JhengHei", "微軟正黑體";
     height: 100%;
     margin: 0;
     min-height: 100%;
@@ -146,7 +146,8 @@ a {
     margin: 0;
     position: fixed;
     top: 0;
-    width: 100px;
+    width: 66px;
+    background-color: #000;
 }
 
 .content {
@@ -165,7 +166,7 @@ a {
     background: #fff;
     bottom: 0;
     height: 100%;
-    left: 100px;
+    left: 66px;
     right: 0;
     top: 0;
 }
@@ -175,7 +176,7 @@ a {
 }
 
 .menu {
-    background: #ddd;
+    background-color: #000000;
     list-style: none;
     margin: 0;
     padding: 0;
@@ -186,29 +187,42 @@ a {
     color: #fff;
 }
 
-.menu .cog {
-    background: #333;
-    color: #fff;
-}
-
-.menu .fa-cog::before {
-    color: #fff;
-    font-size: 3rem;
-}
-
 .menu .menu-item {
-    height: 100px;
-    line-height: 100px;
+    height: 66px;
     text-align: center;
     width: 100%;
+    cursor: pointer;
+}
+
+.menu .menu-item:hover {
+    background-color: rgba(255, 255, 255, 0.5);
 }
 
 .menu .menu-item a {
-    color: #000;
+    color: #FFF;
     display: block;
-    height: 100%;
-    line-height: 100px;
     text-decoration: none;
+    letter-spacing: 0.3px;
+}
+
+.menu .menu-item img {
+    height: 34px;
+    width: 34px;
+    margin-top: 8px;
+}
+
+.menu .sticky-bottom {
+    background-color: #000000;
+    cursor: pointer;
+}
+
+.menu .sticky-bottom:hover {
+    background-color: #999;
+}
+
+.menu .menu-item.brand-name img,
+.menu .sticky-bottom img {
+    margin-top: 15px;
 }
 
 .horizontal-menu .menu-item {
@@ -247,6 +261,7 @@ a {
 .span5 {
     margin: 0 10px;
     width: calc(100% / 12 * 5 - 20px);
+    display: inline-block;
 }
 
 .span6 {
@@ -258,6 +273,7 @@ a {
 .span7 {
     margin: 0 10px;
     width: calc(100% / 12 * 7 - 20px);
+    display: inline-block;
 }
 
 .span8 {
@@ -434,43 +450,39 @@ a {
     position: relative;
 }
 
-.model-displayer {
+.scan-studio .model-displayer {
     height: 90%;
     width: 100%;
 }
 
-.model-displayer .camera-image {
+.scan-studio .model-displayer .camera-image {
     height: 100%;
     width: 100%;
 }
 
-.print-studio .model-displayer {
-    background: #000;
-}
-
-.operating-panel {
+.scan-studio .operating-panel {
     position: absolute;
     width: 300px;
 }
 
-.operating-panel .panel {
+.scan-studio .operating-panel .panel {
     background: rgba(212, 212, 212, 0.7);
     padding: 10px;
     position: fixed;
     z-index: 999;
 }
 
-.operating-panel .param-icon {
+.scan-studio .operating-panel .param-icon {
     color: #777;
     font-size: 2rem;
     line-height: 5rem;
 }
 
-.operating-panel .param {
+.scan-studio .operating-panel .param {
     height: 5rem;
 }
 
-.object-params {
+.laser-studio .object-params {
     right: 25px;
     width: 22%;
 }

@@ -63,6 +63,7 @@ define([
         renderer = new THREE.WebGLRenderer({
             antialias: true
         });
+        renderer.setClearColor( 0xE0E0E0, 1 );
         renderer.setPixelRatio(window.devicePixelRatio);
         renderer.setSize(container.offsetWidth, container.offsetHeight);
         renderer.sortObjects = false;
@@ -143,10 +144,8 @@ define([
     }
 
     function animate() {
-        requestAnimationFrame(animate);
-
+        //requestAnimationFrame(animate);
         render();
-
     }
 
     function render() {

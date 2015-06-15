@@ -31,7 +31,7 @@ define([
                 isValid = (name !== '');
 
                 if (isValid) {
-                    location.href='#initialize/wifi/setup-complete';
+                    location.href='#initialize/wifi/configuring-flux';
                 }
             },
             render : function() {
@@ -80,7 +80,7 @@ define([
                                 </div>
                             </div>
                             <div>
-                                <a href="#initialize/wifi/setup-complete" className="btn btn-large" id="btn-next" onClick={this._handleSetPrinter}>
+                                <a className="btn btn-large" id="btn-next" onClick={this._handleSetPrinter}>
                                     {lang.wifi.set_printer.next}</a>
                             </div>
                         </div>

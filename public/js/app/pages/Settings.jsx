@@ -4,8 +4,9 @@ define([
     'helpers/i18n',
     'jsx!widgets/Select',
     'helpers/display',
+    'plugins/classnames/index',
     'css!cssHome/pages/settings'
-], function($, React, i18n, SelectView, display) {
+], function($, React, i18n, SelectView, Display, ClassNames) {
     'use strict';
 
     return function(args) {
@@ -16,24 +17,41 @@ define([
 
         HomeView = React.createClass({
             getInitialState: function() {
-                return args.state;
+                return {
+                    displayMenu: true,
+                    displayFooter: true
+                }
             },
 
             componentDidMount: function() {
                 var childView;
 
                 switch (args.child) {
-                case 'flux-cloud':
-                    childView = 'Setting-Flux-Cloud';
-                    break;
+                    case 'flux-cloud':
+                        childView = 'Setting-Flux-Cloud';
+                        this.setState({
+                            displayFooter: false
+                        });
+                        break;
 
-                case 'printer':
-                    childView = 'Setting-Printer';
-                    break;
+                    case 'flux-cloud-setup':
+                        childView = 'Setting-Flux-Cloud-Setup';
+                        break;
 
-                default:
-                    childView = 'Setting-General';
-                    break;
+                    case 'printer':
+                        childView = 'Setting-Printer';
+                        break;
+
+                    case 'general':
+                        childView = 'Setting-General';
+                        break;
+
+                    default:
+                        childView = args.child;
+                        this.setState({
+                            displayMenu: false,
+                            displayFooter: false
+                        });
                 }
 
                 // show child view
@@ -43,39 +61,56 @@ define([
                             supported_langs: settings.i18n.supported_langs
                         }
                     };
-                    display(view, args, $('.tab-container')[0]);
+                    Display(view, args, $('.tab-container')[0]);
                 });
             },
 
             render : function() {
-                var lang = this.state.lang,
-                    menu_item = 'menu-item',
-                    tab_classes = {
-                        general : menu_item + ('general' === args.child ? ' active' : ''),
-                        flux_cloud : menu_item + ('flux-cloud' === args.child ? ' active' : ''),
-                        printer : menu_item + ('printer' === args.child ? ' active' : '')
-                    };
+                var lang = args.state.lang,
+                    menu_item = 'nav-item',
+                    generalClass = ClassNames(
+                        menu_item,
+                        {active: 'general' === args.child}),
+                    fluxCloudClass = ClassNames(
+                        menu_item,
+                        {active: 'flux-cloud' === args.child || 'flux-cloud-setup' === args.child}),
+                    printerClass = ClassNames(
+                        menu_item,
+                        {active: 'printer' === args.child}),
+                    tabContainerClass = ClassNames(
+                        'tab-container',
+                        {'no-top-margin': !this.state.displayMenu}),
+                    header,
+                    footer;
+
+                header =
+                    <header>
+                        <ul className="nav clearfix">
+                            <li className={generalClass}>
+                                <a href="#studio/settings/general">{lang.settings.tabs.general}</a>
+                            </li>
+                            <li className={fluxCloudClass}>
+                                <a href="#studio/settings/flux-cloud">{lang.settings.tabs.flux_cloud}</a>
+                            </li>
+                            <li className={printerClass}>
+                                <a href="#studio/settings/printer">{lang.settings.tabs.printer}</a>
+                            </li>
+                        </ul>
+                    </header>
+
+                footer =
+                    <footer className="sticky-bottom">
+                        <div className="actions">
+                            <a className="btn btn-cancel">{lang.settings.cancel}</a>
+                            <a className="btn btn-done">{lang.settings.done}</a>
+                        </div>
+                    </footer>
 
                 return (
                     <div className="settings">
-                        <header>
-                            <h1>{lang.settings.caption}</h1>
-                            <ul className="menu horizontal-menu tabs clearfix">
-                                <li className={tab_classes.general}>
-                                    <a href="#studio/settings/general">{lang.settings.tabs.general}</a>
-                                </li>
-                                <li className={tab_classes.flux_cloud}>
-                                    <a href="#studio/settings/flux-cloud">{lang.settings.tabs.flux_cloud}</a>
-                                </li>
-                                <li className={tab_classes.printer}>
-                                    <a href="#studio/settings/printer">{lang.settings.tabs.printer}</a>
-                                </li>
-                            </ul>
-                        </header>
-                        <div className="tab-container"></div>
-                        <footer className="sticky-bottom">
-                            <a className="btn" href="#studio/print">{lang.settings.close}</a>
-                        </footer>
+                        {this.state.displayMenu ? header : ''}
+                        <div className={tabContainerClass}></div>
+                        {this.state.displayFooter ? footer : ''}
                     </div>
                 );
             }

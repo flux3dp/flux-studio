@@ -51,7 +51,7 @@ define([
                                 placeholder={lang.wifi.set_password.password_placeholder} defaultValue=""/>
                             </div>
                             <div className="btn-group">
-                                <a href="#initialize/wifi/select" className="btn btn-default">{lang.wifi.set_password.cancel}</a>
+                                <a href="#initialize/wifi/select" className="btn btn-default">{lang.wifi.set_password.back}</a>
                                 <button id="btn-access-wifi" onClick={this._handleSetPassword} className="btn">{lang.wifi.set_password.join}</button>
                             </div>
                         </div>
