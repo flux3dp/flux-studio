@@ -130,7 +130,7 @@ define(function() {
         },
         print: {
             import: 'Import',
-            go_home: 'Go home',
+            go_home: 'Go Home',
             save: 'Save',
             normal_preview: 'Normal Preview',
             support_preview: 'Support Preview',
@@ -242,6 +242,9 @@ define(function() {
             },
             quick_print: 'Quick Print',
             scale: 'Scale',
+            rotate: 'Rotate',
+            align_center: 'Align Center',
+            delete: 'Delete',
             reset: 'Reset'
         },
         laser: {

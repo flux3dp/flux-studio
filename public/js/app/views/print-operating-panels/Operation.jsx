@@ -44,14 +44,14 @@ define([
         _handleZoomOut: function(e) {
             this.props.onZoomOut();
         },
-        _handleChangeOperation: function (operation, e) {
+        _handleOperation: function (operation, e) {
             this.props.onOperationChange(operation);
             this.setState({ operation: operation });
         },
         render: function() {
             var lang = this.props.lang,
-                scaleClass = ClassNames('scale', {'active': this.state.operation === 'scale'}),
-                rotateClass = ClassNames('rotate', {'active': this.state.operation === 'rotate'});
+                scaleClass = ClassNames('btn', 'scale', {'active': this.state.operation === 'scale'}),
+                rotateClass = ClassNames('btn', 'rotate', {'active': this.state.operation === 'rotate'});
 
             return (
                 <div id="operating-panel" className="operating-panel">
@@ -62,10 +62,18 @@ define([
                         <div className="operation left" onClick={this._handleNavLeft}><img src="/img/icon-3d-arrow-left.png" /></div>
                         <div className="operation home" onClick={this._handleNavHome}><img src="/img/icon-home-s.png" /></div>
                         <div className="operation command">
-                            <div className={scaleClass} onClick={this._handleChangeOperation.bind(null, 'scale')}></div>
-                            <div className={rotateClass} onClick={this._handleChangeOperation.bind(null, 'rotate')}></div>
-                            <div className="center"></div>
-                            <div className="delete"></div>
+                            <div>
+                                <button className={scaleClass} data-tip={lang.print.scale} onClick={this._handleOperation.bind(null, 'scale')}></button>
+                            </div>
+                            <div>
+                                <button className={rotateClass} data-tip={lang.print.rotate} onClick={this._handleOperation.bind(null, 'rotate')}></button>
+                            </div>
+                            <div>
+                                <button className="btn center" data-tip={lang.print.align_center}></button>
+                            </div>
+                            <div>
+                                <button className="btn delete" data-tip={lang.print.delete}></button>
+                            </div>
                         </div>
                     </div>
                     <div className="panel">

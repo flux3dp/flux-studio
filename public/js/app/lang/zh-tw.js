@@ -127,7 +127,7 @@ define(function() {
         },
         print: {
             import: 'Import',
-            go_home: 'Go home',
+            go_home: 'Go Home',
             save: 'Save',
             normal_preview: 'Normal Preview',
             support_view: 'Support Preview',
@@ -239,6 +239,9 @@ define(function() {
             },
             quick_print: 'Quick Print',
             scale: '比例',
+            rotate: '旋轉',
+            align_center: '置中',
+            delete: '刪除',
             reset: '重設'
         },
         laser: {

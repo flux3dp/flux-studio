@@ -97,11 +97,23 @@ define([
 
                     return (
                         <header>
-                            <div id="uploader">
-                                <button className="btn">
-                                    <i className="fa fa-plus"></i>
-                                    {lang.print.import}
-                                </button>
+                            <div id="uploader" className="actions">
+                                <div>
+                                    <button className="btn btn-default-light">
+                                        <i className="fa fa-plus"></i>
+                                        {lang.print.import}
+                                    </button>
+                                </div>
+                                <div>
+                                    <button className="btn btn-default-light tip" data-tip={lang.print.go_home}>
+                                        <i className="fa fa-home"></i>
+                                    </button>
+                                </div>
+                                <div>
+                                    <button className="btn btn-default-light tip" data-tip={lang.print.save}>
+                                        <i className="fa fa-floppy-o"></i>
+                                    </button>
+                                </div>
                             </div>
 
                             <div className="pull-right">
@@ -110,7 +122,7 @@ define([
                                 <i className="fa fa-caret-down"></i>
                             </div>
 
-                            <div className="pull-right" onClick={this._handleShowPreviewSelection}>
+                            <div className="pull-right preview-container" onClick={this._handleShowPreviewSelection}>
                                 <i className="fa fa-eye"></i>
                                 <span>{currentMode}</span>
                                 <i className="fa fa-caret-down"></i>

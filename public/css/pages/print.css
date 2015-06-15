@@ -4,6 +4,10 @@
     position: relative;
 }
 
+.studio-container .btn.btn-default-light:hover {
+    border-color: #000;
+}
+
 .studio-container header {
     height: 66px;
     width: 100%;
@@ -27,6 +31,14 @@
     position: relative;
 }
 
+.studio-container header .preview-container {
+    width: 180px;
+}
+
+.studio-container header .preview-container .fa-caret-down {
+    float: right;
+}
+
 .studio-container header .preview {
     position: absolute;
     background-color: #FFF;
@@ -34,7 +46,7 @@
     list-style-type: none;
     text-align: left;
     width: 212px;
-    left: -45px;
+    left: -33px;
     padding: 0;
 }
 
@@ -55,6 +67,38 @@
     cursor: pointer;
 }
 
+.studio-container header .actions > div {
+    display: inline-block;
+}
+
+.studio-container header .actions .btn {
+    min-width: 0px;
+    margin-right: 10px;
+    padding: 0 15px;
+}
+
+/*for tips on home / save*/
+
+.studio-container header .actions .btn.tip:hover:before {
+    display: block;
+    position: absolute;
+    content: attr(data-tip);
+    min-width: 75px;
+    text-align: center;
+    white-space: nowrap;
+    top: 50px;
+    background: rgba(0,0,0,.8);
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    color: #FFF;
+    font-size: 11px;
+    left: -15px;
+    z-index: 1;
+    height: 24px;
+    line-height: 24px;
+}
+
 .studio-container .inline {
     display: inline-block
 }
@@ -72,8 +116,8 @@
     border-radius: 5px;
 }
 
-.studio-container .btn > i {
-    margin-right: 7px;
+.studio-container .btn span {
+    margin-left: 7px;
 }
 
 .studio-container #uploader {
@@ -178,6 +222,39 @@
     height: 48px;
     border-radius: 5px;
     margin-top: 8px;
+}
+
+.operating-panel .operation.command > div > button:hover:before {
+    display: block;
+    position: absolute;
+    content: attr(data-tip);
+    min-width: 75px;
+    text-align: center;
+    white-space: nowrap;
+    top: 15px;
+    background: rgba(0,0,0,.8);
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    color: #FFF;
+    font-size: 11px;
+    left: -85px;
+    z-index: 1;
+    height: 24px;
+    line-height: 24px;
+}
+
+.operating-panel .operation.command .btn {
+    min-width: 48px;
+    height: 100%;
+    margin-left: 0;
+    background-repeat: no-repeat;
+    background-position: center;
+    border: none;
+}
+
+.operating-panel .operation.command div:last-child {
+    margin-top: 30px;
 }
 
 .operating-panel .operation.command .scale {
@@ -297,10 +374,6 @@
 .studio-container .setup-panel .main .setup .btn {
     font-size: 13px;
     letter-spacing: 0.3px;
-}
-
-.studio-container .setup-panel .main .setup .btn:hover {
-    border-color: #000;
 }
 
 .studio-container .setup-panel .main .setup > div {
