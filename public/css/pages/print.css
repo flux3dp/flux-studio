@@ -1,14 +1,12 @@
-.studio-container {
-    height: 100%;
-    /*padding: 25px;*/
-    position: relative;
+.print-studio {
+    padding: 0;
 }
 
-.studio-container .btn.btn-default-light:hover {
+.print-studio .btn.btn-default-light:hover {
     border-color: #000;
 }
 
-.studio-container header {
+.print-studio header {
     height: 66px;
     width: 100%;
     display: table;
@@ -16,30 +14,30 @@
     color: #000;
 }
 
-.studio-container header > div {
+.print-studio header > div {
     display: table-cell;
     vertical-align: middle;
 }
 
-.studio-container header div.pull-right {
+.print-studio header div.pull-right {
     padding: 24px 0px;
     border-left: 1px #CCC solid;
     cursor: pointer;
 }
 
-.studio-container header .pull-right {
+.print-studio header .pull-right {
     position: relative;
 }
 
-.studio-container header .preview-container {
+.print-studio header .preview-container {
     width: 180px;
 }
 
-.studio-container header .preview-container .fa-caret-down {
+.print-studio header .preview-container .fa-caret-down {
     float: right;
 }
 
-.studio-container header .preview {
+.print-studio header .preview {
     position: absolute;
     background-color: #FFF;
     margin-top: 24px;
@@ -50,28 +48,28 @@
     padding: 0;
 }
 
-.studio-container header li {
+.print-studio header li {
     font-size: 14px;
     color: #4A4A4A;
     cursor: pointer;
 }
 
-.studio-container header li:hover {
+.print-studio header li:hover {
     background-color: #F0F0F0;
 }
 
-.studio-container header li div {
+.print-studio header li div {
     padding: 15px 20px;
     font-size: 14px;
     color: #4A4A4A;
     cursor: pointer;
 }
 
-.studio-container header .actions > div {
+.print-studio header .actions > div {
     display: inline-block;
 }
 
-.studio-container header .actions .btn {
+.print-studio header .actions .btn {
     min-width: 0px;
     margin-right: 10px;
     padding: 0 15px;
@@ -79,7 +77,7 @@
 
 /*for tips on home / save*/
 
-.studio-container header .actions .btn.tip:hover:before {
+.print-studio header .actions .btn.tip:hover:before {
     display: block;
     position: absolute;
     content: attr(data-tip);
@@ -99,49 +97,49 @@
     line-height: 24px;
 }
 
-.studio-container .inline {
+.print-studio .inline {
     display: inline-block
 }
 
-.studio-container .verticle-middle {
+.print-studio .verticle-middle {
     position: relative;
     top: 50%;
     transform: translateY(-50%);
 }
 
-.studio-container .btn {
+.print-studio .btn {
     background-color: #FFFFFF;
     border: 1px #E0E0E0 solid;
     color: #000;
     border-radius: 5px;
 }
 
-.studio-container .btn span {
+.print-studio .btn span {
     margin-left: 7px;
 }
 
-.studio-container #uploader {
+.print-studio #uploader {
     padding-left: 20px;
 }
 
-.studio-container #uploader .fa.fa-plus {
+.print-studio #uploader .fa.fa-plus {
     -moz-transition: all 0.1s linear;
     -webkit-transition: all 0.1s linear;
     transition: all 0.1s linear;
 }
 
-.studio-container #uploader .fa.fa-plus.rotate {
+.print-studio #uploader .fa.fa-plus.rotate {
     -ms-transform:rotate(90deg);
     -moz-transform:rotate(90deg);
     -webkit-transform:rotate(90deg);
     transform:rotate(90deg);
 }
 
-.studio-container .pull-right i {
+.print-studio .pull-right i {
     padding: 0 12px;
 }
 
-.studio-container .pull-right span {
+.print-studio .pull-right span {
     font-size: 13px;
 }
 
@@ -331,20 +329,20 @@
     width: 30px;
 }
 
-.studio-container .setup-panel {
+.print-studio .setup-panel {
     position: absolute;
     margin-top: 20px;
     margin-left: 20px;
 }
 
-.studio-container .setup-panel .main {
+.print-studio .setup-panel .main {
     width: 182px;
     background-color: #FFF;
     border-radius: 3px;
     height: 320px;
 }
 
-.studio-container .setup-panel .btn-print {
+.print-studio .setup-panel .btn-print {
     width: 182px;
     background-color: #FFF;
     border-radius: 3px;
@@ -355,57 +353,57 @@
     margin-top: 10px;
 }
 
-.studio-container .setup-panel .btn-print:hover {
+.print-studio .setup-panel .btn-print:hover {
     background-color: #33D375;
 }
 
-.studio-container .setup-panel .main .time {
+.print-studio .setup-panel .main .time {
     height: 40px;
     line-height: 40px;
     text-align: center;
 }
 
-.studio-container .setup-panel .main .setup {
+.print-studio .setup-panel .main .setup {
     padding: 0 16px;
     height: 36px;
     margin-bottom: 20px
 }
 
-.studio-container .setup-panel .main .setup .btn {
+.print-studio .setup-panel .main .setup .btn {
     font-size: 13px;
     letter-spacing: 0.3px;
 }
 
-.studio-container .setup-panel .main .setup > div {
+.print-studio .setup-panel .main .setup > div {
     display: inline-block;
 }
 
-.studio-container .setup-panel .main .setup .controls {
+.print-studio .setup-panel .main .setup .controls {
     margin-left: 16px;
     vertical-align: top;
     width: 65%;
 }
 
-.studio-container .setup-panel .main .setup .btn {
+.print-studio .setup-panel .main .setup .btn {
     width: 100%;
     text-align: center;
     height: 36px;
     line-height: 33px
 }
 
-.studio-container .setup-panel .icon {
+.print-studio .setup-panel .icon {
     width: 36px;
     height: 36px;
     background-size: 36px 36px;
 }
 
-.studio-container .setup-panel .label {
+.print-studio .setup-panel .label {
     font-size: 11px;
     color: #9E9E9E;
     text-transform: uppercase;
 }
 
-.studio-container .setup-panel select {
+.print-studio .setup-panel select {
     border: 0;
     border-bottom: 1px #E0E0E0 solid;
     background-image: url('/img/icon-3d-arrow-down.png');
@@ -421,41 +419,41 @@
     appearance: none;
 }
 
-.studio-container .setup-panel .print-speed {
+.print-studio .setup-panel .print-speed {
     background-image: url('/img/icon-speed.png');
     background-repeat: no-repeat;
 }
 
-.studio-container .setup-panel .material {
+.print-studio .setup-panel .material {
     background-image: url('/img/icon-material.png');
     background-repeat: no-repeat;
 }
 
-.studio-container .setup-panel .platform {
+.print-studio .setup-panel .platform {
     background-image: url('/img/icon-platform.png');
     background-repeat: no-repeat;
 }
 
-.studio-container .setup-panel .support {
+.print-studio .setup-panel .support {
     background-image: url('/img/icon-support.png');
     background-repeat: no-repeat;
 }
 
-.studio-container .setup-panel .control label {
+.print-studio .setup-panel .control label {
     font-size: 14px;
     letter-spacing: 0.3;
     color: #000;
     display: inline-block;
 }
 
-.studio-container .setup-panel .control .switchContainer {
+.print-studio .setup-panel .control .switchContainer {
     display: inline-block;
     vertical-align: top;
     position: absolute;
     right: 55px;
 }
 
-.studio-container .setup-panel .control .switchContainer > label {
+.print-studio .setup-panel .control .switchContainer > label {
     width: 0px;
 }
 
@@ -468,7 +466,6 @@
 
 input.switch:empty
 {
-    /*margin-left: -999px;*/
     display: none;
 }
 
@@ -498,7 +495,6 @@ input.switch:empty ~ label:after
     width: 2.8em;
     background-color: #c33;
     border-radius: 1em;
-    /*box-shadow: inset 0 0.2em 0 rgba(0,0,0,0.3);*/
     -webkit-transition: all 100ms ease-in;
     transition: all 100ms ease-in;
 }
@@ -512,7 +508,6 @@ input.switch:empty ~ label:after
     margin-top: 0.05em;
     background-color: #fff;
     border-radius: 0.5em;
-    /*box-shadow: inset 0 -0.2em 0 rgba(0,0,0,0.2);*/
 }
 
 input.switch:checked ~ label:before
@@ -528,13 +523,13 @@ input.switch:checked ~ label:after
 
 /*scale panel*/
 
-.studio-container .control-bottom {
+.print-studio .control-bottom {
     position: absolute;
     bottom: 40px;
     width: 100%;
 }
 
-.studio-container .control-bottom > div {
+.print-studio .control-bottom > div {
     position: relative;
     margin-left: auto;
     margin-right: auto;
@@ -543,31 +538,31 @@ input.switch:checked ~ label:after
     background-color: #FFF;
 }
 
-.studio-container .panel .container {
+.print-studio .panel .container {
 
 }
 
-.studio-container .panel .container > div {
+.print-studio .panel .container > div {
     display: inline-block;
     margin-left: 20px;
 }
 
-.studio-container .panel .controls > label {
+.print-studio .panel .controls > label {
     font-size: 13px;
     font-weight: 500;
     color: #4A4A4A;
 }
 
-.studio-container .panel .controls > input {
+.print-studio .panel .controls > input {
     width: 70px;
     margin-left: 10px;
 }
 
-.studio-container .panel .container .lock-container {
+.print-studio .panel .container .lock-container {
     vertical-align: middle;
 }
 
-.studio-container .panel .container .lock-container > div {
+.print-studio .panel .container .lock-container > div {
     background-size: 36px 36px;
     background-repeat: no-repeat;
     width: 36px;
@@ -575,15 +570,15 @@ input.switch:checked ~ label:after
     cursor: pointer;
 }
 
-.studio-container .panel .lock {
+.print-studio .panel .lock {
     background-image: url('/img/icon-m-lock.png');
 }
 
-.studio-container .panel .unlock {
+.print-studio .panel .unlock {
     background-image: url('/img/icon-m-unlock.png');
 }
 
-.studio-container .panel .btn {
+.print-studio .panel .btn {
     text-align: center;
     height: 30px;
     line-height: 28px;
@@ -593,29 +588,24 @@ input.switch:checked ~ label:after
     margin-left: 30px;
 }
 
-.studio-container .panel .btn:hover {
+.print-studio .panel .btn:hover {
     border-color: #000;
 }
 
 /*rotate panel*/
 
 /*rotate knob*/
-.studio-container .panel .controls div {
+.print-studio .panel .controls div {
     margin-left: 10px;
 }
 
-.studio-container .panel .controls div > canvas {
+.print-studio .panel .controls div > canvas {
     vertical-align: middle;
     margin-top: 152px;
 }
 
-/*rotate knob input*/
-.studio-container .panel .controls div > input {
-    margin-top: 168px !important;
-}
-
 /*reset button*/
-.studio-container .panel .controls.pull-right {
+.print-studio .panel .controls.pull-right {
     position: relative;
     top: 160px;
     right: 20px;

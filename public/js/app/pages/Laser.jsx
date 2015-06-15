@@ -12,7 +12,7 @@ define([
 
         var view = React.createClass({
                 render : function() {
-                    var lang = this.state.lang;
+                    var lang = args.state.lang;
 
                     return (
                         <div className="studio-container laser-studio">
@@ -52,9 +52,9 @@ define([
                                                     <span className="param-icon fa fa-bullseye"></span>
                                                 </div>
                                                 <div className="param col span9">
-                                                    <h4>{lang.laser.print_params.meterial.text}</h4>
+                                                    <h4>{lang.laser.print_params.material.text}</h4>
                                                     <p>
-                                                        <SelectView className="span12" name="meterial" options={lang.laser.print_params.meterial.options}/>
+                                                        <SelectView className="span12" name="material" options={lang.laser.print_params.material.options}/>
                                                     </p>
                                                 </div>
                                             </div>
