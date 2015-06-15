@@ -18,22 +18,28 @@ define([
                 // counter
                 scan_times: ('start' === args.step ? 1 : 0),
 
+                image_timer: null,
+
                 // web socket
                 ws: null,
 
+                // web socket statud
+                ws_is_connected: false,
+
                 getInitialState: function() {
-                    this.ws = new WebSocket({
+                    var self = this;
+
+                    self.ws = new WebSocket({
                         // TODO: To get available device
-                        method: '3d-scan-control/5ZMPBF415VH67ARLGGFWNKCSP',
-                        onMessage: function(result) {
-                            var data = result.data;
-                        }
+                        method: '3d-scan-control/5ZMPBF415VH67ARLGGFWNKCSP'
                     });
+                    args.state.image_src = '';
+
                     return args.state;
                 },
 
                 componentDidMount: function() {
-                    scanedModel.init();
+                    this._refreshCamera();
                 },
 
                 // ui events
@@ -58,6 +64,57 @@ define([
                     });
                 },
 
+                _refreshCamera: function() {
+                    var self = this,
+                        allow_to_get = true,
+                        gettingCameraImage = function(result) {
+                            var data = result.data,
+                                image_blobs = [],
+                                onComplete = function(e, fileEntry) {
+                                    self.setState({
+                                        image_src: fileEntry.toURL()
+                                    });
+                                    allow_to_get = true;
+                                },
+                                file;
+
+                            if ('object' === typeof data) {
+                                image_blobs.push(result.data);
+                            }
+                            else if ('connected' === data) {
+                                self.ws_is_connected = true;
+                            }
+                            else if ('finished' === data) {
+                                // TODO: get image from camera
+                                file = new File(
+                                    image_blobs,
+                                    'scan.png'
+                                );
+
+                                allow_to_get = false;
+
+                                fileSystem.writeFile(
+                                    file,
+                                    {
+                                        onComplete: onComplete
+                                    }
+                                );
+                            }
+                        },
+                        getImage = function() {
+                            self.ws.send('image');
+                        };
+
+                    self.ws.onMessage(gettingCameraImage);
+
+                    self.image_timer = setInterval(function() {
+                        if (true === allow_to_get) {
+                            getImage();
+                        }
+                    }, 500);
+
+                },
+
                 _startScan: function(e) {
                     location.hash = 'studio/scan/start';
                 },
@@ -66,64 +123,65 @@ define([
                     var self = this,
                         ws = self.ws,
                         model_blobs = [],
-                        image_blobs = [],
                         scan_speed = parseInt(this.refs.scan_speed.getDOMNode().value, 10),
+                        mesh = null,
                         popup_window,
-                        gettingCameraImage = function(result) {
-                            var data = result.data,
-                                file;
 
-                            if ('object' === typeof data) {
-                                image_blobs.push(result.data);
-                            }
-                            else if ('finished' === data) {
-                                // TODO: get image from camera
-                                file = new File(
-                                    image_blobs,
-                                    'scan.png'
-                                );
-                                fileSystem.writeFile(file);
-                                ws.send('start').onMessage(gettingScanedModel);
-                            }
-                        },
                         gettingScanedModel = function(result) {
-                            var data = result.data;
+                            var data = result.data,
+                                fileReader = new FileReader(),
+                                typedArray, blob;
 
                             if ('object' === typeof data) {
                                 model_blobs.push(data);
 
                                 // update progress percentage
                                 args.state.progressPercentage = (model_blobs.length / scan_speed * 100).toString().substr(0, 5);
-                            }
-                            else if ('finished' === data) {
-                                var fileReader = new FileReader();
 
-                                fileReader.onload  = function(progressEvent) {
-                                    var typedArray = new Float32Array(this.result);
+                                // refresh model every time
+                                fileReader.onload = function(progressEvent) {
+                                    typedArray = new Float32Array(this.result);
 
                                     renderringModel(typedArray);
                                 };
 
-                                var blob = new Blob(model_blobs, {type: 'text/plain'});
+                                blob = new Blob(model_blobs, {type: 'text/plain'});
                                 fileReader.readAsArrayBuffer(blob);
+                            }
+                            else if ('finished' === data) {
+                                popup_window.close();
+
+                                // disconnect
+                                ws.send('quit');
+
+                                // update scan times
+                                self.scan_times = self.scan_times + 1;
+
+                                self.setState({
+                                    scan_times : self.scan_times
+                                });
                             }
                         },
                         renderringModel = function(views) {
-                            popup_window.close();
 
-                            self.scan_times = self.scan_times + 1;
+                            if (null === mesh) {
 
-                            self.setState({
-                                scan_times : self.scan_times
-                            });
+                                mesh = scanedModel.appendModel(views);
+                            }
+                            else {
+                                mesh = scanedModel.updateMesh(mesh, views);
+                            }
 
-                            // TODO: store created model but don't use global variable
-                            window.meshs = window.meshs || [];
-                            window.meshs.push(scanedModel.appendModel(views));
-
-                            // disconnect
-                            ws.send('quit');
+                            window.mesh = mesh;
                         };
+
+                    clearInterval(self.image_timer);
+
+                    scanedModel.init();
+
+                    this.setState({
+                        is_scan_started: true
+                    });
 
                     require(['jsx!views/scan/Progress-Bar'], function(view) {
 
@@ -133,8 +191,8 @@ define([
                         popup_window = popup(view, args);
                         popup_window.open();
 
-                        if ('connected' === ws.fetchLastResponse()) {
-                            ws.send('image').onMessage(gettingCameraImage);
+                        if (true === self.ws_is_connected) {
+                            ws.send('start').onMessage(gettingScanedModel);
                         }
                         else {
                             // TODO: error occurs
@@ -149,6 +207,7 @@ define([
                         lang = state.lang,
                         start_scan_text,
                         header_class,
+                        camera_image_class,
                         starting_section,
                         operating_section;
 
@@ -173,6 +232,11 @@ define([
                     operating_section = cx({
                         'operating-section' : true,
                         'hide' : 0 === state.scan_times
+                    });
+
+                    camera_image_class = cx({
+                        'camera-image' : true,
+                        'hide' : true === state.is_scan_started
                     });
 
                     return (
@@ -235,7 +299,9 @@ define([
                                             </div>
                                         </div>
                                     </div>
-                                    <div id="model-displayer" className="model-displayer"></div>
+                                    <div id="model-displayer" className="model-displayer">
+                                        <img src={this.state.image_src} className={camera_image_class}/>
+                                    </div>
                                 </section>
                             </div>
                         </div>

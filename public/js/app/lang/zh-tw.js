@@ -27,8 +27,9 @@ define(function() {
                 line1: '請輸入「',
                 line2: '」無線網路的連線密碼',
                 password_placeholder: '請輸入 Wi-Fi 密碼',
-                cancel: '取消',
+                back: '上一步',
                 join: '加入',
+                connecting: '連線中'
             },
             success: {
                 caption: '太棒了，連線成功!',
@@ -54,13 +55,13 @@ define(function() {
                 description: '快點開始進行你的第一次列印',
                 start: '開始使用'
             },
-            flux_as_wifi_1: {
+            configuring_flux: {
                 caption: '我們正在讓你的FLUX變成一個無線基地台...',
                 description: '如此一來，你就可以透過內部的網路來控制你的FLUX',
                 next: '下一步',
                 footer: '我想要改回使用Wifi連線'
             },
-            flux_as_wifi_2: {
+            configured_flux: {
                 caption: '你的FLUX已經成為一個無線基地台',
                 description: '只剩下為你的FLUX做一些簡單的設定就可以開始使用了 :)',
                 next: '下一步',
@@ -98,14 +99,38 @@ define(function() {
                 caption: 'Get FLUX 3D Printer be remote!',
                 line1: 'Control your FLUX 3D Printer with FLUX Cloud in anywhere you are',
                 start_to_use: 'Start to Use',
-                i_have_an_account: 'I have an account'
+                i_have_an_account: 'I have an account',
+                email: '電子信箱',
+                password: '密碼',
+                change_password: '變更密碼',
+                connected_printer: '已連接印表機',
+                connect: '連接'
+            },
+            cancel: '取消',
+            done: '完成',
+            create_account: {
+                create_account: '建立新帳號',
+                your_email: '電子郵件',
+                password: '密碼',
+                confirm_password: '確認密碼',
+                signup: '建立帳號',
+                not_now: '目前先跳過'
+            },
+            activate_info:  {
+                almost_there: '最後一步了!',
+                description: '到Email帳號裡面使用連結啟動帳號',
+                got_it: '瞭解了！'
+            },
+            connect_printer: {
+                title: '選擇連接印表機'
             }
         },
         print: {
             import: 'Import',
-            go_home: 'Go home',
+            go_home: 'Go Home',
             save: 'Save',
             normal_preview: 'Normal Preview',
+            support_view: 'Support Preview',
             start_print: 'Print',
             advanced: 'Advanced',
             mode: [
@@ -135,7 +160,7 @@ define(function() {
                             }
                         ]
                     },
-                    meterial: {
+                    material: {
                         text: 'Meterial',
                         options: [
                             {
@@ -211,7 +236,13 @@ define(function() {
                         ]
                     }
                 }
-            }
+            },
+            quick_print: 'Quick Print',
+            scale: '比例',
+            rotate: '旋轉',
+            align_center: '置中',
+            delete: '刪除',
+            reset: '重設'
         },
         laser: {
             import: 'Import',
@@ -227,7 +258,7 @@ define(function() {
                         engrave: 'Engrave'
                     }
                 },
-                meterial: {
+                material: {
                     text: 'Meterial',
                     options: [
                         {
@@ -257,7 +288,18 @@ define(function() {
                     text: 'ROTATE'
                 },
                 unit: {
-                    text: 'Unit'
+                    text: 'Unit',
+                    options: [
+                        {
+                            value: 'mm',
+                            label: 'mm',
+                            checked: true
+                        },
+                        {
+                            value: 'inches',
+                            label: 'inches'
+                        }
+                    ]
                 }
             }
         },

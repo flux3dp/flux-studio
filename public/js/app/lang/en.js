@@ -27,8 +27,9 @@ define(function() {
                 line1: '請輸入「',
                 line2: '」無線網路的連線密碼',
                 password_placeholder: '請輸入 Wi-Fi 密碼',
-                cancel: '取消',
-                join: '加入',
+                back: 'Back',
+                join: 'Join',
+                connecting: 'Connecting'
             },
             success: {
                 caption: '太棒了，連線成功!',
@@ -54,13 +55,13 @@ define(function() {
                 description: 'Lets start your first printing experience！',
                 start: 'Start Using FLUX'
             },
-            flux_as_wifi_1: {
+            configuring_flux: {
                 caption: 'We\'re configuring your FLUX as a wifi station',
                 description: 'so you can control your FLUX through wifi network',
                 next: 'next',
                 footer: 'I want to swtich back to wifi connection'
             },
-            flux_as_wifi_2: {
+            configured_flux: {
                 caption: 'Your FLUX is now a wifi station',
                 description: 'you can start using it after few simple setting',
                 next: 'next',
@@ -101,14 +102,38 @@ define(function() {
                 caption: 'Get FLUX 3D Printer be remote!',
                 line1: 'Control your FLUX 3D Printer with FLUX Cloud in anywhere you are',
                 start_to_use: 'Start to Use',
-                i_have_an_account: 'I have an account'
+                i_have_an_account: 'I have an account',
+                email: 'Email',
+                password: 'Password',
+                change_password: 'Change Password',
+                connected_printer: 'Connected Printer',
+                connect: 'Connect'
+            },
+            cancel: 'CANCEL',
+            done: 'DONE',
+            create_account: {
+                create: 'Create new account',
+                your_email: 'Your Email',
+                password: 'Your Password',
+                confirm_password: 'Confirm Password',
+                signup: 'Sign Up',
+                not_now: 'not now'
+            },
+            activate_info:  {
+                almost_there: 'Almost there!',
+                description: 'Go to your email inbox and activate your account',
+                got_it: 'Got it'
+            },
+            connect_printer: {
+                title: 'Connect with your printer'
             }
         },
         print: {
             import: 'Import',
-            go_home: 'Go home',
+            go_home: 'Go Home',
             save: 'Save',
             normal_preview: 'Normal Preview',
+            support_preview: 'Support Preview',
             start_print: 'Print',
             advanced: 'Advanced',
             mode: [
@@ -138,7 +163,7 @@ define(function() {
                             }
                         ]
                     },
-                    meterial: {
+                    material: {
                         text: 'Meterial',
                         options: [
                             {
@@ -152,8 +177,8 @@ define(function() {
                         text: 'Support',
                         options: [
                             {
-                                value: 'everywhere',
-                                label: 'Everywhere',
+                                value: 'Touching',
+                                label: 'Touching',
                                 checked: true
                             },
                             {
@@ -214,7 +239,13 @@ define(function() {
                         ]
                     }
                 }
-            }
+            },
+            quick_print: 'Quick Print',
+            scale: 'Scale',
+            rotate: 'Rotate',
+            align_center: 'Align Center',
+            delete: 'Delete',
+            reset: 'Reset'
         },
         laser: {
             import: 'Import',
@@ -230,7 +261,7 @@ define(function() {
                         engrave: 'Engrave'
                     }
                 },
-                meterial: {
+                material: {
                     text: 'Meterial',
                     options: [
                         {
@@ -260,7 +291,18 @@ define(function() {
                     text: 'ROTATE'
                 },
                 unit: {
-                    text: 'Unit'
+                    text: 'Unit',
+                    options: [
+                        {
+                            value: 'mm',
+                            label: 'mm',
+                            checked: true
+                        },
+                        {
+                            value: 'inches',
+                            label: 'inches'
+                        }
+                    ]
                 }
             }
         },
