@@ -137,11 +137,9 @@ define([
 
                                 // update progress percentage
                                 args.state.progressPercentage = (model_blobs.length / scan_speed * 100).toString().substr(0, 5);
-                            }
-                            else if ('finished' === data) {
-                                popup_window.close();
 
-                                fileReader.onload  = function(progressEvent) {
+                                // refresh model every time
+                                fileReader.onload = function(progressEvent) {
                                     typedArray = new Float32Array(this.result);
 
                                     renderringModel(typedArray);
@@ -149,19 +147,24 @@ define([
 
                                 blob = new Blob(model_blobs, {type: 'text/plain'});
                                 fileReader.readAsArrayBuffer(blob);
+                            }
+                            else if ('finished' === data) {
+                                popup_window.close();
 
                                 // disconnect
                                 ws.send('quit');
-                            }
-                        },
-                        renderringModel = function(views) {
 
-                            if (null === mesh) {
+                                // update scan times
                                 self.scan_times = self.scan_times + 1;
 
                                 self.setState({
                                     scan_times : self.scan_times
                                 });
+                            }
+                        },
+                        renderringModel = function(views) {
+
+                            if (null === mesh) {
 
                                 mesh = scanedModel.appendModel(views);
                             }
