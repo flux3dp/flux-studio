@@ -27,7 +27,7 @@ define([
                     location.href = '#studio/settings/setting-configured-flux';
                 },
                 _handleSwtichToWifi: function() {
-
+                    // todo
                 },
                 _handleConfigured: function() {
                     this.setState({ configured: true }, function() {

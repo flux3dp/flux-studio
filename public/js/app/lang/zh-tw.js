@@ -160,7 +160,7 @@ define(function() {
                             }
                         ]
                     },
-                    meterial: {
+                    material: {
                         text: 'Meterial',
                         options: [
                             {

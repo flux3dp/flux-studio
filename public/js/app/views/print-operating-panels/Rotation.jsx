@@ -20,7 +20,8 @@ define([
                 'bgcolor': '#AAAAAA',
                 'format' : function (value) {
                      return value || 0;
-                }
+                },
+                height: 50,
             });
         },
         _handleResetRotation: function () {

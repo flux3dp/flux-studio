@@ -33,7 +33,7 @@ define([
         _renderAction: function(lang) {
             return this.state.configured ? (
                 <a id="btn-next" className="btn btn-large" onClick={this._handleNext}>
-                    {lang.wifi.flux_as_wifi_1.next}
+                    {lang.wifi.configuring_flux.next}
                 </a>
             ) : (
                 <img className="loading" src="/img/ring.svg" />
@@ -47,13 +47,13 @@ define([
                 <div className="configuring-flux center">
                     <img className="wifi-symbol" src="/img/img-flux-ap.png" />
                     <div className="wifi-form">
-                        <h2>{lang.wifi.flux_as_wifi_1.caption}</h2>
-                        <p>{lang.wifi.flux_as_wifi_1.description}</p>
+                        <h2>{lang.wifi.configuring_flux.caption}</h2>
+                        <p>{lang.wifi.configuring_flux.description}</p>
                         <div>
                             {action}
                         </div>
                         <div>
-                            <a onClick={this._handleSwitchToWifi}>{lang.wifi.flux_as_wifi_1.footer}</a>
+                            <a onClick={this._handleSwitchToWifi}>{lang.wifi.configuring_flux.footer}</a>
                         </div>
                     </div>
                 </div>
