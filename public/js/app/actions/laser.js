@@ -120,7 +120,6 @@ define([
 
                         timer = setInterval(function() {
                             if (0 === index || true === go_next) {
-                                console.log('run interval', index);
                                 next_data = request_serial[index];
 
                                 if ('string' === typeof next_data) {
@@ -198,24 +197,36 @@ define([
 
                     return mm;
                 },
+                getCenter = function($el) {
+                    var container_offset = $laser_platform.offset(),
+                        offset = $el.offset(),
+                        half_width = $el.width() / 2,
+                        half_height = $el.height() / 2;
+
+                    return {
+                        x: offset.left - container_offset.left + half_width,
+                        y: offset.top - container_offset.top + half_height
+                    };
+                },
                 args = [];
 
             $ft_controls.each(function(k, el) {
                 var $el = $(el),
                     width = $el.width(),
                     height = $el.height(),
+                    top_left = getCenter($el.find('.ft-scaler-top.ft-scaler-left')),
+                    bottom_right = getCenter($el.find('.ft-scaler-bottom.ft-scaler-right')),
                     pos = $el.position(),
-                    bounding = el.getBoundingClientRect(),
                     sub_data = {
                         width: width,
                         height: height,
                         top_left: {
-                            x: convertToRealCoordinate(pos.left, 'x'),
-                            y: convertToRealCoordinate(pos.top, 'y')
+                            x: convertToRealCoordinate(top_left.x, 'x'),
+                            y: convertToRealCoordinate(top_left.y, 'y')
                         },
                         bottom_right: {
-                            x: convertToRealCoordinate(pos.left + width, 'x'),
-                            y: convertToRealCoordinate(pos.top + height, 'y')
+                            x: convertToRealCoordinate(bottom_right.x + width, 'x'),
+                            y: convertToRealCoordinate(bottom_right.y + height, 'y')
                         },
                         rotate: (Math.PI * getAngle(el) / 180) * -1,
                         data: []
