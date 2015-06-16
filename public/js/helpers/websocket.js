@@ -97,7 +97,11 @@ define(function($) {
                 return this.fetchData()[received_data.length - 1];
             },
 
-            close: function() {
+            close: function(reconnect) {
+                if ('boolean' === typeof reconnect) {
+                    options.autoReconnect = reconnect;
+                }
+
                 if (null !== ws) {
                     ws.close();
                 }
