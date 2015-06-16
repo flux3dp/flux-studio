@@ -187,10 +187,14 @@ define([
 
                     return dataView;
                 },
-                convertToRealCoordinate = function(px) {
+                convertToRealCoordinate = function(px, axis) {
                     var ratio = DIAMETER / PLATFORM_DIAMETER_PIXEL, // 1(px) : N(mm)
                         r = PLATFORM_DIAMETER_PIXEL / 2 * ratio,
                         mm = ratio * px - r;
+
+                    if ('y' === axis.toLowerCase()) {
+                        mm = mm * -1;
+                    }
 
                     return mm;
                 },
@@ -206,12 +210,12 @@ define([
                         width: width,
                         height: height,
                         top_left: {
-                            x: convertToRealCoordinate(pos.left),
-                            y: convertToRealCoordinate(pos.top)
+                            x: convertToRealCoordinate(pos.left, 'x'),
+                            y: convertToRealCoordinate(pos.top, 'y')
                         },
                         bottom_right: {
-                            x: convertToRealCoordinate(pos.left + width),
-                            y: convertToRealCoordinate(pos.top + height)
+                            x: convertToRealCoordinate(pos.left + width, 'x'),
+                            y: convertToRealCoordinate(pos.top + height, 'y')
                         },
                         rotate: (Math.PI * getAngle(el) / 180) * -1,
                         data: []
@@ -239,7 +243,6 @@ define([
 
                 args.push(sub_data);
             });
-
 
             // sending data
             sendingToLaser(args);
