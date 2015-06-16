@@ -39,7 +39,9 @@ define([
                 },
 
                 componentDidMount: function() {
-                    this._refreshCamera();
+                    if ('start' === args.step) {
+                        this._refreshCamera();
+                    }
                 },
 
                 // ui events
@@ -85,7 +87,6 @@ define([
                                 self.ws_is_connected = true;
                             }
                             else if ('finished' === data) {
-                                // TODO: get image from camera
                                 file = new File(
                                     image_blobs,
                                     'scan.png'
