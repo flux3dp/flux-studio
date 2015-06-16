@@ -84,7 +84,6 @@ define([
 
                         ws.onMessage(function(result) {
                             var data = JSON.parse(result.data);
-                            console.log('upload', data);
 
                             switch (data.status) {
                             case 'continue':
@@ -93,10 +92,8 @@ define([
                             case 'accept':
                                 go_next = true;
                                 accept_times++;
-                                console.log(args.length, accept_times);
 
                                 if (args.length === accept_times) {
-                                    console.log('go');
                                     ws.send('go').onMessage(function(result) {
                                         console.log('fantastic work', result);
                                     });
@@ -120,8 +117,6 @@ define([
                             request_serial.push(request_header.join(','));
                             request_serial = request_serial.concat(obj.data);
                         });
-
-                        console.log(request_serial);
 
                         timer = setInterval(function() {
                             if (0 === index || true === go_next) {
@@ -193,9 +188,11 @@ define([
                     return dataView;
                 },
                 convertToRealCoordinate = function(px) {
-                    var ratio = DIAMETER / PLATFORM_DIAMETER_PIXEL;
+                    var ratio = DIAMETER / PLATFORM_DIAMETER_PIXEL, // 1(px) : N(mm)
+                        r = PLATFORM_DIAMETER_PIXEL / 2 * ratio,
+                        mm = ratio * px - r;
 
-                    return parseInt(ratio * px, 10);
+                    return mm;
                 },
                 args = [];
 
@@ -242,6 +239,7 @@ define([
 
                 args.push(sub_data);
             });
+
 
             // sending data
             sendingToLaser(args);
