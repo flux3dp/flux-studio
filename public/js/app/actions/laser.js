@@ -225,8 +225,8 @@ define([
                             y: convertToRealCoordinate(top_left.y, 'y')
                         },
                         bottom_right: {
-                            x: convertToRealCoordinate(bottom_right.x + width, 'x'),
-                            y: convertToRealCoordinate(bottom_right.y + height, 'y')
+                            x: convertToRealCoordinate(bottom_right.x, 'x'),
+                            y: convertToRealCoordinate(bottom_right.y, 'y')
                         },
                         rotate: (Math.PI * getAngle(el) / 180) * -1,
                         data: []
