@@ -9,8 +9,7 @@ define([
     'jsx!views/print-operating-panels/Setting',
     'jsx!views/print-operating-panels/Scale',
     'jsx!views/print-operating-panels/Rotation',
-    'plugins/knob/jquery.knob.min',
-    'css!cssHome/pages/print'
+    'plugins/knob/jquery.knob.min'
 ], function($, React, display, printEvents, RadioGroupView, ClassNames, OperatingPanel, SettingPanel, ScalePanel, RotationPanel) {
     'use strict';
 

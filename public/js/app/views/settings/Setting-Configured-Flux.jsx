@@ -3,9 +3,7 @@ define([
     'react',
     'helpers/i18n',
     'jsx!views/settings/Setting-Menuless-Top-Nav',
-    'jsx!views/wifi/Configured-Flux',
-    'css!cssHome/pages/settings',
-    'css!cssHome/pages/wifi'
+    'jsx!views/wifi/Configured-Flux'
 ], function($, React, i18n, TopNav, ConfiguredFlux) {
     'use strict';
 

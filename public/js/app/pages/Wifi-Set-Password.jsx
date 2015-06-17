@@ -1,8 +1,7 @@
 define([
     'jquery',
     'react',
-    'helpers/local-storage',
-    'css!cssHome/pages/wifi'
+    'helpers/local-storage'
 ], function($, React, localStorage) {
     'use strict';
 

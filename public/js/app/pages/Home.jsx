@@ -2,8 +2,7 @@ define([
     'jquery',
     'react',
     'helpers/i18n',
-    'jsx!widgets/Select',
-    'css!cssHome/pages/welcome'
+    'jsx!widgets/Select'
 ], function($, React, i18n, SelectView) {
     'use strict';
 

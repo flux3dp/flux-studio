@@ -2,8 +2,7 @@ define([
     'jquery',
     'react',
     'helpers/i18n',
-    'jsx!views/settings/Setting-Menuless-Top-Nav',
-    'css!cssHome/pages/settings'
+    'jsx!views/settings/Setting-Menuless-Top-Nav'
 ], function($, React, i18n, TopNav) {
     'use strict';
 

@@ -14,7 +14,7 @@ require.config({
         threeTransformControls: 'lib/three/controls/TransformControls',
         threeSTLLoader: 'lib/three/loaders/STLLoader',
         threeTrackball: 'lib/three/controls/TrackballControls',
-        cssHome: '../css',
+        cssHome: '../css/3rd-party-plugins',
         freetrans: 'plugins/freetrans/jquery.freetrans',
         html2canvas: 'lib/html2canvas.min'
     },
@@ -67,7 +67,7 @@ require.config({
             deps: [
                 'jquery',
                 'plugins/freetrans/Matrix',
-                'css!cssHome/3rd-party-plugins/freetrans/jquery.freetrans'
+                'css!cssHome/freetrans/jquery.freetrans'
             ],
             exports: 'freetrans'
         }
