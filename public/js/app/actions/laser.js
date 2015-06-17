@@ -84,7 +84,6 @@ define([
 
                         ws.onMessage(function(result) {
                             var data = JSON.parse(result.data);
-                            console.log('upload', data);
 
                             switch (data.status) {
                             case 'continue':
@@ -93,10 +92,8 @@ define([
                             case 'accept':
                                 go_next = true;
                                 accept_times++;
-                                console.log(args.length, accept_times);
 
                                 if (args.length === accept_times) {
-                                    console.log('go');
                                     ws.send('go').onMessage(function(result) {
                                         console.log('fantastic work', result);
                                     });
@@ -121,11 +118,8 @@ define([
                             request_serial = request_serial.concat(obj.data);
                         });
 
-                        console.log(request_serial);
-
                         timer = setInterval(function() {
                             if (0 === index || true === go_next) {
-                                console.log('run interval', index);
                                 next_data = request_serial[index];
 
                                 if ('string' === typeof next_data) {
@@ -192,10 +186,27 @@ define([
 
                     return dataView;
                 },
-                convertToRealCoordinate = function(px) {
-                    var ratio = DIAMETER / PLATFORM_DIAMETER_PIXEL;
+                convertToRealCoordinate = function(px, axis) {
+                    var ratio = DIAMETER / PLATFORM_DIAMETER_PIXEL, // 1(px) : N(mm)
+                        r = PLATFORM_DIAMETER_PIXEL / 2 * ratio,
+                        mm = ratio * px - r;
 
-                    return parseInt(ratio * px, 10);
+                    if ('y' === axis.toLowerCase()) {
+                        mm = mm * -1;
+                    }
+
+                    return mm;
+                },
+                getCenter = function($el) {
+                    var container_offset = $laser_platform.offset(),
+                        offset = $el.offset(),
+                        half_width = $el.width() / 2,
+                        half_height = $el.height() / 2;
+
+                    return {
+                        x: offset.left - container_offset.left + half_width,
+                        y: offset.top - container_offset.top + half_height
+                    };
                 },
                 args = [];
 
@@ -203,18 +214,19 @@ define([
                 var $el = $(el),
                     width = $el.width(),
                     height = $el.height(),
+                    top_left = getCenter($el.find('.ft-scaler-top.ft-scaler-left')),
+                    bottom_right = getCenter($el.find('.ft-scaler-bottom.ft-scaler-right')),
                     pos = $el.position(),
-                    bounding = el.getBoundingClientRect(),
                     sub_data = {
                         width: width,
                         height: height,
                         top_left: {
-                            x: convertToRealCoordinate(pos.left),
-                            y: convertToRealCoordinate(pos.top)
+                            x: convertToRealCoordinate(top_left.x, 'x'),
+                            y: convertToRealCoordinate(top_left.y, 'y')
                         },
                         bottom_right: {
-                            x: convertToRealCoordinate(pos.left + width),
-                            y: convertToRealCoordinate(pos.top + height)
+                            x: convertToRealCoordinate(bottom_right.x, 'x'),
+                            y: convertToRealCoordinate(bottom_right.y, 'y')
                         },
                         rotate: (Math.PI * getAngle(el) / 180) * -1,
                         data: []
