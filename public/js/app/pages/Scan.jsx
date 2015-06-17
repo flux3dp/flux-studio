@@ -27,19 +27,21 @@ define([
                 ws_is_connected: false,
 
                 getInitialState: function() {
-                    var self = this;
-
-                    self.ws = new WebSocket({
-                        // TODO: To get available device
-                        method: '3d-scan-control/5ZMPBF415VH67ARLGGFWNKCSP'
-                    });
                     args.state.image_src = '';
 
                     return args.state;
                 },
 
                 componentDidMount: function() {
-                    this._refreshCamera();
+                    if ('start' === args.step) {
+                        this._refreshCamera();
+                    }
+                },
+
+                componentWillUnmount: function() {
+                    if (false === location.hash.startsWith('#studio/scan')) {
+                        this.ws.close(false);
+                    }
                 },
 
                 // ui events
@@ -85,7 +87,6 @@ define([
                                 self.ws_is_connected = true;
                             }
                             else if ('finished' === data) {
-                                // TODO: get image from camera
                                 file = new File(
                                     image_blobs,
                                     'scan.png'
@@ -104,6 +105,11 @@ define([
                         getImage = function() {
                             self.ws.send('image');
                         };
+
+                    self.ws = new WebSocket({
+                        // TODO: To get available device
+                        method: '3d-scan-control/5ZMPBF415VH67ARLGGFWNKCSP'
+                    });
 
                     self.ws.onMessage(gettingCameraImage);
 
