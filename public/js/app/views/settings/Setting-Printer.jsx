@@ -4,8 +4,7 @@ define([
     'helpers/i18n',
     'jsx!widgets/Select',
     'helpers/display',
-    'helpers/local-storage',
-    'css!cssHome/pages/settings'
+    'helpers/local-storage'
 ], function($, React, i18n, SelectView, display, localStorage) {
     'use strict';
 

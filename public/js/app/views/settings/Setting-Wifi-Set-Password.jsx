@@ -4,9 +4,7 @@ define([
     'helpers/i18n',
     'helpers/local-storage',
     'jsx!views/settings/Setting-Menuless-Top-Nav',
-    'jsx!views/wifi/Set-Password',
-    'css!cssHome/pages/settings',
-    'css!cssHome/pages/wifi'
+    'jsx!views/wifi/Set-Password'
 ], function($, React, i18n, localStorage, TopNav, SetPassword) {
     'use strict';
 

@@ -4,8 +4,7 @@ define([
     'helpers/i18n',
     'jsx!widgets/Select',
     'helpers/display',
-    'plugins/classnames/index',
-    'css!cssHome/pages/settings'
+    'plugins/classnames/index'
 ], function($, React, i18n, SelectView, Display, ClassNames) {
     'use strict';
 

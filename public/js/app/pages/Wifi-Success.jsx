@@ -1,7 +1,6 @@
 define([
     'jquery',
-    'react',
-    'css!cssHome/pages/wifi'
+    'react'
 ], function($, React) {
     'use strict';
 
