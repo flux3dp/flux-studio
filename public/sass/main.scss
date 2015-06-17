@@ -1,0 +1,18 @@
+// core
+@import "core/normalize";
+@import "core/font-awesome";
+@import "core/variables";
+@import "core/global";
+
+// mixins
+// @import "mixins/xxx";
+
+// views
+// @import "views/xxx";
+
+// pages
+@import "pages/print";
+@import "pages/settings";
+@import "pages/usb";
+@import "pages/welcome";
+@import "pages/wifi";

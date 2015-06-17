@@ -1,0 +1,543 @@
+.is-ready .content {
+    background-color: #F5F5F5;
+}
+
+.settings {
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    margin: auto;
+    position: absolute;
+    width: 800px;
+    height: 600px;
+    background-color: #FFF;
+    box-shadow: 0px 0px 12px 0px rgba(50%,50%,50%,0.8);
+}
+
+.settings header {
+    height: 47px;
+    padding-top: 30px;
+}
+
+.settings a {
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.settings .center {
+    text-align: center;
+}
+
+.settings .btn.btn-default-dark {
+    background-color: #424242;
+    font-size: 14px;
+    color: #FFF;
+}
+
+.settings .btn.btn-default-dark:hover {
+    background-color: #000000;
+}
+
+.settings .btn.btn-default-light {
+    background-color: #FFFFFF;
+    border: 1px #E0E0E0 solid;
+    font-size: 14px;
+    color: #000;
+    text-align: center;
+}
+
+.settings .btn-long {
+    width: 240px;
+    height: 38px;
+    line-height: 38px;
+}
+
+.settings .btn.btn-default-light:hover {
+    border: 1px #4A4A4A solid;
+}
+
+.settings ul.nav {
+    list-style-type: none;
+    padding: 0;
+    margin: 0 auto;
+    width: 70%;
+    background-color: #FFF;
+    text-align: center;
+}
+
+.settings .nav li.nav-item {
+    width: 165px;
+    height: 47px;
+    line-height: 47px;
+    display: inline;
+    float: left;
+    border-bottom: 2px #E0E0E0 solid;
+}
+
+.settings .nav li.active {
+    border-bottom: 2px #424242 solid;
+}
+
+.settings .nav a {
+    font-size: 16px;
+    letter-spacing: 0.3px;
+    color: #777777;
+    text-decoration: none;
+}
+
+.settings .tabs .active {
+    background: rgba(255, 255, 255, 0.7);
+}
+
+.settings .tab-container {
+    margin-top: 40px;
+    display: inline-block;
+    width: 100%;
+}
+
+.settings .tab-container.no-top-margin {
+    margin-top: 0px;
+}
+
+.settings .form {
+    width: 70%;
+    margin: 0 auto;
+}
+
+.settings .form .no-left-margin {
+    margin-left: 0;
+}
+
+.settings .printer-list ul {
+    list-style: none;
+    padding: 0;
+}
+
+.settings .general .row-fluid {
+    margin: 0 0 20px 0;
+}
+
+.settings .general select {
+    width: 240px;
+    height: 32px;
+    overflow: hidden;;
+    border: 1px solid #ccc;
+    background-color: #FFFFFF;
+}
+
+.settings footer {
+    width: 100%;
+    height: 100px;
+    border-top: 1px #E0E0E0 solid;
+    text-align: center;
+}
+
+.settings footer .actions {
+    padding-top: 30px;
+}
+
+.settings footer .actions a {
+    margin: 0 13px;
+}
+
+.settings footer .actions .btn-cancel {
+    background-color: #FFFFFF;
+    border: 1px #E0E0E0 solid;
+    font-size: 14px;
+    color: #000;
+}
+
+.settings footer .actions .btn-cancel:hover {
+    border: 1px #4A4A4A solid;
+}
+
+.settings footer .actions .btn-done {
+    background-color: #424242;
+    font-size: 14px;
+    color: #FFF;
+}
+
+.settings footer .actions .btn-done:hover {
+    background-color: #000;
+}
+
+.settings .font1 {
+    font-size: 18px;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    color: #424242;
+}
+
+.settings .font2 {
+    font-size: 15px;
+    letter-spacing: 0.3px;
+    color: #777777;
+}
+
+.settings .font3 {
+    font-size: 14px;
+    letter-spacing: 0.3px;
+    color: #424242;
+}
+
+.settings .font4 {
+    font-size: 13px;
+    letter-spacing: 0.3px;
+    color: #777777;
+}
+
+
+/*for cloud*/
+
+
+.settings .cloud {
+    text-align: center;
+}
+
+.settings .cloud .description {
+    padding-top: 20px;
+}
+
+.settings .cloud .description div {
+    padding-bottom: 10px;
+}
+
+.settings .cloud .description .actions {
+    padding-top: 10px;
+}
+
+.settings .cloud .btn-start {
+    padding: 0 40px;
+    height: 38px;
+    line-height: 38px;
+}
+
+.settings .cloud .label {
+    text-align: right;
+    padding-right: 10px;
+}
+
+.settings .cloud .controls {
+    text-align: left;
+    padding-left: 10px;
+    font-size: 14px;
+    color: #BDBDBD;
+    letter-spacing: 0.3px;
+}
+
+.settings .main.cloud {
+    width:90%;
+}
+
+.settings .main.cloud .btn-default-light {
+    width: 145px;
+    height: 34px;
+    line-height: 34px;
+    text-align: center;
+}
+
+.settings .main.cloud .row-fluid {
+    padding-bottom: 10px;
+}
+
+.settings .main.cloud .label {
+    vertical-align: top;
+}
+
+.settings .main.cloud .reset-password .row-fluid {
+    margin: 0;
+}
+
+.settings .main.cloud .reset-password .entry {
+    margin: 5px 0 10px 0;
+}
+
+.settings .main.cloud .reset-password input {
+    width: 100%;
+}
+
+.settings .main.cloud .connected-printer {
+    margin-top: 10px;
+    display: inline-block;
+    vertical-align: top;
+}
+
+.settings .main.cloud .name,
+.settings .main.cloud .actions {
+    display: inline-block;
+    text-align: left;
+}
+
+.settings .main.cloud .footer {
+    width:90%;
+    position: absolute;
+    bottom: 60px;
+}
+
+/*create account*/
+
+.settings .top-nav {
+    margin-top: 20px;
+    overflow: auto;
+}
+
+.settings .top-nav .back {
+    float: left;
+    margin-left: 20px;
+}
+
+.settings .top-nav .cancel {
+    float: right;
+    margin-right: 20px;
+}
+
+.settings .create-account .account-info {
+    width: 240px;
+    margin: 0 auto;
+}
+
+.settings .create-account h2 {
+    margin-top: 58px;
+    margin-bottom: 32px;
+    font-size: 24px;
+    color: #424242;
+    font-weight: 500;
+}
+
+.settings .create-account .account-info input {
+    width: 100%;
+    margin-top: 5px;
+    font-size: 14px;
+    color: #BDBDBD;
+    height: 35px;
+}
+
+.settings .create-account .form-group {
+    margin-bottom: 20px;
+}
+
+.settings .create-account .actions {
+    text-align: center;
+}
+
+.settings .create-account .btn-default-dark {
+    width: 100%;
+    margin: 10px 0;
+}
+
+/*activation info*/
+
+.settings .activation-notice .notice-info {
+    text-align: center;
+    margin-top: 70px;
+}
+
+.settings .activation-notice .notice-info .title {
+    margin-top: 44px;
+}
+
+.settings .activation-notice .notice-info .description {
+    margin-top: 5px;
+}
+
+.settings .activation-notice .btn-default-dark {
+    margin-top: 20px;
+}
+
+/*connect printer*/
+
+.settings .connection-list {
+    padding-top: 50px;
+    margin: 0 auto;
+    width: 40%;
+}
+
+.settings .connection-list .title {
+    font-size: 26px;
+    color: #424242;
+}
+
+.settings .connection-list .connections {
+    margin-top: 30px;
+}
+
+.settings .connection-list .connection {
+    overflow: auto;
+    height: 60px;
+    border-bottom: 1px #777777 dashed;
+}
+
+.settings .connection-list .name {
+    float: left;
+    margin-top: 20px;
+}
+
+.settings .connection-list .select {
+    width: 30px;
+    height: 30px;
+    background-image: url('/img/icon-select.png');
+    float: right;
+    margin-top: 15px;
+    cursor: pointer;
+}
+
+.settings .connection-list .select.active {
+    background-image: url('/img/icon-selected.png');
+}
+
+.settings .connection-list .actions {
+    text-align: center;
+    position: absolute;
+    width: 40%;
+    bottom: 60px;
+}
+
+/*printer setting*/
+
+.settings .form.printer {
+    width: 100%;
+    font-size: 14px;
+    letter-spacing: 0.3px;
+    color: #424242;
+    height: 360px;
+    overflow-x: auto;
+    overflow-y: auto;
+    font-size: 14px;
+    letter-spacing: 0.3;
+    color: #777;
+}
+
+.settings .printer .name {
+    font-size: 15px;
+    letter-spacing: 0.3px;
+    color: #4A4A4A;
+}
+
+.settings .printer .btn-default-light {
+    width: 145px;
+    height: 34px;
+    border: 1px #E0E0E0 solid;
+    line-height: 34px;
+}
+
+.settings .printer .printer-list {
+    margin: 0 0 0 30px;
+    width: 200px;
+}
+
+.settings .printer .fa {
+    margin-right: 10px
+}
+
+.settings .printer-list li {
+    margin: 15px 0;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.settings .printer .printer-name {
+    margin-top: 0;
+}
+
+.settings .printer .printer-name div {
+    border-bottom: 1px #DDD solid;
+    padding: 10px 0;
+}
+
+.settings .printer .set-password {
+    margin-top: 26px;
+}
+
+.settings .printer .set-password .password {
+    margin: 10px 0;
+}
+
+.settings .printer .set-password span {
+    font-size: 12px;
+    letter-spacing: 0.3px;
+    color: #9B9B9B;
+}
+
+.settings .printer .password td:nth-child(2) {
+    padding-left: 20px;
+}
+
+.settings .printer .wifi {
+    margin-top: 26px;
+}
+
+.settings .printer .wifi .join-network {
+    margin: 10px 0;
+}
+
+.settings .printer .remove-printer {
+    padding: 30px 0 0 101px;
+}
+
+.settings .printer .reset-password {
+    overflow: auto;
+}
+
+.settings .printer .reset-password .row-fluid {
+    margin-top: 20px;
+}
+
+.settings .printer .reset-password .entry {
+    padding-top: 10px;
+}
+
+.settings .printer .reset-password input {
+    width: 100%;
+}
+
+.settings .printer .reset-password button {
+    float: right;
+}
+
+.settings .printer .remove-printer a {
+    text-decoration: underline;
+}
+
+
+/*detect new wifi*/
+
+.settings .wifi .btn.btn-default-dark {
+    margin-top: 30px;
+}
+
+.settings .wifi img.loading {
+    margin: 15px 0;
+}
+
+/*select wifi*/
+
+.settings .select-wifi .caption {
+    margin-top: 50px;
+}
+
+.settings .select-wifi .footer-message a {
+    text-decoration: underline;
+}
+
+.settings .select-wifi li {
+    text-align: left;
+    line-height: 40px;
+}
+
+.settings .select-wifi li .fa {
+    width: 20px;
+    padding-left: 10px;
+}
+
+/*set wifi password*/
+
+.settings .wifi .wifi-symbol {
+    margin-top: 0px;
+}
+
+/*set wifi printer*/
+
+.settings .set-printer .flux-printer img {
+    width: 125px;
+}
