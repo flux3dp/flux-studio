@@ -1,596 +1,563 @@
 .print-studio {
     padding: 0;
-}
-
-.print-studio .btn.btn-default-light:hover {
-    border-color: #000;
-}
-
-.print-studio header {
-    height: 66px;
-    width: 100%;
-    display: table;
-    letter-spacing: 0.3px;
-    color: #000;
-}
-
-.print-studio header > div {
-    display: table-cell;
-    vertical-align: middle;
-}
-
-.print-studio header div.pull-right {
-    padding: 24px 0px;
-    border-left: 1px #CCC solid;
-    cursor: pointer;
-}
-
-.print-studio header .pull-right {
-    position: relative;
-}
-
-.print-studio header .preview-container {
-    width: 180px;
-}
-
-.print-studio header .preview-container .fa-caret-down {
-    float: right;
-}
-
-.print-studio header .preview {
-    position: absolute;
-    background-color: #FFF;
-    margin-top: 24px;
-    list-style-type: none;
-    text-align: left;
-    width: 212px;
-    left: -33px;
-    padding: 0;
-}
-
-.print-studio header li {
-    font-size: 14px;
-    color: #4A4A4A;
-    cursor: pointer;
-}
-
-.print-studio header li:hover {
-    background-color: #F0F0F0;
-}
-
-.print-studio header li div {
-    padding: 15px 20px;
-    font-size: 14px;
-    color: #4A4A4A;
-    cursor: pointer;
-}
-
-.print-studio header .actions > div {
-    display: inline-block;
-}
-
-.print-studio header .actions .btn {
-    min-width: 0px;
-    margin-right: 10px;
-    padding: 0 15px;
-}
-
-/*for tips on home / save*/
-
-.print-studio header .actions .btn.tip:hover:before {
-    display: block;
-    position: absolute;
-    content: attr(data-tip);
-    min-width: 75px;
-    text-align: center;
-    white-space: nowrap;
-    top: 50px;
-    background: rgba(0,0,0,.8);
-    -webkit-border-radius: 3px;
-    border-radius: 3px;
-    color: #FFF;
-    font-size: 11px;
-    left: -15px;
-    z-index: 1;
-    height: 24px;
-    line-height: 24px;
-}
-
-.print-studio .verticle-middle {
-    position: relative;
-    top: 50%;
-    transform: translateY(-50%);
-}
-
-.print-studio .btn {
-    background-color: #FFFFFF;
-    border: 1px #E0E0E0 solid;
-    color: #000;
-    border-radius: 5px;
-}
-
-.print-studio .btn span {
-    margin-left: 7px;
-}
-
-.print-studio #uploader {
-    padding-left: 20px;
-}
-
-.print-studio #uploader .fa.fa-plus {
-    -webkit-transition: all 0.1s linear;
-    transition: all 0.1s linear;
-}
-
-.print-studio #uploader .fa.fa-plus.rotate {
-    -webkit-transform:rotate(90deg);
-    transform:rotate(90deg);
-}
-
-.studio-container .pull-right .icon {
-    padding: 0 12px;
-}
-
-.print-studio .pull-right span {
-    font-size: 13px;
-}
-
-.model-displayer {
-    height: 90%;
-    width: 100%;
-}
-
-.print-studio .model-displayer {
-    background: #000;
-}
-
-.operating-panel {
-    position: absolute;
-    width: 100%;
-}
-
-.operating-panel .panel {
-    float: right;
-}
-
-.operating-panel .operation {
-    cursor: pointer;
-}
-
-.operating-panel .operation img {
-    width: 15px;
-}
-
-.operating-panel .operation.up {
-    position: absolute;
-    top: 13px;
-    right: 68px;
-}
-
-.operating-panel .operation.right {
-    position: absolute;
-    top: 60px;
-    right: 22px;
-}
-
-.operating-panel .operation.down {
-    position: absolute;
-    top: 110px;
-    right: 68px;
-}
-
-.operating-panel .operation.left {
-    position: absolute;
-    top: 60px;
-    right: 117px;
-}
-
-.operating-panel .operation.home {
-    position: absolute;
-    top: 40px;
-    right: 50px;
-    background-color: #FFF;
-    padding: 12px;
-    border-radius: 27px;
-}
-
-.operating-panel .operation.home img {
-    width: 30px;
-}
-
-.operating-panel .operation.command {
-    position: absolute;
-    top: 200px;
-    right: 50px;
-}
-
-.operating-panel .operation.command > div {
-    background-color: #FFF;
-    width: 48px;
-    height: 48px;
-    border-radius: 5px;
-    margin-top: 8px;
-}
-
-.operating-panel .operation.command button:hover:before {
-    display: block;
-    position: absolute;
-    content: attr(data-tip);
-    min-width: 75px;
-    text-align: center;
-    white-space: nowrap;
-    top: 15px;
-    background: rgba(0,0,0,.8);
-    -webkit-border-radius: 3px;
-    border-radius: 3px;
-    color: #FFF;
-    font-size: 11px;
-    left: -85px;
-    z-index: 1;
-    height: 24px;
-    line-height: 24px;
-}
-
-.operating-panel .operation.command .btn {
-    min-width: 48px;
-    height: 100%;
-    margin-left: 0;
-    background-repeat: no-repeat;
-    background-position: center;
-    border: none;
-}
-
-.operating-panel .operation.command div:last-child {
-    margin-top: 30px;
-}
-
-.operating-panel .operation.command .scale {
-    background-image: url('/img/icon-scale.png');
-}
-
-.operating-panel .operation.command .scale:hover {
-    background-image: url('/img/icon-scale-a.png');
-}
-
-.operating-panel .operation.command .scale.active {
-    background-image: url('/img/icon-scale-a.png');
-}
-
-.operating-panel .operation.command .rotate {
-    background-image: url('/img/icon-rotate.png');
-}
-
-.operating-panel .operation.command .rotate:hover {
-    background-image: url('/img/icon-rotate-a.png');
-}
-
-.operating-panel .operation.command .rotate.active {
-    background-image: url('/img/icon-rotate-a.png');
-}
-
-.operating-panel .operation.command .center {
-    background-image: url('/img/icon-center.png');
-}
-
-.operating-panel .operation.command .center:hover {
-    background-image: url('/img/icon-center-a.png');
-}
-
-.operating-panel .operation.command .delete {
-    background-image: url('/img/icon-delete.png');
-}
-
-.operating-panel .operation.command .delete:hover {
-    background-image: url('/img/icon-delete-a.png');
-}
-
-.operating-panel .zoom {
-    position: fixed;
-    top: 210px;
-    right: 25px;
-}
-
-.operating-panel .zoom > div {
-    display: inline-block;
-    padding: 0 10px;
-    background-color: #FFF;
-    height: 30px;
-    cursor: pointer;
-}
-
-.operating-panel .zoom .in {
-    border-top-right-radius: 15px;
-    border-bottom-right-radius: 15px;
-}
-
-.operating-panel .zoom .out {
-    border-top-left-radius: 15px;
-    border-bottom-left-radius: 15px;
-}
-
-.operating-panel .zoom .divider {
-    width: 1px;
-    border-left: 1px #E0E0E0 solid;
-    padding: 0;
-}
-
-.operating-panel .zoom > div > img {
-    width: 30px;
-}
-
-.print-studio .setup-panel {
-    position: absolute;
-    margin-top: 20px;
-    margin-left: 20px;
-}
-
-.print-studio .setup-panel .main {
-    width: 182px;
-    background-color: #FFF;
-    border-radius: 3px;
-    height: 320px;
-}
-
-.print-studio .setup-panel .btn-print {
-    width: 182px;
-    background-color: #FFF;
-    border-radius: 3px;
-    text-align: center;
-    background-color: #00C853;
-    color: #FFF;
-    margin-top: 10px;
-}
-
-.print-studio .setup-panel .btn-print:hover {
-    background-color: #33D375;
-}
-
-.print-studio .setup-panel .main .time {
-    height: 40px;
-    line-height: 40px;
-    text-align: center;
-}
-
-.print-studio .setup-panel .main .setup {
-    padding: 0 16px;
-    height: 36px;
-    margin-bottom: 20px
-}
-
-.print-studio .setup-panel .main .setup .btn {
-    font-size: 13px;
-    letter-spacing: 0.3px;
-}
-
-.print-studio .setup-panel .main .setup > div {
-    display: inline-block;
-}
-
-.print-studio .setup-panel .main .setup .controls {
-    margin-left: 16px;
-    vertical-align: top;
-    width: 65%;
-}
-
-.print-studio .setup-panel .main .setup .btn {
-    width: 100%;
-    text-align: center;
-    height: 36px;
-    line-height: 33px
-}
-
-.print-studio .setup-panel .icon {
-    width: 36px;
-    height: 36px;
-    background-size: 36px 36px;
-}
-
-.print-studio .setup-panel .label {
-    font-size: 11px;
-    color: #9E9E9E;
-    text-transform: uppercase;
-}
-
-.print-studio .setup-panel select {
-    border: 0;
-    border-bottom: 1px #E0E0E0 solid;
-    background-image: url('/img/icon-3d-arrow-down.png');
-    background-repeat: no-repeat;
-    background-size: 8px 8px;
-    background-color: transparent;
-    background-position: 83px 6px;
-    width: 100%;
-    letter-spacing: 0.3px;
-    font-size: 14px;
-    -webkit-appearance: none;
-    appearance: none;
-}
-
-.print-studio .setup-panel .print-speed {
-    background-image: url('/img/icon-speed.png');
-    background-repeat: no-repeat;
-}
-
-.print-studio .setup-panel .material {
-    background-image: url('/img/icon-material.png');
-    background-repeat: no-repeat;
-}
-
-.print-studio .setup-panel .platform {
-    background-image: url('/img/icon-platform.png');
-    background-repeat: no-repeat;
-}
-
-.print-studio .setup-panel .support {
-    background-image: url('/img/icon-support.png');
-    background-repeat: no-repeat;
-}
-
-.print-studio .setup-panel .control label {
-    font-size: 14px;
-    letter-spacing: 0.3;
-    color: #000;
-    display: inline-block;
-}
-
-.print-studio .setup-panel .control .switchContainer {
-    display: inline-block;
-    vertical-align: top;
-    position: absolute;
-    right: 55px;
-}
-
-.print-studio .setup-panel .control .switchContainer > label {
-    width: 0px;
-}
-
-.object-params {
-    right: 25px;
-    width: 22%;
-}
-
-/*for toggle switch*/
-
-input.switch:empty
-{
-    display: none;
-}
-
-input.switch:empty ~ label
-{
-    position: relative;
-    float: left;
-    line-height: 1.4em;
-    text-indent: 4em;
-    margin: 0.2em 0;
-    cursor: pointer;
-    -webkit-user-select: none;
-    user-select: none;
-}
-
-input.switch:empty ~ label:before,
-input.switch:empty ~ label:after
-{
-    position: absolute;
-    display: block;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    content: ' ';
-    width: 2.8em;
-    background-color: #c33;
-    border-radius: 1em;
-    -webkit-transition: all 100ms ease-in;
-    transition: all 100ms ease-in;
-}
-
-input.switch:empty ~ label:after
-{
-    width: 1em;
-    top: 0.1em;
-    bottom: 0.1em;
-    margin-left: 0.15em;
-    margin-top: 0.05em;
-    background-color: #fff;
-    border-radius: 0.5em;
-}
-
-input.switch:checked ~ label:before
-{
-    background-color: #393;
-}
-
-input.switch:checked ~ label:after
-{
-    margin-left: 1.6em;
-    margin-top: 0.05em;
-}
-
-/*scale panel*/
-
-.print-studio .control-bottom {
-    position: absolute;
-    bottom: 40px;
-    width: 100%;
-}
-
-.print-studio .control-bottom > div {
-    position: relative;
-    margin-left: auto;
-    margin-right: auto;
-    width: 688px;
-    height: 70px;
-    background-color: #FFF;
-}
-
-.print-studio .panel .container {
-
-}
-
-.print-studio .panel .container > div {
-    display: inline-block;
-    margin-left: 20px;
-}
-
-.print-studio .panel .controls > label {
-    font-size: 13px;
-    font-weight: 500;
-    color: #4A4A4A;
-}
-
-.print-studio .panel .controls > input {
-    width: 70px;
-    margin-left: 10px;
-}
-
-.print-studio .panel .lock-container {
-    vertical-align: middle;
-}
-
-.print-studio .panel .lock-container > div {
-    background-size: 36px 36px;
-    background-repeat: no-repeat;
-    width: 36px;
-    height: 36px;
-    cursor: pointer;
-}
-
-.print-studio .panel .lock {
-    background-image: url('/img/icon-m-lock.png');
-}
-
-.print-studio .panel .unlock {
-    background-image: url('/img/icon-m-unlock.png');
-}
-
-.print-studio .panel .btn {
-    text-align: center;
-    height: 30px;
-    line-height: 28px;
-    font-size: 13px;
-    font-weight: 500;
-    color: #4A4A4A;
-    margin-left: 30px;
-}
-
-.print-studio .panel .btn:hover {
-    border-color: #000;
-}
-
-/*rotate panel*/
-
-/*rotate knob*/
-.print-studio .panel .controls div {
-    margin-left: 10px;
-}
-
-.print-studio .panel .controls div > canvas {
-    vertical-align: middle;
-}
-
-/*reset button*/
-.print-studio .panel .controls.pull-right {
-    position: relative;
-    top: 10px;
-    right: 20px;
+
+    header {
+        display: table;
+        color: #000;
+    }
+
+    header > div {
+        display: table-cell;
+        vertical-align: middle;
+    }
+
+    header div.pull-right {
+        padding: 24px 0px;
+        border-left: 1px #CCC solid;
+        cursor: pointer;
+    }
+
+    header .pull-right {
+        position: relative;
+    }
+
+    header .preview-container {
+        width: 180px;
+    }
+
+    header .preview-container .fa-caret-down {
+        float: right;
+    }
+
+    header .preview {
+        position: absolute;
+        background-color: #FFF;
+        margin-top: 24px;
+        list-style-type: none;
+        text-align: left;
+        width: 212px;
+        left: -33px;
+        padding: 0;
+    }
+
+    header li {
+        font-size: 14px;
+        color: #4A4A4A;
+        cursor: pointer;
+    }
+
+    header li:hover {
+        background-color: #F0F0F0;
+    }
+
+    header li div {
+        padding: 15px 20px;
+        font-size: 14px;
+        color: #4A4A4A;
+        cursor: pointer;
+    }
+
+    header .actions > div {
+        display: inline-block;
+    }
+
+    header .actions .btn {
+        min-width: 0px;
+        margin-right: 10px;
+        padding: 0 15px;
+    }
+
+    /*for tips on home / save*/
+
+    .verticle-middle {
+        position: relative;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    .btn span {
+        margin-left: 7px;
+    }
+
+    #uploader {
+        padding-left: 20px;
+    }
+
+    #uploader .fa.fa-plus {
+        -webkit-transition: all .1s linear;
+        transition: all .1s linear;
+    }
+
+    #uploader .fa.fa-plus.rotate {
+        -webkit-transform: rotate(90deg);
+        transform: rotate(90deg);
+    }
+
+    .studio-container .pull-right .icon {
+        padding: 0 12px;
+    }
+
+    .pull-right span {
+        font-size: 13px;
+    }
+
+    .model-displayer {
+        height: 90%;
+        width: 100%;
+    }
+
+    .model-displayer {
+        background: #000;
+    }
+
+    .operating-panel {
+        position: absolute;
+        width: 100%;
+    }
+
+    .operating-panel .panel {
+        float: right;
+    }
+
+    .operating-panel .operation {
+        cursor: pointer;
+    }
+
+    .operating-panel .operation img {
+        width: 15px;
+    }
+
+    .operating-panel .operation.up {
+        position: absolute;
+        top: 13px;
+        right: 68px;
+    }
+
+    .operating-panel .operation.right {
+        position: absolute;
+        top: 60px;
+        right: 22px;
+    }
+
+    .operating-panel .operation.down {
+        position: absolute;
+        top: 110px;
+        right: 68px;
+    }
+
+    .operating-panel .operation.left {
+        position: absolute;
+        top: 60px;
+        right: 117px;
+    }
+
+    .operating-panel .operation.home {
+        position: absolute;
+        top: 40px;
+        right: 50px;
+        background-color: #FFF;
+        padding: 12px;
+        border-radius: 27px;
+    }
+
+    .operating-panel .operation.home img {
+        width: 30px;
+    }
+
+    .operating-panel .operation.command {
+        position: absolute;
+        top: 200px;
+        right: 50px;
+    }
+
+    .operating-panel .operation.command > div {
+        background-color: #FFF;
+        width: 48px;
+        height: 48px;
+        border-radius: 5px;
+        margin-top: 8px;
+    }
+
+    .operating-panel .operation.command button:hover:before {
+        display: block;
+        position: absolute;
+        content: attr(data-tip);
+        min-width: 75px;
+        text-align: center;
+        white-space: nowrap;
+        top: 15px;
+        background: rgba(0,0,0,.8);
+        -webkit-border-radius: 3px;
+        border-radius: 3px;
+        color: #FFF;
+        font-size: 11px;
+        left: -85px;
+        z-index: 1;
+        height: 24px;
+        line-height: 24px;
+    }
+
+    .operating-panel .operation.command .btn {
+        min-width: 48px;
+        height: 100%;
+        margin-left: 0;
+        background-repeat: no-repeat;
+        background-position: center;
+        border: none;
+    }
+
+    .operating-panel .operation.command div:last-child {
+        margin-top: 30px;
+    }
+
+    .operating-panel .operation.command .scale {
+        background-image: url('/img/icon-scale.png');
+    }
+
+    .operating-panel .operation.command .scale:hover {
+        background-image: url('/img/icon-scale-a.png');
+    }
+
+    .operating-panel .operation.command .scale.active {
+        background-image: url('/img/icon-scale-a.png');
+    }
+
+    .operating-panel .operation.command .rotate {
+        background-image: url('/img/icon-rotate.png');
+    }
+
+    .operating-panel .operation.command .rotate:hover {
+        background-image: url('/img/icon-rotate-a.png');
+    }
+
+    .operating-panel .operation.command .rotate.active {
+        background-image: url('/img/icon-rotate-a.png');
+    }
+
+    .operating-panel .operation.command .center {
+        background-image: url('/img/icon-center.png');
+    }
+
+    .operating-panel .operation.command .center:hover {
+        background-image: url('/img/icon-center-a.png');
+    }
+
+    .operating-panel .operation.command .delete {
+        background-image: url('/img/icon-delete.png');
+    }
+
+    .operating-panel .operation.command .delete:hover {
+        background-image: url('/img/icon-delete-a.png');
+    }
+
+    .operating-panel .zoom {
+        position: fixed;
+        top: 210px;
+        right: 25px;
+    }
+
+    .operating-panel .zoom > div {
+        display: inline-block;
+        padding: 0 10px;
+        background-color: #FFF;
+        height: 30px;
+        cursor: pointer;
+    }
+
+    .operating-panel .zoom .in {
+        border-top-right-radius: 15px;
+        border-bottom-right-radius: 15px;
+    }
+
+    .operating-panel .zoom .out {
+        border-top-left-radius: 15px;
+        border-bottom-left-radius: 15px;
+    }
+
+    .operating-panel .zoom .divider {
+        width: 1px;
+        border-left: 1px #E0E0E0 solid;
+        padding: 0;
+    }
+
+    .operating-panel .zoom > div > img {
+        width: 30px;
+    }
+
+    .setup-panel {
+        position: absolute;
+        margin-top: 20px;
+        margin-left: 20px;
+    }
+
+    .setup-panel .main {
+        width: 182px;
+        background-color: #FFF;
+        border-radius: 3px;
+        height: 320px;
+    }
+
+    .setup-panel .btn-print {
+        width: 182px;
+        background-color: #FFF;
+        border-radius: 3px;
+        text-align: center;
+        background-color: #00C853;
+        color: #FFF;
+        margin-top: 10px;
+    }
+
+    .setup-panel .btn-print:hover {
+        background-color: #33D375;
+    }
+
+    .setup-panel .main .time {
+        height: 40px;
+        line-height: 40px;
+        text-align: center;
+    }
+
+    .setup-panel .main .setup {
+        padding: 0 16px;
+        height: 36px;
+        margin-bottom: 20px
+    }
+
+    .setup-panel .main .setup .btn {
+        font-size: 13px;
+        letter-spacing: 0.3px;
+    }
+
+    .setup-panel .main .setup > div {
+        display: inline-block;
+    }
+
+    .setup-panel .main .setup .controls {
+        margin-left: 16px;
+        vertical-align: top;
+        width: 65%;
+    }
+
+    .setup-panel .main .setup .btn {
+        width: 100%;
+        text-align: center;
+        height: 36px;
+        line-height: 33px
+    }
+
+    .setup-panel .icon {
+        width: 36px;
+        height: 36px;
+        background-size: 36px 36px;
+    }
+
+    .setup-panel .label {
+        font-size: 11px;
+        color: #9E9E9E;
+        text-transform: uppercase;
+    }
+
+    .setup-panel select {
+        border: 0;
+        border-bottom: 1px #E0E0E0 solid;
+        background-image: url('/img/icon-3d-arrow-down.png');
+        background-repeat: no-repeat;
+        background-size: 8px 8px;
+        background-color: transparent;
+        background-position: 83px 6px;
+        width: 100%;
+        letter-spacing: 0.3px;
+        font-size: 14px;
+        -webkit-appearance: none;
+        appearance: none;
+    }
+
+    .setup-panel .print-speed {
+        background-image: url('/img/icon-speed.png');
+        background-repeat: no-repeat;
+    }
+
+    .setup-panel .material {
+        background-image: url('/img/icon-material.png');
+        background-repeat: no-repeat;
+    }
+
+    .setup-panel .platform {
+        background-image: url('/img/icon-platform.png');
+        background-repeat: no-repeat;
+    }
+
+    .setup-panel .support {
+        background-image: url('/img/icon-support.png');
+        background-repeat: no-repeat;
+    }
+
+    .setup-panel .control label {
+        font-size: 14px;
+        letter-spacing: 0.3;
+        color: #000;
+        display: inline-block;
+    }
+
+    .setup-panel .control .switchContainer {
+        display: inline-block;
+        vertical-align: top;
+        position: absolute;
+        right: 55px;
+    }
+
+    .setup-panel .control .switchContainer > label {
+        width: 0px;
+    }
+
+    .object-params {
+        right: 25px;
+        width: 22%;
+    }
+
+    /*for toggle switch*/
+
+    input.switch:empty {
+        display: none;
+    }
+
+    input.switch:empty ~ label
+    {
+        position: relative;
+        float: left;
+        line-height: 1.4em;
+        text-indent: 4em;
+        margin: 0.2em 0;
+        cursor: pointer;
+        -webkit-user-select: none;
+        user-select: none;
+    }
+
+    input.switch:empty ~ label:before,
+    input.switch:empty ~ label:after
+    {
+        position: absolute;
+        display: block;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        content: ' ';
+        width: 2.8em;
+        background-color: #c33;
+        border-radius: 1em;
+        -webkit-transition: all 100ms ease-in;
+        transition: all 100ms ease-in;
+    }
+
+    input.switch:empty ~ label:after
+    {
+        width: 1em;
+        top: 0.1em;
+        bottom: 0.1em;
+        margin-left: 0.15em;
+        margin-top: 0.05em;
+        background-color: #fff;
+        border-radius: 0.5em;
+    }
+
+    input.switch:checked ~ label:before
+    {
+        background-color: #393;
+    }
+
+    input.switch:checked ~ label:after
+    {
+        margin-left: 1.6em;
+        margin-top: 0.05em;
+    }
+
+    /*scale panel*/
+
+    .control-bottom {
+        position: absolute;
+        bottom: 40px;
+        width: 100%;
+    }
+
+    .control-bottom > div {
+        position: relative;
+        margin-left: auto;
+        margin-right: auto;
+        width: 688px;
+        height: 70px;
+        background-color: #FFF;
+    }
+
+    .panel .container {
+
+    }
+
+    .panel .container > div {
+        display: inline-block;
+        margin-left: 20px;
+    }
+
+    .panel .controls > label {
+        font-size: 13px;
+        font-weight: 500;
+        color: #4A4A4A;
+    }
+
+    .panel .controls > input {
+        width: 70px;
+        margin-left: 10px;
+    }
+
+    .panel .lock-container {
+        vertical-align: middle;
+    }
+
+    .panel .lock-container > div {
+        background-size: 36px 36px;
+        background-repeat: no-repeat;
+        width: 36px;
+        height: 36px;
+        cursor: pointer;
+    }
+
+    .panel .lock {
+        background-image: url('/img/icon-m-lock.png');
+    }
+
+    .panel .unlock {
+        background-image: url('/img/icon-m-unlock.png');
+    }
+
+    .panel .btn {
+        text-align: center;
+        height: 30px;
+        line-height: 28px;
+        font-size: 13px;
+        font-weight: 500;
+        color: #4A4A4A;
+        margin-left: 30px;
+    }
+
+    .panel .btn:hover {
+        border-color: #000;
+    }
+
+    /*rotate panel*/
+
+    /*rotate knob*/
+    .panel .controls div {
+        margin-left: 10px;
+    }
+
+    .panel .controls div > canvas {
+        vertical-align: middle;
+    }
+
+    /*reset button*/
+    .panel .controls.pull-right {
+        position: relative;
+        top: 10px;
+        right: 20px;
+    }
+
 }

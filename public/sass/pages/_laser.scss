@@ -1,0 +1,183 @@
+/**
+ * Laser
+ */
+.laser-studio {
+    .top-menu-bar {
+        padding: 0 20px;
+    }
+
+    .fa::before {
+        margin: 0 5px 0 0;
+    }
+
+    .model-displayer {
+        height: calc(100% - 66px);
+
+        .file-importer {
+            border: 2px dashed #CCC;
+            height: 500px;
+            padding: 95px 0;
+            text-align: center;
+            width: 500px;
+
+            h2 {
+                color: #979797;
+                font-size: 18px;
+            }
+
+            p {
+                color: #bdbdbd;
+                font-size: 13px;
+                letter-spacing: .3px;
+            }
+        }
+    }
+
+    .btn-h-group {
+        height: 100%;
+        align-items: center;
+    }
+
+    .laser-object {
+        @include absolute-center();
+        background: url(/img/laser-platform.png);
+        border: 1px solid #DDD;
+        height: 400px;
+        overflow: hidden;
+        position: fixed;
+        width: 400px;
+    }
+
+    .laser-object .ft-container {
+        z-index: 1;
+    }
+
+    .laser-object .image-active {
+        box-shadow: 0 0 10px 3px rgba(0, 0, 0, 0.5);
+    }
+
+    .laser-object .ft-widget {
+        cursor: move;
+        position: fixed;
+    }
+
+    .laser-platform {
+        @include absolute-center();
+        background: #ccc;
+        -webkit-clip-path: polygon(50% 0%, 95% 26%, 95% 74%, 50% 100%, 5% 74%, 5% 26%);
+        clip-path: polygon(50% 0%, 95% 26%, 95% 74%, 50% 100%, 5% 74%, 5% 26%);
+        height: 500px;
+        position: fixed;
+        width: 500px;
+
+        &::before {
+            @include absolute-center();
+            content: "";
+            background: #fff;
+            -webkit-clip-path: polygon(50% 0%, 95% 26%, 95% 74%, 50% 100%, 5% 74%, 5% 26%);
+            clip-path: polygon(50% 0%, 95% 26%, 95% 74%, 50% 100%, 5% 74%, 5% 26%);
+            height: 499px;
+            width: 499px;
+        }
+    }
+
+    .zoom .btn {
+        height: 28px;
+        line-height: 20px;
+        margin: 0 12px 0 0;
+        min-width: 0;
+        width: 28px;
+
+        &::before {
+            margin: 0;
+        }
+    }
+
+    .operating-panel .panel {
+        position: absolute;
+    }
+
+    .print-params,
+    .object-position {
+        background: #eee;
+    }
+
+    .object-position {
+        padding: 20px;
+        right: 25px;
+        width: 214px;
+
+        .control:nth-child(odd) {
+            margin: 0 0 4px 0;
+        }
+
+        .control:nth-child(even) {
+            margin: 0 0 14px 0;
+        }
+
+        input,
+        .radio-group,
+        .caption,
+        .unit {
+            font-size: 11px;
+        }
+
+        .unit {
+            color: #777;
+        }
+
+        .radio-group {
+            input[type="radio"] {
+                display: none;
+            }
+
+            input[type="radio"] + span {
+                border-radius: 10px;
+                color: #9b9b9b;
+                cursor: pointer;
+                display: inline-block;
+                font-size: 14px;
+                padding: 10px;
+            }
+
+            input[type="radio"]:checked + span {
+                background: #c1c1c1;
+                color: #000;
+            }
+        }
+    }
+
+    .objects-params {
+        left: 25px;
+    }
+
+    .print-params {
+        padding: 0 16px 20px 16px;
+
+        .estimated-time {
+            line-height: 40px;
+            margin: 0;
+        }
+
+        .caption {
+            margin: 0;
+        }
+
+        .fa::before {
+            background: #ccc;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            margin: 0 5px;
+            padding: 5px;
+        }
+    }
+
+    .btn-start {
+        margin: 10px 0 0 0;
+
+        img {
+            margin: 0 10px 0 0;
+            width: 14px;
+        }
+    }
+}

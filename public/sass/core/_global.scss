@@ -23,14 +23,6 @@ body {
     display: table;
 }
 
-*,
-:after,
-:before {
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-}
-
 .clearfix:after {
     clear: both;
 }
@@ -45,7 +37,13 @@ body {
 :after,
 :before {
     -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+*,
+:after,
+:before {
+    -webkit-box-sizing: border-box;
     box-sizing: border-box;
 }
 
@@ -56,11 +54,11 @@ a {
     text-decoration: underline;
 }
 
+/* buttons */
 .btn {
-    background: #00C853;
+    background-image: none;
     border: none;
     box-sizing: border-box;
-    color: #fff;
     cursor: pointer;
     display: inline-block;
     font-size: 15px;
@@ -71,23 +69,40 @@ a {
     outline: none;
     padding: 0;
     position: relative;
+    text-align: center;
     text-decoration: none;
-    background-image: none;
-    -webkit-user-select: none;
-    user-select: none;
     -webkit-transition: opacity .1s ease,background-color .1s ease,color .1s ease,box-shadow .1s ease,background .1s ease;
     transition: opacity .1s ease,background-color .1s ease,color .1s ease,box-shadow .1s ease,background .1s ease;
+    -webkit-user-select: none;
+    user-select: none;
     -webkit-tap-highlight-color: transparent;
+
+    &:active {
+        background-color: #ccc;
+        background-image: '';
+        box-shadow: 0 0 0 1px transparent inset,
+                    0 1px 4px 0 rgba(39, 41, 43, .15);
+        color: rgba(0, 0, 0, .8);
+    }
 }
 
 .btn-default {
     background: #fff;
-    border: 1px solid #bdbdbd;
+    border: 1px solid #e0e0e0;
     color: #424242;
+
+    &:hover {
+        border: 1px solid #424242;
+    }
 }
 
-.btn-default:hover {
-    border: 1px solid #424242;
+.btn-action {
+    background: #00C853;
+    color: #fff;
+
+    &:hover {
+        background: #33d375;
+    }
 }
 
 .btn-warning {
@@ -99,31 +114,30 @@ a {
     text-decoration: underline;
 }
 
-.btn:hover {
-    background-color: #e8e8e8;
-    background-image: none;
-    box-shadow: '';
-    color: rgba(0,0,0,.8);
+/* button size */
+.btn-full-width {
+    display: block;
+    width: 100%;
 }
 
-.btn:active {
-    background-color: #ccc;
-    background-image: '';
-    color: rgba(0,0,0,.8);
-    box-shadow: 0 0 0 1px transparent inset,0 1px 4px 0 rgba(39,41,43,.15);
-}
-
-/* btn size */
 .btn-large {
     width: 270px;
 }
 
-/* btn group */
-.btn-group .btn {
+/* button group */
+.btn-h-group {
+    @include flexbox();
+}
+
+.btn-align-center-h-group {
+    justify-content: center;
+}
+
+.btn-h-group .btn {
     margin: 0 0 0 24px;
 }
 
-.btn-group .btn:first-child {
+.btn-h-group .btn:first-child {
     margin: 0;
 }
 
@@ -140,6 +154,7 @@ a {
 }
 
 .sidebar {
+    background-color: #000;
     bottom: 0;
     display: none;
     left: 0;
@@ -147,7 +162,6 @@ a {
     position: fixed;
     top: 0;
     width: 66px;
-    background-color: #000;
 }
 
 .content {
@@ -188,10 +202,10 @@ a {
 }
 
 .menu .menu-item {
+    cursor: pointer;
     height: 66px;
     text-align: center;
     width: 100%;
-    cursor: pointer;
 }
 
 .menu .menu-item:hover {
@@ -201,14 +215,14 @@ a {
 .menu .menu-item a {
     color: #FFF;
     display: block;
-    text-decoration: none;
     letter-spacing: 0.3px;
+    text-decoration: none;
 }
 
 .menu .menu-item img {
     height: 34px;
-    width: 34px;
     margin-top: 8px;
+    width: 34px;
 }
 
 .menu .menu-item.brand-name img,
@@ -230,70 +244,28 @@ a {
 }
 
 /* cols width */
-
-.span2 {
-    margin: 0 10px;
-    width: calc(100% / 12 * 2 - 20px);
-    display: inline-block;
+@for $i from 1 through 12 {
+    .span#{$i} {
+        display: inline-block;
+        margin: 0 10px 0 0;
+        width: calc(100% / 12 * #{$i} - 10px);
+    }
 }
 
-.span3 {
-    margin: 0 10px;
-    width: calc(100% / 12 * 3 - 20px);
-    display: inline-block;
-}
+/* offset */
+@for $i from 1 through 12 {
+    .offset-left-#{$i} {
+        margin-left: calc(100% / 12 * #{$i});
+    }
 
-.span4 {
-    margin: 0 10px;
-    width: calc(100% / 12 * 4 - 20px);
-    display: inline-block;
-}
-
-.span5 {
-    margin: 0 10px;
-    width: calc(100% / 12 * 5 - 20px);
-    display: inline-block;
-}
-
-.span6 {
-    margin: 0 10px;
-    width: calc(100% / 12 * 6 - 20px);
-    display: inline-block;
-}
-
-.span7 {
-    margin: 0 10px;
-    width: calc(100% / 12 * 7 - 20px);
-    display: inline-block;
-}
-
-.span8 {
-    margin: 0 10px;
-    width: calc(100% / 12 * 8 - 20px);
-    display: inline-block;
-}
-
-.span9 {
-    margin: 0 10px;
-    width: calc(100% / 12 * 9 - 20px);
-    display: inline-block;
-}
-
-.span12 {
-    margin-left: 0;
-    margin-right: 0;
-    width: 100%;
-    display: inline-block;
+    .offset-right-#{$i} {
+        margin-right: calc(100% / 12 * #{$i});
+    }
 }
 
 /* position */
 .absolute-center {
-    bottom: 0;
-    left: 0;
-    margin: auto;
-    position: absolute;
-    right: 0;
-    top: 0;
+    @include absolute-center();
 }
 
 /**
@@ -311,59 +283,27 @@ a {
     text-align: left;
 }
 
-.tooltip {
-    display: inline-block;
-}
-
-.tooltip::before {
-    border: 1px solid #ccc;
-    border-radius: 50%;
-    content: "?";
-    cursor: pointer;
-    display: inline-block;
-    height: 20px;
-    line-height: 20px;
+/* tooltip */
+.tip:hover::before {
+    background: rgba(0, 0 , 0, .8);
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    color: #FFF;
+    content: attr(data-tip);
+    display: block;
+    font-size: 11px;
+    height: 24px;
+    left: -15px;
+    line-height: 24px;
+    min-width: 75px;
+    position: absolute;
     text-align: center;
-    width: 20px;
+    white-space: nowrap;
+    z-index: 1;
 }
 
-.tooltip:hover .tooltip-content {
-    background: rgba(0, 0, 0, .7);
-    height: auto;
-    min-width: 400px;
-    overflow: visible;
-    padding: 10px;
-    width: auto;
-}
-
-.tooltip .tooltip-content {
-    background: rgba(0, 0, 0, 0);
-    color: #eee;
-    display: inline-block;
-    height: 0;
-    left: 100%;
-    overflow: hidden;
-    position: absolute;
-    -webkit-transition: background .3s ease-out;
-    transition: background .3s ease-out;
-    width: 0;
-    z-index: 9999;
-}
-
-.tooltip:hover .tooltip-content::before {
-    border: 10px solid transparent;
-    border-right: 10px solid rgba(0, 0, 0, .7);
-}
-
-.tooltip .tooltip-content::before {
-    border-right: 10px solid rgba(0, 0, 0, 0);
-    content: "";
-    left: -20px;
-    position: absolute;
-    top: 1px;
-    -o-transition: border-right .3s ease-out;
-    -webkit-transition: border-right .3s ease-out;
-    transition: border-right .3s ease-out;
+.tip-bottom:hover::before {
+    top: calc(100% + 5px);
 }
 
 .invisible {
@@ -379,27 +319,18 @@ a {
  * general style
  */
 
+.border-circle {
+    border-radius: 50%;
+}
+
 .hide {
     display: none;
 }
 
-.file-importer {
-    position: relative;
-}
-
-.laser-studio .file-importer {
-    height: 100%;
-    text-align: center;
-}
-
 .file-importer input[type="file"] {
-    bottom: 0;
-    display: block;
-    left: 0;
+    @include absolute-center();
+    cursor: pointer;
     opacity: 0;
-    position: absolute;
-    right: 0;
-    top: 0;
     width: 100%;
 }
 
@@ -435,10 +366,21 @@ a {
     position: absolute;
 }
 
+
+/* studio */
 .studio-container {
     height: 100%;
-    padding: 25px;
     position: relative;
+
+    .top-menu-bar {
+        height: 66px;
+        letter-spacing: 0.3px;
+        width: 100%;
+    }
+
+    .btn-default {
+        border-radius: 5px;
+    }
 }
 
 .scan-studio .model-displayer {
@@ -471,37 +413,6 @@ a {
 
 .scan-studio .operating-panel .param {
     height: 5rem;
-}
-
-.laser-studio .object-params {
-    right: 25px;
-    width: 22%;
-}
-
-.laser-object {
-    border: 1px solid #DDD;
-    border-radius: 50%;
-    bottom: 0;
-    height: 400px;
-    left: 0;
-    margin: auto;
-    overflow: hidden;
-    position: fixed;
-    right: 0;
-    top: 0;
-    width: 400px;
-}
-
-.laser-object .ft-container {
-    z-index: 1;
-}
-
-.laser-object .image-active {
-    box-shadow: 0 0 10px 3px rgba(0, 0, 0, 0.5);
-}
-
-.laser-object .ft-widget {
-    cursor: move;
 }
 
 .popup-window {
