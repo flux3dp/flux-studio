@@ -249,8 +249,8 @@ define(function() {
             save: 'Save',
             acceptable_files: 'JPG, PNG, PDF, AI',
             drop_files_to_import: 'Drop your file here or click "import" to upload your file',
-            change_setup: 'Change Setup',
-            start_laser: 'Start',
+            advenced: 'Advenced',
+            start_laser: 'LASER',
             print_params: {
                 method: {
                     text: 'Method',
