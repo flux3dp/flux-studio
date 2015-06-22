@@ -2,14 +2,18 @@ define([
     'jquery',
     'helpers/file-system',
     'helpers/websocket',
+    'helpers/grayscale',
+    'helpers/convertToTypedArray',
     'freetrans'
-], function($, fileSystem, WebSocket) {
+], function($, fileSystem, WebSocket, grayScale, convertToTypedArray) {
     'use strict';
 
     return function(args) {
 
         var DIAMETER = 170,    // 170mm
             CHUNK_PKG_SIZE = 4096,
+            DELECT_KEY_CODE = 68,
+            LASER_IMG_CLASS = 'img-container',
             $uploader = $('.file-importer'),
             $uploader_file_control = $uploader.find('[type="file"]'),
             $laser_platform = $('.laser-object'),
@@ -19,15 +23,74 @@ define([
             $pos_y = $('[name="object-pos-y"]'),
             $size_w = $('[name="object-size-w"]'),
             $size_h = $('[name="object-size-h"]'),
+            $threshold = $('[name="threshold"]'),
+            deleteImage = function() {
+                var $img_container = $('.' + LASER_IMG_CLASS);
+
+                $target_image.parents('.ft-container').remove();
+
+                if (0 === $img_container) {
+                    $target_image = null;
+                }
+                else {
+                    $target_image = $img_container[0];
+                }
+            },
+            refreshImage = function($img) {
+                var height = $img.height(),
+                    width = $img.width(),
+                    img = new Image(),
+                    canvas = document.createElement('canvas'),
+                    ctx = canvas.getContext('2d'),
+                    opts = {
+                        is_rgba: true,
+                        threshold: parseInt($threshold.val(), 10)
+                    },
+                    imageData;
+
+                img.onload = function() {
+                    ctx.drawImage(
+                        img,
+                        0,
+                        0,
+                        width,
+                        height
+                    );
+
+                    imageData = new ImageData(
+                        convertToTypedArray(grayScale(ctx.getImageData(0, 0, width, height).data, opts), Uint8ClampedArray),
+                        width,
+                        height
+                    );
+
+                    ctx.putImageData(imageData, 0, 0);
+
+                    ctx.fillStyle = '#fff';
+                    // refers to: https://developer.mozilla.org/zh-TW/docs/Web/Guide/HTML/Canvas_tutorial/Compositing
+                    // background is always white
+                    ctx.globalCompositeOperation = 'destination-over';
+                    ctx.fillRect(0, 0, width, height);
+
+                    $img.attr('src', canvas.toDataURL('image/jpeg'));
+                };
+
+                canvas.width = width;
+                canvas.height = height;
+
+                img.src = $img.data('base');
+            },
             readfiles = function(files) {
                 var onComplete = function(e, fileEntry) {
-                        var $div = $(document.createElement('div')).addClass('img-container').data('index', $('.img-container').length),
-                            $img = $(document.createElement('img')).attr('src', fileEntry.toURL()),
+                        var $div = $(document.createElement('div')).addClass(LASER_IMG_CLASS).data('index', $('.' + LASER_IMG_CLASS).length),
+                            img = new Image(),
+                            $img = $(img).data('base', fileEntry.toURL()),
                             instantRefresh = function(e, data) {
                                 refreshObjectParams($div);
                             };
 
                         $img.one('load', function() {
+                            $laser_platform.append($div);
+
                             $div.freetrans({
                                 x: $laser_platform.width() / 2,
                                 y: $laser_platform.height() / 2,
@@ -35,12 +98,25 @@ define([
                                 onMove: instantRefresh,
                                 onScale: instantRefresh
                             });
+
+                            $div.parent().find('.ft-controls').on('mousedown', function(e) {
+                                var $self = $(e.target);
+
+                                $('.image-active').removeClass('image-active');
+                                $target_image = $self.parent().find('.' + LASER_IMG_CLASS);
+                                $target_image.find('img').addClass('image-active');
+                            });
+
+                            refreshImage($img);
+
+                            img.onload = null;
                         });
+
+                        img.src = fileEntry.toURL();
 
                         $div.append($img);
 
-                        $laser_platform.append($div);
-
+                        // set default image
                         $target_image = $div;
 
                         $('#file-importer').hide();
@@ -165,27 +241,6 @@ define([
 
         $('#btn-start').on('click', function(e) {
             var $ft_controls = $laser_platform.find('.ft-controls'),
-                convertToGrayScale = function(data) {
-                    var binary = [];
-
-                    for (var i = 0; i < data.length; i += 4) {
-                        // refers to http://en.wikipedia.org/wiki/Grayscale
-                        var grayscale = parseInt(data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114, 10);
-
-                        binary.push(grayscale);
-                    }
-
-                    return binary;
-                },
-                convertIntoUint8Array = function(arr) {
-                    var dataView = new Uint8Array(arr.length);
-
-                    arr.forEach(function(value, i) {
-                        dataView[i] = value;
-                    });
-
-                    return dataView;
-                },
                 convertToRealCoordinate = function(px, axis) {
                     var ratio = DIAMETER / PLATFORM_DIAMETER_PIXEL, // 1(px) : N(mm)
                         r = PLATFORM_DIAMETER_PIXEL / 2 * ratio,
@@ -231,7 +286,6 @@ define([
                         rotate: (Math.PI * getAngle(el) / 180) * -1,
                         data: []
                     },
-
                     canvas = document.createElement('canvas'),
                     ctx = canvas.getContext('2d'),
                     image_blobs = [];
@@ -246,10 +300,10 @@ define([
                     width,
                     height
                 );
-                image_blobs = convertToGrayScale(ctx.getImageData(0, 0, width, height).data);
+                image_blobs = grayScale(ctx.getImageData(0, 0, width, height).data);
 
                 for (var i = 0; i < image_blobs.length; i += CHUNK_PKG_SIZE) {
-                    sub_data.data.push(convertIntoUint8Array(image_blobs.slice(i, i + CHUNK_PKG_SIZE)));
+                    sub_data.data.push(convertToTypedArray(image_blobs.slice(i, i + CHUNK_PKG_SIZE), Uint8Array));
                 }
 
                 args.push(sub_data);
@@ -257,18 +311,6 @@ define([
 
             // sending data
             sendingToLaser(args);
-        });
-
-        $laser_platform.on('mousedown', function(e) {
-            var $self = $(e.target);
-
-            if (true === $self.hasClass('ft-controls')) {
-                $('.image-active').removeClass('image-active');
-                $target_image = $self.parent().find('.img-container');
-                $target_image.find('img').addClass('image-active');
-
-                refreshObjectParams($target_image);
-            }
         });
 
         $angle.on('focus', function(e) {
@@ -296,6 +338,18 @@ define([
         $uploader.on('drop', function(e) {
             e.preventDefault();
             readfiles(e.originalEvent.dataTransfer.files);
+        });
+
+        $threshold.on('keyup', function(e) {
+            $('.' + LASER_IMG_CLASS).find('img').each(function(k, el) {
+                refreshImage($(el));
+            });
+        });
+
+        $(document).on('keydown', function(e) {
+            if (DELECT_KEY_CODE === e.keyCode) {
+                deleteImage();
+            }
         });
     };
 });
