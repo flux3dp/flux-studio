@@ -50,8 +50,8 @@ define([
         },
         render: function() {
             var lang = this.props.lang,
-                scaleClass = ClassNames('btn', 'scale', {'active': this.state.operation === 'scale'}),
-                rotateClass = ClassNames('btn', 'rotate', {'active': this.state.operation === 'rotate'});
+                scaleClass = ClassNames('btn', 'btn-default', 'scale', {'active': this.state.operation === 'scale'}),
+                rotateClass = ClassNames('btn', 'btn-default', 'rotate', {'active': this.state.operation === 'rotate'});
 
             return (
                 <div id="operating-panel" className="operating-panel">
@@ -69,10 +69,10 @@ define([
                                 <button className={rotateClass} data-tip={lang.print.rotate} onClick={this._handleOperation.bind(null, 'rotate')}></button>
                             </div>
                             <div>
-                                <button className="btn center" data-tip={lang.print.align_center}></button>
+                                <button className="btn btn-default center" data-tip={lang.print.align_center}></button>
                             </div>
                             <div>
-                                <button className="btn delete" data-tip={lang.print.delete}></button>
+                                <button className="btn btn-default delete" data-tip={lang.print.delete}></button>
                             </div>
                         </div>
                     </div>

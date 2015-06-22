@@ -79,7 +79,7 @@ define([
                                 </div>
                             </div>
                             <div>
-                                <a className="btn btn-large" id="btn-next" onClick={this._handleSetPrinter}>
+                                <a className="btn btn-action btn-large" id="btn-next" onClick={this._handleSetPrinter}>
                                     {lang.wifi.set_printer.next}</a>
                             </div>
                         </div>

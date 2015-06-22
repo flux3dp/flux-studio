@@ -39,7 +39,7 @@ define([
                 },
 
                 componentWillUnmount: function() {
-                    if (false === location.hash.startsWith('#studio/scan')) {
+                    if (false === location.hash.startsWith('#studio/scan') && null !== this.ws) {
                         this.ws.close(false);
                     }
                 },

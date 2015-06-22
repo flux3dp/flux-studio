@@ -22,7 +22,7 @@ define([
                             <h2>{lang.wifi.failure.caption}</h2>
                             <p>{lang.wifi.failure.line1}</p>
                             <div>
-                                <a href="#initialize/wifi/select" className="btn btn-large">{lang.wifi.failure.next}</a>
+                                <a href="#initialize/wifi/select" className="btn btn-action btn-large">{lang.wifi.failure.next}</a>
                             </div>
                         </div>
                     </div>

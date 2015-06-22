@@ -106,10 +106,12 @@ define([
                     </footer>
 
                 return (
-                    <div className="settings">
-                        {this.state.displayMenu ? header : ''}
-                        <div className={tabContainerClass}></div>
-                        {this.state.displayFooter ? footer : ''}
+                    <div className="studio-container settings-studio">
+                        <div className="settings">
+                            {this.state.displayMenu ? header : ''}
+                            <div className={tabContainerClass}></div>
+                            {this.state.displayFooter ? footer : ''}
+                        </div>
                     </div>
                 );
             }

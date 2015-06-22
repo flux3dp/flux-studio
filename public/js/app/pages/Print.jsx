@@ -95,21 +95,21 @@ define([
                         previewClass    = ClassNames('preview', {hide: !this.state.showPreviewModeList});
 
                     return (
-                        <header>
+                        <header className="top-menu-bar">
                             <div id="uploader" className="actions">
                                 <div>
-                                    <button className="btn btn-default-light">
+                                    <button className="btn btn-default">
                                         <span className="fa fa-plus"></span>
                                         {lang.print.import}
                                     </button>
                                 </div>
                                 <div>
-                                    <button className="btn btn-default-light tip" data-tip={lang.print.go_home}>
+                                    <button className="btn btn-default tip tip-bottom" data-tip={lang.print.go_home}>
                                         <span className="fa fa-home"></span>
                                     </button>
                                 </div>
                                 <div>
-                                    <button className="btn btn-default-light tip" data-tip={lang.print.save}>
+                                    <button className="btn btn-default tip tip-bottom" data-tip={lang.print.save}>
                                         <span className="fa fa-floppy-o"></span>
                                     </button>
                                 </div>
