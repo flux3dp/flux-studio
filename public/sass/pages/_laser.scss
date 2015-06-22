@@ -12,6 +12,7 @@
 
     .model-displayer {
         height: calc(100% - 66px);
+        position: relative;
 
         .file-importer {
             border: 2px dashed #CCC;
@@ -41,11 +42,15 @@
     .laser-object {
         @include absolute-center();
         background: url(/img/laser-platform.png);
-        border: 1px solid #DDD;
+        border: 1px solid #ddd;
         height: 400px;
         overflow: hidden;
         position: fixed;
         width: 400px;
+
+        .img-container {
+            background: #fff;
+        }
     }
 
     .laser-object .ft-container {
