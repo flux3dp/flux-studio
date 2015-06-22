@@ -300,6 +300,10 @@ define(function() {
                             label: 'inches'
                         }
                     ]
+                },
+                threshold: {
+                    text: 'Threshold',
+                    default: 128
                 }
             }
         },
