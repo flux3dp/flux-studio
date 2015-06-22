@@ -116,6 +116,12 @@ define([
                                                 <RadioGroupView className="span8 radio-group" name="object-unit" options={lang.laser.object_params.unit.options}/>
                                             </div>
                                         </div>
+                                        <div className="controls">
+                                            <div className="control">
+                                                <label className="caption span4">{lang.laser.object_params.threshold.text}</label>
+                                                <input type="number" min="0" max="255" className="span4" name="threshold" defaultValue={lang.laser.object_params.threshold.default}/>
+                                            </div>
+                                        </div>
                                     </div>
                                 </section>
                             </div>
