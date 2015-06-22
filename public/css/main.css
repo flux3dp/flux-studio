@@ -3632,7 +3632,8 @@ input.switch:checked ~ label:after {
     margin: 0 5px 0 0; }
 
 .laser-studio .model-displayer {
-    height: calc(100% - 66px); }
+    height: calc(100% - 66px);
+    position: relative; }
     .laser-studio .model-displayer .file-importer {
         border: 2px dashed #CCC;
         height: 500px;
@@ -3660,11 +3661,13 @@ input.switch:checked ~ label:after {
     right: 0;
     top: 0;
     background: url(/img/laser-platform.png);
-    border: 1px solid #DDD;
+    border: 1px solid #ddd;
     height: 400px;
     overflow: hidden;
     position: fixed;
     width: 400px; }
+    .laser-studio .laser-object .img-container {
+        background: #fff; }
 
 .laser-studio .laser-object .ft-container {
     z-index: 1; }
