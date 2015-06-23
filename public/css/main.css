@@ -3668,6 +3668,8 @@ input.switch:checked ~ label:after {
     width: 400px; }
     .laser-studio .laser-object .img-container {
         background: #fff; }
+    .laser-studio .laser-object .svg {
+        min-width: 300px; }
 
 .laser-studio .laser-object .ft-container {
     z-index: 1; }
