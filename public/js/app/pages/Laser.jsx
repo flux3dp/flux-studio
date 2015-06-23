@@ -85,8 +85,8 @@ define([
                                         <div className="controls">
                                             <p className="control">
                                                 <label className="caption span4">{lang.laser.object_params.position.text}</label>
-                                                <input type="number" min="0" name="object-pos-x" className="span4" defaultValue=""/>
-                                                <input type="number" min="0" name="object-pos-y" className="span4" defaultValue=""/>
+                                                <input type="number" min="0" name="object-pos-x" data-type="x" className="span4 instant-change" defaultValue=""/>
+                                                <input type="number" min="0" name="object-pos-y" data-type="y" className="span4 instant-change" defaultValue=""/>
                                             </p>
                                             <p className="control">
                                                 <span className="offset-left-4 span4 text-center unit">X</span>
@@ -96,8 +96,8 @@ define([
                                         <div className="controls">
                                             <p className="control">
                                                 <label className="caption span4">{lang.laser.object_params.size.text}</label>
-                                                <input type="number" min="0" name="object-size-w" className="span4" defaultValue=""/>
-                                                <input type="number" min="0" name="object-size-h" className="span4" defaultValue=""/>
+                                                <input type="number" min="0" name="object-size-w" data-type="width" className="span4 instant-change" defaultValue=""/>
+                                                <input type="number" min="0" name="object-size-h" data-type="height" className="span4 instant-change" defaultValue=""/>
                                             </p>
                                             <p className="control">
                                                 <span className="offset-left-4 span4 text-center unit">{lang.laser.object_params.size.unit.width}</span>
@@ -107,7 +107,7 @@ define([
                                         <div className="controls">
                                             <p className="control">
                                                 <label className="caption span4">{lang.laser.object_params.rotate.text}</label>
-                                                <input type="number" min="-180" name="object-angle" className="span4" defaultValue=""/>
+                                                <input type="number" min="-180" name="object-angle" data-type="angle" className="span4 instant-change" defaultValue=""/>
                                             </p>
                                         </div>
                                         <div className="controls">
