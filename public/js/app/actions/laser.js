@@ -83,10 +83,13 @@ define([
                 var onComplete = function(e, fileEntry) {
                         var $div = $(document.createElement('div')).addClass(LASER_IMG_CLASS).data('index', $('.' + LASER_IMG_CLASS).length),
                             img = new Image(),
-                            $img = $(img).data('base', fileEntry.toURL()),
+                            url = fileEntry.toURL(),
+                            $img = $(img).data('base', url),
                             instantRefresh = function(e, data) {
                                 refreshObjectParams($div);
                             };
+
+                        $img.addClass(url.substr(-3));
 
                         $img.one('load', function() {
                             $laser_platform.append($div);
@@ -112,7 +115,7 @@ define([
                             img.onload = null;
                         });
 
-                        img.src = fileEntry.toURL();
+                        img.src = url;
 
                         $div.append($img);
 
@@ -313,17 +316,17 @@ define([
             sendingToLaser(args);
         });
 
-        $angle.on('focus', function(e) {
-            var $self = $(e.currentTarget);
+        $('.instant-change').on('focus', function(e) {
+            var $self = $(e.currentTarget),
+                args = {};
 
             $self.one('blur', function(e) {
                 $self.off('change keyup');
             });
 
             $self.on('change keyup', function(e) {
-                $target_image.freetrans({
-                    angle: $self.val()
-                });
+                args[$self.data('type')] = parseInt($self.val(), 10);
+                $target_image.freetrans(args);
             });
         });
 
