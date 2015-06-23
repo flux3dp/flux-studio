@@ -16,7 +16,7 @@ define(function() {
             // refers to http://en.wikipedia.org/wiki/Grayscale
             var grayscale = parseInt(data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114, 10);
 
-            grayscale = (opts.threshold < grayscale ? grayscale : grayscale * 1.5);
+            grayscale = (opts.threshold > grayscale ? grayscale : WHITE);
 
             if (false === opts.is_rgba) {
                 binary.push(grayscale);
