@@ -18,6 +18,7 @@ define([
                 onMessage: function(result) {
                     var data = JSON.parse(JSON.stringify(result.data)),
                         error_code;
+
                     lastMessage = data;
 
                     if (false === result.data.startsWith('error')) {
@@ -46,27 +47,43 @@ define([
             },
             upload: function(filesize, print_data) {
                 var CHUNK_PKG_SIZE = 4096,
+                    length = print_data.length || print_data.size,
                     interrupt = function(cmd) {
                         if ('start' === lastOrder) {
                             ws.send(cmd);
                         }
                     },
                     _uploading = function(data) {
-                        if ('continue' === data) {
-                            for (var i = 0; i < print_data.length; i += CHUNK_PKG_SIZE) {
-                                sub_data.push(convertToTypedArray(print_data.slice(i, i + CHUNK_PKG_SIZE), Uint8Array));
+                        if ('connected' === data) {
+                            for (var i = 0; i < length; i += CHUNK_PKG_SIZE) {
+                                chunk = print_data.slice(i, i + CHUNK_PKG_SIZE);
+
+                                if (print_data instanceof Array) {
+                                    chunk = convertToTypedArray(chunk, Uint8Array);
+                                }
+
+                                blobs.push(chunk);
                             }
+                        }
+                        else if('continue' === data) {
+                            blobs.forEach(function(blob, k) {
+                                ws.send(blob);
+                            });
                         }
                         else if ('ok' === data) {
                             lastOrder = 'start';
                             onMessage = _startPrint;
                             ws.send(lastOrder);
                         }
+                        else {
+                            // TODO: do something
+                        }
                     },
                     _startPrint = function(data) {
                         opts.onPrinting(data);
                     },
-                    sub_data = [];
+                    blobs = [],
+                    chunk;
 
                 lastOrder = 'upload';
 
