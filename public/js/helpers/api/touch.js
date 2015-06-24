@@ -29,9 +29,10 @@ define(['helpers/websocket'], function(Websocket) {
                     }
 
                     getResponse = true;
+                    clearInterval(timer);
                 }
             }),
-            getResponse = false,
+            getResponse = true,
             timer;
 
         return {
@@ -41,14 +42,12 @@ define(['helpers/websocket'], function(Websocket) {
 
                 var args = JSON.stringify({ serial: serial, password: password });
 
-                if (true === getResponse) {
-                    ws.send(args);
-                }
-                else {
-                    timer = setInterval(function() {
+                timer = setInterval(function() {
+                    if (true === getResponse) {
+                        getResponse = false;
                         ws.send(args);
-                    }, 0);
-                }
+                    }
+                }, 0);
             }
         };
     };
