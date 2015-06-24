@@ -6,17 +6,10 @@ define([
     'helpers/convertToTypedArray',
     'helpers/api/discover',
     'helpers/api/touch',
+    'helpers/api/control',
     'freetrans'
-], function($, fileSystem, WebSocket, grayScale, convertToTypedArray, discover, touch) {
+], function($, fileSystem, WebSocket, grayScale, convertToTypedArray, discover, touch, control) {
     'use strict';
-
-    discover(function(printers) {
-        console.log(printers);
-
-        touch(function(data) {
-            console.log(data);
-        }).send(printers[0].serial);
-    });
 
     return function(args) {
 
@@ -172,7 +165,9 @@ define([
                             timer, next_data, request_header;
 
                         ws.onMessage(function(result) {
-                            var data = JSON.parse(result.data);
+                            var data = JSON.parse(result.data),
+                                blobs = [],
+                                total_length = 0;
 
                             switch (data.status) {
                             case 'continue':
@@ -184,7 +179,28 @@ define([
 
                                 if (args.length === accept_times) {
                                     ws.send('go').onMessage(function(result) {
-                                        console.log('fantastic work', result);
+                                        var data = ('string' === typeof result.data ? JSON.parse(result.data) : result.data),
+                                            blob_length = 0,
+                                            gcode_blob,
+                                            control_methods,
+                                            opts;
+
+                                        if ('processing' === data.status) {
+                                            // TODO: update progress
+                                        }
+                                        else if ('complete' === data.status) {
+                                            total_length = data.length;
+                                        }
+                                        else if ('object' === typeof data) {
+                                            blobs.push(data);
+                                            gcode_blob = new Blob(blobs);
+
+                                            if (total_length === gcode_blob.size) {
+                                                control_methods = control(printer.serial, opts);
+
+                                                control_methods.upload(gcode_blob.size, gcode_blob);
+                                            }
+                                        }
                                     });
                                 }
 
@@ -250,7 +266,23 @@ define([
                     $size_w.val(bounds.width);
                 }
             },
-            $target_image = null; // changing when image clicked
+            $target_image = null, // changing when image clicked
+            printer = null;
+
+
+        // TODO: should have ui to select print at the very beginning
+        discover(function(printers) {
+            var opts = {
+                onSuccess: function(data) {
+                    printer = printers[0];
+                },
+                onError: function(data) {
+                    // TODO: do something
+                }
+            };
+
+            touch(opts).send(printers[0].serial, 'flux');
+        });
 
         $('#btn-start').on('click', function(e) {
             var $ft_controls = $laser_platform.find('.ft-controls'),
