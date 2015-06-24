@@ -4,9 +4,19 @@ define([
     'helpers/websocket',
     'helpers/grayscale',
     'helpers/convertToTypedArray',
+    'helpers/api/discover',
+    'helpers/api/touch',
     'freetrans'
-], function($, fileSystem, WebSocket, grayScale, convertToTypedArray) {
+], function($, fileSystem, WebSocket, grayScale, convertToTypedArray, discover, touch) {
     'use strict';
+
+    discover(function(printers) {
+        console.log(printers);
+
+        touch(function(data) {
+            console.log(data);
+        }).send(printers[0].serial);
+    });
 
     return function(args) {
 
