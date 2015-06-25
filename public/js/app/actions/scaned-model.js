@@ -12,10 +12,11 @@ define([
         container = document.getElementById('model-displayer');
 
         camera = new THREE.PerspectiveCamera( 70, container.offsetWidth / container.offsetHeight, 1, 3000 );
-        camera.position.set(10, 10, 10);
+        camera.position.set(10, 3, 10);
 
         scene = new THREE.Scene();
         scene.fog = new THREE.Fog(0x050505, 2000, 3500);
+        scene.rotation.x = 717608350.9;
 
         // add controls
         addControls();
