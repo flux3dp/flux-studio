@@ -6,9 +6,10 @@ define([
     'jsx!widgets/List',
     'helpers/websocket',
     'app/actions/scaned-model',
-    'helpers/file-system',
+    'helpers/api/3d-scan-control',
+    'helpers/api/3d-scan-modeling',
     'threejs'
-], function($, React, popup, SelectView, ListView, WebSocket, scanedModel, fileSystem) {
+], function($, React, popup, SelectView, ListView, WebSocket, scanedModel, scanControl, scanModeling) {
     'use strict';
 
     return function(args) {
@@ -18,13 +19,9 @@ define([
                 // counter
                 scan_times: ('start' === args.step ? 1 : 0),
 
-                image_timer: null,
+                scan_ctrl_websocket : null,
 
-                // web socket
-                ws: null,
-
-                // web socket statud
-                ws_is_connected: false,
+                scan_modeling_websocket : null,
 
                 getInitialState: function() {
                     args.state.image_src = '';
@@ -34,6 +31,8 @@ define([
 
                 componentDidMount: function() {
                     if ('start' === args.step) {
+                        this.scan_ctrl_websocket = scanControl('5ZMPBF415VH67ARLGGFWNKCSP');
+                        this.scan_modeling_websocket = scanModeling();
                         this._refreshCamera();
                     }
                 },
@@ -67,58 +66,15 @@ define([
                 },
 
                 _refreshCamera: function() {
-                    var self = this,
-                        allow_to_get = true,
-                        gettingCameraImage = function(result) {
-                            var data = result.data,
-                                image_blobs = [],
-                                onComplete = function(e, fileEntry) {
-                                    self.setState({
-                                        image_src: fileEntry.toURL()
-                                    });
-                                    allow_to_get = true;
-                                },
-                                file;
+                    var self = this;
 
-                            if ('object' === typeof data) {
-                                image_blobs.push(result.data);
-                            }
-                            else if ('connected' === data) {
-                                self.ws_is_connected = true;
-                            }
-                            else if ('finished' === data) {
-                                file = new File(
-                                    image_blobs,
-                                    'scan.png'
-                                );
-
-                                allow_to_get = false;
-
-                                fileSystem.writeFile(
-                                    file,
-                                    {
-                                        onComplete: onComplete
-                                    }
-                                );
-                            }
-                        },
-                        getImage = function() {
-                            self.ws.send('image');
-                        };
-
-                    self.ws = new WebSocket({
-                        // TODO: To get available device
-                        method: '3d-scan-control/5ZMPBF415VH67ARLGGFWNKCSP'
-                    });
-
-                    self.ws.onMessage(gettingCameraImage);
-
-                    self.image_timer = setInterval(function() {
-                        if (true === allow_to_get) {
-                            getImage();
+                    this.scan_ctrl_websocket.getImage(
+                        function(e, fileEntry) {
+                            self.setState({
+                                image_src: fileEntry.toURL()
+                            });
                         }
-                    }, 500);
-
+                    );
                 },
 
                 _startScan: function(e) {
@@ -127,48 +83,11 @@ define([
 
                 _handleScan: function(e) {
                     var self = this,
-                        ws = self.ws,
-                        model_blobs = [],
                         scan_speed = parseInt(this.refs.scan_speed.getDOMNode().value, 10),
                         mesh = null,
                         popup_window,
-
-                        gettingScanedModel = function(result) {
-                            var data = result.data,
-                                fileReader = new FileReader(),
-                                typedArray, blob;
-
-                            if ('object' === typeof data) {
-                                model_blobs.push(data);
-
-                                // update progress percentage
-                                args.state.progressPercentage = (model_blobs.length / scan_speed * 100).toString().substr(0, 5);
-
-                                // refresh model every time
-                                fileReader.onload = function(progressEvent) {
-                                    typedArray = new Float32Array(this.result);
-
-                                    renderringModel(typedArray);
-                                };
-
-                                blob = new Blob(model_blobs, {type: 'text/plain'});
-                                fileReader.readAsArrayBuffer(blob);
-                            }
-                            else if ('finished' === data) {
-                                popup_window.close();
-
-                                // disconnect
-                                ws.send('quit');
-
-                                // update scan times
-                                self.scan_times = self.scan_times + 1;
-
-                                self.setState({
-                                    scan_times : self.scan_times
-                                });
-                            }
-                        },
-                        renderringModel = function(views) {
+                        onRendering = function(views, chunk_length) {
+                            args.state.progressPercentage = (chunk_length / scan_speed * 100).toString().substr(0, 5);
 
                             if (null === mesh) {
 
@@ -179,9 +98,45 @@ define([
                             }
 
                             window.mesh = mesh;
-                        };
+                        },
+                        onFinished = function(point_cloud) {
+                            var upload_name = 'scan-' + (new Date()).getTime(),
+                                delete_noise_name = upload_name + '-d',
+                                onUploadFinished = function() {
 
-                    clearInterval(self.image_timer);
+                                    self.scan_modeling_websocket.delete_noise(
+                                        upload_name,
+                                        delete_noise_name,
+                                        0.3,
+                                        {
+                                            onFinished: onDeleteNoiseFinished
+                                        }
+                                    );
+                                },
+                                onDeleteNoiseFinished = function() {
+                                    // TODO: dump
+                                };
+
+                            popup_window.close();
+
+                            // update scan times
+                            self.scan_times = self.scan_times + 1;
+
+                            self.setState({
+                                scan_times : self.scan_times
+                            });
+
+                            // TODO: show operation panel
+                            // name, point_cloud, opts
+                            self.scan_modeling_websocket.upload(
+                                upload_name,
+                                point_cloud,
+                                {
+                                    onFinished: onUploadFinished
+                                }
+                            );
+                            // delete_noise(in_name, out_name, c)
+                        };
 
                     scanedModel.init();
 
@@ -190,6 +145,10 @@ define([
                     });
 
                     require(['jsx!views/scan/Progress-Bar'], function(view) {
+                        var opts = {
+                            onRendering: onRendering,
+                            onFinished: onFinished
+                        };
 
                         args.disabledEscapeOnBackground = true;
                         args.state.progressPercentage = 0;
@@ -197,12 +156,7 @@ define([
                         popup_window = popup(view, args);
                         popup_window.open();
 
-                        if (true === self.ws_is_connected) {
-                            ws.send('start').onMessage(gettingScanedModel);
-                        }
-                        else {
-                            // TODO: error occurs
-                        }
+                        self.scan_ctrl_websocket.scan(opts);
 
                     });
                 },
