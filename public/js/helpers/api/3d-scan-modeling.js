@@ -4,8 +4,8 @@
  */
 define([
     'helpers/websocket',
-    'helpers/file-system'
-], function(Websocket, fileSystem) {
+    'helpers/point-cloud'
+], function(Websocket, PointCloudHelper) {
     'use strict';
 
     return function(opts) {
@@ -37,7 +37,7 @@ define([
             };
 
         return {
-            ws: ws,
+            connection: ws,
             upload: function(name, point_cloud, opts) {
                 opts.onFinished = opts.onFinished || function() {};
 
@@ -127,7 +127,43 @@ define([
                 // TODO: to be implemented
             },
             dump: function(name) {
-                // TODO: to be implemented
+                opts.onFinished = opts.onFinished || function() {};
+                opts.onReceiving = opts.onReceiving || function() {};
+
+                var lastOrder = 'dump',
+                    args = [
+                        lastOrder,
+                        name
+                    ],
+                    pointCloud = new PointCloudHelper(),
+                    next_left = 0,
+                    next_right = 0,
+                    _opts = {
+                        onProgress: opts.onReceiving
+                    };
+
+                events.onMessage = function(data) {
+
+                    if (true === data instanceof Blob) {
+                        pointCloud.push(data, next_left, next_right, _opts);
+                    }
+                    else if ('string' === typeof data && true === data.startsWith('continue')) {
+                        data = data.split(' ');
+
+                        next_left = parseInt(data[1], 10) * 24;
+                        next_right = parseInt(data[2], 10) * 24;
+                    }
+
+                    else if ('string' === typeof data && 'finished' === data) {
+                        // disconnect
+                        ws.send('quit');
+
+                        opts.onFinished(pointCloud.get());
+                    }
+
+                };
+
+                ws.send(args.join(' '));
             },
             export: function(name) {
                 // TODO: to be implemented

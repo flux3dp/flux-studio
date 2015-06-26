@@ -4,8 +4,9 @@
  */
 define([
     'helpers/websocket',
-    'helpers/file-system'
-], function(Websocket, fileSystem) {
+    'helpers/file-system',
+    'helpers/point-cloud'
+], function(Websocket, fileSystem, PointCloudHelper) {
     'use strict';
 
     return function(serial, opts) {
@@ -65,7 +66,7 @@ define([
             };
 
         return {
-            ws: ws,
+            connection: ws,
             getImage: function(imageHandler) {
                 var allow_to_get = true,
                     image_length = 0,
@@ -81,7 +82,7 @@ define([
                             if ('string' === typeof data && true === data.startsWith('ok')) {
                                 image_length = parseInt(data.replace('ok '), 10);
                             }
-                            else if ('finished' === data) {
+                            else if ('string' === typeof data && 'finished' === data) {
                                 image_file = new File(
                                     image_blobs,
                                     'scan.png'
@@ -96,8 +97,8 @@ define([
                                     }
                                 );
                             }
-                            else {
-                                // get binary
+                            else if (true === data instanceof Blob) {
+                                // get
                                 image_blobs.push(data);
                             }
                         };
@@ -123,53 +124,33 @@ define([
                 opts.onRendering = opts.onRendering || function() {};
                 opts.onFinished = opts.onFinished || function() {};
 
-                var model_blobs = [],
+                var pointCloud = new PointCloudHelper(),
                     next_left = 0,
                     next_right = 0,
-                    point_cloud_left = [],
-                    point_cloud_right = [],
-                    point_cloud = {};
+                    _opts = {
+                        onProgress: opts.onRendering
+                    };
 
                 check_is_connected(function() {
                     lastOrder = 'start';
                     ws.send('start');
 
                     events.onMessage = function(data) {
-                        var fileReader = new FileReader(),
-                            model_blobs_len = 0,
-                            typedArray, blob;
 
                         if (true === data instanceof Blob) {
-                            model_blobs.push(data);
-                            model_blobs_len = model_blobs.length;
-                            point_cloud_left.push(data.slice(0, next_left));
-                            point_cloud_right.push(data.slice(next_left, next_left + next_right));
-
-                            // refresh model every time
-                            fileReader.addEventListener('loadend', function() {
-                                typedArray = new Float32Array(this.result);
-                                opts.onRendering(typedArray, model_blobs_len);
-                            });
-
-                            blob = new Blob(model_blobs);
-                            fileReader.readAsArrayBuffer(blob);
+                            pointCloud.push(data, next_left, next_right, _opts);
                         }
-                        else if (true === data.startsWith('chunk')) {
+                        else if ('string' === typeof data && true === data.startsWith('chunk')) {
                             data = data.split(' ');
 
                             next_left = parseInt(data[1], 10) * 24;
                             next_right = parseInt(data[2], 10) * 24;
                         }
-                        else if ('finished' === data) {
+                        else if ('string' === typeof data && 'finished' === data) {
                             // disconnect
                             ws.send('quit');
 
-                            // origanize point cloud
-                            point_cloud.left = new Blob(point_cloud_left);
-                            point_cloud.right = new Blob(point_cloud_right);
-                            point_cloud.total = new Blob(point_cloud_left.concat(point_cloud_right));
-
-                            opts.onFinished(point_cloud);
+                            opts.onFinished(pointCloud.get());
                         }
                     };
                 });
