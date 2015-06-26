@@ -38,8 +38,12 @@ define([
                 },
 
                 componentWillUnmount: function() {
-                    if (false === location.hash.startsWith('#studio/scan') && null !== this.ws) {
-                        this.ws.close(false);
+                    if (false === location.hash.startsWith('#studio/scan') &&
+                        null !== this.scan_ctrl_websocket &&
+                        null !== this.scan_modeling_websocket
+                    ) {
+                        this.scan_ctrl_websocket.connection.close(false);
+                        this.scan_modeling_websocket.connection.close(false);
                     }
                 },
 
@@ -112,20 +116,21 @@ define([
                         },
                         onFinished = function(point_cloud) {
                             var upload_name = 'scan-' + (new Date()).getTime(),
-                                delete_noise_name = upload_name + '-d',
                                 onUploadFinished = function() {
 
-                                    self.scan_modeling_websocket.delete_noise(
+                                    self.scan_modeling_websocket.dump(
                                         upload_name,
-                                        delete_noise_name,
-                                        0.3,
                                         {
-                                            onFinished: onDeleteNoiseFinished
+                                            onFinished: onDumpFinished,
+                                            onReceiving: onDumpReceiving,
                                         }
                                     );
                                 },
-                                onDeleteNoiseFinished = function() {
-                                    // TODO: dump
+                                onDumpFinished = function() {
+                                    console.log('dump finished');
+                                },
+                                onDumpReceiving = function(data, len) {
+                                    console.log('dump receiving');
                                 };
 
                             popup_window.close();
