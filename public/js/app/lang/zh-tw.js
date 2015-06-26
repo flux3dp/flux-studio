@@ -316,6 +316,7 @@ define(function() {
             print_with_flux: 'Print with FLUX',
             convert_to_3d_model: 'Convert to 3D model...',
             complete: 'Complete',
+            remaining_time: 'Remaining Time',
             save_as: 'Save as',
             do_save: 'Save',
             save_mode: [
