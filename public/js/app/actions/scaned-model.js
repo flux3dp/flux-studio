@@ -15,7 +15,6 @@ define([
         camera.position.set(10, 3, 10);
 
         scene = new THREE.Scene();
-        scene.fog = new THREE.Fog(0x050505, 2000, 3500);
         scene.rotation.x = 717608350.9;
 
         // add controls
@@ -30,7 +29,7 @@ define([
         renderer = new THREE.WebGLRenderer({
             antialias: false
         });
-        renderer.setClearColor(scene.fog.color);
+        renderer.setClearColor( 0xE0E0E0, 1 );
         renderer.setPixelRatio(window.devicePixelRatio);
         renderer.setSize(window.innerWidth, window.innerHeight);
         container.appendChild(renderer.domElement);
@@ -138,7 +137,7 @@ define([
         var materials = [
                 new THREE.LineBasicMaterial({ color: 0x0000ff }),   // x
                 new THREE.LineBasicMaterial({ color: 0x00ff00 }),   // y
-                new THREE.LineBasicMaterial({ color: 0xffffff })    // z
+                new THREE.LineBasicMaterial({ color: 0xff0000 })    // z
             ],
             vertices = [
                 [   // x
