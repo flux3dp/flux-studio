@@ -19,7 +19,12 @@ define([
                             <div className="progress">
                                 <div className="progress-bar progress-bar-striped active" style={style}/>
                             </div>
-                            <p>{lang.scan.complete}<span>{this.state.progressPercentage}</span>%</p>
+                            <p>
+                                <span>{lang.scan.complete}: </span>
+                                <span>{this.state.progressPercentage}%, </span>
+                                <span>{lang.scan.remaining_time}: </span>
+                                <span>{this.state.progressRemainingTime}</span>
+                            </p>
                         </div>
                     );
                 },
