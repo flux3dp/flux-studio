@@ -136,18 +136,20 @@ define([
 
                     events.onMessage = function(data) {
                         var fileReader = new FileReader(),
+                            model_blobs_len = 0,
                             typedArray, blob;
 
                         if (true === data instanceof Blob) {
                             model_blobs.push(data);
+                            model_blobs_len = model_blobs.length;
                             point_cloud_left.push(data.slice(0, next_left));
                             point_cloud_right.push(data.slice(next_left, next_left + next_right));
 
                             // refresh model every time
-                            fileReader.onload = function(progressEvent) {
+                            fileReader.addEventListener('loadend', function() {
                                 typedArray = new Float32Array(this.result);
-                                opts.onRendering(typedArray, model_blobs.length);
-                            };
+                                opts.onRendering(typedArray, model_blobs_len);
+                            });
 
                             blob = new Blob(model_blobs);
                             fileReader.readAsArrayBuffer(blob);
