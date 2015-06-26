@@ -15,7 +15,7 @@ define([
         var ws = new Websocket({
                 method: '3d-scan-modeling',
                 onMessage: function(result) {
-                    var data = ('string' === typeof result.data ? JSON.parse(JSON.stringify(result.data)) : result.data),
+                    var data = ('string' === typeof result.data ? JSON.parse(result.data) : result.data),
                         error_code;
 
                     if ('string' === typeof data && true === data.startsWith('error')) {
@@ -45,16 +45,23 @@ define([
                     args = [
                         lastOrder,
                         name,
-                        point_cloud.left.size,
-                        point_cloud.right.size || 0
+                        point_cloud.left.size / 24,
+                        point_cloud.right.size / 24 || 0
                     ];
 
                 events.onMessage = function(data) {
-                    console.log('upload', data);
-
                     switch (data.status) {
                     case 'continue':
-                        ws.send(point_cloud.total);
+                        var reader = new FileReader();
+
+                        reader.onloadend = function(e) {
+                            var data = e.target.result;
+
+                            ws.send(data);
+                        };
+
+                        reader.readAsArrayBuffer(point_cloud.total);
+
                         break;
                     case 'ok':
                         opts.onFinished();
