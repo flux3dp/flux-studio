@@ -87,7 +87,18 @@ define([
                         mesh = null,
                         popup_window,
                         onRendering = function(views, chunk_length) {
+                            var remaining_sec = (scan_speed - chunk_length) * (20 * 60 / scan_speed),
+                                remaining_min = Math.floor(remaining_sec / 60);
+
+                            remaining_sec = remaining_sec % (remaining_min * 60);
+                            // console.log(remaining_sec, remaining_sec > 59);
+
                             args.state.progressPercentage = (chunk_length / scan_speed * 100).toString().substr(0, 5);
+
+                            // update remaining time every 20 chunks
+                            if (0 === chunk_length % 20) {
+                                args.state.progressRemainingTime = remaining_min + 'm' + remaining_sec + 's';
+                            }
 
                             if (null === mesh) {
 
@@ -127,7 +138,6 @@ define([
                             });
 
                             // TODO: show operation panel
-                            // name, point_cloud, opts
                             self.scan_modeling_websocket.upload(
                                 upload_name,
                                 point_cloud,
@@ -152,6 +162,7 @@ define([
 
                         args.disabledEscapeOnBackground = true;
                         args.state.progressPercentage = 0;
+                        args.state.progressRemainingTime = '20m0s';
 
                         popup_window = popup(view, args);
                         popup_window.open();
