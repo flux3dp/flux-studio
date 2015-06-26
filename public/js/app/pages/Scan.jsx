@@ -114,12 +114,23 @@ define([
 
                             window.mesh = mesh;
                         },
-                        onFinished = function(point_cloud) {
+                        onScanFinished = function(point_cloud) {
                             var upload_name = 'scan-' + (new Date()).getTime(),
+                                delete_noise_name = upload_name + '-d',
                                 onUploadFinished = function() {
-
-                                    self.scan_modeling_websocket.dump(
+                                    // delete noise
+                                    self.scan_modeling_websocket.delete_noise(
                                         upload_name,
+                                        delete_noise_name,
+                                        0.3,
+                                        {
+                                            onFinished: onDeleteNoiseFinished
+                                        }
+                                    );
+                                },
+                                onDeleteNoiseFinished = function() {
+                                    self.scan_modeling_websocket.dump(
+                                        delete_noise_name,
                                         {
                                             onFinished: onDumpFinished,
                                             onReceiving: onDumpReceiving,
@@ -131,6 +142,7 @@ define([
                                 },
                                 onDumpReceiving = function(data, len) {
                                     console.log('dump receiving');
+                                    onRendering(data, len);
                                 };
 
                             popup_window.close();
@@ -150,7 +162,29 @@ define([
                                     onFinished: onUploadFinished
                                 }
                             );
-                            // delete_noise(in_name, out_name, c)
+
+                        },
+                        openProgressBar = function(callback) {
+                            require(['jsx!views/scan/Progress-Bar'], function(view) {
+
+                                args.disabledEscapeOnBackground = true;
+                                args.state.progressPercentage = 0;
+                                args.state.progressRemainingTime = '20m0s';
+
+                                popup_window = popup(view, args);
+                                popup_window.open();
+
+                                callback();
+
+                            });
+                        },
+                        onScan = function() {
+                            var opts = {
+                                onRendering: onRendering,
+                                onFinished: onScanFinished
+                            };
+
+                            self.scan_ctrl_websocket.scan(opts);
                         };
 
                     scanedModel.init();
@@ -159,22 +193,24 @@ define([
                         is_scan_started: true
                     });
 
-                    require(['jsx!views/scan/Progress-Bar'], function(view) {
-                        var opts = {
-                            onRendering: onRendering,
-                            onFinished: onFinished
-                        };
+                    openProgressBar(onScan);
 
-                        args.disabledEscapeOnBackground = true;
-                        args.state.progressPercentage = 0;
-                        args.state.progressRemainingTime = '20m0s';
+                    // require(['jsx!views/scan/Progress-Bar'], function(view) {
+                    //     var opts = {
+                    //         onRendering: onRendering,
+                    //         onFinished: onFinished
+                    //     };
 
-                        popup_window = popup(view, args);
-                        popup_window.open();
+                    //     args.disabledEscapeOnBackground = true;
+                    //     args.state.progressPercentage = 0;
+                    //     args.state.progressRemainingTime = '20m0s';
 
-                        self.scan_ctrl_websocket.scan(opts);
+                    //     popup_window = popup(view, args);
+                    //     popup_window.open();
 
-                    });
+                    //     self.scan_ctrl_websocket.scan(opts);
+
+                    // });
                 },
 
                 render : function() {
