@@ -102,13 +102,6 @@
     transform: translateY(-50%);
 }
 
-.print-studio .btn {
-    // background-color: #FFFFFF;
-    // border: 1px #E0E0E0 solid;
-    // color: #000;
-    // border-radius: 5px;
-}
-
 .print-studio .btn span {
     margin-left: 7px;
 }
@@ -845,7 +838,6 @@ input.switch:checked ~ label:after
                 background-image: url('/img/img-temp-heat.png');
                 background-size: 114px;
                 background-repeat: no-repeat;
-                //box-shadow: $size/25 $size/25 $size/25 $bg-color;
               }
             }
 
