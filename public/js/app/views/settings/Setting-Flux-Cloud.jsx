@@ -82,9 +82,9 @@ define([
                                     </div>
                                 </div>
                             </div>
-                            <div className="row-fluid footer">
+                            {/*<div className="row-fluid footer">
                                 <a className="btn btn-default-dark btn-long">{lang.settings.done}</a>
-                            </div>
+                            </div>*/}
                         </div>
                     );
                 }

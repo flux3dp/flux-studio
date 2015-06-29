@@ -79,21 +79,24 @@ define(function() {
             tabs: {
                 general: '一般',
                 flux_cloud: 'FLUX Could',
-                printer: '印表機'
+                printer: '成型機'
             },
             language: '語言',
             notifications: '通知',
             close: '關閉',
             printer: {
-                new_printer: '新增印表機',
-                name: '印表機名稱',
+                new_printer: '新增成型機',
+                name: '成型機名稱',
                 current_password: '目前密碼',
                 set_password: '設定密碼',
-                security_notice: '你可以用密碼保護你的印表機',
+                security_notice: '你可以用密碼保護你的成型機',
                 connected_wi_fi: 'Wi-Fi 連線',
                 advanced: '進階',
                 join_other_network: '加入其它網路',
-                disconnect_with_this_printer: '中斷這台印表機的連線'
+                disconnect_with_this_printer: '中斷這台成型機的連線',
+                your_password: '新密碼',
+                confirm_password: '確認密碼',
+                save_password: '儲存變更'
             },
             flux_cloud: {
                 caption: 'Get FLUX 3D Printer be remote!',
@@ -103,7 +106,7 @@ define(function() {
                 email: '電子信箱',
                 password: '密碼',
                 change_password: '變更密碼',
-                connected_printer: '已連接印表機',
+                connected_printer: '已連接成型機',
                 connect: '連接'
             },
             cancel: '取消',
@@ -122,7 +125,7 @@ define(function() {
                 got_it: '瞭解了！'
             },
             connect_printer: {
-                title: '選擇連接印表機'
+                title: '選擇連接成型機'
             }
         },
         print: {
@@ -132,7 +135,24 @@ define(function() {
             normal_preview: 'Normal Preview',
             support_view: 'Support Preview',
             start_print: 'Print',
-            advanced: 'Advanced',
+            advanced: {
+                label: '進階設定',
+                quality: 'QUALITY',
+                layer_height: 'Layer Height',
+                infill: 'Infill',
+                speed: 'SPEED',
+                speed_while_traveling: 'Speed While Traveling',
+                speed_while_extruding: 'Spped While Extruding',
+                temperature: 'TEMPERATURE',
+                printing_temperature: 'Printing Temperature',
+                support: 'SUPPORT',
+                support_type: {
+                    label: 'Support Type',
+                    touch_buildplate: 'Touch Buildplate',
+                    everywhere: 'Everywhere'
+                },
+                platform_type: 'Platform Type'
+            },
             mode: [
                 {
                     value: 'beginner',
@@ -161,7 +181,7 @@ define(function() {
                         ]
                     },
                     material: {
-                        text: 'Meterial',
+                        text: '材質',
                         options: [
                             {
                                 value: 'pla',
@@ -242,7 +262,15 @@ define(function() {
             rotate: '旋轉',
             align_center: '置中',
             delete: '刪除',
-            reset: '重設'
+            reset: '重設',
+            cancel: '取消',
+            done: '確認',
+            hour: '小時',
+            minute: '分鐘',
+            gram: '公克',
+            pause: '暫停',
+            continue: '繼續',
+            restart: '重新開始'
         },
         laser: {
             import: 'Import',
@@ -259,7 +287,7 @@ define(function() {
                     }
                 },
                 material: {
-                    text: 'Meterial',
+                    text: '材質',
                     options: [
                         {
                             value: 'wood',

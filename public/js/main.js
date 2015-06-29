@@ -12,8 +12,10 @@ require.config({
         widgets: 'app/widgets',
         threejs: 'lib/three/three.min',
         threeTransformControls: 'lib/three/controls/TransformControls',
+        threeOrbitControls: 'lib/three/controls/OrbitControls',
         threeSTLLoader: 'lib/three/loaders/STLLoader',
         threeTrackball: 'lib/three/controls/TrackballControls',
+        threeCircularGridHelper: 'helpers/CircularGridHelper',
         cssHome: '../css/3rd-party-plugins',
         freetrans: 'plugins/freetrans/jquery.freetrans',
         html2canvas: 'lib/html2canvas.min'

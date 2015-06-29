@@ -28,9 +28,7 @@ define([
                 switch (args.child) {
                     case 'flux-cloud':
                         childView = 'Setting-Flux-Cloud';
-                        this.setState({
-                            displayFooter: false
-                        });
+                        this.setState({ displayFooter: false });
                         break;
 
                     case 'flux-cloud-setup':
@@ -39,10 +37,12 @@ define([
 
                     case 'printer':
                         childView = 'Setting-Printer';
+                        this.setState({ displayFooter: false });
                         break;
 
                     case 'general':
                         childView = 'Setting-General';
+                        this.setState({ displayFooter: false });
                         break;
 
                     default:

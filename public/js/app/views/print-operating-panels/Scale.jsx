@@ -30,7 +30,7 @@ define([
             return (
                 <div className="control-bottom">
                     <div className="panel">
-                        <div className="container verticle-middle">
+                        <div className="container vertical-middle">
                             <div className="controls">
                                 <label>X</label>
                                 <input type="text" />
@@ -51,7 +51,7 @@ define([
                                 <input type="text" />
                             </div>
                             <div clasName="controls">
-                                <a className="btn" onClick={this._handleReset}>{lang.print.reset}</a>
+                                <a className="btn btn-default-light" onClick={this._handleReset}>{lang.print.reset}</a>
                             </div>
                         </div>
                     </div>

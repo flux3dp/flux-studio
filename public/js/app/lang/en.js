@@ -135,7 +135,24 @@ define(function() {
             normal_preview: 'Normal Preview',
             support_preview: 'Support Preview',
             start_print: 'Print',
-            advanced: 'Advanced',
+            advanced: {
+                label: 'ADVANCED',
+                quality: 'QUALITY',
+                layer_height: 'Layer Height',
+                infill: 'Infill',
+                speed: 'SPEED',
+                speed_while_traveling: 'Traveling',
+                speed_while_extruding: 'Extruding',
+                temperature: 'TEMPERATURE',
+                printing_temperature: 'Printing',
+                support: 'SUPPORT',
+                support_type: {
+                    label: 'Support Type',
+                    touch_buildplate: 'Touch Buildplate',
+                    everywhere: 'Everywhere'
+                },
+                platform_type: 'Platform Type',
+            },
             mode: [
                 {
                     value: 'beginner',
@@ -164,7 +181,7 @@ define(function() {
                         ]
                     },
                     material: {
-                        text: 'Meterial',
+                        text: 'Material',
                         options: [
                             {
                                 value: 'pla',
@@ -245,7 +262,15 @@ define(function() {
             rotate: 'Rotate',
             align_center: 'Align Center',
             delete: 'Delete',
-            reset: 'Reset'
+            reset: 'Reset',
+            cancel: 'CANCEL',
+            done: 'DONE',
+            hour: 'hr',
+            minute: 'min',
+            gram: 'g',
+            pause: 'PAUSE',
+            continue: 'CONTINUE',
+            restart: 'RESTART'
         },
         laser: {
             import: 'Import',
@@ -262,7 +287,7 @@ define(function() {
                     }
                 },
                 material: {
-                    text: 'Meterial',
+                    text: 'Material',
                     options: [
                         {
                             value: 'wood',

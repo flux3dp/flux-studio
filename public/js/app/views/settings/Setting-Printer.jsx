@@ -106,9 +106,6 @@ define([
                                 <div>
                                     <button className="btn btn-default-light">{lang.settings.printer.join_other_network}</button>
                                 </div>
-                                <div className="remove-printer">
-                                    <a>{lang.settings.printer.disconnect_with_this_printer}</a>
-                                </div>
                             </div>
                         </div>
                     );

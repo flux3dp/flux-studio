@@ -2,12 +2,15 @@ define([
     'jquery',
     'helpers/file-system',
     'helpers/display',
-    'threeTransformControls',
-    'threeSTLLoader'
+    // 'threeTransformControls',
+    'threeOrbitControls',
+    'threeSTLLoader',
+    'threeCircularGridHelper'
 ], function($, fileSystem, display) {
     'use strict';
 
-    var container, stats;
+    var THREE = window.THREE || {},
+        container, stats;
 
     var camera, cameraTarget, scene, renderer;
     var plane, control, controls;
@@ -29,12 +32,14 @@ define([
             });
             var mesh = new THREE.Mesh(geometry, material);
 
-            mesh.position.set(0, 1, 0);
-            mesh.scale.set(2, 2, 2);
+            mesh.position.set(0, 2000, 0);
+            //mesh.scale.set(1, 1, 1);
 
             scene.add(mesh);
 
             objects.push(mesh);
+            // animate();
+            render();
         });
     }
 
@@ -42,15 +47,34 @@ define([
 
         container = document.getElementById('model-displayer');
 
-        camera = new THREE.PerspectiveCamera( 70, container.offsetWidth / container.offsetHeight, 1, 3000 );
-        camera.position.set(200, 100, 200);
-        camera.lookAt(new THREE.Vector3(0, 0, 0));
+        camera = new THREE.PerspectiveCamera( 70, container.offsetWidth / container.offsetHeight, 1, 300000 );
+        camera.position.set(30900, 20900, 30090);
+        camera.lookAt(new THREE.Vector3(10900, 10900, 10090));
 
         scene = new THREE.Scene();
 
-        // grid helper
-        var gridHelper = new THREE.GridHelper( 500, 50 );
-        scene.add( gridHelper );
+        // circular grid helper
+        var s = {
+            diameter: 50000,
+            step: 5000,
+            upVector: new THREE.Vector3(0,1,0),
+            color:  0x777777,
+            opacity: 0.2,
+            text: true,
+            textColor: '#000000',
+            textPosition: 'center'
+        }
+        var circularGridHelper = new CircularGridHelper(
+            s.diameter,
+            s.step,
+            s.upVector,
+            s.color,
+            s.opacity,
+            s.text,
+            s.textColor,
+            s.textPosition
+        );
+        scene.add(circularGridHelper);
 
         // Lights
         scene.add(new THREE.AmbientLight(0x777777));
@@ -70,51 +94,27 @@ define([
 
         container.appendChild(renderer.domElement);
 
-        //
-        control = new THREE.TransformControls( camera, renderer.domElement );
+        control = new THREE.OrbitControls( camera, renderer.domElement );
+        control.maxPolarAngle = Math.PI/2;
+        control.noKeys = true;
         control.addEventListener( 'change', render );
 
         window.addEventListener('resize', onWindowResize, false);
 
-        window.addEventListener( 'keydown', function ( event ) {
-            switch ( event.keyCode ) {
-            case 81: // Q
-                control.setSpace( control.space == "local" ? "world" : "local" );
-                break;
-            case 87: // W
-                control.setMode( "translate" );
-                break;
-            case 68: // D
-                if ('undefined' !== typeof SELECTED) {
-                    scene.remove(SELECTED);
-                    control.detach(SELECTED);
-                    scene.remove(control);
-                }
-                break;
-            case 69: // E
-                control.setMode( "rotate" );
-                break;
-            case 82: // R
-                control.setMode( "scale" );
-                break;
-            case 187:
-            case 107: // +,=,num+
-                control.setSize( control.size + 0.1 );
-                break;
-            case 189:
-            case 10: // -,_,num-
-                control.setSize( Math.max(control.size - 0.1, 0.1 ) );
-                break;
-            }
-        });
-
         renderer.domElement.addEventListener(
             'mousedown',
             function(e) {
-                SELECTED = onDocumentMouseDown(e);
+                SELECTED = onDocumentMouseDown(e) || SELECTED;
+                if(SELECTED != null) {
+                    var outlineMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000, wireframe: true } );
+                    var outlineMesh = new THREE.Mesh(SELECTED.geomtry, outlineMaterial);
+                    scene.add(outlineMesh);
+                }
             },
             false
         );
+
+        render();
     }
 
     function addShadowedLight(x, y, z, color, intensity) {
@@ -144,12 +144,11 @@ define([
     }
 
     function animate() {
-        //requestAnimationFrame(animate);
-        render();
+        requestAnimationFrame(animate);
+        control.update();
     }
 
     function render() {
-        control.update();
         renderer.render(scene, camera);
     }
 
@@ -178,68 +177,44 @@ define([
         var intersects = raycaster.intersectObjects(objects);
 
         if (intersects.length > 0) {
-
-            scene.add(control);
+            intersects[ 0 ].object.material.color.setHex( Math.random() * 0xffffff );
             selected = intersects[0].object;
-            control.attach(selected);
-
         }
-
+        render();
         return selected;
     }
 
-    return function(args) {
-        init();
-        animate();
+    function rotate(x, y, z) {
+        SELECTED.rotation.x = (x / 360 * Math.PI * 2) || 0;
+        SELECTED.rotation.y = (y / 360 * Math.PI * 2) || 0;
+        SELECTED.rotation.z = (z / 360 * Math.PI * 2) || 0;
+        render();
+    }
 
-        var $uploader = $('#uploader'),
-            $uploader_file_control = $uploader.find('[type="file"]'),
-            $print_mode = $('[name="print-mode"]'),
-            toggleMode = function() {
-                switch ($('[name="print-mode"]:checked').val()) {
-                case 'expert':
-                    require(['jsx!views/print-operating-panels/Expert'], function(view) {
-                        display(view, args, $('#operating-panel')[0]);
-                    });
-                    break;
-                case 'beginner':
-                    require(['jsx!views/print-operating-panels/Beginner'], function(view) {
-                        display(view, args, $('#operating-panel')[0]);
-                    });
-                    break;
-                }
-            },
-            readfiles = function(files) {
-                for (var i = 0; i < files.length; i++) {
-                    fileSystem.writeFile(
-                        files.item(i),
-                        {
-                            onComplete: function(e, fileEntry) {
-                                appendModel(fileEntry.toURL());
-                            }
-                        }
-                    );
+    function alignCenter() {
+        var centerPosition = SELECTED.geometry.center();
+        SELECTED.translateX(centerPosition.x);
+        SELECTED.translateY(centerPosition.y);
+        SELECTED.translateZ(centerPosition.z);
+        render();
+    }
 
-                }
+    function removeSelected() {
+        var index;
+        scene.remove(SELECTED);
+        index = objects.indexOf(SELECTED);
+        if(index > -1) {
+            objects.splice(index, 1);
+        }
+        SELECTED = null;
+        render();
+    }
 
-                toggleMode();
-            };
-
-        $uploader_file_control.on('change', function(e) {
-            readfiles(this.files);
-        });
-
-        $uploader.on('dragover dragend', function() {
-            return false;
-        });
-
-        $uploader.on('drop', function(e) {
-            e.preventDefault();
-            readfiles(e.originalEvent.dataTransfer.files);
-        });
-
-        $print_mode.on('click', function(e) {
-            toggleMode();
-        });
+    return {
+        init: init,
+        appendModel: appendModel,
+        rotate: rotate,
+        alignCenter: alignCenter,
+        removeSelected: removeSelected
     };
 });
