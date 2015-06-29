@@ -62,8 +62,6 @@ define([
                     require(['jsx!views/scan/Export'], function(view) {
                         var popup_window;
 
-                        args.disabledEscapeOnBackground = true;
-
                         popup_window = popup(view, args);
                         popup_window.open();
                     });
@@ -95,7 +93,6 @@ define([
                                 remaining_min = Math.floor(remaining_sec / 60);
 
                             remaining_sec = remaining_sec % (remaining_min * 60);
-                            // console.log(remaining_sec, remaining_sec > 59);
 
                             args.state.progressPercentage = (chunk_length / scan_speed * 100).toString().substr(0, 5);
 
@@ -194,36 +191,46 @@ define([
                     });
 
                     openProgressBar(onScan);
-
-                    // require(['jsx!views/scan/Progress-Bar'], function(view) {
-                    //     var opts = {
-                    //         onRendering: onRendering,
-                    //         onFinished: onFinished
-                    //     };
-
-                    //     args.disabledEscapeOnBackground = true;
-                    //     args.state.progressPercentage = 0;
-                    //     args.state.progressRemainingTime = '20m0s';
-
-                    //     popup_window = popup(view, args);
-                    //     popup_window.open();
-
-                    //     self.scan_ctrl_websocket.scan(opts);
-
-                    // });
                 },
 
-                render : function() {
+                _renderHeader: function() {
                     var state = this.state,
                         cx = React.addons.classSet,
                         lang = state.lang,
-                        start_scan_text,
-                        header_class,
-                        camera_image_class,
-                        starting_section,
-                        operating_section;
+                        header_class;
 
-                    state.scan_times = state.scan_times || this.scan_times || 0;
+                    header_class = cx({
+                        'top-menu-bar' : true,
+                        'btn-h-group'  : true,
+                        'invisible'    : 2 > state.scan_times
+                    });
+
+                    return (
+                        <header ref="header" className={header_class}>
+                            <button className="btn btn-default fa fa-undo" onClick={this._rescan}>{lang.scan.rescan}</button>
+                            <button className="btn btn-default fa fa-paper-plane" onClick={this._saveAs}>{lang.scan.export}</button>
+                            <button className="btn btn-default fa fa-floppy-o">{lang.scan.share}</button>
+                            <button className="btn btn-default fa fa-eye">{lang.scan.print_with_flux}</button>
+                        </header>
+                    );
+                },
+
+                _renderBeginingSection: function() {
+                    return (
+                        <section className="starting-section">
+                            <img className="launch-img absolute-center" src="http://placehold.it/280x193" onClick={this._startScan}/>
+                        </section>
+                    );
+                },
+
+                _renderSettingPanel: function() {
+                    var state = this.state,
+                        cx = React.addons.classSet,
+                        start_scan_text,
+                        lang = state.lang;
+
+                    // TODO: setting up remaining time
+                    lang.scan.remaining_time = '26min';
 
                     start_scan_text = (
                         1 < state.scan_times
@@ -231,20 +238,53 @@ define([
                         : lang.scan.start_scan
                     );
 
-                    header_class = cx({
-                        'scan-herader' : true,
-                        'invisible'    : 2 > state.scan_times
-                    });
+                    return (
+                        <div className="setup-panel operating-panel">
+                            <div className="main">
+                                <div className="time">
+                                    {lang.scan.remaining_time}
+                                </div>
+                                <div className="setup">
+                                    <div className="icon print-speed"></div>
+                                    <div className="controls">
+                                        <div className="label">{lang.scan.scan_params.scan_speed.text}</div>
+                                        <div className="control">
+                                            <SelectView ref="scan_speed" className="span12" options={lang.scan.scan_params.scan_speed.options}/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="setup">
+                                    <div className="icon material"></div>
+                                    <div className="controls">
+                                        <div className="label">{lang.scan.scan_params.luminance.text}</div>
+                                        <div className="control">
+                                            <SelectView ref="luminance" className="luminance span12" options={lang.scan.scan_params.luminance.options}/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="setup last-child">
+                                    <div className="icon material"></div>
+                                    <div className="controls">
+                                        <div className="label">{lang.scan.scan_params.object.text}</div>
+                                        <div className="control">
+                                            <SelectView ref="object_height" className="object-height span12" options={lang.scan.scan_params.object.options}/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <button id="btn-scan" onClick={this._handleScan} className="btn btn-action span12 fa fa-bullseye">
+                                {start_scan_text}
+                            </button>
+                        </div>
+                    );
+                },
 
-                    starting_section = cx({
-                        'starting-section' : true,
-                        'hide' : 0 < state.scan_times
-                    });
-
-                    operating_section = cx({
-                        'operating-section' : true,
-                        'hide' : 0 === state.scan_times
-                    });
+                _renderStageSection: function() {
+                    var state = this.state,
+                        cx = React.addons.classSet,
+                        camera_image_class,
+                        settingPanel = this._renderSettingPanel(),
+                        lang = state.lang;
 
                     camera_image_class = cx({
                         'camera-image' : true,
@@ -252,72 +292,45 @@ define([
                     });
 
                     return (
+                        <section className="operating-section">
+
+                            {settingPanel}
+
+                            <div id="model-displayer" className="model-displayer">
+                                <img src={this.state.image_src} className={camera_image_class}/>
+                            </div>
+                        </section>
+                    );
+                },
+
+                render : function() {
+                    var state = this.state,
+                        cx = React.addons.classSet,
+                        lang = state.lang,
+                        activeSection,
+                        header;
+
+                    state.scan_times = this.scan_times || state.scan_times || 0;
+                    header = this._renderHeader();
+
+                    activeSection = (
+                        0 === state.scan_times ?
+                        this._renderBeginingSection() :
+                        this._renderStageSection()
+                    );
+
+                    return (
                         <div className="studio-container scan-studio">
-                            <header ref="header" className={header_class}>
-                                <button className="btn fa fa-undo" onClick={this._rescan}>{lang.scan.rescan}</button>
-                                <button className="btn fa fa-paper-plane" onClick={this._saveAs}>{lang.scan.export}</button>
-                                <button className="btn fa fa-floppy-o">{lang.scan.share}</button>
-                                <button className="btn fa fa-eye">{lang.scan.print_with_flux}</button>
-                            </header>
+
+                            {header}
+
                             <div className="section-container">
-                                <section className={starting_section}>
-                                    <img className="launch-img absolute-center" src="http://placehold.it/280x193" onClick={this._startScan}/>
-                                </section>
-                                <section className={operating_section}>
-                                    <div id="operating-panel" className="operating-panel">
-                                        <div className="panel print-params">
-                                            <div>
-                                                <h2>
-                                                    <span className="fa fa-clock-o"></span>
-                                                    26min
-                                                </h2>
-                                                <div className="row-fluid clearfix">
-                                                    <div className="col span3">
-                                                        <span className="param-icon fa fa-print"></span>
-                                                    </div>
-                                                    <div className="param col span9">
-                                                        <h4>
-                                                            {lang.scan.scan_params.scan_speed.text}
-                                                        </h4>
-                                                        <p>
-                                                            <SelectView ref="scan_speed" className="span12" options={lang.scan.scan_params.scan_speed.options}/>
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                                <div className="row-fluid clearfix">
-                                                    <div className="col span3">
-                                                        <span className="param-icon fa fa-lightbulb-o"></span>
-                                                    </div>
-                                                    <div className="param col span9">
-                                                        <h4>
-                                                            {lang.scan.scan_params.object.text}
-                                                            <div className="tooltip">
-                                                                <div className="tooltip-content">
-                                                                    {lang.scan.scan_params.object.tooltip.text}
-                                                                    <ListView className="illumination" items={lang.scan.scan_params.object.tooltip.items}/>
-                                                                </div>
-                                                            </div>
-                                                        </h4>
-                                                        <p>
-                                                            <SelectView className="span12" options={lang.scan.scan_params.object.options}/>
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div>
-                                                <button id="btn-scan" onClick={this._handleScan} className="btn span12 fa fa-bullseye">
-                                                    {start_scan_text}
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div id="model-displayer" className="model-displayer">
-                                        <img src={this.state.image_src} className={camera_image_class}/>
-                                    </div>
-                                </section>
+
+                                {activeSection}
+
                             </div>
                         </div>
-                    )
+                    );
                 }
 
             });
