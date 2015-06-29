@@ -67,7 +67,7 @@ a {
     margin: 0;
     min-width: 99px;
     outline: none;
-    padding: 0;
+    padding: 0 5px;
     position: relative;
     text-align: center;
     text-decoration: none;
@@ -247,8 +247,13 @@ a {
 @for $i from 1 through 12 {
     .span#{$i} {
         display: inline-block;
-        margin: 0 10px 0 0;
-        width: calc(100% / 12 * #{$i} - 10px);
+        @if $i < 12 {
+            margin: 0 10px 0 0;
+            width: calc(100% / 12 * #{$i} - 10px);
+        }
+        @else {
+            width: 100%;
+        }
     }
 }
 
@@ -284,26 +289,35 @@ a {
 }
 
 /* tooltip */
-.tip:hover::before {
-    background: rgba(0, 0 , 0, .8);
-    -webkit-border-radius: 3px;
-    border-radius: 3px;
-    color: #FFF;
-    content: attr(data-tip);
-    display: block;
-    font-size: 11px;
-    height: 24px;
-    left: -15px;
-    line-height: 24px;
-    min-width: 75px;
-    position: absolute;
-    text-align: center;
-    white-space: nowrap;
-    z-index: 1;
+.tip {
+    position: relative;
+
+    &:hover::before {
+        background: rgba(0, 0 , 0, .8);
+        -webkit-border-radius: 3px;
+        border-radius: 3px;
+        color: #FFF;
+        content: attr(data-tip);
+        display: block;
+        font-size: 11px;
+        height: 24px;
+        left: -15px;
+        line-height: 24px;
+        min-width: 75px;
+        position: absolute;
+        text-align: center;
+        white-space: nowrap;
+        z-index: 1;
+    }
+
 }
 
 .tip-bottom:hover::before {
     top: calc(100% + 5px);
+}
+
+.tip-right:hover::before {
+    left: calc(100% + 5px);
 }
 
 .invisible {
@@ -366,11 +380,114 @@ a {
     position: absolute;
 }
 
+// controls
+select {
+    background-color: transparent;
+    background-image: url('/img/icon-3d-arrow-down.png');
+    background-position: calc(100% - 4px) center;
+    background-repeat: no-repeat;
+    background-size: 8px 8px;
+    border: 0;
+    border-bottom: 1px #E0E0E0 solid;
+    font-size: 14px;
+    letter-spacing: 0.3px;
+    width: 100%;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+// setup panel (on left side of stage)
+.setup-panel {
+    position: absolute;
+
+    .btn-action {
+        border-radius: 3px;
+        letter-spacing: .3px;
+    }
+
+    .main {
+        background-color: #FFF;
+        border-radius: 3px;
+
+        .time {
+            font-size: 16px;
+            font-weight: normal;
+            height: 40px;
+            line-height: 40px;
+            text-align: center;
+        }
+
+        .setup {
+            height: 36px;
+            margin-bottom: 20px;
+            padding: 0 16px;
+        }
+
+        .last-setup {
+            height: 56px;
+            margin-bottom: 10px;
+            padding-bottom: 20px;
+        }
+    }
+
+    .main .setup > div {
+        display: inline-block;
+    }
+
+    .main .setup .controls {
+        margin-left: 16px;
+        vertical-align: top;
+        width: 65%;
+    }
+
+    .icon {
+        background-size: 36px 36px;
+        height: 36px;
+        width: 36px;
+    }
+
+    .label {
+        color: #9E9E9E;
+        font-size: 11px;
+        text-transform: uppercase;
+    }
+
+    .print-speed {
+        background-image: url('/img/icon-speed.png');
+        background-repeat: no-repeat;
+    }
+
+    .material {
+        background-image: url('/img/icon-material.png');
+        background-repeat: no-repeat;
+    }
+
+    .platform {
+        background-image: url('/img/icon-platform.png');
+        background-repeat: no-repeat;
+    }
+
+    .support {
+        background-image: url('/img/icon-support.png');
+        background-repeat: no-repeat;
+    }
+
+    .control {
+        height: 1.1875rem;
+    }
+
+    .control label {
+        color: #000;
+        display: inline-block;
+        font-size: 14px;
+        letter-spacing: .3px;
+    }
+}
 
 /* studio */
 .studio-container {
     height: 100%;
-    position: relative;
+    // position: relative;
 
     .top-menu-bar {
         height: 66px;
@@ -378,41 +495,13 @@ a {
         width: 100%;
     }
 
+    .stage {
+        height: calc(100% - 66px);
+    }
+
     .btn-default {
         border-radius: 5px;
     }
-}
-
-.scan-studio .model-displayer {
-    height: 90%;
-    width: 100%;
-}
-
-.scan-studio .model-displayer .camera-image {
-    height: 100%;
-    width: 100%;
-}
-
-.scan-studio .operating-panel {
-    position: absolute;
-    width: 300px;
-}
-
-.scan-studio .operating-panel .panel {
-    background: rgba(212, 212, 212, 0.7);
-    padding: 10px;
-    position: fixed;
-    z-index: 999;
-}
-
-.scan-studio .operating-panel .param-icon {
-    color: #777;
-    font-size: 2rem;
-    line-height: 5rem;
-}
-
-.scan-studio .operating-panel .param {
-    height: 5rem;
 }
 
 .popup-window {
@@ -433,55 +522,4 @@ a {
     position: absolute;
     right: 0;
     top: 0;
-}
-
-.scan-studio .section-container,
-.scan-studio .starting-section {
-    height: 100%;
-    width: 100%;
-}
-
-.scan-studio .starting-section {
-    position: relative;
-}
-
-.scan-studio .launch-img {
-    display: block;
-    height: 193px;
-    width: 280px;
-}
-
-.scan-studio .operating-section {
-    height: 100%;
-    position: relative;
-    width: 100%;
-}
-
-.scan-progress {
-    background: #eee;
-    border-radius: 5px;
-    height: 150px;
-    padding: 10px;
-    width: 60%;
-}
-
-.scan-progress .progress {
-    height: 20px;
-}
-
-.scan-progress .progress-bar {
-    background-color: #5BC0DE;
-    background-image: -webkit-linear-gradient(45deg,rgba(255, 255, 255, 0.15) 25%,rgba(0, 0, 0, 0) 25%,rgba(0, 0, 0, 0) 50%,rgba(255, 255, 255, 0.15) 50%,rgba(255, 255, 255, 0.15) 75%,rgba(0, 0, 0, 0) 75%,rgba(0, 0, 0, 0));
-    background-image: linear-gradient(45deg,rgba(255, 255, 255, 0.15) 25%,rgba(0, 0, 0, 0) 25%,rgba(0, 0, 0, 0) 50%,rgba(255, 255, 255, 0.15) 50%,rgba(255, 255, 255, 0.15) 75%,rgba(0, 0, 0, 0) 75%,rgba(0, 0, 0, 0));
-    background-size: 40px 40px;
-    height: 100%;
-    -webkit-background-size: 40px 40px;
-}
-
-.scan-model-save-as {
-    background: #eee;
-    border-radius: 5px;
-    height: 150px;
-    padding: 10px;
-    width: 60%;
 }
