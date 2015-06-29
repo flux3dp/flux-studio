@@ -2126,7 +2126,7 @@ a {
     margin: 0;
     min-width: 99px;
     outline: none;
-    padding: 0;
+    padding: 0 5px;
     position: relative;
     text-align: center;
     text-decoration: none;
@@ -2330,8 +2330,7 @@ a {
 
 .span12 {
     display: inline-block;
-    margin: 0 10px 0 0;
-    width: calc(100% / 12 * 12 - 10px); }
+    width: 100%; }
 
 /* offset */
 .offset-left-1 {
@@ -2429,25 +2428,30 @@ a {
     text-align: left; }
 
 /* tooltip */
-.tip:hover::before {
-    background: rgba(0, 0, 0, 0.8);
-    -webkit-border-radius: 3px;
-    border-radius: 3px;
-    color: #FFF;
-    content: attr(data-tip);
-    display: block;
-    font-size: 11px;
-    height: 24px;
-    left: -15px;
-    line-height: 24px;
-    min-width: 75px;
-    position: absolute;
-    text-align: center;
-    white-space: nowrap;
-    z-index: 1; }
+.tip {
+    position: relative; }
+    .tip:hover::before {
+        background: rgba(0, 0, 0, 0.8);
+        -webkit-border-radius: 3px;
+        border-radius: 3px;
+        color: #FFF;
+        content: attr(data-tip);
+        display: block;
+        font-size: 11px;
+        height: 24px;
+        left: -15px;
+        line-height: 24px;
+        min-width: 75px;
+        position: absolute;
+        text-align: center;
+        white-space: nowrap;
+        z-index: 1; }
 
 .tip-bottom:hover::before {
     top: calc(100% + 5px); }
+
+.tip-right:hover::before {
+    left: calc(100% + 5px); }
 
 .invisible {
     visibility: hidden; }
@@ -2503,42 +2507,87 @@ a {
     bottom: 0;
     position: absolute; }
 
+select {
+    background-color: transparent;
+    background-image: url("/img/icon-3d-arrow-down.png");
+    background-position: calc(100% - 4px) center;
+    background-repeat: no-repeat;
+    background-size: 8px 8px;
+    border: 0;
+    border-bottom: 1px #E0E0E0 solid;
+    font-size: 14px;
+    letter-spacing: 0.3px;
+    width: 100%;
+    -webkit-appearance: none;
+    appearance: none; }
+
+.setup-panel {
+    position: absolute; }
+    .setup-panel .btn-action {
+        border-radius: 3px;
+        letter-spacing: .3px; }
+    .setup-panel .main {
+        background-color: #FFF;
+        border-radius: 3px; }
+        .setup-panel .main .time {
+            font-size: 16px;
+            font-weight: normal;
+            height: 40px;
+            line-height: 40px;
+            text-align: center; }
+        .setup-panel .main .setup {
+            height: 36px;
+            margin-bottom: 20px;
+            padding: 0 16px; }
+        .setup-panel .main .last-setup {
+            height: 56px;
+            margin-bottom: 10px;
+            padding-bottom: 20px; }
+    .setup-panel .main .setup > div {
+        display: inline-block; }
+    .setup-panel .main .setup .controls {
+        margin-left: 16px;
+        vertical-align: top;
+        width: 65%; }
+    .setup-panel .icon {
+        background-size: 36px 36px;
+        height: 36px;
+        width: 36px; }
+    .setup-panel .label {
+        color: #9E9E9E;
+        font-size: 11px;
+        text-transform: uppercase; }
+    .setup-panel .print-speed {
+        background-image: url("/img/icon-speed.png");
+        background-repeat: no-repeat; }
+    .setup-panel .material {
+        background-image: url("/img/icon-material.png");
+        background-repeat: no-repeat; }
+    .setup-panel .platform {
+        background-image: url("/img/icon-platform.png");
+        background-repeat: no-repeat; }
+    .setup-panel .support {
+        background-image: url("/img/icon-support.png");
+        background-repeat: no-repeat; }
+    .setup-panel .control {
+        height: 1.1875rem; }
+    .setup-panel .control label {
+        color: #000;
+        display: inline-block;
+        font-size: 14px;
+        letter-spacing: .3px; }
+
 /* studio */
 .studio-container {
-    height: 100%;
-    position: relative; }
+    height: 100%; }
     .studio-container .top-menu-bar {
         height: 66px;
         letter-spacing: 0.3px;
         width: 100%; }
+    .studio-container .stage {
+        height: calc(100% - 66px); }
     .studio-container .btn-default {
         border-radius: 5px; }
-
-.scan-studio .model-displayer {
-    height: 90%;
-    width: 100%; }
-
-.scan-studio .model-displayer .camera-image {
-    height: 100%;
-    width: 100%; }
-
-.scan-studio .operating-panel {
-    position: absolute;
-    width: 300px; }
-
-.scan-studio .operating-panel .panel {
-    background: rgba(212, 212, 212, 0.7);
-    padding: 10px;
-    position: fixed;
-    z-index: 999; }
-
-.scan-studio .operating-panel .param-icon {
-    color: #777;
-    font-size: 2rem;
-    line-height: 5rem; }
-
-.scan-studio .operating-panel .param {
-    height: 5rem; }
 
 .popup-window {
     background: rgba(0, 0, 0, 0.5);
@@ -2557,49 +2606,6 @@ a {
     position: absolute;
     right: 0;
     top: 0; }
-
-.scan-studio .section-container,
-.scan-studio .starting-section {
-    height: 100%;
-    width: 100%; }
-
-.scan-studio .starting-section {
-    position: relative; }
-
-.scan-studio .launch-img {
-    display: block;
-    height: 193px;
-    width: 280px; }
-
-.scan-studio .operating-section {
-    height: 100%;
-    position: relative;
-    width: 100%; }
-
-.scan-progress {
-    background: #eee;
-    border-radius: 5px;
-    height: 150px;
-    padding: 10px;
-    width: 60%; }
-
-.scan-progress .progress {
-    height: 20px; }
-
-.scan-progress .progress-bar {
-    background-color: #5BC0DE;
-    background-image: -webkit-linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
-    background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
-    background-size: 40px 40px;
-    height: 100%;
-    -webkit-background-size: 40px 40px; }
-
-.scan-model-save-as {
-    background: #eee;
-    border-radius: 5px;
-    height: 150px;
-    padding: 10px;
-    width: 60%; }
 
 .print-studio {
     padding: 0;
@@ -3776,3 +3782,65 @@ input.switch:checked ~ label:after {
     .laser-studio .btn-start img {
         margin: 0 10px 0 0;
         width: 14px; }
+
+.scan-studio .btn-h-group {
+    padding: 10px 0 10px 10px; }
+    .scan-studio .btn-h-group .btn {
+        margin: 0 0 0 10px; }
+
+.scan-studio .model-displayer {
+    height: 90%;
+    width: 100%; }
+    .scan-studio .model-displayer .camera-image {
+        height: 100%;
+        width: 100%; }
+
+.scan-studio .operating-panel {
+    left: 20px;
+    position: absolute;
+    top: 20px;
+    width: 182px; }
+
+.scan-studio .operating-panel .param {
+    height: 5rem; }
+
+.scan-studio .section-container,
+.scan-studio .starting-section {
+    height: 100%;
+    width: 100%; }
+
+.scan-studio .starting-section {
+    position: relative; }
+
+.scan-studio .launch-img {
+    display: block;
+    height: 193px;
+    width: 280px; }
+
+.scan-studio .operating-section {
+    height: 100%;
+    position: relative;
+    width: 100%; }
+
+.scan-progress {
+    background: #eee;
+    border-radius: 5px;
+    height: 150px;
+    padding: 10px;
+    width: 60%; }
+    .scan-progress .progress {
+        height: 20px; }
+    .scan-progress .progress-bar {
+        background-color: #5BC0DE;
+        background-image: -webkit-linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
+        background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
+        background-size: 40px 40px;
+        height: 100%;
+        -webkit-background-size: 40px 40px; }
+
+.scan-model-save-as {
+    background: #eee;
+    border-radius: 5px;
+    height: 150px;
+    padding: 10px;
+    width: 60%; }
