@@ -2,14 +2,12 @@ define([
     'jquery',
     'react',
     'jsx!widgets/Popup',
-    'jsx!widgets/Select',
-    'jsx!widgets/List',
-    'helpers/websocket',
     'app/actions/scaned-model',
     'helpers/api/3d-scan-control',
     'helpers/api/3d-scan-modeling',
+    'jsx!views/scan/Setup-Panel',
     'threejs'
-], function($, React, popup, SelectView, ListView, WebSocket, scanedModel, scanControl, scanModeling) {
+], function($, React, popup, scanedModel, scanControl, scanModeling, SetupPanel) {
     'use strict';
 
     return function(args) {
@@ -83,9 +81,9 @@ define([
                     location.hash = 'studio/scan/start';
                 },
 
-                _handleScan: function(e) {
+                _handleScan: function(e, refs) {
                     var self = this,
-                        scan_speed = parseInt(this.refs.scan_speed.getDOMNode().value, 10),
+                        scan_speed = parseInt(refs.scan_speed.getDOMNode().value, 10),
                         mesh = null,
                         popup_window,
                         onRendering = function(views, chunk_length) {
@@ -225,57 +223,23 @@ define([
 
                 _renderSettingPanel: function() {
                     var state = this.state,
-                        cx = React.addons.classSet,
                         start_scan_text,
                         lang = state.lang;
 
                     // TODO: setting up remaining time
                     lang.scan.remaining_time = '26min';
 
-                    start_scan_text = (
+                    lang.scan.start_scan_text = (
                         1 < state.scan_times
                         ? lang.scan.start_multiscan
                         : lang.scan.start_scan
                     );
 
                     return (
-                        <div className="setup-panel operating-panel">
-                            <div className="main">
-                                <div className="time">
-                                    {lang.scan.remaining_time}
-                                </div>
-                                <div className="setup">
-                                    <div className="icon print-speed"></div>
-                                    <div className="controls">
-                                        <div className="label">{lang.scan.scan_params.scan_speed.text}</div>
-                                        <div className="control">
-                                            <SelectView ref="scan_speed" className="span12" options={lang.scan.scan_params.scan_speed.options}/>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="setup">
-                                    <div className="icon material"></div>
-                                    <div className="controls">
-                                        <div className="label">{lang.scan.scan_params.luminance.text}</div>
-                                        <div className="control">
-                                            <SelectView ref="luminance" className="luminance span12" options={lang.scan.scan_params.luminance.options}/>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="setup last-child">
-                                    <div className="icon material"></div>
-                                    <div className="controls">
-                                        <div className="label">{lang.scan.scan_params.object.text}</div>
-                                        <div className="control">
-                                            <SelectView ref="object_height" className="object-height span12" options={lang.scan.scan_params.object.options}/>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <button id="btn-scan" onClick={this._handleScan} className="btn btn-action span12 fa fa-bullseye">
-                                {start_scan_text}
-                            </button>
-                        </div>
+                        <SetupPanel
+                            lang = {lang}
+                            onScanClick = {this._handleScan}>
+                        </SetupPanel>
                     );
                 },
 
