@@ -360,21 +360,24 @@ define(function() {
                             value: 'manually',
                             label: 'Manually'
                         }
-                    ],
-                    tooltip: {
-                        text: '依據你的物件狀態，你可以選擇不同的亮度',
-                        items: [
-                            {
-                                label: 'Light'
-                            },
-                            {
-                                label: 'Normal'
-                            },
-                            {
-                                label: 'Dark'
-                            }
-                        ]
-                    }
+                    ]
+                },
+                luminance: {
+                    text: 'Luminance',
+                    options: [
+                        {
+                            value: 'light',
+                            label: 'Light'
+                        },
+                        {
+                            value: 'normal',
+                            label: 'Normal'
+                        },
+                        {
+                            value: 'dark',
+                            label: 'Dark'
+                        }
+                    ]
                 }
             }
         }
