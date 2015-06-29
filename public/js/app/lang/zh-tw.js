@@ -364,7 +364,8 @@ define(function() {
                     options: [
                         {
                             value: 'light',
-                            label: 'Light'
+                            label: 'Light',
+                            selected: true
                         },
                         {
                             value: 'normal',
