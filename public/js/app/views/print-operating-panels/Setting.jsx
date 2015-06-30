@@ -99,7 +99,7 @@ define([
                             </div>
                         </div>
                         <div className="setup">
-                            <a className="btn btn-default btn-default-light" onClick={this._handleShowAdvanceSetting}>{lang.settings.printer.advanced}</a>
+                            <a className="btn btn-default btn-default" onClick={this._handleShowAdvanceSetting}>{lang.settings.printer.advanced}</a>
                         </div>
                     </div>
 

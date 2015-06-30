@@ -14,8 +14,8 @@ define([
         var options = [],
             View = React.createClass({
                 componentDidMount: function() {
-                    $('#btn-join').addClass('btn-default-dark');
-                    $('#btn-cancel').addClass('btn-default-light');
+                    $('#btn-join').addClass('btn-confirm');
+                    $('#btn-cancel').addClass('btn-default');
                 },
                 _handleJoin: function() {
                     setTimeout(function() {

@@ -96,6 +96,15 @@ a {
     }
 }
 
+.btn-confirm {
+    background-color: #424242;
+    color: #FFF;
+
+    &:hover {
+        background-color: #000000;
+    }
+}
+
 .btn-action {
     background: #00C853;
     color: #fff;
@@ -487,7 +496,14 @@ select {
 /* studio */
 .studio-container {
     height: 100%;
-    // position: relative;
+
+    .btn-h-group {
+        padding: 10px 0 10px 10px;
+
+        .btn {
+            margin: 0 0 0 10px;
+        }
+    }
 
     .top-menu-bar {
         height: 66px;

@@ -280,12 +280,6 @@ define(function() {
             advenced: 'Advenced',
             start_laser: 'LASER',
             print_params: {
-                method: {
-                    text: 'Method',
-                    options: {
-                        engrave: 'Engrave'
-                    }
-                },
                 material: {
                     text: 'Material',
                     options: [

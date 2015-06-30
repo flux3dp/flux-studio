@@ -13,7 +13,7 @@ define([
         var options = [],
             View = React.createClass({
                 componentDidMount: function() {
-                    $('#next').addClass('btn-default-dark');
+                    $('#next').addClass('btn-confirm');
                 },
                 _handleNext: function() {
                     location.href = '#studio/settings/setting-set-printer';

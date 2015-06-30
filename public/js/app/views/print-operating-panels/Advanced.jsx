@@ -142,8 +142,8 @@ define([
         _renderFooter: function() {
             return (
                 <div className="footer">
-                    <a className="btn btn-default-light" onClick={this._handleCancel}>{this.props.lang.print.cancel}</a>
-                    <a className="btn btn-default-dark" onClick={this._handleDone}>{this.props.lang.print.done}</a>
+                    <a className="btn btn-default" onClick={this._handleCancel}>{this.props.lang.print.cancel}</a>
+                    <a className="btn btn-confirm" onClick={this._handleDone}>{this.props.lang.print.done}</a>
                 </div>
             );
         },

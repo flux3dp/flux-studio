@@ -12,7 +12,7 @@ define(['react'], function(React) {
         _renderCancel: function() {
             return (
                 <div className="cancel">
-                    <a className="btn btn-default-light">{this.props.lang.settings.cancel}</a>
+                    <a className="btn btn-default">{this.props.lang.settings.cancel}</a>
                 </div>
             );
         },

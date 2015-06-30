@@ -2148,6 +2148,12 @@ a {
     .btn-default:hover {
         border: 1px solid #424242; }
 
+.btn-confirm {
+    background-color: #424242;
+    color: #FFF; }
+    .btn-confirm:hover {
+        background-color: #000000; }
+
 .btn-action {
     background: #00C853;
     color: #fff; }
@@ -2580,6 +2586,10 @@ select {
 /* studio */
 .studio-container {
     height: 100%; }
+    .studio-container .btn-h-group {
+        padding: 10px 0 10px 10px; }
+        .studio-container .btn-h-group .btn {
+            margin: 0 0 0 10px; }
     .studio-container .top-menu-bar {
         height: 66px;
         letter-spacing: 0.3px;
@@ -2610,7 +2620,7 @@ select {
 .print-studio {
     padding: 0; }
 
-.print-studio .btn.btn-default-light:hover {
+.print-studio .btn.btn-default:hover {
     border-color: #000; }
 
 .print-studio header {
@@ -3437,7 +3447,8 @@ input.switch:checked ~ label:after {
     height: 32px;
     overflow: hidden;
     border: 1px solid #ccc;
-    background-color: #FFFFFF; }
+    background-color: #FFFFFF;
+    padding-left: 10px; }
 
 .settings footer {
     width: 100%;
@@ -3521,7 +3532,7 @@ input.switch:checked ~ label:after {
 .settings .main.cloud {
     width: 90%; }
 
-.settings .main.cloud .btn-default-light {
+.settings .main.cloud .btn-default {
     width: 145px;
     height: 34px;
     line-height: 34px;
@@ -3594,7 +3605,7 @@ input.switch:checked ~ label:after {
 .settings .create-account .actions {
     text-align: center; }
 
-.settings .create-account .btn-default-dark {
+.settings .create-account .btn-confirm {
     width: 100%;
     margin: 10px 0; }
 
@@ -3609,7 +3620,7 @@ input.switch:checked ~ label:after {
 .settings .activation-notice .notice-info .description {
     margin-top: 5px; }
 
-.settings .activation-notice .btn-default-dark {
+.settings .activation-notice .btn-confirm {
     margin-top: 20px; }
 
 /*connect printer*/
@@ -3669,7 +3680,7 @@ input.switch:checked ~ label:after {
     letter-spacing: 0.3px;
     color: #4A4A4A; }
 
-.settings .printer .btn-default-light {
+.settings .printer .btn-default {
     width: 145px;
     height: 34px;
     border: 1px #E0E0E0 solid;
@@ -3736,7 +3747,7 @@ input.switch:checked ~ label:after {
     text-decoration: underline; }
 
 /*detect new wifi*/
-.settings .wifi .btn.btn-default-dark {
+.settings .wifi .btn.btn-confirm {
     margin-top: 30px; }
 
 .settings .wifi img.loading {
@@ -3989,9 +4000,6 @@ input.switch:checked ~ label:after {
 /**
  * Laser
  */
-.laser-studio .top-menu-bar {
-    padding: 0 20px; }
-
 .laser-studio .fa::before {
     margin: 0 5px 0 0; }
 
@@ -4140,11 +4148,6 @@ input.switch:checked ~ label:after {
     .laser-studio .btn-start img {
         margin: 0 10px 0 0;
         width: 14px; }
-
-.scan-studio .btn-h-group {
-    padding: 10px 0 10px 10px; }
-    .scan-studio .btn-h-group .btn {
-        margin: 0 0 0 10px; }
 
 .scan-studio .model-displayer {
     height: 90%;

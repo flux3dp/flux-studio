@@ -55,9 +55,9 @@ define([
         // components of the position vector for each vertex are stored
         // contiguously in the buffer.
         for ( var i = 0; i < model_data.length; i += SET_ELEM_NUMBER ) {
-            vertices[ i + 0 ] = model_data[ i + X ];
-            vertices[ i + 1 ] = model_data[ i + Y ];
-            vertices[ i + 2 ] = model_data[ i + Z ];
+            vertices[ i / 2 + 0 ] = model_data[ i + X ];
+            vertices[ i / 2 + 1 ] = model_data[ i + Y ];
+            vertices[ i / 2 + 2 ] = model_data[ i + Z ];
 
             color.setRGB(
                 model_data[ i + RED ],
@@ -65,9 +65,9 @@ define([
                 model_data[ i + BLUE ]
             );
 
-            colors[ i + 0 ] = color.r;
-            colors[ i + 1 ] = color.g;
-            colors[ i + 2 ] = color.b;
+            colors[ i / 2 + 0 ] = color.r;
+            colors[ i / 2 + 1 ] = color.g;
+            colors[ i / 2 + 2 ] = color.b;
         }
 
         geometry.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
