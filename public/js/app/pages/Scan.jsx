@@ -102,7 +102,6 @@ define([
                             }
 
                             if (null === mesh) {
-
                                 mesh = scanedModel.appendModel(views);
                             }
                             else {
@@ -134,11 +133,12 @@ define([
                                         }
                                     );
                                 },
-                                onDumpFinished = function() {
+                                onDumpFinished = function(data) {
                                     console.log('dump finished');
+                                    onRendering(data);
                                 },
                                 onDumpReceiving = function(data, len) {
-                                    console.log('dump receiving', data, len);
+                                    console.log('dump receiving');
                                     onRendering(data, len);
                                 };
 
