@@ -43,15 +43,6 @@ define([
                                         <div className="print-params">
                                             <h2 className="estimated-time text-center"> 1 hr 30min </h2>
                                             <div className="row-fluid clearfix">
-                                                <div className="param-icon col span3 fa fa-print"></div>
-                                                <div className="param col span9">
-                                                    <h4 className="caption">{lang.laser.print_params.method.text}</h4>
-                                                    <p>
-                                                        {lang.laser.print_params.method.options}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                            <div className="row-fluid clearfix">
                                                 <div className="param-icon col span3 fa fa-bullseye"></div>
                                                 <div className="param col span9">
                                                     <h4 className="caption">{lang.laser.print_params.material.text}</h4>
