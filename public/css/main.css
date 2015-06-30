@@ -2580,6 +2580,10 @@ select {
 /* studio */
 .studio-container {
     height: 100%; }
+    .studio-container .btn-h-group {
+        padding: 10px 0 10px 10px; }
+        .studio-container .btn-h-group .btn {
+            margin: 0 0 0 10px; }
     .studio-container .top-menu-bar {
         height: 66px;
         letter-spacing: 0.3px;
@@ -3989,9 +3993,6 @@ input.switch:checked ~ label:after {
 /**
  * Laser
  */
-.laser-studio .top-menu-bar {
-    padding: 0 20px; }
-
 .laser-studio .fa::before {
     margin: 0 5px 0 0; }
 
@@ -4140,11 +4141,6 @@ input.switch:checked ~ label:after {
     .laser-studio .btn-start img {
         margin: 0 10px 0 0;
         width: 14px; }
-
-.scan-studio .btn-h-group {
-    padding: 10px 0 10px 10px; }
-    .scan-studio .btn-h-group .btn {
-        margin: 0 0 0 10px; }
 
 .scan-studio .model-displayer {
     height: 90%;
