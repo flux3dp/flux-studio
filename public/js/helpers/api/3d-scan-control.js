@@ -5,8 +5,9 @@
 define([
     'helpers/websocket',
     'helpers/file-system',
-    'helpers/point-cloud'
-], function(Websocket, fileSystem, PointCloudHelper) {
+    'helpers/point-cloud',
+    'helpers/is-json'
+], function(Websocket, fileSystem, PointCloudHelper, isJson) {
     'use strict';
 
     return function(serial, opts) {
@@ -16,7 +17,8 @@ define([
         var ws = new Websocket({
                 method: '3d-scan-control/' + serial,
                 onMessage: function(result) {
-                    var data = ('string' === typeof result.data ? JSON.parse(JSON.stringify(result.data)) : result.data),
+
+                    var data = (true === isJson(result.data) ? JSON.parse(result.data) : result.data),
                         error_code;
 
                     if ('string' === typeof data && true === data.startsWith('error')) {
@@ -140,11 +142,9 @@ define([
                         if (true === data instanceof Blob) {
                             pointCloud.push(data, next_left, next_right, _opts);
                         }
-                        else if ('string' === typeof data && true === data.startsWith('chunk')) {
-                            data = data.split(' ');
-
-                            next_left = parseInt(data[1], 10) * 24;
-                            next_right = parseInt(data[2], 10) * 24;
+                        else if ('undefined' !== typeof data.status && 'chunk' === data.status) {
+                            next_left = parseInt(data.left, 10) * 24;
+                            next_right = parseInt(data.right, 10) * 24;
                         }
                         else if ('string' === typeof data && 'finished' === data) {
                             // disconnect
