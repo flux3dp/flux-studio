@@ -7,7 +7,11 @@ define([
 
     return function(view, args) {
         args = args || {};
-        args.disabledEscapeOnBackground = args.disabledEscapeOnBackground || false;
+        args.disabledEscapeOnBackground = (
+            'boolean' === typeof args.disabledEscapeOnBackground
+            ? args.disabledEscapeOnBackground
+            : false
+        );
 
         var View = view(args),
             $root = $('.popup-window'),
@@ -33,9 +37,7 @@ define([
 
                 // ui events
                 _closeOnBackground: function(e) {
-                    if ('boolean' === typeof args.disabledEscapeOnBackground
-                        && false === args.disabledEscapeOnBackground
-                    ) {
+                    if (false === args.disabledEscapeOnBackground) {
                         methods.close();
                     }
                 }

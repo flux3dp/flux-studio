@@ -2,8 +2,7 @@ define([
     'jquery',
     'react',
     'helpers/i18n',
-    'jsx!views/settings/Setting-Menuless-Top-Nav',
-    'css!cssHome/pages/settings'
+    'jsx!views/settings/Setting-Menuless-Top-Nav'
 ], function($, React, i18n, TopNav) {
     'use strict';
 
@@ -33,7 +32,7 @@ define([
                                     <input className="font3" type="password" placeholder="" />
                                 </div>
                                 <div className="actions">
-                                    <div><a href="#studio/settings/setting-activation-notice" className="btn btn-default-dark">{lang.settings.create_account.signup}</a></div>
+                                    <div><a href="#studio/settings/setting-activation-notice" className="btn btn-confirm">{lang.settings.create_account.signup}</a></div>
                                     <div><a className="font4" href="#">{lang.settings.create_account.not_now}</a></div>
                                 </div>
                             </div>

@@ -12,10 +12,10 @@ define([
         container = document.getElementById('model-displayer');
 
         camera = new THREE.PerspectiveCamera( 70, container.offsetWidth / container.offsetHeight, 1, 3000 );
-        camera.position.set(10, 10, 10);
+        camera.position.set(10, 3, 10);
 
         scene = new THREE.Scene();
-        scene.fog = new THREE.Fog(0x050505, 2000, 3500);
+        scene.rotation.x = 717608350.9;
 
         // add controls
         addControls();
@@ -29,7 +29,7 @@ define([
         renderer = new THREE.WebGLRenderer({
             antialias: false
         });
-        renderer.setClearColor(scene.fog.color);
+        renderer.setClearColor( 0xE0E0E0, 1 );
         renderer.setPixelRatio(window.devicePixelRatio);
         renderer.setSize(window.innerWidth, window.innerHeight);
         container.appendChild(renderer.domElement);
@@ -55,9 +55,9 @@ define([
         // components of the position vector for each vertex are stored
         // contiguously in the buffer.
         for ( var i = 0; i < model_data.length; i += SET_ELEM_NUMBER ) {
-            vertices[ i + 0 ] = model_data[ i + X ];
-            vertices[ i + 1 ] = model_data[ i + Y ];
-            vertices[ i + 2 ] = model_data[ i + Z ];
+            vertices[ i / 2 + 0 ] = model_data[ i + X ];
+            vertices[ i / 2 + 1 ] = model_data[ i + Y ];
+            vertices[ i / 2 + 2 ] = model_data[ i + Z ];
 
             color.setRGB(
                 model_data[ i + RED ],
@@ -65,9 +65,9 @@ define([
                 model_data[ i + BLUE ]
             );
 
-            colors[ i + 0 ] = color.r;
-            colors[ i + 1 ] = color.g;
-            colors[ i + 2 ] = color.b;
+            colors[ i / 2 + 0 ] = color.r;
+            colors[ i / 2 + 1 ] = color.g;
+            colors[ i / 2 + 2 ] = color.b;
         }
 
         geometry.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
@@ -137,7 +137,7 @@ define([
         var materials = [
                 new THREE.LineBasicMaterial({ color: 0x0000ff }),   // x
                 new THREE.LineBasicMaterial({ color: 0x00ff00 }),   // y
-                new THREE.LineBasicMaterial({ color: 0xffffff })    // z
+                new THREE.LineBasicMaterial({ color: 0xff0000 })    // z
             ],
             vertices = [
                 [   // x

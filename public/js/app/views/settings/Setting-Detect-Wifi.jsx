@@ -3,9 +3,7 @@ define([
     'react',
     'helpers/i18n',
     'jsx!views/settings/Setting-Menuless-Top-Nav',
-    'jsx!views/wifi/Detect-Wifi',
-    'css!cssHome/pages/settings',
-    'css!cssHome/pages/wifi'
+    'jsx!views/wifi/Detect-Wifi'
 ], function($, React, i18n, TopNav, DetectWifi) {
     'use strict';
 
@@ -15,7 +13,7 @@ define([
         var options = [],
             View = React.createClass({
                 componentDidMount: function() {
-                    $('#btn-start').addClass('btn-default-dark');
+                    $('#btn-start').addClass('btn-confirm');
                 },
                 _handleStartDetect: function() {
                     location.href = '#studio/settings/setting-select-wifi';

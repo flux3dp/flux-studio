@@ -4,9 +4,7 @@ define([
     'helpers/i18n',
     'helpers/local-storage',
     'jsx!views/settings/Setting-Menuless-Top-Nav',
-    'jsx!views/wifi/Set-Password',
-    'css!cssHome/pages/settings',
-    'css!cssHome/pages/wifi'
+    'jsx!views/wifi/Set-Password'
 ], function($, React, i18n, localStorage, TopNav, SetPassword) {
     'use strict';
 
@@ -16,8 +14,8 @@ define([
         var options = [],
             View = React.createClass({
                 componentDidMount: function() {
-                    $('#btn-join').addClass('btn-default-dark');
-                    $('#btn-cancel').addClass('btn-default-light');
+                    $('#btn-join').addClass('btn-confirm');
+                    $('#btn-cancel').addClass('btn-default');
                 },
                 _handleJoin: function() {
                     setTimeout(function() {

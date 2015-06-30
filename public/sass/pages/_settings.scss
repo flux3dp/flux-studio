@@ -1,4 +1,4 @@
-.is-ready .content {
+.settings-studio {
     background-color: #F5F5F5;
 }
 
@@ -29,32 +29,10 @@
     text-align: center;
 }
 
-.settings .btn.btn-default-dark {
-    background-color: #424242;
-    font-size: 14px;
-    color: #FFF;
-}
-
-.settings .btn.btn-default-dark:hover {
-    background-color: #000000;
-}
-
-.settings .btn.btn-default-light {
-    background-color: #FFFFFF;
-    border: 1px #E0E0E0 solid;
-    font-size: 14px;
-    color: #000;
-    text-align: center;
-}
-
 .settings .btn-long {
     width: 240px;
     height: 38px;
     line-height: 38px;
-}
-
-.settings .btn.btn-default-light:hover {
-    border: 1px #4A4A4A solid;
 }
 
 .settings ul.nav {
@@ -124,6 +102,7 @@
     overflow: hidden;;
     border: 1px solid #ccc;
     background-color: #FFFFFF;
+    padding-left: 10px;
 }
 
 .settings footer {
@@ -230,7 +209,7 @@
     width:90%;
 }
 
-.settings .main.cloud .btn-default-light {
+.settings .main.cloud .btn-default {
     width: 145px;
     height: 34px;
     line-height: 34px;
@@ -321,7 +300,7 @@
     text-align: center;
 }
 
-.settings .create-account .btn-default-dark {
+.settings .create-account .btn-confirm {
     width: 100%;
     margin: 10px 0;
 }
@@ -341,7 +320,7 @@
     margin-top: 5px;
 }
 
-.settings .activation-notice .btn-default-dark {
+.settings .activation-notice .btn-confirm {
     margin-top: 20px;
 }
 
@@ -414,7 +393,7 @@
     color: #4A4A4A;
 }
 
-.settings .printer .btn-default-light {
+.settings .printer .btn-default {
     width: 145px;
     height: 34px;
     border: 1px #E0E0E0 solid;
@@ -502,7 +481,7 @@
 
 /*detect new wifi*/
 
-.settings .wifi .btn.btn-default-dark {
+.settings .wifi .btn.btn-confirm {
     margin-top: 30px;
 }
 

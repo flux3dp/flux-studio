@@ -3,9 +3,7 @@ define([
     'react',
     'helpers/i18n',
     'jsx!views/settings/Setting-Menuless-Top-Nav',
-    'jsx!views/wifi/Set-Printer',
-    'css!cssHome/pages/settings',
-    'css!cssHome/pages/wifi'
+    'jsx!views/wifi/Set-Printer'
 ], function($, React, i18n, TopNav, SetPrinter) {
     'use strict';
 
@@ -15,7 +13,7 @@ define([
         var options = [],
             View = React.createClass({
                 componentDidMount: function() {
-                    $('#btn-set-printer').addClass('btn-default-dark');
+                    $('#btn-set-printer').addClass('btn-confirm');
                 },
                 _handleSetPrinter: function(name, password) {
                     console.log(name, password);

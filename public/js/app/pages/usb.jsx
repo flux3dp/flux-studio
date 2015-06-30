@@ -1,7 +1,6 @@
 define([
     'jquery',
-    'react',
-    'css!cssHome/pages/usb'
+    'react'
 ], function($, React) {
     'use strict';
 

@@ -3,9 +3,7 @@ define([
     'react',
     'helpers/i18n',
     'jsx!views/settings/Setting-Menuless-Top-Nav',
-    'jsx!views/wifi/Wifi-Connected',
-    'css!cssHome/pages/settings',
-    'css!cssHome/pages/wifi'
+    'jsx!views/wifi/Wifi-Connected'
 ], function($, React, i18n, TopNav, WifiConnected) {
     'use strict';
 
@@ -15,7 +13,7 @@ define([
         var options = [],
             View = React.createClass({
                 componentDidMount: function() {
-                    $('#next').addClass('btn-default-dark');
+                    $('#next').addClass('btn-confirm');
                 },
                 _handleNext: function() {
                     location.href = '#studio/settings/setting-set-printer';

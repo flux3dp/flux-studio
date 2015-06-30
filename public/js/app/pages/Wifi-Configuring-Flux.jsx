@@ -1,7 +1,6 @@
 define([
     'jquery',
-    'react',
-    'css!cssHome/pages/wifi'
+    'react'
 ], function($, React, localStorage, actions) {
     'use strict';
 
@@ -26,7 +25,7 @@ define([
                             <h2>{lang.wifi.configuring_flux.caption}</h2>
                             <p>{lang.wifi.configuring_flux.description}</p>
                             <div>
-                                <a href="#initialize/wifi/configured-flux" className="btn btn-large">
+                                <a href="#initialize/wifi/configured-flux" className="btn btn-action btn-large">
                                     {lang.wifi.configuring_flux.next}
                                 </a>
                             </div>

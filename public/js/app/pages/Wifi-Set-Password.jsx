@@ -1,8 +1,7 @@
 define([
     'jquery',
     'react',
-    'helpers/local-storage',
-    'css!cssHome/pages/wifi'
+    'helpers/local-storage'
 ], function($, React, localStorage) {
     'use strict';
 
@@ -50,9 +49,9 @@ define([
                                 <input ref="password" type="password" id="text-password"
                                 placeholder={lang.wifi.set_password.password_placeholder} defaultValue=""/>
                             </div>
-                            <div className="btn-group">
+                            <div className="btn-h-group btn-align-center-h-group">
                                 <a href="#initialize/wifi/select" className="btn btn-default">{lang.wifi.set_password.back}</a>
-                                <button id="btn-access-wifi" onClick={this._handleSetPassword} className="btn">{lang.wifi.set_password.join}</button>
+                                <button id="btn-access-wifi" onClick={this._handleSetPassword} className="btn btn-action">{lang.wifi.set_password.join}</button>
                             </div>
                         </div>
                     </div>

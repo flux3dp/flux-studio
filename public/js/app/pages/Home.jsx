@@ -2,8 +2,7 @@ define([
     'jquery',
     'react',
     'helpers/i18n',
-    'jsx!widgets/Select',
-    'css!cssHome/pages/welcome'
+    'jsx!widgets/Select'
 ], function($, React, i18n, SelectView) {
     'use strict';
 
@@ -29,7 +28,7 @@ define([
                                 <SelectView id="select-lang" options={options}/>
                             </div>
                             <div>
-                                <a href="#initialize/wifi/ask" className="btn btn-large">{this.state.lang.welcome.start}</a>
+                                <a href="#initialize/wifi/ask" className="btn btn-action btn-large">{this.state.lang.welcome.start}</a>
                             </div>
                         </div>
                     </div>

@@ -135,7 +135,24 @@ define(function() {
             normal_preview: 'Normal Preview',
             support_preview: 'Support Preview',
             start_print: 'Print',
-            advanced: 'Advanced',
+            advanced: {
+                label: 'ADVANCED',
+                quality: 'QUALITY',
+                layer_height: 'Layer Height',
+                infill: 'Infill',
+                speed: 'SPEED',
+                speed_while_traveling: 'Traveling',
+                speed_while_extruding: 'Extruding',
+                temperature: 'TEMPERATURE',
+                printing_temperature: 'Printing',
+                support: 'SUPPORT',
+                support_type: {
+                    label: 'Support Type',
+                    touch_buildplate: 'Touch Buildplate',
+                    everywhere: 'Everywhere'
+                },
+                platform_type: 'Platform Type',
+            },
             mode: [
                 {
                     value: 'beginner',
@@ -164,7 +181,7 @@ define(function() {
                         ]
                     },
                     material: {
-                        text: 'Meterial',
+                        text: 'Material',
                         options: [
                             {
                                 value: 'pla',
@@ -245,24 +262,26 @@ define(function() {
             rotate: 'Rotate',
             align_center: 'Align Center',
             delete: 'Delete',
-            reset: 'Reset'
+            reset: 'Reset',
+            cancel: 'CANCEL',
+            done: 'DONE',
+            hour: 'hr',
+            minute: 'min',
+            gram: 'g',
+            pause: 'PAUSE',
+            continue: 'CONTINUE',
+            restart: 'RESTART'
         },
         laser: {
             import: 'Import',
             save: 'Save',
             acceptable_files: 'JPG, PNG, PDF, AI',
             drop_files_to_import: 'Drop your file here or click "import" to upload your file',
-            change_setup: 'Change Setup',
-            start_laser: 'Start',
+            advenced: 'Advenced',
+            start_laser: 'LASER',
             print_params: {
-                method: {
-                    text: 'Method',
-                    options: {
-                        engrave: 'Engrave'
-                    }
-                },
                 material: {
-                    text: 'Meterial',
+                    text: 'Material',
                     options: [
                         {
                             value: 'wood',
@@ -303,6 +322,10 @@ define(function() {
                             label: 'inches'
                         }
                     ]
+                },
+                threshold: {
+                    text: 'Threshold',
+                    default: 128
                 }
             }
         },
@@ -315,6 +338,7 @@ define(function() {
             print_with_flux: 'Print with FLUX',
             convert_to_3d_model: 'Convert to 3D model...',
             complete: 'Complete',
+            remaining_time: 'Remaining Time',
             save_as: 'Save as',
             do_save: 'Save',
             save_mode: [
@@ -355,21 +379,25 @@ define(function() {
                             value: 'manually',
                             label: 'Manually'
                         }
-                    ],
-                    tooltip: {
-                        text: '依據你的物件狀態，你可以選擇不同的亮度',
-                        items: [
-                            {
-                                label: 'Light'
-                            },
-                            {
-                                label: 'Normal'
-                            },
-                            {
-                                label: 'Dark'
-                            }
-                        ]
-                    }
+                    ]
+                },
+                luminance: {
+                    text: 'Luminance',
+                    options: [
+                        {
+                            value: 'light',
+                            label: 'Light',
+                            selected: true
+                        },
+                        {
+                            value: 'normal',
+                            label: 'Normal'
+                        },
+                        {
+                            value: 'dark',
+                            label: 'Dark'
+                        }
+                    ]
                 }
             }
         }

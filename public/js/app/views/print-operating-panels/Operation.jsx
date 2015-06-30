@@ -20,7 +20,7 @@ define([
         },
         getInitialState: function() {
             return {
-                operation: 'scale'
+                operation: ''
             };
         },
         _handleNavUp: function(e) {
@@ -46,7 +46,7 @@ define([
         },
         _handleOperation: function (operation, e) {
             this.props.onOperationChange(operation);
-            this.setState({ operation: operation });
+            this.setState({ operation: this.state.operation == operation ? '' : operation });
         },
         render: function() {
             var lang = this.props.lang,
@@ -69,10 +69,10 @@ define([
                                 <button className={rotateClass} data-tip={lang.print.rotate} onClick={this._handleOperation.bind(null, 'rotate')}></button>
                             </div>
                             <div>
-                                <button className="btn center" data-tip={lang.print.align_center}></button>
+                                <button className="btn center" data-tip={lang.print.align_center} onClick={this._handleOperation.bind(null, 'center')}></button>
                             </div>
                             <div>
-                                <button className="btn delete" data-tip={lang.print.delete}></button>
+                                <button className="btn delete" data-tip={lang.print.delete} onClick={this._handleOperation.bind(null, 'delete')}></button>
                             </div>
                         </div>
                     </div>

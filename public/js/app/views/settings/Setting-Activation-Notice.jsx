@@ -2,8 +2,7 @@ define([
     'jquery',
     'react',
     'helpers/i18n',
-    'jsx!views/settings/Setting-Menuless-Top-Nav',
-    'css!cssHome/pages/settings'
+    'jsx!views/settings/Setting-Menuless-Top-Nav'
 ], function($, React, i18n, TopNav) {
     'use strict';
 
@@ -24,7 +23,7 @@ define([
                                     <div className="font1 title">{lang.settings.activate_info.almost_there}</div>
                                     <div className="font2 description">{lang.settings.activate_info.description}</div>
                                     <div>
-                                        <a href="#studio/settings/setting-connect-printer" className="btn btn-default-dark btn-long">{lang.settings.activate_info.got_it}</a>
+                                        <a href="#studio/settings/setting-connect-printer" className="btn btn-confirm btn-long">{lang.settings.activate_info.got_it}</a>
                                     </div>
                                 </div>
                             </div>

@@ -4,9 +4,7 @@ define([
     'helpers/i18n',
     'helpers/local-storage',
     'jsx!views/settings/Setting-Menuless-Top-Nav',
-    'jsx!views/wifi/Select-Wifi',
-    'css!cssHome/pages/settings',
-    'css!cssHome/pages/wifi'
+    'jsx!views/wifi/Select-Wifi'
 ], function($, React, i18n, localStorage, TopNav, SelectWifi) {
     'use strict';
 

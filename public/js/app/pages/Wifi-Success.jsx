@@ -1,7 +1,6 @@
 define([
     'jquery',
-    'react',
-    'css!cssHome/pages/wifi'
+    'react'
 ], function($, React) {
     'use strict';
 
@@ -23,7 +22,7 @@ define([
                             <h2>{lang.wifi.success.caption}</h2>
                             <p>{lang.wifi.success.line1}</p>
                             <div>
-                                <a href="#initialize/wifi/set-printer" className="btn btn-large">{lang.wifi.success.next}</a>
+                                <a href="#initialize/wifi/set-printer" className="btn btn-action btn-large">{lang.wifi.success.next}</a>
                             </div>
                         </div>
                     </div>

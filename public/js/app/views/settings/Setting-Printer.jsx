@@ -4,8 +4,7 @@ define([
     'helpers/i18n',
     'jsx!widgets/Select',
     'helpers/display',
-    'helpers/local-storage',
-    'css!cssHome/pages/settings'
+    'helpers/local-storage'
 ], function($, React, i18n, SelectView, display, localStorage) {
     'use strict';
 
@@ -65,7 +64,7 @@ define([
                                 <table>
                                     <tr>
                                         <td>
-                                            <button className="btn btn-default-light font3" onClick={this._handleDisplayPasswordSection}>{lang.settings.printer.set_password}</button></td>
+                                            <button className="btn btn-default font3" onClick={this._handleDisplayPasswordSection}>{lang.settings.printer.set_password}</button></td>
                                         <td>
                                             <span>{lang.settings.printer.security_notice}</span></td>
                                     </tr>
@@ -90,7 +89,7 @@ define([
                             </div>
                             <div className="row-fluid">
                                 <div className="">
-                                    <button className="btn btn-default-light" onClick={this._handleSetPassword}>{lang.settings.printer.save_password}</button>
+                                    <button className="btn btn-default" onClick={this._handleSetPassword}>{lang.settings.printer.save_password}</button>
                                 </div>
                             </div>
                         </div>
@@ -105,10 +104,7 @@ define([
                                     <a className="pull-right">{lang.settings.printer.advanced} &gt;</a>
                                 </div>
                                 <div>
-                                    <button className="btn btn-default-light">{lang.settings.printer.join_other_network}</button>
-                                </div>
-                                <div className="remove-printer">
-                                    <a>{lang.settings.printer.disconnect_with_this_printer}</a>
+                                    <button className="btn btn-default">{lang.settings.printer.join_other_network}</button>
                                 </div>
                             </div>
                         </div>

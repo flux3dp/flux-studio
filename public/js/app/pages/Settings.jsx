@@ -4,8 +4,7 @@ define([
     'helpers/i18n',
     'jsx!widgets/Select',
     'helpers/display',
-    'plugins/classnames/index',
-    'css!cssHome/pages/settings'
+    'plugins/classnames/index'
 ], function($, React, i18n, SelectView, Display, ClassNames) {
     'use strict';
 
@@ -29,9 +28,7 @@ define([
                 switch (args.child) {
                     case 'flux-cloud':
                         childView = 'Setting-Flux-Cloud';
-                        this.setState({
-                            displayFooter: false
-                        });
+                        this.setState({ displayFooter: false });
                         break;
 
                     case 'flux-cloud-setup':
@@ -40,10 +37,12 @@ define([
 
                     case 'printer':
                         childView = 'Setting-Printer';
+                        this.setState({ displayFooter: false });
                         break;
 
                     case 'general':
                         childView = 'Setting-General';
+                        this.setState({ displayFooter: false });
                         break;
 
                     default:
@@ -107,10 +106,12 @@ define([
                     </footer>
 
                 return (
-                    <div className="settings">
-                        {this.state.displayMenu ? header : ''}
-                        <div className={tabContainerClass}></div>
-                        {this.state.displayFooter ? footer : ''}
+                    <div className="studio-container settings-studio">
+                        <div className="settings">
+                            {this.state.displayMenu ? header : ''}
+                            <div className={tabContainerClass}></div>
+                            {this.state.displayFooter ? footer : ''}
+                        </div>
                     </div>
                 );
             }

@@ -1,8 +1,7 @@
 define([
     'jquery',
     'react',
-    'app/actions/wifi-select',
-    'css!cssHome/pages/wifi'
+    'app/actions/wifi-select'
 ], function($, React, wifiSelect) {
     'use strict';
 

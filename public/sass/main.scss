@@ -1,0 +1,24 @@
+// core
+@import "core/normalize";
+@import "core/font-awesome";
+@import "core/variables";
+
+// mixins
+@import "mixins/flexbox";
+@import "mixins/absolute-center";
+
+// global style
+@import "core/global";
+
+
+// views
+// @import "views/xxx";
+
+// pages
+@import "pages/print";
+@import "pages/settings";
+@import "pages/usb";
+@import "pages/welcome";
+@import "pages/wifi";
+@import "pages/laser";
+@import "pages/scan";

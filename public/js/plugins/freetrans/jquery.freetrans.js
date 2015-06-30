@@ -47,8 +47,10 @@
         // public methods
         var methods = {
                 init : function(options) {
+
                         return this.each(function() {
                                 var sel = $(this), d = sel.data('freetrans');
+
                                 if(d){
                                         _setOptions(d, options);
                                         _draw(sel, d);
@@ -669,8 +671,9 @@
 
                         el = data._p.divs.rotator[0];
 
+                        // HACKED: modify the rotator position
                         el.style.top = -20 + 'px';
-                        el.style.left = data._p.cwid + 4 + 'px';
+                        el.style.left = 'calc(50% - ' + el.clientWidth / 2 + 'px)';
                         _setTransform(el, tstr);
                         _setTransformOrigin(el, data['rot-origin']);
                 }

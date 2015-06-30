@@ -2,8 +2,7 @@ define([
     'jquery',
     'react',
     'helpers/i18n',
-    'jsx!widgets/Select',
-    'css!cssHome/pages/settings'
+    'jsx!widgets/Select'
 ], function($, React, i18n, SelectView) {
     'use strict';
 
@@ -22,7 +21,7 @@ define([
                                 <div className="font1">{lang.settings.flux_cloud.caption}</div>
                                 <div className="font2">{lang.settings.flux_cloud.line1}</div>
                                 <div className="actions">
-                                    <div><a href="#studio/settings/setting-create-account" className="btn btn-default-dark btn-start">{lang.settings.flux_cloud.start_to_use}</a></div>
+                                    <div><a href="#studio/settings/setting-create-account" className="btn btn-confirm btn-start">{lang.settings.flux_cloud.start_to_use}</a></div>
                                     <div><a href="javascript:void(0);" className="font4 link-account">{lang.settings.flux_cloud.i_have_an_account}</a></div>
                                 </div>
                             </div>
