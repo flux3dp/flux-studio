@@ -13,7 +13,7 @@ define([
         var options = [],
             View = React.createClass({
                 componentDidMount: function() {
-                    $('#btn-set-printer').addClass('btn-default-dark');
+                    $('#btn-set-printer').addClass('btn-confirm');
                 },
                 _handleSetPrinter: function(name, password) {
                     console.log(name, password);
