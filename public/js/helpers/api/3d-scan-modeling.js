@@ -154,7 +154,7 @@ define([
                         next_right = parseInt(data.right, 10) * 24;
                     }
                     else if ('undefined' !== typeof data.status && 'ok' === data.status) {
-                        opts.onFinished(pointCloud.get());
+                        opts.onFinished(pointCloud.get().total);
                     }
 
                 };
