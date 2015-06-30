@@ -2,10 +2,10 @@
   "name": "flux-studio",
   "version": "1.0.0",
   "private": true,
-  "dependencies": {
-  },
+  "dependencies": {},
   "devDependencies": {
     "gulp": "~3.8.8",
-    "gulp-sass": "~2.0.1"
+    "gulp-sass": "~2.0.1",
+    "gulp-webserver": "~0.9.1"
   }
 }

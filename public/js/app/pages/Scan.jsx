@@ -21,6 +21,8 @@ define([
 
                 scan_modeling_websocket : null,
 
+                scan_modeling_image_method : null,
+
                 getInitialState: function() {
                     args.state.image_src = '';
 
@@ -68,7 +70,7 @@ define([
                 _refreshCamera: function() {
                     var self = this;
 
-                    this.scan_ctrl_websocket.getImage(
+                    self.scan_modeling_image_method = this.scan_ctrl_websocket.getImage(
                         function(e, fileEntry) {
                             self.setState({
                                 image_src: fileEntry.toURL()
@@ -136,7 +138,7 @@ define([
                                     console.log('dump finished');
                                 },
                                 onDumpReceiving = function(data, len) {
-                                    console.log('dump receiving');
+                                    console.log('dump receiving', data, len);
                                     onRendering(data, len);
                                 };
 
@@ -161,6 +163,7 @@ define([
                         },
                         openProgressBar = function(callback) {
                             require(['jsx!views/scan/Progress-Bar'], function(view) {
+                                self.scan_modeling_image_method.stop();
 
                                 args.disabledEscapeOnBackground = true;
                                 args.state.progressPercentage = 0;

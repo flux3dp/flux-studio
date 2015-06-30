@@ -4,8 +4,9 @@
  */
 define([
     'helpers/websocket',
-    'helpers/point-cloud'
-], function(Websocket, PointCloudHelper) {
+    'helpers/point-cloud',
+    'helpers/is-json'
+], function(Websocket, PointCloudHelper, isJson) {
     'use strict';
 
     return function(opts) {
@@ -15,7 +16,8 @@ define([
         var ws = new Websocket({
                 method: '3d-scan-modeling',
                 onMessage: function(result) {
-                    var data = ('string' === typeof result.data ? JSON.parse(result.data) : result.data),
+
+                    var data = (true === isJson(result.data) ? JSON.parse(result.data) : result.data),
                         error_code;
 
                     if ('string' === typeof data && true === data.startsWith('error')) {
@@ -89,7 +91,7 @@ define([
 
                 events.onMessage = function(data) {
 
-                    switch (data) {
+                    switch (data.status) {
                     case 'ok':
                         opts.onFinished();
                         break;
@@ -113,7 +115,7 @@ define([
 
                 events.onMessage = function(data) {
 
-                    switch (data) {
+                    switch (data.status) {
                     case 'ok':
                         opts.onFinished();
                         break;
@@ -126,7 +128,7 @@ define([
             merge: function(name, x1, x2, y1, y2) {
                 // TODO: to be implemented
             },
-            dump: function(name) {
+            dump: function(name, opts) {
                 opts.onFinished = opts.onFinished || function() {};
                 opts.onReceiving = opts.onReceiving || function() {};
 
@@ -147,17 +149,11 @@ define([
                     if (true === data instanceof Blob) {
                         pointCloud.push(data, next_left, next_right, _opts);
                     }
-                    else if ('string' === typeof data && true === data.startsWith('continue')) {
-                        data = data.split(' ');
-
-                        next_left = parseInt(data[1], 10) * 24;
-                        next_right = parseInt(data[2], 10) * 24;
+                    else if ('undefined' !== typeof data.status && 'continue' === data.status) {
+                        next_left = parseInt(data.left, 10) * 24;
+                        next_right = parseInt(data.right, 10) * 24;
                     }
-
-                    else if ('string' === typeof data && 'finished' === data) {
-                        // disconnect
-                        ws.send('quit');
-
+                    else if ('undefined' !== typeof data.status && 'ok' === data.status) {
                         opts.onFinished(pointCloud.get());
                     }
 
