@@ -97,9 +97,19 @@ define([
                         $img.one('load', function() {
                             $laser_platform.append($div);
 
+                            if ($img.width() > $laser_platform.width()) {
+                                $img.width(349);
+                            }
+
+                            if ($img.height() > $laser_platform.height()) {
+                                $img.height(349);
+                            }
+
+                            console.log($img.width(), $img.height());
+
                             $div.freetrans({
-                                x: $laser_platform.width() / 2,
-                                y: $laser_platform.height() / 2,
+                                x: $laser_platform.width() / 2 - $img.width() / 2,
+                                y: $laser_platform.height() / 2 - $img.height() / 2,
                                 onRotate: instantRefresh,
                                 onMove: instantRefresh,
                                 onScale: instantRefresh
