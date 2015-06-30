@@ -197,7 +197,6 @@ define([
 
                                             if (total_length === gcode_blob.size) {
                                                 control_methods = control(printer.serial, opts);
-
                                                 control_methods.upload(gcode_blob.size, gcode_blob);
                                             }
                                         }
@@ -216,7 +215,8 @@ define([
                                 obj.top_left.y,
                                 obj.bottom_right.x,
                                 obj.bottom_right.y,
-                                obj.rotate
+                                obj.rotate,
+                                $threshold.val()
                             ];
 
                             request_serial.push(request_header.join(','));
@@ -312,6 +312,7 @@ define([
 
             $ft_controls.each(function(k, el) {
                 var $el = $(el),
+                    image = new Image(),
                     width = $el.width(),
                     height = $el.height(),
                     top_left = getCenter($el.find('.ft-scaler-top.ft-scaler-left')),
@@ -337,21 +338,24 @@ define([
 
                 canvas.width = width;
                 canvas.height = height;
+                image.src = $el.parent().find('.ft-widget img').data('base');
 
-                ctx.drawImage(
-                    $el.parent().find('.ft-widget img')[0],
-                    0,
-                    0,
-                    width,
-                    height
-                );
-                image_blobs = grayScale(ctx.getImageData(0, 0, width, height).data);
+                image.onload = function() {
+                    ctx.drawImage(
+                        image,
+                        0,
+                        0,
+                        width,
+                        height
+                    );
+                    image_blobs = grayScale(ctx.getImageData(0, 0, width, height).data);
 
-                for (var i = 0; i < image_blobs.length; i += CHUNK_PKG_SIZE) {
-                    sub_data.data.push(convertToTypedArray(image_blobs.slice(i, i + CHUNK_PKG_SIZE), Uint8Array));
-                }
+                    for (var i = 0; i < image_blobs.length; i += CHUNK_PKG_SIZE) {
+                        sub_data.data.push(convertToTypedArray(image_blobs.slice(i, i + CHUNK_PKG_SIZE), Uint8Array));
+                    }
 
-                args.push(sub_data);
+                    args.push(sub_data);
+                };
             });
 
             // sending data
