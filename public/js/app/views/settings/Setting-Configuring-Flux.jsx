@@ -18,7 +18,7 @@ define([
                     };
                 },
                 componentDidMount: function() {
-                    $('#next').addClass('btn-default-dark');
+                    $('#next').addClass('btn-confirm');
                     setTimeout(() => { this._handleConfigured() }, 2000);
                 },
                 _handleNext: function() {
@@ -29,7 +29,7 @@ define([
                 },
                 _handleConfigured: function() {
                     this.setState({ configured: true }, function() {
-                        $('#btn-next').addClass('btn-default-dark');
+                        $('#btn-next').addClass('btn-confirm');
                     });
                 },
                 render : function() {

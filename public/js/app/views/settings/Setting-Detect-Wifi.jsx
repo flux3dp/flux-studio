@@ -13,7 +13,7 @@ define([
         var options = [],
             View = React.createClass({
                 componentDidMount: function() {
-                    $('#btn-start').addClass('btn-default-dark');
+                    $('#btn-start').addClass('btn-confirm');
                 },
                 _handleStartDetect: function() {
                     location.href = '#studio/settings/setting-select-wifi';

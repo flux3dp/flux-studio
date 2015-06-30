@@ -76,7 +76,7 @@ define([
                                 <input type="text" className="knob z-axis" onChange={this._handleZChange} />
                             </div>
                             <div className="controls pull-right">
-                                <a className="btn btn-default-light" onClick={this._handleResetRotation}>{lang.print.reset}</a>
+                                <a className="btn btn-default" onClick={this._handleResetRotation}>{lang.print.reset}</a>
                             </div>
                         </div>
                     </div>

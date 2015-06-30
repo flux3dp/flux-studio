@@ -158,7 +158,7 @@ define([
                             <div id="uploader" className="actions">
                                 <div>
                                     <button className="btn btn-default file-importer">
-                                        <span className="fa fa-plus"></span>
+                                        <div className="fa fa-plus"></div>
                                         {lang.print.import}
                                         <input type="file" onChange={this._handleFileUpload} />
                                     </button>

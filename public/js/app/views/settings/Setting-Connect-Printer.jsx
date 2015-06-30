@@ -43,7 +43,7 @@ define([
                                     </div>
                                 </div>
                                 <div className="actions">
-                                    <a href="#studio/settings/flux-cloud" className="btn btn-default-dark btn-long">{lang.settings.done}</a>
+                                    <a href="#studio/settings/flux-cloud" className="btn btn-confirm btn-long">{lang.settings.done}</a>
                                 </div>
                             </div>
                         </div>

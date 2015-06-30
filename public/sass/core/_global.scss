@@ -96,6 +96,15 @@ a {
     }
 }
 
+.btn-confirm {
+    background-color: #424242;
+    color: #FFF;
+
+    &:hover {
+        background-color: #000000;
+    }
+}
+
 .btn-action {
     background: #00C853;
     color: #fff;

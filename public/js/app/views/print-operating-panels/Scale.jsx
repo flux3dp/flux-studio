@@ -51,7 +51,7 @@ define([
                                 <input type="text" />
                             </div>
                             <div clasName="controls">
-                                <a className="btn btn-default-light" onClick={this._handleReset}>{lang.print.reset}</a>
+                                <a className="btn btn-default" onClick={this._handleReset}>{lang.print.reset}</a>
                             </div>
                         </div>
                     </div>

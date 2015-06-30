@@ -102,6 +102,7 @@
     overflow: hidden;;
     border: 1px solid #ccc;
     background-color: #FFFFFF;
+    padding-left: 10px;
 }
 
 .settings footer {
@@ -208,7 +209,7 @@
     width:90%;
 }
 
-.settings .main.cloud .btn-default-light {
+.settings .main.cloud .btn-default {
     width: 145px;
     height: 34px;
     line-height: 34px;
@@ -299,7 +300,7 @@
     text-align: center;
 }
 
-.settings .create-account .btn-default-dark {
+.settings .create-account .btn-confirm {
     width: 100%;
     margin: 10px 0;
 }
@@ -319,7 +320,7 @@
     margin-top: 5px;
 }
 
-.settings .activation-notice .btn-default-dark {
+.settings .activation-notice .btn-confirm {
     margin-top: 20px;
 }
 
@@ -392,7 +393,7 @@
     color: #4A4A4A;
 }
 
-.settings .printer .btn-default-light {
+.settings .printer .btn-default {
     width: 145px;
     height: 34px;
     border: 1px #E0E0E0 solid;
@@ -480,7 +481,7 @@
 
 /*detect new wifi*/
 
-.settings .wifi .btn.btn-default-dark {
+.settings .wifi .btn.btn-confirm {
     margin-top: 30px;
 }
 
