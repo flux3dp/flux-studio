@@ -105,8 +105,6 @@ define([
                                 $img.height(349);
                             }
 
-                            console.log($img.width(), $img.height());
-
                             $div.freetrans({
                                 x: $laser_platform.width() / 2 - $img.width() / 2,
                                 y: $laser_platform.height() / 2 - $img.height() / 2,
