@@ -2,13 +2,12 @@ define([
     'jquery',
     'react',
     'jsx!widgets/Popup',
-    'jsx!widgets/Select',
-    'jsx!widgets/List',
-    'helpers/websocket',
     'app/actions/scaned-model',
-    'helpers/file-system',
+    'helpers/api/3d-scan-control',
+    'helpers/api/3d-scan-modeling',
+    'jsx!views/scan/Setup-Panel',
     'threejs'
-], function($, React, popup, SelectView, ListView, WebSocket, scanedModel, fileSystem) {
+], function($, React, popup, scanedModel, scanControl, scanModeling, SetupPanel) {
     'use strict';
 
     return function(args) {
@@ -18,13 +17,9 @@ define([
                 // counter
                 scan_times: ('start' === args.step ? 1 : 0),
 
-                image_timer: null,
+                scan_ctrl_websocket : null,
 
-                // web socket
-                ws: null,
-
-                // web socket statud
-                ws_is_connected: false,
+                scan_modeling_websocket : null,
 
                 getInitialState: function() {
                     args.state.image_src = '';
@@ -34,13 +29,19 @@ define([
 
                 componentDidMount: function() {
                     if ('start' === args.step) {
+                        this.scan_ctrl_websocket = scanControl('5ZMPBF415VH67ARLGGFWNKCSP');
+                        this.scan_modeling_websocket = scanModeling();
                         this._refreshCamera();
                     }
                 },
 
                 componentWillUnmount: function() {
-                    if (false === location.hash.startsWith('#studio/scan')) {
-                        this.ws.close(false);
+                    if (false === location.hash.startsWith('#studio/scan') &&
+                        null !== this.scan_ctrl_websocket &&
+                        null !== this.scan_modeling_websocket
+                    ) {
+                        this.scan_ctrl_websocket.connection.close(false);
+                        this.scan_modeling_websocket.connection.close(false);
                     }
                 },
 
@@ -59,116 +60,44 @@ define([
                     require(['jsx!views/scan/Export'], function(view) {
                         var popup_window;
 
-                        args.disabledEscapeOnBackground = true;
-
                         popup_window = popup(view, args);
                         popup_window.open();
                     });
                 },
 
                 _refreshCamera: function() {
-                    var self = this,
-                        allow_to_get = true,
-                        gettingCameraImage = function(result) {
-                            var data = result.data,
-                                image_blobs = [],
-                                onComplete = function(e, fileEntry) {
-                                    self.setState({
-                                        image_src: fileEntry.toURL()
-                                    });
-                                    allow_to_get = true;
-                                },
-                                file;
+                    var self = this;
 
-                            if ('object' === typeof data) {
-                                image_blobs.push(result.data);
-                            }
-                            else if ('connected' === data) {
-                                self.ws_is_connected = true;
-                            }
-                            else if ('finished' === data) {
-                                file = new File(
-                                    image_blobs,
-                                    'scan.png'
-                                );
-
-                                allow_to_get = false;
-
-                                fileSystem.writeFile(
-                                    file,
-                                    {
-                                        onComplete: onComplete
-                                    }
-                                );
-                            }
-                        },
-                        getImage = function() {
-                            self.ws.send('image');
-                        };
-
-                    self.ws = new WebSocket({
-                        // TODO: To get available device
-                        method: '3d-scan-control/5ZMPBF415VH67ARLGGFWNKCSP'
-                    });
-
-                    self.ws.onMessage(gettingCameraImage);
-
-                    self.image_timer = setInterval(function() {
-                        if (true === allow_to_get) {
-                            getImage();
+                    this.scan_ctrl_websocket.getImage(
+                        function(e, fileEntry) {
+                            self.setState({
+                                image_src: fileEntry.toURL()
+                            });
                         }
-                    }, 500);
-
+                    );
                 },
 
                 _startScan: function(e) {
                     location.hash = 'studio/scan/start';
                 },
 
-                _handleScan: function(e) {
+                _handleScan: function(e, refs) {
                     var self = this,
-                        ws = self.ws,
-                        model_blobs = [],
-                        scan_speed = parseInt(this.refs.scan_speed.getDOMNode().value, 10),
+                        scan_speed = parseInt(refs.scan_speed.getDOMNode().value, 10),
                         mesh = null,
                         popup_window,
+                        onRendering = function(views, chunk_length) {
+                            var remaining_sec = (scan_speed - chunk_length) * (20 * 60 / scan_speed),
+                                remaining_min = Math.floor(remaining_sec / 60);
 
-                        gettingScanedModel = function(result) {
-                            var data = result.data,
-                                fileReader = new FileReader(),
-                                typedArray, blob;
+                            remaining_sec = remaining_sec % (remaining_min * 60);
 
-                            if ('object' === typeof data) {
-                                model_blobs.push(data);
+                            args.state.progressPercentage = (chunk_length / scan_speed * 100).toString().substr(0, 5);
 
-                                // update progress percentage
-                                args.state.progressPercentage = (model_blobs.length / scan_speed * 100).toString().substr(0, 5);
-
-                                // refresh model every time
-                                fileReader.onload = function(progressEvent) {
-                                    typedArray = new Float32Array(this.result);
-
-                                    renderringModel(typedArray);
-                                };
-
-                                blob = new Blob(model_blobs, {type: 'text/plain'});
-                                fileReader.readAsArrayBuffer(blob);
+                            // update remaining time every 20 chunks
+                            if (0 === chunk_length % 20) {
+                                args.state.progressRemainingTime = remaining_min + 'm' + remaining_sec + 's';
                             }
-                            else if ('finished' === data) {
-                                popup_window.close();
-
-                                // disconnect
-                                ws.send('quit');
-
-                                // update scan times
-                                self.scan_times = self.scan_times + 1;
-
-                                self.setState({
-                                    scan_times : self.scan_times
-                                });
-                            }
-                        },
-                        renderringModel = function(views) {
 
                             if (null === mesh) {
 
@@ -179,9 +108,79 @@ define([
                             }
 
                             window.mesh = mesh;
-                        };
+                        },
+                        onScanFinished = function(point_cloud) {
+                            var upload_name = 'scan-' + (new Date()).getTime(),
+                                delete_noise_name = upload_name + '-d',
+                                onUploadFinished = function() {
+                                    // delete noise
+                                    self.scan_modeling_websocket.delete_noise(
+                                        upload_name,
+                                        delete_noise_name,
+                                        0.3,
+                                        {
+                                            onFinished: onDeleteNoiseFinished
+                                        }
+                                    );
+                                },
+                                onDeleteNoiseFinished = function() {
+                                    self.scan_modeling_websocket.dump(
+                                        delete_noise_name,
+                                        {
+                                            onFinished: onDumpFinished,
+                                            onReceiving: onDumpReceiving,
+                                        }
+                                    );
+                                },
+                                onDumpFinished = function() {
+                                    console.log('dump finished');
+                                },
+                                onDumpReceiving = function(data, len) {
+                                    console.log('dump receiving');
+                                    onRendering(data, len);
+                                };
 
-                    clearInterval(self.image_timer);
+                            popup_window.close();
+
+                            // update scan times
+                            self.scan_times = self.scan_times + 1;
+
+                            self.setState({
+                                scan_times : self.scan_times
+                            });
+
+                            // TODO: show operation panel
+                            self.scan_modeling_websocket.upload(
+                                upload_name,
+                                point_cloud,
+                                {
+                                    onFinished: onUploadFinished
+                                }
+                            );
+
+                        },
+                        openProgressBar = function(callback) {
+                            require(['jsx!views/scan/Progress-Bar'], function(view) {
+
+                                args.disabledEscapeOnBackground = true;
+                                args.state.progressPercentage = 0;
+                                args.state.progressRemainingTime = '20m0s';
+
+                                popup_window = popup(view, args);
+                                popup_window.open();
+
+                                callback();
+
+                            });
+                        },
+                        onScan = function() {
+                            var opts = {
+                                onRendering: onRendering,
+                                onFinished: onScanFinished
+                            };
+
+                            self.scan_ctrl_websocket.scan(opts);
+                        };
 
                     scanedModel.init();
 
@@ -189,56 +188,67 @@ define([
                         is_scan_started: true
                     });
 
-                    require(['jsx!views/scan/Progress-Bar'], function(view) {
-
-                        args.disabledEscapeOnBackground = true;
-                        args.state.progressPercentage = 0;
-
-                        popup_window = popup(view, args);
-                        popup_window.open();
-
-                        if (true === self.ws_is_connected) {
-                            ws.send('start').onMessage(gettingScanedModel);
-                        }
-                        else {
-                            // TODO: error occurs
-                        }
-
-                    });
+                    openProgressBar(onScan);
                 },
 
-                render : function() {
+                _renderHeader: function() {
                     var state = this.state,
                         cx = React.addons.classSet,
                         lang = state.lang,
+                        header_class;
+
+                    header_class = cx({
+                        'top-menu-bar' : true,
+                        'btn-h-group'  : true,
+                        'invisible'    : 2 > state.scan_times
+                    });
+
+                    return (
+                        <header ref="header" className={header_class}>
+                            <button className="btn btn-default fa fa-undo" onClick={this._rescan}>{lang.scan.rescan}</button>
+                            <button className="btn btn-default fa fa-paper-plane" onClick={this._saveAs}>{lang.scan.export}</button>
+                            <button className="btn btn-default fa fa-floppy-o">{lang.scan.share}</button>
+                            <button className="btn btn-default fa fa-eye">{lang.scan.print_with_flux}</button>
+                        </header>
+                    );
+                },
+
+                _renderBeginingSection: function() {
+                    return (
+                        <section className="starting-section">
+                            <img className="launch-img absolute-center" src="http://placehold.it/280x193" onClick={this._startScan}/>
+                        </section>
+                    );
+                },
+
+                _renderSettingPanel: function() {
+                    var state = this.state,
                         start_scan_text,
-                        header_class,
-                        camera_image_class,
-                        starting_section,
-                        operating_section;
+                        lang = state.lang;
 
-                    state.scan_times = state.scan_times || this.scan_times || 0;
+                    // TODO: setting up remaining time
+                    lang.scan.remaining_time = '26min';
 
-                    start_scan_text = (
+                    lang.scan.start_scan_text = (
                         1 < state.scan_times
                         ? lang.scan.start_multiscan
                         : lang.scan.start_scan
                     );
 
-                    header_class = cx({
-                        'scan-herader' : true,
-                        'invisible'    : 2 > state.scan_times
-                    });
+                    return (
+                        <SetupPanel
+                            lang = {lang}
+                            onScanClick = {this._handleScan}>
+                        </SetupPanel>
+                    );
+                },
 
-                    starting_section = cx({
-                        'starting-section' : true,
-                        'hide' : 0 < state.scan_times
-                    });
-
-                    operating_section = cx({
-                        'operating-section' : true,
-                        'hide' : 0 === state.scan_times
-                    });
+                _renderStageSection: function() {
+                    var state = this.state,
+                        cx = React.addons.classSet,
+                        camera_image_class,
+                        settingPanel = this._renderSettingPanel(),
+                        lang = state.lang;
 
                     camera_image_class = cx({
                         'camera-image' : true,
@@ -246,72 +256,45 @@ define([
                     });
 
                     return (
+                        <section className="operating-section">
+
+                            {settingPanel}
+
+                            <div id="model-displayer" className="model-displayer">
+                                <img src={this.state.image_src} className={camera_image_class}/>
+                            </div>
+                        </section>
+                    );
+                },
+
+                render : function() {
+                    var state = this.state,
+                        cx = React.addons.classSet,
+                        lang = state.lang,
+                        activeSection,
+                        header;
+
+                    state.scan_times = this.scan_times || state.scan_times || 0;
+                    header = this._renderHeader();
+
+                    activeSection = (
+                        0 === state.scan_times ?
+                        this._renderBeginingSection() :
+                        this._renderStageSection()
+                    );
+
+                    return (
                         <div className="studio-container scan-studio">
-                            <header ref="header" className={header_class}>
-                                <button className="btn fa fa-undo" onClick={this._rescan}>{lang.scan.rescan}</button>
-                                <button className="btn fa fa-paper-plane" onClick={this._saveAs}>{lang.scan.export}</button>
-                                <button className="btn fa fa-floppy-o">{lang.scan.share}</button>
-                                <button className="btn fa fa-eye">{lang.scan.print_with_flux}</button>
-                            </header>
+
+                            {header}
+
                             <div className="section-container">
-                                <section className={starting_section}>
-                                    <img className="launch-img absolute-center" src="http://placehold.it/280x193" onClick={this._startScan}/>
-                                </section>
-                                <section className={operating_section}>
-                                    <div id="operating-panel" className="operating-panel">
-                                        <div className="panel print-params">
-                                            <div>
-                                                <h2>
-                                                    <span className="fa fa-clock-o"></span>
-                                                    26min
-                                                </h2>
-                                                <div className="row-fluid clearfix">
-                                                    <div className="col span3">
-                                                        <span className="param-icon fa fa-print"></span>
-                                                    </div>
-                                                    <div className="param col span9">
-                                                        <h4>
-                                                            {lang.scan.scan_params.scan_speed.text}
-                                                        </h4>
-                                                        <p>
-                                                            <SelectView ref="scan_speed" className="span12" options={lang.scan.scan_params.scan_speed.options}/>
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                                <div className="row-fluid clearfix">
-                                                    <div className="col span3">
-                                                        <span className="param-icon fa fa-lightbulb-o"></span>
-                                                    </div>
-                                                    <div className="param col span9">
-                                                        <h4>
-                                                            {lang.scan.scan_params.object.text}
-                                                            <div className="tooltip">
-                                                                <div className="tooltip-content">
-                                                                    {lang.scan.scan_params.object.tooltip.text}
-                                                                    <ListView className="illumination" items={lang.scan.scan_params.object.tooltip.items}/>
-                                                                </div>
-                                                            </div>
-                                                        </h4>
-                                                        <p>
-                                                            <SelectView className="span12" options={lang.scan.scan_params.object.options}/>
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div>
-                                                <button id="btn-scan" onClick={this._handleScan} className="btn span12 fa fa-bullseye">
-                                                    {start_scan_text}
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div id="model-displayer" className="model-displayer">
-                                        <img src={this.state.image_src} className={camera_image_class}/>
-                                    </div>
-                                </section>
+
+                                {activeSection}
+
                             </div>
                         </div>
-                    )
+                    );
                 }
 
             });

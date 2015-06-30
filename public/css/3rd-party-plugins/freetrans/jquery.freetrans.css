@@ -7,6 +7,7 @@
 }
 
 .ft-controls {
+    cursor: move;
 	position: absolute;
 	width: 100%;
 	height: 100%;
@@ -14,6 +15,7 @@
 }
 
 .ft-scaler {
+    cursor: crosshair;
     position: absolute;
     width: 8px;
     height: 8px;
@@ -48,6 +50,7 @@
 }
 
 .ft-rotator{
+    cursor: -webkit-grabbing;
     position: absolute;
     width: 16px;
     height: 16px;

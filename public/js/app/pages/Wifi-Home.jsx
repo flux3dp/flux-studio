@@ -21,7 +21,7 @@ define([
                             <h2>{this.state.lang.wifi.home.line1}</h2>
                             <p>{this.state.lang.wifi.home.line2}</p>
                             <div>
-                                <a href="#initialize/wifi/select" className="btn btn-large">{this.state.lang.wifi.home.select}</a>
+                                <a href="#initialize/wifi/select" className="btn btn-action btn-large">{this.state.lang.wifi.home.select}</a>
                             </div>
                             <div>
                                 <a href="#initialize/wifi/flux-as-wifi-1">{this.state.lang.wifi.home.no_available_wifi}</a>

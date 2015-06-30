@@ -30,7 +30,7 @@ define([
                             <h2>{lang.wifi.setup_complete.caption}</h2>
                             <p>{lang.wifi.setup_complete.description}</p>
                             <div>
-                                <button className="btn btn-large" onClick={this._handleStartClick}>{lang.wifi.setup_complete.start}</button>
+                                <button className="btn btn-action btn-large" onClick={this._handleStartClick}>{lang.wifi.setup_complete.start}</button>
                             </div>
                         </div>
                     </div>

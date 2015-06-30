@@ -5,6 +5,7 @@
   "dependencies": {
   },
   "devDependencies": {
+    "gulp": "~3.8.8",
     "gulp-sass": "~2.0.1"
   }
 }

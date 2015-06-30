@@ -277,8 +277,8 @@ define(function() {
             save: 'Save',
             acceptable_files: 'JPG, PNG, PDF, AI',
             drop_files_to_import: 'Drop your file here or click "import" to upload your file',
-            change_setup: 'Change Setup',
-            start_laser: 'Start',
+            advenced: 'Advenced',
+            start_laser: 'LASER',
             print_params: {
                 method: {
                     text: 'Method',
@@ -328,6 +328,10 @@ define(function() {
                             label: 'inches'
                         }
                     ]
+                },
+                threshold: {
+                    text: 'Threshold',
+                    default: 128
                 }
             }
         },
@@ -340,6 +344,7 @@ define(function() {
             print_with_flux: 'Print with FLUX',
             convert_to_3d_model: 'Convert to 3D model...',
             complete: 'Complete',
+            remaining_time: 'Remaining Time',
             save_as: 'Save as',
             do_save: 'Save',
             save_mode: [
@@ -380,21 +385,25 @@ define(function() {
                             value: 'manually',
                             label: 'Manually'
                         }
-                    ],
-                    tooltip: {
-                        text: '依據你的物件狀態，你可以選擇不同的亮度',
-                        items: [
-                            {
-                                label: 'Light'
-                            },
-                            {
-                                label: 'Normal'
-                            },
-                            {
-                                label: 'Dark'
-                            }
-                        ]
-                    }
+                    ]
+                },
+                luminance: {
+                    text: 'Luminance',
+                    options: [
+                        {
+                            value: 'light',
+                            label: 'Light',
+                            selected: true
+                        },
+                        {
+                            value: 'normal',
+                            label: 'Normal'
+                        },
+                        {
+                            value: 'dark',
+                            label: 'Dark'
+                        }
+                    ]
                 }
             }
         }

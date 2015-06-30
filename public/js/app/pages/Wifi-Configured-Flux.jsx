@@ -29,7 +29,7 @@ define([
                             <h2>{lang.wifi.configured_flux.caption}</h2>
                             <p>{lang.wifi.configured_flux.description}</p>
                             <div>
-                                <button className="btn btn-large" onClick={this._next}>
+                                <button className="btn btn-action btn-large" onClick={this._next}>
                                     {lang.wifi.configured_flux.next}
                                 </button>
                             </div>

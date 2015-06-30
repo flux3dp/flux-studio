@@ -139,7 +139,7 @@ define([
                         FileSystem.writeFile(
                             files.item(i),
                             {
-                                onComplete: (e, fileEntry) => {
+                                onComplete: function(e, fileEntry) {
                                     printEvents.appendModel(fileEntry.toURL());
                                 }
                             }
@@ -154,48 +154,26 @@ define([
                         previewClass    = ClassNames('preview', {hide: !this.state.showPreviewModeList});
 
                     return (
-                        <header>
+                        <header className="top-menu-bar">
                             <div id="uploader" className="actions">
                                 <div>
-                                    <button className="btn btn-default-light file-importer">
+                                    <button className="btn btn-default file-importer">
                                         <span className="fa fa-plus"></span>
                                         {lang.print.import}
                                         <input type="file" onChange={this._handleFileUpload} />
                                     </button>
                                 </div>
                                 <div>
-                                    <button className="btn btn-default-light tip" data-tip={lang.print.go_home}>
+                                    <button className="btn btn-default tip" data-tip={lang.print.go_home}>
                                         <div className="fa fa-home"></div>
                                     </button>
                                 </div>
                                 <div>
-                                    <button className="btn btn-default-light tip" data-tip={lang.print.save}>
+                                    <button className="btn btn-default tip" data-tip={lang.print.save}>
                                         <div className="fa fa-floppy-o"></div>
                                     </button>
                                 </div>
                             </div>
-
-                            {/*<<div className="pull-right">
-                                <span className="fa fa-print icon"></span>
-                                <span>{lang.print.quick_print}</span>
-                                <span className="fa fa-caret-down icon"></span>
-                            </div>
-
-                            div className="pull-right preview-container" onClick={this._handleShowPreviewSelection}>
-                                <span className="fa fa-eye icon"></span>
-                                <span>{currentMode}</span>
-                                <span className="fa fa-caret-down icon"></span>
-                                <ul className={previewClass}>
-                                    <li onClick={this._handlePreviewModeChange.bind(null, 'support')}>
-                                        <div>
-                                            {lang.print.support_preview} <span className={supportClass}></span>
-                                        </div></li>
-                                    <li onClick={this._handlePreviewModeChange.bind(null, 'normal')}>
-                                        <div>
-                                            {lang.print.normal_preview} <span className={normalClass}></span>
-                                        </div></li>
-                                </ul>
-                            </div>*/}
                         </header>
                     );
                 },

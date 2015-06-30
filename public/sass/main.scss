@@ -2,10 +2,14 @@
 @import "core/normalize";
 @import "core/font-awesome";
 @import "core/variables";
-@import "core/global";
 
 // mixins
-// @import "mixins/xxx";
+@import "mixins/flexbox";
+@import "mixins/absolute-center";
+
+// global style
+@import "core/global";
+
 
 // views
 // @import "views/xxx";
@@ -16,3 +20,5 @@
 @import "pages/usb";
 @import "pages/welcome";
 @import "pages/wifi";
+@import "pages/laser";
+@import "pages/scan";
