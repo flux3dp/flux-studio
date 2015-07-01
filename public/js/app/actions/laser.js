@@ -60,21 +60,12 @@ define([
                         height
                     );
 
-                    imageData = new ImageData(
-                        convertToTypedArray(grayScale(ctx.getImageData(0, 0, width, height).data, opts), Uint8ClampedArray),
-                        width,
-                        height
-                    );
+                    imageData = ctx.createImageData(width, height);
+                    imageData.data.set(convertToTypedArray(grayScale(ctx.getImageData(0, 0, width, height).data, opts), Uint8ClampedArray));
 
                     ctx.putImageData(imageData, 0, 0);
 
-                    ctx.fillStyle = '#fff';
-                    // refers to: https://developer.mozilla.org/zh-TW/docs/Web/Guide/HTML/Canvas_tutorial/Compositing
-                    // background is always white
-                    ctx.globalCompositeOperation = 'destination-over';
-                    ctx.fillRect(0, 0, width, height);
-
-                    $img.attr('src', canvas.toDataURL('image/jpeg'));
+                    $img.attr('src', canvas.toDataURL('image/png'));
                 };
 
                 canvas.width = width;
