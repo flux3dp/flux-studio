@@ -2,19 +2,19 @@ define([
     'jquery',
     'helpers/file-system',
     'helpers/websocket',
+    'helpers/api/bitmap-laser-parser',
     'helpers/grayscale',
     'helpers/convertToTypedArray',
     'helpers/api/discover',
     'helpers/api/touch',
     'helpers/api/control',
     'freetrans'
-], function($, fileSystem, WebSocket, grayScale, convertToTypedArray, discover, touch, control) {
+], function($, fileSystem, WebSocket, bitmapLaserParser, grayScale, convertToTypedArray, discover, touch, control) {
     'use strict';
 
     return function(args) {
 
         var DIAMETER = 170,    // 170mm
-            CHUNK_PKG_SIZE = 4096,
             DELECT_KEY_CODE = 68,
             LASER_IMG_CLASS = 'img-container',
             $uploader = $('.file-importer'),
@@ -164,99 +164,26 @@ define([
                 return Math.round(Math.atan2(b, a) * (180 / Math.PI));
             },
             sendingToLaser = function(args) {
-                var isReady = function() {
-                        var request_serial = [],
-                            accept_times = 0,
-                            index = 0,
-                            go_next = false,
-                            timer, next_data, request_header;
 
-                        ws.onMessage(function(result) {
-                            var data = JSON.parse(result.data),
-                                blobs = [],
-                                total_length = 0;
-
-                            switch (data.status) {
-                            case 'continue':
-                                go_next = true;
-                                break;
-                            case 'accept':
-                                go_next = true;
-                                accept_times++;
-
-                                if (args.length === accept_times) {
-                                    ws.send('go').onMessage(function(result) {
-                                        var data = ('string' === typeof result.data ? JSON.parse(result.data) : result.data),
-                                            blob_length = 0,
-                                            gcode_blob,
-                                            control_methods,
-                                            opts;
-
-                                        if ('processing' === data.status) {
-                                            // TODO: update progress
-                                        }
-                                        else if ('complete' === data.status) {
-                                            total_length = data.length;
-                                        }
-                                        else if ('object' === typeof data) {
-                                            blobs.push(data);
-                                            gcode_blob = new Blob(blobs);
-
-                                            if (total_length === gcode_blob.size) {
-                                                control_methods = control(printer.serial, opts);
-                                                control_methods.upload(gcode_blob.size, gcode_blob);
-                                            }
-                                        }
-                                    });
-                                }
-
-                                break;
-                            }
+                var laserParser = bitmapLaserParser(),
+                    onSetupFinished = function() {
+                        laserParser.uploadBitmap(args, {
+                            onFinished: onUploadFinish
                         });
-
-                        args.forEach(function(obj) {
-                            request_header = [
-                                obj.width,
-                                obj.height,
-                                obj.top_left.x,
-                                obj.top_left.y,
-                                obj.bottom_right.x,
-                                obj.bottom_right.y,
-                                obj.rotate,
-                                $threshold.val()
-                            ];
-
-                            request_serial.push(request_header.join(','));
-                            request_serial = request_serial.concat(obj.data);
-                        });
-
-                        timer = setInterval(function() {
-                            if (0 === index || true === go_next) {
-                                next_data = request_serial[index];
-
-                                if ('string' === typeof next_data) {
-                                    go_next = false;
-                                }
-
-                                ws.send(next_data);
-                                index++;
-                            }
-
-                            if (index >= request_serial.length) {
-                                clearInterval(timer);
-                            }
-                        }, 0);
                     },
-                    ws = new WebSocket({
-                        method: 'bitmap-laser-parser',
-                        onMessage: function(result) {
-                            var data = JSON.parse(result.data);
+                    onUploadFinish = function() {
+                        laserParser.getGCode({
+                            onFinished: onGetGCodeFinished
+                        });
+                    },
+                    onGetGCodeFinished = function(blob) {
+                        var control_methods = control(printer.serial);
+                        control_methods.upload(blob.size, blob);
+                    };
 
-                            if ('ok' === data.status) {
-                                isReady();
-                            }
-                        }
-                    }).send('0,1,wood');
+                laserParser.setup(0, [1, 'wood'], {
+                    onFinished: onSetupFinished
+                });
 
             },
             refreshObjectParams = function($el) {
@@ -324,20 +251,15 @@ define([
                     height = $el.height(),
                     top_left = getCenter($el.find('.ft-scaler-top.ft-scaler-left')),
                     bottom_right = getCenter($el.find('.ft-scaler-bottom.ft-scaler-right')),
-                    pos = $el.position(),
                     sub_data = {
                         width: width,
                         height: height,
-                        top_left: {
-                            x: convertToRealCoordinate(top_left.x, 'x'),
-                            y: convertToRealCoordinate(top_left.y, 'y')
-                        },
-                        bottom_right: {
-                            x: convertToRealCoordinate(bottom_right.x, 'x'),
-                            y: convertToRealCoordinate(bottom_right.y, 'y')
-                        },
+                        tl_position_x: convertToRealCoordinate(top_left.x, 'x'),
+                        tl_position_y: convertToRealCoordinate(top_left.y, 'y'),
+                        br_position_x: convertToRealCoordinate(bottom_right.x, 'x'),
+                        br_position_y: convertToRealCoordinate(bottom_right.y, 'y'),
                         rotate: (Math.PI * getAngle(el) / 180) * -1,
-                        data: []
+                        threshold: $threshold.val()
                     },
                     canvas = document.createElement('canvas'),
                     ctx = canvas.getContext('2d'),
@@ -355,18 +277,16 @@ define([
                         width,
                         height
                     );
-                    image_blobs = grayScale(ctx.getImageData(0, 0, width, height).data);
-
-                    for (var i = 0; i < image_blobs.length; i += CHUNK_PKG_SIZE) {
-                        sub_data.data.push(convertToTypedArray(image_blobs.slice(i, i + CHUNK_PKG_SIZE), Uint8Array));
-                    }
+                    sub_data.image_data = grayScale(ctx.getImageData(0, 0, width, height).data);
 
                     args.push(sub_data);
+
+                    if (args.length === $ft_controls.length) {
+                        // sending data
+                        sendingToLaser(args);
+                    }
                 };
             });
-
-            // sending data
-            sendingToLaser(args);
         });
 
         $('.instant-change').on('focus', function(e) {
