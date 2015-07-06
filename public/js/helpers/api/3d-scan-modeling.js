@@ -32,7 +32,6 @@ define([
 
                 }
             }),
-            lastOrder = '',
             lastMessage = '',
             events = {
                 onMessage: function() {}
@@ -43,9 +42,9 @@ define([
             upload: function(name, point_cloud, opts) {
                 opts.onFinished = opts.onFinished || function() {};
 
-                var lastOrder = 'upload',
+                var order_name = 'upload',
                     args = [
-                        lastOrder,
+                        order_name,
                         name,
                         point_cloud.left.size / 24,
                         point_cloud.right.size / 24 || 0
@@ -77,9 +76,9 @@ define([
             cut: function(in_name, out_name, mode, direction, value) {
                 opts.onFinished = opts.onFinished || function() {};
 
-                var lastOrder = 'cut',
+                var order_name = 'cut',
                     args = [
-                        lastOrder,
+                        order_name,
                         in_name,
                         out_name,
                         mode,
@@ -105,9 +104,9 @@ define([
 
                 opts.onFinished = opts.onFinished || function() {};
 
-                var lastOrder = 'delete_noise',
+                var order_name = 'delete_noise',
                     args = [
-                        lastOrder,
+                        order_name,
                         in_name,
                         out_name,
                         c = ('number' === typeof c ? c : 0.3)   // default by 0.3
@@ -132,9 +131,9 @@ define([
                 opts.onFinished = opts.onFinished || function() {};
                 opts.onReceiving = opts.onReceiving || function() {};
 
-                var lastOrder = 'dump',
+                var order_name = 'dump',
                     args = [
-                        lastOrder,
+                        order_name,
                         name
                     ],
                     pointCloud = new PointCloudHelper(),
