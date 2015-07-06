@@ -146,9 +146,12 @@ function(React, $, Backbone, display, globalEvents) {
             });
         },
 
-        laser: function() {
+        laser: function(step) {
             require(['jsx!pages/Laser'], function(view) {
-                _display(view);
+                var args = {
+                    step: step
+                };
+                _display(view, args);
             });
         },
 
