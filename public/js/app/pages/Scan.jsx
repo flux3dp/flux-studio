@@ -291,7 +291,7 @@ define([
 
                             {header}
 
-                            <div className="section-container">
+                            <div className="stage">
 
                                 {activeSection}
 
