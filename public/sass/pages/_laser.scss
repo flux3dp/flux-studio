@@ -3,14 +3,17 @@
  */
 .laser-studio {
 
+    .operating-panel {
+        left: 20px;
+        top: 20px;
+        width: 182px;
+    }
+
     .fa::before {
         margin: 0 5px 0 0;
     }
 
-    .model-displayer {
-        height: calc(100% - 66px);
-        position: relative;
-
+    .stage {
         .file-importer {
             border: 2px dashed #CCC;
             height: 500px;
@@ -151,27 +154,6 @@
 
     .objects-params {
         left: 25px;
-    }
-
-    .print-params {
-        padding: 0 16px 20px 16px;
-
-        .estimated-time {
-            line-height: 40px;
-            margin: 0;
-        }
-
-        .caption {
-            margin: 0;
-        }
-
-        .fa::before {
-            background: #ccc;
-            border-radius: 50%;
-            font-size: 1.2rem;
-            margin: 0 5px;
-            padding: 5px;
-        }
     }
 
     .btn-start {
