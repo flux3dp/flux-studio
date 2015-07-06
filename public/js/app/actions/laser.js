@@ -30,13 +30,15 @@ define([
             deleteImage = function() {
                 var $img_container = $('.' + LASER_IMG_CLASS);
 
-                $target_image.parents('.ft-container').remove();
+                if (null !== $target_image) {
+                    $target_image.parents('.ft-container').remove();
 
-                if (0 === $img_container) {
-                    $target_image = null;
-                }
-                else {
-                    $target_image = $img_container[0];
+                    if (0 === $img_container) {
+                        $target_image = null;
+                    }
+                    else {
+                        $target_image = $img_container[0];
+                    }
                 }
             },
             refreshImage = function($img) {
@@ -74,65 +76,71 @@ define([
                 img.src = $img.data('base');
             },
             readfiles = function(files) {
-                var onComplete = function(e, fileEntry) {
-                        var $div = $(document.createElement('div')).addClass(LASER_IMG_CLASS).data('index', $('.' + LASER_IMG_CLASS).length),
-                            img = new Image(),
-                            url = fileEntry.toURL(),
-                            $img = $(img).data('base', url),
-                            instantRefresh = function(e, data) {
-                                refreshObjectParams($div);
-                            };
+                var onComplete = function(index, total) {
+                        return function(e, fileEntry) {
+                            var $div = $(document.createElement('div')).addClass(LASER_IMG_CLASS).data('index', $('.' + LASER_IMG_CLASS).length),
+                                img = new Image(),
+                                url = fileEntry.toURL(),
+                                $img = $(img).data('base', url),
+                                instantRefresh = function(e, data) {
+                                    refreshObjectParams($div);
+                                };
 
-                        $img.addClass(url.substr(-3));
+                            $img.addClass(fileEntry.fileExtension);
 
-                        $img.one('load', function() {
-                            $laser_platform.append($div);
+                            $img.one('load', function() {
+                                $laser_platform.append($div);
 
-                            if ($img.width() > $laser_platform.width()) {
-                                $img.width(349);
-                            }
+                                if ($img.width() > $laser_platform.width()) {
+                                    $img.width(349);
+                                }
 
-                            if ($img.height() > $laser_platform.height()) {
-                                $img.height(349);
-                            }
+                                if ($img.height() > $laser_platform.height()) {
+                                    $img.height(349);
+                                }
 
-                            $div.freetrans({
-                                x: $laser_platform.width() / 2 - $img.width() / 2,
-                                y: $laser_platform.height() / 2 - $img.height() / 2,
-                                onRotate: instantRefresh,
-                                onMove: instantRefresh,
-                                onScale: instantRefresh
+                                $div.freetrans({
+                                    x: $laser_platform.width() / 2 - $img.width() / 2,
+                                    y: $laser_platform.height() / 2 - $img.height() / 2,
+                                    onRotate: instantRefresh,
+                                    onMove: instantRefresh,
+                                    onScale: instantRefresh
+                                });
+
+                                $div.parent().find('.ft-controls').on('mousedown', function(e) {
+                                    var $self = $(e.target);
+
+                                    $('.image-active').removeClass('image-active');
+                                    $target_image = $self.parent().find('.' + LASER_IMG_CLASS);
+                                    $target_image.find('img').addClass('image-active');
+                                });
+
+                                refreshImage($img);
+
+                                img.onload = null;
                             });
 
-                            $div.parent().find('.ft-controls').on('mousedown', function(e) {
-                                var $self = $(e.target);
+                            img.src = url;
 
-                                $('.image-active').removeClass('image-active');
-                                $target_image = $self.parent().find('.' + LASER_IMG_CLASS);
-                                $target_image.find('img').addClass('image-active');
-                            });
+                            $div.append($img);
 
-                            refreshImage($img);
+                            // set default image
+                            $target_image = $div;
 
-                            img.onload = null;
-                        });
+                            $('#file-importer').hide();
+                            $('#operation-table').show();
 
-                        img.src = url;
-
-                        $div.append($img);
-
-                        // set default image
-                        $target_image = $div;
-
-                        $('#file-importer').hide();
-                        $('#operation-table').show();
+                            if (index === total) {
+                                location.hash = 'studio/laser/start';
+                            }
+                        };
                     };
 
                 for (var i = 0; i < files.length; i++) {
                     fileSystem.writeFile(
                         files.item(i),
                         {
-                            onComplete: onComplete
+                            onComplete: onComplete(i + 1, files.length)
                         }
                     );
 
