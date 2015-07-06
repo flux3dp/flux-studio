@@ -513,6 +513,7 @@ select {
 
     .stage {
         height: calc(100% - 66px);
+        position: relative;
     }
 
     .btn-default {
