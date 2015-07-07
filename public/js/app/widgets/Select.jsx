@@ -17,6 +17,9 @@ define(['react'], function(React){
             var defaultValue;
 
             var options = this.props.options.map(function(opt, i){
+
+                var metadata = JSON.stringify(opt.data);
+
                 // if this is the selected option, set the <select>'s defaultValue
                 if (opt.selected === true || opt.selected === 'selected') {
                     // if the <select> is a multiple, push the values
@@ -37,7 +40,7 @@ define(['react'], function(React){
 
                 // attribute schema matches <option> spec; http://www.w3.org/TR/REC-html40/interact/forms.html#h-17.6
                 // EXCEPT for 'key' attribute which is requested by ReactJS
-                return <option key={i} value={opt.value} label={opt.label}>{opt.label}</option>;
+                return <option key={i} value={opt.value} label={opt.label} data-meta={metadata}>{opt.label}</option>;
             }, this);
 
             return  <select
