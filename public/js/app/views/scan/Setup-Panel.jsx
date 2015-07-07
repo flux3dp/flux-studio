@@ -1,6 +1,6 @@
 define([
     'react',
-    'jsx!widgets/Select'
+    'jsx!views/Select'
 ], function(React, SelectView) {
     'use strict';
 
