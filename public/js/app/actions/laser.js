@@ -5,14 +5,23 @@ define([
     'helpers/api/bitmap-laser-parser',
     'helpers/grayscale',
     'helpers/convertToTypedArray',
-    'helpers/api/discover',
-    'helpers/api/touch',
     'helpers/api/control',
+    'jsx!widgets/Popup',
     'freetrans'
-], function($, fileSystem, WebSocket, bitmapLaserParser, grayScale, convertToTypedArray, discover, touch, control) {
+], function(
+    $,
+    fileSystem,
+    WebSocket,
+    bitmapLaserParser,
+    grayScale,
+    convertToTypedArray,
+    control,
+    popup
+) {
     'use strict';
 
     return function(args) {
+        args = args || {};
 
         var DIAMETER = 170,    // 170mm
             DELECT_KEY_CODE = 68,
@@ -201,24 +210,11 @@ define([
                 }
             },
             $target_image = null, // changing when image clicked
-            printer = null;
-
-
-        // TODO: should have ui to select print at the very beginning
-        discover(function(printers) {
-            var opts = {
-                onSuccess: function(data) {
-                    printer = printers[0];
-                },
-                onError: function(data) {
-                    // TODO: do something
-                }
-            };
-
-            touch(opts).send(printers[0].serial, 'flux');
-        });
+            printer = null,
+            printer_selecting = false;
 
         $('#btn-start').on('click', function(e) {
+
             var $ft_controls = $laser_platform.find('.ft-controls'),
                 convertToRealCoordinate = function(px, axis) {
                     var ratio = DIAMETER / PLATFORM_DIAMETER_PIXEL, // 1(px) : N(mm)
@@ -242,51 +238,75 @@ define([
                         y: offset.top - container_offset.top + half_height
                     };
                 },
-                args = [];
+                args = [],
+                doLaser = function() {
+                    $ft_controls.each(function(k, el) {
+                        var $el = $(el),
+                            image = new Image(),
+                            width = $el.width(),
+                            height = $el.height(),
+                            top_left = getCenter($el.find('.ft-scaler-top.ft-scaler-left')),
+                            bottom_right = getCenter($el.find('.ft-scaler-bottom.ft-scaler-right')),
+                            sub_data = {
+                                width: width,
+                                height: height,
+                                tl_position_x: convertToRealCoordinate(top_left.x, 'x'),
+                                tl_position_y: convertToRealCoordinate(top_left.y, 'y'),
+                                br_position_x: convertToRealCoordinate(bottom_right.x, 'x'),
+                                br_position_y: convertToRealCoordinate(bottom_right.y, 'y'),
+                                rotate: (Math.PI * getAngle(el) / 180) * -1,
+                                threshold: $threshold.val()
+                            },
+                            canvas = document.createElement('canvas'),
+                            ctx = canvas.getContext('2d'),
+                            image_blobs = [];
 
-            $ft_controls.each(function(k, el) {
-                var $el = $(el),
-                    image = new Image(),
-                    width = $el.width(),
-                    height = $el.height(),
-                    top_left = getCenter($el.find('.ft-scaler-top.ft-scaler-left')),
-                    bottom_right = getCenter($el.find('.ft-scaler-bottom.ft-scaler-right')),
-                    sub_data = {
-                        width: width,
-                        height: height,
-                        tl_position_x: convertToRealCoordinate(top_left.x, 'x'),
-                        tl_position_y: convertToRealCoordinate(top_left.y, 'y'),
-                        br_position_x: convertToRealCoordinate(bottom_right.x, 'x'),
-                        br_position_y: convertToRealCoordinate(bottom_right.y, 'y'),
-                        rotate: (Math.PI * getAngle(el) / 180) * -1,
-                        threshold: $threshold.val()
-                    },
-                    canvas = document.createElement('canvas'),
-                    ctx = canvas.getContext('2d'),
-                    image_blobs = [];
+                        canvas.width = width;
+                        canvas.height = height;
+                        image.src = $el.parent().find('.ft-widget img').data('base');
 
-                canvas.width = width;
-                canvas.height = height;
-                image.src = $el.parent().find('.ft-widget img').data('base');
+                        image.onload = function() {
+                            ctx.drawImage(
+                                image,
+                                0,
+                                0,
+                                width,
+                                height
+                            );
+                            sub_data.image_data = grayScale(ctx.getImageData(0, 0, width, height).data);
 
-                image.onload = function() {
-                    ctx.drawImage(
-                        image,
-                        0,
-                        0,
-                        width,
-                        height
-                    );
-                    sub_data.image_data = grayScale(ctx.getImageData(0, 0, width, height).data);
+                            args.push(sub_data);
 
-                    args.push(sub_data);
-
-                    if (args.length === $ft_controls.length) {
-                        // sending data
-                        sendingToLaser(args);
-                    }
+                            if (args.length === $ft_controls.length) {
+                                // sending data
+                                sendingToLaser(args);
+                            }
+                        };
+                    });
                 };
+
+            require(['jsx!views/Print-Selector'], function(view) {
+                var popup_window;
+                printer_selecting = true;
+
+                popup_window = popup(
+                    view,
+                    {
+                        getPrinter: function(auth_printer) {
+                            printer = auth_printer;
+                            popup_window.close();
+                            doLaser();
+                        }
+                    }
+                );
+                popup_window.open({
+                    onClose: function() {
+                        printer_selecting = false;
+                    }
+                });
             });
+
+
         });
 
         $('.instant-change').on('focus', function(e) {
@@ -323,7 +343,7 @@ define([
         });
 
         $(document).on('keydown', function(e) {
-            if (DELECT_KEY_CODE === e.keyCode) {
+            if (DELECT_KEY_CODE === e.keyCode && false === printer_selecting) {
                 deleteImage();
             }
         });
