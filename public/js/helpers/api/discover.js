@@ -2,7 +2,10 @@
  * API discover
  * Ref: https://github.com/flux3dp/fluxghost/wiki/websocket-discover
  */
-define(['helpers/websocket'], function(Websocket) {
+define([
+    'helpers/websocket',
+    'helpers/array-findindex'
+], function(Websocket) {
     'use strict';
 
     return function(getPrinters) {
@@ -15,10 +18,19 @@ define(['helpers/websocket'], function(Websocket) {
                     var data = JSON.parse(result.data),
                         someFn = function(el) {
                             return el.serial === data.serial;
-                        };
+                        },
+                        findIndex = function(el) {
+                            return el.serial === data.serial;
+                        },
+                        existing_key = printers.findIndex(findIndex);
 
                     if (false === printers.some(someFn)) {
                         printers.push(data);
+                    }
+
+                    if (false === data.alive && -1 < existing_key) {
+                        // delete it from printers
+                        printers.splice(existing_key, 1);
                     }
                 }
             }),
@@ -29,7 +41,7 @@ define(['helpers/websocket'], function(Websocket) {
         });
 
         return {
-            ws: ws,
+            connection: ws,
             sendAggressive: function() {
                 ws.send('aggressive');
             }
