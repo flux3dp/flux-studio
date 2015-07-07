@@ -36,7 +36,7 @@ define(['helpers/websocket'], function(Websocket) {
             timer;
 
         return {
-            ws: ws,
+            connection: ws,
             send: function(serial, password) {
                 password = password || '';
 
