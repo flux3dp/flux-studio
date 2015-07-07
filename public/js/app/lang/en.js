@@ -400,6 +400,14 @@ define(function() {
                     ]
                 }
             }
+        },
+        select_printer: {
+            choose_printer: 'Choose a printer',
+            notification: 'Please enter the password',
+            submit: 'Submit',
+            please_enter_password: 'Enter the password',
+            auth_failure: 'Authentication fail',
+            retry: 'Retry'
         }
     };
 });
