@@ -399,6 +399,12 @@ define(function() {
                         }
                     ]
                 }
+            },
+            manipulation: {
+                smooth: 'Smooth',
+                crop: 'Crop',
+                delete: 'Delete',
+                reset: 'Reset'
             }
         },
         select_printer: {
