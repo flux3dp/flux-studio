@@ -69,20 +69,20 @@
     .laser-platform {
         @include absolute-center();
         background: #ccc;
-        -webkit-clip-path: polygon(50% 0%, 95% 26%, 95% 74%, 50% 100%, 5% 74%, 5% 26%);
-        clip-path: polygon(50% 0%, 95% 26%, 95% 74%, 50% 100%, 5% 74%, 5% 26%);
         height: 500px;
         position: fixed;
         width: 500px;
+        -webkit-clip-path: polygon(50% 0%, 95% 26%, 95% 74%, 50% 100%, 5% 74%, 5% 26%);
+        clip-path: polygon(50% 0%, 95% 26%, 95% 74%, 50% 100%, 5% 74%, 5% 26%);
 
         &::before {
             @include absolute-center();
-            content: "";
             background: #fff;
-            -webkit-clip-path: polygon(50% 0%, 95% 26%, 95% 74%, 50% 100%, 5% 74%, 5% 26%);
-            clip-path: polygon(50% 0%, 95% 26%, 95% 74%, 50% 100%, 5% 74%, 5% 26%);
+            content: "";
             height: 499px;
             width: 499px;
+            -webkit-clip-path: polygon(50% 0%, 95% 26%, 95% 74%, 50% 100%, 5% 74%, 5% 26%);
+            clip-path: polygon(50% 0%, 95% 26%, 95% 74%, 50% 100%, 5% 74%, 5% 26%);
         }
     }
 
@@ -91,6 +91,7 @@
         line-height: 20px;
         margin: 0 12px 0 0;
         min-width: 0;
+        padding: 0;
         width: 28px;
 
         &::before {
