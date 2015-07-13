@@ -82,6 +82,7 @@ define([
              *      ]
              */
             cut: function(in_name, out_name, args, opts) {
+                opts = opts || {};
                 opts.onFinished = opts.onFinished || function() {};
 
                 var self = this,
