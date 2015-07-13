@@ -65,7 +65,8 @@ define([
                 button_class_name = cx({
                     'btn': true,
                     'btn-default': true,
-                    'btn-full-width': true
+                    'btn-full-width': true,
+                    'btn-multiline-text': true
                 }),
                 wrapper_class_name;
 
