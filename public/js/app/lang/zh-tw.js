@@ -404,6 +404,7 @@ define(function() {
                 smooth: 'Smooth',
                 crop: 'Crop',
                 delete: 'Delete',
+                clear_noise: 'Clear Noise',
                 reset: 'Reset'
             }
         },
