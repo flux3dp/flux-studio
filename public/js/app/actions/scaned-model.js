@@ -16,7 +16,7 @@ define([
 
         scene = new THREE.Scene();
 
-        camera = new THREE.PerspectiveCamera( 70, container.offsetWidth / container.offsetHeight, 1, 3000 );
+        camera = new THREE.PerspectiveCamera( 70, container.offsetWidth / container.offsetHeight, 1, 300000 );
         camera.position.set(200, 200, 60);
         camera.lookAt( new THREE.Vector3( 0, 0, 1 ) );
         camera.up = new THREE.Vector3(0, 0, 1);
@@ -222,6 +222,11 @@ define([
 
         if ('undefined' !== typeof transform_control) {
             transform_control.update();
+        }
+
+        if ('undefined' !== typeof cylinder) {
+            var box = new THREE.Box3().setFromObject(cylinder).size();
+            cylinder.position.z = box.z / 2;
         }
     }
 
