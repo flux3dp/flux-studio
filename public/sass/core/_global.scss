@@ -126,6 +126,7 @@ a {
 /* button size */
 .btn-full-width {
     display: block;
+    min-width: initial;
     width: 100%;
 }
 
