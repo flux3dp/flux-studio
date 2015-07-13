@@ -20,7 +20,7 @@ define([
 ) {
     'use strict';
 
-    return function(args) {
+    return function(args, reactComponent) {
         args = args || {};
 
         var DIAMETER = 170,    // 170mm
@@ -138,9 +138,13 @@ define([
 
                             // set default image
                             $target_image = $div;
+                            console.log('on load', index, total);
 
                             if (index === total) {
-                                location.hash = 'studio/laser/start';
+                                reactComponent.setState({
+                                    step: 'start'
+                                });
+                                // location.hash = 'studio/laser/start';
                             }
                         };
                     };

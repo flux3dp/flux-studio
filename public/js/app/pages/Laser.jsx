@@ -40,7 +40,7 @@ define([
                             'file-importer': true,
                             'absolute-center': true,
                             'border-circle': true,
-                            'invisible': ('start' === args.step)
+                            'hide': ('start' === this.state.step)
                         });
 
                     return (
@@ -57,7 +57,7 @@ define([
                         cx = React.addons.classSet,
                         class_name = cx({
                             'operating-panel': true,
-                            'invisible': ('start' !== args.step)
+                            'hide': ('start' !== this.state.step)
                         });
 
                     return (
@@ -70,6 +70,7 @@ define([
                     );
                 },
                 render : function() {
+                    console.log('render');
                     var lang = args.state.lang,
                         header = this._renderHeader(),
                         beginingSection = this._renderBeginingSection(),
@@ -88,10 +89,12 @@ define([
                     );
                 },
                 getInitialState: function() {
-                    return args.state;
+                    return {
+                        step: ''
+                    };
                 },
                 componentDidMount: function() {
-                    laserEvents(args);
+                    laserEvents(args, this);
                 }
 
             });
