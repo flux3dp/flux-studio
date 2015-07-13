@@ -34,10 +34,17 @@ define([
                     );
                 },
                 _renderBeginingSection: function() {
-                    var lang = args.state.lang;
+                    var lang = args.state.lang,
+                        cx = React.addons.classSet,
+                        class_name = cx({
+                            'file-importer': true,
+                            'absolute-center': true,
+                            'border-circle': true,
+                            'invisible': ('start' === args.step)
+                        });
 
                     return (
-                        <section id="file-importer" className="file-importer absolute-center border-circle">
+                        <section id="file-importer" className={class_name}>
                             <img src="http://placehold.it/200x150"/>
                             <h2>{lang.laser.acceptable_files}</h2>
                             <p>{lang.laser.drop_files_to_import}</p>
@@ -46,10 +53,15 @@ define([
                     );
                 },
                 _renderStageSection: function() {
-                    var lang = args.state.lang;
+                    var lang = args.state.lang,
+                        cx = React.addons.classSet,
+                        class_name = cx({
+                            'operating-panel': true,
+                            'invisible': ('start' !== args.step)
+                        });
 
                     return (
-                        <section id="operation-table" className="operating-panel">
+                        <section id="operation-table" className={class_name}>
                             <div className="laser-platform"/>
                             <div className="laser-object border-circle"/>
                             <SetupPanel lang={lang}/>
@@ -60,13 +72,8 @@ define([
                 render : function() {
                     var lang = args.state.lang,
                         header = this._renderHeader(),
-                        activeSection;
-
-                    activeSection = (
-                        'start' === args.step ?
-                        this._renderStageSection() :
-                        this._renderBeginingSection()
-                    );
+                        beginingSection = this._renderBeginingSection(),
+                        stageSection = this._renderStageSection();
 
                     return (
                         <div className="studio-container laser-studio">
@@ -74,8 +81,8 @@ define([
                             {header}
 
                             <div className="stage">
-                                {activeSection}
-                                <div id="model-displayer" className="model-displayer"/>
+                                {stageSection}
+                                {beginingSection}
                             </div>
                         </div>
                     );
