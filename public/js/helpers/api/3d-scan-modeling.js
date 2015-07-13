@@ -73,32 +73,66 @@ define([
 
                 ws.send(args.join(' '));
             },
-            cut: function(in_name, out_name, mode, direction, value) {
+            /**
+             * @param {String} in_name  - source name
+             * @param {String} out_name - target name
+             * @param {Array}  args     - where to cut
+             *      [
+             *          { <mode>, <direction>, <value> }, ...
+             *      ]
+             */
+            cut: function(in_name, out_name, args, opts) {
                 opts.onFinished = opts.onFinished || function() {};
 
-                var order_name = 'cut',
-                    args = [
-                        order_name,
-                        in_name,
-                        out_name,
-                        mode,
-                        direction,
-                        value
-                    ];
-
-                // TODO: to count the steps of whole progress
+                var self = this,
+                    order_name = 'cut',
+                    timer = null,
+                    all_ok = false,
+                    next_arg = args.pop(),
+                    _args = [];
 
                 events.onMessage = function(data) {
 
                     switch (data.status) {
                     case 'ok':
-                        opts.onFinished();
+                        if (true === all_ok) {
+                            self.dump(
+                                out_name,
+                                opts
+                            );
+                        }
+                        else {
+                            next_arg = args.pop();
+                            // after first cut
+                            in_name = out_name;
+                        }
                         break;
                     }
 
                 };
 
-                ws.send(args.join(' '));
+                timer = setInterval(function() {
+                    if ('undefined' !== typeof next_arg) {
+                        _args = [
+                            order_name,
+                            in_name,
+                            out_name,
+                            next_arg.mode,
+                            next_arg.direction,
+                            next_arg.value
+                        ];
+
+                        ws.send(_args.join(' '));
+                        next_arg = undefined;
+                    }
+
+                    if (0 === args.length) {
+                        all_ok = true;
+                        clearInterval(timer);
+                    }
+                }, 0);
+
+
             },
             delete_noise: function(in_name, out_name, c, opts) {
 
@@ -116,7 +150,10 @@ define([
 
                     switch (data.status) {
                     case 'ok':
-                        opts.onFinished();
+                        this.dump(
+                            out_name,
+                            opts
+                        );
                         break;
                     }
 
@@ -128,6 +165,7 @@ define([
                 // TODO: to be implemented
             },
             dump: function(name, opts) {
+                console.log('on dump');
                 opts.onFinished = opts.onFinished || function() {};
                 opts.onReceiving = opts.onReceiving || function() {};
 
@@ -153,7 +191,7 @@ define([
                         next_right = parseInt(data.right, 10) * 24;
                     }
                     else if ('undefined' !== typeof data.status && 'ok' === data.status) {
-                        opts.onFinished(pointCloud.get().total);
+                        opts.onFinished(pointCloud.get());
                     }
 
                 };
