@@ -2122,11 +2122,10 @@ a {
     display: inline-block;
     font-size: 15px;
     letter-spacing: .5px;
-    line-height: 44px;
     margin: 0;
     min-width: 99px;
     outline: none;
-    padding: 0 5px;
+    padding: 14px 5px;
     position: relative;
     text-align: center;
     text-decoration: none;
@@ -2170,6 +2169,7 @@ a {
 /* button size */
 .btn-full-width {
     display: block;
+    min-width: initial;
     width: 100%; }
 
 .btn-large {
@@ -4091,14 +4091,24 @@ input.switch:checked ~ label:after {
         height: 100%;
         width: 100%; }
 
-.scan-studio .operating-panel {
-    left: 20px;
+.scan-studio .setup-panel,
+.scan-studio .manipulation-panel {
     position: absolute;
-    top: 20px;
-    width: 182px; }
+    top: 20px; }
 
-.scan-studio .operating-panel .param {
-    height: 5rem; }
+.scan-studio .manipulation-panel {
+    right: 20px;
+    width: 80px; }
+    .scan-studio .manipulation-panel .btn {
+        margin: 5px 0; }
+    .scan-studio .manipulation-panel .on {
+        background: #424242;
+        border: #fff solid 1px;
+        color: #fff; }
+
+.scan-studio .setup-panel {
+    left: 20px;
+    width: 182px; }
 
 .scan-studio .starting-section {
     height: 100%;
