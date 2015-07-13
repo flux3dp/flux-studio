@@ -63,10 +63,11 @@ a {
     display: inline-block;
     font-size: 15px;
     letter-spacing: .5px;
+    line-height: 44px;
     margin: 0;
     min-width: 99px;
     outline: none;
-    padding: 14px 5px;
+    padding: 0 5px;
     position: relative;
     text-align: center;
     text-decoration: none;
@@ -131,6 +132,12 @@ a {
 
 .btn-large {
     width: 270px;
+}
+
+/* button helper */
+.btn-multiline-text {
+    line-height: initial;
+    padding: 14px 0;
 }
 
 /* button group */
