@@ -62,7 +62,7 @@ define([
 
                 };
 
-                ws.send(_args.join(','));
+                ws.send(_args.join(' '));
                 lastOrder = 'setup';
             },
             /**
@@ -105,7 +105,7 @@ define([
                         obj.threshold
                     ];
 
-                    requests_serial.push(request_header.join(','));
+                    requests_serial.push(request_header.join(' '));
 
                     for (var i = 0; i < obj.image_data.length; i += CHUNK_PKG_SIZE) {
                         requests_serial.push(convertToTypedArray(obj.image_data.slice(i, i + CHUNK_PKG_SIZE), Uint8Array));
