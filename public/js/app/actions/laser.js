@@ -63,20 +63,22 @@ define([
                     imageData;
 
                 img.onload = function() {
-                    ctx.drawImage(
-                        img,
-                        0,
-                        0,
-                        width,
-                        height
-                    );
+                    if (0 < width || 0 < height) {
+                        ctx.drawImage(
+                            img,
+                            0,
+                            0,
+                            width,
+                            height
+                        );
 
-                    imageData = ctx.createImageData(width, height);
-                    imageData.data.set(convertToTypedArray(grayScale(ctx.getImageData(0, 0, width, height).data, opts), Uint8ClampedArray));
+                        imageData = ctx.createImageData(width, height);
+                        imageData.data.set(convertToTypedArray(grayScale(ctx.getImageData(0, 0, width, height).data, opts), Uint8ClampedArray));
 
-                    ctx.putImageData(imageData, 0, 0);
+                        ctx.putImageData(imageData, 0, 0);
 
-                    $img.attr('src', canvas.toDataURL('image/png'));
+                        $img.attr('src', canvas.toDataURL('image/png'));
+                    }
                 };
 
                 canvas.width = width;
@@ -85,6 +87,7 @@ define([
                 img.src = $img.data('base');
             },
             readfiles = function(files) {
+
                 var onComplete = function(index, total) {
                         return function(e, fileEntry) {
                             var $div = $(document.createElement('div')).addClass(LASER_IMG_CLASS).data('index', $('.' + LASER_IMG_CLASS).length),
@@ -129,15 +132,12 @@ define([
                                 img.onload = null;
                             });
 
-                            img.src = url;
-
                             $div.append($img);
+
+                            $img.attr('src', url);
 
                             // set default image
                             $target_image = $div;
-
-                            $('#file-importer').hide();
-                            $('#operation-table').show();
 
                             if (index === total) {
                                 location.hash = 'studio/laser/start';
@@ -186,8 +186,8 @@ define([
                         });
                     },
                     onGetGCodeFinished = function(blob) {
-                        var control_methods = control(printer.serial);
-                        control_methods.upload(blob.size, blob);
+                        // var control_methods = control(printer.serial);
+                        // control_methods.upload(blob.size, blob);
                     };
 
                 laserParser.setup(0, [1, 'wood'], {
