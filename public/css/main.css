@@ -2122,10 +2122,11 @@ a {
     display: inline-block;
     font-size: 15px;
     letter-spacing: .5px;
+    line-height: 44px;
     margin: 0;
     min-width: 99px;
     outline: none;
-    padding: 14px 5px;
+    padding: 0 5px;
     position: relative;
     text-align: center;
     text-decoration: none;
@@ -2174,6 +2175,11 @@ a {
 
 .btn-large {
     width: 270px; }
+
+/* button helper */
+.btn-multiline-text {
+    line-height: initial;
+    padding: 14px 0; }
 
 /* button group */
 .btn-h-group {
@@ -4011,11 +4017,11 @@ input.switch:checked ~ label:after {
     right: 0;
     top: 0;
     background: #ccc;
-    -webkit-clip-path: polygon(50% 0%, 95% 26%, 95% 74%, 50% 100%, 5% 74%, 5% 26%);
-    clip-path: polygon(50% 0%, 95% 26%, 95% 74%, 50% 100%, 5% 74%, 5% 26%);
     height: 500px;
     position: fixed;
-    width: 500px; }
+    width: 500px;
+    -webkit-clip-path: polygon(50% 0%, 95% 26%, 95% 74%, 50% 100%, 5% 74%, 5% 26%);
+    clip-path: polygon(50% 0%, 95% 26%, 95% 74%, 50% 100%, 5% 74%, 5% 26%); }
     .laser-studio .laser-platform::before {
         bottom: 0;
         display: block;
@@ -4024,18 +4030,19 @@ input.switch:checked ~ label:after {
         position: absolute;
         right: 0;
         top: 0;
-        content: "";
         background: #fff;
-        -webkit-clip-path: polygon(50% 0%, 95% 26%, 95% 74%, 50% 100%, 5% 74%, 5% 26%);
-        clip-path: polygon(50% 0%, 95% 26%, 95% 74%, 50% 100%, 5% 74%, 5% 26%);
+        content: "";
         height: 499px;
-        width: 499px; }
+        width: 499px;
+        -webkit-clip-path: polygon(50% 0%, 95% 26%, 95% 74%, 50% 100%, 5% 74%, 5% 26%);
+        clip-path: polygon(50% 0%, 95% 26%, 95% 74%, 50% 100%, 5% 74%, 5% 26%); }
 
 .laser-studio .zoom .btn {
     height: 28px;
     line-height: 20px;
     margin: 0 12px 0 0;
     min-width: 0;
+    padding: 0;
     width: 28px; }
     .laser-studio .zoom .btn::before {
         margin: 0; }
