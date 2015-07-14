@@ -3,14 +3,17 @@
  */
 .laser-studio {
 
+    .operating-panel {
+        left: 20px;
+        top: 20px;
+        width: 182px;
+    }
+
     .fa::before {
         margin: 0 5px 0 0;
     }
 
-    .model-displayer {
-        height: calc(100% - 66px);
-        position: relative;
-
+    .stage {
         .file-importer {
             border: 2px dashed #CCC;
             height: 500px;
@@ -45,10 +48,6 @@
         position: fixed;
         width: 400px;
 
-        .img-container {
-            background: #fff;
-        }
-
         .svg {
             min-width: 300px;
         }
@@ -70,20 +69,20 @@
     .laser-platform {
         @include absolute-center();
         background: #ccc;
-        -webkit-clip-path: polygon(50% 0%, 95% 26%, 95% 74%, 50% 100%, 5% 74%, 5% 26%);
-        clip-path: polygon(50% 0%, 95% 26%, 95% 74%, 50% 100%, 5% 74%, 5% 26%);
         height: 500px;
         position: fixed;
         width: 500px;
+        -webkit-clip-path: polygon(50% 0%, 95% 26%, 95% 74%, 50% 100%, 5% 74%, 5% 26%);
+        clip-path: polygon(50% 0%, 95% 26%, 95% 74%, 50% 100%, 5% 74%, 5% 26%);
 
         &::before {
             @include absolute-center();
-            content: "";
             background: #fff;
-            -webkit-clip-path: polygon(50% 0%, 95% 26%, 95% 74%, 50% 100%, 5% 74%, 5% 26%);
-            clip-path: polygon(50% 0%, 95% 26%, 95% 74%, 50% 100%, 5% 74%, 5% 26%);
+            content: "";
             height: 499px;
             width: 499px;
+            -webkit-clip-path: polygon(50% 0%, 95% 26%, 95% 74%, 50% 100%, 5% 74%, 5% 26%);
+            clip-path: polygon(50% 0%, 95% 26%, 95% 74%, 50% 100%, 5% 74%, 5% 26%);
         }
     }
 
@@ -92,6 +91,7 @@
         line-height: 20px;
         margin: 0 12px 0 0;
         min-width: 0;
+        padding: 0;
         width: 28px;
 
         &::before {
@@ -155,27 +155,6 @@
 
     .objects-params {
         left: 25px;
-    }
-
-    .print-params {
-        padding: 0 16px 20px 16px;
-
-        .estimated-time {
-            line-height: 40px;
-            margin: 0;
-        }
-
-        .caption {
-            margin: 0;
-        }
-
-        .fa::before {
-            background: #ccc;
-            border-radius: 50%;
-            font-size: 1.2rem;
-            margin: 0 5px;
-            padding: 5px;
-        }
     }
 
     .btn-start {

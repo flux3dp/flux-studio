@@ -2,19 +2,28 @@ define([
     'jquery',
     'helpers/file-system',
     'helpers/websocket',
+    'helpers/api/bitmap-laser-parser',
     'helpers/grayscale',
     'helpers/convertToTypedArray',
-    'helpers/api/discover',
-    'helpers/api/touch',
     'helpers/api/control',
+    'jsx!widgets/Popup',
     'freetrans'
-], function($, fileSystem, WebSocket, grayScale, convertToTypedArray, discover, touch, control) {
+], function(
+    $,
+    fileSystem,
+    WebSocket,
+    bitmapLaserParser,
+    grayScale,
+    convertToTypedArray,
+    control,
+    popup
+) {
     'use strict';
 
-    return function(args) {
+    return function(args, reactComponent) {
+        args = args || {};
 
         var DIAMETER = 170,    // 170mm
-            CHUNK_PKG_SIZE = 4096,
             DELECT_KEY_CODE = 68,
             LASER_IMG_CLASS = 'img-container',
             $uploader = $('.file-importer'),
@@ -30,13 +39,15 @@ define([
             deleteImage = function() {
                 var $img_container = $('.' + LASER_IMG_CLASS);
 
-                $target_image.parents('.ft-container').remove();
+                if (null !== $target_image) {
+                    $target_image.parents('.ft-container').remove();
 
-                if (0 === $img_container) {
-                    $target_image = null;
-                }
-                else {
-                    $target_image = $img_container[0];
+                    if (0 === $img_container) {
+                        $target_image = null;
+                    }
+                    else {
+                        $target_image = $img_container[0];
+                    }
                 }
             },
             refreshImage = function($img) {
@@ -52,29 +63,22 @@ define([
                     imageData;
 
                 img.onload = function() {
-                    ctx.drawImage(
-                        img,
-                        0,
-                        0,
-                        width,
-                        height
-                    );
+                    if (0 < width || 0 < height) {
+                        ctx.drawImage(
+                            img,
+                            0,
+                            0,
+                            width,
+                            height
+                        );
 
-                    imageData = new ImageData(
-                        convertToTypedArray(grayScale(ctx.getImageData(0, 0, width, height).data, opts), Uint8ClampedArray),
-                        width,
-                        height
-                    );
+                        imageData = ctx.createImageData(width, height);
+                        imageData.data.set(convertToTypedArray(grayScale(ctx.getImageData(0, 0, width, height).data, opts), Uint8ClampedArray));
 
-                    ctx.putImageData(imageData, 0, 0);
+                        ctx.putImageData(imageData, 0, 0);
 
-                    ctx.fillStyle = '#fff';
-                    // refers to: https://developer.mozilla.org/zh-TW/docs/Web/Guide/HTML/Canvas_tutorial/Compositing
-                    // background is always white
-                    ctx.globalCompositeOperation = 'destination-over';
-                    ctx.fillRect(0, 0, width, height);
-
-                    $img.attr('src', canvas.toDataURL('image/jpeg'));
+                        $img.attr('src', canvas.toDataURL('image/png'));
+                    }
                 };
 
                 canvas.width = width;
@@ -83,65 +87,73 @@ define([
                 img.src = $img.data('base');
             },
             readfiles = function(files) {
-                var onComplete = function(e, fileEntry) {
-                        var $div = $(document.createElement('div')).addClass(LASER_IMG_CLASS).data('index', $('.' + LASER_IMG_CLASS).length),
-                            img = new Image(),
-                            url = fileEntry.toURL(),
-                            $img = $(img).data('base', url),
-                            instantRefresh = function(e, data) {
-                                refreshObjectParams($div);
-                            };
 
-                        $img.addClass(url.substr(-3));
+                var onComplete = function(index, total) {
+                        return function(e, fileEntry) {
+                            var $div = $(document.createElement('div')).addClass(LASER_IMG_CLASS).data('index', $('.' + LASER_IMG_CLASS).length),
+                                img = new Image(),
+                                url = fileEntry.toURL(),
+                                $img = $(img).data('base', url),
+                                instantRefresh = function(e, data) {
+                                    refreshObjectParams($div);
+                                };
 
-                        $img.one('load', function() {
-                            $laser_platform.append($div);
+                            $img.addClass(fileEntry.fileExtension);
 
-                            if ($img.width() > $laser_platform.width()) {
-                                $img.width(349);
-                            }
+                            $img.one('load', function() {
+                                $laser_platform.append($div);
 
-                            if ($img.height() > $laser_platform.height()) {
-                                $img.height(349);
-                            }
+                                if ($img.width() > $laser_platform.width()) {
+                                    $img.width(349);
+                                }
 
-                            $div.freetrans({
-                                x: $laser_platform.width() / 2 - $img.width() / 2,
-                                y: $laser_platform.height() / 2 - $img.height() / 2,
-                                onRotate: instantRefresh,
-                                onMove: instantRefresh,
-                                onScale: instantRefresh
+                                if ($img.height() > $laser_platform.height()) {
+                                    $img.height(349);
+                                }
+
+                                $div.freetrans({
+                                    x: $laser_platform.width() / 2 - $img.width() / 2,
+                                    y: $laser_platform.height() / 2 - $img.height() / 2,
+                                    onRotate: instantRefresh,
+                                    onMove: instantRefresh,
+                                    onScale: instantRefresh
+                                });
+
+                                $div.parent().find('.ft-controls').on('mousedown', function(e) {
+                                    var $self = $(e.target);
+
+                                    $('.image-active').removeClass('image-active');
+                                    $target_image = $self.parent().find('.' + LASER_IMG_CLASS);
+                                    $target_image.find('img').addClass('image-active');
+                                });
+
+                                refreshImage($img);
+
+                                img.onload = null;
                             });
 
-                            $div.parent().find('.ft-controls').on('mousedown', function(e) {
-                                var $self = $(e.target);
+                            $div.append($img);
 
-                                $('.image-active').removeClass('image-active');
-                                $target_image = $self.parent().find('.' + LASER_IMG_CLASS);
-                                $target_image.find('img').addClass('image-active');
-                            });
+                            $img.attr('src', url);
 
-                            refreshImage($img);
+                            // set default image
+                            $target_image = $div;
+                            console.log('on load', index, total);
 
-                            img.onload = null;
-                        });
-
-                        img.src = url;
-
-                        $div.append($img);
-
-                        // set default image
-                        $target_image = $div;
-
-                        $('#file-importer').hide();
-                        $('#operation-table').show();
+                            if (index === total) {
+                                reactComponent.setState({
+                                    step: 'start'
+                                });
+                                // location.hash = 'studio/laser/start';
+                            }
+                        };
                     };
 
                 for (var i = 0; i < files.length; i++) {
                     fileSystem.writeFile(
                         files.item(i),
                         {
-                            onComplete: onComplete
+                            onComplete: onComplete(i + 1, files.length)
                         }
                     );
 
@@ -165,99 +177,26 @@ define([
                 return Math.round(Math.atan2(b, a) * (180 / Math.PI));
             },
             sendingToLaser = function(args) {
-                var isReady = function() {
-                        var request_serial = [],
-                            accept_times = 0,
-                            index = 0,
-                            go_next = false,
-                            timer, next_data, request_header;
 
-                        ws.onMessage(function(result) {
-                            var data = JSON.parse(result.data),
-                                blobs = [],
-                                total_length = 0;
-
-                            switch (data.status) {
-                            case 'continue':
-                                go_next = true;
-                                break;
-                            case 'accept':
-                                go_next = true;
-                                accept_times++;
-
-                                if (args.length === accept_times) {
-                                    ws.send('go').onMessage(function(result) {
-                                        var data = ('string' === typeof result.data ? JSON.parse(result.data) : result.data),
-                                            blob_length = 0,
-                                            gcode_blob,
-                                            control_methods,
-                                            opts;
-
-                                        if ('processing' === data.status) {
-                                            // TODO: update progress
-                                        }
-                                        else if ('complete' === data.status) {
-                                            total_length = data.length;
-                                        }
-                                        else if ('object' === typeof data) {
-                                            blobs.push(data);
-                                            gcode_blob = new Blob(blobs);
-
-                                            if (total_length === gcode_blob.size) {
-                                                control_methods = control(printer.serial, opts);
-                                                control_methods.upload(gcode_blob.size, gcode_blob);
-                                            }
-                                        }
-                                    });
-                                }
-
-                                break;
-                            }
+                var laserParser = bitmapLaserParser(),
+                    onSetupFinished = function() {
+                        laserParser.uploadBitmap(args, {
+                            onFinished: onUploadFinish
                         });
-
-                        args.forEach(function(obj) {
-                            request_header = [
-                                obj.width,
-                                obj.height,
-                                obj.top_left.x,
-                                obj.top_left.y,
-                                obj.bottom_right.x,
-                                obj.bottom_right.y,
-                                obj.rotate,
-                                $threshold.val()
-                            ];
-
-                            request_serial.push(request_header.join(','));
-                            request_serial = request_serial.concat(obj.data);
-                        });
-
-                        timer = setInterval(function() {
-                            if (0 === index || true === go_next) {
-                                next_data = request_serial[index];
-
-                                if ('string' === typeof next_data) {
-                                    go_next = false;
-                                }
-
-                                ws.send(next_data);
-                                index++;
-                            }
-
-                            if (index >= request_serial.length) {
-                                clearInterval(timer);
-                            }
-                        }, 0);
                     },
-                    ws = new WebSocket({
-                        method: 'bitmap-laser-parser',
-                        onMessage: function(result) {
-                            var data = JSON.parse(result.data);
+                    onUploadFinish = function() {
+                        laserParser.getGCode({
+                            onFinished: onGetGCodeFinished
+                        });
+                    },
+                    onGetGCodeFinished = function(blob) {
+                        // var control_methods = control(printer.serial);
+                        // control_methods.upload(blob.size, blob);
+                    };
 
-                            if ('ok' === data.status) {
-                                isReady();
-                            }
-                        }
-                    }).send('0,1,wood');
+                laserParser.setup(0, [1, 'wood'], {
+                    onFinished: onSetupFinished
+                });
 
             },
             refreshObjectParams = function($el) {
@@ -275,24 +214,11 @@ define([
                 }
             },
             $target_image = null, // changing when image clicked
-            printer = null;
-
-
-        // TODO: should have ui to select print at the very beginning
-        discover(function(printers) {
-            var opts = {
-                onSuccess: function(data) {
-                    printer = printers[0];
-                },
-                onError: function(data) {
-                    // TODO: do something
-                }
-            };
-
-            touch(opts).send(printers[0].serial, 'flux');
-        });
+            printer = null,
+            printer_selecting = false;
 
         $('#btn-start').on('click', function(e) {
+
             var $ft_controls = $laser_platform.find('.ft-controls'),
                 convertToRealCoordinate = function(px, axis) {
                     var ratio = DIAMETER / PLATFORM_DIAMETER_PIXEL, // 1(px) : N(mm)
@@ -316,58 +242,75 @@ define([
                         y: offset.top - container_offset.top + half_height
                     };
                 },
-                args = [];
+                args = [],
+                doLaser = function() {
+                    $ft_controls.each(function(k, el) {
+                        var $el = $(el),
+                            image = new Image(),
+                            width = $el.width(),
+                            height = $el.height(),
+                            top_left = getCenter($el.find('.ft-scaler-top.ft-scaler-left')),
+                            bottom_right = getCenter($el.find('.ft-scaler-bottom.ft-scaler-right')),
+                            sub_data = {
+                                width: width,
+                                height: height,
+                                tl_position_x: convertToRealCoordinate(top_left.x, 'x'),
+                                tl_position_y: convertToRealCoordinate(top_left.y, 'y'),
+                                br_position_x: convertToRealCoordinate(bottom_right.x, 'x'),
+                                br_position_y: convertToRealCoordinate(bottom_right.y, 'y'),
+                                rotate: (Math.PI * getAngle(el) / 180) * -1,
+                                threshold: $threshold.val()
+                            },
+                            canvas = document.createElement('canvas'),
+                            ctx = canvas.getContext('2d'),
+                            image_blobs = [];
 
-            $ft_controls.each(function(k, el) {
-                var $el = $(el),
-                    image = new Image(),
-                    width = $el.width(),
-                    height = $el.height(),
-                    top_left = getCenter($el.find('.ft-scaler-top.ft-scaler-left')),
-                    bottom_right = getCenter($el.find('.ft-scaler-bottom.ft-scaler-right')),
-                    pos = $el.position(),
-                    sub_data = {
-                        width: width,
-                        height: height,
-                        top_left: {
-                            x: convertToRealCoordinate(top_left.x, 'x'),
-                            y: convertToRealCoordinate(top_left.y, 'y')
-                        },
-                        bottom_right: {
-                            x: convertToRealCoordinate(bottom_right.x, 'x'),
-                            y: convertToRealCoordinate(bottom_right.y, 'y')
-                        },
-                        rotate: (Math.PI * getAngle(el) / 180) * -1,
-                        data: []
-                    },
-                    canvas = document.createElement('canvas'),
-                    ctx = canvas.getContext('2d'),
-                    image_blobs = [];
+                        canvas.width = width;
+                        canvas.height = height;
+                        image.src = $el.parent().find('.ft-widget img').data('base');
 
-                canvas.width = width;
-                canvas.height = height;
-                image.src = $el.parent().find('.ft-widget img').data('base');
+                        image.onload = function() {
+                            ctx.drawImage(
+                                image,
+                                0,
+                                0,
+                                width,
+                                height
+                            );
+                            sub_data.image_data = grayScale(ctx.getImageData(0, 0, width, height).data);
 
-                image.onload = function() {
-                    ctx.drawImage(
-                        image,
-                        0,
-                        0,
-                        width,
-                        height
-                    );
-                    image_blobs = grayScale(ctx.getImageData(0, 0, width, height).data);
+                            args.push(sub_data);
 
-                    for (var i = 0; i < image_blobs.length; i += CHUNK_PKG_SIZE) {
-                        sub_data.data.push(convertToTypedArray(image_blobs.slice(i, i + CHUNK_PKG_SIZE), Uint8Array));
-                    }
-
-                    args.push(sub_data);
+                            if (args.length === $ft_controls.length) {
+                                // sending data
+                                sendingToLaser(args);
+                            }
+                        };
+                    });
                 };
+
+            require(['jsx!views/Print-Selector'], function(view) {
+                var popup_window;
+                printer_selecting = true;
+
+                popup_window = popup(
+                    view,
+                    {
+                        getPrinter: function(auth_printer) {
+                            printer = auth_printer;
+                            popup_window.close();
+                            doLaser();
+                        }
+                    }
+                );
+                popup_window.open({
+                    onClose: function() {
+                        printer_selecting = false;
+                    }
+                });
             });
 
-            // sending data
-            sendingToLaser(args);
+
         });
 
         $('.instant-change').on('focus', function(e) {
@@ -404,7 +347,7 @@ define([
         });
 
         $(document).on('keydown', function(e) {
-            if (DELECT_KEY_CODE === e.keyCode) {
+            if (DELECT_KEY_CODE === e.keyCode && false === printer_selecting) {
                 deleteImage();
             }
         });

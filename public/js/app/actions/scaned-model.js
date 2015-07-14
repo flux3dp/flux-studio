@@ -1,21 +1,25 @@
 define([
     'threejs',
-    'threeTrackball'
+    'threeTrackball',
+    'threeTransformControls',
+    'threeCircularGridHelper'
 ], function() {
     'use strict';
 
     var THREE = window.THREE || {},
         geometry = new THREE.BufferGeometry(),
-        container, camera, scene, renderer, controls;
+        container, camera, scene, renderer, controls, transform_control, cylinder;
 
     function init() {
+
         container = document.getElementById('model-displayer');
 
-        camera = new THREE.PerspectiveCamera( 70, container.offsetWidth / container.offsetHeight, 1, 3000 );
-        camera.position.set(10, 3, 10);
-
         scene = new THREE.Scene();
-        scene.rotation.x = 717608350.9;
+
+        camera = new THREE.PerspectiveCamera( 70, container.offsetWidth / container.offsetHeight, 1, 300000 );
+        camera.position.set(200, 200, 60);
+        camera.lookAt( new THREE.Vector3( 0, 0, 1 ) );
+        camera.up = new THREE.Vector3(0, 0, 1);
 
         // add controls
         addControls();
@@ -37,6 +41,38 @@ define([
         window.addEventListener('resize', onWindowResize, false);
 
         animate();
+    }
+
+    function createCylinder(mesh) {
+        var box = new THREE.Box3().setFromObject(mesh),
+            mesh_size = box.size(),
+            material = new THREE.MeshLambertMaterial( { color: 0xffff00, transparent: true, opacity: 0.3 } ),
+            geometry, radius;
+
+        radius = Math.max(mesh_size.x, mesh_size.z);
+
+        geometry = new THREE.CylinderGeometry( radius, radius, mesh_size.y, 32 );
+        cylinder = new THREE.Mesh( geometry, material );
+        cylinder.rotateX(90 * Math.PI / 180);
+        cylinder.position.z = mesh_size.z / 2;
+
+        transform_control = new THREE.TransformControls( camera, renderer.domElement );
+
+        scene.add(transform_control);
+
+        scene.add(cylinder);
+
+        transform_control.addEventListener('change', render);
+        transform_control.attach(cylinder);
+        transform_control.setMode('scale');
+        transform_control.setSpace('local');
+
+        return cylinder;
+    }
+
+    function removeCylinder(cylinder) {
+        transform_control.detach(cylinder);
+        scene.remove(cylinder);
     }
 
     function setupGeometry(model_data) {
@@ -90,6 +126,7 @@ define([
         });
 
         mesh = new THREE.PointCloud( geometry, material );
+
         scene.add( mesh );
 
         return mesh;
@@ -101,6 +138,7 @@ define([
         // refs: https://github.com/mrdoob/three.js/wiki/Migration#r56--r57
         mesh.geometry.attributes.position.needsUpdate = true;
         mesh.geometry.attributes.color.needsUpdate = true;
+        render();
 
         return mesh;
     }
@@ -141,16 +179,16 @@ define([
             ],
             vertices = [
                 [   // x
-                    new THREE.Vector3( -100, 0, 0 ),
-                    new THREE.Vector3( 100, 0, 0 )
+                    new THREE.Vector3( -1000, 0, 0 ),
+                    new THREE.Vector3( 1000, 0, 0 )
                 ],
                 [   // y
-                    new THREE.Vector3( 0, -100, 0 ),
-                    new THREE.Vector3( 0, 100, 0 )
+                    new THREE.Vector3( 0, -1000, 0 ),
+                    new THREE.Vector3( 0, 1000, 0 )
                 ],
                 [   // z
-                    new THREE.Vector3( 0, 0, -100 ),
-                    new THREE.Vector3( 0, 0, 100 )
+                    new THREE.Vector3( 0, 0, -1000 ),
+                    new THREE.Vector3( 0, 0, 1000 )
                 ],
             ],
             geometry;
@@ -181,11 +219,25 @@ define([
 
     function render() {
         renderer.render(scene, camera);
+
+        if ('undefined' !== typeof transform_control) {
+            transform_control.update();
+        }
+
+        if ('undefined' !== typeof cylinder) {
+            var box = new THREE.Box3().setFromObject(cylinder).size();
+            cylinder.position.z = box.z / 2;
+        }
     }
 
     return {
         init: init,
         appendModel: appendModel,
-        updateMesh: updateMesh
+        updateMesh: updateMesh,
+        cylinder: {
+            create: createCylinder,
+            remove: removeCylinder
+        }
+
     };
 });

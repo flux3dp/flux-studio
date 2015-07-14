@@ -32,7 +32,6 @@ define([
 
                 }
             }),
-            lastOrder = '',
             lastMessage = '',
             events = {
                 onMessage: function() {}
@@ -43,9 +42,9 @@ define([
             upload: function(name, point_cloud, opts) {
                 opts.onFinished = opts.onFinished || function() {};
 
-                var lastOrder = 'upload',
+                var order_name = 'upload',
                     args = [
-                        lastOrder,
+                        order_name,
                         name,
                         point_cloud.left.size / 24,
                         point_cloud.right.size / 24 || 0
@@ -74,40 +73,75 @@ define([
 
                 ws.send(args.join(' '));
             },
-            cut: function(in_name, out_name, mode, direction, value) {
+            /**
+             * @param {String} in_name  - source name
+             * @param {String} out_name - target name
+             * @param {Array}  args     - where to cut
+             *      [
+             *          { <mode>, <direction>, <value> }, ...
+             *      ]
+             */
+            cut: function(in_name, out_name, args, opts) {
+                opts = opts || {};
                 opts.onFinished = opts.onFinished || function() {};
 
-                var lastOrder = 'cut',
-                    args = [
-                        lastOrder,
-                        in_name,
-                        out_name,
-                        mode,
-                        direction,
-                        value
-                    ];
-
-                // TODO: to count the steps of whole progress
+                var self = this,
+                    order_name = 'cut',
+                    timer = null,
+                    all_ok = false,
+                    next_arg = args.pop(),
+                    _args = [];
 
                 events.onMessage = function(data) {
 
                     switch (data.status) {
                     case 'ok':
-                        opts.onFinished();
+                        if (true === all_ok) {
+                            self.dump(
+                                out_name,
+                                opts
+                            );
+                        }
+                        else {
+                            next_arg = args.pop();
+                            // after first cut
+                            in_name = out_name;
+                        }
                         break;
                     }
 
                 };
 
-                ws.send(args.join(' '));
+                timer = setInterval(function() {
+                    if ('undefined' !== typeof next_arg) {
+                        _args = [
+                            order_name,
+                            in_name,
+                            out_name,
+                            next_arg.mode,
+                            next_arg.direction,
+                            next_arg.value
+                        ];
+
+                        ws.send(_args.join(' '));
+                        next_arg = undefined;
+                    }
+
+                    if (0 === args.length) {
+                        all_ok = true;
+                        clearInterval(timer);
+                    }
+                }, 0);
+
+
             },
             delete_noise: function(in_name, out_name, c, opts) {
 
                 opts.onFinished = opts.onFinished || function() {};
 
-                var lastOrder = 'delete_noise',
+                var order_name = 'delete_noise',
                     args = [
-                        lastOrder,
+                        order_name,
                         in_name,
                         out_name,
                         c = ('number' === typeof c ? c : 0.3)   // default by 0.3
@@ -117,7 +151,10 @@ define([
 
                     switch (data.status) {
                     case 'ok':
-                        opts.onFinished();
+                        this.dump(
+                            out_name,
+                            opts
+                        );
                         break;
                     }
 
@@ -129,12 +166,13 @@ define([
                 // TODO: to be implemented
             },
             dump: function(name, opts) {
+                console.log('on dump');
                 opts.onFinished = opts.onFinished || function() {};
                 opts.onReceiving = opts.onReceiving || function() {};
 
-                var lastOrder = 'dump',
+                var order_name = 'dump',
                     args = [
-                        lastOrder,
+                        order_name,
                         name
                     ],
                     pointCloud = new PointCloudHelper(),
@@ -154,7 +192,7 @@ define([
                         next_right = parseInt(data.right, 10) * 24;
                     }
                     else if ('undefined' !== typeof data.status && 'ok' === data.status) {
-                        opts.onFinished(pointCloud.get().total);
+                        opts.onFinished(pointCloud.get());
                     }
 
                 };

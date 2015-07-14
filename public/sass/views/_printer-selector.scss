@@ -1,0 +1,51 @@
+/**
+ * the view of printer selector
+ */
+.select-printer {
+    background: #FFF;
+    height: 300px;
+    padding: 10px;
+    width: 50%;
+
+    .select-printer-content {
+        height: 100%;
+        overflow: scroll;
+        position: relative;
+        width: 100%;
+    }
+
+    .printer-list{
+        list-style: none;
+        margin: 0 auto;
+        padding: 0;
+        width: 80%;
+
+        .fa::before {
+            display: block;
+            padding: 5px;
+        }
+
+        .printer-item {
+            cursor: pointer;
+            display: block;
+            position: relative;
+
+            .print-name {
+                display: block;
+                left: 0;
+                padding: 5px 5px 5px 20px;
+                position: absolute;
+                right: 0;
+                top: 0;
+            }
+
+            input[type="radio"] {
+                display: none;
+
+                &:checked + .print-name {
+                    background: #ccc;
+                    z-index: -1;
+                }
+            }        }
+    }
+}
