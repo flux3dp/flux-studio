@@ -125,10 +125,9 @@ define([
                                         name: upload_name,
                                         data: point_cloud.total
                                     });
+
+                                    popup_window.close();
                                 };
-
-                            popup_window.close();
-
                             // update scan times
                             self.scan_times = self.scan_times + 1;
 
