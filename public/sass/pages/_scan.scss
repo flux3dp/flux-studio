@@ -1,7 +1,7 @@
 .scan-studio {
 
     .model-displayer {
-        height: 90%;
+        height: 100%;
         width: 100%;
 
         .camera-image {
@@ -10,18 +10,32 @@
         }
     }
 
-    .operating-panel {
-        left: 20px;
+    .setup-panel,
+    .manipulation-panel {
         position: absolute;
         top: 20px;
+    }
+
+    .manipulation-panel {
+        right: 20px;
+        width: 80px;
+
+        .btn {
+            margin: 5px 0;
+        }
+
+        .on {
+            background: #424242;
+            border: #fff solid 1px;
+            color: #fff;
+        }
+    }
+
+    .setup-panel {
+        left: 20px;
         width: 182px;
     }
 
-    .operating-panel .param {
-        height: 5rem;
-    }
-
-    .section-container,
     .starting-section {
         height: 100%;
         width: 100%;

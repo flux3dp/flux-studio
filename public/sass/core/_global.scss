@@ -126,11 +126,18 @@ a {
 /* button size */
 .btn-full-width {
     display: block;
+    min-width: initial;
     width: 100%;
 }
 
 .btn-large {
     width: 270px;
+}
+
+/* button helper */
+.btn-multiline-text {
+    line-height: initial;
+    padding: 14px 0;
 }
 
 /* button group */
@@ -513,6 +520,7 @@ select {
 
     .stage {
         height: calc(100% - 66px);
+        position: relative;
     }
 
     .btn-default {

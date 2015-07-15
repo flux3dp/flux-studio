@@ -8,12 +8,13 @@ define([
         setup = {
             'min': 0,
             'max': 359,
+            'step': 1,
             'thickness': 0.2,
             'width': 50,
             'fgColor': '#777',
             'bgcolor': '#AAAAAA',
             'format' : function (value) {
-                 return value || 0;
+                 return value;
             },
             height: 50,
         };
@@ -27,9 +28,14 @@ define([
         },
         componentDidMount: function() {
             var thisModule = this;
-            $('.x-axis').knob(React.addons.update(setup, {$merge:{change: function(v) { console.log(v); rotation.x = parseInt(v); thisModule._rotateModel(); }}}));
-            $('.y-axis').knob(React.addons.update(setup, {$merge:{change: function(v) { rotation.y = parseInt(v); thisModule._rotateModel(); }}}));
-            $('.z-axis').knob(React.addons.update(setup, {$merge:{change: function(v) { rotation.z = parseInt(v); thisModule._rotateModel(); }}}));
+            $('.x-axis').knob(React.addons.update(setup, {$merge:{change: function(v) { thisModule._handleXChange(v); }}}));
+            $('.y-axis').knob(React.addons.update(setup, {$merge:{change: function(v) { thisModule._handleYChange(v); }}}));
+            $('.z-axis').knob(React.addons.update(setup, {$merge:{change: function(v) { thisModule._handleZChange(v); }}}));
+        },
+        componentDidUpdate: function(prevProp, prevState) {
+            $('.x-axis').trigger('change');
+            $('.y-axis').trigger('change');
+            $('.z-axis').trigger('change');
         },
         _rotateModel: function() {
             this.props.onRotate(rotation);
@@ -38,26 +44,25 @@ define([
             $('.knob').val(0).trigger('change');
             this.props.onReset();
         },
-        _handleXChange: function(e) {
-            e.preventDefault();
-            rotation.x = parseInt(e.target.value) || 0;
-            $('.x-axis').trigger('change');
+        _handleXChange: function(v) {
+            rotation.x = Math.round(v) || 0;
             this._rotateModel();
         },
-        _handleYChange: function(e) {
-            e.preventDefault();
-            rotation.y = parseInt(e.target.value) || 0;
-            $('.y-axis').trigger('change');
+        _handleYChange: function(v) {
+            rotation.y = Math.round(v) || 0;
             this._rotateModel();
         },
-        _handleZChange: function(e) {
-            e.preventDefault();
-            rotation.z = parseInt(e.target.value) || 0;
-            $('.z-axis').trigger('change');
+        _handleZChange: function(v) {
+            rotation.z = Math.round(v) || 0;
             this._rotateModel();
         },
         render: function() {
-            var lang = this.props.lang;
+            var lang = this.props.lang,
+                selected = this.props.selected;
+
+            rotation.x = selected.rotation.enteredX;
+            rotation.y = selected.rotation.enteredY;
+            rotation.z = selected.rotation.enteredZ;
 
             return (
                 <div className="control-bottom">
@@ -65,15 +70,15 @@ define([
                         <div className="container vertical-middle">
                             <div className="controls">
                                 <label>X</label>
-                                <input type="text" className="knob x-axis" onChange={this._handleXChange} />
+                                <input type="text" className="knob x-axis" value={selected.rotation.enteredX} onChange={this._handleXChange} />
                             </div>
                             <div className="controls">
                                 <label>Y</label>
-                                <input type="text" className="knob y-axis" onChange={this._handleYChange} />
+                                <input type="text" className="knob y-axis" value={selected.rotation.enteredY} onChange={this._handleYChange} />
                             </div>
                             <div className="controls">
                                 <label>Z</label>
-                                <input type="text" className="knob z-axis" onChange={this._handleZChange} />
+                                <input type="text" className="knob z-axis" value={selected.rotation.enteredZ} onChange={this._handleZChange} />
                             </div>
                             <div className="controls pull-right">
                                 <a className="btn btn-default" onClick={this._handleResetRotation}>{lang.print.reset}</a>

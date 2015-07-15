@@ -12,6 +12,7 @@ define([
             ? args.disabledEscapeOnBackground
             : false
         );
+        args.onClose = args.onClose || function() {};
 
         var View = view(args),
             $root = $('.popup-window'),
@@ -59,6 +60,8 @@ define([
                 close: function() {
                     $root.find('.popup-background').remove();
                     $root.hide();
+
+                    args.onClose();
                 }
             };
 

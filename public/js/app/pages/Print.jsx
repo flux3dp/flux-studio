@@ -13,7 +13,7 @@ define([
     'jsx!views/print-operating-panels/Monitor',
     'helpers/file-system',
     'plugins/knob/jquery.knob.min'
-], function($, React, display, printEvents, RadioGroupView, ClassNames, OperatingPanel, SettingPanel, ScalePanel, RotationPanel, AdvancedPanel, MonitorPanel, FileSystem) {
+], function($, React, display, printController, RadioGroupView, ClassNames, OperatingPanel, SettingPanel, ScalePanel, RotationPanel, AdvancedPanel, MonitorPanel, FileSystem) {
     'use strict';
 
     return function(args) {
@@ -27,6 +27,17 @@ define([
                 temperature: 0,
                 support: ''
             },
+            _scale = {
+                locked  : true,
+                x       : 1,
+                y       : 1,
+                z       : 1
+            },
+            _rotation = {
+                x: 0,
+                y: 0,
+                z: 0
+            },
             lang = args.state.lang,
             view = React.createClass({
                 getInitialState: function() {
@@ -38,11 +49,11 @@ define([
                         showPreviewModeList : false,
                         showAdvancedSetting : false,
                         showMonitor         : false,
-                        modelSelected       : false
+                        modelSelected       : null
                     });
                 },
                 componentDidMount: function() {
-                    printEvents.init();
+                    printController.init(this);
                 },
                 _handlePreviewModeChange: function(mode, e) {
                     this.setState({
@@ -75,18 +86,25 @@ define([
                     console.log('zoom out');
                 },
                 _handleOperationChange: function(operation) {
-                    console.log('operation is', operation);
+                    // console.log('operation is', operation);
                     switch(operation) {
+                        case 'scale':
+                            this.setState({ operation: 'scale' });
+                            break;
+                        case 'rotate':
+                            this.setState({ operation: 'rotate' });
+                            break;
                         case 'center':
-                            printEvents.alignCenter();
+                            printController.alignCenter();
                             break;
                         case 'delete':
-                            printEvents.removeSelected();
+                            printController.removeSelected();
+                            this.setState({ operation: '' });
                             break;
                         default:
                             break;
                     }
-                    this.setState({ operation: this.state.operation == operation ? '' : operation });
+
                 },
                 _handlePlatformClick: function(state) {
                     console.log('platform clicked', state)
@@ -101,13 +119,22 @@ define([
                     console.log('start printing');
                 },
                 _handleRotation: function(rotation) {
-                    printEvents.rotate(rotation.x, rotation.y, rotation.z);
+                    _rotation = rotation;
+                    printController.rotate(rotation.x, rotation.y, rotation.z);
                 },
                 _handleResetRotation: function() {
-                    printEvents.rotate(0, 0, 0);
+                    _rotation.x = 0;
+                    _rotation.y = 0;
+                    _rotation.z = 0;
+                    printController.rotate(0, 0, 0);
+                },
+                _handleScaleChange: function(scale) {
+                    _scale = scale;
+                    // console.log(_scale);
+                    printController.setScale(scale.x, scale.y, scale.z, scale.locked);
                 },
                 _handleResetScale: function() {
-                    console.log('reset scale');
+                    printController.setScale(1, 1, 1);
                 },
                 _handleScaleToggleLock: function(state) {
                     console.log('lock', state);
@@ -140,7 +167,7 @@ define([
                             files.item(i),
                             {
                                 onComplete: function(e, fileEntry) {
-                                    printEvents.appendModel(fileEntry.toURL());
+                                    printController.appendModel(fileEntry.toURL());
                                 }
                             }
                         );
@@ -180,6 +207,7 @@ define([
                 _renderOperatingPanel: function() {
                     return (
                         <OperatingPanel
+                            modelSelected       = {this.state.modelSelected}
                             lang                = {lang}
                             onNavUp             = {this._handleNavUp}
                             onNavRight          = {this._handleNavRight}
@@ -231,14 +259,31 @@ define([
 
                     switch(this.state.operation) {
                         case 'rotate':
-                            bottomPanel = <RotationPanel lang={lang} onReset={this._handleResetRotation} onRotate={this._handleRotation} />;
+                            bottomPanel = (
+                                <RotationPanel
+                                    lang={lang}
+                                    selected={this.state.modelSelected}
+                                    onReset={this._handleResetRotation}
+                                    onRotate={this._handleRotation} />
+                            );
                             break;
                         case 'scale':
-                            bottomPanel = <ScalePanel lang={lang} onReset={this._handleResetScale} onToggleLock={this._handleScaleToggleLock} />;
+                            bottomPanel = (
+                                <ScalePanel
+                                    lang={lang}
+                                    selected={this.state.modelSelected}
+                                    onReset={this._handleResetScale}
+                                    onScaleChange={this._handleScaleChange}
+                                    onToggleLock={this._handleScaleToggleLock} />
+                            );
                             break;
                         default:
-                            bottomPanel = '';
+                            // bottomPanel = '';
                             break;
+                    }
+
+                    if(!this.state.modelSelected) {
+                        bottomPanel = '';
                     }
 
                     return (

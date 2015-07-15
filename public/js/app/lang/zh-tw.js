@@ -399,7 +399,22 @@ define(function() {
                         }
                     ]
                 }
+            },
+            manipulation: {
+                smooth: 'Smooth',
+                crop: 'Crop',
+                delete: 'Delete',
+                clear_noise: 'Clear Noise',
+                reset: 'Reset'
             }
+        },
+        select_printer: {
+            choose_printer: '選擇一個成型機',
+            notification: '請輸入密碼',
+            submit: '送出',
+            please_enter_password: '請輸入密碼',
+            auth_failure: '認證失敗',
+            retry: '重新選擇'
         }
     };
 });

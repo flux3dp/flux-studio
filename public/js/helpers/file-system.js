@@ -56,6 +56,12 @@ define(function() {
                         fileEntry.createWriter(function(fileWriter) {
                             var fr = new FileReader();
 
+                            fileEntry.fileExtension = '';
+
+                            if (true === fileEntry.isFile) {
+                                fileEntry.fileExtension = fileEntry.name.split('.').reverse()[0];
+                            }
+
                             fileWriter.onwriteend = function(e) {
                                 options.onComplete(e, fileEntry);
                             };

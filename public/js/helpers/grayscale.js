@@ -26,7 +26,7 @@ define(function() {
                     binary.push(grayscale);
                 }
 
-                binary.push(data[i + 3]);
+                binary.push(WHITE === grayscale ? 0 : data[i + 3]);
             }
         }
 
