@@ -144,7 +144,7 @@ define([
     }
 
     function addControls() {
-        controls = new THREE.TrackballControls( camera );
+        controls = new THREE.TrackballControls( camera, container );
 
         controls.rotateSpeed = 2.0;
         controls.zoomSpeed = 1.2;

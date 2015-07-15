@@ -190,8 +190,8 @@ define([
                         });
                     },
                     onGetGCodeFinished = function(blob) {
-                        // var control_methods = control(printer.serial);
-                        // control_methods.upload(blob.size, blob);
+                        var control_methods = control(printer.serial);
+                        control_methods.upload(blob.size, blob);
                     };
 
                 laserParser.setup(0, [1, 'wood'], {
