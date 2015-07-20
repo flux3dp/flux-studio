@@ -13,8 +13,7 @@ define([
         opts = opts || {};
         opts.onError = opts.onError || function() {};
 
-        var history = [],
-            ws = new Websocket({
+        var ws = new Websocket({
                 method: '3d-scan-modeling',
                 onMessage: function(result) {
 
@@ -31,16 +30,53 @@ define([
 
                 },
                 onClose: function(result) {
-                    history = [];
+                    History.clearAll();
                 }
             }),
             lastMessage = '',
             events = {
                 onMessage: function() {}
-            };
+            },
+            History = (function(undefined) {
+                var history = [];   // uploaded point cloud
+
+                Array.observe(history, function(changes) {
+                    console.log(history);
+                });
+
+                return {
+                    push: function(name, data) {
+                        history.push({
+                            name: name,
+                            data: data
+                        });
+                    },
+                    pop: function() {
+                        return history.pop();
+                    },
+                    update: function(name, data) {
+                        var filtered = history.filter(function(arr) {
+                            return name === arr.name;
+                        });
+
+                        filtered.forEach(function(el) {
+                            el.data = data;
+                        });
+
+                        return filtered.length;
+                    },
+                    clearAll: function() {
+                        history = [];
+                    },
+                    getLatest: function() {
+                        return (0 < history.length ? history.slice(-1)[0] : undefined);
+                    }
+                };
+            })(undefined);
 
         return {
             connection: ws,
+            History: History,
             upload: function(name, point_cloud, opts) {
                 opts.onFinished = opts.onFinished || function() {};
 
@@ -67,10 +103,7 @@ define([
 
                         break;
                     case 'ok':
-                        history.push({
-                            name: name,
-                            data: point_cloud
-                        });
+                        History.push(name, point_cloud.total);
                         opts.onFinished();
                         break;
                     }
@@ -145,7 +178,8 @@ define([
 
                 opts.onFinished = opts.onFinished || function() {};
 
-                var order_name = 'delete_noise',
+                var self = this,
+                    order_name = 'delete_noise',
                     args = [
                         order_name,
                         in_name,
@@ -157,7 +191,7 @@ define([
 
                     switch (data.status) {
                     case 'ok':
-                        this.dump(
+                        self.dump(
                             out_name,
                             opts
                         );
@@ -205,6 +239,7 @@ define([
                         next_right = parseInt(data.right, 10) * 24;
                     }
                     else if ('undefined' !== typeof data.status && 'ok' === data.status) {
+                        History.push(name, pointCloud.get().total);
                         opts.onFinished(pointCloud.get());
                     }
 
@@ -246,7 +281,7 @@ define([
                 };
 
                 ws.send(args.join(' '));
-            },
+            }
         };
     };
 });
