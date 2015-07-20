@@ -6,8 +6,9 @@ define([
     'helpers/api/3d-scan-control',
     'helpers/api/3d-scan-modeling',
     'jsx!views/scan/Setup-Panel',
-    'jsx!views/scan/Manipulation-Panel'
-], function($, React, popup, scanedModel, scanControl, scanModeling, SetupPanel, ManipulationPanel) {
+    'jsx!views/scan/Manipulation-Panel',
+    'helpers/file-system'
+], function($, React, popup, scanedModel, scanControl, scanModeling, SetupPanel, ManipulationPanel, fileSystem) {
     'use strict';
 
     return function(args) {
@@ -64,8 +65,41 @@ define([
                 },
 
                 _saveAs: function(e) {
+                    var self = this;
+
                     require(['jsx!views/scan/Export'], function(view) {
                         var popup_window;
+
+                        args.onExport = function(e) {
+                            var last_point_cloud = self.point_cloud_history.slice(-1)[0],
+                                file_format = $('[name="file-format"]:checked').val(),
+                                file_name = (new Date()).getTime() + '.' + file_format;
+
+                            self.scan_modeling_websocket.export(
+                                last_point_cloud.name,
+                                file_format,
+                                {
+                                    onFinished: function(blob) {
+                                        var file = new File(
+                                            [blob],
+                                            file_name
+                                        );
+
+                                        fileSystem.writeFile(
+                                            file,
+                                            {
+                                                onComplete: function(e, fileEntry) {
+                                                    window.open(fileEntry.toURL());
+                                                }
+                                            }
+                                        );
+
+                                        popup_window.close();
+                                    }
+                                }
+                            );
+                        };
+                        args.disabledEscapeOnBackground = false;
 
                         popup_window = popup(view, args);
                         popup_window.open();
