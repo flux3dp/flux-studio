@@ -4156,3 +4156,7 @@ input.switch:checked ~ label:after {
     height: 150px;
     padding: 10px;
     width: 60%; }
+    .scan-model-save-as .file-formats {
+        margin: 0 0 10px 0; }
+        .scan-model-save-as .file-formats label {
+            float: left; }
