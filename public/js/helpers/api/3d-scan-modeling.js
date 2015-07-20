@@ -13,16 +13,15 @@ define([
         opts = opts || {};
         opts.onError = opts.onError || function() {};
 
-        var ws = new Websocket({
+        var history = [],
+            ws = new Websocket({
                 method: '3d-scan-modeling',
                 onMessage: function(result) {
 
-                    var data = (true === isJson(result.data) ? JSON.parse(result.data) : result.data),
-                        error_code;
+                    var data = (true === isJson(result.data) ? JSON.parse(result.data) : result.data);
 
-                    if ('string' === typeof data && true === data.startsWith('error')) {
-                        error_code = result.data.replace('error ');
-                        opts.onError(error_code, data);
+                    if ('string' === typeof data && 'fatal' === data.status) {
+                        opts.onError(data.error, data);
                     }
                     else {
                         events.onMessage(data);
@@ -30,6 +29,9 @@ define([
 
                     lastMessage = data;
 
+                },
+                onClose: function(result) {
+                    history = [];
                 }
             }),
             lastMessage = '',
@@ -65,6 +67,10 @@ define([
 
                         break;
                     case 'ok':
+                        history.push({
+                            name: name,
+                            data: point_cloud
+                        });
                         opts.onFinished();
                         break;
                     }
@@ -166,7 +172,6 @@ define([
                 // TODO: to be implemented
             },
             dump: function(name, opts) {
-                console.log('on dump');
                 opts.onFinished = opts.onFinished || function() {};
                 opts.onReceiving = opts.onReceiving || function() {};
 
@@ -199,8 +204,32 @@ define([
 
                 ws.send(args.join(' '));
             },
-            export: function(name) {
-                // TODO: to be implemented
+            export: function(name, file_format, opts) {
+                opts.onFinished = opts.onFinished || function() {};
+
+                var order_name = 'export',
+                    args = [
+                        order_name,
+                        name,
+                        file_format
+                    ],
+                    blobs = [];
+
+                events.onMessage = function(data) {
+
+                    if (true === data instanceof Blob) {
+                        blobs.push(data);
+                    }
+                    else if ('string' === typeof data.status && 'continue' === data.status) {
+                        // TODO: do something?
+                    }
+                    else if ('string' === typeof data.status && 'ok' === data.status) {
+                        opts.onFinished(new Blob(blobs));
+                    }
+
+                };
+
+                ws.send(args.join(' '));
             },
         };
     };
