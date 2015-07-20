@@ -85,19 +85,11 @@ define([
                                 image_length = parseInt(data.replace('ok '), 10);
                             }
                             else if ('string' === typeof data && 'finished' === data) {
-                                image_file = new File(
-                                    image_blobs,
-                                    'scan.png'
-                                );
-
                                 allow_to_get = true;
 
-                                fileSystem.writeFile(
-                                    image_file,
-                                    {
-                                        onComplete: imageHandler
-                                    }
-                                );
+                                imageHandler(image_blobs);
+
+                                image_blobs = [];
                             }
                             else if (true === data instanceof Blob) {
                                 // get
