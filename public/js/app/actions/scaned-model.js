@@ -11,7 +11,6 @@ define([
         container, camera, scene, renderer, controls, transform_control, cylinder;
 
     function init() {
-
         container = document.getElementById('model-displayer');
 
         scene = new THREE.Scene();
@@ -35,7 +34,7 @@ define([
         });
         renderer.setClearColor( 0xE0E0E0, 1 );
         renderer.setPixelRatio(window.devicePixelRatio);
-        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setSize(container.offsetWidth, container.offsetHeight);
         container.appendChild(renderer.domElement);
 
         window.addEventListener('resize', onWindowResize, false);
