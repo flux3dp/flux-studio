@@ -6,19 +6,21 @@ define([
 
     return function(args) {
         args = args || {};
+        args.onExport = args.onExport || function() {};
 
         var Widget = React.createClass({
+                _onExport: function(e) {
+                    args.onExport(e);
+                },
                 render : function() {
                     var lang = this.state.lang;
 
                     return (
                         <div className="scan-model-save-as absolute-center">
-                            <h4>{lang.scan.save_as}</h4>
-                            <div className="progress">
-                                <RadioGroupView name="file-mode" options={lang.scan.save_mode}/>
-                            </div>
+                            <h4 className="caption">{lang.scan.save_as}</h4>
+                            <RadioGroupView className="file-formats clearfix" name="file-format" options={lang.scan.save_mode}/>
                             <div>
-                                <button id="btn-save-scan-model" className="btn span12">{lang.scan.do_save}</button>
+                                <button className="btn btn-default" onClick={this._onExport}>{lang.scan.do_save}</button>
                             </div>
                         </div>
                     );
