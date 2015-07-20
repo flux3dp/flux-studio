@@ -138,7 +138,6 @@ define([
 
                             // set default image
                             $target_image = $div;
-                            console.log('on load', index, total);
 
                             if (index === total) {
                                 reactComponent.setState({
