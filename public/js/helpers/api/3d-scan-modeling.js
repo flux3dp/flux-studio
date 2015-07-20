@@ -171,6 +171,14 @@ define([
             merge: function(name, x1, x2, y1, y2) {
                 // TODO: to be implemented
             },
+            /**
+             * @param {String} name - source name
+             * @param {Json}   opts - option parameters
+             *      {
+             *          onFinished <dump finished>
+             *          onReceiving <dump on progressing>
+             *      }
+             */
             dump: function(name, opts) {
                 opts.onFinished = opts.onFinished || function() {};
                 opts.onReceiving = opts.onReceiving || function() {};
@@ -204,6 +212,14 @@ define([
 
                 ws.send(args.join(' '));
             },
+            /**
+             * @param {String} name        - source name
+             * @param {String} file_format - file format (stl, pcd)
+             * @param {Json}   opts        - option parameters
+             *      {
+             *          onFinished <export finished>
+             *      }
+             */
             export: function(name, file_format, opts) {
                 opts.onFinished = opts.onFinished || function() {};
 
