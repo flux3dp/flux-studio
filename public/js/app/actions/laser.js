@@ -5,10 +5,11 @@ define([
     'helpers/api/bitmap-laser-parser',
     'helpers/grayscale',
     'helpers/convertToTypedArray',
+    'helpers/element-angle',
     'helpers/api/control',
     'jsx!widgets/Popup',
     'freetrans',
-    'helpers/jquery.fullPosition'
+    'helpers/jquery.box'
 ], function(
     $,
     fileSystem,
@@ -16,6 +17,7 @@ define([
     bitmapLaserParser,
     grayScale,
     convertToTypedArray,
+    elementAngle,
     control,
     popup
 ) {
@@ -159,23 +161,6 @@ define([
 
                 }
             },
-            getAngle = function(el) {
-                // refs: https://css-tricks.com/get-value-of-css-rotation-through-javascript/
-                var st = window.getComputedStyle(el, null),
-                    matrix = st.getPropertyValue("-webkit-transform"),
-                    values = matrix.split('(')[1].split(')')[0].split(','),
-                    a, b, c, d, scale, sin;
-
-                a = values[0];
-                b = values[1];
-                c = values[2];
-                d = values[3];
-
-                scale = Math.sqrt(a * a + b * b);
-                sin = b / scale;
-
-                return Math.round(Math.atan2(b, a) * (180 / Math.PI));
-            },
             sendingToLaser = function(args) {
 
                 var laserParser = bitmapLaserParser(),
@@ -200,35 +185,37 @@ define([
 
             },
             refreshObjectParams = function($el) {
-                var bounds, platform_position, el_position;
+                var bounds, platform_offset, el_offset, el_position;
 
                 if (null !== $el) {
-                    platform_position = $laser_platform.fullPosition(true);
-                    el_position = $el.fullPosition(true);
+                    platform_offset = $laser_platform.box(true);
+                    el_offset = $el.box(true);
+                    el_position = $el.box();
                     bounds = $el.freetrans('getBounds');
 
-                    if (platform_position.left > el_position.left) {
+                    if (0 > el_position.left) {
                         $el.freetrans({
                             x: 0,
                         });
                     }
-                    else if (platform_position.top > el_position.top) {
+                    if (0 > el_position.top) {
                         $el.freetrans({
                             y: 0,
                         });
                     }
-                    else if (platform_position.bottom < el_position.bottom) {
+                    if (platform_offset.bottom < el_offset.bottom) {
                         $el.freetrans({
-                            y: $laser_platform.height() - $el.height(),
+                            y: el_position.top - (el_offset.bottom - platform_offset.bottom),
                         });
                     }
-                    else if (platform_position.right < el_position.right) {
+                    if (platform_offset.right < el_offset.right) {
                         $el.freetrans({
-                            x: $laser_platform.width() - $el.width(),
+                            x: el_position.left - (el_offset.right - platform_offset.right),
                         });
                     }
 
-                    $angle.val(getAngle($el[0]));
+                    el_position = $el.position();
+                    $angle.val(elementAngle($el[0]));
                     $pos_x.val(el_position.left);
                     $pos_y.val(el_position.top);
                     $size_h.val(bounds.height);
@@ -280,7 +267,7 @@ define([
                                 tl_position_y: convertToRealCoordinate(top_left.y, 'y'),
                                 br_position_x: convertToRealCoordinate(bottom_right.x, 'x'),
                                 br_position_y: convertToRealCoordinate(bottom_right.y, 'y'),
-                                rotate: (Math.PI * getAngle(el) / 180) * -1,
+                                rotate: (Math.PI * elementAngle(el) / 180) * -1,
                                 threshold: $threshold.val()
                             },
                             canvas = document.createElement('canvas'),
