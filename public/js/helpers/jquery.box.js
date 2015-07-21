@@ -6,17 +6,22 @@ define([
 ], function($) {
     'use strict';
 
-    $.fn.fullPosition = function(is_offset) {
+    $.fn.box = function(is_offset) {
         is_offset = ('boolean' === typeof is_offset ? is_offset : false);
 
         var $self = $(this),
+            bounds = $self.get(0).getBoundingClientRect(),
+            real_width = bounds.right - bounds.left,
+            real_height = bounds.bottom - bounds.top,
             pos = (true === is_offset ? $self.offset() : $self.position());
 
         return {
             left: pos.left,
             top: pos.top,
-            right: pos.left + $self.width(),
-            bottom: pos.top + $self.height(),
+            right: pos.left + real_width,
+            bottom: pos.top + real_height,
+            width: real_width,
+            height: real_height
         };
     };
 });
