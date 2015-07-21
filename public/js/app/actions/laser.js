@@ -7,7 +7,8 @@ define([
     'helpers/convertToTypedArray',
     'helpers/api/control',
     'jsx!widgets/Popup',
-    'freetrans'
+    'freetrans',
+    'helpers/jquery.fullPosition'
 ], function(
     $,
     fileSystem,
@@ -199,15 +200,37 @@ define([
 
             },
             refreshObjectParams = function($el) {
-                var bounds, pos;
+                var bounds, platform_position, el_position;
 
                 if (null !== $el) {
+                    platform_position = $laser_platform.fullPosition(true);
+                    el_position = $el.fullPosition(true);
                     bounds = $el.freetrans('getBounds');
-                    pos = $el.position();
+
+                    if (platform_position.left > el_position.left) {
+                        $el.freetrans({
+                            x: 0,
+                        });
+                    }
+                    else if (platform_position.top > el_position.top) {
+                        $el.freetrans({
+                            y: 0,
+                        });
+                    }
+                    else if (platform_position.bottom < el_position.bottom) {
+                        $el.freetrans({
+                            y: $laser_platform.height() - $el.height(),
+                        });
+                    }
+                    else if (platform_position.right < el_position.right) {
+                        $el.freetrans({
+                            x: $laser_platform.width() - $el.width(),
+                        });
+                    }
 
                     $angle.val(getAngle($el[0]));
-                    $pos_x.val(pos.left);
-                    $pos_y.val(pos.top);
+                    $pos_x.val(el_position.left);
+                    $pos_y.val(el_position.top);
                     $size_h.val(bounds.height);
                     $size_w.val(bounds.width);
                 }
