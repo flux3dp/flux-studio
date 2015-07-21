@@ -70,7 +70,6 @@ define([
                     );
                 },
                 render : function() {
-                    console.log('render');
                     var lang = args.state.lang,
                         header = this._renderHeader(),
                         beginingSection = this._renderBeginingSection(),
