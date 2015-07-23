@@ -5,8 +5,9 @@
 define([
     'helpers/websocket',
     'helpers/point-cloud',
-    'helpers/is-json'
-], function(Websocket, PointCloudHelper, isJson) {
+    'helpers/is-json',
+    'helpers/data-history'
+], function(Websocket, PointCloudHelper, isJson, history) {
     'use strict';
 
     return function(opts) {
@@ -37,42 +38,7 @@ define([
             events = {
                 onMessage: function() {}
             },
-            History = (function(undefined) {
-                var history = [];   // uploaded point cloud
-
-                Array.observe(history, function(changes) {
-                    console.log(history);
-                });
-
-                return {
-                    push: function(name, data) {
-                        history.push({
-                            name: name,
-                            data: data
-                        });
-                    },
-                    pop: function() {
-                        return history.pop();
-                    },
-                    update: function(name, data) {
-                        var filtered = history.filter(function(arr) {
-                            return name === arr.name;
-                        });
-
-                        filtered.forEach(function(el) {
-                            el.data = data;
-                        });
-
-                        return filtered.length;
-                    },
-                    clearAll: function() {
-                        history = [];
-                    },
-                    getLatest: function() {
-                        return (0 < history.length ? history.slice(-1)[0] : undefined);
-                    }
-                };
-            })(undefined);
+            History = history();
 
         return {
             connection: ws,
@@ -171,7 +137,6 @@ define([
                         clearInterval(timer);
                     }
                 }, 0);
-
 
             },
             delete_noise: function(in_name, out_name, c, opts) {
