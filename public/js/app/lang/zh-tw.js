@@ -278,7 +278,8 @@ define(function() {
             acceptable_files: 'JPG, PNG, PDF, AI',
             drop_files_to_import: 'Drop your file here or click "import" to upload your file',
             advenced: 'Advenced',
-            start_laser: 'LASER',
+            start_engrave: 'ENGRAVE',
+            start_cut: 'CUT',
             print_params: {
                 material: {
                     text: '材質',
