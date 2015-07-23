@@ -7,7 +7,8 @@ define([
     return React.createClass({
         render: function() {
             var props = this.props,
-                lang = props.lang;
+                lang = props.lang,
+                mode = ('engrave' === props.mode ? lang.laser.start_engrave : lang.laser.start_cut);
 
             return (
                 <div className="setup-panel operating-panel">
@@ -38,7 +39,7 @@ define([
                     </div>
                     <button id="btn-start" className="btn btn-action btn-full-width btn-start">
                         <img src="/img/icon-laser-s.png"/>
-                        {lang.laser.start_laser}
+                        {mode}
                     </button>
                 </div>
             );
