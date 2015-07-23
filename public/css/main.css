@@ -3996,7 +3996,8 @@ input.switch:checked ~ label:after {
     position: fixed;
     width: 400px; }
     .laser-studio .laser-object .svg {
-        min-width: 300px; }
+        min-height: 280px;
+        min-width: 280px; }
 
 .laser-studio .laser-object .ft-container {
     z-index: 1; }
