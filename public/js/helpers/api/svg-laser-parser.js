@@ -133,12 +133,18 @@ define([
                 ],
                 blobs = [],
                 blob,
-                total_length = 0;
+                total_length = 0,
+                size = {
+                    height: 0,
+                    width: 0
+                };
 
                 events.onMessage = function(data) {
 
                     if ('continue' === data.status) {
                         total_length = data.length;
+                        size.height = data.height;
+                        size.width = data.width;
                     }
                     else if (true === data instanceof Blob) {
                         blobs.push(data);
@@ -146,7 +152,7 @@ define([
 
                         if (total_length === blob.size) {
                             History.push(name, blob);
-                            opts.onFinished(blob);
+                            opts.onFinished(blob, size);
                         }
                     }
 
