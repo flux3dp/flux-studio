@@ -49,8 +49,12 @@ define([
 
                 if (null !== $target_image) {
                     // delete svg blob from history
-                    if (true === $img.hasClass('svg')) {
+                    if ('svg' === reactComponent.props.file_format && true === $img.hasClass('svg')) {
                         svgLaserWebSocket.History.deleteAt($img.data('name'));
+
+                        if (true === svgLaserWebSocket.History.isEmpty()) {
+                            reactComponent.props.file_format = '';
+                        }
                     }
 
                     $target_image.parents('.ft-container').remove();
@@ -437,8 +441,8 @@ define([
                             sub_data.image_data = grayScale(ctx.getImageData(0, 0, width, height).data);
 
                             if ('svg' === reactComponent.props.file_format && true === $img.hasClass('svg')) {
-                                sub_data.width = parseInt(sub_data.width / $laser_platform.width() * DIAMETER, 10);
-                                sub_data.height = parseInt(sub_data.height / $laser_platform.height() * DIAMETER, 10);
+                                sub_data.width = sub_data.width / $laser_platform.width() * DIAMETER;
+                                sub_data.height = sub_data.height / $laser_platform.height() * DIAMETER;
                                 sub_data.svg_data = svgLaserWebSocket.History.findByName($img.data('name'))[0].data;
                             }
 
