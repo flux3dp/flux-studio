@@ -175,7 +175,7 @@ define([
                 opts.onFinished = opts.onFinished || function() {};
 
                 var requests_serial = [],
-                    fileReader = new FileReader(),
+                    fileReader,
                     all_ok = false,
                     request_header,
                     next_data,
@@ -221,7 +221,7 @@ define([
                             opts.onFinished();
                         }
                         else {
-                            next_data = args.pop();
+                            next_data = requests_serial.pop();
                         }
                         break;
                     default:
@@ -230,17 +230,23 @@ define([
                     }
                 };
 
-                fileReader.onload = function() {
-                    // send svg
-                    ws.send(this.result);
-                    // send thumbnail
-                    ws.send(next_data.thumbnail);
-                };
-
                 timer = setInterval(function() {
                     if ('undefined' !== typeof next_data) {
 
                         if ('object' === typeof next_data) {
+                            fileReader = new FileReader();
+
+                            fileReader.onload = function() {
+                                // send svg
+                                ws.send(this.result);
+                                // send thumbnail
+                                ws.send(next_data.thumbnail);
+
+                                fileReader.onload = null;
+
+                                next_data = undefined;
+                            };
+
                             fileReader.readAsArrayBuffer(next_data.svg);
                         }
                         else {
