@@ -55,11 +55,9 @@ define([
                     display(factory, args, $root[0]);
                 },
                 /**
-                 * destroy and hide
+                 * hide
                  */
                 close: function() {
-                    $root.children().remove();
-
                     $root.hide();
 
                     args.onClose();
