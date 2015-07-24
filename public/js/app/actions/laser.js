@@ -9,6 +9,7 @@ define([
     'helpers/element-angle',
     'helpers/api/control',
     'jsx!widgets/Popup',
+    'helpers/shortcuts',
     'freetrans',
     'helpers/jquery.box'
 ], function(
@@ -21,7 +22,8 @@ define([
     convertToTypedArray,
     elementAngle,
     control,
-    popup
+    popup,
+    shortcuts
 ) {
     'use strict';
 
@@ -104,7 +106,6 @@ define([
                 img.src = $img.data('base');
             },
             readfiles = function(files) {
-
                 var makeObjectUrl = function(file, index, files) {
                     var extension = file.name.split('.').pop(),
                         blob,
@@ -218,6 +219,8 @@ define([
                                 url = window.URL,
                                 objectUrl = url.createObjectURL(blob);
 
+                            clearFileInput();
+
                             // trigger the image to load
                             $img.data('base', objectUrl).data('name', name).attr('src', objectUrl).trigger('load');
 
@@ -241,9 +244,13 @@ define([
                             onComplete: function(e, fileEntry) {
                                 var name = 'bitmap-' + (new Date()).getTime();
                                 $img.data('name', name).data('base', fileEntry.toURL()).attr('src', fileEntry.toURL());
+                                clearFileInput();
                             }
                         }
                     );
+                },
+                clearFileInput = function() {
+                    $uploader_file_control.replaceWith( $uploader_file_control.val('').clone( true ) );
                 },
                 is_image = function(file) {
                     var mime_type = file.type.split('/')[0];
@@ -517,10 +524,11 @@ define([
             });
         });
 
-        $(document).on('keydown', function(e) {
-            if (DELECT_KEY_CODE === e.keyCode && false === printer_selecting) {
+        shortcuts.on(
+            ['cmd', 'del'],
+            function(e) {
                 deleteImage();
             }
-        });
+        );
     };
 });
