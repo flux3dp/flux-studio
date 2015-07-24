@@ -54,6 +54,9 @@ define(['helpers/array-findindex'], function() {
             },
             getLatest: function() {
                 return (0 < history.length ? history.slice(-1)[0] : undefined);
+            },
+            isEmpty: function() {
+                return 0 === history.length;
             }
         };
     };
