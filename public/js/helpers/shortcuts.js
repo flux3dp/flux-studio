@@ -9,7 +9,8 @@ define([
 
     var $document = $(document),
         special_key_map = {
-            'CMD': 91,
+            'L_CMD': 91,
+            'R_CMD': 93,
             'SHIFT': 16,
             'CTRL': 17,
             'ALT': 18,
