@@ -160,16 +160,21 @@ define([
                     $img.addClass(extension);
 
                     $img.one('load', function() {
-                        var self = this;
+                        var self = this,
+                            defaultSize = {
+                                height: self.naturalHeight,
+                                width: self.naturalWidth
+                            },
+                            size = $img.data('size') || defaultSize;
 
-                        $img.width(self.naturalWidth);
-                        $img.height(self.naturalHeight);
+                        $img.width(size.width);
+                        $img.height(size.height);
 
-                        if (0 === self.naturalWidth || $img.width() > $laser_platform.width()) {
+                        if (0 === size.width || $img.width() > $laser_platform.width()) {
                             $img.width(280);
                         }
 
-                        if (0 === self.naturalHeight || $img.height() > $laser_platform.height()) {
+                        if (0 === size.height || $img.height() > $laser_platform.height()) {
                             $img.height(280);
                         }
 
@@ -214,7 +219,7 @@ define([
                             opts.onFinished = onGetFinished;
                             svgLaserWebSocket.get(name, opts);
                         },
-                        onGetFinished = function(data) {
+                        onGetFinished = function(data, size) {
                             var blob = new Blob([data], { type: 'image/svg+xml;charset=utf-8' }),
                                 url = window.URL,
                                 objectUrl = url.createObjectURL(blob);
@@ -222,7 +227,11 @@ define([
                             clearFileInput();
 
                             // trigger the image to load
-                            $img.data('base', objectUrl).data('name', name).attr('src', objectUrl).trigger('load');
+                            $img.data('base', objectUrl).
+                                data('name', name).
+                                data('size', size).
+                                attr('src', objectUrl).
+                                trigger('load');
 
                             // allow to go next svg
                             go_next = true;
@@ -350,26 +359,26 @@ define([
                     el_position = $el.box();
                     bounds = $el.freetrans('getBounds');
 
-                    if (0 > el_position.left) {
-                        $el.freetrans({
-                            x: 0,
-                        });
-                    }
-                    if (0 > el_position.top) {
-                        $el.freetrans({
-                            y: 0,
-                        });
-                    }
-                    if (platform_offset.bottom < el_offset.bottom) {
-                        $el.freetrans({
-                            y: el_position.top - (el_offset.bottom - platform_offset.bottom),
-                        });
-                    }
-                    if (platform_offset.right < el_offset.right) {
-                        $el.freetrans({
-                            x: el_position.left - (el_offset.right - platform_offset.right),
-                        });
-                    }
+                    // if (0 > el_position.left) {
+                    //     $el.freetrans({
+                    //         x: 0,
+                    //     });
+                    // }
+                    // if (0 > el_position.top) {
+                    //     $el.freetrans({
+                    //         y: 0,
+                    //     });
+                    // }
+                    // if (platform_offset.bottom < el_offset.bottom) {
+                    //     $el.freetrans({
+                    //         y: el_position.top - (el_offset.bottom - platform_offset.bottom),
+                    //     });
+                    // }
+                    // if (platform_offset.right < el_offset.right) {
+                    //     $el.freetrans({
+                    //         x: el_position.left - (el_offset.right - platform_offset.right),
+                    //     });
+                    // }
 
                     el_position = $el.position();
                     $angle.val(elementAngle($el[0]));
