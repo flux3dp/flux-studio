@@ -46,23 +46,23 @@ define([
             $btn_start = $('#btn-start'),
             $threshold = $('[name="threshold"]'),
             deleteImage = function() {
-                var $img_container = $('.' + LASER_IMG_CLASS),
-                    $img = $target_image.find('img');
+                var $img_container = $('.' + LASER_IMG_CLASS).not($target_image),
+                    $img = $target_image.find('img'),
+                    reset_file_type = false;
+
+                console.log($img_container.length);
 
                 if (null !== $target_image) {
                     // delete svg blob from history
                     if ('svg' === reactComponent.props.file_format && true === $img.hasClass('svg')) {
                         svgLaserWebSocket.History.deleteAt($img.data('name'));
-
-                        if (true === svgLaserWebSocket.History.isEmpty()) {
-                            reactComponent.props.file_format = '';
-                        }
                     }
 
                     $target_image.parents('.ft-container').remove();
 
-                    if (0 === $img_container.length) {
+                    if (0 >= $img_container.length) {
                         $target_image = null;
+                        reactComponent.props.file_format = undefined;
                     }
                     else {
                         $target_image = $img_container[0];
@@ -525,7 +525,14 @@ define([
         });
 
         shortcuts.on(
-            ['cmd', 'del'],
+            ['l_cmd', 'del'],
+            function(e) {
+                deleteImage();
+            }
+        );
+
+        shortcuts.on(
+            ['r_cmd', 'del'],
             function(e) {
                 deleteImage();
             }
