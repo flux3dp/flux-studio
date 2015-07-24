@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Don't forget the trailing / on the source directory - if you omit it,
+# it will copy the directory over, rather than just its contents.
+# NOTE: no trailing slash on destination directory
+export QA_SOURCE_DIR=/var/www/web-panel/public/
+export QA_DEST_DIR=/var/web-panel/public
+export QA_SERVER=192.168.0.202
+export QA_ACCOUNT=norman
+export QA_KEY=
+
+export RIGHTFUL_OWNER=root
