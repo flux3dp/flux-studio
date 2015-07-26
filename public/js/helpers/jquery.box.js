@@ -21,7 +21,11 @@ define([
             right: pos.left + real_width,
             bottom: pos.top + real_height,
             width: real_width,
-            height: real_height
+            height: real_height,
+            center: {
+                x: (pos.left * 2 + real_width) / 2,
+                y: (pos.top * 2 + real_height) / 2,
+            }
         };
     };
 });
