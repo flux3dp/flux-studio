@@ -351,34 +351,32 @@ define([
 
             },
             refreshObjectParams = function($el) {
-                var bounds, platform_offset, el_offset, el_position;
+                var bounds, el_offset, el_position,
+                    last_x, last_y,
+                    platform_pos = $laser_platform.box(),
+                    outOfRange = function(point, limit) {
+                        var x = Math.pow((platform_pos.center.x - point.x), 2),
+                            y = Math.pow((platform_pos.center.y - point.y), 2),
+                            range = Math.sqrt(x + y);
+
+                        return range > limit;
+                    };
 
                 if (null !== $el) {
-                    platform_offset = $laser_platform.box(true);
-                    el_offset = $el.box(true);
                     el_position = $el.box();
                     bounds = $el.freetrans('getBounds');
 
-                    // if (0 > el_position.left) {
-                    //     $el.freetrans({
-                    //         x: 0,
-                    //     });
-                    // }
-                    // if (0 > el_position.top) {
-                    //     $el.freetrans({
-                    //         y: 0,
-                    //     });
-                    // }
-                    // if (platform_offset.bottom < el_offset.bottom) {
-                    //     $el.freetrans({
-                    //         y: el_position.top - (el_offset.bottom - platform_offset.bottom),
-                    //     });
-                    // }
-                    // if (platform_offset.right < el_offset.right) {
-                    //     $el.freetrans({
-                    //         x: el_position.left - (el_offset.right - platform_offset.right),
-                    //     });
-                    // }
+                    if (true === outOfRange(el_position.center, DIAMETER)) {
+                        last_x = $el.data('last-x') || el_position.center.x;
+                        last_y = $el.data('last-y') || el_position.center.y;
+                        $el.freetrans({
+                            x: last_x,
+                            y: last_y
+                        });
+                    }
+                    else {
+                        $el.data('last-x', el_position.left).data('last-y', el_position.top);
+                    }
 
                     el_position = $el.position();
                     $angle.val(elementAngle($el[0]));
