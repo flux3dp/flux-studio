@@ -35,7 +35,8 @@ define([
 
                 componentDidMount: function() {
                     if ('start' === args.step) {
-                        this.scan_ctrl_websocket = scanControl('5ZMPBF415VH67ARLGGFWNKCSP');
+                        // this.scan_ctrl_websocket = scanControl('5ZMPBF415VH67ARLGGFWNKCSP');
+                        this.scan_ctrl_websocket = scanControl('1111111111111111111111111');
                         this.scan_modeling_websocket = scanModeling();
                         this._refreshCamera();
                     }
@@ -107,9 +108,9 @@ define([
                 _refreshCamera: function() {
                     var self = this;
 
-                    self.scan_modeling_image_method = this.scan_ctrl_websocket.getImage(
-                        function(image_blobs) {
-                            var blob = new Blob(image_blobs, {type: 'image/jpeg'}),
+                    self.scan_modeling_image_method = self.scan_ctrl_websocket.getImage(
+                        function(image_blobs, mime_type) {
+                            var blob = new Blob(image_blobs, {type: mime_type}),
                                 url = (window.URL || window.webkitURL),
                                 objectUrl = url.createObjectURL(blob),
                                 img = self.refs.camera_image.getDOMNode();
@@ -130,11 +131,15 @@ define([
                     location.hash = 'studio/scan/start';
                 },
 
+                _getScanSpeed: function() {
+                    return parseInt($('[name="scan_speed"] option:selected').val(), 10);
+                },
+
                 _onRendering: function(views, chunk_length) {
                     var self = this,
-                        scan_speed = parseInt(self.refs.scan_speed.getDOMNode().value, 10),
-                        remaining_sec = (scan_speed - chunk_length) * (20 * 60 / scan_speed),
-                        remaining_min = Math.floor(remaining_sec / 60);
+                        scan_speed = self._getScanSpeed(),
+                        remaining_sec = ((scan_speed - chunk_length) * (20 * 60 / scan_speed)) || 0,
+                        remaining_min = Math.floor(remaining_sec / 60) || 0;
 
                     remaining_sec = remaining_sec % (remaining_min * 60);
 
@@ -198,11 +203,12 @@ define([
                         },
                         onScan = function() {
                             var opts = {
-                                onRendering: self._onRendering,
-                                onFinished: onScanFinished
-                            };
+                                    onRendering: self._onRendering,
+                                    onFinished: onScanFinished
+                                },
+                                scan_speed = self._getScanSpeed();
 
-                            self.scan_ctrl_websocket.scan(opts);
+                            self.scan_ctrl_websocket.scan(scan_speed, opts);
                         };
 
                     self.refs = $.extend(true, {}, self.refs, refs);
