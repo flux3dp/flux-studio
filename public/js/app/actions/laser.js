@@ -31,7 +31,6 @@ define([
         args = args || {};
 
         var DIAMETER = 170,    // 170mm
-            DELECT_KEY_CODE = 68,
             LASER_IMG_CLASS = 'img-container',
             $uploader = $('.file-importer'),
             $uploader_file_control = $uploader.find('[type="file"]'),
@@ -49,8 +48,6 @@ define([
                 var $img_container = $('.' + LASER_IMG_CLASS).not($target_image),
                     $img = $target_image.find('img'),
                     reset_file_type = false;
-
-                console.log($img_container.length);
 
                 if (null !== $target_image) {
                     // delete svg blob from history
