@@ -18,39 +18,60 @@ define([
                 method: '3d-scan-control/' + serial,
                 onMessage: function(result) {
 
-                    var data = (true === isJson(result.data) ? JSON.parse(result.data) : result.data),
-                        error_code;
+                    var data = (true === isJson(result.data) ? JSON.parse(result.data) : result.data);
 
-                    if ('string' === typeof data && true === data.startsWith('error')) {
-                        error_code = result.data.replace('error ');
-                        opts.onError(error_code, data);
-
+                    switch (data.status) {
+                    case 'error':
+                        is_ready = false;
+                        is_error = true;
+                        opts.onError(data);
+                        break;
+                    case 'fatal':
+                        is_ready = false;
+                        is_error = true;
+                        break;
+                    case 'ready':
+                        is_ready = true;
+                        is_error = false;
+                        break;
+                    case 'connected':
+                        // wait for machine ready
+                        break;
+                    default:
+                        break;
                     }
-                    else {
-                        if ('connected' === data) {
-                            is_connected = true;
-                        }
 
+                    if (true === is_ready) {
                         events.onMessage(data);
                     }
 
                     lastMessage = data;
-
                 }
             }),
-            is_connected = false,
+            is_error = false,
+            is_ready = false,
             IMAGE_INTERVAL = 500,
             lastOrder = '',
             lastMessage = '',
             events = {
                 onMessage: function() {}
             },
+            retry = function() {
+                if (true === is_error) {
+                    ws.send('retry');
+                }
+            },
+            takeControl = function() {
+                if (true === is_error) {
+                    ws.send('take_control');
+                }
+            },
             wait_gap_time = 0,
             wait_for_connected_timer,
             image_timer,
-            check_is_connected = function(callback) {
+            check_is_ready = function(callback) {
                 wait_for_connected_timer = setInterval(function() {
-                    if (true === is_connected) {
+                    if (true === is_ready) {
                         clearInterval(wait_for_connected_timer);
                         wait_gap_time = 0;
                         callback();
@@ -64,54 +85,52 @@ define([
             stopGettingImage = function() {
                 if ('image' === lastOrder) {
                     clearInterval(image_timer);
+                    lastOrder = '';
                 }
             };
 
         return {
             connection: ws,
             getImage: function(imageHandler) {
-                var allow_to_get = true,
+                var allow_to_get = false,
                     image_length = 0,
+                    mime_type = '',
                     image_blobs = [],
                     fetch = function() {
                         lastOrder = 'image';
                         events.onMessage = function(data) {
-                            var image_file;
 
-                            allow_to_get = false;
-
-                            // ok [length]
-                            if ('string' === typeof data && true === data.startsWith('ok')) {
-                                image_length = parseInt(data.replace('ok '), 10);
-                            }
-                            else if ('string' === typeof data && 'finished' === data) {
-                                allow_to_get = true;
-
-                                imageHandler(image_blobs);
-
-                                image_blobs = [];
-                            }
-                            else if (true === data instanceof Blob) {
-                                // get
-                                image_blobs.push(data);
+                            switch (data.status) {
+                            case 'binary':
+                                mime_type = data.mime;
+                                break;
+                            case 'ok':
+                                imageHandler(image_blobs, mime_type);
+                                break;
+                            default:
+                                if (data instanceof Blob) {
+                                    image_blobs.push(data);
+                                }
+                                else {
+                                    // TODO: unexception data
+                                }
                             }
                         };
 
                         image_timer = setInterval(function() {
-                            if (true === allow_to_get) {
-                                allow_to_get = false;
-                                ws.send(lastOrder);
-                            }
+                            ws.send(lastOrder);
                         }, IMAGE_INTERVAL);
                     };
 
-                check_is_connected(fetch);
+                check_is_ready(fetch);
 
                 return {
-                    stop: stopGettingImage
+                    stop: stopGettingImage,
+                    retry: retry,
+                    take_control: takeControl
                 };
             },
-            scan: function(opts) {
+            scan: function(resolution, opts) {
                 stopGettingImage();
 
                 opts = opts || {};
@@ -123,30 +142,53 @@ define([
                     next_right = 0,
                     _opts = {
                         onProgress: opts.onRendering
-                    };
+                    },
+                    go_next = false,
+                    timer;
 
-                check_is_connected(function() {
-                    lastOrder = 'start';
-                    ws.send('start');
+                check_is_ready(function() {
+                    lastOrder = 'scan';
 
                     events.onMessage = function(data) {
-
-                        if (true === data instanceof Blob) {
-                            pointCloud.push(data, next_left, next_right, _opts);
-                        }
-                        else if ('undefined' !== typeof data.status && 'chunk' === data.status) {
+                        switch (data.status) {
+                        case 'chunk':
                             next_left = parseInt(data.left, 10) * 24;
                             next_right = parseInt(data.right, 10) * 24;
-                        }
-                        else if ('string' === typeof data && 'finished' === data) {
-                            // disconnect
-                            ws.send('quit');
-
-                            opts.onFinished(pointCloud.get());
+                            break;
+                        case 'ok':
+                            go_next = true;
+                            break;
+                        default:
+                            if (data instanceof Blob) {
+                                pointCloud.push(data, next_left, next_right, _opts);
+                            }
+                            else {
+                                // TODO: unexception data
+                            }
                         }
                     };
+
+                    timer = setInterval(function() {
+
+                        if (true === go_next) {
+                            go_next = false;
+                            ws.send(lastOrder);
+                            resolution--;
+                        }
+
+                        if (0 >= resolution) {
+                            opts.onFinished(pointCloud.get());
+                            clearInterval(timer);
+                        }
+                    }, 100);
+
+                    ws.send('resolution ' + resolution);
                 });
 
+                return {
+                    retry: retry,
+                    take_control: takeControl
+                };
             }
         };
     };
