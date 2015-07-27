@@ -35,7 +35,6 @@ define([
 
                 componentDidMount: function() {
                     if ('start' === args.step) {
-                        // this.scan_ctrl_websocket = scanControl('5ZMPBF415VH67ARLGGFWNKCSP');
                         this.scan_ctrl_websocket = scanControl('1111111111111111111111111');
                         this.scan_modeling_websocket = scanModeling();
                         this._refreshCamera();
