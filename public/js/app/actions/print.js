@@ -2,15 +2,17 @@ define([
     'jquery',
     'helpers/file-system',
     'helpers/display',
+    'helpers/websocket',
+    'helpers/api/3d-print-slicing',
     'threeOrbitControls',
     'threeSTLLoader',
     'threeCircularGridHelper'
 
-], function($, fileSystem, display) {
+], function($, fileSystem, display, websocket, printSlicing) {
     'use strict';
 
     var THREE = window.THREE || {},
-        container, stats;
+        container, stats, printController;
 
     var camera, camera2, scene, outScene, renderer, composer;
     var plane, control, controls, reactSrc;
@@ -20,28 +22,35 @@ define([
     var raycaster = new THREE.Raycaster();
     var mouse = new THREE.Vector2(),
         offset = new THREE.Vector3(),
-        myMesh, circularGridHelper, mouseDown, SELECTED;
+        myMesh, circularGridHelper, mouseDown, boundingBox, SELECTED;
 
-    var oldx, oldy;
+    var oldx, oldy, movingOffsetX, movingOffsetY, selectedGeometry, lastMovableX, lastMovableY;
 
+    var colorUnselected = 0x333333;
     var s = {
         diameter: 1700,
+        radius: 850,
+        height: 1800,
         step: 115,
-        upVector: new THREE.Vector3(0, 1, 0),
+        upVector: new THREE.Vector3(0, 0, 1),
         color:  0x777777,
         opacity: 0.2,
         text: true,
         textColor: '#000000',
-        textPosition: 'center'
-    }
+        textPosition: 'center',
+        colorOutside: 0xFF0000,
+        colorSelected: 0xFFCC00,
+        colorUnselected: 0x333333
+    };
 
     function init(src) {
 
         reactSrc = src;
         container = document.getElementById('model-displayer');
 
-        camera = new THREE.PerspectiveCamera( 70, container.offsetWidth / container.offsetHeight, 1, 30000 );
-        camera.position.set(850, 800, 850);
+        camera = new THREE.PerspectiveCamera( 45, (container.offsetWidth) / container.offsetHeight, 1, 30000 );
+        camera.position.set(1000, 1000, 1000);
+        camera.up = new THREE.Vector3(0,0,1);
 
         scene = new THREE.Scene();
 
@@ -58,9 +67,10 @@ define([
         );
         scene.add(circularGridHelper);
 
-        var geometry = new THREE.BoxGeometry( 1700, 0, 1700 );
+        var geometry = new THREE.CircleGeometry( 850, 80 );
         var material = new THREE.MeshBasicMaterial( { color: 0xCCCCCC, transparent: true } );
         myMesh = new THREE.Mesh( geometry, material );
+        myMesh.up = new THREE.Vector3(0,0,1);
         myMesh.visible = false;
         scene.add( myMesh );
         referenceMeshes.push(myMesh);
@@ -77,9 +87,8 @@ define([
         });
         renderer.setClearColor( 0xE0E0E0, 1 );
         renderer.setPixelRatio(window.devicePixelRatio);
-        renderer.setSize(container.offsetWidth, window.innerHeight);
+        renderer.setSize(container.offsetWidth, container.offsetHeight);
         renderer.sortObjects = false;
-
         container.appendChild(renderer.domElement);
 
         control = new THREE.OrbitControls( camera, renderer.domElement );
@@ -88,47 +97,79 @@ define([
         control.addEventListener( 'change', render );
 
         window.addEventListener('resize', onWindowResize, false);
-
-
         renderer.domElement.addEventListener( 'mousemove', onMouseMove, false );
         renderer.domElement.addEventListener('mousedown', onMouseDown, false);
         renderer.domElement.addEventListener( 'mouseup', onMouseUp, false );
 
+        setTimeout(function() {
+            renderer.setSize(container.offsetWidth, container.offsetHeight);
+            render();
+        }, 50)
+
         render();
+
+        // init print controller
+        printController = printSlicing();
     }
 
-    function appendModel(model_file_path) {
+    function uploadStl(name, file, callback) {
+        // pass to slicer
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            var arrayBuffer = reader.result;
+            printController.upload(name, file, callback);
+        }
+        reader.readAsArrayBuffer(file);
+    }
+
+    function appendModel(fileEntry, file) {
         var loader = new THREE.STLLoader();
+        var model_file_path = fileEntry.toURL();
+
+
         loader.load(model_file_path, function(geometry) {
 
             var material = new THREE.MeshPhongMaterial({
-                color: 0x333333,
+                color: s.colorUnselected,
                 specular: 0x111111,
                 shininess: 100
             });
             var mesh = new THREE.Mesh(geometry, material);
+            mesh.up = new THREE.Vector3(0,0,1);
+
+            uploadStl(mesh.uuid, file, function(result) {
+                // console.log('uploaded ', mesh.uuid);
+                console.log(result);
+            });
+
+            // THREE.GeometryUtils.center( geometry );
+            geometry.center();
 
             // normalize - resize, align
             var box = new THREE.Box3().setFromObject(mesh);
-            var v = getLargestPropertyValue(box.size());
-            var s = getScaleDifference(v);
-            console.log(box.size());
-            console.log(s);
+            var scale = getScaleDifference(getLargestPropertyValue(box.size()));
             selectObject(mesh);
-            mesh.scale.set(s, s, s);
-            mesh.scale._x = s;
-            mesh.scale._y = s;
-            mesh.scale._z = s;
+            mesh.scale.set(scale, scale, scale);
+            mesh.scale._x = scale;
+            mesh.scale._y = scale;
+            mesh.scale._z = scale;
+            /* customized properties */
             mesh.scale.enteredX = 1;
             mesh.scale.enteredY = 1;
             mesh.scale.enteredZ = 1;
+            mesh.scale.locked = true;
             mesh.rotation.enteredX = 0;
             mesh.rotation.enteredY = 0;
             mesh.rotation.enteredZ = 0;
+            mesh.position.isOutOfBounds = false;
+            /* end customized property */
+            mesh.rotation.order = 'ZYX';
             alignCenter();
 
             scene.add(mesh);
             objects.push(mesh);
+
+            // console.log('uploading ', mesh.uuid);
             render();
         });
     }
@@ -136,15 +177,22 @@ define([
     function onMouseDown(e) {
         e.preventDefault();
         adjustMousePosition(e);
-        var selected = {};
-        var intersects = getIntersects(mouse.x, mouse.y);
+        // console.log(camera.position);
+        raycaster.setFromCamera( mouse, camera );
+        var intersects = raycaster.intersectObjects( objects );
+        var location = getReferenceIntersectLocation(e);
+        // addPoint(location.x, location.y, location.z);
 
         if (intersects.length > 0) {
             var target = intersects[0].object;
-            control.enabled = false;
             selectObject(target);
+
+            control.enabled = false;
             mouseDown = true;
             container.style.cursor = 'move';
+
+            movingOffsetX = location ? location.x - target.position.x : target.position.x;
+            movingOffsetY = location ? location.y - target.position.y : target.position.y;
         }
         else {
             selectObject(null);
@@ -158,63 +206,65 @@ define([
         control.enabled = true;
         mouseDown = false;
         container.style.cursor = 'auto';
+
+        checkOutOfBounds(SELECTED);
+        render();
     }
 
     function onMouseMove(e) {
         event.preventDefault();
         adjustMousePosition(e);
+        // console.log(e.offsetX, e.offsetY, container.offsetWidth, container.offsetHeight);
 
-        var location = getIntersectLocation(e);
+        var location = getReferenceIntersectLocation(e);
         if(SELECTED && mouseDown)
         {
             if(SELECTED.position && location) {
-                SELECTED.position.x = location.x;
-                SELECTED.position.z = location.z;
+                SELECTED.position.x = location.x - movingOffsetX;
+                SELECTED.position.y = location.y - movingOffsetY;
                 render();
                 return;
             }
         }
-
     }
 
     // get objects that intersects with the ray
     function getIntersects(x, y) {
-        var vector = new THREE.Vector3(x, y, 0.1).unproject(camera);
-        var raycaster = new THREE.Raycaster(camera.position, vector.sub(camera.position).normalize());
+        var vector = new THREE.Vector3(x, y, 0.5).unproject(camera);
+        var raycaster = new THREE.Raycaster(camera.position, mouse.subSelf(camera.position).normalize());
         return raycaster.intersectObjects(objects);
     }
 
     // get ray intersect with reference mesh
-    function getIntersectLocation(e) {
-        var offx = e.clientX - 100,
-            offy = e.clientY - 50;
-        var vector = new THREE.Vector3( (
-            offx / container.offsetWidth ) * 2 - 1,
-            - ( offy / container.offsetHeight ) * 2 + 1,
+    function getReferenceIntersectLocation(e) {
+        var offx = 0,
+            offy = 0;
+
+        var vector = new THREE.Vector3(
+            ((e.offsetX - offx) / container.offsetWidth) * 2 - 1,
+            -((e.offsetY - offy) / container.offsetHeight) * 2 + 1,
             0.5
-        );
-        vector.unproject(camera);
+        ).unproject(camera);
+        // console.log(camera.position);
 
         var ray = new THREE.Raycaster( camera.position, vector.sub( camera.position ).normalize() );
         var intersects = ray.intersectObjects( referenceMeshes );
 
         if ( intersects.length > 0 ) {
-            return intersects[ 0 ].point
+            return intersects[0].point;
         }
     }
 
-    // select the specified object and change its color
+    // select the specified object, will calculate out-of-bounds and change color accordingly
     function selectObject(obj) {
         SELECTED = obj || {};
         reactSrc.setState({ modelSelected: SELECTED.uuid ? SELECTED : null });
         objects.forEach(function(object) {
-            if(object.uuid == SELECTED.uuid) {
-                object.material.color.setHex(0xFFCC00);
-            }
-            else {
-                object.material.color.setHex(0x333333);
+            if(!object.position.isOutOfBounds) {
+                object.material.color.setHex(object.uuid == SELECTED.uuid ? s.colorSelected : s.colorUnselected);
             }
         });
+        render();
     }
 
     // calculate the distance from reference mesh
@@ -222,21 +272,21 @@ define([
         if(mesh) {
             var ref = {},
                 box = new THREE.Box3().setFromObject(mesh);
-            var v = getLargestPropertyValue(box.size()),
-                s = getScaleDifference(v);
+            // var v = getLargestPropertyValue(box.size()),
+            //     s = getScaleDifference(v);
             ref.x = box.center().x;
-            ref.y = box.min.y;
-            ref.z = box.center().z;
+            ref.y = box.center().y;
+            ref.z = box.min.z;
             return ref;
         }
     }
 
     function adjustMousePosition(e) {
-        var offx = e.offsetX - 28,
-            offy = e.offsetY + 9;
+        var offx = 0,
+            offy = 0;
 
-        mouse.x = (offx / container.offsetWidth) * 2 - 1;
-        mouse.y = -(offy / container.offsetHeight) * 2 + 1;
+        mouse.x = ((e.offsetX - offx) / container.offsetWidth) * 2 - 1;
+        mouse.y = -((e.offsetY - offy) / container.offsetHeight) * 2 + 1;
     }
 
     // compare and return the largest axis value (for scaling)
@@ -314,10 +364,10 @@ define([
 
     // events
     function onWindowResize() {
-
-        camera.aspect = window.innerWidth / window.innerHeight;
+        // console.log('resize', container.offsetWidth, container.offsetHeight);
+        camera.aspect = container.offsetWidth / container.offsetHeight;
         camera.updateProjectionMatrix();
-        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setSize(container.offsetWidth, container.offsetHeight);
         render();
     }
 
@@ -325,11 +375,12 @@ define([
         SELECTED.rotation.enteredX = x;
         SELECTED.rotation.enteredY = y;
         SELECTED.rotation.enteredZ = z;
-        SELECTED.rotation.x = (x / 360 * Math.PI * 2) || 0;
-        SELECTED.rotation.y = (y / 360 * Math.PI * 2) || 0;
-        SELECTED.rotation.z = (z / 360 * Math.PI * 2) || 0;
+        SELECTED.rotation.x = degreeToRadian(x);
+        SELECTED.rotation.y = degreeToRadian(y);
+        SELECTED.rotation.z = degreeToRadian(z);
         reactSrc.setState({ modelSelected: SELECTED.uuid ? SELECTED : null });
-        render();
+        // throttle(alignCenter(), 500);
+        debounce(render(), 1000);
     }
 
     function setScale(x, y, z, locked) {
@@ -349,7 +400,8 @@ define([
         );
         SELECTED.scale.locked = locked;
         reactSrc.setState({ modelSelected: SELECTED.uuid ? SELECTED : null });
-        render();
+
+        alignCenter();
     }
 
     function alignCenter() {
@@ -358,6 +410,8 @@ define([
             SELECTED.position.x -= reference.x;
             SELECTED.position.y -= reference.y;
             SELECTED.position.z -= reference.z;
+
+            checkOutOfBounds(SELECTED);
             render();
         }
     }
@@ -370,9 +424,152 @@ define([
             if(index > -1) {
                 objects.splice(index, 1);
             }
-            SELECTED = null;
+
+            // delete model in backend
+
+
+            printController.delete(SELECTED.uuid, function(result) {
+                console.log('delete result: ', result);
+            });
+
+            // console.log('removing ', SELECTED.uuid);
             render();
         }
+    }
+
+    function addPoint(x, y, z) {
+        var geometry = new THREE.SphereGeometry( 5, 32, 32 );
+        var material = new THREE.MeshBasicMaterial( {color: 0xffff00} );
+        var sphere = new THREE.Mesh( geometry, material );
+        sphere.position.x = x;
+        sphere.position.y = y;
+        sphere.position.z = z;
+        scene.add( sphere );
+    }
+
+    function checkOutOfBounds(selectedObject) {
+        if(!$.isEmptyObject(selectedObject)) {
+            var outOfBounds = _isOutOfBounds(selectedObject);
+            selectedObject.material.color.setHex(outOfBounds ? s.colorOutside : s.colorSelected);
+        }
+    }
+
+    function _isOutOfBounds(selectedObject) {
+        var outOfBounds = false;
+        selectedObject.position.isOutOfBounds = false;
+
+        if(selectedObject.geometry) {
+            selectedGeometry = new THREE.Geometry().fromBufferGeometry(selectedObject.geometry);
+            // console.log(selectedGeometry.vertices[0]);
+            for(var i = 0; i < selectedGeometry.vertices.length; i++) {
+                if(Math.pow(selectedGeometry.vertices[i].x * selectedObject.scale.x * selectedObject.scale.enteredX + selectedObject.position.x, 2) +
+                    Math.pow(selectedGeometry.vertices[i].y * selectedObject.scale.y * selectedObject.scale.enteredY + selectedObject.position.y, 2) >
+                    Math.pow(s.radius, 2)) {
+                        selectedObject.position.isOutOfBounds = true;
+                        outOfBounds = true;
+                        break;
+                }
+            }
+        }
+
+        // console.log('is out of bound: ', outOfBounds);
+        return outOfBounds;
+    }
+
+    function degreeToRadian(degree) {
+        return (degree / 360 * Math.PI * 2) || 0;
+    }
+
+    function debounce(func, wait, immediate) {
+    	var timeout;
+    	return function() {
+    		var context = this, args = arguments;
+    		var later = function() {
+    			timeout = null;
+    			if (!immediate) func.apply(context, args);
+    		};
+    		var callNow = immediate && !timeout;
+    		clearTimeout(timeout);
+    		timeout = setTimeout(later, wait);
+    		if (callNow) func.apply(context, args);
+    	};
+    }
+
+    function getFileByteArray(filePath) {
+        getFileObject(filePath, function (fileObject) {
+            //  console.log(fileObject);
+             var reader = new FileReader();
+
+             reader.onload = function(e) {
+                 var arrayBuffer = reader.result;
+                 console.log(arrayBuffer);
+             }
+
+             reader.readAsArrayBuffer(fileObject);
+        });
+
+    }
+
+    function setModel(selectedObject) {
+        printController.set(
+            obj.uuid,
+            obj.position.x,
+            obj.position.y,
+            obj.position.z,
+            obj.rotation.x,
+            obj.rotation.y,
+            obj.rotation.z,
+            obj.scale.x,
+            obj.scale.y,
+            obj.scale.z,
+            function(result) {
+                console.log(result);
+            }
+        );
+    }
+
+    function readyGCode() {
+        // set each model's attribute with backend
+        var ready   = true,
+            counter = objects.length;
+
+        objects.forEach(function(obj) {
+            printController.set(
+                obj.uuid,
+                obj.position.x,
+                obj.position.y,
+                obj.position.z,
+                obj.rotation.x,
+                obj.rotation.y,
+                obj.rotation.z,
+                obj.scale.x,
+                obj.scale.y,
+                obj.scale.z, function(result) {
+                    if(result.status === 'fatal') {
+                        readyFailed(result.error);
+                        ready = false;
+                    }
+                    counter--;
+                    if(counter === 0 && ready) {
+                        getGCode();
+                    }
+                }
+            );
+        });
+    }
+
+    function readyFailed(message) {
+        console.log(message);
+    }
+
+    function getGCode(ready) {
+        var ids = [];
+        objects.forEach(function(obj) {
+            ids.push(obj.uuid);
+        });
+        printController.go(ids, function(result) {
+            console.log(result);
+        });
     }
 
     return {
@@ -381,6 +578,7 @@ define([
         rotate: rotate,
         setScale: setScale,
         alignCenter: alignCenter,
-        removeSelected: removeSelected
+        removeSelected: removeSelected,
+        readyGCode: readyGCode
     };
 });
