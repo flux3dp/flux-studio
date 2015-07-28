@@ -388,9 +388,9 @@ define([
         if(y === '' || y == 0) {y = 1;}
         if(z === '' || z == 0) {z = 1;}
         SELECTED.scale.set(
-            originalScaleX * x,
-            originalScaleY * y,
-            originalScaleZ * z
+            (originalScaleX * x) || originalScaleX,
+            (originalScaleY * y) || originalScaleX,
+            (originalScaleZ * z) || originalScaleX
         );
         SELECTED.scale.locked = locked;
         reactSrc.setState({ modelSelected: SELECTED.uuid ? SELECTED : null });
@@ -450,7 +450,7 @@ define([
         selectedObject.position.isOutOfBounds = false;
 
         if(selectedObject.geometry) {
-            selectedGeometry = new THREE.Geometry().fromBufferGeometry(selectedObject.geometry);
+            selectedGeometry = selectedObject.geometry.type === 'Geometry' ? selectedObject.geometry : new THREE.Geometry().fromBufferGeometry(selectedObject.geometry);
             for(var i = 0; i < selectedGeometry.vertices.length; i++) {
                 if(Math.pow(selectedGeometry.vertices[i].x * selectedObject.scale.x * selectedObject.scale.enteredX + selectedObject.position.x, 2) +
                     Math.pow(selectedGeometry.vertices[i].y * selectedObject.scale.y * selectedObject.scale.enteredY + selectedObject.position.y, 2) >
