@@ -8,14 +8,11 @@ define([
         setup = {
             'min': 0,
             'max': 359,
-            'step': 1,
+            'step': 5,
             'thickness': 0.2,
             'width': 50,
             'fgColor': '#777',
             'bgcolor': '#AAAAAA',
-            'format' : function (value) {
-                 return value;
-            },
             height: 50,
         };
 
@@ -45,15 +42,15 @@ define([
             this.props.onReset();
         },
         _handleXChange: function(v) {
-            rotation.x = Math.round(v) || 0;
+            rotation.x = v || '';
             this._rotateModel();
         },
         _handleYChange: function(v) {
-            rotation.y = Math.round(v) || 0;
+            rotation.y = v || '';
             this._rotateModel();
         },
         _handleZChange: function(v) {
-            rotation.z = Math.round(v) || 0;
+            rotation.z = v || '';
             this._rotateModel();
         },
         render: function() {
@@ -70,15 +67,15 @@ define([
                         <div className="container vertical-middle">
                             <div className="controls">
                                 <label>X</label>
-                                <input type="text" className="knob x-axis" value={selected.rotation.enteredX} onChange={this._handleXChange} />
+                                <input type="text" className="knob x-axis" value={selected.rotation.enteredX} />
                             </div>
                             <div className="controls">
                                 <label>Y</label>
-                                <input type="text" className="knob y-axis" value={selected.rotation.enteredY} onChange={this._handleYChange} />
+                                <input type="text" className="knob y-axis" value={selected.rotation.enteredY} />
                             </div>
                             <div className="controls">
                                 <label>Z</label>
-                                <input type="text" className="knob z-axis" value={selected.rotation.enteredZ} onChange={this._handleZChange} />
+                                <input type="text" className="knob z-axis" value={selected.rotation.enteredZ} />
                             </div>
                             <div className="controls pull-right">
                                 <a className="btn btn-default" onClick={this._handleResetRotation}>{lang.print.reset}</a>

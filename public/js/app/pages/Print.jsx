@@ -12,7 +12,7 @@ define([
     'jsx!views/print-operating-panels/Advanced',
     'jsx!views/print-operating-panels/Monitor',
     'helpers/file-system',
-    'plugins/knob/jquery.knob.min'
+    'plugins/knob/jquery.knob'
 ], function($, React, display, printController, RadioGroupView, ClassNames, OperatingPanel, SettingPanel, ScalePanel, RotationPanel, AdvancedPanel, MonitorPanel, FileSystem) {
     'use strict';
 
@@ -116,7 +116,7 @@ define([
                     this.setState({ showAdvancedSetting: !this.state.showAdvancedSetting });
                 },
                 _handlePrintStart: function() {
-                    console.log('start printing');
+                    printController.readyGCode();
                 },
                 _handleRotation: function(rotation) {
                     _rotation = rotation;
@@ -130,14 +130,10 @@ define([
                 },
                 _handleScaleChange: function(scale) {
                     _scale = scale;
-                    // console.log(_scale);
                     printController.setScale(scale.x, scale.y, scale.z, scale.locked);
                 },
                 _handleResetScale: function() {
                     printController.setScale(1, 1, 1);
-                },
-                _handleScaleToggleLock: function(state) {
-                    console.log('lock', state);
                 },
                 _handleAdvancedSettingCancel: function() {
                     console.log('advanced setting cancelled');
@@ -163,14 +159,17 @@ define([
                 _handleFileUpload: function(e) {
                     var files = e.target.files;
                     for (var i = 0; i < files.length; i++) {
-                        FileSystem.writeFile(
-                            files.item(i),
-                            {
-                                onComplete: function(e, fileEntry) {
-                                    printController.appendModel(fileEntry.toURL());
+                        (function(file) {
+                            FileSystem.writeFile(
+                                file,
+                                {
+                                    onComplete: function(e, fileEntry) {
+                                        printController.appendModel(fileEntry, file);
+                                    }
                                 }
-                            }
-                        );
+                            );
+                        })(files.item(i));
+
                     }
                     e.target.value = null;
                 },
@@ -278,12 +277,14 @@ define([
                             );
                             break;
                         default:
-                            // bottomPanel = '';
                             break;
                     }
 
                     if(!this.state.modelSelected) {
                         bottomPanel = '';
+                    }
+
+                    var divStyle = {
                     }
 
                     return (
@@ -301,7 +302,7 @@ define([
 
                             {monitorPanel}
 
-                            <div id="model-displayer" className="model-displayer"></div>
+                            <div id="model-displayer" className="model-displayer" style={divStyle}></div>
                         </div>
                     );
                 }
