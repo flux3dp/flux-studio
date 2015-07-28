@@ -116,7 +116,6 @@ define([
                     this.setState({ showAdvancedSetting: !this.state.showAdvancedSetting });
                 },
                 _handlePrintStart: function() {
-                    //console.log('start printing');
                     printController.readyGCode();
                 },
                 _handleRotation: function(rotation) {
@@ -131,7 +130,6 @@ define([
                 },
                 _handleScaleChange: function(scale) {
                     _scale = scale;
-                    // console.log(_scale);
                     printController.setScale(scale.x, scale.y, scale.z, scale.locked);
                 },
                 _handleResetScale: function() {
@@ -279,7 +277,6 @@ define([
                             );
                             break;
                         default:
-                            // bottomPanel = '';
                             break;
                     }
 
@@ -288,7 +285,6 @@ define([
                     }
 
                     var divStyle = {
-                        // width: 'calc(100% - 66px)'
                     }
 
                     return (

@@ -57,8 +57,6 @@ define([
             },
             set: function(name, positionX, positionY, positionZ, rotationX, rotationY, rotationZ, scaleX, scaleY, scaleZ, callback) {
                 events.onMessage = function(result) {
-                    // var _dfr = $.Deferred();
-                    // callback(_dfr.resolve(result));
                     callback(result);
                 };
                 var args = [name, positionX, positionY, positionZ, rotationX, rotationY, rotationZ, scaleX, scaleY, scaleZ];

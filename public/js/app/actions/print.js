@@ -40,7 +40,8 @@ define([
         textPosition: 'center',
         colorOutside: 0xFF0000,
         colorSelected: 0xFFCC00,
-        colorUnselected: 0x333333
+        colorUnselected: 0x333333,
+        offsetRatio: 0.1
     };
 
     function init(src) {
@@ -138,11 +139,9 @@ define([
             mesh.up = new THREE.Vector3(0,0,1);
 
             uploadStl(mesh.uuid, file, function(result) {
-                // console.log('uploaded ', mesh.uuid);
                 console.log(result);
             });
 
-            // THREE.GeometryUtils.center( geometry );
             geometry.center();
 
             // normalize - resize, align
@@ -169,7 +168,6 @@ define([
             scene.add(mesh);
             objects.push(mesh);
 
-            // console.log('uploading ', mesh.uuid);
             render();
         });
     }
@@ -177,11 +175,9 @@ define([
     function onMouseDown(e) {
         e.preventDefault();
         adjustMousePosition(e);
-        // console.log(camera.position);
         raycaster.setFromCamera( mouse, camera );
         var intersects = raycaster.intersectObjects( objects );
         var location = getReferenceIntersectLocation(e);
-        // addPoint(location.x, location.y, location.z);
 
         if (intersects.length > 0) {
             var target = intersects[0].object;
@@ -206,7 +202,6 @@ define([
         control.enabled = true;
         mouseDown = false;
         container.style.cursor = 'auto';
-
         checkOutOfBounds(SELECTED);
         render();
     }
@@ -214,7 +209,6 @@ define([
     function onMouseMove(e) {
         event.preventDefault();
         adjustMousePosition(e);
-        // console.log(e.offsetX, e.offsetY, container.offsetWidth, container.offsetHeight);
 
         var location = getReferenceIntersectLocation(e);
         if(SELECTED && mouseDown)
@@ -245,7 +239,6 @@ define([
             -((e.offsetY - offy) / container.offsetHeight) * 2 + 1,
             0.5
         ).unproject(camera);
-        // console.log(camera.position);
 
         var ray = new THREE.Raycaster( camera.position, vector.sub( camera.position ).normalize() );
         var intersects = ray.intersectObjects( referenceMeshes );
@@ -272,8 +265,6 @@ define([
         if(mesh) {
             var ref = {},
                 box = new THREE.Box3().setFromObject(mesh);
-            // var v = getLargestPropertyValue(box.size()),
-            //     s = getScaleDifference(v);
             ref.x = box.center().x;
             ref.y = box.center().y;
             ref.z = box.min.z;
@@ -364,7 +355,6 @@ define([
 
     // events
     function onWindowResize() {
-        // console.log('resize', container.offsetWidth, container.offsetHeight);
         camera.aspect = container.offsetWidth / container.offsetHeight;
         camera.updateProjectionMatrix();
         renderer.setSize(container.offsetWidth, container.offsetHeight);
@@ -379,8 +369,12 @@ define([
         SELECTED.rotation.y = degreeToRadian(y);
         SELECTED.rotation.z = degreeToRadian(z);
         reactSrc.setState({ modelSelected: SELECTED.uuid ? SELECTED : null });
-        // throttle(alignCenter(), 500);
-        debounce(render(), 1000);
+
+        // align to ground
+        var reference = getReferenceDistance(SELECTED);
+        SELECTED.position.z -= reference.z;
+
+        render();
     }
 
     function setScale(x, y, z, locked) {
@@ -426,13 +420,10 @@ define([
             }
 
             // delete model in backend
-
-
             printController.delete(SELECTED.uuid, function(result) {
                 console.log('delete result: ', result);
             });
 
-            // console.log('removing ', SELECTED.uuid);
             render();
         }
     }
@@ -449,18 +440,17 @@ define([
 
     function checkOutOfBounds(selectedObject) {
         if(!$.isEmptyObject(selectedObject)) {
-            var outOfBounds = _isOutOfBounds(selectedObject);
+            var outOfBounds = isOutOfBounds(selectedObject);
             selectedObject.material.color.setHex(outOfBounds ? s.colorOutside : s.colorSelected);
         }
     }
 
-    function _isOutOfBounds(selectedObject) {
+    function isOutOfBounds(selectedObject) {
         var outOfBounds = false;
         selectedObject.position.isOutOfBounds = false;
 
         if(selectedObject.geometry) {
             selectedGeometry = new THREE.Geometry().fromBufferGeometry(selectedObject.geometry);
-            // console.log(selectedGeometry.vertices[0]);
             for(var i = 0; i < selectedGeometry.vertices.length; i++) {
                 if(Math.pow(selectedGeometry.vertices[i].x * selectedObject.scale.x * selectedObject.scale.enteredX + selectedObject.position.x, 2) +
                     Math.pow(selectedGeometry.vertices[i].y * selectedObject.scale.y * selectedObject.scale.enteredY + selectedObject.position.y, 2) >
@@ -472,7 +462,6 @@ define([
             }
         }
 
-        // console.log('is out of bound: ', outOfBounds);
         return outOfBounds;
     }
 
@@ -480,24 +469,8 @@ define([
         return (degree / 360 * Math.PI * 2) || 0;
     }
 
-    function debounce(func, wait, immediate) {
-    	var timeout;
-    	return function() {
-    		var context = this, args = arguments;
-    		var later = function() {
-    			timeout = null;
-    			if (!immediate) func.apply(context, args);
-    		};
-    		var callNow = immediate && !timeout;
-    		clearTimeout(timeout);
-    		timeout = setTimeout(later, wait);
-    		if (callNow) func.apply(context, args);
-    	};
-    }
-
     function getFileByteArray(filePath) {
         getFileObject(filePath, function (fileObject) {
-            //  console.log(fileObject);
              var reader = new FileReader();
 
              reader.onload = function(e) {
@@ -513,15 +486,15 @@ define([
     function setModel(selectedObject) {
         printController.set(
             obj.uuid,
-            obj.position.x,
-            obj.position.y,
-            obj.position.z,
+            obj.position.x * s.offsetRatio,
+            obj.position.y * s.offsetRatio,
+            obj.position.z * s.offsetRatio,
             obj.rotation.x,
             obj.rotation.y,
             obj.rotation.z,
-            obj.scale.x,
-            obj.scale.y,
-            obj.scale.z,
+            obj.scale.x * s.offsetRatio,
+            obj.scale.y * s.offsetRatio,
+            obj.scale.z * s.offsetRatio,
             function(result) {
                 console.log(result);
             }

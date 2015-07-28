@@ -11,8 +11,7 @@ define(function($) {
     return function(options) {
 
         var defaultOptions = {
-                // hostname: location.hostname,
-                hostname: '192.168.0.202',
+                hostname: location.hostname,
                 method: '',
                 port: '8000',
                 autoReconnect: true,
