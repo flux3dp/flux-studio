@@ -4136,7 +4136,7 @@ input.switch:checked ~ label:after {
     .laser-studio .zoom .btn::before {
         margin: 0; }
 
-.laser-studio .operating-panel .panel {
+.laser-studio .panel {
     position: absolute; }
 
 .laser-studio .print-params,
