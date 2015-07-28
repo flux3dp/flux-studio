@@ -56,7 +56,6 @@ define([
                     var lang = args.state.lang,
                         cx = React.addons.classSet,
                         class_name = cx({
-                            'operating-panel': true,
                             'hide': ('start' !== this.state.step)
                         });
 
@@ -64,13 +63,12 @@ define([
                         <section id="operation-table" className={class_name}>
                             <div className="laser-platform"/>
                             <div className="laser-object border-circle"/>
-                            <SetupPanel lang={lang}/>
+                            <SetupPanel lang={lang} mode={this.state.mode} className='operating-panel'/>
                             <ImagePanel lang={lang}/>
                         </section>
                     );
                 },
                 render : function() {
-                    console.log('render');
                     var lang = args.state.lang,
                         header = this._renderHeader(),
                         beginingSection = this._renderBeginingSection(),
@@ -90,7 +88,8 @@ define([
                 },
                 getInitialState: function() {
                     return {
-                        step: ''
+                        step: '',
+                        mode: 'engrave'
                     };
                 },
                 componentDidMount: function() {

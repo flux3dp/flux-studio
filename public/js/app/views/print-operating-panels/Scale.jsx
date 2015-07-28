@@ -17,18 +17,9 @@ define([
                 onReset         : React.PropTypes.func
             };
         },
-        getInitialState: function() {
-            console.log('is locked', this.props.selected.locked);
-            return {
-                locked  : this.props.selected.locked || true,
-                x       : 1,
-                y       : 1,
-                z       : 1
-            };
-        },
         _submitScaleChange: function() {
             this.props.onScaleChange({
-                locked  : this.state.locked,
+                locked  : locked,
                 x       : scaleX,
                 y       : scaleY,
                 z       : scaleZ
@@ -56,34 +47,10 @@ define([
             }
 
             this._submitScaleChange();
-
-
-            // if(this.state.locked) {
-            //     this.setState({
-            //         x: newValue,
-            //         y: newValue,
-            //         z: newValue
-            //     }, function() {
-            //         this._submitScaleChange();
-            //     });
-            // }
-            // else {
-            //     switch(e.target.id) {
-            //         case 'scaleX':
-            //             this.setState({ x: newValue }, function() { this._submitScaleChange(); });
-            //             break;
-            //         case 'scaleY':
-            //             this.setState({ y: newValue }, function() { this._submitScaleChange(); });
-            //             break;
-            //         case 'scaleZ':
-            //             this.setState({ z: newValue }, function() { this._submitScaleChange(); });
-            //             break;
-            //     };
-            // }
         },
         _handleToggleLock: function (e) {
-            this.props.onToggleLock(!this.state.locked);
-            this.setState({ locked: !this.state.locked });
+            locked = !locked;
+            this._submitScaleChange();
         },
         _handleReset: function(e) {
             this.props.onReset();
@@ -94,16 +61,16 @@ define([
             });
         },
         render: function() {
-            var lang        = this.props.lang,
-                lockClass   = this.state.locked ? 'lock' : 'unlock';
-
             var selected = this.props.selected;
-            console.log(selected.scale);
             if(selected) {
-                scaleX = this.props.selected.scale.enteredX;
-                scaleY = this.props.selected.scale.enteredY;
-                scaleZ = this.props.selected.scale.enteredZ;
+                scaleX = selected.scale.enteredX;
+                scaleY = selected.scale.enteredY;
+                scaleZ = selected.scale.enteredZ;
+                locked = selected.scale.locked;
             }
+
+            var lang        = this.props.lang,
+                lockClass   = locked ? 'lock' : 'unlock';
 
             return (
                 <div className="control-bottom">

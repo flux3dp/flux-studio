@@ -8,9 +8,9 @@ define([
     return function(view, args) {
         args = args || {};
         args.disabledEscapeOnBackground = (
-            'boolean' === typeof args.disabledEscapeOnBackground
-            ? args.disabledEscapeOnBackground
-            : false
+            'boolean' === typeof args.disabledEscapeOnBackground ?
+            args.disabledEscapeOnBackground :
+            false
         );
         args.onClose = args.onClose || function() {};
 
@@ -55,10 +55,9 @@ define([
                     display(factory, args, $root[0]);
                 },
                 /**
-                 * destroy and hide
+                 * hide
                  */
                 close: function() {
-                    $root.find('.popup-background').remove();
                     $root.hide();
 
                     args.onClose();

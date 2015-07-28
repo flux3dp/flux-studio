@@ -29,7 +29,7 @@ define([
                             <div className="controls">
                                 <div className="label">{lang.scan.scan_params.scan_speed.text}</div>
                                 <div className="control">
-                                    <SelectView ref="scan_speed" className="span12" options={lang.scan.scan_params.scan_speed.options}/>
+                                    <SelectView name="scan_speed" ref="scan_speed" className="span12" options={lang.scan.scan_params.scan_speed.options}/>
                                 </div>
                             </div>
                         </div>

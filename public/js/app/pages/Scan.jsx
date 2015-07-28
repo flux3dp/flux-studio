@@ -6,8 +6,9 @@ define([
     'helpers/api/3d-scan-control',
     'helpers/api/3d-scan-modeling',
     'jsx!views/scan/Setup-Panel',
-    'jsx!views/scan/Manipulation-Panel'
-], function($, React, popup, scanedModel, scanControl, scanModeling, SetupPanel, ManipulationPanel) {
+    'jsx!views/scan/Manipulation-Panel',
+    'helpers/file-system'
+], function($, React, popup, scanedModel, scanControl, scanModeling, SetupPanel, ManipulationPanel, fileSystem) {
     'use strict';
 
     return function(args) {
@@ -16,7 +17,6 @@ define([
         var View = React.createClass({
                 mesh: null,
                 cylinder: null,
-                point_cloud_history: [],
 
                 // counter
                 scan_times: ('start' === args.step ? 1 : 0),
@@ -35,7 +35,7 @@ define([
 
                 componentDidMount: function() {
                     if ('start' === args.step) {
-                        this.scan_ctrl_websocket = scanControl('5ZMPBF415VH67ARLGGFWNKCSP');
+                        this.scan_ctrl_websocket = scanControl('1111111111111111111111111');
                         this.scan_modeling_websocket = scanModeling();
                         this._refreshCamera();
                     }
@@ -48,7 +48,6 @@ define([
                     ) {
                         this.scan_ctrl_websocket.connection.close(false);
                         this.scan_modeling_websocket.connection.close(false);
-                        this.point_cloud_history = null;
                     }
                 },
 
@@ -64,8 +63,41 @@ define([
                 },
 
                 _saveAs: function(e) {
+                    var self = this;
+
                     require(['jsx!views/scan/Export'], function(view) {
                         var popup_window;
+
+                        args.onExport = function(e) {
+                            var last_point_cloud = self.scan_modeling_websocket.History.getLatest(),
+                                file_format = $('[name="file-format"]:checked').val(),
+                                file_name = (new Date()).getTime() + '.' + file_format;
+
+                            self.scan_modeling_websocket.export(
+                                last_point_cloud.name,
+                                file_format,
+                                {
+                                    onFinished: function(blob) {
+                                        var file = new File(
+                                            [blob],
+                                            file_name
+                                        );
+
+                                        fileSystem.writeFile(
+                                            file,
+                                            {
+                                                onComplete: function(e, fileEntry) {
+                                                    window.open(fileEntry.toURL());
+                                                }
+                                            }
+                                        );
+
+                                        popup_window.close();
+                                    }
+                                }
+                            );
+                        };
+                        args.disabledEscapeOnBackground = false;
 
                         popup_window = popup(view, args);
                         popup_window.open();
@@ -75,11 +107,21 @@ define([
                 _refreshCamera: function() {
                     var self = this;
 
-                    self.scan_modeling_image_method = this.scan_ctrl_websocket.getImage(
-                        function(e, fileEntry) {
-                            self.setState({
-                                image_src: fileEntry.toURL() + '#' + (new Date()).getTime()
-                            });
+                    self.scan_modeling_image_method = self.scan_ctrl_websocket.getImage(
+                        function(image_blobs, mime_type) {
+                            var blob = new Blob(image_blobs, {type: mime_type}),
+                                url = (window.URL || window.webkitURL),
+                                objectUrl = url.createObjectURL(blob),
+                                img = self.refs.camera_image.getDOMNode();
+
+                            img.onload = function() {
+                                // release the object URL once the image has loaded
+                                url.revokeObjectURL(objectUrl);
+                                blob = null;
+                            };
+
+                            // trigger the image to load
+                            img.src = objectUrl;
                         }
                     );
                 },
@@ -88,11 +130,15 @@ define([
                     location.hash = 'studio/scan/start';
                 },
 
+                _getScanSpeed: function() {
+                    return parseInt($('[name="scan_speed"] option:selected').val(), 10);
+                },
+
                 _onRendering: function(views, chunk_length) {
                     var self = this,
-                        scan_speed = parseInt(self.refs.scan_speed.getDOMNode().value, 10),
-                        remaining_sec = (scan_speed - chunk_length) * (20 * 60 / scan_speed),
-                        remaining_min = Math.floor(remaining_sec / 60);
+                        scan_speed = self._getScanSpeed(),
+                        remaining_sec = ((scan_speed - chunk_length) * (20 * 60 / scan_speed)) || 0,
+                        remaining_min = Math.floor(remaining_sec / 60) || 0;
 
                     remaining_sec = remaining_sec % (remaining_min * 60);
 
@@ -120,12 +166,6 @@ define([
                         onScanFinished = function(point_cloud) {
                             var upload_name = 'scan-' + (new Date()).getTime(),
                                 onUploadFinished = function() {
-                                    // save history
-                                    self.point_cloud_history.push({
-                                        name: upload_name,
-                                        data: point_cloud.total
-                                    });
-
                                     popup_window.close();
                                 };
                             // update scan times
@@ -162,11 +202,12 @@ define([
                         },
                         onScan = function() {
                             var opts = {
-                                onRendering: self._onRendering,
-                                onFinished: onScanFinished
-                            };
+                                    onRendering: self._onRendering,
+                                    onFinished: onScanFinished
+                                },
+                                scan_speed = self._getScanSpeed();
 
-                            self.scan_ctrl_websocket.scan(opts);
+                            self.scan_ctrl_websocket.scan(scan_speed, opts);
                         };
 
                     self.refs = $.extend(true, {}, self.refs, refs);
@@ -212,16 +253,11 @@ define([
 
                 _doClearNoise: function() {
                     var self = this,
-                        last_point_cloud = self.point_cloud_history.slice(-1)[0],
+                        last_point_cloud = self.scan_modeling_websocket.History.getLatest(),
                         delete_noise_name = 'clear-noise-' + (new Date()).getTime(),
                         onDumpFinished = function(data) {
                             console.log('dump finished');
                             self._onRendering(data);
-
-                            self.point_cloud_history.push({
-                                name: delete_noise_name,
-                                data: data
-                            });
                         },
                         onDumpReceiving = function(data, len) {
                             console.log('dump receiving');
@@ -246,17 +282,11 @@ define([
 
                 _doCropOff: function() {
                     var self = this,
-                        last_point_cloud = self.point_cloud_history.slice(-1)[0],
+                        last_point_cloud = self.scan_modeling_websocket.History.getLatest(),
                         cut_name = 'cut-' + (new Date()).getTime(),
                         cylider_box = new THREE.Box3().setFromObject(self.cylinder),
                         opts = {
-                            onReceiving: self._onRendering,
-                            onFinished: function(data) {
-                                self.point_cloud_history.push({
-                                    name: cut_name,
-                                    data: data.total
-                                });
-                            }
+                            onReceiving: self._onRendering
                         },
                         args = [
                             // min z
@@ -341,7 +371,7 @@ define([
                             {manipulationPanel}
 
                             <div id="model-displayer" className="model-displayer">
-                                <img src={this.state.image_src} className={camera_image_class}/>
+                                <img ref="camera_image" src={this.state.image_src} className={camera_image_class}/>
                             </div>
                         </section>
                     );

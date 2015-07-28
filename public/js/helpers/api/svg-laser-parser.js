@@ -5,8 +5,9 @@
 define([
     'helpers/websocket',
     'helpers/convertToTypedArray',
-    'helpers/is-json'
-], function(Websocket, convertToTypedArray, isJson) {
+    'helpers/is-json',
+    'helpers/data-history'
+], function(Websocket, convertToTypedArray, isJson, history) {
     'use strict';
 
     return function(opts) {
@@ -29,17 +30,23 @@ define([
 
                     lastMessage = data;
 
+                },
+                onClose: function() {
+                    setup_done = false;
                 }
             }),
             uploaded_svg = [],
             lastOrder = '',
             lastMessage = '',
+            setup_done = false,
             events = {
                 onMessage: function() {}
-            };
+            },
+            History = history();
 
         return {
             connection: ws,
+            History: History,
             setup: function(mode, args, opts) {
                 opts = opts || {};
                 opts.onFinished = opts.onFinished || function() {};
@@ -53,6 +60,7 @@ define([
                 events.onMessage = function(data) {
                     switch (data.status) {
                     case 'ok':
+                        setup_done = true;
                         opts.onFinished();
 
                         break;
@@ -63,66 +71,94 @@ define([
 
                 };
 
-                ws.send(_args.join(' '));
-                lastOrder = 'setup';
+                if (false === setup_done) {
+                    ws.send(_args.join(' '));
+                    lastOrder = 'setup';
+                }
+                else {
+                    opts.onFinished();
+                }
             },
             /**
              * upload svg
              *
-             * @param {ArrayObject} args - detail json object below [{}, {}, ...]
-             *      {String} name - file name
-             *      {Blob}   svg  - svg content
-             * @param {Json} opts - options
+             * @param {String} name - name
+             * @param {Blob}   svg  - svg
+             * @param {Json}   opts - options
              *      {Function}   onFinished - fire on upload finish
              */
-            upload: function(args, opts) {
+            upload: function(name, svg, opts) {
                 opts = opts || {};
                 opts.onFinished = opts.onFinished || function() {};
 
                 var self = this,
-                    order_name = 'cut',
-                    timer = null,
-                    all_ok = false,
-                    next_arg = args.pop(),
-                    _args = [];
+                    order_name = 'upload',
+                    args = [
+                        order_name,
+                        name,
+                        svg.size
+                    ];
 
                 events.onMessage = function(data) {
 
                     switch (data.status) {
                     case 'continue':
-                        ws.send(convertToTypedArray(next_arg.svg, Uint8Array));
+                        ws.send(svg);
                         break;
                     case 'ok':
-                        if (true === all_ok) {
-                            opts.onFinished(data);
-                        }
-                        else {
-                            next_arg = args.pop();
-                        }
+                        opts.onFinished(data);
                         break;
                     }
 
                 };
 
-                timer = setInterval(function() {
-                    if ('undefined' !== typeof next_arg) {
-                        _args = [
-                            order_name,
-                            next_arg.name,
-                            next_arg.svg.size,
-                        ];
+                ws.send(args.join(' '));
+            },
+            /**
+             * get svg
+             *
+             * @param {String} name - svg name has been upload
+             * @param {Json} opts - options
+             *      {Function}   onFinished - fire on upload finish
+             */
+            get: function(name, opts) {
+                opts = opts || {};
+                opts.onFinished = opts.onFinished || function() {};
 
-                        ws.send(_args.join(' '));
-                        next_arg = undefined;
+                lastOrder = 'get';
+
+                var args = [
+                    lastOrder,
+                    name
+                ],
+                blobs = [],
+                blob,
+                total_length = 0,
+                size = {
+                    height: 0,
+                    width: 0
+                };
+
+                events.onMessage = function(data) {
+
+                    if ('continue' === data.status) {
+                        total_length = data.length;
+                        size.height = data.height;
+                        size.width = data.width;
+                    }
+                    else if (true === data instanceof Blob) {
+                        blobs.push(data);
+                        blob = new Blob(blobs);
+
+                        if (total_length === blob.size) {
+                            History.push(name, blob);
+                            opts.onFinished(blob, size);
+                        }
                     }
 
-                    if (0 === args.length) {
-                        all_ok = true;
-                        clearInterval(timer);
-                    }
-                }, 0);
+                };
 
-                order_name = 'upload';
+                ws.send(args.join(' '));
             },
             /**
              * compute svg
@@ -144,16 +180,19 @@ define([
                 opts = opts || {};
                 opts.onFinished = opts.onFinished || function() {};
 
-                var CHUNK_PKG_SIZE = 4096,
-                    requests_serial = [],
-                    request_index = 0,
-                    go_next = true,
+                var requests_serial = [],
+                    fileReader,
+                    all_ok = false,
                     request_header,
                     next_data,
                     timer;
 
+                lastOrder = 'compute';
+
                 args.forEach(function(obj) {
                     request_header = [
+                        lastOrder,
+                        obj.name,
                         obj.width,
                         obj.height,
                         obj.tl_position_x,
@@ -161,59 +200,84 @@ define([
                         obj.br_position_x,
                         obj.br_position_y,
                         obj.rotate,
-                        obj.threshold
+                        obj.svg_data.size,
+                        obj.image_data.length
                     ];
 
                     requests_serial.push(request_header.join(' '));
-
-                    for (var i = 0; i < obj.image_data.length; i += CHUNK_PKG_SIZE) {
-                        requests_serial.push(convertToTypedArray(obj.image_data.slice(i, i + CHUNK_PKG_SIZE), Uint8Array));
-                    }
-
+                    requests_serial.push({
+                        svg: obj.svg_data,
+                        thumbnail: convertToTypedArray(obj.image_data, Uint8Array)
+                    });
                 });
+
+                requests_serial.reverse();
+
+                next_data = requests_serial.pop();
 
                 events.onMessage = function(data) {
                     switch (data.status) {
                     case 'continue':
                         // ready to sending binary
-                        go_next = true;
+                        next_data = requests_serial.pop();
                         break;
-                    case 'accept':
-                    // ready to sending next image set
-                        go_next = true;
+                    case 'ok':
+                        // ready to sending next svg set
+                        if (true === all_ok) {
+                            opts.onFinished();
+                        }
+                        else {
+                            next_data = requests_serial.pop();
+                        }
                         break;
                     default:
                         // TODO: do something?
                         break;
                     }
-
                 };
 
                 timer = setInterval(function() {
+                    if ('undefined' !== typeof next_data) {
 
-                    if (true === go_next) {
-                        next_data = requests_serial[request_index];
+                        if ('object' === typeof next_data) {
+                            fileReader = new FileReader();
 
-                        go_next = ('string' !== typeof next_data);
+                            fileReader.onload = function() {
+                                // send svg
+                                ws.send(this.result);
+                                // send thumbnail
+                                ws.send(next_data.thumbnail);
 
-                        ws.send(next_data);
-                        request_index++;
+                                fileReader.onload = null;
+
+                                next_data = undefined;
+                            };
+
+                            fileReader.readAsArrayBuffer(next_data.svg);
+                        }
+                        else {
+                            ws.send(next_data);
+                            next_data = undefined;
+                        }
                     }
 
-                    if (request_index >= requests_serial.length) {
-                        opts.onFinished();
+                    if (0 === requests_serial.length) {
+                        all_ok = true;
                         clearInterval(timer);
                     }
                 }, 0);
-
-                lastOrder = 'compute';
             },
-            getGCode: function(opts) {
+            getGCode: function(names, opts) {
                 opts = opts || {};
                 opts.onProgressing = opts.onProgressing || function() {};
                 opts.onFinished = opts.onFinished || function() {};
+                lastOrder = 'getGCode';
 
-                var blobs = [],
+                var args = [
+                        'go',
+                        names.join(' ')
+                    ],
+                    blobs = [],
                     total_length = 0,
                     gcode_blob;
 
@@ -236,8 +300,7 @@ define([
 
                 };
 
-                ws.send('go');
-                lastOrder = 'getGCode';
+                ws.send(args.join(' '));
             }
         };
     };
