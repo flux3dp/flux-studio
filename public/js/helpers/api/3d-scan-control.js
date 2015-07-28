@@ -92,7 +92,7 @@ define([
         return {
             connection: ws,
             getImage: function(imageHandler) {
-                var allow_to_get = false,
+                var allow_to_get = true,
                     image_length = 0,
                     mime_type = '',
                     image_blobs = [],
@@ -103,7 +103,6 @@ define([
                             switch (data.status) {
                             case 'binary':
                                 mime_type = data.mime;
-                                allow_to_get = false;
                                 break;
                             case 'ok':
                                 imageHandler(image_blobs, mime_type);
@@ -123,6 +122,7 @@ define([
                         image_timer = setInterval(function() {
                             if (true === allow_to_get) {
                                 ws.send(lastOrder);
+                                allow_to_get = false;
                             }
                         }, IMAGE_INTERVAL);
                     };
