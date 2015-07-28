@@ -4084,7 +4084,8 @@ input.switch:checked ~ label:after {
     position: fixed;
     width: 400px; }
     .laser-studio .laser-object .svg {
-        min-width: 300px; }
+        min-height: 280px;
+        min-width: 280px; }
 
 .laser-studio .laser-object .ft-container {
     z-index: 1; }
@@ -4244,3 +4245,7 @@ input.switch:checked ~ label:after {
     height: 150px;
     padding: 10px;
     width: 60%; }
+    .scan-model-save-as .file-formats {
+        margin: 0 0 10px 0; }
+        .scan-model-save-as .file-formats label {
+            float: left; }

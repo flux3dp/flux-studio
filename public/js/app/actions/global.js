@@ -1,9 +1,15 @@
 define([
     'jquery',
     'helpers/i18n',
-    'helpers/local-storage'
-], function($, i18n, localStorage) {
+    'helpers/local-storage',
+    'helpers/shortcuts'
+], function($, i18n, localStorage, shortcuts) {
     'use strict';
+
+    // detached keyup and keydown event
+    window.addEventListener('popstate', function(e) {
+        shortcuts.disableAll();
+    });
 
     return function(args) {
         $('body').on('change', '#select-lang', function(e) {

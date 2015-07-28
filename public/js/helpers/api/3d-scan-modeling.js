@@ -5,8 +5,9 @@
 define([
     'helpers/websocket',
     'helpers/point-cloud',
-    'helpers/is-json'
-], function(Websocket, PointCloudHelper, isJson) {
+    'helpers/is-json',
+    'helpers/data-history'
+], function(Websocket, PointCloudHelper, isJson, history) {
     'use strict';
 
     return function(opts) {
@@ -17,12 +18,10 @@ define([
                 method: '3d-scan-modeling',
                 onMessage: function(result) {
 
-                    var data = (true === isJson(result.data) ? JSON.parse(result.data) : result.data),
-                        error_code;
+                    var data = (true === isJson(result.data) ? JSON.parse(result.data) : result.data);
 
-                    if ('string' === typeof data && true === data.startsWith('error')) {
-                        error_code = result.data.replace('error ');
-                        opts.onError(error_code, data);
+                    if ('string' === typeof data && 'fatal' === data.status) {
+                        opts.onError(data.error, data);
                     }
                     else {
                         events.onMessage(data);
@@ -30,15 +29,20 @@ define([
 
                     lastMessage = data;
 
+                },
+                onClose: function(result) {
+                    History.clearAll();
                 }
             }),
             lastMessage = '',
             events = {
                 onMessage: function() {}
-            };
+            },
+            History = history();
 
         return {
             connection: ws,
+            History: History,
             upload: function(name, point_cloud, opts) {
                 opts.onFinished = opts.onFinished || function() {};
 
@@ -65,6 +69,7 @@ define([
 
                         break;
                     case 'ok':
+                        History.push(name, point_cloud.total);
                         opts.onFinished();
                         break;
                     }
@@ -133,13 +138,13 @@ define([
                     }
                 }, 0);
 
-
             },
             delete_noise: function(in_name, out_name, c, opts) {
 
                 opts.onFinished = opts.onFinished || function() {};
 
-                var order_name = 'delete_noise',
+                var self = this,
+                    order_name = 'delete_noise',
                     args = [
                         order_name,
                         in_name,
@@ -151,7 +156,7 @@ define([
 
                     switch (data.status) {
                     case 'ok':
-                        this.dump(
+                        self.dump(
                             out_name,
                             opts
                         );
@@ -165,8 +170,15 @@ define([
             merge: function(name, x1, x2, y1, y2) {
                 // TODO: to be implemented
             },
+            /**
+             * @param {String} name - source name
+             * @param {Json}   opts - option parameters
+             *      {
+             *          onFinished <dump finished>
+             *          onReceiving <dump on progressing>
+             *      }
+             */
             dump: function(name, opts) {
-                console.log('on dump');
                 opts.onFinished = opts.onFinished || function() {};
                 opts.onReceiving = opts.onReceiving || function() {};
 
@@ -192,6 +204,7 @@ define([
                         next_right = parseInt(data.right, 10) * 24;
                     }
                     else if ('undefined' !== typeof data.status && 'ok' === data.status) {
+                        History.push(name, pointCloud.get().total);
                         opts.onFinished(pointCloud.get());
                     }
 
@@ -199,9 +212,41 @@ define([
 
                 ws.send(args.join(' '));
             },
-            export: function(name) {
-                // TODO: to be implemented
-            },
+            /**
+             * @param {String} name        - source name
+             * @param {String} file_format - file format (stl, pcd)
+             * @param {Json}   opts        - option parameters
+             *      {
+             *          onFinished <export finished>
+             *      }
+             */
+            export: function(name, file_format, opts) {
+                opts.onFinished = opts.onFinished || function() {};
+
+                var order_name = 'export',
+                    args = [
+                        order_name,
+                        name,
+                        file_format
+                    ],
+                    blobs = [];
+
+                events.onMessage = function(data) {
+
+                    if (true === data instanceof Blob) {
+                        blobs.push(data);
+                    }
+                    else if ('string' === typeof data.status && 'continue' === data.status) {
+                        // TODO: do something?
+                    }
+                    else if ('string' === typeof data.status && 'ok' === data.status) {
+                        opts.onFinished(new Blob(blobs));
+                    }
+
+                };
+
+                ws.send(args.join(' '));
+            }
         };
     };
 });

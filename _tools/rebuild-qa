@@ -1,0 +1,54 @@
+#!/bin/bash
+
+# Set the environment by loading from the file "environment" in the same directory
+DIR="$( cd "$( dirname "$0" )" && pwd)"
+source $DIR/environment
+
+echo -e "Rebuilding QA as    $QA_ACCOUNT"
+echo -e "Rebuilding QA from  $QA_SOURCE_DIR"
+echo -e "Rebuilding QA to    $QA_SERVER:$QA_DEST_DIR"
+echo -e
+
+# QA rebuild with rsync.
+echo -e
+
+while true; do
+    read -p "==> Does this look good? Can I go ahead and rebuild QA ? (Y/N) "
+    case $REPLY in
+        [Yy] )
+            gulp sass
+
+            # Change entire owner/group to qa account in order to have the proper permissions.
+            echo -e "Changing directory permission to $QA_ACCOUNT:$QA_ACCOUNT..."
+            ssh -t $QA_ACCOUNT@$QA_SERVER "sudo chown -R $QA_ACCOUNT:$QA_ACCOUNT $QA_DEST_DIR"
+
+            echo -e "Begin rsync..."
+            if [ "$QA_KEY" == "" ]; then
+                # Access by tediously typing a password over and again
+                rsync --chmod=ug=rwX -e ssh -axv --delete --exclude-from=$DIR/rsync-exclude \
+                    $QA_SOURCE_DIR $QA_ACCOUNT@$QA_SERVER:$QA_DEST_DIR
+            else
+                # Access by key
+                rsync --chmod=ug=rwX -axv --delete --exclude-from=$DIR/rsync-exclude \
+                    -e ssh -i $QA_KEY $QA_SOURCE_DIR $QA_ACCOUNT@$QA_SERVER:$QA_DEST_DIR
+            fi
+
+            # Change back permissions.
+            echo -e "Changing directory permission back to $RIGHTFUL_OWNER:$RIGHTFUL_OWNER..."
+            ssh -t $QA_ACCOUNT@$QA_SERVER "sudo chown -R $RIGHTFUL_OWNER:$RIGHTFUL_OWNER $QA_DEST_DIR"
+
+            break;;
+
+        [Nn] )
+            echo -e "Skipping rebuilding QA..."
+            break;;
+
+        * )
+            echo -e "Please type Y or N"
+    esac
+done
+
+# Saying good-bye.
+echo -e
+echo -e "QA rebuild complete, you're responsible now."
+exit 1
