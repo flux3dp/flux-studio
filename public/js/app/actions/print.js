@@ -388,9 +388,9 @@ define([
         if(y === '' || y == 0) {y = 1;}
         if(z === '' || z == 0) {z = 1;}
         SELECTED.scale.set(
-            originalScaleX * x,
-            originalScaleY * y,
-            originalScaleZ * z
+            (originalScaleX * x) || originalScaleX,
+            (originalScaleY * y) || originalScaleX,
+            (originalScaleZ * z) || originalScaleX
         );
         SELECTED.scale.locked = locked;
         reactSrc.setState({ modelSelected: SELECTED.uuid ? SELECTED : null });
