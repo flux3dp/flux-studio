@@ -50,7 +50,7 @@ define([
             }),
             is_error = false,
             is_ready = false,
-            IMAGE_INTERVAL = 500,
+            IMAGE_INTERVAL = 200,
             lastOrder = '',
             lastMessage = '',
             events = {
@@ -103,9 +103,12 @@ define([
                             switch (data.status) {
                             case 'binary':
                                 mime_type = data.mime;
+                                allow_to_get = false;
                                 break;
                             case 'ok':
                                 imageHandler(image_blobs, mime_type);
+                                allow_to_get = true;
+                                image_blobs = [];
                                 break;
                             default:
                                 if (data instanceof Blob) {
@@ -118,7 +121,9 @@ define([
                         };
 
                         image_timer = setInterval(function() {
-                            ws.send(lastOrder);
+                            if (true === allow_to_get) {
+                                ws.send(lastOrder);
+                            }
                         }, IMAGE_INTERVAL);
                     };
 
@@ -144,22 +149,26 @@ define([
                         onProgress: opts.onRendering
                     },
                     go_next = false,
+                    got_chunk = false,
                     timer;
 
+                lastOrder = 'scan';
+
                 check_is_ready(function() {
-                    lastOrder = 'scan';
 
                     events.onMessage = function(data) {
                         switch (data.status) {
                         case 'chunk':
                             next_left = parseInt(data.left, 10) * 24;
                             next_right = parseInt(data.right, 10) * 24;
+                            got_chunk = true;
                             break;
                         case 'ok':
                             go_next = true;
+                            got_chunk = false;
                             break;
                         default:
-                            if (data instanceof Blob) {
+                            if (data instanceof Blob && true === got_chunk) {
                                 pointCloud.push(data, next_left, next_right, _opts);
                             }
                             else {
