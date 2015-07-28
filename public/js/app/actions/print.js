@@ -483,24 +483,6 @@ define([
 
     }
 
-    function setModel(selectedObject) {
-        printController.set(
-            obj.uuid,
-            obj.position.x * s.offsetRatio,
-            obj.position.y * s.offsetRatio,
-            obj.position.z * s.offsetRatio,
-            obj.rotation.x,
-            obj.rotation.y,
-            obj.rotation.z,
-            obj.scale.x * s.offsetRatio,
-            obj.scale.y * s.offsetRatio,
-            obj.scale.z * s.offsetRatio,
-            function(result) {
-                console.log(result);
-            }
-        );
-    }
-
     function readyGCode() {
         // set each model's attribute with backend
         var ready   = true,
@@ -509,15 +491,16 @@ define([
         objects.forEach(function(obj) {
             printController.set(
                 obj.uuid,
-                obj.position.x,
-                obj.position.y,
-                obj.position.z,
+                obj.position.x * s.offsetRatio,
+                obj.position.y * s.offsetRatio,
+                obj.position.z * s.offsetRatio,
                 obj.rotation.x,
                 obj.rotation.y,
                 obj.rotation.z,
-                obj.scale.x,
-                obj.scale.y,
-                obj.scale.z, function(result) {
+                obj.scale.x * s.offsetRatio,
+                obj.scale.y * s.offsetRatio,
+                obj.scale.z * s.offsetRatio,
+                function(result) {
                     if(result.status === 'fatal') {
                         readyFailed(result.error);
                         ready = false;
