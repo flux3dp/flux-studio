@@ -11,7 +11,7 @@ define([
                 lang = props.lang;
 
             return (
-                <div className="panel object-position">
+                <div className={props.className}>
                     <div className="controls">
                         <p className="control">
                             <label className="caption span4">{lang.laser.object_params.position.text}</label>
