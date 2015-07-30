@@ -2126,6 +2126,7 @@ a {
     margin: 0;
     min-width: 99px;
     outline: none;
+    overflow: hidden;
     padding: 0 5px;
     position: relative;
     text-align: center;
@@ -2159,6 +2160,19 @@ a {
     color: #fff; }
     .btn-action:hover {
         background: #33d375; }
+
+.btn-disabled {
+    pointer-events: none;
+    position: relative; }
+    .btn-disabled::before {
+        background: rgba(255, 255, 255, 0.5);
+        content: "";
+        display: block;
+        height: 100%;
+        left: 0;
+        position: absolute;
+        top: 0;
+        width: 100%; }
 
 .btn-warning {
     background: #f00; }
@@ -4051,19 +4065,8 @@ input.switch:checked ~ label:after {
 .laser-studio .fa::before {
     margin: 0 5px 0 0; }
 
-.laser-studio .stage .file-importer {
-    border: 2px dashed #CCC;
-    height: 500px;
-    padding: 95px 0;
-    text-align: center;
-    width: 500px; }
-    .laser-studio .stage .file-importer h2 {
-        color: #979797;
-        font-size: 18px; }
-    .laser-studio .stage .file-importer p {
-        color: #bdbdbd;
-        font-size: 13px;
-        letter-spacing: .3px; }
+.laser-studio .stage {
+    background: #d6d6d6; }
 
 .laser-studio .btn-h-group {
     height: 100%;
@@ -4079,10 +4082,10 @@ input.switch:checked ~ label:after {
     top: 0;
     background: url(/img/laser-platform.png);
     border: 1px solid #ddd;
-    height: 400px;
+    height: 450px;
     overflow: hidden;
     position: fixed;
-    width: 400px; }
+    width: 450px; }
     .laser-studio .laser-object .svg {
         min-height: 280px;
         min-width: 280px; }
@@ -4091,40 +4094,12 @@ input.switch:checked ~ label:after {
     z-index: 1; }
 
 .laser-studio .laser-object .image-active {
-    box-shadow: 0 0 10px 3px rgba(0, 0, 0, 0.5); }
+    background: rgba(255, 255, 255, 0.6);
+    outline: 5px dashed #bbb; }
 
 .laser-studio .laser-object .ft-widget {
     cursor: move;
     position: fixed; }
-
-.laser-studio .laser-platform {
-    bottom: 0;
-    display: block;
-    left: 0;
-    margin: auto;
-    position: absolute;
-    right: 0;
-    top: 0;
-    background: #ccc;
-    height: 500px;
-    position: fixed;
-    width: 500px;
-    -webkit-clip-path: polygon(50% 0%, 95% 26%, 95% 74%, 50% 100%, 5% 74%, 5% 26%);
-    clip-path: polygon(50% 0%, 95% 26%, 95% 74%, 50% 100%, 5% 74%, 5% 26%); }
-    .laser-studio .laser-platform::before {
-        bottom: 0;
-        display: block;
-        left: 0;
-        margin: auto;
-        position: absolute;
-        right: 0;
-        top: 0;
-        background: #fff;
-        content: "";
-        height: 499px;
-        width: 499px;
-        -webkit-clip-path: polygon(50% 0%, 95% 26%, 95% 74%, 50% 100%, 5% 74%, 5% 26%);
-        clip-path: polygon(50% 0%, 95% 26%, 95% 74%, 50% 100%, 5% 74%, 5% 26%); }
 
 .laser-studio .zoom .btn {
     height: 28px;
