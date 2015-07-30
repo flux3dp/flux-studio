@@ -20,12 +20,19 @@ define([
             _renderPrinterSelection: function() {
                 var self = this,
                     lang = args.state.lang.select_printer,
-                    options = self.state.printer_options;
+                    options = self.state.printer_options,
+                    content = (<ListView className="printer-list" items={options} ondblclick={self._selectPrinter}/>);
+
+                if (0 === options.length) {
+                    content = (<div className="spinner-flip"/>);
+                }
 
                 return (
                     <div>
                         <p className="text-center">{lang.choose_printer}</p>
-                        <ListView className="printer-list" items={options} ondblclick={self._selectPrinter}/>
+
+                        {content}
+
                     </div>
                 );
             },
@@ -34,7 +41,7 @@ define([
                 var lang = args.state.lang.select_printer;
 
                 return (
-                    <form className="form" onSubmit={this._returnSelectedPrinter}>
+                    <form className="form" onSubmit={this._submit}>
                         <p className="text-center">{lang.notification}</p>
                         <input type="password" ref="password" className="span12" defaultValue="" placeholder={lang.please_enter_password} autoFocus/>
                         <button className="btn btn-action btn-full-width sticky-bottom">{lang.submit}</button>
@@ -67,24 +74,13 @@ define([
                     $el = $(e.target),
                     meta = $el.data('meta'),
                     opts = {
-                        onSuccess: function(data) {
-                            returnSelectedPrinter();
-                        },
                         onError: function(data) {
                             self.setState({
                                 show_password: true,
                                 waiting: false
                             });
-                        },
-                        onStart: function() {
-                            self.setState({
-                                waiting: true
-                            });
                         }
-                    },
-                    returnSelectedPrinter = function() {
-                        args.getPrinter(self.selected_printer);
-                    }
+                    };
 
                 self.selected_printer = meta;
 
@@ -92,8 +88,12 @@ define([
                     self._auth(meta.serial, '', opts);
                 }
                 else {
-                    returnSelectedPrinter();
+                    self._returnSelectedPrinter();
                 }
+            },
+
+            _returnSelectedPrinter: function() {
+                args.getPrinter(this.selected_printer);
             },
 
             _renderPrinterItem: function(printer) {
@@ -114,27 +114,16 @@ define([
                 );
             },
 
-            _returnSelectedPrinter: function(e) {
+            _submit: function(e) {
                 e.preventDefault();
 
                 var self = this,
                     opts = {
-                        onSuccess: function(data) {
-                            args.getPrinter(self.selected_printer);
-                            self.setState({
-                                waiting: false
-                            });
-                        },
                         onError: function(data) {
                             self.setState({
                                 auth_failure: true,
                                 show_password: false,
                                 waiting: false
-                            });
-                        },
-                        onStart: function() {
-                            self.setState({
-                                waiting: true
                             });
                         }
                     },
@@ -152,16 +141,27 @@ define([
 
             _auth: function(serial, password, opts) {
                 opts = opts || {};
-                opts.onSuccess = opts.onSuccess || React.PropTypes.func;
                 opts.onError = opts.onError || React.PropTypes.func;
-                opts.onStart = opts.onStart || React.PropTypes.func;
-
-                opts.onStart();
 
                 var self = this,
+                    _opts = {
+                        onSuccess: function(data) {
+                            self._returnSelectedPrinter();
+                            self.setState({
+                                waiting: false
+                            });
+                        },
+                        onError: function(data) {
+                            opts.onError();
+                        }
+                    },
                     touch_socket;
 
-                touch_socket = touch(opts).send(serial, password);
+                self.setState({
+                    waiting: true
+                });
+
+                touch_socket = touch(_opts).send(serial, password);
             },
 
             render : function() {
