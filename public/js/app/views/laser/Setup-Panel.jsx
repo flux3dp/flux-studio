@@ -8,7 +8,12 @@ define([
         render: function() {
             var props = this.props,
                 lang = props.lang,
-                mode = ('engrave' === props.mode ? lang.laser.start_engrave : lang.laser.start_cut);
+                mode = ('engrave' === props.mode ? lang.laser.start_engrave : lang.laser.start_cut),
+                cx = React.addons.classSet,
+                button_class = cx({
+                    'btn btn-action btn-full-width btn-start': true,
+                    'btn-disabled': false === props.hasImage
+                });
 
             return (
                 <div className="setup-panel operating-panel">
@@ -37,7 +42,7 @@ define([
                             <button className="btn btn-default btn-full-width">{lang.laser.advenced}</button>
                         </div>
                     </div>
-                    <button id="btn-start" className="btn btn-action btn-full-width btn-start">
+                    <button id="btn-start" className={button_class}>
                         <img src="/img/icon-laser-s.png"/>
                         {mode}
                     </button>
