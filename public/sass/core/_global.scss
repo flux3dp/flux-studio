@@ -67,6 +67,7 @@ a {
     margin: 0;
     min-width: 99px;
     outline: none;
+    overflow: hidden;
     padding: 0 5px;
     position: relative;
     text-align: center;
@@ -111,6 +112,22 @@ a {
 
     &:hover {
         background: #33d375;
+    }
+}
+
+.btn-disabled {
+    pointer-events: none;
+    position: relative;
+
+    &::before {
+        background: rgba(255, 255, 255, .5);
+        content: "";
+        display: block;
+        height: 100%;
+        left: 0;
+        position: absolute;
+        top: 0;
+        width: 100%;
     }
 }
 
