@@ -1,5 +1,5 @@
 
-CircularGridHelper = function ( diameter, step , upVector, color, opacity, text, textColor, textPosition) {
+CircularGridHelper = function ( diameter, step , upVector, color, opacity, text, textColor, textPosition, marginSize) {
 
       defaults = {
         diameter: 200,
@@ -25,7 +25,7 @@ CircularGridHelper = function ( diameter, step , upVector, color, opacity, text,
       this.name = "grid";
 
       //TODO: clean this up
-      this.marginSize =10;
+      this.marginSize = ('number' === typeof marginSize ? marginSize : 10);
       this.stepSubDivisions = 10;
 
 
