@@ -14,24 +14,7 @@
     }
 
     .stage {
-        .file-importer {
-            border: 2px dashed #CCC;
-            height: 500px;
-            padding: 95px 0;
-            text-align: center;
-            width: 500px;
-
-            h2 {
-                color: #979797;
-                font-size: 18px;
-            }
-
-            p {
-                color: #bdbdbd;
-                font-size: 13px;
-                letter-spacing: .3px;
-            }
-        }
+        background: #d6d6d6;
     }
 
     .btn-h-group {
@@ -43,10 +26,10 @@
         @include absolute-center();
         background: url(/img/laser-platform.png);
         border: 1px solid #ddd;
-        height: 400px;
+        height: 450px;
         overflow: hidden;
         position: fixed;
-        width: 400px;
+        width: 450px;
 
         .svg {
             min-height: 280px;
@@ -59,32 +42,13 @@
     }
 
     .laser-object .image-active {
-        box-shadow: 0 0 10px 3px rgba(0, 0, 0, 0.5);
+        background: rgba(255, 255, 255, .6);
+        outline: 5px dashed #bbb;
     }
 
     .laser-object .ft-widget {
         cursor: move;
         position: fixed;
-    }
-
-    .laser-platform {
-        @include absolute-center();
-        background: #ccc;
-        height: 500px;
-        position: fixed;
-        width: 500px;
-        -webkit-clip-path: polygon(50% 0%, 95% 26%, 95% 74%, 50% 100%, 5% 74%, 5% 26%);
-        clip-path: polygon(50% 0%, 95% 26%, 95% 74%, 50% 100%, 5% 74%, 5% 26%);
-
-        &::before {
-            @include absolute-center();
-            background: #fff;
-            content: "";
-            height: 499px;
-            width: 499px;
-            -webkit-clip-path: polygon(50% 0%, 95% 26%, 95% 74%, 50% 100%, 5% 74%, 5% 26%);
-            clip-path: polygon(50% 0%, 95% 26%, 95% 74%, 50% 100%, 5% 74%, 5% 26%);
-        }
     }
 
     .zoom .btn {
