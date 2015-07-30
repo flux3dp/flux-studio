@@ -146,7 +146,7 @@ define([
 
                     // update remaining time every 20 chunks
                     if (0 === chunk_length % 20) {
-                        args.state.progressRemainingTime = remaining_min + 'm' + remaining_sec + 's';
+                        args.state.progressRemainingTime = remaining_min + 'm' + (remaining_sec || 0) + 's';
                     }
 
                     if (null === self.mesh) {
