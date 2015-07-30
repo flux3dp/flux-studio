@@ -54,5 +54,7 @@
     position: absolute;
     width: 16px;
     height: 16px;
+    left: calc(50% - 8px);
+    top: -24px;
     background-image: url('./rotate_ccw.png');
 }
