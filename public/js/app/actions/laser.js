@@ -57,8 +57,11 @@ define([
 
                     $target_image.parents('.ft-container').remove();
 
-                    if (0 >= $img_container.length) {
+                    if (0 === $img_container.length) {
                         $target_image = null;
+                        reactComponent.setState({
+                            has_image: false
+                        });
                         reactComponent.props.file_format = undefined;
                     }
                     else {
@@ -221,8 +224,6 @@ define([
                                 url = window.URL,
                                 objectUrl = url.createObjectURL(blob);
 
-                            clearFileInput();
-
                             // trigger the image to load
                             $img.data('base', objectUrl).
                                 data('name', name).
@@ -268,6 +269,10 @@ define([
                 first_file_extension = files.item(0).name.split('.').pop(),
                 timer;
 
+                reactComponent.setState({
+                    has_image: true
+                });
+
                 if ('svg' === first_file_extension) {
                     timer = setInterval(function() {
                         if (true === go_next) {
@@ -281,9 +286,10 @@ define([
                         }
 
                         if (files.length === index) {
+                            clearFileInput();
                             clearInterval(timer);
                         }
-                    }, 200);
+                    }, 100);
                 }
                 else {
                     for (var i = 0; i < files.length; i++) {
@@ -364,8 +370,8 @@ define([
                     bounds = $el.freetrans('getBounds');
 
                     if (true === outOfRange(el_position.center, DIAMETER)) {
-                        last_x = $el.data('last-x') || el_position.center.x;
-                        last_y = $el.data('last-y') || el_position.center.y;
+                        last_x = $el.data('last-x');
+                        last_y = $el.data('last-y');
                         $el.freetrans({
                             x: last_x,
                             y: last_y
@@ -511,15 +517,6 @@ define([
 
         $uploader_file_control.on('change', function(e) {
             readfiles(this.files);
-        });
-
-        $uploader.on('dragover dragend', function() {
-            return false;
-        });
-
-        $uploader.on('drop', function(e) {
-            e.preventDefault();
-            readfiles(e.originalEvent.dataTransfer.files);
         });
 
         $threshold.on('keyup', function(e) {
