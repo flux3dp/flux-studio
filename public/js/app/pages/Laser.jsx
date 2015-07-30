@@ -13,7 +13,12 @@ define([
 
         var view = React.createClass({
                 _renderHeader: function() {
-                    var lang = args.state.lang;
+                    var lang = args.state.lang,
+                        cx = React.addons.classSet,
+                        export_file_class = cx({
+                            'btn btn-default fa fa-floppy-o': true,
+                            'hide': false === this.state.has_image
+                        });
 
                     return (
                         <header className="top-menu-bar">
@@ -22,56 +27,30 @@ define([
                                     <lable className="fa fa-plus">{lang.laser.import}</lable>
                                     <input type="file" multiple/>
                                 </div>
-                                <button className="btn btn-default fa fa-floppy-o">{lang.laser.save}</button>
-                            </div>
-
-                            <div className="btn-h-group zoom pull-right">
-                                <button className="btn btn-default fa fa-plus"></button>
-                                <button className="btn btn-default fa fa-search"></button>
-                                <button className="btn btn-default fa fa-minus"></button>
+                                <button className={export_file_class}>{lang.laser.save}</button>
                             </div>
                         </header>
-                    );
-                },
-                _renderBeginingSection: function() {
-                    var lang = args.state.lang,
-                        cx = React.addons.classSet,
-                        class_name = cx({
-                            'file-importer': true,
-                            'absolute-center': true,
-                            'border-circle': true,
-                            'hide': ('start' === this.state.step)
-                        });
-
-                    return (
-                        <section id="file-importer" className={class_name}>
-                            <img src="http://placehold.it/200x150"/>
-                            <h2>{lang.laser.acceptable_files}</h2>
-                            <p>{lang.laser.drop_files_to_import}</p>
-                            <input type="file" multiple/>
-                        </section>
                     );
                 },
                 _renderStageSection: function() {
                     var lang = args.state.lang,
                         cx = React.addons.classSet,
-                        class_name = cx({
-                            'hide': ('start' !== this.state.step)
+                        image_panel_class = cx({
+                            'hide': false === this.state.has_image,
+                            'panel object-position': true
                         });
 
                     return (
-                        <section id="operation-table" className={class_name}>
-                            <div className="laser-platform"/>
+                        <section id="operation-table">
                             <div className="laser-object border-circle"/>
-                            <SetupPanel lang={lang} mode={this.state.mode} className='operating-panel'/>
-                            <ImagePanel lang={lang}/>
+                            <SetupPanel lang={lang} mode={this.state.mode} className='operating-panel' hasImage={this.state.has_image}/>
+                            <ImagePanel lang={lang} className={image_panel_class}/>
                         </section>
                     );
                 },
                 render : function() {
                     var lang = args.state.lang,
                         header = this._renderHeader(),
-                        beginingSection = this._renderBeginingSection(),
                         stageSection = this._renderStageSection();
 
                     return (
@@ -81,7 +60,6 @@ define([
 
                             <div className="stage">
                                 {stageSection}
-                                {beginingSection}
                             </div>
                         </div>
                     );
@@ -89,7 +67,8 @@ define([
                 getInitialState: function() {
                     return {
                         step: '',
-                        mode: 'engrave'
+                        mode: 'engrave',
+                        has_image: false
                     };
                 },
                 componentDidMount: function() {
