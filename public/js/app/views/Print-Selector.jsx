@@ -34,11 +34,11 @@ define([
                 var lang = args.state.lang.select_printer;
 
                 return (
-                    <div className="form">
+                    <form className="form" onSubmit={this._returnSelectedPrinter}>
                         <p className="text-center">{lang.notification}</p>
-                        <input type="password" ref="password" className="span12" defaultValue="" placeholder={lang.please_enter_password}/>
-                        <button className="btn btn-action btn-full-width sticky-bottom" onClick={this._returnSelectedPrinter}>{lang.submit}</button>
-                    </div>
+                        <input type="password" ref="password" className="span12" defaultValue="" placeholder={lang.please_enter_password} autoFocus/>
+                        <button className="btn btn-action btn-full-width sticky-bottom">{lang.submit}</button>
+                    </form>
                 );
             },
 
@@ -65,14 +65,34 @@ define([
             _selectPrinter: function(e) {
                 var self = this,
                     $el = $(e.target),
-                    meta = $el.data('meta');
+                    meta = $el.data('meta'),
+                    opts = {
+                        onSuccess: function(data) {
+                            returnSelectedPrinter();
+                        },
+                        onError: function(data) {
+                            self.setState({
+                                show_password: true,
+                                waiting: false
+                            });
+                        },
+                        onStart: function() {
+                            self.setState({
+                                waiting: true
+                            });
+                        }
+                    },
+                    returnSelectedPrinter = function() {
+                        args.getPrinter(self.selected_printer);
+                    }
 
                 self.selected_printer = meta;
 
                 if (true === meta.password) {
-                    self.setState({
-                        show_password: true
-                    });
+                    self._auth(meta.serial, '', opts);
+                }
+                else {
+                    returnSelectedPrinter();
                 }
             },
 
@@ -88,27 +108,62 @@ define([
                 );
             },
 
+            _renderSpinner: function() {
+                return (
+                    <div className="spinner-flip"/>
+                );
+            },
+
             _returnSelectedPrinter: function(e) {
+                e.preventDefault();
+
                 var self = this,
                     opts = {
                         onSuccess: function(data) {
                             args.getPrinter(self.selected_printer);
+                            self.setState({
+                                waiting: false
+                            });
                         },
                         onError: function(data) {
                             self.setState({
                                 auth_failure: true,
-                                show_password: false
+                                show_password: false,
+                                waiting: false
+                            });
+                        },
+                        onStart: function() {
+                            self.setState({
+                                waiting: true
                             });
                         }
                     },
                     selected_printer = self.selected_printer,
+                    password, touch_socket;
+
+                self.setState({
+                    waiting: true
+                });
+
+                password = self.refs.password.getDOMNode().value;
+
+                touch_socket = self._auth(selected_printer.serial, password, opts);
+            },
+
+            _auth: function(serial, password, opts) {
+                opts = opts || {};
+                opts.onSuccess = opts.onSuccess || React.PropTypes.func;
+                opts.onError = opts.onError || React.PropTypes.func;
+                opts.onStart = opts.onStart || React.PropTypes.func;
+
+                opts.onStart();
+
+                var self = this,
                     touch_socket;
 
-                selected_printer.plain_password = self.refs.password.getDOMNode().value;
-
-                touch_socket = touch(opts).send(selected_printer.serial, selected_printer.plain_password);
-
+                touch_socket = touch(opts).send(serial, password);
             },
+
             render : function() {
                 var self = this,
                     show_password = self.state.show_password,
@@ -121,6 +176,10 @@ define([
 
                 if (true === auth_failure) {
                     content = self._renderAuthFailure();
+                }
+
+                if (true === self.state.waiting) {
+                    content = self._renderSpinner();
                 }
 
                 return (
@@ -156,7 +215,8 @@ define([
 
                 return {
                     printer_options: [],
-                    show_password: false
+                    show_password: false,
+                    waiting: false
                 };
             },
             componentWillUnmount: function() {
