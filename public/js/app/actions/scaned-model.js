@@ -8,7 +8,19 @@ define([
 
     var THREE = window.THREE || {},
         geometry = new THREE.BufferGeometry(),
-        container, camera, scene, renderer, controls, transform_control, cylinder;
+        container, camera, scene, renderer, controls, transform_control, cylinder,
+        settings = {
+            diameter: 170,
+            radius: 850,
+            height: 1800,
+            step: 15,
+            upVector: new THREE.Vector3(0, 0, 1),
+            color:  0x777777,
+            opacity: 0.2,
+            text: true,
+            textColor: '#000000',
+            textPosition: 'center'
+        };
 
     function init() {
         container = document.getElementById('model-displayer');
@@ -16,18 +28,18 @@ define([
         scene = new THREE.Scene();
 
         camera = new THREE.PerspectiveCamera( 70, container.offsetWidth / container.offsetHeight, 1, 300000 );
-        camera.position.set(200, 200, 60);
+        camera.position.set(100, 100, 40);
         camera.lookAt( new THREE.Vector3( 0, 0, 1 ) );
         camera.up = new THREE.Vector3(0, 0, 1);
+
+        // add circular grid helper
+        addCircularGridHelper();
 
         // add controls
         addControls();
 
         // add light
         addLights();
-
-        // add axises
-        addAxises();
 
         renderer = new THREE.WebGLRenderer({
             antialias: false
@@ -40,6 +52,22 @@ define([
         window.addEventListener('resize', onWindowResize, false);
 
         animate();
+    }
+
+    function addCircularGridHelper() {
+        // circular grid helper
+        var circularGridHelper = new CircularGridHelper(
+            settings.diameter,
+            settings.step,
+            settings.upVector,
+            settings.color,
+            settings.opacity,
+            settings.text,
+            settings.textColor,
+            settings.textPosition,
+            0
+        );
+        scene.add(circularGridHelper);
     }
 
     function createCylinder(mesh) {
@@ -168,36 +196,6 @@ define([
         var light2 = new THREE.DirectionalLight(0xffffff, 1.5);
         light2.position.set(0, -1, 0);
         scene.add(light2);
-    }
-
-    function addAxises() {
-        var materials = [
-                new THREE.LineBasicMaterial({ color: 0x0000ff }),   // x
-                new THREE.LineBasicMaterial({ color: 0x00ff00 }),   // y
-                new THREE.LineBasicMaterial({ color: 0xff0000 })    // z
-            ],
-            vertices = [
-                [   // x
-                    new THREE.Vector3( -1000, 0, 0 ),
-                    new THREE.Vector3( 1000, 0, 0 )
-                ],
-                [   // y
-                    new THREE.Vector3( 0, -1000, 0 ),
-                    new THREE.Vector3( 0, 1000, 0 )
-                ],
-                [   // z
-                    new THREE.Vector3( 0, 0, -1000 ),
-                    new THREE.Vector3( 0, 0, 1000 )
-                ],
-            ],
-            geometry;
-
-        materials.forEach(function(material, index) {
-            geometry = new THREE.Geometry();
-            geometry.vertices = vertices[index];
-
-            scene.add( new THREE.Line( geometry, material ) );
-        });
     }
 
     function onWindowResize() {
