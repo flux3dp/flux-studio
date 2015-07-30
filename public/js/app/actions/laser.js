@@ -154,7 +154,7 @@ define([
                         img = new Image(),
                         $img = $(img),
                         instantRefresh = function(e, data) {
-                            refreshObjectParams($div);
+                            refreshObjectParams(e, $div);
                         };
 
                     $img.addClass(extension);
@@ -179,8 +179,8 @@ define([
                         }
 
                         $div.freetrans({
-                            x: $laser_platform.width() / 2 - $img.width() / 2,
-                            y: $laser_platform.height() / 2 - $img.height() / 2,
+                            x: $laser_platform.outerWidth() / 2 - $img.width() / 2,
+                            y: $laser_platform.outerHeight() / 2 - $img.height() / 2,
                             onRotate: instantRefresh,
                             onMove: instantRefresh,
                             onScale: instantRefresh
@@ -353,7 +353,7 @@ define([
                 });
 
             },
-            refreshObjectParams = function($el) {
+            refreshObjectParams = function(e, $el) {
                 var bounds, el_offset, el_position,
                     last_x, last_y,
                     platform_pos = $laser_platform.box(),
@@ -369,22 +369,25 @@ define([
                     el_position = $el.box();
                     bounds = $el.freetrans('getBounds');
 
-                    if (true === outOfRange(el_position.center, DIAMETER)) {
-                        last_x = $el.data('last-x');
-                        last_y = $el.data('last-y');
-                        $el.freetrans({
-                            x: last_x,
-                            y: last_y
-                        });
-                    }
-                    else {
-                        $el.data('last-x', el_position.left).data('last-y', el_position.top);
+                    if ('move' === e.freetransEventType) {
+                        if (true === outOfRange(el_position.center, DIAMETER)) {
+                            last_x = $el.data('last-x');
+                            last_y = $el.data('last-y');
+
+                            $el.freetrans({
+                                x: last_x,
+                                y: last_y
+                            });
+                        }
+                        else {
+                            $el.data('last-x', parseFloat($el[0].style.left, 10)).
+                                data('last-y', parseFloat($el[0].style.top, 10));
+                        }
                     }
 
-                    el_position = $el.position();
                     $angle.val(elementAngle($el[0]));
-                    $pos_x.val(el_position.left);
-                    $pos_y.val(el_position.top);
+                    $pos_x.val($el.data('last-x'));
+                    $pos_y.val($el.data('last-y'));
                     $size_h.val(bounds.height);
                     $size_w.val(bounds.width);
                 }
