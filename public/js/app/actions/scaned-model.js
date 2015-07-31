@@ -1,6 +1,6 @@
 define([
     'threejs',
-    'threeTrackball',
+    'threeOrbitControls',
     'threeTransformControls',
     'threeCircularGridHelper'
 ], function() {
@@ -171,16 +171,18 @@ define([
     }
 
     function addControls() {
-        controls = new THREE.TrackballControls( camera, container );
+        controls = new THREE.OrbitControls( camera, container );
         controls.rotateSpeed = 2.0;
         controls.zoomSpeed = 1.2;
         controls.panSpeed = 1.8;
 
         controls.noZoom = false;
         controls.noPan = false;
-        controls.noRotate = true;
+        controls.noRotate = false;
         controls.maxDistance = 300;
         controls.minDistance = 40;
+        controls.maxPolarAngle = Math.PI/2;
+        controls.noKeys = true;
 
         controls.staticMoving = true;
         controls.dynamicDampingFactor = 0.3;
