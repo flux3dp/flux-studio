@@ -394,8 +394,12 @@ define([
                 },
 
                 componentWillUnmount: function() {
-                    this.props.scan_ctrl_websocket.connection.close(false);
-                    this.props.scan_modeling_websocket.connection.close(false);
+                    if ('undefined' !== typeof this.props.scan_ctrl_websocket &&
+                        'undefined' !== typeof this.props.scan_modeling_websocket
+                    ) {
+                        this.props.scan_ctrl_websocket.connection.close(false);
+                        this.props.scan_modeling_websocket.connection.close(false);
+                    }
                 },
 
                 render : function() {
