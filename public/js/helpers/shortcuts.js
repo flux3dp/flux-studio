@@ -3,7 +3,8 @@
  */
 define([
     'jquery',
-    'helpers/array-unique'
+    'helpers/array-unique',
+    'helpers/array-findindex',
 ], function($) {
     'use strict';
 
