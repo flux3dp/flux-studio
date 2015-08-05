@@ -183,51 +183,27 @@ a {
 
 .sidebar,
 .content {
-    position: fixed;
+    float: left;
 }
 
 .sidebar {
     background-color: #000;
-    bottom: 0;
-    display: none;
-    left: 0;
-    margin: 0;
-    position: fixed;
-    top: 0;
-    width: 66px;
+    height: 100%;
 }
 
 .content {
-    bottom: 0;
     height: 100%;
-    left: 0;
-    right: 0;
-    top: 0;
-}
-
-.is-ready .sidebar {
-    display: block;
-}
-
-.is-ready .content {
-    background: #fff;
-    bottom: 0;
-    height: 100%;
-    left: 66px;
-    right: 0;
-    top: 0;
-}
-
-// TODO: remove old code when new one finished
-.is-ready .popup-window {
-    display: none;
+    width: calc(100% - 66px);
 }
 
 .menu {
     background-color: #000000;
+    height: 100%;
     list-style: none;
     margin: 0;
     padding: 0;
+    position: relative;
+    width: 66px;
 }
 
 .menu .brand-name {
