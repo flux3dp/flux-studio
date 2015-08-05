@@ -2,8 +2,9 @@ define([
     'jquery',
     'helpers/i18n',
     'helpers/local-storage',
-    'helpers/shortcuts'
-], function($, i18n, localStorage, shortcuts) {
+    'helpers/shortcuts',
+    'helpers/api/config'
+], function($, i18n, localStorage, shortcuts, config) {
     'use strict';
 
     // detached keyup and keydown event
@@ -11,28 +12,31 @@ define([
         shortcuts.disableAll();
     });
 
-    return function(args) {
-        $('body').on('change', '#select-lang', function(e) {
-            args.state.lang = i18n.setActiveLang(e.currentTarget.value).get();
-        });
+    return function(callback) {
+        var global_config = config(),
+            $body = $('body'),
+            hash = location.hash;
 
-        (function() {
-            var $body = $('body'),
-                is_ready = localStorage.get('printer-is-ready') || '',
-                hash = location.hash;
+        global_config.read('printer-is-ready', {
+            onFinished: function(data) {
 
-            is_ready = ('' === is_ready ? false : 'true' === is_ready);
+                var is_ready = data;
 
-            if (true === is_ready) {
-                $body.addClass('is-ready');
+                is_ready = ('' === is_ready ? false : 'true' === is_ready);
 
-                if ('' === hash || hash.startsWith('#initialize')) {
-                    location.hash = '#studio/print';
+                if (true === is_ready) {
+                    $body.addClass('is-ready');
+
+                    if ('' === hash || hash.startsWith('#initialize')) {
+                        location.hash = '#studio/print';
+                    }
                 }
+                else {
+                    $body.removeClass('is-ready');
+                }
+
+                callback();
             }
-            else {
-                $body.removeClass('is-ready');
-            }
-        })();
+        });
     };
 });

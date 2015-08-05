@@ -2,10 +2,9 @@ define([
     'react',
     'jquery',
     'backbone',
-    'helpers/display',
-    'app/actions/global'
+    'helpers/display'
 ],
-function(React, $, Backbone, display, globalEvents) {
+function(React, $, Backbone, display) {
     'use strict';
 
     var _display = function(view, args, el) {
@@ -14,7 +13,7 @@ function(React, $, Backbone, display, globalEvents) {
 
         // WARNING: this function includes GLOBAL LIVE EVENTS.
         // DO NOT use non-uniqle selector here (e.g. class, tag name, attribute...etc.)
-        display(view, args, el, globalEvents);
+        display(view, args, el);
     };
 
     return Backbone.Router.extend({
