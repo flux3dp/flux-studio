@@ -16,7 +16,8 @@ define([
             'ALT': 18,
             'DEL': 8,
             'ENTER': 13,    // return
-            'TAB': 9
+            'TAB': 9,
+            'ESC': 27
         },
         events = [],
         keyCodeStatus = [],
@@ -100,6 +101,7 @@ define([
         },
         disableAll: function() {
             $document.off('keyup keydown');
+            has_bind = false;
         }
     };
 });
