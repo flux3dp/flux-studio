@@ -1,7 +1,8 @@
 define([
     'jquery',
-    'react'
-], function($, React) {
+    'react',
+    'jsx!widgets/Modal'
+], function($, React, Modal) {
     'use strict';
 
     return function(args) {
@@ -12,9 +13,8 @@ define([
                 return args.state;
             },
             render : function() {
-
-                return (
-                    <div className="wifi initialization absolute-center text-center">
+                var content = (
+                    <div className="wifi initialization text-center">
                         <h1>{this.state.lang.welcome_headline}</h1>
                         <img className="wifi-symbol" src="/img/img-wifi.png"/>
                         <div className="wifi-form">
@@ -28,6 +28,10 @@ define([
                             </div>
                         </div>
                     </div>
+                );
+
+                return (
+                    <Modal content={content}/>
                 );
             }
         });
