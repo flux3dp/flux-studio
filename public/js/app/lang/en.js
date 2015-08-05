@@ -281,16 +281,6 @@ define(function() {
             start_engrave: 'ENGRAVE',
             start_cut: 'CUT',
             print_params: {
-                material: {
-                    text: 'Material',
-                    options: [
-                        {
-                            value: 'wood',
-                            label: 'Wood',
-                            selected: true
-                        }
-                    ]
-                },
                 object_height: {
                     text: 'Object Height',
                     unit: 'mm'
@@ -328,6 +318,51 @@ define(function() {
                     text: 'Threshold',
                     default: 128
                 }
+            },
+            advanced: {
+                label: 'Setup',
+                form: {
+                    object_options: {
+                        text: 'Material',
+                        label: 'Object Options',
+                        options: [
+                            {
+                                value: 'wood',
+                                label: 'Wood',
+                                selected: true,
+                                data: {
+                                    laser_speed: 10,
+                                    power: 10
+                                }
+                            },
+                            {
+                                value: 'steel',
+                                label: 'Steel',
+                                data: {
+                                    laser_speed: 50,
+                                    power: 50
+                                }
+                            }
+                        ]
+                    },
+                    laser_speed: {
+                        text: 'Laser Speed',
+                        unit: 'mm/s',
+                        fast: 'Fast',
+                        slow: 'Slow',
+                        min: 1,
+                        max: 100
+                    },
+                    power: {
+                        text: 'Power',
+                        high: 'High',
+                        low: 'Low',
+                        min: 1,
+                        max: 50
+                    }
+                },
+                apply: 'Apply',
+                cancel: 'Cancel',
             }
         },
         scan: {
