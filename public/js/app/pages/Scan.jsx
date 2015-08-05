@@ -1,14 +1,30 @@
 define([
     'jquery',
     'react',
-    'jsx!widgets/Popup',
+    'jsx!widgets/Modal',
     'app/actions/scaned-model',
     'helpers/api/3d-scan-control',
     'helpers/api/3d-scan-modeling',
     'jsx!views/scan/Setup-Panel',
     'jsx!views/scan/Manipulation-Panel',
+    'jsx!views/Print-Selector',
+    'jsx!views/scan/Export',
+    'jsx!views/scan/Progress-Bar',
     'helpers/file-system'
-], function($, React, popup, scanedModel, scanControl, scanModeling, SetupPanel, ManipulationPanel, fileSystem) {
+], function(
+    $,
+    React,
+    Modal,
+    scanedModel,
+    scanControl,
+    scanModeling,
+    SetupPanel,
+    ManipulationPanel,
+    PrinterSelector,
+    Export,
+    ProgressBar,
+    fileSystem
+) {
     'use strict';
 
     return function(args) {
@@ -25,44 +41,8 @@ define([
                 },
 
                 _saveAs: function(e) {
-                    var self = this;
-
-                    require(['jsx!views/scan/Export'], function(view) {
-                        var popup_window;
-
-                        args.onExport = function(e) {
-                            var last_point_cloud = self.props.scan_modeling_websocket.History.getLatest(),
-                                file_format = $('[name="file-format"]:checked').val(),
-                                file_name = (new Date()).getTime() + '.' + file_format;
-
-                            self.props.scan_modeling_websocket.export(
-                                last_point_cloud.name,
-                                file_format,
-                                {
-                                    onFinished: function(blob) {
-                                        var file = new File(
-                                            [blob],
-                                            file_name
-                                        );
-
-                                        fileSystem.writeFile(
-                                            file,
-                                            {
-                                                onComplete: function(e, fileEntry) {
-                                                    window.open(fileEntry.toURL());
-                                                }
-                                            }
-                                        );
-
-                                        popup_window.close();
-                                    }
-                                }
-                            );
-                        };
-                        args.disabledEscapeOnBackground = false;
-
-                        popup_window = popup(view, args);
-                        popup_window.open();
+                    this.setState({
+                        openExportWindow: true
                     });
                 },
 
@@ -93,23 +73,8 @@ define([
                 _startScan: function(e) {
                     var self = this;
 
-                    require(['jsx!views/Print-Selector'], function(view) {
-                        var popup_window;
-
-                        popup_window = popup(
-                            view,
-                            {
-                                getPrinter: function(auth_printer) {
-                                    self.state.selected_printer = auth_printer;
-                                    popup_window.close();
-                                    self.setState({
-                                        getting_started: true
-                                    });
-                                }
-                            }
-                        );
-
-                        popup_window.open();
+                    self.setState({
+                        openPrinterSelectorWindow: true
                     });
                 },
 
@@ -122,6 +87,7 @@ define([
                         scan_speed = self._getScanSpeed(),
                         remaining_sec = ((scan_speed - chunk_length) * (20 * 60 / scan_speed)) || 0,
                         remaining_min = Math.floor(remaining_sec / 60) || 0,
+                        progressRemainingTime = self.state.progressRemainingTime,
                         progressPercentage;
 
                     remaining_sec = remaining_sec % (remaining_min * 60);
@@ -131,14 +97,17 @@ define([
                         100
                     );
 
-                    args.state.is_finished = (100 <= progressPercentage);
-
                     args.state.progressPercentage = progressPercentage;
 
                     // update remaining time every 20 chunks
                     if (0 === chunk_length % 20) {
-                        args.state.progressRemainingTime = remaining_min + 'm' + (remaining_sec || 0) + 's';
+                        progressRemainingTime = remaining_min + 'm' + (remaining_sec || 0) + 's';
                     }
+
+                    self.setState({
+                        progressPercentage: progressPercentage,
+                        progressRemainingTime: progressRemainingTime
+                    });
 
                     if ('undefined' === typeof self.props.mesh) {
                         self.setProps({
@@ -156,16 +125,14 @@ define([
 
                 _handleScan: function(e, refs) {
                     var self = this,
-                        popup_window,
 
                         onScanFinished = function(point_cloud) {
                             var upload_name = 'scan-' + (new Date()).getTime(),
                                 onUploadFinished = function() {
-                                    popup_window.close();
-
                                     // update scan times
                                     self.setState({
-                                        scan_times: self.state.scan_times + 1
+                                        scan_times: self.state.scan_times + 1,
+                                        openProgressBar: false
                                     });
                                 };
 
@@ -180,18 +147,11 @@ define([
 
                         },
                         openProgressBar = function(callback) {
-                            require(['jsx!views/scan/Progress-Bar'], function(view) {
-                                self.props.scan_modeling_image_method.stop();
+                            self.props.scan_modeling_image_method.stop();
+                            callback();
 
-                                args.disabledEscapeOnBackground = true;
-                                args.state.progressPercentage = 0;
-                                args.state.progressRemainingTime = '20m0s';
-
-                                popup_window = popup(view, args);
-                                popup_window.open();
-
-                                callback();
-
+                            self.setState({
+                                openProgressBar: true
                             });
                         },
                         onScan = function() {
@@ -250,11 +210,9 @@ define([
                         last_point_cloud = self.props.scan_modeling_websocket.History.getLatest(),
                         delete_noise_name = 'clear-noise-' + (new Date()).getTime(),
                         onDumpFinished = function(data) {
-                            console.log('dump finished');
                             self._onRendering(data);
                         },
                         onDumpReceiving = function(data, len) {
-                            console.log('dump receiving');
                             self._onRendering(data, len);
                         };
 
@@ -374,22 +332,132 @@ define([
                     );
                 },
 
+                _renderExportWindow: function() {
+                    var self = this,
+                        lang = self.state.lang,
+                        onExport = function(e) {
+                            var last_point_cloud = self.props.scan_modeling_websocket.History.getLatest(),
+                                file_format = $('[name="file-format"]:checked').val(),
+                                file_name = (new Date()).getTime() + '.' + file_format;
+
+                            self.props.scan_modeling_websocket.export(
+                                last_point_cloud.name,
+                                file_format,
+                                {
+                                    onFinished: function(blob) {
+                                        console.log('onExport onFinished');
+                                        var blob = new Blob([blob]),
+                                            url = (window.URL || window.webkitURL),
+                                            objectUrl = url.createObjectURL(blob);
+
+                                        window.open(objectUrl);
+                                        // release the object URL once the image has loaded
+                                        url.revokeObjectURL(objectUrl);
+                                        blob = null;
+
+                                        return;
+                                        // trigger the image to load
+                                        img.src = objectUrl;
+
+                                        var file = new File(
+                                            [blob],
+                                            file_name
+                                        );
+
+                                        fileSystem.writeFile(
+                                            file,
+                                            {
+                                                onComplete: function(e, fileEntry) {
+                                                    window.open(fileEntry.toURL());
+                                                }
+                                            }
+                                        );
+
+                                        onClose();
+                                    }
+                                }
+                            );
+                        },
+                        content = (
+                            <Export lang={lang} onExport={onExport}/>
+                        ),
+                        onClose = function(e) {
+                            self.setState({
+                                openExportWindow: false
+                            });
+                        };
+
+                    return (
+                        <Modal content={content} onClose={onClose}/>
+                    );
+                },
+
+                _renderProgressBar: function() {
+                    var self = this,
+                        lang = this.state.lang,
+                        content = (
+                            <ProgressBar
+                                lang={lang}
+                                progressPercentage={this.state.progressPercentage}
+                                progressRemainingTime={this.state.progressRemainingTime}/>
+                        ),
+                        onClose = function(e) {
+                            self.setState({
+                                openProgressBar: false
+                            });
+                        };
+
+                    return (
+                        <Modal disabledEscapeOnBackground="true" content={content} onClose={onClose}/>
+                    );
+                },
+
+                _renderPrinterSelectorWindow: function() {
+                    var self = this,
+                        lang = this.state.lang,
+                        onGettingPrinter = function(auth_printer) {
+                            self.setState({
+                                getting_started: true,
+                                selected_printer: auth_printer,
+                                openPrinterSelectorWindow: false
+                            });
+                        },
+                        content = (
+                            <PrinterSelector lang={lang} onGettingPrinter={onGettingPrinter}/>
+                        ),
+                        onClose = function(e) {
+                            self.setState({
+                                openPrinterSelectorWindow: false
+                            });
+                        };
+
+                    return (
+                        <Modal content={content} onClose={onClose}/>
+                    );
+                },
+
                 getDefaultProps: function() {
                     return {
                         mesh: undefined,
                         cylinder: undefined,
                         scan_ctrl_websocket : undefined,
                         scan_modeling_websocket : undefined,
-                        scan_modeling_image_method : undefined,
+                        scan_modeling_image_method : undefined
                     };
                 },
 
                 getInitialState: function() {
                     return {
+                        lang: args.state.lang,
                         image_src: '',
                         getting_started: false,
                         scan_times: 0,
-                        selected_printer: undefined
+                        selected_printer: undefined,
+                        openExportWindow: false,
+                        openPrinterSelectorWindow: false,
+                        openProgressBar: false,
+                        progressPercentage: 0,
+                        progressRemainingTime: '20m0s'
                     };
                 },
 
@@ -404,6 +472,21 @@ define([
 
                 render : function() {
                     var state = this.state,
+                        exportWindow = (
+                            true === state.openExportWindow ?
+                            this._renderExportWindow() :
+                            ''
+                        ),
+                        printerSelectorWindow = (
+                            true === state.openPrinterSelectorWindow ?
+                            this._renderPrinterSelectorWindow() :
+                            ''
+                        ),
+                        progressBar = (
+                            true === state.openProgressBar ?
+                            this._renderProgressBar() :
+                            ''
+                        ),
                         cx = React.addons.classSet,
                         lang = state.lang,
                         activeSection,
@@ -421,6 +504,9 @@ define([
                         <div className="studio-container scan-studio">
 
                             {header}
+                            {exportWindow}
+                            {printerSelectorWindow}
+                            {progressBar}
 
                             <div className="stage">
 
@@ -437,7 +523,6 @@ define([
                     timer = setInterval(function() {
                         state = self.state;
 
-                        // console.log(state.getting_started, state.selected_printer);
                         if (true === state.getting_started && null !== state.selected_printer) {
                             self.setProps({
                                 scan_ctrl_websocket: scanControl(state.selected_printer.serial),
