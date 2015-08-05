@@ -8,7 +8,6 @@ define([
     'helpers/convertToTypedArray',
     'helpers/element-angle',
     'helpers/api/control',
-    'jsx!widgets/Popup',
     'jsx!views/Print-Selector',
     'jsx!widgets/Modal',
     'helpers/shortcuts',
@@ -24,7 +23,6 @@ define([
     convertToTypedArray,
     elementAngle,
     control,
-    popup,
     PrinterSelector,
     Modal,
     shortcuts
