@@ -13,6 +13,7 @@ define([
     return function(serial, opts) {
         opts = opts || {};
         opts.onError = opts.onError || function() {};
+        opts.onClose = opts.onClose || function() {};
 
         var ws = new Websocket({
                 method: '3d-scan-control/' + serial,
@@ -46,6 +47,9 @@ define([
                     }
 
                     lastMessage = data;
+                },
+                onClose: function() {
+                    opts.onClose();
                 }
             }),
             is_error = false,
