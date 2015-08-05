@@ -1,8 +1,8 @@
 define([
     'jquery',
-    'helpers/local-storage',
+    'helpers/api/config',
     'lib/sha256'
-], function($, localStorage) {
+], function($, config) {
     'use strict';
 
     return function() {
@@ -13,10 +13,7 @@ define([
             var $me = $(e.target),
                 $required_fields = $('.required'),
                 is_vaild = true,
-                printers = localStorage.get('printers') || [],
-                was_ready = localStorage.get('printer-is-ready') || '';
-
-            was_ready = ('' === was_ready ? false : 'true' === was_ready);
+                printers = localStorage.get('printers') || [];
 
             $('.error').removeClass('error');
 
@@ -38,17 +35,11 @@ define([
                 );
                 localStorage.set('printers', printers);
 
-                if (true === was_ready) {
-                    $('.popup-window').hide();
-                    location.href = '#studio/settings/printer';
-                }
-                else {
-                    localStorage.set('printer-is-ready', true);
-                    location.href = '#studio/print';
-                }
-
-                localStorage.set('printer-is-ready', true);
-                location.href='#initialize/wifi/setup-complete';
+                config().write('printer-is-ready', true, {
+                    onFinished: function() {
+                        location.href='#initialize/wifi/setup-complete';
+                    }
+                });
             }
         });
     };
