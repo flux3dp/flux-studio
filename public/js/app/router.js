@@ -53,7 +53,7 @@ function(React, $, Backbone, display) {
                     }
                 };
 
-                _display(view, args, $('.popup-window')[0]);
+                _display(view, args);
             });
         },
 
@@ -61,7 +61,6 @@ function(React, $, Backbone, display) {
             var map = {
                     'ask': 'Wifi-Home',
                     'select': 'Wifi-Select',
-                    'spot': 'Wifi-Spot',
                     'set-printer': 'Wifi-Set-Printer',
                     'set-password': 'Wifi-Set-Password',
                     'setup-complete': 'Wifi-Setup-Complete',
@@ -77,7 +76,7 @@ function(React, $, Backbone, display) {
             }
 
             require(['jsx!pages/' + view_name], function(view) {
-                _display(view, {}, $('.popup-window')[0]);
+                _display(view, {});
             });
         },
 
