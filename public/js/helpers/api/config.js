@@ -51,10 +51,7 @@ define([
                     ],
                     reader = new FileReader();
 
-                events.onClose = opts.onFinished;
-
                 events.onMessage = function(data) {
-                    console.log(data);
 
                     switch (data.status) {
                     case 'opened':
@@ -64,6 +61,9 @@ define([
 
                         reader.readAsArrayBuffer(blob);
 
+                        break;
+                    case 'ok':
+                        opts.onFinished();
                         break;
                     default:
                         // TODO: do something?
@@ -85,8 +85,6 @@ define([
                         key
                     ],
                     reader = new FileReader();
-
-                events.onClose = opts.onFinished;
 
                 events.onMessage = function(data) {
                     if ('opened' === data.status) {
