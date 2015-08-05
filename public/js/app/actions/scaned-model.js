@@ -76,7 +76,8 @@ define([
             material = new THREE.MeshLambertMaterial( { color: 0xffff00, transparent: true, opacity: 0.3 } ),
             geometry, radius;
 
-        radius = Math.max(mesh_size.x, mesh_size.z);
+        radius = Math.min(Math.max(mesh_size.x, mesh_size.z), settings.diameter) / 2;
+        mesh_size.y = Math.min(mesh_size.y, settings.diameter);
 
         geometry = new THREE.CylinderGeometry( radius, radius, mesh_size.y, 32 );
         cylinder = new THREE.Mesh( geometry, material );
