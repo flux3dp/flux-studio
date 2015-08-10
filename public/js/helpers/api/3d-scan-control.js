@@ -14,6 +14,8 @@ define([
         opts = opts || {};
         opts.onError = opts.onError || function() {};
         opts.onClose = opts.onClose || function() {};
+        opts.onStarting = opts.onStarting || function() {};
+        opts.onReady = opts.onReady || function() {};
 
         var ws = new Websocket({
                 method: '3d-scan-control/' + serial,
@@ -34,6 +36,7 @@ define([
                     case 'ready':
                         is_ready = true;
                         is_error = false;
+                        opts.onReady();
                         break;
                     case 'connected':
                         // wait for machine ready
@@ -45,18 +48,15 @@ define([
                     if (true === is_ready) {
                         events.onMessage(data);
                     }
-
-                    lastMessage = data;
                 },
                 onClose: function() {
                     opts.onClose();
-                }
+                },
+                onOpen: opts.onStarting
             }),
             is_error = false,
             is_ready = false,
             IMAGE_INTERVAL = 200,
-            lastOrder = '',
-            lastMessage = '',
             events = {
                 onMessage: function() {}
             },
@@ -70,27 +70,19 @@ define([
                     ws.send('take_control');
                 }
             },
-            wait_gap_time = 0,
             wait_for_connected_timer,
             image_timer,
-            check_is_ready = function(callback) {
-                wait_for_connected_timer = setInterval(function() {
-                    if (true === is_ready) {
-                        clearInterval(wait_for_connected_timer);
-                        wait_gap_time = 0;
-                        callback();
+            stopGettingImage = function(callback) {
+                var timer = setInterval(function() {
+                    if ('undefined' !== typeof image_timer) {
+                        clearInterval(image_timer);
+                        image_timer = undefined;
                     }
                     else {
-                        wait_gap_time = 100;
+                        callback();
+                        clearInterval(timer);
                     }
-
-                }, wait_gap_time);
-            },
-            stopGettingImage = function() {
-                if ('image' === lastOrder) {
-                    clearInterval(image_timer);
-                    lastOrder = '';
-                }
+                }, 100);
             };
 
         return {
@@ -101,9 +93,7 @@ define([
                     mime_type = '',
                     image_blobs = [],
                     fetch = function() {
-                        lastOrder = 'image';
                         events.onMessage = function(data) {
-
                             switch (data.status) {
                             case 'binary':
                                 mime_type = data.mime;
@@ -122,25 +112,23 @@ define([
                                 }
                             }
                         };
-
-                        image_timer = setInterval(function() {
-                            if (true === allow_to_get) {
-                                ws.send(lastOrder);
-                                allow_to_get = false;
-                            }
-                        }, IMAGE_INTERVAL);
                     };
 
-                check_is_ready(fetch);
+                image_timer = setInterval(function() {
+                    if (true === allow_to_get) {
+                        ws.send('image');
+                        allow_to_get = false;
+                    }
+                }, IMAGE_INTERVAL);
+
+                fetch();
 
                 return {
-                    stop: stopGettingImage,
                     retry: retry,
                     take_control: takeControl
                 };
             },
             scan: function(resolution, opts) {
-                stopGettingImage();
 
                 opts = opts || {};
                 opts.onRendering = opts.onRendering || function() {};
@@ -152,51 +140,57 @@ define([
                     _opts = {
                         onProgress: opts.onRendering
                     },
-                    go_next = false,
+                    go_next = true,
                     got_chunk = false,
-                    timer;
-
-                lastOrder = 'scan';
-
-                check_is_ready(function() {
-
-                    events.onMessage = function(data) {
-                        switch (data.status) {
-                        case 'chunk':
-                            next_left = parseInt(data.left, 10) * 24;
-                            next_right = parseInt(data.right, 10) * 24;
-                            got_chunk = true;
-                            break;
-                        case 'ok':
-                            go_next = true;
-                            got_chunk = false;
-                            break;
-                        default:
-                            if (data instanceof Blob && true === got_chunk) {
-                                pointCloud.push(data, next_left, next_right, _opts);
+                    timer,
+                    onResolutionMessage = function() {
+                        events.onMessage = function(data) {
+                            if ('ok' === data.status) {
+                                onScanMessage();
                             }
-                            else {
-                                // TODO: unexception data
+                        };
+                    },
+                    onScanMessage = function() {
+                        events.onMessage = function(data) {
+                            switch (data.status) {
+                            case 'chunk':
+                                next_left = parseInt(data.left, 10) * 24;
+                                next_right = parseInt(data.right, 10) * 24;
+                                got_chunk = true;
+                                break;
+                            case 'ok':
+                                resolution--;
+                                go_next = (0 < resolution);
+                                got_chunk = false;
+                                break;
+                            default:
+                                if (data instanceof Blob && true === got_chunk) {
+                                    pointCloud.push(data, next_left, next_right, _opts);
+                                }
+                                else {
+                                    // TODO: unexception data
+                                }
                             }
-                        }
+                        };
+
+                        timer = setInterval(function() {
+                            if (true === go_next) {
+                                go_next = false;
+                                ws.send('scan');
+                            }
+
+                            if (0 >= resolution) {
+                                opts.onFinished(pointCloud.get());
+                                clearInterval(timer);
+                            }
+                        }, 100);
+                    },
+                    scanStarted = function() {
+                        onResolutionMessage();
+                        ws.send('resolution ' + resolution);
                     };
 
-                    timer = setInterval(function() {
-
-                        if (true === go_next) {
-                            go_next = false;
-                            ws.send(lastOrder);
-                            resolution--;
-                        }
-
-                        if (0 >= resolution) {
-                            opts.onFinished(pointCloud.get());
-                            clearInterval(timer);
-                        }
-                    }, 100);
-
-                    ws.send('resolution ' + resolution);
-                });
+                stopGettingImage(scanStarted);
 
                 return {
                     retry: retry,
