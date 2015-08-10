@@ -50,7 +50,7 @@ define([
         },
 
         componentWillUnmount: function() {
-            shortcuts.disableAll();
+            shortcuts.off(['esc']);
         }
     });
 });
