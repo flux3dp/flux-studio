@@ -37,7 +37,7 @@ define([
 
                 config().write('printer-is-ready', true, {
                     onFinished: function() {
-                        location.href='#initialize/wifi/setup-complete';
+                        location.href = '#initialize/wifi/setup-complete';
                     }
                 });
             }
