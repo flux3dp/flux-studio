@@ -29,9 +29,6 @@ define([
 
                     lastMessage = data;
 
-                },
-                onClose: function(result) {
-                    History.clearAll();
                 }
             }),
             lastMessage = '',
@@ -88,6 +85,7 @@ define([
              */
             cut: function(in_name, out_name, args, opts) {
                 opts = opts || {};
+                opts.onStarting = opts.onStarting || function() {};
                 opts.onFinished = opts.onFinished || function() {};
 
                 var self = this,
@@ -138,10 +136,13 @@ define([
                     }
                 }, 0);
 
+                opts.onStarting();
+
             },
             delete_noise: function(in_name, out_name, c, opts) {
 
                 opts.onFinished = opts.onFinished || function() {};
+                opts.onStarting = opts.onStarting || function() {};
 
                 var self = this,
                     order_name = 'delete_noise',
@@ -166,9 +167,75 @@ define([
                 };
 
                 ws.send(args.join(' '));
+                opts.onStarting();
             },
-            merge: function(name, x1, x2, y1, y2) {
-                // TODO: to be implemented
+            autoMerge: function(base, target, output, opts) {
+                opts.onStarting = opts.onStarting || function() {};
+                opts.onFinished = opts.onFinished || function() {};
+                opts.onFail = opts.onFail || function() {};
+
+                var self = this,
+                    order_name = 'auto_merge',
+                    args = [
+                        order_name,
+                        base,
+                        target,
+                        output
+                    ];
+
+                events.onMessage = function(data) {
+
+                    switch (data.status) {
+                    case 'ok':
+                        self.dump(
+                            output,
+                            opts
+                        );
+                        break;
+                    case 'fail':
+                        opts.onFail();
+                        break;
+                    }
+
+                };
+
+                opts.onStarting();
+                ws.send(args.join(' '));
+            },
+            merge: function(base, target, position, rotation, output, opts) {
+                opts.onStarting = opts.onStarting || function() {};
+                opts.onFinished = opts.onFinished || function() {};
+
+                var self = this,
+                    order_name = 'merge',
+                    args = [
+                        order_name,
+                        base,
+                        target,
+                        position.x,
+                        position.y,
+                        position.z,
+                        rotation.x,
+                        rotation.y,
+                        rotation.z,
+                        output
+                    ];
+
+                events.onMessage = function(data) {
+
+                    switch (data.status) {
+                    case 'ok':
+                        self.dump(
+                            output,
+                            opts
+                        );
+                        break;
+                    }
+
+                };
+
+                opts.onStarting();
+                ws.send(args.join(' '));
             },
             /**
              * @param {String} name - source name
