@@ -439,7 +439,8 @@ define(function() {
             manipulation: {
                 smooth: 'Smooth',
                 crop: 'Crop',
-                delete: 'Delete',
+                auto_merge: 'Auto Merge',
+                manual_merge: 'Manual Merge',
                 clear_noise: 'Clear Noise',
                 reset: 'Reset'
             }
