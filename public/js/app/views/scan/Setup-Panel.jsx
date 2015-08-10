@@ -7,7 +7,8 @@ define([
     return React.createClass({
         getDefaultProps: function() {
             return {
-                onScanClick: React.PropTypes.func
+                onScanClick: React.PropTypes.func,
+                enabledScanButton: React.PropTypes.bool
             };
         },
         _onScanClick: function (e) {
@@ -16,7 +17,12 @@ define([
         render: function() {
             var props = this.props,
                 start_scan_text,
-                lang = props.lang;
+                cx = React.addons.classSet,
+                lang = props.lang,
+                button_class = cx({
+                    'btn btn-action span12 fa fa-bullseye': true,
+                    'btn-disabled': props.enabledScanButton
+                });
 
             return (
                 <div className="setup-panel operating-panel">
@@ -52,7 +58,7 @@ define([
                             </div>
                         </div>
                     </div>
-                    <button id="btn-scan" onClick={this._onScanClick} className="btn btn-action span12 fa fa-bullseye">
+                    <button id="btn-scan" onClick={this._onScanClick} className={button_class}>
                         {lang.scan.start_scan_text}
                     </button>
                 </div>
