@@ -189,7 +189,6 @@ define([
                     if (false === self.props.is_canvas_existing) {
                         stage = scanedModel.init();
                         self.setProps(stage);
-                        // self.props.camera = scanedModel.init().camera;
                     }
 
                     self.setProps({
@@ -315,8 +314,7 @@ define([
                         },
                         box = new THREE.Box3().setFromObject(meshes[1].model);
 
-                    position.z = box.size().z /2;
-                    rotation.z = 45 * Math.PI / 180;
+                    position.z += box.size().z /2;
 
                     self.props.scan_modeling_websocket.merge(
                         meshes[0].name,
@@ -689,6 +687,8 @@ define([
                             }
 
                             self.props.camera.lookAt(self.props.scene.position);
+
+                            scanedModel.update();
                         },
                         zoom = function(dir) {
                             if ('undefined' === typeof self.props.camera) {
@@ -715,6 +715,8 @@ define([
                             self.props.camera.position.set(x, y, z);
 
                             self.props.camera.lookAt(self.props.scene.position);
+
+                            scanedModel.update();
                         },
                         state, timer;
 
