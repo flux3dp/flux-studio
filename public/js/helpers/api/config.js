@@ -17,10 +17,9 @@ define([
                 autoReconnect: false,
                 onMessage: function(result) {
 
-                    var data = (true === isJson(result.data) ? JSON.parse(result.data) : result.data),
-                        error_code;
+                    var data = (true === isJson(result.data) ? JSON.parse(result.data) : result.data);
 
-                    if ('string' === typeof data.status && 'fatal' === data.status) {
+                    if ('string' === typeof data.error) {
                         opts.onError(data.error, data);
                     }
                     else {
