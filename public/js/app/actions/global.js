@@ -14,21 +14,27 @@ define([
 
     return function(callback) {
         var $body = $('body'),
-            hash = location.hash;
-
-        config().read('printer-is-ready', {
-            onFinished: function(data) {
-
+            hash = location.hash,
+            onFinished = function(data) {
                 var is_ready = data;
 
-                is_ready = ('' === is_ready ? false : 'true' === is_ready);
+                is_ready = ('true' === is_ready);
 
                 if (true === is_ready && ('' === hash || hash.startsWith('#initialize'))) {
                     location.hash = '#studio/print';
                 }
+                else if (false === is_ready && ('' !== hash || false === hash.startsWith('#initialize'))) {
+                    location.hash = '#';
+                }
 
                 callback();
-            }
+            },
+            opt = {
+                onError: onFinished
+            };
+
+        config(opt).read('printer-is-ready', {
+            onFinished: onFinished
         });
     };
 });
