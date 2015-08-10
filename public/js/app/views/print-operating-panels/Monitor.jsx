@@ -82,7 +82,9 @@ define([
                 temperatureClass    = this.state.currentTemperature >= this.state.desiredTemperature ? 'done' : 'loading',
                 knobClass           = ClassNames('knob', {'hide': (this.state.printPaused || this.state.printError)}),
                 printStatusClass    = ClassNames('fa fa-pause fa-2x', {'hide': !this.state.printPaused}),
-                actionButton        = <div className="pause"><a className="btn btn-confirm" onClick={this._handleTogglePrintPause}>{this.state.printPaused ? lang.print.continue : lang.print.pause}</a></div>;
+                actionButton        =
+                    <div className="pause">
+                        <a className="btn btn-confirm" onClick={this._handleTogglePrintPause}>{this.state.printPaused ? lang.print.continue : lang.print.pause}</a></div>;
 
             if(this.state.printError) {
                 printStatusClass = ClassNames('fa fa-exclamation-triangle fa-2x');
@@ -108,7 +110,6 @@ define([
                     <div className="actions pull-right">
                         {actionButton}
                         <div className="cancel"><a className="btn btn-default" onClick={this._handlePrintCancel}>{lang.print.cancel}</a></div>
-
                     </div>
                 </div>
             );

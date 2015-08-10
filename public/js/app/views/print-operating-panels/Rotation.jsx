@@ -7,7 +7,7 @@ define([
     var rotation = { x:0, y:0, z:0 },
         setup = {
             'min': 0,
-            'max': 359,
+            'max': 360,
             'step': 5,
             'thickness': 0.2,
             'width': 50,
@@ -23,13 +23,26 @@ define([
                 onRotate: React.PropTypes.func
             };
         },
+        getInitialState: function() {
+            return {
+                x: 10
+            };
+        },
         componentDidMount: function() {
             var thisModule = this;
             $('.x-axis').knob(React.addons.update(setup, {$merge:{change: function(v) { thisModule._handleXChange(v); }}}));
             $('.y-axis').knob(React.addons.update(setup, {$merge:{change: function(v) { thisModule._handleYChange(v); }}}));
             $('.z-axis').knob(React.addons.update(setup, {$merge:{change: function(v) { thisModule._handleZChange(v); }}}));
+
+            $('.x-axis').val(this.props.selected.rotation.enteredX);
+            $('.y-axis').val(this.props.selected.rotation.enteredY);
+            $('.z-axis').val(this.props.selected.rotation.enteredZ);
+            this._updateDialPosition();
         },
         componentDidUpdate: function(prevProp, prevState) {
+            this._updateDialPosition();
+        },
+        _updateDialPosition: function() {
             $('.x-axis').trigger('change');
             $('.y-axis').trigger('change');
             $('.z-axis').trigger('change');
@@ -53,6 +66,10 @@ define([
             rotation.z = v || '';
             this._rotateModel();
         },
+        _temp: function(e) {
+            this.setState({x:e.target.value});
+            console.log('here');
+        },
         render: function() {
             var lang = this.props.lang,
                 selected = this.props.selected;
@@ -67,15 +84,15 @@ define([
                         <div className="container vertical-middle">
                             <div className="controls">
                                 <label>X</label>
-                                <input type="text" className="knob x-axis" value={selected.rotation.enteredX} />
+                                <input type="text" className="knob x-axis" />
                             </div>
                             <div className="controls">
                                 <label>Y</label>
-                                <input type="text" className="knob y-axis" value={selected.rotation.enteredY} />
+                                <input type="text" className="knob y-axis" />
                             </div>
                             <div className="controls">
                                 <label>Z</label>
-                                <input type="text" className="knob z-axis" value={selected.rotation.enteredZ} />
+                                <input type="text" className="knob z-axis" />
                             </div>
                             <div className="controls pull-right">
                                 <a className="btn btn-default" onClick={this._handleResetRotation}>{lang.print.reset}</a>

@@ -242,6 +242,7 @@
                 this.cv = {};
                 this.copy(this.v, this.cv);
             } else {
+                this.v = this.v || 0;
                 this.cv = this.v;
             }
 
@@ -654,10 +655,10 @@
                             && e.preventDefault();
 
                             // arrows
-                            if ($.inArray(kc,[37,38,39,40]) > -1) {
+                            if ($.inArray(kc,[13,37,38,39,40]) > -1) {
                                 e.preventDefault();
 
-                                var v = s.o.parse(s.$.val()) + kv[kc] * m;
+                                var v = kc === 13 ? s.o.parse(s.$.val()) : s.o.parse(s.$.val()) + kv[kc] * m;
                                 s.o.stopper && (v = max(min(v, s.o.max), s.o.min));
 
                                 s.change(s._validate(v));
@@ -667,6 +668,8 @@
                                 to = window.setTimeout(function () {
                                     m *= 2;
                                 }, 30);
+
+                                if (s.cH && (s.cH(s._validate(v)) === false)) return;
                             }
                         }
                     }
