@@ -2113,106 +2113,6 @@ a {
     font-weight: lighter;
     text-decoration: underline; }
 
-/* buttons */
-.btn {
-    background-image: none;
-    border: none;
-    box-sizing: border-box;
-    cursor: pointer;
-    display: inline-block;
-    font-size: 15px;
-    letter-spacing: .5px;
-    line-height: 44px;
-    margin: 0;
-    min-width: 99px;
-    outline: none;
-    overflow: hidden;
-    padding: 0 5px;
-    position: relative;
-    text-align: center;
-    text-decoration: none;
-    -webkit-transition: opacity 0.1s ease, background-color 0.1s ease, color 0.1s ease, box-shadow 0.1s ease, background 0.1s ease;
-    transition: opacity 0.1s ease, background-color 0.1s ease, color 0.1s ease, box-shadow 0.1s ease, background 0.1s ease;
-    -webkit-user-select: none;
-    user-select: none;
-    -webkit-tap-highlight-color: transparent; }
-    .btn:active {
-        background-color: #ccc;
-        background-image: '';
-        box-shadow: 0 0 0 1px transparent inset, 0 1px 4px 0 rgba(39, 41, 43, 0.15);
-        color: rgba(0, 0, 0, 0.8); }
-
-.btn-default {
-    background: #fff;
-    border: 1px solid #e0e0e0;
-    color: #424242; }
-    .btn-default:hover {
-        border: 1px solid #424242; }
-
-.btn-confirm {
-    background-color: #424242;
-    color: #FFF; }
-    .btn-confirm:hover {
-        background-color: #000000; }
-
-.btn-action {
-    background: #00C853;
-    color: #fff; }
-    .btn-action:hover {
-        background: #33d375; }
-
-.btn-disabled {
-    pointer-events: none;
-    position: relative; }
-    .btn-disabled::before {
-        background: rgba(255, 255, 255, 0.5);
-        content: "";
-        display: block;
-        height: 100%;
-        left: 0;
-        position: absolute;
-        top: 0;
-        width: 100%; }
-
-.btn-warning {
-    background: #f00; }
-
-.btn-link {
-    color: #000;
-    text-decoration: underline; }
-
-/* button size */
-.btn-full-width {
-    display: block;
-    min-width: initial;
-    width: 100%; }
-
-.btn-large {
-    width: 270px; }
-
-/* button helper */
-.btn-multiline-text {
-    line-height: initial;
-    padding: 14px 0; }
-
-/* button group */
-.btn-h-group {
-    display: -webkit-box;
-    /* OLD - iOS 6-, Safari 3.1-6 */
-    display: -webkit-flex;
-    /* NEW - Chrome */
-    display: flex;
-    /* NEW, Spec - Opera 12.1, Firefox 20+ */ }
-
-.btn-align-center-h-group {
-    justify-content: center; }
-
-.btn-h-group .btn {
-    margin: 0 0 0 24px; }
-
-.btn-h-group .btn:first-child {
-    margin: 0; }
-
 /**
  * structure
  */
@@ -2229,6 +2129,7 @@ a {
 
 .content {
     height: 100%;
+    overflow: hidden;
     width: calc(100% - 66px); }
 
 .menu {
@@ -2631,24 +2532,6 @@ input[type=range]:focus::-webkit-slider-runnable-track {
     .studio-container .btn-default {
         border-radius: 5px; }
 
-.popup-window {
-    background: rgba(0, 0, 0, 0.5);
-    bottom: 0;
-    height: 100%;
-    left: 0;
-    position: fixed;
-    right: 0;
-    top: 0;
-    width: 100%;
-    z-index: 9999; }
-
-.popup-window .popup-background {
-    bottom: 0;
-    left: 0;
-    position: absolute;
-    right: 0;
-    top: 0; }
-
 /**
  * ref: http://tobiasahlin.com/spinkit/
  */
@@ -2678,6 +2561,108 @@ input[type=range]:focus::-webkit-slider-runnable-track {
     100% {
         -webkit-transform: perspective(120px) rotateX(-180deg) rotateY(-179.9deg);
         transform: perspective(120px) rotateX(-180deg) rotateY(-179.9deg); } }
+
+/**
+ * buttons
+ */
+.btn {
+    background-image: none;
+    border: none;
+    box-sizing: border-box;
+    cursor: pointer;
+    display: inline-block;
+    font-size: 15px;
+    letter-spacing: .5px;
+    line-height: 44px;
+    margin: 0;
+    min-width: 99px;
+    outline: none;
+    overflow: hidden;
+    padding: 0 5px;
+    position: relative;
+    text-align: center;
+    text-decoration: none;
+    -webkit-transition: opacity 0.1s ease, background-color 0.1s ease, color 0.1s ease, box-shadow 0.1s ease, background 0.1s ease;
+    transition: opacity 0.1s ease, background-color 0.1s ease, color 0.1s ease, box-shadow 0.1s ease, background 0.1s ease;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent; }
+    .btn:active {
+        background-color: #ccc;
+        background-image: '';
+        box-shadow: 0 0 0 1px transparent inset, 0 1px 4px 0 rgba(39, 41, 43, 0.15);
+        color: rgba(0, 0, 0, 0.8); }
+
+.btn-default {
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    color: #424242; }
+    .btn-default:hover {
+        border: 1px solid #424242; }
+
+.btn-confirm {
+    background-color: #424242;
+    color: #FFF; }
+    .btn-confirm:hover {
+        background-color: #000000; }
+
+.btn-action {
+    background: #00C853;
+    color: #fff; }
+    .btn-action:hover {
+        background: #33d375; }
+
+.btn-disabled {
+    pointer-events: none;
+    position: relative; }
+    .btn-disabled::before {
+        background: rgba(255, 255, 255, 0.5);
+        content: "";
+        display: block;
+        height: 100%;
+        left: 0;
+        position: absolute;
+        top: 0;
+        width: 100%; }
+
+.btn-warning {
+    background: #f00; }
+
+.btn-link {
+    color: #000;
+    text-decoration: underline; }
+
+/* button size */
+.btn-full-width {
+    display: block;
+    min-width: initial;
+    width: 100%; }
+
+.btn-large {
+    width: 270px; }
+
+/* button helper */
+.btn-multiline-text {
+    line-height: initial;
+    padding: 14px 0; }
+
+/* button group */
+.btn-h-group {
+    display: -webkit-box;
+    /* OLD - iOS 6-, Safari 3.1-6 */
+    display: -webkit-flex;
+    /* NEW - Chrome */
+    display: flex;
+    /* NEW, Spec - Opera 12.1, Firefox 20+ */ }
+
+.btn-align-center-h-group {
+    justify-content: center; }
+
+.btn-h-group .btn {
+    margin: 0 0 0 24px; }
+
+.btn-h-group .btn:first-child {
+    margin: 0; }
 
 /**
  * global advanced panel
@@ -4231,6 +4216,7 @@ input.switch:checked ~ label:after {
     width: 100%; }
     .scan-studio .model-displayer .camera-image {
         height: 100%;
+        object-fit: contain;
         width: 100%; }
 
 .scan-studio .setup-panel,
