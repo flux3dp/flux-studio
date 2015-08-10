@@ -26,14 +26,11 @@ define([
         container = document.getElementById('model-displayer');
 
         scene = new THREE.Scene();
-        window.scene = scene;
 
         camera = new THREE.PerspectiveCamera( 70, container.offsetWidth / container.offsetHeight, 1, 300000 );
         camera.up = new THREE.Vector3(0, 0, 1);
         camera.position.set(100, 100, 120);
         camera.lookAt( new THREE.Vector3( -5, -5, 0 ) );
-
-        window.camera = camera;
 
         scene.add(camera);
 
