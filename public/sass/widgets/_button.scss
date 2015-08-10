@@ -1,0 +1,121 @@
+/**
+ * buttons
+ */
+.btn {
+    background-image: none;
+    border: none;
+    box-sizing: border-box;
+    cursor: pointer;
+    display: inline-block;
+    font-size: 15px;
+    letter-spacing: .5px;
+    line-height: 44px;
+    margin: 0;
+    min-width: 99px;
+    outline: none;
+    overflow: hidden;
+    padding: 0 5px;
+    position: relative;
+    text-align: center;
+    text-decoration: none;
+    -webkit-transition: opacity .1s ease,background-color .1s ease,color .1s ease,box-shadow .1s ease,background .1s ease;
+    transition: opacity .1s ease,background-color .1s ease,color .1s ease,box-shadow .1s ease,background .1s ease;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+
+    &:active {
+        background-color: #ccc;
+        background-image: '';
+        box-shadow: 0 0 0 1px transparent inset,
+                    0 1px 4px 0 rgba(39, 41, 43, .15);
+        color: rgba(0, 0, 0, .8);
+    }
+}
+
+.btn-default {
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    color: #424242;
+
+    &:hover {
+        border: 1px solid #424242;
+    }
+}
+
+.btn-confirm {
+    background-color: #424242;
+    color: #FFF;
+
+    &:hover {
+        background-color: #000000;
+    }
+}
+
+.btn-action {
+    background: #00C853;
+    color: #fff;
+
+    &:hover {
+        background: #33d375;
+    }
+}
+
+.btn-disabled {
+    pointer-events: none;
+    position: relative;
+
+    &::before {
+        background: rgba(255, 255, 255, .5);
+        content: "";
+        display: block;
+        height: 100%;
+        left: 0;
+        position: absolute;
+        top: 0;
+        width: 100%;
+    }
+}
+
+.btn-warning {
+    background: #f00;
+}
+
+.btn-link {
+    color: #000;
+    text-decoration: underline;
+}
+
+/* button size */
+.btn-full-width {
+    display: block;
+    min-width: initial;
+    width: 100%;
+}
+
+.btn-large {
+    width: 270px;
+}
+
+/* button helper */
+.btn-multiline-text {
+    line-height: initial;
+    padding: 14px 0;
+}
+
+/* button group */
+.btn-h-group {
+    @include flexbox();
+}
+
+.btn-align-center-h-group {
+    justify-content: center;
+}
+
+.btn-h-group .btn {
+    margin: 0 0 0 24px;
+}
+
+.btn-h-group .btn:first-child {
+    margin: 0;
+}
