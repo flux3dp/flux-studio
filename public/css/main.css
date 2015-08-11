@@ -4217,8 +4217,8 @@ input.switch:checked ~ label:after {
     width: 100%; }
     .scan-studio .model-displayer .camera-image {
         height: 100%;
-        object-fit: contain;
-        width: 100%; }
+        width: 100%;
+        object-fit: contain; }
 
 .scan-studio .setup-panel,
 .scan-studio .manipulation-panel {
@@ -4256,15 +4256,20 @@ input.switch:checked ~ label:after {
     position: relative;
     width: 100%; }
 
-.scan-progress {
+.scan-studio .scan-progress {
     background: #eee;
     border-radius: 5px;
+    bottom: 10px;
     height: 150px;
+    left: 0;
+    margin: auto;
     padding: 10px;
+    position: absolute;
+    right: 0;
     width: 60%; }
-    .scan-progress .progress {
+    .scan-studio .scan-progress .progress {
         height: 20px; }
-    .scan-progress .progress-bar {
+    .scan-studio .scan-progress .progress-bar {
         background-color: #5BC0DE;
         background-image: -webkit-linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
         background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
@@ -4272,13 +4277,13 @@ input.switch:checked ~ label:after {
         height: 100%;
         -webkit-background-size: 40px 40px; }
 
-.scan-model-save-as {
+.scan-studio .scan-model-save-as {
     background: #eee;
     border-radius: 5px;
     height: 150px;
     padding: 10px;
     width: 60%; }
-    .scan-model-save-as .file-formats {
+    .scan-studio .scan-model-save-as .file-formats {
         margin: 0 0 10px 0; }
-        .scan-model-save-as .file-formats label {
+        .scan-studio .scan-model-save-as .file-formats label {
             float: left; }
