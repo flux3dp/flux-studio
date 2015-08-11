@@ -248,7 +248,12 @@ define([
                                 $img.data('name', name).
                                     data('base', fileEntry.toURL()).
                                     attr('src', fileEntry.toURL());
+
                                 clearFileInput();
+
+                                reactComponent.setState({
+                                    mode: 'engrave'
+                                });
                             }
                         }
                     );
