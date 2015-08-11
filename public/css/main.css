@@ -3404,8 +3404,6 @@ input.switch:checked ~ label:after {
         margin-right: 40px; }
         .print-studio .flux-monitor .actions .cancel {
             padding-top: 10px; }
-    .print-studio .flux-monitor .btn-cancel {
-        border: 1px #E0E0E0 solid; }
 
 .settings-studio {
     background-color: #F5F5F5; }
