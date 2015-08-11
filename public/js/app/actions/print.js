@@ -105,10 +105,7 @@ define([
         renderer.domElement.addEventListener('mousedown', onMouseDown, false);
         renderer.domElement.addEventListener( 'mouseup', onMouseUp, false );
 
-        setTimeout(function() {
-            renderer.setSize(container.offsetWidth, container.offsetHeight);
-            render();
-        }, 50);
+        renderer.setSize(container.offsetWidth, container.offsetHeight);
 
         render();
 

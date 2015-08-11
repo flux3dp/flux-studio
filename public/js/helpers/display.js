@@ -11,8 +11,7 @@ define([
 
     var views = [];
 
-    return function(view, args, el, callback) {
-        callback = callback || function() {};
+    return function(view, args, el) {
         args = args || {};
         args.props = args.props || {};
         args.state = args.state || {};
@@ -33,6 +32,8 @@ define([
 
         views.push(React.render(view, el));
 
-        callback(args);
+        $('body').off('change').on('change', '#select-lang', function(e) {
+            args.state.lang = i18n.setActiveLang(e.currentTarget.value).get();
+        });
     };
 });

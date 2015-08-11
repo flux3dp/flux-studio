@@ -39,32 +39,6 @@ define([
 
         return {
             connection: ws,
-            setup: function(mode, args, opts) {
-                opts = opts || {};
-                opts.onFinished = opts.onFinished || function() {};
-
-                var _args = [
-                    mode
-                ];
-
-                _args = _args.concat(args);
-
-                events.onMessage = function(data) {
-                    switch (data.status) {
-                    case 'ok':
-                        opts.onFinished();
-
-                        break;
-                    default:
-                        // TODO: do something?
-                        break;
-                    }
-
-                };
-
-                ws.send(_args.join(' '));
-                lastOrder = 'setup';
-            },
             /**
              * upload bitmap
              *
@@ -93,8 +67,11 @@ define([
                     next_data,
                     timer;
 
+                lastOrder = 'upload';
+
                 args.forEach(function(obj) {
                     request_header = [
+                        lastOrder,
                         obj.width,
                         obj.height,
                         obj.tl_position_x,
@@ -146,8 +123,6 @@ define([
                         clearInterval(timer);
                     }
                 }, 0);
-
-                lastOrder = 'upload';
             },
             getGCode: function(opts) {
                 opts = opts || {};

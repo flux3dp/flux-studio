@@ -8,15 +8,17 @@ define(function($) {
     //      autoReconnect - auto reconnect on close
     //      onMessage     - fired on receive message
     //      onClose       - fired on connection closed
+    //      onOpen        - fired on connection connecting
     return function(options) {
 
         var defaultOptions = {
                 hostname: location.hostname,
                 method: '',
-                port: '8000',
+                port: location.port || '8000',
                 autoReconnect: true,
                 onMessage: function(result) {},
-                onClose: function(result) {}
+                onClose: function(result) {},
+                onOpen: function(result) {}
             },
             received_data = [],
             origanizeOptions = function(opts) {
@@ -31,6 +33,10 @@ define(function($) {
             createWebSocket = function(options) {
                 var url = 'ws://' + options.hostname + ':' + options.port + '/ws/' + options.method,
                     _ws = new WebSocket(url);
+
+                _ws.onopen = function(e) {
+                    options.onOpen(e);
+                };
 
                 _ws.onmessage = function(result) {
                     // TODO: logging

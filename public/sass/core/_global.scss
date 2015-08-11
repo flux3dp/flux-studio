@@ -54,110 +54,6 @@ a {
     text-decoration: underline;
 }
 
-/* buttons */
-.btn {
-    background-image: none;
-    border: none;
-    box-sizing: border-box;
-    cursor: pointer;
-    display: inline-block;
-    font-size: 15px;
-    letter-spacing: .5px;
-    line-height: 44px;
-    margin: 0;
-    min-width: 99px;
-    outline: none;
-    padding: 0 5px;
-    position: relative;
-    text-align: center;
-    text-decoration: none;
-    -webkit-transition: opacity .1s ease,background-color .1s ease,color .1s ease,box-shadow .1s ease,background .1s ease;
-    transition: opacity .1s ease,background-color .1s ease,color .1s ease,box-shadow .1s ease,background .1s ease;
-    -webkit-user-select: none;
-    user-select: none;
-    -webkit-tap-highlight-color: transparent;
-
-    &:active {
-        background-color: #ccc;
-        background-image: '';
-        box-shadow: 0 0 0 1px transparent inset,
-                    0 1px 4px 0 rgba(39, 41, 43, .15);
-        color: rgba(0, 0, 0, .8);
-    }
-}
-
-.btn-default {
-    background: #fff;
-    border: 1px solid #e0e0e0;
-    color: #424242;
-
-    &:hover {
-        border: 1px solid #424242;
-    }
-}
-
-.btn-confirm {
-    background-color: #424242;
-    color: #FFF;
-    border-radius: 5px;
-
-    &:hover {
-        background-color: #000000;
-    }
-}
-
-.btn-action {
-    background: #00C853;
-    color: #fff;
-
-    &:hover {
-        background: #33d375;
-    }
-}
-
-.btn-warning {
-    background: #f00;
-}
-
-.btn-link {
-    color: #000;
-    text-decoration: underline;
-}
-
-/* button size */
-.btn-full-width {
-    display: block;
-    min-width: initial;
-    width: 100%;
-}
-
-.btn-large {
-    width: 270px;
-}
-
-/* button helper */
-.btn-multiline-text {
-    line-height: initial;
-    padding: 14px 0;
-}
-
-/* button group */
-.btn-h-group {
-    @include flexbox();
-}
-
-.btn-align-center-h-group {
-    justify-content: center;
-}
-
-.btn-h-group .btn {
-    margin: 0 0 0 24px;
-}
-
-.btn-h-group .btn:first-child {
-    margin: 0;
-}
-
 /**
  * structure
  */
@@ -167,50 +63,28 @@ a {
 
 .sidebar,
 .content {
-    position: fixed;
+    float: left;
 }
 
 .sidebar {
     background-color: #000;
-    bottom: 0;
-    display: none;
-    left: 0;
-    margin: 0;
-    position: fixed;
-    top: 0;
-    width: 66px;
+    height: 100%;
 }
 
 .content {
-    bottom: 0;
     height: 100%;
-    left: 0;
-    right: 0;
-    top: 0;
-}
-
-.is-ready .sidebar {
-    display: block;
-}
-
-.is-ready .content {
-    background: #fff;
-    bottom: 0;
-    height: 100%;
-    left: 66px;
-    right: 0;
-    top: 0;
-}
-
-.is-ready .popup-window {
-    display: none;
+    overflow: hidden;
+    width: calc(100% - 66px);
 }
 
 .menu {
     background-color: #000000;
+    height: 100%;
     list-style: none;
     margin: 0;
     padding: 0;
+    position: relative;
+    width: 66px;
 }
 
 .menu .brand-name {
@@ -413,6 +287,39 @@ select {
     appearance: none;
 }
 
+// for slider
+input[type=range] {
+    margin: 6px 0;
+    width: 100%;
+    -webkit-appearance: none;
+}
+input[type=range]:focus {
+    outline: none;
+}
+input[type=range]::-webkit-slider-runnable-track {
+    background: #bbbbbb;
+    border: 0px solid rgba(0, 0, 0, 0);
+    border-radius: 0px;
+    box-shadow: 3.7px 3.7px 0px #ffffff, 0px 0px 3.7px #ffffff;
+    cursor: pointer;
+    height: 8px;
+    width: 100%;
+}
+input[type=range]::-webkit-slider-thumb {
+    background: #777777;
+    border: 2.5px solid #777777;
+    border-radius: 12px;
+    box-shadow: 0px 0px 0px rgba(0, 0, 0, 0), 0px 0px 0px rgba(13, 13, 13, 0);
+    cursor: pointer;
+    height: 20px;
+    margin-top: -6px;
+    width: 20px;
+    -webkit-appearance: none;
+}
+input[type=range]:focus::-webkit-slider-runnable-track {
+    background: #c5c5c5;
+}
+
 // setup panel (on left side of stage)
 .setup-panel {
     position: absolute;
@@ -527,24 +434,4 @@ select {
     .btn-default {
         border-radius: 5px;
     }
-}
-
-.popup-window {
-    background: rgba(0, 0, 0, 0.5);
-    bottom: 0;
-    height: 100%;
-    left: 0;
-    position: fixed;
-    right: 0;
-    top: 0;
-    width: 100%;
-    z-index: 9999;
-}
-
-.popup-window .popup-background {
-    bottom: 0;
-    left: 0;
-    position: absolute;
-    right: 0;
-    top: 0;
 }

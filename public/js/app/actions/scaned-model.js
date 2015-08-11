@@ -1,14 +1,26 @@
 define([
     'threejs',
-    'threeTrackball',
+    'threeOrbitControls',
     'threeTransformControls',
     'threeCircularGridHelper'
 ], function() {
     'use strict';
 
     var THREE = window.THREE || {},
-        geometry = new THREE.BufferGeometry(),
-        container, camera, scene, renderer, controls, transform_control, cylinder;
+
+        container, camera, scene, renderer, controls, cylinder,
+        settings = {
+            diameter: 170,
+            radius: 850,
+            height: 1800,
+            step: 15,
+            upVector: new THREE.Vector3(0, 0, 1),
+            color:  0x777777,
+            opacity: 0.2,
+            text: true,
+            textColor: '#000000',
+            textPosition: 'center'
+        };
 
     function init() {
         container = document.getElementById('model-displayer');
@@ -16,18 +28,17 @@ define([
         scene = new THREE.Scene();
 
         camera = new THREE.PerspectiveCamera( 70, container.offsetWidth / container.offsetHeight, 1, 300000 );
-        camera.position.set(200, 200, 60);
-        camera.lookAt( new THREE.Vector3( 0, 0, 1 ) );
         camera.up = new THREE.Vector3(0, 0, 1);
+        camera.position.set(100, 100, 120);
+        camera.lookAt( new THREE.Vector3( -5, -5, 0 ) );
 
-        // add controls
-        addControls();
+        scene.add(camera);
+
+        // add circular grid helper
+        addCircularGridHelper();
 
         // add light
         addLights();
-
-        // add axises
-        addAxises();
 
         renderer = new THREE.WebGLRenderer({
             antialias: false
@@ -39,7 +50,67 @@ define([
 
         window.addEventListener('resize', onWindowResize, false);
 
-        animate();
+        render();
+
+        return {
+            scene: scene,
+            camera: camera
+        }
+    }
+
+    function addCircularGridHelper() {
+        // circular grid helper
+        var circularGridHelper = new CircularGridHelper(
+            settings.diameter,
+            settings.step,
+            settings.upVector,
+            settings.color,
+            settings.opacity,
+            settings.text,
+            settings.textColor,
+            settings.textPosition,
+            0
+        );
+
+        scene.add(circularGridHelper);
+    }
+
+    function attachControl(mesh) {
+        var setMode = function(mode) {
+                createTransformControls();
+                mesh.transform_control.setMode(mode);
+                render();
+            },
+            createTransformControls = function() {
+                if ('undefined' === typeof mesh.transform_control) {
+                    var transform_control = new THREE.TransformControls( camera, renderer.domElement );
+
+                    transform_control.addEventListener('change', render);
+                    transform_control.setSpace('local');
+
+                    transform_control.attach(mesh);
+                    scene.add(transform_control);
+
+                    mesh.transform_control = transform_control;
+                    mesh.transform = methods;
+                }
+            },
+            methods = {
+                remove: function() {
+                    mesh.transform_control.detach(mesh);
+                },
+                scale: function() {
+                    setMode('scale');
+                },
+                rotate: function() {
+                    setMode('rotate');
+                },
+                translate: function() {
+                    setMode('translate');
+                }
+            };
+
+        return methods;
     }
 
     function createCylinder(mesh) {
@@ -48,33 +119,40 @@ define([
             material = new THREE.MeshLambertMaterial( { color: 0xffff00, transparent: true, opacity: 0.3 } ),
             geometry, radius;
 
-        radius = Math.max(mesh_size.x, mesh_size.z);
+        radius = Math.min(Math.max(mesh_size.x, mesh_size.z), settings.diameter) / 2;
+        mesh_size.y = Math.min(mesh_size.y, settings.diameter);
 
         geometry = new THREE.CylinderGeometry( radius, radius, mesh_size.y, 32 );
         cylinder = new THREE.Mesh( geometry, material );
         cylinder.rotateX(90 * Math.PI / 180);
         cylinder.position.z = mesh_size.z / 2;
 
-        transform_control = new THREE.TransformControls( camera, renderer.domElement );
+        addMesh(cylinder);
 
-        scene.add(transform_control);
-
-        scene.add(cylinder);
-
-        transform_control.addEventListener('change', render);
-        transform_control.attach(cylinder);
-        transform_control.setMode('scale');
-        transform_control.setSpace('local');
+        attachControl(cylinder).scale();
 
         return cylinder;
     }
 
     function removeCylinder(cylinder) {
-        transform_control.detach(cylinder);
-        scene.remove(cylinder);
+        removeMesh(cylinder);
     }
 
-    function setupGeometry(model_data) {
+    function removeMesh(mesh) {
+        if ('undefined' !== typeof mesh.transform_control) {
+            scene.remove(mesh.transform_control);
+        }
+
+        render();
+        scene.remove(mesh);
+    }
+
+    function addMesh(mesh) {
+        scene.add(mesh);
+        render();
+    }
+
+    function setupGeometry(model_data, geometry) {
         var SET_ELEM_NUMBER = 6,
             X = 0,
             Y = 1,
@@ -111,51 +189,56 @@ define([
         geometry.dynamic = true;
         geometry.computeBoundingBox();
 
+        // refs: https://github.com/mrdoob/three.js/wiki/Migration#r56--r57
+        geometry.attributes.position.needsUpdate = true;
+        geometry.attributes.color.needsUpdate = true;
+
         return geometry;
     }
 
     function appendModel(model_data) {
-        var material, geometry, mesh;
+        var material, mesh,
+            geometry = new THREE.BufferGeometry();
 
-        geometry = setupGeometry(model_data);
+        setupGeometry(model_data, geometry);
 
         material = new THREE.PointCloudMaterial({
-            size: 0.01,
+            size: 0.5,
             vertexColors: THREE.VertexColors
         });
 
         mesh = new THREE.PointCloud( geometry, material );
 
-        scene.add( mesh );
+        addMesh( mesh );
 
         return mesh;
     }
 
     function updateMesh(mesh, model_data) {
-        mesh.geometry = setupGeometry(model_data);
+        mesh.geometry = setupGeometry(model_data, mesh.geometry);
 
-        // refs: https://github.com/mrdoob/three.js/wiki/Migration#r56--r57
-        mesh.geometry.attributes.position.needsUpdate = true;
-        mesh.geometry.attributes.color.needsUpdate = true;
         render();
 
         return mesh;
     }
 
     function addControls() {
-        controls = new THREE.TrackballControls( camera, container );
-
+        controls = new THREE.OrbitControls( camera, container );
         controls.rotateSpeed = 2.0;
         controls.zoomSpeed = 1.2;
         controls.panSpeed = 1.8;
 
         controls.noZoom = false;
+        controls.enabled = true;
+        controls.noKeys = false;
         controls.noPan = false;
+        controls.noRotate = false;
+        controls.maxDistance = 300;
+        controls.minDistance = 40;
+        controls.maxPolarAngle = Math.PI/2;
 
         controls.staticMoving = true;
         controls.dynamicDampingFactor = 0.3;
-
-        controls.addEventListener( 'change', render );
     }
 
     function addLights() {
@@ -170,36 +253,6 @@ define([
         scene.add(light2);
     }
 
-    function addAxises() {
-        var materials = [
-                new THREE.LineBasicMaterial({ color: 0x0000ff }),   // x
-                new THREE.LineBasicMaterial({ color: 0x00ff00 }),   // y
-                new THREE.LineBasicMaterial({ color: 0xff0000 })    // z
-            ],
-            vertices = [
-                [   // x
-                    new THREE.Vector3( -1000, 0, 0 ),
-                    new THREE.Vector3( 1000, 0, 0 )
-                ],
-                [   // y
-                    new THREE.Vector3( 0, -1000, 0 ),
-                    new THREE.Vector3( 0, 1000, 0 )
-                ],
-                [   // z
-                    new THREE.Vector3( 0, 0, -1000 ),
-                    new THREE.Vector3( 0, 0, 1000 )
-                ],
-            ],
-            geometry;
-
-        materials.forEach(function(material, index) {
-            geometry = new THREE.Geometry();
-            geometry.vertices = vertices[index];
-
-            scene.add( new THREE.Line( geometry, material ) );
-        });
-    }
-
     function onWindowResize() {
 
         camera.aspect = window.innerWidth / window.innerHeight;
@@ -207,13 +260,6 @@ define([
 
         renderer.setSize(window.innerWidth, window.innerHeight);
 
-    }
-
-    function animate() {
-        requestAnimationFrame(animate);
-        controls.update();
-
-        render();
     }
 
     function render() {
@@ -236,7 +282,10 @@ define([
         cylinder: {
             create: createCylinder,
             remove: removeCylinder
-        }
-
+        },
+        remove: removeMesh,
+        add: addMesh,
+        attachControl: attachControl,
+        update: render
     };
 });

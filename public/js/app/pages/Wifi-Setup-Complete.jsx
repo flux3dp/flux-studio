@@ -1,8 +1,9 @@
 define([
     'jquery',
     'react',
-    'helpers/local-storage'
-], function($, React, localStorage) {
+    'helpers/api/config',
+    'jsx!widgets/Modal'
+], function($, React, config, Modal) {
     'use strict';
 
     return function(args) {
@@ -13,17 +14,18 @@ define([
             getInitialState: function() {
                 return args.state;
             },
-            componentDidMount: function() {
-            },
+
             _handleStartClick: function() {
-                localStorage.set('printer-is-ready', true);
-                location.href = '#studio/print';
+                config().write('printer-is-ready', true, {
+                    onFinished: function() {
+                        location.href = '#studio/print';
+                    }
+                });
             },
             render : function() {
-                var lang = this.state.lang;
-
-                return (
-                    <div className="wifi initialization absolute-center text-center">
+                var lang = this.state.lang,
+                    content = (
+                    <div className="wifi initialization text-center">
                         <h1>{lang.welcome_headline}</h1>
                         <img className="wifi-symbol" src="/img/img-done.png" />
                         <div className="wifi-form">
@@ -34,6 +36,10 @@ define([
                             </div>
                         </div>
                     </div>
+                );
+
+                return (
+                    <Modal content={content}/>
                 );
             }
         });

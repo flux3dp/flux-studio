@@ -4,8 +4,9 @@
  */
 define([
     'helpers/websocket',
+    'helpers/is-json',
     'helpers/convertToTypedArray'
-], function(Websocket, convertToTypedArray) {
+], function(Websocket, isJson, convertToTypedArray) {
     'use strict';
 
     return function(serial, opts) {
@@ -16,17 +17,15 @@ define([
         var ws = new Websocket({
                 method: 'control/' + serial,
                 onMessage: function(result) {
-                    var data = JSON.parse(JSON.stringify(result.data)),
-                        error_code;
+                    var data = (true === isJson(result.data) ? JSON.parse(result.data) : result.data);
 
                     lastMessage = data;
 
-                    if (false === result.data.startsWith('error')) {
-                        onMessage(data);
+                    if ('string' === typeof data && 'error' === data.status) {
+                        opts.onError(data);
                     }
                     else {
-                        error_code = result.data.replace('error ');
-                        opts.onError(error_code, data);
+                        onMessage(data);
                     }
 
                 }
@@ -54,7 +53,8 @@ define([
                         }
                     },
                     _uploading = function(data) {
-                        if ('connected' === data) {
+                        console.log(data);
+                        if ('connected' === data.status) {
                             for (var i = 0; i < length; i += CHUNK_PKG_SIZE) {
                                 chunk = print_data.slice(i, i + CHUNK_PKG_SIZE);
 
@@ -65,12 +65,20 @@ define([
                                 blobs.push(chunk);
                             }
                         }
-                        else if('continue' === data) {
+                        else if ('continue' === data.status) {
+                            var fileReader;
+
                             blobs.forEach(function(blob, k) {
-                                ws.send(blob);
+                                fileReader = new FileReader();
+
+                                fileReader.onloadend = function(e) {
+                                    ws.send(this.result);
+                                };
+
+                                fileReader.readAsArrayBuffer(blob);
                             });
                         }
-                        else if ('ok' === data) {
+                        else if ('ok' === data.status) {
                             lastOrder = 'start';
                             onMessage = _startPrint;
                             ws.send(lastOrder);

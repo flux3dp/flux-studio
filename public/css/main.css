@@ -2113,93 +2113,6 @@ a {
     font-weight: lighter;
     text-decoration: underline; }
 
-/* buttons */
-.btn {
-    background-image: none;
-    border: none;
-    box-sizing: border-box;
-    cursor: pointer;
-    display: inline-block;
-    font-size: 15px;
-    letter-spacing: .5px;
-    line-height: 44px;
-    margin: 0;
-    min-width: 99px;
-    outline: none;
-    padding: 0 5px;
-    position: relative;
-    text-align: center;
-    text-decoration: none;
-    -webkit-transition: opacity 0.1s ease, background-color 0.1s ease, color 0.1s ease, box-shadow 0.1s ease, background 0.1s ease;
-    transition: opacity 0.1s ease, background-color 0.1s ease, color 0.1s ease, box-shadow 0.1s ease, background 0.1s ease;
-    -webkit-user-select: none;
-    user-select: none;
-    -webkit-tap-highlight-color: transparent; }
-    .btn:active {
-        background-color: #ccc;
-        background-image: '';
-        box-shadow: 0 0 0 1px transparent inset, 0 1px 4px 0 rgba(39, 41, 43, 0.15);
-        color: rgba(0, 0, 0, 0.8); }
-
-.btn-default {
-    background: #fff;
-    border: 1px solid #e0e0e0;
-    color: #424242; }
-    .btn-default:hover {
-        border: 1px solid #424242; }
-
-.btn-confirm {
-    background-color: #424242;
-    color: #FFF;
-    border-radius: 5px; }
-    .btn-confirm:hover {
-        background-color: #000000; }
-
-.btn-action {
-    background: #00C853;
-    color: #fff; }
-    .btn-action:hover {
-        background: #33d375; }
-
-.btn-warning {
-    background: #f00; }
-
-.btn-link {
-    color: #000;
-    text-decoration: underline; }
-
-/* button size */
-.btn-full-width {
-    display: block;
-    min-width: initial;
-    width: 100%; }
-
-.btn-large {
-    width: 270px; }
-
-/* button helper */
-.btn-multiline-text {
-    line-height: initial;
-    padding: 14px 0; }
-
-/* button group */
-.btn-h-group {
-    display: -webkit-box;
-    /* OLD - iOS 6-, Safari 3.1-6 */
-    display: -webkit-flex;
-    /* NEW - Chrome */
-    display: flex;
-    /* NEW, Spec - Opera 12.1, Firefox 20+ */ }
-
-.btn-align-center-h-group {
-    justify-content: center; }
-
-.btn-h-group .btn {
-    margin: 0 0 0 24px; }
-
-.btn-h-group .btn:first-child {
-    margin: 0; }
-
 /**
  * structure
  */
@@ -2208,44 +2121,25 @@ a {
 
 .sidebar,
 .content {
-    position: fixed; }
+    float: left; }
 
 .sidebar {
     background-color: #000;
-    bottom: 0;
-    display: none;
-    left: 0;
-    margin: 0;
-    position: fixed;
-    top: 0;
-    width: 66px; }
+    height: 100%; }
 
 .content {
-    bottom: 0;
     height: 100%;
-    left: 0;
-    right: 0;
-    top: 0; }
-
-.is-ready .sidebar {
-    display: block; }
-
-.is-ready .content {
-    background: #fff;
-    bottom: 0;
-    height: 100%;
-    left: 66px;
-    right: 0;
-    top: 0; }
-
-.is-ready .popup-window {
-    display: none; }
+    overflow: hidden;
+    width: calc(100% - 66px); }
 
 .menu {
     background-color: #000000;
+    height: 100%;
     list-style: none;
     margin: 0;
-    padding: 0; }
+    padding: 0;
+    position: relative;
+    width: 66px; }
 
 .menu .brand-name {
     background: #000;
@@ -2534,6 +2428,37 @@ select {
     -webkit-appearance: none;
     appearance: none; }
 
+input[type=range] {
+    margin: 6px 0;
+    width: 100%;
+    -webkit-appearance: none; }
+
+input[type=range]:focus {
+    outline: none; }
+
+input[type=range]::-webkit-slider-runnable-track {
+    background: #bbbbbb;
+    border: 0px solid transparent;
+    border-radius: 0px;
+    box-shadow: 3.7px 3.7px 0px #ffffff, 0px 0px 3.7px #ffffff;
+    cursor: pointer;
+    height: 8px;
+    width: 100%; }
+
+input[type=range]::-webkit-slider-thumb {
+    background: #777777;
+    border: 2.5px solid #777777;
+    border-radius: 12px;
+    box-shadow: 0px 0px 0px transparent, 0px 0px 0px rgba(13, 13, 13, 0);
+    cursor: pointer;
+    height: 20px;
+    margin-top: -6px;
+    width: 20px;
+    -webkit-appearance: none; }
+
+input[type=range]:focus::-webkit-slider-runnable-track {
+    background: #c5c5c5; }
+
 .setup-panel {
     position: absolute; }
     .setup-panel .btn-action {
@@ -2607,7 +2532,174 @@ select {
     .studio-container .btn-default {
         border-radius: 5px; }
 
-.popup-window {
+/**
+ * ref: http://tobiasahlin.com/spinkit/
+ */
+.spinner-flip {
+    background-color: #333;
+    height: 40px;
+    margin: 100px auto;
+    -webkit-animation: sk-rotateplane 1.2s infinite ease-in-out;
+    animation: sk-rotateplane 1.2s infinite ease-in-out;
+    width: 40px; }
+
+@-webkit-keyframes sk-rotateplane {
+    0% {
+        -webkit-transform: perspective(120px); }
+    50% {
+        -webkit-transform: perspective(120px) rotateY(180deg); }
+    100% {
+        -webkit-transform: perspective(120px) rotateY(180deg) rotateX(180deg); } }
+
+@keyframes sk-rotateplane {
+    0% {
+        -webkit-transform: perspective(120px) rotateX(0deg) rotateY(0deg);
+        transform: perspective(120px) rotateX(0deg) rotateY(0deg); }
+    50% {
+        -webkit-transform: perspective(120px) rotateX(-180.1deg) rotateY(0deg);
+        transform: perspective(120px) rotateX(-180.1deg) rotateY(0deg); }
+    100% {
+        -webkit-transform: perspective(120px) rotateX(-180deg) rotateY(-179.9deg);
+        transform: perspective(120px) rotateX(-180deg) rotateY(-179.9deg); } }
+
+/**
+ * buttons
+ */
+.btn {
+    background-image: none;
+    border: none;
+    box-sizing: border-box;
+    cursor: pointer;
+    display: inline-block;
+    font-size: 15px;
+    letter-spacing: .5px;
+    line-height: 44px;
+    margin: 0;
+    min-width: 99px;
+    outline: none;
+    overflow: hidden;
+    padding: 0 5px;
+    position: relative;
+    text-align: center;
+    text-decoration: none;
+    -webkit-transition: opacity 0.1s ease, background-color 0.1s ease, color 0.1s ease, box-shadow 0.1s ease, background 0.1s ease;
+    transition: opacity 0.1s ease, background-color 0.1s ease, color 0.1s ease, box-shadow 0.1s ease, background 0.1s ease;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent; }
+    .btn:active {
+        background-color: #ccc;
+        background-image: '';
+        box-shadow: 0 0 0 1px transparent inset, 0 1px 4px 0 rgba(39, 41, 43, 0.15);
+        color: rgba(0, 0, 0, 0.8); }
+
+.btn-default {
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    color: #424242; }
+    .btn-default:hover {
+        border: 1px solid #424242; }
+
+.btn-confirm {
+    background-color: #424242;
+    color: #FFF;
+    border-radius: 5px; }
+    .btn-confirm:hover {
+        background-color: #000000; }
+
+.btn-action {
+    background: #00C853;
+    color: #fff; }
+    .btn-action:hover {
+        background: #33d375; }
+
+.btn-disabled {
+    pointer-events: none;
+    position: relative; }
+    .btn-disabled::before {
+        background: rgba(255, 255, 255, 0.5);
+        content: "";
+        display: block;
+        height: 100%;
+        left: 0;
+        position: absolute;
+        top: 0;
+        width: 100%; }
+
+.btn-warning {
+    background: #f00; }
+
+.btn-link {
+    color: #000;
+    text-decoration: underline; }
+
+/* button size */
+.btn-full-width {
+    display: block;
+    min-width: initial;
+    width: 100%; }
+
+.btn-large {
+    width: 270px; }
+
+/* button helper */
+.btn-multiline-text {
+    line-height: initial;
+    padding: 14px 0; }
+
+/* button group */
+.btn-h-group {
+    display: -webkit-box;
+    /* OLD - iOS 6-, Safari 3.1-6 */
+    display: -webkit-flex;
+    /* NEW - Chrome */
+    display: flex;
+    /* NEW, Spec - Opera 12.1, Firefox 20+ */ }
+
+.btn-align-center-h-group {
+    justify-content: center; }
+
+.btn-h-group .btn {
+    margin: 0 0 0 24px; }
+
+.btn-h-group .btn:first-child {
+    margin: 0; }
+
+/**
+ * global advanced panel
+ */
+.advanced-panel {
+    background-color: #FFF;
+    display: block;
+    margin: auto;
+    padding: 0 20px; }
+    .advanced-panel .header {
+        border-bottom: 1px solid #E0E0E0;
+        color: #4A4A4A;
+        font-size: 18px;
+        font-weight: 500;
+        height: 48px;
+        letter-spacing: .5px;
+        line-height: 48px; }
+    .advanced-panel .footer {
+        bottom: 0;
+        left: 0;
+        margin-bottom: 40px;
+        right: 0;
+        text-align: center; }
+        .advanced-panel .footer .btn {
+            margin: 0 15px; }
+
+/**
+ * modal
+ */
+.modal-window {
+    display: -webkit-box;
+    /* OLD - iOS 6-, Safari 3.1-6 */
+    display: -webkit-flex;
+    /* NEW - Chrome */
+    display: flex;
+    /* NEW, Spec - Opera 12.1, Firefox 20+ */
     background: rgba(0, 0, 0, 0.5);
     bottom: 0;
     height: 100%;
@@ -2616,14 +2708,16 @@ select {
     right: 0;
     top: 0;
     width: 100%;
-    z-index: 9999; }
-
-.popup-window .popup-background {
-    bottom: 0;
-    left: 0;
-    position: absolute;
-    right: 0;
-    top: 0; }
+    z-index: 9999;
+    align-items: center;
+    justify-content: center; }
+    .modal-window .modal-background {
+        bottom: 0;
+        left: 0;
+        position: absolute;
+        right: 0;
+        top: 0;
+        z-index: -1; }
 
 /**
  * the view of printer selector
@@ -3221,52 +3315,6 @@ input.switch:checked ~ label:after {
             -webkit-appearance: none;
             margin-top: -6px; }
         .print-studio .advanced-panel .controls input[type=range]:focus::-webkit-slider-runnable-track {
-            background: #c5c5c5; }
-        .print-studio .advanced-panel .controls input[type=range]::-moz-range-track {
-            width: 100%;
-            height: 8px;
-            cursor: pointer;
-            box-shadow: 3.7px 3.7px 0px #ffffff, 0px 0px 3.7px #ffffff;
-            background: #bbbbbb;
-            border-radius: 0px;
-            border: 0px solid transparent; }
-        .print-studio .advanced-panel .controls input[type=range]::-moz-range-thumb {
-            box-shadow: 0px 0px 0px transparent, 0px 0px 0px rgba(13, 13, 13, 0);
-            border: 2.5px solid #777777;
-            height: 20px;
-            width: 20px;
-            border-radius: 12px;
-            background: #777777;
-            cursor: pointer; }
-        .print-studio .advanced-panel .controls input[type=range]::-ms-track {
-            width: 100%;
-            height: 8px;
-            cursor: pointer;
-            background: transparent;
-            border-color: transparent;
-            color: transparent; }
-        .print-studio .advanced-panel .controls input[type=range]::-ms-fill-lower {
-            background: #b1b1b1;
-            border: 0px solid transparent;
-            border-radius: 0px;
-            box-shadow: 3.7px 3.7px 0px #ffffff, 0px 0px 3.7px #ffffff; }
-        .print-studio .advanced-panel .controls input[type=range]::-ms-fill-upper {
-            background: #bbbbbb;
-            border: 0px solid transparent;
-            border-radius: 0px;
-            box-shadow: 3.7px 3.7px 0px #ffffff, 0px 0px 3.7px #ffffff; }
-        .print-studio .advanced-panel .controls input[type=range]::-ms-thumb {
-            box-shadow: 0px 0px 0px transparent, 0px 0px 0px rgba(13, 13, 13, 0);
-            border: 2.5px solid #777777;
-            height: 20px;
-            width: 20px;
-            border-radius: 12px;
-            background: #777777;
-            cursor: pointer;
-            height: 8px; }
-        .print-studio .advanced-panel .controls input[type=range]:focus::-ms-fill-lower {
-            background: #bbbbbb; }
-        .print-studio .advanced-panel .controls input[type=range]:focus::-ms-fill-upper {
             background: #c5c5c5; }
     .print-studio .advanced-panel .footer {
         position: absolute;
@@ -4052,19 +4100,8 @@ input.switch:checked ~ label:after {
 .laser-studio .fa::before {
     margin: 0 5px 0 0; }
 
-.laser-studio .stage .file-importer {
-    border: 2px dashed #CCC;
-    height: 500px;
-    padding: 95px 0;
-    text-align: center;
-    width: 500px; }
-    .laser-studio .stage .file-importer h2 {
-        color: #979797;
-        font-size: 18px; }
-    .laser-studio .stage .file-importer p {
-        color: #bdbdbd;
-        font-size: 13px;
-        letter-spacing: .3px; }
+.laser-studio .stage {
+    background: #d6d6d6; }
 
 .laser-studio .btn-h-group {
     height: 100%;
@@ -4080,52 +4117,21 @@ input.switch:checked ~ label:after {
     top: 0;
     background: url(/img/laser-platform.png);
     border: 1px solid #ddd;
-    height: 400px;
+    height: 450px;
     overflow: hidden;
     position: fixed;
-    width: 400px; }
-    .laser-studio .laser-object .svg {
-        min-height: 280px;
-        min-width: 280px; }
+    width: 450px; }
 
 .laser-studio .laser-object .ft-container {
     z-index: 1; }
 
 .laser-studio .laser-object .image-active {
-    box-shadow: 0 0 10px 3px rgba(0, 0, 0, 0.5); }
+    background: rgba(255, 255, 255, 0.6);
+    outline: 5px dashed #bbb; }
 
 .laser-studio .laser-object .ft-widget {
     cursor: move;
     position: fixed; }
-
-.laser-studio .laser-platform {
-    bottom: 0;
-    display: block;
-    left: 0;
-    margin: auto;
-    position: absolute;
-    right: 0;
-    top: 0;
-    background: #ccc;
-    height: 500px;
-    position: fixed;
-    width: 500px;
-    -webkit-clip-path: polygon(50% 0%, 95% 26%, 95% 74%, 50% 100%, 5% 74%, 5% 26%);
-    clip-path: polygon(50% 0%, 95% 26%, 95% 74%, 50% 100%, 5% 74%, 5% 26%); }
-    .laser-studio .laser-platform::before {
-        bottom: 0;
-        display: block;
-        left: 0;
-        margin: auto;
-        position: absolute;
-        right: 0;
-        top: 0;
-        background: #fff;
-        content: "";
-        height: 499px;
-        width: 499px;
-        -webkit-clip-path: polygon(50% 0%, 95% 26%, 95% 74%, 50% 100%, 5% 74%, 5% 26%);
-        clip-path: polygon(50% 0%, 95% 26%, 95% 74%, 50% 100%, 5% 74%, 5% 26%); }
 
 .laser-studio .zoom .btn {
     height: 28px;
@@ -4147,6 +4153,7 @@ input.switch:checked ~ label:after {
 .laser-studio .object-position {
     padding: 20px;
     right: 25px;
+    top: 20px;
     width: 214px; }
     .laser-studio .object-position .control:nth-child(odd) {
         margin: 0 0 4px 0; }
@@ -4181,11 +4188,36 @@ input.switch:checked ~ label:after {
         margin: 0 10px 0 0;
         width: 14px; }
 
+.laser-studio .advanced-panel [type="range"] {
+    position: relative;
+    width: 70%; }
+    .laser-studio .advanced-panel [type="range"]::before,
+    .laser-studio .advanced-panel [type="range"]::after {
+        display: block;
+        position: absolute;
+        top: 170%; }
+    .laser-studio .advanced-panel [type="range"]::before {
+        content: attr(data-min-text);
+        left: 0; }
+    .laser-studio .advanced-panel [type="range"]::after {
+        content: attr(data-max-text);
+        right: 0; }
+    .laser-studio .advanced-panel [type="range"] + span {
+        border: 1px solid #4A4A4A;
+        margin: 5px;
+        padding: 3px 5px; }
+        .laser-studio .advanced-panel [type="range"] + span::after {
+            content: attr(data-tail); }
+
+.laser-studio .advanced-panel .controls {
+    padding: 20px 0; }
+
 .scan-studio .model-displayer {
     height: 100%;
     width: 100%; }
     .scan-studio .model-displayer .camera-image {
         height: 100%;
+        object-fit: contain;
         width: 100%; }
 
 .scan-studio .setup-panel,
