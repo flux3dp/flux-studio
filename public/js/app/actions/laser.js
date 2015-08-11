@@ -8,7 +8,8 @@ define([
     'helpers/convertToTypedArray',
     'helpers/element-angle',
     'helpers/api/control',
-    'jsx!widgets/Popup',
+    'jsx!views/Print-Selector',
+    'jsx!widgets/Modal',
     'helpers/shortcuts',
     'freetrans',
     'helpers/jquery.box'
@@ -22,7 +23,8 @@ define([
     convertToTypedArray,
     elementAngle,
     control,
-    popup,
+    PrinterSelector,
+    Modal,
     shortcuts
 ) {
     'use strict';
@@ -57,8 +59,11 @@ define([
 
                     $target_image.parents('.ft-container').remove();
 
-                    if (0 >= $img_container.length) {
+                    if (0 === $img_container.length) {
                         $target_image = null;
+                        reactComponent.setState({
+                            hasImage: false
+                        });
                         reactComponent.props.file_format = undefined;
                     }
                     else {
@@ -116,7 +121,6 @@ define([
                     }
 
                     fileReader.onloadend = function(e) {
-
                         if ('svg' === reactComponent.props.file_format) {
                             if ('svg' === extension) {
                                 $img = setupImage(extension);
@@ -151,7 +155,7 @@ define([
                         img = new Image(),
                         $img = $(img),
                         instantRefresh = function(e, data) {
-                            refreshObjectParams($div);
+                            refreshObjectParams(e, $div);
                         };
 
                     $img.addClass(extension);
@@ -176,8 +180,8 @@ define([
                         }
 
                         $div.freetrans({
-                            x: $laser_platform.width() / 2 - $img.width() / 2,
-                            y: $laser_platform.height() / 2 - $img.height() / 2,
+                            x: $laser_platform.outerWidth() / 2 - $img.width() / 2,
+                            y: $laser_platform.outerHeight() / 2 - $img.height() / 2,
                             onRotate: instantRefresh,
                             onMove: instantRefresh,
                             onScale: instantRefresh
@@ -207,11 +211,6 @@ define([
                 handleSVG = function($img, blob) {
                     var opts = {},
                         name = 'svgfile-' + (new Date()).getTime(),
-                        onPresetFinished = function() {
-                            opts.onFinished = onUploadFinished;
-
-                            svgLaserWebSocket.upload(name, blob, opts);
-                        },
                         onUploadFinished = function(data) {
                             opts.onFinished = onGetFinished;
                             svgLaserWebSocket.get(name, opts);
@@ -220,8 +219,6 @@ define([
                             var blob = new Blob([data], { type: 'image/svg+xml;charset=utf-8' }),
                                 url = window.URL,
                                 objectUrl = url.createObjectURL(blob);
-
-                            clearFileInput();
 
                             // trigger the image to load
                             $img.data('base', objectUrl).
@@ -238,10 +235,9 @@ define([
                             });
                         };
 
-                    // TODO: the 'wood' should be change
-                    svgLaserWebSocket.setup(0, [0, 'wood'], {
-                        onFinished: onPresetFinished
-                    });
+                    opts.onFinished = onUploadFinished;
+
+                    svgLaserWebSocket.upload(name, blob, opts);
                 },
                 handleBitmap = function($img, file) {
                     fileSystem.writeFile(
@@ -249,8 +245,15 @@ define([
                         {
                             onComplete: function(e, fileEntry) {
                                 var name = 'bitmap-' + (new Date()).getTime();
-                                $img.data('name', name).data('base', fileEntry.toURL()).attr('src', fileEntry.toURL());
+                                $img.data('name', name).
+                                    data('base', fileEntry.toURL()).
+                                    attr('src', fileEntry.toURL());
+
                                 clearFileInput();
+
+                                reactComponent.setState({
+                                    mode: 'engrave'
+                                });
                             }
                         }
                     );
@@ -268,6 +271,10 @@ define([
                 first_file_extension = files.item(0).name.split('.').pop(),
                 timer;
 
+                reactComponent.setState({
+                    hasImage: true
+                });
+
                 if ('svg' === first_file_extension) {
                     timer = setInterval(function() {
                         if (true === go_next) {
@@ -281,9 +288,10 @@ define([
                         }
 
                         if (files.length === index) {
+                            clearFileInput();
                             clearInterval(timer);
                         }
-                    }, 200);
+                    }, 100);
                 }
                 else {
                     for (var i = 0; i < files.length; i++) {
@@ -300,23 +308,18 @@ define([
             sendToBitmapAPI = function(args) {
 
                 var laserParser = bitmapLaserParser(),
-                    onSetupFinished = function() {
-                        laserParser.uploadBitmap(args, {
-                            onFinished: onUploadFinish
-                        });
-                    },
                     onUploadFinish = function() {
                         laserParser.getGCode({
                             onFinished: onGetGCodeFinished
                         });
                     },
                     onGetGCodeFinished = function(blob) {
-                        var control_methods = control(printer.serial);
+                        var control_methods = control(reactComponent.state.selectedPrinter.serial);
                         control_methods.upload(blob.size, blob);
                     };
 
-                laserParser.setup(0, [1, 'wood'], {
-                    onFinished: onSetupFinished
+                laserParser.uploadBitmap(args, {
+                    onFinished: onUploadFinish
                 });
 
             },
@@ -338,7 +341,7 @@ define([
                         );
                     },
                     onGetGCodeFinished = function(blob) {
-                        var control_methods = control(printer.serial);
+                        var control_methods = control(reactComponent.state.selectedPrinter.serial);
                         control_methods.upload(blob.size, blob);
                     };
 
@@ -347,7 +350,7 @@ define([
                 });
 
             },
-            refreshObjectParams = function($el) {
+            refreshObjectParams = function(e, $el) {
                 var bounds, el_offset, el_position,
                     last_x, last_y,
                     platform_pos = $laser_platform.box(),
@@ -363,22 +366,25 @@ define([
                     el_position = $el.box();
                     bounds = $el.freetrans('getBounds');
 
-                    if (true === outOfRange(el_position.center, DIAMETER)) {
-                        last_x = $el.data('last-x') || el_position.center.x;
-                        last_y = $el.data('last-y') || el_position.center.y;
-                        $el.freetrans({
-                            x: last_x,
-                            y: last_y
-                        });
-                    }
-                    else {
-                        $el.data('last-x', el_position.left).data('last-y', el_position.top);
+                    if ('move' === e.freetransEventType) {
+                        if (true === outOfRange(el_position.center, DIAMETER)) {
+                            last_x = $el.data('last-x');
+                            last_y = $el.data('last-y');
+
+                            $el.freetrans({
+                                x: last_x,
+                                y: last_y
+                            });
+                        }
+                        else {
+                            $el.data('last-x', parseFloat($el[0].style.left, 10)).
+                                data('last-y', parseFloat($el[0].style.top, 10));
+                        }
                     }
 
-                    el_position = $el.position();
                     $angle.val(elementAngle($el[0]));
-                    $pos_x.val(el_position.left);
-                    $pos_y.val(el_position.top);
+                    $pos_x.val($el.data('last-x'));
+                    $pos_y.val($el.data('last-y'));
                     $size_h.val(bounds.height);
                     $size_w.val(bounds.width);
                 }
@@ -413,15 +419,15 @@ define([
                     };
                 },
                 args = [],
-                doLaser = function() {
+                doLaser = function(settings) {
                     $ft_controls.each(function(k, el) {
                         var $el = $(el),
                             image = new Image(),
-                            width = $el.width(),
-                            height = $el.height(),
                             top_left = getCenter($el.find('.ft-scaler-top.ft-scaler-left')),
                             bottom_right = getCenter($el.find('.ft-scaler-bottom.ft-scaler-right')),
                             $img = $el.parents('.ft-container').find('.img-container img'),
+                            width = $el.width(),
+                            height = $el.height(),
                             sub_data = {
                                 name: $img.data('name') || '',
                                 width: width,
@@ -435,11 +441,21 @@ define([
                             },
                             canvas = document.createElement('canvas'),
                             ctx = canvas.getContext('2d'),
-                            image_blobs = [];
+                            image_blobs = [],
+                            opt = {
+                                is_svg: ('svg' === reactComponent.props.file_format)
+                            },
+                            imageData;
 
                         canvas.width = width;
                         canvas.height = height;
-                        image.src = $el.parent().find('.ft-widget img').data('base');
+
+                        if ('svg' === reactComponent.props.file_format) {
+                            image.src = $img.attr('src');
+                        }
+                        else {
+                            image.src = $img.data('base');
+                        }
 
                         image.onload = function() {
                             ctx.drawImage(
@@ -449,11 +465,14 @@ define([
                                 width,
                                 height
                             );
-                            sub_data.image_data = grayScale(ctx.getImageData(0, 0, width, height).data);
 
-                            if ('svg' === reactComponent.props.file_format && true === $img.hasClass('svg')) {
-                                sub_data.width = sub_data.width / $laser_platform.width() * DIAMETER;
-                                sub_data.height = sub_data.height / $laser_platform.height() * DIAMETER;
+                            imageData = ctx.createImageData(width, height);
+
+                            sub_data.image_data = grayScale(ctx.getImageData(0, 0, width, height).data, opt);
+
+                            if ('svg' === reactComponent.props.file_format) {
+                                sub_data.real_width = sub_data.width / $laser_platform.width() * DIAMETER;
+                                sub_data.real_height = sub_data.height / $laser_platform.height() * DIAMETER;
                                 sub_data.svg_data = svgLaserWebSocket.History.findByName($img.data('name'))[0].data;
                             }
 
@@ -472,25 +491,12 @@ define([
                     });
                 };
 
-            require(['jsx!views/Print-Selector'], function(view) {
-                var popup_window;
-                printer_selecting = true;
+            reactComponent.setState({
+                openPrinterSelectorWindow: true
+            });
 
-                popup_window = popup(
-                    view,
-                    {
-                        getPrinter: function(auth_printer) {
-                            printer = auth_printer;
-                            popup_window.close();
-                            doLaser();
-                        }
-                    }
-                );
-                popup_window.open({
-                    onClose: function() {
-                        printer_selecting = false;
-                    }
-                });
+            reactComponent.setProps({
+                doLaser: doLaser
             });
 
         });
@@ -511,15 +517,6 @@ define([
 
         $uploader_file_control.on('change', function(e) {
             readfiles(this.files);
-        });
-
-        $uploader.on('dragover dragend', function() {
-            return false;
-        });
-
-        $uploader.on('drop', function(e) {
-            e.preventDefault();
-            readfiles(e.originalEvent.dataTransfer.files);
         });
 
         $threshold.on('keyup', function(e) {

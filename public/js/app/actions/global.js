@@ -2,8 +2,9 @@ define([
     'jquery',
     'helpers/i18n',
     'helpers/local-storage',
-    'helpers/shortcuts'
-], function($, i18n, localStorage, shortcuts) {
+    'helpers/shortcuts',
+    'helpers/api/config'
+], function($, i18n, localStorage, shortcuts, config) {
     'use strict';
 
     // detached keyup and keydown event
@@ -11,23 +12,29 @@ define([
         shortcuts.disableAll();
     });
 
-    return function(args) {
-        $('body').on('change', '#select-lang', function(e) {
-            args.state.lang = i18n.setActiveLang(e.currentTarget.value).get();
+    return function(callback) {
+        var $body = $('body'),
+            hash = location.hash,
+            onFinished = function(data) {
+                var is_ready = data;
+
+                is_ready = ('true' === is_ready);
+
+                if (true === is_ready && ('' === hash || hash.startsWith('#initialize'))) {
+                    location.hash = '#studio/print';
+                }
+                else if (false === is_ready && ('' !== hash || false === hash.startsWith('#initialize'))) {
+                    location.hash = '#';
+                }
+
+                callback();
+            },
+            opt = {
+                onError: onFinished
+            };
+
+        config(opt).read('printer-is-ready', {
+            onFinished: onFinished
         });
-
-        (function() {
-            var $body = $('body'),
-                is_ready = localStorage.get('printer-is-ready') || '';
-
-            is_ready = ('' === is_ready ? false : 'true' === is_ready);
-
-            if (true === is_ready) {
-                $body.addClass('is-ready');
-            }
-            else {
-                $body.removeClass('is-ready');
-            }
-        })();
     };
 });

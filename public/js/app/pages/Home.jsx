@@ -2,8 +2,9 @@ define([
     'jquery',
     'react',
     'helpers/i18n',
-    'jsx!widgets/Select'
-], function($, React, i18n, SelectView) {
+    'jsx!widgets/Select',
+    'jsx!widgets/Modal'
+], function($, React, i18n, SelectView, Modal) {
     'use strict';
 
     return function(args) {
@@ -17,8 +18,8 @@ define([
                 return args.state;
             },
             render : function() {
-                return (
-                    <div className="welcome initialization absolute-center text-center">
+                var content = (
+                    <div className="welcome initialization text-center">
                         <h1>{this.state.lang.welcome_headline}</h1>
                         <img className="brand-image" src="/img/wel-flux-logo.png"/>
                         <div>
@@ -32,6 +33,10 @@ define([
                             </div>
                         </div>
                     </div>
+                );
+
+                return (
+                    <Modal content={content}/>
                 );
             }
         });

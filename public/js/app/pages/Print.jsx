@@ -55,6 +55,9 @@ define([
                 componentDidMount: function() {
                     printController.init(this);
                 },
+                _updateSelectedSize: function() {
+
+                },
                 _handlePreviewModeChange: function(mode, e) {
                     this.setState({
                         previewMode: mode,
@@ -63,27 +66,6 @@ define([
                 },
                 _handleShowPreviewSelection: function(e) {
                     this.setState({ showPreviewModeList: !this.state.showPreviewModeList });
-                },
-                _handleNavUp: function() {
-                    console.log('up');
-                },
-                _handleNavRight: function() {
-                    console.log('right');
-                },
-                _handleNavDown: function() {
-                    console.log('down');
-                },
-                _handleNavLeft: function() {
-                    console.log('left');
-                },
-                _handleNavHome: function() {
-                    console.log('home');
-                },
-                _handleZoomIn: function() {
-                    console.log('zoom in');
-                },
-                _handleZoomOut: function() {
-                    console.log('zoom out');
                 },
                 _handleOperationChange: function(operation) {
                     // console.log('operation is', operation);
@@ -117,6 +99,7 @@ define([
                 },
                 _handlePrintStart: function() {
                     printController.readyGCode();
+                    this.setState({ showMonitor: true });
                 },
                 _handleRotation: function(rotation) {
                     _rotation = rotation;
@@ -173,11 +156,19 @@ define([
                     }
                     e.target.value = null;
                 },
+                _handleFileDownload: function(e) {
+                    var fileName = prompt(lang.print.download_prompt);
+                    fileName = fileName || 'no name';
+                    printController.downloadGCode(fileName);
+                },
                 _renderHeader: function() {
                     var currentMode     = this.state.previewMode === 'normal' ? lang.print.normal_preview : lang.print.support_preview,
                         normalClass     = ClassNames('fa', 'fa-check', 'icon', 'pull-right', {hide: this.state.previewMode !== 'normal'}),
                         supportClass    = ClassNames('fa', 'fa-check', 'icon', 'pull-right', {hide: this.state.previewMode !== 'support'}),
-                        previewClass    = ClassNames('preview', {hide: !this.state.showPreviewModeList});
+                        previewClass    = ClassNames('preview', {hide: !this.state.showPreviewModeList}),
+                        boundingBox     = printController.getSelectedObjectSize();
+
+                        boundingBox = typeof(boundingBox) === 'undefined' ? {x: 0, y: 0, z: 0} : boundingBox.box.size();
 
                     return (
                         <header className="top-menu-bar">
@@ -190,14 +181,12 @@ define([
                                     </button>
                                 </div>
                                 <div>
-                                    <button className="btn btn-default tip" data-tip={lang.print.go_home}>
-                                        <div className="fa fa-home"></div>
+                                    <button className="btn btn-default tip" data-tip={lang.print.save} onClick={this._handleFileDownload}>
+                                        <div className="fa fa-floppy-o"></div>
                                     </button>
                                 </div>
                                 <div>
-                                    <button className="btn btn-default tip" data-tip={lang.print.save}>
-                                        <div className="fa fa-floppy-o"></div>
-                                    </button>
+                                    {Math.round(boundingBox.x * 0.1) + 'mm x ' + Math.round(boundingBox.y * 0.1) + 'mm x ' + Math.round(boundingBox.z * 0.1) + 'mm'}
                                 </div>
                             </div>
                         </header>

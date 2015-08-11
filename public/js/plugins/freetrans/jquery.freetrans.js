@@ -47,7 +47,6 @@
         // public methods
         var methods = {
                 init : function(options) {
-
                         return this.each(function() {
                                 var sel = $(this), d = sel.data('freetrans');
 
@@ -203,6 +202,7 @@
                                 _draw(sel, data);
 
                                 // HACKED: on rotate
+                                evt.freetransEventType = 'move';
                                 options.onMove = options.onMove || function() {};
                                 options.onMove(evt, data);
                         });
@@ -236,6 +236,7 @@
 
                                 _draw(sel, data);
                                 // HACKED: on rotate
+                                evt.freetransEventType = 'rotate';
                                 options.onRotate = options.onRotate || function() {};
                                 options.onRotate(evt, data);
                         });
@@ -400,6 +401,7 @@
                                         if (positionMe) positionMe();
 
                                         // HACKED: on scale
+                                        evt.freetransEventType = 'scale';
                                         options.onScale = options.onScale || function() {};
                                         options.onScale(evt, data);
                                 };
@@ -671,9 +673,6 @@
 
                         el = data._p.divs.rotator[0];
 
-                        // HACKED: modify the rotator position
-                        el.style.top = -20 + 'px';
-                        el.style.left = 'calc(50% - ' + el.clientWidth / 2 + 'px)';
                         _setTransform(el, tstr);
                         _setTransformOrigin(el, data['rot-origin']);
                 }

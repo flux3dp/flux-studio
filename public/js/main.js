@@ -80,16 +80,14 @@ require([
     'jquery',
     'backbone',
     'app/router',
-    'helpers/local-storage',
+    'app/actions/global',
     'domReady!',
     'threejs'
-], function($, Backbone, Router, localStorage) {
+], function($, Backbone, Router, globalEvents) {
     'use strict';
 
-    var router = new Router();
-
-    // load lang file
-    require(['helpers/i18n'], function(i18n) {
+    globalEvents(function() {
+        var router = new Router();
         Backbone.history.start();
     });
 });

@@ -30,15 +30,11 @@ define([
 
                     lastMessage = data;
 
-                },
-                onClose: function() {
-                    setup_done = false;
                 }
             }),
             uploaded_svg = [],
             lastOrder = '',
             lastMessage = '',
-            setup_done = false,
             events = {
                 onMessage: function() {}
             },
@@ -47,38 +43,6 @@ define([
         return {
             connection: ws,
             History: History,
-            setup: function(mode, args, opts) {
-                opts = opts || {};
-                opts.onFinished = opts.onFinished || function() {};
-
-                var _args = [
-                    mode
-                ];
-
-                _args = _args.concat(args);
-
-                events.onMessage = function(data) {
-                    switch (data.status) {
-                    case 'ok':
-                        setup_done = true;
-                        opts.onFinished();
-
-                        break;
-                    default:
-                        // TODO: do something?
-                        break;
-                    }
-
-                };
-
-                if (false === setup_done) {
-                    ws.send(_args.join(' '));
-                    lastOrder = 'setup';
-                }
-                else {
-                    opts.onFinished();
-                }
-            },
             /**
              * upload svg
              *
@@ -193,15 +157,16 @@ define([
                     request_header = [
                         lastOrder,
                         obj.name,
-                        obj.width,
-                        obj.height,
+                        obj.real_width,
+                        obj.real_height,
                         obj.tl_position_x,
                         obj.tl_position_y,
                         obj.br_position_x,
                         obj.br_position_y,
                         obj.rotate,
                         obj.svg_data.size,
-                        obj.image_data.length
+                        obj.width,
+                        obj.height
                     ];
 
                     requests_serial.push(request_header.join(' '));

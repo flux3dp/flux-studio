@@ -2,10 +2,9 @@ define([
     'react',
     'jquery',
     'backbone',
-    'helpers/display',
-    'app/actions/global'
+    'helpers/display'
 ],
-function(React, $, Backbone, display, globalEvents) {
+function(React, $, Backbone, display) {
     'use strict';
 
     var _display = function(view, args, el) {
@@ -14,7 +13,7 @@ function(React, $, Backbone, display, globalEvents) {
 
         // WARNING: this function includes GLOBAL LIVE EVENTS.
         // DO NOT use non-uniqle selector here (e.g. class, tag name, attribute...etc.)
-        display(view, args, el, globalEvents);
+        display(view, args, el);
     };
 
     return Backbone.Router.extend({
@@ -54,7 +53,7 @@ function(React, $, Backbone, display, globalEvents) {
                     }
                 };
 
-                _display(view, args, $('.popup-window')[0]);
+                _display(view, args);
             });
         },
 
@@ -62,7 +61,6 @@ function(React, $, Backbone, display, globalEvents) {
             var map = {
                     'ask': 'Wifi-Home',
                     'select': 'Wifi-Select',
-                    'spot': 'Wifi-Spot',
                     'set-printer': 'Wifi-Set-Printer',
                     'set-password': 'Wifi-Set-Password',
                     'setup-complete': 'Wifi-Setup-Complete',
@@ -78,7 +76,7 @@ function(React, $, Backbone, display, globalEvents) {
             }
 
             require(['jsx!pages/' + view_name], function(view) {
-                _display(view, {}, $('.popup-window')[0]);
+                _display(view, {});
             });
         },
 

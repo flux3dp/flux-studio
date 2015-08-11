@@ -1,8 +1,9 @@
 define([
     'jquery',
     'react',
-    'app/actions/wifi-select'
-], function($, React, wifiSelect) {
+    'app/actions/wifi-select',
+    'jsx!widgets/Modal'
+], function($, React, wifiSelect, Modal) {
     'use strict';
 
     return function(args) {
@@ -38,21 +39,24 @@ define([
                                 <span className="fa fa-lock"></span>
                             </a>
                         </li>);
-                    }, this);
-
-                return (
-                    <div className="wifi initialization absolute-center text-center">
-                        <h1>{state.lang.welcome_headline}</h1>
-                        <div>
-                            <h2>{state.lang.wifi.select.choose_wifi}</h2>
-                            <ul className="pure-list wifi-list clearfix">
-                                {items}
-                            </ul>
+                    }, this),
+                    content = (
+                        <div className="wifi initialization absolute-center text-center">
+                            <h1>{state.lang.welcome_headline}</h1>
                             <div>
-                                <a href="#">{state.lang.wifi.select.no_wifi_available}</a>
+                                <h2>{state.lang.wifi.select.choose_wifi}</h2>
+                                <ul className="pure-list wifi-list clearfix">
+                                    {items}
+                                </ul>
+                                <div>
+                                    <a href="#">{state.lang.wifi.select.no_wifi_available}</a>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    );
+
+                return (
+                    <Modal content={content}/>
                 );
             }
         });

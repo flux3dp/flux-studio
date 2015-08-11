@@ -10,8 +10,13 @@
 // global style
 @import "core/global";
 
+// widgets
+@import "widgets/spinner";
+@import "widgets/button";
 
 // views
+@import "views/advanced-panel";
+@import "views/modal";
 @import "views/printer-selector";
 
 // pages

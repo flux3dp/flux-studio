@@ -11,12 +11,12 @@ define([
                 lang = props.lang;
 
             return (
-                <div className="panel object-position">
+                <div className={props.className}>
                     <div className="controls">
                         <p className="control">
                             <label className="caption span4">{lang.laser.object_params.position.text}</label>
-                            <input type="number" min="0" name="object-pos-x" data-type="x" className="span4 instant-change" defaultValue=""/>
-                            <input type="number" min="0" name="object-pos-y" data-type="y" className="span4 instant-change" defaultValue=""/>
+                            <input type="number" name="object-pos-x" data-type="x" className="span4 instant-change" defaultValue=""/>
+                            <input type="number" name="object-pos-y" data-type="y" className="span4 instant-change" defaultValue=""/>
                         </p>
                         <p className="control">
                             <span className="offset-left-4 span4 text-center unit">X</span>

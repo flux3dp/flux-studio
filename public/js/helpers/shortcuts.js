@@ -3,11 +3,12 @@
  */
 define([
     'jquery',
-    'helpers/array-unique'
+    'helpers/array-unique',
+    'helpers/array-findindex',
 ], function($) {
     'use strict';
 
-    var $document = $(document),
+    var root = window,
         special_key_map = {
             'L_CMD': 91,
             'R_CMD': 93,
@@ -16,38 +17,38 @@ define([
             'ALT': 18,
             'DEL': 8,
             'ENTER': 13,    // return
-            'TAB': 9
+            'TAB': 9,
+            'ESC': 27,
+            'LEFT': 37,
+            'UP': 38,
+            'RIGHT': 39,
+            'DOWN': 40
         },
         events = [],
         keyCodeStatus = [],
         has_bind = false,
+        keyup_event = function(e) {
+            keyCodeStatus = [];
+        },
+        keydown_event = function(e) {
+            keyCodeStatus.push(e.keyCode);
+            keyCodeStatus = keyCodeStatus.unique().sort();
+
+            var matches = matchedEvents(keyCodeStatus);
+
+            if (0 < matches.length) {
+                e.preventDefault();
+                keyCodeStatus = [];
+            }
+
+            matches.forEach(function(event, index) {
+                event.callback.apply(null, [e]);
+            });
+        },
         initialize = function() {
             if (false === has_bind) {
-                $document.on('keyup', function(e) {
-                    var index = keyCodeStatus.findIndex(function(value) {
-                        return value === e.keyCode;
-                    });
-
-                    if (-1 < index) {
-                        keyCodeStatus.splice(index, 1);
-                    }
-                });
-
-                $document.on('keydown', function(e) {
-                    keyCodeStatus.push(e.keyCode);
-                    keyCodeStatus = keyCodeStatus.unique().sort();
-
-                    var matches = matchedEvents(keyCodeStatus);
-
-                    if (0 < matches.length) {
-                        e.preventDefault();
-                        keyCodeStatus = [];
-                    }
-
-                    matches.forEach(function(event, index) {
-                        event.callback.apply(null, [e]);
-                    });
-                });
+                $(root).on('keyup', keyup_event);
+                $(root).on('keydown', keydown_event);
 
                 has_bind = true;
             }
@@ -99,7 +100,8 @@ define([
             }
         },
         disableAll: function() {
-            $document.off('keyup keydown');
+            $(root).off('keyup keydown');
+            has_bind = false;
         }
     };
 });

@@ -6,16 +6,17 @@ define([
     'helpers/api/3d-print-slicing',
     'threeOrbitControls',
     'threeSTLLoader',
-    'threeCircularGridHelper'
+    'threeCircularGridHelper',
+    'plugins/file-saver/file-saver.min'
 
 ], function($, fileSystem, display, websocket, printSlicing) {
     'use strict';
 
     var THREE = window.THREE || {},
-        container, stats, printController;
+        container, printController;
 
-    var camera, camera2, scene, outScene, renderer, composer;
-    var plane, control, controls, reactSrc;
+    var camera, scene, renderer;
+    var control, controls, reactSrc;
 
     var objects = [],
         referenceMeshes = [];
@@ -24,14 +25,16 @@ define([
         offset = new THREE.Vector3(),
         myMesh, circularGridHelper, mouseDown, boundingBox, SELECTED;
 
-    var oldx, oldy, movingOffsetX, movingOffsetY, selectedGeometry, lastMovableX, lastMovableY;
+    var movingOffsetX, movingOffsetY;
 
-    var colorUnselected = 0x333333;
+    var responseMessage, responseBlob,
+        blobExpired = true;
+
     var s = {
         diameter: 1700,
         radius: 850,
         height: 1800,
-        step: 115,
+        step: 100,
         upVector: new THREE.Vector3(0, 0, 1),
         color:  0x777777,
         opacity: 0.2,
@@ -39,7 +42,7 @@ define([
         textColor: '#000000',
         textPosition: 'center',
         colorOutside: 0xFF0000,
-        colorSelected: 0xFFCC00,
+        colorSelected: 0xFFFF00,
         colorUnselected: 0x333333,
         offsetRatio: 0.1
     };
@@ -49,7 +52,7 @@ define([
         reactSrc = src;
         container = document.getElementById('model-displayer');
 
-        camera = new THREE.PerspectiveCamera( 45, (container.offsetWidth) / container.offsetHeight, 1, 30000 );
+        camera = new THREE.PerspectiveCamera( 60, (container.offsetWidth) / container.offsetHeight, 1, 30000 );
         camera.position.set(1000, 1000, 1000);
         camera.up = new THREE.Vector3(0,0,1);
 
@@ -102,10 +105,7 @@ define([
         renderer.domElement.addEventListener('mousedown', onMouseDown, false);
         renderer.domElement.addEventListener( 'mouseup', onMouseUp, false );
 
-        setTimeout(function() {
-            renderer.setSize(container.offsetWidth, container.offsetHeight);
-            render();
-        }, 50)
+        renderer.setSize(container.offsetWidth, container.offsetHeight);
 
         render();
 
@@ -147,11 +147,14 @@ define([
             // normalize - resize, align
             var box = new THREE.Box3().setFromObject(mesh);
             var scale = getScaleDifference(getLargestPropertyValue(box.size()));
-            selectObject(mesh);
+
             mesh.scale.set(scale, scale, scale);
             mesh.scale._x = scale;
             mesh.scale._y = scale;
             mesh.scale._z = scale;
+
+            mesh.rotation.order = 'ZYX';
+
             /* customized properties */
             mesh.scale.enteredX = 1;
             mesh.scale.enteredY = 1;
@@ -162,7 +165,10 @@ define([
             mesh.rotation.enteredZ = 0;
             mesh.position.isOutOfBounds = false;
             /* end customized property */
-            mesh.rotation.order = 'ZYX';
+
+            mesh.geometry = new THREE.Geometry().fromBufferGeometry(mesh.geometry);
+
+            selectObject(mesh);
             alignCenter();
 
             scene.add(mesh);
@@ -203,6 +209,7 @@ define([
         mouseDown = false;
         container.style.cursor = 'auto';
         checkOutOfBounds(SELECTED);
+        updateBoundingBoxFromScene();
         render();
     }
 
@@ -251,12 +258,16 @@ define([
     // select the specified object, will calculate out-of-bounds and change color accordingly
     function selectObject(obj) {
         SELECTED = obj || {};
+
+        removeBoundingBoxFromScene();
+
+        if(!$.isEmptyObject(obj)) {
+            boundingBox = new THREE.BoundingBoxHelper( obj, s.colorSelected );
+            boundingBox.name = "BoundingBoxHelper";
+            boundingBox.update();
+            scene.add(boundingBox);
+        }
         reactSrc.setState({ modelSelected: SELECTED.uuid ? SELECTED : null });
-        objects.forEach(function(object) {
-            if(!object.position.isOutOfBounds) {
-                object.material.color.setHex(object.uuid == SELECTED.uuid ? s.colorSelected : s.colorUnselected);
-            }
-        });
         render();
     }
 
@@ -351,6 +362,7 @@ define([
 
     function render() {
         renderer.render(scene, camera);
+        blobExpired = true;
     }
 
     // events
@@ -373,6 +385,9 @@ define([
         // align to ground
         var reference = getReferenceDistance(SELECTED);
         SELECTED.position.z -= reference.z;
+
+        updateBoundingBoxFromScene();
+        checkOutOfBounds(SELECTED);
 
         render();
     }
@@ -406,6 +421,7 @@ define([
             SELECTED.position.z -= reference.z;
 
             checkOutOfBounds(SELECTED);
+            updateBoundingBoxFromScene();
             render();
         }
     }
@@ -424,13 +440,14 @@ define([
                 console.log('delete result: ', result);
             });
 
+            removeBoundingBoxFromScene();
             render();
         }
     }
 
-    function addPoint(x, y, z) {
-        var geometry = new THREE.SphereGeometry( 5, 32, 32 );
-        var material = new THREE.MeshBasicMaterial( {color: 0xffff00} );
+    function addPoint(x, y, z, r) {
+        var geometry = new THREE.SphereGeometry( r || 5, 32, 32 );
+        var material = new THREE.MeshBasicMaterial( {color: 0xffff00, transparent: true, opacity: 0.3} );
         var sphere = new THREE.Mesh( geometry, material );
         sphere.position.x = x;
         sphere.position.y = y;
@@ -438,31 +455,16 @@ define([
         scene.add( sphere );
     }
 
-    function checkOutOfBounds(selectedObject) {
-        if(!$.isEmptyObject(selectedObject)) {
-            var outOfBounds = isOutOfBounds(selectedObject);
-            selectedObject.material.color.setHex(outOfBounds ? s.colorOutside : s.colorSelected);
+    function checkOutOfBounds(sourceMesh) {
+        if(!$.isEmptyObject(sourceMesh)) {
+            sourceMesh.position.isOutOfBounds = sourceMesh.geometry.vertices.some(function(v) {
+                var vector = v.clone();
+                vector.applyMatrix4(sourceMesh.matrixWorld);
+                return Math.sqrt(Math.pow(vector.x, 2) + Math.pow(vector.y, 2)) > s.radius;
+            });
+
+            boundingBox.material.color.setHex(sourceMesh.position.isOutOfBounds ? s.colorOutside : s.colorSelected);
         }
-    }
-
-    function isOutOfBounds(selectedObject) {
-        var outOfBounds = false;
-        selectedObject.position.isOutOfBounds = false;
-
-        if(selectedObject.geometry) {
-            selectedGeometry = selectedObject.geometry.type === 'Geometry' ? selectedObject.geometry : new THREE.Geometry().fromBufferGeometry(selectedObject.geometry);
-            for(var i = 0; i < selectedGeometry.vertices.length; i++) {
-                if(Math.pow(selectedGeometry.vertices[i].x * selectedObject.scale.x * selectedObject.scale.enteredX + selectedObject.position.x, 2) +
-                    Math.pow(selectedGeometry.vertices[i].y * selectedObject.scale.y * selectedObject.scale.enteredY + selectedObject.position.y, 2) >
-                    Math.pow(s.radius, 2)) {
-                        selectedObject.position.isOutOfBounds = true;
-                        outOfBounds = true;
-                        break;
-                }
-            }
-        }
-
-        return outOfBounds;
     }
 
     function degreeToRadian(degree) {
@@ -483,34 +485,49 @@ define([
 
     }
 
-    function readyGCode() {
+    function readyGCode(callback) {
         // set each model's attribute with backend
-        var ready   = true,
-            counter = objects.length;
+        callback = callback || function() {};
+        if(blobExpired) {
+            var ready   = true,
+                counter = objects.length;
 
-        objects.forEach(function(obj) {
-            printController.set(
-                obj.uuid,
-                obj.position.x * s.offsetRatio,
-                obj.position.y * s.offsetRatio,
-                obj.position.z * s.offsetRatio,
-                obj.rotation.x,
-                obj.rotation.y,
-                obj.rotation.z,
-                obj.scale.x * s.offsetRatio,
-                obj.scale.y * s.offsetRatio,
-                obj.scale.z * s.offsetRatio,
-                function(result) {
-                    if(result.status === 'fatal') {
-                        readyFailed(result.error);
-                        ready = false;
+            objects.forEach(function(obj) {
+                printController.set(
+                    obj.uuid,
+                    obj.position.x * s.offsetRatio,
+                    obj.position.y * s.offsetRatio,
+                    obj.position.z * s.offsetRatio,
+                    obj.rotation.x,
+                    obj.rotation.y,
+                    obj.rotation.z,
+                    obj.scale.x * s.offsetRatio,
+                    obj.scale.y * s.offsetRatio,
+                    obj.scale.z * s.offsetRatio,
+                    function(result) {
+                        if(result.status === 'fatal') {
+                            readyFailed(result.error);
+                            ready = false;
+                            // to do: handle error occured
+                        }
+                        counter--;
+                        if(counter === 0 && ready) {
+                            getGCode(callback);
+                        }
                     }
-                    counter--;
-                    if(counter === 0 && ready) {
-                        getGCode();
-                    }
-                }
-            );
+                );
+            });
+        }
+        else {
+            console.log('already ready');
+            callback();
+        }
+    }
+
+    function downloadGCode(fileName) {
+        readyGCode(function() {
+            fileName += '.gcode';
+            saveAs(responseBlob, fileName);
         });
     }
 
@@ -518,14 +535,50 @@ define([
         console.log(message);
     }
 
-    function getGCode(ready) {
+    function getGCode(callback) {
+        console.log('fetching g-code from server');
         var ids = [];
         objects.forEach(function(obj) {
             ids.push(obj.uuid);
         });
         printController.go(ids, function(result) {
-            console.log(result);
+            if(result instanceof Blob) {
+                responseBlob = result;
+                console.log('blob ready');
+                blobExpired = false;
+                callback();
+            }
+            else {
+                responseMessage = result;
+            }
         });
+    }
+
+    function removeBoundingBoxFromScene() {
+        for(var i = scene.children.length - 1; i >= 0; i--) {
+            if(scene.children[i].name === 'BoundingBoxHelper') {
+                scene.children.splice(i, 1);
+            }
+        }
+    }
+
+    function updateBoundingBoxFromScene() {
+        for(var i = scene.children.length - 1; i >= 0; i--) {
+            if(scene.children[i].name === 'BoundingBoxHelper') {
+                scene.children[i].update();
+            }
+        }
+    }
+
+    function getSelectedObjectSize() {
+        if(scene)
+        {
+            for(var i = scene.children.length - 1; i >= 0; i--) {
+                if(scene.children[i].name === 'BoundingBoxHelper') {
+                    return scene.children[i];
+                }
+            }
+        }
     }
 
     return {
@@ -535,6 +588,8 @@ define([
         setScale: setScale,
         alignCenter: alignCenter,
         removeSelected: removeSelected,
-        readyGCode: readyGCode
+        readyGCode: readyGCode,
+        getSelectedObjectSize: getSelectedObjectSize,
+        downloadGCode: downloadGCode
     };
 });

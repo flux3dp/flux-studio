@@ -7,6 +7,7 @@
         .camera-image {
             height: 100%;
             width: 100%;
+            object-fit: contain;
         }
     }
 
@@ -56,42 +57,47 @@
         position: relative;
         width: 100%;
     }
-}
 
-.scan-progress {
-    background: #eee;
-    border-radius: 5px;
-    height: 150px;
-    padding: 10px;
-    width: 60%;
+    .scan-progress {
+        background: #eee;
+        border-radius: 5px;
+        bottom: 10px;
+        height: 150px;
+        left: 0;
+        margin: auto;
+        padding: 10px;
+        position: absolute;
+        right: 0;
+        width: 60%;
 
-    .progress {
-        height: 20px;
-    }
+        .progress {
+            height: 20px;
+        }
 
-    .progress-bar {
-        background-color: #5BC0DE;
-        background-image: -webkit-linear-gradient(45deg,rgba(255, 255, 255, 0.15) 25%,rgba(0, 0, 0, 0) 25%,rgba(0, 0, 0, 0) 50%,rgba(255, 255, 255, 0.15) 50%,rgba(255, 255, 255, 0.15) 75%,rgba(0, 0, 0, 0) 75%,rgba(0, 0, 0, 0));
-        background-image: linear-gradient(45deg,rgba(255, 255, 255, 0.15) 25%,rgba(0, 0, 0, 0) 25%,rgba(0, 0, 0, 0) 50%,rgba(255, 255, 255, 0.15) 50%,rgba(255, 255, 255, 0.15) 75%,rgba(0, 0, 0, 0) 75%,rgba(0, 0, 0, 0));
-        background-size: 40px 40px;
-        height: 100%;
-        -webkit-background-size: 40px 40px;
-    }
-}
-
-.scan-model-save-as {
-    background: #eee;
-    border-radius: 5px;
-    height: 150px;
-    padding: 10px;
-    width: 60%;
-
-    .file-formats {
-        margin: 0 0 10px 0;
-
-        label {
-            float: left;
+        .progress-bar {
+            background-color: #5BC0DE;
+            background-image: -webkit-linear-gradient(45deg,rgba(255, 255, 255, 0.15) 25%,rgba(0, 0, 0, 0) 25%,rgba(0, 0, 0, 0) 50%,rgba(255, 255, 255, 0.15) 50%,rgba(255, 255, 255, 0.15) 75%,rgba(0, 0, 0, 0) 75%,rgba(0, 0, 0, 0));
+            background-image: linear-gradient(45deg,rgba(255, 255, 255, 0.15) 25%,rgba(0, 0, 0, 0) 25%,rgba(0, 0, 0, 0) 50%,rgba(255, 255, 255, 0.15) 50%,rgba(255, 255, 255, 0.15) 75%,rgba(0, 0, 0, 0) 75%,rgba(0, 0, 0, 0));
+            background-size: 40px 40px;
+            height: 100%;
+            -webkit-background-size: 40px 40px;
         }
     }
 
+    .scan-model-save-as {
+        background: #eee;
+        border-radius: 5px;
+        height: 150px;
+        padding: 10px;
+        width: 60%;
+
+        .file-formats {
+            margin: 0 0 10px 0;
+
+            label {
+                float: left;
+            }
+        }
+
+    }
 }

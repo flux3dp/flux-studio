@@ -16,9 +16,9 @@ define(['helpers/websocket'], function(Websocket) {
                 onMessage: function(result) {
                     var data = JSON.parse(result.data),
                         is_success = (
-                            true === data.has_response || false &&
-                            true === data.reachable || false &&
-                            true === data.auth || false
+                            true === (data.has_response || false) &&
+                            true === (data.reachable || false) &&
+                            true === (data.auth || false)
                         );
 
                     if (true === is_success) {

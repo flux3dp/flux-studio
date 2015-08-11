@@ -270,7 +270,8 @@ define(function() {
             gram: '公克',
             pause: '暫停',
             continue: '繼續',
-            restart: '重新開始'
+            restart: '重新開始',
+            download_prompt: '請輸入檔案名稱'
         },
         laser: {
             import: 'Import',
@@ -281,16 +282,6 @@ define(function() {
             start_engrave: 'ENGRAVE',
             start_cut: 'CUT',
             print_params: {
-                material: {
-                    text: '材質',
-                    options: [
-                        {
-                            value: 'wood',
-                            label: 'Wood',
-                            selected: true
-                        }
-                    ]
-                },
                 object_height: {
                     text: 'Object Height',
                     unit: 'mm'
@@ -328,6 +319,51 @@ define(function() {
                     text: 'Threshold',
                     default: 128
                 }
+            },
+            advanced: {
+                label: 'Setup',
+                form: {
+                    object_options: {
+                        text: '材質',
+                        label: 'Object Options',
+                        options: [
+                            {
+                                value: 'wood',
+                                label: 'Wood',
+                                selected: true,
+                                data: {
+                                    laser_speed: 10,
+                                    power: 20
+                                }
+                            },
+                            {
+                                value: 'steel',
+                                label: 'Steel',
+                                data: {
+                                    laser_speed: 50,
+                                    power: 50
+                                }
+                            }
+                        ]
+                    },
+                    laser_speed: {
+                        text: 'Laser Speed',
+                        unit: 'mm/s',
+                        fast: 'Fast',
+                        slow: 'Slow',
+                        min: 1,
+                        max: 100
+                    },
+                    power: {
+                        text: 'Power',
+                        high: 'High',
+                        low: 'Low',
+                        min: 1,
+                        max: 50
+                    }
+                },
+                apply: 'Apply',
+                cancel: 'Cancel',
             }
         },
         scan: {
@@ -338,7 +374,7 @@ define(function() {
             share: 'Share',
             print_with_flux: 'Print with FLUX',
             convert_to_3d_model: 'Convert to 3D model...',
-            complete: 'Complete',
+            complete: 'Completed',
             remaining_time: 'Remaining Time',
             save_as: 'Save as',
             do_save: 'Save',
@@ -404,7 +440,8 @@ define(function() {
             manipulation: {
                 smooth: 'Smooth',
                 crop: 'Crop',
-                delete: 'Delete',
+                auto_merge: 'Auto Merge',
+                manual_merge: 'Manual Merge',
                 clear_noise: 'Clear Noise',
                 reset: 'Reset'
             }

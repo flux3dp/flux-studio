@@ -1,7 +1,8 @@
 define([
     'jquery',
-    'react'
-], function($, React) {
+    'react',
+    'jsx!widgets/Modal'
+], function($, React, Modal) {
     'use strict';
 
     return function(args) {
@@ -37,7 +38,8 @@ define([
                 var lang = args.state.lang,
                     cx = React.addons.classSet,
                     printerNameClass,
-                    printerPasswordClass;
+                    printerPasswordClass,
+                    content;
 
                 printerNameClass = cx({
                     'required'  : true,
@@ -49,7 +51,7 @@ define([
                     'error'     : !this.state.validPrinterPassword
                 });
 
-                return (
+                content = (
                     <div className="wifi initialization absolute-center text-center">
                         <h1>{lang.welcome_headline}</h1>
                         <div>
@@ -84,6 +86,10 @@ define([
                             </div>
                         </div>
                     </div>
+                );
+
+                return (
+                    <Modal content={content}/>
                 );
             }
         });
