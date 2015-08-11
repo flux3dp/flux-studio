@@ -421,8 +421,8 @@ define([
                             top_left = getCenter($el.find('.ft-scaler-top.ft-scaler-left')),
                             bottom_right = getCenter($el.find('.ft-scaler-bottom.ft-scaler-right')),
                             $img = $el.parents('.ft-container').find('.img-container img'),
-                            width = $img.width(),
-                            height = $img.height(),
+                            width = $el.width(),
+                            height = $el.height(),
                             sub_data = {
                                 name: $img.data('name') || '',
                                 width: width,
