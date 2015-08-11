@@ -50,20 +50,7 @@ define([
 
         window.addEventListener('resize', onWindowResize, false);
 
-        var material = new THREE.LineBasicMaterial({
-            color: 0x0000ff
-        });
-
-        var geometry = new THREE.Geometry();
-        geometry.vertices.push(
-            new THREE.Vector3( 0, 0, -10000 ),
-            new THREE.Vector3( 0, 0, 10000 )
-        );
-
-        var line = new THREE.Line( geometry, material );
-        scene.add( line );
-
-        animate();
+        render();
 
         return {
             scene: scene,
@@ -92,6 +79,7 @@ define([
         var setMode = function(mode) {
                 createTransformControls();
                 mesh.transform_control.setMode(mode);
+                render();
             },
             createTransformControls = function() {
                 if ('undefined' === typeof mesh.transform_control) {
@@ -139,9 +127,9 @@ define([
         cylinder.rotateX(90 * Math.PI / 180);
         cylinder.position.z = mesh_size.z / 2;
 
-        scene.add(cylinder);
+        addMesh(cylinder);
 
-        attachControl(cylinder);
+        attachControl(cylinder).scale();
 
         return cylinder;
     }
@@ -155,11 +143,13 @@ define([
             scene.remove(mesh.transform_control);
         }
 
+        render();
         scene.remove(mesh);
     }
 
     function addMesh(mesh) {
         scene.add(mesh);
+        render();
     }
 
     function setupGeometry(model_data, geometry) {
@@ -219,7 +209,7 @@ define([
 
         mesh = new THREE.PointCloud( geometry, material );
 
-        scene.add( mesh );
+        addMesh( mesh );
 
         return mesh;
     }
@@ -272,12 +262,6 @@ define([
 
     }
 
-    function animate() {
-        requestAnimationFrame(animate);
-
-        render();
-    }
-
     function render() {
         renderer.render(scene, camera);
 
@@ -301,6 +285,7 @@ define([
         },
         remove: removeMesh,
         add: addMesh,
-        attachControl: attachControl
+        attachControl: attachControl,
+        update: render
     };
 });
