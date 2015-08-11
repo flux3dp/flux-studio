@@ -2150,7 +2150,8 @@ a {
 
 .btn-confirm {
     background-color: #424242;
-    color: #FFF; }
+    color: #FFF;
+    border-radius: 5px; }
     .btn-confirm:hover {
         background-color: #000000; }
 

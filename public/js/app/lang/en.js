@@ -270,7 +270,8 @@ define(function() {
             gram: 'g',
             pause: 'PAUSE',
             continue: 'CONTINUE',
-            restart: 'RESTART'
+            restart: 'RESTART',
+            download_prompt: 'please enter file name'
         },
         laser: {
             import: 'Import',

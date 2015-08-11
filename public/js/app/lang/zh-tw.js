@@ -270,7 +270,8 @@ define(function() {
             gram: '公克',
             pause: '暫停',
             continue: '繼續',
-            restart: '重新開始'
+            restart: '重新開始',
+            download_prompt: '請輸入檔案名稱'
         },
         laser: {
             import: 'Import',
