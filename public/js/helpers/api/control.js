@@ -53,7 +53,6 @@ define([
                         }
                     },
                     _uploading = function(data) {
-                        console.log(data);
                         if ('connected' === data.status) {
                             for (var i = 0; i < length; i += CHUNK_PKG_SIZE) {
                                 chunk = print_data.slice(i, i + CHUNK_PKG_SIZE);

@@ -260,6 +260,7 @@ define([
 
         renderer.setSize(window.innerWidth, window.innerHeight);
 
+        render();
     }
 
     function render() {

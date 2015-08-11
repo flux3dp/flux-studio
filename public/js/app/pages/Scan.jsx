@@ -11,7 +11,8 @@ define([
     'jsx!views/scan/Export',
     'jsx!views/scan/Progress-Bar',
     'helpers/file-system',
-    'helpers/shortcuts'
+    'helpers/shortcuts',
+    'plugins/file-saver/file-saver.min'
 ], function(
     $,
     React,
@@ -460,25 +461,16 @@ define([
                                 file_format = $('[name="file-format"]:checked').val(),
                                 file_name = (new Date()).getTime() + '.' + file_format;
 
+                            self.setState({
+                                openBlocker: true
+                            });
+
                             self.props.scan_modeling_websocket.export(
                                 last_point_cloud.name,
                                 file_format,
                                 {
                                     onFinished: function(blob) {
-                                        var file = new File(
-                                            [blob],
-                                            file_name
-                                        );
-
-                                        fileSystem.writeFile(
-                                            file,
-                                            {
-                                                onComplete: function(e, fileEntry) {
-                                                    window.open(fileEntry.toURL());
-                                                }
-                                            }
-                                        );
-
+                                        saveAs(blob, file_name);
                                         onClose();
                                     }
                                 }
@@ -489,7 +481,8 @@ define([
                         ),
                         onClose = function(e) {
                             self.setState({
-                                openExportWindow: false
+                                openExportWindow: false,
+                                openBlocker: false
                             });
                         };
 
@@ -639,7 +632,6 @@ define([
 
                     return (
                         <div className="studio-container scan-studio">
-                            {printerBlocker}
                             {header}
                             {exportWindow}
                             {printerSelectorWindow}
@@ -650,6 +642,8 @@ define([
                                 {activeSection}
 
                             </div>
+
+                            {printerBlocker}
                         </div>
                     );
                 },
