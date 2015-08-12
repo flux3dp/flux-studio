@@ -77,50 +77,6 @@ a {
     width: calc(100% - 66px);
 }
 
-.menu {
-    background-color: #000000;
-    height: 100%;
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    position: relative;
-    width: 66px;
-}
-
-.menu .brand-name {
-    background: #000;
-    color: #fff;
-}
-
-.menu .menu-item {
-    cursor: pointer;
-    height: 66px;
-    text-align: center;
-    width: 100%;
-}
-
-.menu .menu-item:hover {
-    background-color: rgba(255, 255, 255, 0.5);
-}
-
-.menu .menu-item a {
-    color: #FFF;
-    display: block;
-    letter-spacing: 0.3px;
-    text-decoration: none;
-}
-
-.menu .menu-item img {
-    height: 34px;
-    margin-top: 8px;
-    width: 34px;
-}
-
-.menu .menu-item.brand-name img,
-.menu .sticky-bottom img {
-    margin-top: 15px;
-}
-
 .horizontal-menu .menu-item {
     float: left;
     width: auto;
