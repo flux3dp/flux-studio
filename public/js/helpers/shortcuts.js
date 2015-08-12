@@ -84,7 +84,9 @@ define([
         on: function(keys, callback) {
             var keyCodes = convertToKeyCode(keys);
 
-            events.push({ key: keys, keyCode: generateKey(keyCodes), callback: callback });
+            if (0 === matchedEvents(keyCodes).length) {
+                events.push({ key: keys, keyCode: generateKey(keyCodes), callback: callback });
+            }
 
             initialize();
         },
