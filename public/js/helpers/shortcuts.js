@@ -87,6 +87,9 @@ define([
             if (0 === matchedEvents(keyCodes).length) {
                 events.push({ key: keys, keyCode: generateKey(keyCodes), callback: callback });
             }
+            else {
+                console.warn('Register same shortcut');
+            }
 
             initialize();
         },
