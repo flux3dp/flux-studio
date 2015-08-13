@@ -15,11 +15,13 @@ define([
                         lang = this.state.lang,
                         cx = React.addons.classSet,
                         genericClassName = {
-                            'side-bar-item': true,
+                            'item': true,
+                            'menu-item': true,
                             'active': false
                         },
                         settingsClassName = {
-                            'side-bar-item': true,
+                            'item': true,
+                            'menu-item': true,
                             'sticky-bottom': true,
                             'active': false
                         },
@@ -51,13 +53,18 @@ define([
                             {
                                 name: 'settings',
                                 className: settingsClassName,
-                                label: lang.menu.usb,
+                                label: '',
                                 imgSrc: '/img/icon-setting.png'
                             }
                         ],
                         menuItems = options.map(function(opt) {
                             var isActiveItem = -1 < location.hash.indexOf(opt.name),
-                                itemClass = '';
+                                itemClass = '',
+                                label = '';
+
+                            if ('' !== opt.label) {
+                                label = (<p>{opt.label}</p>);
+                            }
 
                             opt.className.active = isActiveItem;
                             itemClass = cx(opt.className);
@@ -65,14 +72,14 @@ define([
                             return (
                                 <li className={itemClass} onClick={self._handleNavigation.bind(null, opt.name)}>
                                     <img src={opt.imgSrc} />
-                                    <p>{opt.label}</p>
+                                    {label}
                                 </li>
                             );
                         }, this);
 
                     return (
                         <ul className="side-bar">
-                            <li className="brand-name">
+                            <li className="item">
                                 <img src="/img/logo-flux.png"/>
                             </li>
                             {menuItems}
