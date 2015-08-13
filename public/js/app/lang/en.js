@@ -368,15 +368,14 @@ define(function() {
         },
         scan: {
             start_scan: 'Scan',
-            start_multiscan: 'Start to Multiscan',
-            rescan: 'Rescan',
-            export: 'Export',
-            share: 'Share',
-            print_with_flux: 'Print with FLUX',
+            cancel_scan: 'Cancel',
+            convert_to_stl: 'Convert',
+            scan_again: 'Scan Again',
+            start_multiscan: ' Multiscan',
             convert_to_3d_model: 'Convert to 3D model...',
             complete: 'Completed',
             remaining_time: 'Remaining Time',
-            save_as: 'Save as',
+            elapsed_time: 'Elapsed Time',
             do_save: 'Save',
             save_mode: [
                 {
