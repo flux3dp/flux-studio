@@ -34,6 +34,7 @@ define([
         args = args || {};
 
         var View = React.createClass({
+                _progressRemainingTime: 1200,    // 20 minutes
 
                 // ui events
                 _rescan: function(e) {
@@ -70,14 +71,6 @@ define([
                     });
                 },
 
-                _startScan: function(e) {
-                    var self = this;
-
-                    self.setState({
-                        openPrinterSelectorWindow: true
-                    });
-                },
-
                 _getMesh: function(index) {
                     index = ('undefined' !== index || 0 > index ? index : this.props.meshes.length - 1);
                     return this.props.meshes.slice(index)[0];
@@ -90,30 +83,21 @@ define([
                 _onRendering: function(views, chunk_length) {
                     var self = this,
                         scan_speed = self._getScanSpeed(),
-                        remaining_sec = ((scan_speed - chunk_length) * (20 * 60 / scan_speed)) || 0,
-                        remaining_min = Math.floor(remaining_sec / 60) || 0,
-                        progressRemainingTime = self.state.progressRemainingTime,
+                        progressRemainingTime = self._progressRemainingTime / scan_speed * (scan_speed - chunk_length),
+                        progressElapsedTime = parseInt(((new Date()).getTime() - self.props.scanStartTime) / 1000, 10),
                         progressPercentage,
                         meshes = self.props.meshes,
                         mesh = self._getMesh(self.state.meshIndex);
-
-                    remaining_sec = remaining_sec % (remaining_min * 60);
 
                     progressPercentage = Math.min(
                         (chunk_length / scan_speed * 100).toString().substr(0, 5),
                         100
                     );
 
-                    args.state.progressPercentage = progressPercentage;
-
-                    // update remaining time every 20 chunks
-                    if (0 === chunk_length % 20) {
-                        progressRemainingTime = remaining_min + 'm' + (remaining_sec || 0) + 's';
-                    }
-
                     self.setState({
                         progressPercentage: progressPercentage,
-                        progressRemainingTime: progressRemainingTime
+                        progressRemainingTime: progressRemainingTime,
+                        progressElapsedTime: progressElapsedTime
                     });
 
                     if ('undefined' === typeof mesh) {
@@ -187,17 +171,18 @@ define([
 
                     self.refs = $.extend(true, {}, self.refs, refs);
 
-                    if (false === self.props.is_canvas_existing) {
+                    if (false === self.props.isCanvasExisting) {
                         stage = scanedModel.init();
                         self.setProps(stage);
                     }
 
                     self.setProps({
-                        is_canvas_existing: true
+                        isCanvasExisting: true,
+                        scanStartTime: (new Date()).getTime()
                     });
 
                     self.setState({
-                        is_scan_started: true
+                        isScanStarted: true
                     });
 
                     openProgressBar(onScan);
@@ -388,9 +373,6 @@ define([
                     var start_scan_text,
                         lang = args.state.lang;
 
-                    // TODO: setting up remaining time
-                    lang.scan.remaining_time = '26min';
-
                     lang.scan.start_scan_text = (
                         0 < this.state.scanTimes
                         ? lang.scan.start_multiscan
@@ -401,7 +383,7 @@ define([
                         <SetupPanel
                             lang={lang}
                             onScanClick={this._handleScan}
-                            enabledScanButton={1 < this.state.scanTimes}
+                            enableMultiScan={1 < this.state.scanTimes}
                         >
                         </SetupPanel>
                     );
@@ -437,7 +419,7 @@ define([
 
                     camera_image_class = cx({
                         'camera-image' : true,
-                        'hide' : true === state.is_scan_started
+                        'hide' : true === state.isScanStarted
                     });
 
                     return (
@@ -494,12 +476,7 @@ define([
                 _renderProgressBar: function() {
                     var self = this,
                         lang = this.state.lang,
-                        content = (
-                            <ProgressBar
-                                lang={lang}
-                                progressPercentage={this.state.progressPercentage}
-                                progressRemainingTime={this.state.progressRemainingTime}/>
-                        ),
+                        content,
                         onClose = function(e) {
                             self.setState({
                                 openProgressBar: false
@@ -507,7 +484,12 @@ define([
                         };
 
                     return (
-                        <Modal disabledEscapeOnBackground="true" content={content} onClose={onClose}/>
+                        <ProgressBar
+                            lang={lang}
+                            percentage={this.state.progressPercentage}
+                            remainingTime={this.state.progressRemainingTime}
+                            elapsedTime={this.state.progressElapsedTime}
+                        />
                     );
                 },
 
@@ -529,41 +511,20 @@ define([
                             self.setState({
                                 openPrinterSelectorWindow: false
                             });
+                        },
+                        className = {
+                            'modal-printer-selecter': true
                         };
 
                     return (
-                        <Modal content={content} onClose={onClose}/>
+                        <Modal content={content} className={className} disabledEscapeOnBackground={true} onClose={onClose}/>
                     );
                 },
 
-                _renderHeader: function() {
-                    var state = this.state,
-                        cx = React.addons.classSet,
-                        lang = args.state.lang,
-                        header_class;
-
-                    header_class = cx({
-                        'top-menu-bar' : true,
-                        'btn-h-group'  : true,
-                        'invisible'    : 1 > state.scanTimes
-                    });
-
-                    return (
-                        <header ref="header" className={header_class}>
-                            <button className="btn btn-default fa fa-undo" onClick={this._rescan}>{lang.scan.rescan}</button>
-                            <button className="btn btn-default fa fa-paper-plane" onClick={this._saveAs}>{lang.scan.export}</button>
-                            <button className="btn btn-default fa fa-floppy-o">{lang.scan.share}</button>
-                            <button className="btn btn-default fa fa-eye">{lang.scan.print_with_flux}</button>
-                        </header>
-                    );
-                },
-
-                _renderBeginingSection: function() {
-                    return (
-                        <section className="starting-section">
-                            <img className="launch-img absolute-center" src="http://placehold.it/280x193" onClick={this._startScan}/>
-                        </section>
-                    );
+                getDefaultProps: function() {
+                    return {
+                        scanStartTime: null
+                    };
                 },
 
                 getInitialState: function() {
@@ -575,11 +536,12 @@ define([
                         scanTimes: 0,
                         selectedPrinter: undefined,
                         openExportWindow: false,
-                        openPrinterSelectorWindow: false,
+                        openPrinterSelectorWindow: true,
                         openProgressBar: false,
                         openBlocker: false,
                         progressPercentage: 0,
-                        progressRemainingTime: '20m0s',
+                        progressRemainingTime: this._progressRemainingTime,    // 20 minutes
+                        progressElapsedTime: 0,
                         printerIsReady: false,
                         autoMerge: true,
                         enableMerge: false
@@ -602,11 +564,6 @@ define([
                             this._renderExportWindow() :
                             ''
                         ),
-                        printerSelectorWindow = (
-                            true === state.openPrinterSelectorWindow ?
-                            this._renderPrinterSelectorWindow() :
-                            ''
-                        ),
                         progressBar = (
                             true === state.openProgressBar ?
                             this._renderProgressBar() :
@@ -622,20 +579,14 @@ define([
                         activeSection,
                         header;
 
-                    header = this._renderHeader();
-
                     activeSection = (
                         false === state.gettingStarted ?
-                        this._renderBeginingSection() :
+                        this._renderPrinterSelectorWindow() :
                         this._renderStageSection()
                     );
 
                     return (
                         <div className="studio-container scan-studio">
-                            {header}
-                            {exportWindow}
-                            {printerSelectorWindow}
-                            {progressBar}
 
                             <div className="stage">
 
@@ -643,6 +594,8 @@ define([
 
                             </div>
 
+                            {exportWindow}
+                            {progressBar}
                             {printerBlocker}
                         </div>
                     );
@@ -723,7 +676,7 @@ define([
                                 scan_modeling_websocket: scanModeling(),
                                 meshes: [],
                                 cylinder: undefined,
-                                is_canvas_existing: false
+                                isCanvasExisting: false
                             });
                             self._refreshCamera();
                             clearInterval(timer);
