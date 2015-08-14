@@ -64,15 +64,53 @@ define([
             );
         },
 
+        _renderButtons: function(lang) {
+            var props = this.props,
+                cx = React.addons.classSet,
+                mode = ('engrave' === props.mode ? lang.laser.start_engrave : lang.laser.start_cut),
+                laser_class = cx({
+                    'btn btn-action btn-full-width btn-start': true
+                }),
+                import_class = cx({
+                    'btn btn-action btn-full-width file-importer': true
+                }),
+                export_file_class = cx({
+                    'btn btn-action btn-full-width fa fa-floppy-o': true
+                }),
+                laserButton = (
+                    true === props.hasImage ?
+                    <button id="btn-start" className={laser_class}>
+                        <img src="/img/icon-laser-s.png"/>
+                        {mode}
+                    </button> :
+                    ''
+                ),
+                importButton = (
+                    <div className={import_class}>
+                        <lable className="fa fa-plus">{lang.laser.import}</lable>
+                        <input type="file" accept="image/*" multiple/>
+                    </div>
+                ),
+                saveButton = (
+                    true === props.hasImage ?
+                    <button className={export_file_class}>{lang.laser.save}</button> :
+                    ''
+                );
+
+            return (
+                <div className="action-buttons">
+                    {laserButton}
+                    {importButton}
+                    {saveButton}
+                </div>
+            );
+        },
+
         render: function() {
             var props = this.props,
                 lang = props.lang,
-                mode = ('engrave' === props.mode ? lang.laser.start_engrave : lang.laser.start_cut),
                 cx = React.addons.classSet,
-                button_class = cx({
-                    'btn btn-action btn-full-width btn-start': true,
-                    'btn-disabled': false === props.hasImage
-                }),
+                buttons = this._renderButtons(lang),
                 default_material = (
                     this.state.defaultMaterial ||
                     lang.laser.advanced.form.object_options.options.filter(
@@ -115,21 +153,18 @@ define([
                             <button className="btn btn-default btn-full-width" onClick={this._openAdvancedPanel}>{lang.laser.advenced}</button>
                         </div>
                     </div>
-                    <button id="btn-start" className={button_class}>
-                        <img src="/img/icon-laser-s.png"/>
-                        {mode}
-                    </button>
+                    {buttons}
+
                     {advancedPanel}
                 </div>
             );
         },
 
         getDefaultProps: function() {
-            var self = this;
-
             return {
                 settingMaterial: React.PropTypes.object,
-                getSettings: React.PropTypes.func
+                getSettings: React.PropTypes.func,
+                hasImage: React.PropTypes.bool
             };
         },
 
