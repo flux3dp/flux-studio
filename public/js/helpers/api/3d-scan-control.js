@@ -73,6 +73,8 @@ define([
             wait_for_connected_timer,
             image_timer,
             stopGettingImage = function(callback) {
+                callback = callback || function() {};
+
                 var timer = setInterval(function() {
                     if ('undefined' !== typeof image_timer) {
                         clearInterval(image_timer);
@@ -125,7 +127,8 @@ define([
 
                 return {
                     retry: retry,
-                    take_control: takeControl
+                    take_control: takeControl,
+                    stop: stopGettingImage
                 };
             },
             scan: function(resolution, opts) {
@@ -194,7 +197,11 @@ define([
 
                 return {
                     retry: retry,
-                    take_control: takeControl
+                    take_control: takeControl,
+                    stop: function() {
+                        clearInterval(timer);
+                        events.onMessage = function() {};
+                    }
                 };
             }
         };
