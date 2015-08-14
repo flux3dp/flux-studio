@@ -7,6 +7,13 @@
         left: 20px;
         top: 20px;
         width: 182px;
+
+        .action-buttons {
+            .btn {
+                display: block;
+                margin: 0 0 5px 0;
+            }
+        }
     }
 
     .fa::before {
