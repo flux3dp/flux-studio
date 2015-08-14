@@ -29,26 +29,6 @@ define([
                     this._setupSettings = settings;
                 },
 
-                _renderHeader: function() {
-                    var lang = args.state.lang,
-                        cx = React.addons.classSet,
-                        export_file_class = cx({
-                            'btn btn-default fa fa-floppy-o': true,
-                            'hide': false === this.state.hasImage
-                        });
-
-                    return (
-                        <header className="top-menu-bar">
-                            <div className="btn-h-group pull-left">
-                                <div className="btn btn-default file-importer">
-                                    <lable className="fa fa-plus">{lang.laser.import}</lable>
-                                    <input type="file" multiple/>
-                                </div>
-                                <button className={export_file_class}>{lang.laser.save}</button>
-                            </div>
-                        </header>
-                    );
-                },
                 _renderStageSection: function() {
                     var lang = args.state.lang,
                         cx = React.addons.classSet,
@@ -97,7 +77,7 @@ define([
 
                 render: function() {
                     var lang = args.state.lang,
-                        header = this._renderHeader(),
+                        // header = this._renderHeader(),
                         stageSection = this._renderStageSection(),
                         printerSelector = (
                             true === this.state.openPrinterSelectorWindow ?
@@ -113,7 +93,6 @@ define([
 
                     return (
                         <div className="studio-container laser-studio">
-                            {header}
                             {printerSelector}
 
                             <div className="stage">
