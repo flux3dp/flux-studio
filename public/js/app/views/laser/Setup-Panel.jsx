@@ -46,6 +46,10 @@ define([
             this._toggleAdvancedPanel(false)(settings.material);
         },
 
+        _onObjectHeightBlur: function(e) {
+            e.currentTarget.value = parseFloat(e.currentTarget.value) || 0;
+        },
+
         _renderAdvancedPanel: function(lang, default_material) {
             var content = (
                     <AdvancedPanel
@@ -106,6 +110,12 @@ define([
             );
         },
 
+        _renderObjectHeight: function(lang) {
+            return (
+                <input type="number" min="0" max="100" step="0.1" defaultValue="0.3" onBlur={this._onObjectHeightBlur}/>
+            )
+        },
+
         render: function() {
             var props = this.props,
                 lang = props.lang,
@@ -119,7 +129,8 @@ define([
                         }
                     )[0]
                 ),
-                advancedPanel = this._renderAdvancedPanel(lang, default_material);
+                advancedPanel = this._renderAdvancedPanel(lang, default_material),
+                objectHeight = this._renderObjectHeight(lang);
 
             return (
                 <div className="setup-panel operating-panel">
@@ -144,7 +155,7 @@ define([
                             <div className="controls">
                                 <div className="label">{lang.laser.print_params.object_height.text}</div>
                                 <div className="control">
-                                    0.3
+                                    {objectHeight}
                                     <span>{lang.laser.print_params.object_height.unit}</span>
                                 </div>
                             </div>
