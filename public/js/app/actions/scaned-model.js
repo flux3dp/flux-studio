@@ -1,9 +1,11 @@
 define([
+    'jquery',
     'threejs',
     'threeOrbitControls',
     'threeTransformControls',
-    'threeCircularGridHelper'
-], function() {
+    'threeCircularGridHelper',
+    'threeSTLLoader'
+], function($) {
     'use strict';
 
     var THREE = window.THREE || {},
@@ -13,7 +15,7 @@ define([
             diameter: 170,
             radius: 850,
             height: 1800,
-            step: 15,
+            step: 10,
             upVector: new THREE.Vector3(0, 0, 1),
             color:  0x777777,
             opacity: 0.2,
@@ -22,40 +24,71 @@ define([
             textPosition: 'center'
         };
 
+    function destroy() {
+        camera = scene = renderer = controls = cylinder = undefined;
+    }
+
     function init() {
         container = document.getElementById('model-displayer');
+        $(container).find('canvas').show();
 
-        scene = new THREE.Scene();
+        if ('undefined' === typeof scene) {
+            scene = new THREE.Scene();
 
-        camera = new THREE.PerspectiveCamera( 70, container.offsetWidth / container.offsetHeight, 1, 300000 );
-        camera.up = new THREE.Vector3(0, 0, 1);
-        camera.position.set(100, 100, 120);
-        camera.lookAt( new THREE.Vector3( -5, -5, 0 ) );
+            camera = new THREE.PerspectiveCamera( 70, container.offsetWidth / container.offsetHeight, 1, 300000 );
+            camera.up = new THREE.Vector3(0, 0, 1);
+            camera.position.set(100, 100, 120);
+            camera.lookAt( new THREE.Vector3( -5, -5, 0 ) );
 
-        scene.add(camera);
+            scene.add(camera);
 
-        // add circular grid helper
-        addCircularGridHelper();
+            // add circular grid helper
+            addCircularGridHelper();
 
-        // add light
-        addLights();
+            // add light
+            addLights();
 
-        renderer = new THREE.WebGLRenderer({
-            antialias: false
-        });
-        renderer.setClearColor( 0xE0E0E0, 1 );
-        renderer.setPixelRatio(window.devicePixelRatio);
-        renderer.setSize(container.offsetWidth, container.offsetHeight);
-        container.appendChild(renderer.domElement);
+            renderer = new THREE.WebGLRenderer({
+                antialias: false
+            });
+            renderer.setClearColor( 0xE0E0E0, 1 );
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.setSize(container.offsetWidth, container.offsetHeight);
+            container.appendChild(renderer.domElement);
 
-        window.addEventListener('resize', onWindowResize, false);
+            window.addEventListener('resize', onWindowResize, false);
 
-        render();
+            render();
+        }
 
         return {
             scene: scene,
             camera: camera
         }
+    }
+
+    function loadStl(blob, callback) {
+        callback = callback || function() {};
+
+        var loader = new THREE.STLLoader(),
+            url = window.URL,
+            objectUrl = url.createObjectURL(blob);
+
+        loader.load(objectUrl, function(geometry) {
+
+            var material = new THREE.MeshPhongMaterial({
+                    color: 0x333333,
+                    specular: 0x111111,
+                    shininess: 100
+                }),
+                mesh = new THREE.Mesh(geometry, material);
+
+            mesh.up = new THREE.Vector3(0,0,1);
+
+            addMesh(mesh);
+            callback();
+            render();
+        });
     }
 
     function addCircularGridHelper() {
@@ -143,8 +176,8 @@ define([
             scene.remove(mesh.transform_control);
         }
 
-        render();
         scene.remove(mesh);
+        render();
     }
 
     function addMesh(mesh) {
@@ -278,6 +311,7 @@ define([
 
     return {
         init: init,
+        destroy: destroy,
         appendModel: appendModel,
         updateMesh: updateMesh,
         cylinder: {
@@ -287,6 +321,7 @@ define([
         remove: removeMesh,
         add: addMesh,
         attachControl: attachControl,
-        update: render
+        update: render,
+        loadStl: loadStl
     };
 });
