@@ -5,24 +5,141 @@ define([
     'use strict';
 
     return React.createClass({
-        getDefaultProps: function() {
-            return {
-                onScanClick: React.PropTypes.func,
-                enabledScanButton: React.PropTypes.bool
-            };
-        },
+        // UI events
         _onScanClick: function (e) {
             this.props.onScanClick(e, this.refs);
         },
+
+        _onCancelClick: function (e) {
+            this.props.onCancelClick(e);
+        },
+
+        _onSaveClick: function (e) {
+            this.props.onSaveClick(e);
+        },
+
+        _onConvertClick: function (e) {
+            this.props.onConvertClick(e);
+        },
+
+        _onScanAgainClick: function (e) {
+            console.log('again');
+            this.props.onScanAgainClick(e);
+        },
+
+        _getButtonsConfig: function(lang) {
+            var self = this,
+                props = self.props,
+                cx = React.addons.classSet,
+                basicStyle = {
+                    'btn': true,
+                    'btn-action': true,
+                    'btn-full-width': true,
+                    'fa': true
+                },
+                buttons = [
+                    // scan | multiscan
+                    {
+                        label: (
+                            0 < props.scanTimes
+                            ? lang.scan.start_multiscan
+                            : lang.scan.start_scan
+                        ),
+                        eventHandler: self._onScanClick,
+                        basicStyle: JSON.parse(JSON.stringify(basicStyle)),
+                        specificStyle: {
+                            'fa-bullseye': true,
+                            // limits 2 times
+                            'btn-disabled': 2 === props.scanTimes || true === props.disabledScanButton
+                        },
+                        display: true === props.showScanButton
+                    },
+                    // cancel scan
+                    {
+                        label: lang.scan.cancel_scan,
+                        eventHandler: self._onCancelClick,
+                        basicStyle: JSON.parse(JSON.stringify(basicStyle)),
+                        specificStyle: {
+                            'fa-stop': true,
+                            'btn-disabled': false
+                        },
+                        display: false === props.showScanButton
+                    },
+                    // convert
+                    {
+                        label: lang.scan.convert_to_stl,
+                        eventHandler: self._onConvertClick,
+                        basicStyle: JSON.parse(JSON.stringify(basicStyle)),
+                        specificStyle: {
+                            'fa-bullseye': true,
+                            'btn-disabled': true === props.isScanStarted || true === props.disabledConvertButton
+                        },
+                        display: 0 < props.scanTimes
+                    },
+                    // save (export)
+                    {
+                        label: lang.scan.do_save,
+                        eventHandler: self._onSaveClick,
+                        basicStyle: JSON.parse(JSON.stringify(basicStyle)),
+                        specificStyle: {
+                            'fa-bullseye': true,
+                            'btn-disabled': true === props.isScanStarted
+                        },
+                        display: 0 < props.scanTimes
+                    },
+                    // scan again
+                    {
+                        label: lang.scan.scan_again,
+                        eventHandler: self._onScanAgainClick,
+                        basicStyle: JSON.parse(JSON.stringify(basicStyle)),
+                        specificStyle: {
+                            'fa-bullseye': true,
+                            'btn-disabled': true === props.isScanStarted
+                        },
+                        display: 0 < props.scanTimes
+                    }
+                ];
+
+            return buttons.map(function(button) {
+                var styles = button.basicStyle;
+
+                for (var key in button.specificStyle) {
+                    styles[key] = button.specificStyle[key];
+                }
+
+                styles = cx(styles);
+
+                if (true === button.display) {
+                    return (
+                        <button onClick={button.eventHandler} className={styles}>
+                            {button.label}
+                        </button>
+                    );
+                }
+                else {
+                    return '';
+                }
+
+            });
+        },
+
+        _renderButtons: function(lang) {
+            var props = this.props,
+                buttons = this._getButtonsConfig(lang);
+
+            return (
+                <div className="action-buttons">
+                    {buttons}
+                </div>
+            );
+        },
+
         render: function() {
             var props = this.props,
                 start_scan_text,
                 cx = React.addons.classSet,
                 lang = props.lang,
-                button_class = cx({
-                    'btn btn-action span12 fa fa-bullseye': true,
-                    'btn-disabled': props.enabledScanButton
-                });
+                buttons = this._renderButtons(lang);
 
             return (
                 <div className="setup-panel operating-panel">
@@ -58,11 +175,25 @@ define([
                             </div>
                         </div>
                     </div>
-                    <button id="btn-scan" onClick={this._onScanClick} className={button_class}>
-                        {lang.scan.start_scan_text}
-                    </button>
+
+                    {buttons}
                 </div>
             );
+        },
+
+        getDefaultProps: function() {
+            return {
+                onScanClick: React.PropTypes.func,
+                onCancelClick: React.PropTypes.func,
+                onSaveClick: React.PropTypes.func,
+                onConvertClick: React.PropTypes.func,
+                onScanAgainClick: React.PropTypes.func,
+                scanTimes: React.PropTypes.number,
+                isScanStarted: React.PropTypes.bool,
+                showScanButton: React.PropTypes.bool,
+                disabledScanButton: React.PropTypes.bool,
+                disabledConvertButton: React.PropTypes.bool
+            };
         }
 
     });
