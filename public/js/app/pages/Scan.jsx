@@ -587,7 +587,7 @@ define([
                         };
 
                     return (
-                        <Modal content={content} disabledEscapeOnBackground={true} onClose={onClose}/>
+                        <Modal content={content} className={className} disabledEscapeOnBackground={true} onClose={onClose}/>
                     );
                 },
 
