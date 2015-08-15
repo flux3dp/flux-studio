@@ -25,13 +25,10 @@ define([
 
                     switch (data.status) {
                     case 'error':
-                        is_ready = false;
-                        is_error = true;
-                        opts.onError(data);
-                        break;
                     case 'fatal':
                         is_ready = false;
                         is_error = true;
+                        opts.onError(data);
                         break;
                     case 'ready':
                         is_ready = true;
@@ -49,8 +46,8 @@ define([
                         events.onMessage(data);
                     }
                 },
-                onClose: function() {
-                    opts.onClose();
+                onClose: function(result) {
+                    opts.onError(result);
                 },
                 onOpen: opts.onStarting
             }),
