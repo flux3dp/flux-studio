@@ -2490,7 +2490,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         letter-spacing: 0.3px;
         width: 100%; }
     .studio-container .stage {
-        height: calc(100% - 66px);
+        height: 100%;
         position: relative; }
     .studio-container .btn-default {
         border-radius: 5px; }
@@ -2579,7 +2579,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
 .btn-disabled {
     pointer-events: none;
     position: relative; }
-    .btn-disabled::before {
+    .btn-disabled::after {
         background: rgba(255, 255, 255, 0.5);
         content: "";
         display: block;
@@ -2590,7 +2590,8 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         width: 100%; }
 
 .btn-warning {
-    background: #f00; }
+    background: #f00;
+    border-radius: 5px; }
 
 .btn-link {
     color: #000;
@@ -2682,6 +2683,12 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         top: 0;
         z-index: -1; }
 
+.modal-alert {
+    background: #FFF;
+    border-radius: 5px;
+    padding: 5px 20px;
+    text-align: center; }
+
 /**
  * the view of printer selector
  */
@@ -2731,7 +2738,14 @@ input[type=range]:focus::-webkit-slider-runnable-track {
     padding: 0;
     position: relative;
     width: 66px; }
-    .side-bar .brand-name {
+    .side-bar .menu-item {
+        cursor: pointer; }
+        .side-bar .menu-item img {
+            display: block;
+            margin: 0; }
+        .side-bar .menu-item:hover {
+            background-color: rgba(255, 255, 255, 0.5); }
+    .side-bar .item {
         display: -webkit-box;
         /* OLD - iOS 6-, Safari 3.1-6 */
         display: -webkit-flex;
@@ -2742,28 +2756,22 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         color: #fff;
         height: 66px;
         align-items: center;
-        justify-content: center; }
-        .side-bar .brand-name img {
-            margin: 0; }
-    .side-bar .side-bar-item {
-        cursor: pointer;
+        flex-direction: column;
+        justify-content: center;
         height: 66px;
         text-align: center;
         width: 100%; }
-        .side-bar .side-bar-item:hover {
-            background-color: rgba(255, 255, 255, 0.5); }
-    .side-bar .side-bar-item p {
-        color: #FFF;
-        display: block;
-        font-size: 12px;
-        font-weight: lighter;
-        letter-spacing: .3px;
-        margin: 0;
-        text-decoration: none; }
-    .side-bar .side-bar-item img {
-        height: 34px;
-        margin-top: 8px;
-        width: 34px; }
+        .side-bar .item p {
+            color: #FFF;
+            display: block;
+            font-size: 12px;
+            font-weight: lighter;
+            letter-spacing: .3px;
+            margin: 0;
+            text-decoration: none; }
+        .side-bar .item img {
+            height: 34px;
+            width: 34px; }
     .side-bar .active {
         box-shadow: 5px 0px 0px 0px #A00 inset; }
 
@@ -4106,6 +4114,9 @@ input.switch:checked ~ label:after {
     left: 20px;
     top: 20px;
     width: 182px; }
+    .laser-studio .operating-panel .action-buttons .btn {
+        display: block;
+        margin: 0 0 5px 0; }
 
 .laser-studio .fa::before {
     margin: 0 5px 0 0; }
@@ -4248,6 +4259,9 @@ input.switch:checked ~ label:after {
 .scan-studio .setup-panel {
     left: 20px;
     width: 182px; }
+    .scan-studio .setup-panel .action-buttons .btn {
+        display: block;
+        margin: 0 0 5px 0; }
 
 .scan-studio .starting-section {
     height: 100%;
@@ -4255,11 +4269,6 @@ input.switch:checked ~ label:after {
 
 .scan-studio .starting-section {
     position: relative; }
-
-.scan-studio .launch-img {
-    display: block;
-    height: 193px;
-    width: 280px; }
 
 .scan-studio .operating-section {
     height: 100%;
@@ -4271,12 +4280,11 @@ input.switch:checked ~ label:after {
     border-radius: 5px;
     bottom: 10px;
     height: 150px;
-    left: 0;
+    left: 15px;
     margin: auto;
     padding: 10px;
     position: absolute;
-    right: 0;
-    width: 60%; }
+    width: 40%; }
     .scan-studio .scan-progress .progress {
         height: 20px; }
     .scan-studio .scan-progress .progress-bar {
@@ -4286,6 +4294,15 @@ input.switch:checked ~ label:after {
         background-size: 40px 40px;
         height: 100%;
         -webkit-background-size: 40px 40px; }
+    .scan-studio .scan-progress .progress-status {
+        display: -webkit-box;
+        /* OLD - iOS 6-, Safari 3.1-6 */
+        display: -webkit-flex;
+        /* NEW - Chrome */
+        display: flex;
+        /* NEW, Spec - Opera 12.1, Firefox 20+ */ }
+        .scan-studio .scan-progress .progress-status span {
+            flex: 1; }
 
 .scan-studio .scan-model-save-as {
     background: #eee;
@@ -4297,3 +4314,6 @@ input.switch:checked ~ label:after {
         margin: 0 0 10px 0; }
         .scan-studio .scan-model-save-as .file-formats label {
             float: left; }
+
+.scan-studio .modal-printer-selecter {
+    position: static; }
