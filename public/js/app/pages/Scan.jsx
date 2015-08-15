@@ -2,6 +2,7 @@ define([
     'jquery',
     'react',
     'jsx!widgets/Modal',
+    'jsx!widgets/Alert',
     'app/actions/scaned-model',
     'helpers/api/3d-scan-control',
     'helpers/api/3d-scan-modeling',
@@ -17,6 +18,7 @@ define([
     $,
     React,
     Modal,
+    Alert,
     scanedModel,
     scanControl,
     scanModeling,
@@ -41,17 +43,15 @@ define([
                     this.setState(this.getInitialState());
                 },
 
-                _saveAs: function(e) {
-                    this.setState({
-                        openExportWindow: true
-                    });
-                },
-
                 _refreshCamera: function() {
                     var self = this;
 
+                    self.setState({
+                        showCamera: true
+                    });
+
                     self.setProps.call(self, {
-                        scan_modeling_image_method: self.props.scan_ctrl_websocket.getImage(
+                        scanControlImageMethods: self.props.scanCtrlWebSocket.getImage(
                             function(image_blobs, mime_type) {
                                 var blob = new Blob(image_blobs, {type: mime_type}),
                                     url = (window.URL || window.webkitURL),
@@ -109,24 +109,83 @@ define([
                     else {
                         mesh.model = scanedModel.updateMesh(mesh.model, views);
                     }
+                },
 
-                    // TODO: clear it
-                    window.meshes = self.props.meshes;
+                _onConvert: function(e) {
+                    var self = this,
+                        last_point_cloud = self.props.scanModelingWebSocket.History.getLatest(),
+                        file_format = 'stl',
+                        onClose = function(e) {
+                            self.props.meshes.forEach(function(mesh, e) {
+                                scanedModel.remove(mesh.model);
+                            });
+                            self.setProps({
+                                meshes: [],
+                                saveFileType: 'stl'
+                            });
+                            self.setState({
+                                openBlocker: false,
+                                meshIndex: -1,
+                                disabledConvertButton: true,
+                                disabledScanButton: true
+                            });
+                        };
+
+                    self.setState({
+                        openBlocker: true
+                    });
+
+                    self.props.scanModelingWebSocket.export(
+                        last_point_cloud.name,
+                        file_format,
+                        {
+                            onFinished: function(blob) {
+                                scanedModel.loadStl(blob, onClose);
+                            }
+                        }
+                    );
+                },
+
+                _onSave: function(e) {
+                    var self = this,
+                        doExport = function() {
+                            var last_point_cloud = self.props.scanModelingWebSocket.History.getLatest(),
+                                file_format = self.props.saveFileType,
+                                file_name = (new Date()).getTime() + '.' + file_format;
+
+                            self.setState({
+                                openBlocker: true
+                            });
+
+                            self.props.scanModelingWebSocket.export(
+                                last_point_cloud.name,
+                                file_format,
+                                {
+                                    onFinished: function(blob) {
+                                        saveAs(blob, file_name);
+                                        onClose();
+                                    }
+                                }
+                            );
+                        },
+                        onClose = function(e) {
+                            self.setState({
+                                openBlocker: false
+                            });
+                        };
+
+                    doExport();
                 },
 
                 _handleScan: function(e, refs) {
                     var self = this,
-
+                        mesh = self._getMesh(self.state.meshIndex),
                         onScanFinished = function(point_cloud) {
                             var upload_name = 'scan-' + (new Date()).getTime(),
                                 onUploadFinished = function() {
-                                    var mesh = self._getMesh(self.state.meshIndex);
+                                    mesh = self._getMesh(self.state.meshIndex);
 
                                     if (0 < self.state.scanTimes) {
-                                        // self.props.meshes[0].model.visible = false;
-                                        self.props.meshes[0].model.material.opacity = 0.1;
-                                        self.props.meshes[0].model.material.transparent = true;
-
                                         self.setState({
                                             enableMerge: true
                                         });
@@ -137,11 +196,13 @@ define([
                                     // update scan times
                                     self.setState({
                                         scanTimes: self.state.scanTimes + 1,
-                                        openProgressBar: false
+                                        openProgressBar: false,
+                                        isScanStarted: false,
+                                        showScanButton: true
                                     });
                                 };
 
-                            self.props.scan_modeling_websocket.upload(
+                            self.props.scanModelingWebSocket.upload(
                                 upload_name,
                                 point_cloud,
                                 {
@@ -165,32 +226,40 @@ define([
                                 },
                                 scan_speed = self._getScanSpeed();
 
-                            self.props.scan_ctrl_websocket.scan(scan_speed, opts);
+                            self.setProps({
+                                scanMethods: self.props.scanCtrlWebSocket.scan(scan_speed, opts)
+                            });
                         },
                         stage;
 
-                    self.refs = $.extend(true, {}, self.refs, refs);
-
-                    if (false === self.props.isCanvasExisting) {
-                        stage = scanedModel.init();
-                        self.setProps(stage);
-                    }
+                    stage = scanedModel.init();
+                    self.setProps(stage);
 
                     self.setProps({
-                        isCanvasExisting: true,
                         scanStartTime: (new Date()).getTime()
                     });
 
                     self.setState({
-                        isScanStarted: true
+                        isScanStarted: true,
+                        showScanButton: false,
+                        showCamera: false
                     });
+
+                    if ('undefined' !== typeof mesh) {
+                        mesh.model.material.opacity = 0.5;
+                        mesh.model.material.transparent = true;
+                    }
 
                     openProgressBar(onScan);
                 },
 
+                _onScanAgain: function(e) {
+                    location.hash = '#studio/scan/' + (new Date()).getTime();
+                },
+
                 _doClearNoise: function() {
                     var self = this,
-                        last_point_cloud = self.props.scan_modeling_websocket.History.getLatest(),
+                        last_point_cloud = self.props.scanModelingWebSocket.History.getLatest(),
                         delete_noise_name = 'clear-noise-' + (new Date()).getTime(),
                         onStarting = function(data) {
                             self._openBlocker(true);
@@ -206,7 +275,7 @@ define([
                             self._onRendering(data, len);
                         };
 
-                    self.props.scan_modeling_websocket.delete_noise(
+                    self.props.scanModelingWebSocket.delete_noise(
                         last_point_cloud.name,
                         delete_noise_name,
                         0.3,
@@ -228,7 +297,7 @@ define([
                 _doCropOff: function() {
                     var self = this,
                         mesh = this._getMesh(this.state.meshIndex),
-                        last_point_cloud = self.props.scan_modeling_websocket.History.getLatest(),
+                        last_point_cloud = self.props.scanModelingWebSocket.History.getLatest(),
                         cut_name = 'cut-' + (new Date()).getTime(),
                         cylider_box = new THREE.Box3().setFromObject(self.props.cylinder),
                         opts = {
@@ -251,7 +320,7 @@ define([
 
                     if (window.confirm('Do crop?')) {
 
-                        self.props.scan_modeling_websocket.cut(
+                        self.props.scanModelingWebSocket.cut(
                             last_point_cloud.name,
                             cut_name,
                             args,
@@ -302,7 +371,7 @@ define([
 
                     position.z += box.size().z /2;
 
-                    self.props.scan_modeling_websocket.merge(
+                    self.props.scanModelingWebSocket.merge(
                         meshes[0].name,
                         meshes[1].name,
                         position,
@@ -350,7 +419,7 @@ define([
                             self._openBlocker(true);
                         };
 
-                    self.props.scan_modeling_websocket.autoMerge(
+                    self.props.scanModelingWebSocket.autoMerge(
                         meshes[0].name,
                         meshes[1].name,
                         output_name,
@@ -368,22 +437,62 @@ define([
                     })
                 },
 
+                _onScanCancel: function(e) {
+                    var self = this,
+                        mesh = self._getMesh(self.state.meshIndex);
+
+                    self.props.scanMethods.stop();
+
+                    console.log(self.state.meshIndex);
+                    if (0 === self.state.meshIndex) {
+                        self._refreshCamera();
+
+                        self.setState({
+                            isScanStarted: false
+                        });
+
+                        $('#model-displayer canvas').hide();
+                    }
+
+                    window.meshes = self.props.meshes;
+
+                    if ('undefined' !== typeof mesh) {
+                        scanedModel.remove(mesh.model);
+
+                        self.setProps({
+                            meshes: self.props.meshes.splice(0, self.state.meshIndex)
+                        });
+                    }
+
+                    self.setState({
+                        openProgressBar: false,
+                        meshIndex: self.state.meshIndex - 1,
+                        scanTimes: (0 === self.state.scanTimes ? 0 : self.state.scanTimes),
+                        isScanStarted: false,
+                        showScanButton: true
+                    });
+                },
+
                 // render sections
                 _renderSettingPanel: function() {
-                    var start_scan_text,
+                    var self = this,
+                        start_scan_text,
                         lang = args.state.lang;
-
-                    lang.scan.start_scan_text = (
-                        0 < this.state.scanTimes
-                        ? lang.scan.start_multiscan
-                        : lang.scan.start_scan
-                    );
 
                     return (
                         <SetupPanel
                             lang={lang}
                             onScanClick={this._handleScan}
+                            onCancelClick={this._onScanCancel}
+                            onConvertClick={this._onConvert}
+                            onSaveClick={this._onSave}
+                            onScanAgainClick={this._onScanAgain}
+                            scanTimes={this.state.scanTimes}
                             enableMultiScan={1 < this.state.scanTimes}
+                            isScanStarted={this.state.isScanStarted}
+                            showScanButton={this.state.showScanButton}
+                            disabledScanButton={this.state.disabledScanButton}
+                            disabledConvertButton={this.state.disabledConvertButton}
                         >
                         </SetupPanel>
                     );
@@ -419,7 +528,7 @@ define([
 
                     camera_image_class = cx({
                         'camera-image' : true,
-                        'hide' : true === state.isScanStarted
+                        'hide' : false === state.showCamera
                     });
 
                     return (
@@ -435,47 +544,8 @@ define([
                     );
                 },
 
-                _renderExportWindow: function() {
+                _renderProgressBar: function(lang) {
                     var self = this,
-                        lang = self.state.lang,
-                        onExport = function(e) {
-                            var last_point_cloud = self.props.scan_modeling_websocket.History.getLatest(),
-                                file_format = $('[name="file-format"]:checked').val(),
-                                file_name = (new Date()).getTime() + '.' + file_format;
-
-                            self.setState({
-                                openBlocker: true
-                            });
-
-                            self.props.scan_modeling_websocket.export(
-                                last_point_cloud.name,
-                                file_format,
-                                {
-                                    onFinished: function(blob) {
-                                        saveAs(blob, file_name);
-                                        onClose();
-                                    }
-                                }
-                            );
-                        },
-                        content = (
-                            <Export lang={lang} onExport={onExport}/>
-                        ),
-                        onClose = function(e) {
-                            self.setState({
-                                openExportWindow: false,
-                                openBlocker: false
-                            });
-                        };
-
-                    return (
-                        <Modal content={content} onClose={onClose}/>
-                    );
-                },
-
-                _renderProgressBar: function() {
-                    var self = this,
-                        lang = this.state.lang,
                         content,
                         onClose = function(e) {
                             self.setState({
@@ -517,14 +587,22 @@ define([
                         };
 
                     return (
-                        <Modal content={content} className={className} disabledEscapeOnBackground={true} onClose={onClose}/>
+                        <Modal content={content} disabledEscapeOnBackground={true} onClose={onClose}/>
                     );
                 },
 
-                getDefaultProps: function() {
-                    return {
-                        scanStartTime: null
-                    };
+                _renderAlert: function(lang) {
+                    var self = this,
+                        onClose = function(e) {
+                            self._onScanAgain(e);
+                        },
+                        content = (
+                            <Alert lang={lang} message={self.props.error.reason} handleClose={onClose}/>
+                        );
+
+                    return (
+                        <Modal content={content} disabledEscapeOnBackground={true} onClose={onClose}/>
+                    );
                 },
 
                 getInitialState: function() {
@@ -535,8 +613,8 @@ define([
                         meshIndex: -1,
                         scanTimes: 0,
                         selectedPrinter: undefined,
-                        openExportWindow: false,
                         openPrinterSelectorWindow: true,
+                        openAlert: false,
                         openProgressBar: false,
                         openBlocker: false,
                         progressPercentage: 0,
@@ -544,29 +622,45 @@ define([
                         progressElapsedTime: 0,
                         printerIsReady: false,
                         autoMerge: true,
-                        enableMerge: false
+                        enableMerge: false,
+                        isScanStarted: false,
+                        showScanButton: true,
+                        showCamera: true,
+                        disabledScanButton: false,
+                        disabledConvertButton: false
+                    };
+                },
+
+                getDefaultProps: function () {
+                    return {
+                          scanStartTime: null,
+                          scanMethods: null,
+                          scanCtrlWebSocket: null,
+                          scanModelingWebSocket: null,
+                          meshes: [],
+                          cylinder: null,
+                          saveFileType: 'pcd',
+                          error: {}
                     };
                 },
 
                 componentWillUnmount: function() {
-                    if ('undefined' !== typeof this.props.scan_ctrl_websocket &&
-                        'undefined' !== typeof this.props.scan_modeling_websocket
+                    if ('undefined' !== typeof this.props.scanCtrlWebSocket &&
+                        'undefined' !== typeof this.props.scanModelingWebSocket
                     ) {
-                        this.props.scan_ctrl_websocket.connection.close(false);
-                        this.props.scan_modeling_websocket.connection.close(false);
+                        this.props.scanCtrlWebSocket.connection.close(false);
+                        this.props.scanModelingWebSocket.connection.close(false);
                     }
+
+                    scanedModel.destroy();
                 },
 
                 render : function() {
                     var state = this.state,
-                        exportWindow = (
-                            true === state.openExportWindow ?
-                            this._renderExportWindow() :
-                            ''
-                        ),
+                        lang = state.lang,
                         progressBar = (
                             true === state.openProgressBar ?
-                            this._renderProgressBar() :
+                            this._renderProgressBar(lang) :
                             ''
                         ),
                         printerBlocker = (
@@ -574,8 +668,12 @@ define([
                             <Modal content={<div className="spinner-flip spinner-reverse"/>}/> :
                             ''
                         ),
+                        alert = (
+                            true === state.openAlert ?
+                            this._renderAlert(lang) :
+                            ''
+                        ),
                         cx = React.addons.classSet,
-                        lang = state.lang,
                         activeSection,
                         header;
 
@@ -594,17 +692,24 @@ define([
 
                             </div>
 
-                            {exportWindow}
                             {progressBar}
                             {printerBlocker}
+                            {alert}
                         </div>
                     );
                 },
 
                 componentDidMount: function() {
                     var self = this,
-                        opt = {
+                        opts = {
                             onError: function(data) {
+                                self.setState({
+                                    openAlert: true
+                                })
+                                self._openBlocker(false);
+                                self.setProps({
+                                    error: data
+                                });
                                 console.log('error', data);
                             },
                             onReady: function() {
@@ -672,11 +777,14 @@ define([
 
                         if (true === state.gettingStarted && null !== state.selectedPrinter) {
                             self.setProps({
-                                scan_ctrl_websocket: scanControl(state.selectedPrinter.serial, opt),
-                                scan_modeling_websocket: scanModeling(),
+                                scanStartTime: null,
+                                scanMethods: null,
+                                scanCtrlWebSocket: scanControl(state.selectedPrinter.serial, opts),
+                                scanModelingWebSocket: scanModeling(opts),
                                 meshes: [],
                                 cylinder: undefined,
-                                isCanvasExisting: false
+                                saveFileType: 'pcd',
+                                error: {}
                             });
                             self._refreshCamera();
                             clearInterval(timer);
