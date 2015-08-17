@@ -28,6 +28,16 @@ define([
                     this.props.laserEvents.handleLaser(settings);
                 },
 
+                _onExport: function(settings) {
+                    this.props.laserEvents.export(settings);
+                },
+
+                _openBlocker: function(is_open) {
+                    this.setState({
+                        openBlocker: is_open
+                    })
+                },
+
                 _renderStageSection: function() {
                     var lang = args.state.lang,
                         cx = React.addons.classSet,
@@ -45,6 +55,7 @@ define([
                                 className='operating-panel'
                                 hasImage={this.state.hasImage}
                                 onRunLaser={this._onRunLaser}
+                                onExport={this._onExport}
                                 ref="setupPanel"
                             />
                             <ImagePanel lang={lang} className={image_panel_class}/>
@@ -74,6 +85,14 @@ define([
                     );
                 },
 
+                _renderBlocker: function(lang) {
+                    return (
+                        true === this.state.openBlocker ?
+                        <Modal content={<div className="spinner-flip spinner-reverse"/>}/> :
+                        ''
+                    );
+                },
+
                 render: function() {
                     var lang = args.state.lang,
                         stageSection = this._renderStageSection(),
@@ -81,7 +100,8 @@ define([
                             true === this.state.openPrinterSelectorWindow ?
                             this._renderPrinterSelectorWindow(lang) :
                             ''
-                        );
+                        ),
+                        blocker = this._renderBlocker(lang);
 
                     return (
                         <div className="studio-container laser-studio">
@@ -90,6 +110,8 @@ define([
                             <div className="stage">
                                 {stageSection}
                             </div>
+
+                            {blocker}
                         </div>
                     );
                 },
@@ -100,7 +122,8 @@ define([
                         mode: 'engrave',
                         hasImage: false,
                         selectedPrinter: 0,
-                        openPrinterSelectorWindow: false
+                        openPrinterSelectorWindow: false,
+                        openBlocker: false
                     };
                 },
 
