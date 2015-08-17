@@ -45,7 +45,8 @@
 }
 
 .settings .nav li.nav-item {
-    width: 165px;
+    // width: 165px; -- hiding flux cloud
+    width: 50%;
     height: 47px;
     line-height: 47px;
     display: inline;

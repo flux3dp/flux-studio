@@ -88,9 +88,12 @@ define([
                             <li className={generalClass}>
                                 <a href="#studio/settings/general">{lang.settings.tabs.general}</a>
                             </li>
-                            <li className={fluxCloudClass}>
-                                <a href="#studio/settings/flux-cloud">{lang.settings.tabs.flux_cloud}</a>
-                            </li>
+                            {
+                                /* turn off temporary, do not remove
+                                <li className={fluxCloudClass}>
+                                    <a href="#studio/settings/flux-cloud">{lang.settings.tabs.flux_cloud}</a>
+                                </li>*/
+                            }
                             <li className={printerClass}>
                                 <a href="#studio/settings/printer">{lang.settings.tabs.printer}</a>
                             </li>

@@ -34,15 +34,17 @@ define([
             $('.y-axis').knob(React.addons.update(setup, {$merge:{change: function(v) { thisModule._handleYChange(v); }}}));
             $('.z-axis').knob(React.addons.update(setup, {$merge:{change: function(v) { thisModule._handleZChange(v); }}}));
 
+
+            this._updateDial();
+        },
+        componentDidUpdate: function(prevProp, prevState) {
+            this._updateDial();
+        },
+        _updateDial: function() {
             $('.x-axis').val(this.props.selected.rotation.enteredX);
             $('.y-axis').val(this.props.selected.rotation.enteredY);
             $('.z-axis').val(this.props.selected.rotation.enteredZ);
-            this._updateDialPosition();
-        },
-        componentDidUpdate: function(prevProp, prevState) {
-            this._updateDialPosition();
-        },
-        _updateDialPosition: function() {
+
             $('.x-axis').trigger('change');
             $('.y-axis').trigger('change');
             $('.z-axis').trigger('change');

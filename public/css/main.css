@@ -2527,7 +2527,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         letter-spacing: 0.3px;
         width: 100%; }
     .studio-container .stage {
-        height: calc(100% - 66px);
+        height: 100%;
         position: relative; }
     .studio-container .btn-default {
         border-radius: 5px; }
@@ -2858,12 +2858,13 @@ input[type=range]:focus::-webkit-slider-runnable-track {
 
 .print-studio .model-displayer {
     background: #000;
-    height: calc(100% - 66px);
+    height: 100%;
     width: 100%; }
 
 .operating-panel {
     position: absolute;
-    width: 100%; }
+    width: 100%;
+    right: 0px; }
 
 .operating-panel .panel {
     float: right; }
@@ -2908,7 +2909,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
 .operating-panel .operation.command {
     position: absolute;
     top: 200px;
-    right: 50px; }
+    right: 20px; }
 
 .operating-panel .operation.command > div {
     background-color: #FFF;
@@ -3017,7 +3018,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
     background-color: #FFF;
     border-radius: 3px; }
 
-.print-studio .setup-panel .btn-print {
+.print-studio .setup-panel .action {
     width: 100%;
     background-color: #FFF;
     border-radius: 3px;
@@ -3026,7 +3027,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
     color: #FFF;
     margin-top: 10px; }
 
-.print-studio .setup-panel .btn-print:hover {
+.print-studio .setup-panel .action:hover {
     background-color: #33D375; }
 
 .print-studio .setup-panel .main .time {
@@ -3167,7 +3168,7 @@ input.switch:checked ~ label:after {
 .print-studio .control-bottom {
     position: absolute;
     bottom: 40px;
-    width: 100%; }
+    width: calc(100% - 66px); }
 
 .print-studio .control-bottom > div {
     position: relative;
@@ -3493,7 +3494,7 @@ input.switch:checked ~ label:after {
     text-align: center; }
 
 .settings .nav li.nav-item {
-    width: 165px;
+    width: 50%;
     height: 47px;
     line-height: 47px;
     display: inline;

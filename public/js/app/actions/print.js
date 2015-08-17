@@ -5,6 +5,7 @@ define([
     'helpers/websocket',
     'helpers/api/3d-print-slicing',
     'threeOrbitControls',
+    'threeTransformControls',
     'threeSTLLoader',
     'threeCircularGridHelper',
     'plugins/file-saver/file-saver.min'
@@ -16,7 +17,7 @@ define([
         container, printController;
 
     var camera, scene, renderer;
-    var control, controls, reactSrc;
+    var control, controls, transformControl, reactSrc;
 
     var objects = [],
         referenceMeshes = [];
@@ -28,13 +29,14 @@ define([
     var movingOffsetX, movingOffsetY;
 
     var responseMessage, responseBlob,
-        blobExpired = true;
+        blobExpired = true,
+        transformMode = false;
 
     var s = {
-        diameter: 1700,
-        radius: 850,
-        height: 1800,
-        step: 100,
+        diameter: 170,
+        radius: 85,
+        height: 180,
+        step: 10,
         upVector: new THREE.Vector3(0, 0, 1),
         color:  0x777777,
         opacity: 0.2,
@@ -44,7 +46,9 @@ define([
         colorOutside: 0xFF0000,
         colorSelected: 0xFFFF00,
         colorUnselected: 0x333333,
-        offsetRatio: 0.1
+        offsetRatio: 0.1,
+        degreeStep: 5,
+        scalePrecision: 1 // in decimal, 1 = up to 0.1, 2 = 0.01
     };
 
     function init(src) {
@@ -53,7 +57,7 @@ define([
         container = document.getElementById('model-displayer');
 
         camera = new THREE.PerspectiveCamera( 60, (container.offsetWidth) / container.offsetHeight, 1, 30000 );
-        camera.position.set(1000, 1000, 1000);
+        camera.position.set(100, 100, 100);
         camera.up = new THREE.Vector3(0,0,1);
 
         scene = new THREE.Scene();
@@ -71,7 +75,7 @@ define([
         );
         scene.add(circularGridHelper);
 
-        var geometry = new THREE.CircleGeometry( 850, 80 );
+        var geometry = new THREE.CircleGeometry( s.radius, 80 );
         var material = new THREE.MeshBasicMaterial( { color: 0xCCCCCC, transparent: true } );
         myMesh = new THREE.Mesh( geometry, material );
         myMesh.up = new THREE.Vector3(0,0,1);
@@ -84,6 +88,8 @@ define([
 
         addShadowedLight(1, 1, 1, 0xffffff, 1.35);
         addShadowedLight(0.5, 1, -1, 0xffaa00, 1);
+        addShadowedLight(-1, -1, -1, 0xffffff, 1.35);
+        addShadowedLight(-0.5, -1, 1, 0xffaa00, 1);
 
         // renderer
         renderer = new THREE.WebGLRenderer({
@@ -95,15 +101,23 @@ define([
         renderer.sortObjects = false;
         container.appendChild(renderer.domElement);
 
-        control = new THREE.OrbitControls( camera, renderer.domElement );
+        control = new THREE.OrbitControls(camera, renderer.domElement);
         control.maxPolarAngle = Math.PI/2;
         control.noKeys = true;
-        control.addEventListener( 'change', render );
+        control.addEventListener('change', render);
+
+        transformControl = new THREE.TransformControls(camera, renderer.domElement);
+        transformControl.addEventListener('change', render);
+        transformControl.addEventListener('mouseDown', transform);
+        transformControl.addEventListener('mouseUp', transform);
+        transformControl.addEventListener('objectChange', transform);
+
+
 
         window.addEventListener('resize', onWindowResize, false);
-        renderer.domElement.addEventListener( 'mousemove', onMouseMove, false );
+        renderer.domElement.addEventListener('mousemove', onMouseMove, false);
         renderer.domElement.addEventListener('mousedown', onMouseDown, false);
-        renderer.domElement.addEventListener( 'mouseup', onMouseUp, false );
+        renderer.domElement.addEventListener('mouseup', onMouseUp, false);
 
         renderer.setSize(container.offsetWidth, container.offsetHeight);
 
@@ -167,6 +181,7 @@ define([
             /* end customized property */
 
             mesh.geometry = new THREE.Geometry().fromBufferGeometry(mesh.geometry);
+            mesh.name = 'custom';
 
             selectObject(mesh);
             alignCenter();
@@ -175,16 +190,17 @@ define([
             objects.push(mesh);
 
             render();
-        });
+    });
     }
 
     function onMouseDown(e) {
         e.preventDefault();
         adjustMousePosition(e);
+
         raycaster.setFromCamera( mouse, camera );
         var intersects = raycaster.intersectObjects( objects );
         var location = getReferenceIntersectLocation(e);
-
+        // console.log('found',intersects.length);
         if (intersects.length > 0) {
             var target = intersects[0].object;
             selectObject(target);
@@ -197,7 +213,13 @@ define([
             movingOffsetY = location ? location.y - target.position.y : target.position.y;
         }
         else {
-            selectObject(null);
+            if(!transformMode) {
+                selectObject(null);
+                removeFromScene('TransformControl');
+                transformControl.detach(SELECTED);
+                transformMode = false;
+                render();
+            }
         }
 
         render();
@@ -209,7 +231,13 @@ define([
         mouseDown = false;
         container.style.cursor = 'auto';
         checkOutOfBounds(SELECTED);
-        updateBoundingBoxFromScene();
+        updateFromScene('BoundingBoxHelper');
+        updateFromScene('TransformControl');
+
+        if(transformMode) {
+            selectObject(transformControl.object);
+        }
+
         render();
     }
 
@@ -218,11 +246,12 @@ define([
         adjustMousePosition(e);
 
         var location = getReferenceIntersectLocation(e);
-        if(SELECTED && mouseDown)
+        if(SELECTED && mouseDown && !transformMode)
         {
             if(SELECTED.position && location) {
                 SELECTED.position.x = location.x - movingOffsetX;
                 SELECTED.position.y = location.y - movingOffsetY;
+                blobExpired = true;
                 render();
                 return;
             }
@@ -259,15 +288,30 @@ define([
     function selectObject(obj) {
         SELECTED = obj || {};
 
-        removeBoundingBoxFromScene();
+        removeFromScene('BoundingBoxHelper');
+        removeFromScene('TransformControl');
 
         if(!$.isEmptyObject(obj)) {
             boundingBox = new THREE.BoundingBoxHelper( obj, s.colorSelected );
             boundingBox.name = "BoundingBoxHelper";
             boundingBox.update();
+
+            transformControl.attach(obj);
+            transformControl.name = 'TransformControl';
+
+            // if(!transformMode) {
+            //     scene.add(boundingBox);
+            // }
+
             scene.add(boundingBox);
         }
+        else {
+            transformMode = false;
+            // removeFromScene('TransformControl');
+            // render();
+        }
         reactSrc.setState({ modelSelected: SELECTED.uuid ? SELECTED : null });
+
         render();
     }
 
@@ -339,8 +383,8 @@ define([
 
         var directionalLight = new THREE.DirectionalLight(color, intensity);
         directionalLight.position.set(x, y, z);
-        scene.add(directionalLight);
 
+        scene.add(directionalLight);
         directionalLight.castShadow = true;
 
         var d = 1;
@@ -358,11 +402,45 @@ define([
         directionalLight.shadowBias = -0.005;
         directionalLight.shadowDarkness = 0.15;
 
+        directionalLight.shadowCameraVisible = true;
+
     }
 
-    function render() {
+    function render(e) {
         renderer.render(scene, camera);
-        blobExpired = true;
+    }
+
+    function transform(e) {
+        switch(e.type) {
+            case 'mouseDown':
+                transformMode = true;
+                break;
+            case 'mouseUp':
+                transformMode = false;
+                // d = degree, s = scale
+                var _dx = updateDegreeWithStep(radianToDegree(SELECTED.rotation.x)),
+                    _dy = updateDegreeWithStep(radianToDegree(SELECTED.rotation.y)),
+                    _dz = updateDegreeWithStep(radianToDegree(SELECTED.rotation.z)),
+                    _sx = updateScaleWithStep(SELECTED.scale.x),
+                    _sy = updateScaleWithStep(SELECTED.scale.y),
+                    _sz = updateScaleWithStep(SELECTED.scale.z);
+                    // console.log(SELECTED.scale.x, SELECTED.scale.y, SELECTED.scale.z);
+                _dx = _dx >= 0 ? _dx : (360 - Math.abs(_dx));
+                _dy = _dy >= 0 ? _dy : (360 - Math.abs(_dy));
+                _dz = _dz >= 0 ? _dz : (360 - Math.abs(_dz));
+                rotate(_dx, _dy, _dz, false);
+                setScale(_sx, _sy, _sz, false, false);
+                render();
+                groundIt(SELECTED);
+                break;
+            case 'objectChange':
+                // console.log(updateScaleWithStep(SELECTED.scale.x), SELECTED.scale.x);
+
+                // console.log('hi');
+                break;
+        }
+        // transformMode = e.type === 'mouseDown';
+        // console.log(e);
     }
 
     // events
@@ -373,26 +451,24 @@ define([
         render();
     }
 
-    function rotate(x, y, z) {
+    function rotate(x, y, z, render) {
         SELECTED.rotation.enteredX = x;
         SELECTED.rotation.enteredY = y;
         SELECTED.rotation.enteredZ = z;
         SELECTED.rotation.x = degreeToRadian(x);
         SELECTED.rotation.y = degreeToRadian(y);
         SELECTED.rotation.z = degreeToRadian(z);
+
         reactSrc.setState({ modelSelected: SELECTED.uuid ? SELECTED : null });
-
-        // align to ground
-        var reference = getReferenceDistance(SELECTED);
-        SELECTED.position.z -= reference.z;
-
-        updateBoundingBoxFromScene();
-        checkOutOfBounds(SELECTED);
-
-        render();
+        if(render) {
+            groundIt(SELECTED);
+            updateFromScene('BoundingBoxHelper');
+            checkOutOfBounds(SELECTED);
+            // render();
+        }
     }
 
-    function setScale(x, y, z, locked) {
+    function setScale(x, y, z, locked, alignCenter) {
         var originalScaleX = SELECTED.scale._x;
         var originalScaleY = SELECTED.scale._y;
         var originalScaleZ = SELECTED.scale._z;
@@ -410,7 +486,9 @@ define([
         SELECTED.scale.locked = locked;
         reactSrc.setState({ modelSelected: SELECTED.uuid ? SELECTED : null });
 
-        alignCenter();
+        if(alignCenter) {
+            alignCenter();
+        }
     }
 
     function alignCenter() {
@@ -419,11 +497,18 @@ define([
             SELECTED.position.x -= reference.x;
             SELECTED.position.y -= reference.y;
             SELECTED.position.z -= reference.z;
+            blobExpired = true;
 
             checkOutOfBounds(SELECTED);
-            updateBoundingBoxFromScene();
+            updateFromScene('BoundingBoxHelper');
             render();
         }
+    }
+
+    function groundIt(mesh) {
+        var reference = getReferenceDistance(mesh);
+        mesh.position.z -= reference.z;
+        blobExpired = true;
     }
 
     function removeSelected() {
@@ -440,7 +525,8 @@ define([
                 console.log('delete result: ', result);
             });
 
-            removeBoundingBoxFromScene();
+            transformControl.detach(SELECTED);
+            removeFromScene('BoundingBoxHelper');
             render();
         }
     }
@@ -469,6 +555,23 @@ define([
 
     function degreeToRadian(degree) {
         return (degree / 360 * Math.PI * 2) || 0;
+    }
+
+    function radianToDegree(radian) {
+        return radian * 180 / Math.PI;
+    }
+
+    function updateDegreeWithStep(degree) {
+        if(degree === 0) {return 0;}
+        return (parseInt(degree / s.degreeStep) + 1) * s.degreeStep;
+    }
+
+    function updateScaleWithStep(scale) {
+        // if no decimal after scale precision, ex: 1.1, not 1.143
+        if(parseInt(scale * Math.pow(10, s.scalePrecision)) == scale * Math.pow(10, s.scalePrecision)) {
+            return scale;
+        }
+        return (parseInt(scale * Math.pow(10, s.scalePrecision)) + 1) / Math.pow(10, s.scalePrecision);
     }
 
     function getFileByteArray(filePath) {
@@ -554,31 +657,52 @@ define([
         });
     }
 
-    function removeBoundingBoxFromScene() {
+    function removeFromScene(name) {
         for(var i = scene.children.length - 1; i >= 0; i--) {
-            if(scene.children[i].name === 'BoundingBoxHelper') {
+            if(scene.children[i].name === name) {
                 scene.children.splice(i, 1);
             }
         }
     }
 
-    function updateBoundingBoxFromScene() {
+    function updateFromScene(name) {
         for(var i = scene.children.length - 1; i >= 0; i--) {
-            if(scene.children[i].name === 'BoundingBoxHelper') {
+            if(scene.children[i].name === name) {
                 scene.children[i].update();
             }
         }
     }
 
     function getSelectedObjectSize() {
-        if(scene)
-        {
-            for(var i = scene.children.length - 1; i >= 0; i--) {
-                if(scene.children[i].name === 'BoundingBoxHelper') {
-                    return scene.children[i];
-                }
-            }
+        // if(scene)
+        // {
+        //     for(var i = scene.children.length - 1; i >= 0; i--) {
+        //         if(scene.children[i].name === 'BoundingBoxHelper') {
+        //             return scene.children[i];
+        //         }
+        //     }
+        // }
+        if(!$.isEmptyObject(SELECTED)) {
+            boundingBox = new THREE.BoundingBoxHelper(SELECTED, s.colorSelected);
+            boundingBox.update();
+            return boundingBox;
         }
+    }
+
+    function setRotateMode() {
+        setMode('rotate');
+    }
+
+    function setScaleMode() {
+        setMode('scale');
+    }
+
+    function setMode(mode) {
+        removeFromScene('TransformControl');
+        transformControl.setMode(mode);
+        scene.add(transformControl);
+        removeFromScene('BoundingBoxHelper');
+        render();
     }
 
     return {
@@ -590,6 +714,8 @@ define([
         removeSelected: removeSelected,
         readyGCode: readyGCode,
         getSelectedObjectSize: getSelectedObjectSize,
-        downloadGCode: downloadGCode
+        downloadGCode: downloadGCode,
+        setRotateMode: setRotateMode,
+        setScaleMode: setScaleMode,
     };
 });
