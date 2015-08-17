@@ -6,8 +6,9 @@ define([
     'helpers/websocket',
     'helpers/convertToTypedArray',
     'helpers/is-json',
-    'helpers/data-history'
-], function(Websocket, convertToTypedArray, isJson, history) {
+    'helpers/data-history',
+    'helpers/api/set-params'
+], function(Websocket, convertToTypedArray, isJson, history, setParams) {
     'use strict';
 
     return function(opts) {
@@ -266,7 +267,8 @@ define([
                 };
 
                 ws.send(args.join(' '));
-            }
+            },
+            params: setParams(ws)
         };
     };
 });

@@ -5,8 +5,9 @@
 define([
     'helpers/websocket',
     'helpers/convertToTypedArray',
-    'helpers/is-json'
-], function(Websocket, convertToTypedArray, isJson) {
+    'helpers/is-json',
+    'helpers/api/set-params'
+], function(Websocket, convertToTypedArray, isJson, setParams) {
     'use strict';
 
     return function(opts) {
@@ -154,7 +155,8 @@ define([
 
                 ws.send('go');
                 lastOrder = 'getGCode';
-            }
+            },
+            params: setParams(ws)
         };
     };
 });
