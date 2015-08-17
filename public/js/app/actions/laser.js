@@ -305,12 +305,17 @@ define([
                 }
 
             },
-            sendToBitmapAPI = function(args) {
+            sendToBitmapAPI = function(args, settings) {
 
                 var laserParser = bitmapLaserParser(),
+                    onSetParamsFinished = function() {
+                        laserParser.uploadBitmap(args, {
+                            onFinished: onUploadFinish
+                        });
+                    },
                     onUploadFinish = function() {
                         laserParser.getGCode({
-                            onFinished: onGetGCodeFinished
+                            onFinished: onSetParamsFinished
                         });
                     },
                     onGetGCodeFinished = function(blob) {
@@ -318,13 +323,20 @@ define([
                         control_methods.upload(blob.size, blob);
                     };
 
-                laserParser.uploadBitmap(args, {
-                    onFinished: onUploadFinish
-                });
-
+                laserParser.params.setEach(
+                    settings,
+                    {
+                        onFinished: onSetParamsFinished
+                    }
+                );
             },
-            sendToSVGAPI = function(args) {
+            sendToSVGAPI = function(args, settings) {
                 var laserParser = svgLaserWebSocket,
+                    onSetParamsFinished = function() {
+                        laserParser.compute(args, {
+                            onFinished: onComputeFinished
+                        });
+                    },
                     onComputeFinished = function() {
                         var names = [],
                             all_svg = laserParser.History.get();
@@ -345,10 +357,12 @@ define([
                         control_methods.upload(blob.size, blob);
                     };
 
-                laserParser.compute(args, {
-                    onFinished: onComputeFinished
-                });
-
+                laserParser.params.setEach(
+                    settings,
+                    {
+                        onFinished: onSetParamsFinished
+                    }
+                );
             },
             refreshObjectParams = function(e, $el) {
                 var bounds, el_offset, el_position,
@@ -391,115 +405,111 @@ define([
             },
             $target_image = null, // changing when image clicked
             printer = null,
-            printer_selecting = false;
+            printer_selecting = false,
+            handleLaser = function(settings) {
 
-        $btn_start.on('click', function(e) {
+                var $ft_controls = $laser_platform.find('.ft-controls'),
+                    convertToRealCoordinate = function(px, axis) {
+                        var ratio = DIAMETER / PLATFORM_DIAMETER_PIXEL, // 1(px) : N(mm)
+                            r = PLATFORM_DIAMETER_PIXEL / 2 * ratio,
+                            mm = ratio * px - r;
 
-            var $ft_controls = $laser_platform.find('.ft-controls'),
-                convertToRealCoordinate = function(px, axis) {
-                    var ratio = DIAMETER / PLATFORM_DIAMETER_PIXEL, // 1(px) : N(mm)
-                        r = PLATFORM_DIAMETER_PIXEL / 2 * ratio,
-                        mm = ratio * px - r;
-
-                    if ('y' === axis.toLowerCase()) {
-                        mm = mm * -1;
-                    }
-
-                    return mm;
-                },
-                getCenter = function($el) {
-                    var container_offset = $laser_platform.offset(),
-                        offset = $el.offset(),
-                        half_width = $el.width() / 2,
-                        half_height = $el.height() / 2;
-
-                    return {
-                        x: offset.left - container_offset.left + half_width,
-                        y: offset.top - container_offset.top + half_height
-                    };
-                },
-                args = [],
-                doLaser = function(settings) {
-                    $ft_controls.each(function(k, el) {
-                        var $el = $(el),
-                            image = new Image(),
-                            top_left = getCenter($el.find('.ft-scaler-top.ft-scaler-left')),
-                            bottom_right = getCenter($el.find('.ft-scaler-bottom.ft-scaler-right')),
-                            $img = $el.parents('.ft-container').find('.img-container img'),
-                            width = $el.width(),
-                            height = $el.height(),
-                            sub_data = {
-                                name: $img.data('name') || '',
-                                width: width,
-                                height: height,
-                                tl_position_x: convertToRealCoordinate(top_left.x, 'x'),
-                                tl_position_y: convertToRealCoordinate(top_left.y, 'y'),
-                                br_position_x: convertToRealCoordinate(bottom_right.x, 'x'),
-                                br_position_y: convertToRealCoordinate(bottom_right.y, 'y'),
-                                rotate: (Math.PI * elementAngle(el) / 180) * -1,
-                                threshold: $threshold.val()
-                            },
-                            canvas = document.createElement('canvas'),
-                            ctx = canvas.getContext('2d'),
-                            image_blobs = [],
-                            opt = {
-                                is_svg: ('svg' === reactComponent.props.file_format)
-                            },
-                            imageData;
-
-                        canvas.width = width;
-                        canvas.height = height;
-
-                        if ('svg' === reactComponent.props.file_format) {
-                            image.src = $img.attr('src');
-                        }
-                        else {
-                            image.src = $img.data('base');
+                        if ('y' === axis.toLowerCase()) {
+                            mm = mm * -1;
                         }
 
-                        image.onload = function() {
-                            ctx.drawImage(
-                                image,
-                                0,
-                                0,
-                                width,
-                                height
-                            );
+                        return mm;
+                    },
+                    getCenter = function($el) {
+                        var container_offset = $laser_platform.offset(),
+                            offset = $el.offset(),
+                            half_width = $el.width() / 2,
+                            half_height = $el.height() / 2;
 
-                            imageData = ctx.createImageData(width, height);
+                        return {
+                            x: offset.left - container_offset.left + half_width,
+                            y: offset.top - container_offset.top + half_height
+                        };
+                    },
+                    args = [],
+                    doLaser = function(settings) {
+                        $ft_controls.each(function(k, el) {
+                            var $el = $(el),
+                                image = new Image(),
+                                top_left = getCenter($el.find('.ft-scaler-top.ft-scaler-left')),
+                                bottom_right = getCenter($el.find('.ft-scaler-bottom.ft-scaler-right')),
+                                $img = $el.parents('.ft-container').find('.img-container img'),
+                                width = $el.width(),
+                                height = $el.height(),
+                                sub_data = {
+                                    name: $img.data('name') || '',
+                                    width: width,
+                                    height: height,
+                                    tl_position_x: convertToRealCoordinate(top_left.x, 'x'),
+                                    tl_position_y: convertToRealCoordinate(top_left.y, 'y'),
+                                    br_position_x: convertToRealCoordinate(bottom_right.x, 'x'),
+                                    br_position_y: convertToRealCoordinate(bottom_right.y, 'y'),
+                                    rotate: (Math.PI * elementAngle(el) / 180) * -1,
+                                    threshold: $threshold.val()
+                                },
+                                canvas = document.createElement('canvas'),
+                                ctx = canvas.getContext('2d'),
+                                image_blobs = [],
+                                opt = {
+                                    is_svg: ('svg' === reactComponent.props.file_format)
+                                },
+                                imageData;
 
-                            sub_data.image_data = grayScale(ctx.getImageData(0, 0, width, height).data, opt);
+                            canvas.width = width;
+                            canvas.height = height;
 
                             if ('svg' === reactComponent.props.file_format) {
-                                sub_data.real_width = sub_data.width / $laser_platform.width() * DIAMETER;
-                                sub_data.real_height = sub_data.height / $laser_platform.height() * DIAMETER;
-                                sub_data.svg_data = svgLaserWebSocket.History.findByName($img.data('name'))[0].data;
+                                image.src = $img.attr('src');
+                            }
+                            else {
+                                image.src = $img.data('base');
                             }
 
-                            args.push(sub_data);
+                            image.onload = function() {
+                                ctx.drawImage(
+                                    image,
+                                    0,
+                                    0,
+                                    width,
+                                    height
+                                );
 
-                            if (args.length === $ft_controls.length) {
-                                // sending data
+                                imageData = ctx.createImageData(width, height);
+
+                                sub_data.image_data = grayScale(ctx.getImageData(0, 0, width, height).data, opt);
+
                                 if ('svg' === reactComponent.props.file_format) {
-                                    sendToSVGAPI(args);
+                                    sub_data.real_width = sub_data.width / $laser_platform.width() * DIAMETER;
+                                    sub_data.real_height = sub_data.height / $laser_platform.height() * DIAMETER;
+                                    sub_data.svg_data = svgLaserWebSocket.History.findByName($img.data('name'))[0].data;
                                 }
-                                else {
-                                    sendToBitmapAPI(args);
+
+                                args.push(sub_data);
+
+                                if (args.length === $ft_controls.length) {
+                                    // sending data
+                                    if ('svg' === reactComponent.props.file_format) {
+                                        sendToSVGAPI(args, settings);
+                                    }
+                                    else {
+                                        sendToBitmapAPI(args, settings);
+                                    }
                                 }
-                            }
-                        };
-                    });
-                };
+                            };
+                        });
+                    };
 
-            reactComponent.setState({
-                openPrinterSelectorWindow: true
-            });
+                reactComponent.setState({
+                    openPrinterSelectorWindow: true
+                });
 
-            reactComponent.setProps({
-                doLaser: doLaser
-            });
-
-        });
+                doLaser(settings);
+            };
 
         $('.instant-change').on('focus', function(e) {
             var $self = $(e.currentTarget),
@@ -538,5 +548,9 @@ define([
                 deleteImage();
             }
         );
+
+        return {
+            handleLaser: handleLaser
+        };
     };
 });
