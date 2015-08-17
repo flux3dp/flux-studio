@@ -12,7 +12,8 @@ define([
     'jsx!widgets/Modal',
     'helpers/shortcuts',
     'freetrans',
-    'helpers/jquery.box'
+    'helpers/jquery.box',
+    'plugins/file-saver/file-saver.min'
 ], function(
     $,
     fileSystem,
@@ -305,7 +306,13 @@ define([
                 }
 
             },
-            sendToBitmapAPI = function(args, settings) {
+            sendToMachine = function(blob) {
+                var control_methods = control(reactComponent.state.selectedPrinter.serial);
+                control_methods.upload(blob.size, blob);
+                reactComponent._openBlocker(false);
+            },
+            sendToBitmapAPI = function(args, settings, callback) {
+                callback = callback || function() {};
 
                 var laserParser = bitmapLaserParser(),
                     onSetParamsFinished = function() {
@@ -315,12 +322,8 @@ define([
                     },
                     onUploadFinish = function() {
                         laserParser.getGCode({
-                            onFinished: onSetParamsFinished
+                            onFinished: callback
                         });
-                    },
-                    onGetGCodeFinished = function(blob) {
-                        var control_methods = control(reactComponent.state.selectedPrinter.serial);
-                        control_methods.upload(blob.size, blob);
                     };
 
                 laserParser.params.setEach(
@@ -329,8 +332,12 @@ define([
                         onFinished: onSetParamsFinished
                     }
                 );
+
+                reactComponent._openBlocker(true);
             },
-            sendToSVGAPI = function(args, settings) {
+            sendToSVGAPI = function(args, settings, callback) {
+                callback = callback || function() {};
+
                 var laserParser = svgLaserWebSocket,
                     onSetParamsFinished = function() {
                         laserParser.compute(args, {
@@ -348,13 +355,9 @@ define([
                         laserParser.getGCode(
                             names,
                             {
-                                onFinished: onGetGCodeFinished
+                                onFinished: callback
                             }
                         );
-                    },
-                    onGetGCodeFinished = function(blob) {
-                        var control_methods = control(reactComponent.state.selectedPrinter.serial);
-                        control_methods.upload(blob.size, blob);
                     };
 
                 laserParser.params.setEach(
@@ -406,7 +409,7 @@ define([
             $target_image = null, // changing when image clicked
             printer = null,
             printer_selecting = false,
-            handleLaser = function(settings) {
+            handleLaser = function(settings, selectPrinter, callback) {
 
                 var $ft_controls = $laser_platform.find('.ft-controls'),
                     convertToRealCoordinate = function(px, axis) {
@@ -494,19 +497,21 @@ define([
                                 if (args.length === $ft_controls.length) {
                                     // sending data
                                     if ('svg' === reactComponent.props.file_format) {
-                                        sendToSVGAPI(args, settings);
+                                        sendToSVGAPI(args, settings, callback);
                                     }
                                     else {
-                                        sendToBitmapAPI(args, settings);
+                                        sendToBitmapAPI(args, settings, callback);
                                     }
                                 }
                             };
                         });
                     };
 
-                reactComponent.setState({
-                    openPrinterSelectorWindow: true
-                });
+                if (true === selectPrinter) {
+                    reactComponent.setState({
+                        openPrinterSelectorWindow: true
+                    });
+                }
 
                 doLaser(settings);
             };
@@ -550,7 +555,25 @@ define([
         );
 
         return {
-            handleLaser: handleLaser
+            handleLaser: function(settings) {
+                handleLaser(
+                    settings,
+                    true,
+                    sendToMachine
+                );
+            },
+            sendToMachine: sendToMachine,
+            export: function(settings) {
+                handleLaser(
+                    settings,
+                    false,
+                    function(blob) {
+                        var file_name = (new Date()).getTime() + '.gcode';
+                        saveAs(blob, file_name);
+                        reactComponent._openBlocker(false);
+                    }
+                );
+            }
         };
     };
 });
