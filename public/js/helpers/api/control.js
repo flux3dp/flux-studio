@@ -21,18 +21,20 @@ define([
 
                     lastMessage = data;
 
-                    if ('string' === typeof data && 'error' === data.status) {
+                    if ('string' === typeof data.status && 'error' === data.status) {
                         opts.onError(data);
                     }
                     else {
-                        onMessage(data);
+                        events.onMessage(data);
                     }
 
                 }
             }),
             lastOrder = '',
             lastMessage = '',
-            onMessage = function() {};
+            events = {
+                onMessage: function() {}
+            };
 
         return {
             ws: ws,
@@ -44,7 +46,9 @@ define([
                 lastOrder = 'select';
                 ws.send(lastOrder + ' ' + filename);
             },
-            upload: function(filesize, print_data) {
+            upload: function(filesize, print_data, opts) {
+                opts.onFinished = opts.onFinished || function() {};
+
                 var CHUNK_PKG_SIZE = 4096,
                     length = print_data.length || print_data.size,
                     interrupt = function(cmd) {
@@ -79,7 +83,7 @@ define([
                         }
                         else if ('ok' === data.status) {
                             lastOrder = 'start';
-                            onMessage = _startPrint;
+                            events.onMessage = _startPrint;
                             ws.send(lastOrder);
                         }
                         else {
@@ -94,7 +98,7 @@ define([
 
                 lastOrder = 'upload';
 
-                onMessage = _uploading;
+                events.onMessage = _uploading;
 
                 ws.send(lastOrder + ' ' + filesize);
 
