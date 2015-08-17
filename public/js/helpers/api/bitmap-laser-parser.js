@@ -58,6 +58,7 @@ define([
              */
             uploadBitmap: function(args, opts) {
                 opts = opts || {};
+                opts.onStarting = opts.onStarting || function() {};
                 opts.onFinished = opts.onFinished || function() {};
 
                 var CHUNK_PKG_SIZE = 4096,
@@ -105,11 +106,9 @@ define([
                         // TODO: do something?
                         break;
                     }
-
                 };
 
                 timer = setInterval(function() {
-
                     if (true === go_next) {
                         next_data = requests_serial[request_index];
 
@@ -124,9 +123,12 @@ define([
                         clearInterval(timer);
                     }
                 }, 0);
+
+                opts.onStarting();
             },
             getGCode: function(opts) {
                 opts = opts || {};
+                opts.onStarting = opts.onStarting || function() {};
                 opts.onProgressing = opts.onProgressing || function() {};
                 opts.onFinished = opts.onFinished || function() {};
 
@@ -155,8 +157,10 @@ define([
 
                 ws.send('go');
                 lastOrder = 'getGCode';
+
+                opts.onStarting();
             },
-            params: setParams(ws)
+            params: setParams(ws, events)
         };
     };
 });

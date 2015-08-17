@@ -268,7 +268,7 @@ define([
 
                 ws.send(args.join(' '));
             },
-            params: setParams(ws)
+            params: setParams(ws, events)
         };
     };
 });
