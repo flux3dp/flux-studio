@@ -18,7 +18,8 @@ define(['helpers/is-json'], function(isJson) {
         return arr;
     };
 
-    return function(ws) {
+    return function(ws, events) {
+        events = events || {};
 
         return {
             /**
@@ -39,17 +40,17 @@ define(['helpers/is-json'], function(isJson) {
                 opts.onFinished = opts.onFinished || function() {};
                 opts.onClose = opts.onClose || function() {};
 
-                ws.onMessage(function(result) {
-                    var data = (true === isJson(result.data) ? JSON.parse(result.data) : result.data);
-
+                events.onMessage = function(data) {
                     if ('ok' === data.status) {
                         nextParam = params.pop();
                         okTimes++;
                     }
-                }).onClose(function(result) {
+                };
+
+                events.onClose = function(result) {
                     clearInterval(timer);
                     opts.onClose(result);
-                });
+                };
 
                 timer = setInterval(function() {
                     if (okTimes === paramsAmount) {
