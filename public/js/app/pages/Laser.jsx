@@ -23,10 +23,9 @@ define([
         args = args || {};
 
         var view = React.createClass({
-                _setupSettings: undefined,
 
-                _saveSettings: function(settings) {
-                    this._setupSettings = settings;
+                _onRunLaser: function(settings) {
+                    this.props.laserEvents.handleLaser(settings);
                 },
 
                 _renderStageSection: function() {
@@ -45,7 +44,8 @@ define([
                                 mode={this.state.mode}
                                 className='operating-panel'
                                 hasImage={this.state.hasImage}
-                                getSettings={this._saveSettings}
+                                onRunLaser={this._onRunLaser}
+                                ref="setupPanel"
                             />
                             <ImagePanel lang={lang} className={image_panel_class}/>
                         </section>
@@ -59,7 +59,6 @@ define([
                                 selectedPrinter: auth_printer,
                                 openPrinterSelectorWindow: false
                             });
-                            self.props.doLaser(self._setupSettings);
                         },
                         content = (
                             <PrinterSelector lang={lang} onGettingPrinter={onGettingPrinter}/>
@@ -77,19 +76,12 @@ define([
 
                 render: function() {
                     var lang = args.state.lang,
-                        // header = this._renderHeader(),
                         stageSection = this._renderStageSection(),
                         printerSelector = (
                             true === this.state.openPrinterSelectorWindow ?
                             this._renderPrinterSelectorWindow(lang) :
                             ''
                         );
-
-                    this._setupSettings = lang.laser.advanced.form.object_options.options.filter(
-                        function(obj) {
-                            return true === obj.selected;
-                        }
-                    )[0].data;
 
                     return (
                         <div className="studio-container laser-studio">
@@ -113,7 +105,9 @@ define([
                 },
 
                 componentDidMount: function() {
-                    laserEvents(args, this);
+                    this.setProps({
+                        laserEvents: laserEvents(args, this)
+                    });
                 }
 
             });
