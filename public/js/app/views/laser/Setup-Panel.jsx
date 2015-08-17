@@ -42,13 +42,7 @@ define([
             this._toggleAdvancedPanel(true)(selected_value);
         },
 
-        _onAdvanceDone: function(settings) {
-            this._advancedSettings = settings;
-
-            this._toggleAdvancedPanel(false)(settings.material);
-        },
-
-        _onRunLaser: function() {
+        _getSettings: function() {
             var settings = JSON.parse(JSON.stringify(this._advancedSettings || {}));
 
             if ('undefined' === typeof this._advancedSettings) {
@@ -58,7 +52,25 @@ define([
             delete settings.material;
             settings.object_height = this.refs.objectHeight.getDOMNode().value;
 
+            return settings;
+        },
+
+        _onAdvanceDone: function(settings) {
+            this._advancedSettings = settings;
+
+            this._toggleAdvancedPanel(false)(settings.material);
+        },
+
+        _onRunLaser: function() {
+            var settings = this._getSettings();
+
             this.props.onRunLaser(settings);
+        },
+
+        _onExport: function() {
+            var settings = this._getSettings();
+
+            this.props.onExport(settings)
         },
 
         _onObjectHeightBlur: function(e) {
@@ -73,6 +85,7 @@ define([
                         defaultMaterial={default_material}
                         onCancel={this._toggleAdvancedPanel(false)}
                         onDone={this._onAdvanceDone}
+                        ref="advancedPanel"
                     />
                 );
 
@@ -112,7 +125,7 @@ define([
                 ),
                 saveButton = (
                     true === props.hasImage ?
-                    <button className={export_file_class}>{lang.laser.save}</button> :
+                    <button className={export_file_class} onClick={this._onExport}>{lang.laser.save}</button> :
                     ''
                 );
 
@@ -190,6 +203,7 @@ define([
             return {
                 settingMaterial: React.PropTypes.object,
                 onRunLaser: React.PropTypes.func,
+                onExport: React.PropTypes.func,
                 hasImage: React.PropTypes.bool
             };
         },
