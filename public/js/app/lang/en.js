@@ -278,7 +278,7 @@ define(function() {
             save: 'Save',
             acceptable_files: 'JPG, PNG, PDF, AI',
             drop_files_to_import: 'Drop your file here or click "import" to upload your file',
-            advenced: 'Advenced',
+            button_advanced: 'Advanced',
             start_engrave: 'ENGRAVE',
             start_cut: 'CUT',
             print_params: {
