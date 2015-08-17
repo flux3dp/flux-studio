@@ -57,7 +57,7 @@ define([
                                 imgSrc: '/img/icon-setting.png'
                             }
                         ],
-                        menuItems = options.map(function(opt) {
+                        menuItems = options.map(function(opt, i) {
                             var isActiveItem = -1 < location.hash.indexOf(opt.name),
                                 itemClass = '',
                                 label = '';
@@ -70,7 +70,7 @@ define([
                             itemClass = cx(opt.className);
 
                             return (
-                                <li className={itemClass} onClick={self._handleNavigation.bind(null, opt.name)}>
+                                <li className={itemClass} key={'menu' + i} onClick={self._handleNavigation.bind(null, opt.name)}>
                                     <img src={opt.imgSrc} />
                                     {label}
                                 </li>
