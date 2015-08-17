@@ -8,6 +8,8 @@ define([
     'use strict';
 
     return React.createClass({
+        _advancedSettings: undefined,
+
         _getSelectedMaterial: function(value) {
             var props = this.props,
                 lang = props.lang,
@@ -40,10 +42,23 @@ define([
             this._toggleAdvancedPanel(true)(selected_value);
         },
 
-        _onDone: function(settings) {
-            this.props.getSettings(settings);
+        _onAdvanceDone: function(settings) {
+            this._advancedSettings = settings;
 
             this._toggleAdvancedPanel(false)(settings.material);
+        },
+
+        _onRunLaser: function() {
+            var settings = JSON.parse(JSON.stringify(this._advancedSettings || {}));
+
+            if ('undefined' === typeof this._advancedSettings) {
+                settings = $(this.refs.material.getDOMNode()).find('option:selected').data('meta');
+            }
+
+            delete settings.material;
+            settings.object_height = this.refs.objectHeight.getDOMNode().value;
+
+            this.props.onRunLaser(settings);
         },
 
         _onObjectHeightBlur: function(e) {
@@ -57,7 +72,7 @@ define([
                         materials={this.state.materials}
                         defaultMaterial={default_material}
                         onCancel={this._toggleAdvancedPanel(false)}
-                        onDone={this._onDone}
+                        onDone={this._onAdvanceDone}
                     />
                 );
 
@@ -83,7 +98,7 @@ define([
                 }),
                 laserButton = (
                     true === props.hasImage ?
-                    <button id="btn-start" className={laser_class}>
+                    <button className={laser_class} onClick={this._onRunLaser}>
                         <img src="/img/icon-laser-s.png"/>
                         {mode}
                     </button> :
@@ -112,7 +127,7 @@ define([
 
         _renderObjectHeight: function(lang) {
             return (
-                <input type="number" min="0" max="100" step="0.1" defaultValue="0.3" onBlur={this._onObjectHeightBlur}/>
+                <input ref="objectHeight" type="number" min="0" max="100" step="0.1" defaultValue="0.3" onBlur={this._onObjectHeightBlur}/>
             )
         },
 
@@ -161,7 +176,7 @@ define([
                             </div>
                         </div>
                         <div className="setup last-setup">
-                            <button className="btn btn-default btn-full-width" onClick={this._openAdvancedPanel}>{lang.laser.advenced}</button>
+                            <button className="btn btn-default btn-full-width" onClick={this._openAdvancedPanel}>{lang.laser.button_advanced}</button>
                         </div>
                     </div>
                     {buttons}
@@ -174,7 +189,7 @@ define([
         getDefaultProps: function() {
             return {
                 settingMaterial: React.PropTypes.object,
-                getSettings: React.PropTypes.func,
+                onRunLaser: React.PropTypes.func,
                 hasImage: React.PropTypes.bool
             };
         },
