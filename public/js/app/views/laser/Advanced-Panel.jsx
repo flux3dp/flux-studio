@@ -13,7 +13,6 @@ define([
                 refs = this.refs,
                 materials = this.state.materials;
 
-
             refs.speedRange.getDOMNode().value = data.laser_speed;
             refs.powerRange.getDOMNode().value = data.power;
             refs.speed.getDOMNode().textContent = data.laser_speed;
@@ -107,7 +106,7 @@ define([
                             <label className="label">{lang.form.laser_speed.text}</label>
                             <div className="control">
                                 <input
-                                    name="speed"
+                                    name="laser_speed"
                                     type="range"
                                     ref="speedRange"
                                     data-min-text={lang.form.laser_speed.slow}
@@ -152,6 +151,8 @@ define([
         },
 
         getDefaultProps: function() {
+            var self = this;
+
             return {
                 lang: React.PropTypes.object,
                 defaultMaterial: React.PropTypes.object,
