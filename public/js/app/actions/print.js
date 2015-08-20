@@ -17,14 +17,14 @@ define([
         container, printController;
 
     var camera, scene, renderer;
-    var control, controls, transformControl, reactSrc;
+    var orbitControl, transformControl, reactSrc;
 
     var objects = [],
         referenceMeshes = [];
     var raycaster = new THREE.Raycaster();
     var mouse = new THREE.Vector2(),
         offset = new THREE.Vector3(),
-        myMesh, circularGridHelper, mouseDown, boundingBox, SELECTED;
+        circularGridHelper, mouseDown, boundingBox, SELECTED;
 
     var movingOffsetX, movingOffsetY;
 
@@ -51,6 +51,8 @@ define([
         scalePrecision: 1 // in decimal, 1 = up to 0.1, 2 = 0.01
     };
 
+    var advanceParameters = ['layerHeight', 'infill', 'travelingSpeed', 'extrudingSpeed', 'temperature'];
+
     function init(src) {
 
         reactSrc = src;
@@ -75,13 +77,14 @@ define([
         );
         scene.add(circularGridHelper);
 
-        var geometry = new THREE.CircleGeometry( s.radius, 80 );
-        var material = new THREE.MeshBasicMaterial( { color: 0xCCCCCC, transparent: true } );
-        myMesh = new THREE.Mesh( geometry, material );
-        myMesh.up = new THREE.Vector3(0,0,1);
-        myMesh.visible = false;
-        scene.add( myMesh );
-        referenceMeshes.push(myMesh);
+        var geometry = new THREE.CircleGeometry( s.radius, 80 ),
+            material = new THREE.MeshBasicMaterial( { color: 0xCCCCCC, transparent: true } ),
+            refMesh  = new THREE.Mesh( geometry, material );
+
+        refMesh.up = new THREE.Vector3(0,0,1);
+        refMesh.visible = false;
+        scene.add(refMesh);
+        referenceMeshes.push(refMesh);
 
         // Lights
         scene.add(new THREE.AmbientLight(0x777777));
@@ -101,10 +104,10 @@ define([
         renderer.sortObjects = false;
         container.appendChild(renderer.domElement);
 
-        control = new THREE.OrbitControls(camera, renderer.domElement);
-        control.maxPolarAngle = Math.PI/2;
-        control.noKeys = true;
-        control.addEventListener('change', render);
+        orbitControl = new THREE.OrbitControls(camera, renderer.domElement);
+        orbitControl.maxPolarAngle = Math.PI/2;
+        orbitControl.noKeys = true;
+        orbitControl.addEventListener('change', render);
 
         transformControl = new THREE.TransformControls(camera, renderer.domElement);
         transformControl.addEventListener('change', render);
@@ -205,7 +208,7 @@ define([
             var target = intersects[0].object;
             selectObject(target);
 
-            control.enabled = false;
+            orbitControl.enabled = false;
             mouseDown = true;
             container.style.cursor = 'move';
 
@@ -227,7 +230,7 @@ define([
 
     function onMouseUp(e) {
         e.preventDefault();
-        control.enabled = true;
+        orbitControl.enabled = true;
         mouseDown = false;
         container.style.cursor = 'auto';
         checkOutOfBounds(SELECTED);
@@ -705,17 +708,53 @@ define([
         render();
     }
 
+    function setAdvanceParameter(settings, index) {
+        index = index || 0;
+        var name = advanceParameters[index],
+            value = settings[name] || 'default';
+
+        $.when(printController.setParameter(name, value)).then(
+            function(result) {
+                if(result.status === 'error') {
+                    index = advanceParameters.length;
+                }
+                if(index < advanceParameters.length - 1) {
+                    setAdvanceParameter(settings, index + 1);
+                }
+                else {
+                    return;
+                }
+            },
+            function() {
+                return;
+            }
+        )
+    }
+
+    function setParameter(name, value) {
+        $.when(printController.setParameter(name, value)).then(
+            function(result) {
+                if(result.status === 'error' || result.status === 'fatal') {
+                    // todo: error logging
+                }
+                console.dir(result);
+            }
+        )
+    }
+
     return {
-        init: init,
-        appendModel: appendModel,
-        rotate: rotate,
-        setScale: setScale,
-        alignCenter: alignCenter,
-        removeSelected: removeSelected,
-        readyGCode: readyGCode,
-        getSelectedObjectSize: getSelectedObjectSize,
-        downloadGCode: downloadGCode,
-        setRotateMode: setRotateMode,
-        setScaleMode: setScaleMode,
+        init                    : init,
+        appendModel             : appendModel,
+        rotate                  : rotate,
+        setScale                : setScale,
+        alignCenter             : alignCenter,
+        removeSelected          : removeSelected,
+        readyGCode              : readyGCode,
+        getSelectedObjectSize   : getSelectedObjectSize,
+        downloadGCode           : downloadGCode,
+        setRotateMode           : setRotateMode,
+        setScaleMode            : setScaleMode,
+        setAdvanceParameter     : setAdvanceParameter,
+        setParameter            : setParameter
     };
 });

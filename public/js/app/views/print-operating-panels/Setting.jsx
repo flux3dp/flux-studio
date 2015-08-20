@@ -11,7 +11,8 @@ define([
                 onPlatformClick: React.PropTypes.func,
                 onSupportClick: React.PropTypes.func,
                 onShowAdvancedSetting: React.PropTypes.func,
-                onPrintStart: React.PropTypes.func
+                onPrintStart: React.PropTypes.func,
+                onSpeedChange: React.PropTypes.func
             };
         },
         getInitialState: function() {
@@ -33,6 +34,9 @@ define([
         },
         _handlePrintStart: function(e) {
             this.props.onPrintStart();
+        },
+        _handlePrintSpeedChange: function(e) {
+            this.props.onSpeedChange(e.target.value.toLowerCase());
         },
         render: function() {
             var lang = this.props.lang,
@@ -60,7 +64,7 @@ define([
                             <div className="controls">
                                 <div className="label">{lang.print.params.beginner.print_speed.text}</div>
                                 <div className="control">
-                                    <select>
+                                    <select onChange={this._handlePrintSpeedChange}>
                                         {printSpeedOptions}
                                     </select>
                                 </div>
@@ -95,7 +99,7 @@ define([
                             <div className="controls">
                                 <div className="label">{lang.print.params.beginner.support.text}</div>
                                 <div className="control">
-                                    <label>{lang.print.params.beginner.support.options[0].label}</label>
+                                    <label>{lang.print.params.beginner.support.on}</label>
                                     <div className="switchContainer">
                                         <input type="checkbox" id="supportSwitch" name="supportSwitch" className="switch" onClick={this._handleSupportClick} />
                                         <label htmlFor="supportSwitch">&nbsp;</label>

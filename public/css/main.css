@@ -4288,3 +4288,8 @@ input.switch:checked ~ label:after {
         margin: 0 0 10px 0; }
         .scan-studio .scan-model-save-as .file-formats label {
             float: left; }
+
+.device-studio {
+    margin-left: 10px; }
+    .device-studio .btn-default {
+        margin-right: 5px; }

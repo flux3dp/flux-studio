@@ -72,7 +72,8 @@ define(function() {
             print: '列印',
             laser: 'Laser',
             scan: 'Scan',
-            usb: 'USB'
+            usb: 'USB',
+            device: '裝置'
         },
         settings: {
             caption: '設定',
@@ -192,6 +193,7 @@ define(function() {
                     },
                     support: {
                         text: 'Support',
+                        on: '開啟',
                         options: [
                             {
                                 value: 'everywhere',
@@ -453,6 +455,15 @@ define(function() {
             please_enter_password: '請輸入密碼',
             auth_failure: '認證失敗',
             retry: '重新選擇'
+        },
+        device: {
+            cameraOn: '啟用鏡頭',
+            cameraOff: '關閉鏡頭',
+            browseFiles: '瀏覽檔案',
+            pause: '暫停',
+            cancelTask: '終止任務',
+            selectPrinter: '選擇成型機',
+            retry: '重試'
         }
     };
 });

@@ -76,6 +76,17 @@ define([
                 };
                 ws.send('go ' + nameArray.join(' '));
                 lastOrder = 'go';
+            },
+            setParameter: function(name, value) {
+                var d = $.Deferred();
+                events.onMessage = function(result) {
+                    return d.resolve(result);
+                };
+
+                ws.send(`set_params ${name} ${value}`);
+                lastOrder = 'set_params';
+
+                return d.promise();
             }
         };
     };

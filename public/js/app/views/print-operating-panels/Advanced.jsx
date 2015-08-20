@@ -123,6 +123,9 @@ define([
             );
         },
         _renderSupportSection: function(lang) {
+            return '';
+            // this feature will be support in the future
+            /*
             var lang = this.props.lang.print.advanced;
             return (
                 <div className="section">
@@ -138,6 +141,7 @@ define([
                     </div>
                 </div>
             );
+            */
         },
         _renderFooter: function() {
             return (

@@ -91,11 +91,17 @@ define([
                     }
 
                 },
+                _handleSpeedChange: function(speed) {
+                    console.log(speed);
+                    printController.setParameter('printSpeed', speed);
+                },
                 _handlePlatformClick: function(state) {
                     console.log('platform clicked', state)
+                    printController.setParameter('raft', state ? '1' : '0');
                 },
                 _handleSupportClick: function(state) {
                     console.log('support clicked', state);
+                    printController.setParameter('support', state ? '1' : '0');
                 },
                 _handleShowAdvancedSetting: function() {
                     this.setState({ showAdvancedSetting: !this.state.showAdvancedSetting });
@@ -129,8 +135,9 @@ define([
                     this.setState({ showAdvancedSetting: false });
                 },
                 _handleAdvancedSettingDone: function(setting) {
-                    console.log(setting);
+                    // console.log(setting);
                     advancedSetting = setting;
+                    printController.setAdvanceParameter(setting);
                     this.setState({ showAdvancedSetting: false });
                 },
                 _handleShowMonitor: function(e) {
@@ -222,7 +229,8 @@ define([
                             onShowAdvancedSetting   = {this._handleShowAdvancedSetting}
                             onImport                = {this._handleFileUpload}
                             onSave                  = {this._handleFileDownload}
-                            onPrintStart            = {this._handlePrintStart} />
+                            onPrintStart            = {this._handlePrintStart}
+                            onSpeedChange           = {this._handleSpeedChange} />
                     );
                 },
                 _renderAdvancedPanel: function() {
