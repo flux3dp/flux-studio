@@ -25,7 +25,10 @@ define([
         var view = React.createClass({
 
                 _onRunLaser: function(settings) {
-                    this.props.laserEvents.handleLaser(settings);
+                    this.setState({
+                        openPrinterSelectorWindow: true,
+                        settings: settings
+                    });
                 },
 
                 _onExport: function(settings) {
@@ -42,9 +45,19 @@ define([
                     var lang = args.state.lang,
                         cx = React.addons.classSet,
                         image_panel_class = cx({
-                            'hide': false === this.state.hasImage,
                             'panel object-position': true
-                        });
+                        }),
+                        imagePanel = (
+                            true === this.state.hasImage ?
+                            <ImagePanel
+                                lang={lang}
+                                ref="imagePanel"
+                                mode={this.state.mode}
+                                className={image_panel_class}
+                                onThresholdChanged={this.props.laserEvents.thresholdChanged}
+                            /> :
+                            ''
+                        );
 
                     return (
                         <section id="operation-table">
@@ -56,9 +69,10 @@ define([
                                 hasImage={this.state.hasImage}
                                 onRunLaser={this._onRunLaser}
                                 onExport={this._onExport}
+                                uploadProcess={this.props.laserEvents}
                                 ref="setupPanel"
                             />
-                            <ImagePanel lang={lang} className={image_panel_class}/>
+                            {imagePanel}
                         </section>
                     );
                 },
@@ -70,6 +84,8 @@ define([
                                 selectedPrinter: auth_printer,
                                 openPrinterSelectorWindow: false
                             });
+
+                            self.props.laserEvents.handleLaser(self.state.settings);
                         },
                         content = (
                             <PrinterSelector lang={lang} onGettingPrinter={onGettingPrinter}/>
@@ -116,6 +132,11 @@ define([
                     );
                 },
 
+                getDefaultProps: function () {
+                    return {
+                        laserEvents: React.PropTypes.object,
+                    };
+                },
                 getInitialState: function() {
                     return {
                         step: '',
@@ -123,14 +144,19 @@ define([
                         hasImage: false,
                         selectedPrinter: 0,
                         openPrinterSelectorWindow: false,
-                        openBlocker: false
+                        openBlocker: false,
+                        settings: {}
                     };
                 },
 
                 componentDidMount: function() {
                     this.setProps({
-                        laserEvents: laserEvents(args, this)
+                        laserEvents: laserEvents.call(this, args)
                     });
+                },
+
+                componentWillUnmount: function () {
+                    this.props.laserEvents.destroySocket();
                 }
 
             });
