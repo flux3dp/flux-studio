@@ -46,7 +46,6 @@ define([
         colorOutside: 0xFF0000,
         colorSelected: 0xFFFF00,
         colorUnselected: 0x333333,
-        offsetRatio: 0.1,
         degreeStep: 5,
         scalePrecision: 1 // in decimal, 1 = up to 0.1, 2 = 0.01
     };
@@ -601,15 +600,15 @@ define([
             objects.forEach(function(obj) {
                 printController.set(
                     obj.uuid,
-                    obj.position.x * s.offsetRatio,
-                    obj.position.y * s.offsetRatio,
-                    obj.position.z * s.offsetRatio,
+                    obj.position.x,
+                    obj.position.y,
+                    obj.position.z,
                     obj.rotation.x,
                     obj.rotation.y,
                     obj.rotation.z,
-                    obj.scale.x * s.offsetRatio,
-                    obj.scale.y * s.offsetRatio,
-                    obj.scale.z * s.offsetRatio,
+                    obj.scale.x,
+                    obj.scale.y,
+                    obj.scale.z,
                     function(result) {
                         if(result.status === 'fatal') {
                             readyFailed(result.error);
