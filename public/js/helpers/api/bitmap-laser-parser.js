@@ -6,8 +6,10 @@ define([
     'helpers/websocket',
     'helpers/convertToTypedArray',
     'helpers/is-json',
-    'helpers/api/set-params'
-], function(Websocket, convertToTypedArray, isJson, setParams) {
+    'helpers/data-history',
+    'helpers/api/set-params',
+    'helpers/image-data'
+], function(Websocket, convertToTypedArray, isJson, history, setParams, imageData) {
     'use strict';
 
     return function(opts) {
@@ -36,12 +38,31 @@ define([
             lastMessage = '',
             events = {
                 onMessage: function() {}
-            };
+            },
+            History = history();
 
         return {
             connection: ws,
+            upload: function(name, file, opts) {
+                opts = opts || {};
+                History.push(name, file);
+                (opts.onFinished || function() {})(file);
+            },
+            get: function(name, opts) {
+                var file = History.findByName(name)[0];
+
+                opts = opts || {};
+                opts.onFinished = opts.onFinished || function() {};
+
+                imageData(file.data.blob, {
+                    type: file.type,
+                    onComplete: function(result) {
+                        opts.onFinished(file.data.blob, result.size);
+                    }
+                });
+            },
             /**
-             * upload bitmap
+             * compute bitmap
              *
              * @param {ArrayObject} args - detail json object below [{}, {}, ...]
              *      {Int}   width         - width pixel
@@ -56,7 +77,7 @@ define([
              * @param {Json} opts - options
              *      {Function}   onFinished - fire on upload finish
              */
-            uploadBitmap: function(args, opts) {
+            compute: function(args, opts) {
                 opts = opts || {};
                 opts.onStarting = opts.onStarting || function() {};
                 opts.onFinished = opts.onFinished || function() {};
