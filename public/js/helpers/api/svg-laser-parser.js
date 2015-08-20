@@ -39,54 +39,7 @@ define([
             events = {
                 onMessage: function() {}
             },
-            History = history();
-
-        return {
-            connection: ws,
-            History: History,
-            /**
-             * upload svg
-             *
-             * @param {String} name - name
-             * @param {Blob}   svg  - svg
-             * @param {Json}   opts - options
-             *      {Function}   onFinished - fire on upload finish
-             */
-            upload: function(name, svg, opts) {
-                opts = opts || {};
-                opts.onFinished = opts.onFinished || function() {};
-
-                var self = this,
-                    order_name = 'upload',
-                    args = [
-                        order_name,
-                        name,
-                        svg.size
-                    ];
-
-                events.onMessage = function(data) {
-
-                    switch (data.status) {
-                    case 'continue':
-                        ws.send(svg);
-                        break;
-                    case 'ok':
-                        opts.onFinished(data);
-                        break;
-                    }
-
-                };
-
-                ws.send(args.join(' '));
-            },
-            /**
-             * get svg
-             *
-             * @param {String} name - svg name has been upload
-             * @param {Json} opts - options
-             *      {Function}   onFinished - fire on upload finish
-             */
-            get: function(name, opts) {
+            get = function(name, opts) {
                 opts = opts || {};
                 opts.onFinished = opts.onFinished || function() {};
 
@@ -116,7 +69,7 @@ define([
                         blob = new Blob(blobs);
 
                         if (total_length === blob.size) {
-                            History.push(name, blob);
+                            History.push(name, { size: size, blob: blob });
                             opts.onFinished(blob, size);
                         }
                     }
@@ -124,6 +77,103 @@ define([
                 };
 
                 ws.send(args.join(' '));
+            },
+            upload = function(name, file, opts) {
+
+                var self = this,
+                    order_name = 'upload',
+                    args = [
+                        order_name,
+                        name,
+                        file.size
+                    ],
+                    onFinished = opts.onFinished || function() {};
+
+                events.onMessage = function(data) {
+
+                    switch (data.status) {
+                    case 'continue':
+                        ws.send(file.data);
+                        break;
+                    case 'ok':
+
+                        get(name, opts);
+                        break;
+                    }
+
+                };
+
+                ws.send(args.join(' '));
+            },
+            History = history(),
+            goNextUpload = true,
+            uploadQueue = [];
+
+        // listen upload request
+        Array.observe(uploadQueue, function(changes) {
+            var change = changes[0],
+                timer;
+
+            // push a new entry will make this value greater than zero.
+            if (0 < change.addedCount) {
+                // keep the current change.
+                timer = setInterval((function(change) {
+
+                    return function() {
+
+                        if (true === goNextUpload) {
+                            var object = change.object[change.index],
+                                onFinished = function(blob, size) {
+                                    object.opts.onFinished(blob, size);
+                                    goNextUpload = true;
+                                    clearInterval(timer);
+                                };
+
+                            goNextUpload = false;
+
+                            upload(object.name, object.file, {
+                                onFinished: onFinished
+                            });
+                        }
+
+                    };
+                })(change), 0);
+            }
+        });
+
+        return {
+            connection: ws,
+            History: History,
+            /**
+             * upload svg
+             *
+             * @param {String} name - name
+             * @param {Json}   file - the file data that convert by File-Uploader
+             * @param {Json}   opts - options
+             *      {Function}   onFinished - fire on upload finish
+             */
+            upload: function(name, file, opts) {
+                opts = opts || {};
+                opts.onFinished = opts.onFinished || function() {};
+
+                // NOTICE: it's very tricky for modified this array.
+                // it will fire observe function then get what you changed (and where you changed)
+                uploadQueue.push({ name: name, file: file, opts: opts });
+            },
+            /**
+             * get svg
+             *
+             * @param {String} name - svg name has been upload
+             * @param {Json} opts - options
+             *      {Function}   onFinished - fire on upload finish
+             */
+            get: function(name, opts) {
+                opts = opts || {};
+                opts.onFinished = opts.onFinished || function() {};
+
+                var svg = History.findByName(name)[0];
+
+                opts.onFinished(svg.data.blob, svg.data.size);
             },
             /**
              * compute svg
@@ -165,14 +215,14 @@ define([
                         obj.br_position_x,
                         obj.br_position_y,
                         obj.rotate,
-                        obj.svg_data.size,
+                        obj.svg_data.blob.size,
                         obj.width,
                         obj.height
                     ];
 
                     requests_serial.push(request_header.join(' '));
                     requests_serial.push({
-                        svg: obj.svg_data,
+                        svg: obj.svg_data.blob,
                         thumbnail: convertToTypedArray(obj.image_data, Uint8Array)
                     });
                 });
