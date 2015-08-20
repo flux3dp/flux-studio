@@ -333,7 +333,7 @@ define(function() {
                                 selected: true,
                                 data: {
                                     laser_speed: 10,
-                                    power: 20
+                                    power: 0.2
                                 }
                             },
                             {
@@ -341,7 +341,7 @@ define(function() {
                                 label: 'Steel',
                                 data: {
                                     laser_speed: 50,
-                                    power: 50
+                                    power: 0.5
                                 }
                             }
                         ]
@@ -358,8 +358,9 @@ define(function() {
                         text: 'Power',
                         high: 'High',
                         low: 'Low',
-                        min: 1,
-                        max: 50
+                        min: 0,
+                        max: 1,
+                        step: 0.1
                     }
                 },
                 apply: 'Apply',
