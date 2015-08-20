@@ -47,6 +47,7 @@ define([
                 ws.send(lastOrder + ' ' + filename);
             },
             upload: function(filesize, print_data, opts) {
+                opts = opts || {};
                 opts.onFinished = opts.onFinished || function() {};
 
                 var CHUNK_PKG_SIZE = 4096,
