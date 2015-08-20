@@ -2403,7 +2403,6 @@ input[type=range]::-webkit-slider-runnable-track {
     background: #bbbbbb;
     border: 0px solid transparent;
     border-radius: 0px;
-    box-shadow: 3.7px 3.7px 0px #ffffff, 0px 0px 3.7px #ffffff;
     cursor: pointer;
     height: 8px;
     width: 100%; }
@@ -2421,6 +2420,9 @@ input[type=range]::-webkit-slider-thumb {
 
 input[type=range]:focus::-webkit-slider-runnable-track {
     background: #c5c5c5; }
+
+.readonly {
+    pointer-events: none; }
 
 .setup-panel {
     position: absolute; }
