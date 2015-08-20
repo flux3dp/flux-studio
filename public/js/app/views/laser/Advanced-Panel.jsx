@@ -133,6 +133,7 @@ define([
                                     data-max-text={lang.form.power.high}
                                     min={lang.form.power.min}
                                     max={lang.form.power.max}
+                                    step={lang.form.power.step}
                                     defaultValue={this.state.defaultMaterial.data.power}
                                     onChange={this._changeRangeNumber('power')}
                                     onMouseUp={this._handleRangeMouseUp}
