@@ -3,8 +3,9 @@ define([
     'react',
     'jsx!widgets/Select',
     'jsx!widgets/Modal',
+    'jsx!widgets/File-Uploader',
     'jsx!views/laser/Advanced-Panel'
-], function($, React, SelectView, Modal, AdvancedPanel) {
+], function($, React, SelectView, Modal, FileUploader, AdvancedPanel) {
     'use strict';
 
     return React.createClass({
@@ -120,7 +121,17 @@ define([
                 importButton = (
                     <div className={import_class}>
                         <lable className="fa fa-plus">{lang.laser.import}</lable>
-                        <input type="file" accept="image/*" multiple/>
+                        <FileUploader
+                            ref="fileUploader"
+                            accept="image/*"
+                            multiple={true}
+                            onReadFileStarted={this.props.uploadProcess.onReadFileStarted}
+                            onReadingFile={this.props.uploadProcess.onFileReading}
+                            onReadEnd={this.props.uploadProcess.onFileReadEnd}
+                            onError={function() {
+                                console.log('error');
+                            }}
+                        />
                     </div>
                 ),
                 saveButton = (
@@ -202,9 +213,11 @@ define([
         getDefaultProps: function() {
             return {
                 settingMaterial: React.PropTypes.object,
+                uploadProcess: React.PropTypes.object,
                 onRunLaser: React.PropTypes.func,
                 onExport: React.PropTypes.func,
-                hasImage: React.PropTypes.bool
+                hasImage: React.PropTypes.bool,
+                mode: React.PropTypes.string
             };
         },
 
