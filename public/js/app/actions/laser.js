@@ -383,7 +383,6 @@ define([
 
         return {
             handleLaser: function(settings) {
-                console.log('handle laser');
                 handleLaser(
                     settings,
                     sendToMachine
@@ -401,8 +400,14 @@ define([
                 );
             },
             destroySocket: function() {
-                bitmapWebSocket.connection.close(false);
-                svgWebSocket.connection.close(false);
+                if ('undefined' !== typeof bitmapWebSocket) {
+                    bitmapWebSocket.connection.close(false);
+                }
+
+                if ('undefined' !== typeof svgWebSocket) {
+                    svgWebSocket.connection.close(false);
+                }
+
                 shortcuts.off(['l_cmd', 'del']);
                 shortcuts.off(['r_cmd', 'del']);
             },
