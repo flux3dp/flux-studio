@@ -183,9 +183,21 @@ define([
                         onScanFinished = function(point_cloud) {
                             var upload_name = 'scan-' + (new Date()).getTime(),
                                 onUploadFinished = function() {
+                                    var control;
                                     mesh = self._getMesh(self.state.meshIndex);
 
                                     if (0 < self.state.scanTimes) {
+                                        control = scanedModel.attachControl(mesh.model);
+                                        control.rotate();
+
+                                        shortcuts.on(['r'], function(e) {
+                                            control.rotate();
+                                        });
+
+                                        shortcuts.on(['t'], function(e) {
+                                            control.translate();
+                                        });
+
                                         self.setState({
                                             enableMerge: true
                                         });
@@ -355,21 +367,18 @@ define([
                         onMergeStarting = function() {
                             self._openBlocker(true);
                         },
-                        target_position = meshes[1].model.position,
                         target_rotation = meshes[1].model.rotation,
+                        box = new THREE.Box3().setFromObject(meshes[1].model),
                         position = {
-                            x: target_position.x,
-                            y: target_position.y,
-                            z: target_position.z
+                            x: box.center().x,
+                            y: box.center().y,
+                            z: box.center().z
                         },
                         rotation = {
                             x: target_rotation.x,
                             y: target_rotation.y,
                             z: target_rotation.z
-                        },
-                        box = new THREE.Box3().setFromObject(meshes[1].model);
-
-                    position.z += box.size().z /2;
+                        };
 
                     self.props.scanModelingWebSocket.merge(
                         meshes[0].name,
@@ -443,7 +452,6 @@ define([
 
                     self.props.scanMethods.stop();
 
-                    console.log(self.state.meshIndex);
                     if (0 === self.state.meshIndex) {
                         self._refreshCamera();
 
@@ -605,6 +613,87 @@ define([
                     );
                 },
 
+                _setManualTracking: function() {
+                    var self = this,
+                        rotateScene = function(dir) {
+                            if ('undefined' === typeof self.props.camera) {
+                                return;
+                            }
+
+                            var cameraPosition = self.props.camera,
+                                x = cameraPosition.position.x,
+                                y = cameraPosition.position.y,
+                                z = cameraPosition.position.z,
+                                speed = Math.PI / 180 * 10; // 10 deg
+
+                            if ('left' === dir) {
+                                cameraPosition.position.x = x * Math.cos(speed) + y * Math.sin(speed);
+                                cameraPosition.position.y = y * Math.cos(speed) - x * Math.sin(speed);
+                            }
+                            else {
+                                cameraPosition.position.x = x * Math.cos(speed) - y * Math.sin(speed);
+                                cameraPosition.position.y = y * Math.cos(speed) + x * Math.sin(speed);
+                            }
+
+                            cameraPosition.lookAt(self.props.scene.position);
+
+                            scanedModel.update();
+                        },
+                        zoom = function(dir) {
+                            if ('undefined' === typeof self.props.camera) {
+                                return;
+                            }
+
+                            var distance = 100 * ( ('out' === dir) ? 1 : -1),
+                                mb = distance > 0 ? 1.1 : 0.9,
+                                cameraPosition = self.props.camera.position;
+
+                            if (isNaN(cameraPosition.x) || isNaN(cameraPosition.y) || isNaN(cameraPosition.y)) {
+                                return;
+                            }
+
+                            if (('in' === dir && 20 >= cameraPosition.z) ||
+                                ('out' === dir && 200 <= cameraPosition.z)
+                            ) {
+                                return;
+                            }
+
+                            cameraPosition.x = cameraPosition.x * mb;
+                            cameraPosition.y = cameraPosition.y * mb;
+                            cameraPosition.z = cameraPosition.z * mb;
+
+                            scanedModel.update();
+                        };
+
+                    shortcuts.on(
+                        ['left'],
+                        function(e) {
+                            rotateScene('left');
+                        }
+                    );
+
+                    shortcuts.on(
+                        ['right'],
+                        function(e) {
+                            rotateScene('right');
+                        }
+                    );
+
+                    shortcuts.on(
+                        ['up'],
+                        function(e) {
+                            zoom('in');
+                        }
+                    );
+
+                    shortcuts.on(
+                        ['down'],
+                        function(e) {
+                            zoom('out');
+                        }
+                    );
+                },
+
                 getInitialState: function() {
                     return {
                         lang: args.state.lang,
@@ -683,6 +772,8 @@ define([
                         this._renderStageSection()
                     );
 
+                    this._setManualTracking();
+
                     return (
                         <div className="studio-container scan-studio">
 
@@ -710,7 +801,6 @@ define([
                                 self.setProps({
                                     error: data
                                 });
-                                console.log('error', data);
                             },
                             onReady: function() {
                                 self.setState({
@@ -718,57 +808,6 @@ define([
                                 });
                                 self._openBlocker(false);
                             }
-                        },
-                        rotateScene = function(dir) {
-                            if ('undefined' === typeof self.props.camera) {
-                                return;
-                            }
-
-                            var x = self.props.camera.position.x,
-                                y = self.props.camera.position.y,
-                                z = self.props.camera.position.z,
-                                speed = 0.5;
-
-                            if ('left' === dir) {
-                                self.props.camera.position.x = x * Math.cos(speed) + y * Math.sin(speed);
-                                self.props.camera.position.y = y * Math.cos(speed) - x * Math.sin(speed);
-                            }
-                            else {
-                                self.props.camera.position.x = x * Math.cos(speed) - y * Math.sin(speed);
-                                self.props.camera.position.y = y * Math.cos(speed) + x * Math.sin(speed);
-                            }
-
-                            self.props.camera.lookAt(self.props.scene.position);
-
-                            scanedModel.update();
-                        },
-                        zoom = function(dir) {
-                            if ('undefined' === typeof self.props.camera) {
-                                return;
-                            }
-
-                            var x = self.props.camera.position.x,
-                                y = self.props.camera.position.y,
-                                z = self.props.camera.position.z,
-                                speed = 0.5;
-
-                            if ('in' === dir) {
-                                x = Math.max(x - 0.5, 10);
-                                y = Math.max(y - 0.5, 10);
-                                z = Math.max(z - 10, 0);
-                            }
-                            else {
-                                x = Math.min(x + 0.5, 200);
-                                y = Math.min(y + 0.5, 200);
-                                z = Math.min(z + 10, 200);
-                            }
-
-                            self.props.camera.position.z = z * Math.cos(speed) + y * Math.sin(speed);
-                            self.props.camera.position.set(x, y, z);
-
-                            self.props.camera.lookAt(self.props.scene.position);
-
-                            scanedModel.update();
                         },
                         state, timer;
 
@@ -790,34 +829,6 @@ define([
                             clearInterval(timer);
                         }
                     }, 100);
-
-                    shortcuts.on(
-                        ['left'],
-                        function(e) {
-                            rotateScene('left');
-                        }
-                    );
-
-                    shortcuts.on(
-                        ['right'],
-                        function(e) {
-                            rotateScene('right');
-                        }
-                    );
-
-                    shortcuts.on(
-                        ['up'],
-                        function(e) {
-                            zoom('in');
-                        }
-                    );
-
-                    shortcuts.on(
-                        ['down'],
-                        function(e) {
-                            zoom('out');
-                        }
-                    );
                 }
 
             });
