@@ -23,7 +23,6 @@ define([
         },
 
         _onScanAgainClick: function (e) {
-            console.log('again');
             this.props.onScanAgainClick(e);
         },
 
