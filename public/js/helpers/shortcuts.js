@@ -109,6 +109,8 @@ define([
             }
 
             initialize();
+
+            return this;
         },
         off: function(keys) {
             var keyCodes = convertToKeyCode(keys),
@@ -120,6 +122,8 @@ define([
             if (-1 < index) {
                 events.splice(index, 1);
             }
+
+            return this;
         },
         disableAll: function() {
             $(root).off('keyup keydown');
