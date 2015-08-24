@@ -9,7 +9,11 @@ define([
     'use strict';
 
     var root = window,
+        isMetaKey = function(keyCode) {
+            return (91 === keyCode || 93 === keyCode);
+        },
         special_key_map = {
+            'CMD': -91,
             'L_CMD': 91,
             'R_CMD': 93,
             'SHIFT': 16,
@@ -31,10 +35,23 @@ define([
             keyCodeStatus = [];
         },
         keydown_event = function(e) {
-            keyCodeStatus.push(e.keyCode);
+            var matches = [];
+
+            if (true === e.metaKey) {
+                keyup_event();
+                keyCodeStatus.push(special_key_map.CMD);
+
+                if (false === isMetaKey(e.keyCode)) {
+                    keyCodeStatus.push(e.keyCode);
+                }
+            }
+            else {
+                keyCodeStatus.push(e.keyCode);
+            }
+
             keyCodeStatus = keyCodeStatus.unique().sort();
 
-            var matches = matchedEvents(keyCodeStatus);
+            matches = matchedEvents(keyCodeStatus);
 
             if (0 < matches.length) {
                 e.preventDefault();
