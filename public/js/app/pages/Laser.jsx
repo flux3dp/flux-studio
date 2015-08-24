@@ -60,7 +60,7 @@ define([
                         );
 
                     return (
-                        <section id="operation-table">
+                        <section id="operation-table" className="operation-table">
                             <div className="laser-object border-circle"/>
                             <SetupPanel
                                 lang={lang}
@@ -150,8 +150,9 @@ define([
                 },
 
                 componentDidMount: function() {
+                    var _laserEvents = laserEvents.call(this, args);
                     this.setProps({
-                        laserEvents: laserEvents.call(this, args)
+                        laserEvents: _laserEvents
                     });
                 },
 
