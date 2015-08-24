@@ -7,6 +7,12 @@ define([
 ], function($, i18n, localStorage, shortcuts, config) {
     'use strict';
 
+    // prevent delete (back) behavior
+    shortcuts.on(['DEL'], function(e) {
+        console.log('del');
+        e.preventDefault();
+    });
+
     // detached keyup and keydown event
     window.addEventListener('popstate', function(e) {
         shortcuts.disableAll();

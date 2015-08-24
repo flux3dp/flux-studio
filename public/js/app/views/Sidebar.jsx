@@ -11,32 +11,78 @@ define([
                     location.href = '#studio/' + address;
                 },
                 render : function() {
-                    var lang = this.state.lang;
+                    var self = this,
+                        lang = this.state.lang,
+                        cx = React.addons.classSet,
+                        genericClassName = {
+                            'item': true,
+                            'menu-item': true,
+                            'active': false
+                        },
+                        settingsClassName = {
+                            'item': true,
+                            'menu-item': true,
+                            'sticky-bottom': true,
+                            'active': false
+                        },
+                        options = [
+                            {
+                                name: 'print',
+                                className: genericClassName,
+                                label: lang.menu.print,
+                                imgSrc: '/img/icon-printer.png'
+                            },
+                            {
+                                name: 'laser',
+                                className: genericClassName,
+                                label: lang.menu.laser,
+                                imgSrc: '/img/icon-laser.png'
+                            },
+                            {
+                                name: 'scan',
+                                className: genericClassName,
+                                label: lang.menu.scan,
+                                imgSrc: '/img/icon-scan.png'
+                            },
+                            {
+                                name: 'usb',
+                                className: genericClassName,
+                                label: lang.menu.usb,
+                                imgSrc: 'http://placehold.it/34x34'
+                            },
+                            {
+                                name: 'settings',
+                                className: settingsClassName,
+                                label: '',
+                                imgSrc: '/img/icon-setting.png'
+                            }
+                        ],
+                        menuItems = options.map(function(opt, i) {
+                            var isActiveItem = -1 < location.hash.indexOf(opt.name),
+                                itemClass = '',
+                                label = '';
+
+                            if ('' !== opt.label) {
+                                label = (<p>{opt.label}</p>);
+                            }
+
+                            opt.className.active = isActiveItem;
+                            itemClass = cx(opt.className);
+
+                            return (
+                                <li className={itemClass} key={'menu' + i} onClick={self._handleNavigation.bind(null, opt.name)}>
+                                    <img src={opt.imgSrc} />
+                                    {label}
+                                </li>
+                            );
+                        }, this);
 
                     return (
-                        <ul className="menu">
-                            <li className="menu-item brand-name">
-                                <img src="/img/logo-flux.png"/></li>
-                            <li className="menu-item" onClick={this._handleNavigation.bind(null, 'print')}>
-                                <img src="/img/icon-printer.png" />
-                                <a>{lang.menu.print}</a>
+                        <ul className="side-bar">
+                            <li className="item">
+                                <img src="/img/logo-flux.png"/>
                             </li>
-                            <li className="menu-item" onClick={this._handleNavigation.bind(null, 'laser')}>
-                                <img src="/img/icon-laser.png" />
-                                <a>{lang.menu.laser}</a>
-                            </li>
-                            <li className="menu-item" onClick={this._handleNavigation.bind(null, 'scan')}>
-                                <img src="/img/icon-scan.png" />
-                                <a>{lang.menu.scan}</a>
-                            </li>
-                            <li className="menu-item" onClick={this._handleNavigation.bind(null, 'device')}>
-                                <img src="http://placehold.it/34x34" />
-                                <a>{lang.menu.device}</a>
-                            </li>
-                            <li className="menu-item sticky-bottom" onClick={this._handleNavigation.bind(null, 'settings')}>
-                                <img src="/img/icon-setting.png" />
-                                <a href="#studio/settings/general"></a>
-                            </li>
+                            {menuItems}
                         </ul>
                     );
                 },
