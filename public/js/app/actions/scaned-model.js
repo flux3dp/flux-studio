@@ -64,7 +64,7 @@ define([
         return {
             scene: scene,
             camera: camera
-        }
+        };
     }
 
     function loadStl(blob, callback) {
