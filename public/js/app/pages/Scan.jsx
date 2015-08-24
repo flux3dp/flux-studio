@@ -245,7 +245,7 @@ define([
                         stage;
 
                     stage = scanedModel.init();
-                    self.setProps(stage);
+                    this._setManualTracking(stage.scene, stage.camera);
 
                     self.setProps({
                         scanStartTime: (new Date()).getTime()
@@ -613,40 +613,40 @@ define([
                     );
                 },
 
-                _setManualTracking: function() {
+                _setManualTracking: function(scene, camera) {
                     var self = this,
                         rotateScene = function(dir) {
-                            if ('undefined' === typeof self.props.camera) {
+                            if ('undefined' === typeof camera) {
                                 return;
                             }
 
-                            var cameraPosition = self.props.camera,
-                                x = cameraPosition.position.x,
-                                y = cameraPosition.position.y,
-                                z = cameraPosition.position.z,
+                            var cameraPosition = camera.position,
+                                x = cameraPosition.x,
+                                y = cameraPosition.y,
+                                z = cameraPosition.z,
                                 speed = Math.PI / 180 * 10; // 10 deg
 
                             if ('left' === dir) {
-                                cameraPosition.position.x = x * Math.cos(speed) + y * Math.sin(speed);
-                                cameraPosition.position.y = y * Math.cos(speed) - x * Math.sin(speed);
+                                cameraPosition.x = x * Math.cos(speed) + y * Math.sin(speed);
+                                cameraPosition.y = y * Math.cos(speed) - x * Math.sin(speed);
                             }
                             else {
-                                cameraPosition.position.x = x * Math.cos(speed) - y * Math.sin(speed);
-                                cameraPosition.position.y = y * Math.cos(speed) + x * Math.sin(speed);
+                                cameraPosition.x = x * Math.cos(speed) - y * Math.sin(speed);
+                                cameraPosition.y = y * Math.cos(speed) + x * Math.sin(speed);
                             }
 
-                            cameraPosition.lookAt(self.props.scene.position);
+                            camera.lookAt(scene.position);
 
                             scanedModel.update();
                         },
                         zoom = function(dir) {
-                            if ('undefined' === typeof self.props.camera) {
+                            if ('undefined' === typeof camera) {
                                 return;
                             }
 
                             var distance = 100 * ( ('out' === dir) ? 1 : -1),
                                 mb = distance > 0 ? 1.1 : 0.9,
-                                cameraPosition = self.props.camera.position;
+                                cameraPosition = camera.position;
 
                             if (isNaN(cameraPosition.x) || isNaN(cameraPosition.y) || isNaN(cameraPosition.y)) {
                                 return;
@@ -665,28 +665,28 @@ define([
                             scanedModel.update();
                         };
 
-                    shortcuts.on(
+                    shortcuts.off(['left']).on(
                         ['left'],
                         function(e) {
                             rotateScene('left');
                         }
                     );
 
-                    shortcuts.on(
+                    shortcuts.off(['right']).on(
                         ['right'],
                         function(e) {
                             rotateScene('right');
                         }
                     );
 
-                    shortcuts.on(
+                    shortcuts.off(['up']).on(
                         ['up'],
                         function(e) {
                             zoom('in');
                         }
                     );
 
-                    shortcuts.on(
+                    shortcuts.off(['down']).on(
                         ['down'],
                         function(e) {
                             zoom('out');
@@ -771,8 +771,6 @@ define([
                         this._renderPrinterSelectorWindow() :
                         this._renderStageSection()
                     );
-
-                    this._setManualTracking();
 
                     return (
                         <div className="studio-container scan-studio">
