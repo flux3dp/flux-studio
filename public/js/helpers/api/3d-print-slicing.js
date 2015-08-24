@@ -23,7 +23,6 @@ define([
                     lastMessage = data.error;
                 },
                 onClose: function(message) {
-                    // events.onMessage({status: 'fatal', error: message});
                     lastMessage = message;
                 }
             }),
@@ -55,13 +54,16 @@ define([
                 ws.send('upload ' + name + ' ' + file.size);
                 lastOrder = 'upload';
             },
-            set: function(name, positionX, positionY, positionZ, rotationX, rotationY, rotationZ, scaleX, scaleY, scaleZ, callback) {
+            set: function(name, positionX, positionY, positionZ, rotationX, rotationY, rotationZ, scaleX, scaleY, scaleZ) {
+                var d = $.Deferred();
                 events.onMessage = function(result) {
-                    callback(result);
+                    d.resolve(result);
                 };
                 var args = [name, positionX, positionY, positionZ, rotationX, rotationY, rotationZ, scaleX, scaleY, scaleZ];
                 ws.send('set ' + args.join(' '));
                 lastOrder = 'set';
+
+                return d.promise();
             },
             delete: function(name, callback) {
                 events.onMessage = function(result) {
@@ -70,12 +72,34 @@ define([
                 ws.send('delete ' + name);
                 lastOrder = 'delete';
             },
-            go: function(nameArray, callback) {
+            go: function(nameArray) {
+                var d = $.Deferred();
                 events.onMessage = function(result) {
-                    callback(result);
+                    // server returns status first then blob
+                    if(result instanceof Blob) {
+                        d.resolve(result);
+                    }
+                    else {
+                        if(result.status !== 'complete') {
+                            d.resolve(result.error);
+                        }
+                    }
                 };
                 ws.send('go ' + nameArray.join(' '));
                 lastOrder = 'go';
+
+                return d.promise();
+            },
+            setParameter: function(name, value) {
+                var d = $.Deferred();
+                events.onMessage = function(result) {
+                    d.resolve(result);
+                };
+
+                ws.send(`set_params ${name} ${value}`);
+                lastOrder = 'set_params';
+
+                return d.promise();
             }
         };
     };

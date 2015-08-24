@@ -29,9 +29,9 @@ define([
                                 <img src="/img/icon-scan.png" />
                                 <a>{lang.menu.scan}</a>
                             </li>
-                            <li className="menu-item" onClick={this._handleNavigation.bind(null, 'usb')}>
+                            <li className="menu-item" onClick={this._handleNavigation.bind(null, 'device')}>
                                 <img src="http://placehold.it/34x34" />
-                                <a>{lang.menu.usb}</a>
+                                <a>{lang.menu.device}</a>
                             </li>
                             <li className="menu-item sticky-bottom" onClick={this._handleNavigation.bind(null, 'settings')}>
                                 <img src="/img/icon-setting.png" />

@@ -54,6 +54,11 @@ define([
                     },
                     _uploading = function(data) {
                         if ('connected' === data.status) {
+                            console.time('uploading');
+                        }
+                        else if ('continue' === data.status) {
+                            var fileReader;
+
                             for (var i = 0; i < length; i += CHUNK_PKG_SIZE) {
                                 chunk = print_data.slice(i, i + CHUNK_PKG_SIZE);
 
@@ -61,26 +66,21 @@ define([
                                     chunk = convertToTypedArray(chunk, Uint8Array);
                                 }
 
-                                blobs.push(chunk);
-                            }
-                        }
-                        else if ('continue' === data.status) {
-                            var fileReader;
-
-                            blobs.forEach(function(blob, k) {
+                                // blobs.push(chunk);
                                 fileReader = new FileReader();
 
                                 fileReader.onloadend = function(e) {
                                     ws.send(this.result);
-                                };
+                                }
+                                fileReader.readAsArrayBuffer(chunk);
+                            }
 
-                                fileReader.readAsArrayBuffer(blob);
-                            });
                         }
                         else if ('ok' === data.status) {
-                            lastOrder = 'start';
-                            onMessage = _startPrint;
-                            ws.send(lastOrder);
+                            // lastOrder = 'start';
+                            // onMessage = _startPrint;
+                            // ws.send(lastOrder);
+                            console.timeEnd('uploading');
                         }
                         else {
                             // TODO: do something

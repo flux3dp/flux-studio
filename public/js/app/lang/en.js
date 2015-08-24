@@ -72,7 +72,8 @@ define(function() {
             print: 'Print',
             laser: 'Laser',
             scan: 'Scan',
-            usb: 'USB'
+            usb: 'USB',
+            device: 'Device'
         },
         settings: {
             caption: 'Settings',
@@ -192,6 +193,7 @@ define(function() {
                     },
                     support: {
                         text: 'Support',
+                        on: 'On',
                         options: [
                             {
                                 value: 'Touching',
@@ -452,6 +454,15 @@ define(function() {
             submit: 'Submit',
             please_enter_password: 'Enter the password',
             auth_failure: 'Authentication fail',
+            retry: 'Retry'
+        },
+        device: {
+            cameraOn: 'Open Camera',
+            cameraOff: 'Close Camera',
+            browseFiles: 'Browse Files',
+            pause: 'Pause',
+            cancelTask: 'Cancel Task',
+            selectPrinter: 'Select Printer',
             retry: 'Retry'
         }
     };
