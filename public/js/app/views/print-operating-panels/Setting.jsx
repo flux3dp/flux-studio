@@ -11,7 +11,7 @@ define([
                 onPlatformClick: React.PropTypes.func,
                 onSupportClick: React.PropTypes.func,
                 onShowAdvancedSetting: React.PropTypes.func,
-                onPrintStart: React.PropTypes.func,
+                onPrintClick: React.PropTypes.func,
                 onSpeedChange: React.PropTypes.func
             };
         },
@@ -32,8 +32,8 @@ define([
         _handleShowAdvanceSetting: function(e) {
             this.props.onShowAdvancedSetting();
         },
-        _handlePrintStart: function(e) {
-            this.props.onPrintStart();
+        _handlePrintClick: function(e) {
+            this.props.onPrintClick();
         },
         _handlePrintSpeedChange: function(e) {
             this.props.onSpeedChange(e.target.value.toLowerCase());
@@ -120,7 +120,7 @@ define([
                         </button>
                     </div>
                     <div><a className="btn action btn-save" onClick={this.props.onSave}><span className="fa fa-floppy-o"></span>{lang.print.save}</a></div>
-                    <div><a className="btn action btn-print" onClick={this._handlePrintStart}><span className="fa fa-print"></span>{lang.print.start_print}</a></div>
+                    <div><a className="btn action btn-print" onClick={this._handlePrintClick}><span className="fa fa-print"></span>{lang.print.start_print}</a></div>
                     <div>{Math.round(boundingBox.x * 0.1) + 'mm x ' + Math.round(boundingBox.y * 0.1) + 'mm x ' + Math.round(boundingBox.z * 0.1) + 'mm'}</div>
                 </div>
             );

@@ -30,7 +30,8 @@ define([
 
     var responseMessage, responseBlob,
         blobExpired = true,
-        transformMode = false;
+        transformMode = false,
+        fileExtension = '.gcode';
 
     var s = {
         diameter: 170,
@@ -115,7 +116,6 @@ define([
         transformControl.addEventListener('objectChange', transform);
 
 
-
         window.addEventListener('resize', onWindowResize, false);
         renderer.domElement.addEventListener('mousemove', onMouseMove, false);
         renderer.domElement.addEventListener('mousedown', onMouseDown, false);
@@ -143,7 +143,6 @@ define([
         var loader = new THREE.STLLoader();
         var model_file_path = fileEntry.toURL();
 
-
         loader.load(model_file_path, function(geometry) {
 
             var material = new THREE.MeshPhongMaterial({
@@ -156,6 +155,9 @@ define([
 
             uploadStl(mesh.uuid, file, function(result) {
                 console.log(result);
+                if(result.status !== 'ok') {
+                    alert(result.error);
+                }
             });
 
             geometry.center();
@@ -192,7 +194,7 @@ define([
             objects.push(mesh);
 
             render();
-    });
+        });
     }
 
     function onMouseDown(e) {
@@ -590,73 +592,81 @@ define([
 
     }
 
-    function readyGCode(callback) {
-        // set each model's attribute with backend
-        callback = callback || function() {};
-        if(blobExpired) {
-            var ready   = true,
-                counter = objects.length;
+    function readyGCode() {
+        var d = $.Deferred();
+        syncObjectParameter(objects, 0).then(function() {
+            d.resolve('');
+        });
+        return d.promise();
+    }
 
-            objects.forEach(function(obj) {
-                printController.set(
-                    obj.uuid,
-                    obj.position.x,
-                    obj.position.y,
-                    obj.position.z,
-                    obj.rotation.x,
-                    obj.rotation.y,
-                    obj.rotation.z,
-                    obj.scale.x,
-                    obj.scale.y,
-                    obj.scale.z,
-                    function(result) {
-                        if(result.status === 'fatal') {
-                            readyFailed(result.error);
-                            ready = false;
-                            // to do: handle error occured
-                        }
-                        counter--;
-                        if(counter === 0 && ready) {
-                            getGCode(callback);
-                        }
-                    }
-                );
+    function syncObjectParameter(objects, index) {
+        var d = $.Deferred();
+        index = index || 0;
+        if(index < objects.length) {
+            printController.set(
+                objects[index].uuid,
+                objects[index].position.x,
+                objects[index].position.y,
+                objects[index].position.z,
+                objects[index].rotation.x,
+                objects[index].rotation.y,
+                objects[index].rotation.z,
+                objects[index].scale.x,
+                objects[index].scale.y,
+                objects[index].scale.z
+            ).then(function(result) {
+                if(result.status === 'error') {
+                    index = objects.length;
+                }
+                if(index < objects.length) {
+                    console.log('syncing parameters');
+                    return d.resolve(syncObjectParameter(objects, index + 1));
+                }
             });
         }
         else {
-            console.log('already ready');
-            callback();
+            console.log('syncing done');
+            var d = $.Deferred();
+            d.resolve('');
         }
+        return d.promise();
     }
 
     function downloadGCode(fileName) {
-        readyGCode(function() {
-            fileName += '.gcode';
-            saveAs(responseBlob, fileName);
+        var d = $.Deferred();
+        getGCode().then(function(blob) {
+            console.log('downloading ', blob);
+            d.resolve(saveAs(blob, fileName));
         });
-    }
-
-    function readyFailed(message) {
-        console.log(message);
+        return d.promise();
     }
 
     function getGCode(callback) {
-        console.log('fetching g-code from server');
+        var d = $.Deferred();
         var ids = [];
         objects.forEach(function(obj) {
             ids.push(obj.uuid);
         });
-        printController.go(ids, function(result) {
+
+        readyGCode().then(
+            function() {
+                return printController.go(ids);
+            }
+        ).then(function(result) {
             if(result instanceof Blob) {
-                responseBlob = result;
                 console.log('blob ready');
                 blobExpired = false;
-                callback();
+                d.resolve(result);
             }
             else {
+                console.log('error: ', result);
                 responseMessage = result;
+                // todo: error logging
             }
         });
+
+        return d.promise();
     }
 
     function removeFromScene(name) {
@@ -676,14 +686,6 @@ define([
     }
 
     function getSelectedObjectSize() {
-        // if(scene)
-        // {
-        //     for(var i = scene.children.length - 1; i >= 0; i--) {
-        //         if(scene.children[i].name === 'BoundingBoxHelper') {
-        //             return scene.children[i];
-        //         }
-        //     }
-        // }
         if(!$.isEmptyObject(SELECTED)) {
             boundingBox = new THREE.BoundingBoxHelper(SELECTED, s.colorSelected);
             boundingBox.update();
@@ -712,26 +714,26 @@ define([
         var name = advanceParameters[index],
             value = settings[name] || 'default';
 
-        $.when(printController.setParameter(name, value)).then(
-            function(result) {
+        if(index < advanceParameters.length)
+        {
+            printController.setParameter(name, value).then(function(result) {
                 if(result.status === 'error') {
                     index = advanceParameters.length;
+                    // todo: error logging
+                    console.log(result.error);
                 }
-                if(index < advanceParameters.length - 1) {
+                if(index < advanceParameters.length) {
                     setAdvanceParameter(settings, index + 1);
                 }
                 else {
                     return;
                 }
-            },
-            function() {
-                return;
-            }
-        )
+            });
+        }
     }
 
     function setParameter(name, value) {
-        $.when(printController.setParameter(name, value)).then(
+        printController.setParameter(name, value).then(
             function(result) {
                 if(result.status === 'error' || result.status === 'fatal') {
                     // todo: error logging
@@ -754,6 +756,7 @@ define([
         setRotateMode           : setRotateMode,
         setScaleMode            : setScaleMode,
         setAdvanceParameter     : setAdvanceParameter,
-        setParameter            : setParameter
+        setParameter            : setParameter,
+        getGCode                : getGCode
     };
 });
