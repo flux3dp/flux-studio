@@ -287,15 +287,9 @@ define([
             };
 
         shortcuts.on(
-            ['l_cmd', 'del'],
+            ['cmd', 'del'],
             function(e) {
-                deleteImage();
-            }
-        );
-
-        shortcuts.on(
-            ['r_cmd', 'del'],
-            function(e) {
+                console.log(e);
                 deleteImage();
             }
         );
@@ -408,8 +402,7 @@ define([
                     svgWebSocket.connection.close(false);
                 }
 
-                shortcuts.off(['l_cmd', 'del']);
-                shortcuts.off(['r_cmd', 'del']);
+                shortcuts.off(['cmd', 'del']);
             },
             resetFileFormat: function() {
                 self.setProps({
