@@ -4112,10 +4112,16 @@ input.switch:checked ~ label:after {
 /**
  * Laser
  */
+.laser-studio .operation-table {
+    position: relative;
+    height: 100%;
+    width: 100%; }
+
 .laser-studio .operating-panel {
     left: 20px;
     top: 20px;
-    width: 182px; }
+    width: 182px;
+    z-index: 9999; }
     .laser-studio .operating-panel .action-buttons .btn {
         display: block;
         margin: 0 0 5px 0; }
@@ -4142,7 +4148,7 @@ input.switch:checked ~ label:after {
     border: 1px solid #ddd;
     height: 450px;
     overflow: hidden;
-    position: fixed;
+    position: absolute;
     width: 450px; }
 
 .laser-studio .laser-object .ft-container {
@@ -4177,7 +4183,8 @@ input.switch:checked ~ label:after {
     padding: 20px;
     right: 25px;
     top: 20px;
-    width: 214px; }
+    width: 214px;
+    z-index: 9999; }
     .laser-studio .object-position .control:nth-child(odd) {
         margin: 0 0 4px 0; }
     .laser-studio .object-position .control:nth-child(even) {
