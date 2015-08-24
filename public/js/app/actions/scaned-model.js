@@ -110,23 +110,25 @@ define([
 
     function attachControl(mesh) {
         var setMode = function(mode) {
-                createTransformControls();
-                mesh.transform_control.setMode(mode);
+                mesh = createTransformControls(mesh);
+                mesh.transformControl.setMode(mode);
                 render();
             },
-            createTransformControls = function() {
-                if ('undefined' === typeof mesh.transform_control) {
-                    var transform_control = new THREE.TransformControls( camera, renderer.domElement );
+            createTransformControls = function(mesh) {
+                if ('undefined' === typeof mesh.transformControl) {
+                    var transformControl = new THREE.TransformControls( camera, renderer.domElement );
 
-                    transform_control.addEventListener('change', render);
-                    transform_control.setSpace('local');
+                    transformControl.addEventListener('change', render);
+                    transformControl.setSpace('local');
 
-                    transform_control.attach(mesh);
-                    scene.add(transform_control);
+                    transformControl.attach(mesh);
+                    scene.add(transformControl);
 
-                    mesh.transform_control = transform_control;
+                    mesh.transformControl = transformControl;
                     mesh.transform = methods;
                 }
+
+                return mesh;
             },
             methods = {
                 remove: function() {
@@ -172,8 +174,8 @@ define([
     }
 
     function removeMesh(mesh) {
-        if ('undefined' !== typeof mesh.transform_control) {
-            scene.remove(mesh.transform_control);
+        if ('undefined' !== typeof mesh.transformControl) {
+            scene.remove(mesh.transformControl);
         }
 
         scene.remove(mesh);
@@ -299,9 +301,11 @@ define([
     function render() {
         renderer.render(scene, camera);
 
-        if ('undefined' !== typeof transform_control) {
-            transform_control.update();
-        }
+        scene.children.forEach(function(el) {
+            if ('undefined' !== typeof el.transformControl) {
+                el.transformControl.update();
+            }
+        });
 
         if ('undefined' !== typeof cylinder) {
             var box = new THREE.Box3().setFromObject(cylinder).size();
