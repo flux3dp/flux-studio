@@ -21,6 +21,9 @@ define([
                 supportOn: true
             };
         },
+        _roundValue: function(value) {
+            return (parseInt(Math.round(value * 10)) * 0.1).toFixed(1);
+        },
         _handlePlatformClick: function (e) {
             this.props.onPlatformClick(this.state.platformOn);
             this.setState({ platformOn: !this.state.platformOn });
@@ -121,7 +124,7 @@ define([
                     </div>
                     <div><a className="btn action btn-save" onClick={this.props.onSave}><span className="fa fa-floppy-o"></span>{lang.print.save}</a></div>
                     <div><a className="btn action btn-print" onClick={this._handlePrintClick}><span className="fa fa-print"></span>{lang.print.start_print}</a></div>
-                    <div>{Math.round(boundingBox.x * 0.1) + 'mm x ' + Math.round(boundingBox.y * 0.1) + 'mm x ' + Math.round(boundingBox.z * 0.1) + 'mm'}</div>
+                    <div>{this._roundValue(boundingBox.x) + ' x ' + this._roundValue(boundingBox.y) + ' x ' + this._roundValue(boundingBox.z) + ' (mm)'}</div>
                 </div>
             );
         }
