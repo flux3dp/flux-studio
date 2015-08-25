@@ -9,7 +9,9 @@ define([
 
     // prevent delete (back) behavior
     shortcuts.on(['DEL'], function(e) {
-        e.preventDefault();
+        if ('BODY' === e.target.tagName) {
+            e.preventDefault();
+        }
     });
 
     // detached keyup and keydown event
