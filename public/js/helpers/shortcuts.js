@@ -37,31 +37,29 @@ define([
         keydown_event = function(e) {
             var matches = [];
 
-            if ('BODY' === e.target.tagName) {
-                if (true === e.metaKey) {
-                    keyup_event();
-                    keyCodeStatus.push(special_key_map.CMD);
+            if (true === e.metaKey) {
+                keyup_event();
+                keyCodeStatus.push(special_key_map.CMD);
 
-                    if (false === isMetaKey(e.keyCode)) {
-                        keyCodeStatus.push(e.keyCode);
-                    }
-                }
-                else {
+                if (false === isMetaKey(e.keyCode)) {
                     keyCodeStatus.push(e.keyCode);
                 }
-
-                keyCodeStatus = keyCodeStatus.unique().sort();
-
-                matches = matchedEvents(keyCodeStatus);
-
-                if (0 < matches.length) {
-                    keyCodeStatus = [];
-                }
-
-                matches.forEach(function(event, index) {
-                    event.callback.apply(null, [e]);
-                });
             }
+            else {
+                keyCodeStatus.push(e.keyCode);
+            }
+
+            keyCodeStatus = keyCodeStatus.unique().sort();
+
+            matches = matchedEvents(keyCodeStatus);
+
+            if (0 < matches.length) {
+                keyCodeStatus = [];
+            }
+
+            matches.forEach(function(event, index) {
+                event.callback.apply(null, [e]);
+            });
         },
         initialize = function() {
             if (false === has_bind) {
