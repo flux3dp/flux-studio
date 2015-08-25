@@ -16,6 +16,12 @@
         </section>
     </div>
 </body>
-<script data-main="js/main" src="js/require.js"></script>
+<script>
+    var script = document.createElement('script'),
+        body = document.querySelector('body');
+    script.setAttribute('src', 'js/require.js');
+    script.dataset.main = 'js/main.js?v=' + (new Date()).getTime();
+    body.appendChild(script);
+</script>
 
 </html>
