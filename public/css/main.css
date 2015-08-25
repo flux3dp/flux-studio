@@ -4125,7 +4125,7 @@ input.switch:checked ~ label:after {
     left: 20px;
     top: 20px;
     width: 182px;
-    z-index: 9999; }
+    z-index: 9998; }
     .laser-studio .operating-panel .action-buttons .btn {
         display: block;
         margin: 0 0 5px 0; }
@@ -4188,7 +4188,7 @@ input.switch:checked ~ label:after {
     right: 25px;
     top: 20px;
     width: 214px;
-    z-index: 9999; }
+    z-index: 9998; }
     .laser-studio .object-position .control:nth-child(odd) {
         margin: 0 0 4px 0; }
     .laser-studio .object-position .control:nth-child(even) {
