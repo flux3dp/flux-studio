@@ -32,7 +32,7 @@ function(React, $, Backbone, display) {
                     ],
                     // go to studio
                     [
-                        /^studio\/?(print|laser|scan|usb|settings)\/?(.*)?/,
+                        /^studio\/?(print|laser|scan|usb|settings|device)\/?(.*)?/,
                         'studio',
                         this.studio
                     ],
@@ -96,7 +96,8 @@ function(React, $, Backbone, display) {
                     'settings': this.settings,
                     'laser': this.laser,
                     'scan': this.scan,
-                    'usb': this.usb
+                    'usb': this.usb,
+                    'device': this.device
                 },
                 func = this.print;
 
@@ -127,6 +128,16 @@ function(React, $, Backbone, display) {
         usb: function() {
             require(['jsx!pages/usb'], function(view) {
                 _display(view);
+            });
+        },
+
+        device: function(child, requests) {
+            require(['jsx!pages/device'], function(view) {
+                var args = {
+                    child: child,
+                    requests: requests
+                };
+                _display(view, args);
             });
         },
 

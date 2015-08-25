@@ -23,51 +23,56 @@ define([
         args = args || {};
 
         var view = React.createClass({
-                _setupSettings: undefined,
 
-                _saveSettings: function(settings) {
-                    this._setupSettings = settings;
+                _onRunLaser: function(settings) {
+                    this.setState({
+                        openPrinterSelectorWindow: true,
+                        settings: settings
+                    });
                 },
 
-                _renderHeader: function() {
-                    var lang = args.state.lang,
-                        cx = React.addons.classSet,
-                        export_file_class = cx({
-                            'btn btn-default fa fa-floppy-o': true,
-                            'hide': false === this.state.hasImage
-                        });
-
-                    return (
-                        <header className="top-menu-bar">
-                            <div className="btn-h-group pull-left">
-                                <div className="btn btn-default file-importer">
-                                    <lable className="fa fa-plus">{lang.laser.import}</lable>
-                                    <input type="file" multiple/>
-                                </div>
-                                <button className={export_file_class}>{lang.laser.save}</button>
-                            </div>
-                        </header>
-                    );
+                _onExport: function(settings) {
+                    this.props.laserEvents.export(settings);
                 },
+
+                _openBlocker: function(is_open) {
+                    this.setState({
+                        openBlocker: is_open
+                    })
+                },
+
                 _renderStageSection: function() {
                     var lang = args.state.lang,
                         cx = React.addons.classSet,
                         image_panel_class = cx({
-                            'hide': false === this.state.hasImage,
                             'panel object-position': true
-                        });
+                        }),
+                        imagePanel = (
+                            true === this.state.hasImage ?
+                            <ImagePanel
+                                lang={lang}
+                                ref="imagePanel"
+                                mode={this.state.mode}
+                                className={image_panel_class}
+                                onThresholdChanged={this.props.laserEvents.thresholdChanged}
+                            /> :
+                            ''
+                        );
 
                     return (
-                        <section id="operation-table">
+                        <section id="operation-table" className="operation-table">
                             <div className="laser-object border-circle"/>
                             <SetupPanel
                                 lang={lang}
                                 mode={this.state.mode}
                                 className='operating-panel'
                                 hasImage={this.state.hasImage}
-                                getSettings={this._saveSettings}
+                                onRunLaser={this._onRunLaser}
+                                onExport={this._onExport}
+                                uploadProcess={this.props.laserEvents}
+                                ref="setupPanel"
                             />
-                            <ImagePanel lang={lang} className={image_panel_class}/>
+                            {imagePanel}
                         </section>
                     );
                 },
@@ -79,7 +84,8 @@ define([
                                 selectedPrinter: auth_printer,
                                 openPrinterSelectorWindow: false
                             });
-                            self.props.doLaser(self._setupSettings);
+
+                            self.props.laserEvents.handleLaser(self.state.settings);
                         },
                         content = (
                             <PrinterSelector lang={lang} onGettingPrinter={onGettingPrinter}/>
@@ -95,46 +101,63 @@ define([
                     );
                 },
 
+                _renderBlocker: function(lang) {
+                    return (
+                        true === this.state.openBlocker ?
+                        <Modal content={<div className="spinner-flip spinner-reverse"/>}/> :
+                        ''
+                    );
+                },
+
                 render: function() {
                     var lang = args.state.lang,
-                        header = this._renderHeader(),
                         stageSection = this._renderStageSection(),
                         printerSelector = (
                             true === this.state.openPrinterSelectorWindow ?
                             this._renderPrinterSelectorWindow(lang) :
                             ''
-                        );
-
-                    this._setupSettings = lang.laser.advanced.form.object_options.options.filter(
-                        function(obj) {
-                            return true === obj.selected;
-                        }
-                    )[0].data;
+                        ),
+                        blocker = this._renderBlocker(lang);
 
                     return (
                         <div className="studio-container laser-studio">
-                            {header}
                             {printerSelector}
 
                             <div className="stage">
                                 {stageSection}
                             </div>
+
+                            {blocker}
                         </div>
                     );
                 },
 
+                getDefaultProps: function () {
+                    return {
+                        laserEvents: React.PropTypes.object,
+                    };
+                },
                 getInitialState: function() {
                     return {
                         step: '',
                         mode: 'engrave',
                         hasImage: false,
                         selectedPrinter: 0,
-                        openPrinterSelectorWindow: false
+                        openPrinterSelectorWindow: false,
+                        openBlocker: false,
+                        settings: {}
                     };
                 },
 
                 componentDidMount: function() {
-                    laserEvents(args, this);
+                    var _laserEvents = laserEvents.call(this, args);
+                    this.setProps({
+                        laserEvents: _laserEvents
+                    });
+                },
+
+                componentWillUnmount: function () {
+                    this.props.laserEvents.destroySocket();
                 }
 
             });

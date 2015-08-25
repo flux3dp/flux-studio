@@ -120,13 +120,14 @@
 
 .print-studio .model-displayer {
     background: #000;
-    height: calc(100% - 66px);
+    height: 100%;
     width: 100%;
 }
 
 .operating-panel {
     position: absolute;
     width: 100%;
+    right: 0px;
 }
 
 .operating-panel .panel {
@@ -181,7 +182,7 @@
 .operating-panel .operation.command {
     position: absolute;
     top: 200px;
-    right: 50px;
+    right: 20px;
 }
 
 .operating-panel .operation.command > div {
@@ -313,7 +314,7 @@
     border-radius: 3px;
 }
 
-.print-studio .setup-panel .btn-print {
+.print-studio .setup-panel .action {
     width: 100%;
     background-color: #FFF;
     border-radius: 3px;
@@ -323,7 +324,7 @@
     margin-top: 10px;
 }
 
-.print-studio .setup-panel .btn-print:hover {
+.print-studio .setup-panel .action:hover {
     background-color: #33D375;
 }
 
@@ -497,7 +498,7 @@ input.switch:checked ~ label:after
 .print-studio .control-bottom {
     position: absolute;
     bottom: 40px;
-    width: 100%;
+    width: calc(100% - 66px);
 }
 
 .print-studio .control-bottom > div {

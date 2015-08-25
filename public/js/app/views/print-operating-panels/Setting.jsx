@@ -1,7 +1,8 @@
 define([
     'jquery',
     'react',
-], function($, React) {
+    'app/actions/print'
+], function($, React, printController) {
     'use strict';
 
     return React.createClass({
@@ -10,7 +11,8 @@ define([
                 onPlatformClick: React.PropTypes.func,
                 onSupportClick: React.PropTypes.func,
                 onShowAdvancedSetting: React.PropTypes.func,
-                onPrintStart: React.PropTypes.func
+                onPrintClick: React.PropTypes.func,
+                onSpeedChange: React.PropTypes.func
             };
         },
         getInitialState: function() {
@@ -30,13 +32,17 @@ define([
         _handleShowAdvanceSetting: function(e) {
             this.props.onShowAdvancedSetting();
         },
-        _handlePrintStart: function(e) {
-            this.props.onPrintStart();
+        _handlePrintClick: function(e) {
+            this.props.onPrintClick();
+        },
+        _handlePrintSpeedChange: function(e) {
+            this.props.onSpeedChange(e.target.value.toLowerCase());
         },
         render: function() {
             var lang = this.props.lang,
                 printSpeedOptions,
-                materialOptions;
+                materialOptions,
+                boundingBox;
 
             printSpeedOptions = lang.print.params.beginner.print_speed.options.map(function(o) {
                 return (<option>{o.label}</option>);
@@ -45,6 +51,9 @@ define([
             materialOptions = lang.print.params.beginner.material.options.map(function(o) {
                 return (<option>{o.label}</option>);
             });
+
+            boundingBox = printController.getSelectedObjectSize();
+            boundingBox = typeof(boundingBox) === 'undefined' ? {x: 0, y: 0, z: 0} : boundingBox.box.size();
 
             return (
                 <div id="setup-panel" className="setup-panel">
@@ -55,7 +64,7 @@ define([
                             <div className="controls">
                                 <div className="label">{lang.print.params.beginner.print_speed.text}</div>
                                 <div className="control">
-                                    <select>
+                                    <select onChange={this._handlePrintSpeedChange}>
                                         {printSpeedOptions}
                                     </select>
                                 </div>
@@ -90,7 +99,7 @@ define([
                             <div className="controls">
                                 <div className="label">{lang.print.params.beginner.support.text}</div>
                                 <div className="control">
-                                    <label>{lang.print.params.beginner.support.options[0].label}</label>
+                                    <label>{lang.print.params.beginner.support.on}</label>
                                     <div className="switchContainer">
                                         <input type="checkbox" id="supportSwitch" name="supportSwitch" className="switch" onClick={this._handleSupportClick} />
                                         <label htmlFor="supportSwitch">&nbsp;</label>
@@ -103,7 +112,16 @@ define([
                         </div>
                     </div>
 
-                    <a className="btn btn-print" onClick={this._handlePrintStart}><span className="fa fa-print"></span>{lang.print.start_print}</a>
+                    <div>
+                        <button className="btn action file-importer">
+                            <div className="fa fa-plus"></div>
+                            {lang.print.import}
+                            <input type="file" accept=".stl" onChange={this.props.onImport} />
+                        </button>
+                    </div>
+                    <div><a className="btn action btn-save" onClick={this.props.onSave}><span className="fa fa-floppy-o"></span>{lang.print.save}</a></div>
+                    <div><a className="btn action btn-print" onClick={this._handlePrintClick}><span className="fa fa-print"></span>{lang.print.start_print}</a></div>
+                    <div>{Math.round(boundingBox.x * 0.1) + 'mm x ' + Math.round(boundingBox.y * 0.1) + 'mm x ' + Math.round(boundingBox.z * 0.1) + 'mm'}</div>
                 </div>
             );
         }

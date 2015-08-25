@@ -167,6 +167,11 @@ define([
             touch_socket = touch(_opts).send(serial, password);
         },
 
+        _handleClose: function(e) {
+            e.preventDefault();
+            this.props.onClose();
+        },
+
         render : function() {
             var self = this,
                 lang = this.props.lang,
@@ -190,6 +195,7 @@ define([
                 <div className="select-printer">
                     <div className="select-printer-content">
                         {content}
+                        <div className="btn btn-default pull-right" onClick={this._handleClose}>{this.props.lang.settings.cancel}</div>
                     </div>
                 </div>
             );
@@ -228,7 +234,8 @@ define([
         getDefaultProps: function() {
             return {
                 lang: React.PropTypes.object,
-                onGettingPrinter: React.PropTypes.func
+                onGettingPrinter: React.PropTypes.func,
+                onClose: React.PropTypes.func
             };
         },
 

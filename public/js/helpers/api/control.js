@@ -21,18 +21,20 @@ define([
 
                     lastMessage = data;
 
-                    if ('string' === typeof data && 'error' === data.status) {
+                    if ('string' === typeof data.status && 'error' === data.status) {
                         opts.onError(data);
                     }
                     else {
-                        onMessage(data);
+                        events.onMessage(data);
                     }
 
                 }
             }),
             lastOrder = '',
             lastMessage = '',
-            onMessage = function() {};
+            events = {
+                onMessage: function() {}
+            };
 
         return {
             ws: ws,
@@ -44,7 +46,10 @@ define([
                 lastOrder = 'select';
                 ws.send(lastOrder + ' ' + filename);
             },
-            upload: function(filesize, print_data) {
+            upload: function(filesize, print_data, opts) {
+                opts = opts || {};
+                opts.onFinished = opts.onFinished || function() {};
+
                 var CHUNK_PKG_SIZE = 4096,
                     length = print_data.length || print_data.size,
                     interrupt = function(cmd) {
@@ -54,6 +59,11 @@ define([
                     },
                     _uploading = function(data) {
                         if ('connected' === data.status) {
+                            console.time('uploading');
+                        }
+                        else if ('continue' === data.status) {
+                            var fileReader;
+
                             for (var i = 0; i < length; i += CHUNK_PKG_SIZE) {
                                 chunk = print_data.slice(i, i + CHUNK_PKG_SIZE);
 
@@ -61,26 +71,18 @@ define([
                                     chunk = convertToTypedArray(chunk, Uint8Array);
                                 }
 
-                                blobs.push(chunk);
-                            }
-                        }
-                        else if ('continue' === data.status) {
-                            var fileReader;
-
-                            blobs.forEach(function(blob, k) {
+                                // blobs.push(chunk);
                                 fileReader = new FileReader();
 
                                 fileReader.onloadend = function(e) {
                                     ws.send(this.result);
-                                };
+                                }
+                                fileReader.readAsArrayBuffer(chunk);
+                            }
 
-                                fileReader.readAsArrayBuffer(blob);
-                            });
                         }
                         else if ('ok' === data.status) {
-                            lastOrder = 'start';
-                            onMessage = _startPrint;
-                            ws.send(lastOrder);
+                            console.timeEnd('uploading');
                         }
                         else {
                             // TODO: do something
@@ -94,7 +96,7 @@ define([
 
                 lastOrder = 'upload';
 
-                onMessage = _uploading;
+                events.onMessage = _uploading;
 
                 ws.send(lastOrder + ' ' + filesize);
 
