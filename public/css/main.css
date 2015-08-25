@@ -2778,7 +2778,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
             height: 34px;
             width: 34px; }
     .side-bar .active {
-        box-shadow: 5px 0px 0px 0px #A00 inset; }
+        box-shadow: 5px 0px 0px 0px #00C853 inset; }
 
 .print-studio {
     padding: 0; }
@@ -4149,6 +4149,7 @@ input.switch:checked ~ label:after {
     right: 0;
     top: 0;
     background: url(/img/laser-platform.png);
+    background-size: 100% 100%;
     border: 1px solid #ddd;
     height: 450px;
     overflow: hidden;
