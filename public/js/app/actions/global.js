@@ -9,7 +9,6 @@ define([
 
     // prevent delete (back) behavior
     shortcuts.on(['DEL'], function(e) {
-        console.log('del');
         e.preventDefault();
     });
 
