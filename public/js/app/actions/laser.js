@@ -345,13 +345,15 @@ define([
                 onGetFinished = function(data, size) {
                     var url = window.URL,
                         blob = new Blob([data], { type: file.type }),
-                        objectUrl = url.createObjectURL(data);
+                        objectUrl = url.createObjectURL(data),
+                        platformWidth = $laser_platform.width(),
+                        platformHeight = $laser_platform.height(),
+                        ratio = 1;
 
-                    if (size.width > $laser_platform.width()) {
-                        size.width = 280;
-                    }
-                    else if (size.height > $laser_platform.height()) {
-                        size.height = 280;
+                    if (size.width > platformWidth || size.height > platformHeight) {
+                        ratio = Math.min(360 / size.width, 260 / size.height);
+                        size.width = size.width * ratio;
+                        size.height = size.height * ratio;
                     }
 
                     imageData(blob, {
