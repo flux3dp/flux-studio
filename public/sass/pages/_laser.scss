@@ -13,7 +13,7 @@
         left: 20px;
         top: 20px;
         width: 182px;
-        z-index: $max-z-index;
+        z-index: $max-z-index - 1;
 
         .action-buttons {
             .btn {
@@ -39,6 +39,7 @@
     .laser-object {
         @include absolute-center();
         background: url(/img/laser-platform.png);
+        background-size: 100% 100%;
         border: 1px solid #ddd;
         height: 450px;
         overflow: hidden;
@@ -87,7 +88,7 @@
         right: 25px;
         top: 20px;
         width: 214px;
-        z-index: $max-z-index;
+        z-index: $max-z-index - 1;
 
         .control:nth-child(odd) {
             margin: 0 0 4px 0;
