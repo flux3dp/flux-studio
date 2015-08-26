@@ -12,8 +12,11 @@ define([
     'jsx!views/print-operating-panels/Advanced',
     'jsx!views/print-operating-panels/Monitor',
     'helpers/file-system',
+    'jsx!widgets/Modal',
+    'jsx!views/Print-Selector',
+    'helpers/api/control',
     'plugins/knob/jquery.knob'
-], function($, React, display, printController, RadioGroupView, ClassNames, OperatingPanel, SettingPanel, ScalePanel, RotationPanel, AdvancedPanel, MonitorPanel, FileSystem) {
+], function($, React, display, director, RadioGroupView, ClassNames, OperatingPanel, SettingPanel, ScalePanel, RotationPanel, AdvancedPanel, MonitorPanel, FileSystem, Modal, PrinterSelector, printerController) {
     'use strict';
 
     return function(args) {
@@ -42,18 +45,20 @@ define([
             view = React.createClass({
                 getInitialState: function() {
                     return ({
-                        checked             : false,
-                        locked              : true,
-                        operation           : '',
-                        previewMode         : 'normal',
-                        showPreviewModeList : false,
-                        showAdvancedSetting : false,
-                        showMonitor         : false,
-                        modelSelected       : null
+                        checked                     : false,
+                        locked                      : true,
+                        operation                   : '',
+                        previewMode                 : 'normal',
+                        showPreviewModeList         : false,
+                        showAdvancedSetting         : false,
+                        showMonitor                 : false,
+                        modelSelected               : null,
+                        openPrinterSelectorWindow   : false,
+                        openWaitWindow              : false
                     });
                 },
                 componentDidMount: function() {
-                    printController.init(this);
+                    director.init(this);
                 },
                 _updateSelectedSize: function() {
 
@@ -77,10 +82,10 @@ define([
                             this.setState({ operation: 'rotate' });
                             break;
                         case 'center':
-                            printController.alignCenter();
+                            director.alignCenter();
                             break;
                         case 'delete':
-                            printController.removeSelected();
+                            director.removeSelected();
                             this.setState({ operation: '' });
                             break;
                         default:
@@ -88,43 +93,50 @@ define([
                     }
 
                 },
+                _handleSpeedChange: function(speed) {
+                    console.log(speed);
+                    director.setParameter('printSpeed', speed);
+                },
                 _handlePlatformClick: function(state) {
                     console.log('platform clicked', state)
+                    director.setParameter('raft', state ? '1' : '0');
                 },
                 _handleSupportClick: function(state) {
                     console.log('support clicked', state);
+                    director.setParameter('support', state ? '1' : '0');
                 },
                 _handleShowAdvancedSetting: function() {
                     this.setState({ showAdvancedSetting: !this.state.showAdvancedSetting });
                 },
-                _handlePrintStart: function() {
-                    printController.readyGCode();
-                    this.setState({ showMonitor: true });
+                _handlePrintClick: function() {
+                    this.setState({
+                        openPrinterSelectorWindow: true
+                    });
                 },
                 _handleRotation: function(rotation) {
                     _rotation = rotation;
-                    printController.rotate(rotation.x, rotation.y, rotation.z);
+                    director.rotate(rotation.x, rotation.y, rotation.z, true);
                 },
                 _handleResetRotation: function() {
                     _rotation.x = 0;
                     _rotation.y = 0;
                     _rotation.z = 0;
-                    printController.rotate(0, 0, 0);
+                    director.rotate(0, 0, 0, true);
                 },
                 _handleScaleChange: function(scale) {
                     _scale = scale;
-                    printController.setScale(scale.x, scale.y, scale.z, scale.locked);
+                    director.setScale(scale.x, scale.y, scale.z, scale.locked, true);
                 },
                 _handleResetScale: function() {
-                    printController.setScale(1, 1, 1);
+                    director.setScale(1, 1, 1, true);
                 },
                 _handleAdvancedSettingCancel: function() {
                     console.log('advanced setting cancelled');
                     this.setState({ showAdvancedSetting: false });
                 },
                 _handleAdvancedSettingDone: function(setting) {
-                    console.log(setting);
                     advancedSetting = setting;
+                    director.setAdvanceParameter(setting);
                     this.setState({ showAdvancedSetting: false });
                 },
                 _handleShowMonitor: function(e) {
@@ -147,28 +159,47 @@ define([
                                 file,
                                 {
                                     onComplete: function(e, fileEntry) {
-                                        printController.appendModel(fileEntry, file);
+                                        director.appendModel(fileEntry, file);
                                     }
                                 }
                             );
                         })(files.item(i));
-
                     }
                     e.target.value = null;
                 },
                 _handleFileDownload: function(e) {
+                    this.setState({ openWaitWindow: true });
                     var fileName = prompt(lang.print.download_prompt);
                     fileName = fileName || 'no name';
-                    printController.downloadGCode(fileName);
+
+                    director.downloadGCode(fileName).then(() => {
+                        this.setState({ openWaitWindow: false });
+                    });
+                },
+                _handlePrinterSelectorWindowClose: function() {
+                    this.setState({ openPrinterSelectorWindow: false });
+                },
+                _handlePrinterSelected: function(selectedPrinter) {
+                    console.log(selectedPrinter);
+                    this.setState({
+                        openPrinterSelectorWindow: false,
+                        openWaitWindow: true
+                    });
+                    var control_methods = printerController(selectedPrinter.serial);
+                    director.getGCode().then((blob) => {
+                        console.log('sending blob to machine', blob);
+                        control_methods.upload(blob.size, blob);
+                        this.setState({ openWaitWindow: false });
+                    });
                 },
                 _renderHeader: function() {
+                    return;
                     var currentMode     = this.state.previewMode === 'normal' ? lang.print.normal_preview : lang.print.support_preview,
                         normalClass     = ClassNames('fa', 'fa-check', 'icon', 'pull-right', {hide: this.state.previewMode !== 'normal'}),
                         supportClass    = ClassNames('fa', 'fa-check', 'icon', 'pull-right', {hide: this.state.previewMode !== 'support'}),
                         previewClass    = ClassNames('preview', {hide: !this.state.showPreviewModeList}),
-                        boundingBox     = printController.getSelectedObjectSize();
-
-                        boundingBox = typeof(boundingBox) === 'undefined' ? {x: 0, y: 0, z: 0} : boundingBox.box.size();
+                        boundingBox     = director.getSelectedObjectSize();
+                        boundingBox     = typeof(boundingBox) === 'undefined' ? {x: 0, y: 0, z: 0} : boundingBox.box.size();
 
                     return (
                         <header className="top-menu-bar">
@@ -197,13 +228,6 @@ define([
                         <OperatingPanel
                             modelSelected       = {this.state.modelSelected}
                             lang                = {lang}
-                            onNavUp             = {this._handleNavUp}
-                            onNavRight          = {this._handleNavRight}
-                            onNavDown           = {this._handleNavDown}
-                            onNavLeft           = {this._handleNavLeft}
-                            onNavHome           = {this._handleNavHome}
-                            onZoomIn            = {this._handleZoomIn}
-                            onZoomOut           = {this._handleZoomOut}
                             onOperationChange   = {this._handleOperationChange} />
                     );
                 },
@@ -214,7 +238,10 @@ define([
                             onPlatformClick         = {this._handlePlatformClick}
                             onSupportClick          = {this._handleSupportClick}
                             onShowAdvancedSetting   = {this._handleShowAdvancedSetting}
-                            onPrintStart            = {this._handlePrintStart} />
+                            onImport                = {this._handleFileUpload}
+                            onSave                  = {this._handleFileDownload}
+                            onPrintClick            = {this._handlePrintClick}
+                            onSpeedChange           = {this._handleSpeedChange} />
                     );
                 },
                 _renderAdvancedPanel: function() {
@@ -237,13 +264,32 @@ define([
                             onPrintRestart={this._handlePrintRestart} />
                     );
                 },
-                render : function() {
-                    var header          = this._renderHeader(),
-                        operatingPanel  = this._renderOperatingPanel(),
-                        settingPanel    = this._renderSettingPanel(),
-                        advancedPanel   = this.state.showAdvancedSetting ? this._renderAdvancedPanel() : '',
+                _renderPrinterSelectorWindow: function() {
+                    var content = (
+                        <PrinterSelector
+                            lang={lang}
+                            onClose={this._handlePrinterSelectorWindowClose}
+                            onGettingPrinter={this._handlePrinterSelected} />
+                    )
+                    return (
+                        <Modal {...this.props} content={content} />
+                    );
+                },
+                _renderWaitWindow: function() {
+                    var spinner = <div className="spinner-flip spinner-reverse"/>;
+                    return (
+                        <Modal content={spinner} />
+                    );
+                },
+                render: function() {
+                    var header                  = this._renderHeader(),
+                        operatingPanel          = this._renderOperatingPanel(),
+                        settingPanel            = this._renderSettingPanel(),
+                        advancedPanel           = this.state.showAdvancedSetting ? this._renderAdvancedPanel() : '',
                         bottomPanel,
-                        monitorPanel    = this.state.showMonitor ? this._renderMonitorPanel() : '';
+                        monitorPanel            = this.state.showMonitor ? this._renderMonitorPanel() : '',
+                        printerSelectorWindow   = this.state.openPrinterSelectorWindow ? this._renderPrinterSelectorWindow() : '',
+                        waitWindow              = this.state.openWaitWindow ? this._renderWaitWindow() : '';
 
                     switch(this.state.operation) {
                         case 'rotate':
@@ -254,6 +300,7 @@ define([
                                     onReset={this._handleResetRotation}
                                     onRotate={this._handleRotation} />
                             );
+                            director.setRotateMode();
                             break;
                         case 'scale':
                             bottomPanel = (
@@ -264,6 +311,7 @@ define([
                                     onScaleChange={this._handleScaleChange}
                                     onToggleLock={this._handleScaleToggleLock} />
                             );
+                            director.setScaleMode();
                             break;
                         default:
                             break;
@@ -290,6 +338,10 @@ define([
                             {bottomPanel}
 
                             {monitorPanel}
+
+                            {printerSelectorWindow}
+
+                            {waitWindow}
 
                             <div id="model-displayer" className="model-displayer" style={divStyle}></div>
                         </div>

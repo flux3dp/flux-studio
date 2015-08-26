@@ -2132,43 +2132,6 @@ a {
     overflow: hidden;
     width: calc(100% - 66px); }
 
-.menu {
-    background-color: #000000;
-    height: 100%;
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    position: relative;
-    width: 66px; }
-
-.menu .brand-name {
-    background: #000;
-    color: #fff; }
-
-.menu .menu-item {
-    cursor: pointer;
-    height: 66px;
-    text-align: center;
-    width: 100%; }
-
-.menu .menu-item:hover {
-    background-color: rgba(255, 255, 255, 0.5); }
-
-.menu .menu-item a {
-    color: #FFF;
-    display: block;
-    letter-spacing: 0.3px;
-    text-decoration: none; }
-
-.menu .menu-item img {
-    height: 34px;
-    margin-top: 8px;
-    width: 34px; }
-
-.menu .menu-item.brand-name img,
-.menu .sticky-bottom img {
-    margin-top: 15px; }
-
 .horizontal-menu .menu-item {
     float: left;
     width: auto; }
@@ -2440,7 +2403,6 @@ input[type=range]::-webkit-slider-runnable-track {
     background: #bbbbbb;
     border: 0px solid transparent;
     border-radius: 0px;
-    box-shadow: 3.7px 3.7px 0px #ffffff, 0px 0px 3.7px #ffffff;
     cursor: pointer;
     height: 8px;
     width: 100%; }
@@ -2458,6 +2420,9 @@ input[type=range]::-webkit-slider-thumb {
 
 input[type=range]:focus::-webkit-slider-runnable-track {
     background: #c5c5c5; }
+
+.readonly {
+    pointer-events: none; }
 
 .setup-panel {
     position: absolute; }
@@ -2527,7 +2492,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         letter-spacing: 0.3px;
         width: 100%; }
     .studio-container .stage {
-        height: calc(100% - 66px);
+        height: 100%;
         position: relative; }
     .studio-container .btn-default {
         border-radius: 5px; }
@@ -2538,7 +2503,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
 .spinner-flip {
     background-color: #333;
     height: 40px;
-    margin: 100px auto;
+    margin: auto;
     -webkit-animation: sk-rotateplane 1.2s infinite ease-in-out;
     animation: sk-rotateplane 1.2s infinite ease-in-out;
     width: 40px; }
@@ -2616,7 +2581,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
 .btn-disabled {
     pointer-events: none;
     position: relative; }
-    .btn-disabled::before {
+    .btn-disabled::after {
         background: rgba(255, 255, 255, 0.5);
         content: "";
         display: block;
@@ -2627,7 +2592,8 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         width: 100%; }
 
 .btn-warning {
-    background: #f00; }
+    background: #f00;
+    border-radius: 5px; }
 
 .btn-link {
     color: #000;
@@ -2719,6 +2685,12 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         top: 0;
         z-index: -1; }
 
+.modal-alert {
+    background: #FFF;
+    border-radius: 5px;
+    padding: 5px 20px;
+    text-align: center; }
+
 /**
  * the view of printer selector
  */
@@ -2756,6 +2728,57 @@ input[type=range]:focus::-webkit-slider-runnable-track {
                 .select-printer .printer-list .printer-item input[type="radio"]:checked + .print-name {
                     background: #ccc;
                     z-index: -1; }
+
+/**
+ * sidebar
+ */
+.side-bar {
+    background-color: #000000;
+    height: 100%;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    position: relative;
+    width: 66px; }
+    .side-bar .menu {
+        margin: 0;
+        padding: 0; }
+    .side-bar .menu-item {
+        cursor: pointer; }
+        .side-bar .menu-item img {
+            display: block;
+            margin: 0; }
+        .side-bar .menu-item:hover {
+            background-color: rgba(255, 255, 255, 0.5); }
+    .side-bar .item {
+        display: -webkit-box;
+        /* OLD - iOS 6-, Safari 3.1-6 */
+        display: -webkit-flex;
+        /* NEW - Chrome */
+        display: flex;
+        /* NEW, Spec - Opera 12.1, Firefox 20+ */
+        background: #000;
+        color: #fff;
+        height: 66px;
+        align-items: center;
+        flex-direction: column;
+        justify-content: center;
+        height: 66px;
+        text-align: center;
+        width: 100%; }
+        .side-bar .item p {
+            color: #FFF;
+            display: block;
+            font-size: 12px;
+            font-weight: lighter;
+            letter-spacing: .3px;
+            margin: 0;
+            text-decoration: none; }
+        .side-bar .item img {
+            height: 34px;
+            width: 34px; }
+    .side-bar .active {
+        box-shadow: 5px 0px 0px 0px #00C853 inset; }
 
 .print-studio {
     padding: 0; }
@@ -2858,12 +2881,13 @@ input[type=range]:focus::-webkit-slider-runnable-track {
 
 .print-studio .model-displayer {
     background: #000;
-    height: calc(100% - 66px);
+    height: 100%;
     width: 100%; }
 
 .operating-panel {
     position: absolute;
-    width: 100%; }
+    width: 100%;
+    right: 0px; }
 
 .operating-panel .panel {
     float: right; }
@@ -2908,7 +2932,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
 .operating-panel .operation.command {
     position: absolute;
     top: 200px;
-    right: 50px; }
+    right: 20px; }
 
 .operating-panel .operation.command > div {
     background-color: #FFF;
@@ -3017,7 +3041,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
     background-color: #FFF;
     border-radius: 3px; }
 
-.print-studio .setup-panel .btn-print {
+.print-studio .setup-panel .action {
     width: 100%;
     background-color: #FFF;
     border-radius: 3px;
@@ -3026,7 +3050,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
     color: #FFF;
     margin-top: 10px; }
 
-.print-studio .setup-panel .btn-print:hover {
+.print-studio .setup-panel .action:hover {
     background-color: #33D375; }
 
 .print-studio .setup-panel .main .time {
@@ -3167,7 +3191,7 @@ input.switch:checked ~ label:after {
 .print-studio .control-bottom {
     position: absolute;
     bottom: 40px;
-    width: 100%; }
+    width: calc(100% - 66px); }
 
 .print-studio .control-bottom > div {
     position: relative;
@@ -3493,7 +3517,7 @@ input.switch:checked ~ label:after {
     text-align: center; }
 
 .settings .nav li.nav-item {
-    width: 165px;
+    width: 50%;
     height: 47px;
     line-height: 47px;
     display: inline;
@@ -4092,10 +4116,19 @@ input.switch:checked ~ label:after {
 /**
  * Laser
  */
+.laser-studio .operation-table {
+    position: relative;
+    height: 100%;
+    width: 100%; }
+
 .laser-studio .operating-panel {
     left: 20px;
     top: 20px;
-    width: 182px; }
+    width: 182px;
+    z-index: 9998; }
+    .laser-studio .operating-panel .action-buttons .btn {
+        display: block;
+        margin: 0 0 5px 0; }
 
 .laser-studio .fa::before {
     margin: 0 5px 0 0; }
@@ -4116,10 +4149,11 @@ input.switch:checked ~ label:after {
     right: 0;
     top: 0;
     background: url(/img/laser-platform.png);
+    background-size: 100% 100%;
     border: 1px solid #ddd;
     height: 450px;
     overflow: hidden;
-    position: fixed;
+    position: absolute;
     width: 450px; }
 
 .laser-studio .laser-object .ft-container {
@@ -4154,7 +4188,8 @@ input.switch:checked ~ label:after {
     padding: 20px;
     right: 25px;
     top: 20px;
-    width: 214px; }
+    width: 214px;
+    z-index: 9998; }
     .laser-studio .object-position .control:nth-child(odd) {
         margin: 0 0 4px 0; }
     .laser-studio .object-position .control:nth-child(even) {
@@ -4238,6 +4273,9 @@ input.switch:checked ~ label:after {
 .scan-studio .setup-panel {
     left: 20px;
     width: 182px; }
+    .scan-studio .setup-panel .action-buttons .btn {
+        display: block;
+        margin: 0 0 5px 0; }
 
 .scan-studio .starting-section {
     height: 100%;
@@ -4245,11 +4283,6 @@ input.switch:checked ~ label:after {
 
 .scan-studio .starting-section {
     position: relative; }
-
-.scan-studio .launch-img {
-    display: block;
-    height: 193px;
-    width: 280px; }
 
 .scan-studio .operating-section {
     height: 100%;
@@ -4261,12 +4294,11 @@ input.switch:checked ~ label:after {
     border-radius: 5px;
     bottom: 10px;
     height: 150px;
-    left: 0;
+    left: 15px;
     margin: auto;
     padding: 10px;
     position: absolute;
-    right: 0;
-    width: 60%; }
+    width: 40%; }
     .scan-studio .scan-progress .progress {
         height: 20px; }
     .scan-studio .scan-progress .progress-bar {
@@ -4276,6 +4308,15 @@ input.switch:checked ~ label:after {
         background-size: 40px 40px;
         height: 100%;
         -webkit-background-size: 40px 40px; }
+    .scan-studio .scan-progress .progress-status {
+        display: -webkit-box;
+        /* OLD - iOS 6-, Safari 3.1-6 */
+        display: -webkit-flex;
+        /* NEW - Chrome */
+        display: flex;
+        /* NEW, Spec - Opera 12.1, Firefox 20+ */ }
+        .scan-studio .scan-progress .progress-status span {
+            flex: 1; }
 
 .scan-studio .scan-model-save-as {
     background: #eee;
@@ -4287,3 +4328,11 @@ input.switch:checked ~ label:after {
         margin: 0 0 10px 0; }
         .scan-studio .scan-model-save-as .file-formats label {
             float: left; }
+
+.scan-studio .modal-printer-selecter {
+    position: static; }
+
+.device-studio {
+    margin-left: 10px; }
+    .device-studio .btn-default {
+        margin-right: 5px; }

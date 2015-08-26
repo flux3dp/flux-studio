@@ -72,7 +72,8 @@ define(function() {
             print: 'Print',
             laser: 'Laser',
             scan: 'Scan',
-            usb: 'USB'
+            usb: 'USB',
+            device: 'Device'
         },
         settings: {
             caption: 'Settings',
@@ -192,6 +193,7 @@ define(function() {
                     },
                     support: {
                         text: 'Support',
+                        on: 'On',
                         options: [
                             {
                                 value: 'Touching',
@@ -278,9 +280,9 @@ define(function() {
             save: 'Save',
             acceptable_files: 'JPG, PNG, PDF, AI',
             drop_files_to_import: 'Drop your file here or click "import" to upload your file',
-            advenced: 'Advenced',
-            start_engrave: 'ENGRAVE',
-            start_cut: 'CUT',
+            button_advanced: 'Advanced',
+            start_engrave: 'Engrave',
+            start_cut: 'Cut',
             print_params: {
                 object_height: {
                     text: 'Object Height',
@@ -333,7 +335,7 @@ define(function() {
                                 selected: true,
                                 data: {
                                     laser_speed: 10,
-                                    power: 10
+                                    power: 255
                                 }
                             },
                             {
@@ -341,7 +343,7 @@ define(function() {
                                 label: 'Steel',
                                 data: {
                                     laser_speed: 50,
-                                    power: 50
+                                    power: 255
                                 }
                             }
                         ]
@@ -358,8 +360,9 @@ define(function() {
                         text: 'Power',
                         high: 'High',
                         low: 'Low',
-                        min: 1,
-                        max: 50
+                        min: 0,
+                        max: 255,
+                        step: 1
                     }
                 },
                 apply: 'Apply',
@@ -368,15 +371,14 @@ define(function() {
         },
         scan: {
             start_scan: 'Scan',
-            start_multiscan: 'Start to Multiscan',
-            rescan: 'Rescan',
-            export: 'Export',
-            share: 'Share',
-            print_with_flux: 'Print with FLUX',
+            cancel_scan: 'Cancel',
+            convert_to_stl: 'Convert',
+            scan_again: 'Scan Again',
+            start_multiscan: ' Multiscan',
             convert_to_3d_model: 'Convert to 3D model...',
             complete: 'Completed',
             remaining_time: 'Remaining Time',
-            save_as: 'Save as',
+            elapsed_time: 'Elapsed Time',
             do_save: 'Save',
             save_mode: [
                 {
@@ -452,6 +454,15 @@ define(function() {
             submit: 'Submit',
             please_enter_password: 'Enter the password',
             auth_failure: 'Authentication fail',
+            retry: 'Retry'
+        },
+        device: {
+            cameraOn: 'Open Camera',
+            cameraOff: 'Close Camera',
+            browseFiles: 'Browse Files',
+            pause: 'Pause',
+            cancelTask: 'Cancel Task',
+            selectPrinter: 'Select Printer',
             retry: 'Retry'
         }
     };

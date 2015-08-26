@@ -35,6 +35,13 @@
     .setup-panel {
         left: 20px;
         width: 182px;
+
+        .action-buttons {
+            .btn {
+                display: block;
+                margin: 0 0 5px 0;
+            }
+        }
     }
 
     .starting-section {
@@ -44,12 +51,6 @@
 
     .starting-section {
         position: relative;
-    }
-
-    .launch-img {
-        display: block;
-        height: 193px;
-        width: 280px;
     }
 
     .operating-section {
@@ -63,12 +64,11 @@
         border-radius: 5px;
         bottom: 10px;
         height: 150px;
-        left: 0;
+        left: 15px;
         margin: auto;
         padding: 10px;
         position: absolute;
-        right: 0;
-        width: 60%;
+        width: 40%;
 
         .progress {
             height: 20px;
@@ -81,6 +81,14 @@
             background-size: 40px 40px;
             height: 100%;
             -webkit-background-size: 40px 40px;
+        }
+
+        .progress-status {
+            @include flexbox();
+
+            span {
+                flex: 1;
+            }
         }
     }
 
@@ -99,5 +107,9 @@
             }
         }
 
+    }
+
+    .modal-printer-selecter {
+        position: static;
     }
 }

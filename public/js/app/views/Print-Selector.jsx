@@ -9,7 +9,6 @@ define([
     'use strict';
 
     return React.createClass({
-        timer: null,
         discover_socket: null,
         selected_printer: null,
 
@@ -167,6 +166,11 @@ define([
             touch_socket = touch(_opts).send(serial, password);
         },
 
+        _handleClose: function(e) {
+            e.preventDefault();
+            this.props.onClose();
+        },
+
         render : function() {
             var self = this,
                 lang = this.props.lang,
@@ -190,6 +194,7 @@ define([
                 <div className="select-printer">
                     <div className="select-printer-content">
                         {content}
+                        <div className="btn btn-default pull-right" onClick={this._handleClose}>{this.props.lang.settings.cancel}</div>
                     </div>
                 </div>
             );
@@ -202,6 +207,12 @@ define([
             self.discover_socket = discover(function(printers) {
                 options = [];
 
+                Array.observe(options, function(changes) {
+                    self.setState({
+                        printer_options: options
+                    });
+                });
+
                 printers.forEach(function(el) {
                     var printer_item = self._renderPrinterItem(el);
 
@@ -211,12 +222,6 @@ define([
                     });
                 });
             });
-
-            self.timer = setInterval(function() {
-                self.setState({
-                    printer_options: options
-                });
-            }, 1000);
 
             return {
                 printer_options: [],
@@ -228,13 +233,13 @@ define([
         getDefaultProps: function() {
             return {
                 lang: React.PropTypes.object,
-                onGettingPrinter: React.PropTypes.func
+                onGettingPrinter: React.PropTypes.func,
+                onClose: React.PropTypes.func
             };
         },
 
         componentWillUnmount: function() {
             this.discover_socket.connection.close();
-            clearInterval(this.timer);
         }
 
     });

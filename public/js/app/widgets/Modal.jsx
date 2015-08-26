@@ -11,7 +11,8 @@ define([
                 onOpen: React.PropTypes.func,
                 onClose: React.PropTypes.func,
                 content: React.PropTypes.element,
-                disabledEscapeOnBackground: false
+                disabledEscapeOnBackground: false,
+                className: {}
             };
         },
 
@@ -28,8 +29,14 @@ define([
         },
 
         render: function() {
+            var cx = React.addons.classSet,
+                backgroundClass;
+
+            this.props.className['modal-window'] = true;
+            backgroundClass = cx(this.props.className);
+
             return (
-                <div className="modal-window">
+                <div className={backgroundClass}>
                     <div className="modal-background" onClick={this._onEscapeOnBackground}/>
                     {this.props.content}
                 </div>

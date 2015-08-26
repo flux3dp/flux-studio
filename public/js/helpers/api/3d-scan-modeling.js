@@ -29,6 +29,9 @@ define([
 
                     lastMessage = data;
 
+                },
+                onClose: function(result) {
+                    opts.onError(result);
                 }
             }),
             lastMessage = '',
