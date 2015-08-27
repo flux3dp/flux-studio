@@ -44,10 +44,10 @@ define([
         },
 
         _getSettings: function() {
-            var settings = JSON.parse(JSON.stringify(this._advancedSettings || {}));
+            var settings = this._advancedSettings;
 
-            if ('undefined' === typeof this._advancedSettings) {
-                settings = $(this.refs.material.getDOMNode()).find('option:selected').data('meta');
+            if ('undefined' === typeof settings) {
+                settings = JSON.parse(JSON.stringify($(this.refs.material.getDOMNode()).find('option:selected').data('meta')));
             }
 
             delete settings.material;
