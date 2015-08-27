@@ -4150,7 +4150,7 @@ input.switch:checked ~ label:after {
     top: 0;
     background: url(/img/laser-platform.png);
     background-size: 100% 100%;
-    border: 1px solid #ddd;
+    border: 1px solid #767676;
     height: 450px;
     overflow: hidden;
     position: absolute;
