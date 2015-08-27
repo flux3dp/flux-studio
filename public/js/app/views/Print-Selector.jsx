@@ -76,7 +76,7 @@ define([
                 $el = $(e.target),
                 meta = $el.data('meta'),
                 opts = {
-                    onError: function(data) {
+                    onFail: function(data) {
                         self.setState({
                             show_password: true,
                             waiting: false
