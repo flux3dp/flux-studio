@@ -64,6 +64,10 @@ define([
             }, 0);
         },
 
+        componentDidMount: function () {
+            this.refs.uploader.getDOMNode().setAttribute('nwsaveas', true);
+        },
+
         render: function() {
             var self = this,
                 cx = React.addons.classSet,
@@ -74,6 +78,7 @@ define([
 
             return (
                 <input
+                    ref="uploader"
                     type="file"
                     className={className}
                     accept={props.accept}
