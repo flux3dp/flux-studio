@@ -48,7 +48,7 @@ define([
                                 name: 'device',
                                 className: genericClassName,
                                 label: lang.menu.device,
-                                imgSrc: 'http://placehold.it/34x34'
+                                imgSrc: '/img/device.png'
                             },
                             {
                                 name: 'settings',
