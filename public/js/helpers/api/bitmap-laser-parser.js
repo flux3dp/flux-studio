@@ -18,24 +18,14 @@ define([
 
         var ws = new Websocket({
                 method: 'bitmap-laser-parser',
-                onMessage: function(result) {
+                onMessage: function(data) {
 
-                    var data = (true === isJson(result.data) ? JSON.parse(result.data) : result.data),
-                        error_code;
+                    events.onMessage(data);
 
-                    if ('string' === typeof data.status && 'fatal' === data.status) {
-                        opts.onError(data.error, data);
-                    }
-                    else {
-                        events.onMessage(data);
-                    }
-
-                    lastMessage = data;
-
-                }
+                },
+                onError: opts.onError
             }),
             lastOrder = '',
-            lastMessage = '',
             events = {
                 onMessage: function() {}
             },

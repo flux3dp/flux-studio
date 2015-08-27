@@ -5,10 +5,9 @@
 define([
     'helpers/websocket',
     'helpers/convertToTypedArray',
-    'helpers/is-json',
     'helpers/data-history',
     'helpers/api/set-params'
-], function(Websocket, convertToTypedArray, isJson, history, setParams) {
+], function(Websocket, convertToTypedArray, history, setParams) {
     'use strict';
 
     return function(opts) {
@@ -17,25 +16,16 @@ define([
 
         var ws = new Websocket({
                 method: 'svg-laser-parser',
-                onMessage: function(result) {
+                onMessage: function(data) {
 
-                    var data = (true === isJson(result.data) ? JSON.parse(result.data) : result.data),
-                        error_code;
+                    events.onMessage(data);
 
-                    if ('string' === typeof data.status && 'fatal' === data.status) {
-                        opts.onError(data.error, data);
-                    }
-                    else {
-                        events.onMessage(data);
-                    }
-
-                    lastMessage = data;
-
-                }
+                },
+                onError: opts.onError,
+                onFatal: opts.onFatal
             }),
             uploaded_svg = [],
             lastOrder = '',
-            lastMessage = '',
             events = {
                 onMessage: function() {}
             },

@@ -8,14 +8,13 @@ define(['helpers/websocket'], function(Websocket) {
     return function(opts) {
         opts = opts || {};
         opts.onSuccess = opts.onSuccess || function() {};
-        opts.onError = opts.onError || function() {};
+        opts.onFail = opts.onFail || function() {};
 
         var ws = new Websocket({
                 method: 'touch',
                 autoReconnect: false,
-                onMessage: function(result) {
-                    var data = JSON.parse(result.data),
-                        is_success = (
+                onMessage: function(data) {
+                    var is_success = (
                             true === (data.has_response || false) &&
                             true === (data.reachable || false) &&
                             true === (data.auth || false)
@@ -25,12 +24,13 @@ define(['helpers/websocket'], function(Websocket) {
                         opts.onSuccess(data);
                     }
                     else {
-                        opts.onError(data);
+                        opts.onFail(data);
                     }
 
                     getResponse = true;
                     clearInterval(timer);
-                }
+                },
+                onError: opts.onError
             }),
             getResponse = true,
             timer;

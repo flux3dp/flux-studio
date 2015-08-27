@@ -4,9 +4,8 @@
  */
 define([
     'helpers/websocket',
-    'helpers/convertToTypedArray',
-    'helpers/is-json'
-], function(Websocket, convertToTypedArray, isJson) {
+    'helpers/convertToTypedArray'
+], function(Websocket, convertToTypedArray) {
     'use strict';
 
     return function(opts) {
@@ -15,9 +14,7 @@ define([
 
         var ws = new Websocket({
                 method: '3dprint-slicing',
-                onMessage: function(result) {
-
-                    var data = (true === isJson(result.data) ? JSON.parse(result.data) : result.data);
+                onMessage: function(data) {
 
                     events.onMessage(data);
                     lastMessage = data.error;
