@@ -70,8 +70,8 @@ define(function() {
         },
         menu: {
             print: '列印',
-            laser: 'Laser',
-            scan: 'Scan',
+            laser: '雷雕',
+            scan: '掃描',
             usb: 'USB',
             device: '裝置'
         },
@@ -130,23 +130,23 @@ define(function() {
             }
         },
         print: {
-            import: 'Import',
+            import: '打開⋯',
             go_home: 'Go Home',
-            save: 'Save',
+            save: '儲存⋯',
             normal_preview: 'Normal Preview',
             support_view: 'Support Preview',
-            start_print: 'Print',
+            start_print: '列印',
             advanced: {
                 label: '進階設定',
-                quality: 'QUALITY',
-                layer_height: 'Layer Height',
-                infill: 'Infill',
-                speed: 'SPEED',
-                speed_while_traveling: 'Speed While Traveling',
-                speed_while_extruding: 'Spped While Extruding',
-                temperature: 'TEMPERATURE',
-                printing_temperature: 'Printing Temperature',
-                support: 'SUPPORT',
+                quality: '品質',
+                layer_height: '每層高度',
+                infill: '填充比例',
+                speed: '噴頭移動速度',
+                speed_while_traveling: 'Traveling',
+                speed_while_extruding: 'Extruding',
+                temperature: '溫度控制',
+                printing_temperature: '列印溫度',
+                support: '支撐材',
                 support_type: {
                     label: 'Support Type',
                     touch_buildplate: 'Touch Buildplate',
@@ -168,15 +168,15 @@ define(function() {
             params: {
                 beginner: {
                     print_speed: {
-                        text: 'Print Speed',
+                        text: '列印速度',
                         options: [
                             {
                                 value: 'slow',
-                                label: '心則慢'
+                                label: '中'
                             },
                             {
                                 value: 'fast',
-                                label: '世界越快',
+                                label: '快',
                                 selected: true
                             }
                         ]
@@ -192,8 +192,8 @@ define(function() {
                         ]
                     },
                     support: {
-                        text: 'Support',
-                        on: '開啟',
+                        text: '支撐',
+                        on: '支撐',
                         options: [
                             {
                                 value: 'everywhere',
@@ -207,11 +207,11 @@ define(function() {
                         ]
                     },
                     platform: {
-                        text: 'Platform',
+                        text: '平台',
                         options: [
                             {
                                 value: 'raft',
-                                label: 'Raft',
+                                label: '墊片',
                                 selected: true
                             }
                         ]
@@ -219,12 +219,12 @@ define(function() {
                 },
                 expert: {
                     layer_height: {
-                        text: 'Layer Height',
+                        text: '每層高度',
                         value: 0.3,
                         unit: 'mm'
                     },
                     print_speed: {
-                        text: 'Print Speed',
+                        text: '列印速度',
                         value: 50,
                         unit: 'mm/s'
                     },
@@ -276,35 +276,35 @@ define(function() {
             download_prompt: '請輸入檔案名稱'
         },
         laser: {
-            import: 'Import',
-            save: 'Save',
+            import: '打開⋯',
+            save: '儲存⋯',
             acceptable_files: 'JPG, PNG, PDF, AI',
             drop_files_to_import: 'Drop your file here or click "import" to upload your file',
-            button_advanced: 'Advanced',
-            start_engrave: 'Engrave',
-            start_cut: 'Cut',
+            button_advanced: '進階',
+            start_engrave: '雕刻',
+            start_cut: '切割',
             print_params: {
                 object_height: {
-                    text: 'Object Height',
+                    text: '物體高度',
                     unit: 'mm'
                 }
             },
             object_params: {
                 position: {
-                    text: 'POSITION'
+                    text: '位置'
                 },
                 size: {
-                    text: 'SIZE',
+                    text: '尺寸',
                     unit: {
-                        width: 'Width',
-                        height: 'Height'
+                        width: '寬',
+                        height: '高'
                     }
                 },
                 rotate: {
-                    text: 'ROTATE'
+                    text: '旋轉'
                 },
                 unit: {
-                    text: 'Unit',
+                    text: '單位',
                     options: [
                         {
                             value: 'mm',
@@ -318,24 +318,24 @@ define(function() {
                     ]
                 },
                 threshold: {
-                    text: 'Threshold',
+                    text: '圖片曝光',
                     default: 128
                 }
             },
             advanced: {
-                label: 'Setup',
+                label: '設定',
                 form: {
                     object_options: {
                         text: '材質',
-                        label: 'Object Options',
+                        label: '材質選項',
                         options: [
                             {
                                 value: 'wood',
-                                label: 'Wood',
+                                label: '木',
                                 selected: true,
                                 data: {
                                     laser_speed: 10,
-                                    power: 255
+                                    power: 0.2
                                 }
                             },
                             {
@@ -343,43 +343,43 @@ define(function() {
                                 label: 'Steel',
                                 data: {
                                     laser_speed: 50,
-                                    power: 255
+                                    power: 0.5
                                 }
                             }
                         ]
                     },
                     laser_speed: {
-                        text: 'Laser Speed',
+                        text: '雷射速度',
                         unit: 'mm/s',
-                        fast: 'Fast',
-                        slow: 'Slow',
+                        fast: '快',
+                        slow: '慢',
                         min: 1,
                         max: 100
                     },
                     power: {
-                        text: 'Power',
-                        high: 'High',
-                        low: 'Low',
+                        text: '雷射強度',
+                        high: '強',
+                        low: '弱',
                         min: 0,
-                        max: 255,
-                        step: 1
+                        max: 1,
+                        step: 0.1
                     }
                 },
-                apply: 'Apply',
-                cancel: 'Cancel',
+                apply: '套用',
+                cancel: '取消',
             }
         },
         scan: {
-            start_scan: 'Scan',
-            cancel_scan: 'Cancel',
-            convert_to_stl: 'Convert',
-            scan_again: 'Scan Again',
-            start_multiscan: 'Multiscan',
-            convert_to_3d_model: 'Convert to 3D model...',
-            complete: 'Completed',
-            remaining_time: 'Remaining Time',
-            elapsed_time: 'Elapsed Time',
-            do_save: 'Save',
+            start_scan: '開始掃瞄',
+            cancel_scan: '取消',
+            convert_to_stl: '轉換成 STL',
+            scan_again: '再次掃描',
+            start_multiscan: '多次掃描',
+            convert_to_3d_model: '掃描中⋯',
+            complete: '掃描進度',
+            remaining_time: '剩餘時間',
+            elapsed_time: '已用時間',
+            do_save: '儲存⋯',
             save_mode: [
                 {
                     value: 'stl',
@@ -393,59 +393,59 @@ define(function() {
             ],
             scan_params: {
                 scan_speed: {
-                    text: 'Scan Speed',
+                    text: '掃描速度',
                     options: [
                         {
                             value: '400',
-                            label: 'Fast Scan',
+                            label: '快',
                             selected: true
                         },
                         {
                             value: '800',
-                            label: 'Delegate Scan'
+                            label: '慢'
                         }
                     ]
                 },
                 object: {
-                    text: 'Object',
+                    text: '物體類型',
                     options: [
                         {
                             value: 'auto',
-                            label: 'Auto',
+                            label: '自動',
                             selected: true
                         },
                         {
                             value: 'manually',
-                            label: 'Manually'
+                            label: '手動'
                         }
                     ]
                 },
                 luminance: {
-                    text: '亮度',
+                    text: '環境光源',
                     options: [
                         {
                             value: 'light',
-                            label: 'Light',
+                            label: '較亮',
                             selected: true
                         },
                         {
                             value: 'normal',
-                            label: 'Normal'
+                            label: '普通'
                         },
                         {
                             value: 'dark',
-                            label: 'Dark'
+                            label: '較暗'
                         }
                     ]
                 }
             },
             manipulation: {
-                smooth: 'Smooth',
-                crop: 'Crop',
-                auto_merge: 'Auto Merge',
-                manual_merge: 'Manual Merge',
-                clear_noise: 'Clear Noise',
-                reset: 'Reset'
+                smooth: '平滑化',
+                crop: '剪裁',
+                auto_merge: '自動合併',
+                manual_merge: '手動合併',
+                clear_noise: '去除噪點',
+                reset: '重設'
             }
         },
         select_printer: {
