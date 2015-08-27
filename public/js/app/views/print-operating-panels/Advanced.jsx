@@ -15,11 +15,11 @@ define([
         getInitialState: function() {
             advancedSetting = this.props.setting;
             return {
-                infill          : advancedSetting.infill || 0,
-                layerHeight     : advancedSetting.layerHeight || 0.02,
-                travelingSpeed  : advancedSetting.travelingSpeed || 5,
-                extrudingSpeed  : advancedSetting.extrudingSpeed || 5,
-                temperature     : advancedSetting.temperature || 160
+                infill          : advancedSetting.infill * 100 || 20,
+                layerHeight     : advancedSetting.layerHeight || 0.2,
+                travelingSpeed  : advancedSetting.travelingSpeed || 88,
+                extrudingSpeed  : advancedSetting.extrudingSpeed || 58,
+                temperature     : advancedSetting.temperature || 200
             };
         },
         _handleLayerHeightChange: function(e) {
@@ -29,7 +29,7 @@ define([
         },
         _handleInfillChange: function(e) {
             var infill = parseInt(e.target.value);
-            advancedSetting.infill = infill;
+            advancedSetting.infill = infill / 100;
             this.setState({ infill: infill });
         },
         _handleTravelingSpeedChange: function(e) {
