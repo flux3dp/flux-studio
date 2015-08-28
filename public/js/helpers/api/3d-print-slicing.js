@@ -96,7 +96,13 @@ define([
                     d.resolve(result);
                 };
 
-                ws.send(`set_params ${name} ${value}`);
+                if(name === 'advancedSettings' && value != '') {
+                    ws.send(`advanced_setting ${value}`);
+                }
+                else {
+                    ws.send(`set_params ${name} ${value}`);
+                }
+
                 lastOrder = 'set_params';
 
                 return d.promise();

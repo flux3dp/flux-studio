@@ -152,6 +152,7 @@ define(function() {
                     touch_buildplate: 'Touch Buildplate',
                     everywhere: 'Everywhere'
                 },
+                direct_setting: 'Direct Setting',
                 platform_type: 'Platform Type'
             },
             mode: [

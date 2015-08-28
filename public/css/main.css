@@ -2647,10 +2647,14 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         height: 48px;
         letter-spacing: .5px;
         line-height: 48px; }
+    .advanced-panel textarea {
+        width: 100%;
+        height: 100px;
+        border-color: #DDDDDD; }
     .advanced-panel .footer {
         bottom: 0;
         left: 0;
-        margin-bottom: 40px;
+        margin-bottom: 20px;
         right: 0;
         text-align: center; }
         .advanced-panel .footer .btn {
@@ -3263,10 +3267,10 @@ input.switch:checked ~ label:after {
     margin: auto;
     left: 0;
     right: 0;
-    top: 90px;
+    top: 20px;
     float: left;
     width: 410px;
-    height: 692px; }
+    height: 610px; }
     .print-studio .advanced-panel .container {
         padding: 0 20px; }
     .print-studio .advanced-panel .header {
@@ -3278,7 +3282,7 @@ input.switch:checked ~ label:after {
         line-height: 48px;
         border-bottom: 1px solid #E0E0E0; }
     .print-studio .advanced-panel .section {
-        padding: 20px 0; }
+        padding: 20px 0 5px 0; }
     .print-studio .advanced-panel .title {
         color: #4A4A4A;
         font-size: 13px;
@@ -3313,7 +3317,7 @@ input.switch:checked ~ label:after {
         .print-studio .advanced-panel .controls .slider-container {
             margin-right: 20px; }
             .print-studio .advanced-panel .controls .slider-container .slider {
-                width: 130px; }
+                width: 100px; }
         .print-studio .advanced-panel .controls input[type=range] {
             -webkit-appearance: none;
             width: 100%;
@@ -3345,8 +3349,7 @@ input.switch:checked ~ label:after {
         bottom: 0;
         left: 0;
         right: 0;
-        text-align: center;
-        margin-bottom: 40px; }
+        text-align: center; }
         .print-studio .advanced-panel .footer .btn {
             margin: 0 15px; }
 

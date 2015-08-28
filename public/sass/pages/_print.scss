@@ -593,10 +593,10 @@ input.switch:checked ~ label:after
         margin: auto;
         left: 0;
         right: 0;
-        top: 90px;
+        top: 20px;
         float: left;
         width: 410px;
-        height: 692px;
+        height: 610px;
 
         .container {
             padding: 0 20px;
@@ -613,7 +613,7 @@ input.switch:checked ~ label:after
         }
 
         .section {
-            padding: 20px 0;
+            padding: 20px 0 5px 0;
         }
 
         .title {
@@ -664,7 +664,7 @@ input.switch:checked ~ label:after
                 margin-right: 20px;
 
                 .slider {
-                    width: 130px;
+                    width: 100px;
                 }
             }
 
@@ -709,7 +709,7 @@ input.switch:checked ~ label:after
             left: 0;
             right: 0;
             text-align: center;
-            margin-bottom: 40px;
+            // margin-bottom: 0px;
 
             .btn {
                 margin: 0 15px;

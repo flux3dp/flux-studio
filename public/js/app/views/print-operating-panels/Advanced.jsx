@@ -3,7 +3,7 @@ define([
     'react'
 ], function($, React) {
     'use strict';
-    var advancedSetting
+    var advancedSetting;
     return React.createClass({
         getDefaultProps: function() {
             return {
@@ -15,11 +15,12 @@ define([
         getInitialState: function() {
             advancedSetting = this.props.setting;
             return {
-                infill          : advancedSetting.infill || 0,
-                layerHeight     : advancedSetting.layerHeight || 0.02,
-                travelingSpeed  : advancedSetting.travelingSpeed || 5,
-                extrudingSpeed  : advancedSetting.extrudingSpeed || 5,
-                temperature     : advancedSetting.temperature || 160
+                infill          : advancedSetting.infill * 100 || 20,
+                layerHeight     : advancedSetting.layerHeight || 0.2,
+                travelingSpeed  : advancedSetting.travelingSpeed || 88,
+                extrudingSpeed  : advancedSetting.extrudingSpeed || 58,
+                temperature     : advancedSetting.temperature || 200,
+                advancedSettings: advancedSetting.advancedSettings
             };
         },
         _handleLayerHeightChange: function(e) {
@@ -29,7 +30,7 @@ define([
         },
         _handleInfillChange: function(e) {
             var infill = parseInt(e.target.value);
-            advancedSetting.infill = infill;
+            advancedSetting.infill = infill / 100;
             this.setState({ infill: infill });
         },
         _handleTravelingSpeedChange: function(e) {
@@ -49,6 +50,10 @@ define([
         },
         _handleSupportChange: function(e) {
             advancedSetting.support = e.target.value;
+        },
+        _handleIniChange: function(e) {
+            advancedSetting.advancedSettings = e.target.value;
+            this.setState({ advancedSettings: e.target.value });
         },
         _handleCancel: function(e) {
             this.props.onCancel(e);
@@ -143,6 +148,18 @@ define([
             );
             */
         },
+        _renderIniSection: function(lang) {
+            return (
+                <div className="section">
+                    <div className="title">{lang.direct_setting}</div>
+                    <div className="controls">
+                        <div className="control">
+                            <textarea value={this.state.advancedSettings} onChange={this._handleIniChange}></textarea>
+                        </div>
+                    </div>
+                </div>
+            );
+        },
         _renderFooter: function() {
             return (
                 <div className="footer">
@@ -157,6 +174,7 @@ define([
                 speedSection = this._renderSpeedSection(lang),
                 temperatureSection = this._renderTemperatureSection(lang),
                 supportSection = this._renderSupportSection(lang),
+                iniSection = this._renderIniSection(lang),
                 footer = this._renderFooter(lang);
 
             return (
@@ -173,6 +191,8 @@ define([
                         {temperatureSection}
 
                         {supportSection}
+
+                        {iniSection}
 
                     </div>
 

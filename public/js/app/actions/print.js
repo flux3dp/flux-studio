@@ -5,6 +5,7 @@ define([
     'helpers/websocket',
     'helpers/api/3d-print-slicing',
     'threeOrbitControls',
+    'threeTrackballControls',
     'threeTransformControls',
     'threeSTLLoader',
     'threeCircularGridHelper',
@@ -17,7 +18,7 @@ define([
         container, printController;
 
     var camera, scene, renderer;
-    var orbitControl, transformControl, reactSrc;
+    var orbitControl, transformControl, reactSrc, controls;
 
     var objects = [],
         referenceMeshes = [];
@@ -31,6 +32,7 @@ define([
     var responseMessage, responseBlob,
         blobExpired = true,
         transformMode = false,
+        shiftPressed = false,
         fileExtension = '.gcode';
 
     var s = {
@@ -48,10 +50,10 @@ define([
         colorSelected: 0xFFFF00,
         colorUnselected: 0x333333,
         degreeStep: 5,
-        scalePrecision: 1 // in decimal, 1 = up to 0.1, 2 = 0.01
+        scalePrecision: 1 // decimal places
     };
 
-    var advanceParameters = ['layerHeight', 'infill', 'travelingSpeed', 'extrudingSpeed', 'temperature'];
+    var advancedParameters = ['layerHeight', 'infill', 'travelingSpeed', 'extrudingSpeed', 'temperature', 'advancedSettings'];
 
     function init(src) {
 
@@ -106,8 +108,18 @@ define([
 
         orbitControl = new THREE.OrbitControls(camera, renderer.domElement);
         orbitControl.maxPolarAngle = Math.PI/2;
+        orbitControl.maxDistance = 1000;
         orbitControl.noKeys = true;
+        // orbitControl.momentumDampingFactor = 100;
+        // orbitControl.momentumScalingFactor = 0.005;
         orbitControl.addEventListener('change', render);
+
+        // orbitControl = new THREE.TrackballControls( camera );
+        // orbitControl.dynamicDampingFactor = 0.1;
+        // orbitControl.rotateSpeed = 4.0;
+        // orbitControl.addEventListener('change', function(e) {
+        //     console.log('changing');
+        // });
 
         transformControl = new THREE.TransformControls(camera, renderer.domElement);
         transformControl.addEventListener('change', render);
@@ -120,11 +132,11 @@ define([
         //     color: 0xff0000,
         //     linewidth: 10
         // });
-        var lineMaterial2 = new THREE.LineBasicMaterial({
-            color: 0x00ff00,
-            linewidth: 100,
-            vertexColors: 0xff0000
-        });
+        // var lineMaterial2 = new THREE.LineBasicMaterial({
+        //     color: 0x00ff00,
+        //     linewidth: 100,
+        //     vertexColors: 0xff0000
+        // });
         // var lineGeometry = new THREE.Geometry();
         // lineGeometry.vertices.push(new THREE.Vector3(-10, 0, 0));
         // lineGeometry.vertices.push(new THREE.Vector3(0, 10, 0));
@@ -140,7 +152,7 @@ define([
         // lineGeometry2.vertices.push(new THREE.Vector3(10, 0, 0));
         // lineGeometry2.vertices.push(new THREE.Vector3(-15, 0, 0));
         // lineGeometry2.vertices.push(new THREE.Vector3(0, 15, 0));
-
+        //
         // var line2 = new THREE.Line(lineGeometry2, lineMaterial2, THREE.LinePieces);
         //
         // scene.add(line1);
@@ -159,7 +171,7 @@ define([
         // ];
         //
         // var colors = [];
-        // var g = new THREE.BufferGeometry();
+        // var g = new THREE.Geometry();
         //
         // for(var i = 0; i < points.length; i++) {
         //     g.vertices.push(new THREE.Vector3(points[i].v[0], points[i].v[1], points[i].v[2]));
@@ -174,7 +186,7 @@ define([
         //
         // g.colors = colors;
         //
-        // var m = new THREE.LineBasicMaterial( { color: 0xffffff, opacity: 10, linewidth: 3, vertexColors: THREE.VertexColors } );
+        // var m = new THREE.LineBasicMaterial( { color: 0xffffff, opacity: 10, linewidth: 10000, vertexColors: THREE.VertexColors } );
         // var line = new THREE.Line(g, m);
         //
         // scene.add(line);
@@ -182,6 +194,8 @@ define([
 
 
         window.addEventListener('resize', onWindowResize, false);
+        window.addEventListener("keydown", onKeyPress, false);
+        window.addEventListener("keyup", onKeyPress, false);
         renderer.domElement.addEventListener('mousemove', onMouseMove, false);
         renderer.domElement.addEventListener('mousedown', onMouseDown, false);
         renderer.domElement.addEventListener('mouseup', onMouseUp, false);
@@ -300,8 +314,6 @@ define([
         mouseDown = false;
         container.style.cursor = 'auto';
         checkOutOfBounds(SELECTED);
-        updateFromScene('BoundingBoxHelper');
-        updateFromScene('TransformControl');
 
         if(transformMode) {
             selectObject(transformControl.object);
@@ -317,10 +329,12 @@ define([
         var location = getReferenceIntersectLocation(e);
         if(SELECTED && mouseDown && !transformMode)
         {
+            if(!transformMode)
             if(SELECTED.position && location) {
                 SELECTED.position.x = location.x - movingOffsetX;
                 SELECTED.position.y = location.y - movingOffsetY;
                 blobExpired = true;
+
                 render();
                 return;
             }
@@ -476,6 +490,11 @@ define([
     }
 
     function render(e) {
+        if(SELECTED) {
+            updateFromScene('BoundingBoxHelper');
+            updateFromScene('TransformControl');
+        }
+        // orbitControl.update();
         renderer.render(scene, camera);
     }
 
@@ -518,6 +537,12 @@ define([
         camera.updateProjectionMatrix();
         renderer.setSize(container.offsetWidth, container.offsetHeight);
         render();
+    }
+
+    function onKeyPress(e) {
+        if(e.keyCode === 16) {
+            shiftPressed = e.type === 'keydown';
+        }
     }
 
     function rotate(x, y, z, render) {
@@ -596,6 +621,7 @@ define([
 
             transformControl.detach(SELECTED);
             removeFromScene('BoundingBoxHelper');
+            selectObject(null);
             render();
         }
     }
@@ -632,7 +658,8 @@ define([
 
     function updateDegreeWithStep(degree) {
         if(degree === 0) {return 0;}
-        return (parseInt(degree / s.degreeStep) + 1) * s.degreeStep;
+        var degreeStep = shiftPressed ? 15 : s.degreeStep;
+        return (parseInt(degree / degreeStep + 1) * degreeStep);
     }
 
     function updateScaleWithStep(scale) {
@@ -776,18 +803,18 @@ define([
 
     function setAdvanceParameter(settings, index) {
         index = index || 0;
-        var name = advanceParameters[index],
+        var name = advancedParameters[index],
             value = settings[name] || 'default';
 
-        if(index < advanceParameters.length)
+        if(index < advancedParameters.length)
         {
             printController.setParameter(name, value).then(function(result) {
                 if(result.status === 'error') {
-                    index = advanceParameters.length;
+                    index = advancedParameters.length;
                     // todo: error logging
                     console.log(result.error);
                 }
-                if(index < advanceParameters.length) {
+                if(index < advancedParameters.length) {
                     setAdvanceParameter(settings, index + 1);
                 }
                 else {

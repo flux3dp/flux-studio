@@ -28,7 +28,8 @@ define([
                 travelingSpeed: 0,
                 extrudingSpeed: 0,
                 temperature: 0,
-                support: ''
+                support: '',
+                advancedSettings: ''
             },
             _scale = {
                 locked  : true,
