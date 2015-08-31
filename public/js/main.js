@@ -91,4 +91,18 @@ require([
         var router = new Router();
         Backbone.history.start();
     });
+
+    // GA setting up
+    // NOTICE: rename ga as GA to prevent conflict with requirejs
+    window.GA = ('undefined' !== typeof ga ? ga : function() {});
+
+    GA(
+        'create',
+        'UA-40862421-6',
+        {
+            'cookieDomain': 'none'
+        }
+    );
+
+    GA('send', 'pageview', location.hash);
 });
