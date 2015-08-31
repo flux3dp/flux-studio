@@ -245,6 +245,11 @@ define([
             var box = new THREE.Box3().setFromObject(mesh);
             var scale = getScaleDifference(getLargestPropertyValue(box.size()));
 
+            // alert for auto scalling
+            if(scale !== 1) {
+                alert('this model has been scaled for better printing ratio');
+            }
+
             mesh.scale.set(scale, scale, scale);
             mesh.scale._x = scale;
             mesh.scale._y = scale;
