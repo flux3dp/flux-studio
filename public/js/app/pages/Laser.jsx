@@ -93,14 +93,14 @@ define([
 
                             self.props.laserEvents.handleLaser(self.state.settings);
                         },
-                        content = (
-                            <PrinterSelector lang={lang} onGettingPrinter={onGettingPrinter}/>
-                        ),
                         onClose = function(e) {
                             self.setState({
                                 openPrinterSelectorWindow: false
                             });
-                        };
+                        },
+                        content = (
+                            <PrinterSelector lang={lang} onClose={onClose} onGettingPrinter={onGettingPrinter}/>
+                        );
 
                     return (
                         <Modal content={content} onClose={onClose}/>
