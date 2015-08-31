@@ -1,5 +1,5 @@
 define([
-    'react',
+    'react'
 ], function(React) {
     'use strict';
 
@@ -8,7 +8,10 @@ define([
 
         var Page = React.createClass({
                 _handleNavigation: function(address, e) {
-                    location.href = '#studio/' + address;
+                    var hash = '#studio/' + address;
+
+                    GA('send', 'pageview', hash);
+                    location.hash = hash;
                 },
                 render : function() {
                     var self = this,
