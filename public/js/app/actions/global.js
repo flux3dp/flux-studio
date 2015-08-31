@@ -19,6 +19,13 @@ define([
         shortcuts.disableAll();
     });
 
+    // listener of all ga event
+    $('body').on('click', '[data-ga-event]', function(e) {
+        var $self = $(e.currentTarget);
+
+        ga('send', 'event', 'button', 'click', $self.data('ga-event'));
+    });
+
     return function(callback) {
         var $body = $('body'),
             hash = location.hash,
