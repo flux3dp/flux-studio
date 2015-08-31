@@ -78,6 +78,7 @@ define([
 
             return (
                 <input
+                    data-ga-event="upload-file"
                     ref="uploader"
                     type="file"
                     className={className}

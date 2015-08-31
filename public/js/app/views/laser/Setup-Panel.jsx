@@ -113,7 +113,7 @@ define([
                 }),
                 laserButton = (
                     true === props.hasImage ?
-                    <button className={laser_class} onClick={this._onRunLaser}>
+                    <button data-ga-event="running-laser" className={laser_class} onClick={this._onRunLaser}>
                         <img src="/img/icon-laser-s.png"/>
                         {mode}
                     </button> :
@@ -137,7 +137,7 @@ define([
                 ),
                 saveButton = (
                     true === props.hasImage ?
-                    <button className={export_file_class} onClick={this._onExport}>{lang.laser.save}</button> :
+                    <button data-ga-event="save-laser-gcode" className={export_file_class} onClick={this._onExport}>{lang.laser.save}</button> :
                     ''
                 );
 
@@ -203,7 +203,12 @@ define([
                             </div>
                         </div>
                         <div className="setup last-setup">
-                            <button className="btn btn-default btn-full-width" onClick={this._openAdvancedPanel}>{lang.laser.button_advanced}</button>
+                            <button
+                                data-ga-event="open-laser-advanced-panel"
+                                className="btn btn-default btn-full-width"
+                                onClick={this._openAdvancedPanel}>
+                                {lang.laser.button_advanced}
+                            </button>
                         </div>
                     </div>
                     {buttons}
