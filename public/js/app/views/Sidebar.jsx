@@ -8,10 +8,7 @@ define([
 
         var Page = React.createClass({
                 _handleNavigation: function(address, e) {
-                    var hash = '#studio/' + address;
-
-                    GA('send', 'pageview', hash);
-                    location.hash = hash;
+                    location.hash = '#studio/' + address;
                 },
                 render : function() {
                     var self = this,

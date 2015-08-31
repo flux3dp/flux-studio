@@ -146,8 +146,8 @@ define([
         _renderFooter: function() {
             return (
                 <div className="footer">
-                    <a className="btn btn-default" onClick={this._handleCancel}>{this.props.lang.print.cancel}</a>
-                    <a className="btn btn-confirm" onClick={this._handleDone}>{this.props.lang.print.done}</a>
+                    <a data-ga-event="cancel-print-advanced" className="btn btn-default" onClick={this._handleCancel}>{this.props.lang.print.cancel}</a>
+                    <a data-ga-event="apply-print-advanced" className="btn btn-confirm" onClick={this._handleDone}>{this.props.lang.print.done}</a>
                 </div>
             );
         },

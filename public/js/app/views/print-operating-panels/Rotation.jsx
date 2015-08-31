@@ -97,7 +97,7 @@ define([
                                 <input type="text" className="knob z-axis" />
                             </div>
                             <div className="controls pull-right">
-                                <a className="btn btn-default" onClick={this._handleResetRotation}>{lang.print.reset}</a>
+                                <a data-ga-event="print-reset-rotation" className="btn btn-default" onClick={this._handleResetRotation}>{lang.print.reset}</a>
                             </div>
                         </div>
                     </div>

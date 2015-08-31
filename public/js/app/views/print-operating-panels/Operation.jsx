@@ -59,16 +59,16 @@ define([
             command = !this.props.modelSelected ? '' : (
                 <div className="operation command">
                     <div>
-                        <button className={scaleClass} data-tip={lang.print.scale} onClick={this._handleOperation.bind(null, 'scale')}></button>
+                        <button data-ga-event="print-scale-model" className={scaleClass} data-tip={lang.print.scale} onClick={this._handleOperation.bind(null, 'scale')}></button>
                     </div>
                     <div>
-                        <button className={rotateClass} data-tip={lang.print.rotate} onClick={this._handleOperation.bind(null, 'rotate')}></button>
+                        <button data-ga-event="print-rotate-model" className={rotateClass} data-tip={lang.print.rotate} onClick={this._handleOperation.bind(null, 'rotate')}></button>
                     </div>
                     <div>
-                        <button className="btn center" data-tip={lang.print.align_center} onClick={this._handleOperation.bind(null, 'center')}></button>
+                        <button data-ga-event="print-center-model" className="btn center" data-tip={lang.print.align_center} onClick={this._handleOperation.bind(null, 'center')}></button>
                     </div>
                     <div>
-                        <button className="btn delete" data-tip={lang.print.delete} onClick={this._handleOperation.bind(null, 'delete')}></button>
+                        <button data-ga-event="print-delete-model" className="btn delete" data-tip={lang.print.delete} onClick={this._handleOperation.bind(null, 'delete')}></button>
                     </div>
                 </div>
             );
