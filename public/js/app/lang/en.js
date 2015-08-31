@@ -353,8 +353,9 @@ define(function() {
                         unit: 'mm/s',
                         fast: 'Fast',
                         slow: 'Slow',
-                        min: 1,
-                        max: 100
+                        min: 0.1,
+                        max: 20,
+                        step: 0.1
                     },
                     power: {
                         text: 'Power',

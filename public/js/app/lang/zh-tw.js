@@ -353,16 +353,17 @@ define(function() {
                         unit: 'mm/s',
                         fast: '快',
                         slow: '慢',
-                        min: 1,
-                        max: 100
+                        min: 0.1,
+                        max: 20,
+                        step: 0.1
                     },
                     power: {
                         text: '雷射強度',
                         high: '強',
                         low: '弱',
                         min: 0,
-                        max: 1,
-                        step: 0.1
+                        max: 255,
+                        step: 1
                     }
                 },
                 apply: '套用',
