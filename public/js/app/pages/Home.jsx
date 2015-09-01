@@ -35,6 +35,10 @@ define([
                         });
                     };
 
+                self.setProps({
+                    usbConfig: usb
+                });
+
                 toggleBlocker(true);
 
                 usb.list({
@@ -97,6 +101,12 @@ define([
                     lang: args.state.lang,
                     openBlocker: false
                 };
+            },
+
+            componentWillUnmount: function () {
+                if ('undefined' !== typeof this.props.usbConfig) {
+                    this.props.usbConfig.connection.close();
+                }
             }
         });
 
