@@ -4,8 +4,9 @@ define([
     'helpers/i18n',
     'jsx!widgets/Select',
     'jsx!widgets/Modal',
-    'helpers/api/config'
-], function($, React, i18n, SelectView, Modal, config) {
+    'helpers/api/config',
+    'helpers/api/usb-config'
+], function($, React, i18n, SelectView, Modal, config, usbConfig) {
     'use strict';
 
     return function(args) {
@@ -15,33 +16,74 @@ define([
             HomeView;
 
         HomeView = React.createClass({
+            // UI events
             _onSkipSettingUp: function(e) {
                 config().write('printer-is-ready', true, {
                     onFinished: function() {
-                        location.hash = '#studio/print';
+                        location.hash = '#studio/print/';
                         console.log(location.hash);
                     }
                 });
             },
 
-            render : function() {
+            _onStartingSetUp: function(e) {
+                var self = this,
+                    usb = usbConfig(),
+                    toggleBlocker = function(open) {
+                        self.setState({
+                            openBlocker: open
+                        });
+                    };
+
+                toggleBlocker(true);
+
+                usb.list({
+                    onSuccess: function(response) {
+                        toggleBlocker(false);
+                        location.hash = '#initialize/wifi/ask/' + response.serial;
+                    },
+                    onError: function(response) {
+                        toggleBlocker(false);
+
+                        // TODO: when this function is fired that means no machine available.
+                    }
+                });
+            },
+
+            // renders
+            _renderBlocker: function() {
                 var content = (
+                    <div className="spinner-flip"/>
+                );
+
+                return (
+                    true === this.state.openBlocker ?
+                    <Modal content={content} disabledEscapeOnBackground={false}/> :
+                    ''
+                );
+            },
+
+            render : function() {
+                var lang = this.state.lang,
+                    blocker = this._renderBlocker(),
+                    content = (
                         <div className="welcome initialization text-center">
-                            <h1>{this.state.lang.welcome_headline}</h1>
+                            <h1>{lang.welcome_headline}</h1>
                             <img className="brand-image" src="/img/wel-flux-logo.png"/>
                             <div>
-                                <h2>{this.state.lang.welcome.header1}</h2>
-                                <p>{this.state.lang.welcome.header2}</p>
+                                <h2>{lang.welcome.header1}</h2>
+                                <p>{lang.welcome.header2}</p>
                                 <div>
                                     <SelectView id="select-lang" options={options}/>
                                 </div>
                                 <div>
-                                    <a href="#initialize/wifi/ask" className="btn btn-action btn-large">{this.state.lang.welcome.start}</a>
+                                    <button className="btn btn-action btn-large" onClick={this._onStartingSetUp}>{lang.welcome.start}</button>
                                 </div>
                                 <div>
-                                    <button className="btn btn-link" onClick={this._onSkipSettingUp}>{this.state.lang.welcome.skip}</button>
+                                    <button className="btn btn-link" onClick={this._onSkipSettingUp}>{lang.welcome.skip}</button>
                                 </div>
                             </div>
+                            {blocker}
                         </div>
                     );
 
@@ -51,7 +93,10 @@ define([
             },
 
             getInitialState: function() {
-                return args.state;
+                return {
+                    lang: args.state.lang,
+                    openBlocker: false
+                };
             }
         });
 
