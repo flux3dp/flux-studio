@@ -16,6 +16,7 @@ define([
 
     // detached keyup and keydown event
     window.addEventListener('popstate', function(e) {
+        GA('send', 'pageview', location.hash);
         shortcuts.disableAll();
     });
 
