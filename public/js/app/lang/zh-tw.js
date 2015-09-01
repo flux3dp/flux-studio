@@ -10,7 +10,8 @@ define(function() {
         welcome: {
             header1: 'Hello! 歡迎使用 FLUX，快點來實現你的點子',
             header2: '請選擇你想使用的語言，我們即將開始為 FLUX 進行設定 :)',
-            start: '開始設定 '
+            start: '開始設定',
+            skip: '跳過'
         },
         wifi: {
             home: {
