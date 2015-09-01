@@ -168,6 +168,8 @@ define([
                         }
                     }
 
+                    refreshImage($el.find('img'), 128);
+
                     imagePanelRefs.objectAngle.getDOMNode().value = elementAngle($el[0]);
                     imagePanelRefs.objectPosX.getDOMNode().value = $el.data('last-x');
                     imagePanelRefs.objectPosY.getDOMNode().value = $el.data('last-y');
@@ -293,7 +295,7 @@ define([
             }
         );
 
-        function setupImage(file, size, name) {
+        function setupImage(file, size, url, name) {
             var $div = $(document.createElement('div')).addClass(LASER_IMG_CLASS),
                 img = new Image(),
                 $img = $(img),
@@ -304,7 +306,7 @@ define([
             $img.addClass(file.extension).
                 attr('src', file.url).
                 data('name', name).
-                data('base', file.url).
+                data('base', url).
                 data('size', size);
 
             $img.one('load', function() {
@@ -344,7 +346,7 @@ define([
                 onGetFinished = function(data, size) {
                     var url = window.URL,
                         blob = new Blob([data], { type: file.type }),
-                        objectUrl = url.createObjectURL(data),
+                        objectUrl = url.createObjectURL(blob),
                         platformWidth = $laser_platform.width(),
                         platformHeight = $laser_platform.height(),
                         ratio = 1;
@@ -366,7 +368,7 @@ define([
                         onComplete: function(result) {
                             file.url = result.canvas.toDataURL('image/png');
 
-                            setupImage(file, size, name);
+                            setupImage(file, size, objectUrl, name);
                         }
                     });
                 };
