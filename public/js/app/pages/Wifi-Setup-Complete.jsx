@@ -18,7 +18,7 @@ define([
             _handleStartClick: function() {
                 config().write('printer-is-ready', true, {
                     onFinished: function() {
-                        location.href = '#studio/print';
+                        location.hash = '#studio/print';
                     }
                 });
             },
