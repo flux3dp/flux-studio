@@ -56,7 +56,7 @@ window._trackJs = {
     console: {
 
       // Watch the console for events
-      enabled: true,
+      enabled: (-1 === location.search.indexOf('debug')),
 
       // Pass console messages through to the browser
       display: true,
