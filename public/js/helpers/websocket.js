@@ -140,6 +140,18 @@ define(['helpers/is-json'], function(isJson) {
                 options.onclose = callback;
 
                 return this;
+            },
+
+            onError: function(callback) {
+                options.onError = callback;
+
+                return this;
+            },
+
+            onFatal: function(callback) {
+                options.onFatal = callback;
+
+                return this;
             }
         };
     };
