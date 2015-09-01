@@ -3,8 +3,9 @@ define([
     'react',
     'helpers/i18n',
     'jsx!widgets/Select',
-    'jsx!widgets/Modal'
-], function($, React, i18n, SelectView, Modal) {
+    'jsx!widgets/Modal',
+    'helpers/api/config'
+], function($, React, i18n, SelectView, Modal, config) {
     'use strict';
 
     return function(args) {
@@ -14,30 +15,43 @@ define([
             HomeView;
 
         HomeView = React.createClass({
-            getInitialState: function() {
-                return args.state;
+            _onSkipSettingUp: function(e) {
+                config().write('printer-is-ready', true, {
+                    onFinished: function() {
+                        location.hash = '#studio/print';
+                        console.log(location.hash);
+                    }
+                });
             },
+
             render : function() {
                 var content = (
-                    <div className="welcome initialization text-center">
-                        <h1>{this.state.lang.welcome_headline}</h1>
-                        <img className="brand-image" src="/img/wel-flux-logo.png"/>
-                        <div>
-                            <h2>{this.state.lang.welcome.header1}</h2>
-                            <p>{this.state.lang.welcome.header2}</p>
+                        <div className="welcome initialization text-center">
+                            <h1>{this.state.lang.welcome_headline}</h1>
+                            <img className="brand-image" src="/img/wel-flux-logo.png"/>
                             <div>
-                                <SelectView id="select-lang" options={options}/>
-                            </div>
-                            <div>
-                                <a href="#initialize/wifi/ask" className="btn btn-action btn-large">{this.state.lang.welcome.start}</a>
+                                <h2>{this.state.lang.welcome.header1}</h2>
+                                <p>{this.state.lang.welcome.header2}</p>
+                                <div>
+                                    <SelectView id="select-lang" options={options}/>
+                                </div>
+                                <div>
+                                    <a href="#initialize/wifi/ask" className="btn btn-action btn-large">{this.state.lang.welcome.start}</a>
+                                </div>
+                                <div>
+                                    <button className="btn btn-link" onClick={this._onSkipSettingUp}>{this.state.lang.welcome.skip}</button>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                );
+                    );
 
                 return (
                     <Modal content={content}/>
                 );
+            },
+
+            getInitialState: function() {
+                return args.state;
             }
         });
 
