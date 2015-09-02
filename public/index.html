@@ -59,10 +59,10 @@ window._trackJs = {
       enabled: (-1 === location.search.indexOf('debug')),
 
       // Pass console messages through to the browser
-      display: true,
+      display: (-1 === location.search.indexOf('debug')),
 
       // Transmit console errors to TrackJS
-      error: true,
+      error: (-1 === location.search.indexOf('debug')),
 
       // Names of console functions to watch
       watch: ["log","debug","info","warn","error"]
