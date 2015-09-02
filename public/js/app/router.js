@@ -57,7 +57,7 @@ function(React, $, Backbone, display) {
             });
         },
 
-        initial: function(step, serial) {
+        initial: function(step, other) {
             var map = {
                     'ask': 'Wifi-Home',
                     'select': 'Wifi-Select',
@@ -80,7 +80,7 @@ function(React, $, Backbone, display) {
                     view,
                     {
                         props: {
-                            serial: serial
+                            other: other
                         }
                     }
                 );
