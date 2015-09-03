@@ -2076,7 +2076,8 @@ body {
     height: 100%;
     margin: 0;
     min-height: 100%;
-    padding: 0; }
+    padding: 0;
+    -webkit-user-select: none; }
 
 body {
     background-color: #FAFAFA;
@@ -4087,35 +4088,42 @@ input.switch:checked ~ label:after {
 
 .wifi .wifi-list {
     border: #ccc 1px solid;
-    cursor: pointer;
     height: 280px;
     margin: 20px auto;
     overflow: scroll;
     padding: 0;
     width: 300px; }
-
-.wifi .wifi-list li {
-    height: 40px; }
-
-.wifi .wifi-list a {
-    box-sizing: border-box;
-    display: block;
-    font-size: 14px;
-    height: 100%;
-    line-height: 40px;
-    padding: 0 10px;
-    text-decoration: none;
-    width: 100%; }
-
-.wifi .wifi-list a:active {
-    background: #00c853; }
-
-.wifi .fa {
-    float: right;
-    width: 50px; }
-
-.wifi .fa::before {
-    line-height: 40px; }
+    .wifi .wifi-list li {
+        height: 40px; }
+        .wifi .wifi-list li label {
+            display: block;
+            height: 100%; }
+            .wifi .wifi-list li label:hover {
+                cursor: pointer; }
+        .wifi .wifi-list li .row-fluid {
+            display: -webkit-box;
+            /* OLD - iOS 6-, Safari 3.1-6 */
+            display: -webkit-flex;
+            /* NEW - Chrome */
+            display: flex;
+            /* NEW, Spec - Opera 12.1, Firefox 20+ */
+            flex: 2;
+            height: 100%;
+            justify-content: space-between;
+            padding: 0 10px; }
+        .wifi .wifi-list li .wifi-ssid {
+            width: calc(100% - 50px); }
+        .wifi .wifi-list li span {
+            display: block;
+            line-height: 40px; }
+        .wifi .wifi-list li input {
+            display: none; }
+            .wifi .wifi-list li input:checked + .row-fluid {
+                background: #ccc; }
+        .wifi .wifi-list li .fa {
+            width: 50px; }
+            .wifi .wifi-list li .fa::before {
+                line-height: 40px; }
 
 /**
  * Laser
