@@ -211,7 +211,7 @@ define([
 
             setMachine: function(opts) {
                 opts = opts || {};
-                opts.onSuccess = opts.onSuccess || function() {};
+                opts.onSuccess = function() {};
                 opts.onError = opts.onError || function() {};
 
                 var args;
@@ -225,7 +225,8 @@ define([
                 };
 
                 return {
-                    name: function(name) {
+                    name: function(name, _opts) {
+                        opts.onSuccess = _opts.onSuccess || function() {};
                         args = [
                             'set general',
                             JSON.stringify({
@@ -234,14 +235,44 @@ define([
                         ];
                         ws.send(args.join(' '));
                     },
-                    password: function(password) {
+                    password: function(password, _opts) {
+                        opts.onSuccess = _opts.onSuccess || function() {};
                         args = [
                             'set password',
                             password
                         ];
-                        ws.send(args.join(' '));
+
+                        if ('' !== password) {
+                            ws.send(args.join(' '));
+                        }
+                        else {
+                            opts.onSuccess();
+                        }
                     }
                 };
+            },
+
+            setAPMode: function(opts) {
+                opts = opts || {};
+                opts.onSuccess = opts.onSuccess || function() {};
+                opts.onError = opts.onError || function() {};
+
+                var args = [
+                    'set network',
+                    JSON.stringify({
+                        wifi_mode: 'host',
+                        method: 'dhcp'
+                    })
+                ];
+
+                events.onMessage = function(data) {
+                    if ('ok' === data.status) {
+                        opts.onSuccess(data);
+                    }
+                };
+
+                ws.onError(opts.onError);
+                ws.send(args.join(' '));
             },
 
             close: function() {
