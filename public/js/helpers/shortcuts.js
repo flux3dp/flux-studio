@@ -54,7 +54,6 @@ define([
             matches = matchedEvents(keyCodeStatus);
 
             if (0 < matches.length) {
-                e.preventDefault();
                 keyCodeStatus = [];
             }
 

@@ -115,6 +115,71 @@ define([
         transformControl.addEventListener('mouseUp', transform);
         transformControl.addEventListener('objectChange', transform);
 
+        // testing lines
+        // var lineMaterial1 = new THREE.LineBasicMaterial({
+        //     color: 0xff0000,
+        //     linewidth: 10
+        // });
+        var lineMaterial2 = new THREE.LineBasicMaterial({
+            color: 0x00ff00,
+            linewidth: 100,
+            vertexColors: 0xff0000
+        });
+        // var lineGeometry = new THREE.Geometry();
+        // lineGeometry.vertices.push(new THREE.Vector3(-10, 0, 0));
+        // lineGeometry.vertices.push(new THREE.Vector3(0, 10, 0));
+        // lineGeometry.vertices.push(new THREE.Vector3(10, 0, 0));
+        // lineGeometry.vertices.push(new THREE.Vector3(-15, 0, 0));
+        // lineGeometry.vertices.push(new THREE.Vector3(0, 15, 0));
+        // lineGeometry.vertices.push(new THREE.Vector3(15, 0, 0));
+        //
+        // var line1 = new THREE.Line(lineGeometry, lineMaterial1, THREE.LinePieces);
+        //
+        // var lineGeometry2 = new THREE.Geometry();
+        // lineGeometry2.vertices.push(new THREE.Vector3(0, 10, 0));
+        // lineGeometry2.vertices.push(new THREE.Vector3(10, 0, 0));
+        // lineGeometry2.vertices.push(new THREE.Vector3(-15, 0, 0));
+        // lineGeometry2.vertices.push(new THREE.Vector3(0, 15, 0));
+
+        // var line2 = new THREE.Line(lineGeometry2, lineMaterial2, THREE.LinePieces);
+        //
+        // scene.add(line1);
+        // scene.add(line2);
+
+
+
+
+        // var points = [
+        //     {t: 1, v: [-5,0,0]},
+        //     {t: 1, v: [0,-5,0]},
+        //     {t: 1, v: [5,0,0]},
+        //     {t: 1, v: [0,5,0]},
+        //     {t: 1, v: [-10,0,0]},
+        //     {t: 1, v: [0,-10,0]}
+        // ];
+        //
+        // var colors = [];
+        // var g = new THREE.BufferGeometry();
+        //
+        // for(var i = 0; i < points.length; i++) {
+        //     g.vertices.push(new THREE.Vector3(points[i].v[0], points[i].v[1], points[i].v[2]));
+        // }
+        //
+        // colors[0] = new THREE.Color( 0x000000 );
+        // colors[1] = new THREE.Color( 0xffff00 );
+        // colors[2] = new THREE.Color( 0xff0000 );
+        // colors[3] = new THREE.Color( 0xff0ff0 );
+        // colors[4] = new THREE.Color( 0xfffff0 );
+        // colors[5] = new THREE.Color( 0x0fffff );
+        //
+        // g.colors = colors;
+        //
+        // var m = new THREE.LineBasicMaterial( { color: 0xffffff, opacity: 10, linewidth: 3, vertexColors: THREE.VertexColors } );
+        // var line = new THREE.Line(g, m);
+        //
+        // scene.add(line);
+
+
 
         window.addEventListener('resize', onWindowResize, false);
         renderer.domElement.addEventListener('mousemove', onMouseMove, false);
@@ -491,7 +556,7 @@ define([
         reactSrc.setState({ modelSelected: SELECTED.uuid ? SELECTED : null });
 
         if(alignCenter) {
-            alignCenter();
+            this.alignCenter();
         }
     }
 

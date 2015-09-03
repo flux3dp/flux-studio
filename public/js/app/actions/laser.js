@@ -289,7 +289,6 @@ define([
         shortcuts.on(
             ['cmd', 'del'],
             function(e) {
-                console.log(e);
                 deleteImage();
             }
         );
@@ -320,7 +319,7 @@ define([
                 $div.parent().find('.ft-controls').on('mousedown', function(e) {
                     var $self = $(e.target);
 
-                    $('.image-active').removeClass('image-active');
+                    inactiveAllImage();
                     $target_image = $self.parent().find('.' + LASER_IMG_CLASS);
                     $target_image.find('img').addClass('image-active');
                 });
@@ -345,13 +344,15 @@ define([
                 onGetFinished = function(data, size) {
                     var url = window.URL,
                         blob = new Blob([data], { type: file.type }),
-                        objectUrl = url.createObjectURL(data);
+                        objectUrl = url.createObjectURL(data),
+                        platformWidth = $laser_platform.width(),
+                        platformHeight = $laser_platform.height(),
+                        ratio = 1;
 
-                    if (size.width > $laser_platform.width()) {
-                        size.width = 280;
-                    }
-                    else if (size.height > $laser_platform.height()) {
-                        size.height = 280;
+                    if (size.width > platformWidth || size.height > platformHeight) {
+                        ratio = Math.min(360 / size.width, 360 / size.height);
+                        size.width = size.width * ratio;
+                        size.height = size.height * ratio;
                     }
 
                     imageData(blob, {
@@ -373,6 +374,10 @@ define([
             opts.onFinished = onUploadFinished;
 
             parserSocket.upload(name, file, opts);
+        }
+
+        function inactiveAllImage() {
+            $('.image-active').removeClass('image-active');
         }
 
         return {
@@ -460,7 +465,8 @@ define([
                 $('.' + LASER_IMG_CLASS).find('img').each(function(k, el) {
                     refreshImage($(el), threshold);
                 });
-            }
+            },
+            inactiveAllImage: inactiveAllImage
         };
     };
 });

@@ -1,4 +1,5 @@
 require.config({
+    urlArgs: 'v=' + (new Date()).getTime(),
     baseUrl: 'js/',
 
     paths: {

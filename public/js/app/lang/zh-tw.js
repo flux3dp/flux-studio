@@ -281,8 +281,8 @@ define(function() {
             acceptable_files: 'JPG, PNG, PDF, AI',
             drop_files_to_import: 'Drop your file here or click "import" to upload your file',
             button_advanced: 'Advanced',
-            start_engrave: 'ENGRAVE',
-            start_cut: 'CUT',
+            start_engrave: 'Engrave',
+            start_cut: 'Cut',
             print_params: {
                 object_height: {
                     text: 'Object Height',
@@ -335,7 +335,7 @@ define(function() {
                                 selected: true,
                                 data: {
                                     laser_speed: 10,
-                                    power: 0.2
+                                    power: 255
                                 }
                             },
                             {
@@ -343,7 +343,7 @@ define(function() {
                                 label: 'Steel',
                                 data: {
                                     laser_speed: 50,
-                                    power: 0.5
+                                    power: 255
                                 }
                             }
                         ]
@@ -361,8 +361,8 @@ define(function() {
                         high: 'High',
                         low: 'Low',
                         min: 0,
-                        max: 1,
-                        step: 0.1
+                        max: 255,
+                        step: 1
                     }
                 },
                 apply: 'Apply',

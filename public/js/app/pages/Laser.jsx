@@ -41,6 +41,12 @@ define([
                     })
                 },
 
+                _inactiveSelectImage: function(e) {
+                    if (e.target === e.currentTarget) {
+                        this.props.laserEvents.inactiveAllImage();
+                    }
+                },
+
                 _renderStageSection: function() {
                     var lang = args.state.lang,
                         cx = React.addons.classSet,
@@ -61,7 +67,7 @@ define([
 
                     return (
                         <section id="operation-table" className="operation-table">
-                            <div className="laser-object border-circle"/>
+                            <div className="laser-object border-circle" onClick={this._inactiveSelectImage}/>
                             <SetupPanel
                                 lang={lang}
                                 mode={this.state.mode}

@@ -45,9 +45,9 @@ define([
                                 imgSrc: '/img/icon-scan.png'
                             },
                             {
-                                name: 'usb',
+                                name: 'device',
                                 className: genericClassName,
-                                label: lang.menu.usb,
+                                label: lang.menu.device,
                                 imgSrc: 'http://placehold.it/34x34'
                             },
                             {

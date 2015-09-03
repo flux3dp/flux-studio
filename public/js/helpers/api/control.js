@@ -59,7 +59,7 @@ define([
                     },
                     _uploading = function(data) {
                         if ('connected' === data.status) {
-                            console.time('uploading');
+                            // TODO: to be implement?
                         }
                         else if ('continue' === data.status) {
                             var fileReader;
@@ -71,7 +71,6 @@ define([
                                     chunk = convertToTypedArray(chunk, Uint8Array);
                                 }
 
-                                // blobs.push(chunk);
                                 fileReader = new FileReader();
 
                                 fileReader.onloadend = function(e) {
@@ -82,7 +81,9 @@ define([
 
                         }
                         else if ('ok' === data.status) {
-                            console.timeEnd('uploading');
+                            lastOrder = 'start';
+                            events.onMessage = _startPrint;
+                            ws.send(lastOrder);
                         }
                         else {
                             // TODO: do something

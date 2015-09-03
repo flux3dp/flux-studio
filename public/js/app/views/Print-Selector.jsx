@@ -9,7 +9,6 @@ define([
     'use strict';
 
     return React.createClass({
-        timer: null,
         discover_socket: null,
         selected_printer: null,
 
@@ -208,6 +207,12 @@ define([
             self.discover_socket = discover(function(printers) {
                 options = [];
 
+                Array.observe(options, function(changes) {
+                    self.setState({
+                        printer_options: options
+                    });
+                });
+
                 printers.forEach(function(el) {
                     var printer_item = self._renderPrinterItem(el);
 
@@ -217,12 +222,6 @@ define([
                     });
                 });
             });
-
-            self.timer = setInterval(function() {
-                self.setState({
-                    printer_options: options
-                });
-            }, 1000);
 
             return {
                 printer_options: [],
@@ -241,7 +240,6 @@ define([
 
         componentWillUnmount: function() {
             this.discover_socket.connection.close();
-            clearInterval(this.timer);
         }
 
     });

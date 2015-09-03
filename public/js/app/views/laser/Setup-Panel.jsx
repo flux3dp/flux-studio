@@ -52,6 +52,7 @@ define([
 
             delete settings.material;
             settings.object_height = this.refs.objectHeight.getDOMNode().value;
+            settings.power = settings.power / 255;
 
             return settings;
         },
@@ -151,7 +152,9 @@ define([
 
         _renderObjectHeight: function(lang) {
             return (
-                <input ref="objectHeight" type="number" min="0" max="100" step="0.1" defaultValue="0.3" onBlur={this._onObjectHeightBlur}/>
+                <input ref="objectHeight" type="number" min="0" max="100" step="0.1" defaultValue="3"
+                    onBlur={this._onObjectHeightBlur}
+                />
             )
         },
 
