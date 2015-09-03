@@ -4,6 +4,7 @@ define([
     'helpers/display',
     'helpers/websocket',
     'helpers/api/3d-print-slicing',
+    'helpers/api/control',
     'threeOrbitControls',
     'threeTrackballControls',
     'threeTransformControls',
@@ -11,7 +12,7 @@ define([
     'threeCircularGridHelper',
     'plugins/file-saver/file-saver.min'
 
-], function($, fileSystem, display, websocket, printSlicing) {
+], function($, fileSystem, display, websocket, printSlicing, printerController) {
     'use strict';
 
     var THREE = window.THREE || {},
@@ -748,10 +749,17 @@ define([
 
     function downloadGCode(fileName) {
         var d = $.Deferred();
-        getGCode().then(function(blob) {
-            console.log('downloading ', blob);
-            d.resolve(saveAs(blob, fileName));
-        });
+        if(!blobExpired) {
+            d.resolve(saveAs(responseBlob, fileName));
+        }
+        else {
+            getGCode().then(function(blob) {
+                console.log('downloading ', blob);
+                _setProgressMessage('');
+                d.resolve(saveAs(blob, fileName));
+            });
+        }
+
         return d.promise();
     }
 
@@ -767,15 +775,20 @@ define([
                 if(result instanceof Blob) {
                     blobExpired = false;
                     responseBlob = result;
+                    _setProgressMessage('');
                     d.resolve(result);
                 }
                 else {
-                    console.log(result);
-                    var serverMessage   = `${result.status}: ${result.message} (${parseInt(result.percentage * 100)}%)`,
-                        drawingMessage  = `drawing: making it pretty (100%)`,
-                        message         = result.status !== 'complete' ? serverMessage : drawingMessage;
-
-                    reactSrc.setState({ progressMessage: message });
+                    if(result.status !== 'error') {
+                        console.log(result);
+                        var serverMessage   = `${result.status}: ${result.message} (${parseInt(result.percentage * 100)}%)`,
+                            drawingMessage  = `FInishing up... (100%)`,
+                            message         = result.status !== 'complete' ? serverMessage : drawingMessage;
+                        _setProgressMessage(message);
+                    }
+                    else {
+                        _setProgressMessage('');
+                    }
                 }
             });
         });
@@ -878,31 +891,45 @@ define([
     }
 
     function togglePreview(isOn) {
-        previewMode = isOn;
-        isOn ? _showPreview() : _hidePreview();
+        if(objects.length === 0) {
+            return;
+        }
+        else {
+            reactSrc.setState({ previewMode: isOn });
+            previewMode = isOn;
+            _setProgressMessage('generating preview...');
+            isOn ? _showPreview() : _hidePreview();
+        }
     }
 
     function _hidePreview() {
         render();
+        _setProgressMessage('');
     }
 
     function _showPreview() {
 
         selectObject(null);
 
+        var drawPath = function() {
+            printController.getPath().then(function(result) {
+                printPath = result;
+                _drawPath();
+            });
+        }
+
         if(blobExpired) {
             getGCode().then(function() {
-                printController.getPath().then(function(result) {
-                    printPath = result;
-                    // console.log(result);
-                    // console.log('new file');
-                    _drawPath();
-                });
+                drawPath();
             });
         }
         else {
-            // console.log('old file');
-            _showPath();
+            if(previewScene.children.length <= 1) {
+                drawPath();
+            }
+            else {
+                _showPath();
+            }
         }
     }
 
@@ -938,13 +965,13 @@ define([
             sliderMax: previewScene.children.length - 1,
             sliderValue: previewScene.children.length - 1
         });
-        _setProgressMessage('');
         _showPath();
     }
 
     function _showPath() {
         console.log('preview scene children count: ', previewScene.children.length);
         render();
+        _setProgressMessage('');
     }
 
     function _setProgressMessage(message) {
@@ -958,6 +985,23 @@ define([
             previewScene.children[i].visible = i - 1 < layer;
         }
         render();
+    }
+
+    function executePrint (serial) {
+
+        var go = function(blob) {
+            var control_methods = printerController(serial);
+            control_methods.upload(blob.size, blob);
+        }
+
+        if(!blobExpired) {
+            go(responseBlob);
+        }
+        else {
+            getGCode().then((blob) => {
+                go(blob);
+            });
+        }
     }
 
     return {
@@ -976,6 +1020,7 @@ define([
         setParameter            : setParameter,
         getGCode                : getGCode,
         togglePreview           : togglePreview,
-        changePreviewLayer      : changePreviewLayer
+        changePreviewLayer      : changePreviewLayer,
+        executePrint            : executePrint
     };
 });

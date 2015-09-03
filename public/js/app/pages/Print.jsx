@@ -14,9 +14,8 @@ define([
     'helpers/file-system',
     'jsx!widgets/Modal',
     'jsx!views/Print-Selector',
-    'helpers/api/control',
     'plugins/knob/jquery.knob'
-], function($, React, display, director, RadioGroupView, ClassNames, OperatingPanel, SettingPanel, ScalePanel, RotationPanel, AdvancedPanel, MonitorPanel, FileSystem, Modal, PrinterSelector, printerController) {
+], function($, React, display, director, RadioGroupView, ClassNames, OperatingPanel, SettingPanel, ScalePanel, RotationPanel, AdvancedPanel, MonitorPanel, FileSystem, Modal, PrinterSelector) {
     'use strict';
 
     return function(args) {
@@ -182,7 +181,6 @@ define([
                 },
                 _handlePreview: function(isOn) {
                     director.togglePreview(isOn);
-                    this.setState({ previewMode: isOn });
                 },
                 _handlePrinterSelectorWindowClose: function() {
                     this.setState({ openPrinterSelectorWindow: false });
@@ -190,15 +188,9 @@ define([
                 _handlePrinterSelected: function(selectedPrinter) {
                     console.log(selectedPrinter);
                     this.setState({
-                        openPrinterSelectorWindow: false,
-                        openWaitWindow: true
+                        openPrinterSelectorWindow: false
                     });
-                    var control_methods = printerController(selectedPrinter.serial);
-                    director.getGCode().then((blob) => {
-                        console.log('sending blob to machine', blob);
-                        control_methods.upload(blob.size, blob);
-                        this.setState({ openWaitWindow: false });
-                    });
+                    director.executePrint(selectedPrinter.serial);
                 },
                 _handlePreviewLayerChange: function(e) {
                     director.changePreviewLayer(e.target.value);
