@@ -52,8 +52,8 @@ define([
             advancedSetting.support = e.target.value;
         },
         _handleIniChange: function(e) {
-            var value = !!e.target.value ? ' ' : e.target.value;
-            advancedSetting.advancedSettings = value
+            var value = !!e.target.value ? e.target.value : ' ';
+            advancedSetting.advancedSettings = value;
             this.setState({ advancedSettings: value });
         },
         _handleCancel: function(e) {
