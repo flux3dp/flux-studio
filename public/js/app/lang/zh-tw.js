@@ -30,7 +30,8 @@ define(function() {
                 password_placeholder: '請輸入 Wi-Fi 密碼',
                 back: '上一步',
                 join: '加入',
-                connecting: '連線中'
+                connecting: '連線中',
+                no_selected: '請選擇 Wifi'
             },
             success: {
                 caption: '太棒了，連線成功!',

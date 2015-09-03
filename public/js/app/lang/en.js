@@ -30,7 +30,8 @@ define(function() {
                 password_placeholder: '請輸入 Wi-Fi 密碼',
                 back: 'Back',
                 join: 'Join',
-                connecting: 'Connecting'
+                connecting: 'Connecting',
+                no_selected: 'No SSID selected'
             },
             success: {
                 caption: '太棒了，連線成功!',
