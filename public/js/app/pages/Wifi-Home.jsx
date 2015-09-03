@@ -1,17 +1,20 @@
 define([
     'jquery',
     'react',
-    'jsx!widgets/Modal'
-], function($, React, Modal) {
+    'jsx!widgets/Modal',
+    'helpers/api/usb-config'
+], function($, React, Modal, usbConfig) {
     'use strict';
 
     return function(args) {
         args = args || {};
 
         var Page = React.createClass({
+
             getInitialState: function() {
                 return args.state;
             },
+
             render : function() {
                 var content = (
                     <div className="wifi initialization text-center">
