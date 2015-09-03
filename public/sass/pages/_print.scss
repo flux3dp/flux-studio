@@ -897,4 +897,28 @@ input.switch:checked ~ label:after
             }
         }
     }
+    .previewPanel {
+        input {
+            position: absolute;
+            bottom: 10%;
+            left: 0%;
+            width: 200px;
+            transform: rotate(270deg);
+        }
+        div {
+            position: absolute;
+            bottom: 14px;
+            left: 8%;
+        }
+    }
+    .progressWindow {
+        width: 600px;
+        height: 100px;
+        background-color: white;
+
+        .message {
+            text-align: center;
+            padding: 15px 0;
+        }
+    }
 }

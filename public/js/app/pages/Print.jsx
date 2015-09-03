@@ -29,7 +29,7 @@ define([
                 extrudingSpeed: 0,
                 temperature: 0,
                 support: '',
-                advancedSettings: ''
+                advancedSettings: ' '
             },
             _scale = {
                 locked  : true,
@@ -49,13 +49,16 @@ define([
                         checked                     : false,
                         locked                      : true,
                         operation                   : '',
-                        previewMode                 : 'normal',
+                        previewMode                 : false,
                         showPreviewModeList         : false,
                         showAdvancedSetting         : false,
                         showMonitor                 : false,
                         modelSelected               : null,
                         openPrinterSelectorWindow   : false,
-                        openWaitWindow              : false
+                        openWaitWindow              : false,
+                        sliderMax                   : 1,
+                        sliderValue                 : 0,
+                        progressMessage             : ''
                     });
                 },
                 componentDidMount: function() {
@@ -64,15 +67,15 @@ define([
                 _updateSelectedSize: function() {
 
                 },
-                _handlePreviewModeChange: function(mode, e) {
-                    this.setState({
-                        previewMode: mode,
-                        showPreviewModeList: false
-                    });
-                },
-                _handleShowPreviewSelection: function(e) {
-                    this.setState({ showPreviewModeList: !this.state.showPreviewModeList });
-                },
+                // _handlePreviewModeChange: function(mode, e) {
+                //     this.setState({
+                //         previewMode: mode,
+                //         showPreviewModeList: false
+                //     });
+                // },
+                // _handleShowPreviewSelection: function(e) {
+                //     this.setState({ showPreviewModeList: !this.state.showPreviewModeList });
+                // },
                 _handleOperationChange: function(operation) {
                     // console.log('operation is', operation);
                     switch(operation) {
@@ -177,6 +180,10 @@ define([
                         this.setState({ openWaitWindow: false });
                     });
                 },
+                _handlePreview: function(isOn) {
+                    director.togglePreview(isOn);
+                    this.setState({ previewMode: isOn });
+                },
                 _handlePrinterSelectorWindowClose: function() {
                     this.setState({ openPrinterSelectorWindow: false });
                 },
@@ -193,12 +200,15 @@ define([
                         this.setState({ openWaitWindow: false });
                     });
                 },
+                _handlePreviewLayerChange: function(e) {
+                    director.changePreviewLayer(e.target.value);
+                    this.setState({ sliderValue: e.target.value });
+                },
                 _renderHeader: function() {
                     return;
-                    var currentMode     = this.state.previewMode === 'normal' ? lang.print.normal_preview : lang.print.support_preview,
-                        normalClass     = ClassNames('fa', 'fa-check', 'icon', 'pull-right', {hide: this.state.previewMode !== 'normal'}),
+                    var normalClass     = ClassNames('fa', 'fa-check', 'icon', 'pull-right', {hide: this.state.previewMode !== 'normal'}),
                         supportClass    = ClassNames('fa', 'fa-check', 'icon', 'pull-right', {hide: this.state.previewMode !== 'support'}),
-                        previewClass    = ClassNames('preview', {hide: !this.state.showPreviewModeList}),
+                        // previewClass    = ClassNames('preview', {hide: !this.state.showPreviewModeList}),
                         boundingBox     = director.getSelectedObjectSize();
                         boundingBox     = typeof(boundingBox) === 'undefined' ? {x: 0, y: 0, z: 0} : boundingBox.box.size();
 
@@ -241,6 +251,7 @@ define([
                             onShowAdvancedSetting   = {this._handleShowAdvancedSetting}
                             onImport                = {this._handleFileUpload}
                             onSave                  = {this._handleFileDownload}
+                            onPreview               = {this._handlePreview}
                             onPrintClick            = {this._handlePrintClick}
                             onSpeedChange           = {this._handleSpeedChange} />
                     );
@@ -282,6 +293,29 @@ define([
                         <Modal content={spinner} />
                     );
                 },
+                _renderPreviewWindow: function() {
+                    return (
+                        <div className="previewPanel">
+                            <input className="range" type="range" value={this.state.sliderValue} min="0" max={this.state.sliderMax} onChange={this._handlePreviewLayerChange} />
+                            <div>
+                                {this.state.sliderValue}
+                            </div>
+                        </div>
+                    );
+                },
+                _renderProgressWindow: function() {
+                    var content = (
+                        <div className="progressWindow">
+                            <div className="message">
+                                {this.state.progressMessage}
+                            </div>
+                            <div className="spinner-flip spinner-reverse"/>
+                        </div>
+                    )
+                    return (
+                        <Modal content={content} />
+                    );
+                },
                 render: function() {
                     var header                  = this._renderHeader(),
                         operatingPanel          = this._renderOperatingPanel(),
@@ -290,7 +324,9 @@ define([
                         bottomPanel,
                         monitorPanel            = this.state.showMonitor ? this._renderMonitorPanel() : '',
                         printerSelectorWindow   = this.state.openPrinterSelectorWindow ? this._renderPrinterSelectorWindow() : '',
-                        waitWindow              = this.state.openWaitWindow ? this._renderWaitWindow() : '';
+                        waitWindow              = this.state.openWaitWindow ? this._renderWaitWindow() : '',
+                        previewWindow           = this.state.previewMode ? this._renderPreviewWindow() : '',
+                        progressWindow          = this.state.progressMessage ? this._renderProgressWindow() : '';
 
                     switch(this.state.operation) {
                         case 'rotate':
@@ -343,6 +379,10 @@ define([
                             {printerSelectorWindow}
 
                             {waitWindow}
+
+                            {previewWindow}
+
+                            {progressWindow}
 
                             <div id="model-displayer" className="model-displayer" style={divStyle}></div>
                         </div>

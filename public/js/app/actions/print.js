@@ -29,10 +29,14 @@ define([
 
     var movingOffsetX, movingOffsetY;
 
-    var responseMessage, responseBlob,
+    var responseMessage, responseBlob, printPath,
+        previewScene,
+        mainScene,
+        previewColors = [],
         blobExpired = true,
         transformMode = false,
         shiftPressed = false,
+        previewMode = false,
         fileExtension = '.gcode';
 
     var s = {
@@ -50,10 +54,16 @@ define([
         colorSelected: 0xFFFF00,
         colorUnselected: 0x333333,
         degreeStep: 5,
-        scalePrecision: 1 // decimal places
+        scalePrecision: 1 // decimal places,
     };
 
     var advancedParameters = ['layerHeight', 'infill', 'travelingSpeed', 'extrudingSpeed', 'temperature', 'advancedSettings'];
+
+    previewColors[0] = new THREE.Color( 0x996633 ); // infill
+    previewColors[1] = new THREE.Color( 0xddcc99 ); // perimeter
+    previewColors[2] = new THREE.Color( 0xbbbbbb ); // support
+    previewColors[3] = new THREE.Color( 0xffffff ); // move
+    previewColors[4] = new THREE.Color( 0xee9966 ); // skirt
 
     function init(src) {
 
@@ -77,7 +87,9 @@ define([
             s.textColor,
             s.textPosition
         );
+        circularGridHelper.name = 'circularGridHelper';
         scene.add(circularGridHelper);
+        previewScene = scene.clone();
 
         var geometry = new THREE.CircleGeometry( s.radius, 80 ),
             material = new THREE.MeshBasicMaterial( { color: 0xCCCCCC, transparent: true } ),
@@ -284,6 +296,10 @@ define([
     function onMouseDown(e) {
         e.preventDefault();
         adjustMousePosition(e);
+
+        if(previewMode) {
+            return;
+        }
 
         raycaster.setFromCamera( mouse, camera );
         var intersects = raycaster.intersectObjects( objects );
@@ -494,13 +510,13 @@ define([
 
     }
 
-    function render(e) {
+    function render() {
         if(SELECTED) {
             updateFromScene('BoundingBoxHelper');
             updateFromScene('TransformControl');
         }
-        // orbitControl.update();
-        renderer.render(scene, camera);
+
+        renderer.render(previewMode ? previewScene : scene, camera);
     }
 
     function transform(e) {
@@ -739,29 +755,48 @@ define([
         return d.promise();
     }
 
-    function getGCode(callback) {
+    function getGCode() {
         var d = $.Deferred();
         var ids = [];
         objects.forEach(function(obj) {
             ids.push(obj.uuid);
         });
 
-        readyGCode().then(
-            function() {
-                return printController.go(ids);
-            }
-        ).then(function(result) {
-            if(result instanceof Blob) {
-                console.log('blob ready');
-                blobExpired = false;
-                d.resolve(result);
-            }
-            else {
-                console.log('error: ', result);
-                responseMessage = result;
-                // todo: error logging
-            }
+        readyGCode().then(function() {
+            printController.go(ids, function(result) {
+                if(result instanceof Blob) {
+                    blobExpired = false;
+                    responseBlob = result;
+                    d.resolve(result);
+                }
+                else {
+                    console.log(result);
+                    var serverMessage   = `${result.status}: ${result.message} (${parseInt(result.percentage * 100)}%)`,
+                        drawingMessage  = `drawing: making it pretty (100%)`,
+                        message         = result.status !== 'complete' ? serverMessage : drawingMessage;
+
+                    reactSrc.setState({ progressMessage: message });
+                }
+            });
         });
+
+        // readyGCode().then(
+        //     function() {
+        //         return printController.go(ids);
+        //     }
+        // ).then(function(result) {
+        //     if(result instanceof Blob) {
+        //         console.log('blob ready');
+        //         blobExpired = false;
+        //         console.log('2');
+        //         d.resolve(result);
+        //     }
+        //     else {
+        //         console.log('error: ', result);
+        //         responseMessage = result;
+        //         // todo: error logging
+        //     }
+        // });
 
         return d.promise();
     }
@@ -827,6 +862,7 @@ define([
                 }
             });
         }
+        blobExpired = true;
     }
 
     function setParameter(name, value) {
@@ -838,6 +874,90 @@ define([
                 console.dir(result);
             }
         )
+        blobExpired = true;
+    }
+
+    function togglePreview(isOn) {
+        previewMode = isOn;
+        isOn ? _showPreview() : _hidePreview();
+    }
+
+    function _hidePreview() {
+        render();
+    }
+
+    function _showPreview() {
+
+        selectObject(null);
+
+        if(blobExpired) {
+            getGCode().then(function() {
+                printController.getPath().then(function(result) {
+                    printPath = result;
+                    // console.log(result);
+                    // console.log('new file');
+                    _drawPath();
+                });
+            });
+        }
+        else {
+            // console.log('old file');
+            _showPath();
+        }
+    }
+
+    function _drawPath() {
+        var color,
+            g, m, line,
+            type;
+
+        previewScene.children.splice(1, previewScene.children.length - 1);
+        m = new THREE.LineBasicMaterial( { color: 0xffffff, opacity: 10, linewidth: 1, vertexColors: THREE.VertexColors } );
+
+        for(var layer = 0; layer < printPath.length; layer++) {
+            g = new THREE.Geometry();
+            color = [];
+
+            for(var point = 0; point < printPath[layer].length; point++) {
+                type = !!printPath[layer][point + 1] ? printPath[layer][point + 1].t : printPath[layer][point].t;
+                color[point] = previewColors[type];
+                g.vertices.push(new THREE.Vector3(
+                    printPath[layer][point].p[0],
+                    printPath[layer][point].p[1],
+                    printPath[layer][point].p[2]
+                ));
+            }
+
+            g.colors = color;
+            line = new THREE.Line(g, m);
+            line.name = 'line';
+            previewScene.add(line);
+        }
+
+        reactSrc.setState({
+            sliderMax: previewScene.children.length - 1,
+            sliderValue: previewScene.children.length - 1
+        });
+        _setProgressMessage('');
+        _showPath();
+    }
+
+    function _showPath() {
+        console.log('preview scene children count: ', previewScene.children.length);
+        render();
+    }
+
+    function _setProgressMessage(message) {
+        reactSrc.setState({
+            progressMessage: message
+        });
+    }
+
+    function changePreviewLayer (layer) {
+        for(var i = 1; i < previewScene.children.length; i++) {
+            previewScene.children[i].visible = i - 1 < layer;
+        }
+        render();
     }
 
     return {
@@ -854,6 +974,8 @@ define([
         setScaleMode            : setScaleMode,
         setAdvanceParameter     : setAdvanceParameter,
         setParameter            : setParameter,
-        getGCode                : getGCode
+        getGCode                : getGCode,
+        togglePreview           : togglePreview,
+        changePreviewLayer      : changePreviewLayer
     };
 });

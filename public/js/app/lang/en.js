@@ -274,7 +274,8 @@ define(function() {
             pause: 'PAUSE',
             continue: 'CONTINUE',
             restart: 'RESTART',
-            download_prompt: 'please enter file name'
+            download_prompt: 'please enter file name',
+            preview: 'Preview'
         },
         laser: {
             import: 'Import',
@@ -464,7 +465,17 @@ define(function() {
             pause: 'Pause',
             cancelTask: 'Cancel Task',
             selectPrinter: 'Select Printer',
-            retry: 'Retry'
+            retry: 'Retry',
+            status: 'Status',
+            busy: 'Busy',
+            ready: 'Ready',
+            reset: 'Reset (Kick)',
+            abort: 'Abort',
+            start: 'Start',
+            noTask: 'There are currently no task to do',
+            pleaseWait: 'Please Wait...',
+            unknownCommand: 'command cannot be executed in current status',
+            quit: 'Quit'
         }
     };
 });

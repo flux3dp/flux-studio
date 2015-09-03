@@ -5,6 +5,8 @@ define([
 ], function($, React, printController) {
     'use strict';
 
+    var preview = false;
+
     return React.createClass({
         getDefaultProps: function() {
             return {
@@ -40,6 +42,10 @@ define([
         },
         _handlePrintSpeedChange: function(e) {
             this.props.onSpeedChange(e.target.value.toLowerCase());
+        },
+        _handleTogglePreview: function(e) {
+            preview = !preview;
+            this.props.onPreview(preview);
         },
         render: function() {
             var lang = this.props.lang,
@@ -116,13 +122,14 @@ define([
                     </div>
 
                     <div>
-                        <button className="btn action file-importer">
+                        <a className="btn action file-importer">
                             <div className="fa fa-plus"></div>
                             {lang.print.import}
                             <input type="file" accept=".stl" onChange={this.props.onImport} />
-                        </button>
+                        </a>
                     </div>
                     <div><a className="btn action btn-save" onClick={this.props.onSave}><span className="fa fa-floppy-o"></span>{lang.print.save}</a></div>
+                    <div><a className="btn action btn-preview" onClick={this._handleTogglePreview}><span className="fa fa-eye"></span>{lang.print.preview}</a></div>
                     <div><a className="btn action btn-print" onClick={this._handlePrintClick}><span className="fa fa-print"></span>{lang.print.start_print}</a></div>
                     <div>{this._roundValue(boundingBox.x) + ' x ' + this._roundValue(boundingBox.y) + ' x ' + this._roundValue(boundingBox.z) + ' (mm)'}</div>
                 </div>

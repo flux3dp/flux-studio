@@ -274,7 +274,8 @@ define(function() {
             pause: '暫停',
             continue: '繼續',
             restart: '重新開始',
-            download_prompt: '請輸入檔案名稱'
+            download_prompt: '請輸入檔案名稱',
+            preview: '預覽'
         },
         laser: {
             import: 'Import',
@@ -464,7 +465,17 @@ define(function() {
             pause: '暫停',
             cancelTask: '終止任務',
             selectPrinter: '選擇成型機',
-            retry: '重試'
+            retry: '重試',
+            status: '狀態',
+            busy: '忙碌中',
+            ready: '就緒',
+            reset: '重設(kick)',
+            abort: '取消工作',
+            start: '開始',
+            noTask: '目前無任何工作',
+            pleaseWait: '請稍待...',
+            unknownCommand: '指令無法在此狀態下被執行',
+            quit: '中斷連結'
         }
     };
 });

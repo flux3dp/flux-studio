@@ -3,10 +3,11 @@
  * Ref: https://github.com/flux3dp/fluxghost/wiki/websocket-control
  */
 define([
+    'jquery',
     'helpers/websocket',
     'helpers/is-json',
     'helpers/convertToTypedArray'
-], function(Websocket, isJson, convertToTypedArray) {
+], function($, Websocket, isJson, convertToTypedArray) {
     'use strict';
 
     return function(serial, opts) {
@@ -19,14 +20,15 @@ define([
                 onMessage: function(result) {
                     var data = (true === isJson(result.data) ? JSON.parse(result.data) : result.data);
 
-                    lastMessage = data;
-
-                    if ('string' === typeof data.status && 'error' === data.status) {
-                        opts.onError(data);
-                    }
-                    else {
-                        events.onMessage(data);
-                    }
+                    lastMessage = result.error || '';
+                    console.log('raw ', data);
+                    events.onMessage(data);
+                    // if ('error' === data.status) {
+                    //     opts.onError(data);
+                    // }
+                    // else {
+                    //     events.onMessage(data);
+                    // }
 
                 }
             }),
@@ -112,6 +114,61 @@ define([
                         interrupt('abort');
                     }
                 };
+            },
+            getStatus: function() {
+                var d = $.Deferred();
+                events.onMessage = function(result) {
+                    d.resolve(result);
+                };
+
+                ws.send('position');
+                lastOrder = 'status';
+
+                return d.promise();
+            },
+            abort: function() {
+                var d = $.Deferred();
+                events.onMessage = function(result) {
+                    d.resolve(result);
+                };
+
+                ws.send('abort');
+                lastOrder = 'abort';
+
+                return d.promise();
+            },
+            start: function() {
+                var d = $.Deferred();
+                events.onMessage = function(result) {
+                    d.resolve(result);
+                };
+
+                ws.send('start');
+                lastOrder = 'start';
+
+                return d.promise();
+            },
+            reset: function() {
+                var d = $.Deferred();
+                events.onMessage = function(result) {
+                    d.resolve(result);
+                };
+
+                ws.send('kick');
+                lastOrder = 'kick';
+
+                return d.promise();
+            },
+            quit: function() {
+                var d = $.Deferred();
+                events.onMessage = function(result) {
+                    d.resolve(result);
+                };
+
+                ws.send('quit');
+                lastOrder = 'quit';
+
+                return d.promise();
             }
         };
     };
