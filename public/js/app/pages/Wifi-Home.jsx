@@ -27,7 +27,7 @@ define([
                                 <a href="#initialize/wifi/select" className="btn btn-action btn-large">{this.state.lang.wifi.home.select}</a>
                             </div>
                             <div>
-                                <a href="#initialize/wifi/flux-as-wifi-1">{this.state.lang.wifi.home.no_available_wifi}</a>
+                                <a href="#initialize/wifi/configuring-flux">{this.state.lang.wifi.home.no_available_wifi}</a>
                             </div>
                         </div>
                     </div>
