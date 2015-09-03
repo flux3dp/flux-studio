@@ -69,7 +69,7 @@ define([
                                 {items}
 
                                 <div>
-                                    <a href="#">{lang.wifi.select.no_wifi_available}</a>
+                                    <a href="#initialize/wifi/configuring-flux">{lang.wifi.select.no_wifi_available}</a>
                                 </div>
                             </div>
                         </div>
