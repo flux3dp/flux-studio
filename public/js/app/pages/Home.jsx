@@ -1,12 +1,12 @@
 define([
-    'jquery',
     'react',
     'helpers/i18n',
+    'helpers/local-storage',
     'jsx!widgets/Select',
     'jsx!widgets/Modal',
     'helpers/api/config',
     'helpers/api/usb-config'
-], function($, React, i18n, SelectView, Modal, config, usbConfig) {
+], function(React, i18n, localStorage, SelectView, Modal, config, usbConfig) {
     'use strict';
 
     return function(args) {
@@ -21,7 +21,6 @@ define([
                 config().write('printer-is-ready', true, {
                     onFinished: function() {
                         location.hash = '#studio/print/';
-                        console.log(location.hash);
                     }
                 });
             },
@@ -35,16 +34,14 @@ define([
                         });
                     };
 
-                self.setProps({
-                    usbConfig: usb
-                });
-
                 toggleBlocker(true);
 
                 usb.list({
                     onSuccess: function(response) {
                         toggleBlocker(false);
-                        location.hash = '#initialize/wifi/ask/' + response.serial;
+                        // temporary
+                        localStorage.set('setting-printer', response);
+                        location.hash = '#initialize/wifi/ask';
                     },
                     onError: function(response) {
                         toggleBlocker(false);
@@ -101,12 +98,6 @@ define([
                     lang: args.state.lang,
                     openBlocker: false
                 };
-            },
-
-            componentWillUnmount: function () {
-                if ('undefined' !== typeof this.props.usbConfig) {
-                    this.props.usbConfig.connection.close();
-                }
             }
         });
 
