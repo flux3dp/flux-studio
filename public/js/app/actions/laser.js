@@ -240,7 +240,8 @@ define([
                                     threshold: parseInt(threshold.getDOMNode().value, 10)
                                 },
                                 grayscaleOpts = {
-                                    is_svg: ('svg' === self.props.fileFormat)
+                                    is_svg: ('svg' === self.props.fileFormat),
+                                    threshold: 255
                                 },
                                 src = '';
 
@@ -367,7 +368,6 @@ define([
                         },
                         onComplete: function(result) {
                             file.url = result.canvas.toDataURL('image/png');
-
                             setupImage(file, size, objectUrl, name);
                         }
                     });
