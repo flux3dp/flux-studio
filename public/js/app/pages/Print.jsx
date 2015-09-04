@@ -118,13 +118,13 @@ define([
                 },
                 _handleRotation: function(rotation) {
                     _rotation = rotation;
-                    director.rotate(rotation.x, rotation.y, rotation.z, true);
+                    director.setRotation(rotation.x, rotation.y, rotation.z, true);
                 },
                 _handleResetRotation: function() {
                     _rotation.x = 0;
                     _rotation.y = 0;
                     _rotation.z = 0;
-                    director.rotate(0, 0, 0, true);
+                    director.setRotation(0, 0, 0, true);
                 },
                 _handleScaleChange: function(scale) {
                     _scale = scale;
