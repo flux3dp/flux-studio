@@ -38,7 +38,7 @@ define([
                 if (true === is_ready && ('' === hash || hash.startsWith('#initialize'))) {
                     location.hash = '#studio/print';
                 }
-                else if (false === is_ready && ('' !== hash || false === hash.startsWith('#initialize'))) {
+                else if (false === is_ready && false === hash.startsWith('#initialize')) {
                     location.hash = '#';
                 }
 
