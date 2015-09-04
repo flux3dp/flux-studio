@@ -167,8 +167,9 @@ define([
                                 data('last-y', parseFloat($el[0].style.top, 10));
                         }
                     }
-
-                    refreshImage($el.find('img'), 128);
+                    else {
+                        refreshImage($el.find('img'), 128);
+                    }
 
                     imagePanelRefs.objectAngle.getDOMNode().value = elementAngle($el[0]);
                     imagePanelRefs.objectPosX.getDOMNode().value = $el.data('last-x');
@@ -180,6 +181,17 @@ define([
             $target_image = null, // changing when image clicked
             printer = null,
             printer_selecting = false,
+            getThreshold = function() {
+                var imagePanelRefs = self.refs.imagePanel.refs;
+
+                return (imagePanelRefs.threshold || {
+                    getDOMNode: function() {
+                        return {
+                            value: 0
+                        };
+                    }
+                });
+            },
             handleLaser = function(settings, callback) {
 
                 var $ft_controls = $laser_platform.find('.ft-controls'),
@@ -212,13 +224,7 @@ define([
                     args = [],
                     doLaser = function(settings) {
                         var imagePanelRefs = self.refs.imagePanel.refs,
-                            threshold = (imagePanelRefs.threshold || {
-                                getDOMNode: function() {
-                                    return {
-                                        value: 0
-                                    };
-                                }
-                            });
+                            threshold = getThreshold();
 
                         $ft_controls.each(function(k, el) {
                             var $el = $(el),
@@ -454,7 +460,9 @@ define([
                     parserSocket = bitmapWebSocket;
                 }
 
-                handleUploadImage(file, parserSocket);
+                if ('undefined' !== typeof parserSocket) {
+                    handleUploadImage(file, parserSocket);
+                }
             },
             onFileReadEnd: function(e, files) {
                 self.setState({
