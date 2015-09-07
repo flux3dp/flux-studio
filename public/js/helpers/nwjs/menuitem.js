@@ -92,6 +92,10 @@ define(function() {
             return matches;
         },
 
+        clear: function() {
+            mainmenu = new Menu({ type: 'menubar', title: 'FLUX Studio', label: 'FLUX Studio' });
+        },
+
         refresh: function() {
             NWjsWindow.menu = mainmenu;
         }
