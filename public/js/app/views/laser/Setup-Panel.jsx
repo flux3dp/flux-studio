@@ -137,7 +137,7 @@ define([
                 ),
                 saveButton = (
                     true === props.hasImage ?
-                    <button data-ga-event="save-laser-gcode" className={export_file_class} onClick={this._onExport}>{lang.laser.save}</button> :
+                    <button ref="saveas" data-ga-event="save-laser-gcode" className={export_file_class} onClick={this._onExport}>{lang.laser.save}</button> :
                     ''
                 );
 
