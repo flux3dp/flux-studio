@@ -6,7 +6,8 @@ define([
     'jsx!views/laser/Setup-Panel',
     'jsx!views/laser/Image-Panel',
     'jsx!widgets/Modal',
-    'jsx!views/Print-Selector'
+    'jsx!views/Print-Selector',
+    'helpers/nwjs/menuitem'
 ], function(
     $,
     React,
@@ -15,7 +16,8 @@ define([
     SetupPanel,
     ImagePanel,
     Modal,
-    PrinterSelector
+    PrinterSelector,
+    menuitem
 ) {
     'use strict';
 
@@ -23,6 +25,44 @@ define([
         args = args || {};
 
         var view = React.createClass({
+
+                _renderTopMenu: function(lang) {
+                    var self = this,
+                        items = [{
+                            label: lang.laser.topmenu.main.label,
+                            subItems: [{
+                                label: lang.laser.topmenu.main.open,
+                                onClick: function() {
+                                    self.refs.setupPanel.refs.fileUploader.getDOMNode().click();
+                                }
+                            },
+                            {
+                                label: lang.laser.topmenu.main.save,
+                                enabled: this.state.hasImage,
+                                onClick: function() {
+                                    self.refs.setupPanel._onExport();
+                                }
+                            },
+                            {
+                                label: lang.laser.topmenu.main.engrave,
+                                enabled: this.state.hasImage,
+                                onClick: function() {
+                                    self.refs.setupPanel._onRunLaser();
+                                }
+                            }]
+                        }],
+                        subMenu,
+                        menu;
+
+                    menuitem.clear();
+
+                    items.forEach(function(menu) {
+                        subMenu = menuitem.createSubMenu(menu.subItems);
+                        menuitem.appendToMenu(menu.label, subMenu);
+                    });
+
+                    menuitem.refresh();
+                },
 
                 _onRunLaser: function(settings) {
                     this.setState({
@@ -124,6 +164,8 @@ define([
                             ''
                         ),
                         blocker = this._renderBlocker(lang);
+
+                    this._renderTopMenu(lang);
 
                     return (
                         <div className="studio-container laser-studio">
