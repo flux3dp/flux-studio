@@ -370,6 +370,14 @@ define(function() {
                 },
                 apply: '套用',
                 cancel: '取消',
+            },
+            topmenu: {
+                main: {
+                    label: 'Main',
+                    open: '打開',
+                    save: '儲存',
+                    engrave: '彫刻',
+                }
             }
         },
         scan: {

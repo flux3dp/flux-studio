@@ -370,6 +370,14 @@ define(function() {
                 },
                 apply: 'Apply',
                 cancel: 'Cancel',
+            },
+            topmenu: {
+                main: {
+                    label: 'Main',
+                    open: 'Open',
+                    save: 'Save',
+                    engrave: 'Engrave',
+                }
             }
         },
         scan: {
