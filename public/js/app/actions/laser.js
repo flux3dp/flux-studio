@@ -232,12 +232,8 @@ define([
                                 top_left = getCenter($el.find('.ft-scaler-top.ft-scaler-left')),
                                 bottom_right = getCenter($el.find('.ft-scaler-bottom.ft-scaler-right')),
                                 $img = $el.parents('.ft-container').find('.img-container img'),
-                                width = $el.width(),
-                                height = $el.height(),
                                 sub_data = {
                                     name: $img.data('name') || '',
-                                    width: width,
-                                    height: height,
                                     tl_position_x: convertToRealCoordinate(top_left.x, 'x'),
                                     tl_position_y: convertToRealCoordinate(top_left.y, 'y'),
                                     br_position_x: convertToRealCoordinate(bottom_right.x, 'x'),
@@ -249,27 +245,20 @@ define([
                                     is_svg: ('svg' === self.props.fileFormat),
                                     threshold: 255
                                 },
-                                src = '';
-
-                            if ('svg' === self.props.fileFormat) {
-                                src = $img.attr('src');
-                            }
-                            else {
                                 src = $img.data('base');
-                            }
 
                             imageData(
                                 src,
                                 {
-                                    height: height,
-                                    width: width,
                                     grayscale: grayscaleOpts,
                                     onComplete: function(result) {
                                         sub_data.image_data = result.imageBinary;
+                                        sub_data.height = result.size.height;
+                                        sub_data.width = result.size.width;
+                                        sub_data.real_width = sub_data.width / $laser_platform.width() * DIAMETER;
+                                        sub_data.real_height = sub_data.height / $laser_platform.height() * DIAMETER;
 
                                         if ('svg' === self.props.fileFormat) {
-                                            sub_data.real_width = sub_data.width / $laser_platform.width() * DIAMETER;
-                                            sub_data.real_height = sub_data.height / $laser_platform.height() * DIAMETER;
                                             sub_data.svg_data = svgWebSocket.History.findByName($img.data('name'))[0].data;
                                         }
 
@@ -330,7 +319,7 @@ define([
 
                     inactiveAllImage();
                     $target_image = $self.parent().find('.' + LASER_IMG_CLASS);
-                    $target_image.find('img').addClass('image-active');
+                    $target_image.addClass('image-active');
                 });
             });
 
