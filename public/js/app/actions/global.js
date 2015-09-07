@@ -16,7 +16,7 @@ define([
 
     // detached keyup and keydown event
     window.addEventListener('popstate', function(e) {
-        GA('send', 'pageview', location.hash);
+        window.GA('send', 'pageview', location.hash);
         shortcuts.disableAll();
     });
 
@@ -24,7 +24,7 @@ define([
     $('body').on('click', '[data-ga-event]', function(e) {
         var $self = $(e.currentTarget);
 
-        ga('send', 'event', 'button', 'click', $self.data('ga-event'));
+        window.GA('send', 'event', 'button', 'click', $self.data('ga-event'));
     });
 
     return function(callback) {
