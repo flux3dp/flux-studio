@@ -10,7 +10,8 @@ define([
     'threeTransformControls',
     'threeSTLLoader',
     'threeCircularGridHelper',
-    'plugins/file-saver/file-saver.min'
+    'plugins/file-saver/file-saver.min',
+    'lib/Canvas-To-Blob'
 
 ], function($, fileSystem, display, websocket, printSlicing, printerController) {
     'use strict';
@@ -28,7 +29,7 @@ define([
         offset = new THREE.Vector3(),
         circularGridHelper, mouseDown, boundingBox, SELECTED;
 
-    var movingOffsetX, movingOffsetY;
+    var movingOffsetX, movingOffsetY, originalCameraPosition, originalCameraRotation;
 
     var responseMessage, responseBlob, printPath,
         previewScene,
@@ -73,7 +74,7 @@ define([
         container = document.getElementById('model-displayer');
 
         camera = new THREE.PerspectiveCamera( 60, (container.offsetWidth) / container.offsetHeight, 1, 30000 );
-        camera.position.set(100, 100, 100);
+        camera.position.set(130, 130, 130);
         camera.up = new THREE.Vector3(0,0,1);
 
         scene = new THREE.Scene();
@@ -112,7 +113,7 @@ define([
 
         // renderer
         renderer = new THREE.WebGLRenderer({
-            // antialias: true
+            preserveDrawingBuffer: true
         });
         renderer.setClearColor( 0xE0E0E0, 1 );
         renderer.setPixelRatio(window.devicePixelRatio);
@@ -141,6 +142,9 @@ define([
 
         renderer.setSize(container.offsetWidth, container.offsetHeight);
 
+        originalCameraPosition = camera.position.clone();
+        originalCameraRotation = camera.rotation.clone();
+
         render();
 
         // init print controller
@@ -161,6 +165,8 @@ define([
         var loader = new THREE.STLLoader();
         var model_file_path = fileEntry.toURL();
 
+        reactSrc.setState({ openWaitWindow: true });
+
         loader.load(model_file_path, function(geometry) {
 
             var material = new THREE.MeshPhongMaterial({
@@ -176,6 +182,7 @@ define([
                 if(result.status !== 'ok') {
                     alert(result.error);
                 }
+                reactSrc.setState({ openWaitWindow: false });
             });
 
             geometry.center();
@@ -320,7 +327,7 @@ define([
                     _sx = updateScaleWithStep(SELECTED.scale.x),
                     _sy = updateScaleWithStep(SELECTED.scale.y),
                     _sz = updateScaleWithStep(SELECTED.scale.z);
-                    // console.log(SELECTED.scale.x, SELECTED.scale.y, SELECTED.scale.z);
+
                 _dx = _dx >= 0 ? _dx : (360 - Math.abs(_dx));
                 _dy = _dy >= 0 ? _dy : (360 - Math.abs(_dy));
                 _dz = _dz >= 0 ? _dz : (360 - Math.abs(_dz));
@@ -385,7 +392,6 @@ define([
 
              reader.readAsArrayBuffer(fileObject);
         });
-
     }
 
     // compare and return the largest axis value (for scaling)
@@ -434,27 +440,39 @@ define([
             ids.push(obj.uuid);
         });
 
-        sendGCodeParameters().then(function() {
-            printController.go(ids, function(result) {
-                if(result instanceof Blob) {
-                    blobExpired = false;
-                    responseBlob = result;
-                    _setProgressMessage('');
-                    d.resolve(result);
-                }
-                else {
-                    if(result.status !== 'error') {
-                        console.log(result);
-                        var serverMessage   = `${result.status}: ${result.message} (${parseInt(result.percentage * 100)}%)`,
-                            drawingMessage  = `FInishing up... (100%)`,
-                            message         = result.status !== 'complete' ? serverMessage : drawingMessage;
-                        _setProgressMessage(message);
-                    }
-                    else {
-                        _setProgressMessage('');
-                    }
-                }
-            });
+        _setProgressMessage('Saving File Preview');
+        saveSceneAsFileIcon().then(function(blob) {
+            return printController.uploadPreviewImage(blob);
+        }).then(function(result) {
+            if(result.status === 'ok') {
+                sendGCodeParameters().then(function() {
+                    printController.go(ids, function(result) {
+                        if(result instanceof Blob) {
+                            blobExpired = false;
+                            responseBlob = result;
+                            _setProgressMessage('');
+                            d.resolve(result);
+                        }
+                        else {
+                            if(result.status !== 'error') {
+                                console.log(result);
+                                var serverMessage   = `${result.status}: ${result.message} (${parseInt(result.percentage * 100)}%)`,
+                                    drawingMessage  = `FInishing up... (100%)`,
+                                    message         = result.status !== 'complete' ? serverMessage : drawingMessage;
+                                _setProgressMessage(message);
+                            }
+                            else {
+                                _setProgressMessage('');
+                            }
+                        }
+                    });
+                });
+            }
+            // error
+            else {
+                _setProgressMessage('');
+                d.resolve(result);
+            }
         });
 
         return d.promise();
@@ -674,11 +692,32 @@ define([
         }
         else {
             getGCode().then(function(blob) {
-                console.log('downloading ', blob);
-                _setProgressMessage('');
-                d.resolve(saveAs(blob, fileName));
+                if(blob instanceof Blob) {
+                    _setProgressMessage('');
+                    d.resolve(saveAs(blob, fileName));
+                }
             });
         }
+
+        return d.promise();
+    }
+
+    function saveSceneAsFileIcon() {
+        var ccp = camera.position.clone(),
+            ccr = camera.rotation.clone(),
+            d   = $.Deferred();
+
+        camera.position.set(originalCameraPosition.x, originalCameraPosition.y, originalCameraPosition.z);
+        camera.rotation.set(originalCameraRotation.x, originalCameraRotation.y, originalCameraRotation.z, originalCameraRotation.order);
+
+        render();
+
+        renderer.domElement.toBlob(function(blob) {
+            camera.position.set(ccp.x, ccp.y, ccp.z);
+            camera.rotation.set(ccr.x, ccr.y, ccr.z, ccr.order);
+            render();
+            d.resolve(blob);
+        });
 
         return d.promise();
     }
@@ -729,7 +768,9 @@ define([
         }
         else {
             getGCode().then((blob) => {
-                go(blob);
+                if(blob instanceof Blob) {
+                    go(blob);
+                }
             });
         }
     }
@@ -844,8 +885,10 @@ define([
         }
 
         if(blobExpired) {
-            getGCode().then(function() {
-                drawPath();
+            getGCode().then(function(blob) {
+                if(blob instanceof Blob) {
+                    drawPath();
+                }
             });
         }
         else {
@@ -870,6 +913,7 @@ define([
             g = new THREE.Geometry();
             color = [];
 
+            // with no gradient, but 2x more points
             for(var point = 0; point < printPath[layer].length; point++) {
                 type = !!printPath[layer][point + 1] ? printPath[layer][point + 1].t : printPath[layer][point].t;
                 color[point] = previewColors[type];

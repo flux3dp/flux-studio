@@ -118,6 +118,30 @@ define([
                 lastOrder = 'get_path';
 
                 return d.promise();
+            },
+            uploadPreviewImage: function(file) {
+                var d = $.Deferred();
+                events.onMessage = function(result) {
+                    console.log(result.status)
+                    switch (result.status) {
+                    case 'ok':
+                        d.resolve(result);
+                        break;
+                    case 'continue':
+                        console.log('sending: ', file);
+                        ws.send(file);
+                        break;
+                    default:
+                        // TODO: do something?
+                        break;
+                    }
+
+                };
+
+                ws.send('upload_image ' + file.size);
+                lastOrder = 'upload_image';
+
+                return d.promise();
             }
         };
     };

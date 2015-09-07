@@ -170,7 +170,7 @@ define([
                     }
                     e.target.value = null;
                 },
-                _handleFileDownload: function(e) {
+                _handleSave: function(e) {
                     this.setState({ openWaitWindow: true });
                     var fileName = prompt(lang.print.download_prompt);
                     fileName = fileName || 'no name';
@@ -215,7 +215,7 @@ define([
                                     </button>
                                 </div>
                                 <div>
-                                    <button className="btn btn-default tip" data-tip={lang.print.save} onClick={this._handleFileDownload}>
+                                    <button className="btn btn-default tip" data-tip={lang.print.save} onClick={this._handleSave}>
                                         <div className="fa fa-floppy-o"></div>
                                     </button>
                                 </div>
@@ -242,7 +242,7 @@ define([
                             onSupportClick          = {this._handleSupportClick}
                             onShowAdvancedSetting   = {this._handleShowAdvancedSetting}
                             onImport                = {this._handleFileUpload}
-                            onSave                  = {this._handleFileDownload}
+                            onSave                  = {this._handleSave}
                             onPreview               = {this._handlePreview}
                             onPrintClick            = {this._handlePrintClick}
                             onSpeedChange           = {this._handleSpeedChange} />
