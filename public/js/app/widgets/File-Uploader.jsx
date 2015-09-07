@@ -64,10 +64,6 @@ define([
             }, 0);
         },
 
-        componentDidMount: function () {
-            this.refs.uploader.getDOMNode().setAttribute('nwsaveas', true);
-        },
-
         render: function() {
             var self = this,
                 cx = React.addons.classSet,
