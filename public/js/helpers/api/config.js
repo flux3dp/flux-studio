@@ -15,18 +15,13 @@ define([
         var ws = new Websocket({
                 method: 'config',
                 autoReconnect: false,
-                onMessage: function(result) {
+                onMessage: function(data) {
 
-                    var data = (true === isJson(result.data) ? JSON.parse(result.data) : result.data);
-
-                    if ('string' === typeof data.error) {
-                        opts.onError(data.error, data);
-                    }
-                    else {
-                        events.onMessage(data);
-                    }
+                    events.onMessage(data);
 
                 },
+                onError: opts.onError,
+                onFatal: opts.onFatal,
                 onClose: function(result) {
                     events.onClose();
                 }

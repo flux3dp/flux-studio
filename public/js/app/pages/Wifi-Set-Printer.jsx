@@ -1,27 +1,43 @@
 define([
-    'jquery',
     'react',
-    'jsx!widgets/Modal'
-], function($, React, Modal) {
+    'helpers/local-storage',
+    'jsx!widgets/Modal',
+    'helpers/api/usb-config'
+], function(React, localStorage, Modal, usbConfig) {
     'use strict';
 
     return function(args) {
         args = args || {};
 
-        var Page = React.createClass({
+        return React.createClass({
+
             getInitialState: function() {
                 return {
                     validPrinterName    : true,
                     validPrinterPassword: true
                 }
             },
-            componentDidMount: function() {
-            },
+
             _handleSetPrinter: function(e) {
                 e.preventDefault();
 
                 var name        = this.refs.name.getDOMNode().value,
                     password    = this.refs.password.getDOMNode().value,
+                    usb         = usbConfig(),
+                    printer     = localStorage.get('setting-printer'),
+                    onError     = function(response) {
+                        // TODO: show error message
+                    },
+                    setPassword = function(password) {
+                        setMachine.password(password, {
+                            onSuccess: function(response) {
+                                printer.name = name;
+                                localStorage.set('setting-printer', printer);
+                                location.hash = '#initialize/wifi/setup-complete';
+                            }
+                        });
+                    },
+                    setMachine,
                     isValid;
 
                 this.setState({
@@ -30,10 +46,19 @@ define([
 
                 isValid = (name !== '');
 
-                if (isValid) {
-                    location.href='#initialize/wifi/configuring-flux';
+                if (true === isValid) {
+                    setMachine = usb.setMachine({
+                        onError: onError
+                    });
+
+                    setMachine.name(name, {
+                        onSuccess: function(response) {
+                            setPassword(password);
+                        }
+                    });
                 }
             },
+
             render : function() {
                 var lang = args.state.lang,
                     cx = React.addons.classSet,
@@ -54,7 +79,7 @@ define([
                 content = (
                     <div className="wifi initialization absolute-center text-center">
                         <h1>{lang.welcome_headline}</h1>
-                        <div>
+                        <form>
                             <h2>{lang.wifi.set_printer.caption}</h2>
                             <div className="wifi-form row-fluid clearfix">
                                 <div className="col span5 flux-printer">
@@ -66,6 +91,7 @@ define([
                                             {lang.wifi.set_printer.printer_name}
                                         </label>
                                         <input ref="name" id="printer-name" type="text" className={printerNameClass}
+                                        autoFocus={true}
                                         placeholder={lang.wifi.set_printer.printer_name_placeholder}/>
                                     </p>
                                     <p>
@@ -81,10 +107,10 @@ define([
                                 </div>
                             </div>
                             <div>
-                                <a className="btn btn-action btn-large" id="btn-next" onClick={this._handleSetPrinter}>
-                                    {lang.wifi.set_printer.next}</a>
+                                <button className="btn btn-action btn-large" id="btn-next" onClick={this._handleSetPrinter}>
+                                    {lang.wifi.set_printer.next}</button>
                             </div>
-                        </div>
+                        </form>
                     </div>
                 );
 
@@ -93,7 +119,5 @@ define([
                 );
             }
         });
-
-        return Page;
     };
 });

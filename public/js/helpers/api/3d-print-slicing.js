@@ -1,12 +1,11 @@
 /**
- * API bitmap laser parser
- * Ref: https://github.com/flux3dp/fluxghost/wiki/websocket-bitmap-laser-parser
+ * API slicing
+ * Ref: https://github.com/flux3dp/fluxghost/wiki/websocket-slicing
  */
 define([
     'helpers/websocket',
-    'helpers/convertToTypedArray',
-    'helpers/is-json'
-], function(Websocket, convertToTypedArray, isJson) {
+    'helpers/convertToTypedArray'
+], function(Websocket, convertToTypedArray) {
     'use strict';
 
     return function(opts) {
@@ -15,12 +14,9 @@ define([
 
         var ws = new Websocket({
                 method: '3dprint-slicing',
-                onMessage: function(result) {
-                    // console.log('raw ', result);
-                    var data = (true === isJson(result.data) ? JSON.parse(result.data) : result.data);
-
+                onMessage: function(data) {
                     events.onMessage(data);
-                    lastMessage = data.error;
+                    lastMessage = data;
                 },
                 onClose: function(message) {
                     lastMessage = message;

@@ -117,7 +117,7 @@ define([
                             </div>
                         </div>
                         <div className="setup">
-                            <a className="btn btn-default btn-default" onClick={this._handleShowAdvanceSetting}>{lang.settings.printer.advanced}</a>
+                            <a data-ga-event="print-open-advanced-setting" className="btn btn-default btn-default" onClick={this._handleShowAdvanceSetting}>{lang.settings.printer.advanced}</a>
                         </div>
                     </div>
 
@@ -128,9 +128,9 @@ define([
                             <input type="file" accept=".stl" onChange={this.props.onImport} />
                         </a>
                     </div>
-                    <div><a className="btn action btn-save" onClick={this.props.onSave}><span className="fa fa-floppy-o"></span>{lang.print.save}</a></div>
-                    <div><a className="btn action btn-preview" onClick={this._handleTogglePreview}><span className="fa fa-eye"></span>{lang.print.preview}</a></div>
-                    <div><a className="btn action btn-print" onClick={this._handlePrintClick}><span className="fa fa-print"></span>{lang.print.start_print}</a></div>
+                    <div><a data-ga-event="print-save" className="btn action btn-save" onClick={this.props.onSave}><span className="fa fa-floppy-o"></span>{lang.print.save}</a></div>
+                    <div><a data-ga-event="print-print-preview" className="btn action btn-preview" onClick={this._handleTogglePreview}><span className="fa fa-eye"></span>{lang.print.preview}</a></div>
+                    <div><a data-ga-event="print-print-started" className="btn action btn-print" onClick={this._handlePrintClick}><span className="fa fa-print"></span>{lang.print.start_print}</a></div>
                     <div>{this._roundValue(boundingBox.x) + ' x ' + this._roundValue(boundingBox.y) + ' x ' + this._roundValue(boundingBox.z) + ' (mm)'}</div>
                 </div>
             );

@@ -167,6 +167,9 @@ define([
                                 data('last-y', parseFloat($el[0].style.top, 10));
                         }
                     }
+                    else {
+                        refreshImage($el.find('img'), 128);
+                    }
 
                     imagePanelRefs.objectAngle.getDOMNode().value = elementAngle($el[0]);
                     imagePanelRefs.objectPosX.getDOMNode().value = $el.data('last-x');
@@ -178,6 +181,17 @@ define([
             $target_image = null, // changing when image clicked
             printer = null,
             printer_selecting = false,
+            getThreshold = function() {
+                var imagePanelRefs = self.refs.imagePanel.refs;
+
+                return (imagePanelRefs.threshold || {
+                    getDOMNode: function() {
+                        return {
+                            value: 0
+                        };
+                    }
+                });
+            },
             handleLaser = function(settings, callback) {
 
                 var $ft_controls = $laser_platform.find('.ft-controls'),
@@ -210,13 +224,7 @@ define([
                     args = [],
                     doLaser = function(settings) {
                         var imagePanelRefs = self.refs.imagePanel.refs,
-                            threshold = (imagePanelRefs.threshold || {
-                                getDOMNode: function() {
-                                    return {
-                                        value: 0
-                                    };
-                                }
-                            });
+                            threshold = getThreshold();
 
                         $ft_controls.each(function(k, el) {
                             var $el = $(el),
@@ -224,12 +232,8 @@ define([
                                 top_left = getCenter($el.find('.ft-scaler-top.ft-scaler-left')),
                                 bottom_right = getCenter($el.find('.ft-scaler-bottom.ft-scaler-right')),
                                 $img = $el.parents('.ft-container').find('.img-container img'),
-                                width = $el.width(),
-                                height = $el.height(),
                                 sub_data = {
                                     name: $img.data('name') || '',
-                                    width: width,
-                                    height: height,
                                     tl_position_x: convertToRealCoordinate(top_left.x, 'x'),
                                     tl_position_y: convertToRealCoordinate(top_left.y, 'y'),
                                     br_position_x: convertToRealCoordinate(bottom_right.x, 'x'),
@@ -238,29 +242,23 @@ define([
                                     threshold: parseInt(threshold.getDOMNode().value, 10)
                                 },
                                 grayscaleOpts = {
-                                    is_svg: ('svg' === self.props.fileFormat)
+                                    is_svg: ('svg' === self.props.fileFormat),
+                                    threshold: 255
                                 },
-                                src = '';
-
-                            if ('svg' === self.props.fileFormat) {
-                                src = $img.attr('src');
-                            }
-                            else {
                                 src = $img.data('base');
-                            }
 
                             imageData(
                                 src,
                                 {
-                                    height: height,
-                                    width: width,
                                     grayscale: grayscaleOpts,
                                     onComplete: function(result) {
                                         sub_data.image_data = result.imageBinary;
+                                        sub_data.height = result.size.height;
+                                        sub_data.width = result.size.width;
+                                        sub_data.real_width = sub_data.width / $laser_platform.width() * DIAMETER;
+                                        sub_data.real_height = sub_data.height / $laser_platform.height() * DIAMETER;
 
                                         if ('svg' === self.props.fileFormat) {
-                                            sub_data.real_width = sub_data.width / $laser_platform.width() * DIAMETER;
-                                            sub_data.real_height = sub_data.height / $laser_platform.height() * DIAMETER;
                                             sub_data.svg_data = svgWebSocket.History.findByName($img.data('name'))[0].data;
                                         }
 
@@ -293,7 +291,7 @@ define([
             }
         );
 
-        function setupImage(file, size, name) {
+        function setupImage(file, size, url, name) {
             var $div = $(document.createElement('div')).addClass(LASER_IMG_CLASS),
                 img = new Image(),
                 $img = $(img),
@@ -304,7 +302,7 @@ define([
             $img.addClass(file.extension).
                 attr('src', file.url).
                 data('name', name).
-                data('base', file.url).
+                data('base', url).
                 data('size', size);
 
             $img.one('load', function() {
@@ -321,7 +319,7 @@ define([
 
                     inactiveAllImage();
                     $target_image = $self.parent().find('.' + LASER_IMG_CLASS);
-                    $target_image.find('img').addClass('image-active');
+                    $target_image.addClass('image-active');
                 });
             });
 
@@ -344,7 +342,7 @@ define([
                 onGetFinished = function(data, size) {
                     var url = window.URL,
                         blob = new Blob([data], { type: file.type }),
-                        objectUrl = url.createObjectURL(data),
+                        objectUrl = url.createObjectURL(blob),
                         platformWidth = $laser_platform.width(),
                         platformHeight = $laser_platform.height(),
                         ratio = 1;
@@ -365,8 +363,7 @@ define([
                         },
                         onComplete: function(result) {
                             file.url = result.canvas.toDataURL('image/png');
-
-                            setupImage(file, size, name);
+                            setupImage(file, size, objectUrl, name);
                         }
                     });
                 };
@@ -452,7 +449,9 @@ define([
                     parserSocket = bitmapWebSocket;
                 }
 
-                handleUploadImage(file, parserSocket);
+                if ('undefined' !== typeof parserSocket) {
+                    handleUploadImage(file, parserSocket);
+                }
             },
             onFileReadEnd: function(e, files) {
                 self.setState({

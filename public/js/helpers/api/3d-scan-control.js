@@ -5,9 +5,8 @@
 define([
     'helpers/websocket',
     'helpers/file-system',
-    'helpers/point-cloud',
-    'helpers/is-json'
-], function(Websocket, fileSystem, PointCloudHelper, isJson) {
+    'helpers/point-cloud'
+], function(Websocket, fileSystem, PointCloudHelper) {
     'use strict';
 
     return function(serial, opts) {
@@ -19,17 +18,9 @@ define([
 
         var ws = new Websocket({
                 method: '3d-scan-control/' + serial,
-                onMessage: function(result) {
-
-                    var data = (true === isJson(result.data) ? JSON.parse(result.data) : result.data);
+                onMessage: function(data) {
 
                     switch (data.status) {
-                    case 'error':
-                    case 'fatal':
-                        is_ready = false;
-                        is_error = true;
-                        opts.onError(data);
-                        break;
                     case 'ready':
                         is_ready = true;
                         is_error = false;
@@ -46,11 +37,15 @@ define([
                         events.onMessage(data);
                     }
                 },
-                onClose: function(result) {
-                    opts.onError(result);
-                },
+                onError: errorHandler,
+                onClose: opts.onClose,
                 onOpen: opts.onStarting
             }),
+            errorHandler = function(data) {
+                is_ready = false;
+                is_error = true;
+                opts.onError(data);
+            },
             is_error = false,
             is_ready = false,
             IMAGE_INTERVAL = 200,

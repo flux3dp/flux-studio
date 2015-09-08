@@ -21,7 +21,13 @@ define(function() {
                 grayscale = (opts.threshold > grayscale ? grayscale : WHITE);
 
                 if (false === opts.is_rgba) {
-                    binary.push(grayscale);
+                    if (0 === data[i + 3]) {
+                        binary.push(WHITE);
+                    }
+                    else {
+                        binary.push(grayscale);
+                    }
+
                 }
                 else {
                     for (var j = 0; j < 3; j++) {

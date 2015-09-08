@@ -1,7 +1,7 @@
 /**
  * set params
  */
-define(['helpers/is-json'], function(isJson) {
+define(function() {
     'use strict';
 
     var convertObjectToArray = function(params) {

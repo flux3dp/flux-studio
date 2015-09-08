@@ -65,11 +65,11 @@ define([
                                     </div>
                                 </div>
                                 <div>
-                                    <button className="btn btn-default span12">{lang.print.advanced}</button>
+                                    <button data-ga-event="show-print-advanced" className="btn btn-default span12">{lang.print.advanced}</button>
                                 </div>
                             </div>
                             <div>
-                                <button className="btn btn-default span12">{lang.print.start_print}</button>
+                                <button data-ga-event="print-started" className="btn btn-default span12">{lang.print.start_print}</button>
                             </div>
                         </div>
                     )

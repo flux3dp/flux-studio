@@ -37,7 +37,7 @@ define([
                             </div>
                             <div className="row-fluid">
                                 <div className="entry span9">
-                                    <button className="btn btn-default pull-right" onClick={this._handleSetPassword}>{lang.settings.printer.save_password}</button>
+                                    <button data-ga-event="save-password" className="btn btn-default pull-right" onClick={this._handleSetPassword}>{lang.settings.printer.save_password}</button>
                                 </div>
                             </div>
                         </div>

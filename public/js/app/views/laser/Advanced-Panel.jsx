@@ -74,8 +74,8 @@ define([
         _renderFooter: function(lang) {
             return (
                 <footer className="footer">
-                    <a className="btn btn-default" onClick={this._handleCancel}>{lang.cancel}</a>
-                    <a className="btn btn-confirm" onClick={this._handleDone}>{lang.apply}</a>
+                    <button className="btn btn-default" onClick={this._handleCancel}>{lang.cancel}</button>
+                    <button className="btn btn-confirm" onClick={this._handleDone}>{lang.apply}</button>
                 </footer>
             );
         },
@@ -113,6 +113,7 @@ define([
                                     data-max-text={lang.form.laser_speed.fast}
                                     min={lang.form.laser_speed.min}
                                     max={lang.form.laser_speed.max}
+                                    step={lang.form.laser_speed.step}
                                     defaultValue={this.state.defaultMaterial.data.laser_speed}
                                     onChange={this._changeRangeNumber('speed')}
                                     onMouseUp={this._handleRangeMouseUp}

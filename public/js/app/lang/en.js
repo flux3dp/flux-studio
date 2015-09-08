@@ -10,7 +10,8 @@ define(function() {
         welcome: {
             header1: 'Hello! Welcome to FLUX. Please choose your preferred language',
             header2: 'We are getting started from your language',
-            start: 'Start'
+            start: 'Start',
+            skip: 'Skip'
         },
         wifi: {
             home: {
@@ -29,7 +30,8 @@ define(function() {
                 password_placeholder: '請輸入 Wi-Fi 密碼',
                 back: 'Back',
                 join: 'Join',
-                connecting: 'Connecting'
+                connecting: 'Connecting',
+                no_selected: 'No SSID selected'
             },
             success: {
                 caption: '太棒了，連線成功!',
@@ -356,8 +358,9 @@ define(function() {
                         unit: 'mm/s',
                         fast: 'Fast',
                         slow: 'Slow',
-                        min: 1,
-                        max: 100
+                        min: 0.1,
+                        max: 20,
+                        step: 0.1
                     },
                     power: {
                         text: 'Power',
@@ -370,6 +373,14 @@ define(function() {
                 },
                 apply: 'Apply',
                 cancel: 'Cancel',
+            },
+            topmenu: {
+                main: {
+                    label: 'Main',
+                    open: 'Open',
+                    save: 'Save',
+                    engrave: 'Engrave',
+                }
             }
         },
         scan: {

@@ -16,7 +16,15 @@ define([
 
     // detached keyup and keydown event
     window.addEventListener('popstate', function(e) {
+        window.GA('send', 'pageview', location.hash);
         shortcuts.disableAll();
+    });
+
+    // listener of all ga event
+    $('body').on('click', '[data-ga-event]', function(e) {
+        var $self = $(e.currentTarget);
+
+        window.GA('send', 'event', 'button', 'click', $self.data('ga-event'));
     });
 
     return function(callback) {
@@ -30,7 +38,7 @@ define([
                 if (true === is_ready && ('' === hash || hash.startsWith('#initialize'))) {
                     location.hash = '#studio/print';
                 }
-                else if (false === is_ready && ('' !== hash || false === hash.startsWith('#initialize'))) {
+                else if (false === is_ready && false === hash.startsWith('#initialize')) {
                     location.hash = '#';
                 }
 

@@ -26,7 +26,7 @@ function(React, $, Backbone, display) {
                     [/^.*$/, 'e404', this.e404],
                     // initialize Flux Printer
                     [
-                        /^initialize\/wifi\/?(ask|select|spot|set-printer|set-password|configuring-flux|configured-flux|setup-complete|success|failure)?/,
+                        /^initialize\/wifi\/?(ask|select|spot|set-printer|set-password|configuring-flux|configured-flux|setup-complete|success|failure)\/?(.*)?/,
                         'initial',
                         this.initial
                     ],
@@ -57,7 +57,7 @@ function(React, $, Backbone, display) {
             });
         },
 
-        initial: function(step) {
+        initial: function(step, other) {
             var map = {
                     'ask': 'Wifi-Home',
                     'select': 'Wifi-Select',
@@ -76,7 +76,14 @@ function(React, $, Backbone, display) {
             }
 
             require(['jsx!pages/' + view_name], function(view) {
-                _display(view, {});
+                _display(
+                    view,
+                    {
+                        props: {
+                            other: other
+                        }
+                    }
+                );
             });
         },
 
