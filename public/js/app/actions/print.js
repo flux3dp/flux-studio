@@ -74,7 +74,7 @@ define([
         container = document.getElementById('model-displayer');
 
         camera = new THREE.PerspectiveCamera( 60, (container.offsetWidth) / container.offsetHeight, 1, 30000 );
-        camera.position.set(130, 130, 130);
+        camera.position.set(0, -180, 130);
         camera.up = new THREE.Vector3(0,0,1);
 
         scene = new THREE.Scene();
@@ -780,7 +780,6 @@ define([
             updateFromScene('BoundingBoxHelper');
             updateFromScene('TransformControl');
         }
-
         renderer.render(previewMode ? previewScene : scene, camera);
     }
 

@@ -195,6 +195,7 @@ define(function() {
                     support: {
                         text: 'Support',
                         on: '開啟',
+                        off: '關閉',
                         options: [
                             {
                                 value: 'everywhere',

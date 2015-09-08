@@ -19,8 +19,8 @@ define([
         },
         getInitialState: function() {
             return {
-                platformOn: true,
-                supportOn: true
+                platformOn: false,
+                supportOn: false
             };
         },
         _roundValue: function(value) {
@@ -108,7 +108,7 @@ define([
                             <div className="controls">
                                 <div className="label">{lang.print.params.beginner.support.text}</div>
                                 <div className="control">
-                                    <label>{lang.print.params.beginner.support.on}</label>
+                                    <label>{this.state.supportOn ? lang.print.params.beginner.support.on : lang.print.params.beginner.support.off}</label>
                                     <div className="switchContainer">
                                         <input type="checkbox" id="supportSwitch" name="supportSwitch" className="switch" onClick={this._handleSupportClick} />
                                         <label htmlFor="supportSwitch">&nbsp;</label>

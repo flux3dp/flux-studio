@@ -195,6 +195,7 @@ define(function() {
                     support: {
                         text: 'Support',
                         on: 'On',
+                        off: 'Off',
                         options: [
                             {
                                 value: 'Touching',
