@@ -14,6 +14,7 @@ require.config({
         threejs: 'lib/three/three.min',
         threeTransformControls: 'lib/three/controls/TransformControls',
         threeOrbitControls: 'lib/three/controls/OrbitControls',
+        threeTrackballControls: 'lib/three/controls/TrackballControls',
         threeSTLLoader: 'lib/three/loaders/STLLoader',
         threeTrackball: 'lib/three/controls/TrackballControls',
         threeCircularGridHelper: 'helpers/CircularGridHelper',

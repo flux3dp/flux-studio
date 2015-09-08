@@ -2494,8 +2494,49 @@ input[type=range]:focus::-webkit-slider-runnable-track {
     .studio-container .stage {
         height: 100%;
         position: relative; }
-    .studio-container .btn-default {
-        border-radius: 5px; }
+    .studio-container .btn {
+        border-radius: 5px;
+        margin-right: 5px; }
+    .studio-container .btn-primary {
+        color: #fff;
+        background-color: #337ab7;
+        border-color: #2e6da4; }
+    .studio-container .btn-primary:hover {
+        color: #fff;
+        background-color: #286090;
+        border-color: #204d74; }
+    .studio-container .btn-success {
+        color: #fff;
+        background-color: #5cb85c;
+        border-color: #4cae4c; }
+    .studio-container .btn-success:hover {
+        color: #fff;
+        background-color: #449d44;
+        border-color: #398439; }
+    .studio-container .btn-info {
+        color: #fff;
+        background-color: #5bc0de;
+        border-color: #46b8da; }
+    .studio-container .btn-info:hover {
+        color: #fff;
+        background-color: #31b0d5;
+        border-color: #269abc; }
+    .studio-container .btn-warning {
+        color: #fff;
+        background-color: #f0ad4e;
+        border-color: #eea236; }
+    .studio-container .btn-warning:hover {
+        color: #fff;
+        background-color: #ec971f;
+        border-color: #d58512; }
+    .studio-container .btn-danger {
+        color: #fff;
+        background-color: #d9534f;
+        border-color: #d43f3a; }
+    .studio-container .btn-danger:hover {
+        color: #fff;
+        background-color: #c9302c;
+        border-color: #ac2925; }
 
 /**
  * ref: http://tobiasahlin.com/spinkit/
@@ -2647,10 +2688,14 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         height: 48px;
         letter-spacing: .5px;
         line-height: 48px; }
+    .advanced-panel textarea {
+        width: 100%;
+        height: 100px;
+        border-color: #DDDDDD; }
     .advanced-panel .footer {
         bottom: 0;
         left: 0;
-        margin-bottom: 40px;
+        margin-bottom: 20px;
         right: 0;
         text-align: center; }
         .advanced-panel .footer .btn {
@@ -3263,10 +3308,10 @@ input.switch:checked ~ label:after {
     margin: auto;
     left: 0;
     right: 0;
-    top: 90px;
+    top: 20px;
     float: left;
     width: 410px;
-    height: 692px; }
+    height: 610px; }
     .print-studio .advanced-panel .container {
         padding: 0 20px; }
     .print-studio .advanced-panel .header {
@@ -3278,7 +3323,7 @@ input.switch:checked ~ label:after {
         line-height: 48px;
         border-bottom: 1px solid #E0E0E0; }
     .print-studio .advanced-panel .section {
-        padding: 20px 0; }
+        padding: 20px 0 5px 0; }
     .print-studio .advanced-panel .title {
         color: #4A4A4A;
         font-size: 13px;
@@ -3313,7 +3358,7 @@ input.switch:checked ~ label:after {
         .print-studio .advanced-panel .controls .slider-container {
             margin-right: 20px; }
             .print-studio .advanced-panel .controls .slider-container .slider {
-                width: 130px; }
+                width: 100px; }
         .print-studio .advanced-panel .controls input[type=range] {
             -webkit-appearance: none;
             width: 100%;
@@ -3345,8 +3390,7 @@ input.switch:checked ~ label:after {
         bottom: 0;
         left: 0;
         right: 0;
-        text-align: center;
-        margin-bottom: 40px; }
+        text-align: center; }
         .print-studio .advanced-panel .footer .btn {
             margin: 0 15px; }
 
@@ -3476,6 +3520,26 @@ input.switch:checked ~ label:after {
         margin-right: 40px; }
         .print-studio .flux-monitor .actions .cancel {
             padding-top: 10px; }
+
+.print-studio .previewPanel input {
+    position: absolute;
+    bottom: 10%;
+    left: 0%;
+    width: 200px;
+    transform: rotate(270deg); }
+
+.print-studio .previewPanel div {
+    position: absolute;
+    bottom: 14px;
+    left: 8%; }
+
+.print-studio .progressWindow {
+    width: 600px;
+    height: 100px;
+    background-color: white; }
+    .print-studio .progressWindow .message {
+        text-align: center;
+        padding: 15px 0; }
 
 .settings-studio {
     background-color: #F5F5F5; }
