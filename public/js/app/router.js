@@ -139,7 +139,7 @@ function(React, $, Backbone, display) {
         },
 
         device: function(child, requests) {
-            require(['jsx!pages/device'], function(view) {
+            require(['jsx!pages/Device'], function(view) {
                 var args = {
                     child: child,
                     requests: requests
