@@ -162,6 +162,12 @@ define([
             )
         },
 
+        _onReady: function() {
+            this.setState({
+                isReady: true
+            });
+        },
+
         componentWillMount: function () {
             var self = this;
 
@@ -256,15 +262,14 @@ define([
                 opts = {
                     onError: function(response) {
                         objectHeight.value = 3;
+                        self._onReady();
                     }
                 }
 
             config(opts).read('laser-object-height', {
                 onFinished: function(response) {
                     objectHeight.value = parseFloat(response, 10);
-                    self.setState({
-                        isReady: true
-                    });
+                    self._onReady();
                 }
             });
         },
