@@ -178,7 +178,6 @@ define([
             mesh.up = new THREE.Vector3(0,0,1);
 
             uploadStl(mesh.uuid, file, function(result) {
-                console.log(result);
                 if(result.status !== 'ok') {
                     alert(result.error);
                 }
@@ -242,7 +241,6 @@ define([
         raycaster.setFromCamera( mouse, camera );
         var intersects = raycaster.intersectObjects( objects );
         var location = getReferenceIntersectLocation(e);
-        // console.log('found',intersects.length);
         if (intersects.length > 0) {
             var target = intersects[0].object;
             selectObject(target);
@@ -387,7 +385,6 @@ define([
 
              reader.onload = function(e) {
                  var arrayBuffer = reader.result;
-                 console.log(arrayBuffer);
              }
 
              reader.readAsArrayBuffer(fileObject);
@@ -455,7 +452,6 @@ define([
                         }
                         else {
                             if(result.status !== 'error') {
-                                console.log(result);
                                 var serverMessage   = `${result.status}: ${result.message} (${parseInt(result.percentage * 100)}%)`,
                                     drawingMessage  = `FInishing up... (100%)`,
                                     message         = result.status !== 'complete' ? serverMessage : drawingMessage;
@@ -645,7 +641,7 @@ define([
 
             // delete model in backend
             printController.delete(SELECTED.uuid, function(result) {
-                console.log('delete result: ', result);
+                // todo: if error
             });
 
             transformControl.detach(SELECTED);
@@ -829,13 +825,11 @@ define([
                     index = objects.length;
                 }
                 if(index < objects.length) {
-                    console.log('syncing parameters');
                     return d.resolve(_syncObjectParameter(objects, index + 1));
                 }
             });
         }
         else {
-            console.log('syncing done');
             var d = $.Deferred();
             d.resolve('');
         }
@@ -937,7 +931,6 @@ define([
     }
 
     function _showPath() {
-        console.log('preview scene children count: ', previewScene.children.length);
         render();
         _setProgressMessage('');
     }
