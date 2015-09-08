@@ -6,7 +6,7 @@ define([
     'jquery',
     'helpers/websocket',
     'helpers/convertToTypedArray'
-], function(Websocket, convertToTypedArray) {
+], function($, Websocket, convertToTypedArray) {
     'use strict';
 
     return function(serial, opts) {
