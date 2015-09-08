@@ -255,12 +255,16 @@ define([
                                         sub_data.image_data = result.imageBinary;
                                         sub_data.height = result.size.height;
                                         sub_data.width = result.size.width;
-                                        sub_data.real_width = sub_data.width / $laser_platform.width() * DIAMETER;
-                                        sub_data.real_height = sub_data.height / $laser_platform.height() * DIAMETER;
 
                                         if ('svg' === self.props.fileFormat) {
                                             sub_data.svg_data = svgWebSocket.History.findByName($img.data('name'))[0].data;
+                                            sub_data.height = $img.box().height;
+                                            sub_data.width = $img.box().width;
                                         }
+                                        console.log(sub_data.width, sub_data.height)
+
+                                        sub_data.real_width = sub_data.width / $laser_platform.width() * DIAMETER;
+                                        sub_data.real_height = sub_data.height / $laser_platform.height() * DIAMETER;
 
                                         args.push(sub_data);
 
