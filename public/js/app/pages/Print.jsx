@@ -66,17 +66,7 @@ define([
                 _updateSelectedSize: function() {
 
                 },
-                // _handlePreviewModeChange: function(mode, e) {
-                //     this.setState({
-                //         previewMode: mode,
-                //         showPreviewModeList: false
-                //     });
-                // },
-                // _handleShowPreviewSelection: function(e) {
-                //     this.setState({ showPreviewModeList: !this.state.showPreviewModeList });
-                // },
                 _handleOperationChange: function(operation) {
-                    // console.log('operation is', operation);
                     switch(operation) {
                         case 'scale':
                             this.setState({ operation: 'scale' });
@@ -97,15 +87,12 @@ define([
 
                 },
                 _handleSpeedChange: function(speed) {
-                    console.log(speed);
                     director.setParameter('printSpeed', speed);
                 },
                 _handlePlatformClick: function(state) {
-                    console.log('platform clicked', state)
                     director.setParameter('raft', state ? '1' : '0');
                 },
                 _handleSupportClick: function(state) {
-                    console.log('support clicked', state);
                     director.setParameter('support', state ? '1' : '0');
                 },
                 _handleShowAdvancedSetting: function() {
@@ -134,7 +121,6 @@ define([
                     director.setScale(1, 1, 1, true);
                 },
                 _handleAdvancedSettingCancel: function() {
-                    console.log('advanced setting cancelled');
                     this.setState({ showAdvancedSetting: false });
                 },
                 _handleAdvancedSettingDone: function(setting) {
@@ -149,10 +135,8 @@ define([
                     console.log(printPaused ? 'print paused' : 'continue printing');
                 },
                 _handlePrintCancel: function(e) {
-                    console.log('print cancelled');
                 },
                 _handlePrintRestart: function(e) {
-                    console.log('print restarted');
                 },
                 _handleFileUpload: function(e) {
                     var files = e.target.files;
