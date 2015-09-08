@@ -232,6 +232,8 @@ define([
                                 top_left = getCenter($el.find('.ft-scaler-top.ft-scaler-left')),
                                 bottom_right = getCenter($el.find('.ft-scaler-bottom.ft-scaler-right')),
                                 $img = $el.parents('.ft-container').find('.img-container img'),
+                                width = 0,
+                                height = 0,
                                 sub_data = {
                                     name: $img.data('name') || '',
                                     tl_position_x: convertToRealCoordinate(top_left.x, 'x'),
@@ -245,11 +247,23 @@ define([
                                     is_svg: ('svg' === self.props.fileFormat),
                                     threshold: 255
                                 },
+                                src = '';
+
+                            if ('svg' === self.props.fileFormat) {
+                                src = $img.attr('src');
+                                // only svg file need size to convert to binary
+                                height = parseInt($img.box().height, 10);
+                                width = parseInt($img.box().width, 10);
+                            }
+                            else {
                                 src = $img.data('base');
+                            }
 
                             imageData(
                                 src,
                                 {
+                                    height: height,
+                                    width: width,
                                     grayscale: grayscaleOpts,
                                     onComplete: function(result) {
                                         sub_data.image_data = result.imageBinary;
@@ -258,10 +272,7 @@ define([
 
                                         if ('svg' === self.props.fileFormat) {
                                             sub_data.svg_data = svgWebSocket.History.findByName($img.data('name'))[0].data;
-                                            sub_data.height = $img.box().height;
-                                            sub_data.width = $img.box().width;
                                         }
-                                        console.log(sub_data.width, sub_data.height)
 
                                         sub_data.real_width = sub_data.width / $laser_platform.width() * DIAMETER;
                                         sub_data.real_height = sub_data.height / $laser_platform.height() * DIAMETER;
