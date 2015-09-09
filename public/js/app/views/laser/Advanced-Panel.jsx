@@ -55,7 +55,7 @@ define([
                     label: self.props.lang.laser.custom,
                     selected: true,
                     data: {
-                        laser_speed: parseInt(refs.speedRange.getDOMNode().value, 10),
+                        laser_speed: parseFloat(refs.speedRange.getDOMNode().value, 10),
                         power: parseInt(refs.powerRange.getDOMNode().value, 10)
                     }
                 },
@@ -63,26 +63,25 @@ define([
                     return el.value === custom_option.value;
                 });
 
-            if (-1 === customIndex) {
-                config().write(
-                    'custom-material',
-                    JSON.stringify(custom_option),
-                    {
-                        onFinished: function(response) {
-                            console.log(response);
+            config().write(
+                'custom-material',
+                JSON.stringify(custom_option),
+                {
+                    onFinished: function(response) {
+                        if (-1 === customIndex) {
                             materials.push(custom_option);
                             self.setState({
                                 materials: materials,
                                 defaultMaterial: custom_option
                             });
                         }
+                        else {
+                            // replace custom material
+                            materials[customIndex] = custom_option;
+                        }
                     }
-                );
-            }
-            else {
-                // replace custom material
-                materials[customIndex] = custom_option;
-            }
+                }
+            );
         },
 
         _renderFooter: function(lang) {
