@@ -206,8 +206,8 @@ define([
                         obj.br_position_y,
                         obj.rotate,
                         obj.svg_data.blob.size,
-                        obj.width,
-                        obj.height
+                        parseInt(obj.width, 10),
+                        parseInt(obj.height, 10)
                     ];
 
                     requests_serial.push(request_header.join(' '));

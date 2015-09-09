@@ -283,6 +283,7 @@ define(function() {
         laser: {
             import: '打開⋯',
             save: '儲存⋯',
+            custom: '自訂',
             acceptable_files: 'JPG, PNG, PDF, AI',
             drop_files_to_import: 'Drop your file here or click "import" to upload your file',
             button_advanced: '進階',
@@ -339,8 +340,8 @@ define(function() {
                                 label: '木',
                                 selected: true,
                                 data: {
-                                    laser_speed: 10,
-                                    power: 0.2
+                                    laser_speed: 5,
+                                    power: 255
                                 }
                             },
                             {
@@ -348,7 +349,7 @@ define(function() {
                                 label: 'Steel',
                                 data: {
                                     laser_speed: 50,
-                                    power: 0.5
+                                    power: 255
                                 }
                             }
                         ]

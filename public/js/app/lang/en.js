@@ -283,6 +283,7 @@ define(function() {
         laser: {
             import: 'Import',
             save: 'Save',
+            custom: 'Custom',
             acceptable_files: 'JPG, PNG, PDF, AI',
             drop_files_to_import: 'Drop your file here or click "import" to upload your file',
             button_advanced: 'Advanced',
@@ -339,7 +340,7 @@ define(function() {
                                 label: 'Wood',
                                 selected: true,
                                 data: {
-                                    laser_speed: 10,
+                                    laser_speed: 5,
                                     power: 255
                                 }
                             },
