@@ -3,35 +3,26 @@
  * Ref: https://github.com/flux3dp/fluxghost/wiki/websocket-control
  */
 define([
+    'jquery',
     'helpers/websocket',
-    'helpers/is-json',
     'helpers/convertToTypedArray'
-], function(Websocket, isJson, convertToTypedArray) {
+], function($, Websocket, convertToTypedArray) {
     'use strict';
 
     return function(serial, opts) {
         opts = opts || {};
-        opts.onPrinting = opts.onPrinting || function() {};
         opts.onError = opts.onError || function() {};
 
         var ws = new Websocket({
                 method: 'control/' + serial,
-                onMessage: function(result) {
-                    var data = (true === isJson(result.data) ? JSON.parse(result.data) : result.data);
+                onMessage: function(data) {
 
-                    lastMessage = data;
+                    events.onMessage(data);
 
-                    if ('string' === typeof data.status && 'error' === data.status) {
-                        opts.onError(data);
-                    }
-                    else {
-                        events.onMessage(data);
-                    }
-
-                }
+                },
+                onError: opts.onError
             }),
             lastOrder = '',
-            lastMessage = '',
             events = {
                 onMessage: function() {}
             };
@@ -48,6 +39,7 @@ define([
             },
             upload: function(filesize, print_data, opts) {
                 opts = opts || {};
+                opts.onPrinting = opts.onPrinting || function() {};
                 opts.onFinished = opts.onFinished || function() {};
 
                 var CHUNK_PKG_SIZE = 4096,
@@ -112,6 +104,61 @@ define([
                         interrupt('abort');
                     }
                 };
+            },
+            getStatus: function() {
+                var d = $.Deferred();
+                events.onMessage = function(result) {
+                    d.resolve(result);
+                };
+
+                ws.send('position');
+                lastOrder = 'status';
+
+                return d.promise();
+            },
+            abort: function() {
+                var d = $.Deferred();
+                events.onMessage = function(result) {
+                    d.resolve(result);
+                };
+
+                ws.send('abort');
+                lastOrder = 'abort';
+
+                return d.promise();
+            },
+            start: function() {
+                var d = $.Deferred();
+                events.onMessage = function(result) {
+                    d.resolve(result);
+                };
+
+                ws.send('start');
+                lastOrder = 'start';
+
+                return d.promise();
+            },
+            reset: function() {
+                var d = $.Deferred();
+                events.onMessage = function(result) {
+                    d.resolve(result);
+                };
+
+                ws.send('kick');
+                lastOrder = 'kick';
+
+                return d.promise();
+            },
+            quit: function() {
+                var d = $.Deferred();
+                events.onMessage = function(result) {
+                    d.resolve(result);
+                };
+
+                ws.send('quit');
+                lastOrder = 'quit';
+
+                return d.promise();
             }
         };
     };

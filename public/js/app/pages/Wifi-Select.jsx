@@ -1,55 +1,75 @@
 define([
     'jquery',
     'react',
-    'app/actions/wifi-select',
-    'jsx!widgets/Modal'
-], function($, React, wifiSelect, Modal) {
+    'helpers/local-storage',
+    'jsx!widgets/Modal',
+    'jsx!widgets/List',
+    'helpers/api/usb-config'
+], function($, React, localStorage, Modal, ListView, usbConfig) {
     'use strict';
 
     return function(args) {
         args = args || {};
 
-        // TODO: remove fake wifi spots
-        args.props.items = [];
+        return React.createClass({
+            _selectWifi: function(e) {
+                e.preventDefault();
 
-        for (var i = 0; i < 10; i++) {
-            args.props.items.push({
-                id: i,
-                name: 'test-' + i,
-                serial: i
-            });
-        }
+                var $li = $(e.target).parents('label'),
+                    meta = $li.data('meta');
 
-        var Page = React.createClass({
+                if (true === meta.password) {
+                    localStorage.set('setting-wifi', meta);
+                    location.hash = '#initialize/wifi/set-password';
+                }
+            },
+
             getInitialState: function() {
-                return args.state;
+                return {
+                    lang: args.state.lang,
+                    wifiOptions: []
+                };
             },
 
-            componentDidMount : function() {
-                wifiSelect();
-            },
-            render : function() {
+            _renderWifiItem: function(wifi) {
+                var lockClassName = 'fa ' + (true === wifi.password ? 'fa-lock' : 'fa-unlock-alt'),
+                    meta = JSON.stringify(wifi);
 
-                var state = this.state,
-                    items = this.props.items.map(function(opt, i) {
-                        return (<li data-wifi-id={opt.id} data-wifi-name={opt.name}>
-                            <a href="#initialize/wifi/set-password">
-                                <span>{opt.name}</span>
-                                <span className="fa fa-wifi"></span>
-                                <span className="fa fa-lock"></span>
-                            </a>
-                        </li>);
-                    }, this),
+                return (
+                    <label data-meta={meta}>
+                        <input type="radio" name="wifi-spot" value={wifi.ssid}/>
+                        <div className="row-fluid">
+                            <span className="wifi-ssid">{wifi.ssid}</span>
+                            <span className={lockClassName}></span>
+                        </div>
+                    </label>
+                );
+            },
+
+            _renderWifiOptions: function(lang) {
+                return (
+                    <ListView
+                        ref="wifiList"
+                        className="pure-list wifi-list clearfix"
+                        ondblclick={this._selectWifi}
+                        items={this.state.wifiOptions}
+                    />
+                );
+            },
+
+            render: function() {
+                var lang = this.state.lang,
+                    items = this._renderWifiOptions(lang),
                     content = (
                         <div className="wifi initialization absolute-center text-center">
-                            <h1>{state.lang.welcome_headline}</h1>
+                            <h1>{lang.welcome_headline}</h1>
                             <div>
-                                <h2>{state.lang.wifi.select.choose_wifi}</h2>
-                                <ul className="pure-list wifi-list clearfix">
-                                    {items}
-                                </ul>
+                                <h2>{lang.wifi.select.choose_wifi}</h2>
+
+                                {items}
+
                                 <div>
-                                    <a href="#">{state.lang.wifi.select.no_wifi_available}</a>
+                                    <a href="#initialize/wifi/configuring-flux">{lang.wifi.select.no_wifi_available}</a>
                                 </div>
                             </div>
                         </div>
@@ -58,9 +78,32 @@ define([
                 return (
                     <Modal content={content}/>
                 );
+            },
+
+            componentDidMount : function() {
+
+                var self = this,
+                    usb = usbConfig(),
+                    wifiOptions = [];
+
+                usb.getWifiNetwork({
+                    onSuccess: function(response) {
+                        var item;
+
+                        response.items.forEach(function(el) {
+                            item = self._renderWifiItem(el);
+                            wifiOptions.push({
+                                value: el.ssid,
+                                label: {item}
+                            });
+
+                            self.setState({
+                                wifiOptions: wifiOptions
+                            });
+                        });
+                    }
+                });
             }
         });
-
-        return Page;
     };
 });

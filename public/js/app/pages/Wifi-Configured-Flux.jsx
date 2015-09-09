@@ -1,23 +1,19 @@
 define([
-    'jquery',
     'react',
     'jsx!widgets/Modal'
-], function($, React, Modal) {
+], function(React, Modal) {
     'use strict';
 
     return function(args) {
 
         args = args || {};
 
-        var Page = React.createClass({
+        return React.createClass({
+
             getInitialState: function() {
                 return args.state;
             },
 
-            _next: function(e) {
-                // TODO: call api
-                location.href = '#initialize/wifi/setup-complete';
-            },
             render : function() {
                 var lang = this.state.lang,
                     content = (
@@ -28,12 +24,12 @@ define([
                                 <h2>{lang.wifi.configured_flux.caption}</h2>
                                 <p>{lang.wifi.configured_flux.description}</p>
                                 <div>
-                                    <button className="btn btn-action btn-large" onClick={this._next}>
+                                    <a className="btn btn-action btn-large" href="#initialize/wifi/set-printer" autoFocus={true}>
                                         {lang.wifi.configured_flux.next}
-                                    </button>
+                                    </a>
                                 </div>
                                 <div>
-                                    <a href="#initialize/wifi/ask">{lang.wifi.configured_flux.footer}</a>
+                                    <a href="#initialize/wifi/select">{lang.wifi.configured_flux.footer}</a>
                                 </div>
                             </div>
                         </div>
@@ -44,7 +40,5 @@ define([
                 );
             }
         });
-
-        return Page;
     };
 });

@@ -3,7 +3,7 @@ define([
     'react'
 ], function($, React) {
     'use strict';
-    var advancedSetting
+    var advancedSetting;
     return React.createClass({
         getDefaultProps: function() {
             return {
@@ -19,7 +19,8 @@ define([
                 layerHeight     : advancedSetting.layerHeight || 0.2,
                 travelingSpeed  : advancedSetting.travelingSpeed || 88,
                 extrudingSpeed  : advancedSetting.extrudingSpeed || 58,
-                temperature     : advancedSetting.temperature || 200
+                temperature     : advancedSetting.temperature || 200,
+                advancedSettings: advancedSetting.advancedSettings
             };
         },
         _handleLayerHeightChange: function(e) {
@@ -49,6 +50,11 @@ define([
         },
         _handleSupportChange: function(e) {
             advancedSetting.support = e.target.value;
+        },
+        _handleIniChange: function(e) {
+            var value = !!e.target.value ? e.target.value : ' ';
+            advancedSetting.advancedSettings = value;
+            this.setState({ advancedSettings: value });
         },
         _handleCancel: function(e) {
             this.props.onCancel(e);
@@ -143,11 +149,23 @@ define([
             );
             */
         },
+        _renderIniSection: function(lang) {
+            return (
+                <div className="section">
+                    <div className="title">{lang.direct_setting}</div>
+                    <div className="controls">
+                        <div className="control">
+                            <textarea value={this.state.advancedSettings} onChange={this._handleIniChange}></textarea>
+                        </div>
+                    </div>
+                </div>
+            );
+        },
         _renderFooter: function() {
             return (
                 <div className="footer">
-                    <a className="btn btn-default" onClick={this._handleCancel}>{this.props.lang.print.cancel}</a>
-                    <a className="btn btn-confirm" onClick={this._handleDone}>{this.props.lang.print.done}</a>
+                    <a data-ga-event="cancel-print-advanced" className="btn btn-default" onClick={this._handleCancel}>{this.props.lang.print.cancel}</a>
+                    <a data-ga-event="apply-print-advanced" className="btn btn-confirm" onClick={this._handleDone}>{this.props.lang.print.done}</a>
                 </div>
             );
         },
@@ -157,6 +175,7 @@ define([
                 speedSection = this._renderSpeedSection(lang),
                 temperatureSection = this._renderTemperatureSection(lang),
                 supportSection = this._renderSupportSection(lang),
+                iniSection = this._renderIniSection(lang),
                 footer = this._renderFooter(lang);
 
             return (
@@ -173,6 +192,8 @@ define([
                         {temperatureSection}
 
                         {supportSection}
+
+                        {iniSection}
 
                     </div>
 

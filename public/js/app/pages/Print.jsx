@@ -14,9 +14,8 @@ define([
     'helpers/file-system',
     'jsx!widgets/Modal',
     'jsx!views/Print-Selector',
-    'helpers/api/control',
     'plugins/knob/jquery.knob'
-], function($, React, display, director, RadioGroupView, ClassNames, OperatingPanel, SettingPanel, ScalePanel, RotationPanel, AdvancedPanel, MonitorPanel, FileSystem, Modal, PrinterSelector, printerController) {
+], function($, React, display, director, RadioGroupView, ClassNames, OperatingPanel, SettingPanel, ScalePanel, RotationPanel, AdvancedPanel, MonitorPanel, FileSystem, Modal, PrinterSelector) {
     'use strict';
 
     return function(args) {
@@ -28,7 +27,8 @@ define([
                 travelingSpeed: 0,
                 extrudingSpeed: 0,
                 temperature: 0,
-                support: ''
+                support: '',
+                advancedSettings: ' '
             },
             _scale = {
                 locked  : true,
@@ -48,13 +48,16 @@ define([
                         checked                     : false,
                         locked                      : true,
                         operation                   : '',
-                        previewMode                 : 'normal',
+                        previewMode                 : false,
                         showPreviewModeList         : false,
                         showAdvancedSetting         : false,
                         showMonitor                 : false,
                         modelSelected               : null,
                         openPrinterSelectorWindow   : false,
-                        openWaitWindow              : false
+                        openWaitWindow              : false,
+                        sliderMax                   : 1,
+                        sliderValue                 : 0,
+                        progressMessage             : ''
                     });
                 },
                 componentDidMount: function() {
@@ -63,17 +66,7 @@ define([
                 _updateSelectedSize: function() {
 
                 },
-                _handlePreviewModeChange: function(mode, e) {
-                    this.setState({
-                        previewMode: mode,
-                        showPreviewModeList: false
-                    });
-                },
-                _handleShowPreviewSelection: function(e) {
-                    this.setState({ showPreviewModeList: !this.state.showPreviewModeList });
-                },
                 _handleOperationChange: function(operation) {
-                    // console.log('operation is', operation);
                     switch(operation) {
                         case 'scale':
                             this.setState({ operation: 'scale' });
@@ -94,15 +87,12 @@ define([
 
                 },
                 _handleSpeedChange: function(speed) {
-                    console.log(speed);
                     director.setParameter('printSpeed', speed);
                 },
                 _handlePlatformClick: function(state) {
-                    console.log('platform clicked', state)
                     director.setParameter('raft', state ? '1' : '0');
                 },
                 _handleSupportClick: function(state) {
-                    console.log('support clicked', state);
                     director.setParameter('support', state ? '1' : '0');
                 },
                 _handleShowAdvancedSetting: function() {
@@ -115,13 +105,13 @@ define([
                 },
                 _handleRotation: function(rotation) {
                     _rotation = rotation;
-                    director.rotate(rotation.x, rotation.y, rotation.z, true);
+                    director.setRotation(rotation.x, rotation.y, rotation.z, true);
                 },
                 _handleResetRotation: function() {
                     _rotation.x = 0;
                     _rotation.y = 0;
                     _rotation.z = 0;
-                    director.rotate(0, 0, 0, true);
+                    director.setRotation(0, 0, 0, true);
                 },
                 _handleScaleChange: function(scale) {
                     _scale = scale;
@@ -131,7 +121,6 @@ define([
                     director.setScale(1, 1, 1, true);
                 },
                 _handleAdvancedSettingCancel: function() {
-                    console.log('advanced setting cancelled');
                     this.setState({ showAdvancedSetting: false });
                 },
                 _handleAdvancedSettingDone: function(setting) {
@@ -146,10 +135,8 @@ define([
                     console.log(printPaused ? 'print paused' : 'continue printing');
                 },
                 _handlePrintCancel: function(e) {
-                    console.log('print cancelled');
                 },
                 _handlePrintRestart: function(e) {
-                    console.log('print restarted');
                 },
                 _handleFileUpload: function(e) {
                     var files = e.target.files;
@@ -167,7 +154,7 @@ define([
                     }
                     e.target.value = null;
                 },
-                _handleFileDownload: function(e) {
+                _handleSave: function(e) {
                     this.setState({ openWaitWindow: true });
                     var fileName = prompt(lang.print.download_prompt);
                     fileName = fileName || 'no name';
@@ -176,28 +163,28 @@ define([
                         this.setState({ openWaitWindow: false });
                     });
                 },
+                _handlePreview: function(isOn) {
+                    director.togglePreview(isOn);
+                },
                 _handlePrinterSelectorWindowClose: function() {
                     this.setState({ openPrinterSelectorWindow: false });
                 },
                 _handlePrinterSelected: function(selectedPrinter) {
                     console.log(selectedPrinter);
                     this.setState({
-                        openPrinterSelectorWindow: false,
-                        openWaitWindow: true
+                        openPrinterSelectorWindow: false
                     });
-                    var control_methods = printerController(selectedPrinter.serial);
-                    director.getGCode().then((blob) => {
-                        console.log('sending blob to machine', blob);
-                        control_methods.upload(blob.size, blob);
-                        this.setState({ openWaitWindow: false });
-                    });
+                    director.executePrint(selectedPrinter.serial);
+                },
+                _handlePreviewLayerChange: function(e) {
+                    director.changePreviewLayer(e.target.value);
+                    this.setState({ sliderValue: e.target.value });
                 },
                 _renderHeader: function() {
                     return;
-                    var currentMode     = this.state.previewMode === 'normal' ? lang.print.normal_preview : lang.print.support_preview,
-                        normalClass     = ClassNames('fa', 'fa-check', 'icon', 'pull-right', {hide: this.state.previewMode !== 'normal'}),
+                    var normalClass     = ClassNames('fa', 'fa-check', 'icon', 'pull-right', {hide: this.state.previewMode !== 'normal'}),
                         supportClass    = ClassNames('fa', 'fa-check', 'icon', 'pull-right', {hide: this.state.previewMode !== 'support'}),
-                        previewClass    = ClassNames('preview', {hide: !this.state.showPreviewModeList}),
+                        // previewClass    = ClassNames('preview', {hide: !this.state.showPreviewModeList}),
                         boundingBox     = director.getSelectedObjectSize();
                         boundingBox     = typeof(boundingBox) === 'undefined' ? {x: 0, y: 0, z: 0} : boundingBox.box.size();
 
@@ -212,7 +199,7 @@ define([
                                     </button>
                                 </div>
                                 <div>
-                                    <button className="btn btn-default tip" data-tip={lang.print.save} onClick={this._handleFileDownload}>
+                                    <button className="btn btn-default tip" data-tip={lang.print.save} onClick={this._handleSave}>
                                         <div className="fa fa-floppy-o"></div>
                                     </button>
                                 </div>
@@ -239,7 +226,8 @@ define([
                             onSupportClick          = {this._handleSupportClick}
                             onShowAdvancedSetting   = {this._handleShowAdvancedSetting}
                             onImport                = {this._handleFileUpload}
-                            onSave                  = {this._handleFileDownload}
+                            onSave                  = {this._handleSave}
+                            onPreview               = {this._handlePreview}
                             onPrintClick            = {this._handlePrintClick}
                             onSpeedChange           = {this._handleSpeedChange} />
                     );
@@ -281,6 +269,29 @@ define([
                         <Modal content={spinner} />
                     );
                 },
+                _renderPreviewWindow: function() {
+                    return (
+                        <div className="previewPanel">
+                            <input className="range" type="range" value={this.state.sliderValue} min="0" max={this.state.sliderMax} onChange={this._handlePreviewLayerChange} />
+                            <div>
+                                {this.state.sliderValue}
+                            </div>
+                        </div>
+                    );
+                },
+                _renderProgressWindow: function() {
+                    var content = (
+                        <div className="progressWindow">
+                            <div className="message">
+                                {this.state.progressMessage}
+                            </div>
+                            <div className="spinner-flip spinner-reverse"/>
+                        </div>
+                    )
+                    return (
+                        <Modal content={content} />
+                    );
+                },
                 render: function() {
                     var header                  = this._renderHeader(),
                         operatingPanel          = this._renderOperatingPanel(),
@@ -289,7 +300,9 @@ define([
                         bottomPanel,
                         monitorPanel            = this.state.showMonitor ? this._renderMonitorPanel() : '',
                         printerSelectorWindow   = this.state.openPrinterSelectorWindow ? this._renderPrinterSelectorWindow() : '',
-                        waitWindow              = this.state.openWaitWindow ? this._renderWaitWindow() : '';
+                        waitWindow              = this.state.openWaitWindow ? this._renderWaitWindow() : '',
+                        previewWindow           = this.state.previewMode ? this._renderPreviewWindow() : '',
+                        progressWindow          = this.state.progressMessage ? this._renderProgressWindow() : '';
 
                     switch(this.state.operation) {
                         case 'rotate':
@@ -342,6 +355,10 @@ define([
                             {printerSelectorWindow}
 
                             {waitWindow}
+
+                            {previewWindow}
+
+                            {progressWindow}
 
                             <div id="model-displayer" className="model-displayer" style={divStyle}></div>
                         </div>

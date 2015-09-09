@@ -91,11 +91,11 @@ define([
 
             return (
                 <div className={wrapper_class_name}>
-                    <button ref="button" className={button_class_name} onClick={self._onSmooth}>{lang.scan.manipulation.smooth}</button>
-                    <button ref="button" className={button_class_name} onClick={self._onCrop}>{lang.scan.manipulation.crop}</button>
-                    <button ref="button" className={button_class_name} onClick={self._onClearNoise}>{lang.scan.manipulation.clear_noise}</button>
-                    <button ref="button" className={merge_button_class_name} onClick={mergeFunc}>{button_merge_text}</button>
-                    <button ref="button" className={button_class_name} onClick={self._onReset}>{lang.scan.manipulation.reset}</button>
+                    <button data-ga-event="scan-smooth" ref="button" className={button_class_name} onClick={self._onSmooth}>{lang.scan.manipulation.smooth}</button>
+                    <button data-ga-event="scan-crop" ref="button" className={button_class_name} onClick={self._onCrop}>{lang.scan.manipulation.crop}</button>
+                    <button data-ga-event="scan-delete-noise" ref="button" className={button_class_name} onClick={self._onClearNoise}>{lang.scan.manipulation.clear_noise}</button>
+                    <button data-ga-event="scan-merge" ref="button" className={merge_button_class_name} onClick={mergeFunc}>{button_merge_text}</button>
+                    <button data-ga-event="scan-reset" ref="button" className={button_class_name} onClick={self._onReset}>{lang.scan.manipulation.reset}</button>
                 </div>
             );
         },

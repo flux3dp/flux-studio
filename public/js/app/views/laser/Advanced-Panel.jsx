@@ -2,8 +2,10 @@ define([
     'jquery',
     'react',
     'jsx!widgets/Select',
+    'helpers/api/config',
     'plugins/jquery/serializeObject',
-], function($, React, SelectView) {
+    'helpers/array-findindex',
+], function($, React, SelectView, config) {
     'use strict';
 
     return React.createClass({
@@ -21,6 +23,10 @@ define([
 
         _handleCancel: function(e) {
             this.props.onCancel(e);
+        },
+
+        _handleDone: function(e) {
+            this.props.onDone(this._getSetting());
         },
 
         _getSetting: function() {
@@ -41,41 +47,48 @@ define([
         },
 
         _handleRangeMouseUp: function(e) {
-            var refs = this.refs,
-                materials = this.state.materials,
+            var self = this,
+                refs = self.refs,
+                materials = self.state.materials,
                 custom_option = {
                     value: 'custom',
-                    label: 'Custom',
+                    label: self.props.lang.laser.custom,
                     selected: true,
                     data: {
-                        laser_speed: refs.speedRange.getDOMNode().value,
-                        power: refs.powerRange.getDOMNode().value
+                        laser_speed: parseFloat(refs.speedRange.getDOMNode().value, 10),
+                        power: parseInt(refs.powerRange.getDOMNode().value, 10)
                     }
                 },
-                custom = materials.filter(function(el) {
+                customIndex = materials.findIndex(function(el) {
                     return el.value === custom_option.value;
-                })[0];
+                });
 
-            if ('undefined' === typeof custom) {
-                materials.push(custom_option);
-                this.setState({
-                    defaultMaterial: custom_option
-                })
-            }
-            else {
-                custom = custom_option;
-            }
-        },
-
-        _handleDone: function(e) {
-            this.props.onDone(this._getSetting());
+            config().write(
+                'custom-material',
+                JSON.stringify(custom_option),
+                {
+                    onFinished: function(response) {
+                        if (-1 === customIndex) {
+                            materials.push(custom_option);
+                            self.setState({
+                                materials: materials,
+                                defaultMaterial: custom_option
+                            });
+                        }
+                        else {
+                            // replace custom material
+                            materials[customIndex] = custom_option;
+                        }
+                    }
+                }
+            );
         },
 
         _renderFooter: function(lang) {
             return (
                 <footer className="footer">
-                    <a className="btn btn-default" onClick={this._handleCancel}>{lang.cancel}</a>
-                    <a className="btn btn-confirm" onClick={this._handleDone}>{lang.apply}</a>
+                    <button className="btn btn-default" onClick={this._handleCancel}>{lang.cancel}</button>
+                    <button className="btn btn-confirm" onClick={this._handleDone}>{lang.apply}</button>
                 </footer>
             );
         },
@@ -113,6 +126,7 @@ define([
                                     data-max-text={lang.form.laser_speed.fast}
                                     min={lang.form.laser_speed.min}
                                     max={lang.form.laser_speed.max}
+                                    step={lang.form.laser_speed.step}
                                     defaultValue={this.state.defaultMaterial.data.laser_speed}
                                     onChange={this._changeRangeNumber('speed')}
                                     onMouseUp={this._handleRangeMouseUp}

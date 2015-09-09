@@ -14,9 +14,8 @@ define([
         var ws = new Websocket({
                 method: 'discover',
                 autoReconnect: false,
-                onMessage: function(result) {
-                    var data = JSON.parse(result.data),
-                        someFn = function(el) {
+                onMessage: function(data) {
+                    var someFn = function(el) {
                             return el.serial === data.serial;
                         },
                         findIndex = function(el) {

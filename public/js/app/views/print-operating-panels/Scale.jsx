@@ -99,7 +99,7 @@ define([
                                 </div>*/
                             }
                             <div clasName="controls">
-                                <a className="btn btn-default" onClick={this._handleReset}>{lang.print.reset}</a>
+                                <a data-ga-event="print-reset-scale" className="btn btn-default" onClick={this._handleReset}>{lang.print.reset}</a>
                             </div>
                         </div>
                     </div>

@@ -1,4 +1,4 @@
-define(function($) {
+define(['helpers/is-json'], function(isJson) {
     'use strict';
 
     // options:
@@ -7,18 +7,23 @@ define(function($) {
     //      method        - method be called
     //      autoReconnect - auto reconnect on close
     //      onMessage     - fired on receive message
+    //      onError       - fired on a normal error happend
+    //      onFatal       - fired on a fatal error closed
     //      onClose       - fired on connection closed
     //      onOpen        - fired on connection connecting
     return function(options) {
 
-        var defaultOptions = {
+        var defaultCallback = function(result) {},
+            defaultOptions = {
                 hostname: location.hostname,
                 method: '',
                 port: location.port || '8000',
                 autoReconnect: true,
-                onMessage: function(result) {},
-                onClose: function(result) {},
-                onOpen: function(result) {}
+                onMessage: defaultCallback,
+                onError: defaultCallback,
+                onFatal: defaultCallback,
+                onClose: defaultCallback,
+                onOpen: defaultCallback
             },
             received_data = [],
             origanizeOptions = function(opts) {
@@ -39,9 +44,20 @@ define(function($) {
                 };
 
                 _ws.onmessage = function(result) {
+                    var data = (true === isJson(result.data) ? JSON.parse(result.data) : result.data);
+
                     // TODO: logging
                     received_data.push(result.data);
-                    options.onMessage(result);
+
+                    if ('error' === data.status) {
+                        options.onError(data);
+                    }
+                    else if ('fatal' === data.status) {
+                        options.onFatal(data);
+                    }
+                    else {
+                        options.onMessage(data);
+                    }
                 };
 
                 _ws.onclose = function(result) {
@@ -122,6 +138,18 @@ define(function($) {
 
             onClose: function(callback) {
                 options.onclose = callback;
+
+                return this;
+            },
+
+            onError: function(callback) {
+                options.onError = callback;
+
+                return this;
+            },
+
+            onFatal: function(callback) {
+                options.onFatal = callback;
 
                 return this;
             }

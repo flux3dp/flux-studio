@@ -1,16 +1,16 @@
 define([
-    'jquery',
     'react',
+    'helpers/local-storage',
     'helpers/api/config',
     'jsx!widgets/Modal'
-], function($, React, config, Modal) {
+], function(React, localStorage, config, Modal) {
     'use strict';
 
     return function(args) {
 
         args = args || {};
 
-        var Page = React.createClass({
+        return React.createClass({
             getInitialState: function() {
                 return args.state;
             },
@@ -18,7 +18,12 @@ define([
             _handleStartClick: function() {
                 config().write('printer-is-ready', true, {
                     onFinished: function() {
-                        location.href = '#studio/print';
+                        config().write('printers', JSON.stringify([localStorage.get('setting-printer')]), {
+                            onFinished: function(response) {
+                                localStorage.removeAt('setting-printer');
+                                location.hash = '#studio/print';
+                            }
+                        });
                     }
                 });
             },
@@ -43,7 +48,5 @@ define([
                 );
             }
         });
-
-        return Page;
     };
 });

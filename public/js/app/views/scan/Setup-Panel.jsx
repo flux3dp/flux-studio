@@ -39,6 +39,7 @@ define([
                 buttons = [
                     // scan | multiscan
                     {
+                        eventName: 'running-scan',
                         label: (
                             0 < props.scanTimes
                             ? lang.scan.start_multiscan
@@ -55,6 +56,7 @@ define([
                     },
                     // cancel scan
                     {
+                        eventName: 'cancel-scan',
                         label: lang.scan.cancel_scan,
                         eventHandler: self._onCancelClick,
                         basicStyle: JSON.parse(JSON.stringify(basicStyle)),
@@ -66,6 +68,7 @@ define([
                     },
                     // convert
                     {
+                        eventName: 'convert-scan',
                         label: lang.scan.convert_to_stl,
                         eventHandler: self._onConvertClick,
                         basicStyle: JSON.parse(JSON.stringify(basicStyle)),
@@ -77,6 +80,7 @@ define([
                     },
                     // save (export)
                     {
+                        eventName: 'export',
                         label: lang.scan.do_save,
                         eventHandler: self._onSaveClick,
                         basicStyle: JSON.parse(JSON.stringify(basicStyle)),
@@ -88,6 +92,7 @@ define([
                     },
                     // scan again
                     {
+                        eventName: 'scan-again',
                         label: lang.scan.scan_again,
                         eventHandler: self._onScanAgainClick,
                         basicStyle: JSON.parse(JSON.stringify(basicStyle)),
@@ -110,7 +115,7 @@ define([
 
                 if (true === button.display) {
                     return (
-                        <button onClick={button.eventHandler} className={styles}>
+                        <button data-ga-event={button.eventName} onClick={button.eventHandler} className={styles}>
                             {button.label}
                         </button>
                     );

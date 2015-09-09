@@ -14,7 +14,8 @@ define([
             'fgColor': '#777',
             'bgcolor': '#AAAAAA',
             height: 50,
-        };
+        },
+        shiftStep = 15;
 
     return React.createClass({
         getDefaultProps: function() {
@@ -34,11 +35,20 @@ define([
             $('.y-axis').knob(React.addons.update(setup, {$merge:{change: function(v) { thisModule._handleYChange(v); }}}));
             $('.z-axis').knob(React.addons.update(setup, {$merge:{change: function(v) { thisModule._handleZChange(v); }}}));
 
+            $(document).on('keydown', this._keyPress);
+            $(document).on('keyup', this._keyPress);
 
             this._updateDial();
         },
         componentDidUpdate: function(prevProp, prevState) {
             this._updateDial();
+        },
+        _keyPress: function(e) {
+            if(e.keyCode === 16) {
+                $('.x-axis').trigger('configure', {"step": e.type === 'keydown' ? shiftStep : setup.step});
+                $('.y-axis').trigger('configure', {"step": e.type === 'keydown' ? shiftStep : setup.step});
+                $('.z-axis').trigger('configure', {"step": e.type === 'keydown' ? shiftStep : setup.step});
+            }
         },
         _updateDial: function() {
             $('.x-axis').val(this.props.selected.rotation.enteredX);
@@ -97,7 +107,7 @@ define([
                                 <input type="text" className="knob z-axis" />
                             </div>
                             <div className="controls pull-right">
-                                <a className="btn btn-default" onClick={this._handleResetRotation}>{lang.print.reset}</a>
+                                <a data-ga-event="print-reset-rotation" className="btn btn-default" onClick={this._handleResetRotation}>{lang.print.reset}</a>
                             </div>
                         </div>
                     </div>

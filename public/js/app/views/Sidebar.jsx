@@ -1,5 +1,5 @@
 define([
-    'react',
+    'react'
 ], function(React) {
     'use strict';
 
@@ -8,7 +8,7 @@ define([
 
         var Page = React.createClass({
                 _handleNavigation: function(address, e) {
-                    location.href = '#studio/' + address;
+                    location.hash = '#studio/' + address;
                 },
                 render : function() {
                     var self = this,
@@ -48,7 +48,7 @@ define([
                                 name: 'device',
                                 className: genericClassName,
                                 label: lang.menu.device,
-                                imgSrc: 'http://placehold.it/34x34'
+                                imgSrc: '/img/device.png'
                             },
                             {
                                 name: 'settings',

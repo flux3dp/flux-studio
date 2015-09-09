@@ -1,0 +1,80 @@
+#!/bin/bash
+
+# Set the environment by loading from the file "environment" in the same directory
+DIR="$( cd "$( dirname "$0" )" && pwd)"
+source $DIR/environment
+
+while true; do
+    read -p "==> Are you going to Development? (Y/N)"
+    case $REPLY in
+        [Yy] )
+            TASK="Development"
+            SOURCE_DIR=$DEVELOPMENT_SOURCE_DIR
+            DEST_DIR=$DEVELOPMENT_DEST_DIR
+            SERVER=$DEVELOPMENT_SERVER
+            KEY=$DEVELOPMENT_KEY
+
+            break;;
+
+        [Nn] )
+            TASK="QA"
+            SOURCE_DIR=$QA_SOURCE_DIR
+            DEST_DIR=$QA_DEST_DIR
+            SERVER=$QA_SERVER
+            KEY=$QA_KEY
+
+            break;;
+
+        * )
+            echo -e "Please type Y or N"
+    esac
+done
+
+echo -e "Rebuilding $TASK as    $ACCOUNT"
+echo -e "Rebuilding $TASK from  $SOURCE_DIR"
+echo -e "Rebuilding $TASK to    $SERVER:$DEST_DIR"
+echo -e
+
+# rebuild with rsync.
+echo -e
+
+while true; do
+    read -p "==> Does this look good? Can I go ahead and rebuild $TASK ? (Y/N) "
+    case $REPLY in
+        [Yy] )
+            gulp sass
+
+            # Change entire owner/group to qa account in order to have the proper permissions.
+            echo -e "Changing directory permission to $ACCOUNT:$ACCOUNT..."
+            ssh -t $ACCOUNT@$SERVER "sudo chown -R $ACCOUNT:$ACCOUNT $DEST_DIR"
+
+            echo -e "Begin rsync..."
+            if [ "$KEY" == "" ]; then
+                # Access by tediously typing a password over and again
+                rsync --chmod=ug=rwX -e ssh -axv --delete --exclude-from=$DIR/rsync-exclude \
+                    $SOURCE_DIR $ACCOUNT@$SERVER:$DEST_DIR
+            else
+                # Access by key
+                rsync --chmod=ug=rwX -axv --delete --exclude-from=$DIR/rsync-exclude \
+                    -e ssh -i $KEY $SOURCE_DIR $ACCOUNT@$SERVER:$DEST_DIR
+            fi
+
+            # Change back permissions.
+            echo -e "Changing directory permission back to $RIGHTFUL_OWNER:$RIGHTFUL_OWNER..."
+            ssh -t $ACCOUNT@$SERVER "sudo chown -R $RIGHTFUL_OWNER:$RIGHTFUL_OWNER $DEST_DIR"
+
+            break;;
+
+        [Nn] )
+            echo -e "Skipping rebuilding $TASK..."
+            break;;
+
+        * )
+            echo -e "Please type Y or N"
+    esac
+done
+
+# Saying good-bye.
+echo -e
+echo -e "$TASK rebuild complete, you're responsible now."
+exit 1
