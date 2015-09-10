@@ -83,6 +83,8 @@ define([
                 }),
                 mesh = new THREE.Mesh(geometry, material);
 
+            material.side = THREE.DoubleSide;
+
             mesh.up = new THREE.Vector3(0,0,1);
 
             addMesh(mesh);
@@ -277,6 +279,7 @@ define([
     }
 
     function addLights() {
+
         scene.add(new THREE.AmbientLight(0xffffff));
 
         var light1 = new THREE.DirectionalLight(0xffffff, 0.5);
