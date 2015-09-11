@@ -62,11 +62,13 @@ define([
                 }
             },
             refreshImage = function($img, threshold) {
+                var box = $img.box();
+
                 imageData(
                     $img.data('base'),
                     {
-                        height: $img.height(),
-                        width: $img.width(),
+                        height: box.height,
+                        width: box.width,
                         grayscale: {
                             is_rgba: true,
                             threshold: parseInt(threshold, 10)
@@ -210,15 +212,23 @@ define([
 
                         return mm;
                     },
-                    getCenter = function($el) {
-                        var container_offset = $laser_platform.offset(),
+                    getPoint = function($el, position) {
+                        var containerOffset = $laser_platform.offset(),
                             offset = $el.offset(),
-                            half_width = $el.width() / 2,
-                            half_height = $el.height() / 2;
+                            width = $el.width(),
+                            height = $el.height(),
+                            // default as bottom-right
+                            pointX = offset.left - containerOffset.left,
+                            pointY = offset.top - containerOffset.top;
+
+                        if ('top-left' === position) {
+                            pointX = pointX + width;
+                            pointY = pointY + height;
+                        }
 
                         return {
-                            x: offset.left - container_offset.left + half_width,
-                            y: offset.top - container_offset.top + half_height
+                            x: pointX,
+                            y: pointY
                         };
                     },
                     args = [],
@@ -229,8 +239,8 @@ define([
                         $ft_controls.each(function(k, el) {
                             var $el = $(el),
                                 image = new Image(),
-                                top_left = getCenter($el.find('.ft-scaler-top.ft-scaler-left')),
-                                bottom_right = getCenter($el.find('.ft-scaler-bottom.ft-scaler-right')),
+                                top_left = getPoint($el.find('.ft-scaler-top.ft-scaler-left'), 'top-left'),
+                                bottom_right = getPoint($el.find('.ft-scaler-bottom.ft-scaler-right'), 'bottom-right'),
                                 $img = $el.parents('.ft-container').find('.img-container img'),
                                 width = 0,
                                 height = 0,
@@ -247,16 +257,18 @@ define([
                                     is_svg: ('svg' === self.props.fileFormat),
                                     threshold: 255
                                 },
-                                src = '';
+                                src = $img.data('base'),
+                                previewImageSize;
 
                             if ('svg' === self.props.fileFormat) {
-                                src = $img.attr('src');
+                                previewImageSize = svgWebSocket.computePreviewImageSize({
+                                    width: $img.box().width,
+                                    height: $img.box().height
+                                });
+
                                 // only svg file need size to convert to binary
-                                height = parseInt($img.box().height, 10);
-                                width = parseInt($img.box().width, 10);
-                            }
-                            else {
-                                src = $img.data('base');
+                                height = parseInt(previewImageSize.height, 10);
+                                width = parseInt(previewImageSize.width, 10);
                             }
 
                             imageData(
@@ -306,7 +318,7 @@ define([
             }
         );
 
-        function setupImage(file, size, url, name) {
+        function setupImage(file, size, originalUrl, name) {
             var $div = $(document.createElement('div')).addClass(LASER_IMG_CLASS),
                 img = new Image(),
                 $img = $(img),
@@ -317,8 +329,10 @@ define([
             $img.addClass(file.extension).
                 attr('src', file.url).
                 data('name', name).
-                data('base', url).
-                data('size', size);
+                data('base', originalUrl).
+                data('size', size).
+                width(size.width).
+                height(size.height);
 
             $img.one('load', function() {
                 $div.freetrans({
@@ -329,17 +343,22 @@ define([
                     onScale: instantRefresh
                 });
 
+                // set default image
+                if (null === $target_image) {
+                    $target_image = $div;
+                    refreshObjectParams({ freetransEventType: 'move' }, $div);
+                }
+
+                // onmousedown
                 $div.parent().find('.ft-controls').on('mousedown', function(e) {
                     var $self = $(e.target);
 
                     inactiveAllImage();
                     $target_image = $self.parent().find('.' + LASER_IMG_CLASS);
-                    $target_image.addClass('image-active');
+                    $self.addClass('image-active');
                 });
             });
 
-            // set default image
-            $target_image = $div;
 
             $div.append($img);
             $laser_platform.append($div);
@@ -358,11 +377,10 @@ define([
                     var url = window.URL,
                         blob = new Blob([data], { type: file.type }),
                         objectUrl = url.createObjectURL(blob),
-                        platformWidth = $laser_platform.width(),
-                        platformHeight = $laser_platform.height(),
+                        platformDiameter = $laser_platform.width(),
                         ratio = 1;
 
-                    if (size.width > platformWidth || size.height > platformHeight) {
+                    if (platformDiameter < Math.max(size.width , size.height)) {
                         ratio = Math.min(360 / size.width, 360 / size.height);
                         size.width = size.width * ratio;
                         size.height = size.height * ratio;
@@ -377,7 +395,7 @@ define([
                             threshold: 128
                         },
                         onComplete: function(result) {
-                            file.url = result.canvas.toDataURL('image/png');
+                            file.url = result.canvas.toDataURL('svg' === file.extension ? 'image/svg+xml' : 'image/png');
                             setupImage(file, size, objectUrl, name);
                         }
                     });
@@ -476,8 +494,12 @@ define([
                 });
             },
             thresholdChanged: function(e, threshold) {
-                $('.' + LASER_IMG_CLASS).find('img').each(function(k, el) {
-                    refreshImage($(el), threshold);
+                var $el, bounds;
+
+                $('.' + LASER_IMG_CLASS).each(function(k, el) {
+                    $el = $(el);
+                    bounds = $el.freetrans('getBounds');
+                    refreshImage($el.find('img'), threshold);
                 });
             },
             inactiveAllImage: inactiveAllImage
