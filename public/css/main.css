@@ -4237,7 +4237,8 @@ input.switch:checked ~ label:after {
 
 .laser-studio .laser-object .image-active {
     background: rgba(255, 255, 255, 0.6);
-    outline: 5px dashed #bbb; }
+    outline: 5px dashed #bbb;
+    z-index: -1; }
 
 .laser-studio .laser-object .ft-widget {
     cursor: move;
