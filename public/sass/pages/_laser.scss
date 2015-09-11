@@ -54,6 +54,7 @@
     .laser-object .image-active {
         background: rgba(255, 255, 255, .6);
         outline: 5px dashed #bbb;
+        z-index: -1;
     }
 
     .laser-object .ft-widget {
