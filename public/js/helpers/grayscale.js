@@ -11,12 +11,19 @@ define(function() {
         opts.is_svg = ('boolean' === typeof opts.is_svg ? opts.is_svg : false);
 
         var binary = [],
-            WHITE = 255;
+            WHITE = 255,
+            grayscale,
+            red, green, blue, alpha;
 
         for (var i = 0; i < data.length; i += 4) {
             if (false === opts.is_svg) {
+                // http://yolijn.com/convert-rgba-to-rgb
+                alpha = data[i + 3] / 255;
+                red = (1 - alpha) * data[i] + alpha * data[i];
+                green = (1 - alpha) * data[i + 1] + alpha * data[i + 1];
+                blue = (1 - alpha) * data[i + 2] + alpha * data[i + 2];
                 // refers to http://en.wikipedia.org/wiki/Grayscale
-                var grayscale = parseInt(data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114, 10);
+                grayscale = parseInt(red * 0.299 + green * 0.587 + blue * 0.114, 10);
 
                 grayscale = (opts.threshold > grayscale ? grayscale : WHITE);
 
