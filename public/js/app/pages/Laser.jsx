@@ -101,6 +101,7 @@ define([
                                 mode={this.state.mode}
                                 className={image_panel_class}
                                 onThresholdChanged={this.props.laserEvents.thresholdChanged}
+                                onTransform={this.props.laserEvents.imageTransform}
                             /> :
                             ''
                         );
