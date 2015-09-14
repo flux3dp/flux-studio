@@ -138,6 +138,8 @@ define([
                 );
             },
             convertToRealCoordinate = function(px, axis) {
+                axis = axis || '';
+
                 var ratio = DIAMETER / PLATFORM_DIAMETER_PIXEL, // 1(px) : N(mm)
                     r = PLATFORM_DIAMETER_PIXEL / 2 * ratio,
                     mm = ratio * px - r;
@@ -148,8 +150,26 @@ define([
 
                 return mm;
             },
+            convertToHtmlCoordinate = function(n, axis) {
+
+                var ratio = PLATFORM_DIAMETER_PIXEL / DIAMETER, // 1(px) : N(mm)
+                    r = DIAMETER / 2,
+                    px;
+
+                n = parseFloat(n, 10) + r;
+                px = n * ratio;
+
+                if ('x' === axis) {
+                    px -= ($target_image.width() / 2);
+                }
+                else {
+                    px -= ($target_image.height() / 2);
+                }
+
+                return px;
+            },
             refreshObjectParams = function(e, $el) {
-                var bounds, el_offset, el_position,
+                var el_position,
                     last_x, last_y,
                     platform_pos = $laser_platform.box(),
                     imagePanelRefs = self.refs.imagePanel.refs,
@@ -163,7 +183,6 @@ define([
 
                 if (null !== $el) {
                     el_position = $el.box();
-                    bounds = $el.freetrans('getBounds');
 
                     if ('move' === e.freetransEventType) {
                         if (true === outOfRange(el_position.center, DIAMETER)) {
@@ -181,14 +200,14 @@ define([
                         }
                     }
                     else {
-                        refreshImage($el, 128);
+                        refreshImage($el, getThreshold().getDOMNode().value);
                     }
 
                     imagePanelRefs.objectAngle.getDOMNode().value = elementAngle($el[0]);
-                    imagePanelRefs.objectPosX.getDOMNode().value = convertToRealCoordinate(el_position.center.x, 'x');
-                    imagePanelRefs.objectPosY.getDOMNode().value = convertToRealCoordinate(el_position.center.y, 'y');
-                    imagePanelRefs.objectSizeW.getDOMNode().value = bounds.height / PLATFORM_DIAMETER_PIXEL * DIAMETER;
-                    imagePanelRefs.objectSizeH.getDOMNode().value = bounds.width / PLATFORM_DIAMETER_PIXEL * DIAMETER;
+                    imagePanelRefs.objectPosX.getDOMNode().value = convertToRealCoordinate(el_position.center.x, 'x').toString().substr(0, 4);
+                    imagePanelRefs.objectPosY.getDOMNode().value = convertToRealCoordinate(el_position.center.y, 'y').toString().substr(0, 4);
+                    imagePanelRefs.objectSizeW.getDOMNode().value = (el_position.width / PLATFORM_DIAMETER_PIXEL * DIAMETER).toString().substr(0, 4);
+                    imagePanelRefs.objectSizeH.getDOMNode().value = (el_position.height / PLATFORM_DIAMETER_PIXEL * DIAMETER).toString().substr(0, 4);
                 }
             },
             $target_image = null, // changing when image clicked
@@ -200,7 +219,7 @@ define([
                 return (imagePanelRefs.threshold || {
                     getDOMNode: function() {
                         return {
-                            value: 0
+                            value: 255
                         };
                     }
                 });
@@ -337,6 +356,7 @@ define([
                 $img.freetrans({
                     x: $laser_platform.outerWidth() / 2 - size.width / 2,
                     y: $laser_platform.outerHeight() / 2 - size.height / 2,
+                    originalSize: size,
                     onRotate: instantRefresh,
                     onMove: instantRefresh,
                     onScale: instantRefresh
@@ -354,7 +374,7 @@ define([
                     var $self = $(e.target);
 
                     inactiveAllImage();
-                    $target_image = $self;
+                    $target_image = $self.parent().find('.' + LASER_IMG_CLASS);
                     $self.addClass('image-active');
                 });
             });
@@ -501,7 +521,36 @@ define([
                     refreshImage($el, threshold);
                 });
             },
-            inactiveAllImage: inactiveAllImage
+            inactiveAllImage: inactiveAllImage,
+            imageTransform: function(e) {
+                var $el = $(e.currentTarget),
+                    type = $el.data('type'),
+                    val = $el.val(),
+                    freetrans = $target_image.data('freetrans'),
+                    args = {};
+
+                val = parseFloat(val, 10);
+
+                switch (type) {
+                case 'x':
+                case 'y':
+                    val = convertToHtmlCoordinate(val, type);
+                    args[type] = val;
+                    break;
+                case 'width':
+                    val = parseFloat((val / DIAMETER * PLATFORM_DIAMETER_PIXEL).toString().substr(0, 4), 10);
+                    args.scalex = parseFloat(val / freetrans.originalSize.width, 10);
+                    break;
+                case 'height':
+                    val = parseFloat((val / DIAMETER * PLATFORM_DIAMETER_PIXEL).toString().substr(0, 4), 10);
+                    args.scaley = parseFloat(val / freetrans.originalSize.height, 10);
+                    break;
+                case 'angle':
+                    args.angle = val;
+                }
+
+                $target_image.freetrans(args);
+            }
         };
     };
 });
