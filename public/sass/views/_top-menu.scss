@@ -1,0 +1,92 @@
+/**
+ * top menu
+ */
+.top-menu {
+    position: fixed;
+    width: 100%;
+
+    .brand-logo {
+        cursor: pointer;
+        left: 24px;
+        position: absolute;
+        top: 24px;
+
+        .logo-icon,
+        .menu {
+            float: left;
+        }
+
+        .logo-icon {
+            height: 4.25rem;
+            width: 4.25rem;
+        }
+
+        .menu {
+            background: #fff;
+            display: none;
+            left: 5.05rem;
+            padding: .65rem 2.6rem;
+            position: relative;
+            top: 27px;
+
+            .arrow {
+                left: -54px;
+                position: absolute;
+                top: 0;
+
+                polygon {
+                    fill: #fff;
+                }
+            }
+
+            .inner-menu {
+                @include flexbox();
+                list-style: none;
+                margin: 0;
+                padding: 0;
+            }
+        }
+
+        &:hover .menu {
+            display: block;
+        }
+    }
+
+    .item {
+        color: #b3b3b3;
+        font-size: 1rem;
+        margin: 0 3.3rem 0 0;
+        padding: 0;
+        text-align: center;
+        flex: 1;
+
+        img {
+            height: 3.2rem;
+            transform-origin: 50% 50%;
+            width: 3.2rem;
+        }
+
+        p,
+        &:last-child {
+            margin: 0;
+        }
+
+        &:hover img {
+            -webkit-filter: invert(1) opacity(0.25);
+        }
+    }
+
+    .setting {
+        font-size: 1rem;
+        line-height: 2rem;
+        position: absolute;
+        right: 24px;
+        text-decoration: none;
+        top: 24px;
+
+        img {
+            display: block;
+            width: 2.75rem;
+        }
+    }
+}

@@ -88,8 +88,8 @@ function(React, $, Backbone, display) {
         },
 
         appendSideBar: function() {
-            require(['jsx!views/Sidebar'], function(view) {
-                display(view, {}, $('.sidebar')[0]);
+            require(['jsx!views/TopMenu'], function(view) {
+                display(view, {}, $('.top-menu')[0]);
             });
         },
 
