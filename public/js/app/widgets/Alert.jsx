@@ -14,11 +14,16 @@ define(['react'], function(React){
         },
 
         render: function() {
-            var buttonsGroup = this._renderButtonGroup();
+            var buttonsGroup = this._renderButtonGroup(),
+                caption = (
+                    '' !== this.props.caption ?
+                    <h2 className="caption">{this.props.caption}</h2> :
+                    ''
+                );
 
             return (
                 <div className="modal-alert">
-                    <h2 className="caption">{this.props.caption}</h2>
+                    {caption}
                     <p className="message">{this.props.message}</p>
                     {buttonsGroup}
                 </div>
