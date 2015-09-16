@@ -75,7 +75,8 @@ define(function() {
             laser: '雷雕',
             scan: '掃描',
             usb: 'USB',
-            device: '裝置'
+            device: '裝置',
+            setting: '設定'
         },
         settings: {
             caption: '設定',

@@ -71,11 +71,12 @@ define(function() {
             }
         },
         menu: {
-            print: 'Print',
-            laser: 'Laser',
-            scan: 'Scan',
+            print: 'PRINT',
+            laser: 'LASER',
+            scan: 'SCAN',
             usb: 'USB',
-            device: 'Device'
+            device: 'Device',
+            setting: 'SETTING'
         },
         settings: {
             caption: 'Settings',
