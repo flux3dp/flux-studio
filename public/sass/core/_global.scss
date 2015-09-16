@@ -63,20 +63,15 @@ a {
     height: 100%;
 }
 
-.sidebar,
-.content {
-    float: left;
-}
-
-.sidebar {
-    background-color: #000;
-    height: 100%;
-}
-
 .content {
     height: 100%;
     overflow: hidden;
-    width: calc(100% - 66px);
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    width: 100%;
 }
 
 .horizontal-menu .menu-item {
