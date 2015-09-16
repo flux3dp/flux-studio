@@ -2,24 +2,35 @@ define(['react'], function(React){
     'use strict';
 
     return React.createClass({
-        _onClose: function(e) {
-            console.log('close', this.props);
-            this.props.handleClose(e);
+
+        _renderButtonGroup: function() {
+            var buttons = this.props.buttons.map(function(opt, i) {
+                return (
+                    <button className="btn btn-default" onClick={opt.onClick}>{opt.label}</button>
+                );
+            }, this);
+
+            return (<div className="button-group">{buttons}</div>);
         },
 
         render: function() {
+            var buttonsGroup = this._renderButtonGroup();
+
             return (
                 <div className="modal-alert">
-                    <p>{this.props.message}</p>
-                    <button className="btn btn-warning" onClick={this._onClose}>OK</button>
+                    <h2 className="caption">{this.props.caption}</h2>
+                    <p className="message">{this.props.message}</p>
+                    {buttonsGroup}
                 </div>
             );
         },
 
         getDefaultProps: function () {
             return {
+                lang: {},
+                caption: React.PropTypes.string,
                 message: React.PropTypes.string,
-                handleClose: React.PropTypes.func
+                buttons: React.PropTypes.array
             };
         },
     });
