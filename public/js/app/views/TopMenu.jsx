@@ -59,29 +59,6 @@ define([
                         );
                     }, this);
 
-                // TODO: test alert modal
-                var message = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Vel itaque atque perferendis consequuntur corrupti quos, dolorem voluptatem dolores minus, voluptatibus, commodi modi quas beatae optio asperiores explicabo ipsa nostrum mollitia.';
-                // var message = 'Lorem ipsum';
-                // message += message;
-                // message += message;
-                // message += message;
-                // message += message;
-                var callback = function(e) {
-                        console.log(e.currentTarget);
-                    },
-                    buttonOptions = [
-                        { label: 'ok', onClick: callback },
-                        { label: 'retry', onClick: callback },
-                        { label: 'exit', onClick: callback },
-                    ];
-
-                var content = (
-                    <Alert message={message} caption="Error" buttons={buttonOptions}/>
-                );
-                return (
-                    <Modal content={content}/>
-                );
-
                 return (
                     <div>
                         <div className="brand-logo">
