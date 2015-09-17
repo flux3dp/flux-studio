@@ -9,6 +9,7 @@ define([
     'jsx!widgets/Modal',
     'helpers/shortcuts',
     'helpers/image-data',
+    'helpers/nwjs/menu-factory',
     'freetrans',
     'helpers/jquery.box',
     'plugins/file-saver/file-saver.min'
@@ -22,7 +23,8 @@ define([
     PrinterSelector,
     Modal,
     shortcuts,
-    imageData
+    imageData,
+    menuFactory
 ) {
     'use strict';
 
@@ -54,6 +56,9 @@ define([
                         self.setState({
                             hasImage: false
                         });
+
+                        menuFactory.items.execute.enabled = false;
+                        menuFactory.items.saveGCode.enabled = false;
                         self.props.fileFormat = undefined;
                     }
                     else {
@@ -359,7 +364,8 @@ define([
                     originalSize: size,
                     onRotate: instantRefresh,
                     onMove: instantRefresh,
-                    onScale: instantRefresh
+                    onScale: instantRefresh,
+                    angle: size.angle || 0
                 });
                 $img.parent().find('.ft-controls').width(size.width).height(size.height);
 
@@ -370,13 +376,47 @@ define([
                 }
 
                 // onmousedown
-                $img.parent().find('.ft-controls').on('mousedown', function(e) {
-                    var $self = $(e.target);
+                (function(file, size, originalUrl, name, $img) {
+                    $img.parent().find('.ft-controls').on('mousedown', function(e) {
+                        var $self = $(e.target),
+                            clone = function() {
+                                var data = $img.data('freetrans');
 
-                    inactiveAllImage();
-                    $target_image = $self.parent().find('.' + LASER_IMG_CLASS);
-                    $self.addClass('image-active');
-                });
+                                size.width = size.width * data.scalex;
+                                size.height = size.height * data.scaley;
+                                size.angle = elementAngle($img[0]);
+
+                                setupImage(file, size, originalUrl, name);
+
+                                self.setState({
+                                    hasImage: true,
+                                });
+                            };
+
+                        inactiveAllImage();
+                        $target_image = $self.parent().find('.' + LASER_IMG_CLASS);
+                        refreshObjectParams({ freetransEventType: 'move' }, $target_image);
+
+                        $self.addClass('image-active');
+                        menuFactory.items.copy.enabled = true;
+                        menuFactory.items.copy.onClick = function() {
+                            menuFactory.items.paste.enabled = true;
+                            menuFactory.items.paste.onClick = clone;
+                        };
+                        menuFactory.items.cut.enabled = true;
+                        menuFactory.items.cut.onClick = function() {
+                            deleteImage();
+
+                            menuFactory.items.paste.enabled = true;
+                            menuFactory.items.paste.onClick = function() {
+                                clone();
+                                menuFactory.items.paste.enabled = false;
+                            };
+                        };
+                        menuFactory.items.duplicate.enabled = true;
+                        menuFactory.items.duplicate.onClick = clone;
+                    });
+                })(file, size, originalUrl, name, $img);
             });
 
 
@@ -427,6 +467,9 @@ define([
 
         function inactiveAllImage() {
             $('.image-active').removeClass('image-active');
+            menuFactory.items.copy.enabled = false;
+            menuFactory.items.cut.enabled = false;
+            menuFactory.items.duplicate.enabled = false;
         }
 
         return {
@@ -511,6 +554,9 @@ define([
                     hasImage: 0 < files.length,
                     mode: ('svg' === self.props.fileFormat ? 'cut' : 'engrave')
                 });
+
+                menuFactory.items.execute.enabled = true;
+                menuFactory.items.saveGCode.enabled = true;
             },
             thresholdChanged: function(e, threshold) {
                 var $el, bounds;
@@ -550,7 +596,8 @@ define([
                 }
 
                 $target_image.freetrans(args);
-            }
+            },
+            menuFactory: menuFactory
         };
     };
 });
