@@ -80,16 +80,6 @@ define([
 
                 ws.send('report');
             },
-            /**
-             * start print with specific toolhead
-             */
-            start: function(opts) {
-                opts = genericOptions(opts);
-
-                events.onMessage = function(response) {};
-
-                ws.send('start')
-            },
             upload: function(filesize, print_data, opts) {
                 opts = genericOptions(opts);
 
