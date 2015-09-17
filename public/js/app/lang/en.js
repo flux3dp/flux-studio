@@ -7,6 +7,51 @@ define(function() {
         app : {
             name : 'Flux Studio - en'
         },
+        topmenu: {
+            flux: {
+                label: 'Flux',
+                about: 'About FLUX studio',
+                preferences: 'Preferences',
+                quit: 'Quit'
+            },
+            file: {
+                label: 'File',
+                import: 'Import',
+                recent: 'Recent',
+                execute: 'Execute',
+                save_gcode: 'Save Gcode'
+            },
+            edit: {
+                label: 'Edit',
+                copy: 'Copy',
+                cut: 'Cut',
+                paste: 'Paste',
+                duplicate: 'Duplicate',
+                scale: 'Scale',
+                rotate: 'Rotate',
+                clear: 'Clear Scene'
+            },
+            view: {
+                label: 'View',
+                standard: 'Standard',
+                preview: 'Gcode Preview'
+            },
+            device: {
+                label: 'Device',
+                new: 'Add New Device...'
+            },
+            window: {
+                label: 'Window',
+                minimize: 'Minimize',
+                fullscreen: 'Fullscreen'
+            },
+            help: {
+                label: 'Help',
+                starting_guide: 'Starting Guide',
+                online_support: 'Online Support',
+                troubleshooting: 'Troubleshooting'
+            }
+        },
         welcome: {
             header1: 'Hello! Welcome to FLUX. Please choose your preferred language',
             header2: 'We are getting started from your language',
@@ -375,14 +420,6 @@ define(function() {
                 },
                 apply: 'Apply',
                 cancel: 'Cancel',
-            },
-            topmenu: {
-                main: {
-                    label: 'Main',
-                    open: 'Open',
-                    save: 'Save',
-                    engrave: 'Engrave',
-                }
             }
         },
         scan: {

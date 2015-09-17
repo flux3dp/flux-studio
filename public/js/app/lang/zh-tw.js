@@ -7,6 +7,51 @@ define(function() {
         app : {
             name : 'Flux Studio - zh-tw'
         },
+        topmenu: {
+            flux: {
+                label: 'Flux',
+                about: 'About FLUX studio',
+                preferences: 'Preferences',
+                quit: 'Quit'
+            },
+            file: {
+                label: 'File',
+                import: 'Import',
+                recent: 'Recent',
+                execute: 'Execute',
+                save_gcode: 'Save Gcode'
+            },
+            edit: {
+                label: 'Edit',
+                copy: 'Copy',
+                cut: 'Cut',
+                paste: 'Paste',
+                duplicate: 'Duplicate',
+                scale: 'Scale',
+                rotate: 'Rotate',
+                clear: 'Clear Scene'
+            },
+            view: {
+                label: 'View',
+                standard: 'Standard',
+                preview: 'Gcode Preview'
+            },
+            device: {
+                label: 'Device',
+                new: 'Add New Device...'
+            },
+            window: {
+                label: 'Window',
+                minimize: 'Minimize',
+                fullscreen: 'Fullscreen'
+            },
+            help: {
+                label: 'Help',
+                starting_guide: 'Starting Guide',
+                online_support: 'Online Support',
+                troubleshooting: 'Troubleshooting'
+            }
+        },
         welcome: {
             header1: 'Hello! 歡迎使用 FLUX，快點來實現你的點子',
             header2: '請選擇你想使用的語言，我們即將開始為 FLUX 進行設定 :)',
@@ -375,14 +420,6 @@ define(function() {
                 },
                 apply: '套用',
                 cancel: '取消',
-            },
-            topmenu: {
-                main: {
-                    label: 'Main',
-                    open: '打開',
-                    save: '儲存',
-                    engrave: '彫刻',
-                }
             }
         },
         scan: {
