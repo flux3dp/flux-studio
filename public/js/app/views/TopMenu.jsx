@@ -1,7 +1,5 @@
 define([
-    'react',
-    'jsx!widgets/Modal',
-    'jsx!widgets/Alert'
+    'react'
 ], function(React, Modal, Alert) {
     'use strict';
 
