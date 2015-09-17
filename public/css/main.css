@@ -2081,6 +2081,7 @@ body {
 
 body {
     background-color: #FAFAFA;
+    cursor: default;
     font-size: 16px;
     position: relative; }
 
