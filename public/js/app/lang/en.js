@@ -7,6 +7,11 @@ define(function() {
         app : {
             name : 'Flux Studio - en'
         },
+        device_selection: {
+            device_name: 'DEVICE NAME',
+            module: 'MODULE',
+            status: 'STATUS'
+        },
         topmenu: {
             flux: {
                 label: 'Flux',
