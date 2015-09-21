@@ -1,5 +1,5 @@
 require.config({
-    urlArgs: 'v=' + (new Date()).getTime(),
+    urlArgs: 'v=' + window.FLUX.timestamp,
     baseUrl: 'js/',
 
     paths: {
