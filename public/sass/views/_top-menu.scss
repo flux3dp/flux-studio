@@ -4,6 +4,7 @@
 .top-menu {
     position: fixed;
     width: 100%;
+    z-index: 1;
 
     .brand-logo {
         cursor: pointer;
