@@ -2125,11 +2125,6 @@ a {
 .content {
     height: 100%;
     overflow: hidden;
-    position: fixed;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    right: 0;
     width: 100%; }
 
 .horizontal-menu .menu-item {
@@ -2714,7 +2709,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
     /* NEW - Chrome */
     display: flex;
     /* NEW, Spec - Opera 12.1, Firefox 20+ */
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.1);
     bottom: 0;
     height: 100%;
     left: 0;
@@ -2786,45 +2781,63 @@ input[type=range]:focus::-webkit-slider-runnable-track {
  */
 .select-printer {
     background: #FFF;
-    height: 300px;
-    padding: 10px;
-    width: 50%; }
-    .select-printer .select-printer-content {
+    color: #b3b3b3;
+    font-size: 1rem;
+    height: 15.6rem;
+    padding: .8rem;
+    position: absolute;
+    width: 30.3rem;
+    z-index: 1; }
+    .select-printer .device-wrapper {
+        position: relative; }
+    .select-printer .arrow {
+        bottom: 3.6rem;
+        left: 100%;
+        position: absolute;
+        fill: #fff; }
+    .select-printer .device {
+        display: -webkit-box;
+        /* OLD - iOS 6-, Safari 3.1-6 */
+        display: -webkit-flex;
+        /* NEW - Chrome */
+        display: flex;
+        /* NEW, Spec - Opera 12.1, Firefox 20+ */
+        justify-content: 1; }
+        .select-printer .device .col {
+            height: 2.8rem;
+            line-height: 2.8rem; }
+        .select-printer .device .device-name {
+            padding: 0 0 0 1.7rem;
+            flex: calc(12 / 28.7 * 100%); }
+        .select-printer .device .module {
+            flex: calc(7 / 28.7 * 100%); }
+        .select-printer .device .status {
+            flex: calc(5 / 28.7 * 100%); }
+    .select-printer .device-wrapper {
         height: 100%;
-        overflow: scroll;
-        position: relative;
         width: 100%; }
     .select-printer .printer-list {
         list-style: none;
         margin: 0 auto;
-        padding: 0;
-        width: 80%; }
-        .select-printer .printer-list .fa::before {
-            display: block;
-            padding: 5px; }
+        max-height: calc(100% - 2.8rem);
+        overflow-x: hidden;
+        overflow-y: scroll;
+        padding: 0; }
         .select-printer .printer-list .printer-item {
-            cursor: pointer;
-            display: block;
-            position: relative; }
-            .select-printer .printer-list .printer-item .print-name {
-                display: block;
-                left: 0;
-                padding: 5px 5px 5px 20px;
-                position: absolute;
-                right: 0;
-                top: 0; }
-            .select-printer .printer-list .printer-item input[type="radio"] {
+            cursor: pointer; }
+            .select-printer .printer-list .printer-item [name="printer-group"] {
                 display: none; }
-                .select-printer .printer-list .printer-item input[type="radio"]:checked + .print-name {
-                    background: #ccc;
-                    z-index: -1; }
+            .select-printer .printer-list .printer-item:hover {
+                background: #b3b3b3;
+                color: #fff; }
 
 /**
  * top menu
  */
 .top-menu {
     position: fixed;
-    width: 100%; }
+    width: 100%;
+    z-index: 9999; }
     .top-menu .brand-logo {
         cursor: pointer;
         left: 24px;
@@ -4250,16 +4263,19 @@ input.switch:checked ~ label:after {
 /**
  * Laser
  */
+.laser-studio .laser-device-selection-popup {
+    bottom: 4.3rem;
+    right: 15rem; }
+
 .laser-studio .operation-table {
-    position: relative;
     height: 100%;
+    position: relative;
     width: 100%; }
 
 .laser-studio .operating-panel {
     left: 20px;
     top: 20px;
-    width: 182px;
-    z-index: 9998; }
+    width: 182px; }
     .laser-studio .operating-panel .action-buttons .btn {
         display: block;
         margin: 0 0 5px 0; }
@@ -4323,8 +4339,7 @@ input.switch:checked ~ label:after {
     padding: 20px;
     right: 25px;
     top: 20px;
-    width: 214px;
-    z-index: 9998; }
+    width: 214px; }
     .laser-studio .object-position .control:nth-child(odd) {
         margin: 0 0 4px 0; }
     .laser-studio .object-position .control:nth-child(even) {
