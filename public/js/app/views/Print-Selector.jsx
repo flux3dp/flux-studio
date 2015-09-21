@@ -88,8 +88,8 @@ define([
                 <label className="device printer-item" data-meta={meta}>
                     <input type="radio" name="printer-group" value={printer.serial}/>
                     <div className="col device-name">{printer.name}</div>
-                    <div className="col module">adf</div>
-                    <div className="col status">adsff</div>
+                    <div className="col module">UNKNOWN</div>
+                    <div className="col status">UNKNOWN</div>
                 </label>
             );
         },
