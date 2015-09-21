@@ -1,7 +1,11 @@
 /**
  * nwjs menu factory
  */
-define(['helpers/nwjs/gui', 'helpers/i18n'], function(gui, i18n) {
+define([
+    'helpers/nwjs/gui',
+    'helpers/i18n',
+    'helpers/api/config'
+], function(gui, i18n, config) {
     'use strict';
 
     var emptyFunction = function(object) {
@@ -112,6 +116,18 @@ define(['helpers/nwjs/gui', 'helpers/i18n'], function(gui, i18n) {
     menuMap.push({
         label: lang.flux.label,
         subItems: [
+            // TODO: remove when it's going to production
+            {
+                label: 'Reset',
+                enable: true,
+                onClick: function() {
+                    config().write('printer-is-ready', false, {
+                        onFinished: function() {
+                            location.reload();
+                        }
+                    });
+                }
+            },
             {
                 label: lang.flux.about,
                 enabled: true,
