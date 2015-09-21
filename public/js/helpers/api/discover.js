@@ -8,36 +8,46 @@ define([
 ], function(Websocket) {
     'use strict';
 
+    var ws,
+        printers = [];
+
     return function(getPrinters) {
         getPrinters = getPrinters || function() {};
 
-        var ws = new Websocket({
-                method: 'discover',
-                autoReconnect: false,
-                onMessage: function(data) {
-                    var someFn = function(el) {
-                            return el.serial === data.serial;
-                        },
-                        findIndex = function(el) {
-                            return el.serial === data.serial;
-                        },
-                        existing_key = printers.findIndex(findIndex);
+        var onMessage = function(data) {
+            var someFn = function(el) {
+                    return el.serial === data.serial;
+                },
+                findIndex = function(el) {
+                    return el.serial === data.serial;
+                },
+                existing_key = printers.findIndex(findIndex);
 
-                    if (false === printers.some(someFn)) {
-                        printers.push(data);
-                    }
+            if (false === printers.some(someFn)) {
+                printers.push(data);
+            }
 
-                    if (false === data.alive && -1 < existing_key) {
-                        // delete it from printers
-                        printers.splice(existing_key, 1);
-                    }
-                }
-            }),
-            printers = [];
+            if (false === data.alive && -1 < existing_key) {
+                // delete it from printers
+                printers.splice(existing_key, 1);
+            }
+        };
+
+        if ('undefined' === typeof ws) {
+            ws = new Websocket({
+                method: 'discover'
+            });
+        }
+
+        ws.onMessage(onMessage);
 
         Array.observe(printers, function(changes) {
             getPrinters(printers);
         });
+
+        if (0 < printers.length) {
+            getPrinters(printers);
+        }
 
         return {
             connection: ws,
