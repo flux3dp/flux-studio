@@ -4405,6 +4405,9 @@ input.switch:checked ~ label:after {
         width: 100%;
         object-fit: contain; }
 
+.scan-studio .scan-printer-selection {
+    position: relative; }
+
 .scan-studio .setup-panel,
 .scan-studio .manipulation-panel {
     position: absolute;
