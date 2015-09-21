@@ -103,7 +103,6 @@ define([
     initialize(menuMap.all);
 
     observe(menuMap.items, function(changes) {
-        console.log('changes');
         initialize(menuMap.all);
     });
 
