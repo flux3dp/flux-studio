@@ -100,7 +100,7 @@ define([
                             });
                         },
                         content = (
-                            <PrinterSelector lang={lang} onClose={onClose} onGettingPrinter={onGettingPrinter}/>
+                            <PrinterSelector className="laser-device-selection-popup" lang={lang} onClose={onClose} onGettingPrinter={onGettingPrinter}/>
                         );
 
                     return (
