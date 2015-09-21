@@ -2,10 +2,14 @@
  * Laser
  */
 .laser-studio {
+    .laser-device-selection-popup {
+        bottom: 4.3rem;
+        right: 15rem;
+    }
 
     .operation-table {
-        position: relative;
         height: 100%;
+        position: relative;
         width: 100%;
     }
 
@@ -13,7 +17,6 @@
         left: 20px;
         top: 20px;
         width: 182px;
-        z-index: $max-z-index - 1;
 
         .action-buttons {
             .btn {
@@ -89,7 +92,6 @@
         right: 25px;
         top: 20px;
         width: 214px;
-        z-index: $max-z-index - 1;
 
         .control:nth-child(odd) {
             margin: 0 0 4px 0;
