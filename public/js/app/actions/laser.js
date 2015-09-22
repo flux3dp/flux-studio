@@ -9,6 +9,7 @@ define([
     'jsx!widgets/Modal',
     'helpers/shortcuts',
     'helpers/image-data',
+    'helpers/nwjs/menu-factory',
     'freetrans',
     'helpers/jquery.box',
     'plugins/file-saver/file-saver.min'
@@ -22,7 +23,8 @@ define([
     PrinterSelector,
     Modal,
     shortcuts,
-    imageData
+    imageData,
+    menuFactory
 ) {
     'use strict';
 
@@ -38,7 +40,7 @@ define([
             PLATFORM_DIAMETER_PIXEL = $laser_platform.width(),
             deleteImage = function() {
                 var $img_container = $('.' + LASER_IMG_CLASS).not($target_image),
-                    $img = $target_image.find('img'),
+                    $img = $target_image,
                     reset_file_type = false;
 
                 if (null !== $target_image) {
@@ -54,6 +56,9 @@ define([
                         self.setState({
                             hasImage: false
                         });
+
+                        menuFactory.items.execute.enabled = false;
+                        menuFactory.items.saveGCode.enabled = false;
                         self.props.fileFormat = undefined;
                     }
                     else {
@@ -62,11 +67,13 @@ define([
                 }
             },
             refreshImage = function($img, threshold) {
+                var box = $img.box();
+
                 imageData(
                     $img.data('base'),
                     {
-                        height: $img.height(),
-                        width: $img.width(),
+                        height: box.height,
+                        width: box.width,
                         grayscale: {
                             is_rgba: true,
                             threshold: parseInt(threshold, 10)
@@ -135,8 +142,39 @@ define([
                     }
                 );
             },
+            convertToRealCoordinate = function(px, axis) {
+                axis = axis || '';
+
+                var ratio = DIAMETER / PLATFORM_DIAMETER_PIXEL, // 1(px) : N(mm)
+                    r = PLATFORM_DIAMETER_PIXEL / 2 * ratio,
+                    mm = ratio * px - r;
+
+                if ('y' === axis.toLowerCase()) {
+                    mm = mm * -1;
+                }
+
+                return mm;
+            },
+            convertToHtmlCoordinate = function(n, axis) {
+
+                var ratio = PLATFORM_DIAMETER_PIXEL / DIAMETER, // 1(px) : N(mm)
+                    r = DIAMETER / 2,
+                    px;
+
+                n = parseFloat(n, 10) + r;
+                px = n * ratio;
+
+                if ('x' === axis) {
+                    px -= ($target_image.width() / 2);
+                }
+                else {
+                    px -= ($target_image.height() / 2);
+                }
+
+                return px;
+            },
             refreshObjectParams = function(e, $el) {
-                var bounds, el_offset, el_position,
+                var el_position,
                     last_x, last_y,
                     platform_pos = $laser_platform.box(),
                     imagePanelRefs = self.refs.imagePanel.refs,
@@ -150,7 +188,6 @@ define([
 
                 if (null !== $el) {
                     el_position = $el.box();
-                    bounds = $el.freetrans('getBounds');
 
                     if ('move' === e.freetransEventType) {
                         if (true === outOfRange(el_position.center, DIAMETER)) {
@@ -168,14 +205,14 @@ define([
                         }
                     }
                     else {
-                        refreshImage($el.find('img'), 128);
+                        refreshImage($el, getThreshold().getDOMNode().value);
                     }
 
                     imagePanelRefs.objectAngle.getDOMNode().value = elementAngle($el[0]);
-                    imagePanelRefs.objectPosX.getDOMNode().value = $el.data('last-x');
-                    imagePanelRefs.objectPosY.getDOMNode().value = $el.data('last-y');
-                    imagePanelRefs.objectSizeW.getDOMNode().value = bounds.height / PLATFORM_DIAMETER_PIXEL * DIAMETER;
-                    imagePanelRefs.objectSizeH.getDOMNode().value = bounds.width / PLATFORM_DIAMETER_PIXEL * DIAMETER;
+                    imagePanelRefs.objectPosX.getDOMNode().value = convertToRealCoordinate(el_position.center.x, 'x').toString().substr(0, 4);
+                    imagePanelRefs.objectPosY.getDOMNode().value = convertToRealCoordinate(el_position.center.y, 'y').toString().substr(0, 4);
+                    imagePanelRefs.objectSizeW.getDOMNode().value = (el_position.width / PLATFORM_DIAMETER_PIXEL * DIAMETER).toString().substr(0, 4);
+                    imagePanelRefs.objectSizeH.getDOMNode().value = (el_position.height / PLATFORM_DIAMETER_PIXEL * DIAMETER).toString().substr(0, 4);
                 }
             },
             $target_image = null, // changing when image clicked
@@ -187,7 +224,7 @@ define([
                 return (imagePanelRefs.threshold || {
                     getDOMNode: function() {
                         return {
-                            value: 0
+                            value: 255
                         };
                     }
                 });
@@ -199,26 +236,23 @@ define([
                         callback.apply(null, arguments);
                         self._openBlocker(false);
                     },
-                    convertToRealCoordinate = function(px, axis) {
-                        var ratio = DIAMETER / PLATFORM_DIAMETER_PIXEL, // 1(px) : N(mm)
-                            r = PLATFORM_DIAMETER_PIXEL / 2 * ratio,
-                            mm = ratio * px - r;
+                    getPoint = function($el, position) {
+                        var containerOffset = $laser_platform.offset(),
+                            offset = $el.offset(),
+                            width = $el.width(),
+                            height = $el.height(),
+                            // default as bottom-right
+                            pointX = offset.left - containerOffset.left,
+                            pointY = offset.top - containerOffset.top;
 
-                        if ('y' === axis.toLowerCase()) {
-                            mm = mm * -1;
+                        if ('top-left' === position) {
+                            pointX = pointX + width;
+                            pointY = pointY + height;
                         }
 
-                        return mm;
-                    },
-                    getCenter = function($el) {
-                        var container_offset = $laser_platform.offset(),
-                            offset = $el.offset(),
-                            half_width = $el.width() / 2,
-                            half_height = $el.height() / 2;
-
                         return {
-                            x: offset.left - container_offset.left + half_width,
-                            y: offset.top - container_offset.top + half_height
+                            x: pointX,
+                            y: pointY
                         };
                     },
                     args = [],
@@ -229,9 +263,9 @@ define([
                         $ft_controls.each(function(k, el) {
                             var $el = $(el),
                                 image = new Image(),
-                                top_left = getCenter($el.find('.ft-scaler-top.ft-scaler-left')),
-                                bottom_right = getCenter($el.find('.ft-scaler-bottom.ft-scaler-right')),
-                                $img = $el.parents('.ft-container').find('.img-container img'),
+                                top_left = getPoint($el.find('.ft-scaler-top.ft-scaler-left'), 'top-left'),
+                                bottom_right = getPoint($el.find('.ft-scaler-bottom.ft-scaler-right'), 'bottom-right'),
+                                $img = $el.parents('.ft-container').find('img'),
                                 width = 0,
                                 height = 0,
                                 sub_data = {
@@ -247,16 +281,18 @@ define([
                                     is_svg: ('svg' === self.props.fileFormat),
                                     threshold: 255
                                 },
-                                src = '';
+                                src = $img.data('base'),
+                                previewImageSize;
 
                             if ('svg' === self.props.fileFormat) {
-                                src = $img.attr('src');
+                                previewImageSize = svgWebSocket.computePreviewImageSize({
+                                    width: $img.box().width,
+                                    height: $img.box().height
+                                });
+
                                 // only svg file need size to convert to binary
-                                height = parseInt($img.box().height, 10);
-                                width = parseInt($img.box().width, 10);
-                            }
-                            else {
-                                src = $img.data('base');
+                                height = parseInt(previewImageSize.height, 10);
+                                width = parseInt(previewImageSize.width, 10);
                             }
 
                             imageData(
@@ -306,43 +342,85 @@ define([
             }
         );
 
-        function setupImage(file, size, url, name) {
-            var $div = $(document.createElement('div')).addClass(LASER_IMG_CLASS),
-                img = new Image(),
-                $img = $(img),
+        function setupImage(file, size, originalUrl, name) {
+            var img = new Image(),
+                $img = $(img).addClass(LASER_IMG_CLASS),
                 instantRefresh = function(e, data) {
-                    refreshObjectParams(e, $div);
+                    refreshObjectParams(e, $img);
                 };
 
             $img.addClass(file.extension).
                 attr('src', file.url).
                 data('name', name).
-                data('base', url).
-                data('size', size);
+                data('base', originalUrl).
+                data('size', size).
+                width(size.width).
+                height(size.height);
 
             $img.one('load', function() {
-                $div.freetrans({
-                    x: $laser_platform.outerWidth() / 2 - $img.width() / 2,
-                    y: $laser_platform.outerHeight() / 2 - $img.height() / 2,
+                $img.freetrans({
+                    x: $laser_platform.outerWidth() / 2 - size.width / 2,
+                    y: $laser_platform.outerHeight() / 2 - size.height / 2,
+                    originalSize: size,
                     onRotate: instantRefresh,
                     onMove: instantRefresh,
-                    onScale: instantRefresh
+                    onScale: instantRefresh,
+                    angle: size.angle || 0
                 });
+                $img.parent().find('.ft-controls').width(size.width).height(size.height);
 
-                $div.parent().find('.ft-controls').on('mousedown', function(e) {
-                    var $self = $(e.target);
+                // set default image
+                if (null === $target_image) {
+                    $target_image = $img;
+                    refreshObjectParams({ freetransEventType: 'move' }, $img);
+                }
 
-                    inactiveAllImage();
-                    $target_image = $self.parent().find('.' + LASER_IMG_CLASS);
-                    $target_image.addClass('image-active');
-                });
+                // onmousedown
+                (function(file, size, originalUrl, name, $img) {
+                    $img.parent().find('.ft-controls').on('mousedown', function(e) {
+                        var $self = $(e.target),
+                            clone = function() {
+                                var data = $img.data('freetrans');
+
+                                size.width = size.width * data.scalex;
+                                size.height = size.height * data.scaley;
+                                size.angle = elementAngle($img[0]);
+
+                                setupImage(file, size, originalUrl, name);
+
+                                self.setState({
+                                    hasImage: true,
+                                });
+                            };
+
+                        inactiveAllImage();
+                        $target_image = $self.parent().find('.' + LASER_IMG_CLASS);
+                        refreshObjectParams({ freetransEventType: 'move' }, $target_image);
+
+                        $self.addClass('image-active');
+                        menuFactory.items.copy.enabled = true;
+                        menuFactory.items.copy.onClick = function() {
+                            menuFactory.items.paste.enabled = true;
+                            menuFactory.items.paste.onClick = clone;
+                        };
+                        menuFactory.items.cut.enabled = true;
+                        menuFactory.items.cut.onClick = function() {
+                            deleteImage();
+
+                            menuFactory.items.paste.enabled = true;
+                            menuFactory.items.paste.onClick = function() {
+                                clone();
+                                menuFactory.items.paste.enabled = false;
+                            };
+                        };
+                        menuFactory.items.duplicate.enabled = true;
+                        menuFactory.items.duplicate.onClick = clone;
+                    });
+                })(file, size, originalUrl, name, $img);
             });
 
-            // set default image
-            $target_image = $div;
 
-            $div.append($img);
-            $laser_platform.append($div);
+            $laser_platform.append($img);
 
             return $img;
         }
@@ -358,11 +436,10 @@ define([
                     var url = window.URL,
                         blob = new Blob([data], { type: file.type }),
                         objectUrl = url.createObjectURL(blob),
-                        platformWidth = $laser_platform.width(),
-                        platformHeight = $laser_platform.height(),
+                        platformDiameter = $laser_platform.width(),
                         ratio = 1;
 
-                    if (size.width > platformWidth || size.height > platformHeight) {
+                    if (platformDiameter < Math.max(size.width , size.height)) {
                         ratio = Math.min(360 / size.width, 360 / size.height);
                         size.width = size.width * ratio;
                         size.height = size.height * ratio;
@@ -377,7 +454,7 @@ define([
                             threshold: 128
                         },
                         onComplete: function(result) {
-                            file.url = result.canvas.toDataURL('image/png');
+                            file.url = result.canvas.toDataURL('svg' === file.extension ? 'image/svg+xml' : 'image/png');
                             setupImage(file, size, objectUrl, name);
                         }
                     });
@@ -390,6 +467,9 @@ define([
 
         function inactiveAllImage() {
             $('.image-active').removeClass('image-active');
+            menuFactory.items.copy.enabled = false;
+            menuFactory.items.cut.enabled = false;
+            menuFactory.items.duplicate.enabled = false;
         }
 
         return {
@@ -474,13 +554,50 @@ define([
                     hasImage: 0 < files.length,
                     mode: ('svg' === self.props.fileFormat ? 'cut' : 'engrave')
                 });
+
+                menuFactory.items.execute.enabled = true;
+                menuFactory.items.saveGCode.enabled = true;
             },
             thresholdChanged: function(e, threshold) {
-                $('.' + LASER_IMG_CLASS).find('img').each(function(k, el) {
-                    refreshImage($(el), threshold);
+                var $el, bounds;
+
+                $('.' + LASER_IMG_CLASS).each(function(k, el) {
+                    $el = $(el);
+                    bounds = $el.freetrans('getBounds');
+                    refreshImage($el, threshold);
                 });
             },
-            inactiveAllImage: inactiveAllImage
+            inactiveAllImage: inactiveAllImage,
+            imageTransform: function(e) {
+                var $el = $(e.currentTarget),
+                    type = $el.data('type'),
+                    val = $el.val(),
+                    freetrans = $target_image.data('freetrans'),
+                    args = {};
+
+                val = parseFloat(val, 10);
+
+                switch (type) {
+                case 'x':
+                case 'y':
+                    val = convertToHtmlCoordinate(val, type);
+                    args[type] = val;
+                    break;
+                case 'width':
+                    val = parseFloat((val / DIAMETER * PLATFORM_DIAMETER_PIXEL).toString().substr(0, 4), 10);
+                    args.scalex = parseFloat(val / freetrans.originalSize.width, 10);
+                    break;
+                case 'height':
+                    val = parseFloat((val / DIAMETER * PLATFORM_DIAMETER_PIXEL).toString().substr(0, 4), 10);
+                    args.scaley = parseFloat(val / freetrans.originalSize.height, 10);
+                    break;
+                case 'angle':
+                    args.angle = val;
+                }
+
+                $target_image.freetrans(args);
+            },
+            menuFactory: menuFactory
         };
     };
 });

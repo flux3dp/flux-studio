@@ -3,8 +3,9 @@ define([
     'helpers/i18n',
     'helpers/local-storage',
     'helpers/shortcuts',
-    'helpers/api/config'
-], function($, i18n, localStorage, shortcuts, config) {
+    'helpers/api/config',
+    'helpers/nwjs/menu-factory'
+], function($, i18n, localStorage, shortcuts, config, menuFactory) {
     'use strict';
 
     // prevent delete (back) behavior

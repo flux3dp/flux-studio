@@ -1,67 +1,64 @@
 /**
- * nwjs menu helper
- * https://github.com/nwjs/nw.js/wiki/MenuItem
+ * nwjs menu factory
  */
-define(function() {
+define([
+    'helpers/nwjs/gui',
+    'helpers/nwjs/menu-map',
+    'helpers/i18n',
+    'helpers/observe'
+], function(gui, menuMap, i18n, observe) {
     'use strict';
 
     var emptyFunction = function(object) {
             return object || {};
         },
-        gui = (window.requireNode || emptyFunction)('nw.gui'),
+        originalMenuMap = JSON.parse(JSON.stringify(menuMap)),
+        lang = i18n.get().topmenu,
         itemMap = [],
         NWjsWindow,
         mainmenu,
         Menu,
-        MenuItem;
-
-    // fake gui object
-    if ('object' !== typeof gui) {
-        gui = {
-            Menu: emptyFunction(function() {
-                return {
-                    append: emptyFunction
-                };
-            }),
-            MenuItem: emptyFunction(function() {
-                return {
-                    on: emptyFunction
-                };
-            }),
-            Window: emptyFunction({
-                get: emptyFunction
-            })
-        };
-    }
+        MenuItem,
+        methods;
 
     MenuItem = gui.MenuItem;
     NWjsWindow = gui.Window.get();
     Menu = gui.Menu;
     mainmenu = new Menu({ type: 'menubar', title: 'FLUX Studio', label: 'FLUX Studio' });
 
-    return {
+    methods = {
         createMenu: function() {
             return new Menu();
         },
 
         createSubMenu: function(items) {
             var subMenu = this.createMenu(),
-                menuItem;
+                menuItem,
+                menuOption;
+
+            if (undefined === items) {
+                return undefined;
+            }
 
             items.forEach(function(el) {
-                menuItem = new MenuItem({
+                menuOption = {
                     label: el.label || '',
                     type: el.type || 'normal',
                     click: el.onClick || emptyFunction,
                     key: el.key || '',
                     modifiers: el.modifiers || '',
-                    enabled: ('boolean' === typeof el.enabled ? el.enabled : true)
-                });
+                    enabled: ('boolean' === typeof el.enabled ? el.enabled : true),
+                    checked: el.checked || false
+                };
 
-                itemMap.push(menuItem);
+                if (true === el.subItems instanceof Array) {
+                    menuOption.submenu = methods.createSubMenu(el.subItems);
+                }
+
+                menuItem = new MenuItem(menuOption);
 
                 menuItem.on('click', function() {
-                    window.GA('send', 'event', 'menubar-button', 'click', this.label);
+                    window.GA('send', 'event', 'menubar-button', 'click', el.label);
                 });
 
                 subMenu.append(menuItem);
@@ -80,18 +77,6 @@ define(function() {
             return mainmenu;
         },
 
-        findByLabel: function(label) {
-            var matches = [];
-
-            itemMap.forEach(function(item) {
-                if (label === item.label) {
-                    matches.push(item);
-                }
-            });
-
-            return matches;
-        },
-
         clear: function() {
             mainmenu = new Menu({ type: 'menubar', title: 'FLUX Studio', label: 'FLUX Studio' });
         },
@@ -99,5 +84,30 @@ define(function() {
         refresh: function() {
             NWjsWindow.menu = mainmenu;
         }
+
+    };
+
+    function initialize(menuMap) {
+        var subMenu;
+
+        methods.clear();
+
+        menuMap.forEach(function(menu) {
+            subMenu = methods.createSubMenu(menu.subItems);
+            methods.appendToMenu(menu.label, subMenu);
+        });
+
+        methods.refresh();
+    }
+
+    initialize(menuMap.all);
+
+    observe(menuMap.items, function(changes) {
+        initialize(menuMap.all);
+    });
+
+    return {
+        items: menuMap.items,
+        methods: methods
     };
 });

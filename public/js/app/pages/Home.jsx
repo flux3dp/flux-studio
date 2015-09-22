@@ -12,15 +12,16 @@ define([
     return function(args) {
         args = args || {};
 
-        var options = [],
-            HomeView;
-
-        HomeView = React.createClass({
+        return React.createClass({
             // UI events
             _onSkipSettingUp: function(e) {
+                var goNext = function() {
+                    location.hash = '#studio/print/';
+                };
+
                 config().write('printer-is-ready', true, {
                     onFinished: function() {
-                        location.hash = '#studio/print/';
+                        goNext();
                     }
                 });
             },
@@ -32,6 +33,11 @@ define([
                         self.setState({
                             openBlocker: open
                         });
+                    },
+                    goNext = function(printer) {
+                        // temporary store for setup
+                        localStorage.set('setting-printer', printer);
+                        location.hash = '#initialize/wifi/ask';
                     };
 
                 toggleBlocker(true);
@@ -39,16 +45,27 @@ define([
                 usb.list({
                     onSuccess: function(response) {
                         toggleBlocker(false);
-                        // temporary
-                        localStorage.set('setting-printer', response);
-                        location.hash = '#initialize/wifi/ask';
+                        goNext(response);
                     },
                     onError: function(response) {
                         toggleBlocker(false);
-
                         // TODO: when this function is fired that means no machine available.
                     }
                 });
+            },
+
+            _getLanguageOptions: function() {
+                var options = [];
+
+                for (var lang_code in args.props.supported_langs) {
+                    options.push({
+                        value: lang_code,
+                        label: args.props.supported_langs[lang_code],
+                        selected: lang_code === i18n.getActiveLang()
+                    });
+                }
+
+                return options;
             },
 
             // renders
@@ -67,6 +84,7 @@ define([
             render : function() {
                 var lang = this.state.lang,
                     blocker = this._renderBlocker(),
+                    options = this._getLanguageOptions(),
                     content = (
                         <div className="welcome initialization text-center">
                             <h1>{lang.welcome_headline}</h1>
@@ -100,15 +118,5 @@ define([
                 };
             }
         });
-
-        for (var lang_code in args.props.supported_langs) {
-            options.push({
-                value: lang_code,
-                label: args.props.supported_langs[lang_code],
-                selected: lang_code === i18n.getActiveLang()
-            });
-        }
-
-        return HomeView;
     };
 });

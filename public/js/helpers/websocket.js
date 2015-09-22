@@ -28,7 +28,7 @@ define(['helpers/is-json'], function(isJson) {
             received_data = [],
             origanizeOptions = function(opts) {
                 for (var name in defaultOptions) {
-                    if (false === opts.hasOwnProperty(name)) {
+                    if (false === opts.hasOwnProperty(name) || 'undefined' === typeof opts[name]) {
                         opts[name] = defaultOptions[name];
                     }
                 }
@@ -75,10 +75,10 @@ define(['helpers/is-json'], function(isJson) {
 
                 return _ws;
             },
-            ws = null;
+            ws = null,
+            socketOptions = origanizeOptions(options);
 
-        options = origanizeOptions(options);
-        ws = createWebSocket(options);
+        ws = createWebSocket(socketOptions);
 
         return {
             send: function(data) {
@@ -121,7 +121,7 @@ define(['helpers/is-json'], function(isJson) {
 
             close: function(reconnect) {
                 if ('boolean' === typeof reconnect) {
-                    options.autoReconnect = reconnect;
+                    socketOptions.autoReconnect = reconnect;
                 }
 
                 if (null !== ws) {
@@ -131,25 +131,25 @@ define(['helpers/is-json'], function(isJson) {
 
             // events
             onMessage: function(callback) {
-                options.onMessage = callback;
+                socketOptions.onMessage = callback;
 
                 return this;
             },
 
             onClose: function(callback) {
-                options.onclose = callback;
+                socketOptions.onclose = callback;
 
                 return this;
             },
 
             onError: function(callback) {
-                options.onError = callback;
+                socketOptions.onError = callback;
 
                 return this;
             },
 
             onFatal: function(callback) {
-                options.onFatal = callback;
+                socketOptions.onFatal = callback;
 
                 return this;
             }

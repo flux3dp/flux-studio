@@ -5,12 +5,12 @@
 # NOTE: no trailing slash on destination directory
 export QA_SOURCE_DIR=/var/www/web-panel/public/
 export QA_DEST_DIR=/var/web-panel-qa/public
-export QA_SERVER=192.168.0.202
+export QA_SERVER=192.168.16.202
 export QA_KEY=
 
 export DEVELOPMENT_SOURCE_DIR=/var/www/web-panel/public/
 export DEVELOPMENT_DEST_DIR=/var/web-panel-development/public
-export DEVELOPMENT_SERVER=192.168.0.202
+export DEVELOPMENT_SERVER=192.168.16.202
 export DEVELOPMENT_KEY=
 
 export ACCOUNT=norman

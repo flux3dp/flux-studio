@@ -13,18 +13,38 @@ define([
         opts = opts || {};
         opts.onError = opts.onError || function() {};
 
-        var ws = new Websocket({
+        var isConnected = false,
+            ws = new Websocket({
                 method: 'control/' + serial,
                 onMessage: function(data) {
-
-                    events.onMessage(data);
-
+                    switch (data.status) {
+                    case 'connecting':
+                        // ignore it
+                        break;
+                    case 'connected':
+                    default:
+                        isConnected = true;
+                        events.onMessage(data);
+                        break;
+                    }
                 },
-                onError: opts.onError
+                onError: opts.onError,
+                onClose: function(response) {
+                    isConnected = false;
+                }
             }),
             lastOrder = '',
             events = {
                 onMessage: function() {}
+            },
+            genericOptions = function(opts) {
+                var emptyFunction = function() {};
+
+                opts = opts || {};
+                opts.onStarting = opts.onStarting || function() {};
+                opts.onFinished = opts.onFinished || function() {};
+
+                return opts;
             };
 
         return {
@@ -33,28 +53,75 @@ define([
                 lastOrder = 'ls';
                 ws.send(lastOrder);
             },
+
             selectFile: function(filename) {
                 lastOrder = 'select';
                 ws.send(lastOrder + ' ' + filename);
             },
-            upload: function(filesize, print_data, opts) {
-                opts = opts || {};
-                opts.onPrinting = opts.onPrinting || function() {};
-                opts.onFinished = opts.onFinished || function() {};
+            position: function(opts) {
+                opts = genericOptions(opts);
 
-                var CHUNK_PKG_SIZE = 4096,
+                events.onMessage = function(response) {
+                    if ('position' === response.status) {
+                        opts.onFinished(response);
+                    }
+                };
+
+                ws.send('position');
+            },
+            report: function(opts) {
+                opts = genericOptions(opts);
+
+                events.onMessage = function(response) {
+                    // if ('position' === response.status) {
+                        opts.onFinished(response);
+                    // }
+                };
+
+                ws.send('report');
+            },
+            upload: function(filesize, print_data, opts) {
+                opts = genericOptions(opts);
+
+                var self = this,
+                    CHUNK_PKG_SIZE = 4096,
                     length = print_data.length || print_data.size,
                     interrupt = function(cmd) {
                         if ('start' === lastOrder) {
                             ws.send(cmd);
                         }
                     },
-                    _uploading = function(data) {
-                        if ('connected' === data.status) {
-                            // TODO: to be implement?
-                        }
-                        else if ('continue' === data.status) {
-                            var fileReader;
+                    positioning = function() {
+                        self.position({
+                            onFinished: function(response) {
+                                if ('PlayTask' === response.location) {
+                                    reporting();
+                                }
+                                else {
+                                    doUpload();
+                                }
+                            }
+                        });
+                    },
+                    reporting = function() {
+                        self.report({
+                            onFinished: function(response) {
+                                response.status = response.status.toUpperCase();
+
+                                if (true === response.status.startsWith('COMPLETED')) {
+                                    self.quit().then(function(data) {
+                                        doUpload();
+                                    });
+                                }
+                                else {
+                                    doUpload();
+                                }
+                            }
+                        });
+                    },
+                    uploading = function(data) {
+                        if ('continue' === data.status) {
+                            var fileReader, chunk;
 
                             for (var i = 0; i < length; i += CHUNK_PKG_SIZE) {
                                 chunk = print_data.slice(i, i + CHUNK_PKG_SIZE);
@@ -73,25 +140,18 @@ define([
 
                         }
                         else if ('ok' === data.status) {
-                            lastOrder = 'start';
-                            events.onMessage = _startPrint;
-                            ws.send(lastOrder);
-                        }
-                        else {
-                            // TODO: do something
+                            self.start(opts);
                         }
                     },
-                    _startPrint = function(data) {
-                        opts.onPrinting(data);
-                    },
-                    blobs = [],
-                    chunk;
+                    doUpload = function() {
+                        events.onMessage = uploading;
+
+                        ws.send(lastOrder + ' ' + filesize);
+                    };
 
                 lastOrder = 'upload';
 
-                events.onMessage = _uploading;
-
-                ws.send(lastOrder + ' ' + filesize);
+                events.onMessage = positioning;
 
                 return {
                     pause: function() {

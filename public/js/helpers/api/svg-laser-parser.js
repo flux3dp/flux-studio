@@ -10,9 +10,11 @@ define([
 ], function(Websocket, convertToTypedArray, history, setParams) {
     'use strict';
 
+    // Because the preview image size is 640x640
+    var MAXWIDTH = 640;
+
     return function(opts) {
         opts = opts || {};
-        opts.onError = opts.onError || function() {};
 
         var ws = new Websocket({
                 method: 'svg-laser-parser',
@@ -36,16 +38,17 @@ define([
                 lastOrder = 'get';
 
                 var args = [
-                    lastOrder,
-                    name
-                ],
-                blobs = [],
-                blob,
-                total_length = 0,
-                size = {
-                    height: 0,
-                    width: 0
-                };
+                        lastOrder,
+                        name
+                    ],
+                    blobs = [],
+                    blob,
+                    url = window.URL,
+                    total_length = 0,
+                    size = {
+                        height: 0,
+                        width: 0
+                    };
 
                 events.onMessage = function(data) {
 
@@ -59,8 +62,19 @@ define([
                         blob = new Blob(blobs);
 
                         if (total_length === blob.size) {
-                            History.push(name, { size: size, blob: blob });
-                            opts.onFinished(blob, size);
+                            $.ajax({
+                                url: url.createObjectURL(blob)
+                            }).done(function(data) {
+                                var $svg = $(data),
+                                    newSize = computePreviewImageSize(size);
+
+                                $svg.attr('width', newSize.width).attr('height', newSize.height);
+
+                                blob = new Blob([$svg[0].outerHTML.replace('viewbox', 'viewBox')]);
+
+                                History.push(name, { size: size, blob: blob });
+                                opts.onFinished(blob, size);
+                            });
                         }
                     }
 
@@ -97,7 +111,22 @@ define([
             },
             History = history(),
             goNextUpload = true,
-            uploadQueue = [];
+            uploadQueue = [],
+            computePreviewImageSize = function(size) {
+                var height = size.height,
+                    width = size.width,
+                    longerSide = Math.max(width, height),
+                    ratio;
+
+                ratio = MAXWIDTH / longerSide;
+                height = height * ratio;
+                width = width * ratio;
+
+                return {
+                    width: width,
+                    height: height
+                };
+            };
 
         // listen upload request
         Array.observe(uploadQueue, function(changes) {
@@ -308,7 +337,8 @@ define([
 
                 ws.send(args.join(' '));
             },
-            params: setParams(ws, events)
+            params: setParams(ws, events),
+            computePreviewImageSize: computePreviewImageSize
         };
     };
 });

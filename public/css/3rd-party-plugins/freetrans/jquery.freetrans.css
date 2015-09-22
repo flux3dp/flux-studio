@@ -19,34 +19,32 @@
     position: absolute;
     width: 8px;
     height: 8px;
-    margin-left: -4px;
-    margin-top: -4px;
     background-color: #fff;
     border: 1px solid #ccc;
 }
 
 .ft-scaler-top {
-    top: 0%;
+    top: -8px;
 }
 
 .ft-scaler-mid {
-    top: 50%;
+    top: calc(50% - 4px);
 }
 
 .ft-scaler-bottom {
-    top: 100%;
+    bottom: -8px;
 }
 
 .ft-scaler-left {
-    left: 0%;
+    left: -8px;
 }
 
 .ft-scaler-center {
-    left: 50%;
+    left: calc(50% - 4px);
 }
 
 .ft-scaler-right {
-    left: 100%;
+    right: -8px;
 }
 
 .ft-rotator{

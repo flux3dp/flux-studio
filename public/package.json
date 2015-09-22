@@ -1,6 +1,6 @@
 {
     "main": "app://localhost/index.html",
-    "name": "FLUX Studio",
+    "name": "flux-studio",
     "node-remote": "localhost",
     "description": "FLUX Studio",
     "version": "0.1.0",
