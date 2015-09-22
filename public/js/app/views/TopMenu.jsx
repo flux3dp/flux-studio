@@ -60,14 +60,14 @@ define([
                 return (
                     <div>
                         <div className="brand-logo">
-                            <img className="logo-icon" src="/img/menu/icon_menu.svg"/>
+                            <img className="logo-icon" src="/img/menu/main_logo.svg"/>
                             <div className="menu">
-                                <svg width="54" height="12"
+                                <svg width="36" height="12"
                                      className="arrow"
-                                     viewPort="0 0 54 12" version="1.1"
+                                     viewBox="0 0 36 12" version="1.1"
                                      xmlns="http://www.w3.org/2000/svg">
 
-                                    <polygon points="0,0 54,0 54,12"/>
+                                    <polygon points="0,0 36,0 36,12"/>
 
                                 </svg>
                                 <ul className="inner-menu">
