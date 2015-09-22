@@ -2891,6 +2891,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         flex: 1; }
         .top-menu .item img {
             height: 3.2rem;
+            margin: 0 auto;
             transform-origin: 50% 50%;
             width: 3.2rem; }
         .top-menu .item p,
