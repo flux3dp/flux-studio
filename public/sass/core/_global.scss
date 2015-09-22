@@ -220,6 +220,15 @@ a {
     position: absolute;
 }
 
+.logo {
+    position: absolute;
+    left: 3.75rem;
+    top: 24px;
+    img {
+        width: 4.25rem;
+    }
+}
+
 // controls
 select {
     background-color: transparent;

@@ -183,7 +183,7 @@ define(function() {
             }
         },
         print: {
-            import: 'Import',
+            import: 'IMPORT',
             go_home: 'Go Home',
             save: 'Save',
             normal_preview: 'Normal Preview',
@@ -313,6 +313,13 @@ define(function() {
                         ]
                     }
                 }
+            },
+            left_panel: {
+                raft_on: 'RAFT ON',
+                raft_off: 'RAFT OFF',
+                support_on: 'SUPPORT ON',
+                support_off: 'SUPPORT OFF',
+                advanced: 'ADVANCED'
             },
             quick_print: 'Quick Print',
             scale: 'Scale',

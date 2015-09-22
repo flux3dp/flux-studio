@@ -314,6 +314,13 @@ define(function() {
                     }
                 }
             },
+            left_panel: {
+                raft_on: 'RAFT ON',
+                raft_off: 'RAFT OFF',
+                support_on: 'SUPPORT ON',
+                support_off: 'SUPPORT OFF',
+                advanced: 'ADVANCED'
+            },
             quick_print: 'Quick Print',
             scale: '比例',
             rotate: '旋轉',
