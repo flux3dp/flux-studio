@@ -31,8 +31,9 @@
             top: 27px;
 
             .arrow {
-                left: -54px;
+                left: 0;
                 position: absolute;
+                transform: translateX(-100%);
                 top: 0;
 
                 polygon {

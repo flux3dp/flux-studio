@@ -62,12 +62,12 @@ define([
                         <div className="brand-logo">
                             <img className="logo-icon" src="/img/menu/main_logo.svg"/>
                             <div className="menu">
-                                <svg width="36" height="12"
+                                <svg width="36" height="15"
                                      className="arrow"
-                                     viewBox="0 0 36 12" version="1.1"
+                                     viewBox="0 0 36 15" version="1.1"
                                      xmlns="http://www.w3.org/2000/svg">
 
-                                    <polygon points="0,0 36,0 36,12"/>
+                                    <polygon points="0,0 36,0 36,15"/>
 
                                 </svg>
                                 <ul className="inner-menu">
