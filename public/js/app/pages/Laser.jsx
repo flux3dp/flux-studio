@@ -6,8 +6,7 @@ define([
     'jsx!views/laser/Setup-Panel',
     'jsx!views/laser/Image-Panel',
     'jsx!widgets/Modal',
-    'jsx!views/Print-Selector',
-    'helpers/nwjs/menuitem'
+    'jsx!views/Print-Selector'
 ], function(
     $,
     React,
@@ -16,8 +15,7 @@ define([
     SetupPanel,
     ImagePanel,
     Modal,
-    PrinterSelector,
-    menuitem
+    PrinterSelector
 ) {
     'use strict';
 
@@ -25,44 +23,6 @@ define([
         args = args || {};
 
         var view = React.createClass({
-
-                _renderTopMenu: function(lang) {
-                    var self = this,
-                        items = [{
-                            label: lang.laser.topmenu.main.label,
-                            subItems: [{
-                                label: lang.laser.topmenu.main.open,
-                                onClick: function() {
-                                    self.refs.setupPanel.refs.fileUploader.getDOMNode().click();
-                                }
-                            },
-                            {
-                                label: lang.laser.topmenu.main.save,
-                                enabled: this.state.hasImage,
-                                onClick: function() {
-                                    self.refs.setupPanel._onExport();
-                                }
-                            },
-                            {
-                                label: lang.laser.topmenu.main.engrave,
-                                enabled: this.state.hasImage,
-                                onClick: function() {
-                                    self.refs.setupPanel._onRunLaser();
-                                }
-                            }]
-                        }],
-                        subMenu,
-                        menu;
-
-                    menuitem.clear();
-
-                    items.forEach(function(menu) {
-                        subMenu = menuitem.createSubMenu(menu.subItems);
-                        menuitem.appendToMenu(menu.label, subMenu);
-                    });
-
-                    menuitem.refresh();
-                },
 
                 _onRunLaser: function(settings) {
                     this.setState({
@@ -101,6 +61,7 @@ define([
                                 mode={this.state.mode}
                                 className={image_panel_class}
                                 onThresholdChanged={this.props.laserEvents.thresholdChanged}
+                                onTransform={this.props.laserEvents.imageTransform}
                             /> :
                             ''
                         );
@@ -139,7 +100,7 @@ define([
                             });
                         },
                         content = (
-                            <PrinterSelector lang={lang} onClose={onClose} onGettingPrinter={onGettingPrinter}/>
+                            <PrinterSelector className="laser-device-selection-popup" lang={lang} onClose={onClose} onGettingPrinter={onGettingPrinter}/>
                         );
 
                     return (
@@ -156,7 +117,8 @@ define([
                 },
 
                 render: function() {
-                    var lang = args.state.lang,
+                    var self = this,
+                        lang = args.state.lang,
                         stageSection = this._renderStageSection(),
                         printerSelector = (
                             true === this.state.openPrinterSelectorWindow ?
@@ -164,8 +126,6 @@ define([
                             ''
                         ),
                         blocker = this._renderBlocker(lang);
-
-                    this._renderTopMenu(lang);
 
                     return (
                         <div className="studio-container laser-studio">
@@ -198,10 +158,26 @@ define([
                 },
 
                 componentDidMount: function() {
-                    var _laserEvents = laserEvents.call(this, args);
+                    var self = this,
+                        _laserEvents = laserEvents.call(this, args);
+
                     this.setProps({
                         laserEvents: _laserEvents
                     });
+
+                    _laserEvents.menuFactory.items.import.onClick = function() {
+                        self.refs.setupPanel.refs.fileUploader.getDOMNode().click();
+                    };
+
+                    _laserEvents.menuFactory.items.execute.enabled = false;
+                    _laserEvents.menuFactory.items.execute.onClick = function() {
+                        self.refs.setupPanel._onRunLaser();
+                    };
+
+                    _laserEvents.menuFactory.items.saveGCode.enabled = false;
+                    _laserEvents.menuFactory.items.saveGCode.onClick = function() {
+                        self.refs.setupPanel._onExport();
+                    };
                 },
 
                 componentWillUnmount: function () {

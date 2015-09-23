@@ -5,18 +5,14 @@ define([
 ], function($, React, shortcuts) {
     'use strict';
 
-    return React.createClass({
-        getDefaultProps: function() {
-            return {
-                onOpen: React.PropTypes.func,
-                onClose: React.PropTypes.func,
-                content: React.PropTypes.element,
-                disabledEscapeOnBackground: false,
-                className: {}
-            };
+    var View = React.createClass({
+
+        onOpen: function() {
+            this.props.onOpen(this);
         },
 
         _onClose: function(e) {
+            React.unmountComponentAtNode(View);
             this.props.onClose(e);
         },
 
@@ -32,6 +28,7 @@ define([
             var cx = React.addons.classSet,
                 backgroundClass;
 
+            this.props.className = this.props.className || {};
             this.props.className['modal-window'] = true;
             backgroundClass = cx(this.props.className);
 
@@ -46,7 +43,7 @@ define([
         componentDidMount: function() {
             var self = this;
 
-            self.props.onOpen(self);
+            self.onOpen();
 
             shortcuts.on(
                 ['esc'],
@@ -58,6 +55,18 @@ define([
 
         componentWillUnmount: function() {
             shortcuts.off(['esc']);
-        }
+        },
+
+        getDefaultProps: function() {
+            return {
+                onOpen: React.PropTypes.func,
+                onClose: React.PropTypes.func,
+                content: React.PropTypes.element,
+                disabledEscapeOnBackground: false,
+                className: {}
+            };
+        },
     });
+
+    return View;
 });

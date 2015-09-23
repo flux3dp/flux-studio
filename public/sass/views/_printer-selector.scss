@@ -3,49 +3,72 @@
  */
 .select-printer {
     background: #FFF;
-    height: 300px;
-    padding: 10px;
-    width: 50%;
+    color: #b3b3b3;
+    font-size: 1rem;
+    height: 15.6rem;
+    padding: .8rem;
+    position: absolute;
+    width: 30.3rem;
+    z-index: 1;
 
-    .select-printer-content {
-        height: 100%;
-        overflow: scroll;
+    .device-wrapper {
         position: relative;
+    }
+
+    .arrow {
+        bottom: 3.6rem;
+        left: 100%;
+        position: absolute;
+        fill: #fff;
+    }
+
+    .device {
+        @include flexbox();
+        justify-content: 1;
+
+        .col {
+            height: 2.8rem;
+            line-height: 2.8rem;
+        }
+
+        .device-name {
+            padding: 0 0 0 1.7rem;
+            flex: calc(12 / 28.7 * 100%);
+        }
+
+        .module {
+            flex: calc(7 / 28.7 * 100%);
+        }
+
+        .status {
+            flex: calc(5 / 28.7 * 100%);
+        }
+    }
+
+    .device-wrapper {
+        height: 100%;
         width: 100%;
     }
 
-    .printer-list{
+    .printer-list {
         list-style: none;
         margin: 0 auto;
+        max-height: calc(100% - 2.8rem);
+        overflow-x: hidden;
+        overflow-y: scroll;
         padding: 0;
-        width: 80%;
-
-        .fa::before {
-            display: block;
-            padding: 5px;
-        }
 
         .printer-item {
             cursor: pointer;
-            display: block;
-            position: relative;
 
-            .print-name {
-                display: block;
-                left: 0;
-                padding: 5px 5px 5px 20px;
-                position: absolute;
-                right: 0;
-                top: 0;
+            [name="printer-group"] {
+                display: none;
             }
 
-            input[type="radio"] {
-                display: none;
-
-                &:checked + .print-name {
-                    background: #ccc;
-                    z-index: -1;
-                }
-            }        }
+            &:hover {
+                background: #b3b3b3;
+                color: #fff;
+            }
+        }
     }
 }

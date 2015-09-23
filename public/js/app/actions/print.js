@@ -29,7 +29,8 @@ define([
         offset = new THREE.Vector3(),
         circularGridHelper, mouseDown, boundingBox, SELECTED;
 
-    var movingOffsetX, movingOffsetY, originalCameraPosition, originalCameraRotation;
+    var movingOffsetX, movingOffsetY, originalCameraPosition, originalCameraRotation,
+        scaleBeforeTransformX, scaleBeforeTransformY, scaleBeforeTransformZ;
 
     var responseMessage, responseBlob, printPath,
         previewScene,
@@ -39,7 +40,8 @@ define([
         transformMode = false,
         shiftPressed = false,
         previewMode = false,
-        fileExtension = '.gcode';
+        fileExtension = '.gcode',
+        leftPanelWidth = 275;
 
     var s = {
         diameter: 170,
@@ -74,7 +76,7 @@ define([
         container = document.getElementById('model-displayer');
 
         camera = new THREE.PerspectiveCamera( 60, (container.offsetWidth) / container.offsetHeight, 1, 30000 );
-        camera.position.set(0, -180, 130);
+        camera.position.set(0, -300, 110);
         camera.up = new THREE.Vector3(0,0,1);
 
         scene = new THREE.Scene();
@@ -125,7 +127,7 @@ define([
         orbitControl.maxPolarAngle = Math.PI/4 * 3;
         orbitControl.maxDistance = 1000;
         orbitControl.noKeys = true;
-        orbitControl.addEventListener('change', render);
+        orbitControl.addEventListener('change', updateOrbitControl);
 
         transformControl = new THREE.TransformControls(camera, renderer.domElement);
         transformControl.addEventListener('change', render);
@@ -146,6 +148,7 @@ define([
         originalCameraRotation = camera.rotation.clone();
 
         render();
+        setImportWindowPosition();
 
         // init print controller
         printController = printSlicing();
@@ -165,7 +168,10 @@ define([
         var loader = new THREE.STLLoader();
         var model_file_path = fileEntry.toURL();
 
-        reactSrc.setState({ openWaitWindow: true });
+        reactSrc.setState({
+            openWaitWindow: true,
+            openImportWindow: false
+        });
 
         loader.load(model_file_path, function(geometry) {
 
@@ -217,9 +223,11 @@ define([
                 mesh.geometry = new THREE.Geometry().fromBufferGeometry(mesh.geometry);
             }
             mesh.name = 'custom';
+            // mesh.material.side = THREE.DoubleSide;
 
-            selectObject(mesh);
             alignCenter();
+            groundIt(mesh);
+            selectObject(mesh);
 
             scene.add(mesh);
             objects.push(mesh);
@@ -260,6 +268,11 @@ define([
                 transformMode = false;
                 render();
             }
+            else {
+                scaleBeforeTransformX = SELECTED.scale.x;
+                scaleBeforeTransformY = SELECTED.scale.y;
+                scaleBeforeTransformZ = SELECTED.scale.z;
+            }
         }
 
         render();
@@ -271,6 +284,7 @@ define([
         mouseDown = false;
         container.style.cursor = 'auto';
         checkOutOfBounds(SELECTED);
+        groundIt(SELECTED);
 
         if(transformMode) {
             selectObject(transformControl.object);
@@ -280,20 +294,21 @@ define([
     }
 
     function onMouseMove(e) {
-        event.preventDefault();
+        e.preventDefault();
         setMousePosition(e);
 
         var location = getReferenceIntersectLocation(e);
         if(SELECTED && mouseDown && !transformMode)
         {
-            if(!transformMode)
-            if(SELECTED.position && location) {
-                SELECTED.position.x = location.x - movingOffsetX;
-                SELECTED.position.y = location.y - movingOffsetY;
-                blobExpired = true;
-
-                render();
-                return;
+            if(!transformMode) {
+                if(SELECTED.position && location) {
+                    SELECTED.position.x = location.x - movingOffsetX;
+                    SELECTED.position.y = location.y - movingOffsetY;
+                    blobExpired = true;
+                    setObjectDialoguePosition();
+                    render();
+                    return;
+                }
             }
         }
     }
@@ -303,6 +318,7 @@ define([
         camera.updateProjectionMatrix();
         renderer.setSize(container.offsetWidth, container.offsetHeight);
         render();
+        setImportWindowPosition();
     }
 
     function onKeyPress(e) {
@@ -329,7 +345,7 @@ define([
                 _dx = _dx >= 0 ? _dx : (360 - Math.abs(_dx));
                 _dy = _dy >= 0 ? _dy : (360 - Math.abs(_dy));
                 _dz = _dz >= 0 ? _dz : (360 - Math.abs(_dz));
-                rotate(_dx, _dy, _dz, false);
+                setRotation(_dx, _dy, _dz, false);
                 setScale(_sx, _sy, _sz, false, false);
                 render();
                 groundIt(SELECTED);
@@ -496,16 +512,16 @@ define([
         var originalScaleX = SELECTED.scale._x;
         var originalScaleY = SELECTED.scale._y;
         var originalScaleZ = SELECTED.scale._z;
+        if(x === '' || x <= 0) {x = scaleBeforeTransformX;}
+        if(y === '' || y <= 0) {y = scaleBeforeTransformY;}
+        if(z === '' || z <= 0) {z = scaleBeforeTransformZ;}
         SELECTED.scale.enteredX = x;
         SELECTED.scale.enteredY = y;
         SELECTED.scale.enteredZ = z;
-        if(x === '' || x == 0) {x = 1;}
-        if(y === '' || y == 0) {y = 1;}
-        if(z === '' || z == 0) {z = 1;}
         SELECTED.scale.set(
-            (originalScaleX * x) || originalScaleX,
-            (originalScaleY * y) || originalScaleX,
-            (originalScaleZ * z) || originalScaleX
+            (originalScaleX * x) || scaleBeforeTransformX,
+            (originalScaleY * y) || scaleBeforeTransformY,
+            (originalScaleZ * z) || scaleBeforeTransformZ
         );
         SELECTED.scale.locked = locked;
         reactSrc.setState({ modelSelected: SELECTED.uuid ? SELECTED : null });
@@ -583,6 +599,16 @@ define([
         }
     }
 
+    function setCameraPosition(refCamera) {
+        var p = refCamera.position,
+            r = refCamera.rotation;
+
+        camera.position.set(p.x, p.y, p.z);
+        camera.rotation.set(r.x, r.y, r.z);
+        render();
+        setObjectDialoguePosition();
+    }
+
     // Main Functions ---
 
     // select the specified object, will calculate out-of-bounds and change color accordingly
@@ -596,22 +622,94 @@ define([
             boundingBox = new THREE.BoundingBoxHelper( obj, s.colorSelected );
             boundingBox.name = "BoundingBoxHelper";
             boundingBox.update();
+            setObjectDialoguePosition(obj);
 
             transformControl.attach(obj);
             transformControl.name = 'TransformControl';
+
+            scaleBeforeTransformX = obj.scale.x;
+            scaleBeforeTransformY = obj.scale.y;
+            scaleBeforeTransformZ = obj.scale.z;
 
             scene.add(boundingBox);
         }
         else {
             transformMode = false;
         }
-        reactSrc.setState({ modelSelected: SELECTED.uuid ? SELECTED : null });
+        reactSrc.setState({
+            modelSelected: SELECTED.uuid ? SELECTED : null,
+            openObjectDialogue: !!obj
+        });
 
         render();
     }
 
+    function setObjectDialoguePosition(obj) {
+        var o = obj || SELECTED;
+
+        if(!$.isEmptyObject(o)) {
+
+            var box   = new THREE.BoundingBoxHelper( o, s.colorSelected ),
+                position   = toScreenPosition(o, camera),
+                cameraDistance  = 0,
+                objectDialogueDistance = 0;
+            // console.log(position);
+
+            box.update();
+            cameraDistance = 320 / Math.sqrt(Math.pow(camera.position.x, 2) + Math.pow(camera.position.y, 2) + Math.pow(camera.position.z, 2));
+            objectDialogueDistance = cameraDistance * 1.2 * Math.sqrt(Math.pow(box.box.size().x, 2) + Math.pow(box.box.size().y, 2)) + 15;
+            objectDialogueDistance = parseInt(objectDialogueDistance);
+
+            reactSrc.setState({
+                openObjectDialogue: true
+            }, function() {
+                var objectDialogue = document.getElementsByClassName('objectDialogue')[0],
+                    objectDialogueWidth = parseInt($(objectDialogue).css('width').replace('px','')),
+                    objectDialogueHeight = parseInt($(objectDialogue).css('height').replace('px','')),
+                    leftOffset = parseInt(position.x),
+                    topOffset = (parseInt(position.y) - objectDialogueHeight / 2),
+                    marginTop = container.offsetHeight / 2 - position.y;
+
+                var rightLimit  = container.offsetWidth / 2 - leftPanelWidth - objectDialogueWidth,
+                    topLimit    = container.offsetHeight / 2 - objectDialogueHeight / 2;
+
+                if(objectDialogueDistance > rightLimit) {
+                    objectDialogueDistance = rightLimit;
+                }
+
+                if(marginTop > topLimit) {
+                    topOffset = 0;
+                }
+
+                reactSrc.setState({
+                    objectDialogueStyle: {
+                        'left': leftOffset + 'px',
+                        'top': topOffset + 'px',
+                        'margin-left': objectDialogueDistance + 'px'
+                    }
+                });
+            });
+        }
+    }
+
+    function setImportWindowPosition() {
+        if(document.getElementsByClassName('arrowBox').length > 0) {
+            var position                = toScreenPosition(referenceMeshes[0], camera),
+                importWindow            = document.getElementsByClassName('arrowBox')[0],
+                importWindowWidth       = parseInt($(importWindow).css('width').replace('px','')),
+                importWindowHeight      = parseInt($(importWindow).css('height').replace('px',''));
+
+            reactSrc.setState({
+                importWindowStyle: {
+                    top: position.y - importWindowHeight - 20,
+                    left: position.x - importWindowWidth / 2
+                }
+            });
+        }
+    }
+
     function alignCenter() {
-        if(SELECTED) {
+        if(!$.isEmptyObject(SELECTED)) {
             var reference = getReferenceDistance(SELECTED);
             SELECTED.position.x -= reference.x;
             SELECTED.position.y -= reference.y;
@@ -625,9 +723,11 @@ define([
     }
 
     function groundIt(mesh) {
-        var reference = getReferenceDistance(mesh);
-        mesh.position.z -= reference.z;
-        blobExpired = true;
+        if(!$.isEmptyObject(mesh)) {
+            var reference = getReferenceDistance(mesh);
+            mesh.position.z -= reference.z;
+            blobExpired = true;
+        }
     }
 
     function removeSelected() {
@@ -763,7 +863,7 @@ define([
             go(responseBlob);
         }
         else {
-            getGCode().then((blob) => {
+            getGCode().then(function(blob) {
                 if(blob instanceof Blob) {
                     go(blob);
                 }
@@ -771,8 +871,15 @@ define([
         }
     }
 
+    function updateOrbitControl(e) {
+        setObjectDialoguePosition();
+        render();
+        setImportWindowPosition();
+        reactSrc.setState({ camera: camera });
+    }
+
     function render() {
-        if(SELECTED) {
+        if(!$.isEmptyObject(SELECTED)) {
             updateFromScene('BoundingBoxHelper');
             updateFromScene('TransformControl');
         }
@@ -801,6 +908,29 @@ define([
             return scale;
         }
         return (parseInt(scale * Math.pow(10, s.scalePrecision)) + 1) / Math.pow(10, s.scalePrecision);
+    }
+
+    function toScreenPosition(obj, camera)
+    {
+        if(!$.isEmptyObject(obj)) {
+            var vector = new THREE.Vector3();
+
+            // TODO: need to update this when resize window
+            var widthHalf = 0.5 * container.offsetWidth;
+            var heightHalf = 0.5 * container.offsetHeight;
+
+            obj.updateMatrixWorld();
+            vector.setFromMatrixPosition(obj.matrixWorld);
+            vector.project(camera);
+
+            vector.x = ( vector.x * widthHalf ) + widthHalf;
+            vector.y = - ( vector.y * heightHalf ) + heightHalf;
+
+            return {
+                x: vector.x,
+                y: vector.y
+            };
+        }
     }
 
     // Private Functions ---
@@ -958,6 +1088,7 @@ define([
         getGCode                : getGCode,
         togglePreview           : togglePreview,
         changePreviewLayer      : changePreviewLayer,
-        executePrint            : executePrint
+        executePrint            : executePrint,
+        setCameraPosition       : setCameraPosition
     };
 });

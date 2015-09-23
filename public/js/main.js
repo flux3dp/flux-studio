@@ -1,5 +1,5 @@
 require.config({
-    urlArgs: 'v=' + (new Date()).getTime(),
+    urlArgs: 'v=' + window.FLUX.timestamp,
     baseUrl: 'js/',
 
     paths: {
@@ -84,6 +84,7 @@ require([
     'app/router',
     'app/actions/global',
     'domReady!',
+    'helpers/tracker',
     'threejs'
 ], function($, Backbone, Router, globalEvents) {
     'use strict';

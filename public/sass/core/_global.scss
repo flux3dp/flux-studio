@@ -15,6 +15,7 @@ body {
 
 body {
     background-color: #FAFAFA;
+    cursor: default;
     font-size: 16px;
     position: relative;
 }
@@ -63,20 +64,10 @@ a {
     height: 100%;
 }
 
-.sidebar,
-.content {
-    float: left;
-}
-
-.sidebar {
-    background-color: #000;
-    height: 100%;
-}
-
 .content {
     height: 100%;
     overflow: hidden;
-    width: calc(100% - 66px);
+    width: 100%;
 }
 
 .horizontal-menu .menu-item {
@@ -227,6 +218,15 @@ a {
 .sticky-bottom {
     bottom: 0;
     position: absolute;
+}
+
+.logo {
+    position: absolute;
+    left: 3.75rem;
+    top: 24px;
+    img {
+        width: 4.25rem;
+    }
 }
 
 // controls

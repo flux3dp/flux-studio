@@ -2081,6 +2081,7 @@ body {
 
 body {
     background-color: #FAFAFA;
+    cursor: default;
     font-size: 16px;
     position: relative; }
 
@@ -2121,18 +2122,10 @@ a {
 .wrapper {
     height: 100%; }
 
-.sidebar,
-.content {
-    float: left; }
-
-.sidebar {
-    background-color: #000;
-    height: 100%; }
-
 .content {
     height: 100%;
     overflow: hidden;
-    width: calc(100% - 66px); }
+    width: 100%; }
 
 .horizontal-menu .menu-item {
     float: left;
@@ -2378,6 +2371,13 @@ a {
 .sticky-bottom {
     bottom: 0;
     position: absolute; }
+
+.logo {
+    position: absolute;
+    left: 3.75rem;
+    top: 24px; }
+    .logo img {
+        width: 4.25rem; }
 
 select {
     background-color: transparent;
@@ -2716,7 +2716,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
     /* NEW - Chrome */
     display: flex;
     /* NEW, Spec - Opera 12.1, Firefox 20+ */
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.1);
     bottom: 0;
     height: 100%;
     left: 0;
@@ -2734,101 +2734,181 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         right: 0;
         top: 0;
         z-index: -1; }
-
-.modal-alert {
-    background: #FFF;
-    border-radius: 5px;
-    padding: 5px 20px;
-    text-align: center; }
-
-/**
- * the view of printer selector
- */
-.select-printer {
-    background: #FFF;
-    height: 300px;
-    padding: 10px;
-    width: 50%; }
-    .select-printer .select-printer-content {
-        height: 100%;
-        overflow: scroll;
-        position: relative;
-        width: 100%; }
-    .select-printer .printer-list {
-        list-style: none;
-        margin: 0 auto;
-        padding: 0;
-        width: 80%; }
-        .select-printer .printer-list .fa::before {
-            display: block;
-            padding: 5px; }
-        .select-printer .printer-list .printer-item {
-            cursor: pointer;
-            display: block;
-            position: relative; }
-            .select-printer .printer-list .printer-item .print-name {
-                display: block;
-                left: 0;
-                padding: 5px 5px 5px 20px;
-                position: absolute;
-                right: 0;
-                top: 0; }
-            .select-printer .printer-list .printer-item input[type="radio"] {
-                display: none; }
-                .select-printer .printer-list .printer-item input[type="radio"]:checked + .print-name {
-                    background: #ccc;
-                    z-index: -1; }
-
-/**
- * sidebar
- */
-.side-bar {
-    background-color: #000000;
-    height: 100%;
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    position: relative;
-    width: 66px; }
-    .side-bar .menu {
-        margin: 0;
-        padding: 0; }
-    .side-bar .menu-item {
-        cursor: pointer; }
-        .side-bar .menu-item img {
-            display: block;
-            margin: 0; }
-        .side-bar .menu-item:hover {
-            background-color: rgba(255, 255, 255, 0.5); }
-    .side-bar .item {
+    .modal-window .modal-alert {
         display: -webkit-box;
         /* OLD - iOS 6-, Safari 3.1-6 */
         display: -webkit-flex;
         /* NEW - Chrome */
         display: flex;
         /* NEW, Spec - Opera 12.1, Firefox 20+ */
-        background: #000;
-        color: #fff;
-        height: 66px;
-        align-items: center;
+        background: #FFF;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.7);
         flex-direction: column;
-        justify-content: center;
-        height: 66px;
+        margin: 2.8rem;
+        min-height: 25rem;
+        min-width: 32.2rem;
+        overflow: scroll;
+        padding: 1.6rem 2.8rem 4.4rem 2.8rem;
+        position: relative;
         text-align: center;
+        align-items: center;
+        justify-content: center; }
+        .modal-window .modal-alert h2 {
+            margin: 0; }
+        .modal-window .modal-alert p {
+            margin: 1.6rem 0; }
+    .modal-window .button-group {
+        display: -webkit-box;
+        /* OLD - iOS 6-, Safari 3.1-6 */
+        display: -webkit-flex;
+        /* NEW - Chrome */
+        display: flex;
+        /* NEW, Spec - Opera 12.1, Firefox 20+ */
+        bottom: 1.6rem;
+        left: 2.8rem;
+        position: absolute;
+        right: 2.8rem;
+        align-items: center;
+        justify-content: center; }
+        .modal-window .button-group .btn {
+            font-size: 1.3rem;
+            height: 2.8rem;
+            line-height: 2.8rem;
+            margin: 0 0.6rem 0 0;
+            max-width: 13rem;
+            flex: 1; }
+            .modal-window .button-group .btn:last-child {
+                margin: 0; }
+    .modal-window .message {
+        word-break: break-all;
+        word-wrap: break-word; }
+
+/**
+ * the view of printer selector
+ */
+.select-printer {
+    background: #FFF;
+    color: #b3b3b3;
+    font-size: 1rem;
+    height: 15.6rem;
+    padding: .8rem;
+    position: absolute;
+    width: 30.3rem;
+    z-index: 1; }
+    .select-printer .device-wrapper {
+        position: relative; }
+    .select-printer .arrow {
+        bottom: 3.6rem;
+        left: 100%;
+        position: absolute;
+        fill: #fff; }
+    .select-printer .device {
+        display: -webkit-box;
+        /* OLD - iOS 6-, Safari 3.1-6 */
+        display: -webkit-flex;
+        /* NEW - Chrome */
+        display: flex;
+        /* NEW, Spec - Opera 12.1, Firefox 20+ */
+        justify-content: 1; }
+        .select-printer .device .col {
+            height: 2.8rem;
+            line-height: 2.8rem; }
+        .select-printer .device .device-name {
+            padding: 0 0 0 1.7rem;
+            flex: calc(12 / 28.7 * 100%); }
+        .select-printer .device .module {
+            flex: calc(7 / 28.7 * 100%); }
+        .select-printer .device .status {
+            flex: calc(5 / 28.7 * 100%); }
+    .select-printer .device-wrapper {
+        height: 100%;
         width: 100%; }
-        .side-bar .item p {
-            color: #FFF;
+    .select-printer .printer-list {
+        list-style: none;
+        margin: 0 auto;
+        max-height: calc(100% - 2.8rem);
+        overflow-x: hidden;
+        overflow-y: scroll;
+        padding: 0; }
+        .select-printer .printer-list .printer-item {
+            cursor: pointer; }
+            .select-printer .printer-list .printer-item [name="printer-group"] {
+                display: none; }
+            .select-printer .printer-list .printer-item:hover {
+                background: #b3b3b3;
+                color: #fff; }
+
+/**
+ * top menu
+ */
+.top-menu {
+    position: fixed;
+    width: 100%;
+    z-index: 9999; }
+    .top-menu .brand-logo {
+        cursor: pointer;
+        left: 24px;
+        position: absolute;
+        top: 24px; }
+        .top-menu .brand-logo .logo-icon,
+        .top-menu .brand-logo .menu {
+            float: left; }
+        .top-menu .brand-logo .logo-icon {
+            height: 4.25rem;
+            width: 4.25rem; }
+        .top-menu .brand-logo .menu {
+            background: #fff;
+            display: none;
+            left: 5.05rem;
+            padding: 0.65rem 2.6rem;
+            position: relative;
+            top: 27px; }
+            .top-menu .brand-logo .menu .arrow {
+                left: 0;
+                position: absolute;
+                transform: translateX(-100%);
+                top: 0; }
+                .top-menu .brand-logo .menu .arrow polygon {
+                    fill: #fff; }
+            .top-menu .brand-logo .menu .inner-menu {
+                display: -webkit-box;
+                /* OLD - iOS 6-, Safari 3.1-6 */
+                display: -webkit-flex;
+                /* NEW - Chrome */
+                display: flex;
+                /* NEW, Spec - Opera 12.1, Firefox 20+ */
+                list-style: none;
+                margin: 0;
+                padding: 0; }
+        .top-menu .brand-logo:hover .menu {
+            display: block; }
+    .top-menu .item {
+        color: #b3b3b3;
+        font-size: 1rem;
+        margin: 0 3.3rem 0 0;
+        padding: 0;
+        text-align: center;
+        flex: 1; }
+        .top-menu .item img {
+            height: 3.2rem;
+            margin: 0 auto;
+            transform-origin: 50% 50%;
+            width: 3.2rem; }
+        .top-menu .item p,
+        .top-menu .item:last-child {
+            margin: 0; }
+        .top-menu .item:hover img {
+            -webkit-filter: invert(1) opacity(0.25); }
+    .top-menu .setting {
+        font-size: 1rem;
+        line-height: 2rem;
+        position: absolute;
+        right: 24px;
+        text-decoration: none;
+        top: 24px; }
+        .top-menu .setting img {
             display: block;
-            font-size: 12px;
-            font-weight: lighter;
-            letter-spacing: .3px;
-            margin: 0;
-            text-decoration: none; }
-        .side-bar .item img {
-            height: 34px;
-            width: 34px; }
-    .side-bar .active {
-        box-shadow: 5px 0px 0px 0px #00C853 inset; }
+            width: 2.75rem; }
 
 .print-studio {
     padding: 0; }
@@ -3241,7 +3321,7 @@ input.switch:checked ~ label:after {
 .print-studio .control-bottom {
     position: absolute;
     bottom: 40px;
-    width: calc(100% - 66px); }
+    width: 100%; }
 
 .print-studio .control-bottom > div {
     position: relative;
@@ -3526,17 +3606,16 @@ input.switch:checked ~ label:after {
         .print-studio .flux-monitor .actions .cancel {
             padding-top: 10px; }
 
-.print-studio .previewPanel input {
+.print-studio .previewPanel {
     position: absolute;
-    bottom: 10%;
-    left: 0%;
-    width: 200px;
-    transform: rotate(270deg); }
-
-.print-studio .previewPanel div {
-    position: absolute;
-    bottom: 14px;
-    left: 8%; }
+    right: 13%;
+    top: 15%; }
+    .print-studio .previewPanel input {
+        width: 150px;
+        transform: rotate(270deg); }
+    .print-studio .previewPanel div {
+        text-align: right;
+        margin-right: 25px; }
 
 .print-studio .progressWindow {
     width: 600px;
@@ -3545,6 +3624,134 @@ input.switch:checked ~ label:after {
     .print-studio .progressWindow .message {
         text-align: center;
         padding: 15px 0; }
+
+.print-studio .importWindow .arrowBox {
+    position: absolute;
+    background: #ffffff;
+    width: 200px;
+    height: 50px;
+    cursor: pointer; }
+    .print-studio .importWindow .arrowBox .import-btn {
+        text-align: center;
+        font-size: 2em;
+        font-weight: bold;
+        letter-spacing: 2px;
+        color: #CCC;
+        margin-top: 0.4rem; }
+
+.print-studio .importWindow .arrowBox:after {
+    top: 100%;
+    left: 50%;
+    border: solid transparent;
+    content: " ";
+    height: 0;
+    width: 0;
+    position: absolute;
+    pointer-events: none;
+    border-color: rgba(255, 255, 255, 0);
+    border-top-color: #ffffff;
+    border-width: 20px;
+    margin-left: -20px; }
+
+.print-studio .leftPanel {
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    top: 50%;
+    margin-top: -150px; }
+    .print-studio .leftPanel ul {
+        position: absolute;
+        list-style-type: none;
+        padding-left: 3.75rem; }
+        .print-studio .leftPanel ul li {
+            font-size: 1.8rem;
+            color: #B3B3B3;
+            line-height: 2em;
+            cursor: pointer; }
+        .print-studio .leftPanel ul li:hover {
+            color: #4D4D4D; }
+
+.print-studio .rightPanel {
+    position: absolute;
+    width: 275px;
+    height: 100%;
+    right: 0; }
+    .print-studio .rightPanel svg {
+        width: 275px;
+        height: 230px;
+        position: absolute;
+        bottom: 50px;
+        left: 0; }
+    .print-studio .rightPanel tspan {
+        font-size: 2.4em;
+        font-weight: bold; }
+    .print-studio .rightPanel g {
+        cursor: pointer; }
+    .print-studio .rightPanel g:hover path {
+        fill: #000; }
+    .print-studio .rightPanel tspan.go {
+        font-size: 3.4em; }
+    .print-studio .rightPanel path:hover {
+        color: red; }
+    .print-studio .rightPanel .cameraViewController {
+        height: 100px;
+        position: absolute;
+        bottom: 55%; }
+
+.print-studio .objectDialogue {
+    position: absolute;
+    background: #FFFFFF;
+    height: 240px;
+    width: 230px; }
+    .print-studio .objectDialogue .title {
+        font-size: 1.3rem;
+        color: #B3B3B3;
+        line-height: 1.5em;
+        padding-left: 0.5em;
+        background-color: #FFF;
+        cursor: pointer; }
+    .print-studio .objectDialogue .divider {
+        width: 100%;
+        height: 5px;
+        background-color: #E0E0E0; }
+    .print-studio .objectDialogue .rotateInputFields {
+        height: 13.5rem;
+        width: 100%; }
+        .print-studio .objectDialogue .rotateInputFields .group {
+            margin-top: 1rem;
+            font-size: 2.5rem;
+            height: 3rem;
+            width: 100%;
+            color: #B3B3B3;
+            display: inline-block; }
+            .print-studio .objectDialogue .rotateInputFields .group .label {
+                padding: 0 1em 0 0.5em;
+                display: inline; }
+            .print-studio .objectDialogue .rotateInputFields .group .control {
+                display: inline; }
+            .print-studio .objectDialogue .rotateInputFields .group input {
+                width: 150px;
+                border-width: 2px;
+                border-style: solid;
+                border-color: #B3B3B3; }
+    .print-studio .objectDialogue .bottom {
+        position: absolute;
+        bottom: 0;
+        width: 100%; }
+
+.print-studio .objectDialogue:after {
+    right: 100%;
+    top: 50%;
+    border: solid transparent;
+    content: " ";
+    height: 0;
+    width: 0;
+    position: absolute;
+    pointer-events: none;
+    border-color: rgba(255, 255, 255, 0);
+    border-right-color: #FFFFFF;
+    border-width: 20px;
+    margin-top: -20px; }
 
 .settings-studio {
     background-color: #F5F5F5; }
@@ -4192,16 +4399,19 @@ input.switch:checked ~ label:after {
 /**
  * Laser
  */
+.laser-studio .laser-device-selection-popup {
+    bottom: 4.3rem;
+    right: 15rem; }
+
 .laser-studio .operation-table {
-    position: relative;
     height: 100%;
+    position: relative;
     width: 100%; }
 
 .laser-studio .operating-panel {
     left: 20px;
     top: 20px;
-    width: 182px;
-    z-index: 9998; }
+    width: 182px; }
     .laser-studio .operating-panel .action-buttons .btn {
         display: block;
         margin: 0 0 5px 0; }
@@ -4237,7 +4447,8 @@ input.switch:checked ~ label:after {
 
 .laser-studio .laser-object .image-active {
     background: rgba(255, 255, 255, 0.6);
-    outline: 5px dashed #bbb; }
+    outline: 5px dashed #bbb;
+    z-index: -1; }
 
 .laser-studio .laser-object .ft-widget {
     cursor: move;
@@ -4264,8 +4475,7 @@ input.switch:checked ~ label:after {
     padding: 20px;
     right: 25px;
     top: 20px;
-    width: 214px;
-    z-index: 9998; }
+    width: 214px; }
     .laser-studio .object-position .control:nth-child(odd) {
         margin: 0 0 4px 0; }
     .laser-studio .object-position .control:nth-child(even) {
@@ -4330,6 +4540,9 @@ input.switch:checked ~ label:after {
         height: 100%;
         width: 100%;
         object-fit: contain; }
+
+.scan-studio .scan-printer-selection {
+    position: relative; }
 
 .scan-studio .setup-panel,
 .scan-studio .manipulation-panel {

@@ -3,7 +3,7 @@
  */
 .modal-window {
     @include flexbox();
-    background: rgba(0, 0, 0, .5);
+    background: rgba(0, 0, 0, .1);
     bottom: 0;
     height: 100%;
     left: 0;
@@ -24,11 +24,56 @@
         z-index: -1;
     }
 
-}
+    .modal-alert {
+        @include flexbox();
+        background: #FFF;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, .7);
+        flex-direction: column;
+        margin: 2.8rem;
+        min-height: 25rem;
+        min-width: 32.2rem;
+        overflow: scroll;
+        padding: 1.6rem 2.8rem 4.4rem 2.8rem;
+        position: relative;
+        text-align: center;
+        align-items: center;
+        justify-content: center;
 
-.modal-alert {
-    background: #FFF;
-    border-radius: 5px;
-    padding: 5px 20px;
-    text-align: center;
+        h2 {
+            margin: 0;
+        }
+
+        p {
+            margin: 1.6rem 0;
+        }
+    }
+
+    .button-group {
+        @include flexbox();
+        bottom: 1.6rem;
+        left: 2.8rem;
+        position: absolute;
+        right: 2.8rem;
+        align-items: center;
+        justify-content: center;
+
+        .btn {
+            font-size: 1.3rem;
+            height: 2.8rem;
+            line-height: 2.8rem;
+            margin: 0 .6rem 0 0;
+            max-width: 13rem;
+            flex: 1;
+
+            &:last-child {
+                margin: 0;
+            }
+        }
+    }
+
+    .message {
+        word-break: break-all;
+        word-wrap: break-word;
+    }
+
 }

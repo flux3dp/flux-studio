@@ -125,7 +125,7 @@ define([
                 // return flux 2.4g
                 items.push({
                     security: 'WPA2-PSK',
-                    ssid: 'Flux-2.4GHz',
+                    ssid: 'FLUX-2.4',
                     password: true
                 });
 
@@ -264,6 +264,30 @@ define([
                         method: 'dhcp'
                     })
                 ];
+
+                events.onMessage = function(data) {
+                    if ('ok' === data.status) {
+                        opts.onSuccess(data);
+                    }
+                };
+
+                ws.onError(opts.onError);
+                ws.send(args.join(' '));
+            },
+
+            auth: function(password, opts) {
+                password = password || '';
+                opts = opts || {};
+                opts.onSuccess = opts.onSuccess || function() {};
+                opts.onError = opts.onError || function() {};
+
+                var args = [
+                    'auth'
+                ];
+
+                if ('' !== password) {
+                    args.push(password);
+                }
 
                 events.onMessage = function(data) {
                     if ('ok' === data.status) {

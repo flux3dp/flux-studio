@@ -11,6 +11,10 @@ define([
             this.props.onThresholdChanged(e, e.currentTarget.value);
         },
 
+        _onTransform: function(e) {
+            this.props.onTransform(e);
+        },
+
         render: function() {
             var props = this.props,
                 lang = props.lang,
@@ -32,8 +36,8 @@ define([
                     <div className="controls">
                         <p className="control">
                             <label className="caption span4">{lang.laser.object_params.position.text}</label>
-                            <input type="number" ref="objectPosX" data-type="x" className="span4 readonly"/>
-                            <input type="number" ref="objectPosY" data-type="y" className="span4 readonly"/>
+                            <input type="number" ref="objectPosX" step="1" data-type="x" className="span4" onChange={this._onTransform}/>
+                            <input type="number" ref="objectPosY" step="1" data-type="y" className="span4" onChange={this._onTransform}/>
                         </p>
                         <p className="control">
                             <span className="offset-left-4 span4 text-center unit">X</span>
@@ -43,8 +47,8 @@ define([
                     <div className="controls">
                         <p className="control">
                             <label className="caption span4">{lang.laser.object_params.size.text}</label>
-                            <input type="number" min="0" ref="objectSizeW" data-type="width" className="span4 readonly"/>
-                            <input type="number" min="0" ref="objectSizeH" data-type="height" className="span4 readonly"/>
+                            <input type="number" min="0" ref="objectSizeW" step="0.1" data-type="width" className="span4" onChange={this._onTransform}/>
+                            <input type="number" min="0" ref="objectSizeH" step="0.1" data-type="height" className="span4" onChange={this._onTransform}/>
                         </p>
                         <p className="control">
                             <span className="offset-left-4 span4 text-center unit">{lang.laser.object_params.size.unit.width}</span>
@@ -54,7 +58,7 @@ define([
                     <div className="controls">
                         <p className="control">
                             <label className="caption span4">{lang.laser.object_params.rotate.text}</label>
-                            <input type="number" min="-180" ref="objectAngle" data-type="angle" className="span4 readonly"/>
+                            <input type="number" min="0" max="360" ref="objectAngle" data-type="angle" className="span4" onChange={this._onTransform}/>
                         </p>
                     </div>
                     <div className="controls">
@@ -71,6 +75,7 @@ define([
         getDefaultProps: function() {
             return {
                 onThresholdChanged: React.PropTypes.func,
+                onTransform: React.PropTypes.func,
                 mode: React.PropTypes.string
             };
         }
