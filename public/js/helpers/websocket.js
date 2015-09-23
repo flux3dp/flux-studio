@@ -1,4 +1,4 @@
-define(function($) {
+define(['helpers/is-json'], function(isJson) {
     'use strict';
 
     // options:
@@ -7,23 +7,28 @@ define(function($) {
     //      method        - method be called
     //      autoReconnect - auto reconnect on close
     //      onMessage     - fired on receive message
+    //      onError       - fired on a normal error happend
+    //      onFatal       - fired on a fatal error closed
     //      onClose       - fired on connection closed
     //      onOpen        - fired on connection connecting
     return function(options) {
 
-        var defaultOptions = {
+        var defaultCallback = function(result) {},
+            defaultOptions = {
                 hostname: location.hostname,
                 method: '',
                 port: location.port || '8000',
                 autoReconnect: true,
-                onMessage: function(result) {},
-                onClose: function(result) {},
-                onOpen: function(result) {}
+                onMessage: defaultCallback,
+                onError: defaultCallback,
+                onFatal: defaultCallback,
+                onClose: defaultCallback,
+                onOpen: defaultCallback
             },
             received_data = [],
             origanizeOptions = function(opts) {
                 for (var name in defaultOptions) {
-                    if (false === opts.hasOwnProperty(name)) {
+                    if (false === opts.hasOwnProperty(name) || 'undefined' === typeof opts[name]) {
                         opts[name] = defaultOptions[name];
                     }
                 }
@@ -39,9 +44,20 @@ define(function($) {
                 };
 
                 _ws.onmessage = function(result) {
+                    var data = (true === isJson(result.data) ? JSON.parse(result.data) : result.data);
+
                     // TODO: logging
                     received_data.push(result.data);
-                    options.onMessage(result);
+
+                    if ('error' === data.status) {
+                        options.onError(data);
+                    }
+                    else if ('fatal' === data.status) {
+                        options.onFatal(data);
+                    }
+                    else {
+                        options.onMessage(data);
+                    }
                 };
 
                 _ws.onclose = function(result) {
@@ -59,10 +75,10 @@ define(function($) {
 
                 return _ws;
             },
-            ws = null;
+            ws = null,
+            socketOptions = origanizeOptions(options);
 
-        options = origanizeOptions(options);
-        ws = createWebSocket(options);
+        ws = createWebSocket(socketOptions);
 
         return {
             send: function(data) {
@@ -105,7 +121,7 @@ define(function($) {
 
             close: function(reconnect) {
                 if ('boolean' === typeof reconnect) {
-                    options.autoReconnect = reconnect;
+                    socketOptions.autoReconnect = reconnect;
                 }
 
                 if (null !== ws) {
@@ -115,13 +131,25 @@ define(function($) {
 
             // events
             onMessage: function(callback) {
-                options.onMessage = callback;
+                socketOptions.onMessage = callback;
 
                 return this;
             },
 
             onClose: function(callback) {
-                options.onclose = callback;
+                socketOptions.onclose = callback;
+
+                return this;
+            },
+
+            onError: function(callback) {
+                socketOptions.onError = callback;
+
+                return this;
+            },
+
+            onFatal: function(callback) {
+                socketOptions.onFatal = callback;
 
                 return this;
             }

@@ -6,7 +6,7 @@ define([
 
     return React.createClass({
         render: function() {
-            var lang    = this.props.lang
+            var lang = this.props.lang
 
             return (
                 <div className="configured-flux center">

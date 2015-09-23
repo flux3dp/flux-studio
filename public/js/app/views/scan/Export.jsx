@@ -16,7 +16,7 @@ define([
                     <h4 className="caption">{lang.scan.save_as}</h4>
                     <RadioGroupView className="file-formats clearfix" name="file-format" options={lang.scan.save_mode}/>
                     <div>
-                        <button className="btn btn-default" onClick={this._onExport}>{lang.scan.do_save}</button>
+                        <button data-ga-event="scan-export-to-file" className="btn btn-default" onClick={this._onExport}>{lang.scan.do_save}</button>
                     </div>
                 </div>
             );

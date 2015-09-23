@@ -61,6 +61,7 @@ define([
                                 mode={this.state.mode}
                                 className={image_panel_class}
                                 onThresholdChanged={this.props.laserEvents.thresholdChanged}
+                                onTransform={this.props.laserEvents.imageTransform}
                             /> :
                             ''
                         );
@@ -93,14 +94,14 @@ define([
 
                             self.props.laserEvents.handleLaser(self.state.settings);
                         },
-                        content = (
-                            <PrinterSelector lang={lang} onGettingPrinter={onGettingPrinter}/>
-                        ),
                         onClose = function(e) {
                             self.setState({
                                 openPrinterSelectorWindow: false
                             });
-                        };
+                        },
+                        content = (
+                            <PrinterSelector className="laser-device-selection-popup" lang={lang} onClose={onClose} onGettingPrinter={onGettingPrinter}/>
+                        );
 
                     return (
                         <Modal content={content} onClose={onClose}/>
@@ -116,7 +117,8 @@ define([
                 },
 
                 render: function() {
-                    var lang = args.state.lang,
+                    var self = this,
+                        lang = args.state.lang,
                         stageSection = this._renderStageSection(),
                         printerSelector = (
                             true === this.state.openPrinterSelectorWindow ?
@@ -156,10 +158,26 @@ define([
                 },
 
                 componentDidMount: function() {
-                    var _laserEvents = laserEvents.call(this, args);
+                    var self = this,
+                        _laserEvents = laserEvents.call(this, args);
+
                     this.setProps({
                         laserEvents: _laserEvents
                     });
+
+                    _laserEvents.menuFactory.items.import.onClick = function() {
+                        self.refs.setupPanel.refs.fileUploader.getDOMNode().click();
+                    };
+
+                    _laserEvents.menuFactory.items.execute.enabled = false;
+                    _laserEvents.menuFactory.items.execute.onClick = function() {
+                        self.refs.setupPanel._onRunLaser();
+                    };
+
+                    _laserEvents.menuFactory.items.saveGCode.enabled = false;
+                    _laserEvents.menuFactory.items.saveGCode.onClick = function() {
+                        self.refs.setupPanel._onExport();
+                    };
                 },
 
                 componentWillUnmount: function () {

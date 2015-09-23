@@ -4,8 +4,9 @@ define([
     'jsx!widgets/Modal',
     'jsx!views/Print-Selector',
     'helpers/api/3d-scan-control',
-    'jsx!views/Message'
-], function($, React, Modal, PrinterSelector, scanControl, MessageBox) {
+    'jsx!views/Message',
+    'helpers/api/control',
+], function($, React, Modal, PrinterSelector, scanControl, MessageBox, deviceControl) {
     'use strict';
 
     return function(args) {
@@ -13,6 +14,8 @@ define([
 
         var lang = args.state.lang,
             timer,
+            statusChecker,
+            deviceController,
             view = React.createClass({
                 getInitialState: function() {
                     return ({
@@ -20,13 +23,17 @@ define([
                         openPrinterSelectorWindow: false,
                         openErrorWindow: false,
                         cameraOn: false,
-                        listFile: false
+                        listFile: false,
+                        status: lang.device.pleaseWait
                     });
                 },
                 componentDidMount: function() {
                     if(!this.state.selectedPrinter.name) {
                         this.setState({ openPrinterSelectorWindow: true });
                     }
+                    // statusChecker = setInterval(() => {
+                    //     this._getStatus();
+                    // }, 1000)
                 },
                 componentWillUnmount: function() {
                     if ('undefined' !== typeof this.props.scan_ctrl_websocket &&
@@ -35,6 +42,7 @@ define([
                         this.props.scan_ctrl_websocket.connection.close(false);
                         this.props.scan_modeling_websocket.connection.close(false);
                     }
+                    clearInterval(statusChecker);
                 },
                 _refreshCamera: function() {
                     var self = this;
@@ -59,6 +67,57 @@ define([
                             }
                         )
                     });
+                },
+                _getStatus: function() {
+                    if(deviceController)
+                    {
+                        var p = deviceController.getStatus();
+                        p.then((result) => {
+                            result = result || {};
+                            this.setState({ status: this._translateStatus(result.location) });
+                        });
+                    }
+                },
+                _translateStatus: function(status) {
+                    switch(status) {
+                        case 'PlayTask':
+                            return lang.device.busy;
+                        case 'CommandTask':
+                            return lang.device.ready;
+                        case 'NO_TASK':
+                            return lang.device.noTask;
+                        case 'UNKNOW_COMMAND':
+                            return lang.device.unknownCommand;
+                        default:
+                            return lang.device.pleaseWait;
+                    }
+                },
+                _executeCommand: function(command) {
+                    if(deviceController) {
+                        var p;
+                        switch (command) {
+                            case 'START':
+                                p = deviceController.start(); break;
+                            case 'ABORT':
+                                p = deviceController.abort(); break;
+                            case 'RESET':
+                                p = deviceController.reset(); break;
+                            case 'QUIT':
+                                p = deviceController.quit(); break;
+                            default: break;
+                        }
+
+                        if(p) {
+                            p.then((result) => {
+                                if(result.status === 'error') {
+                                    this.setState({
+                                        errorMessage: this._translateStatus(result.error),
+                                        openErrorWindow: true
+                                    });
+                                }
+                            });
+                        }
+                    }
                 },
                 _handleCameraOn: function(e) {
                     this.setState({ cameraOn: true });
@@ -101,6 +160,7 @@ define([
                         selectedPrinter: selectedPrinter,
                         openPrinterSelectorWindow: false
                     });
+                    deviceController = deviceControl(this.state.selectedPrinter.serial);
                 },
                 _handleCancelBrowseFile: function(e) {
                     this.setState({ listFile: false });
@@ -108,14 +168,53 @@ define([
                 _handlePrinterSelectionOn: function(e) {
                     this.setState({ openPrinterSelectorWindow: true });
                 },
-                _handleError: function(e) {
-                    this.setState({ openErrorWindow: true });
-                },
                 _handleRetry: function(e) {
                     console.log('retry...');
                 },
                 _handleCloseMessageBox: function(e) {
                     this.setState({ openErrorWindow: false });
+                },
+                _handleStart: function(e) {
+                    this._executeCommand('START');
+                },
+                _handleAbort: function(e) {
+                    this._executeCommand('ABORT');
+                },
+                _handleClearConnection: function(e) {
+                    this._executeCommand('RESET');
+                },
+                _handleQuit: function(e) {
+                    this._executeCommand('QUIT');
+                },
+                _renderInfoSection: function() {
+                    return (
+                        <div>
+                            <div className="row-fluid">
+                                <div className="span1">Device Name</div>
+                                <div className="span5">{this.state.selectedPrinter.name}</div>
+                            </div>
+                            <div className="row-fluid">
+                                <div className="span1">Mode</div>
+                                <div className="span5">laser / print / scan</div>
+                            </div>
+                            <div className="row-fluid">
+                                <div className="span1">Status</div>
+                                <div className="span5">{this.state.status}</div>
+                            </div>
+                            <div className="row-fluid">
+                                <div className="span6">
+                                    <a className="btn btn-default" onClick={this._handleCameraOn}>{lang.device.cameraOn}</a>
+                                    <a className="btn btn-default" onClick={this._handleBrowseFile}>{lang.device.browseFiles}</a>
+                                    <a className="btn btn-default" onClick={this._handlePrinterSelectionOn}>{lang.device.selectPrinter}</a>
+                                    <br/>
+                                    <a className="btn btn-primary" onClick={this._handleStart}>{lang.device.start}</a>
+                                    <a className="btn btn-warning" onClick={this._handleAbort}>{lang.device.abort}</a>
+                                    <a className="btn btn-danger" onClick={this._handleClearConnection}>{lang.device.reset}</a>
+                                    <a className="btn btn-warning" onClick={this._handleQuit}>{lang.device.quit}</a>
+                                </div>
+                            </div>
+                        </div>
+                    );
                 },
                 _renderPrinterSelectorWindow: function() {
                     var content = (
@@ -146,7 +245,7 @@ define([
                     var content = (
                         <MessageBox
                             lang={lang}
-                            message={"some error message"}
+                            message={this.state.errorMessage}
                             onRetry={this._handleRetry}
                             onClose={this._handleCloseMessageBox} />
                     );
@@ -207,33 +306,16 @@ define([
                     )
                 },
                 render: function() {
-                    var printerSelectorWindow   = this.state.openPrinterSelectorWindow ? this._renderPrinterSelectorWindow() : '',
-                        errorWindow = this.state.openErrorWindow ? this._renderErrorWindow() : '',
-                        cameraSection = this.state.cameraOn ? this._renderCameraSection() : '',
-                        fileListSection = this.state.listFile ? this._renderFileList() : '';
+                    var infoSection             = this._renderInfoSection(),
+                        printerSelectorWindow   = this.state.openPrinterSelectorWindow ? this._renderPrinterSelectorWindow() : '',
+                        errorWindow             = this.state.openErrorWindow ? this._renderErrorWindow() : '',
+                        cameraSection           = this.state.cameraOn ? this._renderCameraSection() : '',
+                        fileListSection         = this.state.listFile ? this._renderFileList() : '';
 
                     return (
                         <div className="studio-container device-studio">
-                            <div className="row-fluid">
-                                <div className="span1">Device Name</div>
-                                <div className="span5">{this.state.selectedPrinter.name}</div>
-                            </div>
-                            <div className="row-fluid">
-                                <div className="span1">Mode</div>
-                                <div className="span5">laser / print / scan</div>
-                            </div>
-                            <div className="row-fluid">
-                                <div className="span1">Status</div>
-                                <div className="span5">idle / heating / correcting / scanning ...</div>
-                            </div>
-                            <div className="row-fluid">
-                                <div className="span6">
-                                    <a className="btn btn-default" onClick={this._handleCameraOn}>{lang.device.cameraOn}</a>
-                                    <a className="btn btn-default" onClick={this._handleBrowseFile}>{lang.device.browseFiles}</a>
-                                    <a className="btn btn-default" onClick={this._handlePrinterSelectionOn}>{lang.device.selectPrinter}</a>
-                                    <a className="btn btn-default" onClick={this._handleError}>error window</a>
-                                </div>
-                            </div>
+
+                            {infoSection}
 
                             {cameraSection}
 

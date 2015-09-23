@@ -84,11 +84,11 @@ define([
                 printStatusClass    = ClassNames('fa fa-pause fa-2x', {'hide': !this.state.printPaused}),
                 actionButton        =
                     <div className="pause">
-                        <a className="btn btn-confirm" onClick={this._handleTogglePrintPause}>{this.state.printPaused ? lang.print.continue : lang.print.pause}</a></div>;
+                        <a data-ga-event="print-pause" className="btn btn-confirm" onClick={this._handleTogglePrintPause}>{this.state.printPaused ? lang.print.continue : lang.print.pause}</a></div>;
 
             if(this.state.printError) {
                 printStatusClass = ClassNames('fa fa-exclamation-triangle fa-2x');
-                actionButton = <div className="restart"><a className="btn btn-confirm" onClick={this._handlePrintRestart}>{lang.print.restart}</a></div>
+                actionButton = <div className="restart"><a data-ga-event="print-restart" className="btn btn-confirm" onClick={this._handlePrintRestart}>{lang.print.restart}</a></div>
             }
 
             return (
@@ -109,7 +109,7 @@ define([
                     </div>
                     <div className="actions pull-right">
                         {actionButton}
-                        <div className="cancel"><a className="btn btn-default" onClick={this._handlePrintCancel}>{lang.print.cancel}</a></div>
+                        <div className="cancel"><a data-ga-event="print-cancel" className="btn btn-default" onClick={this._handlePrintCancel}>{lang.print.cancel}</a></div>
                     </div>
                 </div>
             );

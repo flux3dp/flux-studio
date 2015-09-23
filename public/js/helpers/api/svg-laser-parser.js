@@ -5,37 +5,29 @@
 define([
     'helpers/websocket',
     'helpers/convertToTypedArray',
-    'helpers/is-json',
     'helpers/data-history',
     'helpers/api/set-params'
-], function(Websocket, convertToTypedArray, isJson, history, setParams) {
+], function(Websocket, convertToTypedArray, history, setParams) {
     'use strict';
+
+    // Because the preview image size is 640x640
+    var MAXWIDTH = 640;
 
     return function(opts) {
         opts = opts || {};
-        opts.onError = opts.onError || function() {};
 
         var ws = new Websocket({
                 method: 'svg-laser-parser',
-                onMessage: function(result) {
+                onMessage: function(data) {
 
-                    var data = (true === isJson(result.data) ? JSON.parse(result.data) : result.data),
-                        error_code;
+                    events.onMessage(data);
 
-                    if ('string' === typeof data.status && 'fatal' === data.status) {
-                        opts.onError(data.error, data);
-                    }
-                    else {
-                        events.onMessage(data);
-                    }
-
-                    lastMessage = data;
-
-                }
+                },
+                onError: opts.onError,
+                onFatal: opts.onFatal
             }),
             uploaded_svg = [],
             lastOrder = '',
-            lastMessage = '',
             events = {
                 onMessage: function() {}
             },
@@ -46,16 +38,17 @@ define([
                 lastOrder = 'get';
 
                 var args = [
-                    lastOrder,
-                    name
-                ],
-                blobs = [],
-                blob,
-                total_length = 0,
-                size = {
-                    height: 0,
-                    width: 0
-                };
+                        lastOrder,
+                        name
+                    ],
+                    blobs = [],
+                    blob,
+                    url = window.URL,
+                    total_length = 0,
+                    size = {
+                        height: 0,
+                        width: 0
+                    };
 
                 events.onMessage = function(data) {
 
@@ -69,8 +62,19 @@ define([
                         blob = new Blob(blobs);
 
                         if (total_length === blob.size) {
-                            History.push(name, { size: size, blob: blob });
-                            opts.onFinished(blob, size);
+                            $.ajax({
+                                url: url.createObjectURL(blob)
+                            }).done(function(data) {
+                                var $svg = $(data),
+                                    newSize = computePreviewImageSize(size);
+
+                                $svg.attr('width', newSize.width).attr('height', newSize.height);
+
+                                blob = new Blob([$svg[0].outerHTML.replace('viewbox', 'viewBox')]);
+
+                                History.push(name, { size: size, blob: blob });
+                                opts.onFinished(blob, size);
+                            });
                         }
                     }
 
@@ -107,7 +111,22 @@ define([
             },
             History = history(),
             goNextUpload = true,
-            uploadQueue = [];
+            uploadQueue = [],
+            computePreviewImageSize = function(size) {
+                var height = size.height,
+                    width = size.width,
+                    longerSide = Math.max(width, height),
+                    ratio;
+
+                ratio = MAXWIDTH / longerSide;
+                height = height * ratio;
+                width = width * ratio;
+
+                return {
+                    width: width,
+                    height: height
+                };
+            };
 
         // listen upload request
         Array.observe(uploadQueue, function(changes) {
@@ -216,8 +235,8 @@ define([
                         obj.br_position_y,
                         obj.rotate,
                         obj.svg_data.blob.size,
-                        obj.width,
-                        obj.height
+                        parseInt(obj.width, 10),
+                        parseInt(obj.height, 10)
                     ];
 
                     requests_serial.push(request_header.join(' '));
@@ -318,7 +337,8 @@ define([
 
                 ws.send(args.join(' '));
             },
-            params: setParams(ws, events)
+            params: setParams(ws, events),
+            computePreviewImageSize: computePreviewImageSize
         };
     };
 });

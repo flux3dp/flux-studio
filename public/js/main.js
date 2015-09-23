@@ -1,5 +1,5 @@
 require.config({
-    urlArgs: 'v=' + (new Date()).getTime(),
+    urlArgs: 'v=' + window.FLUX.timestamp,
     baseUrl: 'js/',
 
     paths: {
@@ -14,6 +14,7 @@ require.config({
         threejs: 'lib/three/three.min',
         threeTransformControls: 'lib/three/controls/TransformControls',
         threeOrbitControls: 'lib/three/controls/OrbitControls',
+        threeTrackballControls: 'lib/three/controls/TrackballControls',
         threeSTLLoader: 'lib/three/loaders/STLLoader',
         threeTrackball: 'lib/three/controls/TrackballControls',
         threeCircularGridHelper: 'helpers/CircularGridHelper',
@@ -83,6 +84,7 @@ require([
     'app/router',
     'app/actions/global',
     'domReady!',
+    'helpers/tracker',
     'threejs'
 ], function($, Backbone, Router, globalEvents) {
     'use strict';
@@ -91,4 +93,18 @@ require([
         var router = new Router();
         Backbone.history.start();
     });
+
+    // GA setting up
+    // NOTICE: rename ga as GA to prevent conflict with requirejs
+    window.GA = ('undefined' !== typeof ga ? ga : function() {});
+
+    GA(
+        'create',
+        'UA-40862421-6',
+        {
+            'cookieDomain': 'none'
+        }
+    );
+
+    GA('send', 'pageview', location.hash);
 });

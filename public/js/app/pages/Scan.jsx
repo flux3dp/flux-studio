@@ -583,7 +583,7 @@ define([
                             self._openBlocker(true);
                         },
                         content = (
-                            <PrinterSelector lang={lang} onGettingPrinter={onGettingPrinter}/>
+                            <PrinterSelector className="scan-printer-selection" lang={lang} onGettingPrinter={onGettingPrinter}/>
                         ),
                         onClose = function(e) {
                             self.setState({

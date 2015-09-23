@@ -4,20 +4,23 @@ define([
     'helpers/display',
     'helpers/websocket',
     'helpers/api/3d-print-slicing',
+    'helpers/api/control',
     'threeOrbitControls',
+    'threeTrackballControls',
     'threeTransformControls',
     'threeSTLLoader',
     'threeCircularGridHelper',
-    'plugins/file-saver/file-saver.min'
+    'plugins/file-saver/file-saver.min',
+    'lib/Canvas-To-Blob'
 
-], function($, fileSystem, display, websocket, printSlicing) {
+], function($, fileSystem, display, websocket, printSlicing, printerController) {
     'use strict';
 
     var THREE = window.THREE || {},
         container, printController;
 
     var camera, scene, renderer;
-    var orbitControl, transformControl, reactSrc;
+    var orbitControl, transformControl, reactSrc, controls;
 
     var objects = [],
         referenceMeshes = [];
@@ -26,12 +29,19 @@ define([
         offset = new THREE.Vector3(),
         circularGridHelper, mouseDown, boundingBox, SELECTED;
 
-    var movingOffsetX, movingOffsetY;
+    var movingOffsetX, movingOffsetY, originalCameraPosition, originalCameraRotation,
+        scaleBeforeTransformX, scaleBeforeTransformY, scaleBeforeTransformZ;
 
-    var responseMessage, responseBlob,
+    var responseMessage, responseBlob, printPath,
+        previewScene,
+        mainScene,
+        previewColors = [],
         blobExpired = true,
         transformMode = false,
-        fileExtension = '.gcode';
+        shiftPressed = false,
+        previewMode = false,
+        fileExtension = '.gcode',
+        leftPanelWidth = 275;
 
     var s = {
         diameter: 170,
@@ -48,10 +58,17 @@ define([
         colorSelected: 0xFFFF00,
         colorUnselected: 0x333333,
         degreeStep: 5,
-        scalePrecision: 1 // in decimal, 1 = up to 0.1, 2 = 0.01
+        scalePrecision: 1, // decimal places,
+        allowedMin: 1 // (mm)
     };
 
-    var advanceParameters = ['layerHeight', 'infill', 'travelingSpeed', 'extrudingSpeed', 'temperature'];
+    var advancedParameters = ['layerHeight', 'infill', 'travelingSpeed', 'extrudingSpeed', 'temperature', 'advancedSettings'];
+
+    previewColors[0] = new THREE.Color( 0x996633 ); // infill
+    previewColors[1] = new THREE.Color( 0xddcc99 ); // perimeter
+    previewColors[2] = new THREE.Color( 0xbbbbbb ); // support
+    previewColors[3] = new THREE.Color( 0xffffff ); // move
+    previewColors[4] = new THREE.Color( 0xee9966 ); // skirt
 
     function init(src) {
 
@@ -59,7 +76,7 @@ define([
         container = document.getElementById('model-displayer');
 
         camera = new THREE.PerspectiveCamera( 60, (container.offsetWidth) / container.offsetHeight, 1, 30000 );
-        camera.position.set(100, 100, 100);
+        camera.position.set(0, -300, 110);
         camera.up = new THREE.Vector3(0,0,1);
 
         scene = new THREE.Scene();
@@ -75,7 +92,9 @@ define([
             s.textColor,
             s.textPosition
         );
+        circularGridHelper.name = 'circularGridHelper';
         scene.add(circularGridHelper);
+        previewScene = scene.clone();
 
         var geometry = new THREE.CircleGeometry( s.radius, 80 ),
             material = new THREE.MeshBasicMaterial( { color: 0xCCCCCC, transparent: true } ),
@@ -89,14 +108,14 @@ define([
         // Lights
         scene.add(new THREE.AmbientLight(0x777777));
 
-        addShadowedLight(1, 1, 1, 0xffffff, 1.35);
-        addShadowedLight(0.5, 1, -1, 0xffaa00, 1);
-        addShadowedLight(-1, -1, -1, 0xffffff, 1.35);
-        addShadowedLight(-0.5, -1, 1, 0xffaa00, 1);
+        _addShadowedLight(1, 1, 1, 0xffffff, 1.35);
+        _addShadowedLight(0.5, 1, -1, 0xffaa00, 1);
+        _addShadowedLight(-1, -1, -1, 0xffffff, 1.35);
+        _addShadowedLight(-0.5, -1, 1, 0xffaa00, 1);
 
         // renderer
         renderer = new THREE.WebGLRenderer({
-            // antialias: true
+            preserveDrawingBuffer: true
         });
         renderer.setClearColor( 0xE0E0E0, 1 );
         renderer.setPixelRatio(window.devicePixelRatio);
@@ -105,90 +124,31 @@ define([
         container.appendChild(renderer.domElement);
 
         orbitControl = new THREE.OrbitControls(camera, renderer.domElement);
-        orbitControl.maxPolarAngle = Math.PI/2;
+        orbitControl.maxPolarAngle = Math.PI/4 * 3;
+        orbitControl.maxDistance = 1000;
         orbitControl.noKeys = true;
-        orbitControl.addEventListener('change', render);
+        orbitControl.addEventListener('change', updateOrbitControl);
 
         transformControl = new THREE.TransformControls(camera, renderer.domElement);
         transformControl.addEventListener('change', render);
-        transformControl.addEventListener('mouseDown', transform);
-        transformControl.addEventListener('mouseUp', transform);
-        transformControl.addEventListener('objectChange', transform);
-
-        // testing lines
-        // var lineMaterial1 = new THREE.LineBasicMaterial({
-        //     color: 0xff0000,
-        //     linewidth: 10
-        // });
-        var lineMaterial2 = new THREE.LineBasicMaterial({
-            color: 0x00ff00,
-            linewidth: 100,
-            vertexColors: 0xff0000
-        });
-        // var lineGeometry = new THREE.Geometry();
-        // lineGeometry.vertices.push(new THREE.Vector3(-10, 0, 0));
-        // lineGeometry.vertices.push(new THREE.Vector3(0, 10, 0));
-        // lineGeometry.vertices.push(new THREE.Vector3(10, 0, 0));
-        // lineGeometry.vertices.push(new THREE.Vector3(-15, 0, 0));
-        // lineGeometry.vertices.push(new THREE.Vector3(0, 15, 0));
-        // lineGeometry.vertices.push(new THREE.Vector3(15, 0, 0));
-        //
-        // var line1 = new THREE.Line(lineGeometry, lineMaterial1, THREE.LinePieces);
-        //
-        // var lineGeometry2 = new THREE.Geometry();
-        // lineGeometry2.vertices.push(new THREE.Vector3(0, 10, 0));
-        // lineGeometry2.vertices.push(new THREE.Vector3(10, 0, 0));
-        // lineGeometry2.vertices.push(new THREE.Vector3(-15, 0, 0));
-        // lineGeometry2.vertices.push(new THREE.Vector3(0, 15, 0));
-
-        // var line2 = new THREE.Line(lineGeometry2, lineMaterial2, THREE.LinePieces);
-        //
-        // scene.add(line1);
-        // scene.add(line2);
-
-
-
-
-        // var points = [
-        //     {t: 1, v: [-5,0,0]},
-        //     {t: 1, v: [0,-5,0]},
-        //     {t: 1, v: [5,0,0]},
-        //     {t: 1, v: [0,5,0]},
-        //     {t: 1, v: [-10,0,0]},
-        //     {t: 1, v: [0,-10,0]}
-        // ];
-        //
-        // var colors = [];
-        // var g = new THREE.BufferGeometry();
-        //
-        // for(var i = 0; i < points.length; i++) {
-        //     g.vertices.push(new THREE.Vector3(points[i].v[0], points[i].v[1], points[i].v[2]));
-        // }
-        //
-        // colors[0] = new THREE.Color( 0x000000 );
-        // colors[1] = new THREE.Color( 0xffff00 );
-        // colors[2] = new THREE.Color( 0xff0000 );
-        // colors[3] = new THREE.Color( 0xff0ff0 );
-        // colors[4] = new THREE.Color( 0xfffff0 );
-        // colors[5] = new THREE.Color( 0x0fffff );
-        //
-        // g.colors = colors;
-        //
-        // var m = new THREE.LineBasicMaterial( { color: 0xffffff, opacity: 10, linewidth: 3, vertexColors: THREE.VertexColors } );
-        // var line = new THREE.Line(g, m);
-        //
-        // scene.add(line);
-
-
+        transformControl.addEventListener('mouseDown', onTransform);
+        transformControl.addEventListener('mouseUp', onTransform);
+        transformControl.addEventListener('objectChange', onTransform);
 
         window.addEventListener('resize', onWindowResize, false);
+        window.addEventListener("keydown", onKeyPress, false);
+        window.addEventListener("keyup", onKeyPress, false);
         renderer.domElement.addEventListener('mousemove', onMouseMove, false);
         renderer.domElement.addEventListener('mousedown', onMouseDown, false);
         renderer.domElement.addEventListener('mouseup', onMouseUp, false);
 
         renderer.setSize(container.offsetWidth, container.offsetHeight);
 
+        originalCameraPosition = camera.position.clone();
+        originalCameraRotation = camera.rotation.clone();
+
         render();
+        setImportWindowPosition();
 
         // init print controller
         printController = printSlicing();
@@ -208,6 +168,11 @@ define([
         var loader = new THREE.STLLoader();
         var model_file_path = fileEntry.toURL();
 
+        reactSrc.setState({
+            openWaitWindow: true,
+            openImportWindow: false
+        });
+
         loader.load(model_file_path, function(geometry) {
 
             var material = new THREE.MeshPhongMaterial({
@@ -219,10 +184,10 @@ define([
             mesh.up = new THREE.Vector3(0,0,1);
 
             uploadStl(mesh.uuid, file, function(result) {
-                console.log(result);
                 if(result.status !== 'ok') {
                     alert(result.error);
                 }
+                reactSrc.setState({ openWaitWindow: false });
             });
 
             geometry.center();
@@ -230,6 +195,11 @@ define([
             // normalize - resize, align
             var box = new THREE.Box3().setFromObject(mesh);
             var scale = getScaleDifference(getLargestPropertyValue(box.size()));
+
+            // alert for auto scalling
+            if(scale !== 1) {
+                alert('this model has been scaled for better printing ratio');
+            }
 
             mesh.scale.set(scale, scale, scale);
             mesh.scale._x = scale;
@@ -249,11 +219,15 @@ define([
             mesh.position.isOutOfBounds = false;
             /* end customized property */
 
-            mesh.geometry = new THREE.Geometry().fromBufferGeometry(mesh.geometry);
+            if(mesh.geometry.type !== 'Geometry') {
+                mesh.geometry = new THREE.Geometry().fromBufferGeometry(mesh.geometry);
+            }
             mesh.name = 'custom';
+            // mesh.material.side = THREE.DoubleSide;
 
-            selectObject(mesh);
             alignCenter();
+            groundIt(mesh);
+            selectObject(mesh);
 
             scene.add(mesh);
             objects.push(mesh);
@@ -262,14 +236,19 @@ define([
         });
     }
 
+    // Events Section ---
+
     function onMouseDown(e) {
         e.preventDefault();
-        adjustMousePosition(e);
+        setMousePosition(e);
+
+        if(previewMode) {
+            return;
+        }
 
         raycaster.setFromCamera( mouse, camera );
         var intersects = raycaster.intersectObjects( objects );
         var location = getReferenceIntersectLocation(e);
-        // console.log('found',intersects.length);
         if (intersects.length > 0) {
             var target = intersects[0].object;
             selectObject(target);
@@ -289,6 +268,11 @@ define([
                 transformMode = false;
                 render();
             }
+            else {
+                scaleBeforeTransformX = SELECTED.scale.x;
+                scaleBeforeTransformY = SELECTED.scale.y;
+                scaleBeforeTransformZ = SELECTED.scale.z;
+            }
         }
 
         render();
@@ -300,8 +284,7 @@ define([
         mouseDown = false;
         container.style.cursor = 'auto';
         checkOutOfBounds(SELECTED);
-        updateFromScene('BoundingBoxHelper');
-        updateFromScene('TransformControl');
+        groundIt(SELECTED);
 
         if(transformMode) {
             selectObject(transformControl.object);
@@ -311,21 +294,68 @@ define([
     }
 
     function onMouseMove(e) {
-        event.preventDefault();
-        adjustMousePosition(e);
+        e.preventDefault();
+        setMousePosition(e);
 
         var location = getReferenceIntersectLocation(e);
         if(SELECTED && mouseDown && !transformMode)
         {
-            if(SELECTED.position && location) {
-                SELECTED.position.x = location.x - movingOffsetX;
-                SELECTED.position.y = location.y - movingOffsetY;
-                blobExpired = true;
-                render();
-                return;
+            if(!transformMode) {
+                if(SELECTED.position && location) {
+                    SELECTED.position.x = location.x - movingOffsetX;
+                    SELECTED.position.y = location.y - movingOffsetY;
+                    blobExpired = true;
+                    setObjectDialoguePosition();
+                    render();
+                    return;
+                }
             }
         }
     }
+
+    function onWindowResize() {
+        camera.aspect = container.offsetWidth / container.offsetHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(container.offsetWidth, container.offsetHeight);
+        render();
+        setImportWindowPosition();
+    }
+
+    function onKeyPress(e) {
+        if(e.keyCode === 16) {
+            shiftPressed = e.type === 'keydown';
+        }
+    }
+
+    function onTransform(e) {
+        switch(e.type) {
+            case 'mouseDown':
+                transformMode = true;
+                break;
+            case 'mouseUp':
+                transformMode = false;
+                // d = degree, s = scale
+                var _dx = updateDegreeWithStep(radianToDegree(SELECTED.rotation.x)),
+                    _dy = updateDegreeWithStep(radianToDegree(SELECTED.rotation.y)),
+                    _dz = updateDegreeWithStep(radianToDegree(SELECTED.rotation.z)),
+                    _sx = updateScaleWithStep(SELECTED.scale.x),
+                    _sy = updateScaleWithStep(SELECTED.scale.y),
+                    _sz = updateScaleWithStep(SELECTED.scale.z);
+
+                _dx = _dx >= 0 ? _dx : (360 - Math.abs(_dx));
+                _dy = _dy >= 0 ? _dy : (360 - Math.abs(_dy));
+                _dz = _dz >= 0 ? _dz : (360 - Math.abs(_dz));
+                setRotation(_dx, _dy, _dz, false);
+                setScale(_sx, _sy, _sz, false, false);
+                render();
+                groundIt(SELECTED);
+                break;
+            case 'objectChange':
+                break;
+        }
+    }
+
+    // GET section ---
 
     // get objects that intersects with the ray
     function getIntersects(x, y) {
@@ -353,37 +383,6 @@ define([
         }
     }
 
-    // select the specified object, will calculate out-of-bounds and change color accordingly
-    function selectObject(obj) {
-        SELECTED = obj || {};
-
-        removeFromScene('BoundingBoxHelper');
-        removeFromScene('TransformControl');
-
-        if(!$.isEmptyObject(obj)) {
-            boundingBox = new THREE.BoundingBoxHelper( obj, s.colorSelected );
-            boundingBox.name = "BoundingBoxHelper";
-            boundingBox.update();
-
-            transformControl.attach(obj);
-            transformControl.name = 'TransformControl';
-
-            // if(!transformMode) {
-            //     scene.add(boundingBox);
-            // }
-
-            scene.add(boundingBox);
-        }
-        else {
-            transformMode = false;
-            // removeFromScene('TransformControl');
-            // render();
-        }
-        reactSrc.setState({ modelSelected: SELECTED.uuid ? SELECTED : null });
-
-        render();
-    }
-
     // calculate the distance from reference mesh
     function getReferenceDistance(mesh) {
         if(mesh) {
@@ -396,12 +395,16 @@ define([
         }
     }
 
-    function adjustMousePosition(e) {
-        var offx = 0,
-            offy = 0;
+    function getFileByteArray(filePath) {
+        getFileObject(filePath, function (fileObject) {
+             var reader = new FileReader();
 
-        mouse.x = ((e.offsetX - offx) / container.offsetWidth) * 2 - 1;
-        mouse.y = -((e.offsetY - offy) / container.offsetHeight) * 2 + 1;
+             reader.onload = function(e) {
+                 var arrayBuffer = reader.result;
+             }
+
+             reader.readAsArrayBuffer(fileObject);
+        });
     }
 
     // compare and return the largest axis value (for scaling)
@@ -424,15 +427,10 @@ define([
 
         // if loaded object is smaller, enlarge it. offset by *10
         if(value < s.diameter) {
-            while(!done) {
-                if(value * scale > s.diameter) {
-                    done = true;
-                }
-                else {
-                    scale = scale * 10;
-                }
+            if(value * scale < s.allowedMin) {
+                scale = scale * 10;
             }
-            return scale * 0.1;
+            return scale;
         }
         // if loaded object exceed printed area, shrink it (no offset)
         else {
@@ -448,79 +446,144 @@ define([
         }
     }
 
-    function addShadowedLight(x, y, z, color, intensity) {
+    function getGCode() {
+        var d = $.Deferred();
+        var ids = [];
+        objects.forEach(function(obj) {
+            ids.push(obj.uuid);
+        });
 
-        var directionalLight = new THREE.DirectionalLight(color, intensity);
-        directionalLight.position.set(x, y, z);
+        _setProgressMessage('Saving File Preview');
+        saveSceneAsFileIcon().then(function(blob) {
+            return printController.uploadPreviewImage(blob);
+        }).then(function(result) {
+            if(result.status === 'ok') {
+                sendGCodeParameters().then(function() {
+                    printController.go(ids, function(result) {
+                        if(result instanceof Blob) {
+                            blobExpired = false;
+                            responseBlob = result;
+                            _setProgressMessage('');
+                            d.resolve(result);
+                        }
+                        else {
+                            if(result.status !== 'error') {
+                                var serverMessage   = `${result.status}: ${result.message} (${parseInt(result.percentage * 100)}%)`,
+                                    drawingMessage  = `FInishing up... (100%)`,
+                                    message         = result.status !== 'complete' ? serverMessage : drawingMessage;
+                                _setProgressMessage(message);
+                            }
+                            else {
+                                _setProgressMessage('');
+                            }
+                        }
+                    });
+                });
+            }
+            // error
+            else {
+                _setProgressMessage('');
+                d.resolve(result);
+            }
+        });
 
-        scene.add(directionalLight);
-        directionalLight.castShadow = true;
-
-        var d = 1;
-        directionalLight.shadowCameraLeft = -d;
-        directionalLight.shadowCameraRight = d;
-        directionalLight.shadowCameraTop = d;
-        directionalLight.shadowCameraBottom = -d;
-
-        directionalLight.shadowCameraNear = 1;
-        directionalLight.shadowCameraFar = 4;
-
-        directionalLight.shadowMapWidth = 1024;
-        directionalLight.shadowMapHeight = 1024;
-
-        directionalLight.shadowBias = -0.005;
-        directionalLight.shadowDarkness = 0.15;
-
-        directionalLight.shadowCameraVisible = true;
-
+        return d.promise();
     }
 
-    function render(e) {
-        renderer.render(scene, camera);
-    }
-
-    function transform(e) {
-        switch(e.type) {
-            case 'mouseDown':
-                transformMode = true;
-                break;
-            case 'mouseUp':
-                transformMode = false;
-                // d = degree, s = scale
-                var _dx = updateDegreeWithStep(radianToDegree(SELECTED.rotation.x)),
-                    _dy = updateDegreeWithStep(radianToDegree(SELECTED.rotation.y)),
-                    _dz = updateDegreeWithStep(radianToDegree(SELECTED.rotation.z)),
-                    _sx = updateScaleWithStep(SELECTED.scale.x),
-                    _sy = updateScaleWithStep(SELECTED.scale.y),
-                    _sz = updateScaleWithStep(SELECTED.scale.z);
-                    // console.log(SELECTED.scale.x, SELECTED.scale.y, SELECTED.scale.z);
-                _dx = _dx >= 0 ? _dx : (360 - Math.abs(_dx));
-                _dy = _dy >= 0 ? _dy : (360 - Math.abs(_dy));
-                _dz = _dz >= 0 ? _dz : (360 - Math.abs(_dz));
-                rotate(_dx, _dy, _dz, false);
-                setScale(_sx, _sy, _sz, false, false);
-                render();
-                groundIt(SELECTED);
-                break;
-            case 'objectChange':
-                // console.log(updateScaleWithStep(SELECTED.scale.x), SELECTED.scale.x);
-
-                // console.log('hi');
-                break;
+    function getSelectedObjectSize() {
+        if(!$.isEmptyObject(SELECTED)) {
+            boundingBox = new THREE.BoundingBoxHelper(SELECTED, s.colorSelected);
+            boundingBox.update();
+            return boundingBox;
         }
-        // transformMode = e.type === 'mouseDown';
-        // console.log(e);
     }
 
-    // events
-    function onWindowResize() {
-        camera.aspect = container.offsetWidth / container.offsetHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(container.offsetWidth, container.offsetHeight);
+    // SET section ---
+
+    function setMousePosition(e) {
+        var offx = 0,
+            offy = 0;
+
+        mouse.x = ((e.offsetX - offx) / container.offsetWidth) * 2 - 1;
+        mouse.y = -((e.offsetY - offy) / container.offsetHeight) * 2 + 1;
+    }
+
+    function setScale(x, y, z, locked, alignCenter) {
+        var originalScaleX = SELECTED.scale._x;
+        var originalScaleY = SELECTED.scale._y;
+        var originalScaleZ = SELECTED.scale._z;
+        if(x === '' || x <= 0) {x = scaleBeforeTransformX;}
+        if(y === '' || y <= 0) {y = scaleBeforeTransformY;}
+        if(z === '' || z <= 0) {z = scaleBeforeTransformZ;}
+        SELECTED.scale.enteredX = x;
+        SELECTED.scale.enteredY = y;
+        SELECTED.scale.enteredZ = z;
+        SELECTED.scale.set(
+            (originalScaleX * x) || scaleBeforeTransformX,
+            (originalScaleY * y) || scaleBeforeTransformY,
+            (originalScaleZ * z) || scaleBeforeTransformZ
+        );
+        SELECTED.scale.locked = locked;
+        reactSrc.setState({ modelSelected: SELECTED.uuid ? SELECTED : null });
+
+        if(alignCenter) {
+            this.alignCenter();
+        }
+    }
+
+    function setRotateMode() {
+        setMode('rotate');
+    }
+
+    function setScaleMode() {
+        setMode('scale');
+    }
+
+    function setMode(mode) {
+        removeFromScene('TransformControl');
+        transformControl.setMode(mode);
+        scene.add(transformControl);
+        removeFromScene('BoundingBoxHelper');
         render();
     }
 
-    function rotate(x, y, z, render) {
+    function setAdvanceParameter(settings, index) {
+        index = index || 0;
+        var name = advancedParameters[index],
+            value = settings[name] || 'default';
+
+        if(index < advancedParameters.length)
+        {
+            printController.setParameter(name, value).then(function(result) {
+                if(result.status === 'error') {
+                    index = advancedParameters.length;
+                    // todo: error logging
+                    console.log(result.error);
+                }
+                if(index < advancedParameters.length) {
+                    setAdvanceParameter(settings, index + 1);
+                }
+                else {
+                    return;
+                }
+            });
+        }
+        blobExpired = true;
+    }
+
+    function setParameter(name, value) {
+        printController.setParameter(name, value).then(
+            function(result) {
+                if(result.status === 'error' || result.status === 'fatal') {
+                    // todo: error logging
+                }
+                console.dir(result);
+            }
+        )
+        blobExpired = true;
+    }
+
+    function setRotation(x, y, z, render) {
         SELECTED.rotation.enteredX = x;
         SELECTED.rotation.enteredY = y;
         SELECTED.rotation.enteredZ = z;
@@ -533,35 +596,120 @@ define([
             groundIt(SELECTED);
             updateFromScene('BoundingBoxHelper');
             checkOutOfBounds(SELECTED);
-            // render();
         }
     }
 
-    function setScale(x, y, z, locked, alignCenter) {
-        var originalScaleX = SELECTED.scale._x;
-        var originalScaleY = SELECTED.scale._y;
-        var originalScaleZ = SELECTED.scale._z;
-        SELECTED.scale.enteredX = x;
-        SELECTED.scale.enteredY = y;
-        SELECTED.scale.enteredZ = z;
-        if(x === '' || x == 0) {x = 1;}
-        if(y === '' || y == 0) {y = 1;}
-        if(z === '' || z == 0) {z = 1;}
-        SELECTED.scale.set(
-            (originalScaleX * x) || originalScaleX,
-            (originalScaleY * y) || originalScaleX,
-            (originalScaleZ * z) || originalScaleX
-        );
-        SELECTED.scale.locked = locked;
-        reactSrc.setState({ modelSelected: SELECTED.uuid ? SELECTED : null });
+    function setCameraPosition(refCamera) {
+        var p = refCamera.position,
+            r = refCamera.rotation;
 
-        if(alignCenter) {
-            this.alignCenter();
+        camera.position.set(p.x, p.y, p.z);
+        camera.rotation.set(r.x, r.y, r.z);
+        render();
+        setObjectDialoguePosition();
+    }
+
+    // Main Functions ---
+
+    // select the specified object, will calculate out-of-bounds and change color accordingly
+    function selectObject(obj) {
+        SELECTED = obj || {};
+
+        removeFromScene('BoundingBoxHelper');
+        removeFromScene('TransformControl');
+
+        if(!$.isEmptyObject(obj)) {
+            boundingBox = new THREE.BoundingBoxHelper( obj, s.colorSelected );
+            boundingBox.name = "BoundingBoxHelper";
+            boundingBox.update();
+            setObjectDialoguePosition(obj);
+
+            transformControl.attach(obj);
+            transformControl.name = 'TransformControl';
+
+            scaleBeforeTransformX = obj.scale.x;
+            scaleBeforeTransformY = obj.scale.y;
+            scaleBeforeTransformZ = obj.scale.z;
+
+            scene.add(boundingBox);
+        }
+        else {
+            transformMode = false;
+        }
+        reactSrc.setState({
+            modelSelected: SELECTED.uuid ? SELECTED : null,
+            openObjectDialogue: !!obj
+        });
+
+        render();
+    }
+
+    function setObjectDialoguePosition(obj) {
+        var o = obj || SELECTED;
+
+        if(!$.isEmptyObject(o)) {
+
+            var box   = new THREE.BoundingBoxHelper( o, s.colorSelected ),
+                position   = toScreenPosition(o, camera),
+                cameraDistance  = 0,
+                objectDialogueDistance = 0;
+            // console.log(position);
+
+            box.update();
+            cameraDistance = 320 / Math.sqrt(Math.pow(camera.position.x, 2) + Math.pow(camera.position.y, 2) + Math.pow(camera.position.z, 2));
+            objectDialogueDistance = cameraDistance * 1.2 * Math.sqrt(Math.pow(box.box.size().x, 2) + Math.pow(box.box.size().y, 2)) + 15;
+            objectDialogueDistance = parseInt(objectDialogueDistance);
+
+            reactSrc.setState({
+                openObjectDialogue: true
+            }, function() {
+                var objectDialogue = document.getElementsByClassName('objectDialogue')[0],
+                    objectDialogueWidth = parseInt($(objectDialogue).css('width').replace('px','')),
+                    objectDialogueHeight = parseInt($(objectDialogue).css('height').replace('px','')),
+                    leftOffset = parseInt(position.x),
+                    topOffset = (parseInt(position.y) - objectDialogueHeight / 2),
+                    marginTop = container.offsetHeight / 2 - position.y;
+
+                var rightLimit  = container.offsetWidth / 2 - leftPanelWidth - objectDialogueWidth,
+                    topLimit    = container.offsetHeight / 2 - objectDialogueHeight / 2;
+
+                if(objectDialogueDistance > rightLimit) {
+                    objectDialogueDistance = rightLimit;
+                }
+
+                if(marginTop > topLimit) {
+                    topOffset = 0;
+                }
+
+                reactSrc.setState({
+                    objectDialogueStyle: {
+                        'left': leftOffset + 'px',
+                        'top': topOffset + 'px',
+                        'margin-left': objectDialogueDistance + 'px'
+                    }
+                });
+            });
+        }
+    }
+
+    function setImportWindowPosition() {
+        if(document.getElementsByClassName('arrowBox').length > 0) {
+            var position                = toScreenPosition(referenceMeshes[0], camera),
+                importWindow            = document.getElementsByClassName('arrowBox')[0],
+                importWindowWidth       = parseInt($(importWindow).css('width').replace('px','')),
+                importWindowHeight      = parseInt($(importWindow).css('height').replace('px',''));
+
+            reactSrc.setState({
+                importWindowStyle: {
+                    top: position.y - importWindowHeight - 20,
+                    left: position.x - importWindowWidth / 2
+                }
+            });
         }
     }
 
     function alignCenter() {
-        if(SELECTED) {
+        if(!$.isEmptyObject(SELECTED)) {
             var reference = getReferenceDistance(SELECTED);
             SELECTED.position.x -= reference.x;
             SELECTED.position.y -= reference.y;
@@ -575,9 +723,11 @@ define([
     }
 
     function groundIt(mesh) {
-        var reference = getReferenceDistance(mesh);
-        mesh.position.z -= reference.z;
-        blobExpired = true;
+        if(!$.isEmptyObject(mesh)) {
+            var reference = getReferenceDistance(mesh);
+            mesh.position.z -= reference.z;
+            blobExpired = true;
+        }
     }
 
     function removeSelected() {
@@ -591,11 +741,12 @@ define([
 
             // delete model in backend
             printController.delete(SELECTED.uuid, function(result) {
-                console.log('delete result: ', result);
+                // todo: if error
             });
 
             transformControl.detach(SELECTED);
             removeFromScene('BoundingBoxHelper');
+            selectObject(null);
             render();
         }
     }
@@ -622,113 +773,46 @@ define([
         }
     }
 
-    function degreeToRadian(degree) {
-        return (degree / 360 * Math.PI * 2) || 0;
-    }
-
-    function radianToDegree(radian) {
-        return radian * 180 / Math.PI;
-    }
-
-    function updateDegreeWithStep(degree) {
-        if(degree === 0) {return 0;}
-        return (parseInt(degree / s.degreeStep) + 1) * s.degreeStep;
-    }
-
-    function updateScaleWithStep(scale) {
-        // if no decimal after scale precision, ex: 1.1, not 1.143
-        if(parseInt(scale * Math.pow(10, s.scalePrecision)) == scale * Math.pow(10, s.scalePrecision)) {
-            return scale;
-        }
-        return (parseInt(scale * Math.pow(10, s.scalePrecision)) + 1) / Math.pow(10, s.scalePrecision);
-    }
-
-    function getFileByteArray(filePath) {
-        getFileObject(filePath, function (fileObject) {
-             var reader = new FileReader();
-
-             reader.onload = function(e) {
-                 var arrayBuffer = reader.result;
-                 console.log(arrayBuffer);
-             }
-
-             reader.readAsArrayBuffer(fileObject);
-        });
-
-    }
-
-    function readyGCode() {
+    function sendGCodeParameters() {
         var d = $.Deferred();
-        syncObjectParameter(objects, 0).then(function() {
+        _syncObjectParameter(objects, 0).then(function() {
             d.resolve('');
         });
-        return d.promise();
-    }
-
-    function syncObjectParameter(objects, index) {
-        var d = $.Deferred();
-        index = index || 0;
-        if(index < objects.length) {
-            printController.set(
-                objects[index].uuid,
-                objects[index].position.x,
-                objects[index].position.y,
-                objects[index].position.z,
-                objects[index].rotation.x,
-                objects[index].rotation.y,
-                objects[index].rotation.z,
-                objects[index].scale.x,
-                objects[index].scale.y,
-                objects[index].scale.z
-            ).then(function(result) {
-                if(result.status === 'error') {
-                    index = objects.length;
-                }
-                if(index < objects.length) {
-                    console.log('syncing parameters');
-                    return d.resolve(syncObjectParameter(objects, index + 1));
-                }
-            });
-        }
-        else {
-            console.log('syncing done');
-            var d = $.Deferred();
-            d.resolve('');
-        }
         return d.promise();
     }
 
     function downloadGCode(fileName) {
         var d = $.Deferred();
-        getGCode().then(function(blob) {
-            console.log('downloading ', blob);
-            d.resolve(saveAs(blob, fileName));
-        });
+        if(!blobExpired) {
+            d.resolve(saveAs(responseBlob, fileName));
+        }
+        else {
+            getGCode().then(function(blob) {
+                if(blob instanceof Blob) {
+                    _setProgressMessage('');
+                    d.resolve(saveAs(blob, fileName));
+                }
+            });
+        }
+
         return d.promise();
     }
 
-    function getGCode(callback) {
-        var d = $.Deferred();
-        var ids = [];
-        objects.forEach(function(obj) {
-            ids.push(obj.uuid);
-        });
+    function saveSceneAsFileIcon() {
+        var ccp = camera.position.clone(),
+            ccr = camera.rotation.clone(),
+            d   = $.Deferred();
 
-        readyGCode().then(
-            function() {
-                return printController.go(ids);
-            }
-        ).then(function(result) {
-            if(result instanceof Blob) {
-                console.log('blob ready');
-                blobExpired = false;
-                d.resolve(result);
-            }
-            else {
-                console.log('error: ', result);
-                responseMessage = result;
-                // todo: error logging
-            }
+        camera.position.set(originalCameraPosition.x, originalCameraPosition.y, originalCameraPosition.z);
+        camera.rotation.set(originalCameraRotation.x, originalCameraRotation.y, originalCameraRotation.z, originalCameraRotation.order);
+
+        render();
+
+        renderer.domElement.toBlob(function(blob) {
+            camera.position.set(ccp.x, ccp.y, ccp.z);
+            camera.rotation.set(ccr.x, ccr.y, ccr.z, ccr.order);
+            render();
+            d.resolve(blob);
         });
 
         return d.promise();
@@ -750,78 +834,261 @@ define([
         }
     }
 
-    function getSelectedObjectSize() {
-        if(!$.isEmptyObject(SELECTED)) {
-            boundingBox = new THREE.BoundingBoxHelper(SELECTED, s.colorSelected);
-            boundingBox.update();
-            return boundingBox;
+    function togglePreview(isOn) {
+        if(objects.length === 0) {
+            return;
+        }
+        else {
+            reactSrc.setState({ previewMode: isOn });
+            previewMode = isOn;
+            _setProgressMessage('generating preview...');
+            isOn ? _showPreview() : _hidePreview();
         }
     }
 
-    function setRotateMode() {
-        setMode('rotate');
-    }
-
-    function setScaleMode() {
-        setMode('scale');
-    }
-
-    function setMode(mode) {
-        removeFromScene('TransformControl');
-        transformControl.setMode(mode);
-        scene.add(transformControl);
-        removeFromScene('BoundingBoxHelper');
+    function changePreviewLayer (layerNumber) {
+        for(var i = 1; i < previewScene.children.length; i++) {
+            previewScene.children[i].visible = i - 1 < layerNumber;
+        }
         render();
     }
 
-    function setAdvanceParameter(settings, index) {
-        index = index || 0;
-        var name = advanceParameters[index],
-            value = settings[name] || 'default';
+    function executePrint(serial) {
+        var go = function(blob) {
+            var control_methods = printerController(serial);
+            control_methods.upload(blob.size, blob);
+        }
 
-        if(index < advanceParameters.length)
-        {
-            printController.setParameter(name, value).then(function(result) {
-                if(result.status === 'error') {
-                    index = advanceParameters.length;
-                    // todo: error logging
-                    console.log(result.error);
-                }
-                if(index < advanceParameters.length) {
-                    setAdvanceParameter(settings, index + 1);
-                }
-                else {
-                    return;
+        if(!blobExpired) {
+            go(responseBlob);
+        }
+        else {
+            getGCode().then(function(blob) {
+                if(blob instanceof Blob) {
+                    go(blob);
                 }
             });
         }
     }
 
-    function setParameter(name, value) {
-        printController.setParameter(name, value).then(
-            function(result) {
-                if(result.status === 'error' || result.status === 'fatal') {
-                    // todo: error logging
+    function updateOrbitControl(e) {
+        setObjectDialoguePosition();
+        render();
+        setImportWindowPosition();
+        reactSrc.setState({ camera: camera });
+    }
+
+    function render() {
+        if(!$.isEmptyObject(SELECTED)) {
+            updateFromScene('BoundingBoxHelper');
+            updateFromScene('TransformControl');
+        }
+        renderer.render(previewMode ? previewScene : scene, camera);
+    }
+
+    // Helper Functions ---
+
+    function degreeToRadian(degree) {
+        return (degree / 360 * Math.PI * 2) || 0;
+    }
+
+    function radianToDegree(radian) {
+        return radian * 180 / Math.PI;
+    }
+
+    function updateDegreeWithStep(degree) {
+        if(degree === 0) {return 0;}
+        var degreeStep = shiftPressed ? 15 : s.degreeStep;
+        return (parseInt(degree / degreeStep + 1) * degreeStep);
+    }
+
+    function updateScaleWithStep(scale) {
+        // if no decimal after scale precision, ex: 1.1, not 1.143
+        if(parseInt(scale * Math.pow(10, s.scalePrecision)) == scale * Math.pow(10, s.scalePrecision)) {
+            return scale;
+        }
+        return (parseInt(scale * Math.pow(10, s.scalePrecision)) + 1) / Math.pow(10, s.scalePrecision);
+    }
+
+    function toScreenPosition(obj, camera)
+    {
+        if(!$.isEmptyObject(obj)) {
+            var vector = new THREE.Vector3();
+
+            // TODO: need to update this when resize window
+            var widthHalf = 0.5 * container.offsetWidth;
+            var heightHalf = 0.5 * container.offsetHeight;
+
+            obj.updateMatrixWorld();
+            vector.setFromMatrixPosition(obj.matrixWorld);
+            vector.project(camera);
+
+            vector.x = ( vector.x * widthHalf ) + widthHalf;
+            vector.y = - ( vector.y * heightHalf ) + heightHalf;
+
+            return {
+                x: vector.x,
+                y: vector.y
+            };
+        }
+    }
+
+    // Private Functions ---
+
+    function _syncObjectParameter(objects, index) {
+        var d = $.Deferred();
+        index = index || 0;
+        if(index < objects.length) {
+            printController.set(
+                objects[index].uuid,
+                objects[index].position.x,
+                objects[index].position.y,
+                objects[index].position.z,
+                objects[index].rotation.x,
+                objects[index].rotation.y,
+                objects[index].rotation.z,
+                objects[index].scale.x,
+                objects[index].scale.y,
+                objects[index].scale.z
+            ).then(function(result) {
+                if(result.status === 'error') {
+                    index = objects.length;
                 }
-                console.dir(result);
+                if(index < objects.length) {
+                    return d.resolve(_syncObjectParameter(objects, index + 1));
+                }
+            });
+        }
+        else {
+            var d = $.Deferred();
+            d.resolve('');
+        }
+        return d.promise();
+    }
+
+    function _addShadowedLight(x, y, z, color, intensity) {
+
+        var directionalLight = new THREE.DirectionalLight(color, intensity);
+        directionalLight.position.set(x, y, z);
+
+        scene.add(directionalLight);
+        directionalLight.castShadow = true;
+
+        var d = 1;
+        directionalLight.shadowCameraLeft = -d;
+        directionalLight.shadowCameraRight = d;
+        directionalLight.shadowCameraTop = d;
+        directionalLight.shadowCameraBottom = -d;
+
+        directionalLight.shadowCameraNear = 1;
+        directionalLight.shadowCameraFar = 4;
+
+        directionalLight.shadowMapWidth = 1024;
+        directionalLight.shadowMapHeight = 1024;
+
+        directionalLight.shadowBias = -0.005;
+        directionalLight.shadowDarkness = 0.15;
+
+        directionalLight.shadowCameraVisible = true;
+    }
+
+    function _hidePreview() {
+        render();
+        _setProgressMessage('');
+    }
+
+    function _showPreview() {
+        selectObject(null);
+
+        var drawPath = function() {
+            printController.getPath().then(function(result) {
+                printPath = result;
+                _drawPath();
+            });
+        }
+
+        if(blobExpired) {
+            getGCode().then(function(blob) {
+                if(blob instanceof Blob) {
+                    drawPath();
+                }
+            });
+        }
+        else {
+            if(previewScene.children.length <= 1) {
+                drawPath();
             }
-        )
+            else {
+                _showPath();
+            }
+        }
+    }
+
+    function _drawPath() {
+        var color,
+            g, m, line,
+            type;
+
+        previewScene.children.splice(1, previewScene.children.length - 1);
+        m = new THREE.LineBasicMaterial( { color: 0xffffff, opacity: 10, linewidth: 1, vertexColors: THREE.VertexColors } );
+
+        for(var layer = 0; layer < printPath.length; layer++) {
+            g = new THREE.Geometry();
+            color = [];
+
+            // with no gradient, but 2x more points
+            for(var point = 0; point < printPath[layer].length; point++) {
+                type = !!printPath[layer][point + 1] ? printPath[layer][point + 1].t : printPath[layer][point].t;
+                color[point] = previewColors[type];
+                g.vertices.push(new THREE.Vector3(
+                    printPath[layer][point].p[0],
+                    printPath[layer][point].p[1],
+                    printPath[layer][point].p[2]
+                ));
+            }
+
+            g.colors = color;
+            line = new THREE.Line(g, m);
+            line.name = 'line';
+            previewScene.add(line);
+        }
+
+        reactSrc.setState({
+            sliderMax: previewScene.children.length - 1,
+            sliderValue: previewScene.children.length - 1
+        });
+        _showPath();
+    }
+
+    function _showPath() {
+        render();
+        _setProgressMessage('');
+    }
+
+    function _setProgressMessage(message) {
+        reactSrc.setState({
+            progressMessage: message
+        });
     }
 
     return {
         init                    : init,
         appendModel             : appendModel,
-        rotate                  : rotate,
+        setRotation             : setRotation,
         setScale                : setScale,
         alignCenter             : alignCenter,
         removeSelected          : removeSelected,
-        readyGCode              : readyGCode,
+        sendGCodeParameters     : sendGCodeParameters,
         getSelectedObjectSize   : getSelectedObjectSize,
         downloadGCode           : downloadGCode,
         setRotateMode           : setRotateMode,
         setScaleMode            : setScaleMode,
         setAdvanceParameter     : setAdvanceParameter,
         setParameter            : setParameter,
-        getGCode                : getGCode
+        getGCode                : getGCode,
+        togglePreview           : togglePreview,
+        changePreviewLayer      : changePreviewLayer,
+        executePrint            : executePrint,
+        setCameraPosition       : setCameraPosition
     };
 });

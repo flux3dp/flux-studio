@@ -9,27 +9,39 @@
 
 <body>
     <div class="wrapper">
-        <section class="sidebar"></section>
+        <section class="top-menu"></section>
         <section class="content">
             <div class="spinner-flip absolute-center"></div>
         </section>
     </div>
 </body>
 <script>
-    var script = document.createElement('script'),
-        cssLink = document.createElement('link'),
-        head = document.querySelector('head'),
-        body = document.querySelector('body'),
-        timestamp = (new Date()).getTime();
+    (function() {
+        var script = document.createElement('script'),
+            analytics = document.createElement('script'),
+            cssLink = document.createElement('link'),
+            head = document.querySelector('head'),
+            body = document.querySelector('body');
 
-    cssLink.setAttribute('rel', 'stylesheet');
-    cssLink.setAttribute('href', 'css/main.css?v=' + timestamp);
-    head.appendChild(cssLink);
-    head.appendChild(cssLink);
+        // set global definition
+        window.FLUX = {
+            debug: -1 !== location.search.indexOf('debug'),
+            timestamp: (new Date()).getTime()
+        };
 
-    script.setAttribute('src', 'js/require.js');
-    script.dataset.main = 'js/main.js?v=' + timestamp;
-    body.appendChild(script);
+        cssLink.setAttribute('rel', 'stylesheet');
+        cssLink.setAttribute('href', 'css/main.css?v=' + window.FLUX.timestamp);
+        head.appendChild(cssLink);
+        head.appendChild(cssLink);
+
+        script.setAttribute('src', 'js/require.js');
+        script.dataset.main = 'js/main.js?v=' + window.FLUX.timestamp;
+        body.appendChild(script);
+
+        analytics.setAttribute('src', 'https://www.google-analytics.com/analytics.js');
+        analytics.setAttribute('async', true);
+        body.appendChild(analytics);
+    })();
 </script>
 
 </html>

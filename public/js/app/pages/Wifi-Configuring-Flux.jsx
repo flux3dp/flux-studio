@@ -1,17 +1,33 @@
 define([
-    'jquery',
     'react',
-    'jsx!widgets/Modal'
-], function($, React, Modal) {
+    'jsx!widgets/Modal',
+    'helpers/api/usb-config'
+], function(React, Modal, usbConfig) {
     'use strict';
 
     return function(args) {
 
         args = args || {};
 
-        var Page = React.createClass({
+        return React.createClass({
+
+            _onSettingUpAsAPMode: function(e) {
+                var usb = usbConfig();
+
+                usb.setAPMode({
+                    onSuccess: function(response) {
+                        location.hash = '#initialize/wifi/configured-flux';
+                    },
+                    onError: function(response) {
+                        // TODO: show error message
+                    }
+                });
+            },
+
             getInitialState: function() {
-                return args.state;
+                return {
+                    lang: args.state.lang
+                };
             },
 
             render : function() {
@@ -24,12 +40,13 @@ define([
                                 <h2>{lang.wifi.configuring_flux.caption}</h2>
                                 <p>{lang.wifi.configuring_flux.description}</p>
                                 <div>
-                                    <a href="#initialize/wifi/configured-flux" className="btn btn-action btn-large">
+                                    <button onClick={this._onSettingUpAsAPMode}
+                                        className="btn btn-action btn-large">
                                         {lang.wifi.configuring_flux.next}
-                                    </a>
+                                    </button>
                                 </div>
                                 <div>
-                                    <a href="#initialize/wifi/ask">{lang.wifi.configuring_flux.footer}</a>
+                                    <a href="#initialize/wifi/select">{lang.wifi.configuring_flux.footer}</a>
                                 </div>
                             </div>
                         </div>
@@ -40,7 +57,5 @@ define([
                 );
             }
         });
-
-        return Page;
     };
 });

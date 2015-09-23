@@ -234,6 +234,11 @@ define(['module'], function (module) {
         }
     };
 
+    // HACKED: forcing the environment as 'xhr'
+    if ('app:' === location.protocol) {
+        masterConfig.env = 'xhr';
+    }
+
     if (masterConfig.env === 'node' || (!masterConfig.env &&
             typeof process !== "undefined" &&
             process.versions &&

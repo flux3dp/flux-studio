@@ -7,10 +7,61 @@ define(function() {
         app : {
             name : 'Flux Studio - en'
         },
+        device_selection: {
+            device_name: 'DEVICE NAME',
+            module: 'MODULE',
+            status: 'STATUS'
+        },
+        topmenu: {
+            flux: {
+                label: 'Flux',
+                about: 'About FLUX studio',
+                preferences: 'Preferences',
+                quit: 'Quit'
+            },
+            file: {
+                label: 'File',
+                import: 'Import',
+                recent: 'Recent',
+                execute: 'Execute',
+                save_gcode: 'Save Gcode'
+            },
+            edit: {
+                label: 'Edit',
+                copy: 'Copy',
+                cut: 'Cut',
+                paste: 'Paste',
+                duplicate: 'Duplicate',
+                scale: 'Scale',
+                rotate: 'Rotate',
+                clear: 'Clear Scene'
+            },
+            view: {
+                label: 'View',
+                standard: 'Standard',
+                preview: 'Gcode Preview'
+            },
+            device: {
+                label: 'Device',
+                new: 'Add New Device...'
+            },
+            window: {
+                label: 'Window',
+                minimize: 'Minimize',
+                fullscreen: 'Fullscreen'
+            },
+            help: {
+                label: 'Help',
+                starting_guide: 'Starting Guide',
+                online_support: 'Online Support',
+                troubleshooting: 'Troubleshooting'
+            }
+        },
         welcome: {
             header1: 'Hello! Welcome to FLUX. Please choose your preferred language',
             header2: 'We are getting started from your language',
-            start: 'Start'
+            start: 'Start',
+            skip: 'Skip'
         },
         wifi: {
             home: {
@@ -29,7 +80,8 @@ define(function() {
                 password_placeholder: '請輸入 Wi-Fi 密碼',
                 back: 'Back',
                 join: 'Join',
-                connecting: 'Connecting'
+                connecting: 'Connecting',
+                no_selected: 'No SSID selected'
             },
             success: {
                 caption: '太棒了，連線成功!',
@@ -69,11 +121,12 @@ define(function() {
             }
         },
         menu: {
-            print: 'Print',
-            laser: 'Laser',
-            scan: 'Scan',
+            print: 'PRINT',
+            laser: 'LASER',
+            scan: 'SCAN',
             usb: 'USB',
-            device: 'Device'
+            device: 'Device',
+            setting: 'SETTING'
         },
         settings: {
             caption: 'Settings',
@@ -130,7 +183,7 @@ define(function() {
             }
         },
         print: {
-            import: 'Import',
+            import: 'IMPORT',
             go_home: 'Go Home',
             save: 'Save',
             normal_preview: 'Normal Preview',
@@ -152,6 +205,7 @@ define(function() {
                     touch_buildplate: 'Touch Buildplate',
                     everywhere: 'Everywhere'
                 },
+                direct_setting: 'Direct Setting',
                 platform_type: 'Platform Type',
             },
             mode: [
@@ -194,6 +248,7 @@ define(function() {
                     support: {
                         text: 'Support',
                         on: 'On',
+                        off: 'Off',
                         options: [
                             {
                                 value: 'Touching',
@@ -259,6 +314,13 @@ define(function() {
                     }
                 }
             },
+            left_panel: {
+                raft_on: 'RAFT ON',
+                raft_off: 'RAFT OFF',
+                support_on: 'SUPPORT ON',
+                support_off: 'SUPPORT OFF',
+                advanced: 'ADVANCED'
+            },
             quick_print: 'Quick Print',
             scale: 'Scale',
             rotate: 'Rotate',
@@ -273,11 +335,13 @@ define(function() {
             pause: 'PAUSE',
             continue: 'CONTINUE',
             restart: 'RESTART',
-            download_prompt: 'please enter file name'
+            download_prompt: 'please enter file name',
+            preview: 'Preview'
         },
         laser: {
             import: 'Import',
             save: 'Save',
+            custom: 'Custom',
             acceptable_files: 'JPG, PNG, PDF, AI',
             drop_files_to_import: 'Drop your file here or click "import" to upload your file',
             button_advanced: 'Advanced',
@@ -334,7 +398,7 @@ define(function() {
                                 label: 'Wood',
                                 selected: true,
                                 data: {
-                                    laser_speed: 10,
+                                    laser_speed: 5,
                                     power: 255
                                 }
                             },
@@ -353,8 +417,9 @@ define(function() {
                         unit: 'mm/s',
                         fast: 'Fast',
                         slow: 'Slow',
-                        min: 1,
-                        max: 100
+                        min: 0.1,
+                        max: 20,
+                        step: 0.1
                     },
                     power: {
                         text: 'Power',
@@ -463,7 +528,17 @@ define(function() {
             pause: 'Pause',
             cancelTask: 'Cancel Task',
             selectPrinter: 'Select Printer',
-            retry: 'Retry'
+            retry: 'Retry',
+            status: 'Status',
+            busy: 'Busy',
+            ready: 'Ready',
+            reset: 'Reset (Kick)',
+            abort: 'Abort',
+            start: 'Start',
+            noTask: 'There are currently no task to do',
+            pleaseWait: 'Please Wait...',
+            unknownCommand: 'command cannot be executed in current status',
+            quit: 'Quit'
         }
     };
 });

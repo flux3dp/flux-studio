@@ -1,0 +1,21 @@
+{
+    "main": "app://localhost/index.html",
+    "name": "flux-studio",
+    "node-remote": "localhost",
+    "description": "FLUX Studio",
+    "version": "0.1.0",
+    "inject-js-start": "nw-inject.js",
+    "window": {
+        "title": "FLUX Studio",
+        "icon": "icon.png",
+        // "toolbar": false,
+        "frame": true,
+        "width": 1280,
+        "height": 640,
+        "min_width": 640,
+        "min_height": 480
+    },
+    "webkit": {
+        "plugin": true
+    }
+}

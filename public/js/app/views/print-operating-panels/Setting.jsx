@@ -5,6 +5,8 @@ define([
 ], function($, React, printController) {
     'use strict';
 
+    var preview = false;
+
     return React.createClass({
         getDefaultProps: function() {
             return {
@@ -17,8 +19,8 @@ define([
         },
         getInitialState: function() {
             return {
-                platformOn: true,
-                supportOn: true
+                platformOn: false,
+                supportOn: false
             };
         },
         _roundValue: function(value) {
@@ -40,6 +42,10 @@ define([
         },
         _handlePrintSpeedChange: function(e) {
             this.props.onSpeedChange(e.target.value.toLowerCase());
+        },
+        _handleTogglePreview: function(e) {
+            preview = !preview;
+            this.props.onPreview(preview);
         },
         render: function() {
             var lang = this.props.lang,
@@ -102,7 +108,7 @@ define([
                             <div className="controls">
                                 <div className="label">{lang.print.params.beginner.support.text}</div>
                                 <div className="control">
-                                    <label>{lang.print.params.beginner.support.on}</label>
+                                    <label>{this.state.supportOn ? lang.print.params.beginner.support.on : lang.print.params.beginner.support.off}</label>
                                     <div className="switchContainer">
                                         <input type="checkbox" id="supportSwitch" name="supportSwitch" className="switch" onClick={this._handleSupportClick} />
                                         <label htmlFor="supportSwitch">&nbsp;</label>
@@ -111,19 +117,20 @@ define([
                             </div>
                         </div>
                         <div className="setup">
-                            <a className="btn btn-default btn-default" onClick={this._handleShowAdvanceSetting}>{lang.settings.printer.advanced}</a>
+                            <a data-ga-event="print-open-advanced-setting" className="btn btn-default btn-default" onClick={this._handleShowAdvanceSetting}>{lang.settings.printer.advanced}</a>
                         </div>
                     </div>
 
                     <div>
-                        <button className="btn action file-importer">
+                        <a className="btn action file-importer">
                             <div className="fa fa-plus"></div>
                             {lang.print.import}
                             <input type="file" accept=".stl" onChange={this.props.onImport} />
-                        </button>
+                        </a>
                     </div>
-                    <div><a className="btn action btn-save" onClick={this.props.onSave}><span className="fa fa-floppy-o"></span>{lang.print.save}</a></div>
-                    <div><a className="btn action btn-print" onClick={this._handlePrintClick}><span className="fa fa-print"></span>{lang.print.start_print}</a></div>
+                    <div><a data-ga-event="print-save" className="btn action btn-save" onClick={this.props.onSave}><span className="fa fa-floppy-o"></span>{lang.print.save}</a></div>
+                    <div><a data-ga-event="print-print-preview" className="btn action btn-preview" onClick={this._handleTogglePreview}><span className="fa fa-eye"></span>{lang.print.preview}</a></div>
+                    <div><a data-ga-event="print-print-started" className="btn action btn-print" onClick={this._handlePrintClick}><span className="fa fa-print"></span>{lang.print.start_print}</a></div>
                     <div>{this._roundValue(boundingBox.x) + ' x ' + this._roundValue(boundingBox.y) + ' x ' + this._roundValue(boundingBox.z) + ' (mm)'}</div>
                 </div>
             );

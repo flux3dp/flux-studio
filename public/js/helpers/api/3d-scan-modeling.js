@@ -5,36 +5,27 @@
 define([
     'helpers/websocket',
     'helpers/point-cloud',
-    'helpers/is-json',
     'helpers/data-history'
-], function(Websocket, PointCloudHelper, isJson, history) {
+], function(Websocket, PointCloudHelper, history) {
     'use strict';
 
     return function(opts) {
         opts = opts || {};
         opts.onError = opts.onError || function() {};
+        opts.onFatal = opts.onFatal || function() {};
+        opts.onClose = opts.onClose || function() {};
 
         var ws = new Websocket({
                 method: '3d-scan-modeling',
-                onMessage: function(result) {
+                onMessage: function(data) {
 
-                    var data = (true === isJson(result.data) ? JSON.parse(result.data) : result.data);
-
-                    if ('string' === typeof data && 'fatal' === data.status) {
-                        opts.onError(data.error, data);
-                    }
-                    else {
-                        events.onMessage(data);
-                    }
-
-                    lastMessage = data;
+                    events.onMessage(data);
 
                 },
-                onClose: function(result) {
-                    opts.onError(result);
-                }
+                onError: opts.onError,
+                onFatal: opts.onFatal,
+                onClose: opts.onClose
             }),
-            lastMessage = '',
             events = {
                 onMessage: function() {}
             },
