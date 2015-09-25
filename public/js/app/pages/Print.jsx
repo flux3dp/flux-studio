@@ -70,7 +70,6 @@ define([
                         sliderValue                 : 0,
                         progressMessage             : '',
                         objectDialogueStyle         : {},
-                        importWindowStyle           : {},
                         mode                        : 'rotate',
                         camera                      : {}
                     });
@@ -199,8 +198,8 @@ define([
                     console.log(source);
                     this.setState({ mode: source });
                 },
-                _handleCameraPositionChange: function(camera) {
-                    director.setCameraPosition(camera);
+                _handleCameraPositionChange: function(position, rotation) {
+                    director.setCameraPosition(position, rotation);
                 },
                 _renderOperatingPanel: function() {
                     return (
@@ -244,7 +243,7 @@ define([
                 _renderImportWindow: function() {
                     return (
                         <div className="importWindow">
-                            <div className="arrowBox" style={this.state.importWindowStyle}>
+                            <div className="arrowBox">
                                 <div className="file-importer">
                                     <div className="import-btn">{lang.print.import}</div>
                                     <input type="file" accept=".stl" onChange={this._handleImport} />
