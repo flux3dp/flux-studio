@@ -10,6 +10,7 @@ define([
     'jsx!views/print-operating-panels/Right-Panel',
     'helpers/file-system',
     'jsx!widgets/Modal',
+    'helpers/api/config',
     'jsx!views/Print-Selector',
     'plugins/knob/jquery.knob'
 ], function($,
@@ -23,6 +24,7 @@ define([
     RightPanel,
     FileSystem,
     Modal,
+    Config,
     PrinterSelector) {
 
     'use strict';
@@ -76,6 +78,15 @@ define([
                 },
                 componentDidMount: function() {
                     director.init(this);
+                    Config().read('advanced-options', {
+                        onFinished: function(response) {
+                            var options = JSON.parse(response);
+                            if(!$.isEmptyObject(options)) {
+                                advancedSetting = options;
+                            }
+                            console.log(advancedSetting);
+                        }.bind(this)
+                    });
                 },
                 _updateSelectedSize: function() {
 
@@ -138,6 +149,9 @@ define([
                     this.setState({ showAdvancedSetting: false });
                 },
                 _handleAdvancedSettingDone: function(setting) {
+                    Config().write('advanced-options', JSON.stringify(advancedSetting), {
+                        onFinished: function(response) {}
+                    });
                     advancedSetting = setting;
                     director.setAdvanceParameter(setting);
                     this.setState({ showAdvancedSetting: false });
@@ -185,10 +199,11 @@ define([
                 },
                 _handlePrinterSelected: function(selectedPrinter) {
                     console.log(selectedPrinter);
+
                     this.setState({
                         openPrinterSelectorWindow: false
                     });
-                    director.executePrint(selectedPrinter.serial);
+                    // director.executePrint(selectedPrinter.serial);
                 },
                 _handlePreviewLayerChange: function(e) {
                     director.changePreviewLayer(e.target.value);
