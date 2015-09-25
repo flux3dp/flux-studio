@@ -232,6 +232,23 @@ define([
                 mesh.geometry = new THREE.Geometry().fromBufferGeometry(mesh.geometry);
             }
             mesh.name = 'custom';
+            mesh.plane_boundary = planeBoundary(mesh);
+
+            ///////////////////////////////// fake code  ////////////////////////////////////////////////////
+            var material_ = new THREE.LineBasicMaterial({
+                color: 0x0000ff
+            });
+
+            var geometry_ = new THREE.Geometry();
+            for(var i = 0; i < mesh.plane_boundary.length ; i += 1){
+                geometry_.vertices.push(mesh.geometry.vertices[mesh.plane_boundary[i]]);
+            }
+
+            var line = new THREE.Line( geometry_, material_ );
+            scene.add( line );
+            ///////////////////////////////// fake code  ////////////////////////////////////////////////////
+
+
             // mesh.material.side = THREE.DoubleSide;
 
             alignCenter();
@@ -768,10 +785,56 @@ define([
         scene.add(sphere);
     }
 
+
+
+    function planeBoundary(sourceMesh){
+        // ref: http://www.csie.ntnu.edu.tw/~u91029/ConvexHull.html
+        // Andrew's Monotone Chain
+
+        var cross = (function cross(p0, p1, p2){
+            return ((p1.x - p0.x) * (p2.y - p0.y)) - ((p1.y - p0.y) * (p2.x - p0.x));
+        })
+
+        var stl_index = [];
+        for (var i = 0; i < sourceMesh.geometry.vertices.length; i += 1) {
+          stl_index.push(i);
+        }
+
+        stl_index.sort(function(a, b){
+            if (sourceMesh.geometry.vertices[a].y == sourceMesh.geometry.vertices[b].y){
+                return sourceMesh.geometry.vertices[a].x - sourceMesh.geometry.vertices[b].x;
+            }
+            return sourceMesh.geometry.vertices[a].y - sourceMesh.geometry.vertices[b].y;
+        })
+        var m = 0;
+        var boundary = new Array(stl_index.length);;
+
+        //upper
+        for (var i = 0; i < stl_index.length; i += 1){
+          while( m >= 2 && cross(sourceMesh.geometry.vertices[boundary[m - 2]], sourceMesh.geometry.vertices[boundary[m - 1]], sourceMesh.geometry.vertices[stl_index[i]]) <= 0){
+            m -= 1;
+          }
+            boundary[m] = stl_index[i];
+            m += 1;
+        }
+        // lower
+        var t = m + 1;
+        for (var i = stl_index.length - 2 ; i >= 0; i -= 1){
+            while( m >= t && cross(sourceMesh.geometry.vertices[boundary[m - 2]], sourceMesh.geometry.vertices[boundary[m - 1]], sourceMesh.geometry.vertices[stl_index[i]]) <= 0){
+                m -= 1;
+            }
+            boundary[m] = stl_index[i];
+            m += 1;
+        }
+        m -= 1;
+        boundary = boundary.slice(0, m);;
+        return boundary;
+    }
+
     function checkOutOfBounds(sourceMesh) {
         if (!$.isEmptyObject(sourceMesh)) {
-            sourceMesh.position.isOutOfBounds = sourceMesh.geometry.vertices.some(function(v) {
-                var vector = v.clone();
+            sourceMesh.position.isOutOfBounds = sourceMesh.plane_boundary.some(function(v) {
+                var vector = sourceMesh.geometry.vertices[v].clone();
                 vector.applyMatrix4(sourceMesh.matrixWorld);
                 return Math.sqrt(Math.pow(vector.x, 2) + Math.pow(vector.y, 2)) > s.radius;
             });
