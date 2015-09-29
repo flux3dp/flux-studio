@@ -235,19 +235,22 @@ define([
             mesh.plane_boundary = planeBoundary(mesh);
 
             ///////////////////////////////// fake code  ////////////////////////////////////////////////////
+            console.log("boundary.length:", mesh.plane_boundary.length, "vertices:", mesh.geometry.vertices.length);
+
             var material_ = new THREE.LineBasicMaterial({
                 color: 0x0000ff
             });
 
             var geometry_ = new THREE.Geometry();
             for(var i = 0; i < mesh.plane_boundary.length ; i += 1){
-                geometry_.vertices.push(mesh.geometry.vertices[mesh.plane_boundary[i]]);
+                var p = mesh.geometry.vertices[mesh.plane_boundary[i]].clone();
+                p.z = 0;
+                geometry_.vertices.push(p);
             }
 
             var line = new THREE.Line( geometry_, material_ );
             scene.add( line );
             ///////////////////////////////// fake code  ////////////////////////////////////////////////////
-
 
             // mesh.material.side = THREE.DoubleSide;
 
@@ -826,7 +829,7 @@ define([
             }
             boundary.push(stl_index[i]);
         }
-        // delete redundant point i.e starting point
+        // delete redundant point(i.e., starting point)
         boundary.pop();
 
         return boundary;
