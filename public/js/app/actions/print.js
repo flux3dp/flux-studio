@@ -788,46 +788,47 @@ define([
 
 
     function planeBoundary(sourceMesh){
-        // ref: http://www.csie.ntnu.edu.tw/~u91029/ConvexHull.html
+        // ref: http://www.csie.ntnu.edu.tw/~u91029/ConvexHull.html#4
         // Andrew's Monotone Chain
 
+        // define Cross product function on 2d plane
         var cross = (function cross(p0, p1, p2){
             return ((p1.x - p0.x) * (p2.y - p0.y)) - ((p1.y - p0.y) * (p2.x - p0.x));
         })
 
+        // sort the index of each point in stl
         var stl_index = [];
         for (var i = 0; i < sourceMesh.geometry.vertices.length; i += 1) {
           stl_index.push(i);
         }
-
         stl_index.sort(function(a, b){
             if (sourceMesh.geometry.vertices[a].y == sourceMesh.geometry.vertices[b].y){
                 return sourceMesh.geometry.vertices[a].x - sourceMesh.geometry.vertices[b].x;
             }
             return sourceMesh.geometry.vertices[a].y - sourceMesh.geometry.vertices[b].y;
         })
-        var m = 0;
-        var boundary = new Array(stl_index.length);;
 
-        //upper
+        // find boundary
+        var boundary = [];
+
+        // compute upper hull
         for (var i = 0; i < stl_index.length; i += 1){
-          while( m >= 2 && cross(sourceMesh.geometry.vertices[boundary[m - 2]], sourceMesh.geometry.vertices[boundary[m - 1]], sourceMesh.geometry.vertices[stl_index[i]]) <= 0){
-            m -= 1;
+          while( boundary.length >= 2 && cross(sourceMesh.geometry.vertices[boundary[boundary.length - 2]], sourceMesh.geometry.vertices[boundary[boundary.length - 1]], sourceMesh.geometry.vertices[stl_index[i]]) <= 0){
+            boundary.pop();
           }
-            boundary[m] = stl_index[i];
-            m += 1;
+            boundary.push(stl_index[i]);
         }
-        // lower
-        var t = m + 1;
+        // compute lower hull
+        var t = boundary.length + 1;
         for (var i = stl_index.length - 2 ; i >= 0; i -= 1){
-            while( m >= t && cross(sourceMesh.geometry.vertices[boundary[m - 2]], sourceMesh.geometry.vertices[boundary[m - 1]], sourceMesh.geometry.vertices[stl_index[i]]) <= 0){
-                m -= 1;
+            while( boundary.length >= t && cross(sourceMesh.geometry.vertices[boundary[boundary.length - 2]], sourceMesh.geometry.vertices[boundary[boundary.length - 1]], sourceMesh.geometry.vertices[stl_index[i]]) <= 0){
+                boundary.pop();
             }
-            boundary[m] = stl_index[i];
-            m += 1;
+            boundary.push(stl_index[i]);
         }
-        m -= 1;
-        boundary = boundary.slice(0, m);;
+        // delete redundant point i.e starting point
+        boundary.pop();
+
         return boundary;
     }
 
