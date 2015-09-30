@@ -27,7 +27,7 @@ define([
     var raycaster = new THREE.Raycaster();
     var mouse = new THREE.Vector2(),
         offset = new THREE.Vector3(),
-        circularGridHelper, mouseDown, boundingBox, SELECTED;
+        circularGridHelper, mouseDown, SELECTED;
 
     var movingOffsetX, movingOffsetY, panningOffset, originalCameraPosition, originalCameraRotation,
         scaleBeforeTransformX, scaleBeforeTransformY, scaleBeforeTransformZ;
@@ -238,6 +238,7 @@ define([
             alignCenter();
             groundIt(mesh);
             selectObject(mesh);
+            createOutline(geometry, mesh);
 
             scene.add(mesh);
             objects.push(mesh);
@@ -311,6 +312,8 @@ define([
                 if (SELECTED.position && location) {
                     SELECTED.position.x = location.x - movingOffsetX;
                     SELECTED.position.y = location.y - movingOffsetY;
+                    SELECTED.outlineMesh.position.x = location.x - movingOffsetX;
+                    SELECTED.outlineMesh.position.y = location.y - movingOffsetY;
                     blobExpired = true;
                     setObjectDialoguePosition();
                     render();
@@ -530,6 +533,10 @@ define([
         SELECTED.scale.set(
             (originalScaleX * x) || scaleBeforeTransformX, (originalScaleY * y) || scaleBeforeTransformY, (originalScaleZ * z) || scaleBeforeTransformZ
         );
+        SELECTED.outlineMesh.scale.set(
+            (originalScaleX * x) || scaleBeforeTransformX, (originalScaleY * y) || scaleBeforeTransformY, (originalScaleZ * z) || scaleBeforeTransformZ
+        );
+        SELECTED.outlineMesh.scale.multiplyScalar(1.05);
         SELECTED.scale.locked = locked;
         SELECTED.plane_boundary = planeBoundary(SELECTED);
         reactSrc.setState({
@@ -554,7 +561,6 @@ define([
         removeFromScene('TransformControl');
         transformControl.setMode(mode);
         scene.add(transformControl);
-        removeFromScene('BoundingBoxHelper');
         render();
     }
 
@@ -599,6 +605,9 @@ define([
         SELECTED.rotation.x = degreeToRadian(x);
         SELECTED.rotation.y = degreeToRadian(y);
         SELECTED.rotation.z = degreeToRadian(z);
+        SELECTED.outlineMesh.rotation.x = degreeToRadian(x);
+        SELECTED.outlineMesh.rotation.y = degreeToRadian(y);
+        SELECTED.outlineMesh.rotation.z = degreeToRadian(z);
 
         reactSrc.setState({
             modelSelected: SELECTED.uuid ? SELECTED : null
@@ -606,7 +615,6 @@ define([
         if (render) {
             SELECTED.plane_boundary = planeBoundary(SELECTED);
             groundIt(SELECTED);
-            updateFromScene('BoundingBoxHelper');
             checkOutOfBounds(SELECTED);
         }
     }
@@ -687,13 +695,15 @@ define([
     function selectObject(obj) {
         SELECTED = obj || {};
 
-        removeFromScene('BoundingBoxHelper');
         removeFromScene('TransformControl');
 
         if (!$.isEmptyObject(obj)) {
-            boundingBox = new THREE.BoundingBoxHelper(obj, s.colorSelected);
-            boundingBox.name = "BoundingBoxHelper";
-            boundingBox.update();
+
+            // boundary
+            var model = toScreenPosition(obj, camera);
+            if(obj.outlineMesh) {
+                obj.outlineMesh.visible = true;
+            }
             setObjectDialoguePosition(obj);
 
             transformControl.attach(obj);
@@ -703,9 +713,9 @@ define([
             scaleBeforeTransformY = obj.scale.y;
             scaleBeforeTransformZ = obj.scale.z;
 
-            scene.add(boundingBox);
         } else {
             transformMode = false;
+            _removeAllMeshOutline();
         }
         reactSrc.setState({
             modelSelected: SELECTED.uuid ? SELECTED : null,
@@ -723,8 +733,7 @@ define([
             SELECTED.position.z -= reference.z;
             blobExpired = true;
 
-            // checkOutOfBounds(SELECTED);
-            updateFromScene('BoundingBoxHelper');
+            checkOutOfBounds(SELECTED);
             render();
         }
     }
@@ -752,7 +761,6 @@ define([
             });
 
             transformControl.detach(SELECTED);
-            removeFromScene('BoundingBoxHelper');
             selectObject(null);
             render();
 
@@ -833,7 +841,7 @@ define([
                 return Math.sqrt(Math.pow(vector.x, 2) + Math.pow(vector.y, 2)) > s.radius;
             });
 
-            boundingBox.material.color.setHex(sourceMesh.position.isOutOfBounds ? s.colorOutside : s.colorSelected);
+            sourceMesh.outlineMesh.material.color.setHex(sourceMesh.position.isOutOfBounds ? s.colorOutside : s.colorSelected);
         }
     }
 
@@ -946,7 +954,6 @@ define([
 
     function render() {
         if (!$.isEmptyObject(SELECTED)) {
-            updateFromScene('BoundingBoxHelper');
             updateFromScene('TransformControl');
         }
         renderer.render(previewMode ? previewScene : scene, camera);
@@ -998,6 +1005,15 @@ define([
                 y: vector.y
             };
         }
+    }
+
+    function createOutline(geometry, mesh) {
+        var outlineMaterial = new THREE.MeshBasicMaterial( { color: s.colorSelected, side: THREE.BackSide } );
+        var outlineMesh = new THREE.Mesh( geometry, outlineMaterial );
+        outlineMesh.position.set(mesh.position.x, mesh.position.y, mesh.position.z);
+        outlineMesh.scale.multiplyScalar(1.05);
+        mesh.outlineMesh = outlineMesh;
+        scene.add(mesh.outlineMesh);
     }
 
     // Private Functions ---
@@ -1137,6 +1153,12 @@ define([
     function _setProgressMessage(message) {
         reactSrc.setState({
             progressMessage: message
+        });
+    }
+
+    function _removeAllMeshOutline() {
+        objects.forEach(function(obj) {
+            obj.outlineMesh.visible = false;
         });
     }
 
