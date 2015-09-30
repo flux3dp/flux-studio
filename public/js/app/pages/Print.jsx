@@ -84,9 +84,14 @@ define([
                             if(!$.isEmptyObject(options)) {
                                 advancedSetting = options;
                             }
-                            console.log(advancedSetting);
                         }.bind(this)
                     });
+                    // register for delete button
+                    $(document).keyup(function(e) {
+                        if(e.keyCode === 8 || e.keyCode === 46) {
+                            this._handleOperationChange('delete');
+                        }
+                    }.bind(this));
                 },
                 _updateSelectedSize: function() {
 

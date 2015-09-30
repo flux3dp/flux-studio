@@ -64,6 +64,12 @@ define([
         allowedMin: 1 // (mm)
     };
 
+    var commonMaterial = new THREE.MeshPhongMaterial({
+        color: s.colorUnselected,
+        specular: 0x111111,
+        shininess: 100
+    });
+
     var advancedParameters = ['layerHeight', 'infill', 'travelingSpeed', 'extrudingSpeed', 'temperature', 'advancedSettings'];
 
     previewColors[0] = new THREE.Color(0x996633); // infill
@@ -182,12 +188,7 @@ define([
 
         loader.load(model_file_path, function(geometry) {
 
-            var material = new THREE.MeshPhongMaterial({
-                color: s.colorUnselected,
-                specular: 0x111111,
-                shininess: 100
-            });
-            var mesh = new THREE.Mesh(geometry, material);
+            var mesh = new THREE.Mesh(geometry, commonMaterial);
             mesh.up = new THREE.Vector3(0, 0, 1);
 
             uploadStl(mesh.uuid, file, function(result) {
@@ -232,7 +233,7 @@ define([
                 mesh.geometry = new THREE.Geometry().fromBufferGeometry(mesh.geometry);
             }
             mesh.name = 'custom';
-            // mesh.material.side = THREE.DoubleSide;
+            mesh.plane_boundary = planeBoundary(mesh);
 
             alignCenter();
             groundIt(mesh);
@@ -530,12 +531,14 @@ define([
             (originalScaleX * x) || scaleBeforeTransformX, (originalScaleY * y) || scaleBeforeTransformY, (originalScaleZ * z) || scaleBeforeTransformZ
         );
         SELECTED.scale.locked = locked;
+        SELECTED.plane_boundary = planeBoundary(SELECTED);
         reactSrc.setState({
             modelSelected: SELECTED.uuid ? SELECTED : null
         });
 
         if (alignCenter) {
             this.alignCenter();
+            checkOutOfBounds(SELECTED);
         }
     }
 
@@ -601,6 +604,7 @@ define([
             modelSelected: SELECTED.uuid ? SELECTED : null
         });
         if (render) {
+            SELECTED.plane_boundary = planeBoundary(SELECTED);
             groundIt(SELECTED);
             updateFromScene('BoundingBoxHelper');
             checkOutOfBounds(SELECTED);
@@ -719,7 +723,7 @@ define([
             SELECTED.position.z -= reference.z;
             blobExpired = true;
 
-            checkOutOfBounds(SELECTED);
+            // checkOutOfBounds(SELECTED);
             updateFromScene('BoundingBoxHelper');
             render();
         }
@@ -742,7 +746,7 @@ define([
                 objects.splice(index, 1);
             }
 
-            // delete model in backend
+            //  model in backend
             printController.delete(SELECTED.uuid, function(result) {
                 // todo: if error
             });
@@ -751,6 +755,12 @@ define([
             removeFromScene('BoundingBoxHelper');
             selectObject(null);
             render();
+
+            if(objects.length === 0) {
+                reactSrc.setState({ openImportWindow: true }, function() {
+                    setImportWindowPosition();
+                });
+            }
         }
     }
 
@@ -768,10 +778,57 @@ define([
         scene.add(sphere);
     }
 
+
+
+    function planeBoundary(sourceMesh){
+        // ref: http://www.csie.ntnu.edu.tw/~u91029/ConvexHull.html#4
+        // Andrew's Monotone Chain
+
+        // define Cross product function on 2d plane
+        var cross = (function cross(p0, p1, p2){
+            return ((p1.x - p0.x) * (p2.y - p0.y)) - ((p1.y - p0.y) * (p2.x - p0.x));
+        })
+
+        // sort the index of each point in stl
+        var stl_index = [];
+        for (var i = 0; i < sourceMesh.geometry.vertices.length; i += 1) {
+          stl_index.push(i);
+        }
+        stl_index.sort(function(a, b){
+            if (sourceMesh.geometry.vertices[a].y == sourceMesh.geometry.vertices[b].y){
+                return sourceMesh.geometry.vertices[a].x - sourceMesh.geometry.vertices[b].x;
+            }
+            return sourceMesh.geometry.vertices[a].y - sourceMesh.geometry.vertices[b].y;
+        })
+
+        // find boundary
+        var boundary = [];
+
+        // compute upper hull
+        for (var i = 0; i < stl_index.length; i += 1){
+          while( boundary.length >= 2 && cross(sourceMesh.geometry.vertices[boundary[boundary.length - 2]], sourceMesh.geometry.vertices[boundary[boundary.length - 1]], sourceMesh.geometry.vertices[stl_index[i]]) <= 0){
+            boundary.pop();
+          }
+            boundary.push(stl_index[i]);
+        }
+        // compute lower hull
+        var t = boundary.length + 1;
+        for (var i = stl_index.length - 2 ; i >= 0; i -= 1){
+            while( boundary.length >= t && cross(sourceMesh.geometry.vertices[boundary[boundary.length - 2]], sourceMesh.geometry.vertices[boundary[boundary.length - 1]], sourceMesh.geometry.vertices[stl_index[i]]) <= 0){
+                boundary.pop();
+            }
+            boundary.push(stl_index[i]);
+        }
+        // delete redundant point(i.e., starting point)
+        boundary.pop();
+
+        return boundary;
+    }
+
     function checkOutOfBounds(sourceMesh) {
         if (!$.isEmptyObject(sourceMesh)) {
-            sourceMesh.position.isOutOfBounds = sourceMesh.geometry.vertices.some(function(v) {
-                var vector = v.clone();
+            sourceMesh.position.isOutOfBounds = sourceMesh.plane_boundary.some(function(v) {
+                var vector = sourceMesh.geometry.vertices[v].clone();
                 vector.applyMatrix4(sourceMesh.matrixWorld);
                 return Math.sqrt(Math.pow(vector.x, 2) + Math.pow(vector.y, 2)) > s.radius;
             });
