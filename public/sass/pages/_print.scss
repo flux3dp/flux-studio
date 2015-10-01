@@ -1026,13 +1026,58 @@ input.switch:checked ~ label:after
         height: 240px;
         width: 230px;
 
-        .title {
-            font-size: 1.3rem;
-            color: #B3B3B3;
-            line-height: 1.5em;
-            padding-left: 0.5em;
-            background-color: #FFF;
-            cursor: pointer;
+        .accordion {
+            margin-top: 0;
+            dt {
+                background-color: #EEE;
+            }
+            dt, dd {
+                border-bottom: 0;
+                .title {
+                    font-size: 1.3rem;
+                    color: #B3B3B3;
+                    text-decoration: none;
+                    line-height: 1.5em;
+                    padding-left: 0.5em;
+                    cursor: pointer;
+                }
+            }
+            dd {
+                margin-left: 20px;
+                font-size: 12px;
+                &:last-of-type {
+                    border-top: 1px solid white;
+                    position: relative;
+                    top: -1px;
+                }
+                .group {
+                    margin-top: 20px;
+                    font-size: 2.5rem;
+                    height: 3rem;
+                    width: 100%;
+                    color: #B3B3B3;
+
+                    .label {
+                        width: 50px;
+                        padding: 0 0.8em 0 0;
+                        display: inline-block;
+                    }
+
+                    .control {
+                        display: inline;
+                    }
+
+                    input {
+                        width: 130px;
+                        border-width: 2px;
+                        border-style: solid;
+                        border-color: #B3B3B3;
+                    }
+                }
+            }
+            .scale-content {
+                height: 195px;
+            }
         }
 
         .divider {
@@ -1045,30 +1090,7 @@ input.switch:checked ~ label:after
             height: 13.5rem;
             width: 100%;
 
-            .group {
-                margin-top: 1rem;
-                font-size: 2.5rem;
-                height: 3rem;
-                width: 100%;
-                color: #B3B3B3;
-                display: inline-block;
 
-                .label {
-                    padding: 0 1em 0 0.5em;
-                    display: inline;
-                }
-
-                .control {
-                    display: inline;
-                }
-
-                input {
-                    width: 150px;
-                    border-width: 2px;
-                    border-style: solid;
-                    border-color: #B3B3B3;
-                }
-            }
         }
 
         .bottom {

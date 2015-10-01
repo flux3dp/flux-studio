@@ -58,7 +58,6 @@ define([
                     return ({
                         checked                     : false,
                         locked                      : true,
-                        operation                   : '',
                         previewMode                 : false,
                         showPreviewModeList         : false,
                         showAdvancedSetting         : false,
@@ -89,31 +88,11 @@ define([
                     // register for delete button
                     $(document).keyup(function(e) {
                         if(e.keyCode === 8 || e.keyCode === 46) {
-                            this._handleOperationChange('delete');
+                            director.removeSelected();
                         }
                     }.bind(this));
                 },
                 _updateSelectedSize: function() {
-
-                },
-                _handleOperationChange: function(operation) {
-                    switch(operation) {
-                        case 'scale':
-                            this.setState({ operation: 'scale' });
-                            break;
-                        case 'rotate':
-                            this.setState({ operation: 'rotate' });
-                            break;
-                        case 'center':
-                            director.alignCenter();
-                            break;
-                        case 'delete':
-                            director.removeSelected();
-                            this.setState({ operation: '' });
-                            break;
-                        default:
-                            break;
-                    }
 
                 },
                 _handleSpeedChange: function(speed) {
@@ -214,20 +193,8 @@ define([
                     director.changePreviewLayer(e.target.value);
                     this.setState({ sliderValue: e.target.value });
                 },
-                _handleToggleMode: function(source) {
-                    console.log(source);
-                    this.setState({ mode: source });
-                },
                 _handleCameraPositionChange: function(position, rotation) {
                     director.setCameraPosition(position, rotation);
-                },
-                _renderOperatingPanel: function() {
-                    return (
-                        <OperatingPanel
-                            modelSelected       = {this.state.modelSelected}
-                            lang                = {lang}
-                            onOperationChange   = {this._handleOperationChange} />
-                    );
                 },
                 _renderAdvancedPanel: function() {
                     return (
@@ -298,29 +265,27 @@ define([
 
                     return (
                         <div className="objectDialogue" style={this.state.objectDialogueStyle}>
-                            <div id="scale" className="section" onClick={this._handleToggleMode.bind(this, 'scale')}>
-                                <div className="title">{lang.print.scale}</div>
-                            </div>
+                            <dl className="accordion">
 
-                            <div id="rotate" className={rotateClass} onClick={this._handleToggleMode.bind(this, 'rotate')}>
-                                <div className="divider"></div>
-                                <div className="title">{lang.print.rotate}</div>
-                            </div>
+                                <dt><a id="scale" className="title" href="">{lang.print.scale}</a></dt>
+                                    <dd className="scale-content">Scale Mode</dd>
 
-                            <div className={rotateInputFieldsClass}>
-                                <div className="group">
-                                    <div className="label">X</div>
-                                    <div className="control"><input type="text" /></div>
-                                </div>
-                                <div className="group">
-                                    <div className="label">Y</div>
-                                    <div className="control"><input type="text" /></div>
-                                </div>
-                                <div className="group">
-                                    <div className="label">Z</div>
-                                    <div className="control"><input type="text" /></div>
-                                </div>
-                            </div>
+                                <dt><a id="rotate" className="title" href="">{lang.print.rotate}</a></dt>
+                                    <dd className="rotate-content">
+                                        <div className="group">
+                                            <div className="label">X</div>
+                                            <div className="control"><input type="text" /></div>
+                                        </div>
+                                        <div className="group">
+                                            <div className="label">Y</div>
+                                            <div className="control"><input type="text" /></div>
+                                        </div>
+                                        <div className="group">
+                                            <div className="label">Z</div>
+                                            <div className="control"><input type="text" /></div>
+                                        </div>
+                                    </dd>
+                            </dl>
                         </div>
                     );
                 },
@@ -359,44 +324,10 @@ define([
                         leftPanel               = this._renderLeftPanel(),
                         rightPanel              = this._renderRightPanel(),
                         objectDialogue          = this.state.openObjectDialogue ? this._renderObjectDialogue() : '',
-                        bottomPanel,
                         printerSelectorWindow   = this.state.openPrinterSelectorWindow ? this._renderPrinterSelectorWindow() : '',
                         waitWindow              = this.state.openWaitWindow ? this._renderWaitWindow() : '',
                         previewWindow           = this.state.previewMode ? this._renderPreviewWindow() : '',
                         progressWindow          = this.state.progressMessage ? this._renderProgressWindow() : '';
-
-                    switch(this.state.operation) {
-                        case 'rotate':
-                            bottomPanel = (
-                                <RotationPanel
-                                    lang={lang}
-                                    selected={this.state.modelSelected}
-                                    onReset={this._handleResetRotation}
-                                    onRotate={this._handleRotation} />
-                            );
-                            director.setRotateMode();
-                            break;
-                        case 'scale':
-                            bottomPanel = (
-                                <ScalePanel
-                                    lang={lang}
-                                    selected={this.state.modelSelected}
-                                    onReset={this._handleResetScale}
-                                    onScaleChange={this._handleScaleChange}
-                                    onToggleLock={this._handleScaleToggleLock} />
-                            );
-                            director.setScaleMode();
-                            break;
-                        default:
-                            break;
-                    }
-
-                    if(!this.state.modelSelected) {
-                        bottomPanel = '';
-                    }
-
-                    var divStyle = {
-                    }
 
                     return (
                         <div className="studio-container print-studio">
@@ -419,7 +350,7 @@ define([
 
                             {progressWindow}
 
-                            <div id="model-displayer" className="model-displayer" style={divStyle}></div>
+                            <div id="model-displayer" className="model-displayer"></div>
                         </div>
                     );
                 }

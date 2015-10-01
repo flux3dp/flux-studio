@@ -238,9 +238,10 @@ define([
             alignCenter();
             groundIt(mesh);
             selectObject(mesh);
-            createOutline(geometry, mesh);
+            createOutline(mesh);
 
             scene.add(mesh);
+            scene.add(mesh.outlineMesh);
             objects.push(mesh);
 
             render();
@@ -361,6 +362,7 @@ define([
                 groundIt(SELECTED);
                 break;
             case 'objectChange':
+                syncObjectOutline(e.target.object);
                 break;
         }
     }
@@ -676,6 +678,20 @@ define([
                         'margin-left': objectDialogueDistance + 'px'
                     }
                 });
+
+                // for rotation and scale content accordion
+                var allPanels = $('.accordion > dd');
+
+                $('.accordion > dt > a').click(function() {
+                    allPanels.slideUp();
+                    $(this).parent().next().slideDown();
+                    var mode = $(this)[0].id;
+                    mode === 'rotate' ? setRotateMode() : setScaleMode();
+                    reactSrc.setState({ mode: mode});
+                    return false;
+                });
+
+                reactSrc.state.mode === 'rotate' ? $('.scale-content').hide() : $('.rotate-content').hide();
             });
         }
     }
@@ -713,6 +729,7 @@ define([
             scaleBeforeTransformY = obj.scale.y;
             scaleBeforeTransformZ = obj.scale.z;
 
+            reactSrc.state.mode === 'rotate' ? setRotateMode() : setScaleMode();
         } else {
             transformMode = false;
             _removeAllMeshOutline();
@@ -742,6 +759,9 @@ define([
         if (!$.isEmptyObject(mesh)) {
             var reference = getReferenceDistance(mesh);
             mesh.position.z -= reference.z;
+            if(mesh.outlineMesh) {
+                mesh.outlineMesh.position.z -= reference.z;
+            }
             blobExpired = true;
         }
     }
@@ -1007,17 +1027,23 @@ define([
         }
     }
 
-    function createOutline(geometry, mesh) {
+    function createOutline(mesh) {
         var outlineMaterial = new THREE.MeshBasicMaterial( { color: s.colorSelected, side: THREE.BackSide } );
-        var outlineMesh = new THREE.Mesh( geometry, outlineMaterial );
+        var outlineMesh = new THREE.Mesh(mesh.geometry, outlineMaterial);
         outlineMesh.position.set(mesh.position.x, mesh.position.y, mesh.position.z);
         outlineMesh.scale.multiplyScalar(1.05);
         mesh.outlineMesh = outlineMesh;
-        scene.add(mesh.outlineMesh);
+    }
+
+    function syncObjectOutline(src) {
+        src.outlineMesh.rotation.set(src.rotation.x, src.rotation.y, src.rotation.z, 'ZYX');
+        src.outlineMesh.scale.set(src.scale.x, src.scale.y, src.scale.z);
+        src.outlineMesh.scale.multiplyScalar(1.05);
     }
 
     // Private Functions ---
 
+    // sync parameters with server
     function _syncObjectParameter(objects, index) {
         var d = $.Deferred();
         index = index || 0;
