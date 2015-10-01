@@ -31,8 +31,9 @@
             top: 27px;
 
             .arrow {
-                left: -54px;
+                left: 0;
                 position: absolute;
+                transform: translateX(-100%);
                 top: 0;
 
                 polygon {
@@ -63,6 +64,7 @@
 
         img {
             height: 3.2rem;
+            margin: 0 auto;
             transform-origin: 50% 50%;
             width: 3.2rem;
         }

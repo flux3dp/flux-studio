@@ -2864,8 +2864,9 @@ input[type=range]:focus::-webkit-slider-runnable-track {
             position: relative;
             top: 27px; }
             .top-menu .brand-logo .menu .arrow {
-                left: -54px;
+                left: 0;
                 position: absolute;
+                transform: translateX(-100%);
                 top: 0; }
                 .top-menu .brand-logo .menu .arrow polygon {
                     fill: #fff; }
@@ -2890,6 +2891,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         flex: 1; }
         .top-menu .item img {
             height: 3.2rem;
+            margin: 0 auto;
             transform-origin: 50% 50%;
             width: 3.2rem; }
         .top-menu .item p,
