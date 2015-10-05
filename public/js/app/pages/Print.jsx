@@ -8,6 +8,7 @@ define([
     'jsx!views/print-operating-panels/Advanced',
     'jsx!views/print-operating-panels/Left-Panel',
     'jsx!views/print-operating-panels/Right-Panel',
+    'jsx!views/print-operating-panels/Object-Dialogue',
     'helpers/file-system',
     'jsx!widgets/Modal',
     'helpers/api/config',
@@ -22,6 +23,7 @@ define([
     AdvancedPanel,
     LeftPanel,
     RightPanel,
+    ObjectDialogue,
     FileSystem,
     Modal,
     Config,
@@ -46,6 +48,12 @@ define([
                 x       : 1,
                 y       : 1,
                 z       : 1
+            },
+            _size = {
+                locked  : true,
+                x       : 0,
+                y       : 0,
+                z       : 0
             },
             _rotation = {
                 x: 0,
@@ -72,7 +80,9 @@ define([
                         progressMessage             : '',
                         objectDialogueStyle         : {},
                         mode                        : 'rotate',
-                        camera                      : {}
+                        camera                      : {},
+                        rotation                    : {},
+                        scale                       : {}
                     });
                 },
                 componentDidMount: function() {
@@ -85,15 +95,12 @@ define([
                             }
                         }.bind(this)
                     });
-                    // register for delete button
-                    $(document).keyup(function(e) {
-                        if(e.keyCode === 8 || e.keyCode === 46) {
+
+                    $(document).keydown(function(e) {
+                        if(e.metaKey && e.keyCode === 8 || e.keyCode === 46) {
                             director.removeSelected();
                         }
-                    }.bind(this));
-                },
-                _updateSelectedSize: function() {
-
+                    })
                 },
                 _handleSpeedChange: function(speed) {
                     director.setParameter('printSpeed', speed);
@@ -112,19 +119,36 @@ define([
                         openPrinterSelectorWindow: true
                     });
                 },
-                _handleRotation: function(rotation) {
-                    _rotation = rotation;
-                    director.setRotation(rotation.x, rotation.y, rotation.z, true);
+                _handleRotationChange: function(src) {
+                    var axis = src.target.id;
+                    console.log(src.type, src.target.value);
+                    console.log(src.type === 'blur', !$.isNumeric(src.target.value));
+                    _rotation[axis] = src.type === 'blur' && !$.isNumeric(src.target.value) ? 0 : src.target.value;
+                    director.setRotation(_rotation.x, _rotation.y, _rotation.z, true);
                 },
                 _handleResetRotation: function() {
                     _rotation.x = 0;
                     _rotation.y = 0;
                     _rotation.z = 0;
+                    this.setState({ rotation: _rotation });
                     director.setRotation(0, 0, 0, true);
                 },
-                _handleScaleChange: function(scale) {
-                    _scale = scale;
+                _handleScaleChange: function(src) {
+                    var axis = src.target.id;
+                    _scale[axis] = src.type === 'blur' && !$.isNumeric(src.target.value) ? 1 : src.target.value;
                     director.setScale(scale.x, scale.y, scale.z, scale.locked, true);
+                },
+                _handleResize: function(size) {
+                    // console.log('size', size);
+                    var sx = Math.round(size.x / this.state.modelSelected.size.x * 1000) / 1000,
+                        sy = Math.round(size.y / this.state.modelSelected.size.y * 1000) / 1000,
+                        sz = Math.round(size.z / this.state.modelSelected.size.z * 1000) / 1000,
+                        locked = false,
+                        render = true;
+
+                    console.log(sx, sy, sz);
+
+                    director.setScale(sx, sy, sz, locked, render);
                 },
                 _handleResetScale: function() {
                     director.setScale(1, 1, 1, true);
@@ -260,33 +284,15 @@ define([
                     );
                 },
                 _renderObjectDialogue: function() {
-                    var rotateInputFieldsClass = ClassNames('rotateInputFields', {bottom: this.state.mode === 'rotate'}),
-                        rotateClass = ClassNames('section', {bottom: this.state.mode === 'scale'});
-
                     return (
-                        <div className="objectDialogue" style={this.state.objectDialogueStyle}>
-                            <dl className="accordion">
-
-                                <dt><a id="scale" className="title" href="">{lang.print.scale}</a></dt>
-                                    <dd className="scale-content">Scale Mode</dd>
-
-                                <dt><a id="rotate" className="title" href="">{lang.print.rotate}</a></dt>
-                                    <dd className="rotate-content">
-                                        <div className="group">
-                                            <div className="label">X</div>
-                                            <div className="control"><input type="text" /></div>
-                                        </div>
-                                        <div className="group">
-                                            <div className="label">Y</div>
-                                            <div className="control"><input type="text" /></div>
-                                        </div>
-                                        <div className="group">
-                                            <div className="label">Z</div>
-                                            <div className="control"><input type="text" /></div>
-                                        </div>
-                                    </dd>
-                            </dl>
-                        </div>
+                        <ObjectDialogue
+                            lang        = {lang}
+                            model       = {this.state.modelSelected}
+                            style       = {this.state.objectDialogueStyle}
+                            mode        = {this.state.mode}
+                            onRotate    = {this._handleRotationChange}
+                            onResize    = {this._handleResize}
+                            />
                     );
                 },
                 _renderWaitWindow: function() {

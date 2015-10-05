@@ -236,6 +236,7 @@ define([
             mesh.plane_boundary = planeBoundary(mesh);
 
             alignCenter();
+            addSizeProperty(mesh);
             groundIt(mesh);
             selectObject(mesh);
             createOutline(mesh);
@@ -261,7 +262,9 @@ define([
         raycaster.setFromCamera(mouse, camera);
         var intersects = raycaster.intersectObjects(objects);
         var location = getReferenceIntersectLocation(e);
+
         if (intersects.length > 0) {
+
             var target = intersects[0].object;
             selectObject(target);
 
@@ -271,7 +274,11 @@ define([
 
             movingOffsetX = location ? location.x - target.position.x : target.position.x;
             movingOffsetY = location ? location.y - target.position.y : target.position.y;
-        } else {
+
+        }
+
+        else {
+
             if (!transformMode) {
                 selectObject(null);
                 removeFromScene('TransformControl');
@@ -498,11 +505,14 @@ define([
         return d.promise();
     }
 
-    function getSelectedObjectSize() {
-        if (!$.isEmptyObject(SELECTED)) {
-            boundingBox = new THREE.BoundingBoxHelper(SELECTED, s.colorSelected);
+    function addSizeProperty(obj) {
+        if (!$.isEmptyObject(obj)) {
+            var boundingBox = new THREE.BoundingBoxHelper(obj);
             boundingBox.update();
-            return boundingBox;
+            obj.size = boundingBox.box.size();
+            obj.size.enteredX = boundingBox.box.size().x;
+            obj.size.enteredY = boundingBox.box.size().y;
+            obj.size.enteredZ = boundingBox.box.size().z;
         }
     }
 
@@ -546,9 +556,15 @@ define([
         });
 
         if (alignCenter) {
-            this.alignCenter();
+            SELECTED.plane_boundary = planeBoundary(SELECTED);
+            groundIt(SELECTED);
             checkOutOfBounds(SELECTED);
+            render();
         }
+    }
+
+    function setSize(x, y, z, locked) {
+        console.log(SELECTED.size);
     }
 
     function setRotateMode() {
@@ -600,24 +616,28 @@ define([
         blobExpired = true;
     }
 
-    function setRotation(x, y, z, render) {
+    function setRotation(x, y, z, needRender) {
+        var _x = parseInt(x) || 0,
+            _y = parseInt(y) || 0,
+            _z = parseInt(z) || 0;
         SELECTED.rotation.enteredX = x;
         SELECTED.rotation.enteredY = y;
         SELECTED.rotation.enteredZ = z;
-        SELECTED.rotation.x = degreeToRadian(x);
-        SELECTED.rotation.y = degreeToRadian(y);
-        SELECTED.rotation.z = degreeToRadian(z);
-        SELECTED.outlineMesh.rotation.x = degreeToRadian(x);
-        SELECTED.outlineMesh.rotation.y = degreeToRadian(y);
-        SELECTED.outlineMesh.rotation.z = degreeToRadian(z);
+        SELECTED.rotation.x = degreeToRadian(_x);
+        SELECTED.rotation.y = degreeToRadian(_y);
+        SELECTED.rotation.z = degreeToRadian(_z);
+        SELECTED.outlineMesh.rotation.x = degreeToRadian(_x);
+        SELECTED.outlineMesh.rotation.y = degreeToRadian(_y);
+        SELECTED.outlineMesh.rotation.z = degreeToRadian(_z);
 
         reactSrc.setState({
             modelSelected: SELECTED.uuid ? SELECTED : null
         });
-        if (render) {
+        if (needRender) {
             SELECTED.plane_boundary = planeBoundary(SELECTED);
             groundIt(SELECTED);
             checkOutOfBounds(SELECTED);
+            render();
         }
     }
 
@@ -651,6 +671,7 @@ define([
             objectDialogueDistance = parseInt(objectDialogueDistance);
 
             reactSrc.setState({
+                modelSelected: o,
                 openObjectDialogue: true
             }, function() {
                 var objectDialogue = document.getElementsByClassName('objectDialogue')[0],
@@ -733,11 +754,8 @@ define([
         } else {
             transformMode = false;
             _removeAllMeshOutline();
+            reactSrc.setState({ openObjectDialogue: false });
         }
-        reactSrc.setState({
-            modelSelected: SELECTED.uuid ? SELECTED : null,
-            openObjectDialogue: !!obj
-        });
 
         render();
     }
@@ -769,6 +787,7 @@ define([
     function removeSelected() {
         if (SELECTED) {
             var index;
+            scene.remove(SELECTED.outlineMesh);
             scene.remove(SELECTED);
             index = objects.indexOf(SELECTED);
             if (index > -1) {
@@ -1189,23 +1208,23 @@ define([
     }
 
     return {
-        init: init,
-        appendModel: appendModel,
-        setRotation: setRotation,
-        setScale: setScale,
-        alignCenter: alignCenter,
-        removeSelected: removeSelected,
-        sendGCodeParameters: sendGCodeParameters,
-        getSelectedObjectSize: getSelectedObjectSize,
-        downloadGCode: downloadGCode,
-        setRotateMode: setRotateMode,
-        setScaleMode: setScaleMode,
-        setAdvanceParameter: setAdvanceParameter,
-        setParameter: setParameter,
-        getGCode: getGCode,
-        togglePreview: togglePreview,
-        changePreviewLayer: changePreviewLayer,
-        executePrint: executePrint,
-        setCameraPosition: setCameraPosition
+        init                : init,
+        appendModel         : appendModel,
+        setRotation         : setRotation,
+        setScale            : setScale,
+        alignCenter         : alignCenter,
+        removeSelected      : removeSelected,
+        sendGCodeParameters : sendGCodeParameters,
+        setSize             : setSize,
+        downloadGCode       : downloadGCode,
+        setRotateMode       : setRotateMode,
+        setScaleMode        : setScaleMode,
+        setAdvanceParameter : setAdvanceParameter,
+        setParameter        : setParameter,
+        getGCode            : getGCode,
+        togglePreview       : togglePreview,
+        changePreviewLayer  : changePreviewLayer,
+        executePrint        : executePrint,
+        setCameraPosition   : setCameraPosition
     };
 });
