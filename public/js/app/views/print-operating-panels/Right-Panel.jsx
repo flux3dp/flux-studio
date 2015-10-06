@@ -17,7 +17,6 @@ define([
             objectController.init(this);
         },
         componentWillReceiveProps: function(nextProps) {
-            // console.log(nextProps.camera.position);
             objectController.setCameraPosition(nextProps.camera);
         },
         _handlePreviewClick: function(e) {
@@ -30,8 +29,8 @@ define([
         _handleGo: function(e) {
             this.props.onPrintClick();
         },
-        _updateCamera: function(camera) {
-            this.props.onCameraPositionChange(camera);
+        _updateCamera: function(position, rotation) {
+            this.props.onCameraPositionChange(position, rotation);
         },
         render: function() {
             var lang = this.props.lang.print.left_panel;

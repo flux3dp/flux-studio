@@ -313,6 +313,8 @@ THREE.OrbitControls = function ( object, domElement ) {
 		offset.y = radius * Math.cos( phi );
 		offset.z = radius * Math.sin( phi ) * Math.cos( theta );
 
+		position.raw = offset;
+
 		// rotate offset back to "camera-up-vector-is-up" space
 		offset.applyQuaternion( quatInverse );
 

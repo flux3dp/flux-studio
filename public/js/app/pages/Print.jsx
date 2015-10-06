@@ -8,8 +8,10 @@ define([
     'jsx!views/print-operating-panels/Advanced',
     'jsx!views/print-operating-panels/Left-Panel',
     'jsx!views/print-operating-panels/Right-Panel',
+    'jsx!views/print-operating-panels/Object-Dialogue',
     'helpers/file-system',
     'jsx!widgets/Modal',
+    'helpers/api/config',
     'jsx!views/Print-Selector',
     'plugins/knob/jquery.knob'
 ], function($,
@@ -21,8 +23,10 @@ define([
     AdvancedPanel,
     LeftPanel,
     RightPanel,
+    ObjectDialogue,
     FileSystem,
     Modal,
+    Config,
     PrinterSelector) {
 
     'use strict';
@@ -45,6 +49,12 @@ define([
                 y       : 1,
                 z       : 1
             },
+            _size = {
+                locked  : true,
+                x       : 0,
+                y       : 0,
+                z       : 0
+            },
             _rotation = {
                 x: 0,
                 y: 0,
@@ -56,7 +66,6 @@ define([
                     return ({
                         checked                     : false,
                         locked                      : true,
-                        operation                   : '',
                         previewMode                 : false,
                         showPreviewModeList         : false,
                         showAdvancedSetting         : false,
@@ -70,36 +79,28 @@ define([
                         sliderValue                 : 0,
                         progressMessage             : '',
                         objectDialogueStyle         : {},
-                        importWindowStyle           : {},
                         mode                        : 'rotate',
-                        camera                      : {}
+                        camera                      : {},
+                        rotation                    : {},
+                        scale                       : {}
                     });
                 },
                 componentDidMount: function() {
                     director.init(this);
-                },
-                _updateSelectedSize: function() {
+                    Config().read('advanced-options', {
+                        onFinished: function(response) {
+                            var options = JSON.parse(response);
+                            if(!$.isEmptyObject(options)) {
+                                advancedSetting = options;
+                            }
+                        }.bind(this)
+                    });
 
-                },
-                _handleOperationChange: function(operation) {
-                    switch(operation) {
-                        case 'scale':
-                            this.setState({ operation: 'scale' });
-                            break;
-                        case 'rotate':
-                            this.setState({ operation: 'rotate' });
-                            break;
-                        case 'center':
-                            director.alignCenter();
-                            break;
-                        case 'delete':
+                    $(document).keydown(function(e) {
+                        if(e.metaKey && e.keyCode === 8 || e.keyCode === 46) {
                             director.removeSelected();
-                            this.setState({ operation: '' });
-                            break;
-                        default:
-                            break;
-                    }
-
+                        }
+                    })
                 },
                 _handleSpeedChange: function(speed) {
                     director.setParameter('printSpeed', speed);
@@ -118,19 +119,36 @@ define([
                         openPrinterSelectorWindow: true
                     });
                 },
-                _handleRotation: function(rotation) {
-                    _rotation = rotation;
-                    director.setRotation(rotation.x, rotation.y, rotation.z, true);
+                _handleRotationChange: function(src) {
+                    var axis = src.target.id;
+                    console.log(src.type, src.target.value);
+                    console.log(src.type === 'blur', !$.isNumeric(src.target.value));
+                    _rotation[axis] = src.type === 'blur' && !$.isNumeric(src.target.value) ? 0 : src.target.value;
+                    director.setRotation(_rotation.x, _rotation.y, _rotation.z, true);
                 },
                 _handleResetRotation: function() {
                     _rotation.x = 0;
                     _rotation.y = 0;
                     _rotation.z = 0;
+                    this.setState({ rotation: _rotation });
                     director.setRotation(0, 0, 0, true);
                 },
-                _handleScaleChange: function(scale) {
-                    _scale = scale;
+                _handleScaleChange: function(src) {
+                    var axis = src.target.id;
+                    _scale[axis] = src.type === 'blur' && !$.isNumeric(src.target.value) ? 1 : src.target.value;
                     director.setScale(scale.x, scale.y, scale.z, scale.locked, true);
+                },
+                _handleResize: function(size) {
+                    // console.log('size', size);
+                    var sx = Math.round(size.x / this.state.modelSelected.size.x * 1000) / 1000,
+                        sy = Math.round(size.y / this.state.modelSelected.size.y * 1000) / 1000,
+                        sz = Math.round(size.z / this.state.modelSelected.size.z * 1000) / 1000,
+                        locked = false,
+                        render = true;
+
+                    console.log(sx, sy, sz);
+
+                    director.setScale(sx, sy, sz, locked, render);
                 },
                 _handleResetScale: function() {
                     director.setScale(1, 1, 1, true);
@@ -139,6 +157,9 @@ define([
                     this.setState({ showAdvancedSetting: false });
                 },
                 _handleAdvancedSettingDone: function(setting) {
+                    Config().write('advanced-options', JSON.stringify(advancedSetting), {
+                        onFinished: function(response) {}
+                    });
                     advancedSetting = setting;
                     director.setAdvanceParameter(setting);
                     this.setState({ showAdvancedSetting: false });
@@ -186,29 +207,18 @@ define([
                 },
                 _handlePrinterSelected: function(selectedPrinter) {
                     console.log(selectedPrinter);
+
                     this.setState({
                         openPrinterSelectorWindow: false
                     });
-                    director.executePrint(selectedPrinter.serial);
+                    // director.executePrint(selectedPrinter.serial);
                 },
                 _handlePreviewLayerChange: function(e) {
                     director.changePreviewLayer(e.target.value);
                     this.setState({ sliderValue: e.target.value });
                 },
-                _handleToggleMode: function(source) {
-                    console.log(source);
-                    this.setState({ mode: source });
-                },
-                _handleCameraPositionChange: function(camera) {
-                    director.setCameraPosition(camera);
-                },
-                _renderOperatingPanel: function() {
-                    return (
-                        <OperatingPanel
-                            modelSelected       = {this.state.modelSelected}
-                            lang                = {lang}
-                            onOperationChange   = {this._handleOperationChange} />
-                    );
+                _handleCameraPositionChange: function(position, rotation) {
+                    director.setCameraPosition(position, rotation);
                 },
                 _renderAdvancedPanel: function() {
                     return (
@@ -244,7 +254,7 @@ define([
                 _renderImportWindow: function() {
                     return (
                         <div className="importWindow">
-                            <div className="arrowBox" style={this.state.importWindowStyle}>
+                            <div className="arrowBox">
                                 <div className="file-importer">
                                     <div className="import-btn">{lang.print.import}</div>
                                     <input type="file" accept=".stl" onChange={this._handleImport} />
@@ -274,35 +284,15 @@ define([
                     );
                 },
                 _renderObjectDialogue: function() {
-                    var rotateInputFieldsClass = ClassNames('rotateInputFields', {bottom: this.state.mode === 'rotate'}),
-                        rotateClass = ClassNames('section', {bottom: this.state.mode === 'scale'});
-
                     return (
-                        <div className="objectDialogue" style={this.state.objectDialogueStyle}>
-                            <div id="scale" className="section" onClick={this._handleToggleMode.bind(this, 'scale')}>
-                                <div className="title">{lang.print.scale}</div>
-                            </div>
-
-                            <div id="rotate" className={rotateClass} onClick={this._handleToggleMode.bind(this, 'rotate')}>
-                                <div className="divider"></div>
-                                <div className="title">{lang.print.rotate}</div>
-                            </div>
-
-                            <div className={rotateInputFieldsClass}>
-                                <div className="group">
-                                    <div className="label">X</div>
-                                    <div className="control"><input type="text" /></div>
-                                </div>
-                                <div className="group">
-                                    <div className="label">Y</div>
-                                    <div className="control"><input type="text" /></div>
-                                </div>
-                                <div className="group">
-                                    <div className="label">Z</div>
-                                    <div className="control"><input type="text" /></div>
-                                </div>
-                            </div>
-                        </div>
+                        <ObjectDialogue
+                            lang        = {lang}
+                            model       = {this.state.modelSelected}
+                            style       = {this.state.objectDialogueStyle}
+                            mode        = {this.state.mode}
+                            onRotate    = {this._handleRotationChange}
+                            onResize    = {this._handleResize}
+                            />
                     );
                 },
                 _renderWaitWindow: function() {
@@ -340,44 +330,10 @@ define([
                         leftPanel               = this._renderLeftPanel(),
                         rightPanel              = this._renderRightPanel(),
                         objectDialogue          = this.state.openObjectDialogue ? this._renderObjectDialogue() : '',
-                        bottomPanel,
                         printerSelectorWindow   = this.state.openPrinterSelectorWindow ? this._renderPrinterSelectorWindow() : '',
                         waitWindow              = this.state.openWaitWindow ? this._renderWaitWindow() : '',
                         previewWindow           = this.state.previewMode ? this._renderPreviewWindow() : '',
                         progressWindow          = this.state.progressMessage ? this._renderProgressWindow() : '';
-
-                    switch(this.state.operation) {
-                        case 'rotate':
-                            bottomPanel = (
-                                <RotationPanel
-                                    lang={lang}
-                                    selected={this.state.modelSelected}
-                                    onReset={this._handleResetRotation}
-                                    onRotate={this._handleRotation} />
-                            );
-                            director.setRotateMode();
-                            break;
-                        case 'scale':
-                            bottomPanel = (
-                                <ScalePanel
-                                    lang={lang}
-                                    selected={this.state.modelSelected}
-                                    onReset={this._handleResetScale}
-                                    onScaleChange={this._handleScaleChange}
-                                    onToggleLock={this._handleScaleToggleLock} />
-                            );
-                            director.setScaleMode();
-                            break;
-                        default:
-                            break;
-                    }
-
-                    if(!this.state.modelSelected) {
-                        bottomPanel = '';
-                    }
-
-                    var divStyle = {
-                    }
 
                     return (
                         <div className="studio-container print-studio">
@@ -400,7 +356,7 @@ define([
 
                             {progressWindow}
 
-                            <div id="model-displayer" className="model-displayer" style={divStyle}></div>
+                            <div id="model-displayer" className="model-displayer"></div>
                         </div>
                     );
                 }
