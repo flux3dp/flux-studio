@@ -121,8 +121,6 @@ define([
                 },
                 _handleRotationChange: function(src) {
                     var axis = src.target.id;
-                    console.log(src.type, src.target.value);
-                    console.log(src.type === 'blur', !$.isNumeric(src.target.value));
                     _rotation[axis] = src.type === 'blur' && !$.isNumeric(src.target.value) ? 0 : src.target.value;
                     director.setRotation(_rotation.x, _rotation.y, _rotation.z, true);
                 },
@@ -139,16 +137,11 @@ define([
                     director.setScale(scale.x, scale.y, scale.z, scale.locked, true);
                 },
                 _handleResize: function(size) {
-                    // console.log('size', size);
-                    var sx = Math.round(size.x / this.state.modelSelected.size.x * 1000) / 1000,
-                        sy = Math.round(size.y / this.state.modelSelected.size.y * 1000) / 1000,
-                        sz = Math.round(size.z / this.state.modelSelected.size.z * 1000) / 1000,
-                        locked = false,
-                        render = true;
-
-                    console.log(sx, sy, sz);
-
-                    director.setScale(sx, sy, sz, locked, render);
+                    director.setSize(size.x, size.y, size.z);
+                },
+                _handleSetSize: function(size) {
+                    var updateOriginalSize = true;
+                    director.setSize(size.x, size.y, size.z, updateOriginalSize);
                 },
                 _handleResetScale: function() {
                     director.setScale(1, 1, 1, true);
@@ -290,6 +283,7 @@ define([
                             model       = {this.state.modelSelected}
                             style       = {this.state.objectDialogueStyle}
                             mode        = {this.state.mode}
+                            onSetSize   = {this._handleSetSize}
                             onRotate    = {this._handleRotationChange}
                             onResize    = {this._handleResize}
                             />

@@ -15,15 +15,20 @@ define([
             };
         },
         getInitialState: function() {
-            _size = this.props.model.size.clone();
+            this._updateSizeProperty(this.props.model.size);
+            return ({
+                size: _size
+            });
+        },
+        componentWillUpdate: function(nextProp, nextState) {
+            this._updateSizeProperty(nextProp.model.size);
+        },
+        _updateSizeProperty: function(size) {
+            _size = size.clone();
             Object.keys(_size).map(function(p) {
                 _size[p] = this._roundSizeToTwoDecimalPlace(_size[p]);
                 _size['entered' + p.toUpperCase()] = _size[p].toFixed(2) + 'mm';
             }.bind(this));
-
-            return ({
-                size: _size
-            });
         },
         _handleResize: function(src) {
             var axis    = src.target.id,
@@ -62,8 +67,6 @@ define([
                 rotateClass             = ClassNames('section', {bottom: this.props.mode === 'scale'}),
                 rotation                = this.props.model.rotation;
 
-            // this._roundSizeToTwoDecimalPlace(size);
-
             return (
                 <div className="objectDialogue" style={this.props.style}>
                     <dl className="accordion">
@@ -76,7 +79,7 @@ define([
                                         <input id="x" type="text"
                                             onChange={this._handleResize.bind(this)}
                                             onBlur={this._handleResize.bind(this)}
-                                            value={this.state.size.enteredX} /></div>
+                                            value={_size.enteredX} /></div>
                                 </div>
                                 <div className="group">
                                     <div className="label">Y</div>
@@ -84,7 +87,7 @@ define([
                                         <input id="y" type="text"
                                             onChange={this._handleResize.bind(this)}
                                             onBlur={this._handleResize.bind(this)}
-                                            value={this.state.size.enteredY} /></div>
+                                            value={_size.enteredY} /></div>
                                 </div>
                                 <div className="group">
                                     <div className="label">Z</div>
@@ -92,7 +95,7 @@ define([
                                         <input id="z" type="text"
                                             onChange={this._handleResize.bind(this)}
                                             onBlur={this._handleResize.bind(this)}
-                                            value={this.state.size.enteredZ} /></div>
+                                            value={_size.enteredZ} /></div>
                                 </div>
                             </dd>
 

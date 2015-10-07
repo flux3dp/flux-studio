@@ -27,7 +27,7 @@ define([
     var raycaster = new THREE.Raycaster();
     var mouse = new THREE.Vector2(),
         offset = new THREE.Vector3(),
-        circularGridHelper, mouseDown, SELECTED;
+        circularGridHelper, mouseDown, SELECTED, lastSelected;
 
     var movingOffsetX, movingOffsetY, panningOffset, originalCameraPosition, originalCameraRotation,
         scaleBeforeTransformX, scaleBeforeTransformY, scaleBeforeTransformZ;
@@ -353,23 +353,13 @@ define([
             case 'mouseUp':
                 transformMode = false;
                 // d = degree, s = scale
-                var _dx = updateDegreeWithStep(radianToDegree(SELECTED.rotation.x)),
-                    _dy = updateDegreeWithStep(radianToDegree(SELECTED.rotation.y)),
-                    _dz = updateDegreeWithStep(radianToDegree(SELECTED.rotation.z)),
-                    _sx = updateScaleWithStep(SELECTED.scale.x),
-                    _sy = updateScaleWithStep(SELECTED.scale.y),
-                    _sz = updateScaleWithStep(SELECTED.scale.z);
-
-                _dx = _dx >= 0 ? _dx : (360 - Math.abs(_dx));
-                _dy = _dy >= 0 ? _dy : (360 - Math.abs(_dy));
-                _dz = _dz >= 0 ? _dz : (360 - Math.abs(_dz));
-                setRotation(_dx, _dy, _dz, false);
-                setScale(_sx, _sy, _sz, false, false);
-                render();
-                groundIt(SELECTED);
+                SELECTED.rotation.enteredX = updateDegreeWithStep(radianToDegree(SELECTED.rotation.x));
+                SELECTED.rotation.enteredY = updateDegreeWithStep(radianToDegree(SELECTED.rotation.y));
+                SELECTED.rotation.enteredZ = updateDegreeWithStep(radianToDegree(SELECTED.rotation.z));
+                updateObjectSize(SELECTED);
                 break;
             case 'objectChange':
-                syncObjectOutline(e.target.object);
+                updateObjectSize(e.target.object);
                 break;
         }
     }
@@ -419,7 +409,7 @@ define([
 
             reader.onload = function(e) {
                 var arrayBuffer = reader.result;
-            }
+            };
 
             reader.readAsArrayBuffer(fileObject);
         });
@@ -513,6 +503,9 @@ define([
             obj.size.enteredX = boundingBox.box.size().x;
             obj.size.enteredY = boundingBox.box.size().y;
             obj.size.enteredZ = boundingBox.box.size().z;
+            obj.size.originalX = boundingBox.box.size().x;
+            obj.size.originalY = boundingBox.box.size().y;
+            obj.size.originalZ = boundingBox.box.size().z;
         }
     }
 
@@ -551,6 +544,7 @@ define([
         SELECTED.outlineMesh.scale.multiplyScalar(1.05);
         SELECTED.scale.locked = locked;
         SELECTED.plane_boundary = planeBoundary(SELECTED);
+
         reactSrc.setState({
             modelSelected: SELECTED.uuid ? SELECTED : null
         });
@@ -563,8 +557,18 @@ define([
         }
     }
 
-    function setSize(x, y, z, locked) {
-        console.log(SELECTED.size);
+    function setSize(x, y, z) {
+        var sx = Math.round(x / SELECTED.size.originalX * 1000) / 1000,
+            sy = Math.round(y / SELECTED.size.originalY * 1000) / 1000,
+            sz = Math.round(z / SELECTED.size.originalZ * 1000) / 1000,
+            locked = false,
+            render = true;
+
+        setScale(sx, sy, sz, locked, render);
+
+        SELECTED.size.x = x;
+        SELECTED.size.y = y;
+        SELECTED.size.z = z;
     }
 
     function setRotateMode() {
@@ -612,7 +616,7 @@ define([
                 }
                 console.dir(result);
             }
-        )
+        );
         blobExpired = true;
     }
 
@@ -630,10 +634,10 @@ define([
         SELECTED.outlineMesh.rotation.y = degreeToRadian(_y);
         SELECTED.outlineMesh.rotation.z = degreeToRadian(_z);
 
-        reactSrc.setState({
-            modelSelected: SELECTED.uuid ? SELECTED : null
-        });
         if (needRender) {
+            reactSrc.setState({
+                modelSelected: SELECTED.uuid ? SELECTED : null
+            });
             SELECTED.plane_boundary = planeBoundary(SELECTED);
             groundIt(SELECTED);
             checkOutOfBounds(SELECTED);
@@ -1013,7 +1017,7 @@ define([
             return 0;
         }
         var degreeStep = shiftPressed ? 15 : s.degreeStep;
-        return (parseInt(degree / degreeStep + 1) * degreeStep);
+        return (parseInt(degree / degreeStep) * degreeStep);
     }
 
     function updateScaleWithStep(scale) {
@@ -1022,6 +1026,26 @@ define([
             return scale;
         }
         return (parseInt(scale * Math.pow(10, s.scalePrecision)) + 1) / Math.pow(10, s.scalePrecision);
+    }
+
+    function updateObjectSize(src) {
+        var boundingBox = new THREE.BoundingBoxHelper(src);
+        boundingBox.update();
+        src.size = boundingBox.box.size();
+        src.size.enteredX = src.size.x;
+        src.size.enteredY = src.size.y;
+        src.size.enteredZ = src.size.z;
+
+        src.rotation.enteredX = updateDegreeWithStep(radianToDegree(src.rotation.x));
+        src.rotation.enteredY = updateDegreeWithStep(radianToDegree(src.rotation.y));
+        src.rotation.enteredZ = updateDegreeWithStep(radianToDegree(src.rotation.z));
+
+        syncObjectOutline(src);
+        setRotation(src.rotation.enteredX, src.rotation.enteredY, src.rotation.enteredZ);
+
+        reactSrc.setState({
+            modelSelected: src
+        });
     }
 
     function toScreenPosition(obj, camera) {
@@ -1058,6 +1082,7 @@ define([
         src.outlineMesh.rotation.set(src.rotation.x, src.rotation.y, src.rotation.z, 'ZYX');
         src.outlineMesh.scale.set(src.scale.x, src.scale.y, src.scale.z);
         src.outlineMesh.scale.multiplyScalar(1.05);
+        render();
     }
 
     // Private Functions ---
