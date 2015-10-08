@@ -13,10 +13,15 @@ define([
         displayName: 'PrinterSelection',
         selected_printer: null,
 
+        propTypes: {
+            onClose: React.PropTypes.func,
+            onGettingPrinter: React.PropTypes.func
+        },
+
         _goBackToPrinterList: function() {
             this.setState({
                 authFailure: false,
-                showPassword: false,
+                showPassword: false
             });
         },
 
@@ -88,7 +93,7 @@ define([
         },
 
         _handleClose: function(e) {
-            React.unmountComponentAtNode(View);
+            // React.unmountComponentAtNode(View);
             this.props.onClose();
         },
 
@@ -102,6 +107,7 @@ define([
                             <div className="col device-name">{lang.device_selection.device_name}</div>
                             <div className="col module">{lang.device_selection.module}</div>
                             <div className="col status">{lang.device_selection.status}</div>
+                            <div className="close" onClick={this._handleClose}>X</div>
                         </div>
                         <ListView className="printer-list" items={options} ondblclick={self._selectPrinter}/>
                     </div>

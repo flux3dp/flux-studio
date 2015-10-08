@@ -26,24 +26,19 @@ define([
         referenceMeshes = [];
     var raycaster = new THREE.Raycaster();
     var mouse = new THREE.Vector2(),
-        offset = new THREE.Vector3(),
-        circularGridHelper, mouseDown, SELECTED, lastSelected;
+        circularGridHelper, mouseDown, SELECTED;
 
     var movingOffsetX, movingOffsetY, panningOffset, originalCameraPosition, originalCameraRotation,
         scaleBeforeTransformX, scaleBeforeTransformY, scaleBeforeTransformZ;
 
-    var responseMessage, responseBlob, printPath,
+    var responseBlob, printPath,
         previewScene,
-        mainScene,
         previewColors = [],
         blobExpired = true,
         transformMode = false,
         shiftPressed = false,
         previewMode = false,
-        fileExtension = '.gcode',
-        leftPanelWidth = 275,
-        // originalRadius = 320,
-        fireStateChange = true;
+        leftPanelWidth = 275;
 
     var s = {
         diameter: 170,
@@ -84,7 +79,7 @@ define([
         container = document.getElementById('model-displayer');
 
         camera = new THREE.PerspectiveCamera(60, (container.offsetWidth) / container.offsetHeight, 1, 30000);
-        camera.position.set(0, -300, 110);
+        camera.position.set(0, -200, 100);
         camera.up = new THREE.Vector3(0, 0, 1);
 
         scene = new THREE.Scene();
@@ -147,8 +142,8 @@ define([
         transformControl.addEventListener('objectChange', onTransform);
 
         window.addEventListener('resize', onWindowResize, false);
-        window.addEventListener("keydown", onKeyPress, false);
-        window.addEventListener("keyup", onKeyPress, false);
+        window.addEventListener('keydown', onKeyPress, false);
+        window.addEventListener('keyup', onKeyPress, false);
         renderer.domElement.addEventListener('mousemove', onMouseMove, false);
         renderer.domElement.addEventListener('mousedown', onMouseDown, false);
         renderer.domElement.addEventListener('mouseup', onMouseUp, false);
@@ -173,7 +168,7 @@ define([
         reader.onload = function(e) {
             var arrayBuffer = reader.result;
             printController.upload(name, file, callback);
-        }
+        };
         reader.readAsArrayBuffer(file);
     }
 
@@ -193,7 +188,7 @@ define([
 
             uploadStl(mesh.uuid, file, function(result) {
                 if (result.status !== 'ok') {
-                    alert(result.error);
+                    console.log(result.error);
                 }
                 reactSrc.setState({
                     openWaitWindow: false
@@ -208,7 +203,7 @@ define([
 
             // alert for auto scalling
             if (scale !== 1) {
-                alert('this model has been scaled for better printing ratio');
+                console.log('this model has been scaled for better printing ratio');
             }
 
             mesh.scale.set(scale, scale, scale);
@@ -315,7 +310,7 @@ define([
         setMousePosition(e);
 
         var location = getReferenceIntersectLocation(e);
-        if (SELECTED && mouseDown && !transformMode) {
+        if (SELECTED && mouseDown) {
             if (!transformMode) {
                 if (SELECTED.position && location) {
                     SELECTED.position.x = location.x - movingOffsetX;
@@ -365,13 +360,6 @@ define([
     }
 
     // GET section ---
-
-    // get objects that intersects with the ray
-    function getIntersects(x, y) {
-        var vector = new THREE.Vector3(x, y, 0.5).unproject(camera);
-        var raycaster = new THREE.Raycaster(camera.position, mouse.subSelf(camera.position).normalize());
-        return raycaster.intersectObjects(objects);
-    }
 
     // get ray intersect with reference mesh
     function getReferenceIntersectLocation(e) {
@@ -463,8 +451,8 @@ define([
         _setProgressMessage('Saving File Preview');
         saveSceneAsFileIcon().then(function(blob) {
             return printController.uploadPreviewImage(blob);
-        }).then(function(result) {
-            if (result.status === 'ok') {
+        }).then(function(response) {
+            if (response.status === 'ok') {
                 sendGCodeParameters().then(function() {
                     printController.go(ids, function(result) {
                         if (result instanceof Blob) {
@@ -495,18 +483,8 @@ define([
         return d.promise();
     }
 
-    function addSizeProperty(obj) {
-        if (!$.isEmptyObject(obj)) {
-            var boundingBox = new THREE.BoundingBoxHelper(obj);
-            boundingBox.update();
-            obj.size = boundingBox.box.size();
-            obj.size.enteredX = boundingBox.box.size().x;
-            obj.size.enteredY = boundingBox.box.size().y;
-            obj.size.enteredZ = boundingBox.box.size().z;
-            obj.size.originalX = boundingBox.box.size().x;
-            obj.size.originalY = boundingBox.box.size().y;
-            obj.size.originalZ = boundingBox.box.size().z;
-        }
+    function getModelCount() {
+        return objects.length;
     }
 
     // SET section ---
@@ -519,7 +497,7 @@ define([
         mouse.y = -((e.offsetY - offy) / container.offsetHeight) * 2 + 1;
     }
 
-    function setScale(x, y, z, locked, alignCenter) {
+    function setScale(x, y, z, locked, center) {
         var originalScaleX = SELECTED.scale._x;
         var originalScaleY = SELECTED.scale._y;
         var originalScaleZ = SELECTED.scale._z;
@@ -549,7 +527,7 @@ define([
             modelSelected: SELECTED.uuid ? SELECTED : null
         });
 
-        if (alignCenter) {
+        if (center) {
             SELECTED.plane_boundary = planeBoundary(SELECTED);
             groundIt(SELECTED);
             checkOutOfBounds(SELECTED);
@@ -561,10 +539,10 @@ define([
         var sx = Math.round(x / SELECTED.size.originalX * 1000) / 1000,
             sy = Math.round(y / SELECTED.size.originalY * 1000) / 1000,
             sz = Math.round(z / SELECTED.size.originalZ * 1000) / 1000,
-            locked = false,
-            render = true;
+            _locked = false,
+            _render = true;
 
-        setScale(sx, sy, sz, locked, render);
+        setScale(sx, sy, sz, _locked, _render);
 
         SELECTED.size.x = x;
         SELECTED.size.y = y;
@@ -736,12 +714,10 @@ define([
     function selectObject(obj) {
         SELECTED = obj || {};
 
-        removeFromScene('TransformControl');
-
         if (!$.isEmptyObject(obj)) {
 
             // boundary
-            var model = toScreenPosition(obj, camera);
+            // var model = toScreenPosition(obj, camera);
             if(obj.outlineMesh) {
                 obj.outlineMesh.visible = true;
             }
@@ -754,9 +730,16 @@ define([
             scaleBeforeTransformY = obj.scale.y;
             scaleBeforeTransformZ = obj.scale.z;
 
-            reactSrc.state.mode === 'rotate' ? setRotateMode() : setScaleMode();
-        } else {
+            if(reactSrc.state.mode === 'rotate') {
+                setRotateMode();
+            }
+            else {
+                setScaleMode();
+            }
+        }
+        else {
             transformMode = false;
+            removeFromScene('TransformControl');
             _removeAllMeshOutline();
             reactSrc.setState({ openObjectDialogue: false });
         }
@@ -831,7 +814,7 @@ define([
 
 
 
-    function planeBoundary(sourceMesh){
+    function planeBoundary(sourceMesh) {
         // ref: http://www.csie.ntnu.edu.tw/~u91029/ConvexHull.html#4
         // Andrew's Monotone Chain
 
@@ -898,18 +881,24 @@ define([
 
     function downloadGCode(fileName) {
         var d = $.Deferred();
-        if (!blobExpired) {
-            d.resolve(saveAs(responseBlob, fileName));
-        } else {
-            getGCode().then(function(blob) {
-                if (blob instanceof Blob) {
-                    _setProgressMessage('');
-                    d.resolve(saveAs(blob, fileName));
-                }
-            });
-        }
+        if(objects.length > 0) {
+            if (!blobExpired) {
+                d.resolve(saveAs(responseBlob, fileName));
+            } else {
+                getGCode().then(function(blob) {
+                    if (blob instanceof Blob) {
+                        _setProgressMessage('');
+                        d.resolve(saveAs(blob, fileName));
+                    }
+                });
+            }
 
-        return d.promise();
+            return d.promise();
+        }
+        else {
+            d.resolve('');
+            return d.promise();
+        }
     }
 
     function saveSceneAsFileIcon() {
@@ -972,7 +961,7 @@ define([
         var go = function(blob) {
             var control_methods = printerController(serial);
             control_methods.upload(blob.size, blob);
-        }
+        };
 
         if (!blobExpired) {
             go(responseBlob);
@@ -1002,6 +991,20 @@ define([
         renderer.render(previewMode ? previewScene : scene, camera);
     }
 
+    function addSizeProperty(obj) {
+        if (!$.isEmptyObject(obj)) {
+            var boundingBox = new THREE.BoundingBoxHelper(obj);
+            boundingBox.update();
+            obj.size = boundingBox.box.size();
+            obj.size.enteredX = boundingBox.box.size().x;
+            obj.size.enteredY = boundingBox.box.size().y;
+            obj.size.enteredZ = boundingBox.box.size().z;
+            obj.size.originalX = boundingBox.box.size().x;
+            obj.size.originalY = boundingBox.box.size().y;
+            obj.size.originalZ = boundingBox.box.size().z;
+        }
+    }
+
     // Helper Functions ---
 
     function degreeToRadian(degree) {
@@ -1022,7 +1025,7 @@ define([
 
     function updateScaleWithStep(scale) {
         // if no decimal after scale precision, ex: 1.1, not 1.143
-        if (parseInt(scale * Math.pow(10, s.scalePrecision)) == scale * Math.pow(10, s.scalePrecision)) {
+        if (parseInt(scale * Math.pow(10, s.scalePrecision)) === scale * Math.pow(10, s.scalePrecision)) {
             return scale;
         }
         return (parseInt(scale * Math.pow(10, s.scalePrecision)) + 1) / Math.pow(10, s.scalePrecision);
@@ -1112,7 +1115,6 @@ define([
                 }
             });
         } else {
-            var d = $.Deferred();
             d.resolve('');
         }
         return d.promise();
@@ -1157,7 +1159,7 @@ define([
                 printPath = result;
                 _drawPath();
             });
-        }
+        };
 
         if (blobExpired) {
             getGCode().then(function(blob) {
@@ -1247,6 +1249,7 @@ define([
         setAdvanceParameter : setAdvanceParameter,
         setParameter        : setParameter,
         getGCode            : getGCode,
+        getModelCount       : getModelCount,
         togglePreview       : togglePreview,
         changePreviewLayer  : changePreviewLayer,
         executePrint        : executePrint,

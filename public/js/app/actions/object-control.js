@@ -1,19 +1,18 @@
 define([
     'jquery',
-    'threeOrbitControls',
+    'threeOrbitControls'
 
 ], function ($) {
-    'use strict';
 
     var THREE = window.THREE || {},
-        container
-    reactSrc;
+        container,
+        reactSrc;
 
     var controllerWidth = 275,
         controllerHeight = 100;
 
-    var sourceCamera, camera, scene, renderer;
-    var orbitControl, transformControl, reactSrc, controls,
+    var camera, scene, renderer;
+    var orbitControl,
         defaultDistance, offsetRatio;
 
     function init(src) {
@@ -44,9 +43,10 @@ define([
 
         // renderer
         renderer = new THREE.WebGLRenderer({
-            preserveDrawingBuffer: true
+            preserveDrawingBuffer: true,
+            alpha: true
         });
-        renderer.setClearColor(0xE0E0E0, 1);
+        renderer.setClearColor(0x000000, 0);
         renderer.setPixelRatio(window.devicePixelRatio);
         renderer.setSize(controllerWidth, controllerHeight);
         renderer.sortObjects = false;
@@ -69,7 +69,7 @@ define([
                 r = refCamera.rotation;
 
             offsetRatio = Math.sqrt(Math.pow(p.x, 2) + Math.pow(p.y, 2) + Math.pow(p.z, 2)) / defaultDistance;
-            camera.position.set(p.x/offsetRatio, p.y/offsetRatio, p.z/offsetRatio);
+            camera.position.set(p.x / offsetRatio, p.y / offsetRatio, p.z / offsetRatio);
             camera.rotation.set(r.x, r.y, r.z);
 
             render();

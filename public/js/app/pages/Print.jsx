@@ -5,10 +5,10 @@ define([
     'app/actions/print',
     'jsx!widgets/Radio-Group',
     'plugins/classnames/index',
-    'jsx!views/print-operating-panels/Advanced',
-    'jsx!views/print-operating-panels/Left-Panel',
-    'jsx!views/print-operating-panels/Right-Panel',
-    'jsx!views/print-operating-panels/Object-Dialogue',
+    'jsx!views/print/Advanced',
+    'jsx!views/print/Left-Panel',
+    'jsx!views/print/Right-Panel',
+    'jsx!views/print/Object-Dialogue',
     'helpers/file-system',
     'jsx!widgets/Modal',
     'helpers/api/config',
@@ -28,8 +28,6 @@ define([
     Modal,
     Config,
     PrinterSelector) {
-
-    'use strict';
 
     return function(args) {
         args = args || {};
@@ -93,14 +91,14 @@ define([
                             if(!$.isEmptyObject(options)) {
                                 advancedSetting = options;
                             }
-                        }.bind(this)
+                        }
                     });
 
                     $(document).keydown(function(e) {
                         if(e.metaKey && e.keyCode === 8 || e.keyCode === 46) {
                             director.removeSelected();
                         }
-                    })
+                    });
                 },
                 _handleSpeedChange: function(speed) {
                     director.setParameter('printSpeed', speed);
@@ -183,14 +181,19 @@ define([
                     }
                     e.target.value = null;
                 },
-                _handleDownloadGCode: function(e) {
-                    this.setState({ openWaitWindow: true });
-                    var fileName = prompt(lang.print.download_prompt);
-                    fileName = fileName || 'no name';
-
-                    director.downloadGCode(fileName).then(() => {
-                        this.setState({ openWaitWindow: false });
-                    });
+                _handleDownloadGCode: function() {
+                    if(director.getModelCount() !== 0) {
+                        var fileName = prompt(lang.print.download_prompt);
+                        if(fileName === null) {
+                            return;
+                        }
+                        else {
+                            this.setState({ openWaitWindow: true });
+                            director.downloadGCode(fileName).then(() => {
+                                this.setState({ openWaitWindow: false });
+                            });
+                        }
+                    }
                 },
                 _handlePreview: function(isOn) {
                     director.togglePreview(isOn);
@@ -222,24 +225,24 @@ define([
                             onDone      = {this._handleAdvancedSettingDone} />
                     );
                 },
-                _renderMonitorPanel: function() {
-                    return (
-                        <MonitorPanel
-                            lang={lang}
-                            timeLeft={90}
-                            objectWeight={280.5}
-                            onPrintCancel={this._handlePrintCancel}
-                            onTogglePrintPause={this._handleTogglePrintPause}
-                            onPrintRestart={this._handlePrintRestart} />
-                    );
-                },
+                // _renderMonitorPanel: function() {
+                //     return (
+                //         <MonitorPanel
+                //             lang={lang}
+                //             timeLeft={90}
+                //             objectWeight={280.5}
+                //             onPrintCancel={this._handlePrintCancel}
+                //             onTogglePrintPause={this._handleTogglePrintPause}
+                //             onPrintRestart={this._handlePrintRestart} />
+                //     );
+                // },
                 _renderPrinterSelectorWindow: function() {
                     var content = (
                         <PrinterSelector
                             lang={lang}
                             onClose={this._handlePrinterSelectorWindowClose}
                             onGettingPrinter={this._handlePrinterSelected} />
-                    )
+                    );
                     return (
                         <Modal {...this.props} content={content} />
                     );
@@ -313,7 +316,7 @@ define([
                             </div>
                             <div className="spinner-flip spinner-reverse"/>
                         </div>
-                    )
+                    );
                     return (
                         <Modal content={content} />
                     );

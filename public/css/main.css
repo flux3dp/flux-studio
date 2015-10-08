@@ -2820,6 +2820,10 @@ input[type=range]:focus::-webkit-slider-runnable-track {
             flex: calc(7 / 28.7 * 100%); }
         .select-printer .device .status {
             flex: calc(5 / 28.7 * 100%); }
+        .select-printer .device .close {
+            position: absolute;
+            right: 2px;
+            cursor: pointer; }
     .select-printer .device-wrapper {
         height: 100%;
         width: 100%; }
@@ -3703,13 +3707,45 @@ input.switch:checked ~ label:after {
     background: #FFFFFF;
     height: 240px;
     width: 230px; }
-    .print-studio .objectDialogue .title {
-        font-size: 1.3rem;
-        color: #B3B3B3;
-        line-height: 1.5em;
-        padding-left: 0.5em;
-        background-color: #FFF;
-        cursor: pointer; }
+    .print-studio .objectDialogue .accordion {
+        margin-top: 0; }
+        .print-studio .objectDialogue .accordion dt {
+            background-color: #EEE; }
+        .print-studio .objectDialogue .accordion dt, .print-studio .objectDialogue .accordion dd {
+            border-bottom: 0; }
+            .print-studio .objectDialogue .accordion dt .title, .print-studio .objectDialogue .accordion dd .title {
+                font-size: 1.3rem;
+                color: #B3B3B3;
+                text-decoration: none;
+                line-height: 1.5em;
+                padding-left: 0.5em;
+                cursor: pointer; }
+        .print-studio .objectDialogue .accordion dd {
+            margin-left: 20px;
+            font-size: 12px; }
+            .print-studio .objectDialogue .accordion dd:last-of-type {
+                border-top: 1px solid white;
+                position: relative;
+                top: -1px; }
+            .print-studio .objectDialogue .accordion dd .group {
+                margin-top: 20px;
+                font-size: 2.5rem;
+                height: 3rem;
+                width: 100%;
+                color: #B3B3B3; }
+                .print-studio .objectDialogue .accordion dd .group .label {
+                    width: 50px;
+                    padding: 0 0.8em 0 0;
+                    display: inline-block; }
+                .print-studio .objectDialogue .accordion dd .group .control {
+                    display: inline; }
+                .print-studio .objectDialogue .accordion dd .group input {
+                    width: 130px;
+                    border-width: 2px;
+                    border-style: solid;
+                    border-color: #B3B3B3; }
+        .print-studio .objectDialogue .accordion .scale-content {
+            height: 195px; }
     .print-studio .objectDialogue .divider {
         width: 100%;
         height: 5px;
@@ -3717,23 +3753,6 @@ input.switch:checked ~ label:after {
     .print-studio .objectDialogue .rotateInputFields {
         height: 13.5rem;
         width: 100%; }
-        .print-studio .objectDialogue .rotateInputFields .group {
-            margin-top: 1rem;
-            font-size: 2.5rem;
-            height: 3rem;
-            width: 100%;
-            color: #B3B3B3;
-            display: inline-block; }
-            .print-studio .objectDialogue .rotateInputFields .group .label {
-                padding: 0 1em 0 0.5em;
-                display: inline; }
-            .print-studio .objectDialogue .rotateInputFields .group .control {
-                display: inline; }
-            .print-studio .objectDialogue .rotateInputFields .group input {
-                width: 150px;
-                border-width: 2px;
-                border-style: solid;
-                border-color: #B3B3B3; }
     .print-studio .objectDialogue .bottom {
         position: absolute;
         bottom: 0;
