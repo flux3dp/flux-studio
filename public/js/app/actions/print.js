@@ -17,7 +17,7 @@ define([
     'use strict';
 
     var THREE = window.THREE || {},
-        container, printController;
+        container, slicer;
 
     var camera, scene, renderer;
     var orbitControl, transformControl, reactSrc, controls;
@@ -159,17 +159,21 @@ define([
         setImportWindowPosition();
 
         // init print controller
-        printController = printSlicing();
+        slicer = printSlicing();
     }
 
-    function uploadStl(name, file, callback) {
+    function uploadStl(name, file) {
         // pass to slicer
+        var d = $.Deferred();
         var reader = new FileReader();
-        reader.onload = function(e) {
-            var arrayBuffer = reader.result;
-            printController.upload(name, file, callback);
+        reader.onload = function() {
+            // var arrayBuffer = reader.result;
+            slicer.upload(name, file).then(function(result) {
+                d.resolve(result);
+            });
         };
         reader.readAsArrayBuffer(file);
+        return d.promise();
     }
 
     function appendModel(fileEntry, file) {
@@ -186,7 +190,7 @@ define([
             var mesh = new THREE.Mesh(geometry, commonMaterial);
             mesh.up = new THREE.Vector3(0, 0, 1);
 
-            uploadStl(mesh.uuid, file, function(result) {
+            uploadStl(mesh.uuid, file).then(function(result) {
                 if (result.status !== 'ok') {
                     console.log(result.error);
                 }
@@ -281,9 +285,11 @@ define([
                 transformMode = false;
                 render();
             } else {
-                scaleBeforeTransformX = SELECTED.scale.x;
-                scaleBeforeTransformY = SELECTED.scale.y;
-                scaleBeforeTransformZ = SELECTED.scale.z;
+                if(SELECTED) {
+                    scaleBeforeTransformX = SELECTED.scale.x;
+                    scaleBeforeTransformY = SELECTED.scale.y;
+                    scaleBeforeTransformZ = SELECTED.scale.z;
+                }
             }
         }
 
@@ -449,24 +455,27 @@ define([
         });
 
         _setProgressMessage('Saving File Preview');
-        saveSceneAsFileIcon().then(function(blob) {
-            return printController.uploadPreviewImage(blob);
+        getBlobFromScene().then(function(blob) {
+            reactSrc.setState({ previewUrl: URL.createObjectURL(blob) });
+            return slicer.uploadPreviewImage(blob);
         }).then(function(response) {
             if (response.status === 'ok') {
                 sendGCodeParameters().then(function() {
-                    printController.go(ids, function(result) {
+                    slicer.go(ids, function(result) {
                         if (result instanceof Blob) {
                             blobExpired = false;
                             responseBlob = result;
                             _setProgressMessage('');
                             d.resolve(result);
-                        } else {
+                        }
+                        else {
                             if (result.status !== 'error') {
                                 var serverMessage = `${result.status}: ${result.message} (${parseInt(result.percentage * 100)}%)`,
                                     drawingMessage = `FInishing up... (100%)`,
                                     message = result.status !== 'complete' ? serverMessage : drawingMessage;
                                 _setProgressMessage(message);
-                            } else {
+                            }
+                            else {
                                 _setProgressMessage('');
                             }
                         }
@@ -570,7 +579,7 @@ define([
             value = settings[name] || 'default';
 
         if (index < advancedParameters.length) {
-            printController.setParameter(name, value).then(function(result) {
+            slicer.setParameter(name, value).then(function(result) {
                 if (result.status === 'error') {
                     index = advancedParameters.length;
                     // todo: error logging
@@ -587,7 +596,7 @@ define([
     }
 
     function setParameter(name, value) {
-        printController.setParameter(name, value).then(
+        slicer.setParameter(name, value).then(
             function(result) {
                 if (result.status === 'error' || result.status === 'fatal') {
                     // todo: error logging
@@ -782,7 +791,7 @@ define([
             }
 
             //  model in backend
-            printController.delete(SELECTED.uuid, function(result) {
+            slicer.delete(SELECTED.uuid, function(result) {
                 // todo: if error
             });
 
@@ -819,27 +828,27 @@ define([
         // Andrew's Monotone Chain
 
         // define Cross product function on 2d plane
-        var cross = (function cross(p0, p1, p2){
+        var cross = (function cross(p0, p1, p2) {
             return ((p1.x - p0.x) * (p2.y - p0.y)) - ((p1.y - p0.y) * (p2.x - p0.x));
-        })
+        });
 
         // sort the index of each point in stl
         var stl_index = [];
         for (var i = 0; i < sourceMesh.geometry.vertices.length; i += 1) {
           stl_index.push(i);
         }
-        stl_index.sort(function(a, b){
-            if (sourceMesh.geometry.vertices[a].y == sourceMesh.geometry.vertices[b].y){
+        stl_index.sort(function(a, b) {
+            if (sourceMesh.geometry.vertices[a].y === sourceMesh.geometry.vertices[b].y) {
                 return sourceMesh.geometry.vertices[a].x - sourceMesh.geometry.vertices[b].x;
             }
             return sourceMesh.geometry.vertices[a].y - sourceMesh.geometry.vertices[b].y;
-        })
+        });
 
         // find boundary
         var boundary = [];
 
         // compute upper hull
-        for (var i = 0; i < stl_index.length; i += 1){
+        for (var i = 0; i < stl_index.length; i += 1) {
           while( boundary.length >= 2 && cross(sourceMesh.geometry.vertices[boundary[boundary.length - 2]], sourceMesh.geometry.vertices[boundary[boundary.length - 1]], sourceMesh.geometry.vertices[stl_index[i]]) <= 0){
             boundary.pop();
           }
@@ -847,7 +856,7 @@ define([
         }
         // compute lower hull
         var t = boundary.length + 1;
-        for (var i = stl_index.length - 2 ; i >= 0; i -= 1){
+        for (var i = stl_index.length - 2 ; i >= 0; i -= 1) {
             while( boundary.length >= t && cross(sourceMesh.geometry.vertices[boundary[boundary.length - 2]], sourceMesh.geometry.vertices[boundary[boundary.length - 1]], sourceMesh.geometry.vertices[stl_index[i]]) <= 0){
                 boundary.pop();
             }
@@ -880,6 +889,7 @@ define([
     }
 
     function downloadGCode(fileName) {
+        selectObject(null);
         var d = $.Deferred();
         if(objects.length > 0) {
             if (!blobExpired) {
@@ -887,6 +897,7 @@ define([
             } else {
                 getGCode().then(function(blob) {
                     if (blob instanceof Blob) {
+                        console.log(blob);
                         _setProgressMessage('');
                         d.resolve(saveAs(blob, fileName));
                     }
@@ -901,14 +912,14 @@ define([
         }
     }
 
-    function saveSceneAsFileIcon() {
+    function getBlobFromScene() {
         var ccp = camera.position.clone(),
             ccr = camera.rotation.clone(),
             d = $.Deferred();
 
         camera.position.set(originalCameraPosition.x, originalCameraPosition.y, originalCameraPosition.z);
         camera.rotation.set(originalCameraRotation.x, originalCameraRotation.y, originalCameraRotation.z, originalCameraRotation.order);
-
+        console.log('blob from scene');
         render();
 
         renderer.domElement.toBlob(function(blob) {
@@ -958,20 +969,31 @@ define([
     }
 
     function executePrint(serial) {
+        var d = $.Deferred();
+        selectObject(null);
+        if(objects.length === 0) {
+            d.resolve('');
+            return d.promise();
+        }
         var go = function(blob) {
             var control_methods = printerController(serial);
+            console.log('upload to control...');
             control_methods.upload(blob.size, blob);
+            console.log('done upload to control');
+            d.resolve('');
         };
 
         if (!blobExpired) {
             go(responseBlob);
-        } else {
-            getGCode().then(function(blob) {
-                if (blob instanceof Blob) {
-                    go(blob);
+        }
+        else {
+            getGCode().then(function(result) {
+                if (result instanceof Blob) {
+                    go(result);
                 }
             });
         }
+        return d.promise();
     }
 
     function updateOrbitControl(e) {
@@ -1095,7 +1117,7 @@ define([
         var d = $.Deferred();
         index = index || 0;
         if (index < objects.length) {
-            printController.set(
+            slicer.set(
                 objects[index].uuid,
                 objects[index].position.x,
                 objects[index].position.y,
@@ -1155,7 +1177,7 @@ define([
         selectObject(null);
 
         var drawPath = function() {
-            printController.getPath().then(function(result) {
+            slicer.getPath().then(function(result) {
                 printPath = result;
                 _drawPath();
             });

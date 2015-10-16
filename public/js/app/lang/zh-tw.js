@@ -543,6 +543,11 @@ define(function() {
             pleaseWait: '請稍待...',
             unknownCommand: '指令無法在此狀態下被執行',
             quit: '中斷連結'
+        },
+        monitor: {
+            change_filament: 'CHANGE FILLAMENT',
+            browse_file: 'BROWSE FILE',
+            monitor: 'MONITOR'
         }
     };
 });

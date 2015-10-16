@@ -107,7 +107,6 @@ define([
                             <div className="col device-name">{lang.device_selection.device_name}</div>
                             <div className="col module">{lang.device_selection.module}</div>
                             <div className="col status">{lang.device_selection.status}</div>
-                            <div className="close" onClick={this._handleClose}>X</div>
                         </div>
                         <ListView className="printer-list" items={options} ondblclick={self._selectPrinter}/>
                     </div>

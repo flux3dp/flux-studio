@@ -2916,6 +2916,8 @@ input[type=range]:focus::-webkit-slider-runnable-track {
 
 .print-studio {
     padding: 0; }
+    .print-studio .center {
+        text-align: center; }
 
 .print-studio .btn.btn-default:hover {
     border-color: #000; }
@@ -2932,8 +2934,8 @@ input[type=range]:focus::-webkit-slider-runnable-track {
     vertical-align: middle; }
 
 .print-studio header div.pull-right {
-    padding: 24px 0px;
-    border-left: 1px #CCC solid;
+    padding: 24px 0;
+    border-left: 1px #ccc solid;
     cursor: pointer; }
 
 .print-studio header .pull-right {
@@ -2947,7 +2949,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
 
 .print-studio header .preview {
     position: absolute;
-    background-color: #FFF;
+    background-color: #fff;
     margin-top: 24px;
     list-style-type: none;
     text-align: left;
@@ -2957,23 +2959,23 @@ input[type=range]:focus::-webkit-slider-runnable-track {
 
 .print-studio header li {
     font-size: 14px;
-    color: #4A4A4A;
+    color: #4a4a4a;
     cursor: pointer; }
 
 .print-studio header li:hover {
-    background-color: #F0F0F0; }
+    background-color: #f0f0f0; }
 
 .print-studio header li div {
     padding: 15px 20px;
     font-size: 14px;
-    color: #4A4A4A;
+    color: #4a4a4a;
     cursor: pointer; }
 
 .print-studio header .actions > div {
     display: inline-block; }
 
 .print-studio header .actions .btn {
-    min-width: 0px;
+    min-width: 0;
     margin-right: 10px;
     padding: 0 15px; }
 
@@ -2989,7 +2991,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
     background: rgba(0, 0, 0, 0.8);
     -webkit-border-radius: 3px;
     border-radius: 3px;
-    color: #FFF;
+    color: #fff;
     font-size: 11px;
     left: -15px;
     z-index: 1;
@@ -3021,7 +3023,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
 .operating-panel {
     position: absolute;
     width: 100%;
-    right: 0px; }
+    right: 0; }
 
 .operating-panel .panel {
     float: right; }
@@ -3056,7 +3058,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
     position: absolute;
     top: 40px;
     right: 50px;
-    background-color: #FFF;
+    background-color: #fff;
     padding: 12px;
     border-radius: 27px; }
 
@@ -3069,7 +3071,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
     right: 20px; }
 
 .operating-panel .operation.command > div {
-    background-color: #FFF;
+    background-color: #fff;
     width: 48px;
     height: 48px;
     border-radius: 5px;
@@ -3086,7 +3088,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
     background: rgba(0, 0, 0, 0.8);
     -webkit-border-radius: 3px;
     border-radius: 3px;
-    color: #FFF;
+    color: #fff;
     font-size: 11px;
     left: -85px;
     z-index: 1;
@@ -3100,7 +3102,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
     background-repeat: no-repeat;
     background-position: center;
     border: none;
-    background-color: #FFFFFF;
+    background-color: #fff;
     color: #000;
     border-radius: 5px; }
 
@@ -3145,7 +3147,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
 .operating-panel .zoom > div {
     display: inline-block;
     padding: 0 10px;
-    background-color: #FFF;
+    background-color: #fff;
     height: 30px;
     cursor: pointer; }
 
@@ -3159,7 +3161,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
 
 .operating-panel .zoom .divider {
     width: 1px;
-    border-left: 1px #E0E0E0 solid;
+    border-left: 1px #e0e0e0 solid;
     padding: 0; }
 
 .operating-panel .zoom > div > img {
@@ -3172,20 +3174,20 @@ input[type=range]:focus::-webkit-slider-runnable-track {
 
 .print-studio .setup-panel .main {
     width: 182px;
-    background-color: #FFF;
+    background-color: #fff;
     border-radius: 3px; }
 
 .print-studio .setup-panel .action {
     width: 100%;
-    background-color: #FFF;
+    background-color: #fff;
     border-radius: 3px;
     text-align: center;
-    background-color: #00C853;
-    color: #FFF;
+    background-color: #00c853;
+    color: #fff;
     margin-top: 10px; }
 
 .print-studio .setup-panel .action:hover {
-    background-color: #33D375; }
+    background-color: #33d375; }
 
 .print-studio .setup-panel .main .time {
     height: 40px;
@@ -3225,12 +3227,12 @@ input[type=range]:focus::-webkit-slider-runnable-track {
 
 .print-studio .setup-panel .label {
     font-size: 11px;
-    color: #9E9E9E;
+    color: #9e9e9e;
     text-transform: uppercase; }
 
 .print-studio .setup-panel select {
     border: 0;
-    border-bottom: 1px #E0E0E0 solid;
+    border-bottom: 1px #e0e0e0 solid;
     background-image: url("/img/icon-3d-arrow-down.png");
     background-repeat: no-repeat;
     background-size: 8px 8px;
@@ -3271,7 +3273,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
     right: 55px; }
 
 .print-studio .setup-panel .control .switchContainer > label {
-    width: 0px; }
+    width: 0; }
 
 .object-params {
     right: 25px;
@@ -3333,7 +3335,7 @@ input.switch:checked ~ label:after {
     margin-right: auto;
     width: 688px;
     height: 70px;
-    background-color: #FFF; }
+    background-color: #fff; }
 
 .print-studio .panel .container > div {
     display: inline-block;
@@ -3342,7 +3344,7 @@ input.switch:checked ~ label:after {
 .print-studio .panel .controls > label {
     font-size: 13px;
     font-weight: 500;
-    color: #4A4A4A; }
+    color: #4a4a4a; }
 
 .print-studio .panel .controls > input {
     width: 70px;
@@ -3370,7 +3372,7 @@ input.switch:checked ~ label:after {
     line-height: 28px;
     font-size: 13px;
     font-weight: 500;
-    color: #4A4A4A;
+    color: #4a4a4a;
     margin-left: 30px; }
 
 .print-studio .panel .btn:hover {
@@ -3392,7 +3394,7 @@ input.switch:checked ~ label:after {
 
 /* Advanced Panel */
 .print-studio .advanced-panel {
-    background-color: #FFF;
+    background-color: #fff;
     position: absolute;
     margin: auto;
     left: 0;
@@ -3410,9 +3412,9 @@ input.switch:checked ~ label:after {
         color: #4A4A4A;
         height: 48px;
         line-height: 48px;
-        border-bottom: 1px solid #E0E0E0; }
+        border-bottom: 1px solid #e0e0e0; }
     .print-studio .advanced-panel .section {
-        padding: 20px 0 5px 0; }
+        padding: 20px 0 5px; }
     .print-studio .advanced-panel .title {
         color: #4A4A4A;
         font-size: 13px;
@@ -3431,7 +3433,7 @@ input.switch:checked ~ label:after {
             width: 80px;
             font-size: 13px; }
         .print-studio .advanced-panel .controls select {
-            border: 1px solid #D8D8D8;
+            border: 1px solid #d8d8d8;
             background-image: url("/img/icon-3d-arrow-down.png");
             background-repeat: no-repeat;
             background-size: 8px 8px;
@@ -3458,17 +3460,17 @@ input.switch:checked ~ label:after {
             width: 100%;
             height: 7px;
             cursor: pointer;
-            box-shadow: 3.7px 3.7px 0px #ffffff, 0px 0px 3.7px #ffffff;
-            background: #bbbbbb;
-            border-radius: 0px;
-            border: 0px solid transparent; }
+            box-shadow: 3.7px 3.7px 0 #ffffff, 0 0 3.7px #fff;
+            background: #bbb;
+            border-radius: 0;
+            border: 0 solid transparent; }
         .print-studio .advanced-panel .controls input[type=range]::-webkit-slider-thumb {
-            box-shadow: 0px 0px 0px transparent, 0px 0px 0px rgba(13, 13, 13, 0);
-            border: 2.5px solid #777777;
+            box-shadow: 0 0 0 transparent, 0 0 0 rgba(13, 13, 13, 0);
+            border: 2.5px solid #777;
             height: 18px;
             width: 18px;
             border-radius: 12px;
-            background: #777777;
+            background: #777;
             cursor: pointer;
             -webkit-appearance: none;
             margin-top: -6px; }
@@ -3485,130 +3487,158 @@ input.switch:checked ~ label:after {
 
 .print-studio .flux-monitor {
     position: absolute;
-    bottom: 0;
-    height: 150px;
-    background-color: #FFF;
-    width: 100%; }
-    .print-studio .flux-monitor > div {
-        display: inline-block;
-        vertical-align: middle; }
-    .print-studio .flux-monitor .title {
-        line-height: 150px;
-        width: 255px;
-        padding-left: 60px;
-        padding-right: 75px; }
-    .print-studio .flux-monitor .temperature {
-        width: 106px; }
-        .print-studio .flux-monitor .temperature .current-temperature {
-            font-size: 23px;
-            font-weight: bold;
-            color: #777777;
-            text-align: center;
-            height: 106px;
-            line-height: 106px;
-            width: 106px; }
-        .print-studio .flux-monitor .temperature .loading {
-            box-sizing: border-box;
-            position: absolute;
-            top: 20px;
-            display: inline-block;
-            width: 112px;
-            height: 112px;
-            background-color: transparent;
-            border-radius: 100%;
-            animation: loading-spin 1s infinite linear;
-            margin-left: -4px; }
-            .print-studio .flux-monitor .temperature .loading:after {
-                content: '';
-                box-sizing: border-box;
-                display: inline-block;
+    left: 50%;
+    top: 100px; }
+    .print-studio .flux-monitor .main {
+        background-color: white;
+        height: 40rem;
+        width: 31rem;
+        left: -50%;
+        position: relative; }
+        .print-studio .flux-monitor .main .title {
+            height: 5rem;
+            text-align: center; }
+            .print-studio .flux-monitor .main .title span {
+                font-size: 1.8rem;
+                color: #999;
+                line-height: 5rem; }
+            .print-studio .flux-monitor .main .title .back {
+                font-size: 3rem;
                 position: absolute;
-                width: 110%;
-                height: 110%;
-                top: -5%;
-                left: -5%;
-                right: 0;
-                bottom: 0;
-                border: 5px solid transparent;
-                border-radius: 100%;
-                background-image: url("/img/img-temp-heat.png");
-                background-size: 114px;
-                background-repeat: no-repeat; }
-        .print-studio .flux-monitor .temperature .done {
-            box-sizing: border-box;
-            position: absolute;
-            top: 22px;
-            display: inline-block;
-            width: 106px;
-            height: 106px;
-            background-color: transparent;
-            border-radius: 100%; }
-            .print-studio .flux-monitor .temperature .done:after {
-                content: '';
-                box-sizing: border-box;
-                display: inline-block;
+                top: 0px;
+                left: 15px;
+                color: #BBB;
+                cursor: pointer; }
+            .print-studio .flux-monitor .main .title .back:hover {
+                color: #333; }
+            .print-studio .flux-monitor .main .title .close {
+                right: 12px;
+                top: 9px; }
+        .print-studio .flux-monitor .main .body {
+            height: 70%; }
+            .print-studio .flux-monitor .main .body .content {
+                border-color: #999;
+                width: 90%;
+                margin: 0 auto;
+                overflow-y: auto; }
+                .print-studio .flux-monitor .main .body .content img {
+                    width: 100%; }
+                .print-studio .flux-monitor .main .body .content .image-wrapper {
+                    position: absolute;
+                    margin-left: auto;
+                    margin-right: auto;
+                    width: 100%; }
+                .print-studio .flux-monitor .main .body .content .name {
+                    font-size: 1rem;
+                    position: absolute;
+                    bottom: 0;
+                    text-align: center;
+                    width: 100%; }
+                .print-studio .flux-monitor .main .body .content .folder {
+                    color: #BBB;
+                    display: inline-block;
+                    width: 33%;
+                    height: 80px;
+                    position: relative;
+                    background-image: url("../../img/folder.svg");
+                    background-repeat: no-repeat;
+                    background-size: 72px 60px;
+                    background-position: top;
+                    margin-top: 10px;
+                    cursor: pointer; }
+                .print-studio .flux-monitor .main .body .content .folder:hover {
+                    color: #333; }
+                .print-studio .flux-monitor .main .body .content .file {
+                    text-align: center;
+                    color: #BBB;
+                    display: inline-block;
+                    width: 33%;
+                    height: 80px;
+                    position: relative;
+                    background-repeat: no-repeat;
+                    background-size: 72px 60px;
+                    background-position: top;
+                    margin-top: 10px;
+                    cursor: pointer; }
+                    .print-studio .flux-monitor .main .body .content .file img {
+                        width: 60px; }
+                .print-studio .flux-monitor .main .body .content .file:hover {
+                    color: #333; }
+                .print-studio .flux-monitor .main .body .content .spinner-wrapper {
+                    position: absolute;
+                    width: calc(100% - 20px);
+                    margin: auto;
+                    top: 200px; }
+            .print-studio .flux-monitor .main .body .close {
+                right: 20px; }
+        .print-studio .flux-monitor .main .operation {
+            margin-top: 15px; }
+            .print-studio .flux-monitor .main .operation .controls {
                 position: absolute;
-                width: 110%;
-                height: 110%;
-                top: -5%;
-                left: -5%;
-                right: 0;
-                bottom: 0;
-                border: 5px solid #FF4910;
-                border-radius: 100%; }
-        .print-studio .flux-monitor .temperature div {
-            vertical-align: middle; }
-
-@keyframes loading-spin {
-    0% {
-        transform: rotateZ(0deg); }
-    100% {
-        transform: rotateZ(360deg); } }
-        .print-studio .flux-monitor .temperature html {
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle, #fff 0%, #aaa 100%) no-repeat;
-            overflow-x: hidden;
-            overflow-y: hidden; }
-        .print-studio .flux-monitor .temperature body {
-            text-align: center;
-            display: table;
-            width: 100%;
-            height: 100%;
-            overflow-x: hidden;
-            overflow-y: hidden; }
-        .print-studio .flux-monitor .temperature #wrap {
-            box-sizing: border-box;
-            display: table-cell;
-            vertical-align: middle; }
-    .print-studio .flux-monitor canvas {
-        vertical-align: middle; }
-    .print-studio .flux-monitor .temperature-option {
-        width: 40px; }
-    .print-studio .flux-monitor .printing-progress .knob {
-        line-height: 38px; }
-    .print-studio .flux-monitor .printing-progress .fa {
-        vertical-align: middle;
-        cursor: pointer; }
-    .print-studio .flux-monitor .printing-progress .fa-pause {
-        margin-left: -70px;
-        color: #777; }
-    .print-studio .flux-monitor .printing-progress .fa-exclamation-triangle {
-        margin-left: -73px;
-        color: #FF4910; }
-    .print-studio .flux-monitor .printing-info {
-        margin-left: 20px; }
-        .print-studio .flux-monitor .printing-info .time-left {
-            font-size: 16px;
-            color: #4A4A4A; }
-        .print-studio .flux-monitor .printing-info .object-weight {
-            font-size: 13px;
-            color: #444444; }
-    .print-studio .flux-monitor .actions {
-        margin-top: 26px;
-        margin-right: 40px; }
-        .print-studio .flux-monitor .actions .cancel {
-            padding-top: 10px; }
+                color: #BBB;
+                text-align: center;
+                width: 50px;
+                cursor: pointer; }
+                .print-studio .flux-monitor .main .operation .controls .description {
+                    padding-top: 5px;
+                    font-size: 1.2rem; }
+            .print-studio .flux-monitor .main .operation .controls:hover {
+                color: #333; }
+            .print-studio .flux-monitor .main .operation .left {
+                left: 2rem; }
+            .print-studio .flux-monitor .main .operation .center {
+                margin: auto;
+                left: 0;
+                right: 0; }
+            .print-studio .flux-monitor .main .operation .right {
+                right: 2rem; }
+    .print-studio .flux-monitor .sub {
+        background-color: white;
+        height: 10rem;
+        width: 31rem;
+        left: -50%;
+        position: relative;
+        margin-top: 5px; }
+        .print-studio .flux-monitor .sub .wrapper {
+            padding: 1.5rem 1.5rem 0 1.5rem; }
+            .print-studio .flux-monitor .sub .wrapper .row {
+                font-size: 1.2rem;
+                color: #888; }
+                .print-studio .flux-monitor .sub .wrapper .row div {
+                    display: inline-block; }
+                .print-studio .flux-monitor .sub .wrapper .row .right {
+                    float: right; }
+        .print-studio .flux-monitor .sub .actions {
+            position: absolute;
+            margin-left: auto;
+            margin-right: auto;
+            display: inline-block;
+            bottom: 1rem;
+            width: 100%; }
+        .print-studio .flux-monitor .sub .btn {
+            font-size: 1rem;
+            color: #FFF;
+            background-color: #BBB;
+            border-radius: 0;
+            margin: 0 0.25rem;
+            transition: none; }
+            .print-studio .flux-monitor .sub .btn .filament {
+                width: 12rem; }
+            .print-studio .flux-monitor .sub .btn .file {
+                width: 8rem; }
+            .print-studio .flux-monitor .sub .btn .monitor {
+                width: 8rem; }
+        .print-studio .flux-monitor .sub .btn:hover {
+            background-color: #333; }
+    .print-studio .flux-monitor ul {
+        list-style: none;
+        float: left;
+        display: block;
+        width: 100%; }
+    .print-studio .flux-monitor li {
+        display: inline;
+        width: 25%;
+        float: left; }
 
 .print-studio .previewPanel {
     position: absolute;
@@ -3631,7 +3661,7 @@ input.switch:checked ~ label:after {
 
 .print-studio .importWindow .arrowBox {
     position: absolute;
-    background: #ffffff;
+    background: #fff;
     width: 200px;
     height: 50px;
     cursor: pointer; }
@@ -3640,7 +3670,7 @@ input.switch:checked ~ label:after {
         font-size: 2em;
         font-weight: bold;
         letter-spacing: 2px;
-        color: #CCC;
+        color: #ccc;
         margin-top: 0.4rem; }
 
 .print-studio .importWindow .arrowBox:after {
@@ -3653,7 +3683,7 @@ input.switch:checked ~ label:after {
     position: absolute;
     pointer-events: none;
     border-color: rgba(255, 255, 255, 0);
-    border-top-color: #ffffff;
+    border-top-color: #fff;
     border-width: 20px;
     margin-left: -20px; }
 
@@ -3669,11 +3699,11 @@ input.switch:checked ~ label:after {
         padding-left: 3.75rem; }
         .print-studio .leftPanel ul li {
             font-size: 1.8rem;
-            color: #B3B3B3;
+            color: #b3b3b3;
             line-height: 2em;
             cursor: pointer; }
         .print-studio .leftPanel ul li:hover {
-            color: #4D4D4D; }
+            color: #4d4d4d; }
 
 .print-studio .rightPanel {
     position: absolute;
@@ -3704,18 +3734,20 @@ input.switch:checked ~ label:after {
 
 .print-studio .objectDialogue {
     position: absolute;
-    background: #FFFFFF;
+    background: #fff;
     height: 240px;
     width: 230px; }
     .print-studio .objectDialogue .accordion {
         margin-top: 0; }
         .print-studio .objectDialogue .accordion dt {
-            background-color: #EEE; }
-        .print-studio .objectDialogue .accordion dt, .print-studio .objectDialogue .accordion dd {
+            background-color: #eee; }
+        .print-studio .objectDialogue .accordion dt,
+        .print-studio .objectDialogue .accordion dd {
             border-bottom: 0; }
-            .print-studio .objectDialogue .accordion dt .title, .print-studio .objectDialogue .accordion dd .title {
+            .print-studio .objectDialogue .accordion dt .title,
+            .print-studio .objectDialogue .accordion dd .title {
                 font-size: 1.3rem;
-                color: #B3B3B3;
+                color: #b3b3b3;
                 text-decoration: none;
                 line-height: 1.5em;
                 padding-left: 0.5em;
@@ -3732,7 +3764,7 @@ input.switch:checked ~ label:after {
                 font-size: 2.5rem;
                 height: 3rem;
                 width: 100%;
-                color: #B3B3B3; }
+                color: #b3b3b3; }
                 .print-studio .objectDialogue .accordion dd .group .label {
                     width: 50px;
                     padding: 0 0.8em 0 0;
@@ -3743,13 +3775,13 @@ input.switch:checked ~ label:after {
                     width: 130px;
                     border-width: 2px;
                     border-style: solid;
-                    border-color: #B3B3B3; }
+                    border-color: #b3b3b3; }
         .print-studio .objectDialogue .accordion .scale-content {
             height: 195px; }
     .print-studio .objectDialogue .divider {
         width: 100%;
         height: 5px;
-        background-color: #E0E0E0; }
+        background-color: #e0e0e0; }
     .print-studio .objectDialogue .rotateInputFields {
         height: 13.5rem;
         width: 100%; }
@@ -3768,13 +3800,37 @@ input.switch:checked ~ label:after {
     position: absolute;
     pointer-events: none;
     border-color: rgba(255, 255, 255, 0);
-    border-right-color: #FFFFFF;
+    border-right-color: #fff;
     border-width: 20px;
     margin-top: -20px; }
 
 .print-studio .select-printer {
     bottom: 65px;
     right: 240px; }
+
+.close {
+    position: absolute;
+    width: 32px;
+    height: 32px;
+    opacity: 0.3;
+    cursor: pointer; }
+
+.close:hover {
+    opacity: 1; }
+
+.close:before, .close:after {
+    position: absolute;
+    left: 15px;
+    content: ' ';
+    height: 33px;
+    width: 2px;
+    background-color: #333; }
+
+.close:before {
+    transform: rotate(45deg); }
+
+.close:after {
+    transform: rotate(-45deg); }
 
 .settings-studio {
     background-color: #F5F5F5; }

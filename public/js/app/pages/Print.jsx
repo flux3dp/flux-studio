@@ -8,6 +8,7 @@ define([
     'jsx!views/print/Advanced',
     'jsx!views/print/Left-Panel',
     'jsx!views/print/Right-Panel',
+    'jsx!views/print/Monitor',
     'jsx!views/print/Object-Dialogue',
     'helpers/file-system',
     'jsx!widgets/Modal',
@@ -23,6 +24,7 @@ define([
     AdvancedPanel,
     LeftPanel,
     RightPanel,
+    Monitor,
     ObjectDialogue,
     FileSystem,
     Modal,
@@ -59,6 +61,7 @@ define([
                 z: 0
             },
             lang = args.state.lang,
+            selectedPrinter,
             view = React.createClass({
                 getInitialState: function() {
                     return ({
@@ -80,7 +83,8 @@ define([
                         mode                        : 'rotate',
                         camera                      : {},
                         rotation                    : {},
-                        scale                       : {}
+                        scale                       : {},
+                        previewUrl                  : ''
                     });
                 },
                 componentDidMount: function() {
@@ -188,6 +192,7 @@ define([
                             return;
                         }
                         else {
+                            // fileName += '.gcode';
                             this.setState({ openWaitWindow: true });
                             director.downloadGCode(fileName).then(() => {
                                 this.setState({ openWaitWindow: false });
@@ -201,13 +206,16 @@ define([
                 _handlePrinterSelectorWindowClose: function() {
                     this.setState({ openPrinterSelectorWindow: false });
                 },
-                _handlePrinterSelected: function(selectedPrinter) {
-                    console.log(selectedPrinter);
+                _handlePrinterSelected: function(printer) {
+                    // console.log(selectedPrinter);
+                    selectedPrinter = printer;
 
-                    this.setState({
-                        openPrinterSelectorWindow: false
-                    });
-                    // director.executePrint(selectedPrinter.serial);
+                    director.executePrint(selectedPrinter.serial).then(function() {
+                        this.setState({
+                            openPrinterSelectorWindow: false,
+                            showMonitor: true
+                        });
+                    }.bind(this));
                 },
                 _handlePreviewLayerChange: function(e) {
                     director.changePreviewLayer(e.target.value);
@@ -215,6 +223,11 @@ define([
                 },
                 _handleCameraPositionChange: function(position, rotation) {
                     director.setCameraPosition(position, rotation);
+                },
+                _handleMonitorClose: function() {
+                    this.setState({
+                        showMonitor: false
+                    });
                 },
                 _renderAdvancedPanel: function() {
                     return (
@@ -225,17 +238,6 @@ define([
                             onDone      = {this._handleAdvancedSettingDone} />
                     );
                 },
-                // _renderMonitorPanel: function() {
-                //     return (
-                //         <MonitorPanel
-                //             lang={lang}
-                //             timeLeft={90}
-                //             objectWeight={280.5}
-                //             onPrintCancel={this._handlePrintCancel}
-                //             onTogglePrintPause={this._handleTogglePrintPause}
-                //             onPrintRestart={this._handlePrintRestart} />
-                //     );
-                // },
                 _renderPrinterSelectorWindow: function() {
                     var content = (
                         <PrinterSelector
@@ -244,7 +246,9 @@ define([
                             onGettingPrinter={this._handlePrinterSelected} />
                     );
                     return (
-                        <Modal {...this.props} content={content} />
+                        <Modal {...this.props}
+                            content={content}
+                            onClose={this._handlePrinterSelectorWindowClose} />
                     );
                 },
                 _renderImportWindow: function() {
@@ -279,6 +283,20 @@ define([
                             onCameraPositionChange  = {this._handleCameraPositionChange} />
                     );
                 },
+                _renderMonitorPanel: function() {
+                    var content = (
+                        <Monitor
+                            lang            = {lang}
+                            previewUrl      = {this.state.previewUrl}
+                            selectedPrinter = {selectedPrinter}
+                            onClose         = {this._handleMonitorClose} />
+                    );
+                    return (
+                        <Modal {...this.props}
+                            content={content}
+                            onClose={this._handleMonitorClose} />
+                    );
+                },
                 _renderObjectDialogue: function() {
                     return (
                         <ObjectDialogue
@@ -288,8 +306,7 @@ define([
                             mode        = {this.state.mode}
                             onSetSize   = {this._handleSetSize}
                             onRotate    = {this._handleRotationChange}
-                            onResize    = {this._handleResize}
-                            />
+                            onResize    = {this._handleResize} />
                     );
                 },
                 _renderWaitWindow: function() {
@@ -326,6 +343,7 @@ define([
                         importWindow            = this.state.openImportWindow ? this._renderImportWindow() : '',
                         leftPanel               = this._renderLeftPanel(),
                         rightPanel              = this._renderRightPanel(),
+                        monitorPanel            = this.state.showMonitor ? this._renderMonitorPanel() : '',
                         objectDialogue          = this.state.openObjectDialogue ? this._renderObjectDialogue() : '',
                         printerSelectorWindow   = this.state.openPrinterSelectorWindow ? this._renderPrinterSelectorWindow() : '',
                         waitWindow              = this.state.openWaitWindow ? this._renderWaitWindow() : '',
@@ -340,6 +358,8 @@ define([
                             {leftPanel}
 
                             {rightPanel}
+
+                            {monitorPanel}
 
                             {objectDialogue}
 

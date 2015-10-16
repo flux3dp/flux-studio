@@ -49,11 +49,44 @@ define([
 
         return {
             ws: ws,
-            ls: function() {
+            ls: function(path) {
+                var d = $.Deferred();
+                events.onMessage = function(result) {
+                    switch (result.status) {
+                        case 'connected':
+                            // ws.send('ls ' + path);
+                            break;
+                        case 'ok':
+                            d.resolve(result);
+                            break;
+                        default:
+                            // d.resolve(result);
+                            break;
+                    }
+                };
                 lastOrder = 'ls';
-                ws.send(lastOrder);
-            },
+                ws.send(lastOrder + ' ' + path);
 
+                return d.promise();
+            },
+            fileInfo: function(path, fileNameWithPath) {
+                var d = $.Deferred(),
+                    data = [];
+
+                data.push(fileNameWithPath);
+                lastOrder = 'fileinfo';
+                ws.send(lastOrder + ' ' + path + '/' + fileNameWithPath);
+                events.onMessage = function(result) {
+                    if(result instanceof Blob) {
+                        data.push(result);
+                    }
+                    if(result.status === 'ok') {
+                        d.resolve(data);
+                    }
+                };
+
+                return d.promise();
+            },
             selectFile: function(filename) {
                 lastOrder = 'select';
                 ws.send(lastOrder + ' ' + filename);
@@ -106,14 +139,28 @@ define([
                     reporting = function() {
                         self.report({
                             onFinished: function(response) {
-                                response.status = response.status.toUpperCase();
+
+                                if(typeof(response) === 'string') {
+                                    try {
+                                        response = JSON.parse(response);
+                                    } catch (variable) {
+                                        response.status = 'ERROR';
+                                    } finally {
+                                        response.status = response.status.toUpperCase();
+                                    }
+                                }
+                                else {
+                                    response.status = response.status.toUpperCase();
+                                }
 
                                 if (true === response.status.startsWith('COMPLETED')) {
                                     self.quit().then(function(data) {
+                                        console.log('do upload 1', data);
                                         doUpload();
                                     });
                                 }
                                 else {
+                                    console.log('do upload 2');
                                     doUpload();
                                 }
                             }
@@ -140,13 +187,13 @@ define([
 
                         }
                         else if ('ok' === data.status) {
-                            self.start(opts);
+                            //self.start(opts);
                         }
                     },
                     doUpload = function() {
                         events.onMessage = uploading;
-
-                        ws.send(lastOrder + ' ' + filesize);
+                        console.log('upload fcode');
+                        ws.send(lastOrder + ' application/fcode ' + filesize + ' #');
                     };
 
                 lastOrder = 'upload';
