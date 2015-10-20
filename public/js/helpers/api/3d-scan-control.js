@@ -13,7 +13,6 @@ define([
         opts = opts || {};
         opts.onError = opts.onError || function() {};
         opts.onClose = opts.onClose || function() {};
-        opts.onStarting = opts.onStarting || function() {};
         opts.onReady = opts.onReady || function() {};
 
         var ws = new Websocket({
@@ -38,8 +37,7 @@ define([
                     }
                 },
                 onError: errorHandler,
-                onClose: opts.onClose,
-                onOpen: opts.onStarting
+                onClose: opts.onClose
             }),
             errorHandler = function(data) {
                 is_ready = false;
@@ -109,10 +107,20 @@ define([
                     };
 
                 image_timer = setInterval(function() {
+                    // if disconnect shortly then fire again when reconnected
+                    if (ws.readyState.OPEN !== ws.getReadyState()) {
+                        ws.onOpen(function() {
+                            ws.send('image');
+                            allow_to_get = false;
+                        });
+                    }
+
+                    // wait for last process finished
                     if (true === allow_to_get) {
                         ws.send('image');
                         allow_to_get = false;
                     }
+
                 }, IMAGE_INTERVAL);
 
                 fetch();

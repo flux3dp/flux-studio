@@ -30,12 +30,12 @@ define([
 
         return {
             connection: ws,
-            upload: function(name, file, callback) {
-
+            upload: function(name, file) {
+                var d = $.Deferred();
                 events.onMessage = function(result) {
                     switch (result.status) {
                     case 'ok':
-                        callback(result);
+                        d.resolve(result);
                         break;
                     case 'continue':
                         ws.send(file);
@@ -49,6 +49,7 @@ define([
 
                 ws.send('upload ' + name + ' ' + file.size);
                 lastOrder = 'upload';
+                return d.promise();
             },
             set: function(name, positionX, positionY, positionZ, rotationX, rotationY, rotationZ, scaleX, scaleY, scaleZ) {
                 var d = $.Deferred();
@@ -69,11 +70,18 @@ define([
                 lastOrder = 'delete';
             },
             // go does not use deferred because multiple response and instant update
-            go: function(nameArray, callback) {
+            goG: function(nameArray, callback) {
                 events.onMessage = function(result) {
                     callback(result);
                 };
-                ws.send('go ' + nameArray.join(' '));
+                ws.send('go ' + nameArray.join(' ') + ' g');
+                lastOrder = 'go';
+            },
+            goF: function(nameArray, callback) {
+                events.onMessage = function(result) {
+                    callback(result);
+                };
+                ws.send('go ' + nameArray.join(' ') + ' f');
                 lastOrder = 'go';
             },
             setParameter: function(name, value) {
@@ -118,13 +126,11 @@ define([
             uploadPreviewImage: function(file) {
                 var d = $.Deferred();
                 events.onMessage = function(result) {
-                    console.log(result.status)
                     switch (result.status) {
                     case 'ok':
                         d.resolve(result);
                         break;
                     case 'continue':
-                        console.log('sending: ', file);
                         ws.send(file);
                         break;
                     default:

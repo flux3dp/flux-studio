@@ -76,37 +76,30 @@ define(['helpers/is-json'], function(isJson) {
                 return _ws;
             },
             ws = null,
+            readyState = {
+                CONNECTING : 0,
+                OPEN       : 1,
+                CLOSING    : 2,
+                CLOSED     : 3
+            },
             socketOptions = origanizeOptions(options);
 
         ws = createWebSocket(socketOptions);
 
         return {
+            readyState: readyState,
+
             send: function(data) {
-                var wait = 0,
-                    retry_times = 1000,
-                    timer = setInterval(function() {
-                        // waiting for connected
-                        retry_times--;
+                var self = this;
 
-                        try {
-                            if (1 === ws.readyState) {
-                                ws.send(data);
-
-                                // reset timer
-                                retry_times = 0;
-                            }
-                        }
-                        catch (ex) {
-                            // TODO: logging
-                        }
-
-                        if (retry_times <= 0) {
-                            clearInterval(timer);
-                        }
-
-                        wait = 100;
-
-                    }, wait);
+                if (readyState.OPEN !== ws.readyState) {
+                    ws.onopen = function() {
+                        ws.send(data);
+                    };
+                }
+                else {
+                    ws.send(data);
+                }
 
                 return this;
             },
@@ -117,6 +110,10 @@ define(['helpers/is-json'], function(isJson) {
 
             fetchLastResponse: function() {
                 return this.fetchData()[received_data.length - 1];
+            },
+
+            getReadyState: function() {
+                return ws.readyState;
             },
 
             close: function(reconnect) {
@@ -130,6 +127,12 @@ define(['helpers/is-json'], function(isJson) {
             },
 
             // events
+            onOpen: function(callback) {
+                socketOptions.onOpen = callback;
+
+                return this;
+            },
+
             onMessage: function(callback) {
                 socketOptions.onMessage = callback;
 
