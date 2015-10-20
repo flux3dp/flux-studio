@@ -9,7 +9,7 @@ define([
         pathArray,
         start,
         scrollSize = 10,
-        currentLevelFiles,
+        currentLevelFiles = [],
         filesInfo = [];
 
     var mode = {
@@ -56,11 +56,9 @@ define([
             var dir = this.state.directoryContent.directories;
             // if it's a directory
             if(dir.some(function(d) {
-                // console.log('d is', d);
                 return d === pathName;
             })) {
                 pathArray.push(pathName);
-                // console.log(pathArray.join('/'));
                 start = 0;
                 this._retrieveList(pathArray.join('/'));
                 this.setState({ waiting: true });
@@ -82,7 +80,6 @@ define([
                 var onNeedData = e.target.scrollHeight === e.target.offsetHeight + e.target.scrollTop;
                 if(onNeedData) {
                     start = start + scrollSize;
-                    console.log('scrolling: ' + start + ' - ' + scrollSize);
                     this._retrieveList(pathArray.join('/'));
                 }
             }
@@ -95,7 +92,6 @@ define([
             }
 
             controller.ls(path).then(function(result) {
-                // console.log('list:', result);
                 currentLevelFiles = result.files;
                 self._retrieveFileInfo(path).then(function(info) {
                     filesInfo = filesInfo.concat(info);
@@ -110,6 +106,7 @@ define([
             var d = $.Deferred();
             var returnArray = [];
 
+            currentLevelFiles = currentLevelFiles || [];
             if(currentLevelFiles.length === 0) {
                 d.resolve(returnArray);
                 return d.promise();
@@ -123,32 +120,29 @@ define([
             return d.promise();
         },
         _iterateFileInfo: function(path, startIndex, endIndex, returnArray, callback) {
-            var self = this;
+            var self = this,
+                opt = {};
             if(startIndex < endIndex) {
-            // if(index < 5) {
-                controller.fileInfo(path, currentLevelFiles[startIndex]).then(function(r) {
-                    console.log('getting ' + currentLevelFiles[startIndex]);
+                controller.fileInfo(path, currentLevelFiles[startIndex], opt).then(function(r) {
                     returnArray.push(r);
                     return self._iterateFileInfo(path, startIndex + 1, endIndex, returnArray, callback);
                 });
             }
             else {
-                // console.log('resolving');
                 callback(returnArray);
-                // d.resolve('');
             }
+
+            opt.onError = function(error) {
+                console.log('error happened', error);
+            };
         },
         _renderDirectoryContent: function(content) {
             if(!content.directories) {
                 return '';
             }
 
-            // render directories
-
-            // var source = ['folder1', 'folder2', 'folder3', 'folder4', 'folder5', 'folder6'];
             var folders;
             folders = content.directories.map(function(item) {
-            // items = source.map(function(item) {
                 return (
                     <div className="folder" onDoubleClick={this._handleSelectFile.bind(this, item)}>
                         <div className="name">{item}</div>

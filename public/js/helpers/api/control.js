@@ -22,6 +22,7 @@ define([
                         // ignore it
                         break;
                     case 'connected':
+                        break;
                     default:
                         isConnected = true;
                         events.onMessage(data);
@@ -54,13 +55,11 @@ define([
                 events.onMessage = function(result) {
                     switch (result.status) {
                         case 'connected':
-                            // ws.send('ls ' + path);
                             break;
                         case 'ok':
                             d.resolve(result);
                             break;
                         default:
-                            // d.resolve(result);
                             break;
                     }
                 };
@@ -69,7 +68,8 @@ define([
 
                 return d.promise();
             },
-            fileInfo: function(path, fileNameWithPath) {
+            fileInfo: function(path, fileNameWithPath, opt) {
+                opts = genericOptions(opts);
                 var d = $.Deferred(),
                     data = [];
 
@@ -80,8 +80,12 @@ define([
                     if(result instanceof Blob) {
                         data.push(result);
                     }
-                    if(result.status === 'ok') {
-                        d.resolve(data);
+                    switch(result.status) {
+                        case 'ok':
+                            d.resolve(data);
+                            break;
+                        default:
+                            break;
                     }
                 };
 
@@ -106,9 +110,7 @@ define([
                 opts = genericOptions(opts);
 
                 events.onMessage = function(response) {
-                    // if ('position' === response.status) {
-                        opts.onFinished(response);
-                    // }
+                    opts.onFinished(response);
                 };
 
                 ws.send('report');

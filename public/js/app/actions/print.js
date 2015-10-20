@@ -5,6 +5,7 @@ define([
     'helpers/websocket',
     'helpers/api/3d-print-slicing',
     'helpers/api/control',
+    'helpers/file-system',
     'threeOrbitControls',
     'threeTrackballControls',
     'threeTransformControls',
@@ -13,7 +14,7 @@ define([
     'plugins/file-saver/file-saver.min',
     'lib/Canvas-To-Blob'
 
-], function($, fileSystem, display, websocket, printSlicing, printerController) {
+], function($, fileSystem, display, websocket, printSlicing, printerController, FileSystem) {
     'use strict';
 
     var THREE = window.THREE || {},
@@ -160,6 +161,8 @@ define([
 
         // init print controller
         slicer = printSlicing();
+
+        registerDropToImport();
     }
 
     function uploadStl(name, file) {
@@ -246,6 +249,37 @@ define([
 
             render();
         });
+    }
+
+    function registerDropToImport() {
+        if(window.FileReader) {
+            var zone = document.querySelector('.studio-container.print-studio');
+            // zone.addEventListener('drop', onDropFile);
+            addEventHandler(zone, 'dragover', cancel);
+            addEventHandler(zone, 'dragenter', cancel);
+            addEventHandler(zone, 'drop', onDropFile);
+        }
+    }
+
+    function onDropFile(e) {
+    }
+
+    function cancel(e) {
+      if (e.preventDefault) { e.preventDefault(); }
+      return false;
+    }
+
+    function addEventHandler(obj, evt, handler) {
+        if(obj.addEventListener) {
+            // W3C method
+            obj.addEventListener(evt, handler, false);
+        } else if(obj.attachEvent) {
+            // IE method.
+            obj.attachEvent('on'+evt, handler);
+        } else {
+            // Old school method.
+            obj['on'+evt] = handler;
+        }
     }
 
     // Events Section ---
@@ -897,7 +931,6 @@ define([
             } else {
                 getGCode().then(function(blob) {
                     if (blob instanceof Blob) {
-                        console.log(blob);
                         _setProgressMessage('');
                         d.resolve(saveAs(blob, fileName));
                     }
@@ -919,7 +952,6 @@ define([
 
         camera.position.set(originalCameraPosition.x, originalCameraPosition.y, originalCameraPosition.z);
         camera.rotation.set(originalCameraRotation.x, originalCameraRotation.y, originalCameraRotation.z, originalCameraRotation.order);
-        console.log('blob from scene');
         render();
 
         renderer.domElement.toBlob(function(blob) {
@@ -977,9 +1009,7 @@ define([
         }
         var go = function(blob) {
             var control_methods = printerController(serial);
-            console.log('upload to control...');
             control_methods.upload(blob.size, blob);
-            console.log('done upload to control');
             d.resolve('');
         };
 
