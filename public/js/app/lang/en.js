@@ -321,6 +321,11 @@ define(function() {
                 support_off: 'SUPPORT OFF',
                 advanced: 'ADVANCED'
             },
+            right_panel: {
+                get: 'Get',
+                go: 'Go',
+                preview: 'Preview'
+            },
             quick_print: 'Quick Print',
             scale: 'Scale',
             rotate: 'Rotate',
@@ -335,8 +340,7 @@ define(function() {
             pause: 'PAUSE',
             continue: 'CONTINUE',
             restart: 'RESTART',
-            download_prompt: 'please enter file name',
-            preview: 'Preview'
+            download_prompt: 'please enter file name'
         },
         laser: {
             import: 'Import',
@@ -539,6 +543,11 @@ define(function() {
             pleaseWait: 'Please Wait...',
             unknownCommand: 'command cannot be executed in current status',
             quit: 'Quit'
+        },
+        monitor: {
+            change_filament: 'CHANGE FILLAMENT',
+            browse_file: 'BROWSE FILE',
+            monitor: 'MONITOR'
         }
     };
 });

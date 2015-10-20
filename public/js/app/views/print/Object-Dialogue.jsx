@@ -7,12 +7,13 @@ define([
     var _size;
 
     return React.createClass({
-        getDefaultProps: function() {
-            return {
-                lang: React.PropTypes.object,
-                onRotate: React.PropTypes.func,
-                onScale: React.PropTypes.func
-            };
+        propTypes: {
+            lang: React.PropTypes.object,
+            model: React.PropTypes.object,
+            onRotate: React.PropTypes.func,
+            onScale: React.PropTypes.func,
+            onResize: React.PropTypes.func,
+            style: React.PropTypes.object
         },
         getInitialState: function() {
             this._updateSizeProperty(this.props.model.size);
@@ -20,7 +21,7 @@ define([
                 size: _size
             });
         },
-        componentWillUpdate: function(nextProp, nextState) {
+        componentWillUpdate: function(nextProp) {
             this._updateSizeProperty(nextProp.model.size);
         },
         _updateSizeProperty: function(size) {
@@ -35,19 +36,21 @@ define([
                 _value  = this._getNumberOnly(src.target.value),
                 changed = false;
 
-            if(typeof(_value) === 'number' && !isNaN(_value)) {
-                _size[axis] = this._roundSizeToTwoDecimalPlace(_value);
-                changed = true;
-            }
+            _size['entered' + src.target.id.toUpperCase()] = src.target.value;
+
+            // if(typeof(_value) === 'number' && !isNaN(_value) && _value !== 0) {
+            //     _size[axis] = this._roundSizeToTwoDecimalPlace(_value);
+            //     changed = true;
+            // }
 
             if(src.type === 'blur') {
                 var v = this._roundSizeToTwoDecimalPlace(_value);
                 _size['entered' + src.target.id.toUpperCase()] = isNaN(v) ? _size[axis] : v.toFixed(2) + 'mm';
                 changed = true;
             }
-            else {
-                _size['entered' + src.target.id.toUpperCase()] = src.target.value;
-            }
+            // else {
+            //     console.log(src.target.value);
+            // }
 
             if(changed) {
                 this.props.onResize(_size);
@@ -63,8 +66,8 @@ define([
         },
         render: function() {
             var lang                    = this.props.lang,
-                rotateInputFieldsClass  = ClassNames('rotateInputFields', {bottom: this.props.mode === 'rotate'}),
-                rotateClass             = ClassNames('section', {bottom: this.props.mode === 'scale'}),
+                // rotateInputFieldsClass  = ClassNames('rotateInputFields', {bottom: this.props.mode === 'rotate'}),
+                // rotateClass             = ClassNames('section', {bottom: this.props.mode === 'scale'}),
                 rotation                = this.props.model.rotation;
 
             return (
@@ -79,7 +82,7 @@ define([
                                         <input id="x" type="text"
                                             onChange={this._handleResize.bind(this)}
                                             onBlur={this._handleResize.bind(this)}
-                                            value={_size.enteredX} /></div>
+                                            value={this.state.size.enteredX} /></div>
                                 </div>
                                 <div className="group">
                                     <div className="label">Y</div>
