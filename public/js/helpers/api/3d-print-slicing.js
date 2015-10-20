@@ -70,7 +70,14 @@ define([
                 lastOrder = 'delete';
             },
             // go does not use deferred because multiple response and instant update
-            go: function(nameArray, callback) {
+            goG: function(nameArray, callback) {
+                events.onMessage = function(result) {
+                    callback(result);
+                };
+                ws.send('go ' + nameArray.join(' ') + ' g');
+                lastOrder = 'go';
+            },
+            goF: function(nameArray, callback) {
                 events.onMessage = function(result) {
                     callback(result);
                 };

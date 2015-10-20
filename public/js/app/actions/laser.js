@@ -266,6 +266,7 @@ define([
                                 top_left = getPoint($el.find('.ft-scaler-top.ft-scaler-left'), 'top-left'),
                                 bottom_right = getPoint($el.find('.ft-scaler-bottom.ft-scaler-right'), 'bottom-right'),
                                 $img = $el.parents('.ft-container').find('img'),
+                                box = $img.box(),
                                 width = 0,
                                 height = 0,
                                 sub_data = {
@@ -286,8 +287,8 @@ define([
 
                             if ('svg' === self.props.fileFormat) {
                                 previewImageSize = svgWebSocket.computePreviewImageSize({
-                                    width: $img.box().width,
-                                    height: $img.box().height
+                                    width: box.width,
+                                    height: box.height
                                 });
 
                                 // only svg file need size to convert to binary
@@ -310,8 +311,8 @@ define([
                                             sub_data.svg_data = svgWebSocket.History.findByName($img.data('name'))[0].data;
                                         }
 
-                                        sub_data.real_width = sub_data.width / $laser_platform.width() * DIAMETER;
-                                        sub_data.real_height = sub_data.height / $laser_platform.height() * DIAMETER;
+                                        sub_data.real_width = box.width / $laser_platform.width() * DIAMETER;
+                                        sub_data.real_height = box.height / $laser_platform.height() * DIAMETER;
 
                                         args.push(sub_data);
 
