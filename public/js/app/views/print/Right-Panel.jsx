@@ -10,6 +10,7 @@ define([
             lang: React.PropTypes.object,
             onPreviewClick: React.PropTypes.func,
             onDownloadGCode: React.PropTypes.func,
+            onDownloadFCode: React.PropTypes.func,
             onPrintClick: React.PropTypes.func,
             onCameraPositionChange: React.PropTypes.func
         },
@@ -29,12 +30,15 @@ define([
             this.setState({ previewOn: !this.state.previewOn });
             this.props.onPreviewClick(!this.state.previewOn);
         },
-        _handleGetGCode: function() {
-            this.props.onDownloadGCode();
+        _handleGetFCode: function() {
+            this.props.onDownloadFCode();
         },
         _handleGo: function(e) {
             e.preventDefault();
             this.props.onPrintClick();
+        },
+        _handleGetGCode: function() {
+            this.props.onDownloadGCode();
         },
         _updateCamera: function(position, rotation) {
             this.props.onCameraPositionChange(position, rotation);
@@ -44,13 +48,14 @@ define([
             return (
                 <div className='rightPanel'>
                     <a className="btn" onClick={this._handlePreviewClick}>{lang.preview}</a>
+                    <a className="btn" onClick={this._handleGetGCode}>Gcode</a>
                     <div id="cameraViewController" className="cameraViewController"></div>
                     <svg viewBox="-70 0 400 370">
-                        <g onClick={this._handleGetGCode}>
+                        <g onClick={this._handleGetFCode}>
                             <path className="btn get-gcode" d="M86.602,0 l86.602,50 l0,100 l-86.602,50 l-86.602,-50, l0,-100z" fill="#999"></path>
                             <text className="txt-get-gcode" x="0" y="0" fill="#EEE">
                                 <tspan x="55" y="85">{lang.get}</tspan>
-                                <tspan x="25" y="130">GCode</tspan>
+                                <tspan x="25" y="130">FCode</tspan>
                             </text>
                         </g>
 

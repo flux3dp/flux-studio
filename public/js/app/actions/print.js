@@ -213,7 +213,9 @@ define([
                 console.log('this model has been scaled for better printing ratio');
             }
 
+            // SELECTED = mesh;
             mesh.scale.set(scale, scale, scale);
+            // setScale(scale, scale, scale, false, false);
             mesh.scale._x = scale;
             mesh.scale._y = scale;
             mesh.scale._z = scale;
@@ -495,7 +497,52 @@ define([
         }).then(function(response) {
             if (response.status === 'ok') {
                 sendGCodeParameters().then(function() {
-                    slicer.go(ids, function(result) {
+                    slicer.goG(ids, function(result) {
+                        if (result instanceof Blob) {
+                            blobExpired = false;
+                            responseBlob = result;
+                            _setProgressMessage('');
+                            d.resolve(result);
+                        }
+                        else {
+                            if (result.status !== 'error') {
+                                var serverMessage = `${result.status}: ${result.message} (${parseInt(result.percentage * 100)}%)`,
+                                    drawingMessage = `FInishing up... (100%)`,
+                                    message = result.status !== 'complete' ? serverMessage : drawingMessage;
+                                _setProgressMessage(message);
+                            }
+                            else {
+                                _setProgressMessage('');
+                            }
+                        }
+                    });
+                });
+            }
+            // error
+            else {
+                _setProgressMessage('');
+                d.resolve(result);
+            }
+        });
+
+        return d.promise();
+    }
+
+    function getFCode() {
+        var d = $.Deferred();
+        var ids = [];
+        objects.forEach(function(obj) {
+            ids.push(obj.uuid);
+        });
+
+        _setProgressMessage('Saving File Preview');
+        getBlobFromScene().then(function(blob) {
+            reactSrc.setState({ previewUrl: URL.createObjectURL(blob) });
+            return slicer.uploadPreviewImage(blob);
+        }).then(function(response) {
+            if (response.status === 'ok') {
+                sendGCodeParameters().then(function() {
+                    slicer.goF(ids, function(result) {
                         if (result instanceof Blob) {
                             blobExpired = false;
                             responseBlob = result;
@@ -725,18 +772,6 @@ define([
                     }
                 });
 
-                // for rotation and scale content accordion
-                var allPanels = $('.accordion > dd');
-
-                $('.accordion > dt > a').click(function() {
-                    allPanels.slideUp();
-                    $(this).parent().next().slideDown();
-                    var mode = $(this)[0].id;
-                    mode === 'rotate' ? setRotateMode() : setScaleMode();
-                    reactSrc.setState({ mode: mode});
-                    return false;
-                });
-
                 reactSrc.state.mode === 'rotate' ? $('.scale-content').hide() : $('.rotate-content').hide();
             });
         }
@@ -923,6 +958,7 @@ define([
     }
 
     function downloadGCode(fileName) {
+        blobExpired = true;
         selectObject(null);
         var d = $.Deferred();
         if(objects.length > 0) {
@@ -930,6 +966,29 @@ define([
                 d.resolve(saveAs(responseBlob, fileName));
             } else {
                 getGCode().then(function(blob) {
+                    if (blob instanceof Blob) {
+                        _setProgressMessage('');
+                        d.resolve(saveAs(blob, fileName));
+                    }
+                });
+            }
+
+            return d.promise();
+        }
+        else {
+            d.resolve('');
+            return d.promise();
+        }
+    }
+
+    function downloadFCode(fileName) {
+        selectObject(null);
+        var d = $.Deferred();
+        if(objects.length > 0) {
+            if (!blobExpired) {
+                d.resolve(saveAs(responseBlob, fileName));
+            } else {
+                getFCode().then(function(blob) {
                     if (blob instanceof Blob) {
                         _setProgressMessage('');
                         d.resolve(saveAs(blob, fileName));
@@ -1296,6 +1355,7 @@ define([
         sendGCodeParameters : sendGCodeParameters,
         setSize             : setSize,
         downloadGCode       : downloadGCode,
+        downloadFCode       : downloadFCode,
         setRotateMode       : setRotateMode,
         setScaleMode        : setScaleMode,
         setAdvanceParameter : setAdvanceParameter,

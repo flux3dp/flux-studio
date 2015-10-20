@@ -4,7 +4,8 @@ define([
 ], function(React, ClassNames) {
     'use strict';
 
-    var _size;
+    var _size,
+        _mode = 'scale';
 
     return React.createClass({
         propTypes: {
@@ -24,6 +25,24 @@ define([
         componentWillUpdate: function(nextProp) {
             this._updateSizeProperty(nextProp.model.size);
         },
+        componentDidMount: function() {
+            // for rotation and scale content accordion
+            var allPanels = $('.accordion > dd'),
+                self = this;
+
+            $('.accordion > dt > a').click(function() {
+                var mode = $(this)[0].id;
+                if(mode !== _mode) {
+                    allPanels.slideUp();
+                    _mode = mode;
+                    $(this).parent().next().slideDown();
+                    self.props.onModeChange(mode);
+                }
+
+                return false;
+            });
+
+        },
         _updateSizeProperty: function(size) {
             _size = size.clone();
             Object.keys(_size).map(function(p) {
@@ -38,10 +57,10 @@ define([
 
             _size['entered' + src.target.id.toUpperCase()] = src.target.value;
 
-            // if(typeof(_value) === 'number' && !isNaN(_value) && _value !== 0) {
-            //     _size[axis] = this._roundSizeToTwoDecimalPlace(_value);
-            //     changed = true;
-            // }
+            if(typeof(_value) === 'number' && !isNaN(_value) && _value !== 0) {
+                _size[axis] = this._roundSizeToTwoDecimalPlace(_value);
+                changed = true;
+            }
 
             if(src.type === 'blur') {
                 var v = this._roundSizeToTwoDecimalPlace(_value);
