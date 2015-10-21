@@ -19,6 +19,7 @@ define([
     window.addEventListener('popstate', function(e) {
         window.GA('send', 'pageview', location.hash);
         shortcuts.disableAll();
+        menuFactory.methods.refresh();
     });
 
     // listener of all ga event

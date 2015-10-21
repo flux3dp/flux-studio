@@ -60,6 +60,7 @@ define([
                 y: 0,
                 z: 0
             },
+            _mode = 'scale',
             lang = args.state.lang,
             selectedPrinter,
             view = React.createClass({
@@ -80,7 +81,6 @@ define([
                         sliderValue                 : 0,
                         progressMessage             : '',
                         objectDialogueStyle         : {},
-                        mode                        : 'rotate',
                         camera                      : {},
                         rotation                    : {},
                         scale                       : {},
@@ -200,6 +200,21 @@ define([
                         }
                     }
                 },
+                _handleDownloadFCode: function() {
+                    if(director.getModelCount() !== 0) {
+                        var fileName = prompt(lang.print.download_prompt);
+                        if(fileName === null) {
+                            return;
+                        }
+                        else {
+                            // fileName += '.gcode';
+                            this.setState({ openWaitWindow: true });
+                            director.downloadFCode(fileName).then(() => {
+                                this.setState({ openWaitWindow: false });
+                            });
+                        }
+                    }
+                },
                 _handlePreview: function(isOn) {
                     director.togglePreview(isOn);
                 },
@@ -228,6 +243,16 @@ define([
                     this.setState({
                         showMonitor: false
                     });
+                },
+                _handleModeChange: function(mode) {
+                    console.log(mode);
+                    this.setState({ mode: mode });
+                    if(mode === 'rotate') {
+                        director.setRotateMode();
+                    }
+                    else {
+                        director.setScaleMode();
+                    }
                 },
                 _renderAdvancedPanel: function() {
                     return (
@@ -280,7 +305,8 @@ define([
                             onPreviewClick          = {this._handlePreview}
                             onPrintClick            = {this._handlePrintClick}
                             onDownloadGCode         = {this._handleDownloadGCode}
-                            onCameraPositionChange  = {this._handleCameraPositionChange} />
+                            onCameraPositionChange  = {this._handleCameraPositionChange}
+                            onDownloadFCode         = {this._handleDownloadFCode} />
                     );
                 },
                 _renderMonitorPanel: function() {
@@ -300,13 +326,14 @@ define([
                 _renderObjectDialogue: function() {
                     return (
                         <ObjectDialogue
-                            lang        = {lang}
-                            model       = {this.state.modelSelected}
-                            style       = {this.state.objectDialogueStyle}
-                            mode        = {this.state.mode}
-                            onSetSize   = {this._handleSetSize}
-                            onRotate    = {this._handleRotationChange}
-                            onResize    = {this._handleResize} />
+                            lang            = {lang}
+                            model           = {this.state.modelSelected}
+                            style           = {this.state.objectDialogueStyle}
+                            mode            = {_mode}
+                            onSetSize       = {this._handleSetSize}
+                            onRotate        = {this._handleRotationChange}
+                            onResize        = {this._handleResize}
+                            onModeChange    = {this._handleModeChange} />
                     );
                 },
                 _renderWaitWindow: function() {
