@@ -5,8 +5,9 @@ define([
     'jsx!widgets/Modal',
     'jsx!widgets/File-Uploader',
     'jsx!views/laser/Advanced-Panel',
+    'jsx!widgets/Text-Toggle',
     'helpers/api/config'
-], function($, React, SelectView, Modal, FileUploader, AdvancedPanel, config) {
+], function($, React, SelectView, Modal, FileUploader, AdvancedPanel, TextToggle, config) {
     'use strict';
 
     return React.createClass({
@@ -156,7 +157,7 @@ define([
 
         _renderObjectHeight: function(lang) {
             return (
-                <input ref="objectHeight" type="number" min="0" max="100" step="0.1" defaultValue="" readOnly={!this.state.isReady}
+                <input ref="objectHeight" className="text-center control" type="number" min="0" max="100" step="0.1" defaultValue="" readOnly={!this.state.isReady}
                     onBlur={this._onObjectHeightBlur}
                 />
             )
@@ -216,49 +217,36 @@ define([
 
             return (
                 <div className="setup-panel operating-panel">
-                    <div className="main">
-                        <div className="time">1 hr 30min</div>
-                        <div className="setup">
-                            <div className="icon print-speed"></div>
-                            <div className="controls">
-                                <div className="label">{lang.laser.advanced.form.object_options.text}</div>
-                                <div className="control">
-                                    <SelectView
-                                        defaultValue={default_material.value}
-                                        ref="material"
-                                        className="span12"
-                                        options={this.state.materials}
-                                    />
-                                </div>
-                            </div>
-                        </div>
-                        <div className="setup">
-                            <div className="icon material"></div>
-                            <div className="controls">
-                                <div className="label">{lang.laser.print_params.object_height.text}</div>
-                                <div className="control">
-                                    {objectHeight}
-                                    <span>{lang.laser.print_params.object_height.unit}</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="setup last-setup">
-                            <button
-                                data-ga-event="open-laser-advanced-panel"
-                                className="btn btn-default btn-full-width"
-                                onClick={this._openAdvancedPanel}>
-                                {lang.laser.button_advanced}
-                            </button>
-                        </div>
-                    </div>
-                    {buttons}
+                    <ul className="main">
+                        <li>
+                            <label>
+                                <span>{lang.laser.advanced.form.object_options.text}</span>
+                                <SelectView
+                                    className="control"
+                                    defaultValue={default_material.value}
+                                    ref="material"
+                                    options={this.state.materials}
+                                />
+                            </label>
+                        </li>
+                        <li>
+                            <label>
+                                <span>{lang.laser.print_params.object_height.text}</span>
+                                {objectHeight}
+                                <span>{lang.laser.print_params.object_height.unit}</span>
+                            </label>
+                        </li>
+                        <li data-ga-event="open-laser-advanced-panel" onClick={this._openAdvancedPanel}>
+                            {lang.laser.button_advanced}
+                        </li>
+                    </ul>
 
                     {advancedPanel}
                 </div>
             );
         },
 
-        componentDidMount: function () {
+        componentDidMount: function() {
             var self = this,
                 objectHeight = self.refs.objectHeight.getDOMNode(),
                 opts = {
