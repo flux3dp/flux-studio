@@ -1,0 +1,17 @@
+.ui-control-text-toggle {
+
+    input {
+        display: none;
+
+        & + span:after {
+            content: attr(data-text-off);
+        }
+    }
+
+    input:checked {
+        & + span:after {
+            content: attr(data-text-on);
+        }
+    }
+
+}
