@@ -5,6 +5,7 @@ define([
     'helpers/websocket',
     'helpers/api/3d-print-slicing',
     'helpers/api/control',
+    'helpers/file-system',
     'threeOrbitControls',
     'threeTrackballControls',
     'threeTransformControls',
@@ -13,11 +14,11 @@ define([
     'plugins/file-saver/file-saver.min',
     'lib/Canvas-To-Blob'
 
-], function($, fileSystem, display, websocket, printSlicing, printerController) {
+], function($, fileSystem, display, websocket, printSlicing, printerController, FileSystem) {
     'use strict';
 
     var THREE = window.THREE || {},
-        container, printController;
+        container, slicer;
 
     var camera, scene, renderer;
     var orbitControl, transformControl, reactSrc, controls;
@@ -26,24 +27,19 @@ define([
         referenceMeshes = [];
     var raycaster = new THREE.Raycaster();
     var mouse = new THREE.Vector2(),
-        offset = new THREE.Vector3(),
         circularGridHelper, mouseDown, SELECTED;
 
     var movingOffsetX, movingOffsetY, panningOffset, originalCameraPosition, originalCameraRotation,
         scaleBeforeTransformX, scaleBeforeTransformY, scaleBeforeTransformZ;
 
-    var responseMessage, responseBlob, printPath,
+    var responseBlob, printPath,
         previewScene,
-        mainScene,
         previewColors = [],
         blobExpired = true,
         transformMode = false,
         shiftPressed = false,
         previewMode = false,
-        fileExtension = '.gcode',
-        leftPanelWidth = 275,
-        // originalRadius = 320,
-        fireStateChange = true;
+        leftPanelWidth = 275;
 
     var s = {
         diameter: 170,
@@ -84,7 +80,7 @@ define([
         container = document.getElementById('model-displayer');
 
         camera = new THREE.PerspectiveCamera(60, (container.offsetWidth) / container.offsetHeight, 1, 30000);
-        camera.position.set(0, -300, 110);
+        camera.position.set(0, -200, 100);
         camera.up = new THREE.Vector3(0, 0, 1);
 
         scene = new THREE.Scene();
@@ -147,8 +143,8 @@ define([
         transformControl.addEventListener('objectChange', onTransform);
 
         window.addEventListener('resize', onWindowResize, false);
-        window.addEventListener("keydown", onKeyPress, false);
-        window.addEventListener("keyup", onKeyPress, false);
+        window.addEventListener('keydown', onKeyPress, false);
+        window.addEventListener('keyup', onKeyPress, false);
         renderer.domElement.addEventListener('mousemove', onMouseMove, false);
         renderer.domElement.addEventListener('mousedown', onMouseDown, false);
         renderer.domElement.addEventListener('mouseup', onMouseUp, false);
@@ -164,17 +160,23 @@ define([
         setImportWindowPosition();
 
         // init print controller
-        printController = printSlicing();
+        slicer = printSlicing();
+
+        registerDropToImport();
     }
 
-    function uploadStl(name, file, callback) {
+    function uploadStl(name, file) {
         // pass to slicer
+        var d = $.Deferred();
         var reader = new FileReader();
-        reader.onload = function(e) {
-            var arrayBuffer = reader.result;
-            printController.upload(name, file, callback);
-        }
+        reader.onload = function() {
+            // var arrayBuffer = reader.result;
+            slicer.upload(name, file).then(function(result) {
+                d.resolve(result);
+            });
+        };
         reader.readAsArrayBuffer(file);
+        return d.promise();
     }
 
     function appendModel(fileEntry, file) {
@@ -191,9 +193,9 @@ define([
             var mesh = new THREE.Mesh(geometry, commonMaterial);
             mesh.up = new THREE.Vector3(0, 0, 1);
 
-            uploadStl(mesh.uuid, file, function(result) {
+            uploadStl(mesh.uuid, file).then(function(result) {
                 if (result.status !== 'ok') {
-                    alert(result.error);
+                    console.log(result.error);
                 }
                 reactSrc.setState({
                     openWaitWindow: false
@@ -208,10 +210,12 @@ define([
 
             // alert for auto scalling
             if (scale !== 1) {
-                alert('this model has been scaled for better printing ratio');
+                console.log('this model has been scaled for better printing ratio');
             }
 
+            // SELECTED = mesh;
             mesh.scale.set(scale, scale, scale);
+            // setScale(scale, scale, scale, false, false);
             mesh.scale._x = scale;
             mesh.scale._y = scale;
             mesh.scale._z = scale;
@@ -236,6 +240,7 @@ define([
             mesh.plane_boundary = planeBoundary(mesh);
 
             alignCenter();
+            addSizeProperty(mesh);
             groundIt(mesh);
             selectObject(mesh);
             createOutline(mesh);
@@ -246,6 +251,37 @@ define([
 
             render();
         });
+    }
+
+    function registerDropToImport() {
+        if(window.FileReader) {
+            var zone = document.querySelector('.studio-container.print-studio');
+            // zone.addEventListener('drop', onDropFile);
+            addEventHandler(zone, 'dragover', cancel);
+            addEventHandler(zone, 'dragenter', cancel);
+            addEventHandler(zone, 'drop', onDropFile);
+        }
+    }
+
+    function onDropFile(e) {
+    }
+
+    function cancel(e) {
+      if (e.preventDefault) { e.preventDefault(); }
+      return false;
+    }
+
+    function addEventHandler(obj, evt, handler) {
+        if(obj.addEventListener) {
+            // W3C method
+            obj.addEventListener(evt, handler, false);
+        } else if(obj.attachEvent) {
+            // IE method.
+            obj.attachEvent('on'+evt, handler);
+        } else {
+            // Old school method.
+            obj['on'+evt] = handler;
+        }
     }
 
     // Events Section ---
@@ -261,7 +297,9 @@ define([
         raycaster.setFromCamera(mouse, camera);
         var intersects = raycaster.intersectObjects(objects);
         var location = getReferenceIntersectLocation(e);
+
         if (intersects.length > 0) {
+
             var target = intersects[0].object;
             selectObject(target);
 
@@ -271,7 +309,11 @@ define([
 
             movingOffsetX = location ? location.x - target.position.x : target.position.x;
             movingOffsetY = location ? location.y - target.position.y : target.position.y;
-        } else {
+
+        }
+
+        else {
+
             if (!transformMode) {
                 selectObject(null);
                 removeFromScene('TransformControl');
@@ -279,9 +321,11 @@ define([
                 transformMode = false;
                 render();
             } else {
-                scaleBeforeTransformX = SELECTED.scale.x;
-                scaleBeforeTransformY = SELECTED.scale.y;
-                scaleBeforeTransformZ = SELECTED.scale.z;
+                if(SELECTED) {
+                    scaleBeforeTransformX = SELECTED.scale.x;
+                    scaleBeforeTransformY = SELECTED.scale.y;
+                    scaleBeforeTransformZ = SELECTED.scale.z;
+                }
             }
         }
 
@@ -308,7 +352,7 @@ define([
         setMousePosition(e);
 
         var location = getReferenceIntersectLocation(e);
-        if (SELECTED && mouseDown && !transformMode) {
+        if (SELECTED && mouseDown) {
             if (!transformMode) {
                 if (SELECTED.position && location) {
                     SELECTED.position.x = location.x - movingOffsetX;
@@ -346,35 +390,18 @@ define([
             case 'mouseUp':
                 transformMode = false;
                 // d = degree, s = scale
-                var _dx = updateDegreeWithStep(radianToDegree(SELECTED.rotation.x)),
-                    _dy = updateDegreeWithStep(radianToDegree(SELECTED.rotation.y)),
-                    _dz = updateDegreeWithStep(radianToDegree(SELECTED.rotation.z)),
-                    _sx = updateScaleWithStep(SELECTED.scale.x),
-                    _sy = updateScaleWithStep(SELECTED.scale.y),
-                    _sz = updateScaleWithStep(SELECTED.scale.z);
-
-                _dx = _dx >= 0 ? _dx : (360 - Math.abs(_dx));
-                _dy = _dy >= 0 ? _dy : (360 - Math.abs(_dy));
-                _dz = _dz >= 0 ? _dz : (360 - Math.abs(_dz));
-                setRotation(_dx, _dy, _dz, false);
-                setScale(_sx, _sy, _sz, false, false);
-                render();
-                groundIt(SELECTED);
+                SELECTED.rotation.enteredX = updateDegreeWithStep(radianToDegree(SELECTED.rotation.x));
+                SELECTED.rotation.enteredY = updateDegreeWithStep(radianToDegree(SELECTED.rotation.y));
+                SELECTED.rotation.enteredZ = updateDegreeWithStep(radianToDegree(SELECTED.rotation.z));
+                updateObjectSize(SELECTED);
                 break;
             case 'objectChange':
-                syncObjectOutline(e.target.object);
+                updateObjectSize(e.target.object);
                 break;
         }
     }
 
     // GET section ---
-
-    // get objects that intersects with the ray
-    function getIntersects(x, y) {
-        var vector = new THREE.Vector3(x, y, 0.5).unproject(camera);
-        var raycaster = new THREE.Raycaster(camera.position, mouse.subSelf(camera.position).normalize());
-        return raycaster.intersectObjects(objects);
-    }
 
     // get ray intersect with reference mesh
     function getReferenceIntersectLocation(e) {
@@ -412,7 +439,7 @@ define([
 
             reader.onload = function(e) {
                 var arrayBuffer = reader.result;
-            }
+            };
 
             reader.readAsArrayBuffer(fileObject);
         });
@@ -464,24 +491,27 @@ define([
         });
 
         _setProgressMessage('Saving File Preview');
-        saveSceneAsFileIcon().then(function(blob) {
-            return printController.uploadPreviewImage(blob);
-        }).then(function(result) {
-            if (result.status === 'ok') {
+        getBlobFromScene().then(function(blob) {
+            reactSrc.setState({ previewUrl: URL.createObjectURL(blob) });
+            return slicer.uploadPreviewImage(blob);
+        }).then(function(response) {
+            if (response.status === 'ok') {
                 sendGCodeParameters().then(function() {
-                    printController.go(ids, function(result) {
+                    slicer.goG(ids, function(result) {
                         if (result instanceof Blob) {
                             blobExpired = false;
                             responseBlob = result;
                             _setProgressMessage('');
                             d.resolve(result);
-                        } else {
+                        }
+                        else {
                             if (result.status !== 'error') {
                                 var serverMessage = `${result.status}: ${result.message} (${parseInt(result.percentage * 100)}%)`,
                                     drawingMessage = `FInishing up... (100%)`,
                                     message = result.status !== 'complete' ? serverMessage : drawingMessage;
                                 _setProgressMessage(message);
-                            } else {
+                            }
+                            else {
                                 _setProgressMessage('');
                             }
                         }
@@ -498,12 +528,53 @@ define([
         return d.promise();
     }
 
-    function getSelectedObjectSize() {
-        if (!$.isEmptyObject(SELECTED)) {
-            boundingBox = new THREE.BoundingBoxHelper(SELECTED, s.colorSelected);
-            boundingBox.update();
-            return boundingBox;
-        }
+    function getFCode() {
+        var d = $.Deferred();
+        var ids = [];
+        objects.forEach(function(obj) {
+            ids.push(obj.uuid);
+        });
+
+        _setProgressMessage('Saving File Preview');
+        getBlobFromScene().then(function(blob) {
+            reactSrc.setState({ previewUrl: URL.createObjectURL(blob) });
+            return slicer.uploadPreviewImage(blob);
+        }).then(function(response) {
+            if (response.status === 'ok') {
+                sendGCodeParameters().then(function() {
+                    slicer.goF(ids, function(result) {
+                        if (result instanceof Blob) {
+                            blobExpired = false;
+                            responseBlob = result;
+                            _setProgressMessage('');
+                            d.resolve(result);
+                        }
+                        else {
+                            if (result.status !== 'error') {
+                                var serverMessage = `${result.status}: ${result.message} (${parseInt(result.percentage * 100)}%)`,
+                                    drawingMessage = `FInishing up... (100%)`,
+                                    message = result.status !== 'complete' ? serverMessage : drawingMessage;
+                                _setProgressMessage(message);
+                            }
+                            else {
+                                _setProgressMessage('');
+                            }
+                        }
+                    });
+                });
+            }
+            // error
+            else {
+                _setProgressMessage('');
+                d.resolve(result);
+            }
+        });
+
+        return d.promise();
+    }
+
+    function getModelCount() {
+        return objects.length;
     }
 
     // SET section ---
@@ -516,7 +587,7 @@ define([
         mouse.y = -((e.offsetY - offy) / container.offsetHeight) * 2 + 1;
     }
 
-    function setScale(x, y, z, locked, alignCenter) {
+    function setScale(x, y, z, locked, center) {
         var originalScaleX = SELECTED.scale._x;
         var originalScaleY = SELECTED.scale._y;
         var originalScaleZ = SELECTED.scale._z;
@@ -541,14 +612,31 @@ define([
         SELECTED.outlineMesh.scale.multiplyScalar(1.05);
         SELECTED.scale.locked = locked;
         SELECTED.plane_boundary = planeBoundary(SELECTED);
+
         reactSrc.setState({
             modelSelected: SELECTED.uuid ? SELECTED : null
         });
 
-        if (alignCenter) {
-            this.alignCenter();
+        if (center) {
+            SELECTED.plane_boundary = planeBoundary(SELECTED);
+            groundIt(SELECTED);
             checkOutOfBounds(SELECTED);
+            render();
         }
+    }
+
+    function setSize(x, y, z) {
+        var sx = Math.round(x / SELECTED.size.originalX * 1000) / 1000,
+            sy = Math.round(y / SELECTED.size.originalY * 1000) / 1000,
+            sz = Math.round(z / SELECTED.size.originalZ * 1000) / 1000,
+            _locked = false,
+            _render = true;
+
+        setScale(sx, sy, sz, _locked, _render);
+
+        SELECTED.size.x = x;
+        SELECTED.size.y = y;
+        SELECTED.size.z = z;
     }
 
     function setRotateMode() {
@@ -572,7 +660,7 @@ define([
             value = settings[name] || 'default';
 
         if (index < advancedParameters.length) {
-            printController.setParameter(name, value).then(function(result) {
+            slicer.setParameter(name, value).then(function(result) {
                 if (result.status === 'error') {
                     index = advancedParameters.length;
                     // todo: error logging
@@ -589,35 +677,39 @@ define([
     }
 
     function setParameter(name, value) {
-        printController.setParameter(name, value).then(
+        slicer.setParameter(name, value).then(
             function(result) {
                 if (result.status === 'error' || result.status === 'fatal') {
                     // todo: error logging
                 }
                 console.dir(result);
             }
-        )
+        );
         blobExpired = true;
     }
 
-    function setRotation(x, y, z, render) {
+    function setRotation(x, y, z, needRender) {
+        var _x = parseInt(x) || 0,
+            _y = parseInt(y) || 0,
+            _z = parseInt(z) || 0;
         SELECTED.rotation.enteredX = x;
         SELECTED.rotation.enteredY = y;
         SELECTED.rotation.enteredZ = z;
-        SELECTED.rotation.x = degreeToRadian(x);
-        SELECTED.rotation.y = degreeToRadian(y);
-        SELECTED.rotation.z = degreeToRadian(z);
-        SELECTED.outlineMesh.rotation.x = degreeToRadian(x);
-        SELECTED.outlineMesh.rotation.y = degreeToRadian(y);
-        SELECTED.outlineMesh.rotation.z = degreeToRadian(z);
+        SELECTED.rotation.x = degreeToRadian(_x);
+        SELECTED.rotation.y = degreeToRadian(_y);
+        SELECTED.rotation.z = degreeToRadian(_z);
+        SELECTED.outlineMesh.rotation.x = degreeToRadian(_x);
+        SELECTED.outlineMesh.rotation.y = degreeToRadian(_y);
+        SELECTED.outlineMesh.rotation.z = degreeToRadian(_z);
 
-        reactSrc.setState({
-            modelSelected: SELECTED.uuid ? SELECTED : null
-        });
-        if (render) {
+        if (needRender) {
+            reactSrc.setState({
+                modelSelected: SELECTED.uuid ? SELECTED : null
+            });
             SELECTED.plane_boundary = planeBoundary(SELECTED);
             groundIt(SELECTED);
             checkOutOfBounds(SELECTED);
+            render();
         }
     }
 
@@ -651,6 +743,7 @@ define([
             objectDialogueDistance = parseInt(objectDialogueDistance);
 
             reactSrc.setState({
+                modelSelected: o,
                 openObjectDialogue: true
             }, function() {
                 var objectDialogue = document.getElementsByClassName('objectDialogue')[0],
@@ -679,18 +772,6 @@ define([
                     }
                 });
 
-                // for rotation and scale content accordion
-                var allPanels = $('.accordion > dd');
-
-                $('.accordion > dt > a').click(function() {
-                    allPanels.slideUp();
-                    $(this).parent().next().slideDown();
-                    var mode = $(this)[0].id;
-                    mode === 'rotate' ? setRotateMode() : setScaleMode();
-                    reactSrc.setState({ mode: mode});
-                    return false;
-                });
-
                 reactSrc.state.mode === 'rotate' ? $('.scale-content').hide() : $('.rotate-content').hide();
             });
         }
@@ -711,12 +792,10 @@ define([
     function selectObject(obj) {
         SELECTED = obj || {};
 
-        removeFromScene('TransformControl');
-
         if (!$.isEmptyObject(obj)) {
 
             // boundary
-            var model = toScreenPosition(obj, camera);
+            // var model = toScreenPosition(obj, camera);
             if(obj.outlineMesh) {
                 obj.outlineMesh.visible = true;
             }
@@ -729,15 +808,19 @@ define([
             scaleBeforeTransformY = obj.scale.y;
             scaleBeforeTransformZ = obj.scale.z;
 
-            reactSrc.state.mode === 'rotate' ? setRotateMode() : setScaleMode();
-        } else {
-            transformMode = false;
-            _removeAllMeshOutline();
+            if(reactSrc.state.mode === 'rotate') {
+                setRotateMode();
+            }
+            else {
+                setScaleMode();
+            }
         }
-        reactSrc.setState({
-            modelSelected: SELECTED.uuid ? SELECTED : null,
-            openObjectDialogue: !!obj
-        });
+        else {
+            transformMode = false;
+            removeFromScene('TransformControl');
+            _removeAllMeshOutline();
+            reactSrc.setState({ openObjectDialogue: false });
+        }
 
         render();
     }
@@ -769,6 +852,7 @@ define([
     function removeSelected() {
         if (SELECTED) {
             var index;
+            scene.remove(SELECTED.outlineMesh);
             scene.remove(SELECTED);
             index = objects.indexOf(SELECTED);
             if (index > -1) {
@@ -776,7 +860,7 @@ define([
             }
 
             //  model in backend
-            printController.delete(SELECTED.uuid, function(result) {
+            slicer.delete(SELECTED.uuid, function(result) {
                 // todo: if error
             });
 
@@ -808,32 +892,32 @@ define([
 
 
 
-    function planeBoundary(sourceMesh){
+    function planeBoundary(sourceMesh) {
         // ref: http://www.csie.ntnu.edu.tw/~u91029/ConvexHull.html#4
         // Andrew's Monotone Chain
 
         // define Cross product function on 2d plane
-        var cross = (function cross(p0, p1, p2){
+        var cross = (function cross(p0, p1, p2) {
             return ((p1.x - p0.x) * (p2.y - p0.y)) - ((p1.y - p0.y) * (p2.x - p0.x));
-        })
+        });
 
         // sort the index of each point in stl
         var stl_index = [];
         for (var i = 0; i < sourceMesh.geometry.vertices.length; i += 1) {
           stl_index.push(i);
         }
-        stl_index.sort(function(a, b){
-            if (sourceMesh.geometry.vertices[a].y == sourceMesh.geometry.vertices[b].y){
+        stl_index.sort(function(a, b) {
+            if (sourceMesh.geometry.vertices[a].y === sourceMesh.geometry.vertices[b].y) {
                 return sourceMesh.geometry.vertices[a].x - sourceMesh.geometry.vertices[b].x;
             }
             return sourceMesh.geometry.vertices[a].y - sourceMesh.geometry.vertices[b].y;
-        })
+        });
 
         // find boundary
         var boundary = [];
 
         // compute upper hull
-        for (var i = 0; i < stl_index.length; i += 1){
+        for (var i = 0; i < stl_index.length; i += 1) {
           while( boundary.length >= 2 && cross(sourceMesh.geometry.vertices[boundary[boundary.length - 2]], sourceMesh.geometry.vertices[boundary[boundary.length - 1]], sourceMesh.geometry.vertices[stl_index[i]]) <= 0){
             boundary.pop();
           }
@@ -841,7 +925,7 @@ define([
         }
         // compute lower hull
         var t = boundary.length + 1;
-        for (var i = stl_index.length - 2 ; i >= 0; i -= 1){
+        for (var i = stl_index.length - 2 ; i >= 0; i -= 1) {
             while( boundary.length >= t && cross(sourceMesh.geometry.vertices[boundary[boundary.length - 2]], sourceMesh.geometry.vertices[boundary[boundary.length - 1]], sourceMesh.geometry.vertices[stl_index[i]]) <= 0){
                 boundary.pop();
             }
@@ -874,29 +958,59 @@ define([
     }
 
     function downloadGCode(fileName) {
+        blobExpired = true;
+        selectObject(null);
         var d = $.Deferred();
-        if (!blobExpired) {
-            d.resolve(saveAs(responseBlob, fileName));
-        } else {
-            getGCode().then(function(blob) {
-                if (blob instanceof Blob) {
-                    _setProgressMessage('');
-                    d.resolve(saveAs(blob, fileName));
-                }
-            });
-        }
+        if(objects.length > 0) {
+            if (!blobExpired) {
+                d.resolve(saveAs(responseBlob, fileName));
+            } else {
+                getGCode().then(function(blob) {
+                    if (blob instanceof Blob) {
+                        _setProgressMessage('');
+                        d.resolve(saveAs(blob, fileName));
+                    }
+                });
+            }
 
-        return d.promise();
+            return d.promise();
+        }
+        else {
+            d.resolve('');
+            return d.promise();
+        }
     }
 
-    function saveSceneAsFileIcon() {
+    function downloadFCode(fileName) {
+        selectObject(null);
+        var d = $.Deferred();
+        if(objects.length > 0) {
+            if (!blobExpired) {
+                d.resolve(saveAs(responseBlob, fileName));
+            } else {
+                getFCode().then(function(blob) {
+                    if (blob instanceof Blob) {
+                        _setProgressMessage('');
+                        d.resolve(saveAs(blob, fileName));
+                    }
+                });
+            }
+
+            return d.promise();
+        }
+        else {
+            d.resolve('');
+            return d.promise();
+        }
+    }
+
+    function getBlobFromScene() {
         var ccp = camera.position.clone(),
             ccr = camera.rotation.clone(),
             d = $.Deferred();
 
         camera.position.set(originalCameraPosition.x, originalCameraPosition.y, originalCameraPosition.z);
         camera.rotation.set(originalCameraRotation.x, originalCameraRotation.y, originalCameraRotation.z, originalCameraRotation.order);
-
         render();
 
         renderer.domElement.toBlob(function(blob) {
@@ -946,20 +1060,29 @@ define([
     }
 
     function executePrint(serial) {
+        var d = $.Deferred();
+        selectObject(null);
+        if(objects.length === 0) {
+            d.resolve('');
+            return d.promise();
+        }
         var go = function(blob) {
             var control_methods = printerController(serial);
             control_methods.upload(blob.size, blob);
-        }
+            d.resolve('');
+        };
 
         if (!blobExpired) {
             go(responseBlob);
-        } else {
-            getGCode().then(function(blob) {
-                if (blob instanceof Blob) {
-                    go(blob);
+        }
+        else {
+            getGCode().then(function(result) {
+                if (result instanceof Blob) {
+                    go(result);
                 }
             });
         }
+        return d.promise();
     }
 
     function updateOrbitControl(e) {
@@ -979,6 +1102,20 @@ define([
         renderer.render(previewMode ? previewScene : scene, camera);
     }
 
+    function addSizeProperty(obj) {
+        if (!$.isEmptyObject(obj)) {
+            var boundingBox = new THREE.BoundingBoxHelper(obj);
+            boundingBox.update();
+            obj.size = boundingBox.box.size();
+            obj.size.enteredX = boundingBox.box.size().x;
+            obj.size.enteredY = boundingBox.box.size().y;
+            obj.size.enteredZ = boundingBox.box.size().z;
+            obj.size.originalX = boundingBox.box.size().x;
+            obj.size.originalY = boundingBox.box.size().y;
+            obj.size.originalZ = boundingBox.box.size().z;
+        }
+    }
+
     // Helper Functions ---
 
     function degreeToRadian(degree) {
@@ -994,15 +1131,35 @@ define([
             return 0;
         }
         var degreeStep = shiftPressed ? 15 : s.degreeStep;
-        return (parseInt(degree / degreeStep + 1) * degreeStep);
+        return (parseInt(degree / degreeStep) * degreeStep);
     }
 
     function updateScaleWithStep(scale) {
         // if no decimal after scale precision, ex: 1.1, not 1.143
-        if (parseInt(scale * Math.pow(10, s.scalePrecision)) == scale * Math.pow(10, s.scalePrecision)) {
+        if (parseInt(scale * Math.pow(10, s.scalePrecision)) === scale * Math.pow(10, s.scalePrecision)) {
             return scale;
         }
         return (parseInt(scale * Math.pow(10, s.scalePrecision)) + 1) / Math.pow(10, s.scalePrecision);
+    }
+
+    function updateObjectSize(src) {
+        var boundingBox = new THREE.BoundingBoxHelper(src);
+        boundingBox.update();
+        src.size = boundingBox.box.size();
+        src.size.enteredX = src.size.x;
+        src.size.enteredY = src.size.y;
+        src.size.enteredZ = src.size.z;
+
+        src.rotation.enteredX = updateDegreeWithStep(radianToDegree(src.rotation.x));
+        src.rotation.enteredY = updateDegreeWithStep(radianToDegree(src.rotation.y));
+        src.rotation.enteredZ = updateDegreeWithStep(radianToDegree(src.rotation.z));
+
+        syncObjectOutline(src);
+        setRotation(src.rotation.enteredX, src.rotation.enteredY, src.rotation.enteredZ);
+
+        reactSrc.setState({
+            modelSelected: src
+        });
     }
 
     function toScreenPosition(obj, camera) {
@@ -1039,6 +1196,7 @@ define([
         src.outlineMesh.rotation.set(src.rotation.x, src.rotation.y, src.rotation.z, 'ZYX');
         src.outlineMesh.scale.set(src.scale.x, src.scale.y, src.scale.z);
         src.outlineMesh.scale.multiplyScalar(1.05);
+        render();
     }
 
     // Private Functions ---
@@ -1048,7 +1206,7 @@ define([
         var d = $.Deferred();
         index = index || 0;
         if (index < objects.length) {
-            printController.set(
+            slicer.set(
                 objects[index].uuid,
                 objects[index].position.x,
                 objects[index].position.y,
@@ -1068,7 +1226,6 @@ define([
                 }
             });
         } else {
-            var d = $.Deferred();
             d.resolve('');
         }
         return d.promise();
@@ -1109,11 +1266,11 @@ define([
         selectObject(null);
 
         var drawPath = function() {
-            printController.getPath().then(function(result) {
+            slicer.getPath().then(function(result) {
                 printPath = result;
                 _drawPath();
             });
-        }
+        };
 
         if (blobExpired) {
             getGCode().then(function(blob) {
@@ -1189,23 +1346,25 @@ define([
     }
 
     return {
-        init: init,
-        appendModel: appendModel,
-        setRotation: setRotation,
-        setScale: setScale,
-        alignCenter: alignCenter,
-        removeSelected: removeSelected,
-        sendGCodeParameters: sendGCodeParameters,
-        getSelectedObjectSize: getSelectedObjectSize,
-        downloadGCode: downloadGCode,
-        setRotateMode: setRotateMode,
-        setScaleMode: setScaleMode,
-        setAdvanceParameter: setAdvanceParameter,
-        setParameter: setParameter,
-        getGCode: getGCode,
-        togglePreview: togglePreview,
-        changePreviewLayer: changePreviewLayer,
-        executePrint: executePrint,
-        setCameraPosition: setCameraPosition
+        init                : init,
+        appendModel         : appendModel,
+        setRotation         : setRotation,
+        setScale            : setScale,
+        alignCenter         : alignCenter,
+        removeSelected      : removeSelected,
+        sendGCodeParameters : sendGCodeParameters,
+        setSize             : setSize,
+        downloadGCode       : downloadGCode,
+        downloadFCode       : downloadFCode,
+        setRotateMode       : setRotateMode,
+        setScaleMode        : setScaleMode,
+        setAdvanceParameter : setAdvanceParameter,
+        setParameter        : setParameter,
+        getGCode            : getGCode,
+        getModelCount       : getModelCount,
+        togglePreview       : togglePreview,
+        changePreviewLayer  : changePreviewLayer,
+        executePrint        : executePrint,
+        setCameraPosition   : setCameraPosition
     };
 });

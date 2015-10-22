@@ -5,9 +5,11 @@ define([
     'app/actions/print',
     'jsx!widgets/Radio-Group',
     'plugins/classnames/index',
-    'jsx!views/print-operating-panels/Advanced',
-    'jsx!views/print-operating-panels/Left-Panel',
-    'jsx!views/print-operating-panels/Right-Panel',
+    'jsx!views/print/Advanced',
+    'jsx!views/print/Left-Panel',
+    'jsx!views/print/Right-Panel',
+    'jsx!views/print/Monitor',
+    'jsx!views/print/Object-Dialogue',
     'helpers/file-system',
     'jsx!widgets/Modal',
     'helpers/api/config',
@@ -22,12 +24,12 @@ define([
     AdvancedPanel,
     LeftPanel,
     RightPanel,
+    Monitor,
+    ObjectDialogue,
     FileSystem,
     Modal,
     Config,
     PrinterSelector) {
-
-    'use strict';
 
     return function(args) {
         args = args || {};
@@ -47,12 +49,20 @@ define([
                 y       : 1,
                 z       : 1
             },
+            _size = {
+                locked  : true,
+                x       : 0,
+                y       : 0,
+                z       : 0
+            },
             _rotation = {
                 x: 0,
                 y: 0,
                 z: 0
             },
+            _mode = 'scale',
             lang = args.state.lang,
+            selectedPrinter,
             view = React.createClass({
                 getInitialState: function() {
                     return ({
@@ -71,8 +81,10 @@ define([
                         sliderValue                 : 0,
                         progressMessage             : '',
                         objectDialogueStyle         : {},
-                        mode                        : 'rotate',
-                        camera                      : {}
+                        camera                      : {},
+                        rotation                    : {},
+                        scale                       : {},
+                        previewUrl                  : ''
                     });
                 },
                 componentDidMount: function() {
@@ -83,17 +95,14 @@ define([
                             if(!$.isEmptyObject(options)) {
                                 advancedSetting = options;
                             }
-                        }.bind(this)
+                        }
                     });
-                    // register for delete button
-                    $(document).keyup(function(e) {
-                        if(e.keyCode === 8 || e.keyCode === 46) {
+
+                    $(document).keydown(function(e) {
+                        if(e.metaKey && e.keyCode === 8 || e.keyCode === 46) {
                             director.removeSelected();
                         }
-                    }.bind(this));
-                },
-                _updateSelectedSize: function() {
-
+                    });
                 },
                 _handleSpeedChange: function(speed) {
                     director.setParameter('printSpeed', speed);
@@ -112,19 +121,29 @@ define([
                         openPrinterSelectorWindow: true
                     });
                 },
-                _handleRotation: function(rotation) {
-                    _rotation = rotation;
-                    director.setRotation(rotation.x, rotation.y, rotation.z, true);
+                _handleRotationChange: function(src) {
+                    var axis = src.target.id;
+                    _rotation[axis] = src.type === 'blur' && !$.isNumeric(src.target.value) ? 0 : src.target.value;
+                    director.setRotation(_rotation.x, _rotation.y, _rotation.z, true);
                 },
                 _handleResetRotation: function() {
                     _rotation.x = 0;
                     _rotation.y = 0;
                     _rotation.z = 0;
+                    this.setState({ rotation: _rotation });
                     director.setRotation(0, 0, 0, true);
                 },
-                _handleScaleChange: function(scale) {
-                    _scale = scale;
+                _handleScaleChange: function(src) {
+                    var axis = src.target.id;
+                    _scale[axis] = src.type === 'blur' && !$.isNumeric(src.target.value) ? 1 : src.target.value;
                     director.setScale(scale.x, scale.y, scale.z, scale.locked, true);
+                },
+                _handleResize: function(size) {
+                    director.setSize(size.x, size.y, size.z);
+                },
+                _handleSetSize: function(size) {
+                    var updateOriginalSize = true;
+                    director.setSize(size.x, size.y, size.z, updateOriginalSize);
                 },
                 _handleResetScale: function() {
                     director.setScale(1, 1, 1, true);
@@ -166,14 +185,35 @@ define([
                     }
                     e.target.value = null;
                 },
-                _handleDownloadGCode: function(e) {
-                    this.setState({ openWaitWindow: true });
-                    var fileName = prompt(lang.print.download_prompt);
-                    fileName = fileName || 'no name';
-
-                    director.downloadGCode(fileName).then(() => {
-                        this.setState({ openWaitWindow: false });
-                    });
+                _handleDownloadGCode: function() {
+                    if(director.getModelCount() !== 0) {
+                        var fileName = prompt(lang.print.download_prompt);
+                        if(fileName === null) {
+                            return;
+                        }
+                        else {
+                            // fileName += '.gcode';
+                            this.setState({ openWaitWindow: true });
+                            director.downloadGCode(fileName).then(() => {
+                                this.setState({ openWaitWindow: false });
+                            });
+                        }
+                    }
+                },
+                _handleDownloadFCode: function() {
+                    if(director.getModelCount() !== 0) {
+                        var fileName = prompt(lang.print.download_prompt);
+                        if(fileName === null) {
+                            return;
+                        }
+                        else {
+                            // fileName += '.gcode';
+                            this.setState({ openWaitWindow: true });
+                            director.downloadFCode(fileName).then(() => {
+                                this.setState({ openWaitWindow: false });
+                            });
+                        }
+                    }
                 },
                 _handlePreview: function(isOn) {
                     director.togglePreview(isOn);
@@ -181,13 +221,16 @@ define([
                 _handlePrinterSelectorWindowClose: function() {
                     this.setState({ openPrinterSelectorWindow: false });
                 },
-                _handlePrinterSelected: function(selectedPrinter) {
-                    console.log(selectedPrinter);
+                _handlePrinterSelected: function(printer) {
+                    // console.log(selectedPrinter);
+                    selectedPrinter = printer;
 
-                    this.setState({
-                        openPrinterSelectorWindow: false
-                    });
-                    // director.executePrint(selectedPrinter.serial);
+                    director.executePrint(selectedPrinter.serial).then(function() {
+                        this.setState({
+                            openPrinterSelectorWindow: false,
+                            showMonitor: true
+                        });
+                    }.bind(this));
                 },
                 _handlePreviewLayerChange: function(e) {
                     director.changePreviewLayer(e.target.value);
@@ -195,6 +238,21 @@ define([
                 },
                 _handleCameraPositionChange: function(position, rotation) {
                     director.setCameraPosition(position, rotation);
+                },
+                _handleMonitorClose: function() {
+                    this.setState({
+                        showMonitor: false
+                    });
+                },
+                _handleModeChange: function(mode) {
+                    console.log(mode);
+                    this.setState({ mode: mode });
+                    if(mode === 'rotate') {
+                        director.setRotateMode();
+                    }
+                    else {
+                        director.setScaleMode();
+                    }
                 },
                 _renderAdvancedPanel: function() {
                     return (
@@ -205,26 +263,17 @@ define([
                             onDone      = {this._handleAdvancedSettingDone} />
                     );
                 },
-                _renderMonitorPanel: function() {
-                    return (
-                        <MonitorPanel
-                            lang={lang}
-                            timeLeft={90}
-                            objectWeight={280.5}
-                            onPrintCancel={this._handlePrintCancel}
-                            onTogglePrintPause={this._handleTogglePrintPause}
-                            onPrintRestart={this._handlePrintRestart} />
-                    );
-                },
                 _renderPrinterSelectorWindow: function() {
                     var content = (
                         <PrinterSelector
                             lang={lang}
                             onClose={this._handlePrinterSelectorWindowClose}
                             onGettingPrinter={this._handlePrinterSelected} />
-                    )
+                    );
                     return (
-                        <Modal {...this.props} content={content} />
+                        <Modal {...this.props}
+                            content={content}
+                            onClose={this._handlePrinterSelectorWindowClose} />
                     );
                 },
                 _renderImportWindow: function() {
@@ -256,37 +305,35 @@ define([
                             onPreviewClick          = {this._handlePreview}
                             onPrintClick            = {this._handlePrintClick}
                             onDownloadGCode         = {this._handleDownloadGCode}
-                            onCameraPositionChange  = {this._handleCameraPositionChange} />
+                            onCameraPositionChange  = {this._handleCameraPositionChange}
+                            onDownloadFCode         = {this._handleDownloadFCode} />
+                    );
+                },
+                _renderMonitorPanel: function() {
+                    var content = (
+                        <Monitor
+                            lang            = {lang}
+                            previewUrl      = {this.state.previewUrl}
+                            selectedPrinter = {selectedPrinter}
+                            onClose         = {this._handleMonitorClose} />
+                    );
+                    return (
+                        <Modal {...this.props}
+                            content={content}
+                            onClose={this._handleMonitorClose} />
                     );
                 },
                 _renderObjectDialogue: function() {
-                    var rotateInputFieldsClass = ClassNames('rotateInputFields', {bottom: this.state.mode === 'rotate'}),
-                        rotateClass = ClassNames('section', {bottom: this.state.mode === 'scale'});
-
                     return (
-                        <div className="objectDialogue" style={this.state.objectDialogueStyle}>
-                            <dl className="accordion">
-
-                                <dt><a id="scale" className="title" href="">{lang.print.scale}</a></dt>
-                                    <dd className="scale-content">Scale Mode</dd>
-
-                                <dt><a id="rotate" className="title" href="">{lang.print.rotate}</a></dt>
-                                    <dd className="rotate-content">
-                                        <div className="group">
-                                            <div className="label">X</div>
-                                            <div className="control"><input type="text" /></div>
-                                        </div>
-                                        <div className="group">
-                                            <div className="label">Y</div>
-                                            <div className="control"><input type="text" /></div>
-                                        </div>
-                                        <div className="group">
-                                            <div className="label">Z</div>
-                                            <div className="control"><input type="text" /></div>
-                                        </div>
-                                    </dd>
-                            </dl>
-                        </div>
+                        <ObjectDialogue
+                            lang            = {lang}
+                            model           = {this.state.modelSelected}
+                            style           = {this.state.objectDialogueStyle}
+                            mode            = {_mode}
+                            onSetSize       = {this._handleSetSize}
+                            onRotate        = {this._handleRotationChange}
+                            onResize        = {this._handleResize}
+                            onModeChange    = {this._handleModeChange} />
                     );
                 },
                 _renderWaitWindow: function() {
@@ -313,7 +360,7 @@ define([
                             </div>
                             <div className="spinner-flip spinner-reverse"/>
                         </div>
-                    )
+                    );
                     return (
                         <Modal content={content} />
                     );
@@ -323,6 +370,7 @@ define([
                         importWindow            = this.state.openImportWindow ? this._renderImportWindow() : '',
                         leftPanel               = this._renderLeftPanel(),
                         rightPanel              = this._renderRightPanel(),
+                        monitorPanel            = this.state.showMonitor ? this._renderMonitorPanel() : '',
                         objectDialogue          = this.state.openObjectDialogue ? this._renderObjectDialogue() : '',
                         printerSelectorWindow   = this.state.openPrinterSelectorWindow ? this._renderPrinterSelectorWindow() : '',
                         waitWindow              = this.state.openWaitWindow ? this._renderWaitWindow() : '',
@@ -337,6 +385,8 @@ define([
                             {leftPanel}
 
                             {rightPanel}
+
+                            {monitorPanel}
 
                             {objectDialogue}
 

@@ -321,6 +321,11 @@ define(function() {
                 support_off: 'SUPPORT OFF',
                 advanced: 'ADVANCED'
             },
+            right_panel: {
+                get: 'Get',
+                go: 'Go',
+                preview: '預覽'
+            },
             quick_print: 'Quick Print',
             scale: '比例',
             rotate: '旋轉',
@@ -335,8 +340,7 @@ define(function() {
             pause: '暫停',
             continue: '繼續',
             restart: '重新開始',
-            download_prompt: '請輸入檔案名稱',
-            preview: '預覽'
+            download_prompt: '請輸入檔案名稱'
         },
         laser: {
             import: '打開⋯',
@@ -539,6 +543,11 @@ define(function() {
             pleaseWait: '請稍待...',
             unknownCommand: '指令無法在此狀態下被執行',
             quit: '中斷連結'
+        },
+        monitor: {
+            change_filament: 'CHANGE FILLAMENT',
+            browse_file: 'BROWSE FILE',
+            monitor: 'MONITOR'
         }
     };
 });

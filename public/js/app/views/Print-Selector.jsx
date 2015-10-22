@@ -13,10 +13,15 @@ define([
         displayName: 'PrinterSelection',
         selected_printer: null,
 
+        propTypes: {
+            onClose: React.PropTypes.func,
+            onGettingPrinter: React.PropTypes.func
+        },
+
         _goBackToPrinterList: function() {
             this.setState({
                 authFailure: false,
-                showPassword: false,
+                showPassword: false
             });
         },
 
@@ -88,7 +93,7 @@ define([
         },
 
         _handleClose: function(e) {
-            React.unmountComponentAtNode(View);
+            // React.unmountComponentAtNode(View);
             this.props.onClose();
         },
 
