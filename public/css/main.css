@@ -2677,6 +2677,14 @@ input[type=range]:focus::-webkit-slider-runnable-track {
 .btn-h-group .btn:first-child {
     margin: 0; }
 
+.ui-control-text-toggle input {
+    display: none; }
+    .ui-control-text-toggle input + span:after {
+        content: attr(data-text-off); }
+
+.ui-control-text-toggle input:checked + span:after {
+    content: attr(data-text-on); }
+
 /**
  * global advanced panel
  */
@@ -4490,14 +4498,36 @@ input.switch:checked ~ label:after {
     right: 15rem; }
 
 .laser-studio .operation-table {
+    display: -webkit-box;
+    /* OLD - iOS 6-, Safari 3.1-6 */
+    display: -webkit-flex;
+    /* NEW - Chrome */
+    display: flex;
+    /* NEW, Spec - Opera 12.1, Firefox 20+ */
     height: 100%;
     position: relative;
     width: 100%; }
 
 .laser-studio .operating-panel {
-    left: 20px;
-    top: 20px;
-    width: 182px; }
+    margin: 0 0 0 30px;
+    position: static;
+    align-self: center; }
+    .laser-studio .operating-panel li {
+        color: #b3b3b3;
+        font-size: 1.8rem;
+        line-height: 2em; }
+        .laser-studio .operating-panel li .control {
+            background: transparent;
+            background-image: none;
+            border: none;
+            border: 0;
+            font-size: 1.8rem;
+            height: auto;
+            width: auto; }
+    .laser-studio .operating-panel .main {
+        background-color: transparent;
+        list-style: none;
+        padding: 0; }
     .laser-studio .operating-panel .action-buttons .btn {
         display: block;
         margin: 0 0 5px 0; }
@@ -4523,10 +4553,10 @@ input.switch:checked ~ label:after {
     background: url(/img/laser-platform.png);
     background-size: 100% 100%;
     border: 1px solid #767676;
-    height: 450px;
+    height: 520px;
     overflow: hidden;
     position: absolute;
-    width: 450px; }
+    width: 520px; }
 
 .laser-studio .laser-object .ft-container {
     z-index: 1; }

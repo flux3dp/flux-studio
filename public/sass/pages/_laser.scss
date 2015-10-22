@@ -2,21 +2,45 @@
  * Laser
  */
 .laser-studio {
+
     .laser-device-selection-popup {
         bottom: 4.3rem;
         right: 15rem;
     }
 
     .operation-table {
+        @include flexbox();
         height: 100%;
         position: relative;
         width: 100%;
     }
 
     .operating-panel {
-        left: 20px;
-        top: 20px;
-        width: 182px;
+        margin: 0 0 0 30px;
+        position: static;
+        align-self: center;
+
+        li {
+            color: #b3b3b3;
+            font-size: 1.8rem;
+            line-height: 2em;
+
+            .control {
+                background: rgba(0, 0, 0, 0);
+                background-image: none;
+                border: none;
+                border: 0;
+                font-size: 1.8rem;
+                height: auto;
+                width: auto;
+            }
+        }
+
+        .main {
+            background-color: rgba(0, 0, 0, 0);
+            list-style: none;
+            padding: 0;
+        }
 
         .action-buttons {
             .btn {
@@ -44,10 +68,10 @@
         background: url(/img/laser-platform.png);
         background-size: 100% 100%;
         border: 1px solid #767676;
-        height: 450px;
+        height: 520px;
         overflow: hidden;
         position: absolute;
-        width: 450px;
+        width: 520px;
     }
 
     .laser-object .ft-container {
