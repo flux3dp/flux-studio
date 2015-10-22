@@ -2858,8 +2858,13 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         .top-menu .brand-logo .menu {
             float: left; }
         .top-menu .brand-logo .logo-icon {
-            height: 4.25rem;
-            width: 4.25rem; }
+            width: 49px; }
+        .top-menu .brand-logo .func-name {
+            color: #B3B3B3;
+            font-family: "HelveticaNeue-Thin";
+            font-size: 40px;
+            line-height: 49px;
+            padding: 0 0 0 21px; }
         .top-menu .brand-logo .menu {
             background: #fff;
             display: none;
@@ -2886,6 +2891,8 @@ input[type=range]:focus::-webkit-slider-runnable-track {
                 padding: 0; }
         .top-menu .brand-logo:hover .menu {
             display: block; }
+        .top-menu .brand-logo:hover .func-name {
+            display: none; }
     .top-menu .item {
         color: #b3b3b3;
         font-size: 1rem;
