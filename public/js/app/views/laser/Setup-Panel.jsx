@@ -173,7 +173,7 @@ define([
 
             config().read('custom-material', {
                 onFinished: function(response) {
-                    var data = JSON.parse(response),
+                    var data = JSON.parse(response || '{}'),
                         materials = self.state.materials,
                         customIndex = materials.findIndex(function(el) {
                             return el.value === 'custom';
@@ -211,6 +211,8 @@ define([
                 ),
                 advancedPanel = this._renderAdvancedPanel(lang, default_material),
                 objectHeight = this._renderObjectHeight(lang);
+
+            default_material = default_material || {};
 
             return (
                 <div className="setup-panel operating-panel">
