@@ -5,8 +5,11 @@ define([
     'jsx!widgets/Select',
     'jsx!views/laser/Setup-Panel',
     'jsx!views/laser/Image-Panel',
+    'jsx!widgets/File-Uploader',
     'jsx!widgets/Modal',
-    'jsx!views/Print-Selector'
+    'jsx!views/Print-Selector',
+    'jsx!widgets/Alert',
+    'jsx!widgets/Button-Group'
 ], function(
     $,
     React,
@@ -14,8 +17,11 @@ define([
     SelectView,
     SetupPanel,
     ImagePanel,
+    FileUploader,
     Modal,
-    PrinterSelector
+    PrinterSelector,
+    Alert,
+    ButtonGroup
 ) {
     'use strict';
 
@@ -23,18 +29,28 @@ define([
         args = args || {};
 
         var view = React.createClass({
-
-                _onRunLaser: function(settings) {
+                // UI events
+                _onRunLaser: function() {
                     this.setState({
                         openPrinterSelectorWindow: true,
-                        settings: settings
+                        settings: this.refs.setupPanel.getSettings()
                     });
                 },
 
-                _onExport: function(settings) {
-                    this.props.laserEvents.export(settings);
+                _onExport: function() {
+                    this.state.laserEvents.export(this.refs.setupPanel.getSettings());
                 },
 
+                _onDropUpload: function(e) {
+                    e.preventDefault();
+
+                    var updatedFiles = e.originalEvent.dataTransfer.files;
+
+                    e.target.files = updatedFiles;
+                    this.refs.fileUploader.readFiles(e, updatedFiles);
+                },
+
+                // Private events
                 _openBlocker: function(is_open) {
                     this.setState({
                         openBlocker: is_open
@@ -43,10 +59,11 @@ define([
 
                 _inactiveSelectImage: function(e) {
                     if (e.target === e.currentTarget) {
-                        this.props.laserEvents.inactiveAllImage();
+                        this.state.laserEvents.inactiveAllImage();
                     }
                 },
 
+                // Lifecycle
                 _renderStageSection: function() {
                     var lang = args.state.lang,
                         cx = React.addons.classSet,
@@ -60,23 +77,20 @@ define([
                                 ref="imagePanel"
                                 mode={this.state.mode}
                                 className={image_panel_class}
-                                onThresholdChanged={this.props.laserEvents.thresholdChanged}
-                                onTransform={this.props.laserEvents.imageTransform}
+                                onThresholdChanged={this.state.laserEvents.thresholdChanged}
+                                onTransform={this.state.laserEvents.imageTransform}
                             /> :
                             ''
                         );
 
                     return (
-                        <section id="operation-table" className="operation-table">
-                            <div className="laser-object border-circle" onClick={this._inactiveSelectImage}/>
+                        <section ref="operationTable" id="operation-table" className="operation-table">
+                            <div ref="laserObject" className="laser-object border-circle" onClick={this._inactiveSelectImage}/>
                             <SetupPanel
                                 lang={lang}
                                 mode={this.state.mode}
                                 className='operating-panel'
                                 hasImage={this.state.hasImage}
-                                onRunLaser={this._onRunLaser}
-                                onExport={this._onExport}
-                                uploadProcess={this.props.laserEvents}
                                 ref="setupPanel"
                             />
                             {imagePanel}
@@ -92,7 +106,7 @@ define([
                                 openPrinterSelectorWindow: false
                             });
 
-                            self.props.laserEvents.handleLaser(self.state.settings);
+                            self.state.laserEvents.handleLaser(self.state.settings);
                         },
                         onClose = function(e) {
                             self.setState({
@@ -116,6 +130,89 @@ define([
                     );
                 },
 
+                _renderAlert: function(lang) {
+                    var self = this,
+                        onClose = function() {
+                            self.setState({
+                                openAlert: false
+                            });
+                        },
+                        buttons = [
+                            {
+                                label: lang.laser.close_alert,
+                                onClick: onClose
+                            }
+                        ],
+                        content = (
+                            <Alert
+                                lang={lang}
+                                caption={self.state.alertContents.caption}
+                                message={self.state.alertContents.message}
+                                buttons={buttons}
+                            />
+                        );
+
+                    return (
+                        true === self.state.openAlert ?
+                        <Modal content={content} disabledEscapeOnBackground={true} onClose={onClose}/> :
+                        ''
+                    );
+                },
+
+                _renderFileUploader: function(lang) {
+                    var self = this,
+                        uploadStyle = false === self.state.hasImage ? 'file-importer absolute-center' : 'hide',
+                        onError = function(msg) {
+                            self.setState({
+                                openAlert: true,
+                                alertContents: {
+                                    caption: 'Error',
+                                    message: msg
+                                }
+                            });
+                        };
+
+                    return (
+                        <div className={uploadStyle}>
+                            <lable>{lang.laser.import}</lable>
+                            <FileUploader
+                                ref="fileUploader"
+                                accept="image/*"
+                                multiple={true}
+                                onReadFileStarted={this.state.laserEvents.onReadFileStarted}
+                                onReadingFile={this.state.laserEvents.onFileReading}
+                                onReadEnd={this.state.laserEvents.onFileReadEnd}
+                                onError={onError}
+                            />
+                        </div>
+                    );
+                },
+
+                _renderActionButtons: function(lang) {
+                    var cx = React.addons.classSet,
+                        buttons = [{
+                            label: lang.laser.get_fcode,
+                            className: cx({
+                                'btn-disabled': !this.state.hasImage,
+                                'btn-hexagon': true,
+                                'btn-get-fcode': true
+                            }),
+                            onClick: this._onExport
+                        }, {
+                            label: lang.laser.go,
+                            className: cx({
+                                'btn-disabled': !this.state.hasImage,
+                                'btn-hexagon': true,
+                                'btn-go': true
+                            }),
+                            onClick: this._onRunLaser
+                        }];
+
+                    return (
+                        <ButtonGroup buttons={buttons}/>
+                    );
+                },
+
                 render: function() {
                     var self = this,
                         lang = args.state.lang,
@@ -125,7 +222,10 @@ define([
                             this._renderPrinterSelectorWindow(lang) :
                             ''
                         ),
-                        blocker = this._renderBlocker(lang);
+                        uploader = this._renderFileUploader(lang),
+                        blocker = this._renderBlocker(lang),
+                        actionButtons = this._renderActionButtons(lang),
+                        alert = this._renderAlert(lang);
 
                     return (
                         <div className="studio-container laser-studio">
@@ -133,18 +233,16 @@ define([
 
                             <div className="stage">
                                 {stageSection}
+                                {actionButtons}
                             </div>
 
+                            {uploader}
                             {blocker}
+                            {alert}
                         </div>
                     );
                 },
 
-                getDefaultProps: function () {
-                    return {
-                        laserEvents: React.PropTypes.object,
-                    };
-                },
                 getInitialState: function() {
                     return {
                         step: '',
@@ -153,37 +251,43 @@ define([
                         selectedPrinter: 0,
                         openPrinterSelectorWindow: false,
                         openBlocker: false,
-                        settings: {}
+                        openAlert: false,
+                        alertContents: {},
+                        settings: {},
+                        laserEvents: laserEvents.call(this, args)
                     };
                 },
 
                 componentDidMount: function() {
                     var self = this,
-                        _laserEvents = laserEvents.call(this, args);
+                        $operationTable = $(self.refs.operationTable.getDOMNode());
 
-                    this.setProps({
-                        laserEvents: _laserEvents
+                    $operationTable.on('dragover dragend', function(e) {
+                        e.preventDefault();
                     });
+                    $operationTable.on('drop', self._onDropUpload);
 
-                    _laserEvents.menuFactory.items.import.onClick = function() {
+                    self.state.laserEvents.setPlatform(self.refs.laserObject.getDOMNode());
+
+
+                    self.state.laserEvents.menuFactory.items.import.onClick = function() {
                         self.refs.setupPanel.refs.fileUploader.getDOMNode().click();
                     };
 
-                    _laserEvents.menuFactory.items.execute.enabled = false;
-                    _laserEvents.menuFactory.items.execute.onClick = function() {
+                    self.state.laserEvents.menuFactory.items.execute.enabled = false;
+                    self.state.laserEvents.menuFactory.items.execute.onClick = function() {
                         self.refs.setupPanel._onRunLaser();
                     };
 
-                    _laserEvents.menuFactory.items.saveGCode.enabled = false;
-                    _laserEvents.menuFactory.items.saveGCode.onClick = function() {
+                    self.state.laserEvents.menuFactory.items.saveGCode.enabled = false;
+                    self.state.laserEvents.menuFactory.items.saveGCode.onClick = function() {
                         self.refs.setupPanel._onExport();
                     };
                 },
 
                 componentWillUnmount: function () {
-                    this.props.laserEvents.destroySocket();
+                    this.state.laserEvents.destroySocket();
                 }
-
             });
 
         return view;
