@@ -352,6 +352,8 @@ define(function() {
             start_engrave: 'Engrave',
             start_cut: 'Cut',
             close_alert: 'Close',
+            get_fcode: 'Get Fcode',
+            go: 'GO',
             print_params: {
                 object_height: {
                     text: 'Object Height',

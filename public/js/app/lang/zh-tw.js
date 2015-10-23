@@ -352,6 +352,8 @@ define(function() {
             start_engrave: '雕刻',
             start_cut: '切割',
             close_alert: '關閉',
+            get_fcode: 'Get Fcode',
+            go: 'GO',
             print_params: {
                 object_height: {
                     text: '物體高度',
