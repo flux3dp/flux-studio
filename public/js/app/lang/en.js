@@ -351,6 +351,7 @@ define(function() {
             button_advanced: 'Advanced',
             start_engrave: 'Engrave',
             start_cut: 'Cut',
+            close_alert: 'Close',
             print_params: {
                 object_height: {
                     text: 'Object Height',

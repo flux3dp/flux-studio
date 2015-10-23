@@ -351,6 +351,7 @@ define(function() {
             button_advanced: '進階',
             start_engrave: '雕刻',
             start_cut: '切割',
+            close_alert: '關閉',
             print_params: {
                 object_height: {
                     text: '物體高度',
@@ -399,7 +400,7 @@ define(function() {
                         options: [
                             {
                                 value: 'wood',
-                                label: '木',
+                                label: '木材',
                                 selected: true,
                                 data: {
                                     laser_speed: 5,
