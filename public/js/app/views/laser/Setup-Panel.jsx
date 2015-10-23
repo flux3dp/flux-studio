@@ -3,16 +3,31 @@ define([
     'react',
     'jsx!widgets/Select',
     'jsx!widgets/Modal',
-    'jsx!widgets/File-Uploader',
     'jsx!views/laser/Advanced-Panel',
     'jsx!widgets/Text-Toggle',
     'helpers/api/config'
-], function($, React, SelectView, Modal, FileUploader, AdvancedPanel, TextToggle, config) {
+], function($, React, SelectView, Modal, AdvancedPanel, TextToggle, config) {
     'use strict';
 
     return React.createClass({
         _advancedSettings: undefined,
 
+        // Public
+        getSettings: function() {
+            var settings = this._advancedSettings;
+
+            if ('undefined' === typeof settings) {
+                settings = JSON.parse(JSON.stringify($(this.refs.material.getDOMNode()).find('option:selected').data('meta')));
+            }
+
+            delete settings.material;
+            settings.object_height = this.refs.objectHeight.getDOMNode().value;
+            settings.power = settings.power / 255;
+
+            return settings;
+        },
+
+        // Private
         _getSelectedMaterial: function(value) {
             var props = this.props,
                 lang = props.lang,
@@ -25,12 +40,12 @@ define([
             return (0 < selected_material.length ? selected_material[0] : undefined);
         },
 
+        // UI Events
         _toggleAdvancedPanel: function(open) {
             var self = this;
 
             return function(material_name) {
                 material_name = material_name || '';
-
                 self.setState({
                     openAdvancedPanel: open,
                     defaultMaterial: self._getSelectedMaterial(material_name)
@@ -45,20 +60,6 @@ define([
             this._toggleAdvancedPanel(true)(selected_value);
         },
 
-        _getSettings: function() {
-            var settings = this._advancedSettings;
-
-            if ('undefined' === typeof settings) {
-                settings = JSON.parse(JSON.stringify($(this.refs.material.getDOMNode()).find('option:selected').data('meta')));
-            }
-
-            delete settings.material;
-            settings.object_height = this.refs.objectHeight.getDOMNode().value;
-            settings.power = settings.power / 255;
-
-            return settings;
-        },
-
         _onAdvanceDone: function(settings) {
             this._advancedSettings = settings;
 
@@ -66,15 +67,15 @@ define([
         },
 
         _onRunLaser: function() {
-            var settings = this._getSettings();
+            var settings = this.getSettings();
 
             this.props.onRunLaser(settings);
         },
 
         _onExport: function() {
-            var settings = this._getSettings();
+            var settings = this.getSettings();
 
-            this.props.onExport(settings)
+            this.props.onExport(settings);
         },
 
         _onObjectHeightBlur: function(e) {
@@ -103,58 +104,6 @@ define([
             );
         },
 
-        _renderButtons: function(lang) {
-            var props = this.props,
-                cx = React.addons.classSet,
-                mode = ('engrave' === props.mode ? lang.laser.start_engrave : lang.laser.start_cut),
-                laser_class = cx({
-                    'btn btn-action btn-full-width btn-start': true
-                }),
-                import_class = cx({
-                    'btn btn-action btn-full-width file-importer': true
-                }),
-                export_file_class = cx({
-                    'btn btn-action btn-full-width fa fa-floppy-o': true
-                }),
-                laserButton = (
-                    true === props.hasImage ?
-                    <button data-ga-event="running-laser" className={laser_class} onClick={this._onRunLaser}>
-                        <img src="/img/icon-laser-s.png"/>
-                        {mode}
-                    </button> :
-                    ''
-                ),
-                importButton = (
-                    <div className={import_class}>
-                        <lable className="fa fa-plus">{lang.laser.import}</lable>
-                        <FileUploader
-                            ref="fileUploader"
-                            accept="image/*"
-                            multiple={true}
-                            onReadFileStarted={this.props.uploadProcess.onReadFileStarted}
-                            onReadingFile={this.props.uploadProcess.onFileReading}
-                            onReadEnd={this.props.uploadProcess.onFileReadEnd}
-                            onError={function() {
-                                console.log('error');
-                            }}
-                        />
-                    </div>
-                ),
-                saveButton = (
-                    true === props.hasImage ?
-                    <button ref="saveas" data-ga-event="save-laser-gcode" className={export_file_class} onClick={this._onExport}>{lang.laser.save}</button> :
-                    ''
-                );
-
-            return (
-                <div className="action-buttons">
-                    {laserButton}
-                    {importButton}
-                    {saveButton}
-                </div>
-            );
-        },
-
         _renderObjectHeight: function(lang) {
             return (
                 <input ref="objectHeight" className="text-center control" type="number" min="0" max="100" step="0.1" defaultValue="" readOnly={!this.state.isReady}
@@ -174,24 +123,26 @@ define([
 
             config().read('custom-material', {
                 onFinished: function(response) {
-                    var data = JSON.parse(response || '{}'),
-                        materials = self.state.materials,
-                        customIndex = materials.findIndex(function(el) {
-                            return el.value === 'custom';
-                        });
+                    if ('' !== response) {
+                        var data = response,
+                            materials = self.state.materials,
+                            customIndex = materials.findIndex(function(el) {
+                                return el.value === 'custom';
+                            });
 
-                    data.label = self.props.lang.laser.custom;
+                        data.label = self.props.lang.laser.custom;
 
-                    if (-1 === customIndex) {
-                        materials.forEach(function(el) {
-                            el.selected = false;
-                        });
+                        if (-1 === customIndex) {
+                            materials.forEach(function(el) {
+                                el.selected = false;
+                            });
 
-                        materials.push(data);
+                            materials.push(data);
 
-                        self.setState({
-                            materials: materials
-                        });
+                            self.setState({
+                                materials: materials
+                            });
+                        }
                     }
                 }
             });
@@ -201,7 +152,6 @@ define([
             var props = this.props,
                 lang = props.lang,
                 cx = React.addons.classSet,
-                buttons = this._renderButtons(lang),
                 default_material = (
                     this.state.defaultMaterial ||
                     lang.laser.advanced.form.object_options.options.filter(
@@ -267,9 +217,6 @@ define([
         getDefaultProps: function() {
             return {
                 settingMaterial: React.PropTypes.object,
-                uploadProcess: React.PropTypes.object,
-                onRunLaser: React.PropTypes.func,
-                onExport: React.PropTypes.func,
                 hasImage: React.PropTypes.bool,
                 mode: React.PropTypes.string
             };
