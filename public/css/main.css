@@ -2654,6 +2654,11 @@ input[type=range]:focus::-webkit-slider-runnable-track {
 .btn-large {
     width: 270px; }
 
+/* special shape button */
+.btn-hexagon {
+    -webkit-clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); }
+
 /* button helper */
 .btn-multiline-text {
     line-height: initial;
@@ -4497,6 +4502,35 @@ input.switch:checked ~ label:after {
     bottom: 4.3rem;
     right: 15rem; }
 
+.laser-studio .file-importer {
+    display: -webkit-box;
+    /* OLD - iOS 6-, Safari 3.1-6 */
+    display: -webkit-flex;
+    /* NEW - Chrome */
+    display: flex;
+    /* NEW, Spec - Opera 12.1, Firefox 20+ */
+    background: #fff;
+    color: #E1E1E0;
+    font-size: 23px;
+    height: 37.8px;
+    top: -78px;
+    width: 126.9px;
+    align-items: center;
+    justify-content: center; }
+    .laser-studio .file-importer:after {
+        border: solid transparent;
+        border-color: rgba(255, 255, 255, 0);
+        border-top-color: #fff;
+        border-width: 22px 13px;
+        content: " ";
+        height: 0;
+        left: 50%;
+        margin-left: -15px;
+        pointer-events: none;
+        position: absolute;
+        top: 100%;
+        width: 0; }
+
 .laser-studio .operation-table {
     display: -webkit-box;
     /* OLD - iOS 6-, Safari 3.1-6 */
@@ -4511,7 +4545,8 @@ input.switch:checked ~ label:after {
 .laser-studio .operating-panel {
     margin: 0 0 0 30px;
     position: static;
-    align-self: center; }
+    align-self: center;
+    width: 205px; }
     .laser-studio .operating-panel li {
         color: #b3b3b3;
         font-size: 1.8rem;
@@ -4536,7 +4571,36 @@ input.switch:checked ~ label:after {
     margin: 0 5px 0 0; }
 
 .laser-studio .stage {
-    background: #d6d6d6; }
+    background: #E0E0E0; }
+
+.laser-studio .button-group {
+    bottom: 28px;
+    position: fixed;
+    right: 78px; }
+    .laser-studio .button-group .btn-disabled {
+        background: #CCCCCC; }
+
+.laser-studio .btn-default {
+    background: #B3B3B3;
+    border: none;
+    border-radius: 0;
+    color: #EEE;
+    display: block;
+    font-size: 21px;
+    height: 100px;
+    line-height: 20px;
+    margin: 0;
+    min-width: 87px;
+    position: relative;
+    width: 87px; }
+    .laser-studio .btn-default:hover {
+        background: #000; }
+
+.laser-studio .btn-go {
+    font-size: 35px;
+    background: #4D4D4D;
+    left: 50px;
+    top: -21px; }
 
 .laser-studio .btn-h-group {
     height: 100%;
