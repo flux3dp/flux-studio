@@ -61,12 +61,6 @@ define([
                             <input type="number" min="0" max="360" ref="objectAngle" data-type="angle" className="span4" onChange={this._onTransform}/>
                         </p>
                     </div>
-                    <div className="controls">
-                        <div className="control">
-                            <label className="caption span4">{lang.laser.object_params.unit.text}</label>
-                            <RadioGroupView className="span8 radio-group" name="object-unit" ref="objectUnit" options={lang.laser.object_params.unit.options}/>
-                        </div>
-                    </div>
                     {threshold}
                 </div>
             );
