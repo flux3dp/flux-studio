@@ -36,8 +36,8 @@ define([
             bitmapWebSocket,
             svgWebSocket,
             LASER_IMG_CLASS = 'img-container',
-            $laser_platform = $('.laser-object'),
-            PLATFORM_DIAMETER_PIXEL = $laser_platform.width(),
+            $laser_platform,
+            PLATFORM_DIAMETER_PIXEL,
             deleteImage = function() {
                 var $img_container = $('.' + LASER_IMG_CLASS).not($target_image),
                     $img = $target_image,
@@ -510,7 +510,7 @@ define([
             onReadFileStarted: function(e) {
                 var firstFile = e.target.files.item(0),
                     setupPanel = self.refs.setupPanel,
-                    extension = setupPanel.refs.fileUploader.getFileExtension(firstFile.name),
+                    extension = self.refs.fileUploader.getFileExtension(firstFile.name),
                     currentFileFormat = self.props.fileFormat;
 
                 if ('string' !== typeof currentFileFormat) {
@@ -598,7 +598,11 @@ define([
 
                 $target_image.freetrans(args);
             },
-            menuFactory: menuFactory
+            menuFactory: menuFactory,
+            setPlatform: function(el) {
+                $laser_platform = $(el);
+                PLATFORM_DIAMETER_PIXEL = $laser_platform.width();
+            }
         };
     };
 });
