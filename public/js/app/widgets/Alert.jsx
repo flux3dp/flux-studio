@@ -1,20 +1,12 @@
-define(['react'], function(React){
+define(['react', 'jsx!widgets/Button-Group'], function(React, ButtonGroup) {
     'use strict';
 
     return React.createClass({
 
-        _renderButtonGroup: function() {
-            var buttons = this.props.buttons.map(function(opt, i) {
-                return (
-                    <button className="btn btn-default" onClick={opt.onClick}>{opt.label}</button>
-                );
-            }, this);
-
-            return (<div className="button-group">{buttons}</div>);
-        },
-
         render: function() {
-            var buttonsGroup = this._renderButtonGroup(),
+            var buttonsGroup = (
+                    <ButtonGroup buttons={this.props.buttons}/>
+                ),
                 caption = (
                     '' !== this.props.caption ?
                     <h2 className="caption">{this.props.caption}</h2> :
