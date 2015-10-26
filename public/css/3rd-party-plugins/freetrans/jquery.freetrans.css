@@ -7,7 +7,7 @@
 }
 
 .ft-controls {
-    cursor: move;
+    cursor: -webkit-grabbing;
 	position: absolute;
 	width: 100%;
 	height: 100%;
@@ -71,7 +71,7 @@
     background-color: #fff;
     border: 1px solid #626262;
     border-radius: 50%;
-    cursor: -webkit-grabbing;
+    cursor: url(rotate.svg) 13 13, default;
     position: absolute;
     width: 8px;
     height: 8px;
