@@ -398,7 +398,7 @@ define([
                         $target_image = $self.parent().find('.' + LASER_IMG_CLASS);
                         refreshObjectParams({ freetransEventType: 'move' }, $target_image);
 
-                        $self.addClass('image-active');
+                        $target_image.addClass('image-active');
                         menuFactory.items.copy.enabled = true;
                         menuFactory.items.copy.onClick = function() {
                             menuFactory.items.paste.enabled = true;

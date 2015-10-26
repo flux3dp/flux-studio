@@ -133,6 +133,7 @@
                 // generate all the controls markup
                 var markup = '';
                 markup +=                 '<div class="ft-controls">';
+                markup +=                         '<div class="ft-rotator-line"></div>';
                 markup +=                         '<div class="ft-rotator"></div>';
                 markup +=                         '<div class="ft-scaler ft-scaler-top ft-scaler-left ft-scaler-tl"></div>';
                 markup +=                         '<div class="ft-scaler ft-scaler-top ft-scaler-right ft-scaler-tr"></div>';

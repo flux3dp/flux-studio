@@ -138,19 +138,23 @@
         width: 520px;
     }
 
-    .laser-object .ft-container {
-        z-index: 1;
-    }
+    .laser-object {
+        .ft-container {
+            z-index: 1;
+        }
 
-    .laser-object .image-active {
-        background: rgba(255, 255, 255, .6);
-        outline: 5px dashed #bbb;
-        z-index: -1;
-    }
+        .ft-widget {
+            cursor: move;
+            position: fixed;
+        }
 
-    .laser-object .ft-widget {
-        cursor: move;
-        position: fixed;
+        .image-active {
+            background: rgba(255, 255, 255, .6);
+
+            & + .ft-controls {
+                outline: 1px solid #626262;
+            }
+        }
     }
 
     .zoom .btn {

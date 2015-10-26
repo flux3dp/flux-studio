@@ -15,16 +15,15 @@
 }
 
 .ft-scaler {
-    cursor: crosshair;
     position: absolute;
     width: 8px;
     height: 8px;
     background-color: #fff;
-    border: 1px solid #ccc;
+    border: 1px solid #626262;
 }
 
 .ft-scaler-top {
-    top: -8px;
+    top: -4px;
 }
 
 .ft-scaler-mid {
@@ -32,11 +31,11 @@
 }
 
 .ft-scaler-bottom {
-    bottom: -8px;
+    bottom: -4px;
 }
 
 .ft-scaler-left {
-    left: -8px;
+    left: -4px;
 }
 
 .ft-scaler-center {
@@ -44,15 +43,47 @@
 }
 
 .ft-scaler-right {
-    right: -8px;
+    right: -4px;
 }
 
-.ft-rotator{
+/* cursors */
+.ft-scaler-tl,
+.ft-scaler-br {
+    cursor: nwse-resize;
+}
+
+.ft-scaler-tr,
+.ft-scaler-bl {
+    cursor: nesw-resize;
+}
+
+.ft-scaler-tc,
+.ft-scaler-bc {
+    cursor: ns-resize;
+}
+
+.ft-scaler-ml,
+.ft-scaler-mr {
+    cursor: ew-resize;
+}
+
+.ft-rotator {
+    background-color: #fff;
+    border: 1px solid #626262;
+    border-radius: 50%;
     cursor: -webkit-grabbing;
     position: absolute;
-    width: 16px;
+    width: 8px;
+    height: 8px;
+    left: calc(50% - 4px);
+    top: -20px;
+}
+
+.ft-rotator-line {
+    border: none;
+    border-right: 1px solid #626262;
     height: 16px;
-    left: calc(50% - 8px);
-    top: -24px;
-    background-image: url('./rotate_ccw.png');
+    left: calc(50% - 0.5px);
+    position: absolute;
+    bottom: 100%;
 }
