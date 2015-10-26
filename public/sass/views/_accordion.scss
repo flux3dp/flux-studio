@@ -1,0 +1,22 @@
+.accordion {
+
+    .accordion-body {
+        display: block;
+        height: 0;
+        overflow: hidden;
+        transform: scaleY(0);
+        -webkit-transition: all .3s ease;
+        transition: all .3s ease;
+        -webkit-transform-origin: 0 0;
+        transform-origin: 0 0;
+    }
+
+    .accordion-switcher {
+        display: none;
+    }
+
+    .accordion-switcher:checked ~ .accordion-body {
+        height: auto;
+        transform: scaleY(1);
+    }
+}
