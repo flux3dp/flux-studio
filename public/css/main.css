@@ -2934,6 +2934,23 @@ input[type=range]:focus::-webkit-slider-runnable-track {
             display: block;
             width: 2.75rem; }
 
+.accordion .accordion-body {
+    display: block;
+    height: 0;
+    overflow: hidden;
+    transform: scaleY(0);
+    -webkit-transition: all 0.3s ease;
+    transition: all 0.3s ease;
+    -webkit-transform-origin: 0 0;
+    transform-origin: 0 0; }
+
+.accordion .accordion-switcher {
+    display: none; }
+
+.accordion .accordion-switcher:checked ~ .accordion-body {
+    height: auto;
+    transform: scaleY(1); }
+
 .print-studio {
     padding: 0; }
     .print-studio .center {
@@ -4629,10 +4646,21 @@ input.switch:checked ~ label:after {
     cursor: move;
     position: fixed; }
 
+.laser-studio .laser-object .ft-rotator,
+.laser-studio .laser-object .ft-rotator-line,
+.laser-studio .laser-object .ft-scaler {
+    display: none; }
+
 .laser-studio .laser-object .image-active {
     background: rgba(255, 255, 255, 0.6); }
     .laser-studio .laser-object .image-active + .ft-controls {
         outline: 1px solid #626262; }
+    .laser-studio .laser-object .image-active + .ft-controls {
+        outline: 1px solid #626262; }
+        .laser-studio .laser-object .image-active + .ft-controls .ft-rotator,
+        .laser-studio .laser-object .image-active + .ft-controls .ft-rotator-line,
+        .laser-studio .laser-object .image-active + .ft-controls .ft-scaler {
+            display: block; }
 
 .laser-studio .zoom .btn {
     height: 28px;
@@ -4647,38 +4675,36 @@ input.switch:checked ~ label:after {
 .laser-studio .panel {
     position: absolute; }
 
-.laser-studio .print-params,
 .laser-studio .object-position {
-    background: #eee; }
-
-.laser-studio .object-position {
-    padding: 20px;
-    right: 25px;
-    top: 20px;
-    width: 214px; }
-    .laser-studio .object-position .control:nth-child(odd) {
-        margin: 0 0 4px 0; }
-    .laser-studio .object-position .control:nth-child(even) {
-        margin: 0 0 14px 0; }
-    .laser-studio .object-position input,
-    .laser-studio .object-position .radio-group,
+    font-size: 20px;
+    width: 230px; }
     .laser-studio .object-position .caption,
-    .laser-studio .object-position .unit {
-        font-size: 11px; }
-    .laser-studio .object-position .unit {
-        color: #777; }
-    .laser-studio .object-position .radio-group input[type="radio"] {
-        display: none; }
-    .laser-studio .object-position .radio-group input[type="radio"] + span {
-        border-radius: 10px;
-        color: #9b9b9b;
-        cursor: pointer;
-        display: inline-block;
-        font-size: 14px;
-        padding: 10px; }
-    .laser-studio .object-position .radio-group input[type="radio"]:checked + span {
-        background: #c1c1c1;
-        color: #000; }
+    .laser-studio .object-position .controls {
+        margin: 0; }
+    .laser-studio .object-position .controls {
+        background: #FFFFFF;
+        display: block;
+        margin: 0 0 3px 0;
+        padding: 0 20px; }
+    .laser-studio .object-position .control {
+        margin: 0 0 10px 0; }
+        .laser-studio .object-position .control .header {
+            color: #E0E0DF; }
+    .laser-studio .object-position .caption {
+        display: -webkit-box;
+        /* OLD - iOS 6-, Safari 3.1-6 */
+        display: -webkit-flex;
+        /* NEW - Chrome */
+        display: flex;
+        /* NEW, Spec - Opera 12.1, Firefox 20+ */
+        justify-content: space-between;
+        color: #B3B3B3;
+        font-size: 12px;
+        line-height: 30px; }
+    .laser-studio .object-position input {
+        border: 1px solid #E0E0DF;
+        color: #B3B3B3;
+        font-size: 15px; }
 
 .laser-studio .objects-params {
     left: 25px; }
