@@ -1,0 +1,138 @@
+
+    .controls {
+        overflow: hidden;
+
+        .label {
+            color: #B3B3B3;
+            font-size: 13px;
+            line-height: 40px;
+        }
+        .control {
+            line-height: 40px;
+            position: relative;
+        }
+        .control > div {
+            display: inline-block;
+            margin-right: 30px;
+            color: #B3B3B3;
+            size: 13px;
+        }
+        .radio {
+            width: 15px;
+            height: 15px;
+            background-color: #E0E0DF;
+            background-size: 15px 15px;
+            display: inline-block;
+            margin-right: 15px;
+        }
+        .switch-container {
+            margin-left: 30px;
+            position: relative;
+            div {
+                display: inline-block;
+            }
+            .onoffswitch {
+                position: absolute;
+                top: 9px;
+                left: 42px;
+            }
+        }
+        .dropdown-container {
+            position: absolute;
+            top: 5px;
+            left: 130px;
+            line-height: 20px;
+            margin-right: 0;
+            select {
+                width: 270px;
+                -webkit-appearance: none;
+                -moz-appearance: none;
+                appearance: none;
+                background: url('/img/arrow-down.png')  no-repeat;
+                background-position: 245px 9px;
+                background-size: 16px 10px;
+                height: 30px;
+                border-radius: 0;
+                border: 2px solid #E0E0DF;
+            }
+        }
+        .textarea-container {
+            margin-right: 0;
+            width: 100%;
+            height: 335px;
+            textarea {
+                width: 100%;
+                height: 100%;
+                line-height: 20px;
+                border: 2px solid #E0E0DF;
+            }
+        }
+        input {
+            width: 90px;
+            height: 30px;
+            font-size: 15px;
+            color: #B3B3B3;
+        }
+        input[type=text] {
+            padding-left: 10px;
+            border: 2px solid #E0E0DF;
+        }
+        select {
+            border: 1px solid #d8d8d8;
+            background-image: url("/img/icon-3d-arrow-down.png");
+            background-repeat: no-repeat;
+            background-size: 8px 8px;
+            background-color: transparent;
+            background-position: 150px 8px;
+            width: 170px;
+            height: 25px;
+            letter-spacing: 0.3px;
+            font-size: 14px;
+            -webkit-appearance: none;
+            appearance: none;
+            padding-left: 10px;
+        }
+        .slider-container {
+            margin-right: 20px;
+            position: relative;
+            .slider {
+                width: 150px;
+                position: absolute;
+                right: 0;
+                top: -20px;
+            }
+        }
+
+        // for slider
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            margin: 0;
+        }
+        input[type=range]:focus {
+            outline: none;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 3px;
+            cursor: pointer;
+            box-shadow: 3.7px 3.7px 0 #ffffff, 0 0 3.7px #fff;
+            background-color: #E0E0DF;
+            border-radius: 0;
+            border: 0 solid rgba(0, 0, 0, 0);
+        }
+        input[type=range]::-webkit-slider-thumb {
+            box-shadow: 0 0 0 rgba(0, 0, 0, 0), 0 0 0 rgba(130, 13, 13, 0);
+            border: 2.5px solid #B3B3B3;
+            height: 13px;
+            width: 13px;
+            border-radius: 12px;
+            background: #B3B3B3;
+            cursor: pointer;
+            -webkit-appearance: none;
+            margin-top: -5px;
+        }
+        input[type=range]:focus::-webkit-slider-runnable-track {
+            background: #E0E0DF;
+        }
+    }
