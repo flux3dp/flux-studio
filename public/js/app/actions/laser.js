@@ -174,8 +174,9 @@ define([
                 return px;
             },
             refreshObjectParams = function(e, $el) {
-                var el_position,
+                var el_position, el_offset_position,
                     last_x, last_y,
+                    position, size, angle,
                     platform_pos = $laser_platform.box(),
                     imagePanelRefs = self.refs.imagePanel.refs,
                     outOfRange = function(point, limit) {
@@ -188,6 +189,7 @@ define([
 
                 if (null !== $el) {
                     el_position = $el.box();
+                    el_offset_position = $el.box(true);
 
                     if ('move' === e.freetransEventType) {
                         if (true === outOfRange(el_position.center, DIAMETER)) {
@@ -208,11 +210,31 @@ define([
                         refreshImage($el, getThreshold().getDOMNode().value);
                     }
 
-                    imagePanelRefs.objectAngle.getDOMNode().value = elementAngle($el[0]);
-                    imagePanelRefs.objectPosX.getDOMNode().value = convertToRealCoordinate(el_position.center.x, 'x').toString().substr(0, 4);
-                    imagePanelRefs.objectPosY.getDOMNode().value = convertToRealCoordinate(el_position.center.y, 'y').toString().substr(0, 4);
-                    imagePanelRefs.objectSizeW.getDOMNode().value = (el_position.width / PLATFORM_DIAMETER_PIXEL * DIAMETER).toString().substr(0, 4);
-                    imagePanelRefs.objectSizeH.getDOMNode().value = (el_position.height / PLATFORM_DIAMETER_PIXEL * DIAMETER).toString().substr(0, 4);
+                    position = {
+                        x: convertToRealCoordinate(el_position.center.x, 'x').toString().substr(0, 5),
+                        y: convertToRealCoordinate(el_position.center.y, 'y').toString().substr(0, 5)
+                    }
+                    size = {
+                        width: (el_position.width / PLATFORM_DIAMETER_PIXEL * DIAMETER).toString().substr(0, 5),
+                        height: (el_position.height / PLATFORM_DIAMETER_PIXEL * DIAMETER).toString().substr(0, 5)
+                    };
+                    angle = elementAngle($el[0]);
+
+                    self.setState({
+                        imagePanel: {
+                            x: 20,
+                            y: el_offset_position.right + 10
+                        },
+                        position: position,
+                        size: size,
+                        angle: angle
+                    });
+
+                    imagePanelRefs.objectAngle.getDOMNode().value = angle;
+                    imagePanelRefs.objectPosX.getDOMNode().value = position.x;
+                    imagePanelRefs.objectPosY.getDOMNode().value = position.y;
+                    imagePanelRefs.objectSizeW.getDOMNode().value = size.width;
+                    imagePanelRefs.objectSizeH.getDOMNode().value = size.height;
                 }
             },
             $target_image = null, // changing when image clicked
@@ -376,9 +398,9 @@ define([
                     refreshObjectParams({ freetransEventType: 'move' }, $img);
                 }
 
-                // onmousedown
+                // onclick
                 (function(file, size, originalUrl, name, $img) {
-                    $img.parent().find('.ft-controls').on('mousedown', function(e) {
+                    $img.parent().find('.ft-controls').on('click', function(e) {
                         var $self = $(e.target),
                             clone = function() {
                                 var data = $img.data('freetrans');
@@ -397,6 +419,10 @@ define([
                         inactiveAllImage();
                         $target_image = $self.parent().find('.' + LASER_IMG_CLASS);
                         refreshObjectParams({ freetransEventType: 'move' }, $target_image);
+
+                        self.setState({
+                            selectedImage: true
+                        });
 
                         $target_image.addClass('image-active');
                         menuFactory.items.copy.enabled = true;
@@ -471,6 +497,10 @@ define([
             menuFactory.items.copy.enabled = false;
             menuFactory.items.cut.enabled = false;
             menuFactory.items.duplicate.enabled = false;
+
+            self.setState({
+                selectedImage: false
+            });
         }
 
         return {
@@ -574,6 +604,7 @@ define([
                     type = $el.data('type'),
                     val = $el.val(),
                     freetrans = $target_image.data('freetrans'),
+                    pos = $target_image.box(true),
                     args = {};
 
                 val = parseFloat(val, 10);
@@ -595,6 +626,13 @@ define([
                 case 'angle':
                     args.angle = val;
                 }
+
+                self.setState({
+                    imagePanel: {
+                        x: 20,
+                        y: pos.right + 10
+                    }
+                });
 
                 $target_image.freetrans(args);
             },

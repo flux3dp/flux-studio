@@ -68,19 +68,27 @@ define([
                     var lang = args.state.lang,
                         cx = React.addons.classSet,
                         image_panel_class = cx({
-                            'panel object-position': true
+                            'panel object-position': true,
+                            'hide': !this.state.selectedImage
                         }),
+                        inlineStyles = {
+                            top: this.state.imagePanel.x,
+                            left: this.state.imagePanel.y
+                        },
                         imagePanel = (
-                            true === this.state.hasImage ?
                             <ImagePanel
                                 lang={lang}
+                                style={inlineStyles}
                                 ref="imagePanel"
                                 mode={this.state.mode}
                                 className={image_panel_class}
                                 onThresholdChanged={this.state.laserEvents.thresholdChanged}
                                 onTransform={this.state.laserEvents.imageTransform}
-                            /> :
-                            ''
+                                position={this.state.position}
+                                size={this.state.size}
+                                angle={this.state.angle}
+                                threshold={this.state.threshold}
+                            />
                         );
 
                     return (
@@ -248,13 +256,19 @@ define([
                         step: '',
                         mode: 'engrave',
                         hasImage: false,
+                        selectedImage: false,
                         selectedPrinter: 0,
                         openPrinterSelectorWindow: false,
                         openBlocker: false,
                         openAlert: false,
                         alertContents: {},
                         settings: {},
-                        laserEvents: laserEvents.call(this, args)
+                        laserEvents: laserEvents.call(this, args),
+                        imagePanel: {},
+                        position: {},
+                        size: {},
+                        angle: 0,
+                        threshold: 128
                     };
                 },
 
