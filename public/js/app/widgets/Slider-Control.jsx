@@ -4,8 +4,6 @@ define([
 ], function(React, ClassNames) {
     'use strict';
 
-    var lastValidValue;
-
     return React.createClass({
 
         propTypes: {
@@ -20,20 +18,16 @@ define([
 
         getInitialState: function() {
             return {
-                sliderValue: this.props.default
+                sliderValue: this.props.default,
+                lastValidValue: this.props.default
             };
         },
 
         shouldComponentUpdate: function(nextProps, nextState) {
-            console.log('passing:' + nextProps.default, 'current state:' + this.state.sliderValue, 'next State:' + nextState.sliderValue);
             var newPropIsDifferent = nextProps.default !== this.state.sliderValue,
                 newStateIsDifferent = this.state.sliderValue !== nextState.sliderValue;
 
             return newPropIsDifferent || newStateIsDifferent;
-        },
-
-        componentDidMount: function() {
-            lastValidValue = this.props.default;
         },
 
         _fireChange: function(newValue) {
@@ -42,8 +36,10 @@ define([
 
         _validateValue: function(e) {
             if(!this._isValidValue(this.state.sliderValue)) {
-                this.setState({ sliderValue: lastValidValue });
-                this._fireChange(lastValidValue);
+                this.setState({
+                    sliderValue: this.state.lastValidValue,
+                });
+                this._fireChange(this.state.lastValidValue);
             }
         },
 
@@ -56,8 +52,10 @@ define([
 
         _handleSliderChange: function(key, e) {
             var value = e.target.value;
-            this.setState({ sliderValue: value }, function() {
-                lastValidValue = value;
+            this.setState({
+                sliderValue: value,
+                lastValidValue: value
+            }, function() {
                 this._fireChange(value);
             });
         },
@@ -66,7 +64,7 @@ define([
             var newValue = e.target.value;
 
             if(this._isValidValue(newValue)) {
-                lastValidValue = newValue;
+                this.setState({ lastValidValue: newValue });
                 this._fireChange(newValue);
             }
 
@@ -90,6 +88,7 @@ define([
 
                         <input id={this.props.id} type="text" value={this.state.sliderValue}
                             onChange={this._handleEditValue}
+                            onFocus={this._handleEditValue}
                             onBlur={this._validateValue} />
                     </div>
                 </div>
