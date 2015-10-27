@@ -68,14 +68,14 @@ define([
                     var lang = args.state.lang,
                         cx = React.addons.classSet,
                         image_panel_class = cx({
-                            'panel object-position': true,
-                            'hide': !this.state.selectedImage
+                            'panel object-position': true
                         }),
                         inlineStyles = {
                             top: this.state.imagePanel.x,
                             left: this.state.imagePanel.y
                         },
                         imagePanel = (
+                            true === this.state.selectedImage ?
                             <ImagePanel
                                 lang={lang}
                                 style={inlineStyles}
@@ -88,7 +88,8 @@ define([
                                 size={this.state.size}
                                 angle={this.state.angle}
                                 threshold={this.state.threshold}
-                            />
+                            /> :
+                            ''
                         );
 
                     return (
