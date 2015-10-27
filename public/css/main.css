@@ -3701,6 +3701,9 @@ input.switch:checked ~ label:after {
                     width: calc(100% - 20px);
                     margin: auto;
                     top: 200px; }
+                .print-studio .flux-monitor .main .body .content .camera-image {
+                    width: 100%;
+                    height: 249px; }
             .print-studio .flux-monitor .main .body .close {
                 right: 20px; }
         .print-studio .flux-monitor .main .operation {
@@ -3709,7 +3712,7 @@ input.switch:checked ~ label:after {
                 position: absolute;
                 color: #BBB;
                 text-align: center;
-                width: 50px;
+                width: 60px;
                 cursor: pointer; }
                 .print-studio .flux-monitor .main .operation .controls .description {
                     padding-top: 5px;
