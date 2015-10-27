@@ -71,8 +71,8 @@ define([
                             'panel object-position': true
                         }),
                         inlineStyles = {
-                            top: this.state.imagePanel.x,
-                            left: this.state.imagePanel.y
+                            top: this.state.imagePanel.y,
+                            left: this.state.imagePanel.x
                         },
                         imagePanel = (
                             true === this.state.selectedImage ?
