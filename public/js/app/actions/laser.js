@@ -41,7 +41,10 @@ define([
             deleteImage = function() {
                 var $img_container = $('.' + LASER_IMG_CLASS).not($target_image),
                     $img = $target_image,
-                    reset_file_type = false;
+                    reset_file_type = false,
+                    state = {
+                        selectedImage: false
+                    };
 
                 if (null !== $target_image) {
                     // delete svg blob from history
@@ -53,9 +56,7 @@ define([
 
                     if (0 === $img_container.length) {
                         $target_image = null;
-                        self.setState({
-                            hasImage: false
-                        });
+                        state['hasImage'] = false;
 
                         menuFactory.items.execute.enabled = false;
                         menuFactory.items.saveGCode.enabled = false;
@@ -64,6 +65,8 @@ define([
                     else {
                         $target_image = $img_container[0];
                     }
+
+                    self.setState(state);
                 }
             },
             refreshImage = function($img, threshold) {
@@ -176,9 +179,8 @@ define([
             refreshObjectParams = function(e, $el) {
                 var el_position, el_offset_position,
                     last_x, last_y,
-                    position, size, angle,
+                    position, size, angle, threshold,
                     platform_pos = $laser_platform.box(),
-                    imagePanelRefs = self.refs.imagePanel.refs,
                     outOfRange = function(point, limit) {
                         var x = Math.pow((platform_pos.center.x - point.x), 2),
                             y = Math.pow((platform_pos.center.y - point.y), 2),
@@ -190,6 +192,17 @@ define([
                 if (null !== $el) {
                     el_position = $el.box();
                     el_offset_position = $el.box(true);
+
+                    position = {
+                        x: convertToRealCoordinate(el_position.center.x, 'x').toString().substr(0, 5),
+                        y: convertToRealCoordinate(el_position.center.y, 'y').toString().substr(0, 5)
+                    }
+                    size = {
+                        width: (el_position.width / PLATFORM_DIAMETER_PIXEL * DIAMETER).toString().substr(0, 5),
+                        height: (el_position.height / PLATFORM_DIAMETER_PIXEL * DIAMETER).toString().substr(0, 5)
+                    };
+                    angle = elementAngle($el[0]);
+                    threshold = $el.data('threshold') || 128;
 
                     if ('move' === e.freetransEventType) {
                         if (true === outOfRange(el_position.center, DIAMETER)) {
@@ -207,50 +220,24 @@ define([
                         }
                     }
                     else {
-                        refreshImage($el, getThreshold().getDOMNode().value);
+                        refreshImage($el, threshold);
                     }
-
-                    position = {
-                        x: convertToRealCoordinate(el_position.center.x, 'x').toString().substr(0, 5),
-                        y: convertToRealCoordinate(el_position.center.y, 'y').toString().substr(0, 5)
-                    }
-                    size = {
-                        width: (el_position.width / PLATFORM_DIAMETER_PIXEL * DIAMETER).toString().substr(0, 5),
-                        height: (el_position.height / PLATFORM_DIAMETER_PIXEL * DIAMETER).toString().substr(0, 5)
-                    };
-                    angle = elementAngle($el[0]);
 
                     self.setState({
                         imagePanel: {
-                            x: 20,
+                            x: el_offset_position.top,
                             y: el_offset_position.right + 10
                         },
                         position: position,
                         size: size,
-                        angle: angle
+                        angle: angle,
+                        threshold: threshold
                     });
-
-                    imagePanelRefs.objectAngle.getDOMNode().value = angle;
-                    imagePanelRefs.objectPosX.getDOMNode().value = position.x;
-                    imagePanelRefs.objectPosY.getDOMNode().value = position.y;
-                    imagePanelRefs.objectSizeW.getDOMNode().value = size.width;
-                    imagePanelRefs.objectSizeH.getDOMNode().value = size.height;
                 }
             },
             $target_image = null, // changing when image clicked
             printer = null,
             printer_selecting = false,
-            getThreshold = function() {
-                var imagePanelRefs = self.refs.imagePanel.refs;
-
-                return (imagePanelRefs.threshold || {
-                    getDOMNode: function() {
-                        return {
-                            value: 255
-                        };
-                    }
-                });
-            },
             handleLaser = function(settings, callback) {
 
                 var $ft_controls = $laser_platform.find('.ft-controls'),
@@ -279,8 +266,6 @@ define([
                     },
                     args = [],
                     doLaser = function(settings) {
-                        var imagePanelRefs = self.refs.imagePanel.refs,
-                            threshold = getThreshold();
 
                         $ft_controls.each(function(k, el) {
                             var $el = $(el),
@@ -298,7 +283,7 @@ define([
                                     br_position_x: convertToRealCoordinate(bottom_right.x, 'x'),
                                     br_position_y: convertToRealCoordinate(bottom_right.y, 'y'),
                                     rotate: (Math.PI * elementAngle(el) / 180) * -1,
-                                    threshold: parseInt(threshold.getDOMNode().value, 10)
+                                    threshold: $img.data('threshold')
                                 },
                                 grayscaleOpts = {
                                     is_svg: ('svg' === self.props.fileFormat),
@@ -412,7 +397,7 @@ define([
                                 setupImage(file, size, originalUrl, name);
 
                                 self.setState({
-                                    hasImage: true,
+                                    hasImage: true
                                 });
                             };
 
@@ -589,14 +574,11 @@ define([
                 menuFactory.items.execute.enabled = true;
                 menuFactory.items.saveGCode.enabled = true;
             },
-            thresholdChanged: function(e, threshold) {
-                var $el, bounds;
+            thresholdChanged: function(threshold) {
+                var $el = $('.image-active:eq(0)');
 
-                $('.' + LASER_IMG_CLASS).each(function(k, el) {
-                    $el = $(el);
-                    bounds = $el.freetrans('getBounds');
-                    refreshImage($el, threshold);
-                });
+                $el.data('threshold', threshold);
+                refreshImage($el, threshold);
             },
             inactiveAllImage: inactiveAllImage,
             imageTransform: function(e) {
@@ -629,7 +611,7 @@ define([
 
                 self.setState({
                     imagePanel: {
-                        x: 20,
+                        x: pos.top,
                         y: pos.right + 10
                     }
                 });
