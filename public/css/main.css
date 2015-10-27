@@ -3652,7 +3652,8 @@ input.switch:checked ~ label:after {
         .print-studio .flux-monitor .main .body {
             height: 70%; }
             .print-studio .flux-monitor .main .body .content {
-                padding: 0 20px; }
+                padding: 0 20px;
+                overflow-y: auto; }
                 .print-studio .flux-monitor .main .body .content img {
                     width: 100%; }
                 .print-studio .flux-monitor .main .body .content .image-wrapper {
@@ -3666,6 +3667,11 @@ input.switch:checked ~ label:after {
                     bottom: 0;
                     text-align: center;
                     width: 100%; }
+                .print-studio .flux-monitor .main .body .content .name.selected {
+                    padding: 0 8px;
+                    border-radius: 5px;
+                    color: white;
+                    background: #0950D0; }
                 .print-studio .flux-monitor .main .body .content .folder {
                     color: #BBB;
                     display: inline-block;

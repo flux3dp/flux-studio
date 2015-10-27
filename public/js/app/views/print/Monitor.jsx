@@ -50,7 +50,8 @@ define([
                 waiting             : false,
                 mode                : mode.preview,
                 directoryContent    : {},
-                cameraImageUrl      : ''
+                cameraImageUrl      : '',
+                selectedFileName    : ''
             };
         },
 
@@ -128,6 +129,10 @@ define([
             }
         },
 
+        _handleFileSelect: function(fileName) {
+            this.setState({ selectedFileName: fileName });
+        },
+
         _handleTurnOnCamera: function(e) {
             this.setState({
                 mode: mode.camera,
@@ -202,7 +207,10 @@ define([
                 return '';
             }
 
-            var folders;
+            var self = this,
+                files,
+                folders;
+
             folders = content.directories.map(function(item) {
                 return (
                     <div className="folder" onDoubleClick={this._handleSelectFile.bind(this, item)}>
@@ -211,14 +219,16 @@ define([
                 );
             }.bind(this));
 
-            var files = filesInfo.map(function(item) {
-                var imgSrc = URL.createObjectURL(item[1]) || 'http://placehold.it/60x60';
+            files = filesInfo.map(function(item) {
+                var imgSrc = URL.createObjectURL(item[1]) || 'http://placehold.it/60x60',
+                    fileNameClass = ClassNames('name', {'selected': self.state.selectedFileName === item[0]});
+
                 return (
-                    <div className="file">
+                    <div className="file" onClick={self._handleFileSelect.bind(null, item[0])}>
                         <div className="image-wrapper">
                             <img src={imgSrc} />
                         </div>
-                        <div className="name">{item[0]}</div>
+                        <div className={fileNameClass}>{item[0]}</div>
                     </div>
                 );
             });
