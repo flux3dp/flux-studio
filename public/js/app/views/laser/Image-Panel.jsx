@@ -8,7 +8,16 @@ define([
     return React.createClass({
         // UI events
         _onThresholdChanged: function(e) {
-            this.props.onThresholdChanged(e, e.currentTarget.value);
+            var self = this,
+                trigger = function() {
+                    self.props.onThresholdChanged(e.currentTarget.value);
+                };
+
+            self.setState({
+                threshold: e.currentTarget.value
+            });
+
+            self._thresholdTimer = trigger();
         },
 
         _onTransform: function(e) {
@@ -33,12 +42,35 @@ define([
             this.setState(state);
         },
 
+        _renderThreshold: function(lang, props, state) {
+            var thresholdValue = (state.threshold || props.threshold || lang.laser.object_params.threshold.default),
+                thresholdDisplay = (thresholdValue / 255 * 100).toString().substr(0, 5);
+
+            return (
+                'engrave' === props.mode ?
+                <label className="controls accordion">
+                    <p className="caption">
+                        {lang.laser.object_params.threshold.text}
+                        <span className="value">{thresholdDisplay}%</span>
+                    </p>
+                    <input type="checkbox" className="accordion-switcher"/>
+                    <div className="accordion-body">
+                        <div className="control">
+                            <input type="range" min="0" max="255" step="1" ref="threshold"
+                                defaultValue={thresholdValue}
+                                onChange={this._onThresholdChanged}/>
+                        </div>
+                    </div>
+                </label> :
+                ''
+            );
+        },
+
         render: function() {
             var props = this.props,
                 state = this.state,
                 lang = props.lang,
                 angle = state.angle || props.angle,
-                threshold = state.threshold || props.threshold || lang.laser.object_params.threshold.default,
                 position = {
                     x: state.position.x || props.position.x,
                     y: state.position.y || props.position.y
@@ -47,24 +79,7 @@ define([
                     width: state.size.width || props.size.width,
                     height: state.size.height || props.size.height
                 },
-                threshold = (
-                    'engrave' === this.props.mode ?
-                    <label className="controls accordion">
-                        <p className="caption">
-                            {lang.laser.object_params.threshold.text}
-                            <span className="value">{threshold}</span>
-                        </p>
-                        <input type="checkbox" className="accordion-switcher"/>
-                        <div className="accordion-body">
-                            <div className="control">
-                                <input type="range" min="0" max="255" ref="threshold"
-                                    defaultValue={threshold}
-                                    onChange={this._onThresholdChanged}/>
-                            </div>
-                        </div>
-                    </label> :
-                    ''
-                );
+                thresholdRange = this._renderThreshold(lang, props, state);
 
             return (
                 <div className={props.className} style={this.props.style}>
@@ -78,11 +93,13 @@ define([
                             <div className="control">
                                 <span className="span3 text-center header">X</span>
                                 <input type="number" ref="objectPosX" data-type="x" className="span9"
+                                    defaultValue={position.x}
                                     onChange={this._onTransform}/>
                             </div>
                             <div className="control">
                                 <span className="span3 text-center header">Y</span>
                                 <input type="number" ref="objectPosY" data-type="y" className="span9"
+                                    defaultValue={position.y}
                                     onChange={this._onTransform}/>
                             </div>
                         </label>
@@ -91,17 +108,19 @@ define([
                         <input type="checkbox" className="accordion-switcher"/>
                         <p className="caption">
                             {lang.laser.object_params.size.text}
-                            <span className="value">{size.width}*{size.height}</span>
+                            <span className="value">{size.width}mm*{size.height}mm</span>
                         </p>
                         <div className="accordion-body">
                             <div className="control">
                                 <span className="span3 text-center header">{lang.laser.object_params.size.unit.width}</span>
                                 <input type="number" min="0" ref="objectSizeW" step="0.1" data-type="width" className="span9"
+                                    defaultValue={size.width}
                                     onChange={this._onTransform}/>
                             </div>
                             <div className="control">
                                 <span className="span3 text-center header">{lang.laser.object_params.size.unit.height}</span>
                                 <input type="number" min="0" ref="objectSizeH" step="0.1" data-type="height" className="span9"
+                                    defaultValue={size.height}
                                     onChange={this._onTransform}/>
                             </div>
                         </div>
@@ -115,11 +134,12 @@ define([
                         <div className="accordion-body">
                             <div className="control">
                                 <input type="number" min="0" max="360" ref="objectAngle" data-type="angle" className="span4"
+                                    defaultValue={angle}
                                     onChange={this._onTransform}/>
                             </div>
                         </div>
                     </label>
-                    {threshold}
+                    {thresholdRange}
                 </div>
             );
         },
