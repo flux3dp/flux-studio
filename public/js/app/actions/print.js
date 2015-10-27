@@ -1188,6 +1188,7 @@ define([
         var outlineMaterial = new THREE.MeshBasicMaterial( { color: s.colorSelected, side: THREE.BackSide } );
         var outlineMesh = new THREE.Mesh(mesh.geometry, outlineMaterial);
         outlineMesh.position.set(mesh.position.x, mesh.position.y, mesh.position.z);
+        outlineMesh.scale.set(mesh.scale.x, mesh.scale.y, mesh.scale.z);
         outlineMesh.scale.multiplyScalar(1.05);
         mesh.outlineMesh = outlineMesh;
     }

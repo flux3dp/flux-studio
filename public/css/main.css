@@ -2677,6 +2677,120 @@ input[type=range]:focus::-webkit-slider-runnable-track {
 .btn-h-group .btn:first-child {
     margin: 0; }
 
+.controls {
+    overflow: hidden; }
+    .controls .label {
+        color: #B3B3B3;
+        font-size: 13px;
+        line-height: 40px; }
+    .controls .control {
+        line-height: 40px;
+        position: relative; }
+    .controls .control > div {
+        display: inline-block;
+        margin-right: 30px;
+        color: #B3B3B3;
+        size: 13px; }
+    .controls .radio {
+        width: 15px;
+        height: 15px;
+        background-color: #E0E0DF;
+        background-size: 15px 15px;
+        display: inline-block;
+        margin-right: 15px; }
+    .controls .switch-container {
+        margin-left: 30px;
+        position: relative; }
+        .controls .switch-container div {
+            display: inline-block; }
+        .controls .switch-container .onoffswitch {
+            position: absolute;
+            top: 9px;
+            left: 42px; }
+    .controls .dropdown-container {
+        position: absolute;
+        top: 5px;
+        left: 130px;
+        line-height: 20px;
+        margin-right: 0; }
+        .controls .dropdown-container select {
+            width: 270px;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background: url("/img/arrow-down.png") no-repeat;
+            background-position: 245px 9px;
+            background-size: 16px 10px;
+            height: 30px;
+            border-radius: 0;
+            border: 2px solid #E0E0DF; }
+    .controls .textarea-container {
+        margin-right: 0;
+        width: 100%;
+        height: 335px; }
+        .controls .textarea-container textarea {
+            width: 100%;
+            height: 100%;
+            line-height: 20px;
+            border: 2px solid #E0E0DF;
+            resize: none; }
+    .controls input {
+        width: 90px;
+        height: 30px;
+        font-size: 15px;
+        color: #B3B3B3; }
+    .controls input[type=text] {
+        padding-left: 10px;
+        border: 2px solid #E0E0DF; }
+    .controls select {
+        border: 1px solid #d8d8d8;
+        background-image: url("/img/icon-3d-arrow-down.png");
+        background-repeat: no-repeat;
+        background-size: 8px 8px;
+        background-color: transparent;
+        background-position: 150px 8px;
+        width: 170px;
+        height: 25px;
+        letter-spacing: 0.3px;
+        font-size: 14px;
+        -webkit-appearance: none;
+        appearance: none;
+        padding-left: 10px; }
+    .controls .slider-container {
+        margin-right: 20px;
+        position: relative; }
+        .controls .slider-container .slider {
+            width: 150px;
+            position: absolute;
+            right: 0;
+            top: -20px; }
+    .controls input[type=range] {
+        -webkit-appearance: none;
+        width: 100%;
+        margin: 0; }
+    .controls input[type=range]:focus {
+        outline: none; }
+    .controls input[type=range]::-webkit-slider-runnable-track {
+        width: 100%;
+        height: 3px;
+        cursor: pointer;
+        box-shadow: 3.7px 3.7px 0 #ffffff, 0 0 3.7px #fff;
+        background-color: #E0E0DF;
+        border-radius: 0;
+        border: 0 solid transparent; }
+    .controls input[type=range]::-webkit-slider-thumb {
+        box-shadow: 0 0 0 transparent, 0 0 0 rgba(130, 13, 13, 0);
+        border: 2.5px solid #B3B3B3;
+        height: 13px;
+        width: 13px;
+        border-radius: 12px;
+        background: #B3B3B3;
+        cursor: pointer;
+        -webkit-appearance: none;
+        margin-top: -5px; }
+    .controls input[type=range]:focus::-webkit-slider-runnable-track {
+        background: #E0E0DF; }
+
 /**
  * global advanced panel
  */
@@ -3161,7 +3275,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
 
 .operating-panel .zoom .divider {
     width: 1px;
-    border-left: 1px #e0e0e0 solid;
+    border-left: 1px #E0E0DF solid;
     padding: 0; }
 
 .operating-panel .zoom > div > img {
@@ -3232,7 +3346,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
 
 .print-studio .setup-panel select {
     border: 0;
-    border-bottom: 1px #e0e0e0 solid;
+    border-bottom: 1px #E0E0DF solid;
     background-image: url("/img/icon-3d-arrow-down.png");
     background-repeat: no-repeat;
     background-size: 8px 8px;
@@ -3397,93 +3511,114 @@ input.switch:checked ~ label:after {
     background-color: #fff;
     position: absolute;
     margin: auto;
+    padding: 0;
     left: 0;
     right: 0;
     top: 20px;
     float: left;
-    width: 410px;
-    height: 610px; }
-    .print-studio .advanced-panel .container {
-        padding: 0 20px; }
-    .print-studio .advanced-panel .header {
-        font-size: 18px;
+    width: 440px;
+    height: 540px; }
+    .print-studio .advanced-panel .content-wrapper {
+        overflow-y: auto;
+        height: 415px; }
+    .print-studio .advanced-panel .tab-list {
+        display: table;
+        width: 100%;
+        list-style: none;
+        padding: 0;
+        margin: 0; }
+        .print-studio .advanced-panel .tab-list .tab {
+            display: table-cell;
+            text-align: center;
+            border-right: 1px solid #DDD;
+            border-bottom: 1px solid #DDD;
+            padding: 10px 0;
+            cursor: pointer; }
+            .print-studio .advanced-panel .tab-list .tab a {
+                text-decoration: none;
+                font-size: 17px;
+                color: #626262;
+                display: block; }
+        .print-studio .advanced-panel .tab-list li:first-child {
+            border-top: 0; }
+        .print-studio .advanced-panel .tab-list li:last-child {
+            border-right: 0; }
+        .print-studio .advanced-panel .tab-list li.selected {
+            border-bottom: 3px solid #9B9B9B; }
+    .print-studio .advanced-panel .section {
+        padding: 30px 20px 0 20px; }
+    .print-studio .advanced-panel .title {
+        color: #626262;
+        font-size: 15px;
         font-weight: 500;
         letter-spacing: 0.5px;
-        color: #4A4A4A;
-        height: 48px;
-        line-height: 48px;
-        border-bottom: 1px solid #e0e0e0; }
-    .print-studio .advanced-panel .section {
-        padding: 20px 0 5px; }
-    .print-studio .advanced-panel .title {
-        color: #4A4A4A;
-        font-size: 13px;
-        font-weight: 500;
-        letter-spacing: 0.5px; }
-    .print-studio .advanced-panel .controls {
-        margin-top: 14px;
-        margin-left: 30px;
-        overflow: hidden; }
-        .print-studio .advanced-panel .controls .label {
-            color: #4A4A4A;
-            font-size: 15px; }
-        .print-studio .advanced-panel .controls .control > div {
-            display: inline-block; }
-        .print-studio .advanced-panel .controls input {
-            width: 80px;
-            font-size: 13px; }
-        .print-studio .advanced-panel .controls select {
-            border: 1px solid #d8d8d8;
-            background-image: url("/img/icon-3d-arrow-down.png");
-            background-repeat: no-repeat;
-            background-size: 8px 8px;
-            background-color: transparent;
-            background-position: 150px 8px;
-            width: 170px;
-            height: 25px;
-            letter-spacing: 0.3px;
-            font-size: 14px;
-            -webkit-appearance: none;
-            appearance: none;
-            padding-left: 10px; }
-        .print-studio .advanced-panel .controls .slider-container {
-            margin-right: 20px; }
-            .print-studio .advanced-panel .controls .slider-container .slider {
-                width: 100px; }
-        .print-studio .advanced-panel .controls input[type=range] {
-            -webkit-appearance: none;
-            width: 100%;
-            margin: 6px 0; }
-        .print-studio .advanced-panel .controls input[type=range]:focus {
-            outline: none; }
-        .print-studio .advanced-panel .controls input[type=range]::-webkit-slider-runnable-track {
-            width: 100%;
-            height: 7px;
-            cursor: pointer;
-            box-shadow: 3.7px 3.7px 0 #ffffff, 0 0 3.7px #fff;
-            background: #bbb;
-            border-radius: 0;
-            border: 0 solid transparent; }
-        .print-studio .advanced-panel .controls input[type=range]::-webkit-slider-thumb {
-            box-shadow: 0 0 0 transparent, 0 0 0 rgba(13, 13, 13, 0);
-            border: 2.5px solid #777;
-            height: 18px;
-            width: 18px;
-            border-radius: 12px;
-            background: #777;
-            cursor: pointer;
-            -webkit-appearance: none;
-            margin-top: -6px; }
-        .print-studio .advanced-panel .controls input[type=range]:focus::-webkit-slider-runnable-track {
-            background: #c5c5c5; }
+        margin-bottom: 15px; }
     .print-studio .advanced-panel .footer {
         position: absolute;
+        height: 70px;
         bottom: 0;
         left: 0;
         right: 0;
-        text-align: center; }
+        text-align: center;
+        margin-bottom: 0;
+        border-top: 1px solid #DDD; }
+        .print-studio .advanced-panel .footer div {
+            line-height: 10px; }
+        .print-studio .advanced-panel .footer .right {
+            padding: 4% 0;
+            padding-right: 16px;
+            float: right; }
+            .print-studio .advanced-panel .footer .right a {
+                margin-left: 10px; }
+        .print-studio .advanced-panel .footer .left {
+            padding: 4% 0;
+            padding-left: 16px;
+            float: left; }
         .print-studio .advanced-panel .footer .btn {
-            margin: 0 15px; }
+            margin: 0;
+            border: 2px solid #E0E0DF;
+            border-radius: 0;
+            font-size: 15px;
+            color: #B3B3B3;
+            line-height: 30px;
+            padding: 0 10px; }
+    .print-studio .advanced-panel .preset-wrapper {
+        margin: 20px 20px 0 20px; }
+        .print-studio .advanced-panel .preset-wrapper .preset-header {
+            font-size: 15px;
+            color: #626262; }
+        .print-studio .advanced-panel .preset-wrapper .preset-list {
+            width: 100%;
+            height: 110px;
+            border: 2px solid #E0E0DF;
+            margin-top: 20px;
+            overflow-y: auto; }
+            .print-studio .advanced-panel .preset-wrapper .preset-list .preset-entry {
+                border-bottom: 1px solid #E0E0DF;
+                height: 40px;
+                line-height: 40px;
+                color: #B3B3B3;
+                cursor: pointer; }
+                .print-studio .advanced-panel .preset-wrapper .preset-list .preset-entry span {
+                    margin-left: 10px; }
+            .print-studio .advanced-panel .preset-wrapper .preset-list .selected {
+                background-color: #E0E0E0;
+                color: #FFF; }
+        .print-studio .advanced-panel .preset-wrapper .preset-content {
+            width: 100%;
+            height: 275px;
+            border: 2px solid #E0E0E0;
+            margin-top: 10px; }
+        .print-studio .advanced-panel .preset-wrapper .preset-name {
+            margin-top: 20px;
+            height: 40px;
+            line-height: 40px;
+            color: #B3B3B3; }
+            .print-studio .advanced-panel .preset-wrapper .preset-name input {
+                margin-left: 70px;
+                height: 40px;
+                width: 288px;
+                border: 2px solid #E0E0E0; }
 
 .print-studio .flux-monitor {
     position: absolute;
@@ -3517,10 +3652,7 @@ input.switch:checked ~ label:after {
         .print-studio .flux-monitor .main .body {
             height: 70%; }
             .print-studio .flux-monitor .main .body .content {
-                border-color: #999;
-                width: 90%;
-                margin: 0 auto;
-                overflow-y: auto; }
+                padding: 0 20px; }
                 .print-studio .flux-monitor .main .body .content img {
                     width: 100%; }
                 .print-studio .flux-monitor .main .body .content .image-wrapper {
@@ -3781,7 +3913,7 @@ input.switch:checked ~ label:after {
     .print-studio .objectDialogue .divider {
         width: 100%;
         height: 5px;
-        background-color: #e0e0e0; }
+        background-color: #E0E0DF; }
     .print-studio .objectDialogue .rotateInputFields {
         height: 13.5rem;
         width: 100%; }
@@ -3831,6 +3963,74 @@ input.switch:checked ~ label:after {
 
 .close:after {
     transform: rotate(-45deg); }
+
+.onoffswitch {
+    position: relative;
+    width: 50px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none; }
+
+.onoffswitch-checkbox {
+    display: none; }
+
+.onoffswitch-label {
+    display: block;
+    overflow: hidden;
+    cursor: pointer;
+    border: 2px solid #E0E0DF;
+    border-radius: 14px; }
+
+.onoffswitch-inner {
+    display: block;
+    width: 200%;
+    margin-left: -100%;
+    transition: margin 0.3s ease-in 0s; }
+
+.onoffswitch-inner:before, .onoffswitch-inner:after {
+    display: block;
+    float: left;
+    width: 50%;
+    height: 18px;
+    padding: 0;
+    line-height: 18px;
+    font-size: 14px;
+    color: white;
+    font-family: Trebuchet, Arial, sans-serif;
+    font-weight: bold;
+    box-sizing: border-box; }
+
+.onoffswitch-inner:before {
+    content: "";
+    padding-left: 10px;
+    background-color: #E0E0DF;
+    color: #FFFFFF; }
+
+.onoffswitch-inner:after {
+    content: "";
+    padding-right: 10px;
+    background-color: #E0E0DF;
+    color: #E0E0DF;
+    text-align: right; }
+
+.onoffswitch-switch {
+    display: block;
+    width: 20px;
+    margin: 1px;
+    background: #FFFFFF;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 31px;
+    border: 2px solid #E0E0DF;
+    border-radius: 14px;
+    transition: all 0.3s ease-in 0s; }
+
+.onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-inner {
+    margin-left: 0; }
+
+.onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-switch {
+    right: 0px; }
 
 .settings-studio {
     background-color: #F5F5F5; }

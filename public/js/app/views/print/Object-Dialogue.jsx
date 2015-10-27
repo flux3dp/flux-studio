@@ -101,7 +101,7 @@ define([
                                         <input id="x" type="text"
                                             onChange={this._handleResize.bind(this)}
                                             onBlur={this._handleResize.bind(this)}
-                                            value={this.state.size.enteredX} /></div>
+                                            value={_size.enteredX} /></div>
                                 </div>
                                 <div className="group">
                                     <div className="label">Y</div>

@@ -179,7 +179,15 @@ define([
         _renderContent: function() {
             switch(this.state.mode) {
                 case mode.preview:
-                    return (<img src={this.props.previewUrl} />);
+                var divStyle = {
+                        backgroundColor: '#E0E0E0',
+                        backgroundImage: 'url(' + this.props.previewUrl + ')',
+                        backgroundSize: 'cover',
+                        backgroundPosition: '50% 50%',
+                        width: '100%',
+                        height: '100%'
+                    };
+                    return (<div style={divStyle} />);
                     break;
                 case mode.browse_file:
                     return this._renderDirectoryContent(this.state.directoryContent);
@@ -189,9 +197,9 @@ define([
             }
         },
         render: function() {
-            var lang                = this.props.lang.monitor,
-                content             = this._renderContent(),
-                waitIcon            = this.state.waiting ? this._renderSpinner() : '';
+                var lang    = this.props.lang.monitor,
+                content     = this._renderContent(),
+                waitIcon    = this.state.waiting ? this._renderSpinner() : '';
 
             return (
                 <div className="flux-monitor">
