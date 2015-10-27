@@ -224,15 +224,12 @@ define([
                     }
 
                     self.setState({
-                        imagePanel: {
-                            x: el_offset_position.top,
-                            y: el_offset_position.right + 10
-                        },
                         position: position,
                         size: size,
                         angle: angle,
                         threshold: threshold
                     });
+                    refreshImagePanelPos();
                 }
             },
             $target_image = null, // changing when image clicked
@@ -488,6 +485,28 @@ define([
             });
         }
 
+        function refreshImagePanelPos() {
+            var pos = $target_image.box(true),
+                windowPos = $('body').box(true),
+                y = pos.top;
+
+            if (windowPos.top > y) {
+                y = windowPos.top;
+            }
+
+            self.setState({
+                imagePanel: {
+                    y: y,
+                    x: pos.right + 10
+                }
+            });
+        }
+
+        // on window resize
+        window.addEventListener('resize', function(e) {
+            refreshImagePanelPos();
+        });
+
         return {
             handleLaser: function(settings) {
                 handleLaser(
@@ -586,7 +605,6 @@ define([
                     type = $el.data('type'),
                     val = $el.val(),
                     freetrans = $target_image.data('freetrans'),
-                    pos = $target_image.box(true),
                     args = {};
 
                 val = parseFloat(val, 10);
@@ -609,12 +627,7 @@ define([
                     args.angle = val;
                 }
 
-                self.setState({
-                    imagePanel: {
-                        x: pos.top,
-                        y: pos.right + 10
-                    }
-                });
+                refreshImagePanelPos();
 
                 $target_image.freetrans(args);
             },
