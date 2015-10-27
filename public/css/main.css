@@ -4677,7 +4677,8 @@ input.switch:checked ~ label:after {
 
 .laser-studio .object-position {
     font-size: 20px;
-    width: 230px; }
+    width: 230px;
+    z-index: 1; }
     .laser-studio .object-position .caption,
     .laser-studio .object-position .controls {
         margin: 0; }
