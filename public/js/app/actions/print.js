@@ -257,21 +257,26 @@ define([
     }
 
     function appendModels(files, index, callback) {
-        FileSystem.writeFile(
-            files.item(index),
-            {
-                onComplete: function(e, fileEntry) {
-                    appendModel(fileEntry, files.item(index), function() {
-                        if(files.length > index + 1) {
-                            appendModels(files, index + 1, callback);
-                        }
-                        else {
-                            callback();
-                        }
-                    });
+        if(files.item(index).name.split('.').pop().toLowerCase() === 'stl') {
+            FileSystem.writeFile(
+                files.item(index),
+                {
+                    onComplete: function(e, fileEntry) {
+                        appendModel(fileEntry, files.item(index), function() {
+                            if(files.length > index + 1) {
+                                appendModels(files, index + 1, callback);
+                            }
+                            else {
+                                callback();
+                            }
+                        });
+                    }
                 }
-            }
-        );
+            );
+        }
+        else {
+            callback();
+        }
     }
 
     function registerDropToImport() {
@@ -302,7 +307,7 @@ define([
             ddHelper++;
         }
         $('.import-indicator').show();
-        
+
         return false;
     }
 
