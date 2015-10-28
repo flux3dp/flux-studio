@@ -400,7 +400,9 @@ define([
 
                             {progressWindow}
 
-                            <div id="model-displayer" className="model-displayer"></div>
+                            <div id="model-displayer" className="model-displayer">
+                                <div className="import-indicator"></div>
+                            </div>
                         </div>
                     );
                 }

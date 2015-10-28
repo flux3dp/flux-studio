@@ -39,7 +39,8 @@ define([
         transformMode = false,
         shiftPressed = false,
         previewMode = false,
-        leftPanelWidth = 275;
+        leftPanelWidth = 275,
+        ddHelper = 0;
 
     var s = {
         diameter: 170,
@@ -179,9 +180,10 @@ define([
         return d.promise();
     }
 
-    function appendModel(fileEntry, file) {
+    function appendModel(fileEntry, file, callback) {
         var loader = new THREE.STLLoader();
         var model_file_path = fileEntry.toURL();
+        callback = callback || function(){};
 
         reactSrc.setState({
             openWaitWindow: true,
@@ -250,38 +252,68 @@ define([
             objects.push(mesh);
 
             render();
+            callback();
         });
+    }
+
+    function appendModels(files, index, callback) {
+        FileSystem.writeFile(
+            files.item(index),
+            {
+                onComplete: function(e, fileEntry) {
+                    appendModel(fileEntry, files.item(index), function() {
+                        if(files.length > index + 1) {
+                            appendModels(files, index + 1, callback);
+                        }
+                        else {
+                            callback();
+                        }
+                    });
+                }
+            }
+        );
     }
 
     function registerDropToImport() {
         if(window.FileReader) {
             var zone = document.querySelector('.studio-container.print-studio');
-            // zone.addEventListener('drop', onDropFile);
-            addEventHandler(zone, 'dragover', cancel);
-            addEventHandler(zone, 'dragenter', cancel);
-            addEventHandler(zone, 'drop', onDropFile);
+            zone.addEventListener('dragenter', onDragEnter);
+            zone.addEventListener('dragover', onDragEnter);
+            zone.addEventListener('dragleave', onDragLeave);
+            zone.addEventListener('drop', onDropFile);
         }
     }
 
     function onDropFile(e) {
-    }
-
-    function cancel(e) {
-      if (e.preventDefault) { e.preventDefault(); }
-      return false;
-    }
-
-    function addEventHandler(obj, evt, handler) {
-        if(obj.addEventListener) {
-            // W3C method
-            obj.addEventListener(evt, handler, false);
-        } else if(obj.attachEvent) {
-            // IE method.
-            obj.attachEvent('on'+evt, handler);
-        } else {
-            // Old school method.
-            obj['on'+evt] = handler;
+        e.preventDefault();
+        var files = e.dataTransfer.files;
+        if(files.length > 0) {
+            appendModels(files, 0, function() {
+                $('.import-indicator').hide();
+                e.target.value = null;
+            });
         }
+    }
+
+    function onDragEnter(e) {
+        e.preventDefault();
+
+        if(e.type === 'dragenter') {
+            ddHelper++;
+        }
+        $('.import-indicator').show();
+        
+        return false;
+    }
+
+    function onDragLeave(e) {
+        ddHelper--;
+        console.log(e.type, ddHelper);
+        e.preventDefault();
+        if(ddHelper === 0) {
+            $('.import-indicator').hide();
+        }
+        return false;
     }
 
     // Events Section ---

@@ -488,6 +488,15 @@ input.switch:checked ~ label:after {
 
 /* Advanced Panel */
 .print-studio {
+    .import-indicator {
+        background-color: rgba(0,0,0,0.5);
+        width: 100%;
+        position: absolute;
+        z-index: 9999;
+        height: 100%;
+        border: 7px dashed #DDD;
+        display: none;
+    }
     .advanced-panel {
         background-color: #fff;
         position: absolute;
