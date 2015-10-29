@@ -68,17 +68,16 @@ define([
 
             pathArray = [];
             controller = control(this.props.selectedPrinter.serial);
-            scanController = scanControl(this.props.selectedPrinter.serial, opts);
         },
 
         componentWillUnmount: function() {
-            if(cameraSource) {
-                cameraSource.stop();
-            }
+            if(cameraSource) { cameraSource.stop(); }
+            this._closeConnection(scanController);
+            this._closeConnection(controller);
+        },
 
-            if(scanController) {
-                scanController.connection.close(false);
-            }
+        _closeConnection: function(controller) {
+            if(typeof controller !== 'undefined') { controller.connection.close(false); }
         },
 
         _handleClose: function() {
@@ -86,6 +85,7 @@ define([
         },
 
         _handleBrowseFile: function() {
+            this._closeConnection(scanController);
             this._retrieveList('');
             filesInfo = [];
             this.setState({
@@ -134,17 +134,30 @@ define([
         },
 
         _handleTurnOnCamera: function(e) {
-            this.setState({
-                mode: mode.camera,
-                waiting: this.state.cameraImageUrl === ''
-            });
-            cameraSource = scanController.getImage(this._processImage);
+            var self = this,
+                opts = {
+                onReady: function() {
+                    self.setState({
+                        mode: mode.camera
+                    });
+                    cameraSource = scanController.getImage(self._processImage);
+                },
+                onError: function() {
+
+                }
+            }
+
+            scanController = scanControl(this.props.selectedPrinter.serial, opts);
+            this.setState({ waiting: true });
         },
 
         _processImage: function(image_blobs, mime_type) {
             var blob = new Blob(image_blobs, {type: mime_type});
             var url = URL.createObjectURL(blob);
-            this.setState({ cameraImageUrl: url });
+            this.setState({
+                cameraImageUrl: url,
+                waiting: false
+            });
         },
 
         _retrieveList: function(path) {

@@ -312,12 +312,13 @@ define([
     }
 
     function onDragLeave(e) {
-        ddHelper--;
-        console.log(e.type, ddHelper);
         e.preventDefault();
+        ddHelper--;
+
         if(ddHelper === 0) {
             $('.import-indicator').hide();
         }
+
         return false;
     }
 
@@ -624,7 +625,7 @@ define([
         mouse.y = -((e.offsetY - offy) / container.offsetHeight) * 2 + 1;
     }
 
-    function setScale(x, y, z, locked, center) {
+    function setScale(x, y, z, isLocked, center) {
         var originalScaleX = SELECTED.scale._x;
         var originalScaleY = SELECTED.scale._y;
         var originalScaleZ = SELECTED.scale._z;
@@ -647,7 +648,7 @@ define([
             (originalScaleX * x) || scaleBeforeTransformX, (originalScaleY * y) || scaleBeforeTransformY, (originalScaleZ * z) || scaleBeforeTransformZ
         );
         SELECTED.outlineMesh.scale.multiplyScalar(1.05);
-        SELECTED.scale.locked = locked;
+        SELECTED.scale.locked = isLocked;
         SELECTED.plane_boundary = planeBoundary(SELECTED);
 
         reactSrc.setState({
@@ -662,14 +663,13 @@ define([
         }
     }
 
-    function setSize(x, y, z) {
+    function setSize(x, y, z, isLocked) {
         var sx = Math.round(x / SELECTED.size.originalX * 1000) / 1000,
             sy = Math.round(y / SELECTED.size.originalY * 1000) / 1000,
             sz = Math.round(z / SELECTED.size.originalZ * 1000) / 1000,
-            _locked = false,
-            _render = true;
+            _center = true;
 
-        setScale(sx, sy, sz, _locked, _render);
+        setScale(sx, sy, sz, isLocked, _center);
 
         SELECTED.size.x = x;
         SELECTED.size.y = y;
@@ -1180,9 +1180,14 @@ define([
     }
 
     function updateObjectSize(src) {
-        var boundingBox = new THREE.BoundingBoxHelper(src);
+        var boundingBox = new THREE.BoundingBoxHelper(src),
+            size;
+
         boundingBox.update();
-        src.size = boundingBox.box.size();
+        size = boundingBox.box.size();
+        src.size.x = size.x;
+        src.size.y = size.y;
+        src.size.z = size.z;
         src.size.enteredX = src.size.x;
         src.size.enteredY = src.size.y;
         src.size.enteredZ = src.size.z;

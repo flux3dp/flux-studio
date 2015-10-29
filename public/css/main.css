@@ -3928,6 +3928,21 @@ input.switch:checked ~ label:after {
                     border-color: #b3b3b3; }
         .print-studio .objectDialogue .accordion .scale-content {
             height: 195px; }
+            .print-studio .objectDialogue .accordion .scale-content .lock {
+                color: #BBB;
+                display: inline-block;
+                width: 12px;
+                height: 36px;
+                position: absolute;
+                background-image: url("../../img/lock.svg");
+                background-repeat: no-repeat;
+                background-size: 12px 36px;
+                background-position: top;
+                cursor: pointer;
+                top: 102px;
+                right: 10px; }
+            .print-studio .objectDialogue .accordion .scale-content .lock.unlock {
+                background-image: url("../../img/unlock.svg"); }
     .print-studio .objectDialogue .divider {
         width: 100%;
         height: 5px;

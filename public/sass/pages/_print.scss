@@ -1020,6 +1020,23 @@ input.switch:checked ~ label:after {
             }
             .scale-content {
                 height: 195px;
+                .lock {
+                    color: #BBB;
+                    display: inline-block;
+                    width: 12px;
+                    height: 36px;
+                    position: absolute;
+                    background-image: url("../../img/lock.svg");
+                    background-repeat: no-repeat;
+                    background-size: 12px 36px;
+                    background-position: top;
+                    cursor: pointer;
+                    top: 102px;
+                    right: 10px;
+                }
+                .lock.unlock {
+                    background-image: url("../../img/unlock.svg");
+                }
             }
         }
         .divider {

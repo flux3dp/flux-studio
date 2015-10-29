@@ -49,6 +49,7 @@ define([
                 y       : 1,
                 z       : 1
             },
+
             _size = {
                 locked  : true,
                 x       : 0,
@@ -67,7 +68,6 @@ define([
                 getInitialState: function() {
                     return ({
                         checked                     : false,
-                        locked                      : true,
                         previewMode                 : false,
                         showPreviewModeList         : false,
                         showAdvancedSetting         : false,
@@ -138,12 +138,11 @@ define([
                     _scale[axis] = src.type === 'blur' && !$.isNumeric(src.target.value) ? 1 : src.target.value;
                     director.setScale(scale.x, scale.y, scale.z, scale.locked, true);
                 },
-                _handleResize: function(size) {
-                    director.setSize(size.x, size.y, size.z);
+                _handleToggleScaleLock: function(isLocked) {
+                    _scale.locked = isLocked;
                 },
-                _handleSetSize: function(size) {
-                    var updateOriginalSize = true;
-                    director.setSize(size.x, size.y, size.z, updateOriginalSize);
+                _handleResize: function(size, isLocked) {
+                    director.setSize(size.x, size.y, size.z, isLocked);
                 },
                 _handleResetScale: function() {
                     director.setScale(1, 1, 1, true);
@@ -222,7 +221,6 @@ define([
                     this.setState({ openPrinterSelectorWindow: false });
                 },
                 _handlePrinterSelected: function(printer) {
-                    // console.log(selectedPrinter);
                     selectedPrinter = printer;
 
                     director.executePrint(selectedPrinter.serial).then(function() {
@@ -330,9 +328,10 @@ define([
                             model           = {this.state.modelSelected}
                             style           = {this.state.objectDialogueStyle}
                             mode            = {_mode}
-                            onSetSize       = {this._handleSetSize}
+                            scaleLocked     = {_scale.locked}
                             onRotate        = {this._handleRotationChange}
                             onResize        = {this._handleResize}
+                            onScaleLock     = {this._handleToggleScaleLock}
                             onModeChange    = {this._handleModeChange} />
                     );
                 },
