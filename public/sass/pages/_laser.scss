@@ -48,20 +48,168 @@
         align-self: center;
         width: 205px;
 
+        .material-label {
+            padding: 0 3px;
+        }
+
+        .custom-presets-wrapper {
+            background: #FFF;
+            padding: 0 20px;
+            width: 440px;
+
+            .custom-presets-list {
+                border: 2px solid #E0E0DF;
+                list-style: none;
+                height: 110px;
+                overflow: scroll;
+                padding: 0;
+
+                &:empty {
+                    background: #B3B3B3;
+                    color: #E0E0DF;
+                    @include flexbox();
+                    align-items: center;
+                    justify-content: center;
+
+                    &::after {
+                        content: attr(data-empty-message);
+                    }
+                }
+
+                input[type="radio"] {
+                    display: none;
+
+                    &:checked + .preset-item-name {
+                        background-color: #E0E0E0;
+                        color: #FFF;
+                    }
+                }
+
+                .preset-item-name {
+                    border-bottom: 1px solid #E0E0DF;
+                    color: #B3B3B3;
+                    cursor: pointer;
+                    height: 40px;
+                    line-height: 40px;
+                    margin: 0;
+                    padding: 0 0 0 10px;
+                }
+            }
+
+            .custom-preset-buttons {
+                height: 69px;
+                justify-content: flex-end;
+                position: static;
+
+                .btn-default {
+                    border-radius: 0;
+                    font-size: 15px;
+                    height: 30px;
+                    line-height: 26px;
+                    min-width: 66px;
+                    max-width: 66px;
+                    width: 66px;
+                }
+            }
+        }
+
+        .popup-selection {
+            display: block;
+            height: 40px;
+            position: relative;
+            @include flexbox();
+
+            ul {
+                background: #B3B3B3;
+                list-style: none;
+                padding: 0 10px 10px 10px;
+
+                li {
+                    cursor: pointer;
+                    color: #E0E0DF;
+                    margin: 10px 0 0 0;
+                }
+            }
+
+            .popup-open {
+                display: none;
+
+                &:checked ~ .display-text {
+                    background: #B3B3B3;
+                    color: #E0E0DF;
+                }
+
+                &:checked ~ .popup {
+                    visibility: visible;
+                }
+            }
+
+            .display-text {
+                display: inline-block;
+                font-size: 16px;
+                line-height: 40px;
+                padding: 0 16px 0 6px;
+
+                p {
+                    display: block;
+                    margin: 0;
+                    width: 183px;
+                }
+            }
+
+            .popup {
+                visibility: hidden;
+                align-self: center;
+                @include flexbox();
+
+                .arrow {
+                    align-self: center;
+                    position: relative;
+                    right: -1px;
+
+                    polygon {
+                        fill: #B3B3B3;
+                    }
+                }
+            }
+        }
+
+        .object-height-input {
+            width: 164px;
+
+            .ui-control-unit-input {
+                input[type="text"] {
+                    background: rgba(0, 0, 0, 0);
+                    border: 2px solid #fff;
+                    color: #E0E0DF;
+                    font-size: 16px;
+                    line-height: 32px;
+                    padding: 0 5px;
+                    width: 100%;
+                }
+            }
+        }
+
+        .material-list {
+            width: 116px;
+        }
+
+        .btn-advance {
+            border-radius: 0;
+            background: rgba(0,0,0,0);
+            color: #b3b3b3;
+            font-size: 16px;
+            line-height: 40px;
+            text-align: left;
+            padding: 0 16px 0 6px;
+            margin: 0;
+            width: 100%;
+        }
+
         li {
             color: #b3b3b3;
-            font-size: 1.8rem;
-            line-height: 2em;
-
-            .control {
-                background: rgba(0, 0, 0, 0);
-                background-image: none;
-                border: none;
-                border: 0;
-                font-size: 1.8rem;
-                height: auto;
-                width: auto;
-            }
+            font-size: 16px;
+            line-height: 40px;
         }
 
         .main {
@@ -86,45 +234,41 @@
         background: #E0E0E0;
     }
 
-    .button-group {
-        bottom: 28px;
-        position: fixed;
-        right: 78px;
+    .action-buttons {
+        .button-group {
+            bottom: 28px;
+            position: fixed;
+            right: 78px;
 
-        .btn-disabled {
-            background: #CCCCCC;
+            .btn-disabled {
+                background: #CCCCCC;
+            }
         }
-    }
 
-    .btn-default {
-        background: #B3B3B3;
-        border: none;
-        border-radius: 0;
-        color: #EEE;
-        display: block;
-        font-size: 21px;
-        height: 100px;
-        line-height: 20px;
-        margin: 0;
-        min-width: 87px;
-        position: relative;
-        width: 87px;
+        .btn-default {
+            background: #B3B3B3;
+            border: none;
+            border-radius: 0;
+            color: #EEE;
+            display: block;
+            font-size: 21px;
+            height: 100px;
+            margin: 0;
+            min-width: 87px;
+            position: relative;
+            width: 87px;
 
-        &:hover {
-            background: #000;
+            &:hover {
+                background: #000;
+            }
         }
-    }
 
-    .btn-go {
-        font-size: 35px;
-        background: #4D4D4D;
-        left: 50px;
-        top: -21px;
-    }
-
-    .btn-h-group {
-        height: 100%;
-        align-items: center;
+        .btn-go {
+            font-size: 35px;
+            background: #4D4D4D;
+            left: 50px;
+            top: -21px;
+        }
     }
 
     .laser-object {
@@ -191,9 +335,18 @@
     }
 
     .object-position {
+        @include flexbox();
         font-size: 20px;
         width: 230px;
         z-index: 1;
+
+        .arrow {
+            align-self: center;
+
+            polygon {
+                fill: #fff;
+            }
+        }
 
         .caption,
         .controls {
@@ -244,40 +397,51 @@
     }
 
     .advanced-panel {
+        background: #FFF;
+        padding: 20px 20px 0;
+        width: 440px;
+
+        .footer {
+            height: 70px;
+            justify-content: flex-end;
+            margin-bottom: 0;
+            position: static;
+        }
+    }
+
+    .control {
+        align-items: center;
+        @include flexbox();
+        justify-content: space-around;
+        color: #B3B3B3;
+        font-size: 13px;
+        line-height: 40px;
+        height: 40px;
+
         [type="range"] {
-            position: relative;
-            width: 70%;
-
-            &::before,
-            &::after {
-                display: block;
-                position: absolute;
-                top: 170%;
-            }
-
-            &::before {
-                content: attr(data-min-text);
-                left: 0;
-            }
-
-            &::after {
-                content: attr(data-max-text);
-                right: 0;
-            }
-
-            &+span {
-                border: 1px solid #4A4A4A;
-                margin: 5px;
-                padding: 3px 5px;
-
-                &::after {
-                    content: attr(data-tail);
-                }
-            }
+            flex: 1 auto;
         }
 
-        .controls {
-            padding: 20px 0;
+        .value-text {
+            width: 120px;
+        }
+
+        .label {
+            align-self: center;
+            color: #B3B3B3;
+            line-height: 1em;
+            width: 100px;
+        }
+
+        .value-text {
+            border: 2px solid #E0E0DF;
+            line-height: 28px;
+            margin: 5px;
+            padding: 0 5px;
+
+            &::after {
+                content: attr(data-tail);
+            }
         }
     }
 }
