@@ -9,7 +9,8 @@ define([
     'jsx!widgets/Modal',
     'jsx!views/Print-Selector',
     'jsx!widgets/Alert',
-    'jsx!widgets/Button-Group'
+    'jsx!widgets/Button-Group',
+    'helpers/api/config'
 ], function(
     $,
     React,
@@ -21,7 +22,8 @@ define([
     Modal,
     PrinterSelector,
     Alert,
-    ButtonGroup
+    ButtonGroup,
+    config
 ) {
     'use strict';
 
@@ -70,15 +72,11 @@ define([
                         image_panel_class = cx({
                             'panel object-position': true
                         }),
-                        inlineStyles = {
-                            top: this.state.imagePanel.y,
-                            left: this.state.imagePanel.x
-                        },
                         imagePanel = (
                             true === this.state.selectedImage ?
                             <ImagePanel
                                 lang={lang}
-                                style={inlineStyles}
+                                initialPosition={this.state.initialPosition}
                                 ref="imagePanel"
                                 mode={this.state.mode}
                                 className={image_panel_class}
@@ -90,16 +88,35 @@ define([
                                 threshold={this.state.threshold}
                             /> :
                             ''
-                        );
+                        ),
+                        setupPanelDefaults = {
+                            material: undefined,
+                            objectHeight: 0
+                        };
+
+
+                    config().read('laser-defaults', {
+                        onFinished: function(response) {
+                            response = response || {};
+                            setupPanelDefaults = response;
+
+                            if ('undefined' === typeof response.material) {
+                                setupPanelDefaults.material = lang.laser.advanced.form.object_options.options[0];
+                            }
+
+                            if ('undefined' !== typeof response.objectHeight) {
+                                setupPanelDefaults.objectHeight = response.objectHeight;
+                            }
+                        }
+                    });
 
                     return (
                         <section ref="operationTable" id="operation-table" className="operation-table">
                             <div ref="laserObject" className="laser-object border-circle" onClick={this._inactiveSelectImage}/>
                             <SetupPanel
                                 lang={lang}
-                                mode={this.state.mode}
-                                className='operating-panel'
-                                hasImage={this.state.hasImage}
+                                className="operating-panel"
+                                defaults={setupPanelDefaults}
                                 ref="setupPanel"
                             />
                             {imagePanel}
@@ -123,7 +140,12 @@ define([
                             });
                         },
                         content = (
-                            <PrinterSelector className="laser-device-selection-popup" lang={lang} onClose={onClose} onGettingPrinter={onGettingPrinter}/>
+                            <PrinterSelector
+                                className="laser-device-selection-popup"
+                                lang={lang}
+                                onClose={onClose}
+                                onGettingPrinter={onGettingPrinter}
+                            />
                         );
 
                     return (
@@ -218,7 +240,7 @@ define([
                         }];
 
                     return (
-                        <ButtonGroup buttons={buttons}/>
+                        <ButtonGroup buttons={buttons} className="action-buttons"/>
                     );
                 },
 
