@@ -207,8 +207,13 @@ define([
             geometry.center();
 
             // normalize - resize, align
-            var box = new THREE.Box3().setFromObject(mesh);
-            var scale = getScaleDifference(getLargestPropertyValue(box.size()));
+            var box = new THREE.Box3().setFromObject(mesh),
+                enlarge = parseInt(box.size().x) !== 0 && parseInt(box.size().y) !== 0 && parseInt(box.size().z) !== 0,
+                scale = getScaleDifference(
+                    enlarge ?
+                    getLargestPropertyValue(box.size()) :
+                    getSmallestPropertyValue(box.size())
+                );
 
             // alert for auto scalling
             if (scale !== 1) {
@@ -496,6 +501,19 @@ define([
         return v;
     }
 
+    function getSmallestPropertyValue(obj) {
+        var v = 1;
+        for (var property in obj) {
+            if (obj.hasOwnProperty(property)) {
+                if (obj[property] < v) {
+                    v = obj[property];
+                }
+            }
+        }
+        console.log(v);
+        return v;
+    }
+
     // return the scale to fit the area
     function getScaleDifference(value) {
         var done = false,
@@ -503,9 +521,15 @@ define([
 
         // if loaded object is smaller, enlarge it. offset by *10
         if (value < s.diameter) {
-            if (value * scale < s.allowedMin) {
-                scale = scale * 10;
+            while(!done) {
+                if (value * scale < s.allowedMin) {
+                    scale = scale * 10;
+                }
+                else {
+                    done = true;
+                }
             }
+
             return scale;
         }
         // if loaded object exceed printed area, shrink it (no offset)
