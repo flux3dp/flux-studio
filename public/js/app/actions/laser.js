@@ -205,7 +205,7 @@ define([
                     threshold = $el.data('threshold') || 128;
 
                     if ('move' === e.freetransEventType) {
-                        if (true === outOfRange(el_position.center, DIAMETER)) {
+                        if (true === outOfRange(el_position.center, platform_pos.width / 2)) {
                             last_x = $el.data('last-x');
                             last_y = $el.data('last-y');
 
@@ -380,9 +380,9 @@ define([
                     refreshObjectParams({ freetransEventType: 'move' }, $img);
                 }
 
-                // onclick
+                // onmousedown
                 (function(file, size, originalUrl, name, $img) {
-                    $img.parent().find('.ft-controls').on('click', function(e) {
+                    $img.parent().find('.ft-controls').on('mousedown', function(e) {
                         var $self = $(e.target),
                             clone = function() {
                                 var data = $img.data('freetrans');
@@ -398,15 +398,20 @@ define([
                                 });
                             };
 
-                        inactiveAllImage();
                         $target_image = $self.parent().find('.' + LASER_IMG_CLASS);
-                        refreshObjectParams({ freetransEventType: 'move' }, $target_image);
 
-                        self.setState({
-                            selectedImage: true
-                        });
+                        if (false === $target_image.hasClass('image-active')) {
+                            inactiveAllImage();
 
-                        $target_image.addClass('image-active');
+                            refreshObjectParams({ freetransEventType: 'move' }, $target_image);
+
+                            self.setState({
+                                selectedImage: true
+                            });
+
+                            $target_image.addClass('image-active');
+                        }
+
                         menuFactory.items.copy.enabled = true;
                         menuFactory.items.copy.onClick = function() {
                             menuFactory.items.paste.enabled = true;
@@ -488,17 +493,22 @@ define([
         function refreshImagePanelPos() {
             var pos = $target_image.box(true),
                 windowPos = $('body').box(true),
-                y = pos.top;
+                initialPosition = {
+                    left: pos.right + 10,
+                    top: pos.center.y - 66
+                };
 
-            if (windowPos.top > y) {
-                y = windowPos.top;
+            // check position top
+            if (pos.bottom > windowPos.bottom) {
+                initialPosition.top = windowPos.bottom - self.refs.imagePanel.getDOMNode().height;
+            }
+
+            if (windowPos.top > initialPosition.top) {
+                initialPosition.top = windowPos.top;
             }
 
             self.setState({
-                imagePanel: {
-                    y: y,
-                    x: pos.right + 10
-                }
+                initialPosition: initialPosition
             });
         }
 
@@ -600,7 +610,7 @@ define([
                 refreshImage($el, threshold);
             },
             inactiveAllImage: inactiveAllImage,
-            imageTransform: function(e) {
+            imageTransform: function(e, params) {
                 var $el = $(e.currentTarget),
                     type = $el.data('type'),
                     val = $el.val(),
@@ -628,6 +638,7 @@ define([
                 }
 
                 refreshImagePanelPos();
+                self.setState(params);
 
                 $target_image.freetrans(args);
             },
