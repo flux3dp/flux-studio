@@ -13,7 +13,7 @@ define([
         // UI Events
         _onBlur: function(e) {
             var el = this.refs.unitInput.getDOMNode(),
-                pattern = new RegExp('^(\\d+\\.?\\d+)(' + unitConverter.acceptableUnits.join('|') + ')?$'),
+                pattern = new RegExp('^(\\d+\\.?\\d{0,})(' + unitConverter.acceptableUnits.join('|') + ')?$'),
                 matches = pattern.exec(e.currentTarget.value) || [],
                 unit = matches[2] || unitConverter.defaultUnit,
                 value;
@@ -44,15 +44,14 @@ define([
                 displayValue = props.defaultValue + props.defaultUnit;
 
             return (
-                <label className="ui ui-control-unit-input">
-                    <input
-                        ref="unitInput"
-                        type="text"
-                        defaultValue={displayValue}
-                        onBlur={this._onBlur}
-                        onKeyDown={this._onKeyDown}
-                    />
-                </label>
+                <input
+                    ref="unitInput"
+                    className="ui ui-control-unit-input"
+                    type="text"
+                    defaultValue={displayValue}
+                    onBlur={this._onBlur}
+                    onKeyDown={this._onKeyDown}
+                />
             );
         },
 
