@@ -11,7 +11,6 @@
     letter-spacing: .5px;
     line-height: 44px;
     margin: 0;
-    min-width: 99px;
     outline: none;
     overflow: hidden;
     padding: 0 5px;
@@ -35,18 +34,18 @@
 
 .btn-default {
     background: #fff;
-    border: 1px solid #e0e0e0;
-    color: #424242;
+    border: 2px solid #E0E0DF;
+    color: #B3B3B3;
 
     &:hover {
-        border: 1px solid #424242;
+        border: 2px solid #424242;
+        color: #424242;
     }
 }
 
 .btn-confirm {
     background-color: #424242;
     color: #FFF;
-    border-radius: 5px;
 
     &:hover {
         background-color: #000000;
@@ -80,7 +79,6 @@
 
 .btn-warning {
     background: #f00;
-    border-radius: 5px;
 }
 
 .btn-link {
