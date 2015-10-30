@@ -4,24 +4,32 @@ define(['react'], function(React){
     return React.createClass({
 
         render: function() {
-            var buttons = this.props.buttons.map(function(opt, i) {
-                var className = 'btn btn-default';
+            var className,
+                buttons = this.props.buttons.map(function(opt, i) {
+                    className = 'btn btn-default';
 
-                if ('string' === typeof opt.className) {
-                    className += ' ' + opt.className;
-                }
+                    if ('string' === typeof opt.className) {
+                        className += ' ' + opt.className;
+                    }
 
-                return (
-                    <button className={className} onClick={opt.onClick}>{opt.label}</button>
-                );
-            }, this);
+                    return (
+                        <button className={className} onClick={opt.onClick}>{opt.label}</button>
+                    );
+                }, this);
 
-            return (<div className="button-group">{buttons}</div>);
+            className = 'button-group';
+
+            if ('string' === typeof this.props.className) {
+                className += ' ' + this.props.className;
+            }
+
+            return (<div className={className}>{buttons}</div>);
         },
 
         getDefaultProps: function () {
             return {
-                buttons: React.PropTypes.array
+                buttons: React.PropTypes.array,
+                className: React.PropTypes.string
             };
         },
     });
