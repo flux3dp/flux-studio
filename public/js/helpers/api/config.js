@@ -27,11 +27,13 @@ define([
                 return this;
             },
             read: function(key, opts) {
+                var value = localStorage.get(key);
+
                 opts = stardardOptions(opts);
 
-                opts.onFinished(localStorage.get(key));
+                opts.onFinished(value);
 
-                return this;
+                return value;
             }
         };
 
