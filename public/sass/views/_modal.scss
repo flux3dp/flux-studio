@@ -24,6 +24,13 @@
         z-index: -1;
     }
 
+    .modal-body {
+        box-shadow: 0 4px 40px 0px rgba(0, 0, 0, 0.5);
+        @include flexbox();
+        max-height: 100%;
+        overflow: scroll;
+    }
+
     .modal-alert {
         @include flexbox();
         background: #FFF;
