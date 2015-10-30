@@ -16,10 +16,14 @@
 
 }
 
+.ui-control-text-input,
 .ui-control-unit-input {
-    display: block;
-
-    input[type="text"] {
-        width: 100%;
-    }
+    background: #FFF;
+    border: 2px solid #E0E0DF;
+    color: #B3B3B3;
+    font-size: 1.2rem;
+    height: 40px;
+    line-height: 32px;
+    padding: 2px 5px;
+    width: 100%;
 }
