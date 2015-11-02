@@ -350,6 +350,7 @@ define(function() {
             acceptable_files: 'JPG, PNG, SVG',
             drop_files_to_import: 'Drop your file here or click "import" to upload your file',
             button_advanced: 'Advanced',
+            confirm: 'Confirm',
             start_engrave: 'Engrave',
             start_cut: 'Cut',
             close_alert: 'Close',

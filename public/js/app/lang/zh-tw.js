@@ -350,6 +350,7 @@ define(function() {
             acceptable_files: 'JPG, PNG, SVG',
             drop_files_to_import: 'Drop your file here or click "import" to upload your file',
             button_advanced: '進階',
+            confirm: '確認',
             start_engrave: '雕刻',
             start_cut: '切割',
             close_alert: '關閉',
