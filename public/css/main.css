@@ -2756,7 +2756,6 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         top: 0;
         z-index: -1; }
     .modal-window .modal-body {
-        box-shadow: 0 4px 40px 0px rgba(0, 0, 0, 0.5);
         display: -webkit-box;
         /* OLD - iOS 6-, Safari 3.1-6 */
         display: -webkit-flex;
@@ -4532,6 +4531,9 @@ input.switch:checked ~ label:after {
 /**
  * Laser
  */
+.laser-studio .modal-body {
+    box-shadow: 0 4px 40px 0px rgba(0, 0, 0, 0.5); }
+
 .laser-studio .laser-device-selection-popup {
     bottom: 4.3rem;
     right: 15rem; }
@@ -4969,7 +4971,8 @@ input.switch:checked ~ label:after {
             float: left; }
 
 .scan-studio .modal-printer-selecter {
-    position: static; }
+    position: static;
+    z-index: 1; }
 
 .device-studio {
     margin-left: 10px; }

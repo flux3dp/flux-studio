@@ -3,6 +3,10 @@
  */
 .laser-studio {
 
+    .modal-body {
+        box-shadow: 0 4px 40px 0px rgba(0, 0, 0, .5);
+    }
+
     .laser-device-selection-popup {
         bottom: 4.3rem;
         right: 15rem;
