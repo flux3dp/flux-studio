@@ -512,6 +512,7 @@ define([
         function refreshImagePanelPos() {
             var pos = $target_image.box(true),
                 imagePanel = self.refs.imagePanel,
+                platformPos = $laser_platform.box(true),
                 windowPos = $('body').box(true),
                 initialPosition = {
                     left: pos.right + 10,
@@ -525,6 +526,11 @@ define([
 
             if (windowPos.top > initialPosition.top) {
                 initialPosition.top = windowPos.top;
+            }
+
+            // check position left
+            if (initialPosition.left > platformPos.right) {
+                initialPosition.left = platformPos.right + 10;
             }
 
             self.setState({
