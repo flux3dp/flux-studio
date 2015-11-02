@@ -564,6 +564,10 @@ define(function() {
             change_filament: 'CHANGE FILLAMENT',
             browse_file: 'BROWSE FILE',
             monitor: 'MONITOR'
+        },
+        alert: {
+            caption: 'Error',
+            duplicated_preset_name: 'Duplicated preset name'
         }
     };
 });

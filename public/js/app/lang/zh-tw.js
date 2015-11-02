@@ -564,6 +564,10 @@ define(function() {
             change_filament: 'CHANGE FILLAMENT',
             browse_file: 'BROWSE FILE',
             monitor: 'MONITOR'
+        },
+        alert: {
+            caption: '錯誤',
+            duplicated_preset_name: '重複的Preset名稱'
         }
     };
 });
