@@ -102,7 +102,6 @@ define([
                 return true;
             }
             else {
-                // TODO: alerm
                 this.setState({
                     showAlert: true,
                     alertContent: {
