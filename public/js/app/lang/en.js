@@ -451,7 +451,7 @@ define(function() {
                 load_preset: 'LOAD PRESET',
                 apply: 'Apply',
                 cancel: 'Cancel',
-                cancel: 'Cancel'
+                save: 'Save'
             }
         },
         scan: {
