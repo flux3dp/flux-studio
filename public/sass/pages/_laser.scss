@@ -234,43 +234,6 @@
         background: #E0E0E0;
     }
 
-    .action-buttons {
-        .button-group {
-            bottom: 28px;
-            position: fixed;
-            right: 78px;
-
-            .btn-disabled {
-                background: #CCCCCC;
-            }
-        }
-
-        .btn-default {
-            background: #B3B3B3;
-            border: none;
-            border-radius: 0;
-            color: #EEE;
-            display: block;
-            font-size: 21px;
-            height: 100px;
-            margin: 0;
-            min-width: 87px;
-            position: relative;
-            width: 87px;
-
-            &:hover {
-                background: #000;
-            }
-        }
-
-        .btn-go {
-            font-size: 35px;
-            background: #4D4D4D;
-            left: 50px;
-            top: -21px;
-        }
-    }
-
     .laser-object {
         @include absolute-center();
         background: url(/img/laser-platform.png);
@@ -300,6 +263,7 @@
 
         .image-active {
             background: rgba(255, 255, 255, .6);
+            transition: all .5s ease;
 
             & + .ft-controls {
                 outline: 1px solid #626262;
@@ -337,6 +301,7 @@
     .object-position {
         @include flexbox();
         font-size: 20px;
+        transition: all .1s ease;
         width: 230px;
         z-index: 1;
 
@@ -383,16 +348,39 @@
         }
     }
 
-    .objects-params {
-        left: 25px;
-    }
+    .action-buttons {
+        bottom: 28px;
+        position: fixed;
+        right: 78px;
 
-    .btn-start {
-        margin: 10px 0 0 0;
+        .btn.btn-disabled {
+            background: #CCC;
+        }
 
-        img {
-            margin: 0 10px 0 0;
-            width: 14px;
+        .btn-default {
+            background: #B3B3B3;
+            border: none;
+            border-radius: 0;
+            color: #EEE;
+            display: block;
+            font-size: 21px;
+            height: 100px;
+            line-height: 1.2em;
+            margin: 0;
+            min-width: 87px;
+            position: relative;
+            width: 87px;
+
+            &:hover {
+                background: #000;
+            }
+        }
+
+        .btn-go {
+            font-size: 35px;
+            background: #4D4D4D;
+            left: 50px;
+            top: -21px;
         }
     }
 

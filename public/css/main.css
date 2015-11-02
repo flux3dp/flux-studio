@@ -4720,34 +4720,6 @@ input.switch:checked ~ label:after {
 .laser-studio .stage {
     background: #E0E0E0; }
 
-.laser-studio .action-buttons .button-group {
-    bottom: 28px;
-    position: fixed;
-    right: 78px; }
-    .laser-studio .action-buttons .button-group .btn-disabled {
-        background: #CCCCCC; }
-
-.laser-studio .action-buttons .btn-default {
-    background: #B3B3B3;
-    border: none;
-    border-radius: 0;
-    color: #EEE;
-    display: block;
-    font-size: 21px;
-    height: 100px;
-    margin: 0;
-    min-width: 87px;
-    position: relative;
-    width: 87px; }
-    .laser-studio .action-buttons .btn-default:hover {
-        background: #000; }
-
-.laser-studio .action-buttons .btn-go {
-    font-size: 35px;
-    background: #4D4D4D;
-    left: 50px;
-    top: -21px; }
-
 .laser-studio .laser-object {
     bottom: 0;
     display: block;
@@ -4777,7 +4749,8 @@ input.switch:checked ~ label:after {
     display: none; }
 
 .laser-studio .laser-object .image-active {
-    background: rgba(255, 255, 255, 0.6); }
+    background: rgba(255, 255, 255, 0.6);
+    transition: all 0.5s ease; }
     .laser-studio .laser-object .image-active + .ft-controls {
         outline: 1px solid #626262; }
     .laser-studio .laser-object .image-active + .ft-controls {
@@ -4808,6 +4781,7 @@ input.switch:checked ~ label:after {
     display: flex;
     /* NEW, Spec - Opera 12.1, Firefox 20+ */
     font-size: 20px;
+    transition: all 0.1s ease;
     width: 230px;
     z-index: 1; }
     .laser-studio .object-position .arrow {
@@ -4842,14 +4816,32 @@ input.switch:checked ~ label:after {
         color: #B3B3B3;
         font-size: 15px; }
 
-.laser-studio .objects-params {
-    left: 25px; }
-
-.laser-studio .btn-start {
-    margin: 10px 0 0 0; }
-    .laser-studio .btn-start img {
-        margin: 0 10px 0 0;
-        width: 14px; }
+.laser-studio .action-buttons {
+    bottom: 28px;
+    position: fixed;
+    right: 78px; }
+    .laser-studio .action-buttons .btn.btn-disabled {
+        background: #CCC; }
+    .laser-studio .action-buttons .btn-default {
+        background: #B3B3B3;
+        border: none;
+        border-radius: 0;
+        color: #EEE;
+        display: block;
+        font-size: 21px;
+        height: 100px;
+        line-height: 1.2em;
+        margin: 0;
+        min-width: 87px;
+        position: relative;
+        width: 87px; }
+        .laser-studio .action-buttons .btn-default:hover {
+            background: #000; }
+    .laser-studio .action-buttons .btn-go {
+        font-size: 35px;
+        background: #4D4D4D;
+        left: 50px;
+        top: -21px; }
 
 .laser-studio .advanced-panel {
     background: #FFF;
