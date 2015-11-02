@@ -49,7 +49,7 @@ define([
             };
 
         return {
-            ws: ws,
+            connection: ws,
             ls: function(path) {
                 var d = $.Deferred();
                 events.onMessage = function(result) {

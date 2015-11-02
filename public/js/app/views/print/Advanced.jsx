@@ -1,207 +1,814 @@
 define([
     'jquery',
-    'react'
-], function($, React) {
-    'use strict';
-    var advancedSetting;
+    'react',
+    'jsx!widgets/Slider-Control',
+    'jsx!widgets/Dropdown-Control',
+    'jsx!widgets/Switch-Control',
+    'plugins/classnames/index',
+    'helpers/api/config',
+], function($, React, SliderControl, DropdownControl, SwitchControl, ClassNames, Config) {
+
+    var mode = {
+            'setup'     : 1,
+            'load'      : 2,
+            'save'      : 3
+        },
+        tab = {
+            'General'   : 1,
+            'Layers'    : 2,
+            'Infill'    : 3,
+            'Support'   : 4,
+            'Speed'     : 5,
+            'Custom'    : 6
+        },
+        lang,
+        currentKey,
+        lastValidValue;
+
+    var hiddenPresets = ['engine', 'custom'],
+        configs = ['avoid_crossing_perimeters','bed_shape','bed_temperature','before_layer_gcode','bottom_solid_layers','bridge_acceleration','bridge_fan_speed','bridge_flow_ratio','bridge_speed','brim_width','complete_objects','cooling','default_acceleration','disable_fan_first_layers','dont_support_bridges','duplicate_distance','end_gcode','external_fill_pattern','external_perimeter_extrusion_width','external_perimeter_speed','external_perimeters_first','extra_perimeters','extruder_clearance_height','extruder_clearance_radius','extruder_offset','extrusion_axis','extrusion_multiplier','extrusion_width','fan_always_on','fan_below_layer_time','filament_colour','filament_diameter','fill_angle','fill_density','fill_pattern','first_layer_acceleration','first_layer_bed_temperature','first_layer_extrusion_width','first_layer_height','first_layer_speed','first_layer_temperature','gap_fill_speed','gcode_arcs','gcode_comments','gcode_flavor','infill_acceleration','infill_every_layers','infill_extruder','infill_extrusion_width','infill_first','infill_only_where_needed','infill_overlap','infill_speed','interface_shells','layer_gcode','layer_height','max_fan_speed','max_print_speed','max_volumetric_speed','min_fan_speed','min_print_speed','min_skirt_length','notes','nozzle_diameter','octoprint_apikey','octoprint_host','only_retract_when_crossing_perimeters','ooze_prevention','output_filename_format','overhangs','perimeter_acceleration','perimeter_extruder','perimeter_extrusion_width','perimeter_speed','perimeters','post_process','pressure_advance','raft_layers','resolution','retract_before_travel','retract_layer_change','retract_length','retract_length_toolchange','retract_lift','retract_restart_extra','retract_restart_extra_toolchange','retract_speed','seam_position','skirt_distance','skirt_height','skirts','slowdown_below_layer_time','small_perimeter_speed','solid_infill_below_area','solid_infill_every_layers','solid_infill_extruder','solid_infill_extrusion_width','solid_infill_speed','spiral_vase','standby_temperature_delta','start_gcode','support_material','support_material_angle','support_material_contact_distance','support_material_enforce_layers','support_material_extruder','support_material_extrusion_width','support_material_interface_extruder','support_material_interface_layers','support_material_interface_spacing','support_material_interface_speed','support_material_pattern','support_material_spacing','support_material_speed','support_material_threshold','temperature','thin_walls','threads','toolchange_gcode','top_infill_extrusion_width','top_solid_infill_speed','top_solid_layers','travel_speed','use_firmware_retraction','use_relative_e_distances','use_volumetric_e','vibration_limit','wipe','xy_size_compensation','z_offset'],
+        advancedSetting = {
+            // General
+            engine                              : '',
+            temperature                         : 200,
+
+            // Layers
+            layer_height                        : 0.2,
+            first_layer_height                  : 0.25,
+            perimeters                          : 3,
+            top_solid_layers                    : 3,
+            bottom_solid_layers                 : 3,
+
+            // Infill
+            fill_density                        : 10,
+            fill_pattern                        : 'auto',
+            spiral_vase                         : false,
+
+            // Support
+            support_material                    : true,
+            support_material_spacing            : 2.5,
+            support_material_threshold          : 60,
+            support_material_pattern            : 'auto',
+            support_material_contact_distance   : 0.2,
+            raft_layers                         : 4,
+
+            // Speed
+            travel_speed                        : 150,
+            support_material_speed              : 80,
+            infill_speed                        : 80,
+            first_layer_speed                   : 30,
+            solid_infill_speed                  : 20,
+            perimeter_speed                     : 70,
+            external_perimeter_speed            : 50,
+            bridge_speed                        : 60,
+
+            // Custom
+            custom                              : ''
+        };
+
     return React.createClass({
-        getDefaultProps: function() {
-            return {
-                onCancel: React.PropTypes.func,
-                onDone  : React.PropTypes.func,
-                setting : React.PropTypes.object
-            };
+
+        propTypes: {
+            lang: React.PropTypes.object,
+            setting: React.PropTypes.object,
+            onClose: React.PropTypes.func,
+            onApply: React.PropTypes.func
         },
+
         getInitialState: function() {
-            advancedSetting = this.props.setting;
             return {
-                infill          : advancedSetting.infill * 100 || 20,
-                layerHeight     : advancedSetting.layerHeight || 0.2,
-                travelingSpeed  : advancedSetting.travelingSpeed || 88,
-                extrudingSpeed  : advancedSetting.extrudingSpeed || 58,
-                temperature     : advancedSetting.temperature || 200,
-                advancedSettings: advancedSetting.advancedSettings
+                mode                : 1,
+                selectedTab         : 1,
+
+                // Presets
+                selectedPreset      : '',
+                presets             : {}
             };
         },
-        _handleLayerHeightChange: function(e) {
-            var layerHeight = parseFloat(e.target.value);
-            advancedSetting.layerHeight = layerHeight;
-            this.setState({ layerHeight: layerHeight });
+
+        componentWillMount: function() {
+            lang = this.props.lang.print.advanced;
+            this._updateCustomField();
         },
-        _handleInfillChange: function(e) {
-            var infill = parseInt(e.target.value);
-            advancedSetting.infill = infill / 100;
-            this.setState({ infill: infill });
+
+        _createState: function(key, value) {
+            var newState = {};
+            newState[key] = value;
+            return newState;
         },
-        _handleTravelingSpeedChange: function(e) {
-            var travelingSpeed = parseInt(e.target.value);
-            advancedSetting.travelingSpeed = travelingSpeed;
-            this.setState({ travelingSpeed: travelingSpeed });
+
+        _validateValue: function(e) {
+            e.preventDefault();
+            if(!this._isValidValue(currentKey, this.state[currentKey])) {
+                this.setState(this._createState(currentKey, lastValidValue));
+            }
         },
-        _handleExtrudingSpeedChange: function(e) {
-            var extrudingSpeed = parseInt(e.target.value);
-            advancedSetting.extrudingSpeed = extrudingSpeed;
-            this.setState({ extrudingSpeed: extrudingSpeed });
+
+        _isValidValue: function(key, value) {
+            var min = parseInt(this.refs[key].getDOMNode().min),
+                max = parseInt(this.refs[key].getDOMNode().max);
+
+            return min <= value && value <= max;
         },
-        _handleTemperatureChange: function(e) {
-            var temperature = parseInt(e.target.value);
-            advancedSetting.temperature = temperature;
-            this.setState({ temperature: temperature });
+        
+        _validateCustomFields: function() {
+            var settings = this.state.custom.split('\n');
+            
         },
-        _handleSupportChange: function(e) {
-            advancedSetting.support = e.target.value;
+        
+        _updateCustomField: function() {
+            var custom = this._formatPreset(advancedSetting);
+            this.setState({ custom: custom });
         },
-        _handleIniChange: function(e) {
-            var value = !!e.target.value ? e.target.value : ' ';
-            advancedSetting.advancedSettings = value;
-            this.setState({ advancedSettings: value });
+        
+        _getPresets: function(callback) {
+            Config().read('preset-settings', {
+                onFinished: function(response) {
+                    callback(response);
+                }
+            });
         },
-        _handleCancel: function(e) {
-            this.props.onCancel(e);
+        
+        _savePreset: function(presets) {
+            var self = this,
+                name = this.refs.presetName.getDOMNode().value;
+                p = JSON.parse(presets);
+            
+            p[name] = JSON.stringify(advancedSetting);
+            Config().write('preset-settings', JSON.stringify(p), {
+                onFinished: function() {
+                    self._handleBackToSetting();
+                },
+                onError: function(error) {
+                    // TODO: log error
+                    console.log(error);
+                }
+            });
         },
-        _handleDone: function(e) {
-            this.props.onDone(advancedSetting);
+        
+        _listPresets: function(presets) {
+            var p = JSON.parse(presets);
+            
+            this.setState({ 
+                presets: p,
+                selectedPreset: Object.keys(p)[0]
+            });
         },
-        _renderQualitySection: function(lang) {
+        
+        _formatPreset: function(presetInJSON) {
+            if(!presetInJSON) { return ''; }
+            var settings = Object.keys(presetInJSON).map(function(name) {
+                if(hiddenPresets.indexOf(name) >= 0) {
+                    return '';
+                }
+                return name.replace(/,/g,'') + ' = ' + presetInJSON[name] + '\n';
+            });
+            return settings.join('');
+        },
+
+        _handleNavigate: function(selectedTab, e) {
+            e.preventDefault();
+            this.setState({
+                selectedTab: selectedTab
+            });
+        },
+
+        _handleParameterChange: function(key, e) {
+            var value = e.target.value;
+            if(e.target.type === 'checkbox') {
+                value = e.target.checked;
+            }
+
+            this.setState(this._createState(key, value));
+        },
+
+        _handleSelectPreset: function(name) {
+            this.setState({ selectedPreset: name });
+        },
+
+        _handleLoadPreset: function() {
+            var self = this;
+            this.setState({ mode: mode.load });
+            this._getPresets(function(settings) {
+                self._listPresets(settings);
+            });
+        },
+
+        _handleBackToSetting: function() {
+            this.setState({ mode: mode.setup });
+        },
+
+        _handleOpenSaveAsPreset: function() {
+            this.setState({ mode: mode.save });
+        },
+        
+        _handleSaveAndApply: function() {
+            var self = this;
+            this._getPresets(function(presets) {
+                self._savePreset(presets);
+            });
+        },
+
+        _handleEditValue: function(e) {
+            var newValue    = e.target.value;
+            currentKey  = e.target.id;
+
+            if(this._isValidValue(currentKey, newValue)) {
+                lastValidValue = newValue;
+            }
+
+            this.setState(this._createState(currentKey, newValue));
+        },
+
+        _handleControlValueChange: function(id, value) {
+            console.log(id, value);
+            advancedSetting[id] = value;
+            
+            this._updateCustomField();
+        },
+        
+        _handleApplyPreset: function() {
+            var p = this.state.presets[this.state.selectedPreset];
+            advancedSetting = JSON.parse(p);
+            this._updateCustomField();
+            this._handleBackToSetting();
+        },
+
+        _handleApply: function(e) {
+            e.preventDefault();
+            if(this.state.selectedTab === tab.Custom) {
+                this._validateCustomFields();
+            }
+            
+            this.props.onApply(advancedSetting);
+        },
+
+        _renderSliderControl: function(key, min, max, step) {
             return (
-                <div className="section">
-                    <div className="title">{lang.quality}</div>
-                    <div className="controls">
-                        <div className="label pull-left">{lang.layer_height}</div>
-                        <div className="control pull-right">
-                            <div className="slider-container">
-                                <input className="slider" type="range" min="0.02" max="0.3" step="0.01" value={this.state.layerHeight} onChange={this._handleLayerHeightChange} />
-                            </div>
-                            <input type="text" readOnly value={this.state.layerHeight + 'mm'} />
-                        </div>
+                <div className="control pull-right">
+
+                    <div className="slider-container">
+                        <input className="slider" type="range" min={min} max={max} step={step}
+                            ref={key}
+                            value={this.state[key]}
+                            onChange={this._handleParameterChange.bind(null, key)} />
                     </div>
-                    <div className="controls">
-                        <div className="label pull-left">{lang.infill}</div>
-                        <div className="control pull-right">
-                            <div className="slider-container">
-                                <input className="slider" type="range" min="0" max="100" value={this.state.infill} onChange={this._handleInfillChange} />
-                            </div>
-                            <input type="text" readOnly value={this.state.infill + '%'} />
-                        </div>
-                    </div>
+
+                    <input id={key} type="text" value={this.state[key]}
+                        onChange={this._handleEditValue}
+                        onFocus={this._handleEditValue}
+                        onBlur={this._validateValue} />
                 </div>
             );
         },
-        _renderSpeedSection: function(lang) {
+
+        _renderSwitchControl: function(key) {
             return (
-                <div className="section">
-                    <div className="title">{lang.speed}</div>
-                    <div className="controls">
-                        <div className="label pull-left">{lang.speed_while_traveling}</div>
-                        <div className="control pull-right">
-                            <div className="slider-container">
-                                <input className="slider" type="range" min="5" max="200" step="1" value={this.state.travelingSpeed} onChange={this._handleTravelingSpeedChange} />
-                            </div>
-                            <input type="text" readOnly value={this.state.travelingSpeed} />
-                        </div>
-                    </div>
-                    <div className="controls">
-                        <div className="label pull-left">{lang.speed_while_extruding}</div>
-                        <div className="control pull-right">
-                            <div className="slider-container">
-                                <input className="slider" type="range" min="5" max="200" step="1" value={this.state.extrudingSpeed} onChange={this._handleExtrudingSpeedChange} />
-                            </div>
-                            <input type="text" readOnly value={this.state.extrudingSpeed} />
-                        </div>
+                <div className="switch-container">
+                    <div className="switch-status">{this.state[key] ? 'ON' : 'OFF'}</div>
+                    <div className="onoffswitch">
+                        <input type="checkbox" name="onoffswitch" className="onoffswitch-checkbox" id={key}
+                            onChange={this._handleParameterChange.bind(null, key)}
+                            checked={this.state[key]} />
+                        <label className="onoffswitch-label" htmlFor={key}>
+                            <span className="onoffswitch-inner"></span>
+                            <span className="onoffswitch-switch"></span>
+                        </label>
                     </div>
                 </div>
             );
         },
-        _renderTemperatureSection: function(lang) {
-            return(
-                <div className="section">
-                    <div className="title">{lang.temperature}</div>
-                    <div className="controls">
-                        <div className="label pull-left">{lang.printing_temperature}</div>
-                        <div className="control pull-right">
-                            <div className="slider-container">
-                                <input className="slider" type="range" min="160" max="250" step="1" value={this.state.temperature} onChange={this._handleTemperatureChange} />
-                            </div>
-                            <input type="text" readOnly value={this.state.temperature} />
-                        </div>
-                    </div>
-                </div>
-            );
-        },
-        _renderSupportSection: function(lang) {
-            return '';
-            // this feature will be support in the future
-            /*
-            var lang = this.props.lang.print.advanced;
+
+        _renderDropdownControl: function(key, options, defaultValue) {
+            var _options = options.map(function(option) {
+                var isSelected = option === defaultValue ? 'selected' : '';
+                return (<option value={option} selected={isSelected}>{option}</option>);
+            });
+
             return (
-                <div className="section">
-                    <div className="title">{lang.support}</div>
-                    <div className="controls">
-                        <div className="label pull-left">{lang.support_type.label}</div>
-                        <div className="control pull-right">
-                            <select onChange={this._handleSupportChange}>
-                                <option>{lang.support_type.touch_buildplate}</option>
-                                <option>{lang.support_type.everywhere}</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
+                <select onChange={this._handleParameterChange.bind(null, key)}>
+                    {_options}
+                </select>
             );
-            */
         },
-        _renderIniSection: function(lang) {
+
+        _renderTabs: function() {
+            var tabGeneral  = ClassNames('tab', {selected: this.state.selectedTab === tab.General}),
+                tabLayers   = ClassNames('tab', {selected: this.state.selectedTab === tab.Layers}),
+                tabInfill   = ClassNames('tab', {selected: this.state.selectedTab === tab.Infill}),
+                tabSupport  = ClassNames('tab', {selected: this.state.selectedTab === tab.Support}),
+                tabSpeed    = ClassNames('tab', {selected: this.state.selectedTab === tab.Speed}),
+                tabCustom   = ClassNames('tab', {selected: this.state.selectedTab === tab.Custom});
+
             return (
-                <div className="section">
-                    <div className="title">{lang.direct_setting}</div>
-                    <div className="controls">
-                        <div className="control">
-                            <textarea value={this.state.advancedSettings} onChange={this._handleIniChange}></textarea>
-                        </div>
-                    </div>
+                <div className="tab-container">
+                    <ul className="tab-list">
+                        <li className={tabGeneral} onClick={this._handleNavigate.bind(null, 1)}><a href="#">{lang.general}</a></li>
+                        <li className={tabLayers} onClick={this._handleNavigate.bind(null, 2)}><a href="#">{lang.layers}</a></li>
+                        <li className={tabInfill} onClick={this._handleNavigate.bind(null, 3)}><a href="#">{lang.infill}</a></li>
+                        <li className={tabSupport} onClick={this._handleNavigate.bind(null, 4)}><a href="#">{lang.support}</a></li>
+                        <li className={tabSpeed} onClick={this._handleNavigate.bind(null, 5)}><a href="#">{lang.speed}</a></li>
+                        <li className={tabCustom} onClick={this._handleNavigate.bind(null, 6)}><a href="#">{lang.custom}</a></li>
+                    </ul>
                 </div>
             );
         },
+
+        _renderGeneralSection: function() {
+            return (
+                <div className="content-wrapper">
+
+                    <div className="section">
+                        <div className="title">{lang.slicingEngine}</div>
+                        <div className="controls">
+                            <div className="label"></div>
+                            <div className="control">
+                                <div>
+                                    <div className="radio"></div>
+                                    <span>{lang.slic3r}</span>
+                                </div>
+                                <div>
+                                    <div className="radio"></div>
+                                    <span>{lang.experiment}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="section">
+                        <div className="title">{lang.filament}</div>
+                        <SliderControl
+                            id="temperature"
+                            label={lang.temperature}
+                            min={10}
+                            max={230}
+                            step={1}
+                            default={advancedSetting.temperature}
+                            onChange={this._handleControlValueChange} />
+
+                    </div>
+
+                </div>
+            );
+        },
+
+        _renderLayersSection: function() {
+            return (
+                <div className="content-wrapper">
+
+                    <div className="section">
+                        <div className="title">{lang.layerHeight}</div>
+
+                        <SliderControl
+                            id="layer_height"
+                            label={lang.layerHeight}
+                            min={0.02}
+                            max={20}
+                            step={0.01}
+                            default={advancedSetting.layer_height}
+                            onChange={this._handleControlValueChange} />
+
+                        <SliderControl
+                            id="first_layer_height"
+                            label={lang.firstLayerHeight}
+                            min={0.02}
+                            max={0.4}
+                            step={0.01}
+                            default={advancedSetting.first_layer_height}
+                            onChange={this._handleControlValueChange} />
+
+                    </div>
+
+                    <div className="section">
+                        <div className="title">{lang.shell}</div>
+
+                        <SliderControl
+                            id="perimeters"
+                            label={lang.shellSurface}
+                            min={0}
+                            max={20}
+                            step={1}
+                            default={advancedSetting.perimeters}
+                            onChange={this._handleControlValueChange} />
+
+                        <SliderControl
+                            id="top_solid_layers"
+                            label={lang.solidLayerTop}
+                            min={0}
+                            max={20}
+                            step={1}
+                            default={advancedSetting.top_solid_layers}
+                            onChange={this._handleControlValueChange} />
+
+                        <SliderControl
+                            id="bottom_solid_layers"
+                            label={lang.solidLayerBottom}
+                            min={0}
+                            max={20}
+                            step={1}
+                            default={advancedSetting.bottom_solid_layers}
+                            onChange={this._handleControlValueChange} />
+
+                    </div>
+
+                </div>
+            );
+        },
+
+        _renderInfillSection: function() {
+            return (
+                <div className="content-wrapper">
+
+                    <div className="section">
+                        <div className="title">Infill</div>
+
+                        <SliderControl
+                            id="fill_density"
+                            label={lang.density}
+                            min={0}
+                            max={100}
+                            step={1}
+                            default={advancedSetting.fill_density}
+                            onChange={this._handleControlValueChange} />
+
+                        <DropdownControl
+                            id="fill_pattern"
+                            label={lang.pattern}
+                            options={[lang.auto, lang.line, lang.rectilinear, lang.honeycomb]}
+                            default={advancedSetting.fill_pattern}
+                            onChange={this._handleControlValueChange} />
+
+                    </div>
+
+                    <div className="section">
+                        <div className="title">{lang.blackMagic}</div>
+
+                        <SwitchControl
+                            id="spiral_vase"
+                            label={lang.shellSurface}
+                            default={advancedSetting.spiralVase}
+                            onChange={this._handleControlValueChange} />
+
+                    </div>
+
+                </div>
+            );
+        },
+
+        _renderSupportSection: function() {
+            return (
+                <div className="content-wrapper">
+
+                    <div className="section">
+                        <div className="title">{lang.support}</div>
+
+                        <SwitchControl
+                            id="support_material"
+                            label={lang.generalSupport}
+                            default={advancedSetting.support_material}
+                            onChange={this._handleControlValueChange} />
+
+                        <SliderControl
+                            id="support_material_spacing"
+                            label={lang.spacing}
+                            min={0.1}
+                            max={50}
+                            step={0.1}
+                            default={advancedSetting.support_material_spacing}
+                            onChange={this._handleControlValueChange} />
+
+                        <SliderControl
+                            id="support_material_threshold"
+                            label={lang.overhang}
+                            min={0}
+                            max={90}
+                            step={1}
+                            default={advancedSetting.support_material_threshold}
+                            onChange={this._handleControlValueChange} />
+
+                        <DropdownControl
+                            id="support_material_pattern"
+                            label={lang.pattern}
+                            options={[lang.auto, lang.line, lang.rectilinear, lang.honeycomb]}
+                            default={advancedSetting.support_material_pattern}
+                            onChange={this._handleControlValueChange} />
+
+                        <SliderControl
+                            id="support_material_contact_distance"
+                            label={lang.zDistance}
+                            min={0.05}
+                            max={20}
+                            step={0.01}
+                            default={advancedSetting.support_material_contact_distance}
+                            onChange={this._handleControlValueChange} />
+
+                    </div>
+
+                    <div className="section">
+                        <div className="title">{lang.raft}</div>
+
+                        <SliderControl
+                            id="raft_layers"
+                            label={lang.raftLayers}
+                            min={0}
+                            max={20}
+                            step={1}
+                            default={advancedSetting.raft_layers}
+                            onChange={this._handleControlValueChange} />
+
+                    </div>
+
+                </div>
+            );
+        },
+
+        _renderSpeedSection: function() {
+            return (
+                <div className="content-wrapper">
+
+                    <div className="section">
+                        <div className="title">{lang.movement}</div>
+                        <SliderControl
+                            id="travel_speed"
+                            label={lang.traveling}
+                            min={1}
+                            max={150}
+                            step={1}
+                            default={advancedSetting.travel_speed}
+                            onChange={this._handleControlValueChange} />
+                    </div>
+
+                    <div className="section">
+                        <div className="title">{lang.structure}</div>
+
+                        <SliderControl
+                            id="support_material_speed"
+                            label={lang.support}
+                            min={1}
+                            max={150}
+                            step={1}
+                            default={advancedSetting.support_material_speed}
+                            onChange={this._handleControlValueChange} />
+
+                        <SliderControl
+                            id="infill_speed"
+                            label={lang.infill}
+                            min={1}
+                            max={150}
+                            step={1}
+                            default={advancedSetting.infill_speed}
+                            onChange={this._handleControlValueChange} />
+
+                    </div>
+
+                    <div className="section">
+                        <div className="title">{lang.surface}</div>
+
+                        <SliderControl
+                            id="first_layer_speed"
+                            label={lang.firstLayer}
+                            min={1}
+                            max={150}
+                            step={1}
+                            default={advancedSetting.first_layer_speed}
+                            onChange={this._handleControlValueChange} />
+
+                        <SliderControl
+                            id="solid_infill_speed"
+                            label={lang.solidLayers}
+                            min={1}
+                            max={150}
+                            step={1}
+                            default={advancedSetting.solid_infill_speed}
+                            onChange={this._handleControlValueChange} />
+
+                        <SliderControl
+                            id="perimeter_speed"
+                            label={lang.innerShell}
+                            min={1}
+                            max={150}
+                            step={1}
+                            default={advancedSetting.perimeter_speed}
+                            onChange={this._handleControlValueChange} />
+
+                        <SliderControl
+                            id="external_perimeter_speed"
+                            label={lang.outerShell}
+                            min={1}
+                            max={150}
+                            step={1}
+                            default={advancedSetting.external_perimeter_speed}
+                            onChange={this._handleControlValueChange} />
+
+                        <SliderControl
+                            id="bridge_speed"
+                            label={lang.bridge}
+                            min={1}
+                            max={150}
+                            step={1}
+                            default={advancedSetting.bridge_speed}
+                            onChange={this._handleControlValueChange} />
+
+                    </div>
+
+                </div>
+            );
+        },
+
+        _renderCustomSection: function() {
+            // var ignored = ['engine', 'custom'];
+            // var settings = Object.keys(advancedSetting).map(function(name) {
+            //     if(ignored.indexOf(name) >= 0) {
+            //         return '';
+            //     }
+            //     return name.replace(/,/g,'') + ' = ' + advancedSetting[name] + '\n';
+            // });
+            // advancedSetting['custom'] = settings;
+            
+            return (
+                <div className="content-wrapper">
+
+                    <div className="section">
+                        <div className="title">{lang.config}</div>
+                        <div className="controls">
+                            <div className="label pull-left"></div>
+                            <div className="control">
+                                <div className="textarea-container">
+                                    <textarea
+                                        rows="20" 
+                                        cols="50" 
+                                        value={this.state.custom}
+                                        onChange={this._handleParameterChange.bind(null, 'custom')} />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            );
+        },
+
+        _renderContent: function() {
+            var self = this,
+                content;
+
+            switch(this.state.selectedTab) {
+
+                case tab.General:
+                    content = self._renderGeneralSection(); break;
+
+                case tab.Layers:
+                    content = self._renderLayersSection(); break;
+
+                case tab.Infill:
+                    content = self._renderInfillSection(); break;
+
+                case tab.Support:
+                    content = self._renderSupportSection(); break;
+
+                case tab.Speed:
+                    content = self._renderSpeedSection(); break;
+
+                case tab.Custom:
+                    content = self._renderCustomSection(); break;
+
+                default:
+                    break;
+            }
+
+            return content;
+        },
+
         _renderFooter: function() {
+            var button1, button2, button3;
+
+            switch(this.state.mode) {
+
+                case mode.setup:
+                    button1 = (<a className="btn" onClick={this._handleLoadPreset}>{lang.loadPreset}</a>);
+                    button2 = (<a className="btn" onClick={this._handleApply}>{lang.apply}</a>);
+                    button3 = (<a className="btn" onClick={this._handleOpenSaveAsPreset}>{lang.saveAsPreset}</a>);
+                    break;
+
+                case mode.load:
+                    button1 = '';
+                    button2 = (<a className="btn" onClick={this._handleApplyPreset}>{lang.apply}</a>);
+                    button3 = (<a className="btn" onClick={this._handleBackToSetting}>{lang.cancel}</a>);
+                    break;
+
+                case mode.save:
+                    button1 = '';
+                    button2 = (<a className="btn" onClick={this._handleSaveAndApply}>{lang.saveAndApply}</a>);
+                    button3 = (<a className="btn" onClick={this._handleBackToSetting}>{lang.cancel}</a>);
+
+                default:
+                    break;
+
+            }
+
             return (
                 <div className="footer">
-                    <a data-ga-event="cancel-print-advanced" className="btn btn-default" onClick={this._handleCancel}>{this.props.lang.print.cancel}</a>
-                    <a data-ga-event="apply-print-advanced" className="btn btn-confirm" onClick={this._handleDone}>{this.props.lang.print.done}</a>
+
+                    <div className="left">
+                        {button1}
+                    </div>
+
+                    <div className="right">
+                        {button2}
+                        {button3}
+                    </div>
+
                 </div>
             );
         },
-        render: function() {
-            var lang = this.props.lang.print.advanced,
-                qualitySection = this._renderQualitySection(lang),
-                speedSection = this._renderSpeedSection(lang),
-                temperatureSection = this._renderTemperatureSection(lang),
-                supportSection = this._renderSupportSection(lang),
-                iniSection = this._renderIniSection(lang),
-                footer = this._renderFooter(lang);
+
+        _renderSetupUI: function() {
+            var tabs    = this._renderTabs(),
+                content = this._renderContent(),
+                footer  = this._renderFooter();
 
             return (
                 <div id="advanced-panel" className="advanced-panel">
-
-                    <div className="container">
-
-                        <div className="header">{lang.label}</div>
-
-                        {qualitySection}
-
-                        {speedSection}
-
-                        {temperatureSection}
-
-                        {supportSection}
-
-                        {iniSection}
-
-                    </div>
-
+                    {tabs}
+                    {content}
                     {footer}
-
                 </div>
-
             );
+        },
+
+        _renderLoadPresetUI: function() {
+            var self = this,
+                footer = this._renderFooter(),
+                entries,
+                entryClass,
+                presetList = Object.keys(this.state.presets);
+
+            entries = presetList.map(function(entry) {
+                entryClass = ClassNames('preset-entry', {'selected': self.state.selectedPreset === entry});
+                return (
+                    <div className={entryClass} onClick={self._handleSelectPreset.bind(null, entry)}>
+                        <span>{entry}</span>
+                    </div>
+                );
+            });
+            
+            var preset = this.state.presets[this.state.selectedPreset] || '{}',
+                presetContent = this._formatPreset(JSON.parse(preset));
+
+            return (
+                <div id="advanced-panel" className="advanced-panel">
+                    <div className="preset-wrapper">
+                        <div className="preset-header">{lang.presets}</div>
+                        <div className="preset-list">
+                            {entries}
+                        </div>
+                        <textarea className="preset-content" value={presetContent} disabled />
+                        {footer}
+                    </div>
+                </div>
+            );
+        },
+
+        _renderSavePresetUI: function() {
+            var divStyle = {
+                    height: '190px'
+                },
+                footer = this._renderFooter();
+
+            return (
+                <div id="advanced-panel" className="advanced-panel" style={divStyle}>
+                    <div className="preset-wrapper">
+                        <div className="preset-header">{lang.saveAsPreset}</div>
+                        <div className="preset-name">
+                            <span>{lang.name}</span>
+                            <input ref="presetName" type="text" />
+                        </div>
+
+                        {footer}
+                    </div>
+                </div>
+            );
+        },
+
+        render: function() {
+            var self = this,
+                UI;
+
+            switch(this.state.mode) {
+
+                case mode.setup:
+                    UI = self._renderSetupUI(); break;
+
+                case mode.load:
+                    UI = self._renderLoadPresetUI(); break;
+
+                case mode.save:
+                    UI = self._renderSavePresetUI(); break;
+
+                default: break;
+            }
+
+            return UI;
         }
 
     });

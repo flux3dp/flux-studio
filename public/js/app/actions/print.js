@@ -39,7 +39,8 @@ define([
         transformMode = false,
         shiftPressed = false,
         previewMode = false,
-        leftPanelWidth = 275;
+        leftPanelWidth = 275,
+        ddHelper = 0;
 
     var s = {
         diameter: 170,
@@ -179,9 +180,10 @@ define([
         return d.promise();
     }
 
-    function appendModel(fileEntry, file) {
+    function appendModel(fileEntry, file, callback) {
         var loader = new THREE.STLLoader();
         var model_file_path = fileEntry.toURL();
+        callback = callback || function(){};
 
         reactSrc.setState({
             openWaitWindow: true,
@@ -205,8 +207,13 @@ define([
             geometry.center();
 
             // normalize - resize, align
-            var box = new THREE.Box3().setFromObject(mesh);
-            var scale = getScaleDifference(getLargestPropertyValue(box.size()));
+            var box = new THREE.Box3().setFromObject(mesh),
+                enlarge = parseInt(box.size().x) !== 0 && parseInt(box.size().y) !== 0 && parseInt(box.size().z) !== 0,
+                scale = getScaleDifference(
+                    enlarge ?
+                    getLargestPropertyValue(box.size()) :
+                    getSmallestPropertyValue(box.size())
+                );
 
             // alert for auto scalling
             if (scale !== 1) {
@@ -250,38 +257,74 @@ define([
             objects.push(mesh);
 
             render();
+            callback();
         });
+    }
+
+    function appendModels(files, index, callback) {
+        if(files.item(index).name.split('.').pop().toLowerCase() === 'stl') {
+            FileSystem.writeFile(
+                files.item(index),
+                {
+                    onComplete: function(e, fileEntry) {
+                        appendModel(fileEntry, files.item(index), function() {
+                            if(files.length > index + 1) {
+                                appendModels(files, index + 1, callback);
+                            }
+                            else {
+                                callback();
+                            }
+                        });
+                    }
+                }
+            );
+        }
+        else {
+            callback();
+        }
     }
 
     function registerDropToImport() {
         if(window.FileReader) {
             var zone = document.querySelector('.studio-container.print-studio');
-            // zone.addEventListener('drop', onDropFile);
-            addEventHandler(zone, 'dragover', cancel);
-            addEventHandler(zone, 'dragenter', cancel);
-            addEventHandler(zone, 'drop', onDropFile);
+            zone.addEventListener('dragenter', onDragEnter);
+            zone.addEventListener('dragover', onDragEnter);
+            zone.addEventListener('dragleave', onDragLeave);
+            zone.addEventListener('drop', onDropFile);
         }
     }
 
     function onDropFile(e) {
-    }
-
-    function cancel(e) {
-      if (e.preventDefault) { e.preventDefault(); }
-      return false;
-    }
-
-    function addEventHandler(obj, evt, handler) {
-        if(obj.addEventListener) {
-            // W3C method
-            obj.addEventListener(evt, handler, false);
-        } else if(obj.attachEvent) {
-            // IE method.
-            obj.attachEvent('on'+evt, handler);
-        } else {
-            // Old school method.
-            obj['on'+evt] = handler;
+        e.preventDefault();
+        var files = e.dataTransfer.files;
+        if(files.length > 0) {
+            appendModels(files, 0, function() {
+                $('.import-indicator').hide();
+                e.target.value = null;
+            });
         }
+    }
+
+    function onDragEnter(e) {
+        e.preventDefault();
+
+        if(e.type === 'dragenter') {
+            ddHelper++;
+        }
+        $('.import-indicator').show();
+
+        return false;
+    }
+
+    function onDragLeave(e) {
+        e.preventDefault();
+        ddHelper--;
+
+        if(ddHelper === 0) {
+            $('.import-indicator').hide();
+        }
+
+        return false;
     }
 
     // Events Section ---
@@ -458,6 +501,19 @@ define([
         return v;
     }
 
+    function getSmallestPropertyValue(obj) {
+        var v = 1;
+        for (var property in obj) {
+            if (obj.hasOwnProperty(property)) {
+                if (obj[property] < v) {
+                    v = obj[property];
+                }
+            }
+        }
+        console.log(v);
+        return v;
+    }
+
     // return the scale to fit the area
     function getScaleDifference(value) {
         var done = false,
@@ -465,9 +521,15 @@ define([
 
         // if loaded object is smaller, enlarge it. offset by *10
         if (value < s.diameter) {
-            if (value * scale < s.allowedMin) {
-                scale = scale * 10;
+            while(!done) {
+                if (value * scale < s.allowedMin) {
+                    scale = scale * 10;
+                }
+                else {
+                    done = true;
+                }
             }
+
             return scale;
         }
         // if loaded object exceed printed area, shrink it (no offset)
@@ -587,7 +649,7 @@ define([
         mouse.y = -((e.offsetY - offy) / container.offsetHeight) * 2 + 1;
     }
 
-    function setScale(x, y, z, locked, center) {
+    function setScale(x, y, z, isLocked, center) {
         var originalScaleX = SELECTED.scale._x;
         var originalScaleY = SELECTED.scale._y;
         var originalScaleZ = SELECTED.scale._z;
@@ -610,7 +672,7 @@ define([
             (originalScaleX * x) || scaleBeforeTransformX, (originalScaleY * y) || scaleBeforeTransformY, (originalScaleZ * z) || scaleBeforeTransformZ
         );
         SELECTED.outlineMesh.scale.multiplyScalar(1.05);
-        SELECTED.scale.locked = locked;
+        SELECTED.scale.locked = isLocked;
         SELECTED.plane_boundary = planeBoundary(SELECTED);
 
         reactSrc.setState({
@@ -625,14 +687,13 @@ define([
         }
     }
 
-    function setSize(x, y, z) {
+    function setSize(x, y, z, isLocked) {
         var sx = Math.round(x / SELECTED.size.originalX * 1000) / 1000,
             sy = Math.round(y / SELECTED.size.originalY * 1000) / 1000,
             sz = Math.round(z / SELECTED.size.originalZ * 1000) / 1000,
-            _locked = false,
-            _render = true;
+            _center = true;
 
-        setScale(sx, sy, sz, _locked, _render);
+        setScale(sx, sy, sz, isLocked, _center);
 
         SELECTED.size.x = x;
         SELECTED.size.y = y;
@@ -1143,9 +1204,14 @@ define([
     }
 
     function updateObjectSize(src) {
-        var boundingBox = new THREE.BoundingBoxHelper(src);
+        var boundingBox = new THREE.BoundingBoxHelper(src),
+            size;
+
         boundingBox.update();
-        src.size = boundingBox.box.size();
+        size = boundingBox.box.size();
+        src.size.x = size.x;
+        src.size.y = size.y;
+        src.size.z = size.z;
         src.size.enteredX = src.size.x;
         src.size.enteredY = src.size.y;
         src.size.enteredZ = src.size.z;
@@ -1188,6 +1254,7 @@ define([
         var outlineMaterial = new THREE.MeshBasicMaterial( { color: s.colorSelected, side: THREE.BackSide } );
         var outlineMesh = new THREE.Mesh(mesh.geometry, outlineMaterial);
         outlineMesh.position.set(mesh.position.x, mesh.position.y, mesh.position.z);
+        outlineMesh.scale.set(mesh.scale.x, mesh.scale.y, mesh.scale.z);
         outlineMesh.scale.multiplyScalar(1.05);
         mesh.outlineMesh = outlineMesh;
     }
