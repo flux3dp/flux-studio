@@ -350,17 +350,13 @@ define([
                 data('name', name).
                 data('base', originalUrl).
                 data('size', size).
-                data('originalPosition', {
-                    x: $laser_platform.outerWidth() / 2 - size.width / 2,
-                    y: $laser_platform.outerHeight() / 2 - size.height / 2
-                }).
                 width(size.width).
                 height(size.height);
 
             $img.one('load', function() {
                 $img.freetrans({
-                    x: $img.data('originalPosition').x,
-                    y: $img.data('originalPosition').y,
+                    x: $laser_platform.outerWidth() / 2 - size.width / 2,
+                    y: $laser_platform.outerHeight() / 2 - size.height / 2,
                     originalSize: size,
                     onRotate: instantRefresh,
                     onMove: instantRefresh,
@@ -392,10 +388,12 @@ define([
                             );
                         });
 
+                        el_position = $img.box();
+
                         if (true === rollback) {
                             $target_image.freetrans({
-                                x: $img.data('originalPosition').x,
-                                y: $img.data('originalPosition').y
+                                x: platform_pos.width / 2 - el_position.width / 2,
+                                y: platform_pos.height / 2 - el_position.height / 2
                             });
                         }
                     });
