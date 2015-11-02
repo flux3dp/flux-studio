@@ -24,12 +24,17 @@
         z-index: -1;
     }
 
+    .modal-body {
+        @include flexbox();
+        max-height: 100%;
+        overflow: scroll;
+    }
+
     .modal-alert {
         @include flexbox();
         background: #FFF;
         box-shadow: 0 10px 20px rgba(0, 0, 0, .7);
         flex-direction: column;
-        margin: 2.8rem;
         min-height: 25rem;
         min-width: 32.2rem;
         overflow: scroll;

@@ -94,18 +94,24 @@ define([
             return events.filter(function(event) {
                 return event.keyCode === keyCode;
             });
+        },
+        removeEvent = function(event) {
+            var currentEvent;
+
+            for (var i = events.length - 1; i >= 0; i--) {
+                currentEvent = events[i];
+
+                if (currentEvent.keyCode === event.keyCode) {
+                    events.splice(i, 1);
+                }
+            }
         };
 
     return {
         on: function(keys, callback) {
             var keyCodes = convertToKeyCode(keys);
 
-            if (0 === matchedEvents(keyCodes).length) {
-                events.push({ key: keys, keyCode: generateKey(keyCodes), callback: callback });
-            }
-            else {
-                console.warn('Register same shortcut');
-            }
+            events.push({ key: keys, keyCode: generateKey(keyCodes), callback: callback });
 
             initialize();
 
@@ -113,20 +119,16 @@ define([
         },
         off: function(keys) {
             var keyCodes = convertToKeyCode(keys),
-                keyCode = generateKey(keyCodes),
-                index = events.findIndex(function(obj) {
-                    return obj.keyCode === keyCode;
-                });
+                keyCode = generateKey(keyCodes);
 
-            if (-1 < index) {
-                events.splice(index, 1);
-            }
+            removeEvent({ keyCode: keyCode });
 
             return this;
         },
         disableAll: function() {
             $(root).off('keyup keydown');
             has_bind = false;
+            events = [];
         }
     };
 });

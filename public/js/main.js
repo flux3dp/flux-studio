@@ -1,4 +1,4 @@
-require.config({
+requirejs.config({
     urlArgs: 'v=' + window.FLUX.timestamp,
     baseUrl: 'js/',
 
@@ -78,7 +78,7 @@ require.config({
     }
 });
 
-require([
+requirejs([
     'jquery',
     'backbone',
     'app/router',

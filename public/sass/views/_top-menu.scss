@@ -18,8 +18,15 @@
         }
 
         .logo-icon {
-            height: 4.25rem;
-            width: 4.25rem;
+            width: 49px;
+        }
+
+        .func-name {
+            color: #B3B3B3;
+            font-family: "HelveticaNeue-Thin";
+            font-size: 40px;
+            line-height: 49px;
+            padding: 0 0 0 21px;
         }
 
         .menu {
@@ -49,8 +56,14 @@
             }
         }
 
-        &:hover .menu {
-            display: block;
+        &:hover {
+            .menu {
+                display: block;
+            }
+
+            .func-name {
+                display: none;
+            }
         }
     }
 

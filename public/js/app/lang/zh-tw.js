@@ -377,11 +377,17 @@ define(function() {
             import: '打開⋯',
             save: '儲存⋯',
             custom: '自訂',
-            acceptable_files: 'JPG, PNG, PDF, AI',
+            presets: 'Presets',
+            acceptable_files: 'JPG, PNG, SVG',
             drop_files_to_import: 'Drop your file here or click "import" to upload your file',
             button_advanced: '進階',
+            confirm: '確認',
             start_engrave: '雕刻',
             start_cut: '切割',
+            close_alert: '關閉',
+            get_fcode: 'Get Fcode',
+            name: '名稱',
+            go: 'GO',
             print_params: {
                 object_height: {
                     text: '物體高度',
@@ -402,20 +408,6 @@ define(function() {
                 rotate: {
                     text: '旋轉'
                 },
-                unit: {
-                    text: '單位',
-                    options: [
-                        {
-                            value: 'mm',
-                            label: 'mm',
-                            checked: true
-                        },
-                        {
-                            value: 'inches',
-                            label: 'inches'
-                        }
-                    ]
-                },
                 threshold: {
                     text: '圖片曝光',
                     default: 128
@@ -430,8 +422,7 @@ define(function() {
                         options: [
                             {
                                 value: 'wood',
-                                label: '木',
-                                selected: true,
+                                label: '木材',
                                 data: {
                                     laser_speed: 5,
                                     power: 255
@@ -439,11 +430,32 @@ define(function() {
                             },
                             {
                                 value: 'steel',
-                                label: 'Steel',
+                                label: '皮革',
                                 data: {
                                     laser_speed: 50,
                                     power: 255
                                 }
+                            },
+                            {
+                                value: 'paper',
+                                label: '紙',
+                                data: {
+                                    laser_speed: 10,
+                                    power: 25
+                                }
+                            },
+                            {
+                                value: 'cork',
+                                label: '軟木',
+                                data: {
+                                    laser_speed: 15,
+                                    power: 200
+                                }
+                            },
+                            {
+                                value: 'other',
+                                label: '其它',
+                                data: {}
                             }
                         ]
                     },
@@ -465,8 +477,12 @@ define(function() {
                         step: 1
                     }
                 },
+                save_and_apply: '儲存並套用',
+                save_as_preset: 'SAVE AS PRESET',
+                load_preset: 'LOAD PRESET',
                 apply: '套用',
                 cancel: '取消',
+                save: '儲存'
             }
         },
         scan: {
@@ -579,6 +595,10 @@ define(function() {
             change_filament: 'CHANGE FILLAMENT',
             browse_file: 'BROWSE FILE',
             monitor: 'MONITOR'
+        },
+        alert: {
+            caption: '錯誤',
+            duplicated_preset_name: '重複的Preset名稱'
         }
     };
 });

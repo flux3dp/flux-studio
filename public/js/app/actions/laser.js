@@ -9,6 +9,7 @@ define([
     'jsx!widgets/Modal',
     'helpers/shortcuts',
     'helpers/image-data',
+    'helpers/round',
     'helpers/nwjs/menu-factory',
     'freetrans',
     'helpers/jquery.box',
@@ -24,6 +25,7 @@ define([
     Modal,
     shortcuts,
     imageData,
+    round,
     menuFactory
 ) {
     'use strict';
@@ -36,12 +38,15 @@ define([
             bitmapWebSocket,
             svgWebSocket,
             LASER_IMG_CLASS = 'img-container',
-            $laser_platform = $('.laser-object'),
-            PLATFORM_DIAMETER_PIXEL = $laser_platform.width(),
+            $laser_platform,
+            PLATFORM_DIAMETER_PIXEL,
             deleteImage = function() {
                 var $img_container = $('.' + LASER_IMG_CLASS).not($target_image),
                     $img = $target_image,
-                    reset_file_type = false;
+                    reset_file_type = false,
+                    state = {
+                        selectedImage: false
+                    };
 
                 if (null !== $target_image) {
                     // delete svg blob from history
@@ -53,9 +58,7 @@ define([
 
                     if (0 === $img_container.length) {
                         $target_image = null;
-                        self.setState({
-                            hasImage: false
-                        });
+                        state['hasImage'] = false;
 
                         menuFactory.items.execute.enabled = false;
                         menuFactory.items.saveGCode.enabled = false;
@@ -64,6 +67,8 @@ define([
                     else {
                         $target_image = $img_container[0];
                     }
+
+                    self.setState(state);
                 }
             },
             refreshImage = function($img, threshold) {
@@ -153,7 +158,7 @@ define([
                     mm = mm * -1;
                 }
 
-                return mm;
+                return round(mm, -2);
             },
             convertToHtmlCoordinate = function(n, axis) {
 
@@ -171,64 +176,45 @@ define([
                     px -= ($target_image.height() / 2);
                 }
 
-                return px;
+                return round(px, -2);
             },
             refreshObjectParams = function(e, $el) {
-                var el_position,
+                var el_position, el_offset_position,
                     last_x, last_y,
-                    platform_pos = $laser_platform.box(),
-                    imagePanelRefs = self.refs.imagePanel.refs,
-                    outOfRange = function(point, limit) {
-                        var x = Math.pow((platform_pos.center.x - point.x), 2),
-                            y = Math.pow((platform_pos.center.y - point.y), 2),
-                            range = Math.sqrt(x + y);
-
-                        return range > limit;
-                    };
+                    position, size, angle, threshold;
 
                 if (null !== $el) {
                     el_position = $el.box();
+                    el_offset_position = $el.box(true);
 
-                    if ('move' === e.freetransEventType) {
-                        if (true === outOfRange(el_position.center, DIAMETER)) {
-                            last_x = $el.data('last-x');
-                            last_y = $el.data('last-y');
-
-                            $el.freetrans({
-                                x: last_x,
-                                y: last_y
-                            });
-                        }
-                        else {
-                            $el.data('last-x', parseFloat($el[0].style.left, 10)).
-                                data('last-y', parseFloat($el[0].style.top, 10));
-                        }
+                    position = {
+                        x: convertToRealCoordinate(el_position.center.x, 'x'),
+                        y: convertToRealCoordinate(el_position.center.y, 'y')
                     }
-                    else {
-                        refreshImage($el, getThreshold().getDOMNode().value);
+                    size = {
+                        width: round(el_position.width / PLATFORM_DIAMETER_PIXEL * DIAMETER, -2),
+                        height: round(el_position.height / PLATFORM_DIAMETER_PIXEL * DIAMETER, -2)
+                    };
+                    angle = elementAngle($el[0]);
+                    threshold = $el.data('threshold') || 128;
+
+                    if ('move' !== e.freetransEventType) {
+                        refreshImage($el, threshold);
                     }
 
-                    imagePanelRefs.objectAngle.getDOMNode().value = elementAngle($el[0]);
-                    imagePanelRefs.objectPosX.getDOMNode().value = convertToRealCoordinate(el_position.center.x, 'x').toString().substr(0, 4);
-                    imagePanelRefs.objectPosY.getDOMNode().value = convertToRealCoordinate(el_position.center.y, 'y').toString().substr(0, 4);
-                    imagePanelRefs.objectSizeW.getDOMNode().value = (el_position.width / PLATFORM_DIAMETER_PIXEL * DIAMETER).toString().substr(0, 4);
-                    imagePanelRefs.objectSizeH.getDOMNode().value = (el_position.height / PLATFORM_DIAMETER_PIXEL * DIAMETER).toString().substr(0, 4);
+                    self.setState({
+                        position: position,
+                        size: size,
+                        angle: angle,
+                        threshold: threshold
+                    }, function() {
+                        refreshImagePanelPos();
+                    });
                 }
             },
             $target_image = null, // changing when image clicked
             printer = null,
             printer_selecting = false,
-            getThreshold = function() {
-                var imagePanelRefs = self.refs.imagePanel.refs;
-
-                return (imagePanelRefs.threshold || {
-                    getDOMNode: function() {
-                        return {
-                            value: 255
-                        };
-                    }
-                });
-            },
             handleLaser = function(settings, callback) {
 
                 var $ft_controls = $laser_platform.find('.ft-controls'),
@@ -257,8 +243,6 @@ define([
                     },
                     args = [],
                     doLaser = function(settings) {
-                        var imagePanelRefs = self.refs.imagePanel.refs,
-                            threshold = getThreshold();
 
                         $ft_controls.each(function(k, el) {
                             var $el = $(el),
@@ -276,7 +260,7 @@ define([
                                     br_position_x: convertToRealCoordinate(bottom_right.x, 'x'),
                                     br_position_y: convertToRealCoordinate(bottom_right.y, 'y'),
                                     rotate: (Math.PI * elementAngle(el) / 180) * -1,
-                                    threshold: parseInt(threshold.getDOMNode().value, 10)
+                                    threshold: $img.data('threshold')
                                 },
                                 grayscaleOpts = {
                                     is_svg: ('svg' === self.props.fileFormat),
@@ -348,7 +332,18 @@ define([
                 $img = $(img).addClass(LASER_IMG_CLASS),
                 instantRefresh = function(e, data) {
                     refreshObjectParams(e, $img);
-                };
+                },
+                platform_pos = $laser_platform.box(true),
+                outOfRange = function(point, limit) {
+                    var x = Math.pow((platform_pos.center.x - point.x), 2),
+                        y = Math.pow((platform_pos.center.y - point.y), 2),
+                        range = Math.sqrt(x + y);
+
+                    return range > limit;
+                },
+                el_position,
+                $controlPoints,
+                $ftControls;
 
             $img.addClass(file.extension).
                 attr('src', file.url).
@@ -368,7 +363,8 @@ define([
                     onScale: instantRefresh,
                     angle: size.angle || 0
                 });
-                $img.parent().find('.ft-controls').width(size.width).height(size.height);
+                $ftControls = $img.parent().find('.ft-controls');
+                $ftControls.width(size.width).height(size.height);
 
                 // set default image
                 if (null === $target_image) {
@@ -378,9 +374,32 @@ define([
 
                 // onmousedown
                 (function(file, size, originalUrl, name, $img) {
-                    $img.parent().find('.ft-controls').on('mousedown', function(e) {
-                        var $self = $(e.target),
-                            clone = function() {
+                    $img.on('transitionend mouseup', function(e) {
+                        var rollback = true;
+
+                        $controlPoints = $ftControls.find('.ft-scaler');
+                        $controlPoints.each(function(k, el) {
+                            el_position = $(el).box(true);
+
+                            rollback = (
+                                false === outOfRange(el_position.center, platform_pos.width / 2) ?
+                                false :
+                                rollback
+                            );
+                        });
+
+                        el_position = $img.box();
+
+                        if (true === rollback) {
+                            $target_image.freetrans({
+                                x: platform_pos.width / 2 - el_position.width / 2,
+                                y: platform_pos.height / 2 - el_position.height / 2
+                            });
+                        }
+                    });
+
+                    $ftControls.on('mousedown', function(e) {
+                        var clone = function() {
                                 var data = $img.data('freetrans');
 
                                 size.width = size.width * data.scalex;
@@ -390,15 +409,28 @@ define([
                                 setupImage(file, size, originalUrl, name);
 
                                 self.setState({
-                                    hasImage: true,
+                                    hasImage: true
                                 });
                             };
 
-                        inactiveAllImage();
-                        $target_image = $self.parent().find('.' + LASER_IMG_CLASS);
-                        refreshObjectParams({ freetransEventType: 'move' }, $target_image);
+                        $target_image = $img;
 
-                        $self.addClass('image-active');
+                        if (false === $target_image.hasClass('image-active')) {
+                            inactiveAllImage();
+
+                            refreshObjectParams({ freetransEventType: 'move' }, $target_image);
+
+                            $target_image.on('transitionend', function(e) {
+                                refreshImagePanelPos();
+                            });
+
+                            self.setState({
+                                selectedImage: true
+                            });
+
+                            $target_image.addClass('image-active');
+                        }
+
                         menuFactory.items.copy.enabled = true;
                         menuFactory.items.copy.onClick = function() {
                             menuFactory.items.paste.enabled = true;
@@ -471,7 +503,45 @@ define([
             menuFactory.items.copy.enabled = false;
             menuFactory.items.cut.enabled = false;
             menuFactory.items.duplicate.enabled = false;
+
+            self.setState({
+                selectedImage: false
+            });
         }
+
+        function refreshImagePanelPos() {
+            var pos = $target_image.box(true),
+                imagePanel = self.refs.imagePanel,
+                platformPos = $laser_platform.box(true),
+                windowPos = $('body').box(true),
+                initialPosition = {
+                    left: pos.right + 10,
+                    top: pos.center.y - 66
+                };
+
+            // check position top
+            if ('undefined' !== typeof imagePanel && pos.bottom > windowPos.bottom) {
+                initialPosition.top = windowPos.bottom - imagePanel.getDOMNode().clientHeight;
+            }
+
+            if (windowPos.top > initialPosition.top) {
+                initialPosition.top = windowPos.top;
+            }
+
+            // check position left
+            if (initialPosition.left > platformPos.right) {
+                initialPosition.left = platformPos.right + 10;
+            }
+
+            self.setState({
+                initialPosition: initialPosition
+            });
+        }
+
+        // on window resize
+        window.addEventListener('resize', function(e) {
+            refreshImagePanelPos();
+        });
 
         return {
             handleLaser: function(settings) {
@@ -510,7 +580,7 @@ define([
             onReadFileStarted: function(e) {
                 var firstFile = e.target.files.item(0),
                     setupPanel = self.refs.setupPanel,
-                    extension = setupPanel.refs.fileUploader.getFileExtension(firstFile.name),
+                    extension = self.refs.fileUploader.getFileExtension(firstFile.name),
                     currentFileFormat = self.props.fileFormat;
 
                 if ('string' !== typeof currentFileFormat) {
@@ -559,17 +629,14 @@ define([
                 menuFactory.items.execute.enabled = true;
                 menuFactory.items.saveGCode.enabled = true;
             },
-            thresholdChanged: function(e, threshold) {
-                var $el, bounds;
+            thresholdChanged: function(threshold) {
+                var $el = $('.image-active:eq(0)');
 
-                $('.' + LASER_IMG_CLASS).each(function(k, el) {
-                    $el = $(el);
-                    bounds = $el.freetrans('getBounds');
-                    refreshImage($el, threshold);
-                });
+                $el.data('threshold', threshold);
+                refreshImage($el, threshold);
             },
             inactiveAllImage: inactiveAllImage,
-            imageTransform: function(e) {
+            imageTransform: function(e, params) {
                 var $el = $(e.currentTarget),
                     type = $el.data('type'),
                     val = $el.val(),
@@ -585,20 +652,27 @@ define([
                     args[type] = val;
                     break;
                 case 'width':
-                    val = parseFloat((val / DIAMETER * PLATFORM_DIAMETER_PIXEL).toString().substr(0, 4), 10);
-                    args.scalex = parseFloat(val / freetrans.originalSize.width, 10);
+                    val = round(val / DIAMETER * PLATFORM_DIAMETER_PIXEL, -2);
+                    args.scalex = round(val / freetrans.originalSize.width, -2);
                     break;
                 case 'height':
-                    val = parseFloat((val / DIAMETER * PLATFORM_DIAMETER_PIXEL).toString().substr(0, 4), 10);
-                    args.scaley = parseFloat(val / freetrans.originalSize.height, 10);
+                    val = round(val / DIAMETER * PLATFORM_DIAMETER_PIXEL, -2);
+                    args.scaley = round(val / freetrans.originalSize.height, -2);
                     break;
                 case 'angle':
                     args.angle = val;
                 }
 
+                refreshImagePanelPos();
+                self.setState(params);
+
                 $target_image.freetrans(args);
             },
-            menuFactory: menuFactory
+            menuFactory: menuFactory,
+            setPlatform: function(el) {
+                $laser_platform = $(el);
+                PLATFORM_DIAMETER_PIXEL = $laser_platform.width();
+            }
         };
     };
 });

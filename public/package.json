@@ -1,5 +1,5 @@
 {
-    "main": "app://localhost/index.html",
+    "main": "app://localhost/index.html?debug",
     "name": "flux-studio",
     "node-remote": "localhost",
     "description": "FLUX Studio",

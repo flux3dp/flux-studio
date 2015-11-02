@@ -20,18 +20,21 @@ define([
                     options = [
                         {
                             name: 'print',
+                            displayName: 'PRINT',
                             className: genericClassName,
                             label: lang.menu.print,
                             imgSrc: '/img/menu/icon_print.svg'
                         },
                         {
                             name: 'laser',
+                            displayName: 'LASER',
                             className: genericClassName,
                             label: lang.menu.laser,
                             imgSrc: '/img/menu/icon_laser.svg'
                         },
                         {
                             name: 'scan',
+                            displayName: 'SCAN',
                             className: genericClassName,
                             label: lang.menu.scan,
                             imgSrc: '/img/menu/icon_scan.svg'
@@ -50,17 +53,23 @@ define([
                         itemClass = cx(opt.className);
 
                         return (
-                            <li className={itemClass} key={'menu' + i} onClick={self._handleNavigation.bind(null, opt.name)}>
+                            <li className={itemClass} key={'menu' + i} data-display-name={opt.displayName} onClick={self._handleNavigation.bind(null, opt.name)}>
                                 <img src={opt.imgSrc} />
                                 {label}
                             </li>
                         );
-                    }, this);
+                    }, this),
+                    currentWorkingFunction = options.filter(function(el) {
+                        return -1 < location.hash.search(el.name);
+                    })[0];
+
+                currentWorkingFunction = currentWorkingFunction || {};
 
                 return (
                     <div>
                         <div className="brand-logo">
                             <img className="logo-icon" src="/img/menu/main_logo.svg"/>
+                            <span className="func-name">{currentWorkingFunction.displayName}</span>
                             <div className="menu">
                                 <svg width="36" height="15"
                                      className="arrow"

@@ -1,0 +1,29 @@
+.ui-control-text-toggle {
+
+    input {
+        display: none;
+
+        & + span:after {
+            content: attr(data-text-off);
+        }
+    }
+
+    input:checked {
+        & + span:after {
+            content: attr(data-text-on);
+        }
+    }
+
+}
+
+.ui-control-text-input,
+.ui-control-unit-input {
+    background: #FFF;
+    border: 2px solid #E0E0DF;
+    color: #B3B3B3;
+    font-size: 1.2rem;
+    height: 40px;
+    line-height: 32px;
+    padding: 2px 5px;
+    width: 100%;
+}

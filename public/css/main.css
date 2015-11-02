@@ -2497,7 +2497,6 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         height: 100%;
         position: relative; }
     .studio-container .btn {
-        border-radius: 5px;
         margin-right: 5px; }
     .studio-container .btn-primary {
         color: #fff;
@@ -2583,7 +2582,6 @@ input[type=range]:focus::-webkit-slider-runnable-track {
     letter-spacing: .5px;
     line-height: 44px;
     margin: 0;
-    min-width: 99px;
     outline: none;
     overflow: hidden;
     padding: 0 5px;
@@ -2603,15 +2601,15 @@ input[type=range]:focus::-webkit-slider-runnable-track {
 
 .btn-default {
     background: #fff;
-    border: 1px solid #e0e0e0;
-    color: #424242; }
+    border: 2px solid #E0E0DF;
+    color: #B3B3B3; }
     .btn-default:hover {
-        border: 1px solid #424242; }
+        border: 2px solid #424242;
+        color: #424242; }
 
 .btn-confirm {
     background-color: #424242;
-    color: #FFF;
-    border-radius: 5px; }
+    color: #FFF; }
     .btn-confirm:hover {
         background-color: #000000; }
 
@@ -2635,8 +2633,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         width: 100%; }
 
 .btn-warning {
-    background: #f00;
-    border-radius: 5px; }
+    background: #f00; }
 
 .btn-link {
     background: none;
@@ -2653,6 +2650,11 @@ input[type=range]:focus::-webkit-slider-runnable-track {
 
 .btn-large {
     width: 270px; }
+
+/* special shape button */
+.btn-hexagon {
+    -webkit-clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); }
 
 /* button helper */
 .btn-multiline-text {
@@ -2791,6 +2793,25 @@ input[type=range]:focus::-webkit-slider-runnable-track {
     .controls input[type=range]:focus::-webkit-slider-runnable-track {
         background: #E0E0DF; }
 
+.ui-control-text-toggle input {
+    display: none; }
+    .ui-control-text-toggle input + span:after {
+        content: attr(data-text-off); }
+
+.ui-control-text-toggle input:checked + span:after {
+    content: attr(data-text-on); }
+
+.ui-control-text-input,
+.ui-control-unit-input {
+    background: #FFF;
+    border: 2px solid #E0E0DF;
+    color: #B3B3B3;
+    font-size: 1.2rem;
+    height: 40px;
+    line-height: 32px;
+    padding: 2px 5px;
+    width: 100%; }
+
 /**
  * global advanced panel
  */
@@ -2848,6 +2869,15 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         right: 0;
         top: 0;
         z-index: -1; }
+    .modal-window .modal-body {
+        display: -webkit-box;
+        /* OLD - iOS 6-, Safari 3.1-6 */
+        display: -webkit-flex;
+        /* NEW - Chrome */
+        display: flex;
+        /* NEW, Spec - Opera 12.1, Firefox 20+ */
+        max-height: 100%;
+        overflow: scroll; }
     .modal-window .modal-alert {
         display: -webkit-box;
         /* OLD - iOS 6-, Safari 3.1-6 */
@@ -2858,7 +2888,6 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         background: #FFF;
         box-shadow: 0 10px 20px rgba(0, 0, 0, 0.7);
         flex-direction: column;
-        margin: 2.8rem;
         min-height: 25rem;
         min-width: 32.2rem;
         overflow: scroll;
@@ -2972,8 +3001,13 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         .top-menu .brand-logo .menu {
             float: left; }
         .top-menu .brand-logo .logo-icon {
-            height: 4.25rem;
-            width: 4.25rem; }
+            width: 49px; }
+        .top-menu .brand-logo .func-name {
+            color: #B3B3B3;
+            font-family: "HelveticaNeue-Thin";
+            font-size: 40px;
+            line-height: 49px;
+            padding: 0 0 0 21px; }
         .top-menu .brand-logo .menu {
             background: #fff;
             display: none;
@@ -3000,6 +3034,8 @@ input[type=range]:focus::-webkit-slider-runnable-track {
                 padding: 0; }
         .top-menu .brand-logo:hover .menu {
             display: block; }
+        .top-menu .brand-logo:hover .func-name {
+            display: none; }
     .top-menu .item {
         color: #b3b3b3;
         font-size: 1rem;
@@ -3027,6 +3063,23 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         .top-menu .setting img {
             display: block;
             width: 2.75rem; }
+
+.accordion .accordion-body {
+    display: block;
+    height: 0;
+    overflow: hidden;
+    transform: scaleY(0);
+    -webkit-transition: all 0.3s ease;
+    transition: all 0.3s ease;
+    -webkit-transform-origin: 0 0;
+    transform-origin: 0 0; }
+
+.accordion .accordion-switcher {
+    display: none; }
+
+.accordion .accordion-switcher:checked ~ .accordion-body {
+    height: auto;
+    transform: scaleY(1); }
 
 .print-studio {
     padding: 0; }
@@ -4712,19 +4765,187 @@ input.switch:checked ~ label:after {
 /**
  * Laser
  */
+.laser-studio .modal-body {
+    box-shadow: 0 4px 40px 0px rgba(0, 0, 0, 0.5); }
+
 .laser-studio .laser-device-selection-popup {
     bottom: 4.3rem;
     right: 15rem; }
 
+.laser-studio .file-importer {
+    display: -webkit-box;
+    /* OLD - iOS 6-, Safari 3.1-6 */
+    display: -webkit-flex;
+    /* NEW - Chrome */
+    display: flex;
+    /* NEW, Spec - Opera 12.1, Firefox 20+ */
+    background: #fff;
+    color: #E1E1E0;
+    font-size: 23px;
+    height: 37.8px;
+    top: -78px;
+    width: 126.9px;
+    align-items: center;
+    justify-content: center; }
+    .laser-studio .file-importer:after {
+        border: solid transparent;
+        border-color: rgba(255, 255, 255, 0);
+        border-top-color: #fff;
+        border-width: 22px 13px;
+        content: " ";
+        height: 0;
+        left: 50%;
+        margin-left: -15px;
+        pointer-events: none;
+        position: absolute;
+        top: 100%;
+        width: 0; }
+
 .laser-studio .operation-table {
+    display: -webkit-box;
+    /* OLD - iOS 6-, Safari 3.1-6 */
+    display: -webkit-flex;
+    /* NEW - Chrome */
+    display: flex;
+    /* NEW, Spec - Opera 12.1, Firefox 20+ */
     height: 100%;
     position: relative;
     width: 100%; }
 
 .laser-studio .operating-panel {
-    left: 20px;
-    top: 20px;
-    width: 182px; }
+    margin: 0 0 0 30px;
+    position: static;
+    align-self: center;
+    width: 205px; }
+    .laser-studio .operating-panel .material-label {
+        padding: 0 3px; }
+    .laser-studio .operating-panel .custom-presets-wrapper {
+        background: #FFF;
+        padding: 0 20px;
+        width: 440px; }
+        .laser-studio .operating-panel .custom-presets-wrapper .custom-presets-list {
+            border: 2px solid #E0E0DF;
+            list-style: none;
+            height: 110px;
+            overflow: scroll;
+            padding: 0; }
+            .laser-studio .operating-panel .custom-presets-wrapper .custom-presets-list:empty {
+                background: #B3B3B3;
+                color: #E0E0DF;
+                display: -webkit-box;
+                /* OLD - iOS 6-, Safari 3.1-6 */
+                display: -webkit-flex;
+                /* NEW - Chrome */
+                display: flex;
+                /* NEW, Spec - Opera 12.1, Firefox 20+ */
+                align-items: center;
+                justify-content: center; }
+                .laser-studio .operating-panel .custom-presets-wrapper .custom-presets-list:empty::after {
+                    content: attr(data-empty-message); }
+            .laser-studio .operating-panel .custom-presets-wrapper .custom-presets-list input[type="radio"] {
+                display: none; }
+                .laser-studio .operating-panel .custom-presets-wrapper .custom-presets-list input[type="radio"]:checked + .preset-item-name {
+                    background-color: #E0E0E0;
+                    color: #FFF; }
+            .laser-studio .operating-panel .custom-presets-wrapper .custom-presets-list .preset-item-name {
+                border-bottom: 1px solid #E0E0DF;
+                color: #B3B3B3;
+                cursor: pointer;
+                height: 40px;
+                line-height: 40px;
+                margin: 0;
+                padding: 0 0 0 10px; }
+        .laser-studio .operating-panel .custom-presets-wrapper .custom-preset-buttons {
+            height: 69px;
+            justify-content: flex-end;
+            position: static; }
+            .laser-studio .operating-panel .custom-presets-wrapper .custom-preset-buttons .btn-default {
+                border-radius: 0;
+                font-size: 15px;
+                height: 30px;
+                line-height: 26px;
+                min-width: 66px;
+                max-width: 66px;
+                width: 66px; }
+    .laser-studio .operating-panel .popup-selection {
+        display: block;
+        height: 40px;
+        position: relative;
+        display: -webkit-box;
+        /* OLD - iOS 6-, Safari 3.1-6 */
+        display: -webkit-flex;
+        /* NEW - Chrome */
+        display: flex;
+        /* NEW, Spec - Opera 12.1, Firefox 20+ */ }
+        .laser-studio .operating-panel .popup-selection ul {
+            background: #B3B3B3;
+            list-style: none;
+            padding: 0 10px 10px 10px; }
+            .laser-studio .operating-panel .popup-selection ul li {
+                cursor: pointer;
+                color: #E0E0DF;
+                margin: 10px 0 0 0; }
+        .laser-studio .operating-panel .popup-selection .popup-open {
+            display: none; }
+            .laser-studio .operating-panel .popup-selection .popup-open:checked ~ .display-text {
+                background: #B3B3B3;
+                color: #E0E0DF; }
+            .laser-studio .operating-panel .popup-selection .popup-open:checked ~ .popup {
+                visibility: visible; }
+        .laser-studio .operating-panel .popup-selection .display-text {
+            display: inline-block;
+            font-size: 16px;
+            line-height: 40px;
+            padding: 0 16px 0 6px; }
+            .laser-studio .operating-panel .popup-selection .display-text p {
+                display: block;
+                margin: 0;
+                width: 183px; }
+        .laser-studio .operating-panel .popup-selection .popup {
+            visibility: hidden;
+            align-self: center;
+            display: -webkit-box;
+            /* OLD - iOS 6-, Safari 3.1-6 */
+            display: -webkit-flex;
+            /* NEW - Chrome */
+            display: flex;
+            /* NEW, Spec - Opera 12.1, Firefox 20+ */ }
+            .laser-studio .operating-panel .popup-selection .popup .arrow {
+                align-self: center;
+                position: relative;
+                right: -1px; }
+                .laser-studio .operating-panel .popup-selection .popup .arrow polygon {
+                    fill: #B3B3B3; }
+    .laser-studio .operating-panel .object-height-input {
+        width: 164px; }
+        .laser-studio .operating-panel .object-height-input .ui-control-unit-input input[type="text"] {
+            background: transparent;
+            border: 2px solid #fff;
+            color: #E0E0DF;
+            font-size: 16px;
+            line-height: 32px;
+            padding: 0 5px;
+            width: 100%; }
+    .laser-studio .operating-panel .material-list {
+        width: 116px; }
+    .laser-studio .operating-panel .btn-advance {
+        border-radius: 0;
+        background: transparent;
+        color: #b3b3b3;
+        font-size: 16px;
+        line-height: 40px;
+        text-align: left;
+        padding: 0 16px 0 6px;
+        margin: 0;
+        width: 100%; }
+    .laser-studio .operating-panel li {
+        color: #b3b3b3;
+        font-size: 16px;
+        line-height: 40px; }
+    .laser-studio .operating-panel .main {
+        background-color: transparent;
+        list-style: none;
+        padding: 0; }
     .laser-studio .operating-panel .action-buttons .btn {
         display: block;
         margin: 0 0 5px 0; }
@@ -4733,11 +4954,7 @@ input.switch:checked ~ label:after {
     margin: 0 5px 0 0; }
 
 .laser-studio .stage {
-    background: #d6d6d6; }
-
-.laser-studio .btn-h-group {
-    height: 100%;
-    align-items: center; }
+    background: #E0E0E0; }
 
 .laser-studio .laser-object {
     bottom: 0;
@@ -4750,22 +4967,34 @@ input.switch:checked ~ label:after {
     background: url(/img/laser-platform.png);
     background-size: 100% 100%;
     border: 1px solid #767676;
-    height: 450px;
+    height: 520px;
     overflow: hidden;
     position: absolute;
-    width: 450px; }
+    width: 520px; }
 
 .laser-studio .laser-object .ft-container {
     z-index: 1; }
 
-.laser-studio .laser-object .image-active {
-    background: rgba(255, 255, 255, 0.6);
-    outline: 5px dashed #bbb;
-    z-index: -1; }
-
 .laser-studio .laser-object .ft-widget {
     cursor: move;
     position: fixed; }
+
+.laser-studio .laser-object .ft-rotator,
+.laser-studio .laser-object .ft-rotator-line,
+.laser-studio .laser-object .ft-scaler {
+    display: none; }
+
+.laser-studio .laser-object .image-active {
+    background: rgba(255, 255, 255, 0.6);
+    transition: all 0.5s ease; }
+    .laser-studio .laser-object .image-active + .ft-controls {
+        outline: 1px solid #626262; }
+    .laser-studio .laser-object .image-active + .ft-controls {
+        outline: 1px solid #626262; }
+        .laser-studio .laser-object .image-active + .ft-controls .ft-rotator,
+        .laser-studio .laser-object .image-active + .ft-controls .ft-rotator-line,
+        .laser-studio .laser-object .image-active + .ft-controls .ft-scaler {
+            display: block; }
 
 .laser-studio .zoom .btn {
     height: 28px;
@@ -4780,71 +5009,115 @@ input.switch:checked ~ label:after {
 .laser-studio .panel {
     position: absolute; }
 
-.laser-studio .print-params,
 .laser-studio .object-position {
-    background: #eee; }
-
-.laser-studio .object-position {
-    padding: 20px;
-    right: 25px;
-    top: 20px;
-    width: 214px; }
-    .laser-studio .object-position .control:nth-child(odd) {
-        margin: 0 0 4px 0; }
-    .laser-studio .object-position .control:nth-child(even) {
-        margin: 0 0 14px 0; }
-    .laser-studio .object-position input,
-    .laser-studio .object-position .radio-group,
+    display: -webkit-box;
+    /* OLD - iOS 6-, Safari 3.1-6 */
+    display: -webkit-flex;
+    /* NEW - Chrome */
+    display: flex;
+    /* NEW, Spec - Opera 12.1, Firefox 20+ */
+    font-size: 20px;
+    transition: all 0.1s ease;
+    width: 230px;
+    z-index: 1; }
+    .laser-studio .object-position .arrow {
+        align-self: center; }
+        .laser-studio .object-position .arrow polygon {
+            fill: #fff; }
     .laser-studio .object-position .caption,
-    .laser-studio .object-position .unit {
-        font-size: 11px; }
-    .laser-studio .object-position .unit {
-        color: #777; }
-    .laser-studio .object-position .radio-group input[type="radio"] {
-        display: none; }
-    .laser-studio .object-position .radio-group input[type="radio"] + span {
-        border-radius: 10px;
-        color: #9b9b9b;
-        cursor: pointer;
-        display: inline-block;
-        font-size: 14px;
-        padding: 10px; }
-    .laser-studio .object-position .radio-group input[type="radio"]:checked + span {
-        background: #c1c1c1;
-        color: #000; }
-
-.laser-studio .objects-params {
-    left: 25px; }
-
-.laser-studio .btn-start {
-    margin: 10px 0 0 0; }
-    .laser-studio .btn-start img {
-        margin: 0 10px 0 0;
-        width: 14px; }
-
-.laser-studio .advanced-panel [type="range"] {
-    position: relative;
-    width: 70%; }
-    .laser-studio .advanced-panel [type="range"]::before,
-    .laser-studio .advanced-panel [type="range"]::after {
+    .laser-studio .object-position .controls {
+        margin: 0; }
+    .laser-studio .object-position .controls {
+        background: #FFFFFF;
         display: block;
-        position: absolute;
-        top: 170%; }
-    .laser-studio .advanced-panel [type="range"]::before {
-        content: attr(data-min-text);
-        left: 0; }
-    .laser-studio .advanced-panel [type="range"]::after {
-        content: attr(data-max-text);
-        right: 0; }
-    .laser-studio .advanced-panel [type="range"] + span {
-        border: 1px solid #4A4A4A;
-        margin: 5px;
-        padding: 3px 5px; }
-        .laser-studio .advanced-panel [type="range"] + span::after {
-            content: attr(data-tail); }
+        margin: 0 0 3px 0;
+        padding: 0 20px; }
+    .laser-studio .object-position .control {
+        margin: 0 0 10px 0; }
+        .laser-studio .object-position .control .header {
+            color: #E0E0DF; }
+    .laser-studio .object-position .caption {
+        display: -webkit-box;
+        /* OLD - iOS 6-, Safari 3.1-6 */
+        display: -webkit-flex;
+        /* NEW - Chrome */
+        display: flex;
+        /* NEW, Spec - Opera 12.1, Firefox 20+ */
+        justify-content: space-between;
+        color: #B3B3B3;
+        font-size: 12px;
+        line-height: 30px; }
+    .laser-studio .object-position input {
+        border: 1px solid #E0E0DF;
+        color: #B3B3B3;
+        font-size: 15px; }
 
-.laser-studio .advanced-panel .controls {
-    padding: 20px 0; }
+.laser-studio .action-buttons {
+    bottom: 28px;
+    position: fixed;
+    right: 78px; }
+    .laser-studio .action-buttons .btn.btn-disabled {
+        background: #CCC; }
+    .laser-studio .action-buttons .btn-default {
+        background: #B3B3B3;
+        border: none;
+        border-radius: 0;
+        color: #EEE;
+        display: block;
+        font-size: 21px;
+        height: 100px;
+        line-height: 1.2em;
+        margin: 0;
+        min-width: 87px;
+        position: relative;
+        width: 87px; }
+        .laser-studio .action-buttons .btn-default:hover {
+            background: #000; }
+    .laser-studio .action-buttons .btn-go {
+        font-size: 35px;
+        background: #4D4D4D;
+        left: 50px;
+        top: -21px; }
+
+.laser-studio .advanced-panel {
+    background: #FFF;
+    padding: 20px 20px 0;
+    width: 440px; }
+    .laser-studio .advanced-panel .footer {
+        height: 70px;
+        justify-content: flex-end;
+        margin-bottom: 0;
+        position: static; }
+
+.laser-studio .control {
+    align-items: center;
+    display: -webkit-box;
+    /* OLD - iOS 6-, Safari 3.1-6 */
+    display: -webkit-flex;
+    /* NEW - Chrome */
+    display: flex;
+    /* NEW, Spec - Opera 12.1, Firefox 20+ */
+    justify-content: space-around;
+    color: #B3B3B3;
+    font-size: 13px;
+    line-height: 40px;
+    height: 40px; }
+    .laser-studio .control [type="range"] {
+        flex: 1 auto; }
+    .laser-studio .control .value-text {
+        width: 120px; }
+    .laser-studio .control .label {
+        align-self: center;
+        color: #B3B3B3;
+        line-height: 1em;
+        width: 100px; }
+    .laser-studio .control .value-text {
+        border: 2px solid #E0E0DF;
+        line-height: 28px;
+        margin: 5px;
+        padding: 0 5px; }
+        .laser-studio .control .value-text::after {
+            content: attr(data-tail); }
 
 .scan-studio .model-displayer {
     height: 100%;
@@ -4932,7 +5205,8 @@ input.switch:checked ~ label:after {
             float: left; }
 
 .scan-studio .modal-printer-selecter {
-    position: static; }
+    position: static;
+    z-index: 1; }
 
 .device-studio {
     margin-left: 10px; }

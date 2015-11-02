@@ -2,49 +2,36 @@ define([
     'jquery',
     'react',
     'jsx!widgets/Select',
+    'jsx!widgets/List',
     'jsx!widgets/Modal',
-    'jsx!widgets/File-Uploader',
     'jsx!views/laser/Advanced-Panel',
-    'helpers/api/config'
-], function($, React, SelectView, Modal, FileUploader, AdvancedPanel, config) {
+    'jsx!widgets/Text-Toggle',
+    'jsx!widgets/Unit-Input',
+    'jsx!widgets/Button-Group',
+    'jsx!widgets/Alert',
+    'helpers/api/config',
+    'helpers/round',
+], function(
+    $,
+    React,
+    SelectView,
+    List,
+    Modal,
+    AdvancedPanel,
+    TextToggle,
+    UnitInput,
+    ButtonGroup,
+    Alert,
+    config,
+    round
+) {
     'use strict';
 
     return React.createClass({
         _advancedSettings: undefined,
 
-        _getSelectedMaterial: function(value) {
-            var props = this.props,
-                lang = props.lang,
-                selected_material = lang.laser.advanced.form.object_options.options.filter(
-                    function(obj) {
-                        return value === obj.value;
-                    }
-                );
-
-            return (0 < selected_material.length ? selected_material[0] : undefined);
-        },
-
-        _toggleAdvancedPanel: function(open) {
-            var self = this;
-
-            return function(material_name) {
-                material_name = material_name || '';
-
-                self.setState({
-                    openAdvancedPanel: open,
-                    defaultMaterial: self._getSelectedMaterial(material_name)
-                });
-            };
-        },
-
-        _openAdvancedPanel: function(e) {
-            var $material = $(this.refs.material.getDOMNode()),
-                selected_value = $material.find('option:selected').val();
-
-            this._toggleAdvancedPanel(true)(selected_value);
-        },
-
-        _getSettings: function() {
+        // Public
+        getSettings: function() {
             var settings = this._advancedSettings;
 
             if ('undefined' === typeof settings) {
@@ -58,230 +45,365 @@ define([
             return settings;
         },
 
-        _onAdvanceDone: function(settings) {
-            this._advancedSettings = settings;
+        // UI Events
+        _togglePanel: function(name, open) {
+            var self = this,
+                panelMap = {
+                    advanced: [{
+                        openAdvancedPanel: open
+                    }],
+                    alert: [{
+                        showAlert: open
+                    }],
+                    customPresets: [{
+                        openCustomPresets: open
+                    },
+                    {
+                        hasSelectedPreset: false
+                    }]
+                };
 
-            this._toggleAdvancedPanel(false)(settings.material);
+            return function() {
+                var panelSettings = panelMap[name],
+                    state = {};
+
+                panelSettings.forEach(function(setting) {
+                    for (var key in setting) {
+                        state[key] = setting[key];
+                    }
+                })
+
+                self.setState(state);
+            };
         },
 
-        _onRunLaser: function() {
-            var settings = this._getSettings();
-
-            this.props.onRunLaser(settings);
+        _openAdvancedPanel: function(e) {
+            this._togglePanel('advanced', true)();
         },
 
-        _onExport: function() {
-            var settings = this._getSettings();
-
-            this.props.onExport(settings)
+        _onAdvanceDone: function(material) {
+            this._saveLastestSet({
+                material: material
+            });
+            this._togglePanel('advanced', false)();
         },
 
-        _onObjectHeightBlur: function(e) {
-            var value = parseFloat(e.currentTarget.value) || 0;
-            e.currentTarget.value = value;
+        _onSaveCustomPreset: function(material) {
+            var customPresets = config().read('laser-custom-presets') || [],
+                sameNamePresets = customPresets.some(function(preset) {
+                    return preset.label === material.label;
+                }),
+                lang = this.props.lang;
 
-            config().write('laser-object-height', value);
+            if (false === sameNamePresets) {
+                customPresets.push(material);
+                config().write('laser-custom-presets', customPresets);
+
+                return true;
+            }
+            else {
+                this.setState({
+                    showAlert: true,
+                    alertContent: {
+                        caption: lang.alert.caption,
+                        message: lang.alert.duplicated_preset_name
+                    }
+                })
+            }
+
+            return !sameNamePresets;
+        },
+
+        _saveLastestSet: function(opts) {
+            opts = opts || {};
+            opts.material = opts.material || this.state.defaults.material;
+            opts.objectHeight = opts.objectHeight || this.state.defaults.objectHeight;
+
+            var self = this,
+                state = {
+                    defaults: opts
+                };
+
+            config().write('laser-defaults', opts);
+
+            self.setState(state);
+        },
+
+        _onPickupMaterial: function(e) {
+            var self = this,
+                chooseMaterial;
+
+            if ('LI' === e.target.tagName) {
+                if ('other' === e.target.dataset.value) {
+                    self._togglePanel('customPresets', true)();
+                }
+                else {
+                    chooseMaterial = this.state.materials.filter(function(el) {
+                        return el.value === e.target.dataset.value;
+                    })[0];
+
+                    self._saveLastestSet({ material: chooseMaterial });
+                }
+            }
+        },
+
+        _onOpenSubPopup: function(e) {
+            var $me = $(e.currentTarget),
+                $popupOpen = $('.popup-open:checked').not($me);
+
+            $popupOpen.removeAttr('checked');
+        },
+
+        _refreshObjectHeight: function(value) {
+            this._saveLastestSet({ objectHeight: value });
+        },
+
+        // Lifecycle
+        _renderCustomPresets: function(lang) {
+            var self = this,
+                // TODO: remove pseudo entry
+                customPresets = config().read('laser-custom-presets') || [],
+                buttons = [{
+                    label: lang.laser.advanced.apply,
+                    className: (false === self.state.hasSelectedPreset ? 'btn-disabled' : ''),
+                    onClick: function(e) {
+                        var elCustomPresets = self.refs.customPresets.getDOMNode();
+
+                        self._saveLastestSet({ material: JSON.parse(elCustomPresets.dataset.selectedMaterial) });
+                        self._togglePanel('customPresets', false)();
+                        self._togglePanel('advanced', false)();
+                    }
+                },
+                {
+                    label: lang.laser.advanced.cancel,
+                    onClick: function(e) {
+                        self._togglePanel('customPresets', false)();
+                    }
+                }],
+                selectPresetMaterial = function(e) {
+                    var elCustomPresets = self.refs.customPresets.getDOMNode(),
+                        meta;
+
+                    if ('undefined' !== typeof e.target.dataset.meta) {
+                        meta = JSON.parse(e.target.dataset.meta);
+
+                        self.setState({
+                            hasSelectedPreset: true,
+                            chooseSpeed: meta.data.laser_speed,
+                            choosePower: meta.data.power
+                        });
+
+                        elCustomPresets.dataset.selectedMaterial = JSON.stringify(meta);
+                    }
+                },
+                advancedLang = lang.laser.advanced,
+                content;
+
+            customPresets = customPresets.map(function(opt, i) {
+                opt.label = (
+                    <label>
+                        <input name="custom-preset-item" type="radio"/>
+                        <p className="preset-item-name" data-meta={JSON.stringify(opt)}>{opt.label}</p>
+                    </label>
+                );
+
+                return opt;
+            });
+
+            content = (
+                <div className="custom-presets-wrapper" ref="customPresets">
+                    <p className="caption">{lang.laser.presets}</p>
+                    <List
+                        className="custom-presets-list"
+                        items={customPresets}
+                        onClick={selectPresetMaterial}
+                        emptyMessage="N/A"
+                    />
+                    <div className="control">
+                            <span className="label">{advancedLang.form.laser_speed.text}</span>
+                            <input
+                                type="range"
+                                ref="presetSpeed"
+                                min={advancedLang.form.laser_speed.min}
+                                max={advancedLang.form.laser_speed.max}
+                                step={advancedLang.form.laser_speed.step}
+                                value={this.state.chooseSpeed || 0}
+                                className="readonly"
+                            />
+                            <span className="value-text" ref="presetSpeedDisplay" data-tail={advancedLang.form.laser_speed.unit}>
+                                {this.state.chooseSpeed || 0}
+                            </span>
+                    </div>
+                    <div className="control">
+                            <span className="label">{advancedLang.form.power.text}</span>
+                            <input
+                                type="range"
+                                ref="presetPower"
+                                min={advancedLang.form.power.min}
+                                max={advancedLang.form.power.max}
+                                step={advancedLang.form.power.step}
+                                value={this.state.choosePower || 0}
+                                className="readonly"
+                            />
+                            <span className="value-text" ref="presetPowerDisplay" data-tail="%">
+                                {round(this.state.choosePower / advancedLang.form.power.max * 100, -2) || 0}
+                            </span>
+                    </div>
+                    <ButtonGroup
+                        className="custom-preset-buttons"
+                        buttons={buttons}
+                    />
+                </div>
+            );
+
+            return (
+                true === self.state.openCustomPresets ?
+                <Modal content={content} onClose={self._togglePanel('customPresets', false)}/> :
+                ''
+            );
         },
 
         _renderAdvancedPanel: function(lang, default_material) {
             var content = (
                     <AdvancedPanel
                         lang={lang}
-                        materials={this.state.materials}
                         defaultMaterial={default_material}
-                        onCancel={this._toggleAdvancedPanel(false)}
-                        onDone={this._onAdvanceDone}
+                        onClose={this._togglePanel('advanced', false)}
+                        onLoadPreset={this._togglePanel('customPresets', true)}
+                        onApply={this._onAdvanceDone}
+                        onSave={this._onSaveCustomPreset}
                         ref="advancedPanel"
                     />
                 );
 
             return (
                 true === this.state.openAdvancedPanel ?
-                <Modal content={content} onClose={this._toggleAdvancedPanel(false)}/> :
+                <Modal content={content} onClose={this._togglePanel('advanced', false)}/> :
                 ''
-            );
-        },
-
-        _renderButtons: function(lang) {
-            var props = this.props,
-                cx = React.addons.classSet,
-                mode = ('engrave' === props.mode ? lang.laser.start_engrave : lang.laser.start_cut),
-                laser_class = cx({
-                    'btn btn-action btn-full-width btn-start': true
-                }),
-                import_class = cx({
-                    'btn btn-action btn-full-width file-importer': true
-                }),
-                export_file_class = cx({
-                    'btn btn-action btn-full-width fa fa-floppy-o': true
-                }),
-                laserButton = (
-                    true === props.hasImage ?
-                    <button data-ga-event="running-laser" className={laser_class} onClick={this._onRunLaser}>
-                        <img src="/img/icon-laser-s.png"/>
-                        {mode}
-                    </button> :
-                    ''
-                ),
-                importButton = (
-                    <div className={import_class}>
-                        <lable className="fa fa-plus">{lang.laser.import}</lable>
-                        <FileUploader
-                            ref="fileUploader"
-                            accept="image/*"
-                            multiple={true}
-                            onReadFileStarted={this.props.uploadProcess.onReadFileStarted}
-                            onReadingFile={this.props.uploadProcess.onFileReading}
-                            onReadEnd={this.props.uploadProcess.onFileReadEnd}
-                            onError={function() {
-                                console.log('error');
-                            }}
-                        />
-                    </div>
-                ),
-                saveButton = (
-                    true === props.hasImage ?
-                    <button ref="saveas" data-ga-event="save-laser-gcode" className={export_file_class} onClick={this._onExport}>{lang.laser.save}</button> :
-                    ''
-                );
-
-            return (
-                <div className="action-buttons">
-                    {laserButton}
-                    {importButton}
-                    {saveButton}
-                </div>
             );
         },
 
         _renderObjectHeight: function(lang) {
             return (
-                <input ref="objectHeight" type="number" min="0" max="100" step="0.1" defaultValue="" readOnly={!this.state.isReady}
-                    onBlur={this._onObjectHeightBlur}
-                />
+                <label className="popup-selection">
+                    <input className="popup-open" name="popup-open" type="checkbox" onClick={this._onOpenSubPopup}/>
+                    <div className="display-text">
+                        <p>
+                            {lang.laser.print_params.object_height.text}
+                            {this.state.defaults.objectHeight}
+                            {lang.laser.print_params.object_height.unit}
+                        </p>
+                    </div>
+                    <label className="popup">
+                        <svg className="arrow" version="1.1" xmlns="http://www.w3.org/2000/svg"
+                            width="36.8" height="20">
+                            <polygon points="0,10 36.8,0 36.8,20"/>
+                        </svg>
+                        <ul className="object-height-input">
+                            <li>
+                                <UnitInput
+                                    defaultUnit="mm"
+                                    defaultValue={this.props.defaults.objectHeight}
+                                    getValue={this._refreshObjectHeight}
+                                />
+                            </li>
+                            <li>
+                                AUTODETECTION
+                            </li>
+                        </ul>
+                    </label>
+                </label>
             )
         },
 
-        _onReady: function() {
-            this.setState({
-                isReady: true
-            });
+        _renderMaterialSelection: function(lang) {
+            var props = this.props;
+
+            return (
+                <label className="popup-selection">
+                    <input className="popup-open" name="popup-open" type="checkbox" onClick={this._onOpenSubPopup}/>
+                    <div className="display-text">
+                        <p>
+                            <span>{lang.laser.advanced.form.object_options.text}</span>
+                            <span className="material-label">{this.state.defaults.material.label}</span>
+                        </p>
+                    </div>
+                    <label className="popup">
+                        <svg className="arrow" version="1.1" xmlns="http://www.w3.org/2000/svg"
+                            width="36.8" height="20">
+                            <polygon points="0,10 36.8,0 36.8,20"/>
+                        </svg>
+                        <List
+                            className="material-list"
+                            ref="materials"
+                            items={this.state.materials}
+                            onClick={this._onPickupMaterial}
+                        />
+                    </label>
+                </label>
+            );
         },
 
-        componentWillMount: function () {
-            var self = this;
+        _renderAlert: function(lang) {
+            var buttons = [{
+                label: lang.laser.confirm,
+                onClick: this._togglePanel('alert', false)
+            }],
+            content = (
+                <Alert
+                    caption={this.state.alertContent.caption}
+                    message={this.state.alertContent.message}
+                    buttons={buttons}
+                />
+            );
 
-            config().read('custom-material', {
-                onFinished: function(response) {
-                    var data = JSON.parse(response),
-                        materials = self.state.materials,
-                        customIndex = materials.findIndex(function(el) {
-                            return el.value === 'custom';
-                        });
-
-                    data.label = self.props.lang.laser.custom;
-
-                    if (-1 === customIndex) {
-                        materials.forEach(function(el) {
-                            el.selected = false;
-                        });
-
-                        materials.push(data);
-
-                        self.setState({
-                            materials: materials
-                        });
-                    }
-                }
-            });
+            return (
+                true === this.state.showAlert ?
+                <Modal
+                    content={content}
+                    disabledEscapeOnBackground={true}
+                    onClose={this._togglePanel('alert', false)}
+                /> :
+                ''
+            );
         },
 
         render: function() {
             var props = this.props,
                 lang = props.lang,
                 cx = React.addons.classSet,
-                buttons = this._renderButtons(lang),
-                default_material = (
-                    this.state.defaultMaterial ||
-                    lang.laser.advanced.form.object_options.options.filter(
-                        function(obj) {
-                            return true === obj.selected;
-                        }
-                    )[0]
-                ),
-                advancedPanel = this._renderAdvancedPanel(lang, default_material),
-                objectHeight = this._renderObjectHeight(lang);
+                advancedPanel = this._renderAdvancedPanel(lang, this.state.defaults.material),
+                material = this._renderMaterialSelection(lang),
+                objectHeight = this._renderObjectHeight(lang),
+                customPresets = this._renderCustomPresets(lang),
+                alert = this._renderAlert(lang);
 
             return (
                 <div className="setup-panel operating-panel">
-                    <div className="main">
-                        <div className="time">1 hr 30min</div>
-                        <div className="setup">
-                            <div className="icon print-speed"></div>
-                            <div className="controls">
-                                <div className="label">{lang.laser.advanced.form.object_options.text}</div>
-                                <div className="control">
-                                    <SelectView
-                                        defaultValue={default_material.value}
-                                        ref="material"
-                                        className="span12"
-                                        options={this.state.materials}
-                                    />
-                                </div>
-                            </div>
-                        </div>
-                        <div className="setup">
-                            <div className="icon material"></div>
-                            <div className="controls">
-                                <div className="label">{lang.laser.print_params.object_height.text}</div>
-                                <div className="control">
-                                    {objectHeight}
-                                    <span>{lang.laser.print_params.object_height.unit}</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="setup last-setup">
-                            <button
-                                data-ga-event="open-laser-advanced-panel"
-                                className="btn btn-default btn-full-width"
-                                onClick={this._openAdvancedPanel}>
+                    <ul className="main">
+                        <li>
+                            {material}
+                        </li>
+                        <li>
+                            {objectHeight}
+                        </li>
+                        <li>
+                            <button className="btn btn-advance" data-ga-event="open-laser-advanced-panel" onClick={this._togglePanel('advanced', true)}>
                                 {lang.laser.button_advanced}
                             </button>
-                        </div>
-                    </div>
-                    {buttons}
+                        </li>
+                    </ul>
 
                     {advancedPanel}
+                    {customPresets}
+                    {alert}
                 </div>
             );
         },
 
-        componentDidMount: function () {
-            var self = this,
-                objectHeight = self.refs.objectHeight.getDOMNode(),
-                opts = {
-                    onError: function(response) {
-                        objectHeight.value = 3;
-                        self._onReady();
-                    }
-                }
-
-            config(opts).read('laser-object-height', {
-                onFinished: function(response) {
-                    objectHeight.value = parseFloat(response, 10);
-                    self._onReady();
-                }
-            });
-        },
-
         getDefaultProps: function() {
             return {
-                settingMaterial: React.PropTypes.object,
-                uploadProcess: React.PropTypes.object,
-                onRunLaser: React.PropTypes.func,
-                onExport: React.PropTypes.func,
-                hasImage: React.PropTypes.bool,
-                mode: React.PropTypes.string
+                defaults: React.PropTypes.object
             };
         },
 
@@ -291,9 +413,15 @@ define([
 
             return {
                 openAdvancedPanel: false,
-                defaultMaterial: undefined,
-                isReady: false,
-                materials: lang.laser.advanced.form.object_options.options
+                openCustomPresets: false,
+                hasSelectedPreset: false,
+                defaults: this.props.defaults,
+                materials: lang.laser.advanced.form.object_options.options,
+                showAlert: false,
+                alertContent: {
+                    caption: '',
+                    message: ''
+                }
             };
         }
 

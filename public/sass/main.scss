@@ -14,12 +14,14 @@
 @import "widgets/spinner";
 @import "widgets/button";
 @import "widgets/controls";
+@import "widgets/control";
 
 // views
 @import "views/advanced-panel";
 @import "views/modal";
 @import "views/printer-selector";
 @import "views/top-menu";
+@import "views/accordion";
 
 // pages
 @import "pages/print";

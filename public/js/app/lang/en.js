@@ -377,11 +377,17 @@ define(function() {
             import: 'Import',
             save: 'Save',
             custom: 'Custom',
-            acceptable_files: 'JPG, PNG, PDF, AI',
+            presets: 'Presets',
+            acceptable_files: 'JPG, PNG, SVG',
             drop_files_to_import: 'Drop your file here or click "import" to upload your file',
             button_advanced: 'Advanced',
+            confirm: 'Confirm',
             start_engrave: 'Engrave',
             start_cut: 'Cut',
+            close_alert: 'Close',
+            get_fcode: 'Get Fcode',
+            name: 'Name',
+            go: 'GO',
             print_params: {
                 object_height: {
                     text: 'Object Height',
@@ -402,20 +408,6 @@ define(function() {
                 rotate: {
                     text: 'ROTATE'
                 },
-                unit: {
-                    text: 'Unit',
-                    options: [
-                        {
-                            value: 'mm',
-                            label: 'mm',
-                            checked: true
-                        },
-                        {
-                            value: 'inches',
-                            label: 'inches'
-                        }
-                    ]
-                },
                 threshold: {
                     text: 'Threshold',
                     default: 128
@@ -430,20 +422,40 @@ define(function() {
                         options: [
                             {
                                 value: 'wood',
-                                label: 'Wood',
-                                selected: true,
+                                label: 'WOOD',
                                 data: {
                                     laser_speed: 5,
                                     power: 255
                                 }
                             },
                             {
-                                value: 'steel',
-                                label: 'Steel',
+                                value: 'leather',
+                                label: 'LEATHER',
                                 data: {
                                     laser_speed: 50,
                                     power: 255
                                 }
+                            },
+                            {
+                                value: 'paper',
+                                label: 'PAPER',
+                                data: {
+                                    laser_speed: 10,
+                                    power: 25
+                                }
+                            },
+                            {
+                                value: 'cork',
+                                label: 'CORK',
+                                data: {
+                                    laser_speed: 15,
+                                    power: 200
+                                }
+                            },
+                            {
+                                value: 'other',
+                                label: 'OTHER',
+                                data: {}
                             }
                         ]
                     },
@@ -465,8 +477,12 @@ define(function() {
                         step: 1
                     }
                 },
+                save_and_apply: 'SAVE & APPLY',
+                save_as_preset: 'SAVE AS PRESET',
+                load_preset: 'LOAD PRESET',
                 apply: 'Apply',
                 cancel: 'Cancel',
+                save: 'Save'
             }
         },
         scan: {
@@ -579,6 +595,10 @@ define(function() {
             change_filament: 'CHANGE FILLAMENT',
             browse_file: 'BROWSE FILE',
             monitor: 'MONITOR'
+        },
+        alert: {
+            caption: 'Error',
+            duplicated_preset_name: 'Duplicated preset name'
         }
     };
 });

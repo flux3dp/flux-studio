@@ -2,165 +2,206 @@ define([
     'jquery',
     'react',
     'jsx!widgets/Select',
+    'jsx!widgets/Button-Group',
+    'jsx!widgets/Text-Input',
     'helpers/api/config',
+    'helpers/round',
     'plugins/jquery/serializeObject',
     'helpers/array-findindex',
-], function($, React, SelectView, config) {
+], function($, React, SelectView, ButtonGroup, TextInput, config, round) {
     'use strict';
 
     return React.createClass({
-        _handleMaterialChange: function(e) {
-            var $self = $(e.currentTarget).find('option:selected'),
-                data = $self.data('meta'),
-                refs = this.refs,
-                materials = this.state.materials;
-
-            refs.speedRange.getDOMNode().value = data.laser_speed;
-            refs.powerRange.getDOMNode().value = data.power;
-            refs.speed.getDOMNode().textContent = data.laser_speed;
-            refs.power.getDOMNode().textContent = data.power;
+        // Private methods
+        _openSaveForm: function(open) {
+            this.setState({
+                openSaveWindow: open
+            });
         },
 
-        _handleCancel: function(e) {
-            this.props.onCancel(e);
-        },
-
-        _handleDone: function(e) {
-            this.props.onDone(this._getSetting());
-        },
-
-        _getSetting: function() {
-            return $(this.refs.advancedForm.getDOMNode()).serializeObject();
-        },
-
-        _changeRangeNumber: function(target) {
+        _getFooterButtons: function(lang) {
             var self = this,
-                materials = this.state.materials;
-
-            return function(e) {
-                var el = React.findDOMNode(self.refs[target]);
-
-                if ('undefined' !== typeof el) {
-                    el.textContent = e.currentTarget.value;
-                }
-            };
-        },
-
-        _handleRangeMouseUp: function(e) {
-            var self = this,
-                refs = self.refs,
-                materials = self.state.materials,
-                custom_option = {
-                    value: 'custom',
-                    label: self.props.lang.laser.custom,
-                    selected: true,
-                    data: {
-                        laser_speed: parseFloat(refs.speedRange.getDOMNode().value, 10),
-                        power: parseInt(refs.powerRange.getDOMNode().value, 10)
-                    }
-                },
-                customIndex = materials.findIndex(function(el) {
-                    return el.value === custom_option.value;
-                });
-
-            config().write(
-                'custom-material',
-                JSON.stringify(custom_option),
-                {
-                    onFinished: function(response) {
-                        if (-1 === customIndex) {
-                            materials.push(custom_option);
-                            self.setState({
-                                materials: materials,
-                                defaultMaterial: custom_option
-                            });
+                buttonGroup = {
+                    default: [{
+                        label: lang.load_preset,
+                        onClick: this._onLoadPreset
+                    },
+                    {
+                        label: lang.apply,
+                        onClick: this._onApply
+                    },
+                    {
+                        label: lang.save_as_preset,
+                        className: (true === this.state.materialHasChanged ? '' : 'btn-disabled'),
+                        onClick: this._onSaveStarting
+                    }],
+                    save: [{
+                        label: lang.save_and_apply,
+                        onClick: self._onSaveAndApply
+                    },
+                    {
+                        label: lang.cancel,
+                        onClick: function() {
+                            self._openSaveForm(false);
                         }
-                        else {
-                            // replace custom material
-                            materials[customIndex] = custom_option;
-                        }
-                    }
-                }
+                    }]
+                };
+
+            return (
+                false === this.state.openSaveWindow ?
+                buttonGroup.default :
+                buttonGroup.save
             );
         },
 
+        _applySetting: function(e) {
+            this.props.onDone();
+        },
+
+        // UI Events
+        _onLoadPreset: function(e) {
+            this.props.onLoadPreset(e);
+        },
+
+        _onCancel: function(e) {
+            this.props.onClose(e);
+        },
+
+        _onSaveAndApply: function(e) {
+            var lang = this.props.lang,
+                value = this.refs.presetName.value(),
+                refs = this.refs,
+                material = {
+                    value: value,
+                    label: value,
+                    data: this.state.defaultMaterial.data
+                };
+
+            if (true === this.props.onSave(material)) {
+                this.props.onApply(material);
+            }
+        },
+
+        _onApply: function(e) {
+            var lang = this.props.lang,
+                refs = this.refs,
+                material = {
+                    value: 'custom',
+                    label: lang.laser.custom,
+                    data: this.state.defaultMaterial.data
+                };
+
+            this.props.onApply(material);
+        },
+
+        _onSaveStarting: function(e) {
+            this._openSaveForm(true);
+        },
+
+        _changeRangeNumber: function(target) {
+            var self = this;
+
+            return function(e) {
+                var speedRange = self.refs.speedRange.getDOMNode(),
+                    powerRange = self.refs.powerRange.getDOMNode(),
+                    defaultMaterial = self.state.defaultMaterial;
+
+                // changed state
+                defaultMaterial.data.laser_speed = parseFloat(speedRange.value, 10);
+                defaultMaterial.data.power = parseFloat(powerRange.value, 10);
+
+                self.setState({
+                    materialHasChanged: true
+                });
+            };
+        },
+
+        // Lifecycle
         _renderFooter: function(lang) {
+            lang = lang.advanced;
+
+            var buttons = this._getFooterButtons(lang);
+
             return (
-                <footer className="footer">
-                    <button className="btn btn-default" onClick={this._handleCancel}>{lang.cancel}</button>
-                    <button className="btn btn-confirm" onClick={this._handleDone}>{lang.apply}</button>
-                </footer>
+                <ButtonGroup className="footer" buttons={buttons}/>
+            );
+        },
+
+        _renderSaveForm: function(lang) {
+            return (
+                <div className="form">
+                    <header class="header">{lang.save_as_preset}</header>
+                    <div className="controls">
+                        <div className="control">
+                            <label className="label">{lang.name}</label>
+                            <TextInput ref="presetName"/>
+                        </div>
+                    </div>
+                </div>
+            );
+        },
+
+        _renderDefaultForm: function(lang) {
+            lang = lang.advanced;
+
+            return (
+                <form ref="advancedForm" className="form">
+                    <div className="controls clearfix">
+                        <div className="control">
+                            <label className="label">{lang.form.laser_speed.text}</label>
+                            <input
+                                type="range"
+                                ref="speedRange"
+                                data-min-text={lang.form.laser_speed.slow}
+                                data-max-text={lang.form.laser_speed.fast}
+                                min={lang.form.laser_speed.min}
+                                max={lang.form.laser_speed.max}
+                                step={lang.form.laser_speed.step}
+                                defaultValue={this.state.defaultMaterial.data.laser_speed}
+                                onChange={this._changeRangeNumber('speed')}
+                            />
+                            <span ref="speed" data-tail={lang.form.laser_speed.unit} className="value-text">
+                                {this.state.defaultMaterial.data.laser_speed}
+                            </span>
+                        </div>
+                    </div>
+                    <div className="controls clearfix">
+                        <div className="control">
+                            <label className="label">{lang.form.power.text}</label>
+                            <input
+                                type="range"
+                                ref="powerRange"
+                                data-min-text={lang.form.power.low}
+                                data-max-text={lang.form.power.high}
+                                min={lang.form.power.min}
+                                max={lang.form.power.max}
+                                step={lang.form.power.step}
+                                defaultValue={this.state.defaultMaterial.data.power}
+                                onChange={this._changeRangeNumber('power')}
+                            />
+                            <span ref="power" data-tail="%" className="value-text">
+                                {round(this.state.defaultMaterial.data.power / lang.form.power.max * 100, -2)}
+                            </span>
+                        </div>
+                    </div>
+                </form>
             );
         },
 
         render: function() {
             var self = this,
-                lang = this.props.lang.laser.advanced,
+                lang = this.props.lang.laser,
+                form = (
+                    false === this.state.openSaveWindow ?
+                    this._renderDefaultForm(lang) :
+                    this._renderSaveForm(lang)
+                ),
                 footer = this._renderFooter(lang);
 
             return (
                 <div className="advanced-panel">
-
-                    <header className="header">{lang.label}</header>
-
-                    <form ref="advancedForm" className="form">
-                        <div className="controls clearfix">
-                            <label className="label">{lang.form.object_options.label}</label>
-                            <div className="control">
-                                <SelectView
-                                    name="material"
-                                    defaultValue={this.state.defaultMaterial.value}
-                                    options={this.state.materials}
-                                    onChange={this._handleMaterialChange}
-                                />
-                            </div>
-                        </div>
-                        <div className="controls clearfix">
-                            <label className="label">{lang.form.laser_speed.text}</label>
-                            <div className="control">
-                                <input
-                                    name="laser_speed"
-                                    type="range"
-                                    ref="speedRange"
-                                    data-min-text={lang.form.laser_speed.slow}
-                                    data-max-text={lang.form.laser_speed.fast}
-                                    min={lang.form.laser_speed.min}
-                                    max={lang.form.laser_speed.max}
-                                    step={lang.form.laser_speed.step}
-                                    defaultValue={this.state.defaultMaterial.data.laser_speed}
-                                    onChange={this._changeRangeNumber('speed')}
-                                    onMouseUp={this._handleRangeMouseUp}
-                                />
-                                <span ref="speed" data-tail={lang.form.laser_speed.unit}>
-                                    {this.props.defaultMaterial.data.laser_speed}
-                                </span>
-                            </div>
-                        </div>
-                        <div className="controls clearfix">
-                            <label className="label">{lang.form.power.text}</label>
-                            <div className="control">
-                                <input
-                                    name="power"
-                                    type="range"
-                                    ref="powerRange"
-                                    data-min-text={lang.form.power.low}
-                                    data-max-text={lang.form.power.high}
-                                    min={lang.form.power.min}
-                                    max={lang.form.power.max}
-                                    step={lang.form.power.step}
-                                    defaultValue={this.state.defaultMaterial.data.power}
-                                    onChange={this._changeRangeNumber('power')}
-                                    onMouseUp={this._handleRangeMouseUp}
-                                />
-                                <span ref="power">
-                                    {this.props.defaultMaterial.data.power}
-                                </span>
-                            </div>
-                        </div>
-                    </form>
-
+                    {form}
                     {footer}
-
                 </div>
             );
         },
@@ -171,9 +212,9 @@ define([
             return {
                 lang: React.PropTypes.object,
                 defaultMaterial: React.PropTypes.object,
-                materials: React.PropTypes.array,
-                openAdvancedPanel: React.PropTypes.bool,
-                onCancel: React.PropTypes.func,
+                onLoadPreset: React.PropTypes.func,
+                onClose: React.PropTypes.func,
+                onSave: React.PropTypes.func,
                 onDone : React.PropTypes.func
             };
         },
@@ -181,7 +222,8 @@ define([
         getInitialState: function() {
             return {
                 defaultMaterial: this.props.defaultMaterial,
-                materials: this.props.materials
+                materialHasChanged: false,
+                openSaveWindow: false
             };
         }
 

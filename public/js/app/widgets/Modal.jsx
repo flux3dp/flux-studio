@@ -35,7 +35,7 @@ define([
             return (
                 <div className={backgroundClass}>
                     <div className="modal-background" onClick={this._onEscapeOnBackground}/>
-                    {this.props.content}
+                    <div className="modal-body">{this.props.content}</div>
                 </div>
             );
         },

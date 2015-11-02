@@ -91,7 +91,7 @@ define([
                     director.init(this);
                     Config().read('advanced-options', {
                         onFinished: function(response) {
-                            var options = JSON.parse(response);
+                            var options = JSON.parse(response || '{}');
                             if(!$.isEmptyObject(options)) {
                                 advancedSetting = options;
                             }
