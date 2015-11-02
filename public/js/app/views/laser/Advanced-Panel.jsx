@@ -77,8 +77,9 @@ define([
                     data: this.state.defaultMaterial.data
                 };
 
-            this.props.onSave(material);
-            this.props.onApply(material);
+            if (true === this.props.onSave(material)) {
+                this.props.onApply(material);
+            }
         },
 
         _onApply: function(e) {
