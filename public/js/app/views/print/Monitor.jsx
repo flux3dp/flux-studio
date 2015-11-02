@@ -33,7 +33,7 @@ define([
 
     return React.createClass({
 
-        PropTypes: {
+        propTypes: {
             lang: React.PropTypes.object,
             onClose: React.PropTypes.func,
             selectedPrinter: React.PropTypes.object,

@@ -3617,7 +3617,8 @@ input.switch:checked ~ label:after {
             width: 100%;
             height: 275px;
             border: 2px solid #E0E0E0;
-            margin-top: 10px; }
+            margin-top: 10px;
+            color: #B3B3B3; }
         .print-studio .advanced-panel .preset-wrapper .preset-name {
             margin-top: 20px;
             height: 40px;

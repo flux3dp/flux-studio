@@ -147,13 +147,13 @@ define([
                 _handleResetScale: function() {
                     director.setScale(1, 1, 1, true);
                 },
-                _handleAdvancedSettingCancel: function() {
+                _handleCloseAdvancedSetting: function() {
                     this.setState({ showAdvancedSetting: false });
                 },
-                _handleAdvancedSettingDone: function(setting) {
-                    Config().write('advanced-options', JSON.stringify(advancedSetting), {
-                        onFinished: function(response) {}
-                    });
+                _handleApplyAdvancedSetting: function(setting) {
+                    // Config().write('advanced-options', JSON.stringify(setting), {
+                    //     onFinished: function(response) {}
+                    // });
                     advancedSetting = setting;
                     director.setAdvanceParameter(setting);
                     this.setState({ showAdvancedSetting: false });
@@ -257,8 +257,8 @@ define([
                         <AdvancedPanel
                             lang        = {lang}
                             setting     = {advancedSetting}
-                            onCancel    = {this._handleAdvancedSettingCancel}
-                            onDone      = {this._handleAdvancedSettingDone} />
+                            onClose     = {this._handleCloseAdvancedSetting}
+                            onApply     = {this._handleApplyAdvancedSetting} />
                     );
                 },
                 _renderPrinterSelectorWindow: function() {
@@ -374,7 +374,7 @@ define([
                         printerSelectorWindow   = this.state.openPrinterSelectorWindow ? this._renderPrinterSelectorWindow() : '',
                         waitWindow              = this.state.openWaitWindow ? this._renderWaitWindow() : '',
                         previewWindow           = this.state.previewMode ? this._renderPreviewWindow() : '',
-                        progressWindow          = this.state.progressMessage ? this._renderProgressWindow() : '';
+                        progressWindow          = this.state.progressMessage ? this._renderProgressWindow() : ''
 
                     return (
                         <div className="studio-container print-studio">

@@ -4,9 +4,9 @@ define([
     'jsx!widgets/Slider-Control',
     'jsx!widgets/Dropdown-Control',
     'jsx!widgets/Switch-Control',
-    'plugins/classnames/index'
-], function($, React, SliderControl, DropdownControl, SwitchControl, ClassNames) {
-    'use strict';
+    'plugins/classnames/index',
+    'helpers/api/config',
+], function($, React, SliderControl, DropdownControl, SwitchControl, ClassNames, Config) {
 
     var mode = {
             'setup'     : 1,
@@ -25,47 +25,55 @@ define([
         currentKey,
         lastValidValue;
 
-    var presets = ['preset 1', 'preset 2', 'preset 3', 'preset 4', 'preset 5'],
+    var hiddenPresets = ['engine', 'custom'],
+        configs = ['avoid_crossing_perimeters','bed_shape','bed_temperature','before_layer_gcode','bottom_solid_layers','bridge_acceleration','bridge_fan_speed','bridge_flow_ratio','bridge_speed','brim_width','complete_objects','cooling','default_acceleration','disable_fan_first_layers','dont_support_bridges','duplicate_distance','end_gcode','external_fill_pattern','external_perimeter_extrusion_width','external_perimeter_speed','external_perimeters_first','extra_perimeters','extruder_clearance_height','extruder_clearance_radius','extruder_offset','extrusion_axis','extrusion_multiplier','extrusion_width','fan_always_on','fan_below_layer_time','filament_colour','filament_diameter','fill_angle','fill_density','fill_pattern','first_layer_acceleration','first_layer_bed_temperature','first_layer_extrusion_width','first_layer_height','first_layer_speed','first_layer_temperature','gap_fill_speed','gcode_arcs','gcode_comments','gcode_flavor','infill_acceleration','infill_every_layers','infill_extruder','infill_extrusion_width','infill_first','infill_only_where_needed','infill_overlap','infill_speed','interface_shells','layer_gcode','layer_height','max_fan_speed','max_print_speed','max_volumetric_speed','min_fan_speed','min_print_speed','min_skirt_length','notes','nozzle_diameter','octoprint_apikey','octoprint_host','only_retract_when_crossing_perimeters','ooze_prevention','output_filename_format','overhangs','perimeter_acceleration','perimeter_extruder','perimeter_extrusion_width','perimeter_speed','perimeters','post_process','pressure_advance','raft_layers','resolution','retract_before_travel','retract_layer_change','retract_length','retract_length_toolchange','retract_lift','retract_restart_extra','retract_restart_extra_toolchange','retract_speed','seam_position','skirt_distance','skirt_height','skirts','slowdown_below_layer_time','small_perimeter_speed','solid_infill_below_area','solid_infill_every_layers','solid_infill_extruder','solid_infill_extrusion_width','solid_infill_speed','spiral_vase','standby_temperature_delta','start_gcode','support_material','support_material_angle','support_material_contact_distance','support_material_enforce_layers','support_material_extruder','support_material_extrusion_width','support_material_interface_extruder','support_material_interface_layers','support_material_interface_spacing','support_material_interface_speed','support_material_pattern','support_material_spacing','support_material_speed','support_material_threshold','temperature','thin_walls','threads','toolchange_gcode','top_infill_extrusion_width','top_solid_infill_speed','top_solid_layers','travel_speed','use_firmware_retraction','use_relative_e_distances','use_volumetric_e','vibration_limit','wipe','xy_size_compensation','z_offset'],
         advancedSetting = {
             // General
-            engine              : '',
-            temperature         : 200,
+            engine                              : '',
+            temperature                         : 200,
 
             // Layers
-            layerHeight         : 0.2,
-            firstLayerHeight    : 0.25,
-            shellSurface        : 3,
-            solidLayerTop       : 3,
-            solidLayerBottom    : 3,
+            layer_height                        : 0.2,
+            first_layer_height                  : 0.25,
+            perimeters                          : 3,
+            top_solid_layers                    : 3,
+            bottom_solid_layers                 : 3,
 
             // Infill
-            density             : 10,
-            infillPattern       : 'auto',
-            shellSurfaceOn      : false,
+            fill_density                        : 10,
+            fill_pattern                        : 'auto',
+            spiral_vase                         : false,
 
             // Support
-            generalSupportOn    : true,
-            spacing             : 2.5,
-            overhang            : 60,
-            supportPattern      : 'auto',
-            zDistance           : 0.2,
-            raftLayers          : 4,
+            support_material                    : true,
+            support_material_spacing            : 2.5,
+            support_material_threshold          : 60,
+            support_material_pattern            : 'auto',
+            support_material_contact_distance   : 0.2,
+            raft_layers                         : 4,
 
             // Speed
-            traveling           : 150,
-            support             : 80,
-            infill              : 80,
-            firstLayer          : 30,
-            solidLayers         : 20,
-            innerShell          : 70,
-            outerShell          : 50,
-            bridge              : 60,
+            travel_speed                        : 150,
+            support_material_speed              : 80,
+            infill_speed                        : 80,
+            first_layer_speed                   : 30,
+            solid_infill_speed                  : 20,
+            perimeter_speed                     : 70,
+            external_perimeter_speed            : 50,
+            bridge_speed                        : 60,
 
             // Custom
-            custom              : ''
-        }
+            custom                              : ''
+        };
 
     return React.createClass({
+
+        propTypes: {
+            lang: React.PropTypes.object,
+            setting: React.PropTypes.object,
+            onClose: React.PropTypes.func,
+            onApply: React.PropTypes.func
+        },
 
         getInitialState: function() {
             return {
@@ -73,12 +81,14 @@ define([
                 selectedTab         : 1,
 
                 // Presets
-                selectedPreset      : ''
-            }
+                selectedPreset      : '',
+                presets             : {}
+            };
         },
 
         componentWillMount: function() {
             lang = this.props.lang.print.advanced;
+            this._updateCustomField();
         },
 
         _createState: function(key, value) {
@@ -88,6 +98,7 @@ define([
         },
 
         _validateValue: function(e) {
+            e.preventDefault();
             if(!this._isValidValue(currentKey, this.state[currentKey])) {
                 this.setState(this._createState(currentKey, lastValidValue));
             }
@@ -99,34 +110,67 @@ define([
 
             return min <= value && value <= max;
         },
+        
+        _validateCustomFields: function() {
+            var settings = this.state.custom.split('\n');
+            
+        },
+        
+        _updateCustomField: function() {
+            var custom = this._formatPreset(advancedSetting);
+            this.setState({ custom: custom });
+        },
+        
+        _getPresets: function(callback) {
+            Config().read('preset-settings', {
+                onFinished: function(response) {
+                    callback(response);
+                }
+            });
+        },
+        
+        _savePreset: function(presets) {
+            var self = this,
+                name = this.refs.presetName.getDOMNode().value;
+                p = JSON.parse(presets);
+            
+            p[name] = JSON.stringify(advancedSetting);
+            Config().write('preset-settings', JSON.stringify(p), {
+                onFinished: function() {
+                    self._handleBackToSetting();
+                },
+                onError: function(error) {
+                    // TODO: log error
+                    console.log(error);
+                }
+            });
+        },
+        
+        _listPresets: function(presets) {
+            var p = JSON.parse(presets);
+            
+            this.setState({ 
+                presets: p,
+                selectedPreset: Object.keys(p)[0]
+            });
+        },
+        
+        _formatPreset: function(presetInJSON) {
+            if(!presetInJSON) { return ''; }
+            var settings = Object.keys(presetInJSON).map(function(name) {
+                if(hiddenPresets.indexOf(name) >= 0) {
+                    return '';
+                }
+                return name.replace(/,/g,'') + ' = ' + presetInJSON[name] + '\n';
+            });
+            return settings.join('');
+        },
 
         _handleNavigate: function(selectedTab, e) {
             e.preventDefault();
             this.setState({
                 selectedTab: selectedTab
             });
-            // switch(selectedTab) {
-            //     case tab.General:
-            //         console.log('general');
-            //         break;
-            //     case tab.Layers:
-            //         console.log('layers');
-            //         break;
-            //     case tab.Infill:
-            //         console.log('infill');
-            //         break;
-            //     case tab.Support:
-            //         console.log('support');
-            //         break;
-            //     case tab.Speed:
-            //         console.log('speed');
-            //         break;
-            //     case tab.Custom:
-            //         console.log('custom');
-            //         break;
-            //     default:
-            //         break;
-            // }
         },
 
         _handleParameterChange: function(key, e) {
@@ -143,15 +187,26 @@ define([
         },
 
         _handleLoadPreset: function() {
+            var self = this;
             this.setState({ mode: mode.load });
+            this._getPresets(function(settings) {
+                self._listPresets(settings);
+            });
         },
 
         _handleBackToSetting: function() {
             this.setState({ mode: mode.setup });
         },
 
-        _handleSavePreset: function() {
+        _handleOpenSaveAsPreset: function() {
             this.setState({ mode: mode.save });
+        },
+        
+        _handleSaveAndApply: function() {
+            var self = this;
+            this._getPresets(function(presets) {
+                self._savePreset(presets);
+            });
         },
 
         _handleEditValue: function(e) {
@@ -168,6 +223,24 @@ define([
         _handleControlValueChange: function(id, value) {
             console.log(id, value);
             advancedSetting[id] = value;
+            
+            this._updateCustomField();
+        },
+        
+        _handleApplyPreset: function() {
+            var p = this.state.presets[this.state.selectedPreset];
+            advancedSetting = JSON.parse(p);
+            this._updateCustomField();
+            this._handleBackToSetting();
+        },
+
+        _handleApply: function(e) {
+            e.preventDefault();
+            if(this.state.selectedTab === tab.Custom) {
+                this._validateCustomFields();
+            }
+            
+            this.props.onApply(advancedSetting);
         },
 
         _renderSliderControl: function(key, min, max, step) {
@@ -276,7 +349,7 @@ define([
                     </div>
 
                 </div>
-            )
+            );
         },
 
         _renderLayersSection: function() {
@@ -287,21 +360,21 @@ define([
                         <div className="title">{lang.layerHeight}</div>
 
                         <SliderControl
-                            id="layerHeight"
+                            id="layer_height"
                             label={lang.layerHeight}
                             min={0.02}
                             max={20}
                             step={0.01}
-                            default={advancedSetting.layerHeight}
+                            default={advancedSetting.layer_height}
                             onChange={this._handleControlValueChange} />
 
                         <SliderControl
-                            id="firstLayerHeight"
+                            id="first_layer_height"
                             label={lang.firstLayerHeight}
                             min={0.02}
                             max={0.4}
                             step={0.01}
-                            default={advancedSetting.firstLayerHeight}
+                            default={advancedSetting.first_layer_height}
                             onChange={this._handleControlValueChange} />
 
                     </div>
@@ -310,30 +383,30 @@ define([
                         <div className="title">{lang.shell}</div>
 
                         <SliderControl
-                            id="shellSurface"
+                            id="perimeters"
                             label={lang.shellSurface}
                             min={0}
                             max={20}
                             step={1}
-                            default={advancedSetting.shellSurface}
+                            default={advancedSetting.perimeters}
                             onChange={this._handleControlValueChange} />
 
                         <SliderControl
-                            id="solidLayerTop"
+                            id="top_solid_layers"
                             label={lang.solidLayerTop}
                             min={0}
                             max={20}
                             step={1}
-                            default={advancedSetting.solidLayerTop}
+                            default={advancedSetting.top_solid_layers}
                             onChange={this._handleControlValueChange} />
 
                         <SliderControl
-                            id="solidLayerBottom"
+                            id="bottom_solid_layers"
                             label={lang.solidLayerBottom}
                             min={0}
                             max={20}
                             step={1}
-                            default={advancedSetting.solidLayerBottom}
+                            default={advancedSetting.bottom_solid_layers}
                             onChange={this._handleControlValueChange} />
 
                     </div>
@@ -350,19 +423,19 @@ define([
                         <div className="title">Infill</div>
 
                         <SliderControl
-                            id="density"
+                            id="fill_density"
                             label={lang.density}
                             min={0}
                             max={100}
                             step={1}
-                            default={advancedSetting.density}
+                            default={advancedSetting.fill_density}
                             onChange={this._handleControlValueChange} />
 
                         <DropdownControl
-                            id="infillPattern"
+                            id="fill_pattern"
                             label={lang.pattern}
                             options={[lang.auto, lang.line, lang.rectilinear, lang.honeycomb]}
-                            default={advancedSetting.infillPattern}
+                            default={advancedSetting.fill_pattern}
                             onChange={this._handleControlValueChange} />
 
                     </div>
@@ -371,9 +444,9 @@ define([
                         <div className="title">{lang.blackMagic}</div>
 
                         <SwitchControl
-                            id="shellSurfaceOn"
+                            id="spiral_vase"
                             label={lang.shellSurface}
-                            default={advancedSetting.shellSurfaceOn}
+                            default={advancedSetting.spiralVase}
                             onChange={this._handleControlValueChange} />
 
                     </div>
@@ -390,43 +463,43 @@ define([
                         <div className="title">{lang.support}</div>
 
                         <SwitchControl
-                            id="generalSupportOn"
+                            id="support_material"
                             label={lang.generalSupport}
-                            default={advancedSetting.generalSupportOn}
+                            default={advancedSetting.support_material}
                             onChange={this._handleControlValueChange} />
 
                         <SliderControl
-                            id="spacing"
+                            id="support_material_spacing"
                             label={lang.spacing}
                             min={0.1}
                             max={50}
                             step={0.1}
-                            default={advancedSetting.spacing}
+                            default={advancedSetting.support_material_spacing}
                             onChange={this._handleControlValueChange} />
 
                         <SliderControl
-                            id="overhang"
+                            id="support_material_threshold"
                             label={lang.overhang}
                             min={0}
                             max={90}
                             step={1}
-                            default={advancedSetting.overhang}
+                            default={advancedSetting.support_material_threshold}
                             onChange={this._handleControlValueChange} />
 
                         <DropdownControl
-                            id="supportPattern"
+                            id="support_material_pattern"
                             label={lang.pattern}
                             options={[lang.auto, lang.line, lang.rectilinear, lang.honeycomb]}
-                            default={advancedSetting.supportPattern}
+                            default={advancedSetting.support_material_pattern}
                             onChange={this._handleControlValueChange} />
 
                         <SliderControl
-                            id="zDistance"
+                            id="support_material_contact_distance"
                             label={lang.zDistance}
                             min={0.05}
                             max={20}
                             step={0.01}
-                            default={advancedSetting.zDistance}
+                            default={advancedSetting.support_material_contact_distance}
                             onChange={this._handleControlValueChange} />
 
                     </div>
@@ -435,12 +508,12 @@ define([
                         <div className="title">{lang.raft}</div>
 
                         <SliderControl
-                            id="raftLayers"
+                            id="raft_layers"
                             label={lang.raftLayers}
                             min={0}
                             max={20}
                             step={1}
-                            default={advancedSetting.raftLayers}
+                            default={advancedSetting.raft_layers}
                             onChange={this._handleControlValueChange} />
 
                     </div>
@@ -456,12 +529,12 @@ define([
                     <div className="section">
                         <div className="title">{lang.movement}</div>
                         <SliderControl
-                            id="traveling"
+                            id="travel_speed"
                             label={lang.traveling}
                             min={1}
                             max={150}
                             step={1}
-                            default={advancedSetting.traveling}
+                            default={advancedSetting.travel_speed}
                             onChange={this._handleControlValueChange} />
                     </div>
 
@@ -469,21 +542,21 @@ define([
                         <div className="title">{lang.structure}</div>
 
                         <SliderControl
-                            id="support"
+                            id="support_material_speed"
                             label={lang.support}
                             min={1}
                             max={150}
                             step={1}
-                            default={advancedSetting.support}
+                            default={advancedSetting.support_material_speed}
                             onChange={this._handleControlValueChange} />
 
                         <SliderControl
-                            id="infill"
+                            id="infill_speed"
                             label={lang.infill}
                             min={1}
                             max={150}
                             step={1}
-                            default={advancedSetting.infill}
+                            default={advancedSetting.infill_speed}
                             onChange={this._handleControlValueChange} />
 
                     </div>
@@ -492,48 +565,48 @@ define([
                         <div className="title">{lang.surface}</div>
 
                         <SliderControl
-                            id="firstLayer"
+                            id="first_layer_speed"
                             label={lang.firstLayer}
                             min={1}
                             max={150}
                             step={1}
-                            default={advancedSetting.firstLayer}
+                            default={advancedSetting.first_layer_speed}
                             onChange={this._handleControlValueChange} />
 
                         <SliderControl
-                            id="solidLayers"
+                            id="solid_infill_speed"
                             label={lang.solidLayers}
                             min={1}
                             max={150}
                             step={1}
-                            default={advancedSetting.solidLayers}
+                            default={advancedSetting.solid_infill_speed}
                             onChange={this._handleControlValueChange} />
 
                         <SliderControl
-                            id="innerShell"
+                            id="perimeter_speed"
                             label={lang.innerShell}
                             min={1}
                             max={150}
                             step={1}
-                            default={advancedSetting.innerShell}
+                            default={advancedSetting.perimeter_speed}
                             onChange={this._handleControlValueChange} />
 
                         <SliderControl
-                            id="outerShell"
+                            id="external_perimeter_speed"
                             label={lang.outerShell}
                             min={1}
                             max={150}
                             step={1}
-                            default={advancedSetting.outerShell}
+                            default={advancedSetting.external_perimeter_speed}
                             onChange={this._handleControlValueChange} />
 
                         <SliderControl
-                            id="bridge"
+                            id="bridge_speed"
                             label={lang.bridge}
                             min={1}
                             max={150}
                             step={1}
-                            default={advancedSetting.bridge}
+                            default={advancedSetting.bridge_speed}
                             onChange={this._handleControlValueChange} />
 
                     </div>
@@ -543,6 +616,15 @@ define([
         },
 
         _renderCustomSection: function() {
+            // var ignored = ['engine', 'custom'];
+            // var settings = Object.keys(advancedSetting).map(function(name) {
+            //     if(ignored.indexOf(name) >= 0) {
+            //         return '';
+            //     }
+            //     return name.replace(/,/g,'') + ' = ' + advancedSetting[name] + '\n';
+            // });
+            // advancedSetting['custom'] = settings;
+            
             return (
                 <div className="content-wrapper">
 
@@ -552,7 +634,11 @@ define([
                             <div className="label pull-left"></div>
                             <div className="control">
                                 <div className="textarea-container">
-                                    <textarea rows="20" cols="50" value={this.state.custom} onChange={this._handleParameterChange.bind(null, 'custom')} />
+                                    <textarea
+                                        rows="20" 
+                                        cols="50" 
+                                        value={this.state.custom}
+                                        onChange={this._handleParameterChange.bind(null, 'custom')} />
                                 </div>
                             </div>
                         </div>
@@ -600,19 +686,19 @@ define([
 
                 case mode.setup:
                     button1 = (<a className="btn" onClick={this._handleLoadPreset}>{lang.loadPreset}</a>);
-                    button2 = (<a className="btn">{lang.apply}</a>);
-                    button3 = (<a className="btn" onClick={this._handleSavePreset}>{lang.saveAsPreset}</a>);
+                    button2 = (<a className="btn" onClick={this._handleApply}>{lang.apply}</a>);
+                    button3 = (<a className="btn" onClick={this._handleOpenSaveAsPreset}>{lang.saveAsPreset}</a>);
                     break;
 
                 case mode.load:
                     button1 = '';
-                    button2 = (<a className="btn">{lang.apply}</a>);
+                    button2 = (<a className="btn" onClick={this._handleApplyPreset}>{lang.apply}</a>);
                     button3 = (<a className="btn" onClick={this._handleBackToSetting}>{lang.cancel}</a>);
                     break;
 
                 case mode.save:
                     button1 = '';
-                    button2 = (<a className="btn">{lang.saveAndApply}</a>);
+                    button2 = (<a className="btn" onClick={this._handleSaveAndApply}>{lang.saveAndApply}</a>);
                     button3 = (<a className="btn" onClick={this._handleBackToSetting}>{lang.cancel}</a>);
 
                 default:
@@ -654,9 +740,10 @@ define([
             var self = this,
                 footer = this._renderFooter(),
                 entries,
-                entryClass;
+                entryClass,
+                presetList = Object.keys(this.state.presets);
 
-            entries = presets.map(function(entry) {
+            entries = presetList.map(function(entry) {
                 entryClass = ClassNames('preset-entry', {'selected': self.state.selectedPreset === entry});
                 return (
                     <div className={entryClass} onClick={self._handleSelectPreset.bind(null, entry)}>
@@ -664,6 +751,9 @@ define([
                     </div>
                 );
             });
+            
+            var preset = this.state.presets[this.state.selectedPreset] || '{}',
+                presetContent = this._formatPreset(JSON.parse(preset));
 
             return (
                 <div id="advanced-panel" className="advanced-panel">
@@ -672,7 +762,7 @@ define([
                         <div className="preset-list">
                             {entries}
                         </div>
-                        <div className="preset-content"></div>
+                        <textarea className="preset-content" value={presetContent} disabled />
                         {footer}
                     </div>
                 </div>
@@ -691,7 +781,7 @@ define([
                         <div className="preset-header">{lang.saveAsPreset}</div>
                         <div className="preset-name">
                             <span>{lang.name}</span>
-                            <input type="text" />
+                            <input ref="presetName" type="text" />
                         </div>
 
                         {footer}
