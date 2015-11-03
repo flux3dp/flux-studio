@@ -104,9 +104,7 @@ define([
                                 setupPanelDefaults.material = lang.laser.advanced.form.object_options.options[0];
                             }
 
-                            if ('undefined' !== typeof response.objectHeight) {
-                                setupPanelDefaults.objectHeight = response.objectHeight;
-                            }
+                            setupPanelDefaults.objectHeight = response.objectHeight || 0;
                         }
                     });
 
