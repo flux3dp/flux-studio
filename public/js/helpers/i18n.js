@@ -24,7 +24,7 @@ define([
 
             for (var name in supported_langs) {
                 if (true === supported_langs.hasOwnProperty(name)) {
-                    require([path + '/' + name], storeLang(name));
+                    requirejs([path + '/' + name], storeLang(name));
                 }
             }
         },

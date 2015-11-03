@@ -229,7 +229,6 @@ define(function() {
                 innerShell: 'Inner Shell',
                 outerShell: 'Outer Shell',
                 bridge: 'Bridge',
-                custom: 'Custom',
                 config: 'Config',
                 presets: 'Presets',
                 name: 'Name',

@@ -89,11 +89,6 @@ requirejs([
 ], function($, Backbone, Router, globalEvents) {
     'use strict';
 
-    globalEvents(function() {
-        var router = new Router();
-        Backbone.history.start();
-    });
-
     // GA setting up
     // NOTICE: rename ga as GA to prevent conflict with requirejs
     window.GA = ('undefined' !== typeof ga ? ga : function() {});
@@ -107,4 +102,9 @@ requirejs([
     );
 
     GA('send', 'pageview', location.hash);
+
+    globalEvents(function() {
+        var router = new Router();
+        Backbone.history.start();
+    });
 });
