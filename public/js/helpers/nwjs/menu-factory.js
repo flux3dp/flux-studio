@@ -89,7 +89,6 @@ define([
 
     function initialize(menuMap) {
         var subMenu;
-        console.log(menuMap);
 
         methods.clear();
 
