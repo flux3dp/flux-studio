@@ -112,130 +112,138 @@ define([
             }
         };
 
+    function bindMap() {
+        menuMap = [];
 
-    menuMap.push({
-        label: lang.flux.label,
-        subItems: [
-            // TODO: remove when it's going to production
-            {
-                label: 'Reset',
-                enable: true,
-                onClick: function() {
-                    config().write('printer-is-ready', false, {
-                        onFinished: function() {
-                            location.reload();
-                        }
-                    });
-                }
-            },
-            {
-                label: lang.flux.about,
-                enabled: true,
-                onClick: emptyFunction
-            },
-            {
-                label: lang.flux.preferences,
-                enabled: true,
-                onClick: emptyFunction
-            },
-            separator,
-            {
-                label: lang.flux.quit,
-                enabled: true,
-                onClick: function() {
-                    if (true === window.confirm('Quit?')) {
-                        gui.App.quit();
-                    }
-                }
-            }
-        ]
-    });
-
-    if (true === location.hash.startsWith('#studio')) {
         menuMap.push({
-            label: lang.file.label,
+            label: lang.flux.label,
             subItems: [
-                items.import,
-                items.recent,
-                separator,
-                items.execute,
-                items.saveGCode
-            ]
-        },
-        {
-            label: lang.edit.label,
-            subItems: [
-                items.copy,
-                items.cut,
-                items.paste,
-                items.duplicate,
-                separator,
-                items.scale,
-                items.rotate,
-                separator,
-                items.clear
-            ]
-        },
-        {
-            label: lang.view.label,
-            subItems: [
-                items.viewStandard,
-                items.viewPreview
-            ]
-        },
-        {
-            label: lang.device.label,
-            subItems: [
-                items.newDevice
-            ]
-        },
-        {
-            label: lang.window.label,
-            subItems: [
+                // TODO: remove when it's going to production
                 {
-                    label: lang.window.minimize,
-                    enabled: true,
+                    label: 'Reset',
+                    enable: true,
                     onClick: function() {
-                        gui.Window.get().minimize();
-                    },
-                    key: 'm',
-                    modifiers: 'cmd'
+                        config().write('printer-is-ready', false, {
+                            onFinished: function() {
+                                location.reload();
+                            }
+                        });
+                    }
                 },
                 {
-                    label: lang.window.fullscreen,
+                    label: lang.flux.about,
+                    enabled: true,
+                    onClick: emptyFunction
+                },
+                {
+                    label: lang.flux.preferences,
+                    enabled: true,
+                    onClick: emptyFunction
+                },
+                separator,
+                {
+                    label: lang.flux.quit,
                     enabled: true,
                     onClick: function() {
-                        gui.Window.get().maximize();
+                        if (true === window.confirm('Quit?')) {
+                            gui.App.quit();
+                        }
                     }
                 }
             ]
         });
+
+        if (true === location.hash.startsWith('#studio')) {
+            menuMap.push({
+                label: lang.file.label,
+                subItems: [
+                    items.import,
+                    items.recent,
+                    separator,
+                    items.execute,
+                    items.saveGCode
+                ]
+            },
+            {
+                label: lang.edit.label,
+                subItems: [
+                    items.copy,
+                    items.cut,
+                    items.paste,
+                    items.duplicate,
+                    separator,
+                    items.scale,
+                    items.rotate,
+                    separator,
+                    items.clear
+                ]
+            },
+            {
+                label: lang.view.label,
+                subItems: [
+                    items.viewStandard,
+                    items.viewPreview
+                ]
+            },
+            {
+                label: lang.device.label,
+                subItems: [
+                    items.newDevice
+                ]
+            },
+            {
+                label: lang.window.label,
+                subItems: [
+                    {
+                        label: lang.window.minimize,
+                        enabled: true,
+                        onClick: function() {
+                            gui.Window.get().minimize();
+                        },
+                        key: 'm',
+                        modifiers: 'cmd'
+                    },
+                    {
+                        label: lang.window.fullscreen,
+                        enabled: true,
+                        onClick: function() {
+                            gui.Window.get().maximize();
+                        }
+                    }
+                ]
+            });
+        }
+
+        menuMap.push({
+            label: lang.help.label,
+            subItems: [
+                {
+                    label: lang.help.starting_guide,
+                    enabled: true,
+                    onClick: emptyFunction
+                },
+                {
+                    label: lang.help.online_support,
+                    enabled: true,
+                    onClick: emptyFunction
+                },
+                {
+                    label: lang.help.troubleshooting,
+                    enabled: true,
+                    onClick: emptyFunction
+                }
+            ]
+        });
+
+        return menuMap;
     }
 
-    menuMap.push({
-        label: lang.help.label,
-        subItems: [
-            {
-                label: lang.help.starting_guide,
-                enabled: true,
-                onClick: emptyFunction
-            },
-            {
-                label: lang.help.online_support,
-                enabled: true,
-                onClick: emptyFunction
-            },
-            {
-                label: lang.help.troubleshooting,
-                enabled: true,
-                onClick: emptyFunction
-            }
-        ]
-    });
+    menuMap = bindMap();
 
     return {
         all: menuMap,
-        items: items
+        items: items,
+        refresh: bindMap
     };
 
 });
