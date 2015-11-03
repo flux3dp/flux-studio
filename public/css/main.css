@@ -4765,7 +4765,7 @@ input.switch:checked ~ label:after {
 /**
  * Laser
  */
-.laser-studio .modal-body {
+.laser-studio .hasShadow .modal-body {
     box-shadow: 0 4px 40px 0px rgba(0, 0, 0, 0.5); }
 
 .laser-studio .laser-device-selection-popup {
