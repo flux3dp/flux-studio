@@ -54,12 +54,13 @@ define([
 
                 // Private events
                 _fetchFormalSettings: function() {
-                    var defaultSettings = config().read('laser-defaults');
+                    var defaultSettings = config().read('laser-defaults'),
+                        max = args.state.lang.laser.advanced.form.power.max;
 
                     return {
                         object_height: defaultSettings.objectHeight,
                         laser_speed: defaultSettings.material.data.laser_speed,
-                        power: defaultSettings.material.data.power
+                        power: defaultSettings.material.data.power / max
                     };
                 },
 
