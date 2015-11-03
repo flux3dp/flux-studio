@@ -35,12 +35,12 @@ define([
                 _onRunLaser: function() {
                     this.setState({
                         openPrinterSelectorWindow: true,
-                        settings: this.refs.setupPanel.getSettings()
+                        settings: this._fetchFormalSettings()
                     });
                 },
 
                 _onExport: function() {
-                    this.state.laserEvents.export(this.refs.setupPanel.getSettings());
+                    this.state.laserEvents.export(this._fetchFormalSettings());
                 },
 
                 _onDropUpload: function(e) {
@@ -53,6 +53,16 @@ define([
                 },
 
                 // Private events
+                _fetchFormalSettings: function() {
+                    var defaultSettings = config().read('laser-defaults');
+
+                    return {
+                        object_height: defaultSettings.objectHeight,
+                        laser_speed: defaultSettings.material.data.laser_speed,
+                        power: defaultSettings.material.data.power
+                    };
+                },
+
                 _openBlocker: function(is_open) {
                     this.setState({
                         openBlocker: is_open
@@ -89,22 +99,21 @@ define([
                             /> :
                             ''
                         ),
-                        setupPanelDefaults = {
-                            material: undefined,
-                            objectHeight: 0
-                        };
-
+                        setupPanelDefaults;
 
                     config().read('laser-defaults', {
                         onFinished: function(response) {
-                            response = response || {};
-                            setupPanelDefaults = response;
+                            setupPanelDefaults = response || {};
 
-                            if ('undefined' === typeof response.material) {
+                            if ('undefined' === typeof setupPanelDefaults.material) {
                                 setupPanelDefaults.material = lang.laser.advanced.form.object_options.options[0];
                             }
 
-                            setupPanelDefaults.objectHeight = response.objectHeight || 0;
+                            setupPanelDefaults.objectHeight = setupPanelDefaults.objectHeight || 0;
+
+                            if ('' === response) {
+                                config().write('laser-defaults', setupPanelDefaults);
+                            }
                         }
                     });
 

@@ -30,21 +30,6 @@ define([
     return React.createClass({
         _advancedSettings: undefined,
 
-        // Public
-        getSettings: function() {
-            var settings = this._advancedSettings;
-
-            if ('undefined' === typeof settings) {
-                settings = JSON.parse(JSON.stringify($(this.refs.material.getDOMNode()).find('option:selected').data('meta')));
-            }
-
-            delete settings.material;
-            settings.object_height = this.refs.objectHeight.getDOMNode().value;
-            settings.power = settings.power / 255;
-
-            return settings;
-        },
-
         // UI Events
         _togglePanel: function(name, open) {
             var self = this,
@@ -258,7 +243,7 @@ define([
 
             return (
                 true === self.state.openCustomPresets ?
-                <Modal content={content} onClose={self._togglePanel('customPresets', false)}/> :
+                <Modal className={{ hasShadow: true }} content={content} onClose={self._togglePanel('customPresets', false)}/> :
                 ''
             );
         },
@@ -278,7 +263,7 @@ define([
 
             return (
                 true === this.state.openAdvancedPanel ?
-                <Modal content={content} onClose={this._togglePanel('advanced', false)}/> :
+                <Modal className={{ hasShadow: true }} content={content} onClose={this._togglePanel('advanced', false)}/> :
                 ''
             );
         },
@@ -360,6 +345,7 @@ define([
             return (
                 true === this.state.showAlert ?
                 <Modal
+                    className={{ hasShadow: true }}
                     content={content}
                     disabledEscapeOnBackground={true}
                     onClose={this._togglePanel('alert', false)}
