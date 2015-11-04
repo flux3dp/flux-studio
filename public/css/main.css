@@ -3001,7 +3001,8 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         .top-menu .brand-logo .menu {
             float: left; }
         .top-menu .brand-logo .logo-icon {
-            width: 49px; }
+            width: 49px;
+            transition: all 0.25s; }
         .top-menu .brand-logo .func-name {
             color: #B3B3B3;
             font-family: "HelveticaNeue-Thin";
@@ -3034,6 +3035,8 @@ input[type=range]:focus::-webkit-slider-runnable-track {
                 padding: 0; }
         .top-menu .brand-logo:hover .menu {
             display: block; }
+        .top-menu .brand-logo:hover .logo-icon {
+            transform: rotate(90deg); }
         .top-menu .brand-logo:hover .func-name {
             display: none; }
     .top-menu .item {

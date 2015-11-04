@@ -19,6 +19,7 @@
 
         .logo-icon {
             width: 49px;
+            transition: all .25s;
         }
 
         .func-name {
@@ -59,6 +60,10 @@
         &:hover {
             .menu {
                 display: block;
+            }
+
+            .logo-icon {
+                transform: rotate(90deg);
             }
 
             .func-name {
