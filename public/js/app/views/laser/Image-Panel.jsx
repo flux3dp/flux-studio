@@ -45,7 +45,7 @@ define([
 
         _renderThreshold: function(lang, props, state) {
             var thresholdValue = (state.threshold || lang.laser.object_params.threshold.default),
-                thresholdDisplay = round(thresholdValue / 255 * 100, -2);
+                thresholdDisplay = round(thresholdValue / lang.laser.advanced.form.power.max * 100, 0);
 
             return (
                 'engrave' === props.mode ?
