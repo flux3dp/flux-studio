@@ -264,12 +264,15 @@
         .ft-rotator,
         .ft-rotator-line,
         .ft-scaler {
-            display: none;
+            visibility: hidden;
+        }
+
+        .bounce {
+            transition: all .3s ease;
         }
 
         .image-active {
             background: rgba(255, 255, 255, .6);
-            transition: all .5s ease;
 
             & + .ft-controls {
                 outline: 1px solid #626262;
@@ -281,7 +284,7 @@
                 .ft-rotator,
                 .ft-rotator-line,
                 .ft-scaler {
-                    display: block;
+                    visibility: visible;
                 }
             }
         }
