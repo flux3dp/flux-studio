@@ -4985,11 +4985,13 @@ input.switch:checked ~ label:after {
 .laser-studio .laser-object .ft-rotator,
 .laser-studio .laser-object .ft-rotator-line,
 .laser-studio .laser-object .ft-scaler {
-    display: none; }
+    visibility: hidden; }
+
+.laser-studio .laser-object .bounce {
+    transition: all 0.3s ease; }
 
 .laser-studio .laser-object .image-active {
-    background: rgba(255, 255, 255, 0.6);
-    transition: all 0.5s ease; }
+    background: rgba(255, 255, 255, 0.6); }
     .laser-studio .laser-object .image-active + .ft-controls {
         outline: 1px solid #626262; }
     .laser-studio .laser-object .image-active + .ft-controls {
@@ -4997,7 +4999,7 @@ input.switch:checked ~ label:after {
         .laser-studio .laser-object .image-active + .ft-controls .ft-rotator,
         .laser-studio .laser-object .image-active + .ft-controls .ft-rotator-line,
         .laser-studio .laser-object .image-active + .ft-controls .ft-scaler {
-            display: block; }
+            visibility: visible; }
 
 .laser-studio .zoom .btn {
     height: 28px;
