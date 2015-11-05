@@ -562,8 +562,10 @@ define([
             export: function(settings) {
                 handleLaser(
                     settings,
-                    function(blob) {
-                        var file_name = (new Date()).getTime() + '.gcode';
+                    function(blob, filemode) {
+                        var extension = ('-f' === filemode ? 'fc' : 'gcode'),
+                            file_name = (new Date()).getTime() + '.' + extension;
+
                         saveAs(blob, file_name);
                         self._openBlocker(false);
                     }
