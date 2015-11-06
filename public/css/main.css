@@ -4825,6 +4825,7 @@ input.switch:checked ~ label:after {
     .laser-studio .operating-panel .custom-presets-wrapper {
         background: #FFF;
         padding: 0 20px;
+        overflow: scroll;
         width: 440px; }
         .laser-studio .operating-panel .custom-presets-wrapper .custom-presets-list {
             border: 2px solid #E0E0DF;
