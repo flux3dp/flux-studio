@@ -518,32 +518,34 @@ define([
         }
 
         function refreshImagePanelPos() {
-            var pos = $target_image.box(true),
-                imagePanel = self.refs.imagePanel,
-                platformPos = $laser_platform.box(true),
-                windowPos = $('body').box(true),
-                initialPosition = {
-                    left: pos.right + 10,
-                    top: pos.center.y - 66
-                };
+            if (null !== $target_image) {
+                var pos = $target_image.box(true),
+                    imagePanel = self.refs.imagePanel,
+                    platformPos = $laser_platform.box(true),
+                    windowPos = $('body').box(true),
+                    initialPosition = {
+                        left: pos.right + 10,
+                        top: pos.center.y - 66
+                    };
 
-            // check position top
-            if ('undefined' !== typeof imagePanel && pos.bottom > windowPos.bottom) {
-                initialPosition.top = windowPos.bottom - imagePanel.getDOMNode().clientHeight;
+                // check position top
+                if ('undefined' !== typeof imagePanel && pos.bottom > windowPos.bottom) {
+                    initialPosition.top = windowPos.bottom - imagePanel.getDOMNode().clientHeight;
+                }
+
+                if (windowPos.top > initialPosition.top) {
+                    initialPosition.top = windowPos.top;
+                }
+
+                // check position left
+                if (initialPosition.left > platformPos.right) {
+                    initialPosition.left = platformPos.right + 10;
+                }
+
+                self.setState({
+                    initialPosition: initialPosition
+                });
             }
-
-            if (windowPos.top > initialPosition.top) {
-                initialPosition.top = windowPos.top;
-            }
-
-            // check position left
-            if (initialPosition.left > platformPos.right) {
-                initialPosition.left = platformPos.right + 10;
-            }
-
-            self.setState({
-                initialPosition: initialPosition
-            });
         }
 
         // on window resize
