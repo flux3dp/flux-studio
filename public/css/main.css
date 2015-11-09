@@ -2693,13 +2693,20 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         margin-right: 30px;
         color: #B3B3B3;
         size: 13px; }
-    .controls .radio {
+    .controls .radio > div {
         width: 15px;
         height: 15px;
-        background-color: #E0E0DF;
+        background-image: url("/img/icon-radio-off.png");
         background-size: 15px 15px;
         display: inline-block;
-        margin-right: 15px; }
+        margin-right: 15px;
+        cursor: pointer; }
+    .controls .radio .selected {
+        background-image: url("/img/icon-radio-on.png"); }
+    .controls .radio .grey-out {
+        cursor: auto; }
+    .controls .radio .grey-out + span {
+        color: #E0E0E0; }
     .controls .switch-container {
         margin-left: 30px;
         position: relative; }

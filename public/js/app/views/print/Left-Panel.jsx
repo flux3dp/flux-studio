@@ -61,6 +61,11 @@ define([
             this._closePopup();
         },
 
+        _handleOpenAdvancedSetting: function(e) {
+            this._closePopup();
+            this.props.onShowAdvancedSettingPanel();
+        },
+
         _onOpenSubPopup: function(e) {
             var $me = $(e.currentTarget),
                 $popupOpen = $('.popup-open:checked').not($me);
@@ -164,7 +169,7 @@ define([
 
         _renderAdvanced: function() {
             return (
-                <li onClick={this.props.onShowAdvancedSettingPanel}>
+                <li onClick={this._handleOpenAdvancedSetting}>
                     <div>{this.props.lang.print.left_panel.advanced}</div>
                 </li>
             );

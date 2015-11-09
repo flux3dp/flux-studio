@@ -4,9 +4,10 @@ define([
     'jsx!widgets/Slider-Control',
     'jsx!widgets/Dropdown-Control',
     'jsx!widgets/Switch-Control',
+    'jsx!widgets/Radio-Control',
     'plugins/classnames/index',
     'helpers/api/config',
-], function($, React, SliderControl, DropdownControl, SwitchControl, ClassNames, Config) {
+], function($, React, SliderControl, DropdownControl, SwitchControl, RadioControl, ClassNames, Config) {
 
 var mode = {
             'setup'     : 1,
@@ -127,7 +128,7 @@ var mode = {
         _savePreset: function(presets) {
             var self = this,
                 name = this.refs.presetName.getDOMNode().value;
-                p = JSON.parse(presets);
+                p = presets === '' ? {} : presets;
 
             p[name] = JSON.stringify(advancedSetting);
             Config().write('preset-settings', JSON.stringify(p), {
@@ -142,16 +143,17 @@ var mode = {
         },
 
         _listPresets: function(presets) {
-            var p = JSON.parse(presets);
+            if(presets.length === 0) { return; }
+            // var p = JSON.parse(presets);
 
             this.setState({
-                presets: p,
-                selectedPreset: Object.keys(p)[0]
+                presets: presets,
+                selectedPreset: Object.keys(presets)[0]
             });
         },
 
         _JSONToKeyValue: function(presetInJSON) {
-            if(!presetInJSON) { return ''; }
+            if(Object.keys(presetInJSON).length === 0) { return ''; }
             var settings = [];
 
             Object.keys(presetInJSON).forEach(function(name) {
@@ -257,6 +259,11 @@ var mode = {
             this.props.onApply(_settings);
         },
 
+        _handleCloseAdvancedSetting: function(e) {
+            e.preventDefault();
+            this.props.onClose();
+        },
+
         _renderTabs: function() {
             var tabGeneral  = ClassNames('tab', {selected: this.state.selectedTab === tab.General}),
                 tabLayers   = ClassNames('tab', {selected: this.state.selectedTab === tab.Layers}),
@@ -280,6 +287,16 @@ var mode = {
         },
 
         _renderGeneralSection: function() {
+            var options = [
+                {
+                    id: lang.slic3r,
+                    name: lang.slic3r
+                },
+                {
+                    id: lang.experiment,
+                    name: lang.experiment
+                }
+            ];
             return (
                 <div className="content-wrapper">
 
@@ -287,16 +304,10 @@ var mode = {
                         <div className="title">{lang.slicingEngine}</div>
                         <div className="controls">
                             <div className="label"></div>
-                            <div className="control">
-                                <div>
-                                    <div className="radio"></div>
-                                    <span>{lang.slic3r}</span>
-                                </div>
-                                <div>
-                                    <div className="radio"></div>
-                                    <span>{lang.experiment}</span>
-                                </div>
-                            </div>
+                            <RadioControl
+                                options={options}
+                                onChange={this._handleControlValueChange}
+                                />
                         </div>
                     </div>
 
@@ -600,15 +611,6 @@ var mode = {
         },
 
         _renderCustomSection: function() {
-            // var ignored = ['engine', 'custom'];
-            // var settings = Object.keys(advancedSetting).map(function(name) {
-            //     if(ignored.indexOf(name) >= 0) {
-            //         return '';
-            //     }
-            //     return name.replace(/,/g,'') + ' = ' + advancedSetting[name] + '\n';
-            // });
-            // advancedSetting['custom'] = settings;
-
             return (
                 <div className="content-wrapper">
 
@@ -672,19 +674,21 @@ var mode = {
                     button1 = (<a className="btn" onClick={this._handleLoadPreset}>{lang.loadPreset}</a>);
                     button2 = (<a className="btn" onClick={this._handleApply}>{lang.apply}</a>);
                     button3 = (<a className="btn" onClick={this._handleOpenSaveAsPreset}>{lang.saveAsPreset}</a>);
+                    button4 = (<a className="btn" onClick={this._handleCloseAdvancedSetting}>{lang.cancel}</a>);
                     break;
 
                 case mode.load:
                     button1 = '';
                     button2 = (<a className="btn" onClick={this._handleApplyPreset}>{lang.apply}</a>);
                     button3 = (<a className="btn" onClick={this._handleBackToSetting}>{lang.cancel}</a>);
+                    button4 = '';
                     break;
 
                 case mode.save:
                     button1 = '';
                     button2 = (<a className="btn" onClick={this._handleSavePreset}>{lang.saveAndApply}</a>);
                     button3 = (<a className="btn" onClick={this._handleBackToSetting}>{lang.cancel}</a>);
-
+                    button4 = '';
                 default:
                     break;
 
@@ -698,8 +702,9 @@ var mode = {
                     </div>
 
                     <div className="right">
-                        {button2}
                         {button3}
+                        {button4}
+                        {button2}
                     </div>
 
                 </div>

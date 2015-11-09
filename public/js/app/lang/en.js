@@ -232,9 +232,9 @@ define(function() {
                 config: 'Config',
                 presets: 'Presets',
                 name: 'Name',
-                loadPreset: 'LOAD PRESET',
+                loadPreset: 'LOAD',
                 apply: 'APPLY',
-                saveAsPreset: 'SAVE AS PRESET',
+                saveAsPreset: 'SAVE AS',
                 cancel: 'CANCEL',
                 saveAndApply: 'SAVE & APPLY'
             },
