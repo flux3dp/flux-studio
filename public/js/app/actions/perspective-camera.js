@@ -28,12 +28,24 @@ define([
         scene = new THREE.Scene();
 
         var geometry = new THREE.BoxGeometry(150, 150, 150);
-        var material = new THREE.MeshBasicMaterial({
-            color: 0xAAAAAA,
-            wireframe: false
-        });
-        var cube = new THREE.Mesh(geometry, material);
+        // var material = new THREE.MeshBasicMaterial({
+        //     color: 0xAAAAAA,
+        //     wireframe: false
+        // });
+        var front = new THREE.MeshBasicMaterial({ map: THREE.ImageUtils.loadTexture('img/pc-front.png') }),
+            back = new THREE.MeshBasicMaterial({ map: THREE.ImageUtils.loadTexture('img/pc-back.png') }),
+            left = new THREE.MeshBasicMaterial({ map: THREE.ImageUtils.loadTexture('img/pc-left.png') }),
+            right = new THREE.MeshBasicMaterial({ map: THREE.ImageUtils.loadTexture('img/pc-right.png') }),
+            top = new THREE.MeshBasicMaterial({ map: THREE.ImageUtils.loadTexture('img/pc-top.png') }),
+            bottom = new THREE.MeshBasicMaterial({ map: THREE.ImageUtils.loadTexture('img/pc-bottom.png') }),
+            meshFaceMaterial = new THREE.MeshFaceMaterial([right, left, back, front, top, bottom]);
+
+        var cube = new THREE.Mesh(geometry, meshFaceMaterial);
         scene.add(cube);
+
+        THREE.DefaultLoadingManager.onLoad = function () {
+            render();
+        }; 
 
         scene.add(new THREE.AmbientLight(0x777777));
         _addShadowedLight(1, 1, 1, 0xffffff, 1.35);

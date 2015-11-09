@@ -1,7 +1,7 @@
 define([
     'jquery',
     'react',
-    'app/actions/object-control'
+    'app/actions/perspective-camera'
 ], function($, React, objectController) {
     'use strict';
 
