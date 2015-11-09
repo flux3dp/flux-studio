@@ -90,7 +90,7 @@ define([
                     d.resolve(result);
                 };
 
-                if(name === 'advancedSettings' && value != '') {
+                if(name === 'advancedSettings' && value !== '') {
                     ws.send(`advanced_setting ${value}`);
                 }
                 else {

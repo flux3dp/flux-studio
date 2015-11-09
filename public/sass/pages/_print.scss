@@ -928,10 +928,166 @@ input.switch:checked ~ label:after {
                 line-height: 2em;
                 cursor: pointer;
             }
+            li > div {
+                padding-left: 6px;
+            }
             li:hover {
                 color: #4d4d4d;
             }
         }
+
+        .popup-selection {
+            display: block;
+            height: 40px;
+            position: relative;
+            @include flexbox();
+
+            ul {
+                // background: #B3B3B3;
+                list-style: none;
+                padding: 0 10px 10px 10px;
+
+                li {
+                    cursor: pointer;
+                    // color: #E0E0DF;
+                    margin: 10px 0 0 0;
+                }
+            }
+
+            .popup-open {
+                display: none;
+
+                &:checked ~ .display-text {
+                    background: #B3B3B3;
+                    color: #E0E0DF;
+                }
+
+                &:checked ~ .popup {
+                    visibility: visible;
+                }
+            }
+
+            .display-text {
+                display: inline-block;
+                // font-size: 16px;
+                line-height: 40px;
+                padding: 0 16px 0 6px;
+                cursor: pointer;
+
+                p {
+                    display: block;
+                    margin: 0;
+                    width: 220px;
+                }
+            }
+
+            .popup {
+                visibility: hidden;
+                align-self: center;
+                @include flexbox();
+
+                .arrow {
+                    align-self: center;
+                    position: relative;
+                    right: -1px;
+
+                    polygon {
+                        fill: #FFFFFF;
+                    }
+                }
+
+                .content {
+                    background-color: #F9F9F9;
+
+                    .title {
+                        padding: 15px;
+                        font-size: 16px;
+                        line-height: 18px;
+                        color: #B3B3B3;
+                    }
+
+                    .colorSets {
+                        padding: 0 15px 15px 15px;
+                    }
+
+                    .set {
+                        position: relative;
+                        position: relative;
+                        display: inline-block;
+                        width: 120px;
+                        z-index: 1000;
+
+                        .color {
+                            width: 6.5px;
+                            height: 38px;
+                            display: inline-block;
+                        }
+                        .description {
+                            position: absolute;
+                            line-height: 38px;
+                            font-size: 16px;
+                            padding-left: 3.5px;
+                            color: #B3B3B3;
+                            display: inline-block;
+                            cursor: pointer;
+                        }
+                        .green {
+                            background-color: #61C46D;
+                        }
+                        .red {
+                            background-color: #E32B32;
+                        }
+                        .black {
+                            background-color: #2E2E2E;
+                        }
+                        .turquoise {
+                            background-color: #44C1BA;
+                        }
+                        .orange {
+                            background-color: #F7931D;
+                        }
+                        .gray {
+                            background-color: #808080;
+                        }
+                        .blue {
+                            background-color: #29ABE2;
+                        }
+                        .brown {
+                            background-color: #A37D53;
+                        }
+                        .white {
+                            background-color: #FFFFFF;
+                        }
+                        .purple {
+                            background-color: #A952A5;
+                        }
+                        .yellow {
+                            background-color: #FCEE22;
+                        }
+                        .transparent {
+                            border: 1px solid #E7E7E7;
+                        }
+                    }
+                }
+
+                .content.color {
+                    width: 403px;
+                    height: 255px;
+                }
+
+                .content.quality {
+                    width: 205px;
+                    height: 275px;
+                    z-index: 1000;
+
+                    ul {
+                        background-color: #F9F9F9;
+                        color: #B3B3B3;
+                    }
+                }
+            }
+        }
+
     }
     .rightPanel {
         position: absolute;
@@ -957,6 +1113,10 @@ input.switch:checked ~ label:after {
         }
         tspan.go {
             font-size: 3.4em;
+            font-style: italic;
+        }
+        text.txt-get-gcode {
+            font-style: italic;
         }
         path:hover {
             color: red;
@@ -1037,6 +1197,7 @@ input.switch:checked ~ label:after {
                 }
                 .lock.unlock {
                     background-image: url("../../img/unlock.svg");
+                    background-size: 24px 36px;
                 }
             }
         }

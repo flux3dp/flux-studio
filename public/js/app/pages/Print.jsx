@@ -151,9 +151,6 @@ define([
                     this.setState({ showAdvancedSetting: false });
                 },
                 _handleApplyAdvancedSetting: function(setting) {
-                    // Config().write('advanced-options', JSON.stringify(setting), {
-                    //     onFinished: function(response) {}
-                    // });
                     advancedSetting = setting;
                     director.setAdvanceParameter(setting);
                     this.setState({ showAdvancedSetting: false });
@@ -252,6 +249,9 @@ define([
                         director.setScaleMode();
                     }
                 },
+                _handleQualitySelected: function(quality) {
+                    
+                },
                 _renderAdvancedPanel: function() {
                     return (
                         <AdvancedPanel
@@ -290,6 +290,7 @@ define([
                     return (
                         <LeftPanel
                             lang                        = {lang}
+                            onQualitySelected           = {this._handleQualitySelected}
                             onRaftClick                 = {this._handleRaftClick}
                             onSupportClick              = {this._handleSupportClick}
                             onShowAdvancedSettingPanel  = {this._handleToggleAdvancedSettingPanel} />

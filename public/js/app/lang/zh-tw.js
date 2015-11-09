@@ -349,12 +349,20 @@ define(function() {
                 raft_off: 'RAFT OFF',
                 support_on: 'SUPPORT ON',
                 support_off: 'SUPPORT OFF',
-                advanced: 'ADVANCED'
+                advanced: 'ADVANCED',
+                plaTitle: 'PICK THE COLOR OF THE FILAMENT'
             },
             right_panel: {
                 get: 'Get',
                 go: 'Go',
                 preview: '預覽'
+            },
+            quality: {
+                high: 'High Quality',
+                good: 'Good Quality',
+                normal: 'Normal Quality',
+                quick: 'Quick Quality',
+                fast: 'Fast Quality'
             },
             quick_print: 'Quick Print',
             scale: '比例',
@@ -598,6 +606,20 @@ define(function() {
         alert: {
             caption: '錯誤',
             duplicated_preset_name: '重複的Preset名稱'
+        },
+        color: {
+            green: 'GREEN',
+            red: 'RED',
+            black: 'BLACK',
+            turquoise: 'TURQUOISE',
+            orange: 'ORANGE',
+            gray: 'GRAY',
+            blue: 'BLUE',
+            brown: 'BROWN',
+            white: 'WHITE',
+            purple: 'PURPLE',
+            yellow: 'YELLOW',
+            transparent: 'TRANSPARENT'
         }
     };
 });

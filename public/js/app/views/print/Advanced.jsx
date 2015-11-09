@@ -8,7 +8,7 @@ define([
     'helpers/api/config',
 ], function($, React, SliderControl, DropdownControl, SwitchControl, ClassNames, Config) {
 
-    var mode = {
+var mode = {
             'setup'     : 1,
             'load'      : 2,
             'save'      : 3
@@ -110,17 +110,12 @@ define([
 
             return min <= value && value <= max;
         },
-        
-        _validateCustomFields: function() {
-            var settings = this.state.custom.split('\n');
-            
-        },
-        
+
         _updateCustomField: function() {
-            var custom = this._formatPreset(advancedSetting);
+            var custom = this._JSONToKeyValue(advancedSetting);
             this.setState({ custom: custom });
         },
-        
+
         _getPresets: function(callback) {
             Config().read('preset-settings', {
                 onFinished: function(response) {
@@ -128,12 +123,12 @@ define([
                 }
             });
         },
-        
+
         _savePreset: function(presets) {
             var self = this,
                 name = this.refs.presetName.getDOMNode().value;
                 p = JSON.parse(presets);
-            
+
             p[name] = JSON.stringify(advancedSetting);
             Config().write('preset-settings', JSON.stringify(p), {
                 onFinished: function() {
@@ -145,25 +140,51 @@ define([
                 }
             });
         },
-        
+
         _listPresets: function(presets) {
             var p = JSON.parse(presets);
-            
-            this.setState({ 
+
+            this.setState({
                 presets: p,
                 selectedPreset: Object.keys(p)[0]
             });
         },
-        
-        _formatPreset: function(presetInJSON) {
+
+        _JSONToKeyValue: function(presetInJSON) {
             if(!presetInJSON) { return ''; }
-            var settings = Object.keys(presetInJSON).map(function(name) {
-                if(hiddenPresets.indexOf(name) >= 0) {
-                    return '';
+            var settings = [];
+
+            Object.keys(presetInJSON).forEach(function(name) {
+                if(hiddenPresets.indexOf(name) < 0) {
+                    settings.push(name.replace(/,/g,'') + ' = ' + presetInJSON[name] + '\n');
                 }
-                return name.replace(/,/g,'') + ' = ' + presetInJSON[name] + '\n';
             });
+
+            // remove last newline wow fast
+            settings[settings.length -1] = settings[settings.length - 1].replace(/\r?\n|\r/g,'');
             return settings.join('');
+        },
+
+        _processCustomInput: function() {
+            var settings = this.state.custom.split('\n');
+            var _key, _value;
+
+            settings.forEach(function(setting) {
+                setting = setting.split('=');
+
+                if(setting.length === 2) {
+                    _key = setting[0].replace(/ /g, '');
+                    _value = setting[1].trim();
+
+                    if(this._isValidSlicerParameter(_key)) {
+                        advancedSetting[_key] = parseFloat(_value) || _value;
+                    }
+                }
+            }.bind(this));
+        },
+
+        _isValidSlicerParameter: function(property) {
+            return configs.indexOf(property) >= 0;
         },
 
         _handleNavigate: function(selectedTab, e) {
@@ -201,32 +222,19 @@ define([
         _handleOpenSaveAsPreset: function() {
             this.setState({ mode: mode.save });
         },
-        
-        _handleSaveAndApply: function() {
+
+        _handleSavePreset: function() {
             var self = this;
             this._getPresets(function(presets) {
                 self._savePreset(presets);
             });
         },
 
-        _handleEditValue: function(e) {
-            var newValue    = e.target.value;
-            currentKey  = e.target.id;
-
-            if(this._isValidValue(currentKey, newValue)) {
-                lastValidValue = newValue;
-            }
-
-            this.setState(this._createState(currentKey, newValue));
-        },
-
         _handleControlValueChange: function(id, value) {
-            console.log(id, value);
             advancedSetting[id] = value;
-            
             this._updateCustomField();
         },
-        
+
         _handleApplyPreset: function() {
             var p = this.state.presets[this.state.selectedPreset];
             advancedSetting = JSON.parse(p);
@@ -237,59 +245,16 @@ define([
         _handleApply: function(e) {
             e.preventDefault();
             if(this.state.selectedTab === tab.Custom) {
-                this._validateCustomFields();
+                this._processCustomInput();
             }
-            
-            this.props.onApply(advancedSetting);
-        },
 
-        _renderSliderControl: function(key, min, max, step) {
-            return (
-                <div className="control pull-right">
-
-                    <div className="slider-container">
-                        <input className="slider" type="range" min={min} max={max} step={step}
-                            ref={key}
-                            value={this.state[key]}
-                            onChange={this._handleParameterChange.bind(null, key)} />
-                    </div>
-
-                    <input id={key} type="text" value={this.state[key]}
-                        onChange={this._handleEditValue}
-                        onFocus={this._handleEditValue}
-                        onBlur={this._validateValue} />
-                </div>
-            );
-        },
-
-        _renderSwitchControl: function(key) {
-            return (
-                <div className="switch-container">
-                    <div className="switch-status">{this.state[key] ? 'ON' : 'OFF'}</div>
-                    <div className="onoffswitch">
-                        <input type="checkbox" name="onoffswitch" className="onoffswitch-checkbox" id={key}
-                            onChange={this._handleParameterChange.bind(null, key)}
-                            checked={this.state[key]} />
-                        <label className="onoffswitch-label" htmlFor={key}>
-                            <span className="onoffswitch-inner"></span>
-                            <span className="onoffswitch-switch"></span>
-                        </label>
-                    </div>
-                </div>
-            );
-        },
-
-        _renderDropdownControl: function(key, options, defaultValue) {
-            var _options = options.map(function(option) {
-                var isSelected = option === defaultValue ? 'selected' : '';
-                return (<option value={option} selected={isSelected}>{option}</option>);
+            var _settings = {};
+            Object.keys(advancedSetting).forEach(function(name) {
+                if(hiddenPresets.indexOf(name) < 0) {
+                    _settings[name] = advancedSetting[name];
+                }
             });
-
-            return (
-                <select onChange={this._handleParameterChange.bind(null, key)}>
-                    {_options}
-                </select>
-            );
+            this.props.onApply(_settings);
         },
 
         _renderTabs: function() {
@@ -339,6 +304,7 @@ define([
                         <div className="title">{lang.filament}</div>
                         <SliderControl
                             id="temperature"
+                            key="temperature"
                             label={lang.temperature}
                             min={10}
                             max={230}
@@ -361,6 +327,7 @@ define([
 
                         <SliderControl
                             id="layer_height"
+                            key="layer_height"
                             label={lang.layerHeight}
                             min={0.02}
                             max={20}
@@ -370,6 +337,7 @@ define([
 
                         <SliderControl
                             id="first_layer_height"
+                            key="first_layer_height"
                             label={lang.firstLayerHeight}
                             min={0.02}
                             max={0.4}
@@ -384,6 +352,7 @@ define([
 
                         <SliderControl
                             id="perimeters"
+                            key="perimeters"
                             label={lang.shellSurface}
                             min={0}
                             max={20}
@@ -393,6 +362,7 @@ define([
 
                         <SliderControl
                             id="top_solid_layers"
+                            key="top_solid_layers"
                             label={lang.solidLayerTop}
                             min={0}
                             max={20}
@@ -402,6 +372,7 @@ define([
 
                         <SliderControl
                             id="bottom_solid_layers"
+                            key="bottom_solid_layers"
                             label={lang.solidLayerBottom}
                             min={0}
                             max={20}
@@ -424,6 +395,7 @@ define([
 
                         <SliderControl
                             id="fill_density"
+                            key="fill_density"
                             label={lang.density}
                             min={0}
                             max={100}
@@ -470,6 +442,7 @@ define([
 
                         <SliderControl
                             id="support_material_spacing"
+                            key="support_material_spacing"
                             label={lang.spacing}
                             min={0.1}
                             max={50}
@@ -479,6 +452,7 @@ define([
 
                         <SliderControl
                             id="support_material_threshold"
+                            key="support_material_threshold"
                             label={lang.overhang}
                             min={0}
                             max={90}
@@ -495,6 +469,7 @@ define([
 
                         <SliderControl
                             id="support_material_contact_distance"
+                            key="support_material_contact_distance"
                             label={lang.zDistance}
                             min={0.05}
                             max={20}
@@ -509,6 +484,7 @@ define([
 
                         <SliderControl
                             id="raft_layers"
+                            key="raft_layers"
                             label={lang.raftLayers}
                             min={0}
                             max={20}
@@ -530,6 +506,7 @@ define([
                         <div className="title">{lang.movement}</div>
                         <SliderControl
                             id="travel_speed"
+                            key="travel_speed"
                             label={lang.traveling}
                             min={1}
                             max={150}
@@ -543,6 +520,7 @@ define([
 
                         <SliderControl
                             id="support_material_speed"
+                            key="support_material_speed"
                             label={lang.support}
                             min={1}
                             max={150}
@@ -552,6 +530,7 @@ define([
 
                         <SliderControl
                             id="infill_speed"
+                            key="infill_speed"
                             label={lang.infill}
                             min={1}
                             max={150}
@@ -566,6 +545,7 @@ define([
 
                         <SliderControl
                             id="first_layer_speed"
+                            key="first_layer_speed"
                             label={lang.firstLayer}
                             min={1}
                             max={150}
@@ -575,6 +555,7 @@ define([
 
                         <SliderControl
                             id="solid_infill_speed"
+                            key="solid_infill_speed"
                             label={lang.solidLayers}
                             min={1}
                             max={150}
@@ -584,6 +565,7 @@ define([
 
                         <SliderControl
                             id="perimeter_speed"
+                            key="perimeter_speed"
                             label={lang.innerShell}
                             min={1}
                             max={150}
@@ -593,6 +575,7 @@ define([
 
                         <SliderControl
                             id="external_perimeter_speed"
+                            key="external_perimeter_speed"
                             label={lang.outerShell}
                             min={1}
                             max={150}
@@ -602,6 +585,7 @@ define([
 
                         <SliderControl
                             id="bridge_speed"
+                            key="bridge_speed"
                             label={lang.bridge}
                             min={1}
                             max={150}
@@ -624,7 +608,7 @@ define([
             //     return name.replace(/,/g,'') + ' = ' + advancedSetting[name] + '\n';
             // });
             // advancedSetting['custom'] = settings;
-            
+
             return (
                 <div className="content-wrapper">
 
@@ -635,8 +619,8 @@ define([
                             <div className="control">
                                 <div className="textarea-container">
                                     <textarea
-                                        rows="20" 
-                                        cols="50" 
+                                        rows="20"
+                                        cols="50"
                                         value={this.state.custom}
                                         onChange={this._handleParameterChange.bind(null, 'custom')} />
                                 </div>
@@ -698,7 +682,7 @@ define([
 
                 case mode.save:
                     button1 = '';
-                    button2 = (<a className="btn" onClick={this._handleSaveAndApply}>{lang.saveAndApply}</a>);
+                    button2 = (<a className="btn" onClick={this._handleSavePreset}>{lang.saveAndApply}</a>);
                     button3 = (<a className="btn" onClick={this._handleBackToSetting}>{lang.cancel}</a>);
 
                 default:
@@ -751,9 +735,9 @@ define([
                     </div>
                 );
             });
-            
+
             var preset = this.state.presets[this.state.selectedPreset] || '{}',
-                presetContent = this._formatPreset(JSON.parse(preset));
+                presetContent = this._JSONToKeyValue(JSON.parse(preset));
 
             return (
                 <div id="advanced-panel" className="advanced-panel">

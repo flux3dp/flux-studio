@@ -349,12 +349,21 @@ define(function() {
                 raft_off: 'RAFT OFF',
                 support_on: 'SUPPORT ON',
                 support_off: 'SUPPORT OFF',
-                advanced: 'ADVANCED'
+                advanced: 'ADVANCED',
+                plaTitle: 'PICK THE COLOR OF THE FILAMENT',
+                transparent: 'TRANSPARENT'
             },
             right_panel: {
                 get: 'Get',
                 go: 'Go',
                 preview: 'Preview'
+            },
+            quality: {
+                high: 'HIGH QUALITY',
+                good: 'GOOD QUALITY',
+                normal: 'NORMAL QUALITY',
+                quick: 'QUICK QUALITY',
+                fast: 'FAST QUALITY'
             },
             quick_print: 'Quick Print',
             scale: 'Scale',
@@ -598,6 +607,20 @@ define(function() {
         alert: {
             caption: 'Error',
             duplicated_preset_name: 'Duplicated preset name'
+        },
+        color: {
+            green: 'GREEN',
+            red: 'RED',
+            black: 'BLACK',
+            turquoise: 'TURQUOISE',
+            orange: 'ORANGE',
+            gray: 'GRAY',
+            blue: 'BLUE',
+            brown: 'BROWN',
+            white: 'WHITE',
+            purple: 'PURPLE',
+            yellow: 'YELLOW',
+            transparent: 'TRANSPARENT'
         }
     };
 });

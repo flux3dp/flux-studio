@@ -67,7 +67,7 @@ define([
         shininess: 100
     });
 
-    var advancedParameters = ['layerHeight', 'infill', 'travelingSpeed', 'extrudingSpeed', 'temperature', 'advancedSettings'];
+    // var advancedParameters = ['layerHeight', 'infill', 'travelingSpeed', 'extrudingSpeed', 'temperature', 'advancedSettings'];
 
     previewColors[0] = new THREE.Color(0x996633); // infill
     previewColors[1] = new THREE.Color(0xddcc99); // perimeter
@@ -715,25 +715,17 @@ define([
         render();
     }
 
-    function setAdvanceParameter(settings, index) {
-        index = index || 0;
-        var name = advancedParameters[index],
-            value = settings[name] || 'default';
-
-        if (index < advancedParameters.length) {
-            slicer.setParameter(name, value).then(function(result) {
-                if (result.status === 'error') {
-                    index = advancedParameters.length;
-                    // todo: error logging
-                    console.log(result.error);
-                }
-                if (index < advancedParameters.length) {
-                    setAdvanceParameter(settings, index + 1);
-                } else {
-                    return;
-                }
-            });
-        }
+    function setAdvanceParameter(settings) {
+        var _settings = Object.keys(settings).map(function(key) {
+            return `${key}=${settings[key]} \n`;
+        });
+        slicer.setParameter('advancedSettings', _settings.join('')).then(function(result) {
+            if (result.status === 'error') {
+                index = keys.length;
+                // todo: error logging
+                console.log(result.error);
+            }
+        });
         blobExpired = true;
     }
 
