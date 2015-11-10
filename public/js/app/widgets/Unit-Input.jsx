@@ -1,56 +1,111 @@
 define([
     'react',
-    'helpers/unit-converter'
-], function(React, unitConverter) {
+    'helpers/unit-converter',
+    'helpers/round'
+], function(React, unitConverter, round) {
     'use strict';
 
     return React.createClass({
+
         // Public methods
-        value: function() {
-            return this.refs.unitInput.getDOMNode().dataset.value;
+        value: function(val) {
+            if ('number' === typeof val) {
+                this.refs.unitInput.getDOMNode().value = round(val, -2) + this.props.defaultUnit;
+            }
+            else {
+                return round(parseFloat(this.refs.unitInput.getDOMNode().value), -2);
+            }
+        },
+
+        // Private methods
+        _parseValue: function(el) {
+            var pattern = new RegExp('^(\\d+\\.?\\d{0,})(' + unitConverter.acceptableUnits.join('|') + ')?$'),
+                matches = pattern.exec(el.value) || [],
+                defaultUnit = this.props.defaultUnit,
+                unit = matches[2] || defaultUnit,
+                value;
+
+            if (1 < matches.length) {
+                value = matches[1];
+                value = unitConverter.from(value, unit).to(defaultUnit);
+            }
+            else {
+                value = parseFloat(el.value) || this.props.defaultValue;
+            }
+
+            return value;
+        },
+
+        _confirmValue: function(addValue) {
+            addValue = parseFloat(addValue, 10) || 0;
+
+            var el = this.refs.unitInput.getDOMNode(),
+                value = this._parseValue(el);
+
+            this.value(value + addValue);
+
+            return this.value();
         },
 
         // UI Events
+        _onChange: function(e) {
+            if ('function' === typeof this.props.onChange) {
+                var value = this._parseValue(this.refs.unitInput.getDOMNode());
+                this.props.onChange(e, value);
+            }
+        },
+
         _onBlur: function(e) {
-            var el = this.refs.unitInput.getDOMNode(),
-                pattern = new RegExp('^(\\d+\\.?\\d{0,})(' + unitConverter.acceptableUnits.join('|') + ')?$'),
-                matches = pattern.exec(e.currentTarget.value) || [],
-                unit = matches[2] || unitConverter.defaultUnit,
-                value;
+            var value = this._confirmValue();
 
-            if (0 < matches.length) {
-                value = matches[1];
-                value = unitConverter.from(value, unit).to(this.props.defaultUnit);
-                e.currentTarget.dataset.value = value;
-            }
-            else {
-                value = parseFloat(e.currentTarget.value) || '0';
-            }
-
-            e.currentTarget.value = value + this.props.defaultUnit;
-
-            this.props.getValue(value);
+            this.props.getValue(e, value);
         },
 
         _onKeyDown: function(e) {
-            if (13 === e.keyCode) {
+            var KEY_RETURN = 13,
+                KEY_UP = 38,
+                KEY_DOWN = 40,
+                addValue = 0;
+
+            switch (e.keyCode) {
+            case KEY_RETURN:
                 this._onBlur(e);
+                break;
+            case KEY_UP:
+                addValue = Math.abs(this.props.step);
+                break;
+            case KEY_DOWN:
+                addValue = -Math.abs(this.props.step);
+                break;
+            }
+
+            if (0 !== addValue) {
+                this._confirmValue(addValue);
+                this._onChange(e);
+
             }
         },
 
         // Lifecycle
         render: function() {
-            var props = this.props,
-                displayValue = props.defaultValue + props.defaultUnit;
+            var self = this,
+                props = self.props,
+                displayValue = props.defaultValue + props.defaultUnit,
+                attrs = {};
+
+            for (var key in props.dataAttrs) {
+                attrs['data-' + key] = props.dataAttrs[key];
+            }
 
             return (
                 <input
                     ref="unitInput"
-                    className="ui ui-control-unit-input"
                     type="text"
+                    className="ui ui-control-unit-input"
                     defaultValue={displayValue}
                     onBlur={this._onBlur}
                     onKeyDown={this._onKeyDown}
+                    {...attrs}
                 />
             );
         },
@@ -58,9 +113,18 @@ define([
         getDefaultProps: function() {
             return {
                 defaultValue: React.PropTypes.string,
-                defaultUnit: React.PropTypes.oneOf(unitConverter.acceptableUnits),
-                getValue: React.PropTypes.func
+                defaultUnit: unitConverter.defaultUnit,
+                min: Number.MIN_SAFE_INTEGER,
+                max: Number.MAX_SAFE_INTEGER,
+                step: 1,
+                dataAttrs: {},
+                getValue: React.PropTypes.func,
+                onChange: undefined
             };
+        },
+
+        componentWillReceiveProps: function (nextProps) {
+            this.value(nextProps.defaultValue);
         }
     });
 });
