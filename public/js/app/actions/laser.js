@@ -666,10 +666,14 @@ define([
                 case 'width':
                     val = round(val / DIAMETER * PLATFORM_DIAMETER_PIXEL, -2);
                     args.scalex = round(val / freetrans.originalSize.width, -2);
+                    val = round(params.size.height / DIAMETER * PLATFORM_DIAMETER_PIXEL, -2);
+                    args.scaley = round(val / freetrans.originalSize.height, -2);
                     break;
                 case 'height':
                     val = round(val / DIAMETER * PLATFORM_DIAMETER_PIXEL, -2);
                     args.scaley = round(val / freetrans.originalSize.height, -2);
+                    val = round(params.size.width / DIAMETER * PLATFORM_DIAMETER_PIXEL, -2);
+                    args.scalex = round(val / freetrans.originalSize.width, -2);
                     break;
                 case 'angle':
                     args.angle = val;
