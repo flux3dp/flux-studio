@@ -139,7 +139,7 @@ define([
             $popupOpen.removeAttr('checked');
         },
 
-        _refreshObjectHeight: function(value) {
+        _refreshObjectHeight: function(e, value) {
             this._saveLastestSet({ objectHeight: value });
         },
 
