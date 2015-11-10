@@ -2795,10 +2795,10 @@ input[type=range]:focus::-webkit-slider-runnable-track {
 
 .ui-control-text-toggle input {
     display: none; }
-    .ui-control-text-toggle input + span:after {
+    .ui-control-text-toggle input + span::after {
         content: attr(data-text-off); }
 
-.ui-control-text-toggle input:checked + span:after {
+.ui-control-text-toggle input:checked + span::after {
     content: attr(data-text-on); }
 
 .ui-control-text-input,
@@ -2808,7 +2808,6 @@ input[type=range]:focus::-webkit-slider-runnable-track {
     color: #B3B3B3;
     font-size: 1.2rem;
     height: 40px;
-    line-height: 32px;
     padding: 2px 5px;
     width: 100%; }
 
@@ -4818,30 +4817,30 @@ input.switch:checked ~ label:after {
 .laser-studio .operating-panel {
     margin: 0 0 0 30px;
     position: static;
-    align-self: center;
-    width: 205px; }
+    width: 205px;
+    align-self: center; }
     .laser-studio .operating-panel .material-label {
         padding: 0 3px; }
     .laser-studio .operating-panel .custom-presets-wrapper {
         background: #FFF;
-        padding: 0 20px;
         overflow: scroll;
+        padding: 0 20px;
         width: 440px; }
         .laser-studio .operating-panel .custom-presets-wrapper .custom-presets-list {
             border: 2px solid #E0E0DF;
-            list-style: none;
             height: 110px;
+            list-style: none;
             overflow: scroll;
             padding: 0; }
             .laser-studio .operating-panel .custom-presets-wrapper .custom-presets-list:empty {
-                background: #B3B3B3;
-                color: #E0E0DF;
                 display: -webkit-box;
                 /* OLD - iOS 6-, Safari 3.1-6 */
                 display: -webkit-flex;
                 /* NEW - Chrome */
                 display: flex;
                 /* NEW, Spec - Opera 12.1, Firefox 20+ */
+                background: #B3B3B3;
+                color: #E0E0DF;
                 align-items: center;
                 justify-content: center; }
                 .laser-studio .operating-panel .custom-presets-wrapper .custom-presets-list:empty::after {
@@ -4861,33 +4860,33 @@ input.switch:checked ~ label:after {
                 padding: 0 0 0 10px; }
         .laser-studio .operating-panel .custom-presets-wrapper .custom-preset-buttons {
             height: 69px;
-            justify-content: flex-end;
-            position: static; }
+            position: static;
+            justify-content: flex-end; }
             .laser-studio .operating-panel .custom-presets-wrapper .custom-preset-buttons .btn-default {
                 border-radius: 0;
                 font-size: 15px;
                 height: 30px;
                 line-height: 26px;
-                min-width: 66px;
                 max-width: 66px;
+                min-width: 66px;
                 width: 66px; }
     .laser-studio .operating-panel .popup-selection {
-        display: block;
-        height: 40px;
-        position: relative;
         display: -webkit-box;
         /* OLD - iOS 6-, Safari 3.1-6 */
         display: -webkit-flex;
         /* NEW - Chrome */
         display: flex;
-        /* NEW, Spec - Opera 12.1, Firefox 20+ */ }
+        /* NEW, Spec - Opera 12.1, Firefox 20+ */
+        display: block;
+        height: 40px;
+        position: relative; }
         .laser-studio .operating-panel .popup-selection ul {
             background: #B3B3B3;
             list-style: none;
             padding: 0 10px 10px 10px; }
             .laser-studio .operating-panel .popup-selection ul li {
-                cursor: pointer;
                 color: #E0E0DF;
+                cursor: pointer;
                 margin: 10px 0 0 0; }
         .laser-studio .operating-panel .popup-selection .popup-open {
             display: none; }
@@ -4906,18 +4905,18 @@ input.switch:checked ~ label:after {
                 margin: 0;
                 width: 183px; }
         .laser-studio .operating-panel .popup-selection .popup {
-            visibility: hidden;
-            align-self: center;
             display: -webkit-box;
             /* OLD - iOS 6-, Safari 3.1-6 */
             display: -webkit-flex;
             /* NEW - Chrome */
             display: flex;
-            /* NEW, Spec - Opera 12.1, Firefox 20+ */ }
+            /* NEW, Spec - Opera 12.1, Firefox 20+ */
+            visibility: hidden;
+            align-self: center; }
             .laser-studio .operating-panel .popup-selection .popup .arrow {
-                align-self: center;
                 position: relative;
-                right: -1px; }
+                right: -1px;
+                align-self: center; }
                 .laser-studio .operating-panel .popup-selection .popup .arrow polygon {
                     fill: #B3B3B3; }
     .laser-studio .operating-panel .object-height-input {
@@ -4933,14 +4932,14 @@ input.switch:checked ~ label:after {
     .laser-studio .operating-panel .material-list {
         width: 116px; }
     .laser-studio .operating-panel .btn-advance {
-        border-radius: 0;
         background: transparent;
+        border-radius: 0;
         color: #b3b3b3;
         font-size: 16px;
         line-height: 40px;
-        text-align: left;
-        padding: 0 16px 0 6px;
         margin: 0;
+        padding: 0 16px 0 6px;
+        text-align: left;
         width: 100%; }
     .laser-studio .operating-panel li {
         color: #b3b3b3;
@@ -5026,6 +5025,18 @@ input.switch:checked ~ label:after {
     transition: all 0.1s ease;
     width: 230px;
     z-index: 1; }
+    .laser-studio .object-position .accordion-body {
+        overflow: visible;
+        position: relative; }
+        .laser-studio .object-position .accordion-body .icon-locker {
+            bottom: 0;
+            cursor: pointer;
+            height: 20px;
+            left: 100%;
+            margin: auto;
+            position: absolute;
+            top: 0;
+            width: 20px; }
     .laser-studio .object-position .arrow {
         align-self: center; }
         .laser-studio .object-position .arrow polygon {
@@ -5041,7 +5052,10 @@ input.switch:checked ~ label:after {
     .laser-studio .object-position .control {
         margin: 0 0 10px 0; }
         .laser-studio .object-position .control .header {
-            color: #E0E0DF; }
+            color: #E0E0DF;
+            width: 45%; }
+        .laser-studio .object-position .control input {
+            width: 80%; }
     .laser-studio .object-position .caption {
         display: -webkit-box;
         /* OLD - iOS 6-, Safari 3.1-6 */
@@ -5049,10 +5063,10 @@ input.switch:checked ~ label:after {
         /* NEW - Chrome */
         display: flex;
         /* NEW, Spec - Opera 12.1, Firefox 20+ */
-        justify-content: space-between;
         color: #B3B3B3;
         font-size: 12px;
-        line-height: 30px; }
+        line-height: 30px;
+        justify-content: space-between; }
     .laser-studio .object-position input {
         border: 1px solid #E0E0DF;
         color: #B3B3B3;
@@ -5082,8 +5096,8 @@ input.switch:checked ~ label:after {
         .laser-studio .action-buttons .btn-default:hover {
             background: #000; }
     .laser-studio .action-buttons .btn-go {
-        font-size: 35px;
         background: #4D4D4D;
+        font-size: 35px;
         left: 50px;
         top: -21px; }
 
@@ -5093,32 +5107,32 @@ input.switch:checked ~ label:after {
     width: 440px; }
     .laser-studio .advanced-panel .footer {
         height: 70px;
-        justify-content: flex-end;
         margin-bottom: 0;
-        position: static; }
+        position: static;
+        justify-content: flex-end; }
 
 .laser-studio .control {
-    align-items: center;
     display: -webkit-box;
     /* OLD - iOS 6-, Safari 3.1-6 */
     display: -webkit-flex;
     /* NEW - Chrome */
     display: flex;
     /* NEW, Spec - Opera 12.1, Firefox 20+ */
-    justify-content: space-around;
     color: #B3B3B3;
     font-size: 13px;
+    height: 40px;
     line-height: 40px;
-    height: 40px; }
+    align-items: center;
+    justify-content: space-around; }
     .laser-studio .control [type="range"] {
         flex: 1 auto; }
     .laser-studio .control .value-text {
         width: 120px; }
     .laser-studio .control .label {
-        align-self: center;
         color: #B3B3B3;
         line-height: 1em;
-        width: 100px; }
+        width: 100px;
+        align-self: center; }
     .laser-studio .control .value-text {
         border: 2px solid #E0E0DF;
         line-height: 28px;
