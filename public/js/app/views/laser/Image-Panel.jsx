@@ -3,8 +3,9 @@ define([
     'react',
     'jsx!widgets/Radio-Group',
     'jsx!widgets/Select',
+    'jsx!widgets/Unit-Input',
     'helpers/round'
-], function($, React, RadioGroupView, SelectView, round) {
+], function($, React, RadioGroupView, SelectView, UnitInput, round) {
     'use strict';
 
     return React.createClass({
@@ -24,23 +25,52 @@ define([
         },
 
         _onTransform: function(e) {
-            var newParams = {
-                angle: this.refs.objectAngle.getDOMNode().value,
-                position: {
-                    x: this.refs.objectPosX.getDOMNode().value,
-                    y: this.refs.objectPosY.getDOMNode().value
+            var type = e.currentTarget.dataset.type,
+                newParams = {
+                    angle: this.refs.objectAngle.getDOMNode().value,
+                    position: {
+                        x: this.refs.objectPosX.getDOMNode().value,
+                        y: this.refs.objectPosY.getDOMNode().value
+                    },
+                    size: {
+                        width: this.refs.objectSizeW.value(),
+                        height: this.refs.objectSizeH.value()
+                    }
                 },
-                size: {
-                    width: this.refs.objectSizeW.getDOMNode().value,
-                    height: this.refs.objectSizeH.getDOMNode().value
-                }
-            };
+                ratio;
 
             if ('undefined' !== typeof this.refs.threshold) {
                 newParams['threshold'] = this.refs.threshold.getDOMNode().value;
             }
 
+            if (true === this.state.lockSize) {
+                switch (type) {
+                case 'width':
+                    ratio = newParams.size.width / this.props.size.width;
+                    newParams.size.height = round(newParams.size.height * ratio, -2);
+                    break;
+                case 'height':
+                    ratio = newParams.size.height / this.props.size.height;
+                    newParams.size.width = round(newParams.size.width * ratio, -2);
+                    break;
+                }
+            }
+
             this.props.onTransform(e, newParams);
+        },
+
+        _lockRatio: function(which) {
+            var self = this,
+                state;
+
+            return function(e) {
+                e.preventDefault();
+
+                state = {};
+                state[which] = !self.state[which];
+
+                self.setState(state);
+            };
         },
 
         _renderThreshold: function(lang, props, state) {
@@ -55,13 +85,13 @@ define([
                         <span className="value">{thresholdDisplay}%</span>
                     </p>
                     <input type="checkbox" className="accordion-switcher"/>
-                    <div className="accordion-body">
+                    <label className="accordion-body">
                         <div className="control">
                             <input type="range" min="0" max="255" step="1" ref="threshold"
                                 defaultValue={props.thresholdValue} value={props.thresholdValue}
                                 onChange={this._onThresholdChanged}/>
                         </div>
-                    </div>
+                    </label>
                 </label> :
                 ''
             );
@@ -72,7 +102,9 @@ define([
                 initialPosition: {
                     top: this.props.initialPosition.top,
                     left: this.props.initialPosition.left
-                }
+                },
+                size: this.props.size,
+                lockSize: false
             };
         },
 
@@ -98,10 +130,13 @@ define([
                 style = {
                     top: state.initialPosition.top,
                     left: state.initialPosition.left
+                },
+                lockerImage = {
+                    size: (false === state.lockSize ? '/img/unlock.svg' : '/img/lock.svg')
                 };
 
             return (
-                <div ref="objectPanel" className={props.className} style={style}>
+                <div ref="imagePanel" className={props.className} style={style}>
                     <svg className="arrow" version="1.1" xmlns="http://www.w3.org/2000/svg"
                         width="36.8" height="20">
                         <polygon points="0,10 36.8,0 36.8,20"/>
@@ -115,14 +150,14 @@ define([
                         </p>
                         <label className="accordion-body">
                             <div className="control">
-                                <span className="span3 text-center header">X</span>
-                                <input type="number" ref="objectPosX" data-type="x" className="span9"
+                                <span className="text-center header">X</span>
+                                <input type="number" ref="objectPosX" data-type="x"
                                     defaultValue={props.position.x} value={props.position.x}
                                     onChange={this._onTransform}/>
                             </div>
                             <div className="control">
-                                <span className="span3 text-center header">Y</span>
-                                <input type="number" ref="objectPosY" data-type="y" className="span9"
+                                <span className="text-center header">Y</span>
+                                <input type="number" ref="objectPosY" data-type="y"
                                     defaultValue={props.position.y} value={props.position.y}
                                     onChange={this._onTransform}/>
                             </div>
@@ -132,22 +167,31 @@ define([
                         <input type="checkbox" className="accordion-switcher"/>
                         <p className="caption">
                             {lang.laser.object_params.size.text}
-                            <span className="value">{props.size.width} x {props.size.height}mm</span>
+                            <span className="value">{state.size.width} x {state.size.height}mm</span>
                         </p>
-                        <div className="accordion-body">
+                        <label className="accordion-body">
                             <div className="control">
-                                <span className="span3 text-center header">{lang.laser.object_params.size.unit.width}</span>
-                                <input type="number" min="0" ref="objectSizeW" step="0.1" data-type="width" className="span9"
-                                    defaultValue={props.size.width} value={props.size.width}
-                                    onChange={this._onTransform}/>
+                                <span className="text-center header">{lang.laser.object_params.size.unit.width}</span>
+                                <UnitInput
+                                    dataAttrs={{ type: 'width' }}
+                                    ref="objectSizeW"
+                                    defaultValue={state.size.width}
+                                    getValue={this._onTransform}
+                                    onChange={this._onTransform}
+                                />
                             </div>
                             <div className="control">
-                                <span className="span3 text-center header">{lang.laser.object_params.size.unit.height}</span>
-                                <input type="number" min="0" ref="objectSizeH" step="0.1" data-type="height" className="span9"
-                                    defaultValue={props.size.height} value={props.size.height}
-                                    onChange={this._onTransform}/>
+                                <span className="text-center header">{lang.laser.object_params.size.unit.height}</span>
+                                <UnitInput
+                                    dataAttrs={{ type: 'height' }}
+                                    ref="objectSizeH"
+                                    defaultValue={state.size.height}
+                                    getValue={this._onTransform}
+                                    onChange={this._onTransform}
+                                />
                             </div>
-                        </div>
+                            <img className="icon-locker" src={lockerImage.size} onClick={this._lockRatio('lockSize')}/>
+                        </label>
                     </label>
                     <label className="controls accordion">
                         <input type="checkbox" className="accordion-switcher"/>
@@ -155,13 +199,13 @@ define([
                             {lang.laser.object_params.rotate.text}
                             <span className="value">{props.angle}°</span>
                         </p>
-                        <div className="accordion-body">
+                        <label className="accordion-body">
                             <div className="control">
-                                <input type="number" min="0" max="360" ref="objectAngle" data-type="angle" className="span4"
+                                <input type="number" min="0" max="360" ref="objectAngle" data-type="angle"
                                     defaultValue={props.angle} value={props.angle}
                                     onChange={this._onTransform}/>
-                            </div>
-                        </div>
+                            </div>label
+                        </label>
                     </label>
                     {thresholdRange}
                     </div>
@@ -171,8 +215,10 @@ define([
 
         componentWillReceiveProps: function (nextProps) {
             this.setState({
-                initialPosition: nextProps.initialPosition
-            })
+                initialPosition: nextProps.initialPosition,
+                size: nextProps.size,
+                position: nextProps.position
+            });
         }
     });
 });
