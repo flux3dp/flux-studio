@@ -51,8 +51,8 @@
     .operating-panel {
         margin: 0 0 0 30px;
         position: static;
-        align-self: center;
         width: 205px;
+        align-self: center;
 
         .material-label {
             padding: 0 3px;
@@ -60,21 +60,21 @@
 
         .custom-presets-wrapper {
             background: #FFF;
-            padding: 0 20px;
             overflow: scroll;
+            padding: 0 20px;
             width: 440px;
 
             .custom-presets-list {
                 border: 2px solid #E0E0DF;
-                list-style: none;
                 height: 110px;
+                list-style: none;
                 overflow: scroll;
                 padding: 0;
 
                 &:empty {
+                    @include flexbox();
                     background: #B3B3B3;
                     color: #E0E0DF;
-                    @include flexbox();
                     align-items: center;
                     justify-content: center;
 
@@ -105,26 +105,26 @@
 
             .custom-preset-buttons {
                 height: 69px;
-                justify-content: flex-end;
                 position: static;
+                justify-content: flex-end;
 
                 .btn-default {
                     border-radius: 0;
                     font-size: 15px;
                     height: 30px;
                     line-height: 26px;
-                    min-width: 66px;
                     max-width: 66px;
+                    min-width: 66px;
                     width: 66px;
                 }
             }
         }
 
         .popup-selection {
+            @include flexbox();
             display: block;
             height: 40px;
             position: relative;
-            @include flexbox();
 
             ul {
                 background: #B3B3B3;
@@ -132,8 +132,8 @@
                 padding: 0 10px 10px 10px;
 
                 li {
-                    cursor: pointer;
                     color: #E0E0DF;
+                    cursor: pointer;
                     margin: 10px 0 0 0;
                 }
             }
@@ -165,14 +165,14 @@
             }
 
             .popup {
+                @include flexbox();
                 visibility: hidden;
                 align-self: center;
-                @include flexbox();
 
                 .arrow {
-                    align-self: center;
                     position: relative;
                     right: -1px;
+                    align-self: center;
 
                     polygon {
                         fill: #B3B3B3;
@@ -202,14 +202,14 @@
         }
 
         .btn-advance {
-            border-radius: 0;
             background: rgba(0,0,0,0);
+            border-radius: 0;
             color: #b3b3b3;
             font-size: 16px;
             line-height: 40px;
-            text-align: left;
-            padding: 0 16px 0 6px;
             margin: 0;
+            padding: 0 16px 0 6px;
+            text-align: left;
             width: 100%;
         }
 
@@ -315,6 +315,22 @@
         width: 230px;
         z-index: 1;
 
+        .accordion-body {
+            overflow: visible;
+            position: relative;
+
+            .icon-locker {
+                bottom: 0;
+                cursor: pointer;
+                height: 20px;
+                left: 100%;
+                margin: auto;
+                position: absolute;
+                top: 0;
+                width: 20px;
+            }
+        }
+
         .arrow {
             align-self: center;
 
@@ -340,15 +356,20 @@
 
             .header {
                 color: #E0E0DF;
+                width: 45%;
+            }
+
+            input {
+                width: 80%;
             }
         }
 
         .caption {
             @include flexbox();
-            justify-content: space-between;
             color: #B3B3B3;
             font-size: 12px;
             line-height: 30px;
+            justify-content: space-between;
         }
 
         input {
@@ -389,8 +410,8 @@
         }
 
         .btn-go {
-            font-size: 35px;
             background: #4D4D4D;
+            font-size: 35px;
             left: 50px;
             top: -21px;
         }
@@ -403,20 +424,20 @@
 
         .footer {
             height: 70px;
-            justify-content: flex-end;
             margin-bottom: 0;
             position: static;
+            justify-content: flex-end;
         }
     }
 
     .control {
-        align-items: center;
         @include flexbox();
-        justify-content: space-around;
         color: #B3B3B3;
         font-size: 13px;
-        line-height: 40px;
         height: 40px;
+        line-height: 40px;
+        align-items: center;
+        justify-content: space-around;
 
         [type="range"] {
             flex: 1 auto;
@@ -427,10 +448,10 @@
         }
 
         .label {
-            align-self: center;
             color: #B3B3B3;
             line-height: 1em;
             width: 100px;
+            align-self: center;
         }
 
         .value-text {
