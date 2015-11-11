@@ -16,14 +16,16 @@ define([
             },
 
             _handleStartClick: function() {
-                config().write('printer-is-ready', true, {
-                    onFinished: function() {
-                        config().write('printers', JSON.stringify([localStorage.get('setting-printer')]), {
-                            onFinished: function(response) {
-                                localStorage.removeAt('setting-printer');
-                                location.hash = '#studio/print';
-                            }
-                        });
+                var settedPrinters = config().read('printers') || [];
+
+                settedPrinters.push(localStorage.get('setting-printer'));
+
+                config().write('printer-is-ready', true);
+                config().write('printers', JSON.stringify(settedPrinters), {
+                    onFinished: function(response) {
+                        // remove current setting printer
+                        localStorage.removeAt('setting-printer');
+                        location.hash = '#studio/print';
                     }
                 });
             },
