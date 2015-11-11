@@ -593,6 +593,12 @@ define([
     function getFCode() {
         var d = $.Deferred();
         var ids = [];
+
+        if(!blobExpired) {
+            d.resolve(responseBlob);
+            return d.promise();
+        }
+
         objects.forEach(function(obj) {
             ids.push(obj.uuid);
         });
@@ -1122,14 +1128,14 @@ define([
         var go = function(blob) {
             var control_methods = printerController(serial);
             control_methods.upload(blob.size, blob);
-            d.resolve('');
+            d.resolve(blob);
         };
 
         if (!blobExpired) {
             go(responseBlob);
         }
         else {
-            getGCode().then(function(result) {
+            getFCode().then(function(result) {
                 if (result instanceof Blob) {
                     go(result);
                 }
@@ -1146,6 +1152,10 @@ define([
             camera: camera
         });
         panningOffset = camera.position.clone().sub(camera.position.raw);
+    }
+
+    function clearSelection() {
+        selectObject(null);
     }
 
     function render() {
@@ -1420,10 +1430,12 @@ define([
         setAdvanceParameter : setAdvanceParameter,
         setParameter        : setParameter,
         getGCode            : getGCode,
+        getFCode            : getFCode,
         getModelCount       : getModelCount,
         togglePreview       : togglePreview,
         changePreviewLayer  : changePreviewLayer,
         executePrint        : executePrint,
-        setCameraPosition   : setCameraPosition
+        setCameraPosition   : setCameraPosition,
+        clearSelection      : clearSelection
     };
 });

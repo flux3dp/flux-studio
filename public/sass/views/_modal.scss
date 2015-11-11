@@ -27,7 +27,7 @@
     .modal-body {
         @include flexbox();
         max-height: 100%;
-        overflow: scroll;
+        overflow: hidden;
     }
 
     .modal-alert {

@@ -830,6 +830,7 @@ input.switch:checked ~ label:after {
                 background-color: #BBB;
                 border-radius: 0;
                 margin: 0 0.25rem;
+                padding: 0 12px;
                 transition: none;
                 .filament {
                     width: 12rem;
@@ -1076,13 +1077,16 @@ input.switch:checked ~ label:after {
                 }
 
                 .content.quality {
-                    width: 205px;
-                    height: 275px;
+                    width: 160px;
+                    height: 220px;
                     z-index: 1000;
 
                     ul {
                         background-color: #F9F9F9;
                         color: #B3B3B3;
+                        li {
+                            font-size: 16px;
+                        }
                     }
                 }
             }

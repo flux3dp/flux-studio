@@ -11,6 +11,7 @@ define([
     'jsx!views/print/Monitor',
     'jsx!views/print/Object-Dialogue',
     'helpers/file-system',
+    'helpers/api/control',
     'jsx!widgets/Modal',
     'helpers/api/config',
     'jsx!views/Print-Selector',
@@ -27,6 +28,7 @@ define([
     Monitor,
     ObjectDialogue,
     FileSystem,
+    PrinterController,
     Modal,
     Config,
     PrinterSelector) {
@@ -64,6 +66,7 @@ define([
             _mode = 'scale',
             lang = args.state.lang,
             selectedPrinter,
+            printerController,
             view = React.createClass({
                 getInitialState: function() {
                     return ({
@@ -80,6 +83,7 @@ define([
                         sliderMax                   : 1,
                         sliderValue                 : 0,
                         progressMessage             : '',
+                        fcode                       : {},
                         objectDialogueStyle         : {},
                         camera                      : {},
                         rotation                    : {},
@@ -120,6 +124,7 @@ define([
                     this.setState({
                         openPrinterSelectorWindow: true
                     });
+                    director.clearSelection();
                 },
                 _handleRotationChange: function(src) {
                     var axis = src.target.id;
@@ -220,12 +225,15 @@ define([
                 _handlePrinterSelected: function(printer) {
                     selectedPrinter = printer;
 
-                    director.executePrint(selectedPrinter.serial).then(function() {
+                    director.getFCode().then(function(fcode) {
                         this.setState({
                             openPrinterSelectorWindow: false,
-                            showMonitor: true
+                            showMonitor: true,
+                            fcode: fcode
                         });
                     }.bind(this));
+
+                    printerController = PrinterController(selectedPrinter.serial);
                 },
                 _handlePreviewLayerChange: function(e) {
                     director.changePreviewLayer(e.target.value);
@@ -250,7 +258,7 @@ define([
                     }
                 },
                 _handleQualitySelected: function(quality) {
-                    
+
                 },
                 _renderAdvancedPanel: function() {
                     return (
@@ -314,6 +322,8 @@ define([
                             lang            = {lang}
                             previewUrl      = {this.state.previewUrl}
                             selectedPrinter = {selectedPrinter}
+                            fCode           = {this.state.fcode}
+                            controller      = {printerController}
                             onClose         = {this._handleMonitorClose} />
                     );
                     return (
