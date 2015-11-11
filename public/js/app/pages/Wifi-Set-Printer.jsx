@@ -33,7 +33,7 @@ define([
                             onSuccess: function(response) {
                                 printer.name = name;
                                 localStorage.set('setting-printer', printer);
-                                location.hash = '#initialize/wifi/setup-complete';
+                                location.hash = '#initialize/wifi/select';
                             }
                         });
                     },
