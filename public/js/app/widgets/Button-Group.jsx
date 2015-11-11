@@ -7,14 +7,26 @@ define(['react'], function(React){
             var className,
                 buttons = this.props.buttons.map(function(opt, i) {
                     className = 'btn btn-default';
+                    opt.type = opt.type || 'button';
+
+                    var content = '';
 
                     if ('string' === typeof opt.className) {
                         className += ' ' + opt.className;
                     }
 
-                    return (
-                        <button className={className} onClick={opt.onClick}>{opt.label}</button>
-                    );
+                    if ('link' === opt.type) {
+                        content = (
+                            <a className={className} href={opt.href} onClick={opt.onClick}>{opt.label}</a>
+                        );
+                    }
+                    else {
+                        content = (
+                            <button className={className} onClick={opt.onClick}>{opt.label}</button>
+                        );
+                    }
+
+                    return content;
                 }, this);
 
             className = 'button-group';
