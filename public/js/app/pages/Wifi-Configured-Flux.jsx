@@ -24,7 +24,7 @@ define([
                                 <h2>{lang.wifi.configured_flux.caption}</h2>
                                 <p>{lang.wifi.configured_flux.description}</p>
                                 <div>
-                                    <a className="btn btn-action btn-large" href="#initialize/wifi/set-printer" autoFocus={true}>
+                                    <a className="btn btn-action btn-large" href="#initialize/wifi/setup-complete" autoFocus={true}>
                                         {lang.wifi.configured_flux.next}
                                     </a>
                                 </div>
