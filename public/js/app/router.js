@@ -26,7 +26,7 @@ function(React, $, Backbone, display) {
                     [/^.*$/, 'e404', this.e404],
                     // initialize Flux Printer
                     [
-                        /^initialize\/wifi\/?(ask|select|spot|set-printer|set-password|configuring-flux|configured-flux|setup-complete|success|failure)\/?(.*)?/,
+                        /^initialize\/wifi\/?(connect-machine|ask|select|spot|set-printer|set-password|configuring-flux|configured-flux|setup-complete|success|failure)\/?(.*)?/,
                         'initial',
                         this.initial
                     ],
@@ -59,6 +59,7 @@ function(React, $, Backbone, display) {
 
         initial: function(step, other) {
             var map = {
+                    'connect-machine': 'Connect-Machine',
                     'ask': 'Wifi-Home',
                     'select': 'Wifi-Select',
                     'set-printer': 'Wifi-Set-Printer',
