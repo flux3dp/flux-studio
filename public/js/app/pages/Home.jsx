@@ -29,25 +29,26 @@ define([
             render: function() {
                 var lang = this.state.lang,
                     options = this._getLanguageOptions(),
+                    wrapperClassName = {
+                        'initialization': true
+                    },
                     content = (
-                        <div className="welcome initialization text-center">
-                            <h1>{lang.welcome_headline}</h1>
-                            <img className="brand-image" src="/img/wel-flux-logo.png"/>
+                        <div className="home text-center">
+                            <img className="brand-image" src="/img/menu/main_logo.svg"/>
                             <div>
-                                <h2>{lang.welcome.header1}</h2>
-                                <p>{lang.welcome.header2}</p>
-                                <div>
+                                <h1 className="headline">{lang.welcome.select_language}</h1>
+                                <div className="language">
                                     <SelectView id="select-lang" options={options}/>
                                 </div>
                                 <div>
-                                    <a href="#initialize/wifi/connect-machine" className="btn btn-action btn-large">{lang.welcome.start}</a>
+                                    <a href="#initialize/wifi/connect-machine" className="btn btn-action btn-large">{lang.welcome.next}</a>
                                 </div>
                             </div>
                         </div>
                     );
 
                 return (
-                    <Modal content={content}/>
+                    <Modal className={wrapperClassName} content={content}/>
                 );
             },
 
