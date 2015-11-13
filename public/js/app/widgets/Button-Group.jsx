@@ -6,13 +6,16 @@ define(['react'], function(React){
         render: function() {
             var className,
                 buttons = this.props.buttons.map(function(opt, i) {
-                    className = 'btn btn-default';
+                    className = 'btn';
                     opt.type = opt.type || 'button';
 
                     var content = '';
 
-                    if ('string' === typeof opt.className) {
+                    if ('string' === typeof opt.className && '' !== opt.className) {
                         className += ' ' + opt.className;
+                    }
+                    else {
+                        className += ' btn-default';
                     }
 
                     if ('link' === opt.type) {
@@ -29,10 +32,13 @@ define(['react'], function(React){
                     return content;
                 }, this);
 
-            className = 'button-group';
+            className = '';
 
-            if ('string' === typeof this.props.className) {
+            if ('string' === typeof this.props.className && '' !== this.props.className) {
                 className += ' ' + this.props.className;
+            }
+            else {
+                className = 'btn-h-group';
             }
 
             return (<div className={className}>{buttons}</div>);
