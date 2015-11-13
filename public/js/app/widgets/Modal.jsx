@@ -7,6 +7,16 @@ define([
 
     var View = React.createClass({
 
+        getDefaultProps: function() {
+            return {
+                onOpen: function() {},
+                onClose: function() {},
+                content: <div/>,
+                disabledEscapeOnBackground: false,
+                className: {}
+            };
+        },
+
         onOpen: function() {
             this.props.onOpen(this);
         },
@@ -55,16 +65,6 @@ define([
 
         componentWillUnmount: function() {
             shortcuts.off(['esc']);
-        },
-
-        getDefaultProps: function() {
-            return {
-                onOpen: React.PropTypes.func,
-                onClose: React.PropTypes.func,
-                content: React.PropTypes.element,
-                disabledEscapeOnBackground: false,
-                className: {}
-            };
         },
     });
 
