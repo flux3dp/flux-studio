@@ -35,7 +35,7 @@ define([
                         <div>{lang.wifi.set_password.connecting}</div>
                     </div>
                 ) : (
-                    <div className="btn-h-group btn-align-center-h-group">
+                    <div className="btn-h-group">
                         <a id="btn-cancel" className="btn" onClick={this._handleBack}>{lang.wifi.set_password.back}</a>
                         <a id="btn-join" className="btn" onClick={this._handleJoin}>{lang.wifi.set_password.join}</a>
                     </div>
