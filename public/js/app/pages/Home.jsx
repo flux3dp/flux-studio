@@ -36,12 +36,12 @@ define([
                         <div className="home text-center">
                             <img className="brand-image" src="/img/menu/main_logo.svg"/>
                             <div>
-                                <h1 className="headline">{lang.welcome.select_language}</h1>
+                                <h1 className="headline">{lang.initialize.select_language}</h1>
                                 <div className="language">
                                     <SelectView id="select-lang" options={options}/>
                                 </div>
                                 <div>
-                                    <a href="#initialize/wifi/connect-machine" className="btn btn-action btn-large">{lang.welcome.next}</a>
+                                    <a href="#initialize/wifi/connect-machine" className="btn btn-action btn-large">{lang.initialize.next}</a>
                                 </div>
                             </div>
                         </div>
