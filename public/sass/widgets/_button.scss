@@ -9,7 +9,7 @@
     display: inline-block;
     font-size: 15px;
     letter-spacing: .5px;
-    line-height: 44px;
+    line-height: 36px;
     margin: 0;
     outline: none;
     overflow: hidden;
@@ -53,11 +53,11 @@
 }
 
 .btn-action {
-    background: #00C853;
+    background: #B2B2B2;
     color: #fff;
 
     &:hover {
-        background: #33d375;
+        opacity: .7;
     }
 }
 
@@ -83,11 +83,11 @@
 
 .btn-link {
     background: none;
-    color: #000;
+    color: #808080;
     text-decoration: underline;
 
     &:hover {
-        color: #777;
+        opacity: .7;
     }
 }
 
@@ -99,7 +99,7 @@
 }
 
 .btn-large {
-    width: 270px;
+    width: 250px;
 }
 
 /* special shape button */
@@ -117,16 +117,21 @@
 /* button group */
 .btn-h-group {
     @include flexbox();
-}
-
-.btn-align-center-h-group {
+    align-items: center;
     justify-content: center;
+
+    .btn {
+        margin: 0 0 0 24px;
+
+        &:first-child {
+            margin: 0;
+        }
+    }
 }
 
-.btn-h-group .btn {
-    margin: 0 0 0 24px;
-}
-
-.btn-h-group .btn:first-child {
-    margin: 0;
+.btn-v-group {
+    .btn {
+        display: block;
+        margin: 0 auto 10px auto;
+    }
 }
