@@ -1,14 +1,13 @@
 define([
     'jquery',
     'react',
-    'helpers/local-storage',
+    'app/actions/initialize-machine',
     'jsx!widgets/Modal',
     'jsx!widgets/List',
     'jsx!widgets/Button-Group',
     'jsx!widgets/Alert',
-    'helpers/api/usb-config',
-    'helpers/api/config'
-], function($, React, localStorage, Modal, ListView, ButtonGroup, Alert, usbConfig, config) {
+    'helpers/api/usb-config'
+], function($, React, initializeMachine, Modal, ListView, ButtonGroup, Alert, usbConfig) {
     'use strict';
 
     return function(args) {
@@ -16,25 +15,56 @@ define([
 
         return React.createClass({
             // Private methods
-            _completeSettingUp: function(e) {
-                config().write('printer-is-ready', true, {
-                    onFinished: function() {
-                        location.hash = '#studio/print/';
-                    }
-                });
+            _openAlert: function(open, detail) {
+                detail = detail || {};
+
+                var self = this;
+
+                return function() {
+                    self.setState({
+                        openAlert: open,
+                        alertContent: detail,
+                        openBlocker: false
+                    });
+                }
+            },
+
+            _openBlocker: function(open) {
+                var self = this;
+
+                return function() {
+                    self.setState({
+                        openBlocker: open
+                    });
+                }
+            },
+
+            _handleSetPassword: function(e) {
+                e.preventDefault();
+
+                var self = this,
+                    wifi = initializeMachine.settingWifi.get();
+
+                wifi.plain_password = self.refs.password.getDOMNode().value;
+
+                initializeMachine.settingWifi.set(wifi);
+
+                location.hash = '#initialize/wifi/set-password';
             },
 
             // UI events
             _confirmWifi: function(e) {
                 e.preventDefault();
 
-                var SettingWifi = localStorage.get('setting-wifi');
+                var settingWifi = initializeMachine.settingWifi.get();
 
-                if (true === SettingWifi.password) {
-                    location.hash = '#initialize/wifi/set-password';
+                if (true === settingWifi.password) {
+                    this.setState({
+                        openPassword: true
+                    });
                 }
                 else {
-                    this._completeSettingUp(e);
+                    location.hash = '#initialize/wifi/setup-complete/with-wifi';
                 }
             },
 
@@ -46,16 +76,29 @@ define([
                     selectedWifi: true
                 });
 
-                localStorage.set('setting-wifi', meta);
+                initializeMachine.settingWifi.set(meta);
             },
 
-            _handleWithUSBFlashDrive: function(e) {
-                this.setState({
-                    openAlert: true,
-                    alertContent: {
-                        message: '稍後，您可以使用隨身碟，將資料上傳至機器'
+            _setAsStationMode: function(e) {
+                var self = this,
+                    lang = self.state.lang,
+                    usb = usbConfig();
+
+                self._openBlocker(true)();
+
+                usb.setAPMode({
+                    onSuccess: function(response) {
+                        location.hash = 'initialize/wifi/setup-complete/station-mode';
+                    },
+                    onError: function() {
+                        self._openAlert(true, {
+                            caption: lang.initialize.errors.error,
+                            message: lang.initialize.errors.select_wifi.ap_mode_fail,
+                            onClick: self._openAlert(false)
+                        })();
                     }
                 });
+
             },
 
             // Lifecycle
@@ -65,12 +108,57 @@ define([
                     wifiOptions: [],
                     selectedWifi: false,
                     openAlert: false,
+                    openPassword: false,
                     alertContent: {}
                 };
             },
 
+            _renderPasswordForm: function(lang) {
+                var self = this,
+                    settingWifi = initializeMachine.settingWifi.get(),
+                    buttons = [{
+                        label: lang.initialize.connect,
+                        className: 'btn-action btn-large',
+                        onClick: self._handleSetPassword
+                    },
+                    {
+                        label: lang.initialize.cancel,
+                        className: 'btn-link btn-large',
+                        onClick: function(e) {
+                            e.preventDefault();
+
+                            self.setState({
+                                openPassword: false
+                            });
+                        }
+                    }],
+                    content = (
+                        <form className="form form-wifi-password">
+                            <div className="notice">
+                                <p>“{settingWifi.ssid}”</p>
+                                <p>{lang.initialize.requires_wifi_password}</p>
+                            </div>
+                            <input
+                                ref="password"
+                                type="password"
+                                className="password-input"
+                                placeholder={lang.initialize.set_machine_generic.password_placeholder}
+                                defaultValue=""
+                                autoFocus={true}
+                            />
+                            <ButtonGroup className="btn-v-group" buttons={buttons}/>
+                        </form>
+                    );
+
+                return (
+                    true === this.state.openPassword ?
+                    <Modal content={content}/> :
+                    ''
+                );
+            },
+
             _renderWifiItem: function(wifi) {
-                var lockClassName = 'fa ' + (true === wifi.password ? 'fa-lock' : 'fa-unlock-alt'),
+                var lockClassName = 'fa ' + (true === wifi.password ? 'fa-lock' : ''),
                     meta = JSON.stringify(wifi);
 
                 return (
@@ -79,6 +167,7 @@ define([
                         <div className="row-fluid">
                             <span className="wifi-ssid">{wifi.ssid}</span>
                             <span className={lockClassName}></span>
+                            <span className="wifi-signal-strength fa fa-wifi"></span>
                         </div>
                     </label>
                 );
@@ -97,16 +186,18 @@ define([
             },
 
             _renderAlert: function(lang) {
-                var buttons = [{
-                        label: '確認',
-                        onClick: this._completeSettingUp
+                var state = this.state,
+                    buttons = [{
+                        label: lang.initialize.confirm,
+                        className: 'btn-action',
+                        onClick: state.alertContent.onClick
                     }],
                     content = (
-                        <Alert message={this.state.alertContent.message} buttons={buttons}/>
+                        <Alert caption={state.alertContent.caption} message={state.alertContent.message} buttons={buttons}/>
                     );
 
                 return (
-                    true === this.state.openAlert ?
+                    true === state.openAlert ?
                     <Modal content={content}/> :
                     ''
                 );
@@ -114,37 +205,44 @@ define([
 
             render: function() {
                 var lang = this.state.lang,
+                    wrapperClassName = {
+                        'initialization': true
+                    },
                     items = this._renderWifiOptions(lang),
                     buttons = [{
-                        label: '建立FLUX終端連線',
-                        onClick: function(e) {
-                            location.hash = 'initialize/wifi/configuring-flux';
-                        }
-                    },
-                    {
-                        label: '透過隨身碟操作',
-                        onClick: this._handleWithUSBFlashDrive
-                    },
-                    {
-                        label: '連線',
-                        className: (true === this.state.selectedWifi ? '' : 'btn-disabled'),
+                        label: lang.initialize.next,
+                        className: 'btn-action btn-large' + (true === this.state.selectedWifi ? '' : ' btn-disabled'),
                         onClick: this._confirmWifi
+                    },
+                    {
+                        label: lang.initialize.set_machine_generic.set_station_mode,
+                        className: 'btn-action btn-large btn-set-station-mode',
+                        onClick: this._setAsStationMode
+                    },
+                    {
+                        label: lang.initialize.skip,
+                        className: 'btn-link btn-large',
+                        type: 'link',
+                        href: '#initialize/wifi/setup-complete/with-usb'
                     }],
+                    passwordForm = this._renderPasswordForm(lang),
                     alert = this._renderAlert(lang),
                     content = (
-                        <div className="wifi initialization absolute-center text-center">
-                            <h1>{lang.welcome_headline}</h1>
+                        <div className="select-wifi text-center">
+                            <img className="brand-image" src="/img/menu/main_logo.svg"/>
                             <div>
-                                <h2>{lang.wifi.select.choose_wifi}</h2>
+                                <h1 className="headline">{lang.initialize.wifi_setup}</h1>
+                                <p className="notice">{lang.initialize.select_preferred_wifi}</p>
                                 {items}
-                                <ButtonGroup className="footer" buttons={buttons}/>
+                                <ButtonGroup className="btn-v-group" buttons={buttons}/>
                             </div>
+                            {passwordForm}
                             {alert}
                         </div>
                     );
 
                 return (
-                    <Modal content={content}/>
+                    <Modal className={wrapperClassName} content={content}/>
                 );
             },
 
