@@ -2346,23 +2346,8 @@ a {
     width: 100%; }
 
 .pure-list {
-    list-style: none; }
-
-.initialization {
-    background-color: #fff;
-    height: 508px;
-    overflow: scroll;
-    width: 700px; }
-
-.initialization h1 {
-    background: #272727;
-    color: #fafafa;
-    font-size: 1rem;
-    letter-spacing: 1px;
-    line-height: 40px;
-    margin: 0;
-    padding: 0 16px;
-    text-align: left; }
+    list-style: none;
+    padding: 0; }
 
 .error {
     border: 2px solid #F00;
@@ -2569,6 +2554,63 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         -webkit-transform: perspective(120px) rotateX(-180deg) rotateY(-179.9deg);
         transform: perspective(120px) rotateX(-180deg) rotateY(-179.9deg); } }
 
+.spinner-roller {
+    font-size: 10px;
+    margin: 50px auto;
+    text-indent: -9999em;
+    width: 11em;
+    height: 11em;
+    border-radius: 50%;
+    background: #ffffff;
+    background: -moz-linear-gradient(left, #ffffff 10%, rgba(255, 255, 255, 0) 42%);
+    background: -webkit-linear-gradient(left, #ffffff 10%, rgba(255, 255, 255, 0) 42%);
+    background: -o-linear-gradient(left, #ffffff 10%, rgba(255, 255, 255, 0) 42%);
+    background: -ms-linear-gradient(left, #ffffff 10%, rgba(255, 255, 255, 0) 42%);
+    background: linear-gradient(to right, #ffffff 10%, rgba(255, 255, 255, 0) 42%);
+    position: relative;
+    -webkit-animation: load3 1.4s infinite linear;
+    animation: load3 1.4s infinite linear;
+    -webkit-transform: translateZ(0);
+    -ms-transform: translateZ(0);
+    transform: translateZ(0); }
+    .spinner-roller:before {
+        width: 50%;
+        height: 50%;
+        background: #ffffff;
+        border-radius: 100% 0 0 0;
+        position: absolute;
+        top: 0;
+        left: 0;
+        content: ''; }
+    .spinner-roller:after {
+        background: #DEDEDC;
+        width: 75%;
+        height: 75%;
+        border-radius: 50%;
+        content: '';
+        margin: auto;
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0; }
+
+@-webkit-keyframes load3 {
+    0% {
+        -webkit-transform: rotate(0deg);
+        transform: rotate(0deg); }
+    100% {
+        -webkit-transform: rotate(360deg);
+        transform: rotate(360deg); } }
+
+@keyframes load3 {
+    0% {
+        -webkit-transform: rotate(0deg);
+        transform: rotate(0deg); }
+    100% {
+        -webkit-transform: rotate(360deg);
+        transform: rotate(360deg); } }
+
 /**
  * buttons
  */
@@ -2580,7 +2622,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
     display: inline-block;
     font-size: 15px;
     letter-spacing: .5px;
-    line-height: 44px;
+    line-height: 36px;
     margin: 0;
     outline: none;
     overflow: hidden;
@@ -2614,10 +2656,10 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         background-color: #000000; }
 
 .btn-action {
-    background: #00C853;
+    background: #B2B2B2;
     color: #fff; }
     .btn-action:hover {
-        background: #33d375; }
+        opacity: .7; }
 
 .btn-disabled {
     pointer-events: none;
@@ -2637,10 +2679,10 @@ input[type=range]:focus::-webkit-slider-runnable-track {
 
 .btn-link {
     background: none;
-    color: #000;
+    color: #808080;
     text-decoration: underline; }
     .btn-link:hover {
-        color: #777; }
+        opacity: .7; }
 
 /* button size */
 .btn-full-width {
@@ -2649,7 +2691,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
     width: 100%; }
 
 .btn-large {
-    width: 270px; }
+    width: 250px; }
 
 /* special shape button */
 .btn-hexagon {
@@ -2668,16 +2710,17 @@ input[type=range]:focus::-webkit-slider-runnable-track {
     display: -webkit-flex;
     /* NEW - Chrome */
     display: flex;
-    /* NEW, Spec - Opera 12.1, Firefox 20+ */ }
-
-.btn-align-center-h-group {
+    /* NEW, Spec - Opera 12.1, Firefox 20+ */
+    align-items: center;
     justify-content: center; }
+    .btn-h-group .btn {
+        margin: 0 0 0 24px; }
+        .btn-h-group .btn:first-child {
+            margin: 0; }
 
-.btn-h-group .btn {
-    margin: 0 0 0 24px; }
-
-.btn-h-group .btn:first-child {
-    margin: 0; }
+.btn-v-group .btn {
+    display: block;
+    margin: 0 auto 10px auto; }
 
 .controls {
     overflow: hidden; }
@@ -2741,7 +2784,8 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         height: 30px;
         font-size: 15px;
         color: #B3B3B3; }
-    .controls input[type=text] {
+    .controls input[type="text"],
+    .controls input[type="password"] {
         padding-left: 10px;
         border: 2px solid #E0E0DF; }
     .controls select {
@@ -2899,31 +2943,23 @@ input[type=range]:focus::-webkit-slider-runnable-track {
             margin: 0; }
         .modal-window .modal-alert p {
             margin: 1.6rem 0; }
-    .modal-window .button-group {
-        display: -webkit-box;
-        /* OLD - iOS 6-, Safari 3.1-6 */
-        display: -webkit-flex;
-        /* NEW - Chrome */
-        display: flex;
-        /* NEW, Spec - Opera 12.1, Firefox 20+ */
+    .modal-window .message {
+        word-break: break-all;
+        word-wrap: break-word; }
+    .modal-window .btn-h-group {
         bottom: 1.6rem;
         left: 2.8rem;
         position: absolute;
-        right: 2.8rem;
-        align-items: center;
-        justify-content: center; }
-        .modal-window .button-group .btn {
+        right: 2.8rem; }
+        .modal-window .btn-h-group .btn {
             font-size: 1.3rem;
             height: 2.8rem;
             line-height: 2.8rem;
             margin: 0 0.6rem 0 0;
             max-width: 13rem;
             flex: 1; }
-            .modal-window .button-group .btn:last-child {
+            .modal-window .btn-h-group .btn:last-child {
                 margin: 0; }
-    .modal-window .message {
-        word-break: break-all;
-        word-wrap: break-word; }
 
 /**
  * the view of printer selector
@@ -4651,118 +4687,111 @@ input.switch:checked ~ label:after {
     font-size: 14px;
     color: #EEEEEE; }
 
-.welcome .brand-image {
-    margin: 69px 0 45px 0;
-    width: 138px; }
-
-.welcome h2 {
-    color: #424242;
-    font-size: 20px;
-    letter-spacing: 0.4px;
-    margin: 0 0 6px 0; }
-
-.welcome p {
-    color: #777;
-    font-size: 15px;
-    font-weight: lighter;
-    letter-spacing: 0.2px;
-    margin: 0; }
-
-.welcome select {
-    border: 1px solid #bdbdbd;
-    color: #424242;
-    font-size: 14px;
-    font-weight: lighter;
-    height: 36px;
-    letter-spacing: 0.2px;
-    margin: 23px 0 17px 0;
-    width: 270px; }
-
-.wifi .wifi-symbol {
-    margin: 20px 0 26px 0;
-    width: 362px; }
-
-.wifi .flux-printer {
-    text-align: right; }
-
-.wifi .flux-printer img {
-    width: 168px; }
-
-.wifi h2 {
-    color: #424242;
-    font-size: 18px;
-    letter-spacing: 0.4px;
-    margin: 49px 0 21px 0; }
-
-.wifi p {
-    color: #777;
-    font-size: 15px;
-    font-weight: lighter;
-    letter-spacing: 0.2px;
-    margin: 0; }
-
-.wifi .notice {
-    color: #9b9b9b;
-    font-size: 12px;
-    text-align: left; }
-
-.wifi .wifi-form h2 {
-    margin: 0 0 6px 0; }
-
-.wifi .wifi-form .btn-large {
-    margin: 30px 0 18px 0; }
-
-.wifi .wifi-form label {
-    display: block; }
-
-.wifi input[type="text"],
-.wifi input[type="password"] {
-    font-size: 14px;
-    font-weight: lighter;
-    letter-spacing: .2px;
-    line-height: 36px;
-    margin: 16px 0 19px 0;
-    padding: 0 5px;
-    width: 270px; }
-
-.wifi .wifi-list {
-    border: #ccc 1px solid;
-    height: 280px;
-    margin: 20px auto;
-    overflow: scroll;
-    padding: 0;
-    width: 300px; }
-    .wifi .wifi-list li {
-        height: 40px; }
-        .wifi .wifi-list li label {
-            display: block;
-            height: 100%; }
-            .wifi .wifi-list li label:hover {
-                cursor: pointer; }
-        .wifi .wifi-list li .row-fluid {
+.initialization {
+    background: #DEDEDC;
+    color: #808080;
+    position: relative; }
+    .initialization .brand-image {
+        height: 52px;
+        left: 15px;
+        position: absolute;
+        top: 15px;
+        width: 52px; }
+    .initialization .headline {
+        font-size: 24px;
+        font-weight: 200; }
+    .initialization select {
+        background: url("/img/arrow-down.png") #fff no-repeat;
+        background-position: calc(100% - 5px) center;
+        background-size: 16px 10px;
+        border: none;
+        border-radius: 0;
+        height: 36px;
+        padding: 0 0 0 10px;
+        width: 250px;
+        -webkit-appearance: none;
+        appearance: none; }
+    .initialization .home .language {
+        margin: 0 0 8px 0; }
+    .initialization .connect-machine .scene {
+        height: 209px;
+        margin: 0 0 10px 0;
+        width: 209px; }
+    .initialization .select-wifi .notice {
+        margin: 0 0 34px 0; }
+        .initialization .select-wifi .notice P {
+            line-height: 2rem;
+            margin: 0; }
+    .initialization .select-wifi .modal-body {
+        box-shadow: 0 0 14px 1px rgba(0, 0, 0, 0.7); }
+    .initialization .select-wifi .form-wifi-password {
+        background: #DEDEDC;
+        overflow: scroll;
+        width: 300px; }
+        .initialization .select-wifi .form-wifi-password .notice {
+            color: #989898;
+            font-size: 14px;
+            line-height: 16.8px;
+            margin: 20px 0; }
+        .initialization .select-wifi .form-wifi-password .password-input {
+            height: 36px;
+            margin: 0 0 10px 0;
+            padding: 0 0 0 5px;
+            width: 250px; }
+    .initialization .select-wifi .wifi-list {
+        height: 175px;
+        overflow: scroll;
+        width: 252px; }
+        .initialization .select-wifi .wifi-list .row-fluid {
             display: -webkit-box;
             /* OLD - iOS 6-, Safari 3.1-6 */
             display: -webkit-flex;
             /* NEW - Chrome */
             display: flex;
             /* NEW, Spec - Opera 12.1, Firefox 20+ */
-            flex: 2;
+            cursor: pointer;
             height: 100%;
-            justify-content: space-between;
-            padding: 0 10px; }
-        .wifi .wifi-list li .wifi-ssid {
+            margin: 0;
+            padding: 0 10px;
+            flex: 2;
+            justify-content: space-between; }
+        .initialization .select-wifi .wifi-list .wifi-ssid {
             width: calc(100% - 50px); }
-        .wifi .wifi-list li span {
+        .initialization .select-wifi .wifi-list span {
             display: block;
             line-height: 40px; }
-        .wifi .wifi-list li input {
+        .initialization .select-wifi .wifi-list input[type="radio"] {
             display: none; }
-            .wifi .wifi-list li input:checked + .row-fluid {
+            .initialization .select-wifi .wifi-list input[type="radio"]:checked + .row-fluid {
                 background: #ccc; }
-        .wifi .wifi-list li .fa {
-            width: 50px; }
-            .wifi .wifi-list li .fa::before {
-                line-height: 40px; }
+        .initialization .select-wifi .wifi-list .fa {
+            font-size: 1.2405951937882669rem; }
+    .initialization .select-wifi .btn-set-station-mode {
+        line-height: 22px; }
+    .initialization .connecting-wifi .spinner-roller {
+        height: 52px;
+        width: 52px; }
+    .initialization .setting-completed .headline {
+        margin: 0 0 12px 0; }
+    .initialization .setting-completed .notice {
+        border: 2px dashed #AF0000;
+        font-size: 14px;
+        line-height: 20px;
+        margin: 0 0 20px 0;
+        padding: 20px;
+        width: 451px; }
+    .initialization .h-form .control {
+        display: -webkit-box;
+        /* OLD - iOS 6-, Safari 3.1-6 */
+        display: -webkit-flex;
+        /* NEW - Chrome */
+        display: flex;
+        /* NEW, Spec - Opera 12.1, Firefox 20+ */
+        margin: 0 0 10px 0;
+        justify-content: space-around; }
+        .initialization .h-form .control input {
+            height: 36px;
+            width: 250px; }
 
 /**
  * Laser
