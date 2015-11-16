@@ -209,11 +209,12 @@ define(function() {
                 solidLayerBottom: 'Solid Layer: Bottom',
                 density: 'Density',
                 pattern: 'Pattern',
-                auto: 'Auto',
-                line: 'Line',
-                rectilinear: 'Rectilinear',
-                honeycomb: 'Honeycomb',
+                auto: 'auto',                       // do not change
+                line: 'line',                       // do not change
+                rectilinear: 'rectilinear',         // do not change
+                honeycomb: 'honeycomb',             // do not change
                 blackMagic: 'Black Magic',
+                spiral: 'Spiral',
                 generalSupport: 'General Support',
                 spacing: 'Spacing',
                 overhang: 'Overhang',
@@ -606,7 +607,10 @@ define(function() {
         },
         alert: {
             caption: 'Error',
-            duplicated_preset_name: 'Duplicated preset name'
+            duplicated_preset_name: 'Duplicated preset name',
+            info: 'INFO',
+            warning: 'WARNING',
+            error: 'ERROR'
         },
         color: {
             green: 'GREEN',

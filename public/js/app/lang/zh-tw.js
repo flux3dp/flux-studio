@@ -209,11 +209,12 @@ define(function() {
                 solidLayerBottom: 'Solid Layer: Bottom',
                 density: 'Density',
                 pattern: 'Pattern',
-                auto: 'Auto',
-                line: 'Line',
-                rectilinear: 'Rectilinear',
-                honeycomb: 'Honeycomb',
+                auto: 'auto',                       // do not change
+                line: 'line',                       // do not change
+                rectilinear: 'rectilinear',         // do not change
+                honeycomb: 'honeycomb',             // do not change
                 blackMagic: 'Black Magic',
+                spiral: 'Spiral',
                 generalSupport: 'General Support',
                 spacing: 'Spacing',
                 overhang: 'Overhang',
@@ -605,7 +606,10 @@ define(function() {
         },
         alert: {
             caption: '錯誤',
-            duplicated_preset_name: '重複的Preset名稱'
+            duplicated_preset_name: '重複的Preset名稱',
+            info: '訊息',
+            warning: '警告',
+            error: '錯誤'
         },
         color: {
             green: 'GREEN',
