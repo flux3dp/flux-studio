@@ -78,7 +78,8 @@ define([
 
                 // Lifecycle
                 _renderStageSection: function() {
-                    var lang = args.state.lang,
+                    var self = this,
+                        lang = args.state.lang,
                         cx = React.addons.classSet,
                         image_panel_class = cx({
                             'panel object-position': true
@@ -100,6 +101,11 @@ define([
                             /> :
                             ''
                         ),
+                        closeSubPopup = function(e) {
+                            if ('operation-table' === e.currentTarget.id) {
+                                self.refs.setupPanel.openSubPopup(e);
+                            }
+                        },
                         setupPanelDefaults;
 
                     config().read('laser-defaults', {
@@ -119,16 +125,18 @@ define([
                     });
 
                     return (
-                        <section ref="operationTable" id="operation-table" className="operation-table">
-                            <div ref="laserObject" className="laser-object border-circle" onClick={this._inactiveSelectImage}/>
+                        <div ref="laserStage" className="laser-stage">
+                            <section ref="operationTable" id="operation-table" className="operation-table" onClick={closeSubPopup}>
+                                <div ref="laserObject" className="laser-object border-circle" onClick={this._inactiveSelectImage}/>
+                                {imagePanel}
+                            </section>
                             <SetupPanel
                                 lang={lang}
                                 className="operating-panel"
                                 defaults={setupPanelDefaults}
                                 ref="setupPanel"
                             />
-                            {imagePanel}
-                        </section>
+                        </div>
                     );
                 },
 
@@ -233,6 +241,7 @@ define([
                             label: lang.laser.get_fcode,
                             className: cx({
                                 'btn-disabled': !this.state.hasImage,
+                                'btn-default': true,
                                 'btn-hexagon': true,
                                 'btn-get-fcode': true
                             }),
@@ -241,6 +250,7 @@ define([
                             label: lang.laser.go,
                             className: cx({
                                 'btn-disabled': !this.state.hasImage,
+                                'btn-default': true,
                                 'btn-hexagon': true,
                                 'btn-go': true
                             }),
