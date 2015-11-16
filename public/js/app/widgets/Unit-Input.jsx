@@ -6,21 +6,40 @@ define([
     'use strict';
 
     return React.createClass({
+        operatorRegex: /(\+|-|\*|\/)/,
+
+        getDefaultProps: function() {
+            return {
+                defaultValue: React.PropTypes.string,
+                defaultUnit: unitConverter.defaultUnit,
+                min: Number.MIN_SAFE_INTEGER,
+                max: Number.MAX_SAFE_INTEGER,
+                step: 1,
+                dataAttrs: {},
+                getValue: React.PropTypes.func,
+                onChange: undefined
+            };
+        },
 
         // Public methods
         value: function(val) {
             if ('number' === typeof val) {
                 this.refs.unitInput.getDOMNode().value = round(val, -2) + this.props.defaultUnit;
+                return round(val, -2);
             }
             else {
-                return round(parseFloat(this.refs.unitInput.getDOMNode().value), -2);
+                val = round(parseFloat(this.refs.unitInput.getDOMNode().value), -2);
+
+                this.props.getValue(null, val);
+
+                return val;
             }
         },
 
         // Private methods
-        _parseValue: function(el) {
+        _parseValue: function(value) {
             var pattern = new RegExp('^(\\d+\\.?\\d{0,})(' + unitConverter.acceptableUnits.join('|') + ')?$'),
-                matches = pattern.exec(el.value) || [],
+                matches = pattern.exec(value) || [],
                 defaultUnit = this.props.defaultUnit,
                 unit = matches[2] || defaultUnit,
                 value;
@@ -30,7 +49,7 @@ define([
                 value = unitConverter.from(value, unit).to(defaultUnit);
             }
             else {
-                value = parseFloat(el.value) || this.props.defaultValue;
+                value = parseFloat(value, 10) || 0;
             }
 
             return value;
@@ -40,9 +59,35 @@ define([
             addValue = parseFloat(addValue, 10) || 0;
 
             var el = this.refs.unitInput.getDOMNode(),
-                value = this._parseValue(el);
+                values = el.value.split(this.operatorRegex),
+                tempValue,
+                value;
 
-            this.value(value + addValue);
+            if (3 <= values.length) {
+                tempValue = this._parseValue(values[2]);
+                value = this._parseValue(values[0]);
+
+                switch (values[1]) {
+                case '+':
+                    el.value = value + tempValue;
+                    break;
+                case '-':
+                    el.value = value - tempValue;
+                    break;
+                case '*':
+                    el.value = value * tempValue;
+                    break;
+                case '/':
+                    el.value = value / tempValue;
+                    break;
+                }
+            }
+
+            this.value(this._parseValue(el.value) + addValue);
+
+            if ('undefined' !== typeof values[3]) {
+                el.value += values[3];
+            }
 
             return this.value();
         },
@@ -50,8 +95,7 @@ define([
         // UI Events
         _onChange: function(e) {
             if ('function' === typeof this.props.onChange) {
-                var value = this._parseValue(this.refs.unitInput.getDOMNode());
-                this.props.onChange(e, value);
+                this.props.onChange(e, this.value());
             }
         },
 
@@ -61,11 +105,16 @@ define([
             this.props.getValue(e, value);
         },
 
-        _onKeyDown: function(e) {
+        _onKeyUp: function(e) {
             var KEY_RETURN = 13,
                 KEY_UP = 38,
                 KEY_DOWN = 40,
-                addValue = 0;
+                KEY_PLUS = 187,
+                KEY_MINUS = 189,
+                KEY_MULTIPLY = 56,
+                KEY_DIVIDE = 191,
+                addValue = undefined,
+                operatorAmount = 0;
 
             switch (e.keyCode) {
             case KEY_RETURN:
@@ -77,12 +126,22 @@ define([
             case KEY_DOWN:
                 addValue = -Math.abs(this.props.step);
                 break;
+            case KEY_PLUS:
+            case KEY_MINUS:
+            case KEY_MULTIPLY:
+            case KEY_DIVIDE:
+                operatorAmount = Math.floor(e.currentTarget.value.split(this.operatorRegex).length / 2);
+
+                if (1 < operatorAmount) {
+                    addValue = 0;
+                }
+
+                break;
             }
 
-            if (0 !== addValue) {
+            if ('undefined' !== typeof addValue) {
                 this._confirmValue(addValue);
                 this._onChange(e);
-
             }
         },
 
@@ -90,7 +149,8 @@ define([
         render: function() {
             var self = this,
                 props = self.props,
-                displayValue = props.defaultValue + props.defaultUnit,
+                state = self.state,
+                displayValue = state.defaultValue + props.defaultUnit,
                 attrs = {};
 
             for (var key in props.dataAttrs) {
@@ -104,22 +164,16 @@ define([
                     className="ui ui-control-unit-input"
                     defaultValue={displayValue}
                     onBlur={this._onBlur}
-                    onKeyDown={this._onKeyDown}
+                    onKeyUp={this._onKeyUp}
                     {...attrs}
                 />
             );
         },
 
-        getDefaultProps: function() {
+        getInitialState: function() {
             return {
-                defaultValue: React.PropTypes.string,
-                defaultUnit: unitConverter.defaultUnit,
-                min: Number.MIN_SAFE_INTEGER,
-                max: Number.MAX_SAFE_INTEGER,
-                step: 1,
-                dataAttrs: {},
-                getValue: React.PropTypes.func,
-                onChange: undefined
+                defaultValue: this.props.defaultValue,
+                operatorAmount: 0
             };
         },
 
