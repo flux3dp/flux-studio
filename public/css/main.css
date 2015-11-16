@@ -4796,6 +4796,15 @@ input.switch:checked ~ label:after {
 /**
  * Laser
  */
+.laser-studio .laser-stage {
+    display: -webkit-box;
+    /* OLD - iOS 6-, Safari 3.1-6 */
+    display: -webkit-flex;
+    /* NEW - Chrome */
+    display: flex;
+    /* NEW, Spec - Opera 12.1, Firefox 20+ */
+    height: 100%; }
+
 .laser-studio .hasShadow .modal-body {
     box-shadow: 0 4px 40px 0px rgba(0, 0, 0, 0.5); }
 
@@ -4833,14 +4842,12 @@ input.switch:checked ~ label:after {
         width: 0; }
 
 .laser-studio .operation-table {
-    display: -webkit-box;
-    /* OLD - iOS 6-, Safari 3.1-6 */
-    display: -webkit-flex;
-    /* NEW - Chrome */
-    display: flex;
-    /* NEW, Spec - Opera 12.1, Firefox 20+ */
-    height: 100%;
-    position: relative;
+    bottom: 0;
+    left: 0;
+    margin: auto;
+    position: absolute;
+    right: 0;
+    top: 0;
     width: 100%; }
 
 .laser-studio .operating-panel {
@@ -4906,7 +4913,6 @@ input.switch:checked ~ label:after {
         /* NEW - Chrome */
         display: flex;
         /* NEW, Spec - Opera 12.1, Firefox 20+ */
-        display: block;
         height: 40px;
         position: relative; }
         .laser-studio .operating-panel .popup-selection ul {

@@ -2,6 +2,10 @@
  * Laser
  */
 .laser-studio {
+    .laser-stage {
+        @include flexbox();
+        height: 100%;
+    }
 
     .hasShadow {
         .modal-body {
@@ -42,9 +46,12 @@
     }
 
     .operation-table {
-        @include flexbox();
-        height: 100%;
-        position: relative;
+        bottom: 0;
+        left: 0;
+        margin: auto;
+        position: absolute;
+        right: 0;
+        top: 0;
         width: 100%;
     }
 
@@ -122,7 +129,6 @@
 
         .popup-selection {
             @include flexbox();
-            display: block;
             height: 40px;
             position: relative;
 
