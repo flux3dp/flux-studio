@@ -53,7 +53,6 @@ body {
 a {
     color: #000;
     font-size: 12px;
-    font-weight: lighter;
     text-decoration: underline;
 }
 
@@ -438,4 +437,14 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         background-color: #c9302c;
         border-color: #ac2925;
     }
+}
+
+
+// pull
+.pull-left {
+    float: left;
+}
+
+.pull-right {
+    float: right;
 }
