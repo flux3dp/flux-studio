@@ -176,7 +176,6 @@ define([
                                     dataAttrs={{ type: 'width' }}
                                     ref="objectSizeW"
                                     defaultValue={state.size.width}
-                                    getValue={this._onTransform}
                                     onChange={this._onTransform}
                                 />
                             </div>
@@ -186,7 +185,6 @@ define([
                                     dataAttrs={{ type: 'height' }}
                                     ref="objectSizeH"
                                     defaultValue={state.size.height}
-                                    getValue={this._onTransform}
                                     onChange={this._onTransform}
                                 />
                             </div>
