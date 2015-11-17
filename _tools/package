@@ -1,6 +1,8 @@
 #!/bin/bash
 DIR="$( cd "../$( dirname "$0" )" && pwd)"
 
+./nwjs-shell-builder/nwjs-build.sh --clean
+
 while true; do
     read -p "==> Build for which OS? (Windows[W], OSX[O]) "
     case $REPLY in
