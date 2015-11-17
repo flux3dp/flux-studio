@@ -32,7 +32,7 @@ define([
                     },
                     {
                         label: lang.save_as_preset,
-                        className: (true === this.state.materialHasChanged ? '' : 'btn-disabled'),
+                        className: 'btn-default' + (true === this.state.materialHasChanged ? '' : ' btn-disabled'),
                         onClick: this._onSaveStarting
                     }],
                     save: [{
@@ -123,7 +123,7 @@ define([
             var buttons = this._getFooterButtons(lang);
 
             return (
-                <ButtonGroup className="footer" buttons={buttons}/>
+                <ButtonGroup className="footer btn-h-group" buttons={buttons}/>
             );
         },
 

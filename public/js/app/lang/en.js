@@ -3,7 +3,6 @@ define(function() {
 
     return {
         brand_name : 'FLUX',
-        welcome_headline : 'Welcome to FLUX',
         app : {
             name : 'Flux Studio - en'
         },
@@ -57,11 +56,64 @@ define(function() {
                 troubleshooting: 'Troubleshooting'
             }
         },
-        welcome: {
-            header1: 'Hello! Welcome to FLUX. Please choose your preferred language',
-            header2: 'We are getting started from your language',
-            start: 'Start',
-            skip: 'Skip'
+        initialize: {
+            // generic strings
+            next: 'Next',
+            start: 'START',
+            skip: 'Skip',
+            cancel: 'CANCEL',
+            confirm: 'Confirm',
+            connect: 'Connect',
+
+            // specific caption/content
+            select_language: 'Select Language',
+            change_password: 'Change password?',
+            connect_flux: 'Connect FLUX to Your Computer by USB Cable',
+            name_your_flux: 'Name Your FLUX',
+            why_need_name: 'This will be used as Wi-Fi ap name if station mode is enabled.',
+            wifi_setup: 'Wi-Fi Setup',
+            select_preferred_wifi: 'Select your preferred network.',
+            requires_wifi_password: 'requires a password.',
+            connecting: 'Connecting...',
+
+            // page specific
+            set_machine_generic: {
+                printer_name: 'Name',
+                printer_name_placeholder: 'Printer\'s Name',
+                password: 'Password',
+                set_station_mode: 'Set station mode',
+                password_placeholder: 'Password'
+            },
+
+            setting_completed: {
+                start: 'Start',
+                is_ready: '“%s” is ready',
+                station_ready_statement: 'Your FLUX is now a Wi-Fi station, you can use your FLUX wirelessly by connect to Wi-Fi “%s”',
+                brilliant: 'Brilliant!',
+                begin_journey: 'You can begin the journey with your FLUX now.',
+                great: 'Great!',
+                upload_via_usb: 'You can setup Wi-Fi later, or use USB drive to print.',
+                back: 'Back',
+                ok: 'OK!'
+            },
+
+            // errors
+            errors: {
+                error: 'Error',
+
+                keep_connect: {
+                    caption: 'Unable to detect FLUX device',
+                    content: 'Please make sure your FLUX has been powered on and attached to micro-usb cord.'
+                },
+
+                wifi_connection: {
+                    connecting_fail: 'Connecting Fail.'
+                },
+
+                select_wifi: {
+                    ap_mode_fail: 'Setup Failed.'
+                }
+            }
         },
         wifi: {
             home: {

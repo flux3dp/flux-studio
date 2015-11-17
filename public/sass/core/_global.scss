@@ -4,7 +4,7 @@
 
 html,
 body {
-    font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif, "Microsoft JhengHei", "微軟正黑體";
+    font-family: "Helvetica Neue", "HelveticaNeue-Light", "Helvetica Neue Light", Helvetica, Arial, "Lucida Grande", sans-serif, "Microsoft JhengHei", "微軟正黑體";
     font-size: 12px;
     height: 100%;
     margin: 0;
@@ -190,24 +190,7 @@ a {
 
 .pure-list {
     list-style: none;
-}
-
-.initialization {
-    background-color: #fff;
-    height: 508px;
-    overflow: scroll;
-    width: 700px;
-}
-
-.initialization h1 {
-    background: #272727;
-    color: #fafafa;
-    font-size: 1rem;
-    letter-spacing: 1px;
-    line-height: 40px;
-    margin: 0;
-    padding: 0 16px;
-    text-align: left;
+    padding: 0;
 }
 
 .error {

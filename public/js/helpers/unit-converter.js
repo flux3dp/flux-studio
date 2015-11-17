@@ -6,8 +6,11 @@ define(function() {
 
     var defaultUnit = 'mm',
         acceptableUnits = [
-            'mm', 'cm', 'inch'
+            'mm', 'cm', 'inch', '"'
         ],
+        symbolMap = {
+            '"': 'inch'
+        },
         conversionRate = {
             'mm': {
                 from: 1,
@@ -34,6 +37,11 @@ define(function() {
 
         from: function(fromValue, fromUnitName) {
             fromUnitName = fromUnitName || defaultUnit;
+
+            if (true === symbolMap.hasOwnProperty(fromUnitName)) {
+                fromUnitName = symbolMap[fromUnitName];
+            }
+
             checkUnitAcceptable(fromUnitName, conversionRate);
 
             var fromRate = conversionRate[fromUnitName].from;

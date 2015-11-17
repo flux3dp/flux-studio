@@ -178,10 +178,21 @@ define([
 
                 return round(px, -2);
             },
+            sleep,
             refreshObjectParams = function(e, $el) {
                 var el_position, el_offset_position,
                     last_x, last_y,
-                    position, size, angle, threshold;
+                    $controlPoints,
+                    position, size, angle, threshold,
+                    outOfRange = function(point, limit) {
+                        var x = Math.pow((platform_pos.center.x - point.x), 2),
+                            y = Math.pow((platform_pos.center.y - point.y), 2),
+                            range = Math.sqrt(x + y);
+
+                        return range > limit;
+                    },
+                    rollback = true,
+                    platform_pos = $laser_platform.box(true);
 
                 if (null !== $el) {
                     el_position = $el.box();
@@ -200,6 +211,36 @@ define([
 
                     if ('move' !== e.freetransEventType) {
                         refreshImage($el, threshold);
+                    }
+
+                    $controlPoints = $el.parent().find('.ft-scaler');
+                    $controlPoints.each(function(k, el) {
+                        var elPosition = $(el).box(true);
+
+                        rollback = (
+                            false === outOfRange(elPosition.center, platform_pos.width / 2) ?
+                            false :
+                            rollback
+                        );
+                    });
+
+                    clearTimeout(sleep);
+
+                    if (true === rollback) {
+                        sleep = setTimeout(function() {
+                            var data = $el.data('freetrans');
+
+                            $target_image.addClass('bounce').parent().find('.ft-controls').addClass('bounce');
+
+                            $target_image.freetrans({
+                                x: ((platform_pos.width - el_position.width) / 2) - data.originalSize.width * (1 - data.scalex),
+                                y: ((platform_pos.height - el_position.height) / 2) - data.originalSize.height * (1 - data.scaley)
+                            });
+
+                            $target_image.one('transitionend', function() {
+                                $target_image.removeClass('bounce').parent().find('.ft-controls').removeClass('bounce');;
+                            });
+                        }, 300);
                     }
 
                     self.setState({
@@ -260,7 +301,7 @@ define([
                                     br_position_x: convertToRealCoordinate(bottom_right.x, 'x'),
                                     br_position_y: convertToRealCoordinate(bottom_right.y, 'y'),
                                     rotate: (Math.PI * elementAngle(el) / 180) * -1,
-                                    threshold: $img.data('threshold')
+                                    threshold: $img.data('threshold') || 128
                                 },
                                 grayscaleOpts = {
                                     is_svg: ('svg' === self.props.fileFormat),
@@ -333,16 +374,6 @@ define([
                 instantRefresh = function(e, data) {
                     refreshObjectParams(e, $img);
                 },
-                platform_pos = $laser_platform.box(true),
-                outOfRange = function(point, limit) {
-                    var x = Math.pow((platform_pos.center.x - point.x), 2),
-                        y = Math.pow((platform_pos.center.y - point.y), 2),
-                        range = Math.sqrt(x + y);
-
-                    return range > limit;
-                },
-                el_position,
-                $controlPoints,
                 $ftControls;
 
             $img.addClass(file.extension).
@@ -355,8 +386,8 @@ define([
 
             $img.one('load', function() {
                 $img.freetrans({
-                    x: $laser_platform.outerWidth() / 2 - size.width / 2,
-                    y: $laser_platform.outerHeight() / 2 - size.height / 2,
+                    x: ($laser_platform.outerWidth() - size.width) / 2,
+                    y: ($laser_platform.outerHeight() - size.height) / 2,
                     originalSize: size,
                     onRotate: instantRefresh,
                     onMove: instantRefresh,
@@ -374,29 +405,6 @@ define([
 
                 // onmousedown
                 (function(file, size, originalUrl, name, $img) {
-                    $img.on('transitionend mouseup', function(e) {
-                        var rollback = true;
-
-                        $controlPoints = $ftControls.find('.ft-scaler');
-                        $controlPoints.each(function(k, el) {
-                            el_position = $(el).box(true);
-
-                            rollback = (
-                                false === outOfRange(el_position.center, platform_pos.width / 2) ?
-                                false :
-                                rollback
-                            );
-                        });
-
-                        el_position = $img.box();
-
-                        if (true === rollback) {
-                            $target_image.freetrans({
-                                x: platform_pos.width / 2 - el_position.width / 2,
-                                y: platform_pos.height / 2 - el_position.height / 2
-                            });
-                        }
-                    });
 
                     $ftControls.on('mousedown', function(e) {
                         var clone = function() {
@@ -510,32 +518,34 @@ define([
         }
 
         function refreshImagePanelPos() {
-            var pos = $target_image.box(true),
-                imagePanel = self.refs.imagePanel,
-                platformPos = $laser_platform.box(true),
-                windowPos = $('body').box(true),
-                initialPosition = {
-                    left: pos.right + 10,
-                    top: pos.center.y - 66
-                };
+            if (null !== $target_image) {
+                var pos = $target_image.box(true),
+                    imagePanel = self.refs.imagePanel,
+                    platformPos = $laser_platform.box(true),
+                    windowPos = $('body').box(true),
+                    initialPosition = {
+                        left: pos.right + 10,
+                        top: pos.center.y - 66
+                    };
 
-            // check position top
-            if ('undefined' !== typeof imagePanel && pos.bottom > windowPos.bottom) {
-                initialPosition.top = windowPos.bottom - imagePanel.getDOMNode().clientHeight;
+                // check position top
+                if ('undefined' !== typeof imagePanel && pos.bottom > windowPos.bottom) {
+                    initialPosition.top = windowPos.bottom - imagePanel.getDOMNode().clientHeight;
+                }
+
+                if (windowPos.top > initialPosition.top) {
+                    initialPosition.top = windowPos.top;
+                }
+
+                // check position left
+                if (initialPosition.left > platformPos.right) {
+                    initialPosition.left = platformPos.right + 10;
+                }
+
+                self.setState({
+                    initialPosition: initialPosition
+                });
             }
-
-            if (windowPos.top > initialPosition.top) {
-                initialPosition.top = windowPos.top;
-            }
-
-            // check position left
-            if (initialPosition.left > platformPos.right) {
-                initialPosition.left = platformPos.right + 10;
-            }
-
-            self.setState({
-                initialPosition: initialPosition
-            });
         }
 
         // on window resize
@@ -554,8 +564,10 @@ define([
             export: function(settings) {
                 handleLaser(
                     settings,
-                    function(blob) {
-                        var file_name = (new Date()).getTime() + '.gcode';
+                    function(blob, filemode) {
+                        var extension = ('-f' === filemode ? 'fc' : 'gcode'),
+                            file_name = (new Date()).getTime() + '.' + extension;
+
                         saveAs(blob, file_name);
                         self._openBlocker(false);
                     }
@@ -654,10 +666,14 @@ define([
                 case 'width':
                     val = round(val / DIAMETER * PLATFORM_DIAMETER_PIXEL, -2);
                     args.scalex = round(val / freetrans.originalSize.width, -2);
+                    val = round(params.size.height / DIAMETER * PLATFORM_DIAMETER_PIXEL, -2);
+                    args.scaley = round(val / freetrans.originalSize.height, -2);
                     break;
                 case 'height':
                     val = round(val / DIAMETER * PLATFORM_DIAMETER_PIXEL, -2);
                     args.scaley = round(val / freetrans.originalSize.height, -2);
+                    val = round(params.size.width / DIAMETER * PLATFORM_DIAMETER_PIXEL, -2);
+                    args.scalex = round(val / freetrans.originalSize.width, -2);
                     break;
                 case 'angle':
                     args.angle = val;

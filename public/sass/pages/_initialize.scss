@@ -1,0 +1,160 @@
+.initialization {
+    // local varibles
+    $primary-font-color: #808080;
+    $primary-background-color: #DEDEDC;
+
+    background: $primary-background-color;
+    color: $primary-font-color;
+    position: relative;
+
+    .brand-image {
+        height: 52px;
+        left: 15px;
+        position: absolute;
+        top: 15px;
+        width: 52px;
+    }
+
+    .headline {
+        font-size: 24px;
+        font-weight: 200;
+    }
+
+    select {
+        background: url('/img/arrow-down.png') #fff no-repeat;
+        background-position: calc(100% - 5px) center;
+        background-size: 16px 10px;
+        border: none;
+        border-radius: 0;
+        height: 36px;
+        padding: 0 0 0 10px;
+        width: 250px;
+        -webkit-appearance: none;
+        appearance: none;
+    }
+
+    .home {
+        .language {
+            margin: 0 0 8px 0;
+        }
+    }
+
+    .connect-machine {
+        .scene {
+            height: 209px;
+            margin: 0 0 10px 0;
+            width: 209px;
+        }
+    }
+
+    .select-wifi {
+        .notice {
+            margin: 0 0 34px 0;
+
+            P {
+                line-height: 2rem;
+                margin: 0;
+            }
+        }
+
+        .modal-body {
+            box-shadow: 0 0 14px 1px rgba(0, 0, 0, .7);
+        }
+
+        .form-wifi-password {
+            background: $primary-background-color;
+            overflow: scroll;
+            width: 300px;
+
+            .notice {
+                color: #989898;
+                font-size: 14px;
+                line-height: 16.8px;
+                margin: 20px 0;
+            }
+
+            .password-input {
+                height: 36px;
+                margin: 0 0 10px 0;
+                padding: 0 0 0 5px;
+                width: 250px;
+            }
+        }
+
+        .wifi-list {
+            height: 175px;
+            overflow: scroll;
+            width: 252px;
+
+            .row-fluid {
+                @include flexbox();
+                cursor: pointer;
+                height: 100%;
+                margin: 0;
+                padding: 0 10px;
+                flex: 2;
+                justify-content: space-between;
+            }
+
+            .wifi-ssid {
+                width: calc(100% - 50px);
+            }
+
+            span {
+                display: block;
+                line-height: 40px;
+            }
+
+            input[type="radio"] {
+                display: none;
+
+                &:checked + .row-fluid {
+                    background: #ccc;
+                }
+            }
+
+            .fa {
+                font-size: 1.2405951937882669rem;
+            }
+        }
+
+        .btn-set-station-mode {
+            line-height: 22px;
+        }
+    }
+
+    .connecting-wifi {
+        .spinner-roller {
+            height: 52px;
+            width: 52px;
+        }
+    }
+
+    .setting-completed {
+        .headline {
+            margin: 0 0 12px 0;
+        }
+
+        .notice {
+            border: 2px dashed #AF0000;
+            font-size: 14px;
+            line-height: 20px;
+            margin: 0 0 20px 0;
+            padding: 20px;
+            width: 451px;
+        }
+    }
+
+    .h-form {
+        .control {
+            @include flexbox();
+            margin: 0 0 10px 0;
+            justify-content: space-around;
+
+            input {
+                height: 36px;
+                width: 250px;
+            }
+        }
+    }
+}

@@ -11,16 +11,17 @@ define(['react'], function(React){
                 return <li data-meta={metadata} data-value={opt.value}>{opt.label}</li>;
             }, this);
 
-            return  <ul
-                        name={this.props.name}
-                        id={this.props.id}
-                        className={this.props.className}
-                        data-empty-message={this.props.emptyMessage}
-                        onClick={this.props.onClick}
-                        onDoubleClick={this.props.ondblclick}
-                    >
-                        {list_items}
-                    </ul>;
+            return  (
+                <ul
+                    name={this.props.name}
+                    id={this.props.id}
+                    className={this.props.className}
+                    data-empty-message={this.props.emptyMessage}
+                    onClick={this.props.onClick}
+                    onDoubleClick={this.props.ondblclick}>
+                    {list_items}
+                </ul>
+            );
         }
     });
 });

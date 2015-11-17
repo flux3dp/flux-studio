@@ -3,7 +3,6 @@ define(function() {
 
     return {
         brand_name : 'FLUX',
-        welcome_headline : 'Welcome to FLUX',
         app : {
             name : 'Flux Studio - zh-tw'
         },
@@ -57,11 +56,64 @@ define(function() {
                 troubleshooting: 'Troubleshooting'
             }
         },
-        welcome: {
-            header1: 'Hello! 歡迎使用 FLUX，快點來實現你的點子',
-            header2: '請選擇你想使用的語言，我們即將開始為 FLUX 進行設定 :)',
+        initialize: {
+            // generic strings
+            next: '下一步',
             start: '開始設定',
-            skip: '跳過'
+            skip: '跳過',
+            cancel: '取消',
+            confirm: '確認',
+            connect: '連接',
+
+            // specific caption/content
+            select_language: '請選擇你想使用的語言',
+            change_password: '要更改密碼嗎?',
+            connect_flux: '用 USB 連接你的電腦',
+            name_your_flux: '命名你的 FLUX',
+            why_need_name: '當工作站模式啟動時，這將會被用作 Wi-Fi 名稱',
+            wifi_setup: 'Wi-Fi Setup',
+            select_preferred_wifi: '選擇你偏好的網路',
+            requires_wifi_password: '需要密碼',
+            connecting: '連接中...',
+
+            // page specific
+            set_machine_generic: {
+                printer_name: 'Name',
+                printer_name_placeholder: '請輸入名稱',
+                password: 'Password',
+                set_station_mode: 'Set station mode',
+                password_placeholder: '請輸入密碼'
+            },
+
+            setting_completed: {
+                start: '開始使用',
+                is_ready: '“%s” 準備好了',
+                station_ready_statement: '你的 FLUX 已成為 Wi-Fi 熱點，你可以藉由無線連接“%s”這個熱點操作 FLUX',
+                brilliant: 'Brilliant!',
+                begin_journey: 'You can begin the journey with your FLUX now.',
+                great: 'Great!',
+                upload_via_usb: 'You can setup Wi-Fi later, or use USB drive to print.',
+                back: 'Back',
+                ok: 'OK!'
+            },
+
+            // errors
+            errors: {
+                error: 'Error',
+
+                keep_connect: {
+                    caption: '無法連接裝置',
+                    content: '請確認電源已被開啟及已經由 micro-usb 連接'
+                },
+
+                wifi_connection: {
+                    connecting_fail: '連接失敗'
+                },
+
+                select_wifi: {
+                    ap_mode_fail: '設定失敗'
+                }
+            }
         },
         wifi: {
             home: {

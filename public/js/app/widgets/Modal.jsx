@@ -15,6 +15,9 @@ define([
 
         getDefaultProps: function() {
             return {
+                onOpen: function() {},
+                onClose: function() {},
+                content: <div/>,
                 disabledEscapeOnBackground: false,
                 className: {}
             };
@@ -69,7 +72,6 @@ define([
                 </div>
             );
         }
-
     });
 
     return View;

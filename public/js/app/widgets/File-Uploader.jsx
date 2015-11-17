@@ -112,7 +112,7 @@ define([
             return {
                 lang: React.PropTypes.object,
                 sizeMaxLimit: React.PropTypes.number,
-                accept: React.PropTypes.string,
+                accept: '',
                 multiple: React.PropTypes.bool,
                 className: {},
                 // events

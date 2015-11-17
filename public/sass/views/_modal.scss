@@ -92,14 +92,16 @@
         }
     }
 
-    .button-group {
-        @include flexbox();
+    .message {
+        word-break: break-all;
+        word-wrap: break-word;
+    }
+
+    .btn-h-group {
         bottom: 1.6rem;
         left: 2.8rem;
         position: absolute;
         right: 2.8rem;
-        align-items: center;
-        justify-content: center;
 
         .btn {
             font-size: 1.3rem;
@@ -113,11 +115,6 @@
                 margin: 0;
             }
         }
-    }
-
-    .message {
-        word-break: break-all;
-        word-wrap: break-word;
     }
 
 }
