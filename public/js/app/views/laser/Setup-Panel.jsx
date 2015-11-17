@@ -148,6 +148,7 @@ define([
 
         _refreshObjectHeight: function(e, value) {
             this._saveLastestSet({ objectHeight: value });
+            this.openSubPopup(e);
         },
 
         // Lifecycle
