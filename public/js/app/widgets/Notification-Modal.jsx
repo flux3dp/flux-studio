@@ -12,7 +12,7 @@ define([
         propTypes: {
             open        : React.PropTypes.bool,
             lang        : React.PropTypes.object,
-            type        : React.PropTypes.number,   // 0 (Info), 1 (Warning), 2 (Error)
+            type        : React.PropTypes.string,   // 0 (Info), 1 (Warning), 2 (Error)
             hasRetry    : React.PropTypes.bool,
             escapable   : React.PropTypes.bool,
             message     : React.PropTypes.string,
@@ -22,7 +22,7 @@ define([
 
         getDefaultProps: function() {
             return {
-                type: 0,
+                type: 'INFO',
                 escapable: true,
                 open: true
             };
@@ -58,9 +58,9 @@ define([
 
         _renderTypeTitle: function() {
             var types = {
-                0: lang.info,
-                1: lang.warning,
-                2: lang.error
+                'INFO': lang.info,
+                'WARNING': lang.warning,
+                'ERROR': lang.error
             };
 
             return(
