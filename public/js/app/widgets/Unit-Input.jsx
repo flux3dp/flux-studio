@@ -30,7 +30,7 @@ define([
             else {
                 val = round(parseFloat(this.refs.unitInput.getDOMNode().value), -2);
 
-                this.props.getValue(null, val);
+                this.props.getValue({ currentTarget: this.refs.unitInput.getDOMNode() }, val);
 
                 return val;
             }
