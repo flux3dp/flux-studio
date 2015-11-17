@@ -24,16 +24,23 @@ define([
                 buttonGroup = {
                     default: [{
                         label: lang.load_preset,
+                        className: 'pull-left btn-default',
                         onClick: this._onLoadPreset
                     },
                     {
-                        label: lang.apply,
-                        onClick: this._onApply
+                        label: lang.save_as_preset,
+                        className: 'pull-left btn-default' + (true === this.state.materialHasChanged ? '' : ' btn-disabled'),
+                        onClick: this._onSaveStarting
                     },
                     {
-                        label: lang.save_as_preset,
-                        className: 'btn-default' + (true === this.state.materialHasChanged ? '' : ' btn-disabled'),
-                        onClick: this._onSaveStarting
+                        label: lang.cancel,
+                        className: 'pull-right btn-default btn-cancel',
+                        onClick: this._onCancel
+                    },
+                    {
+                        label: lang.apply,
+                        className: 'pull-right btn-default',
+                        onClick: this._onApply
                     }],
                     save: [{
                         label: lang.save_and_apply,
@@ -123,7 +130,7 @@ define([
             var buttons = this._getFooterButtons(lang);
 
             return (
-                <ButtonGroup className="footer btn-h-group" buttons={buttons}/>
+                <ButtonGroup className="footer clearfix" buttons={buttons}/>
             );
         },
 

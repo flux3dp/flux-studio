@@ -441,7 +441,7 @@ define(function() {
             presets: 'Presets',
             acceptable_files: 'JPG, PNG, SVG',
             drop_files_to_import: 'Drop your file here or click "import" to upload your file',
-            button_advanced: 'Advanced',
+            button_advanced: 'ADVANCED',
             confirm: 'Confirm',
             start_engrave: 'Engrave',
             start_cut: 'Cut',
@@ -451,7 +451,7 @@ define(function() {
             go: 'GO',
             print_params: {
                 object_height: {
-                    text: 'Object Height',
+                    text: 'OBJECT HEIGHT',
                     unit: 'mm'
                 }
             },
@@ -478,7 +478,7 @@ define(function() {
                 label: 'Setup',
                 form: {
                     object_options: {
-                        text: 'Material',
+                        text: 'MATERIAL',
                         label: 'Object Options',
                         options: [
                             {
@@ -539,11 +539,11 @@ define(function() {
                     }
                 },
                 save_and_apply: 'SAVE & APPLY',
-                save_as_preset: 'SAVE AS PRESET',
-                load_preset: 'LOAD PRESET',
-                apply: 'Apply',
-                cancel: 'Cancel',
-                save: 'Save'
+                save_as_preset: 'SAVE',
+                load_preset: 'LOAD',
+                apply: 'APPLY',
+                cancel: 'CANCEL',
+                save: 'SAVE'
             }
         },
         scan: {

@@ -58,12 +58,8 @@
     .operating-panel {
         margin: 0 0 0 30px;
         position: static;
-        width: 205px;
+        width: 305px;
         align-self: center;
-
-        .material-label {
-            padding: 0 3px;
-        }
 
         .custom-presets-wrapper {
             background: #FFF;
@@ -159,14 +155,18 @@
 
             .display-text {
                 display: inline-block;
-                font-size: 16px;
+                font-size: 1.8rem;
                 line-height: 40px;
                 padding: 0 16px 0 6px;
+
+                .caption {
+                    padding: 0 .3em 0 0;
+                }
 
                 p {
                     display: block;
                     margin: 0;
-                    width: 183px;
+                    width: 257px;
                 }
             }
 
@@ -211,7 +211,7 @@
             background: rgba(0,0,0,0);
             border-radius: 0;
             color: #b3b3b3;
-            font-size: 16px;
+            font-size: 1.8rem;
             line-height: 40px;
             margin: 0;
             padding: 0 16px 0 6px;
@@ -428,11 +428,25 @@
         padding: 20px 20px 0;
         width: 440px;
 
+        .form {
+            margin: 0 0 10px 0;
+        }
+
         .footer {
-            height: 70px;
             margin-bottom: 0;
             position: static;
-            justify-content: flex-end;
+            margin: 0 0 10px 0;
+
+            .btn {
+                flex: initial;
+                line-height: 30px;
+                margin: 0 10px 0 0;
+                padding: 0 10px;
+
+                &.btn-cancel {
+                    margin: 0;
+                }
+            }
         }
     }
 
@@ -463,7 +477,7 @@
         .value-text {
             border: 2px solid #E0E0DF;
             line-height: 28px;
-            margin: 5px;
+            margin: 5px 0 5px 5px;
             padding: 0 5px;
 
             &::after {

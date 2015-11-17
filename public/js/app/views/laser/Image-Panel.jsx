@@ -176,7 +176,6 @@ define([
                                     dataAttrs={{ type: 'width' }}
                                     ref="objectSizeW"
                                     defaultValue={state.size.width}
-                                    getValue={this._onTransform}
                                     onChange={this._onTransform}
                                 />
                             </div>
@@ -186,7 +185,6 @@ define([
                                     dataAttrs={{ type: 'height' }}
                                     ref="objectSizeH"
                                     defaultValue={state.size.height}
-                                    getValue={this._onTransform}
                                     onChange={this._onTransform}
                                 />
                             </div>
@@ -204,7 +202,7 @@ define([
                                 <input type="number" min="0" max="360" ref="objectAngle" data-type="angle"
                                     defaultValue={props.angle} value={props.angle}
                                     onChange={this._onTransform}/>
-                            </div>label
+                            </div>
                         </label>
                     </label>
                     {thresholdRange}

@@ -2113,7 +2113,6 @@ body {
 a {
     color: #000;
     font-size: 12px;
-    font-weight: lighter;
     text-decoration: underline; }
 
 /**
@@ -2524,6 +2523,12 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         background-color: #c9302c;
         border-color: #ac2925; }
 
+.pull-left {
+    float: left; }
+
+.pull-right {
+    float: right; }
+
 /**
  * ref: http://tobiasahlin.com/spinkit/
  */
@@ -2792,7 +2797,8 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         font-size: 15px;
         color: #B3B3B3; }
     .controls input[type="text"],
-    .controls input[type="password"] {
+    .controls input[type="password"],
+    .controls input[type="number"] {
         padding-left: 10px;
         border: 2px solid #E0E0DF; }
     .controls select {
@@ -4024,12 +4030,17 @@ input.switch:checked ~ label:after {
         float: left; }
 
 .print-studio .previewPanel {
-    position: absolute;
-    right: 13%;
-    top: 15%; }
+    position: relative;
+    width: 50px;
+    background-color: #FFFFFF;
+    height: 200px;
+    overflow-y: hidden; }
     .print-studio .previewPanel input {
         width: 150px;
-        transform: rotate(270deg); }
+        transform: rotate(270deg);
+        position: absolute;
+        top: 90px;
+        left: -50px; }
     .print-studio .previewPanel div {
         text-align: right;
         margin-right: 25px; }
@@ -4072,12 +4083,11 @@ input.switch:checked ~ label:after {
 
 .print-studio .leftPanel {
     position: absolute;
-    width: 300px;
+    width: 220px;
     height: 300px;
     top: 50%;
     margin-top: -150px; }
     .print-studio .leftPanel ul {
-        position: absolute;
         list-style-type: none;
         padding-left: 3.75rem; }
         .print-studio .leftPanel ul li {
@@ -4116,11 +4126,12 @@ input.switch:checked ~ label:after {
             display: inline-block;
             line-height: 40px;
             padding: 0 16px 0 6px;
-            cursor: pointer; }
+            cursor: pointer;
+            width: 100%; }
             .print-studio .leftPanel .popup-selection .display-text p {
                 display: block;
                 margin: 0;
-                width: 220px; }
+                width: 175px; }
         .print-studio .leftPanel .popup-selection .popup {
             visibility: hidden;
             align-self: center;
@@ -4199,6 +4210,8 @@ input.switch:checked ~ label:after {
                     color: #B3B3B3; }
                     .print-studio .leftPanel .popup-selection .popup .content.quality ul li {
                         font-size: 16px; }
+            .print-studio .leftPanel .popup-selection .popup .content.preview {
+                width: 50px; }
 
 .print-studio .rightPanel {
     position: absolute;
@@ -4212,8 +4225,7 @@ input.switch:checked ~ label:after {
         bottom: 50px;
         left: 0; }
     .print-studio .rightPanel tspan {
-        font-size: 2.4em;
-        font-weight: bold; }
+        font-size: 2.4em; }
     .print-studio .rightPanel g {
         cursor: pointer; }
     .print-studio .rightPanel g:hover path {
@@ -5031,7 +5043,6 @@ input.switch:checked ~ label:after {
     .initialization .setting-completed .headline {
         margin: 0 0 12px 0; }
     .initialization .setting-completed .notice {
-        border: 2px dashed #AF0000;
         font-size: 14px;
         line-height: 20px;
         margin: 0 0 20px 0;
@@ -5110,10 +5121,8 @@ input.switch:checked ~ label:after {
 .laser-studio .operating-panel {
     margin: 0 0 0 30px;
     position: static;
-    width: 205px;
+    width: 305px;
     align-self: center; }
-    .laser-studio .operating-panel .material-label {
-        padding: 0 3px; }
     .laser-studio .operating-panel .custom-presets-wrapper {
         background: #FFF;
         overflow: scroll;
@@ -5189,13 +5198,15 @@ input.switch:checked ~ label:after {
                 visibility: visible; }
         .laser-studio .operating-panel .popup-selection .display-text {
             display: inline-block;
-            font-size: 16px;
+            font-size: 1.8rem;
             line-height: 40px;
             padding: 0 16px 0 6px; }
+            .laser-studio .operating-panel .popup-selection .display-text .caption {
+                padding: 0 0.3em 0 0; }
             .laser-studio .operating-panel .popup-selection .display-text p {
                 display: block;
                 margin: 0;
-                width: 183px; }
+                width: 257px; }
         .laser-studio .operating-panel .popup-selection .popup {
             display: -webkit-box;
             /* OLD - iOS 6-, Safari 3.1-6 */
@@ -5227,7 +5238,7 @@ input.switch:checked ~ label:after {
         background: transparent;
         border-radius: 0;
         color: #b3b3b3;
-        font-size: 16px;
+        font-size: 1.8rem;
         line-height: 40px;
         margin: 0;
         padding: 0 16px 0 6px;
@@ -5397,11 +5408,19 @@ input.switch:checked ~ label:after {
     background: #FFF;
     padding: 20px 20px 0;
     width: 440px; }
+    .laser-studio .advanced-panel .form {
+        margin: 0 0 10px 0; }
     .laser-studio .advanced-panel .footer {
-        height: 70px;
         margin-bottom: 0;
         position: static;
-        justify-content: flex-end; }
+        margin: 0 0 10px 0; }
+        .laser-studio .advanced-panel .footer .btn {
+            flex: initial;
+            line-height: 30px;
+            margin: 0 10px 0 0;
+            padding: 0 10px; }
+            .laser-studio .advanced-panel .footer .btn.btn-cancel {
+                margin: 0; }
 
 .laser-studio .control {
     display: -webkit-box;
@@ -5428,7 +5447,7 @@ input.switch:checked ~ label:after {
     .laser-studio .control .value-text {
         border: 2px solid #E0E0DF;
         line-height: 28px;
-        margin: 5px;
+        margin: 5px 0 5px 5px;
         padding: 0 5px; }
         .laser-studio .control .value-text::after {
             content: attr(data-tail); }

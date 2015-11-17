@@ -1,11 +1,18 @@
 var gui = require('nw.gui'),
     currentWindow = gui.Window.get(),
     fs = require('fs'),
+    os = require('os'),
     spawn = require('child_process').spawn,
     exec = require('child_process').exec,
     ghost;
 
-fs.chmodSync(process.cwd() + '/ghost/ghost', 0777);
+if ('Windows_NT' === os.type()) {
+    fs.chmodSync(process.cwd() + '/ghost/ghost.exe', 0777);
+}
+else {
+    fs.chmodSync(process.cwd() + '/ghost/ghost', 0777);
+}
+
 
 ghost = spawn(process.cwd() + '/ghost/ghost', ['-s', '-d']);
 

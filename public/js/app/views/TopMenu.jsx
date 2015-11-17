@@ -3,8 +3,9 @@ define([
     'lib/jquery.growl',
     'app/actions/Alert-Actions',
     'app/stores/Alert-Store',
+    'app//constants/Alert-Constants',
     'jsx!widgets/Notification-Modal',
-], function(React, Notifier, AlertActions, AlertStore, Modal) {
+], function(React, Notifier, AlertActions, AlertStore, AlertConstants, Modal) {
     'use strict';
 
     return function(args) {
@@ -31,22 +32,23 @@ define([
 
             _handleNotification: function(type, message) {
                 var self = this;
+
                 var types = {
-                    0: function() {
+                    INFO: function() {
                         $.growl.notice({
                             title: self.state.lang.alert.info,
                             message: message
                         });
                     },
 
-                    1: function() {
+                    WARNING: function() {
                         $.growl.warning({
                             title: self.state.lang.alert.warning,
                             message: message
                         });
                     },
 
-                    2: function() {
+                    ERROR: function() {
                         $.growl.error({
                             title: self.state.lang.alert.error,
                             message: message,

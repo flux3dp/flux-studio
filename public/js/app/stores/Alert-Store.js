@@ -1,8 +1,11 @@
 define([
     'app/dispatcher/Alert-Dispatcher',
-    'events'
+    'app/constants/Alert-Constants',
+    'events',
+    'helpers/object-assign'
 ], function(
     Dispatcher,
+    AlertConstants,
     EventEmitter
 ){
 
@@ -42,27 +45,27 @@ define([
             var action = {
 
                 'SHOW_INFO': function() {
-                    AlertStore.emit(NOTIFY_EVENT, 0, payload.message);
+                    AlertStore.emit(NOTIFY_EVENT, AlertConstants.INFO, payload.message);
                 },
 
                 'SHOW_WARNING': function() {
-                    AlertStore.emit(NOTIFY_EVENT, 1, payload.message);
+                    AlertStore.emit(NOTIFY_EVENT, AlertConstants.WARNING, payload.message);
                 },
 
                 'SHOW_ERROR': function() {
-                    AlertStore.emit(NOTIFY_EVENT, 2, payload.message);
+                    AlertStore.emit(NOTIFY_EVENT, AlertConstants.ERROR, payload.message);
                 },
 
                 'SHOW_POPUP_INFO': function() {
-                    AlertStore.emit(POPUP_EVENT, 0, payload.id, payload.message);
+                    AlertStore.emit(POPUP_EVENT, AlertConstants.INFO, payload.id, payload.message);
                 },
 
                 'SHOW_POPUP_WARNING': function() {
-                    AlertStore.emit(POPUP_EVENT, 1, payload.id, payload.message);
+                    AlertStore.emit(POPUP_EVENT, AlertConstants.WARNING, payload.id, payload.message);
                 },
 
                 'SHOW_POPUP_ERROR': function() {
-                    AlertStore.emit(POPUP_EVENT, 2, payload.id, payload.message);
+                    AlertStore.emit(POPUP_EVENT, AlertConstants.ERROR, payload.id, payload.message);
                 },
 
                 'NOTIFY_RETRY': function() {

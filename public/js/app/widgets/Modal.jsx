@@ -41,7 +41,9 @@ define([
         },
 
         onOpen: function() {
-            this.props.onOpen(this);
+            if(this.props.onOpen) {
+                this.props.onOpen(this);
+            }
         },
 
         _onClose: function(e) {
