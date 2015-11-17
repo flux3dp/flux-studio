@@ -1,5 +1,6 @@
 define([
     'app/dispatcher/Alert-Dispatcher',
+    'app/constants/Alert-Constants',
     'events',
     'helpers/object-assign'
 ], function(
