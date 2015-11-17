@@ -202,7 +202,7 @@ define([
                                 <input type="number" min="0" max="360" ref="objectAngle" data-type="angle"
                                     defaultValue={props.angle} value={props.angle}
                                     onChange={this._onTransform}/>
-                            </div>label
+                            </div>
                         </label>
                     </label>
                     {thresholdRange}
