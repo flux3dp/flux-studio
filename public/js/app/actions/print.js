@@ -67,7 +67,7 @@ define([
         shininess: 100
     });
 
-    var advancedParameters = ['layerHeight', 'infill', 'travelingSpeed', 'extrudingSpeed', 'temperature', 'advancedSettings'];
+    // var advancedParameters = ['layerHeight', 'infill', 'travelingSpeed', 'extrudingSpeed', 'temperature', 'advancedSettings'];
 
     previewColors[0] = new THREE.Color(0x996633); // infill
     previewColors[1] = new THREE.Color(0xddcc99); // perimeter
@@ -593,6 +593,12 @@ define([
     function getFCode() {
         var d = $.Deferred();
         var ids = [];
+
+        if(!blobExpired) {
+            d.resolve(responseBlob);
+            return d.promise();
+        }
+
         objects.forEach(function(obj) {
             ids.push(obj.uuid);
         });
@@ -715,25 +721,17 @@ define([
         render();
     }
 
-    function setAdvanceParameter(settings, index) {
-        index = index || 0;
-        var name = advancedParameters[index],
-            value = settings[name] || 'default';
-
-        if (index < advancedParameters.length) {
-            slicer.setParameter(name, value).then(function(result) {
-                if (result.status === 'error') {
-                    index = advancedParameters.length;
-                    // todo: error logging
-                    console.log(result.error);
-                }
-                if (index < advancedParameters.length) {
-                    setAdvanceParameter(settings, index + 1);
-                } else {
-                    return;
-                }
-            });
-        }
+    function setAdvanceParameter(settings) {
+        var _settings = Object.keys(settings).map(function(key) {
+            return `${key}=${settings[key]} \n`;
+        });
+        slicer.setParameter('advancedSettings', _settings.join('')).then(function(result) {
+            if (result.status === 'error') {
+                index = keys.length;
+                // todo: error logging
+                console.log(result.error);
+            }
+        });
         blobExpired = true;
     }
 
@@ -1130,14 +1128,14 @@ define([
         var go = function(blob) {
             var control_methods = printerController(serial);
             control_methods.upload(blob.size, blob);
-            d.resolve('');
+            d.resolve(blob);
         };
 
         if (!blobExpired) {
             go(responseBlob);
         }
         else {
-            getGCode().then(function(result) {
+            getFCode().then(function(result) {
                 if (result instanceof Blob) {
                     go(result);
                 }
@@ -1154,6 +1152,10 @@ define([
             camera: camera
         });
         panningOffset = camera.position.clone().sub(camera.position.raw);
+    }
+
+    function clearSelection() {
+        selectObject(null);
     }
 
     function render() {
@@ -1428,10 +1430,12 @@ define([
         setAdvanceParameter : setAdvanceParameter,
         setParameter        : setParameter,
         getGCode            : getGCode,
+        getFCode            : getFCode,
         getModelCount       : getModelCount,
         togglePreview       : togglePreview,
         changePreviewLayer  : changePreviewLayer,
         executePrint        : executePrint,
-        setCameraPosition   : setCameraPosition
+        setCameraPosition   : setCameraPosition,
+        clearSelection      : clearSelection
     };
 });

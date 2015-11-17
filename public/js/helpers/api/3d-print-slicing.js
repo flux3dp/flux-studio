@@ -74,14 +74,14 @@ define([
                 events.onMessage = function(result) {
                     callback(result);
                 };
-                ws.send('go ' + nameArray.join(' ') + ' g');
+                ws.send('go ' + nameArray.join(' ') + ' -g');
                 lastOrder = 'go';
             },
             goF: function(nameArray, callback) {
                 events.onMessage = function(result) {
                     callback(result);
                 };
-                ws.send('go ' + nameArray.join(' ') + ' f');
+                ws.send('go ' + nameArray.join(' ') + ' -f');
                 lastOrder = 'go';
             },
             setParameter: function(name, value) {
@@ -90,7 +90,7 @@ define([
                     d.resolve(result);
                 };
 
-                if(name === 'advancedSettings' && value != '') {
+                if(name === 'advancedSettings' && value !== '') {
                     ws.send(`advanced_setting ${value}`);
                 }
                 else {

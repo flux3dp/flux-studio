@@ -209,11 +209,12 @@ define(function() {
                 solidLayerBottom: 'Solid Layer: Bottom',
                 density: 'Density',
                 pattern: 'Pattern',
-                auto: 'Auto',
-                line: 'Line',
-                rectilinear: 'Rectilinear',
-                honeycomb: 'Honeycomb',
+                auto: 'auto',                       // do not change
+                line: 'line',                       // do not change
+                rectilinear: 'rectilinear',         // do not change
+                honeycomb: 'honeycomb',             // do not change
                 blackMagic: 'Black Magic',
+                spiral: 'Spiral',
                 generalSupport: 'General Support',
                 spacing: 'Spacing',
                 overhang: 'Overhang',
@@ -349,12 +350,20 @@ define(function() {
                 raft_off: 'RAFT OFF',
                 support_on: 'SUPPORT ON',
                 support_off: 'SUPPORT OFF',
-                advanced: 'ADVANCED'
+                advanced: 'ADVANCED',
+                plaTitle: 'PICK THE COLOR OF THE FILAMENT'
             },
             right_panel: {
                 get: 'Get',
                 go: 'Go',
                 preview: '預覽'
+            },
+            quality: {
+                high: 'High Quality',
+                good: 'Good Quality',
+                normal: 'Normal Quality',
+                quick: 'Quick Quality',
+                fast: 'Fast Quality'
             },
             quick_print: 'Quick Print',
             scale: '比例',
@@ -597,7 +606,24 @@ define(function() {
         },
         alert: {
             caption: '錯誤',
-            duplicated_preset_name: '重複的Preset名稱'
+            duplicated_preset_name: '重複的Preset名稱',
+            info: '訊息',
+            warning: '警告',
+            error: '錯誤'
+        },
+        color: {
+            green: 'GREEN',
+            red: 'RED',
+            black: 'BLACK',
+            turquoise: 'TURQUOISE',
+            orange: 'ORANGE',
+            gray: 'GRAY',
+            blue: 'BLUE',
+            brown: 'BROWN',
+            white: 'WHITE',
+            purple: 'PURPLE',
+            yellow: 'YELLOW',
+            transparent: 'TRANSPARENT'
         }
     };
 });

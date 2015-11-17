@@ -209,11 +209,12 @@ define(function() {
                 solidLayerBottom: 'Solid Layer: Bottom',
                 density: 'Density',
                 pattern: 'Pattern',
-                auto: 'Auto',
-                line: 'Line',
-                rectilinear: 'Rectilinear',
-                honeycomb: 'Honeycomb',
+                auto: 'auto',                       // do not change
+                line: 'line',                       // do not change
+                rectilinear: 'rectilinear',         // do not change
+                honeycomb: 'honeycomb',             // do not change
                 blackMagic: 'Black Magic',
+                spiral: 'Spiral',
                 generalSupport: 'General Support',
                 spacing: 'Spacing',
                 overhang: 'Overhang',
@@ -232,9 +233,9 @@ define(function() {
                 config: 'Config',
                 presets: 'Presets',
                 name: 'Name',
-                loadPreset: 'LOAD PRESET',
+                loadPreset: 'LOAD',
                 apply: 'APPLY',
-                saveAsPreset: 'SAVE AS PRESET',
+                saveAsPreset: 'SAVE AS',
                 cancel: 'CANCEL',
                 saveAndApply: 'SAVE & APPLY'
             },
@@ -349,12 +350,21 @@ define(function() {
                 raft_off: 'RAFT OFF',
                 support_on: 'SUPPORT ON',
                 support_off: 'SUPPORT OFF',
-                advanced: 'ADVANCED'
+                advanced: 'ADVANCED',
+                plaTitle: 'PICK THE COLOR OF THE FILAMENT',
+                transparent: 'TRANSPARENT'
             },
             right_panel: {
                 get: 'Get',
                 go: 'Go',
                 preview: 'Preview'
+            },
+            quality: {
+                high: 'HIGH QUALITY',
+                good: 'GOOD QUALITY',
+                normal: 'NORMAL QUALITY',
+                quick: 'QUICK QUALITY',
+                fast: 'FAST QUALITY'
             },
             quick_print: 'Quick Print',
             scale: 'Scale',
@@ -597,7 +607,24 @@ define(function() {
         },
         alert: {
             caption: 'Error',
-            duplicated_preset_name: 'Duplicated preset name'
+            duplicated_preset_name: 'Duplicated preset name',
+            info: 'INFO',
+            warning: 'WARNING',
+            error: 'ERROR'
+        },
+        color: {
+            green: 'GREEN',
+            red: 'RED',
+            black: 'BLACK',
+            turquoise: 'TURQUOISE',
+            orange: 'ORANGE',
+            gray: 'GRAY',
+            blue: 'BLUE',
+            brown: 'BROWN',
+            white: 'WHITE',
+            purple: 'PURPLE',
+            yellow: 'YELLOW',
+            transparent: 'TRANSPARENT'
         }
     };
 });

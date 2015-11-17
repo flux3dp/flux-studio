@@ -27,7 +27,46 @@
     .modal-body {
         @include flexbox();
         max-height: 100%;
-        overflow: scroll;
+        overflow: hidden;
+    }
+
+    .notification {
+        width: 32.2rem;
+        height: 25rem;
+        background-color: #FFFFFF;
+        position: relative;
+
+        .modal-content {
+            height: 80%;
+
+            .wrapper {
+                display:-webkit-box;
+                -webkit-box-pack:center;
+                -webkit-box-align:center;
+                text-align: center;
+            }
+
+            h4 {
+                margin: 0;
+                font-size: 2em;
+                color: #B3B3B3;
+                display: inline-block;
+            }
+
+            span {
+                font-size: 1.8em;
+                color: #B3B3B3;
+                display: inline-block;
+                padding: 0 21px;
+                min-width: 400px;
+            }
+        }
+
+        .btn {
+            color: #B3B3B3;
+            border: 1px solid #B3B3B3;
+            width: 13rem;
+        }
     }
 
     .modal-alert {
