@@ -281,9 +281,9 @@ define([
                     <input className="popup-open" name="popup-open" type="checkbox" onClick={this.openSubPopup}/>
                     <div className="display-text">
                         <p>
-                            {lang.laser.print_params.object_height.text}
-                            {this.state.defaults.objectHeight}
-                            {lang.laser.print_params.object_height.unit}
+                            <span className="caption">{lang.laser.print_params.object_height.text}</span>
+                            <span>{this.state.defaults.objectHeight}</span>
+                            <span>{lang.laser.print_params.object_height.unit}</span>
                         </p>
                     </div>
                     <label className="popup">
@@ -300,7 +300,7 @@ define([
                                 />
                             </li>
                             <li>
-                                AUTODETECTION
+                                AUTO
                             </li>
                         </ul>
                     </label>
@@ -316,8 +316,8 @@ define([
                     <input className="popup-open" name="popup-open" type="checkbox" onClick={this.openSubPopup}/>
                     <div className="display-text">
                         <p>
-                            <span>{lang.laser.advanced.form.object_options.text}</span>
-                            <span className="material-label">{this.state.defaults.material.label}</span>
+                            <span className="caption">{lang.laser.advanced.form.object_options.text}</span>
+                            <span>{this.state.defaults.material.label}</span>
                         </p>
                     </div>
                     <label className="popup">
