@@ -861,12 +861,17 @@ input.switch:checked ~ label:after {
 
     }
     .previewPanel {
-        position: absolute;
-        right: 13%;
-        top: 15%;
+        position: relative;
+        width: 50px;
+        background-color: #FFFFFF;
+        height: 200px;
+        overflow-y: hidden;
         input {
             width: 150px;
             transform: rotate(270deg);
+            position: absolute;
+            top: 90px;
+            left: -50px;
         }
         div {
             text-align: right;
@@ -915,12 +920,11 @@ input.switch:checked ~ label:after {
     }
     .leftPanel {
         position: absolute;
-        width: 300px;
+        width: 220px;
         height: 300px;
         top: 50%;
         margin-top: -150px;
         ul {
-            position: absolute;
             list-style-type: none;
             padding-left: 3.75rem;
             li {
@@ -974,11 +978,12 @@ input.switch:checked ~ label:after {
                 line-height: 40px;
                 padding: 0 16px 0 6px;
                 cursor: pointer;
+                width: 100%;
 
                 p {
                     display: block;
                     margin: 0;
-                    width: 220px;
+                    width: 175px;
                 }
             }
 
@@ -1088,6 +1093,9 @@ input.switch:checked ~ label:after {
                             font-size: 16px;
                         }
                     }
+                }
+                .content.preview {
+                    width: 50px;
                 }
             }
         }

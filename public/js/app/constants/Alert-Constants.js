@@ -1,5 +1,8 @@
 define([], function(){
     return {
+        INFO                : 'INFO',
+        WARNING             : 'WARNING',
+        ERROR               : 'ERROR',
         SHOW_INFO           : 'SHOW_INFO',
         SHOW_WARNING        : 'SHOW_WARNING',
         SHOW_ERROR          : 'SHOW_ERROR',

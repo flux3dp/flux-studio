@@ -16,33 +16,31 @@ define([
         defaultDistance, offsetRatio;
 
     function init(src) {
-        reactSrc        = src;
-        container       = document.getElementById('cameraViewController');
-        camera          = new THREE.PerspectiveCamera(60, controllerWidth / controllerHeight, 1, 30000);
-        camera.up       = new THREE.Vector3(0, 0, 1);
-        defaultDistance = camera.position.length();
-        offsetRatio     = Math.sqrt(Math.pow(camera.position.x, 2) + Math.pow(camera.position.y, 2) + Math.pow(camera.position.z, 2)) / defaultDistance;
+        reactSrc = src;
+        container = document.getElementById('cameraViewController');
 
+        camera = new THREE.PerspectiveCamera(60, controllerWidth / controllerHeight, 1, 30000);
         camera.position.set(0, -300, 110);
+        camera.up = new THREE.Vector3(0, 0, 1);
+        defaultDistance = camera.position.length();
+        offsetRatio = Math.sqrt(Math.pow(camera.position.x, 2) + Math.pow(camera.position.y, 2) + Math.pow(camera.position.z, 2)) / defaultDistance;
+
         scene = new THREE.Scene();
 
-        var geometry            = new THREE.BoxGeometry(150, 150, 150),
-            front               = new THREE.MeshBasicMaterial({ map: THREE.ImageUtils.loadTexture('img/pc-front.png') }),
-            back                = new THREE.MeshBasicMaterial({ map: THREE.ImageUtils.loadTexture('img/pc-back.png') }),
-            left                = new THREE.MeshBasicMaterial({ map: THREE.ImageUtils.loadTexture('img/pc-left.png') }),
-            right               = new THREE.MeshBasicMaterial({ map: THREE.ImageUtils.loadTexture('img/pc-right.png') }),
-            top                 = new THREE.MeshBasicMaterial({ map: THREE.ImageUtils.loadTexture('img/pc-top.png') }),
-            bottom              = new THREE.MeshBasicMaterial({ map: THREE.ImageUtils.loadTexture('img/pc-bottom.png') }),
-            meshFaceMaterial    = new THREE.MeshFaceMaterial([right, left, back, front, top, bottom]);
-            cube                = new THREE.Mesh(geometry, meshFaceMaterial);
+        var geometry = new THREE.BoxGeometry(150, 150, 150);
+        // var material = new THREE.MeshBasicMaterial({
+        //     color: 0xAAAAAA,
+        //     wireframe: false
+        // });
+        var front = new THREE.MeshBasicMaterial({ map: THREE.ImageUtils.loadTexture('img/pc-front.png') }),
+            back = new THREE.MeshBasicMaterial({ map: THREE.ImageUtils.loadTexture('img/pc-back.png') }),
+            left = new THREE.MeshBasicMaterial({ map: THREE.ImageUtils.loadTexture('img/pc-left.png') }),
+            right = new THREE.MeshBasicMaterial({ map: THREE.ImageUtils.loadTexture('img/pc-right.png') }),
+            top = new THREE.MeshBasicMaterial({ map: THREE.ImageUtils.loadTexture('img/pc-top.png') }),
+            bottom = new THREE.MeshBasicMaterial({ map: THREE.ImageUtils.loadTexture('img/pc-bottom.png') }),
+            meshFaceMaterial = new THREE.MeshFaceMaterial([right, left, back, front, top, bottom]);
 
-        front.map.minFilter     = THREE.LinearFilter;
-        back.map.minFilter      = THREE.LinearFilter;
-        left.map.minFilter      = THREE.LinearFilter;
-        right.map.minFilter     = THREE.LinearFilter;
-        top.map.minFilter       = THREE.LinearFilter;
-        bottom.map.minFilter    = THREE.LinearFilter;
-
+        var cube = new THREE.Mesh(geometry, meshFaceMaterial);
         scene.add(cube);
 
         THREE.DefaultLoadingManager.onLoad = function () {
