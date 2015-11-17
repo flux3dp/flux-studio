@@ -18,13 +18,27 @@
             size: 13px;
         }
         .radio {
-            width: 15px;
-            height: 15px;
-            background-color: #E0E0DF;
-            background-size: 15px 15px;
-            display: inline-block;
-            margin-right: 15px;
+            >div {
+                width: 15px;
+                height: 15px;
+                background-image: url('/img/icon-radio-off.png');
+                background-size: 15px 15px;
+                display: inline-block;
+                margin-right: 15px;
+                cursor: pointer;
+            }
+
+            .selected {
+                background-image: url('/img/icon-radio-on.png');
+            }
+            .grey-out {
+                cursor: auto;
+            }
+            .grey-out + span {
+                color: #E0E0E0;
+            }
         }
+
         .switch-container {
             margin-left: 30px;
             position: relative;
@@ -74,7 +88,9 @@
             font-size: 15px;
             color: #B3B3B3;
         }
-        input[type=text] {
+        input[type="text"],
+        input[type="password"],
+        input[type="number"] {
             padding-left: 10px;
             border: 2px solid #E0E0DF;
         }

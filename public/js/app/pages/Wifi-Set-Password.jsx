@@ -1,95 +1,148 @@
 define([
     'jquery',
     'react',
-    'helpers/local-storage',
+    'app/actions/initialize-machine',
+    'jsx!widgets/Button-Group',
     'jsx!widgets/Modal',
+    'jsx!widgets/Alert',
     'helpers/api/usb-config'
-], function($, React, localStorage, Modal, usbConfig) {
+], function($, React, initializeMachine, ButtonGroup, Modal, Alert, usbConfig) {
     'use strict';
 
     return function(args) {
         args = args || {};
 
         var Page = React.createClass({
-            getInitialState: function() {
-                return args.state;
-            },
 
-            _getWifi: function() {
-                return localStorage.get('setting-wifi');
+            // UI events
+            _onCancelConnection: function(e) {
+                var wifi = initializeMachine.settingWifi.get();
+
+                delete wifi.plain_password;
+                initializeMachine.settingWifi.set(wifi);
+
+                location.hash = '#initialize/wifi/select';
             },
 
             _handleSetPassword: function(e) {
-                e.preventDefault();
-
-                var wifi = this._getWifi(),
+                var self = this,
+                    wifi = initializeMachine.settingWifi.get(),
                     usb = usbConfig(),
-                    password = this.refs.password.getDOMNode().value;
+                    lang = self.state.lang,
+                    password = wifi.plain_password,
+                    checkTimes = 10,    // check network per second, 10 times in maximum.
+                    checkCountdown = function(callback) {
+                        if (0 === checkTimes) {
+                            genericFailureHandler();
+                            callback();
+                        }
+
+                        checkTimes--;
+                    },
+                    genericFailureHandler = function() {
+                        self._openAlert(true)();
+
+                        self.setState({
+                            alertContent: {
+                                caption: lang.initialize.errors.error,
+                                message: lang.initialize.errors.wifi_connection.connecting_fail
+                            }
+                        });
+                    },
+                    checkNetworkStatus = function() {
+                        var methods = usb.getMachineNetwork({
+                                onSuccess: function(response) {
+                                    response.ipaddr = response.ipaddr || [];
+                                    response.ssid = response.ssid || '';
+
+                                    if (0 < response.ipaddr.length && '' !== response.ssid) {
+                                        methods.stop();
+                                        location.hash = '#initialize/wifi/setup-complete';
+                                    }
+                                    else {
+                                        checkCountdown(methods.stop);
+                                    }
+                                },
+                                onError: function(response) {
+                                    checkCountdown(methods.stop);
+                                }
+                            });
+                    };
 
                 usb.setWifiNetwork(wifi, password, {
                     onSuccess: function(response) {
-                        location.hash = '#initialize/wifi/success';
+                        checkNetworkStatus();
                     },
                     onError: function(response) {
-                        location.hash = '#initialize/wifi/failure';
+                        genericFailureHandler();
                     }
                 });
 
             },
 
-            _renderForm: function(lang, wifi) {
-                return (
-                    <form className="wifi-form">
-                        <h2>
-                            {lang.wifi.set_password.line1}
-                            {wifi.ssid}
-                            {lang.wifi.set_password.line2}
-                        </h2>
-                        <div>
-                            <input ref="password" type="password" data-
-                            placeholder={lang.wifi.set_password.password_placeholder} defaultValue="" autoFocus={true}/>
-                        </div>
-                        <div className="btn-h-group btn-align-center-h-group">
-                            <a href="#initialize/wifi/select" className="btn btn-default">{lang.wifi.set_password.back}</a>
-                            <button onClick={this._handleSetPassword} className="btn btn-action">{lang.wifi.set_password.join}</button>
-                        </div>
-                    </form>
-                );
+            _openAlert: function(open) {
+                var self = this;
+
+                return function() {
+                    self.setState({
+                        openAlert: open
+                    });
+                }
             },
 
-            _renderNoSsidSeleted: function(lang) {
-                return (
-                    <div className="wifi-form">
-                        <h2>
-                            {lang.wifi.set_password.no_selected}
-                        </h2>
-                        <div className="btn-h-group btn-align-center-h-group">
-                            <a href="#initialize/wifi/select" className="btn btn-default">{lang.wifi.set_password.back}</a>
-                        </div>
-                    </div>
-                );
+            // Lifecycle
+            getInitialState: function() {
+                return {
+                    lang: args.state.lang,
+                    openAlert: false,
+                    alertContent: {}
+                };
             },
 
-            render : function() {
-                var wifi = this._getWifi(),
-                    lang = this.state.lang,
-                    form = (
-                        '' === wifi.ssid ?
-                        this._renderNoSsidSeleted(lang) :
-                        this._renderForm(lang, wifi)
-                    ),
+            _renderAlert: function(lang) {
+                var self = this,
+                    buttons = [{
+                        label: lang.initialize.confirm,
+                        className: 'btn-action',
+                        onClick: function(e) {
+                            self._openAlert(false)();
+                            location.hash = '#initialize/wifi/select';
+                        }
+                    }],
                     content = (
-                        <div className="wifi initialization text-center">
-                            <h1>{lang.welcome_headline}</h1>
-                            <img className="wifi-symbol" src="/img/img-wifi-lock.png"/>
-                            {form}
+                        <Alert caption={this.state.alertContent.caption} message={this.state.alertContent.message} buttons={buttons}/>
+                    );
+
+                return (
+                    true === this.state.openAlert ?
+                    <Modal content={content}/> :
+                    ''
+                );
+            },
+
+            render: function() {
+                var wrapperClassName = {
+                        'initialization': true
+                    },
+                    lang = this.state.lang,
+                    alert = this._renderAlert(lang),
+                    content = (
+                        <div className="connecting-wifi text-center">
+                            <h1>{lang.initialize.connecting}</h1>
+                            <div className="spinner-roller"/>
+                            <button className="btn btn-action btn-large" onClick={this._onCancelConnection}>{lang.initialize.cancel}</button>
+                            {alert}
                         </div>
                     );
 
                 return (
-                    <Modal content={content}/>
+                    <Modal className={wrapperClassName} content={content}/>
                 );
-            }
+            },
+
+            componentDidMount: function() {
+                this._handleSetPassword();
+            },
         });
 
         return Page;

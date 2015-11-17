@@ -3,8 +3,8 @@ define([
     'react',
     'plugins/classnames/index',
     'helpers/api/control',
-    'helpers/api/3d-scan-control',
-], function($, React, ClassNames, control, scanControl) {
+    'helpers/api/3d-scan-control'
+], function($, React, ClassNames, control, scanControl, director) {
     'use strict';
 
     var controller,
@@ -14,7 +14,9 @@ define([
         scrollSize = 10,
         currentLevelFiles = [],
         filesInfo = [],
-        cameraSource;
+        cameraSource,
+        remote,
+        report;
 
     var mode = {
         preview: 1,
@@ -31,13 +33,21 @@ define([
         }
     };
 
+    var status = {
+        ready   : 0,
+        printing: 1,
+        paused  : 2
+    };
+
     return React.createClass({
 
         propTypes: {
-            lang: React.PropTypes.object,
-            onClose: React.PropTypes.func,
-            selectedPrinter: React.PropTypes.object,
-            previewUrl: React.PropTypes.string
+            lang            : React.PropTypes.object,
+            onClose         : React.PropTypes.func,
+            selectedPrinter : React.PropTypes.object,
+            previewUrl      : React.PropTypes.string,
+            fcode           : React.PropTypes.object,
+            controller      : React.PropTypes.object
         },
 
         getInitialState: function() {
@@ -51,7 +61,9 @@ define([
                 mode                : mode.preview,
                 directoryContent    : {},
                 cameraImageUrl      : '',
-                selectedFileName    : ''
+                selectedFileName    : '',
+                currentStatus       : status.ready,
+                printerStatus       : ''
             };
         },
 
@@ -67,17 +79,16 @@ define([
                 };
 
             pathArray = [];
-            controller = control(this.props.selectedPrinter.serial);
+            controller = this.props.controller;
         },
 
         componentWillUnmount: function() {
             if(cameraSource) { cameraSource.stop(); }
             this._closeConnection(scanController);
-            this._closeConnection(controller);
         },
 
-        _closeConnection: function(controller) {
-            if(typeof controller !== 'undefined') { controller.connection.close(false); }
+        _closeConnection: function(c) {
+            if(typeof c !== 'undefined') { c.connection.close(false); }
         },
 
         _handleClose: function() {
@@ -145,10 +156,68 @@ define([
                 onError: function() {
 
                 }
-            }
+            };
 
             scanController = scanControl(this.props.selectedPrinter.serial, opts);
             this.setState({ waiting: true });
+        },
+
+        _handleGo: function() {
+            if(this.state.currentStatus === status.ready) {
+                var blob = this.props.fCode;
+                remote = controller.upload(blob.size, blob, {
+                    onFinished: function(result) {
+                        console.log(result);
+                    }
+                });
+                this.setState({ currentStatus: status.printing }, function() {
+                    this._startReport();
+                });
+            }
+            else {
+                this.setState({ currentStatus: status.printing }, function() {
+                    remote.resume();
+                });
+            }
+        },
+
+        _handlePause: function() {
+            this.setState({ currentStatus: status.paused }, function() {
+                remote.pause();
+            });
+        },
+
+        _handleStop: function() {
+            controller.abort();
+            controller.quit().then(function() {
+                this._stopReport();
+                this.setState({ currentStatus: status.ready });
+            }.bind(this));
+        },
+
+        _startReport: function() {
+            var self = this;
+            report = setInterval(function() {
+                controller.report({
+                    onFinished: function(data) {
+                        self._processReport(data);
+                    }
+                });
+            }, 5000);
+        },
+
+        _processReport: function(data) {
+            var _data = data.replace(/NaN/g, ''),
+                printer = JSON.parse(_data);
+
+            this.setState({
+                temperature: printer.rt,
+                printerStatus: printer.st_label
+            });
+        },
+
+        _stopReport: function() {
+            clearInterval(report);
         },
 
         _processImage: function(image_blobs, mime_type) {
@@ -304,10 +373,49 @@ define([
             }
         },
 
+        _renderCommand: function() {
+            var self = this;
+            var commands = {
+                '0': function() {
+                    return (
+                        <div className="controls center" onClick={self._handleGo}>
+                            <div className="icon"><i className="fa fa-play fa-2x"></i></div>
+                            <div className="description">GO</div>
+                        </div>
+                    );
+                },
+
+                '1': function() {
+                    return (
+                        <div className="controls center" onClick={self._handlePause}>
+                            <div className="icon"><i className="fa fa-pause fa-2x"></i></div>
+                            <div className="description">PAUSE</div>
+                        </div>
+                    );
+                },
+
+                '2': function() {
+                    return (
+                        <div className="controls center" onClick={self._handleGo}>
+                            <div className="icon"><i className="fa fa-play fa-2x"></i></div>
+                            <div className="description">GO</div>
+                        </div>
+                    );
+                },
+            }
+
+            if(typeof commands[this.state.currentStatus] !== 'function') {
+                throw new Error('Invalid Status');
+            }
+
+            return commands[this.state.currentStatus]();
+        },
+
         render: function() {
             var lang        = this.props.lang.monitor,
                 content     = this._renderContent(),
-                waitIcon    = this.state.waiting ? this._renderSpinner() : '';
+                waitIcon    = this.state.waiting ? this._renderSpinner() : '',
+                command     = this._renderCommand();
 
             return (
                 <div className="flux-monitor">
@@ -331,14 +439,11 @@ define([
                             </div>
                         </div>
                         <div className="operation">
-                            <div className="controls left">
+                            <div className="controls left" onClick={this._handleStop}>
                                 <div className="icon"><i className="fa fa-stop fa-2x"></i></div>
                                 <div className="description">STOP</div>
                             </div>
-                            <div className="controls center">
-                                <div className="icon"><i className="fa fa-play fa-2x"></i></div>
-                                <div className="description">GO</div>
-                            </div>
+                            {command}
                             <div className="controls right">
                                 <div className="icon"><i className="fa fa-circle fa-2x"></i></div>
                                 <div className="description">RECORD</div>
@@ -352,11 +457,11 @@ define([
                                     3D PRINTER
                                 </div>
                                 <div className="status right">
-                                    WORKING
+                                    {this.state.printerStatus}
                                 </div>
                             </div>
                             <div className="row">
-                                <div className="temperature">temperature</div>
+                                <div className="temperature">{this.state.temperature}</div>
                                 <div className="time-left right">1 hour 30 min</div>
                             </div>
                         </div>

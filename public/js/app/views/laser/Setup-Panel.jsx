@@ -28,7 +28,12 @@ define([
     'use strict';
 
     return React.createClass({
-        _advancedSettings: undefined,
+
+        getDefaultProps: function() {
+            return {
+                defaults: React.PropTypes.object
+            };
+        },
 
         // UI Events
         _togglePanel: function(name, open) {
@@ -115,6 +120,8 @@ define([
         },
 
         _onPickupMaterial: function(e) {
+            e.preventDefault();
+
             var self = this,
                 chooseMaterial;
 
@@ -132,25 +139,25 @@ define([
             }
         },
 
-        _onOpenSubPopup: function(e) {
+        openSubPopup: function(e) {
             var $me = $(e.currentTarget),
                 $popupOpen = $('.popup-open:checked').not($me);
 
             $popupOpen.removeAttr('checked');
         },
 
-        _refreshObjectHeight: function(value) {
+        _refreshObjectHeight: function(e, value) {
             this._saveLastestSet({ objectHeight: value });
+            this.openSubPopup(e);
         },
 
         // Lifecycle
         _renderCustomPresets: function(lang) {
             var self = this,
-                // TODO: remove pseudo entry
                 customPresets = config().read('laser-custom-presets') || [],
                 buttons = [{
                     label: lang.laser.advanced.apply,
-                    className: (false === self.state.hasSelectedPreset ? 'btn-disabled' : ''),
+                    className: 'btn-default' + (false === self.state.hasSelectedPreset ? ' btn-disabled' : ''),
                     onClick: function(e) {
                         var elCustomPresets = self.refs.customPresets.getDOMNode();
 
@@ -235,7 +242,7 @@ define([
                             </span>
                     </div>
                     <ButtonGroup
-                        className="custom-preset-buttons"
+                        className="btn-h-group custom-preset-buttons"
                         buttons={buttons}
                     />
                 </div>
@@ -271,12 +278,12 @@ define([
         _renderObjectHeight: function(lang) {
             return (
                 <label className="popup-selection">
-                    <input className="popup-open" name="popup-open" type="checkbox" onClick={this._onOpenSubPopup}/>
+                    <input className="popup-open" name="popup-open" type="checkbox" onClick={this.openSubPopup}/>
                     <div className="display-text">
                         <p>
-                            {lang.laser.print_params.object_height.text}
-                            {this.state.defaults.objectHeight}
-                            {lang.laser.print_params.object_height.unit}
+                            <span className="caption">{lang.laser.print_params.object_height.text}</span>
+                            <span>{this.state.defaults.objectHeight}</span>
+                            <span>{lang.laser.print_params.object_height.unit}</span>
                         </p>
                     </div>
                     <label className="popup">
@@ -288,12 +295,12 @@ define([
                             <li>
                                 <UnitInput
                                     defaultUnit="mm"
-                                    defaultValue={this.props.defaults.objectHeight}
+                                    defaultValue={this.state.defaults.objectHeight}
                                     getValue={this._refreshObjectHeight}
                                 />
                             </li>
                             <li>
-                                AUTODETECTION
+                                AUTO
                             </li>
                         </ul>
                     </label>
@@ -306,11 +313,11 @@ define([
 
             return (
                 <label className="popup-selection">
-                    <input className="popup-open" name="popup-open" type="checkbox" onClick={this._onOpenSubPopup}/>
+                    <input className="popup-open" name="popup-open" type="checkbox" onClick={this.openSubPopup}/>
                     <div className="display-text">
                         <p>
-                            <span>{lang.laser.advanced.form.object_options.text}</span>
-                            <span className="material-label">{this.state.defaults.material.label}</span>
+                            <span className="caption">{lang.laser.advanced.form.object_options.text}</span>
+                            <span>{this.state.defaults.material.label}</span>
                         </p>
                     </div>
                     <label className="popup">
@@ -385,12 +392,6 @@ define([
                     {alert}
                 </div>
             );
-        },
-
-        getDefaultProps: function() {
-            return {
-                defaults: React.PropTypes.object
-            };
         },
 
         getInitialState: function() {

@@ -20,7 +20,8 @@ requirejs.config({
         threeCircularGridHelper: 'helpers/CircularGridHelper',
         cssHome: '../css/3rd-party-plugins',
         freetrans: 'plugins/freetrans/jquery.freetrans',
-        html2canvas: 'lib/html2canvas.min'
+        html2canvas: 'lib/html2canvas.min',
+        events: 'lib/events'
     },
 
     jsx: {
@@ -74,6 +75,9 @@ requirejs.config({
                 'css!cssHome/freetrans/jquery.freetrans'
             ],
             exports: 'freetrans'
+        },
+        events: {
+            exports: 'events'
         }
     }
 });

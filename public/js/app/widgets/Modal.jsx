@@ -7,8 +7,43 @@ define([
 
     var View = React.createClass({
 
+        propTypes: {
+            onOpen: React.PropTypes.func,
+            onClose: React.PropTypes.func,
+            content: React.PropTypes.element
+        },
+
+        getDefaultProps: function() {
+            return {
+                onOpen: function() {},
+                onClose: function() {},
+                content: <div/>,
+                disabledEscapeOnBackground: false,
+                className: {}
+            };
+        },
+
+        componentDidMount: function() {
+            var self = this;
+
+            self.onOpen();
+
+            shortcuts.on(
+                ['esc'],
+                function(e) {
+                    self.props.onClose(e);
+                }
+            );
+        },
+
+        componentWillUnmount: function() {
+            shortcuts.off(['esc']);
+        },
+
         onOpen: function() {
-            this.props.onOpen(this);
+            if(this.props.onOpen) {
+                this.props.onOpen(this);
+            }
         },
 
         _onClose: function(e) {
@@ -38,34 +73,7 @@ define([
                     <div className="modal-body">{this.props.content}</div>
                 </div>
             );
-        },
-
-        componentDidMount: function() {
-            var self = this;
-
-            self.onOpen();
-
-            shortcuts.on(
-                ['esc'],
-                function(e) {
-                    self.props.onClose(e);
-                }
-            );
-        },
-
-        componentWillUnmount: function() {
-            shortcuts.off(['esc']);
-        },
-
-        getDefaultProps: function() {
-            return {
-                onOpen: React.PropTypes.func,
-                onClose: React.PropTypes.func,
-                content: React.PropTypes.element,
-                disabledEscapeOnBackground: false,
-                className: {}
-            };
-        },
+        }
     });
 
     return View;

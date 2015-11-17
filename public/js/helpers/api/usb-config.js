@@ -16,12 +16,20 @@ define([
         globalOpts.onClose = globalOpts.onClose || function() {};
 
         var events = {
-            onMessage: function() {}
-        };
+                onMessage: function() {}
+            },
+            reorganizeOptions = function(opts) {
+                opts = opts || {};
+                opts.onSuccess = opts.onSuccess || function() {};
+                opts.onError = opts.onError || function() {};
+
+                return opts;
+            };
 
         if ('undefined' === typeof ws) {
             ws = new Websocket({
-                method: 'usb-config'
+                method: 'usb-config',
+                autoReconnect: false
             });
         }
 
@@ -38,11 +46,9 @@ define([
 
         return {
             connection: ws,
-            // list available machine
+            // list available port
             list: function(opts) {
-                opts = opts || {};
-                opts.onSuccess = opts.onSuccess || function() {};
-                opts.onError = opts.onError || function() {};
+                opts = reorganizeOptions(opts);
 
                 var self = this,
                     goNext = true,
@@ -89,9 +95,7 @@ define([
             },
 
             connect: function(port, opts) {
-                opts = opts || {};
-                opts.onSuccess = opts.onSuccess || function() {};
-                opts.onError = opts.onError || function() {};
+                opts = reorganizeOptions(opts);
 
                 var args = [
                     'connect',
@@ -111,43 +115,33 @@ define([
             },
 
             getWifiNetwork: function(opts) {
-                opts = opts || {};
-                opts.onSuccess = opts.onSuccess || function() {};
-                opts.onError = opts.onError || function() {};
+                opts = reorganizeOptions(opts);
 
-                // TODO: remove fake wifi network
-                var securities = [
-                        '', 'WEP', 'WPA-PSK', 'WPA2-PSK'
-                    ],
-                    items = [],
-                    security;
+                ws.onError(opts.onError);
 
-                // return flux 2.4g
-                items.push({
-                    security: 'WPA2-PSK',
-                    ssid: 'FLUX-2.4',
-                    password: true
-                });
+                events.onMessage = function(data) {
+                    if ('ok' === data.status) {
+                        for (var i in data.wifi) {
+                            data.items = data.items || [];
 
-                for (var i = 0; i < 10; i++) {
-                    security = securities[parseInt(Math.random() * 100 % 4, 10)];
-                    items.push({
-                        security: security,
-                        ssid: 'test-' + i,
-                        password: '' !== security
-                    });
+                            if (true === data.wifi.hasOwnProperty(i)) {
+                                data.items.push({
+                                    security: data.wifi[i].security,
+                                    ssid: data.wifi[i].ssid,
+                                    password: ('' !== data.wifi[i].security)
+                                });
+                            }
+                        };
+
+                        opts.onSuccess(data);
+                    }
                 };
 
-                opts.onSuccess({
-                    status: 'ok',
-                    items: items
-                });
+                ws.send('scan_wifi');
             },
 
             setWifiNetwork: function(wifi, password, opts) {
-                opts = opts || {};
-                opts.onSuccess = opts.onSuccess || function() {};
-                opts.onError = opts.onError || function() {};
+                opts = reorganizeOptions(opts);
 
                 var wifi = {
                         wifi_mode: 'client',
@@ -186,33 +180,33 @@ define([
             },
 
             getMachineNetwork: function(opts) {
-                opts = opts || {};
-                opts.onSuccess = opts.onSuccess || function() {};
-                opts.onError = opts.onError || function() {};
+                opts = reorganizeOptions(opts);
 
                 ws.onError(opts.onError);
+
+                var sendCommand = function() {
+                    ws.send('get network');
+                };
 
                 events.onMessage = function(data) {
                     if ('ok' === data.status) {
                         opts.onSuccess(data);
                     }
+
+                    sendCommand();
                 };
 
-                var timer = setInterval(function() {
-                    ws.send('get network');
-                }, 1000);
+                sendCommand();
 
                 return {
                     stop: function() {
-                        clearInterval(timer);
+                        sendCommand = function() {};
                     }
                 };
             },
 
             setMachine: function(opts) {
-                opts = opts || {};
-                opts.onSuccess = function() {};
-                opts.onError = opts.onError || function() {};
+                opts = reorganizeOptions(opts);
 
                 var args;
 
@@ -253,9 +247,7 @@ define([
             },
 
             setAPMode: function(opts) {
-                opts = opts || {};
-                opts.onSuccess = opts.onSuccess || function() {};
-                opts.onError = opts.onError || function() {};
+                opts = reorganizeOptions(opts);
 
                 var args = [
                     'set network',
@@ -277,9 +269,7 @@ define([
 
             auth: function(password, opts) {
                 password = password || '';
-                opts = opts || {};
-                opts.onSuccess = opts.onSuccess || function() {};
-                opts.onError = opts.onError || function() {};
+                opts = reorganizeOptions(opts);
 
                 var args = [
                     'auth'

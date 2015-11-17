@@ -1,59 +1,16 @@
 define([
     'react',
     'helpers/i18n',
-    'helpers/local-storage',
     'jsx!widgets/Select',
-    'jsx!widgets/Modal',
-    'helpers/api/config',
-    'helpers/api/usb-config'
-], function(React, i18n, localStorage, SelectView, Modal, config, usbConfig) {
+    'jsx!widgets/Modal'
+], function(React, i18n, SelectView, Modal) {
     'use strict';
 
     return function(args) {
         args = args || {};
 
         return React.createClass({
-            // UI events
-            _onSkipSettingUp: function(e) {
-                var goNext = function() {
-                    location.hash = '#studio/print/';
-                };
-
-                config().write('printer-is-ready', true, {
-                    onFinished: function() {
-                        goNext();
-                    }
-                });
-            },
-
-            _onStartingSetUp: function(e) {
-                var self = this,
-                    usb = usbConfig(),
-                    toggleBlocker = function(open) {
-                        self.setState({
-                            openBlocker: open
-                        });
-                    },
-                    goNext = function(printer) {
-                        // temporary store for setup
-                        localStorage.set('setting-printer', printer);
-                        location.hash = '#initialize/wifi/ask';
-                    };
-
-                toggleBlocker(true);
-
-                usb.list({
-                    onSuccess: function(response) {
-                        toggleBlocker(false);
-                        goNext(response);
-                    },
-                    onError: function(response) {
-                        toggleBlocker(false);
-                        // TODO: when this function is fired that means no machine available.
-                    }
-                });
-            },
-
+            // Private methods
             _getLanguageOptions: function() {
                 var options = [];
 
@@ -68,53 +25,36 @@ define([
                 return options;
             },
 
-            // renders
-            _renderBlocker: function() {
-                var content = (
-                    <div className="spinner-flip"/>
-                );
-
-                return (
-                    true === this.state.openBlocker ?
-                    <Modal content={content} disabledEscapeOnBackground={false}/> :
-                    ''
-                );
-            },
-
-            render : function() {
+            // Lifecycle
+            render: function() {
                 var lang = this.state.lang,
-                    blocker = this._renderBlocker(),
                     options = this._getLanguageOptions(),
+                    wrapperClassName = {
+                        'initialization': true
+                    },
                     content = (
-                        <div className="welcome initialization text-center">
-                            <h1>{lang.welcome_headline}</h1>
-                            <img className="brand-image" src="/img/wel-flux-logo.png"/>
+                        <div className="home text-center">
+                            <img className="brand-image" src="/img/menu/main_logo.svg"/>
                             <div>
-                                <h2>{lang.welcome.header1}</h2>
-                                <p>{lang.welcome.header2}</p>
-                                <div>
+                                <h1 className="headline">{lang.initialize.select_language}</h1>
+                                <div className="language">
                                     <SelectView id="select-lang" options={options}/>
                                 </div>
                                 <div>
-                                    <button className="btn btn-action btn-large" onClick={this._onStartingSetUp}>{lang.welcome.start}</button>
-                                </div>
-                                <div>
-                                    <button className="btn btn-link" onClick={this._onSkipSettingUp}>{lang.welcome.skip}</button>
+                                    <a href="#initialize/wifi/connect-machine" className="btn btn-action btn-large">{lang.initialize.next}</a>
                                 </div>
                             </div>
-                            {blocker}
                         </div>
                     );
 
                 return (
-                    <Modal content={content}/>
+                    <Modal className={wrapperClassName} content={content}/>
                 );
             },
 
             getInitialState: function() {
                 return {
-                    lang: args.state.lang,
-                    openBlocker: false
+                    lang: args.state.lang
                 };
             }
         });
