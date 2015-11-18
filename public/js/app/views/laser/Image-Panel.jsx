@@ -176,7 +176,7 @@ define([
                                     dataAttrs={{ type: 'width' }}
                                     ref="objectSizeW"
                                     defaultValue={state.size.width}
-                                    onChange={this._onTransform}
+                                    getValue={this._onTransform}
                                 />
                             </div>
                             <div className="control">
@@ -185,7 +185,7 @@ define([
                                     dataAttrs={{ type: 'height' }}
                                     ref="objectSizeH"
                                     defaultValue={state.size.height}
-                                    onChange={this._onTransform}
+                                    getValue={this._onTransform}
                                 />
                             </div>
                             <img className="icon-locker" src={lockerImage.size} onClick={this._lockRatio('lockSize')}/>
