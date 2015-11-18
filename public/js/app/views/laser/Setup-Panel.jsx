@@ -297,10 +297,9 @@ define([
                                     defaultUnit="mm"
                                     defaultValue={this.state.defaults.objectHeight}
                                     getValue={this._refreshObjectHeight}
+                                    min={0}
+                                    max={150}
                                 />
-                            </li>
-                            <li>
-                                AUTO
                             </li>
                         </ul>
                     </label>
