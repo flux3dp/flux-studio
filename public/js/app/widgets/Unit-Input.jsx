@@ -10,14 +10,13 @@ define([
 
         getDefaultProps: function() {
             return {
-                defaultValue: React.PropTypes.string,
+                defaultValue: '',
                 defaultUnit: unitConverter.defaultUnit,
                 min: Number.MIN_SAFE_INTEGER,
                 max: Number.MAX_SAFE_INTEGER,
                 step: 1,
                 dataAttrs: {},
-                getValue: React.PropTypes.func,
-                onChange: undefined
+                getValue: function() {}
             };
         },
 
@@ -29,8 +28,6 @@ define([
             }
             else {
                 val = round(parseFloat(this.refs.unitInput.getDOMNode().value), -2);
-
-                this.props.getValue({ currentTarget: this.refs.unitInput.getDOMNode() }, val);
 
                 return val;
             }
@@ -93,12 +90,6 @@ define([
         },
 
         // UI Events
-        _onChange: function(e) {
-            if ('function' === typeof this.props.onChange) {
-                this.props.onChange(e, this.value());
-            }
-        },
-
         _onBlur: function(e) {
             var value = this._confirmValue();
 
@@ -114,7 +105,8 @@ define([
                 KEY_MULTIPLY = 56,
                 KEY_DIVIDE = 191,
                 addValue = undefined,
-                operatorAmount = 0;
+                operatorAmount = 0,
+                value;
 
             switch (e.keyCode) {
             case KEY_RETURN:
@@ -140,8 +132,8 @@ define([
             }
 
             if ('undefined' !== typeof addValue) {
-                this._confirmValue(addValue);
-                this._onChange(e);
+                value = this._confirmValue(addValue);
+                this.props.getValue(e, value);
             }
         },
 
