@@ -24,12 +24,56 @@
         z-index: -1;
     }
 
+    .modal-body {
+        @include flexbox();
+        max-height: 100%;
+        overflow: hidden;
+    }
+
+    .notification {
+        width: 32.2rem;
+        height: 25rem;
+        background-color: #FFFFFF;
+        position: relative;
+
+        .modal-content {
+            height: 80%;
+
+            .wrapper {
+                display:-webkit-box;
+                -webkit-box-pack:center;
+                -webkit-box-align:center;
+                text-align: center;
+            }
+
+            h4 {
+                margin: 0;
+                font-size: 2em;
+                color: #B3B3B3;
+                display: inline-block;
+            }
+
+            span {
+                font-size: 1.8em;
+                color: #B3B3B3;
+                display: inline-block;
+                padding: 0 21px;
+                min-width: 400px;
+            }
+        }
+
+        .btn {
+            color: #B3B3B3;
+            border: 1px solid #B3B3B3;
+            width: 13rem;
+        }
+    }
+
     .modal-alert {
         @include flexbox();
         background: #FFF;
         box-shadow: 0 10px 20px rgba(0, 0, 0, .7);
         flex-direction: column;
-        margin: 2.8rem;
         min-height: 25rem;
         min-width: 32.2rem;
         overflow: scroll;
@@ -48,14 +92,16 @@
         }
     }
 
-    .button-group {
-        @include flexbox();
+    .message {
+        word-break: break-all;
+        word-wrap: break-word;
+    }
+
+    .btn-h-group {
         bottom: 1.6rem;
         left: 2.8rem;
         position: absolute;
         right: 2.8rem;
-        align-items: center;
-        justify-content: center;
 
         .btn {
             font-size: 1.3rem;
@@ -69,11 +115,6 @@
                 margin: 0;
             }
         }
-    }
-
-    .message {
-        word-break: break-all;
-        word-wrap: break-word;
     }
 
 }

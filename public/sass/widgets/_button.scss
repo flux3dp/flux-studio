@@ -9,9 +9,8 @@
     display: inline-block;
     font-size: 15px;
     letter-spacing: .5px;
-    line-height: 44px;
+    line-height: 36px;
     margin: 0;
-    min-width: 99px;
     outline: none;
     overflow: hidden;
     padding: 0 5px;
@@ -35,18 +34,18 @@
 
 .btn-default {
     background: #fff;
-    border: 1px solid #e0e0e0;
-    color: #424242;
+    border: 2px solid #E0E0DF;
+    color: #B3B3B3;
 
     &:hover {
-        border: 1px solid #424242;
+        border: 2px solid #424242;
+        color: #424242;
     }
 }
 
 .btn-confirm {
     background-color: #424242;
     color: #FFF;
-    border-radius: 5px;
 
     &:hover {
         background-color: #000000;
@@ -54,11 +53,11 @@
 }
 
 .btn-action {
-    background: #00C853;
+    background: #B2B2B2;
     color: #fff;
 
     &:hover {
-        background: #33d375;
+        opacity: .7;
     }
 }
 
@@ -80,16 +79,15 @@
 
 .btn-warning {
     background: #f00;
-    border-radius: 5px;
 }
 
 .btn-link {
     background: none;
-    color: #000;
+    color: #808080;
     text-decoration: underline;
 
     &:hover {
-        color: #777;
+        opacity: .7;
     }
 }
 
@@ -101,7 +99,13 @@
 }
 
 .btn-large {
-    width: 270px;
+    width: 250px;
+}
+
+/* special shape button */
+.btn-hexagon {
+    -webkit-clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
 }
 
 /* button helper */
@@ -113,16 +117,21 @@
 /* button group */
 .btn-h-group {
     @include flexbox();
-}
-
-.btn-align-center-h-group {
+    align-items: center;
     justify-content: center;
+
+    .btn {
+        margin: 0 0 0 24px;
+
+        &:first-child {
+            margin: 0;
+        }
+    }
 }
 
-.btn-h-group .btn {
-    margin: 0 0 0 24px;
-}
-
-.btn-h-group .btn:first-child {
-    margin: 0;
+.btn-v-group {
+    .btn {
+        display: block;
+        margin: 0 auto 10px auto;
+    }
 }

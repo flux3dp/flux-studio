@@ -1,4 +1,4 @@
-require.config({
+requirejs.config({
     urlArgs: 'v=' + window.FLUX.timestamp,
     baseUrl: 'js/',
 
@@ -20,7 +20,8 @@ require.config({
         threeCircularGridHelper: 'helpers/CircularGridHelper',
         cssHome: '../css/3rd-party-plugins',
         freetrans: 'plugins/freetrans/jquery.freetrans',
-        html2canvas: 'lib/html2canvas.min'
+        html2canvas: 'lib/html2canvas.min',
+        events: 'lib/events'
     },
 
     jsx: {
@@ -74,11 +75,14 @@ require.config({
                 'css!cssHome/freetrans/jquery.freetrans'
             ],
             exports: 'freetrans'
+        },
+        events: {
+            exports: 'events'
         }
     }
 });
 
-require([
+requirejs([
     'jquery',
     'backbone',
     'app/router',
@@ -88,11 +92,6 @@ require([
     'threejs'
 ], function($, Backbone, Router, globalEvents) {
     'use strict';
-
-    globalEvents(function() {
-        var router = new Router();
-        Backbone.history.start();
-    });
 
     // GA setting up
     // NOTICE: rename ga as GA to prevent conflict with requirejs
@@ -107,4 +106,9 @@ require([
     );
 
     GA('send', 'pageview', location.hash);
+
+    globalEvents(function() {
+        var router = new Router();
+        Backbone.history.start();
+    });
 });

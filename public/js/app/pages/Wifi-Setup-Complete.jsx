@@ -1,9 +1,10 @@
 define([
     'react',
-    'helpers/local-storage',
+    'helpers/sprintf',
+    'app/actions/initialize-machine',
     'helpers/api/config',
     'jsx!widgets/Modal'
-], function(React, localStorage, config, Modal) {
+], function(React, sprintf, initializeMachine, config, Modal) {
     'use strict';
 
     return function(args) {
@@ -11,42 +12,90 @@ define([
         args = args || {};
 
         return React.createClass({
+
             getInitialState: function() {
                 return args.state;
             },
 
-            _handleStartClick: function() {
-                config().write('printer-is-ready', true, {
-                    onFinished: function() {
-                        config().write('printers', JSON.stringify([localStorage.get('setting-printer')]), {
-                            onFinished: function(response) {
-                                localStorage.removeAt('setting-printer');
-                                location.hash = '#studio/print';
-                            }
-                        });
-                    }
-                });
+            _goBack: function(e) {
+                history.go(-1);
             },
-            render : function() {
-                var lang = this.state.lang,
+
+            _onStart: function(e) {
+                initializeMachine.completeSettingUp(true);
+            },
+
+            _getArticle: function(lang) {
+                var settingPrinter = initializeMachine.settingPrinter.get(),
+                    article = {};
+
+                switch (this.props.other) {
+                case 'with-wifi':
+                    article = {
+                        caption: lang.initialize.setting_completed.brilliant,
+                        content: lang.initialize.setting_completed.begin_journey
+                    };
+                    break;
+                case 'with-usb':
+                    article = {
+                        caption: lang.initialize.setting_completed.great,
+                        content: lang.initialize.setting_completed.upload_via_usb
+                    };
+                    break;
+                case 'station-mode':
+                    article = {
+                        caption: sprintf(lang.initialize.setting_completed.is_ready, settingPrinter.name || ''),
+                        content: sprintf(lang.initialize.setting_completed.station_ready_statement, settingPrinter.name)
+                    };
+                    break;
+                }
+
+                return article;
+            },
+
+            render: function() {
+                this.props.other = this.props.other || 'with-wifi';
+
+                var wrapperClassName = {
+                        'initialization': true
+                    },
+                    lang = this.state.lang,
+                    article = this._getArticle(lang),
+                    startText = (
+                        'with-usb' === this.props.other ?
+                        lang.initialize.setting_completed.ok :
+                        lang.initialize.setting_completed.start
+                    ),
+                    backToWifiSelect = (
+                        'with-usb' === this.props.other ?
+                        <button className="btn btn-link btn-large" onClick={this._goBack}>
+                            {lang.initialize.setting_completed.back}
+                        </button> :
+                        ''
+                    ),
                     content = (
-                    <div className="wifi initialization text-center">
-                        <h1>{lang.welcome_headline}</h1>
-                        <img className="wifi-symbol" src="/img/img-done.png" />
-                        <div className="wifi-form">
-                            <h2>{lang.wifi.setup_complete.caption}</h2>
-                            <p>{lang.wifi.setup_complete.description}</p>
-                            <div>
-                                <button className="btn btn-action btn-large" onClick={this._handleStartClick}>{lang.wifi.setup_complete.start}</button>
+                        <div className="setting-completed text-center">
+                            <h1 className="headline">{article.caption}</h1>
+                            <p className="notice">{article.content}</p>
+                            <div className="btn-v-group">
+                                <button className="btn btn-action btn-large" onClick={this._onStart}>
+                                    {startText}
+                                </button>
+                                {backToWifiSelect}
                             </div>
                         </div>
-                    </div>
-                );
+                    );
 
                 return (
-                    <Modal content={content}/>
+                    <Modal className={wrapperClassName} content={content}/>
                 );
-            }
+            },
+
+            componentDidMount: function() {
+                if ('with-usb' !== this.props.other) {
+                    initializeMachine.completeSettingUp(false);
+                }
+            },
         });
     };
 });

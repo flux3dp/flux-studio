@@ -1,15 +1,90 @@
 define([
-    'react'
-], function(React, Modal, Alert) {
+    'react',
+    'lib/jquery.growl',
+    'app/actions/Alert-Actions',
+    'app/stores/Alert-Store',
+    'app//constants/Alert-Constants',
+    'jsx!widgets/Notification-Modal',
+], function(React, Notifier, AlertActions, AlertStore, AlertConstants, Modal) {
     'use strict';
 
     return function(args) {
         args = args || {};
-
         return React.createClass({
-            _handleNavigation: function(address, e) {
+
+            getInitialState: function() {
+                return {
+                    lang        : args.state.lang,
+                    sourceId    : '',
+                    showModal   : false
+                };
+            },
+
+            componentDidMount: function() {
+                AlertStore.onNotify(this._handleNotification);
+                AlertStore.onPopup(this._handlePopup);
+            },
+
+            componentWillUnmount: function() {
+                AlertStore.removeNotifyListener(this._handleNotification);
+                AlertStore.removePopupListener(this._handlePopup);
+            },
+
+            _handleNotification: function(type, message) {
+                var self = this;
+
+                var types = {
+                    INFO: function() {
+                        $.growl.notice({
+                            title: self.state.lang.alert.info,
+                            message: message
+                        });
+                    },
+
+                    WARNING: function() {
+                        $.growl.warning({
+                            title: self.state.lang.alert.warning,
+                            message: message
+                        });
+                    },
+
+                    ERROR: function() {
+                        $.growl.error({
+                            title: self.state.lang.alert.error,
+                            message: message,
+                            fixed: true
+                        });
+                    }
+                };
+
+                types[type]();
+            },
+
+            _handlePopup: function(type, id, message) {
+                this.setState({
+                    showModal   : true,
+                    type        : type,
+                    sourceId    : id,
+                    message     : message
+                });
+            },
+
+            _handleNavigation: function(address) {
                 location.hash = '#studio/' + address;
             },
+
+            _handleModalClose: function() {
+                this.setState({ showModal: false });
+            },
+
+            _handleRetry: function() {
+                AlertActions.notifyRetry(this.state.sourceId);
+            },
+
+            _handleModalOpen: function() {
+
+            },
+
             render : function() {
                 var self = this,
                     lang = this.state.lang,
@@ -20,18 +95,21 @@ define([
                     options = [
                         {
                             name: 'print',
+                            displayName: 'PRINT',
                             className: genericClassName,
                             label: lang.menu.print,
                             imgSrc: '/img/menu/icon_print.svg'
                         },
                         {
                             name: 'laser',
+                            displayName: 'LASER',
                             className: genericClassName,
                             label: lang.menu.laser,
                             imgSrc: '/img/menu/icon_laser.svg'
                         },
                         {
                             name: 'scan',
+                            displayName: 'SCAN',
                             className: genericClassName,
                             label: lang.menu.scan,
                             imgSrc: '/img/menu/icon_scan.svg'
@@ -50,17 +128,23 @@ define([
                         itemClass = cx(opt.className);
 
                         return (
-                            <li className={itemClass} key={'menu' + i} onClick={self._handleNavigation.bind(null, opt.name)}>
+                            <li className={itemClass} key={'menu' + i} data-display-name={opt.displayName} onClick={self._handleNavigation.bind(null, opt.name)}>
                                 <img src={opt.imgSrc} />
                                 {label}
                             </li>
                         );
-                    }, this);
+                    }, this),
+                    currentWorkingFunction = options.filter(function(el) {
+                        return -1 < location.hash.search(el.name);
+                    })[0];
+
+                currentWorkingFunction = currentWorkingFunction || {};
 
                 return (
                     <div>
                         <div className="brand-logo">
                             <img className="logo-icon" src="/img/menu/main_logo.svg"/>
+                            <span className="func-name">{currentWorkingFunction.displayName}</span>
                             <div className="menu">
                                 <svg width="36" height="15"
                                      className="arrow"
@@ -76,6 +160,14 @@ define([
                             </div>
                         </div>
 
+                        <Modal
+                            lang={lang}
+                            type={this.state.type}
+                            open={this.state.showModal}
+                            message={this.state.message}
+                            onRetry={this._handleRetry}
+                            onClose={this._handleModalClose} />
+
                         <a href="#studio/settings" className="setting inner-menu">
                             <div className="item" onClick={self._handleNavigation.bind(null, 'settings')}>
                                 <img src="/img/menu/icon_setting.svg" />
@@ -84,11 +176,6 @@ define([
                         </a>
                     </div>
                 );
-            },
-            getInitialState: function() {
-                return {
-                    lang: args.state.lang
-                };
             }
 
         });

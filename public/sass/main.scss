@@ -13,19 +13,22 @@
 // widgets
 @import "widgets/spinner";
 @import "widgets/button";
+@import "widgets/controls";
+@import "widgets/control";
 
 // views
 @import "views/advanced-panel";
 @import "views/modal";
 @import "views/printer-selector";
 @import "views/top-menu";
+@import "views/accordion";
+@import "views/message-growl";
 
 // pages
 @import "pages/print";
 @import "pages/settings";
 @import "pages/usb";
-@import "pages/welcome";
-@import "pages/wifi";
+@import "pages/initialize";
 @import "pages/laser";
 @import "pages/scan";
 @import "pages/device";

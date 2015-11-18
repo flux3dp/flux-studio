@@ -11,6 +11,7 @@ define([
     'jsx!views/print/Monitor',
     'jsx!views/print/Object-Dialogue',
     'helpers/file-system',
+    'helpers/api/control',
     'jsx!widgets/Modal',
     'helpers/api/config',
     'jsx!views/Print-Selector',
@@ -27,6 +28,7 @@ define([
     Monitor,
     ObjectDialogue,
     FileSystem,
+    PrinterController,
     Modal,
     Config,
     PrinterSelector) {
@@ -49,6 +51,7 @@ define([
                 y       : 1,
                 z       : 1
             },
+
             _size = {
                 locked  : true,
                 x       : 0,
@@ -63,11 +66,12 @@ define([
             _mode = 'scale',
             lang = args.state.lang,
             selectedPrinter,
+            printerController,
             view = React.createClass({
+
                 getInitialState: function() {
                     return ({
                         checked                     : false,
-                        locked                      : true,
                         previewMode                 : false,
                         showPreviewModeList         : false,
                         showAdvancedSetting         : false,
@@ -80,6 +84,7 @@ define([
                         sliderMax                   : 1,
                         sliderValue                 : 0,
                         progressMessage             : '',
+                        fcode                       : {},
                         objectDialogueStyle         : {},
                         camera                      : {},
                         rotation                    : {},
@@ -87,11 +92,12 @@ define([
                         previewUrl                  : ''
                     });
                 },
+
                 componentDidMount: function() {
                     director.init(this);
                     Config().read('advanced-options', {
                         onFinished: function(response) {
-                            var options = JSON.parse(response);
+                            var options = JSON.parse(response || '{}');
                             if(!$.isEmptyObject(options)) {
                                 advancedSetting = options;
                             }
@@ -104,28 +110,36 @@ define([
                         }
                     });
                 },
+
                 _handleSpeedChange: function(speed) {
                     director.setParameter('printSpeed', speed);
                 },
+
                 _handleRaftClick: function(state) {
                     director.setParameter('raft', state ? '1' : '0');
                 },
+
                 _handleSupportClick: function(state) {
                     director.setParameter('support', state ? '1' : '0');
                 },
+
                 _handleToggleAdvancedSettingPanel: function() {
                     this.setState({ showAdvancedSetting: !this.state.showAdvancedSetting });
                 },
+
                 _handlePrintClick: function() {
                     this.setState({
                         openPrinterSelectorWindow: true
                     });
+                    director.clearSelection();
                 },
+
                 _handleRotationChange: function(src) {
                     var axis = src.target.id;
                     _rotation[axis] = src.type === 'blur' && !$.isNumeric(src.target.value) ? 0 : src.target.value;
                     director.setRotation(_rotation.x, _rotation.y, _rotation.z, true);
                 },
+
                 _handleResetRotation: function() {
                     _rotation.x = 0;
                     _rotation.y = 0;
@@ -133,42 +147,49 @@ define([
                     this.setState({ rotation: _rotation });
                     director.setRotation(0, 0, 0, true);
                 },
+
                 _handleScaleChange: function(src) {
                     var axis = src.target.id;
                     _scale[axis] = src.type === 'blur' && !$.isNumeric(src.target.value) ? 1 : src.target.value;
                     director.setScale(scale.x, scale.y, scale.z, scale.locked, true);
                 },
-                _handleResize: function(size) {
-                    director.setSize(size.x, size.y, size.z);
+
+                _handleToggleScaleLock: function(isLocked) {
+                    _scale.locked = isLocked;
                 },
-                _handleSetSize: function(size) {
-                    var updateOriginalSize = true;
-                    director.setSize(size.x, size.y, size.z, updateOriginalSize);
+
+                _handleResize: function(size, isLocked) {
+                    director.setSize(size.x, size.y, size.z, isLocked);
                 },
+
                 _handleResetScale: function() {
                     director.setScale(1, 1, 1, true);
                 },
-                _handleAdvancedSettingCancel: function() {
+
+                _handleCloseAdvancedSetting: function() {
                     this.setState({ showAdvancedSetting: false });
                 },
-                _handleAdvancedSettingDone: function(setting) {
-                    Config().write('advanced-options', JSON.stringify(advancedSetting), {
-                        onFinished: function(response) {}
-                    });
+
+                _handleApplyAdvancedSetting: function(setting) {
                     advancedSetting = setting;
                     director.setAdvanceParameter(setting);
                     this.setState({ showAdvancedSetting: false });
                 },
+
                 _handleShowMonitor: function(e) {
 
                 },
+
                 _handleTogglePrintPause: function(printPaused) {
                     console.log(printPaused ? 'print paused' : 'continue printing');
                 },
+
                 _handlePrintCancel: function(e) {
                 },
+
                 _handlePrintRestart: function(e) {
                 },
+
                 _handleImport: function(e) {
                     var files = e.target.files;
                     for (var i = 0; i < files.length; i++) {
@@ -185,6 +206,7 @@ define([
                     }
                     e.target.value = null;
                 },
+
                 _handleDownloadGCode: function() {
                     if(director.getModelCount() !== 0) {
                         var fileName = prompt(lang.print.download_prompt);
@@ -200,6 +222,7 @@ define([
                         }
                     }
                 },
+
                 _handleDownloadFCode: function() {
                     if(director.getModelCount() !== 0) {
                         var fileName = prompt(lang.print.download_prompt);
@@ -215,35 +238,44 @@ define([
                         }
                     }
                 },
+
                 _handlePreview: function(isOn) {
                     director.togglePreview(isOn);
                 },
+
                 _handlePrinterSelectorWindowClose: function() {
                     this.setState({ openPrinterSelectorWindow: false });
                 },
+
                 _handlePrinterSelected: function(printer) {
-                    // console.log(selectedPrinter);
                     selectedPrinter = printer;
 
-                    director.executePrint(selectedPrinter.serial).then(function() {
+                    director.getFCode().then(function(fcode) {
                         this.setState({
                             openPrinterSelectorWindow: false,
-                            showMonitor: true
+                            showMonitor: true,
+                            fcode: fcode
                         });
                     }.bind(this));
+
+                    printerController = PrinterController(selectedPrinter.serial);
                 },
+
                 _handlePreviewLayerChange: function(e) {
                     director.changePreviewLayer(e.target.value);
                     this.setState({ sliderValue: e.target.value });
                 },
+
                 _handleCameraPositionChange: function(position, rotation) {
                     director.setCameraPosition(position, rotation);
                 },
+
                 _handleMonitorClose: function() {
                     this.setState({
                         showMonitor: false
                     });
                 },
+
                 _handleModeChange: function(mode) {
                     console.log(mode);
                     this.setState({ mode: mode });
@@ -254,15 +286,21 @@ define([
                         director.setScaleMode();
                     }
                 },
+
+                _handleQualitySelected: function(quality) {
+
+                },
+
                 _renderAdvancedPanel: function() {
                     return (
                         <AdvancedPanel
                             lang        = {lang}
                             setting     = {advancedSetting}
-                            onCancel    = {this._handleAdvancedSettingCancel}
-                            onDone      = {this._handleAdvancedSettingDone} />
+                            onClose     = {this._handleCloseAdvancedSetting}
+                            onApply     = {this._handleApplyAdvancedSetting} />
                     );
                 },
+
                 _renderPrinterSelectorWindow: function() {
                     var content = (
                         <PrinterSelector
@@ -276,6 +314,7 @@ define([
                             onClose={this._handlePrinterSelectorWindowClose} />
                     );
                 },
+
                 _renderImportWindow: function() {
                     return (
                         <div className="importWindow">
@@ -288,15 +327,18 @@ define([
                         </div>
                     );
                 },
+
                 _renderLeftPanel: function() {
                     return (
                         <LeftPanel
                             lang                        = {lang}
+                            onQualitySelected           = {this._handleQualitySelected}
                             onRaftClick                 = {this._handleRaftClick}
                             onSupportClick              = {this._handleSupportClick}
                             onShowAdvancedSettingPanel  = {this._handleToggleAdvancedSettingPanel} />
                     );
                 },
+
                 _renderRightPanel: function() {
                     return (
                         <RightPanel
@@ -309,12 +351,15 @@ define([
                             onDownloadFCode         = {this._handleDownloadFCode} />
                     );
                 },
+
                 _renderMonitorPanel: function() {
                     var content = (
                         <Monitor
                             lang            = {lang}
                             previewUrl      = {this.state.previewUrl}
                             selectedPrinter = {selectedPrinter}
+                            fCode           = {this.state.fcode}
+                            controller      = {printerController}
                             onClose         = {this._handleMonitorClose} />
                     );
                     return (
@@ -323,6 +368,7 @@ define([
                             onClose={this._handleMonitorClose} />
                     );
                 },
+
                 _renderObjectDialogue: function() {
                     return (
                         <ObjectDialogue
@@ -330,18 +376,21 @@ define([
                             model           = {this.state.modelSelected}
                             style           = {this.state.objectDialogueStyle}
                             mode            = {_mode}
-                            onSetSize       = {this._handleSetSize}
+                            scaleLocked     = {_scale.locked}
                             onRotate        = {this._handleRotationChange}
                             onResize        = {this._handleResize}
+                            onScaleLock     = {this._handleToggleScaleLock}
                             onModeChange    = {this._handleModeChange} />
                     );
                 },
+
                 _renderWaitWindow: function() {
                     var spinner = <div className="spinner-flip spinner-reverse"/>;
                     return (
                         <Modal content={spinner} />
                     );
                 },
+
                 _renderPreviewWindow: function() {
                     return (
                         <div className="previewPanel">
@@ -352,6 +401,7 @@ define([
                         </div>
                     );
                 },
+
                 _renderProgressWindow: function() {
                     var content = (
                         <div className="progressWindow">
@@ -365,6 +415,7 @@ define([
                         <Modal content={content} />
                     );
                 },
+                
                 render: function() {
                     var advancedPanel           = this.state.showAdvancedSetting ? this._renderAdvancedPanel() : '',
                         importWindow            = this.state.openImportWindow ? this._renderImportWindow() : '',
@@ -375,7 +426,7 @@ define([
                         printerSelectorWindow   = this.state.openPrinterSelectorWindow ? this._renderPrinterSelectorWindow() : '',
                         waitWindow              = this.state.openWaitWindow ? this._renderWaitWindow() : '',
                         previewWindow           = this.state.previewMode ? this._renderPreviewWindow() : '',
-                        progressWindow          = this.state.progressMessage ? this._renderProgressWindow() : '';
+                        progressWindow          = this.state.progressMessage ? this._renderProgressWindow() : ''
 
                     return (
                         <div className="studio-container print-studio">
@@ -400,7 +451,9 @@ define([
 
                             {progressWindow}
 
-                            <div id="model-displayer" className="model-displayer"></div>
+                            <div id="model-displayer" className="model-displayer">
+                                <div className="import-indicator"></div>
+                            </div>
                         </div>
                     );
                 }

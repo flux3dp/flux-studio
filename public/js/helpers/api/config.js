@@ -4,101 +4,38 @@
  */
 define([
     'helpers/websocket',
-    'helpers/is-json'
-], function(Websocket, isJson) {
+    'helpers/local-storage'
+], function(Websocket, localStorage) {
     'use strict';
 
-    return function(opts) {
-        opts = opts || {};
-        opts.onError = opts.onError || function() {};
+    return function() {
+        var stardardOptions = function(opts) {
+            opts = opts || {};
+            opts.onFinished = opts.onFinished || function() {};
 
-        var ws = new Websocket({
-                method: 'config',
-                autoReconnect: false,
-                onMessage: function(data) {
-
-                    events.onMessage(data);
-
-                },
-                onError: opts.onError,
-                onFatal: opts.onFatal,
-                onClose: function(result) {
-                    events.onClose();
-                }
-            }),
-            events = {
-                onMessage: function() {},
-                onClose: function() {}
-            };
+            return opts;
+        };
 
         return {
-            connection: ws,
+            connection: {},
             write: function(key, value, opts) {
-                opts = opts || {};
-                opts.onFinished = opts.onFinished || function() {};
+                opts = stardardOptions(opts);
 
-                var blob = new Blob([value.toString()]),
-                    args = [
-                        'w',
-                        key,
-                        blob.size
-                    ],
-                    reader = new FileReader();
-
-                events.onMessage = function(data) {
-
-                    switch (data.status) {
-                    case 'opened':
-                        reader.onloadend = function(e) {
-                            ws.send(e.target.result);
-                        };
-
-                        reader.readAsArrayBuffer(blob);
-
-                        break;
-                    case 'ok':
-                        opts.onFinished();
-                        break;
-                    default:
-                        // TODO: do something?
-                        break;
-                    }
-
-                };
-
-                ws.send(args.join(' '));
+                localStorage.set(key, value);
+                opts.onFinished();
 
                 return this;
             },
             read: function(key, opts) {
-                opts = opts || {};
-                opts.onFinished = opts.onFinished || function() {};
+                var value = localStorage.get(key);
 
-                var args = [
-                        'r',
-                        key
-                    ],
-                    reader = new FileReader();
+                opts = stardardOptions(opts);
 
-                events.onMessage = function(data) {
-                    if ('opened' === data.status) {
-                        // TODO: do something?
-                    }
-                    else if (data instanceof Blob) {
-                        reader.onloadend = function(e) {
-                            var data = e.target.result;
-                            opts.onFinished(data);
-                        };
+                opts.onFinished(value);
 
-                        reader.readAsText(data);
-                    }
-
-                };
-
-                ws.send(args.join(' '));
-
-                return this;
+                return value;
             }
         };
+
     };
 });

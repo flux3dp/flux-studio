@@ -1,9 +1,10 @@
 define([
     'react',
-    'helpers/local-storage',
+    'app/actions/initialize-machine',
+    'helpers/api/usb-config',
     'jsx!widgets/Modal',
-    'helpers/api/usb-config'
-], function(React, localStorage, Modal, usbConfig) {
+    'jsx!widgets/Alert'
+], function(React, initializeMachine, usbConfig, Modal, Alert) {
     'use strict';
 
     return function(args) {
@@ -13,54 +14,108 @@ define([
 
             getInitialState: function() {
                 return {
+                    lang: args.state.lang,
                     validPrinterName    : true,
-                    validPrinterPassword: true
+                    validPrinterPassword: true,
+                    settingPrinter: initializeMachine.settingPrinter.get(),
+                    openAlert: false,
+                    alertContent: {}
                 }
             },
 
             _handleSetPrinter: function(e) {
                 e.preventDefault();
 
-                var name        = this.refs.name.getDOMNode().value,
-                    password    = this.refs.password.getDOMNode().value,
+                var self        = this,
+                    name        = self.refs.name.getDOMNode().value,
+                    password    = self.refs.password.getDOMNode().value,
                     usb         = usbConfig(),
-                    printer     = localStorage.get('setting-printer'),
                     onError     = function(response) {
                         // TODO: show error message
                     },
                     setPassword = function(password) {
                         setMachine.password(password, {
                             onSuccess: function(response) {
-                                printer.name = name;
-                                localStorage.set('setting-printer', printer);
-                                location.hash = '#initialize/wifi/setup-complete';
+                                self.state.settingPrinter.name = name;
+                                initializeMachine.settingPrinter.set(self.state.settingPrinter);
+                                location.hash = '#initialize/wifi/select';
+                            }
+                        });
+                    },
+                    startSetting = function() {
+                        setMachine = usb.setMachine({
+                            onError: onError
+                        });
+
+                        setMachine.name(name, {
+                            onSuccess: function(response) {
+                                setPassword(password);
                             }
                         });
                     },
                     setMachine,
                     isValid;
 
-                this.setState({
-                    validPrinterName    : name !== '',
+                self.setState({
+                    validPrinterName: name !== '',
                 });
 
                 isValid = (name !== '');
 
                 if (true === isValid) {
-                    setMachine = usb.setMachine({
-                        onError: onError
-                    });
 
-                    setMachine.name(name, {
-                        onSuccess: function(response) {
-                            setPassword(password);
-                        }
-                    });
+                    if (true === self.state.settingPrinter.password) {
+                        self.setState({
+                            openAlert: true,
+                            alertContent: {
+                                caption: '',
+                                message: self.state.lang.initialize.change_password,
+                                onClick: function(e) {
+                                    startSetting();
+                                }
+                            }
+                        });
+                    }
+                    else {
+                        startSetting();
+                    }
+
+
                 }
             },
 
+            _renderAlert: function(lang) {
+                var self = this,
+                    buttons = [{
+                        label: lang.initialize.confirm,
+                        className: 'btn-action',
+                        onClick: self.state.alertContent.onClick
+                    },
+                    {
+                        label: lang.initialize.cancel,
+                        onClick: function(e) {
+                            self.setState({
+                                openAlert: false
+                            });
+                        }
+                    }],
+                    content = (
+                        <Alert caption={this.state.alertContent.caption} message={this.state.alertContent.message} buttons={buttons}/>
+                    );
+
+                return (
+                    true === this.state.openAlert ?
+                    <Modal content={content}/> :
+                    ''
+                );
+            },
+
             render : function() {
-                var lang = args.state.lang,
+                var lang = this.state.lang,
+                    wrapperClassName = {
+                        'initialization': true
+                    },
+                    alert = this._renderAlert(lang),
                     cx = React.addons.classSet,
                     printerNameClass,
                     printerPasswordClass,
@@ -77,45 +132,46 @@ define([
                 });
 
                 content = (
-                    <div className="wifi initialization absolute-center text-center">
-                        <h1>{lang.welcome_headline}</h1>
-                        <form>
-                            <h2>{lang.wifi.set_printer.caption}</h2>
-                            <div className="wifi-form row-fluid clearfix">
-                                <div className="col span5 flux-printer">
-                                    <img src="/img/img-flux-printer.png"/>
-                                </div>
-                                <div className="col span7 text-left">
-                                    <p>
-                                        <label for="printer-name">
-                                            {lang.wifi.set_printer.printer_name}
-                                        </label>
-                                        <input ref="name" id="printer-name" type="text" className={printerNameClass}
-                                        autoFocus={true}
-                                        placeholder={lang.wifi.set_printer.printer_name_placeholder}/>
-                                    </p>
-                                    <p>
-                                        <label for="printer-password">
-                                            {lang.wifi.set_printer.password}
-                                        </label>
-                                        <input ref="password" for="printer-password" type="password" className={printerPasswordClass}
-                                        placeholder={lang.wifi.set_printer.password_placeholder}/>
-                                    </p>
-                                    <p className="notice">
-                                        {lang.wifi.set_printer.notice}
-                                    </p>
-                                </div>
+                    <div className="set-machine-generic text-center">
+                        <img className="brand-image" src="/img/menu/main_logo.svg"/>
+
+                        <form className="form h-form">
+                            <h1 className="headline">{lang.initialize.name_your_flux}</h1>
+                            <p>{lang.initialize.why_need_name}</p>
+
+                            <div className="controls">
+                                <p className="control">
+                                    <label for="printer-name">
+                                        {lang.initialize.set_machine_generic.printer_name}
+                                    </label>
+                                    <input ref="name" id="printer-name" type="text" className={printerNameClass}
+                                    autoFocus={true}
+                                    defaultValue={this.state.settingPrinter.name}
+                                    placeholder={lang.initialize.set_machine_generic.printer_name_placeholder}/>
+                                </p>
+                                <p className="control">
+                                    <label for="printer-password">
+                                        {lang.initialize.set_machine_generic.password}
+                                    </label>
+                                    <input ref="password" for="printer-password" type="password" className={printerPasswordClass}
+                                    placeholder={lang.initialize.set_machine_generic.password_placeholder}/>
+                                </p>
                             </div>
-                            <div>
-                                <button className="btn btn-action btn-large" id="btn-next" onClick={this._handleSetPrinter}>
-                                    {lang.wifi.set_printer.next}</button>
+                            <div className="btn-v-group">
+                                <button className="btn btn-action btn-large" onClick={this._handleSetPrinter} autoFocus={true}>
+                                    {lang.initialize.next}
+                                </button>
+                                <a href="#initialize/wifi/setup-complete/with-usb" className="btn btn-link btn-large">
+                                    {lang.initialize.skip}
+                                </a>
                             </div>
                         </form>
+                        {alert}
                     </div>
                 );
 
                 return (
-                    <Modal content={content}/>
+                    <Modal className={wrapperClassName} content={content}/>
                 );
             }
         });

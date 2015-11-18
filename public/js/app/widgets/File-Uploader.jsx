@@ -9,25 +9,15 @@ define([
             return fileName.split('.').pop();
         },
 
-        // UI events
-        _onReadFile: function(e) {
+        readFiles: function(e, files) {
             var self = this,
                 currentTarget = e.currentTarget,
-                files = currentTarget.files,
                 fileIndex = 0,
-                goNext = true,
                 thisFile = files.item(0),
                 blobUrl = window.URL,
                 fileReader,
                 blob,
-                timer;
-
-            self.props.onReadFileStarted(e);
-
-            timer = setInterval(function() {
-                if (true === goNext) {
-                    goNext = false;
-
+                readFile = function() {
                     fileReader = new FileReader();
 
                     fileReader.onloadend = function(e) {
@@ -44,24 +34,56 @@ define([
                         fileIndex++;
                         thisFile = files.item(fileIndex);
 
+                        // finished
                         if (fileIndex === files.length) {
                             self.props.onReadEnd(e, files);
-                            clearInterval(timer);
                             currentTarget.value = '';
                         }
-
-                        goNext = true;
+                        // move forward
+                        else {
+                            readFile();
+                        }
                     };
 
                     fileReader.onerror = function() {
-                        self.onError();
-                        clearInterval(timer);
+                        self.props.onError();
                         currentTarget.value = '';
                     };
 
                     fileReader.readAsArrayBuffer(thisFile);
-                }
-            }, 0);
+                },
+                checkType = function(files) {
+                    var accept = self.props.accept.replace(',', '|'),
+                        reg = new RegExp(accept.replace('*', '\\w*')),
+                        result = true;
+
+                    for (var i = 0; i < files.length; i++) {
+                        result = reg.test(files.item(i).type);
+
+                        if (false === result) {
+                            break;
+                        }
+                    }
+
+                    return result;
+                };
+
+            self.props.onReadFileStarted(e);
+
+            if (false === checkType(files)) {
+                self.props.onError('Image only');
+            }
+            else {
+                readFile();
+            }
+        },
+
+        // UI events
+        _onReadFile: function(e) {
+            var self = this,
+                files = e.currentTarget.files;
+
+            self.readFiles(e, files);
         },
 
         render: function() {
@@ -90,9 +112,10 @@ define([
             return {
                 lang: React.PropTypes.object,
                 sizeMaxLimit: React.PropTypes.number,
-                accept: React.PropTypes.string,
+                accept: '',
                 multiple: React.PropTypes.bool,
                 className: {},
+                // events
                 onReadFileStarted: React.PropTypes.func,
                 onReadingFile: React.PropTypes.func,
                 onReadEnd: React.PropTypes.func,

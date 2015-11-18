@@ -310,11 +310,13 @@ define([
 
                 var args = [
                         'go',
-                        names.join(' ')
+                        names.join(' '),
+                        opts.filemode || '-f'
                     ],
                     blobs = [],
                     total_length = 0,
-                    gcode_blob;
+                    goGcode = window.FLUX.debug,
+                    blob;
 
                 events.onMessage = function(data) {
 
@@ -326,10 +328,17 @@ define([
                     }
                     else if (true === data instanceof Blob) {
                         blobs.push(data);
-                        gcode_blob = new Blob(blobs);
+                        blob = new Blob(blobs);
 
-                        if (total_length === gcode_blob.size) {
-                            opts.onFinished(gcode_blob);
+                        if (total_length === blob.size) {
+                            opts.onFinished(blob, args[2]);
+                            blobs = [];
+
+                            if (true === goGcode) {
+                                args[2] = '-g';
+                                ws.send(args.join(' '));
+                                goGcode = false;
+                            }
                         }
                     }
 

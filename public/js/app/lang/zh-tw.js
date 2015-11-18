@@ -3,7 +3,6 @@ define(function() {
 
     return {
         brand_name : 'FLUX',
-        welcome_headline : 'Welcome to FLUX',
         app : {
             name : 'Flux Studio - zh-tw'
         },
@@ -57,11 +56,64 @@ define(function() {
                 troubleshooting: 'Troubleshooting'
             }
         },
-        welcome: {
-            header1: 'Hello! 歡迎使用 FLUX，快點來實現你的點子',
-            header2: '請選擇你想使用的語言，我們即將開始為 FLUX 進行設定 :)',
+        initialize: {
+            // generic strings
+            next: '下一步',
             start: '開始設定',
-            skip: '跳過'
+            skip: '跳過',
+            cancel: '取消',
+            confirm: '確認',
+            connect: '連接',
+
+            // specific caption/content
+            select_language: '請選擇你想使用的語言',
+            change_password: '要更改密碼嗎?',
+            connect_flux: '用 USB 連接你的電腦',
+            name_your_flux: '命名你的 FLUX',
+            why_need_name: '當工作站模式啟動時，這將會被用作 Wi-Fi 名稱',
+            wifi_setup: 'Wi-Fi Setup',
+            select_preferred_wifi: '選擇你偏好的網路',
+            requires_wifi_password: '需要密碼',
+            connecting: '連接中...',
+
+            // page specific
+            set_machine_generic: {
+                printer_name: 'Name',
+                printer_name_placeholder: '請輸入名稱',
+                password: 'Password',
+                set_station_mode: 'Set station mode',
+                password_placeholder: '請輸入密碼'
+            },
+
+            setting_completed: {
+                start: '開始使用',
+                is_ready: '“%s” 準備好了',
+                station_ready_statement: '你的 FLUX 已成為 Wi-Fi 熱點，你可以藉由無線連接“%s”這個熱點操作 FLUX',
+                brilliant: 'Brilliant!',
+                begin_journey: 'You can begin the journey with your FLUX now.',
+                great: 'Great!',
+                upload_via_usb: 'You can setup Wi-Fi later, or use USB drive to print.',
+                back: 'Back',
+                ok: 'OK!'
+            },
+
+            // errors
+            errors: {
+                error: 'Error',
+
+                keep_connect: {
+                    caption: '無法連接裝置',
+                    content: '請確認電源已被開啟及已經由 micro-usb 連接'
+                },
+
+                wifi_connection: {
+                    connecting_fail: '連接失敗'
+                },
+
+                select_wifi: {
+                    ap_mode_fail: '設定失敗'
+                }
+            }
         },
         wifi: {
             home: {
@@ -190,23 +242,54 @@ define(function() {
             support_view: 'Support Preview',
             start_print: '列印',
             advanced: {
-                label: '進階設定',
-                quality: '品質',
-                layer_height: '每層高度',
-                infill: '填充比例',
-                speed: '噴頭移動速度',
-                speed_while_traveling: 'Traveling',
-                speed_while_extruding: 'Extruding',
-                temperature: '溫度控制',
-                printing_temperature: '列印溫度',
-                support: '支撐材',
-                support_type: {
-                    label: 'Support Type',
-                    touch_buildplate: 'Touch Buildplate',
-                    everywhere: 'Everywhere'
-                },
-                direct_setting: 'Direct Setting',
-                platform_type: 'Platform Type'
+                general: 'General',
+                layers: 'Layers',
+                infill: 'Infill',
+                support: 'Support',
+                speed: 'Speed',
+                custom: 'Custom',
+                slicingEngine: 'Slicing Engine',
+                slic3r: 'Slic3r',
+                experiment: 'Experiment',
+                filament: 'Filament',
+                temperature: 'Temperature',
+                layerHeight: 'Layer Height',
+                firstLayerHeight: 'First Layer Height',
+                shell: 'Shell',
+                shellSurface: 'Shell Surface',
+                solidLayerTop: 'Solid Layer: Top',
+                solidLayerBottom: 'Solid Layer: Bottom',
+                density: 'Density',
+                pattern: 'Pattern',
+                auto: 'auto',                       // do not change
+                line: 'line',                       // do not change
+                rectilinear: 'rectilinear',         // do not change
+                honeycomb: 'honeycomb',             // do not change
+                blackMagic: 'Black Magic',
+                spiral: 'Spiral',
+                generalSupport: 'General Support',
+                spacing: 'Spacing',
+                overhang: 'Overhang',
+                zDistance: 'Z Distance',
+                raft: 'Raft',
+                raftLayers: 'Raft Layers',
+                movement: 'Movement',
+                structure: 'Structure',
+                traveling: 'Traveling',
+                surface: 'Surface',
+                firstLayer: 'First Layer',
+                solidLayers: 'Solid Layers',
+                innerShell: 'Inner Shell',
+                outerShell: 'Outer Shell',
+                bridge: 'Bridge',
+                config: 'Config',
+                presets: 'Presets',
+                name: 'Name',
+                loadPreset: 'LOAD PRESET',
+                apply: 'APPLY',
+                saveAsPreset: 'SAVE AS PRESET',
+                cancel: 'CANCEL',
+                saveAndApply: 'SAVE & APPLY'
             },
             mode: [
                 {
@@ -319,12 +402,20 @@ define(function() {
                 raft_off: 'RAFT OFF',
                 support_on: 'SUPPORT ON',
                 support_off: 'SUPPORT OFF',
-                advanced: 'ADVANCED'
+                advanced: 'ADVANCED',
+                plaTitle: 'PICK THE COLOR OF THE FILAMENT'
             },
             right_panel: {
                 get: 'Get',
                 go: 'Go',
                 preview: '預覽'
+            },
+            quality: {
+                high: 'High Quality',
+                good: 'Good Quality',
+                normal: 'Normal Quality',
+                quick: 'Quick Quality',
+                fast: 'Fast Quality'
             },
             quick_print: 'Quick Print',
             scale: '比例',
@@ -346,11 +437,17 @@ define(function() {
             import: '打開⋯',
             save: '儲存⋯',
             custom: '自訂',
-            acceptable_files: 'JPG, PNG, PDF, AI',
+            presets: 'Presets',
+            acceptable_files: 'JPG, PNG, SVG',
             drop_files_to_import: 'Drop your file here or click "import" to upload your file',
             button_advanced: '進階',
+            confirm: '確認',
             start_engrave: '雕刻',
             start_cut: '切割',
+            close_alert: '關閉',
+            get_fcode: 'Get Fcode',
+            name: '名稱',
+            go: 'GO',
             print_params: {
                 object_height: {
                     text: '物體高度',
@@ -371,20 +468,6 @@ define(function() {
                 rotate: {
                     text: '旋轉'
                 },
-                unit: {
-                    text: '單位',
-                    options: [
-                        {
-                            value: 'mm',
-                            label: 'mm',
-                            checked: true
-                        },
-                        {
-                            value: 'inches',
-                            label: 'inches'
-                        }
-                    ]
-                },
                 threshold: {
                     text: '圖片曝光',
                     default: 128
@@ -399,8 +482,7 @@ define(function() {
                         options: [
                             {
                                 value: 'wood',
-                                label: '木',
-                                selected: true,
+                                label: '木材',
                                 data: {
                                     laser_speed: 5,
                                     power: 255
@@ -408,11 +490,32 @@ define(function() {
                             },
                             {
                                 value: 'steel',
-                                label: 'Steel',
+                                label: '皮革',
                                 data: {
                                     laser_speed: 50,
                                     power: 255
                                 }
+                            },
+                            {
+                                value: 'paper',
+                                label: '紙',
+                                data: {
+                                    laser_speed: 10,
+                                    power: 25
+                                }
+                            },
+                            {
+                                value: 'cork',
+                                label: '軟木',
+                                data: {
+                                    laser_speed: 15,
+                                    power: 200
+                                }
+                            },
+                            {
+                                value: 'other',
+                                label: '其它',
+                                data: {}
                             }
                         ]
                     },
@@ -434,8 +537,12 @@ define(function() {
                         step: 1
                     }
                 },
+                save_and_apply: '儲存並套用',
+                save_as_preset: '儲存',
+                load_preset: '載入',
                 apply: '套用',
                 cancel: '取消',
+                save: '儲存'
             }
         },
         scan: {
@@ -548,6 +655,27 @@ define(function() {
             change_filament: 'CHANGE FILLAMENT',
             browse_file: 'BROWSE FILE',
             monitor: 'MONITOR'
+        },
+        alert: {
+            caption: '錯誤',
+            duplicated_preset_name: '重複的Preset名稱',
+            info: '訊息',
+            warning: '警告',
+            error: '錯誤'
+        },
+        color: {
+            green: 'GREEN',
+            red: 'RED',
+            black: 'BLACK',
+            turquoise: 'TURQUOISE',
+            orange: 'ORANGE',
+            gray: 'GRAY',
+            blue: 'BLUE',
+            brown: 'BROWN',
+            white: 'WHITE',
+            purple: 'PURPLE',
+            yellow: 'YELLOW',
+            transparent: 'TRANSPARENT'
         }
     };
 });

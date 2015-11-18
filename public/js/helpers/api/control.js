@@ -49,7 +49,7 @@ define([
             };
 
         return {
-            ws: ws,
+            connection: ws,
             ls: function(path) {
                 var d = $.Deferred();
                 events.onMessage = function(result) {
@@ -189,18 +189,19 @@ define([
 
                         }
                         else if ('ok' === data.status) {
-                            //self.start(opts);
+                            self.start(opts);
                         }
                     },
                     doUpload = function() {
                         events.onMessage = uploading;
-                        console.log('upload fcode');
-                        ws.send(lastOrder + ' application/fcode ' + filesize + ' #');
+                        ws.send(lastOrder + ' application/fcode ' + filesize);
                     };
 
                 lastOrder = 'upload';
 
                 events.onMessage = positioning;
+
+                doUpload();
 
                 return {
                     pause: function() {

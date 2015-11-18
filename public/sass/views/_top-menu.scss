@@ -18,8 +18,16 @@
         }
 
         .logo-icon {
-            height: 4.25rem;
-            width: 4.25rem;
+            width: 49px;
+            transition: all .25s;
+        }
+
+        .func-name {
+            color: #B3B3B3;
+            font-family: "HelveticaNeue-Thin";
+            font-size: 40px;
+            line-height: 49px;
+            padding: 0 0 0 21px;
         }
 
         .menu {
@@ -49,8 +57,18 @@
             }
         }
 
-        &:hover .menu {
-            display: block;
+        &:hover {
+            .menu {
+                display: block;
+            }
+
+            .logo-icon {
+                transform: rotate(90deg);
+            }
+
+            .func-name {
+                display: none;
+            }
         }
     }
 

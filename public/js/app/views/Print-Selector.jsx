@@ -244,7 +244,7 @@ define([
             if (false === window.FLUX.debug) {
                 config().read('printers', {
                     onFinished: function(response) {
-                        options = JSON.parse(response);
+                        options = JSON.parse(response || '{}');
 
                         refreshOption(options);
                     }
