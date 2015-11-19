@@ -94,7 +94,7 @@ define(function() {
                 great: 'Great!',
                 upload_via_usb: 'You can setup Wi-Fi later, or use USB drive to print.',
                 back: 'Back',
-                ok: 'OK!'
+                ok: 'OK'
             },
 
             // errors
