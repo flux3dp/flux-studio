@@ -36,12 +36,6 @@ define([
             console.log('sending retry with ID:' + id);
         },
 
-        _handlePreviewClick: function(e) {
-            e.preventDefault();
-            this.setState({ previewOn: !this.state.previewOn });
-            this.props.onPreviewClick(!this.state.previewOn);
-        },
-
         _handleGetFCode: function() {
             this.props.onDownloadFCode();
         },
@@ -82,7 +76,6 @@ define([
             var lang = this.props.lang.print.right_panel;
             return (
                 <div className='rightPanel'>
-                    <a className="btn" onClick={this._handlePreviewClick}>{lang.preview}</a>
                     <a className="btn" onClick={this._handleGetGCode}>Gcode</a><p/>
                     <a className="btn" onClick={this._handleTest}>Notify</a>
                     <a className="btn" onClick={this._showInfo}>Info</a>
