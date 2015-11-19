@@ -12,24 +12,42 @@ define([
 
         propTypes: {
             lang                        : React.PropTypes.object,
+            previewLayerCount           : React.PropTypes.number,
             onQualitySelected           : React.PropTypes.func,
             onRaftClick                 : React.PropTypes.func,
             onSupportClick              : React.PropTypes.func,
+            onPreviewClick              : React.PropTypes.func,
+            onPreviewLayerChange        : React.PropTypes.func,
             onShowAdvancedSettingPanel  : React.PropTypes.func
         },
 
         getInitialState: function() {
             return {
-                raftOn      : true,
-                supportOn   : true,
-                quality     : 'HIGH QUALITY',
-                color       : 'WHITE'
+                raftOn              : true,
+                supportOn           : true,
+                previewOn           : false,
+                previewCurrentLayer : 0,
+                previewLayerCount   : this.props.previewLayerCount,
+                quality             : 'HIGH QUALITY',
+                color               : 'WHITE'
             };
         },
 
         componentWillMount: function() {
             lang = this.props.lang.print.left_panel;
             lang.quality = this.props.lang.print.quality;
+        },
+
+        componentWillReceiveProps: function(nextProps) {
+            this.setState({
+                previewLayerCount: nextProps.previewLayerCount || 0
+            });
+
+            if(nextProps.previewLayerCount !== this.state.previewLayerCount) {
+                this.setState({
+                    previewCurrentLayer: nextProps.previewLayerCount
+                });
+            }
         },
 
         _closePopup: function() {
@@ -66,6 +84,22 @@ define([
             this.props.onShowAdvancedSettingPanel();
         },
 
+        _handleOpenPreview: function(e) {
+            e.preventDefault();
+            if(e.target.type === 'range') { return; }
+            var src = this.refs.preview.getDOMNode();
+            $(src).prop('checked', !this.state.previewOn);
+            this.setState({ previewOn: !this.state.previewOn });
+            this.props.onPreviewClick(!this.state.previewOn);
+        },
+
+        _handlePreviewLayerChange(e) {
+            this.props.onPreviewLayerChange(e.target.value);
+            this.setState({
+                previewCurrentLayer: e.target.value
+            });
+        },
+
         _onOpenSubPopup: function(e) {
             var $me = $(e.currentTarget),
                 $popupOpen = $('.popup-open:checked').not($me);
@@ -80,7 +114,8 @@ define([
             qualitySelection = _quality.map(function(quality) {
                 return (
                     <li onClick={this._handleSelectQuality.bind(null, quality)}>
-                        {lang.quality[quality]}</li>
+                        {lang.quality[quality]}
+                    </li>
                 );
             }.bind(this));
 
@@ -94,7 +129,7 @@ define([
                             </p>
                         </div>
                         <label className="popup">
-                            <svg className="arrow" version="1.1" xmlns="http://www.w3.org/2000/svg"
+                            <svg className="arrow light" version="1.1" xmlns="http://www.w3.org/2000/svg"
                                 width="36.8" height="30">
                                 <polygon points="0,15 36.8,0 36.8,30"/>
                             </svg>
@@ -135,11 +170,11 @@ define([
                             </p>
                         </div>
                         <label className="popup">
-                            <svg className="arrow" version="1.1" xmlns="http://www.w3.org/2000/svg"
+                            <svg className="arrow dark" version="1.1" xmlns="http://www.w3.org/2000/svg"
                                 width="36.8" height="30">
                                 <polygon points="0,15 36.8,0 36.8,30"/>
                             </svg>
-                            <div className="content color">
+                            <div className="content color light">
                                 <div className="title">PICK THE COLOR OF THE FILAMENT</div>
                                 <div className="colorSets">
                                     {colorSet}
@@ -175,12 +210,42 @@ define([
             );
         },
 
+        _renderPreview: function() {
+            return (
+                <li onClick={this._handleOpenPreview}>
+                    <label className="popup-selection">
+                        <input ref="preview" className="popup-open" name="popup-open" type="checkbox" onClick={this._onOpenSubPopup}/>
+                        <div className="display-text">
+                            <p>
+                                <span>{lang.preview}</span>
+                            </p>
+                        </div>
+                        <label className="popup">
+                            <svg className="arrow dark" version="1.1" xmlns="http://www.w3.org/2000/svg"
+                                width="36.8" height="30">
+                                <polygon points="0,15 36.8,0 36.8,30"/>
+                            </svg>
+                            <div className="content preview">
+                                <div className="preview-panel">
+                                    <input className="range" type="range" value={this.state.previewCurrentLayer} min="0" max={this.state.previewLayerCount} onChange={this._handlePreviewLayerChange} />
+                                    <div className="layer-count">
+                                        {this.state.previewCurrentLayer}
+                                    </div>
+                                </div>
+                            </div>
+                        </label>
+                    </label>
+                </li>
+            );
+        },
+
         render: function() {
             var quality     = this._renderQuanlity(),
                 material    = this._renderMaterialPallet(),
                 raft        = this._renderRaft(),
                 support     = this._renderSupport(),
-                advanced    = this._renderAdvanced();
+                advanced    = this._renderAdvanced(),
+                preview     = this._renderPreview();
 
             return (
                 <div className='leftPanel'>
@@ -194,6 +259,8 @@ define([
                         {support}
 
                         {advanced}
+
+                        {preview}
                     </ul>
                 </div>
             );

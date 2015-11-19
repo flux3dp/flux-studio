@@ -81,15 +81,15 @@ define([
                         openObjectDialogue          : false,
                         openWaitWindow              : false,
                         openImportWindow            : true,
-                        sliderMax                   : 1,
-                        sliderValue                 : 0,
+                        previewLayerCount           : 0,
                         progressMessage             : '',
                         fcode                       : {},
                         objectDialogueStyle         : {},
                         camera                      : {},
                         rotation                    : {},
                         scale                       : {},
-                        previewUrl                  : ''
+                        previewUrl                  : '',
+                        printerControllerStatus     : {}
                     });
                 },
 
@@ -170,10 +170,10 @@ define([
                     this.setState({ showAdvancedSetting: false });
                 },
 
-                _handleApplyAdvancedSetting: function(setting) {
+                _handleApplyAdvancedSetting: function(setting, closeAdvancedSetting) {
                     advancedSetting = setting;
                     director.setAdvanceParameter(setting);
-                    this.setState({ showAdvancedSetting: false });
+                    this.setState({ showAdvancedSetting: closeAdvancedSetting });
                 },
 
                 _handleShowMonitor: function(e) {
@@ -258,12 +258,19 @@ define([
                         });
                     }.bind(this));
 
-                    printerController = PrinterController(selectedPrinter.serial);
+                    printerController = PrinterController(selectedPrinter.serial, {
+                        onConnect: this._handlePrinterConnection
+                    });
                 },
 
-                _handlePreviewLayerChange: function(e) {
-                    director.changePreviewLayer(e.target.value);
-                    this.setState({ sliderValue: e.target.value });
+                _handlePrinterConnection: function(connectionStatus) {
+                    this.setState({
+                        printerControllerStatus: connectionStatus
+                    });
+                },
+
+                _handlePreviewLayerChange: function(targetLayer) {
+                    director.changePreviewLayer(targetLayer);
                 },
 
                 _handleCameraPositionChange: function(position, rotation) {
@@ -332,9 +339,12 @@ define([
                     return (
                         <LeftPanel
                             lang                        = {lang}
+                            previewLayerCount           = {this.state.previewLayerCount}
                             onQualitySelected           = {this._handleQualitySelected}
                             onRaftClick                 = {this._handleRaftClick}
                             onSupportClick              = {this._handleSupportClick}
+                            onPreviewClick              = {this._handlePreview}
+                            onPreviewLayerChange        = {this._handlePreviewLayerChange}
                             onShowAdvancedSettingPanel  = {this._handleToggleAdvancedSettingPanel} />
                     );
                 },
@@ -344,7 +354,6 @@ define([
                         <RightPanel
                             lang                    = {lang}
                             camera                  = {this.state.camera}
-                            onPreviewClick          = {this._handlePreview}
                             onPrintClick            = {this._handlePrintClick}
                             onDownloadGCode         = {this._handleDownloadGCode}
                             onCameraPositionChange  = {this._handleCameraPositionChange}
@@ -355,12 +364,13 @@ define([
                 _renderMonitorPanel: function() {
                     var content = (
                         <Monitor
-                            lang            = {lang}
-                            previewUrl      = {this.state.previewUrl}
-                            selectedPrinter = {selectedPrinter}
-                            fCode           = {this.state.fcode}
-                            controller      = {printerController}
-                            onClose         = {this._handleMonitorClose} />
+                            lang                = {lang}
+                            previewUrl          = {this.state.previewUrl}
+                            selectedPrinter     = {selectedPrinter}
+                            fCode               = {this.state.fcode}
+                            controller          = {printerController}
+                            controllerStatus    = {this.state.printerControllerStatus}
+                            onClose             = {this._handleMonitorClose} />
                     );
                     return (
                         <Modal {...this.props}
@@ -391,17 +401,6 @@ define([
                     );
                 },
 
-                _renderPreviewWindow: function() {
-                    return (
-                        <div className="previewPanel">
-                            <input className="range" type="range" value={this.state.sliderValue} min="0" max={this.state.sliderMax} onChange={this._handlePreviewLayerChange} />
-                            <div>
-                                {this.state.sliderValue}
-                            </div>
-                        </div>
-                    );
-                },
-
                 _renderProgressWindow: function() {
                     var content = (
                         <div className="progressWindow">
@@ -415,7 +414,7 @@ define([
                         <Modal content={content} />
                     );
                 },
-                
+
                 render: function() {
                     var advancedPanel           = this.state.showAdvancedSetting ? this._renderAdvancedPanel() : '',
                         importWindow            = this.state.openImportWindow ? this._renderImportWindow() : '',
@@ -425,7 +424,6 @@ define([
                         objectDialogue          = this.state.openObjectDialogue ? this._renderObjectDialogue() : '',
                         printerSelectorWindow   = this.state.openPrinterSelectorWindow ? this._renderPrinterSelectorWindow() : '',
                         waitWindow              = this.state.openWaitWindow ? this._renderWaitWindow() : '',
-                        previewWindow           = this.state.previewMode ? this._renderPreviewWindow() : '',
                         progressWindow          = this.state.progressMessage ? this._renderProgressWindow() : ''
 
                     return (
@@ -446,8 +444,6 @@ define([
                             {advancedPanel}
 
                             {waitWindow}
-
-                            {previewWindow}
 
                             {progressWindow}
 
