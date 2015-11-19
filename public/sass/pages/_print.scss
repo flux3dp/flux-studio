@@ -583,6 +583,9 @@ input.switch:checked ~ label:after {
                 padding: 4% 0;
                 padding-left: 16px;
                 float: left;
+                a {
+                    margin-right: 10px;
+                }
             }
             .btn {
                 margin: 0;
@@ -765,7 +768,6 @@ input.switch:checked ~ label:after {
                 .close {
                     right: 20px;
                 }
-
             }
             .operation {
                 margin-top: 15px;
@@ -794,6 +796,12 @@ input.switch:checked ~ label:after {
                 .right {
                     right: 2rem;
                 }
+            }
+            .wait {
+                text-align: center;
+                margin-top: 30px;
+                font-size: 1.2rem;
+                color: #B3B3B3;
             }
         }
         .sub {
@@ -857,25 +865,23 @@ input.switch:checked ~ label:after {
             width: 25%;
             float: left;
         }
-
-
     }
-    .previewPanel {
+    .preview-panel {
         position: relative;
         width: 50px;
-        background-color: #FFFFFF;
+        background-color: #B3B3B3;
         height: 200px;
         overflow-y: hidden;
         input {
             width: 150px;
             transform: rotate(270deg);
             position: absolute;
-            top: 90px;
+            top: 100px;
             left: -50px;
         }
-        div {
-            text-align: right;
-            margin-right: 25px;
+        .layer-count {
+            text-align: center;
+            color: #E0E0DF;
         }
     }
     .progressWindow {
@@ -948,7 +954,7 @@ input.switch:checked ~ label:after {
             @include flexbox();
 
             ul {
-                // background: #B3B3B3;
+                background: #B3B3B3;
                 list-style: none;
                 padding: 0 10px 10px 10px;
 
@@ -996,14 +1002,17 @@ input.switch:checked ~ label:after {
                     align-self: center;
                     position: relative;
                     right: -1px;
+                }
 
-                    polygon {
-                        fill: #FFFFFF;
-                    }
+                .arrow.light > polygon {
+                    fill: #F9F9F9;
+                }
+
+                .arrow.dark > polygon {
+                    fill: #B3B3B3;
                 }
 
                 .content {
-                    background-color: #F9F9F9;
 
                     .title {
                         padding: 15px;
@@ -1079,18 +1088,21 @@ input.switch:checked ~ label:after {
                 .content.color {
                     width: 403px;
                     height: 255px;
+                    background-color: #F9F9F9;
                 }
 
                 .content.quality {
                     width: 160px;
                     height: 220px;
                     z-index: 1000;
+                    background-color: #B3B3B3;
 
                     ul {
-                        background-color: #F9F9F9;
+                        background-color: #B3B3B3;
                         color: #B3B3B3;
                         li {
                             font-size: 16px;
+                            color: #E0E0DF;
                         }
                     }
                 }

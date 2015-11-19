@@ -12,6 +12,7 @@ define([
     return function(serial, opts) {
         opts = opts || {};
         opts.onError = opts.onError || function() {};
+        opts.onConnect = opts.onConnect || function() {};
 
         var isConnected = false,
             ws = new Websocket({
@@ -19,9 +20,11 @@ define([
                 onMessage: function(data) {
                     switch (data.status) {
                     case 'connecting':
+                        opts.onConnect(data);
                         // ignore it
                         break;
                     case 'connected':
+                        opts.onConnect(data);
                         break;
                     default:
                         isConnected = true;

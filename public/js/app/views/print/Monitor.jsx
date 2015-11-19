@@ -3,8 +3,9 @@ define([
     'react',
     'plugins/classnames/index',
     'helpers/api/control',
-    'helpers/api/3d-scan-control'
-], function($, React, ClassNames, control, scanControl, director) {
+    'helpers/api/3d-scan-control',
+    'app/actions/Alert-Actions',
+], function($, React, ClassNames, control, scanControl, AlertActions) {
     'use strict';
 
     var controller,
@@ -42,12 +43,13 @@ define([
     return React.createClass({
 
         propTypes: {
-            lang            : React.PropTypes.object,
-            onClose         : React.PropTypes.func,
-            selectedPrinter : React.PropTypes.object,
-            previewUrl      : React.PropTypes.string,
-            fcode           : React.PropTypes.object,
-            controller      : React.PropTypes.object
+            lang                : React.PropTypes.object,
+            onClose             : React.PropTypes.func,
+            selectedPrinter     : React.PropTypes.object,
+            previewUrl          : React.PropTypes.string,
+            fCode               : React.PropTypes.object,
+            controller          : React.PropTypes.object,
+            controllerStatus    : React.PropTypes.object
         },
 
         getInitialState: function() {
@@ -89,6 +91,10 @@ define([
 
         _closeConnection: function(c) {
             if(typeof c !== 'undefined') { c.connection.close(false); }
+        },
+
+        _hasFCode: function() {
+            return this.props.fCode instanceof Blob;
         },
 
         _handleClose: function() {
@@ -163,6 +169,11 @@ define([
         },
 
         _handleGo: function() {
+            if(!this._hasFCode()) {
+                AlertActions.showInfo('there is nothing to print (need localisation)');
+                return;
+            }
+
             if(this.state.currentStatus === status.ready) {
                 var blob = this.props.fCode;
                 remote = controller.upload(blob.size, blob, {
@@ -188,9 +199,13 @@ define([
         },
 
         _handleStop: function() {
+            if(!this._hasFCode()) {
+                AlertActions.showInfo('there is nothing to stop (need localisation)');
+                return;
+            }
+            this._stopReport();
             controller.abort();
             controller.quit().then(function() {
-                this._stopReport();
                 this.setState({ currentStatus: status.ready });
             }.bind(this));
         },
@@ -328,7 +343,7 @@ define([
                 <div className="wrapper">
                     <img className="camera-image" src={this.state.cameraImageUrl} />
                 </div>
-            )
+            );
         },
 
         _renderSpinner: function() {
@@ -373,9 +388,13 @@ define([
             }
         },
 
-        _renderCommand: function() {
-            var self = this;
-            var commands = {
+        _renderOperation: function() {
+            var self = this,
+                operation,
+                wait,
+                commands;
+
+            commands = {
                 '0': function() {
                     return (
                         <div className="controls center" onClick={self._handleGo}>
@@ -402,27 +421,45 @@ define([
                         </div>
                     );
                 },
-            }
+            };
 
             if(typeof commands[this.state.currentStatus] !== 'function') {
                 throw new Error('Invalid Status');
             }
 
-            return commands[this.state.currentStatus]();
+            operation = (
+                <div className="operation">
+                    <div className="controls left" onClick={this._handleStop}>
+                        <div className="icon"><i className="fa fa-stop fa-2x"></i></div>
+                        <div className="description">STOP</div>
+                    </div>
+                    {commands[this.state.currentStatus]()}
+                    <div className="controls right">
+                        <div className="icon"><i className="fa fa-circle fa-2x"></i></div>
+                        <div className="description">RECORD</div>
+                    </div>
+                </div>
+            );
+
+            wait = (<div className="wait">Connecting, please wait...</div>);
+
+            return this.props.controllerStatus.status === 'connected' ? operation : wait;
         },
 
         render: function() {
+            console.log('from monitor',this.props.controllerStatus);
             var lang        = this.props.lang.monitor,
+                name        = this.props.selectedPrinter.name,
                 content     = this._renderContent(),
                 waitIcon    = this.state.waiting ? this._renderSpinner() : '',
-                command     = this._renderCommand();
+                operation   = this._renderOperation();
 
             return (
                 <div className="flux-monitor">
                     <div className="main">
                         <div className="header">
                             <div className="title">
-                                <span>Someone's Flux</span>
+                                <span>{name}</span>
                                 <div className="close" onClick={this._handleClose}>
                                     <div className="x"></div>
                                 </div>
@@ -438,17 +475,7 @@ define([
                                 {waitIcon}
                             </div>
                         </div>
-                        <div className="operation">
-                            <div className="controls left" onClick={this._handleStop}>
-                                <div className="icon"><i className="fa fa-stop fa-2x"></i></div>
-                                <div className="description">STOP</div>
-                            </div>
-                            {command}
-                            <div className="controls right">
-                                <div className="icon"><i className="fa fa-circle fa-2x"></i></div>
-                                <div className="description">RECORD</div>
-                            </div>
-                        </div>
+                        {operation}
                     </div>
                     <div className="sub">
                         <div className="wrapper">
