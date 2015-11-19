@@ -115,23 +115,45 @@ define([
             },
 
             getWifiNetwork: function(opts) {
+                var strength = {
+                    BEST: 'best',
+                    GOOD: 'good',
+                    POOR: 'poor',
+                    BAD: 'bad'
+                };
+
                 opts = reorganizeOptions(opts);
 
                 ws.onError(opts.onError);
 
                 events.onMessage = function(data) {
                     if ('ok' === data.status) {
-                        for (var i in data.wifi) {
-                            data.items = data.items || [];
+                        data.items = data.items || [];
 
-                            if (true === data.wifi.hasOwnProperty(i)) {
-                                data.items.push({
-                                    security: data.wifi[i].security,
-                                    ssid: data.wifi[i].ssid,
-                                    password: ('' !== data.wifi[i].security)
-                                });
+                        data.wifi.forEach(function(wifi, i) {
+                            wifi.rssi = Math.abs(wifi.rssi || 0);
+
+                            if (75 < wifi.rssi) {
+                                data.wifi[i].strength = strength.BEST;
                             }
-                        };
+                            else if (50 < strength) {
+                                data.wifi[i].strength = strength.GOOD;
+                            }
+                            else if (25 < strength) {
+                                data.wifi[i].strength = strength.POOR;
+                            }
+                            else {
+                                data.wifi[i].strength = strength.BAD;
+                            }
+
+                            data.items.push({
+                                security: data.wifi[i].security,
+                                ssid: data.wifi[i].ssid,
+                                password: ('' !== data.wifi[i].security),
+                                rssi: wifi.rssi,
+                                strength: wifi.strength
+                            });
+                        });
 
                         opts.onSuccess(data);
                     }
@@ -143,7 +165,7 @@ define([
             setWifiNetwork: function(wifi, password, opts) {
                 opts = reorganizeOptions(opts);
 
-                var wifi = {
+                var wifiConfig = {
                         wifi_mode: 'client',
                         ssid: wifi.ssid,
                         security: wifi.security,
@@ -153,20 +175,20 @@ define([
                         'set network'
                     ];
 
-                switch (wifi.security.toUpperCase()) {
+                switch (wifiConfig.security.toUpperCase()) {
                 case 'WEP':
-                    wifi['wepkey'] = password;
+                    wifiConfig.wepkey = password;
                     break;
                 case 'WPA-PSK':
                 case 'WPA2-PSK':
-                    wifi['psk'] = password;
+                    wifiConfig.psk = password;
                     break;
                 default:
                     // do nothing
                     break;
                 }
 
-                args.push(JSON.stringify(wifi));
+                args.push(JSON.stringify(wifiConfig));
 
                 ws.onError(opts.onError);
 
