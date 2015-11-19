@@ -5011,6 +5011,9 @@ input.switch:checked ~ label:after {
         height: 175px;
         overflow: scroll;
         width: 252px; }
+        .initialization .select-wifi .wifi-list .spinner-roller {
+            height: 5em;
+            width: 5em; }
         .initialization .select-wifi .wifi-list .row-fluid {
             display: -webkit-box;
             /* OLD - iOS 6-, Safari 3.1-6 */
@@ -5025,6 +5028,7 @@ input.switch:checked ~ label:after {
             flex: 2;
             justify-content: space-between; }
         .initialization .select-wifi .wifi-list .wifi-ssid {
+            text-overflow: ellipsis;
             width: calc(100% - 50px); }
         .initialization .select-wifi .wifi-list span {
             display: block;
@@ -5059,7 +5063,10 @@ input.switch:checked ~ label:after {
         justify-content: space-around; }
         .initialization .h-form .control input {
             height: 36px;
-            width: 250px; }
+            width: 250px;
+            flex: 3; }
+        .initialization .h-form .control label {
+            flex: 1; }
 
 /**
  * Laser
