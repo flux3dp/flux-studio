@@ -2522,6 +2522,37 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         color: #fff;
         background-color: #c9302c;
         border-color: #ac2925; }
+    .studio-container .action-buttons {
+        bottom: 28px;
+        position: fixed;
+        right: 78px; }
+        .studio-container .action-buttons .btn {
+            display: block;
+            margin: 0 0 5px 0; }
+        .studio-container .action-buttons .btn.btn-disabled {
+            background: #CCC; }
+        .studio-container .action-buttons .btn-default {
+            background: #B3B3B3;
+            border: none;
+            border-radius: 0;
+            color: #EEE;
+            display: block;
+            font-size: 21px;
+            font-style: italic;
+            font-weight: normal;
+            height: 100px;
+            line-height: 1.2em;
+            margin: 0;
+            min-width: 87px;
+            position: relative;
+            width: 87px; }
+            .studio-container .action-buttons .btn-default:hover {
+                background: #000; }
+        .studio-container .action-buttons .btn-go {
+            background: #4D4D4D;
+            font-size: 35px;
+            left: 50px;
+            top: -21px; }
 
 .pull-left {
     float: left; }
@@ -2938,7 +2969,9 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         width: 32.2rem;
         height: 25rem;
         background-color: #FFFFFF;
-        position: relative; }
+        position: relative;
+        max-height: 100%;
+        overflow: hidden; }
         .modal-window .notification .modal-content {
             height: 80%; }
             .modal-window .notification .modal-content .wrapper {
@@ -2955,12 +2988,14 @@ input[type=range]:focus::-webkit-slider-runnable-track {
                 font-size: 1.8em;
                 color: #B3B3B3;
                 display: inline-block;
-                padding: 0 21px;
-                min-width: 400px; }
-        .modal-window .notification .btn {
-            color: #B3B3B3;
-            border: 1px solid #B3B3B3;
-            width: 13rem; }
+                padding: 0 21px; }
+        .modal-window .notification .modal-actions {
+            text-align: center; }
+            .modal-window .notification .modal-actions .btn {
+                color: #B3B3B3;
+                border: 1px solid #B3B3B3;
+                width: 13rem;
+                margin: 0 5px; }
     .modal-window .modal-alert {
         display: -webkit-box;
         /* OLD - iOS 6-, Safari 3.1-6 */
@@ -3820,6 +3855,8 @@ input.switch:checked ~ label:after {
             padding: 4% 0;
             padding-left: 16px;
             float: left; }
+            .print-studio .advanced-panel .footer .left a {
+                margin-right: 10px; }
         .print-studio .advanced-panel .footer .btn {
             margin: 0;
             border: 2px solid #E0E0DF;
@@ -3980,6 +4017,11 @@ input.switch:checked ~ label:after {
                 right: 0; }
             .print-studio .flux-monitor .main .operation .right {
                 right: 2rem; }
+        .print-studio .flux-monitor .main .wait {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 1.2rem;
+            color: #B3B3B3; }
     .print-studio .flux-monitor .sub {
         background-color: white;
         height: 10rem;
@@ -4029,21 +4071,21 @@ input.switch:checked ~ label:after {
         width: 25%;
         float: left; }
 
-.print-studio .previewPanel {
+.print-studio .preview-panel {
     position: relative;
     width: 50px;
-    background-color: #FFFFFF;
+    background-color: #B3B3B3;
     height: 200px;
     overflow-y: hidden; }
-    .print-studio .previewPanel input {
+    .print-studio .preview-panel input {
         width: 150px;
         transform: rotate(270deg);
         position: absolute;
-        top: 90px;
+        top: 100px;
         left: -50px; }
-    .print-studio .previewPanel div {
-        text-align: right;
-        margin-right: 25px; }
+    .print-studio .preview-panel .layer-count {
+        text-align: center;
+        color: #E0E0DF; }
 
 .print-studio .progressWindow {
     width: 600px;
@@ -4089,7 +4131,7 @@ input.switch:checked ~ label:after {
     margin-top: -150px; }
     .print-studio .leftPanel ul {
         list-style-type: none;
-        padding-left: 3.75rem; }
+        padding-left: 24px; }
         .print-studio .leftPanel ul li {
             font-size: 1.8rem;
             color: #b3b3b3;
@@ -4110,6 +4152,7 @@ input.switch:checked ~ label:after {
         display: flex;
         /* NEW, Spec - Opera 12.1, Firefox 20+ */ }
         .print-studio .leftPanel .popup-selection ul {
+            background: #B3B3B3;
             list-style: none;
             padding: 0 10px 10px 10px; }
             .print-studio .leftPanel .popup-selection ul li {
@@ -4145,71 +4188,74 @@ input.switch:checked ~ label:after {
                 align-self: center;
                 position: relative;
                 right: -1px; }
-                .print-studio .leftPanel .popup-selection .popup .arrow polygon {
-                    fill: #FFFFFF; }
-            .print-studio .leftPanel .popup-selection .popup .content {
-                background-color: #F9F9F9; }
-                .print-studio .leftPanel .popup-selection .popup .content .title {
-                    padding: 15px;
+            .print-studio .leftPanel .popup-selection .popup .arrow.light > polygon {
+                fill: #F9F9F9; }
+            .print-studio .leftPanel .popup-selection .popup .arrow.dark > polygon {
+                fill: #B3B3B3; }
+            .print-studio .leftPanel .popup-selection .popup .content .title {
+                padding: 15px;
+                font-size: 16px;
+                line-height: 18px;
+                color: #B3B3B3; }
+            .print-studio .leftPanel .popup-selection .popup .content .colorSets {
+                padding: 0 15px 15px 15px; }
+            .print-studio .leftPanel .popup-selection .popup .content .set {
+                position: relative;
+                position: relative;
+                display: inline-block;
+                width: 120px;
+                z-index: 1000; }
+                .print-studio .leftPanel .popup-selection .popup .content .set .color {
+                    width: 6.5px;
+                    height: 38px;
+                    display: inline-block; }
+                .print-studio .leftPanel .popup-selection .popup .content .set .description {
+                    position: absolute;
+                    line-height: 38px;
                     font-size: 16px;
-                    line-height: 18px;
-                    color: #B3B3B3; }
-                .print-studio .leftPanel .popup-selection .popup .content .colorSets {
-                    padding: 0 15px 15px 15px; }
-                .print-studio .leftPanel .popup-selection .popup .content .set {
-                    position: relative;
-                    position: relative;
+                    padding-left: 3.5px;
+                    color: #B3B3B3;
                     display: inline-block;
-                    width: 120px;
-                    z-index: 1000; }
-                    .print-studio .leftPanel .popup-selection .popup .content .set .color {
-                        width: 6.5px;
-                        height: 38px;
-                        display: inline-block; }
-                    .print-studio .leftPanel .popup-selection .popup .content .set .description {
-                        position: absolute;
-                        line-height: 38px;
-                        font-size: 16px;
-                        padding-left: 3.5px;
-                        color: #B3B3B3;
-                        display: inline-block;
-                        cursor: pointer; }
-                    .print-studio .leftPanel .popup-selection .popup .content .set .green {
-                        background-color: #61C46D; }
-                    .print-studio .leftPanel .popup-selection .popup .content .set .red {
-                        background-color: #E32B32; }
-                    .print-studio .leftPanel .popup-selection .popup .content .set .black {
-                        background-color: #2E2E2E; }
-                    .print-studio .leftPanel .popup-selection .popup .content .set .turquoise {
-                        background-color: #44C1BA; }
-                    .print-studio .leftPanel .popup-selection .popup .content .set .orange {
-                        background-color: #F7931D; }
-                    .print-studio .leftPanel .popup-selection .popup .content .set .gray {
-                        background-color: #808080; }
-                    .print-studio .leftPanel .popup-selection .popup .content .set .blue {
-                        background-color: #29ABE2; }
-                    .print-studio .leftPanel .popup-selection .popup .content .set .brown {
-                        background-color: #A37D53; }
-                    .print-studio .leftPanel .popup-selection .popup .content .set .white {
-                        background-color: #FFFFFF; }
-                    .print-studio .leftPanel .popup-selection .popup .content .set .purple {
-                        background-color: #A952A5; }
-                    .print-studio .leftPanel .popup-selection .popup .content .set .yellow {
-                        background-color: #FCEE22; }
-                    .print-studio .leftPanel .popup-selection .popup .content .set .transparent {
-                        border: 1px solid #E7E7E7; }
+                    cursor: pointer; }
+                .print-studio .leftPanel .popup-selection .popup .content .set .green {
+                    background-color: #61C46D; }
+                .print-studio .leftPanel .popup-selection .popup .content .set .red {
+                    background-color: #E32B32; }
+                .print-studio .leftPanel .popup-selection .popup .content .set .black {
+                    background-color: #2E2E2E; }
+                .print-studio .leftPanel .popup-selection .popup .content .set .turquoise {
+                    background-color: #44C1BA; }
+                .print-studio .leftPanel .popup-selection .popup .content .set .orange {
+                    background-color: #F7931D; }
+                .print-studio .leftPanel .popup-selection .popup .content .set .gray {
+                    background-color: #808080; }
+                .print-studio .leftPanel .popup-selection .popup .content .set .blue {
+                    background-color: #29ABE2; }
+                .print-studio .leftPanel .popup-selection .popup .content .set .brown {
+                    background-color: #A37D53; }
+                .print-studio .leftPanel .popup-selection .popup .content .set .white {
+                    background-color: #FFFFFF; }
+                .print-studio .leftPanel .popup-selection .popup .content .set .purple {
+                    background-color: #A952A5; }
+                .print-studio .leftPanel .popup-selection .popup .content .set .yellow {
+                    background-color: #FCEE22; }
+                .print-studio .leftPanel .popup-selection .popup .content .set .transparent {
+                    border: 1px solid #E7E7E7; }
             .print-studio .leftPanel .popup-selection .popup .content.color {
                 width: 403px;
-                height: 255px; }
+                height: 255px;
+                background-color: #F9F9F9; }
             .print-studio .leftPanel .popup-selection .popup .content.quality {
                 width: 160px;
                 height: 220px;
-                z-index: 1000; }
+                z-index: 1000;
+                background-color: #B3B3B3; }
                 .print-studio .leftPanel .popup-selection .popup .content.quality ul {
-                    background-color: #F9F9F9;
+                    background-color: #B3B3B3;
                     color: #B3B3B3; }
                     .print-studio .leftPanel .popup-selection .popup .content.quality ul li {
-                        font-size: 16px; }
+                        font-size: 16px;
+                        color: #E0E0DF; }
             .print-studio .leftPanel .popup-selection .popup .content.preview {
                 width: 50px; }
 
@@ -5252,9 +5298,6 @@ input.switch:checked ~ label:after {
         background-color: transparent;
         list-style: none;
         padding: 0; }
-    .laser-studio .operating-panel .action-buttons .btn {
-        display: block;
-        margin: 0 0 5px 0; }
 
 .laser-studio .fa::before {
     margin: 0 5px 0 0; }
@@ -5374,35 +5417,6 @@ input.switch:checked ~ label:after {
         border: 1px solid #E0E0DF;
         color: #B3B3B3;
         font-size: 15px; }
-
-.laser-studio .action-buttons {
-    bottom: 28px;
-    position: fixed;
-    right: 78px; }
-    .laser-studio .action-buttons .btn.btn-disabled {
-        background: #CCC; }
-    .laser-studio .action-buttons .btn-default {
-        background: #B3B3B3;
-        border: none;
-        border-radius: 0;
-        color: #EEE;
-        display: block;
-        font-size: 21px;
-        font-style: italic;
-        font-weight: normal;
-        height: 100px;
-        line-height: 1.2em;
-        margin: 0;
-        min-width: 87px;
-        position: relative;
-        width: 87px; }
-        .laser-studio .action-buttons .btn-default:hover {
-            background: #000; }
-    .laser-studio .action-buttons .btn-go {
-        background: #4D4D4D;
-        font-size: 35px;
-        left: 50px;
-        top: -21px; }
 
 .laser-studio .advanced-panel {
     background: #FFF;
