@@ -132,7 +132,7 @@ define([
                             </p>
                         </div>
                         <label className="popup">
-                            <svg className="arrow light" version="1.1" xmlns="http://www.w3.org/2000/svg"
+                            <svg className="arrow dark" version="1.1" xmlns="http://www.w3.org/2000/svg"
                                 width="36.8" height="30">
                                 <polygon points="0,15 36.8,0 36.8,30"/>
                             </svg>
@@ -173,12 +173,12 @@ define([
                             </p>
                         </div>
                         <label className="popup">
-                            <svg className="arrow dark" version="1.1" xmlns="http://www.w3.org/2000/svg"
+                            <svg className="arrow light" version="1.1" xmlns="http://www.w3.org/2000/svg"
                                 width="36.8" height="30">
                                 <polygon points="0,15 36.8,0 36.8,30"/>
                             </svg>
                             <div className="content color light">
-                                <div className="title">PICK THE COLOR OF THE FILAMENT</div>
+                                <div className="title">{lang.plaTitle}</div>
                                 <div className="colorSets">
                                     {colorSet}
                                 </div>

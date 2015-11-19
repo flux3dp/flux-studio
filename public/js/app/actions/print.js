@@ -40,7 +40,8 @@ define([
         shiftPressed = false,
         previewMode = false,
         leftPanelWidth = 275,
-        ddHelper = 0;
+        ddHelper = 0,
+        defaultFileName = '';
 
     var s = {
         diameter: 170,
@@ -184,6 +185,18 @@ define([
         var loader = new THREE.STLLoader();
         var model_file_path = fileEntry.toURL();
         callback = callback || function(){};
+
+        if(defaultFileName === '') {
+            var lastIndex = fileEntry.name.lastIndexOf('.');
+            if(lastIndex > 0) {
+                defaultFileName = fileEntry.name.substring(0, 20);
+            }
+            else {
+                defaultFileName = fileEntry.name;
+            }
+        }
+
+        console.log(defaultFileName);
 
         reactSrc.setState({
             openWaitWindow: true,
@@ -1028,6 +1041,12 @@ define([
     }
 
     function downloadGCode(fileName) {
+        if(!fileName) {
+            fileName = defaultFileName;
+        }
+
+        fileName = fileName + '.fcode';
+
         blobExpired = true;
         selectObject(null);
         var d = $.Deferred();
@@ -1052,6 +1071,12 @@ define([
     }
 
     function downloadFCode(fileName) {
+        if(!fileName) {
+            fileName = defaultFileName;
+        }
+
+        fileName = fileName + '.fcode';
+
         selectObject(null);
         var d = $.Deferred();
         if(objects.length > 0) {
