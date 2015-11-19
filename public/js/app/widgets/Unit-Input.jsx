@@ -80,7 +80,16 @@ define([
                 }
             }
 
-            this.value(this._parseValue(el.value) + addValue);
+            value = this.value(this._parseValue(el.value) + addValue);
+
+            // check value boundary
+            if (value > this.props.max) {
+                value = this.value(this.props.max);
+            }
+
+            if (value < this.props.min) {
+                value = this.value(this.props.min);
+            }
 
             if ('undefined' !== typeof values[3]) {
                 el.value += values[3];
