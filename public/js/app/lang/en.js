@@ -287,7 +287,7 @@ define(function() {
                 name: 'Name',
                 loadPreset: 'LOAD',
                 apply: 'APPLY',
-                saveAsPreset: 'SAVE AS',
+                saveAsPreset: 'SAVE',
                 cancel: 'CANCEL',
                 saveAndApply: 'SAVE & APPLY'
             },

@@ -15,7 +15,7 @@ define([
     'jsx!widgets/Modal',
     'helpers/api/config',
     'jsx!views/Print-Selector',
-    'plugins/knob/jquery.knob'
+    'helpers/nwjs/menu-factory',
 ], function($,
     React,
     display,
@@ -31,7 +31,9 @@ define([
     PrinterController,
     Modal,
     Config,
-    PrinterSelector) {
+    PrinterSelector,
+    menuFactory
+) {
 
     return function(args) {
         args = args || {};
@@ -67,6 +69,7 @@ define([
             lang = args.state.lang,
             selectedPrinter,
             printerController,
+            importBtn,
             view = React.createClass({
 
                 getInitialState: function() {
@@ -107,6 +110,12 @@ define([
                             director.removeSelected();
                         }
                     });
+
+                    importBtn = this.refs.importBtn.getDOMNode();
+                    menuFactory.items.import.enable = true;
+                    menuFactory.items.import.onClick = function(e) {
+                        $(importBtn).click();
+                    }.bind(this);
                 },
 
                 _handleSpeedChange: function(speed) {
@@ -450,6 +459,7 @@ define([
                             <div id="model-displayer" className="model-displayer">
                                 <div className="import-indicator"></div>
                             </div>
+                            <input className="hide" ref="importBtn" type="file" accept=".stl" onChange={this._handleImport} />
                         </div>
                     );
                 }

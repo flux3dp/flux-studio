@@ -509,6 +509,7 @@ input.switch:checked ~ label:after {
         width: 440px;
         height: 540px;
         $border-color: #DDD;
+        box-shadow: 0 4px 15px rgba(0,0,0,.3), 0 16px 40px rgba(0,0,0,.5);
 
         .content-wrapper {
             overflow-y: auto;
@@ -923,6 +924,9 @@ input.switch:checked ~ label:after {
             border-width: 20px;
             margin-left: -20px;
         }
+    }
+    .hide {
+        display: none;
     }
     .leftPanel {
         position: absolute;

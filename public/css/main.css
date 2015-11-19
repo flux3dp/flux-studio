@@ -3798,7 +3798,8 @@ input.switch:checked ~ label:after {
     top: 20px;
     float: left;
     width: 440px;
-    height: 540px; }
+    height: 540px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3), 0 16px 40px rgba(0, 0, 0, 0.5); }
     .print-studio .advanced-panel .content-wrapper {
         overflow-y: auto;
         height: 415px; }
@@ -4122,6 +4123,9 @@ input.switch:checked ~ label:after {
     border-top-color: #fff;
     border-width: 20px;
     margin-left: -20px; }
+
+.print-studio .hide {
+    display: none; }
 
 .print-studio .leftPanel {
     position: absolute;
