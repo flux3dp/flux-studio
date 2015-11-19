@@ -12,6 +12,7 @@ define([
 
         propTypes: {
             lang                        : React.PropTypes.object,
+            previewMode                 : React.PropTypes.bool,
             previewLayerCount           : React.PropTypes.number,
             onQualitySelected           : React.PropTypes.func,
             onRaftClick                 : React.PropTypes.func,
@@ -79,7 +80,7 @@ define([
             this._closePopup();
         },
 
-        _handleOpenAdvancedSetting: function(e) {
+        _handleOpenAdvancedSetting: function() {
             this._closePopup();
             this.props.onShowAdvancedSettingPanel();
         },
@@ -87,10 +88,12 @@ define([
         _handleOpenPreview: function(e) {
             e.preventDefault();
             if(e.target.type === 'range') { return; }
-            var src = this.refs.preview.getDOMNode();
-            $(src).prop('checked', !this.state.previewOn);
-            this.setState({ previewOn: !this.state.previewOn });
-            this.props.onPreviewClick(!this.state.previewOn);
+            if(this.props.hasObject) {
+                var src = this.refs.preview.getDOMNode();
+                $(src).prop('checked', !this.state.previewOn);
+                this.setState({ previewOn: !this.state.previewOn });
+                this.props.onPreviewClick(!this.state.previewOn);
+            }
         },
 
         _handlePreviewLayerChange(e) {

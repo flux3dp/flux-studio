@@ -20,7 +20,7 @@ define([
     var THREE = window.THREE || {},
         container, slicer;
 
-    var camera, scene, renderer;
+    var camera, scene, outlineScene, renderer;
     var orbitControl, transformControl, reactSrc, controls;
 
     var objects = [],
@@ -255,6 +255,9 @@ define([
             scene.add(mesh);
             scene.add(mesh.outlineMesh);
             objects.push(mesh);
+            reactSrc.setState({
+                hasObject: true
+            });
 
             render();
             callback();
@@ -594,6 +597,11 @@ define([
         var d = $.Deferred();
         var ids = [];
 
+        if(objects.length === 0) {
+            d.resolve('');
+            return d.promise();
+        }
+
         if(!blobExpired) {
             d.resolve(responseBlob);
             return d.promise();
@@ -677,7 +685,7 @@ define([
         SELECTED.outlineMesh.scale.set(
             (originalScaleX * x) || scaleBeforeTransformX, (originalScaleY * y) || scaleBeforeTransformY, (originalScaleZ * z) || scaleBeforeTransformZ
         );
-        SELECTED.outlineMesh.scale.multiplyScalar(1.05);
+        // SELECTED.outlineMesh.scale.multiplyScalar(1.05);
         SELECTED.scale.locked = isLocked;
         SELECTED.plane_boundary = planeBoundary(SELECTED);
 
@@ -725,7 +733,8 @@ define([
         var _settings = Object.keys(settings).map(function(key) {
             return `${key}=${settings[key]} \n`;
         });
-        slicer.setParameter('advancedSettings', _settings.join('')).then(function(result) {
+        //slicer.setParameter('advancedSettings', _settings.join('\n')).then(function(result) {
+        slicer.setParameter('advancedSettings', settings.custom).then(function(result) {
             if (result.status === 'error') {
                 index = keys.length;
                 // todo: error logging
@@ -741,7 +750,6 @@ define([
                 if (result.status === 'error' || result.status === 'fatal') {
                     // todo: error logging
                 }
-                console.dir(result);
             }
         );
         blobExpired = true;
@@ -928,7 +936,10 @@ define([
             render();
 
             if(objects.length === 0) {
-                reactSrc.setState({ openImportWindow: true }, function() {
+                reactSrc.setState({
+                    openImportWindow: true,
+                    hasObject: false
+                }, function() {
                     setImportWindowPosition();
                 });
             }
@@ -1102,9 +1113,9 @@ define([
         if (objects.length === 0) {
             return;
         } else {
-            reactSrc.setState({
-                previewMode: isOn
-            });
+            // reactSrc.setState({
+            //     previewMode: isOn
+            // });
             previewMode = isOn;
             _setProgressMessage('generating preview...');
             isOn ? _showPreview() : _hidePreview();
@@ -1253,18 +1264,23 @@ define([
     }
 
     function createOutline(mesh) {
-        var outlineMaterial = new THREE.MeshBasicMaterial( { color: s.colorSelected, side: THREE.BackSide } );
+        var outlineMaterial = new THREE.MeshBasicMaterial({
+            color: s.colorSelected,
+            side: THREE.BackSide,
+            wireframe: true,
+            wireframeLinewidth: 5
+        });
         var outlineMesh = new THREE.Mesh(mesh.geometry, outlineMaterial);
         outlineMesh.position.set(mesh.position.x, mesh.position.y, mesh.position.z);
         outlineMesh.scale.set(mesh.scale.x, mesh.scale.y, mesh.scale.z);
-        outlineMesh.scale.multiplyScalar(1.05);
+        // outlineMesh.scale.multiplyScalar(1.05);
         mesh.outlineMesh = outlineMesh;
     }
 
     function syncObjectOutline(src) {
         src.outlineMesh.rotation.set(src.rotation.x, src.rotation.y, src.rotation.z, 'ZYX');
         src.outlineMesh.scale.set(src.scale.x, src.scale.y, src.scale.z);
-        src.outlineMesh.scale.multiplyScalar(1.05);
+        // src.outlineMesh.scale.multiplyScalar(1.05);
         render();
     }
 
@@ -1391,8 +1407,7 @@ define([
         }
 
         reactSrc.setState({
-            sliderMax: previewScene.children.length - 1,
-            sliderValue: previewScene.children.length - 1
+            previewLayerCount: previewScene.children.length - 1
         });
         _showPath();
     }

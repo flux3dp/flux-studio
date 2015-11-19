@@ -71,8 +71,6 @@ define([
 
                 getInitialState: function() {
                     return ({
-                        checked                     : false,
-                        previewMode                 : false,
                         showPreviewModeList         : false,
                         showAdvancedSetting         : false,
                         showMonitor                 : false,
@@ -339,6 +337,7 @@ define([
                     return (
                         <LeftPanel
                             lang                        = {lang}
+                            hasObject                   = {this.state.hasObject}
                             previewLayerCount           = {this.state.previewLayerCount}
                             onQualitySelected           = {this._handleQualitySelected}
                             onRaftClick                 = {this._handleRaftClick}
@@ -354,6 +353,7 @@ define([
                         <RightPanel
                             lang                    = {lang}
                             camera                  = {this.state.camera}
+                            hasObject               = {this.state.hasObject}
                             onPrintClick            = {this._handlePrintClick}
                             onDownloadGCode         = {this._handleDownloadGCode}
                             onCameraPositionChange  = {this._handleCameraPositionChange}
