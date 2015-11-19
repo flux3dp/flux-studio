@@ -14,6 +14,9 @@ define([
         args = args || {};
 
         return React.createClass({
+
+            scanWifi: true,
+
             // Private methods
             _openAlert: function(open, detail) {
                 detail = detail || {};
@@ -175,13 +178,17 @@ define([
 
             _renderWifiOptions: function(lang) {
                 return (
+                    0 < this.state.wifiOptions.length ?
                     <ListView
                         ref="wifiList"
                         className="pure-list wifi-list clearfix"
                         ondblclick={this._confirmWifi}
                         onClick={this._selectWifi}
                         items={this.state.wifiOptions}
-                    />
+                    /> :
+                    <div className="wifi-list">
+                        <div className="spinner-roller"/>
+                    </div>
                 );
             },
 
@@ -250,26 +257,55 @@ define([
 
                 var self = this,
                     usb = usbConfig(),
-                    wifiOptions = [];
+                    wifiOptions = [],
+                    getWifi = function() {
+                        wifiOptions = [];
 
-                usb.getWifiNetwork({
-                    onSuccess: function(response) {
-                        var item;
+                        usb.getWifiNetwork({
+                            onSuccess: function(response) {
+                                var item;
 
-                        response.items.forEach(function(el) {
-                            item = self._renderWifiItem(el);
-                            wifiOptions.push({
-                                value: el.ssid,
-                                label: {item}
-                            });
+                                response.items = response.items.sort(function(a, b) {
+                                    var aSSid = a.ssid.toUpperCase(),
+                                        bSsid = b.ssid.toUpperCase();
 
-                            self.setState({
-                                wifiOptions: wifiOptions
-                            });
+                                    if (aSSid === bSsid) {
+                                        return 0;
+                                    }
+                                    else if (aSSid > bSsid) {
+                                        return 1;
+                                    }
+                                    else {
+                                        return -1;
+                                    }
+                                });
+
+                                response.items.forEach(function(el) {
+                                    item = self._renderWifiItem(el);
+                                    wifiOptions.push({
+                                        value: el.ssid,
+                                        label: {item}
+                                    });
+
+                                    self.setState({
+                                        wifiOptions: wifiOptions
+                                    });
+                                });
+
+                                if (true === self.scanWifi) {
+                                    getWifi();
+                                }
+                            }
                         });
-                    }
-                });
-            }
+                    };
+
+
+                getWifi();
+            },
+
+            componentWillUnmount: function() {
+                this.scanWifi = false;
+            },
         });
     };
 });
