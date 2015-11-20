@@ -62,6 +62,12 @@ define([
             return {
                 checked: this.props.defaultChecked
             };
+        },
+
+        componentWillReceiveProps: function(nextProps) {
+            this.setState({
+                checked: nextProps.defaultChecked
+            });
         }
 
     });
