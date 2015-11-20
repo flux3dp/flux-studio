@@ -50,7 +50,7 @@ define([
 
                 if (null !== $target_image) {
                     // delete svg blob from history
-                    if ('svg' === self.props.fileFormat && true === $img.hasClass('svg')) {
+                    if ('svg' === self.state.fileFormat && true === $img.hasClass('svg')) {
                         svgWebSocket.History.deleteAt($img.data('name'));
                     }
 
@@ -62,7 +62,7 @@ define([
 
                         menuFactory.items.execute.enabled = false;
                         menuFactory.items.saveGCode.enabled = false;
-                        self.props.fileFormat = undefined;
+                        self.state.fileFormat = undefined;
                     }
                     else {
                         $target_image = $img_container[0];
@@ -306,14 +306,14 @@ define([
                                     threshold: $img.data('threshold') || 128
                                 },
                                 grayscaleOpts = {
-                                    is_svg: ('svg' === self.props.fileFormat),
+                                    is_svg: ('svg' === self.state.fileFormat),
                                     is_shading: self.refs.setupPanel.isShading(),
                                     threshold: 255
                                 },
                                 src = $img.data('base'),
                                 previewImageSize;
 
-                            if ('svg' === self.props.fileFormat) {
+                            if ('svg' === self.state.fileFormat) {
                                 previewImageSize = svgWebSocket.computePreviewImageSize({
                                     width: box.width,
                                     height: box.height
@@ -335,7 +335,7 @@ define([
                                         sub_data.height = result.size.height;
                                         sub_data.width = result.size.width;
 
-                                        if ('svg' === self.props.fileFormat) {
+                                        if ('svg' === self.state.fileFormat) {
                                             sub_data.svg_data = svgWebSocket.History.findByName($img.data('name'))[0].data;
                                         }
 
@@ -346,7 +346,7 @@ define([
 
                                         if (args.length === $ft_controls.length) {
                                             // sending data
-                                            if ('svg' === self.props.fileFormat) {
+                                            if ('svg' === self.state.fileFormat) {
                                                 sendToSVGAPI(args, settings, _callback);
                                             }
                                             else {
@@ -589,7 +589,7 @@ define([
                 shortcuts.off(['cmd', 'del']);
             },
             resetFileFormat: function() {
-                self.setProps({
+                self.setState({
                     fileFormat: undefined
                 });
             },
@@ -597,11 +597,11 @@ define([
                 var firstFile = e.target.files.item(0),
                     setupPanel = self.refs.setupPanel,
                     extension = self.refs.fileUploader.getFileExtension(firstFile.name),
-                    currentFileFormat = self.props.fileFormat;
+                    currentFileFormat = self.state.fileFormat;
 
                 if ('string' !== typeof currentFileFormat) {
                     currentFileFormat = ('svg' === extension ? 'svg' : 'bitmap');
-                    self.setProps({
+                    self.setState({
                         fileFormat: currentFileFormat
                     });
                 }
@@ -618,7 +618,7 @@ define([
                     parserSocket;
 
                 // go svg process
-                if ('svg' === self.props.fileFormat) {
+                if ('svg' === self.state.fileFormat) {
                     if ('svg' === file.extension) {
                         parserSocket = svgWebSocket;
                     }
@@ -639,7 +639,7 @@ define([
                 self.setState({
                     step: 'start',
                     hasImage: 0 < files.length,
-                    mode: ('svg' === self.props.fileFormat ? 'cut' : 'engrave')
+                    mode: ('svg' === self.state.fileFormat ? 'cut' : 'engrave')
                 });
 
                 menuFactory.items.execute.enabled = true;
