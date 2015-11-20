@@ -400,6 +400,10 @@ define([
                 $ftControls = $img.parent().find('.ft-controls');
                 $ftControls.width(size.width).height(size.height);
 
+                if (file.index === file.totalFiles - 1) {
+                    self._openBlocker(false);
+                }
+
                 // set default image
                 if (null === $target_image) {
                     $target_image = $img;
@@ -598,6 +602,8 @@ define([
                     setupPanel = self.refs.setupPanel,
                     extension = self.refs.fileUploader.getFileExtension(firstFile.name),
                     currentFileFormat = self.state.fileFormat;
+
+                self._openBlocker(true);
 
                 if ('string' !== typeof currentFileFormat) {
                     currentFileFormat = ('svg' === extension ? 'svg' : 'bitmap');
