@@ -73,7 +73,6 @@ define([
             },
             refreshImage = function($img, threshold) {
                 var box = $img.box();
-                console.log(self.refs.setupPanel.isShading());
 
                 imageData(
                     $img.data('base'),
