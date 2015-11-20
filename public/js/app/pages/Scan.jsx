@@ -38,6 +38,18 @@ define([
         var View = React.createClass({
                 _progressRemainingTime: 1200,    // 20 minutes
 
+                getDefaultProps: function () {
+                    return {
+                        scanStartTime: null,
+                        scanMethods: null,
+                        scanCtrlWebSocket: null,
+                        scanModelingWebSocket: null,
+                        meshes: [],
+                        cylinder: null,
+                        saveFileType: 'pcd'
+                    };
+                },
+
                 // ui events
                 _rescan: function(e) {
                     this.setState(this.getInitialState());
@@ -562,12 +574,14 @@ define([
                         };
 
                     return (
+                        true === this.state.openProgressBar ?
                         <ProgressBar
                             lang={lang}
                             percentage={this.state.progressPercentage}
                             remainingTime={this.state.progressRemainingTime}
                             elapsedTime={this.state.progressElapsedTime}
-                        />
+                        /> :
+                        ''
                     );
                 },
 
@@ -605,11 +619,21 @@ define([
                             self._onScanAgain(e);
                         },
                         content = (
-                            <Alert lang={lang} message={self.props.error.reason} handleClose={onClose}/>
+                            <Alert lang={lang} caption={self.state.error.caption} message={self.state.error.message} handleClose={onClose}/>
                         );
 
                     return (
-                        <Modal content={content} disabledEscapeOnBackground={true} onClose={onClose}/>
+                        true === self.state.openAlert ?
+                        <Modal content={content} disabledEscapeOnBackground={true} onClose={onClose}/> :
+                        ''
+                    );
+                },
+
+                _renderBlocker: function(lang) {
+                    return (
+                        true === this.state.openBlocker ?
+                        <Modal content={<div className="spinner-flip spinner-reverse"/>}/> :
+                        ''
                     );
                 },
 
@@ -716,20 +740,11 @@ define([
                         showScanButton: true,
                         showCamera: true,
                         disabledScanButton: false,
-                        disabledConvertButton: false
-                    };
-                },
-
-                getDefaultProps: function () {
-                    return {
-                          scanStartTime: null,
-                          scanMethods: null,
-                          scanCtrlWebSocket: null,
-                          scanModelingWebSocket: null,
-                          meshes: [],
-                          cylinder: null,
-                          saveFileType: 'pcd',
-                          error: {}
+                        disabledConvertButton: false,
+                        error: {
+                            caption: '',
+                            message: ''
+                        }
                     };
                 },
 
@@ -747,21 +762,9 @@ define([
                 render : function() {
                     var state = this.state,
                         lang = state.lang,
-                        progressBar = (
-                            true === state.openProgressBar ?
-                            this._renderProgressBar(lang) :
-                            ''
-                        ),
-                        printerBlocker = (
-                            true === state.openBlocker ?
-                            <Modal content={<div className="spinner-flip spinner-reverse"/>}/> :
-                            ''
-                        ),
-                        alert = (
-                            true === state.openAlert ?
-                            this._renderAlert(lang) :
-                            ''
-                        ),
+                        progressBar = this._renderProgressBar(lang),
+                        printerBlocker = this._renderBlocker(lang),
+                        alert = this._renderAlert(lang),
                         cx = React.addons.classSet,
                         activeSection,
                         header;
@@ -820,9 +823,11 @@ define([
                                 scanModelingWebSocket: scanModeling(opts),
                                 meshes: [],
                                 cylinder: undefined,
-                                saveFileType: 'pcd',
-                                error: {}
+                                saveFileType: 'pcd'
                             });
+
+                            self.setState(self.getInitialState());
+
                             self._refreshCamera();
                             clearInterval(timer);
                         }
