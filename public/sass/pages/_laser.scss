@@ -59,6 +59,7 @@
         margin: 0 0 0 30px;
         position: static;
         width: 305px;
+        z-index: 1;
         align-self: center;
 
         .custom-presets-wrapper {
@@ -123,6 +124,17 @@
             }
         }
 
+        .display-text {
+            display: inline-block;
+            font-size: 1.8rem;
+            line-height: 40px;
+            padding: 0 16px 0 6px;
+
+            .caption {
+                padding: 0 .3em 0 0;
+            }
+        }
+
         .popup-selection {
             @include flexbox();
             height: 40px;
@@ -154,15 +166,6 @@
             }
 
             .display-text {
-                display: inline-block;
-                font-size: 1.8rem;
-                line-height: 40px;
-                padding: 0 16px 0 6px;
-
-                .caption {
-                    padding: 0 .3em 0 0;
-                }
-
                 p {
                     display: block;
                     margin: 0;
@@ -433,15 +436,14 @@
         }
 
         .footer {
-            margin-bottom: 0;
-            position: static;
             margin: 0 0 10px 0;
+            position: static;
 
             .btn {
-                flex: initial;
                 line-height: 30px;
                 margin: 0 10px 0 0;
                 padding: 0 10px;
+                flex: initial;
 
                 &.btn-cancel {
                     margin: 0;
