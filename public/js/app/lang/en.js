@@ -453,6 +453,12 @@ define(function() {
                 object_height: {
                     text: 'OBJECT HEIGHT',
                     unit: 'mm'
+                },
+                shading: {
+                    text: 'SHADING',
+                    textOn: 'ON',
+                    textOff: 'OFF',
+                    checked: true
                 }
             },
             object_params: {

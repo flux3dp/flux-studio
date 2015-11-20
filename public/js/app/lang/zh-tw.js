@@ -452,6 +452,12 @@ define(function() {
                 object_height: {
                     text: '物體高度',
                     unit: 'mm'
+                },
+                shading: {
+                    text: 'SHADING',
+                    textOn: 'ON',
+                    textOff: 'OFF',
+                    checked: true
                 }
             },
             object_params: {
