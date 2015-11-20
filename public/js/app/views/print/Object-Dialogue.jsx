@@ -1,7 +1,8 @@
 define([
     'react',
-    'plugins/classnames/index'
-], function(React, ClassNames) {
+    'plugins/classnames/index',
+    'jsx!widgets/Unit-Input'
+], function(React, ClassNames, UnitInput) {
     'use strict';
 
     var refSize,
@@ -105,6 +106,10 @@ define([
             this.props.onScaleLock(!this.state.scaleLocked);
         },
 
+        _handleRotationChange: function(e, value) {
+            console.log(e, value);
+        },
+
         _getNumberOnly: function(string) {
             return parseFloat(string.replace(/[^0-9\.]+/g, ''));
         },
@@ -121,79 +126,85 @@ define([
                 rotation        = this.props.model.rotation;
 
             return (
-                <div className="objectDialogue" style={this.props.style}>
-                    <dl className="accordion">
-
-                        <dt><a id="scale" className="title" href="">{lang.print.scale}</a></dt>
-                            <dd className="scale-content">
-
-                                <div className="group">
-                                    <div className="label">X</div>
-                                    <div className="control">
-                                        <input id="x" type="text"
-                                            onChange={this._handleResize}
-                                            onKeyUp={this._handleUpdateSize}
-                                            onBlur={this._handleUpdateSize}
-                                            value={_size.enteredX} /></div>
-                                </div>
-
-                                <div className="group">
-                                    <div className="label">Y</div>
-                                    <div className="control">
-                                        <input id="y" type="text"
-                                            onChange={this._handleResize}
-                                            onKeyUp={this._handleUpdateSize}
-                                            onBlur={this._handleUpdateSize}
-                                            value={_size.enteredY} /></div>
-                                </div>
-
-                                <div className="group">
-                                    <div className="label">Z</div>
-                                    <div className="control">
-                                        <input id="z" type="text"
-                                            onChange={this._handleResize}
-                                            onKeyUp={this._handleUpdateSize}
-                                            onBlur={this._handleUpdateSize}
-                                            value={_size.enteredZ} /></div>
-                                </div>
-
-                                <div className={lockClass} onClick={this._handleToggleScaleLock}>
-
-                                </div>
-                            </dd>
-
-                        <dt><a id="rotate" className="title" href="">{lang.print.rotate}</a></dt>
-                            <dd className="rotate-content">
-
-                                <div className="group">
-                                    <div className="label">X</div>
-                                    <div className="control">
-                                        <input id="x" type="text"
-                                            onChange={this.props.onRotate.bind(this)}
-                                            onBlur={this.props.onRotate.bind(this)}
-                                            value={rotation.enteredX} /></div>
-                                </div>
-
-                                <div className="group">
-                                    <div className="label">Y</div>
-                                    <div className="control">
-                                        <input id="y" type="text"
-                                            onChange={this.props.onRotate.bind(this)}
-                                            onBlur={this.props.onRotate.bind(this)}
-                                            value={rotation.enteredY} /></div>
-                                </div>
-
-                                <div className="group">
-                                    <div className="label">Z</div>
-                                    <div className="control">
-                                        <input id="z" type="text"
-                                            onChange={this.props.onRotate.bind(this)}
-                                            onBlur={this.props.onRotate.bind(this)}
-                                            value={rotation.enteredZ} /></div>
-                                </div>
-
-                            </dd>
-                    </dl>
+                <div className="object-dialogue" style={this.props.style}>
+                    <svg className="arrow" version="1.1" xmlns="http://www.w3.org/2000/svg"
+                        width="36.8" height="20">
+                        <polygon points="0,10 36.8,0 36.8,20"/>
+                    </svg>
+                    <div>
+                    <label className="controls accordion">
+                        <input type="checkbox" className="accordion-switcher"/>
+                        <p className="caption">
+                            {lang.print.scale}
+                            <span className="value">11.1 x 22.2 x 33.3 mm</span>
+                        </p>
+                        <label className="accordion-body">
+                            <div className="control">
+                                <span className="text-center header">X</span>
+                                    <input
+                                        id="x"
+                                        type="text"
+                                        onChange={this._handleResize}
+                                        onBlur={this._handleUpdateSize}
+                                        value={_size.enteredX} />
+                            </div>
+                            <div className="control">
+                                <span className="text-center header">Y</span>
+                                    <input
+                                        id="y"
+                                        type="text"
+                                        onChange={this._handleResize}
+                                        onBlur={this._handleUpdateSize}
+                                        value={_size.enteredY} />
+                            </div>
+                            <div className="control">
+                                <span className="text-center header">Z</span>
+                                    <input
+                                        id="z"
+                                        type="text"
+                                        onChange={this._handleResize}
+                                        onBlur={this._handleUpdateSize}
+                                        value={_size.enteredZ} />
+                            </div>
+                        </label>
+                    </label>
+                    <label className="controls accordion">
+                        <input type="checkbox" className="accordion-switcher"/>
+                        <p className="caption">
+                            {lang.print.rotate}
+                            <span className="value">80 x 70 x 60 &#176;</span>
+                        </p>
+                        <label className="accordion-body">
+                            <div className="control">
+                                <span className="text-center header">X</span>
+                                    <input
+                                        id="x"
+                                        type="text"
+                                        onChange={this.props.onRotate.bind(this)}
+                                        onBlur={this.props.onRotate.bind(this)}
+                                        value={rotation.enteredX} />
+                            </div>
+                            <div className="control">
+                                <span className="text-center header">Y</span>
+                                <input
+                                    id="y"
+                                    type="text"
+                                    onChange={this.props.onRotate.bind(this)}
+                                    onBlur={this.props.onRotate.bind(this)}
+                                    value={rotation.enteredY} />
+                            </div>
+                            <div className="control">
+                                <span className="text-center header">Z</span>
+                                <input
+                                    id="z"
+                                    type="text"
+                                    onChange={this.props.onRotate.bind(this)}
+                                    onBlur={this.props.onRotate.bind(this)}
+                                    value={rotation.enteredZ} />
+                            </div>
+                        </label>
+                    </label>
+                    </div>
                 </div>
             );
         }

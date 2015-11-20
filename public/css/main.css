@@ -4292,93 +4292,76 @@ input.switch:checked ~ label:after {
         position: absolute;
         bottom: 55%; }
 
-.print-studio .objectDialogue {
-    position: absolute;
-    background: #fff;
-    height: 240px;
-    width: 230px; }
-    .print-studio .objectDialogue .accordion {
-        margin-top: 0; }
-        .print-studio .objectDialogue .accordion dt {
-            background-color: #eee; }
-        .print-studio .objectDialogue .accordion dt,
-        .print-studio .objectDialogue .accordion dd {
-            border-bottom: 0; }
-            .print-studio .objectDialogue .accordion dt .title,
-            .print-studio .objectDialogue .accordion dd .title {
-                font-size: 1.3rem;
-                color: #b3b3b3;
-                text-decoration: none;
-                line-height: 1.5em;
-                padding-left: 0.5em;
-                cursor: pointer; }
-        .print-studio .objectDialogue .accordion dd {
-            margin-left: 20px;
-            font-size: 12px; }
-            .print-studio .objectDialogue .accordion dd:last-of-type {
-                border-top: 1px solid white;
-                position: relative;
-                top: -1px; }
-            .print-studio .objectDialogue .accordion dd .group {
-                margin-top: 20px;
-                font-size: 2.5rem;
-                height: 3rem;
-                width: 100%;
-                color: #b3b3b3; }
-                .print-studio .objectDialogue .accordion dd .group .label {
-                    width: 50px;
-                    padding: 0 0.8em 0 0;
-                    display: inline-block; }
-                .print-studio .objectDialogue .accordion dd .group .control {
-                    display: inline; }
-                .print-studio .objectDialogue .accordion dd .group input {
-                    width: 130px;
-                    border-width: 2px;
-                    border-style: solid;
-                    border-color: #b3b3b3; }
-        .print-studio .objectDialogue .accordion .scale-content {
-            height: 195px; }
-            .print-studio .objectDialogue .accordion .scale-content .lock {
-                color: #BBB;
-                display: inline-block;
-                width: 12px;
-                height: 36px;
-                position: absolute;
-                background-image: url("../../img/lock.svg");
-                background-repeat: no-repeat;
-                background-size: 12px 36px;
-                background-position: top;
-                cursor: pointer;
-                top: 102px;
-                right: 10px; }
-            .print-studio .objectDialogue .accordion .scale-content .lock.unlock {
-                background-image: url("../../img/unlock.svg");
-                background-size: 24px 36px; }
-    .print-studio .objectDialogue .divider {
-        width: 100%;
-        height: 5px;
-        background-color: #E0E0DF; }
-    .print-studio .objectDialogue .rotateInputFields {
-        height: 13.5rem;
-        width: 100%; }
-    .print-studio .objectDialogue .bottom {
-        position: absolute;
-        bottom: 0;
-        width: 100%; }
-
-.print-studio .objectDialogue:after {
-    right: 100%;
-    top: 50%;
-    border: solid transparent;
-    content: " ";
-    height: 0;
-    width: 0;
-    position: absolute;
-    pointer-events: none;
-    border-color: rgba(255, 255, 255, 0);
-    border-right-color: #fff;
-    border-width: 20px;
-    margin-top: -20px; }
+.print-studio .object-dialogue {
+    display: -webkit-box;
+    /* OLD - iOS 6-, Safari 3.1-6 */
+    display: -webkit-flex;
+    /* NEW - Chrome */
+    display: flex;
+    /* NEW, Spec - Opera 12.1, Firefox 20+ */
+    font-size: 20px;
+    transition: all 0.1s ease;
+    width: 230px;
+    z-index: 1;
+    position: absolute; }
+    .print-studio .object-dialogue .accordion-body {
+        overflow: visible;
+        position: relative; }
+        .print-studio .object-dialogue .accordion-body .icon-locker {
+            bottom: 0;
+            cursor: pointer;
+            height: 20px;
+            left: 100%;
+            margin: auto;
+            position: absolute;
+            top: 0;
+            width: 20px; }
+    .print-studio .object-dialogue .arrow {
+        align-self: center; }
+        .print-studio .object-dialogue .arrow polygon {
+            fill: #fff; }
+    .print-studio .object-dialogue .caption,
+    .print-studio .object-dialogue .controls {
+        margin: 0; }
+    .print-studio .object-dialogue .controls {
+        background: #FFFFFF;
+        display: block;
+        margin: 0 0 3px 0;
+        padding: 0 20px; }
+    .print-studio .object-dialogue .control {
+        margin: 0 0 10px 0;
+        display: -webkit-box;
+        /* OLD - iOS 6-, Safari 3.1-6 */
+        display: -webkit-flex;
+        /* NEW - Chrome */
+        display: flex;
+        /* NEW, Spec - Opera 12.1, Firefox 20+ */
+        color: #B3B3B3;
+        font-size: 13px;
+        height: 40px;
+        line-height: 40px;
+        align-items: center;
+        justify-content: space-around; }
+        .print-studio .object-dialogue .control .header {
+            color: #E0E0DF;
+            width: 45%; }
+        .print-studio .object-dialogue .control input {
+            width: 80%; }
+    .print-studio .object-dialogue .caption {
+        display: -webkit-box;
+        /* OLD - iOS 6-, Safari 3.1-6 */
+        display: -webkit-flex;
+        /* NEW - Chrome */
+        display: flex;
+        /* NEW, Spec - Opera 12.1, Firefox 20+ */
+        color: #B3B3B3;
+        font-size: 12px;
+        line-height: 30px;
+        justify-content: space-between; }
+    .print-studio .object-dialogue input {
+        border: 1px solid #E0E0DF;
+        color: #B3B3B3;
+        font-size: 15px; }
 
 .print-studio .select-printer {
     bottom: 65px;

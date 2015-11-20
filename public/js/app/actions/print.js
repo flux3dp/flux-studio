@@ -826,7 +826,7 @@ define([
                 modelSelected: o,
                 openObjectDialogue: true
             }, function() {
-                var objectDialogue = document.getElementsByClassName('objectDialogue')[0],
+                var objectDialogue = document.getElementsByClassName('object-dialogue')[0],
                     objectDialogueWidth = parseInt($(objectDialogue).css('width').replace('px', '')),
                     objectDialogueHeight = parseInt($(objectDialogue).css('height').replace('px', '')),
                     leftOffset = parseInt(position.x),
