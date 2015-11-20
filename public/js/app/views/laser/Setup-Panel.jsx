@@ -31,8 +31,19 @@ define([
 
         getDefaultProps: function() {
             return {
-                defaults: React.PropTypes.object
+                defaults: {},
+                imageFormat: 'bitmap',  // svg, bitmap
+                onShadingChanged: function() {}
             };
+        },
+
+        isShading: function() {
+            if ('undefined' === typeof this.refs.shading) {
+                return true;
+            }
+            else {
+                return this.refs.shading.isChecked();
+            }
         },
 
         // UI Events
@@ -139,6 +150,10 @@ define([
             }
         },
 
+        _onShadingChanged: function(e) {
+            this.props.onShadingChanged(e);
+        },
+
         openSubPopup: function(e) {
             var $me = $(e.currentTarget),
                 $popupOpen = $('.popup-open:checked').not($me);
@@ -212,34 +227,34 @@ define([
                         emptyMessage="N/A"
                     />
                     <div className="control">
-                            <span className="label">{advancedLang.form.laser_speed.text}</span>
-                            <input
-                                type="range"
-                                ref="presetSpeed"
-                                min={advancedLang.form.laser_speed.min}
-                                max={advancedLang.form.laser_speed.max}
-                                step={advancedLang.form.laser_speed.step}
-                                value={this.state.chooseSpeed || 0}
-                                className="readonly"
-                            />
-                            <span className="value-text" ref="presetSpeedDisplay" data-tail={advancedLang.form.laser_speed.unit}>
-                                {this.state.chooseSpeed || 0}
-                            </span>
+                        <span className="label">{advancedLang.form.laser_speed.text}</span>
+                        <input
+                            type="range"
+                            ref="presetSpeed"
+                            min={advancedLang.form.laser_speed.min}
+                            max={advancedLang.form.laser_speed.max}
+                            step={advancedLang.form.laser_speed.step}
+                            value={this.state.chooseSpeed || 0}
+                            className="readonly"
+                        />
+                        <span className="value-text" ref="presetSpeedDisplay" data-tail={advancedLang.form.laser_speed.unit}>
+                            {this.state.chooseSpeed || 0}
+                        </span>
                     </div>
                     <div className="control">
-                            <span className="label">{advancedLang.form.power.text}</span>
-                            <input
-                                type="range"
-                                ref="presetPower"
-                                min={advancedLang.form.power.min}
-                                max={advancedLang.form.power.max}
-                                step={advancedLang.form.power.step}
-                                value={this.state.choosePower || 0}
-                                className="readonly"
-                            />
-                            <span className="value-text" ref="presetPowerDisplay" data-tail="%">
-                                {round(this.state.choosePower / advancedLang.form.power.max * 100, -2) || 0}
-                            </span>
+                        <span className="label">{advancedLang.form.power.text}</span>
+                        <input
+                            type="range"
+                            ref="presetPower"
+                            min={advancedLang.form.power.min}
+                            max={advancedLang.form.power.max}
+                            step={advancedLang.form.power.step}
+                            value={this.state.choosePower || 0}
+                            className="readonly"
+                        />
+                        <span className="value-text" ref="presetPowerDisplay" data-tail="%">
+                            {round(this.state.choosePower / advancedLang.form.power.max * 100, -2) || 0}
+                        </span>
                     </div>
                     <ButtonGroup
                         className="btn-h-group custom-preset-buttons"
@@ -335,6 +350,28 @@ define([
             );
         },
 
+        _renderShading: function(lang) {
+            var props = this.props,
+                cx = React.addons.classSet,
+                checked = ('undefined' !== typeof this.props.imageFormat && 'svg' === this.props.imageFormat ? false : this.isShading()),
+                classes = cx({
+                    'display-text': true,
+                    'disabled-pointer': 'svg' === this.props.imageFormat
+                });
+
+            return (
+                <TextToggle
+                    ref="shading"
+                    className={classes}
+                    displayText={lang.laser.print_params.shading.text}
+                    textOn={lang.laser.print_params.shading.textOn}
+                    textOff={lang.laser.print_params.shading.textOff}
+                    defaultChecked={checked}
+                    onClick={this._onShadingChanged}
+                />
+            );
+        },
+
         _renderAlert: function(lang) {
             var buttons = [{
                 label: lang.laser.confirm,
@@ -368,6 +405,7 @@ define([
                 material = this._renderMaterialSelection(lang),
                 objectHeight = this._renderObjectHeight(lang),
                 customPresets = this._renderCustomPresets(lang),
+                shading = this._renderShading(lang),
                 alert = this._renderAlert(lang);
 
             return (
@@ -378,6 +416,9 @@ define([
                         </li>
                         <li>
                             {objectHeight}
+                        </li>
+                        <li>
+                            {shading}
                         </li>
                         <li>
                             <button className="btn btn-advance" data-ga-event="open-laser-advanced-panel" onClick={this._togglePanel('advanced', true)}>
