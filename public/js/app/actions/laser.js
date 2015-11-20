@@ -58,7 +58,7 @@ define([
 
                     if (0 === $img_container.length) {
                         $target_image = null;
-                        state['hasImage'] = false;
+                        state.hasImage = false;
 
                         menuFactory.items.execute.enabled = false;
                         menuFactory.items.saveGCode.enabled = false;
@@ -73,6 +73,7 @@ define([
             },
             refreshImage = function($img, threshold) {
                 var box = $img.box();
+                console.log(self.refs.setupPanel.isShading());
 
                 imageData(
                     $img.data('base'),
@@ -81,6 +82,7 @@ define([
                         width: box.width,
                         grayscale: {
                             is_rgba: true,
+                            is_shading: self.refs.setupPanel.isShading(),
                             threshold: parseInt(threshold, 10)
                         },
                         onComplete: function(result) {
@@ -201,7 +203,7 @@ define([
                     position = {
                         x: convertToRealCoordinate(el_position.center.x, 'x'),
                         y: convertToRealCoordinate(el_position.center.y, 'y')
-                    }
+                    };
                     size = {
                         width: round(el_position.width / PLATFORM_DIAMETER_PIXEL * DIAMETER, -2),
                         height: round(el_position.height / PLATFORM_DIAMETER_PIXEL * DIAMETER, -2)
@@ -238,7 +240,7 @@ define([
                             });
 
                             $target_image.one('transitionend', function() {
-                                $target_image.removeClass('bounce').parent().find('.ft-controls').removeClass('bounce');;
+                                $target_image.removeClass('bounce').parent().find('.ft-controls').removeClass('bounce');
                             });
                         }, 300);
                     }
@@ -305,6 +307,7 @@ define([
                                 },
                                 grayscaleOpts = {
                                     is_svg: ('svg' === self.props.fileFormat),
+                                    is_shading: self.refs.setupPanel.isShading(),
                                     threshold: 255
                                 },
                                 src = $img.data('base'),
@@ -492,6 +495,7 @@ define([
                         type: file.type,
                         grayscale: {
                             is_rgba: true,
+                            is_shading: self.refs.setupPanel.isShading(),
                             threshold: 128
                         },
                         onComplete: function(result) {
@@ -688,6 +692,10 @@ define([
             setPlatform: function(el) {
                 $laser_platform = $(el);
                 PLATFORM_DIAMETER_PIXEL = $laser_platform.width();
+            },
+            refreshImage: refreshImage,
+            getCurrentImages: function() {
+                return $('.' + LASER_IMG_CLASS);
             }
         };
     };
