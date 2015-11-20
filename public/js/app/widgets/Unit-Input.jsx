@@ -12,6 +12,10 @@ define([
             return {
                 defaultValue: '',
                 defaultUnit: unitConverter.defaultUnit,
+                defaultUnitType: unitConverter.defaultUnitType,
+                handleNumberFormat: function(value) {
+                    return round(value, -2);
+                },
                 min: Number.MIN_SAFE_INTEGER,
                 max: Number.MAX_SAFE_INTEGER,
                 step: 1,
@@ -23,8 +27,10 @@ define([
         // Public methods
         value: function(val) {
             if ('number' === typeof val) {
-                this.refs.unitInput.getDOMNode().value = round(val, -2) + this.props.defaultUnit;
-                return round(val, -2);
+                val = this.props.handleNumberFormat(val);
+                this.refs.unitInput.getDOMNode().value = val + this.props.defaultUnit;
+
+                return val;
             }
             else {
                 val = round(parseFloat(this.refs.unitInput.getDOMNode().value), -2);
@@ -43,7 +49,9 @@ define([
 
             if (1 < matches.length) {
                 value = matches[1];
-                value = unitConverter.from(value, unit).to(defaultUnit);
+                value = unitConverter.setDefaultUnitType(this.props.defaultUnitType)
+                    .from(value, unit)
+                    .to(defaultUnit);
             }
             else {
                 value = parseFloat(value, 10) || 0;
@@ -56,7 +64,7 @@ define([
             addValue = parseFloat(addValue, 10) || 0;
 
             var el = this.refs.unitInput.getDOMNode(),
-                values = el.value.split(this.operatorRegex),
+                values = el.value.replace(/\s+/g, '').split(this.operatorRegex),
                 tempValue,
                 value;
 
@@ -106,6 +114,8 @@ define([
         },
 
         _onKeyUp: function(e) {
+            e.preventDefault();
+
             var KEY_RETURN = 13,
                 KEY_UP = 38,
                 KEY_DOWN = 40,
@@ -140,7 +150,7 @@ define([
                 break;
             }
 
-            if ('undefined' !== typeof addValue) {
+            if ('number' === typeof addValue) {
                 value = this._confirmValue(addValue);
                 this.props.getValue(e, value);
             }
