@@ -62,6 +62,10 @@
         z-index: 1;
         align-self: center;
 
+        .disabled-pointer {
+            opacity: 0.3;
+        }
+
         .custom-presets-wrapper {
             background: #FFF;
             overflow: scroll;

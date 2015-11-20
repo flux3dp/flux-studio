@@ -2529,6 +2529,9 @@ input[type=range]:focus::-webkit-slider-runnable-track {
 .pull-right {
     float: right; }
 
+.disabled-pointer {
+    pointer-events: none; }
+
 /**
  * ref: http://tobiasahlin.com/spinkit/
  */
@@ -5129,7 +5132,10 @@ input.switch:checked ~ label:after {
     margin: 0 0 0 30px;
     position: static;
     width: 305px;
+    z-index: 1;
     align-self: center; }
+    .laser-studio .operating-panel .disabled-pointer {
+        opacity: 0.3; }
     .laser-studio .operating-panel .custom-presets-wrapper {
         background: #FFF;
         overflow: scroll;
@@ -5179,6 +5185,13 @@ input.switch:checked ~ label:after {
                 max-width: 66px;
                 min-width: 66px;
                 width: 66px; }
+    .laser-studio .operating-panel .display-text {
+        display: inline-block;
+        font-size: 1.8rem;
+        line-height: 40px;
+        padding: 0 16px 0 6px; }
+        .laser-studio .operating-panel .display-text .caption {
+            padding: 0 0.3em 0 0; }
     .laser-studio .operating-panel .popup-selection {
         display: -webkit-box;
         /* OLD - iOS 6-, Safari 3.1-6 */
@@ -5203,17 +5216,10 @@ input.switch:checked ~ label:after {
                 color: #E0E0DF; }
             .laser-studio .operating-panel .popup-selection .popup-open:checked ~ .popup {
                 visibility: visible; }
-        .laser-studio .operating-panel .popup-selection .display-text {
-            display: inline-block;
-            font-size: 1.8rem;
-            line-height: 40px;
-            padding: 0 16px 0 6px; }
-            .laser-studio .operating-panel .popup-selection .display-text .caption {
-                padding: 0 0.3em 0 0; }
-            .laser-studio .operating-panel .popup-selection .display-text p {
-                display: block;
-                margin: 0;
-                width: 257px; }
+        .laser-studio .operating-panel .popup-selection .display-text p {
+            display: block;
+            margin: 0;
+            width: 257px; }
         .laser-studio .operating-panel .popup-selection .popup {
             display: -webkit-box;
             /* OLD - iOS 6-, Safari 3.1-6 */
@@ -5418,14 +5424,13 @@ input.switch:checked ~ label:after {
     .laser-studio .advanced-panel .form {
         margin: 0 0 10px 0; }
     .laser-studio .advanced-panel .footer {
-        margin-bottom: 0;
-        position: static;
-        margin: 0 0 10px 0; }
+        margin: 0 0 10px 0;
+        position: static; }
         .laser-studio .advanced-panel .footer .btn {
-            flex: initial;
             line-height: 30px;
             margin: 0 10px 0 0;
-            padding: 0 10px; }
+            padding: 0 10px;
+            flex: initial; }
             .laser-studio .advanced-panel .footer .btn.btn-cancel {
                 margin: 0; }
 
