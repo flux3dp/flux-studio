@@ -69,7 +69,8 @@ define([
             lang = args.state.lang,
             selectedPrinter,
             printerController,
-            importBtn,
+            $importBtn,
+            nwjsMenu = menuFactory.items,
             view = React.createClass({
 
                 getInitialState: function() {
@@ -111,11 +112,11 @@ define([
                         }
                     });
 
-                    importBtn = this.refs.importBtn.getDOMNode();
-                    menuFactory.items.import.enable = true;
-                    menuFactory.items.import.onClick = function(e) {
-                        $(importBtn).click();
-                    }.bind(this);
+                    $importBtn = this.refs.importBtn.getDOMNode();
+
+                    nwjsMenu.import.enabled = true;
+                    nwjsMenu.import.onClick = function() { $importBtn.click(); };
+                    nwjsMenu.saveGCode.onClick = this._handleDownloadGCode;
                 },
 
                 _handleSpeedChange: function(speed) {
@@ -216,33 +217,19 @@ define([
 
                 _handleDownloadGCode: function() {
                     if(director.getModelCount() !== 0) {
-                        var fileName = prompt(lang.print.download_prompt);
-                        if(fileName === null) {
-                            return;
-                        }
-                        else {
-                            // fileName += '.gcode';
-                            this.setState({ openWaitWindow: true });
-                            director.downloadGCode(fileName).then(() => {
-                                this.setState({ openWaitWindow: false });
-                            });
-                        }
+                        this.setState({ openWaitWindow: true });
+                        director.downloadGCode().then(() => {
+                            this.setState({ openWaitWindow: false });
+                        });
                     }
                 },
 
                 _handleDownloadFCode: function() {
                     if(director.getModelCount() !== 0) {
-                        var fileName = prompt(lang.print.download_prompt);
-                        if(fileName === null) {
-                            return;
-                        }
-                        else {
-                            // fileName += '.gcode';
-                            this.setState({ openWaitWindow: true });
-                            director.downloadFCode(fileName).then(() => {
-                                this.setState({ openWaitWindow: false });
-                            });
-                        }
+                        this.setState({ openWaitWindow: true });
+                        director.downloadFCode().then(() => {
+                            this.setState({ openWaitWindow: false });
+                        });
                     }
                 },
 
@@ -424,6 +411,10 @@ define([
                     );
                 },
 
+                _renderNwjsMenu: function() {
+                    nwjsMenu.saveGCode.enabled = this.state.hasObject;
+                },
+
                 render: function() {
                     var advancedPanel           = this.state.showAdvancedSetting ? this._renderAdvancedPanel() : '',
                         importWindow            = this.state.openImportWindow ? this._renderImportWindow() : '',
@@ -433,7 +424,9 @@ define([
                         objectDialogue          = this.state.openObjectDialogue ? this._renderObjectDialogue() : '',
                         printerSelectorWindow   = this.state.openPrinterSelectorWindow ? this._renderPrinterSelectorWindow() : '',
                         waitWindow              = this.state.openWaitWindow ? this._renderWaitWindow() : '',
-                        progressWindow          = this.state.progressMessage ? this._renderProgressWindow() : ''
+                        progressWindow          = this.state.progressMessage ? this._renderProgressWindow() : '';
+
+                    this._renderNwjsMenu();
 
                     return (
                         <div className="studio-container print-studio">

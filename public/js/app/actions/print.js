@@ -1045,7 +1045,7 @@ define([
             fileName = defaultFileName;
         }
 
-        fileName = fileName + '.fcode';
+        fileName = fileName + '.gcode';
 
         blobExpired = true;
         selectObject(null);
