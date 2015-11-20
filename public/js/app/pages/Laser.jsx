@@ -52,15 +52,28 @@ define([
                     this.refs.fileUploader.readFiles(e, updatedFiles);
                 },
 
+                _onShadingChanged: function(e) {
+                    var self = this,
+                        $images = self.state.laserEvents.getCurrentImages();
+
+                    $images.each(function(k, el) {
+                        var $el = $(el);
+
+                        self.state.laserEvents.refreshImage($el, $el.data('threshold') || 128);
+                    });
+                },
+
                 // Private events
                 _fetchFormalSettings: function() {
-                    var defaultSettings = config().read('laser-defaults'),
+                    var self = this,
+                        defaultSettings = config().read('laser-defaults'),
                         max = args.state.lang.laser.advanced.form.power.max;
 
                     return {
                         object_height: defaultSettings.objectHeight,
                         laser_speed: defaultSettings.material.data.laser_speed,
-                        power: defaultSettings.material.data.power / max
+                        power: defaultSettings.material.data.power / max,
+                        shading: (true === self.refs.setupPanel.isShading() ? 0 : 1)
                     };
                 },
 
@@ -133,8 +146,10 @@ define([
                             <SetupPanel
                                 lang={lang}
                                 className="operating-panel"
+                                imageFormat={this.state.fileFormat}
                                 defaults={setupPanelDefaults}
                                 ref="setupPanel"
+                                onShadingChanged={this._onShadingChanged}
                             />
                         </div>
                     );
@@ -298,6 +313,7 @@ define([
                         mode: 'engrave',
                         hasImage: false,
                         selectedImage: false,
+                        fileFormat: undefined,
                         selectedPrinter: 0,
                         openPrinterSelectorWindow: false,
                         openBlocker: false,
