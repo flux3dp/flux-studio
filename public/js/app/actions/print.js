@@ -353,6 +353,10 @@ define([
             return;
         }
 
+        reactSrc.setState({
+            isTransforming: true
+        });
+
         raycaster.setFromCamera(mouse, camera);
         var intersects = raycaster.intersectObjects(objects);
         var location = getReferenceIntersectLocation(e);
@@ -393,6 +397,9 @@ define([
 
     function onMouseUp(e) {
         e.preventDefault();
+        reactSrc.setState({
+            isTransforming: false
+        });
         orbitControl.enabled = true;
         mouseDown = false;
         container.style.cursor = 'auto';
@@ -445,10 +452,15 @@ define([
         switch (e.type) {
             case 'mouseDown':
                 transformMode = true;
+                reactSrc.setState({
+                    isTransforming: true
+                });
                 break;
             case 'mouseUp':
                 transformMode = false;
-                // d = degree, s = scale
+                reactSrc.setState({
+                    isTransforming: false
+                });
                 SELECTED.rotation.enteredX = updateDegreeWithStep(radianToDegree(SELECTED.rotation.x));
                 SELECTED.rotation.enteredY = updateDegreeWithStep(radianToDegree(SELECTED.rotation.y));
                 SELECTED.rotation.enteredZ = updateDegreeWithStep(radianToDegree(SELECTED.rotation.z));

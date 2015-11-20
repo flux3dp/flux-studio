@@ -411,81 +411,6 @@ input.switch:checked ~ label:after {
     margin-top: 0.05em;
 }
 
-/*scale panel*/
-.print-studio .control-bottom {
-    position: absolute;
-    bottom: 40px;
-    width: 100%;
-}
-.print-studio .control-bottom > div {
-    position: relative;
-    margin-left: auto;
-    margin-right: auto;
-    width: 688px;
-    height: 70px;
-    background-color: #fff;
-}
-.print-studio .panel .container {
-
-}
-.print-studio .panel .container > div {
-    display: inline-block;
-    margin-left: 20px;
-}
-.print-studio .panel .controls > label {
-    font-size: 13px;
-    font-weight: 500;
-    color: #4a4a4a;
-}
-.print-studio .panel .controls > input {
-    width: 70px;
-    margin-left: 10px;
-}
-.print-studio .panel .lock-container {
-    vertical-align: middle;
-}
-.print-studio .panel .lock-container > div {
-    background-size: 36px 36px;
-    background-repeat: no-repeat;
-    width: 36px;
-    height: 36px;
-    cursor: pointer;
-}
-.print-studio .panel .lock {
-    background-image: url("/img/icon-m-lock.png");
-}
-.print-studio .panel .unlock {
-    background-image: url("/img/icon-m-unlock.png");
-}
-.print-studio .panel .btn {
-    text-align: center;
-    height: 30px;
-    line-height: 28px;
-    font-size: 13px;
-    font-weight: 500;
-    color: #4a4a4a;
-    margin-left: 30px;
-}
-.print-studio .panel .btn:hover {
-    border-color: #000;
-}
-
-/*rotate panel*/
-/*rotate knob*/
-.print-studio .panel .controls div {
-    margin-left: 10px;
-}
-.print-studio .panel .controls div > canvas {
-    vertical-align: middle;
-}
-
-/*reset button*/
-.print-studio .panel .controls.pull-right {
-    position: relative;
-    top: 10px;
-    right: 20px;
-}
-
 /* Advanced Panel */
 .print-studio {
     .import-indicator {
@@ -1154,11 +1079,15 @@ input.switch:checked ~ label:after {
             bottom: 55%;
         }
     }
+
+    .object-dialogue.through {
+        pointer-events: none;
+    }
     .object-dialogue {
         @include flexbox();
         font-size: 20px;
         transition: all .1s ease;
-        width: 230px;
+        width: 280px;
         z-index: 1;
         position: absolute;
 
@@ -1231,93 +1160,27 @@ input.switch:checked ~ label:after {
             color: #B3B3B3;
             font-size: 15px;
         }
-        // position: absolute;
-        // background: #fff;
-        // height: 240px;
-        // width: 230px;
-        // .accordion {
-        //     margin-top: 0;
-        //     dt {
-        //         background-color: #eee;
-        //     }
-        //     dt,
-        //     dd {
-        //         border-bottom: 0;
-        //         .title {
-        //             font-size: 1.3rem;
-        //             color: #b3b3b3;
-        //             text-decoration: none;
-        //             line-height: 1.5em;
-        //             padding-left: 0.5em;
-        //             cursor: pointer;
-        //         }
-        //     }
-        //     dd {
-        //         margin-left: 20px;
-        //         font-size: 12px;
-        //         &:last-of-type {
-        //             border-top: 1px solid white;
-        //             position: relative;
-        //             top: -1px;
-        //         }
-        //         .group {
-        //             margin-top: 20px;
-        //             font-size: 2.5rem;
-        //             height: 3rem;
-        //             width: 100%;
-        //             color: #b3b3b3;
-        //             .label {
-        //                 width: 50px;
-        //                 padding: 0 0.8em 0 0;
-        //                 display: inline-block;
-        //             }
-        //             .control {
-        //                 display: inline;
-        //             }
-        //             input {
-        //                 width: 130px;
-        //                 border-width: 2px;
-        //                 border-style: solid;
-        //                 border-color: #b3b3b3;
-        //             }
-        //         }
-        //     }
-        //     .scale-content {
-        //         height: 195px;
-        //         .lock {
-        //             color: #BBB;
-        //             display: inline-block;
-        //             width: 12px;
-        //             height: 36px;
-        //             position: absolute;
-        //             background-image: url("../../img/lock.svg");
-        //             background-repeat: no-repeat;
-        //             background-size: 12px 36px;
-        //             background-position: top;
-        //             cursor: pointer;
-        //             top: 102px;
-        //             right: 10px;
-        //         }
-        //         .lock.unlock {
-        //             background-image: url("../../img/unlock.svg");
-        //             background-size: 24px 36px;
-        //         }
-        //     }
-        // }
-        // .divider {
-        //     width: 100%;
-        //     height: 5px;
-        //     background-color: #E0E0DF;
-        // }
-        // .rotateInputFields {
-        //     height: 13.5rem;
-        //     width: 100%;
-        // }
-        // .bottom {
-        //     position: absolute;
-        //     bottom: 0;
-        //     width: 100%;
-        // }
+
+        .accordion {
+            .lock {
+                color: #BBB;
+                display: inline-block;
+                width: 12px;
+                height: 36px;
+                position: absolute;
+                background-image: url("../../img/lock.svg");
+                background-repeat: no-repeat;
+                background-size: 12px 36px;
+                background-position: top;
+                cursor: pointer;
+                top: 38%;
+                right: 16px;
+            }
+            .lock.unlock {
+                background-image: url("../../img/unlock.svg");
+                background-size: 24px 36px;
+            }
+        }
     }
     .select-printer {
         bottom: 65px;

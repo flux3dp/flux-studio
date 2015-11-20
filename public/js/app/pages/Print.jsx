@@ -65,7 +65,7 @@ define([
                 y: 0,
                 z: 0
             },
-            _mode = 'scale',
+            _mode = 'size',
             lang = args.state.lang,
             selectedPrinter,
             printerController,
@@ -83,6 +83,7 @@ define([
                         openObjectDialogue          : false,
                         openWaitWindow              : false,
                         openImportWindow            : true,
+                        isTransforming              : false,
                         previewLayerCount           : 0,
                         progressMessage             : '',
                         fcode                       : {},
@@ -278,7 +279,6 @@ define([
                 },
 
                 _handleModeChange: function(mode) {
-                    console.log(mode);
                     this.setState({ mode: mode });
                     if(mode === 'rotate') {
                         director.setRotateMode();
@@ -382,6 +382,7 @@ define([
                             model           = {this.state.modelSelected}
                             style           = {this.state.objectDialogueStyle}
                             mode            = {_mode}
+                            isTransforming  = {this.state.isTransforming}
                             scaleLocked     = {_scale.locked}
                             onRotate        = {this._handleRotationChange}
                             onResize        = {this._handleResize}

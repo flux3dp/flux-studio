@@ -2077,7 +2077,8 @@ body {
     margin: 0;
     min-height: 100%;
     padding: 0;
-    -webkit-user-select: none; }
+    -webkit-user-select: none;
+    overflow: hidden; }
 
 body {
     background-color: #FAFAFA;
@@ -3709,75 +3710,6 @@ input.switch:checked ~ label:after {
     margin-left: 1.6em;
     margin-top: 0.05em; }
 
-/*scale panel*/
-.print-studio .control-bottom {
-    position: absolute;
-    bottom: 40px;
-    width: 100%; }
-
-.print-studio .control-bottom > div {
-    position: relative;
-    margin-left: auto;
-    margin-right: auto;
-    width: 688px;
-    height: 70px;
-    background-color: #fff; }
-
-.print-studio .panel .container > div {
-    display: inline-block;
-    margin-left: 20px; }
-
-.print-studio .panel .controls > label {
-    font-size: 13px;
-    font-weight: 500;
-    color: #4a4a4a; }
-
-.print-studio .panel .controls > input {
-    width: 70px;
-    margin-left: 10px; }
-
-.print-studio .panel .lock-container {
-    vertical-align: middle; }
-
-.print-studio .panel .lock-container > div {
-    background-size: 36px 36px;
-    background-repeat: no-repeat;
-    width: 36px;
-    height: 36px;
-    cursor: pointer; }
-
-.print-studio .panel .lock {
-    background-image: url("/img/icon-m-lock.png"); }
-
-.print-studio .panel .unlock {
-    background-image: url("/img/icon-m-unlock.png"); }
-
-.print-studio .panel .btn {
-    text-align: center;
-    height: 30px;
-    line-height: 28px;
-    font-size: 13px;
-    font-weight: 500;
-    color: #4a4a4a;
-    margin-left: 30px; }
-
-.print-studio .panel .btn:hover {
-    border-color: #000; }
-
-/*rotate panel*/
-/*rotate knob*/
-.print-studio .panel .controls div {
-    margin-left: 10px; }
-
-.print-studio .panel .controls div > canvas {
-    vertical-align: middle; }
-
-/*reset button*/
-.print-studio .panel .controls.pull-right {
-    position: relative;
-    top: 10px;
-    right: 20px; }
-
 /* Advanced Panel */
 .print-studio .import-indicator {
     background-color: rgba(0, 0, 0, 0.5);
@@ -4292,6 +4224,9 @@ input.switch:checked ~ label:after {
         position: absolute;
         bottom: 55%; }
 
+.print-studio .object-dialogue.through {
+    pointer-events: none; }
+
 .print-studio .object-dialogue {
     display: -webkit-box;
     /* OLD - iOS 6-, Safari 3.1-6 */
@@ -4301,7 +4236,7 @@ input.switch:checked ~ label:after {
     /* NEW, Spec - Opera 12.1, Firefox 20+ */
     font-size: 20px;
     transition: all 0.1s ease;
-    width: 230px;
+    width: 280px;
     z-index: 1;
     position: absolute; }
     .print-studio .object-dialogue .accordion-body {
@@ -4362,6 +4297,22 @@ input.switch:checked ~ label:after {
         border: 1px solid #E0E0DF;
         color: #B3B3B3;
         font-size: 15px; }
+    .print-studio .object-dialogue .accordion .lock {
+        color: #BBB;
+        display: inline-block;
+        width: 12px;
+        height: 36px;
+        position: absolute;
+        background-image: url("../../img/lock.svg");
+        background-repeat: no-repeat;
+        background-size: 12px 36px;
+        background-position: top;
+        cursor: pointer;
+        top: 38%;
+        right: 16px; }
+    .print-studio .object-dialogue .accordion .lock.unlock {
+        background-image: url("../../img/unlock.svg");
+        background-size: 24px 36px; }
 
 .print-studio .select-printer {
     bottom: 65px;
