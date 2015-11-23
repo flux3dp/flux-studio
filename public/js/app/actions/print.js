@@ -86,6 +86,7 @@ define([
         camera.up = new THREE.Vector3(0, 0, 1);
 
         scene = new THREE.Scene();
+        outlineScene = new THREE.Scene();
 
         // circular grid helper
         circularGridHelper = new CircularGridHelper(
@@ -123,9 +124,8 @@ define([
         _addShadowedLight(-0.5, -1, 1, 0xffaa00, 1);
 
         // renderer
-        renderer = new THREE.WebGLRenderer({
-            preserveDrawingBuffer: true
-        });
+        renderer = new THREE.WebGLRenderer();
+        renderer.autoClear = false;
         renderer.setClearColor(0xE0E0E0, 1);
         renderer.setPixelRatio(window.devicePixelRatio);
         renderer.setSize(container.offsetWidth, container.offsetHeight);
@@ -158,6 +158,15 @@ define([
 
         panningOffset = new THREE.Vector3();
 
+        // var _g = new THREE.BoxGeometry(20, 20, 20);
+        // var _m = new THREE.MeshBasicMaterial({
+        //     color: 0xAAAAAA,
+        //     wireframe: false
+        // });
+        // var _cube = new THREE.Mesh(_g, _m);
+        // var axes = new THREE.AxisHelper( 100 ); // this will be on top
+        // outlineScene.add(_cube);
+
         render();
         setImportWindowPosition();
 
@@ -165,6 +174,20 @@ define([
         slicer = printSlicing();
 
         registerDropToImport();
+    }
+
+    function animate() {
+
+        requestAnimationFrame( animate );
+
+        // controls.update();
+        render();
+
+        // renderer.clear();
+        // renderer.render( scene, camera );
+        // renderer.clearDepth();
+        // renderer.render( scene2, camera );
+
     }
 
     function uploadStl(name, file) {
@@ -195,8 +218,6 @@ define([
                 defaultFileName = fileEntry.name;
             }
         }
-
-        console.log(defaultFileName);
 
         reactSrc.setState({
             openWaitWindow: true,
@@ -266,7 +287,7 @@ define([
             createOutline(mesh);
 
             scene.add(mesh);
-            scene.add(mesh.outlineMesh);
+            outlineScene.add(mesh.outlineMesh);
             objects.push(mesh);
             reactSrc.setState({
                 hasObject: true
@@ -710,7 +731,6 @@ define([
         SELECTED.outlineMesh.scale.set(
             (originalScaleX * x) || scaleBeforeTransformX, (originalScaleY * y) || scaleBeforeTransformY, (originalScaleZ * z) || scaleBeforeTransformZ
         );
-        // SELECTED.outlineMesh.scale.multiplyScalar(1.05);
         SELECTED.scale.locked = isLocked;
         SELECTED.plane_boundary = planeBoundary(SELECTED);
 
@@ -1210,6 +1230,11 @@ define([
         if (!$.isEmptyObject(SELECTED)) {
             updateFromScene('TransformControl');
         }
+        // renderer.render(previewMode ? previewScene : scene, camera);
+        renderer.clear();
+        renderer.render( outlineScene, camera );
+
+        renderer.clearDepth();
         renderer.render(previewMode ? previewScene : scene, camera);
     }
 
@@ -1310,14 +1335,14 @@ define([
         var outlineMesh = new THREE.Mesh(mesh.geometry, outlineMaterial);
         outlineMesh.position.set(mesh.position.x, mesh.position.y, mesh.position.z);
         outlineMesh.scale.set(mesh.scale.x, mesh.scale.y, mesh.scale.z);
-        // outlineMesh.scale.multiplyScalar(1.05);
         mesh.outlineMesh = outlineMesh;
+        outlineScene.add(outlineMesh);
+
     }
 
     function syncObjectOutline(src) {
         src.outlineMesh.rotation.set(src.rotation.x, src.rotation.y, src.rotation.z, 'ZYX');
         src.outlineMesh.scale.set(src.scale.x, src.scale.y, src.scale.z);
-        // src.outlineMesh.scale.multiplyScalar(1.05);
         render();
     }
 
@@ -1468,6 +1493,7 @@ define([
 
     return {
         init                : init,
+        animate             : animate,
         appendModel         : appendModel,
         setRotation         : setRotation,
         setScale            : setScale,
