@@ -819,7 +819,7 @@ define([
                             self.setProps({
                                 scanStartTime: null,
                                 scanMethods: null,
-                                scanCtrlWebSocket: scanControl(state.selectedPrinter.serial, opts),
+                                scanCtrlWebSocket: scanControl(state.selectedPrinter.uuid, opts),
                                 scanModelingWebSocket: scanModeling(opts),
                                 meshes: [],
                                 cylinder: undefined,

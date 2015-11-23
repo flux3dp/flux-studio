@@ -258,7 +258,7 @@ define([
                         });
                     }.bind(this));
 
-                    printerController = PrinterController(selectedPrinter.serial);
+                    printerController = PrinterController(selectedPrinter.uuid);
                 },
 
                 _handlePreviewLayerChange: function(e) {
@@ -415,7 +415,7 @@ define([
                         <Modal content={content} />
                     );
                 },
-                
+
                 render: function() {
                     var advancedPanel           = this.state.showAdvancedSetting ? this._renderAdvancedPanel() : '',
                         importWindow            = this.state.openImportWindow ? this._renderImportWindow() : '',
