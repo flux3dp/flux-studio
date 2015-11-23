@@ -91,7 +91,7 @@ define([
                 );
             },
             sendToMachine = function(blob) {
-                var control_methods = control(self.state.selectedPrinter.serial);
+                var control_methods = control(self.state.selectedPrinter.uuid);
                 control_methods.upload(blob.size, blob);
             },
             sendToBitmapAPI = function(args, settings, callback) {
