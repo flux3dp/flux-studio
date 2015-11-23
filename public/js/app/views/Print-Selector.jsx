@@ -40,7 +40,7 @@ define([
 
             self.selected_printer = meta;
 
-            self._auth(meta.serial, '', opts);
+            self._auth(meta.uuid, '', opts);
         },
 
         _submit: function(e) {
@@ -64,7 +64,7 @@ define([
 
             password = self.refs.password.getDOMNode().value;
 
-            touch_socket = self._auth(selected_printer.serial, password, opts);
+            touch_socket = self._auth(selected_printer.uuid, password, opts);
         },
 
         _auth: function(serial, password, opts) {
@@ -93,7 +93,6 @@ define([
         },
 
         _handleClose: function(e) {
-            // React.unmountComponentAtNode(View);
             this.props.onClose();
         },
 
