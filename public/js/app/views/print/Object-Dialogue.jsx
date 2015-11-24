@@ -1,22 +1,25 @@
 define([
     'react',
-    'plugins/classnames/index'
-], function(React, ClassNames) {
+    'plugins/classnames/index',
+    'jsx!widgets/Unit-Input'
+], function(React, ClassNames, UnitInput) {
     'use strict';
 
     var refSize,
         lastModifiedAxis,
         _size,
         _ratio = 1,
-        _mode = 'scale';
+        _mode = 'size';
 
     return React.createClass({
         propTypes: {
             lang        : React.PropTypes.object,
             model       : React.PropTypes.object,
+            mode        : React.PropTypes.string,
             scaleLocked : React.PropTypes.bool,
             onRotate    : React.PropTypes.func,
             onScale     : React.PropTypes.func,
+            onScaleLock : React.PropTypes.func,
             onResize    : React.PropTypes.func,
             style       : React.PropTypes.object
         },
@@ -31,20 +34,22 @@ define([
 
         componentDidMount: function() {
             // for rotation and scale content accordion
-            var allPanels = $('.accordion > dd'),
-                self = this;
+            // var allPanels = $('.accordion > dd'),
+            //     self = this;
 
-            $('.accordion > dt > a').click(function() {
-                var mode = $(this)[0].id;
-                if(mode !== _mode) {
-                    allPanels.slideUp();
-                    _mode = mode;
-                    $(this).parent().next().slideDown();
-                    self.props.onModeChange(mode);
-                }
+            // $('.accordion > dt > a').click(function() {
+            //     var mode = $(this)[0].id;
+            //     if(mode !== _mode) {
+            //         allPanels.slideUp();
+            //         _mode = mode;
+            //         $(this).parent().next().slideDown();
+            //         self.props.onModeChange(mode);
+            //     }
+            //
+            //     return false;
+            // });
 
-                return false;
-            });
+            this._openAccordion(this.props.mode);
 
             refSize = this.props.model.size.clone();
         },
@@ -74,18 +79,54 @@ define([
             }.bind(this));
         },
 
-        _handleResize: function(src, e) {
-            var axis    = src.target.id,
-                _value  = this._getNumberOnly(src.target.value);
+        _openAccordion(name) {
+            $('.accordion-switcher').prop('checked', '');
+            $('.accordion-switcher').map(function(i, target) {
+                if(target.name === name) {
+                    $(target).prop('checked', 'checked');
+                }
+            });
+        },
 
-            _size['entered' + axis.toUpperCase()] = src.target.value;
-            lastModifiedAxis = src.target.id;
+        _handleResize: function(src, value) {
+            if(src.keyCode !== 13) {
+                return;
+            }
+            var axis = $(src.target).attr('data-id');
+            lastModifiedAxis = axis;
 
             if(this.state.scaleLocked) {
-                _ratio = _value / _size[axis];
+                _ratio = value / _size[axis];
+                _size.x *= _ratio;
+                _size.y *= _ratio;
+                _size.z *= _ratio;
+                _ratio = 1;
+            }
+            else {
+                _size[axis] = value;
             }
 
+            // _size[axis] = value;
+            // _size['entered' + axis] = value;
+            //
+            // _size[lastModifiedAxis] /= _ratio;
+            // _ratio = 1;
+            this._updateSizeProperty(_size);
+            this.props.onResize(_size);
+
             this.setState({ size: _size });
+
+            // var axis    = src.target.id,
+            //     _value  = this._getNumberOnly(src.target.value);
+            //
+            // _size['entered' + axis.toUpperCase()] = src.target.value;
+            // lastModifiedAxis = src.target.id;
+            //
+            // if(this.state.scaleLocked) {
+            //     _ratio = _value / _size[axis];
+            // }
+            //
+            // this.setState({ size: _size });
         },
 
         _handleUpdateSize: function(e) {
@@ -105,6 +146,15 @@ define([
             this.props.onScaleLock(!this.state.scaleLocked);
         },
 
+        _handleRotationChange: function(e, value) {
+            console.log(e, value);
+        },
+
+        _handleModeChange: function(e) {
+            this._openAccordion(e.target.name);
+            this.props.onModeChange(e.target.name)
+        },
+
         _getNumberOnly: function(string) {
             return parseFloat(string.replace(/[^0-9\.]+/g, ''));
         },
@@ -115,85 +165,108 @@ define([
 
         render: function() {
             var lang            = this.props.lang,
+                dialogueClass   = ClassNames('object-dialogue', {'through': this.props.isTransforming}),
                 lockClass       = ClassNames('lock', { 'unlock': !this.state.scaleLocked }),
-                // rotateInputFieldsClass  = ClassNames('rotateInputFields', {bottom: this.props.mode === 'rotate'}),
-                // rotateClass             = ClassNames('section', {bottom: this.props.mode === 'scale'}),
                 rotation        = this.props.model.rotation;
 
             return (
-                <div className="objectDialogue" style={this.props.style}>
-                    <dl className="accordion">
+                <div className={dialogueClass} style={this.props.style}>
+                    <svg className="arrow" version="1.1" xmlns="http://www.w3.org/2000/svg"
+                        width="36.8" height="20">
+                        <polygon points="0,10 36.8,0 36.8,20"/>
+                    </svg>
+                    <div>
 
-                        <dt><a id="scale" className="title" href="">{lang.print.scale}</a></dt>
-                            <dd className="scale-content">
+                    <label className="controls accordion">
+                        <input
+                            name="size"
+                            type="checkbox"
+                            className="accordion-switcher"
+                            onClick={this._handleModeChange}/>
+                        <p className="caption">
+                            {lang.print.scale}
+                            <span className="value">{_size.x} x {_size.y} x {_size.z} mm</span>
+                        </p>
+                        <label className="accordion-body">
 
-                                <div className="group">
-                                    <div className="label">X</div>
-                                    <div className="control">
-                                        <input id="x" type="text"
-                                            onChange={this._handleResize}
-                                            onKeyUp={this._handleUpdateSize}
-                                            onBlur={this._handleUpdateSize}
-                                            value={_size.enteredX} /></div>
-                                </div>
+                            <div className="control">
+                                <span className="text-center header">X</span>
+                                    <UnitInput
+                                        dataAttrs={{ type: 'width' }}
+                                        defaultValue={_size.x}
+                                        dataAttrs={{id: 'x'}}
+                                        getValue={this._handleResize} />
+                            </div>
 
-                                <div className="group">
-                                    <div className="label">Y</div>
-                                    <div className="control">
-                                        <input id="y" type="text"
-                                            onChange={this._handleResize}
-                                            onKeyUp={this._handleUpdateSize}
-                                            onBlur={this._handleUpdateSize}
-                                            value={_size.enteredY} /></div>
-                                </div>
+                            <div className="control">
+                                <span className="text-center header">Y</span>
+                                    <UnitInput
+                                        dataAttrs={{ type: 'width' }}
+                                        defaultValue={_size.y}
+                                        dataAttrs={{id: 'y'}}
+                                        getValue={this._handleResize} />
+                            </div>
 
-                                <div className="group">
-                                    <div className="label">Z</div>
-                                    <div className="control">
-                                        <input id="z" type="text"
-                                            onChange={this._handleResize}
-                                            onKeyUp={this._handleUpdateSize}
-                                            onBlur={this._handleUpdateSize}
-                                            value={_size.enteredZ} /></div>
-                                </div>
+                            <div className="control">
+                                <span className="text-center header">Z</span>
+                                    <UnitInput
+                                        dataAttrs={{ type: 'width' }}
+                                        defaultValue={_size.z}
+                                        dataAttrs={{id: 'z'}}
+                                        getValue={this._handleResize} />
+                            </div>
 
-                                <div className={lockClass} onClick={this._handleToggleScaleLock}>
+                        </label>
 
-                                </div>
-                            </dd>
+                        <div className={lockClass} onClick={this._handleToggleScaleLock}></div>
+                    </label>
 
-                        <dt><a id="rotate" className="title" href="">{lang.print.rotate}</a></dt>
-                            <dd className="rotate-content">
+                    <label className="controls accordion">
+                        <input
+                            name="rotate"
+                            type="checkbox"
+                            className="accordion-switcher"
+                            onClick={this._handleModeChange}/>
+                        <p className="caption">
+                            {lang.print.rotate}
+                            <span className="value">80 x 70 x 60 &#176;</span>
+                        </p>
+                        <label className="accordion-body">
 
-                                <div className="group">
-                                    <div className="label">X</div>
-                                    <div className="control">
-                                        <input id="x" type="text"
-                                            onChange={this.props.onRotate.bind(this)}
-                                            onBlur={this.props.onRotate.bind(this)}
-                                            value={rotation.enteredX} /></div>
-                                </div>
+                            <div className="control">
+                                <span className="text-center header">X</span>
+                                    <input
+                                        id="x"
+                                        type="text"
+                                        onChange={this.props.onRotate.bind(this)}
+                                        onBlur={this.props.onRotate.bind(this)}
+                                        value={rotation.enteredX} />
+                            </div>
 
-                                <div className="group">
-                                    <div className="label">Y</div>
-                                    <div className="control">
-                                        <input id="y" type="text"
-                                            onChange={this.props.onRotate.bind(this)}
-                                            onBlur={this.props.onRotate.bind(this)}
-                                            value={rotation.enteredY} /></div>
-                                </div>
+                            <div className="control">
+                                <span className="text-center header">Y</span>
+                                <input
+                                    id="y"
+                                    type="text"
+                                    onChange={this.props.onRotate.bind(this)}
+                                    onBlur={this.props.onRotate.bind(this)}
+                                    value={rotation.enteredY} />
+                            </div>
 
-                                <div className="group">
-                                    <div className="label">Z</div>
-                                    <div className="control">
-                                        <input id="z" type="text"
-                                            onChange={this.props.onRotate.bind(this)}
-                                            onBlur={this.props.onRotate.bind(this)}
-                                            value={rotation.enteredZ} /></div>
-                                </div>
+                            <div className="control">
+                                <span className="text-center header">Z</span>
+                                <input
+                                    id="z"
+                                    type="text"
+                                    onChange={this.props.onRotate.bind(this)}
+                                    onBlur={this.props.onRotate.bind(this)}
+                                    value={rotation.enteredZ} />
+                            </div>
 
-                            </dd>
-                    </dl>
+                        </label>
+                    </label>
+
+                    </div>
                 </div>
             );
         }

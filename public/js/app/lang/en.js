@@ -287,7 +287,7 @@ define(function() {
                 name: 'Name',
                 loadPreset: 'LOAD',
                 apply: 'APPLY',
-                saveAsPreset: 'SAVE AS',
+                saveAsPreset: 'SAVE',
                 cancel: 'CANCEL',
                 saveAndApply: 'SAVE & APPLY'
             },
@@ -403,6 +403,7 @@ define(function() {
                 support_on: 'SUPPORT ON',
                 support_off: 'SUPPORT OFF',
                 advanced: 'ADVANCED',
+                preview: 'PREVIEW',
                 plaTitle: 'PICK THE COLOR OF THE FILAMENT',
                 transparent: 'TRANSPARENT'
             },

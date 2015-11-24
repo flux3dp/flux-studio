@@ -27,7 +27,7 @@ define([
 
         scene = new THREE.Scene();
 
-        var geometry = new THREE.BoxGeometry(150, 150, 150);
+        var geometry = new THREE.BoxGeometry(200, 200, 200);
         // var material = new THREE.MeshBasicMaterial({
         //     color: 0xAAAAAA,
         //     wireframe: false

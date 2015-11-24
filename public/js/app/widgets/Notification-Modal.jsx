@@ -89,7 +89,7 @@ define([
             return (
                 <div className="modal-window">
                     <div className="modal-background" onClick={this._onEscapeOnBackground}/>
-                    <div className="modal-body notification">
+                    <div className="notification">
                         <div className="modal-content">
                             <div className="wrapper">
                                 {typeTitle}

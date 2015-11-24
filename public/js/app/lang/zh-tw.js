@@ -403,7 +403,9 @@ define(function() {
                 support_on: 'SUPPORT ON',
                 support_off: 'SUPPORT OFF',
                 advanced: 'ADVANCED',
-                plaTitle: 'PICK THE COLOR OF THE FILAMENT'
+                preview: 'PREVIEW',
+                plaTitle: 'PICK THE COLOR OF THE FILAMENT',
+                transparent: 'TRANSPARENT'
             },
             right_panel: {
                 get: 'Get',

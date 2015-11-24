@@ -20,7 +20,7 @@ define([
     var THREE = window.THREE || {},
         container, slicer;
 
-    var camera, scene, renderer;
+    var camera, scene, outlineScene, renderer;
     var orbitControl, transformControl, reactSrc, controls;
 
     var objects = [],
@@ -40,7 +40,8 @@ define([
         shiftPressed = false,
         previewMode = false,
         leftPanelWidth = 275,
-        ddHelper = 0;
+        ddHelper = 0,
+        defaultFileName = '';
 
     var s = {
         diameter: 170,
@@ -85,6 +86,7 @@ define([
         camera.up = new THREE.Vector3(0, 0, 1);
 
         scene = new THREE.Scene();
+        outlineScene = new THREE.Scene();
 
         // circular grid helper
         circularGridHelper = new CircularGridHelper(
@@ -122,9 +124,8 @@ define([
         _addShadowedLight(-0.5, -1, 1, 0xffaa00, 1);
 
         // renderer
-        renderer = new THREE.WebGLRenderer({
-            preserveDrawingBuffer: true
-        });
+        renderer = new THREE.WebGLRenderer();
+        renderer.autoClear = false;
         renderer.setClearColor(0xE0E0E0, 1);
         renderer.setPixelRatio(window.devicePixelRatio);
         renderer.setSize(container.offsetWidth, container.offsetHeight);
@@ -157,6 +158,15 @@ define([
 
         panningOffset = new THREE.Vector3();
 
+        // var _g = new THREE.BoxGeometry(20, 20, 20);
+        // var _m = new THREE.MeshBasicMaterial({
+        //     color: 0xAAAAAA,
+        //     wireframe: false
+        // });
+        // var _cube = new THREE.Mesh(_g, _m);
+        // var axes = new THREE.AxisHelper( 100 ); // this will be on top
+        // outlineScene.add(_cube);
+
         render();
         setImportWindowPosition();
 
@@ -164,6 +174,20 @@ define([
         slicer = printSlicing();
 
         registerDropToImport();
+    }
+
+    function animate() {
+
+        requestAnimationFrame( animate );
+
+        // controls.update();
+        render();
+
+        // renderer.clear();
+        // renderer.render( scene, camera );
+        // renderer.clearDepth();
+        // renderer.render( scene2, camera );
+
     }
 
     function uploadStl(name, file) {
@@ -184,6 +208,16 @@ define([
         var loader = new THREE.STLLoader();
         var model_file_path = fileEntry.toURL();
         callback = callback || function(){};
+
+        if(defaultFileName === '') {
+            var lastIndex = fileEntry.name.lastIndexOf('.');
+            if(lastIndex > 0) {
+                defaultFileName = fileEntry.name.substring(0, 20);
+            }
+            else {
+                defaultFileName = fileEntry.name;
+            }
+        }
 
         reactSrc.setState({
             openWaitWindow: true,
@@ -253,8 +287,11 @@ define([
             createOutline(mesh);
 
             scene.add(mesh);
-            scene.add(mesh.outlineMesh);
+            outlineScene.add(mesh.outlineMesh);
             objects.push(mesh);
+            reactSrc.setState({
+                hasObject: true
+            });
 
             render();
             callback();
@@ -337,6 +374,10 @@ define([
             return;
         }
 
+        reactSrc.setState({
+            isTransforming: true
+        });
+
         raycaster.setFromCamera(mouse, camera);
         var intersects = raycaster.intersectObjects(objects);
         var location = getReferenceIntersectLocation(e);
@@ -377,6 +418,9 @@ define([
 
     function onMouseUp(e) {
         e.preventDefault();
+        reactSrc.setState({
+            isTransforming: false
+        });
         orbitControl.enabled = true;
         mouseDown = false;
         container.style.cursor = 'auto';
@@ -429,10 +473,15 @@ define([
         switch (e.type) {
             case 'mouseDown':
                 transformMode = true;
+                reactSrc.setState({
+                    isTransforming: true
+                });
                 break;
             case 'mouseUp':
                 transformMode = false;
-                // d = degree, s = scale
+                reactSrc.setState({
+                    isTransforming: false
+                });
                 SELECTED.rotation.enteredX = updateDegreeWithStep(radianToDegree(SELECTED.rotation.x));
                 SELECTED.rotation.enteredY = updateDegreeWithStep(radianToDegree(SELECTED.rotation.y));
                 SELECTED.rotation.enteredZ = updateDegreeWithStep(radianToDegree(SELECTED.rotation.z));
@@ -594,6 +643,11 @@ define([
         var d = $.Deferred();
         var ids = [];
 
+        if(objects.length === 0) {
+            d.resolve('');
+            return d.promise();
+        }
+
         if(!blobExpired) {
             d.resolve(responseBlob);
             return d.promise();
@@ -677,7 +731,6 @@ define([
         SELECTED.outlineMesh.scale.set(
             (originalScaleX * x) || scaleBeforeTransformX, (originalScaleY * y) || scaleBeforeTransformY, (originalScaleZ * z) || scaleBeforeTransformZ
         );
-        SELECTED.outlineMesh.scale.multiplyScalar(1.05);
         SELECTED.scale.locked = isLocked;
         SELECTED.plane_boundary = planeBoundary(SELECTED);
 
@@ -725,7 +778,8 @@ define([
         var _settings = Object.keys(settings).map(function(key) {
             return `${key}=${settings[key]} \n`;
         });
-        slicer.setParameter('advancedSettings', _settings.join('')).then(function(result) {
+        //slicer.setParameter('advancedSettings', _settings.join('\n')).then(function(result) {
+        slicer.setParameter('advancedSettings', settings.custom).then(function(result) {
             if (result.status === 'error') {
                 index = keys.length;
                 // todo: error logging
@@ -741,7 +795,6 @@ define([
                 if (result.status === 'error' || result.status === 'fatal') {
                     // todo: error logging
                 }
-                console.dir(result);
             }
         );
         blobExpired = true;
@@ -805,7 +858,7 @@ define([
                 modelSelected: o,
                 openObjectDialogue: true
             }, function() {
-                var objectDialogue = document.getElementsByClassName('objectDialogue')[0],
+                var objectDialogue = document.getElementsByClassName('object-dialogue')[0],
                     objectDialogueWidth = parseInt($(objectDialogue).css('width').replace('px', '')),
                     objectDialogueHeight = parseInt($(objectDialogue).css('height').replace('px', '')),
                     leftOffset = parseInt(position.x),
@@ -928,7 +981,10 @@ define([
             render();
 
             if(objects.length === 0) {
-                reactSrc.setState({ openImportWindow: true }, function() {
+                reactSrc.setState({
+                    openImportWindow: true,
+                    hasObject: false
+                }, function() {
                     setImportWindowPosition();
                 });
             }
@@ -1017,6 +1073,12 @@ define([
     }
 
     function downloadGCode(fileName) {
+        if(!fileName) {
+            fileName = defaultFileName;
+        }
+
+        fileName = fileName + '.gcode';
+
         blobExpired = true;
         selectObject(null);
         var d = $.Deferred();
@@ -1041,6 +1103,12 @@ define([
     }
 
     function downloadFCode(fileName) {
+        if(!fileName) {
+            fileName = defaultFileName;
+        }
+
+        fileName = fileName + '.fcode';
+
         selectObject(null);
         var d = $.Deferred();
         if(objects.length > 0) {
@@ -1102,9 +1170,9 @@ define([
         if (objects.length === 0) {
             return;
         } else {
-            reactSrc.setState({
-                previewMode: isOn
-            });
+            // reactSrc.setState({
+            //     previewMode: isOn
+            // });
             previewMode = isOn;
             _setProgressMessage('generating preview...');
             isOn ? _showPreview() : _hidePreview();
@@ -1162,6 +1230,11 @@ define([
         if (!$.isEmptyObject(SELECTED)) {
             updateFromScene('TransformControl');
         }
+        // renderer.render(previewMode ? previewScene : scene, camera);
+        renderer.clear();
+        renderer.render( outlineScene, camera );
+
+        renderer.clearDepth();
         renderer.render(previewMode ? previewScene : scene, camera);
     }
 
@@ -1253,18 +1326,23 @@ define([
     }
 
     function createOutline(mesh) {
-        var outlineMaterial = new THREE.MeshBasicMaterial( { color: s.colorSelected, side: THREE.BackSide } );
+        var outlineMaterial = new THREE.MeshBasicMaterial({
+            color: s.colorSelected,
+            side: THREE.BackSide,
+            wireframe: true,
+            wireframeLinewidth: 5
+        });
         var outlineMesh = new THREE.Mesh(mesh.geometry, outlineMaterial);
         outlineMesh.position.set(mesh.position.x, mesh.position.y, mesh.position.z);
         outlineMesh.scale.set(mesh.scale.x, mesh.scale.y, mesh.scale.z);
-        outlineMesh.scale.multiplyScalar(1.05);
         mesh.outlineMesh = outlineMesh;
+        outlineScene.add(outlineMesh);
+
     }
 
     function syncObjectOutline(src) {
         src.outlineMesh.rotation.set(src.rotation.x, src.rotation.y, src.rotation.z, 'ZYX');
         src.outlineMesh.scale.set(src.scale.x, src.scale.y, src.scale.z);
-        src.outlineMesh.scale.multiplyScalar(1.05);
         render();
     }
 
@@ -1391,8 +1469,7 @@ define([
         }
 
         reactSrc.setState({
-            sliderMax: previewScene.children.length - 1,
-            sliderValue: previewScene.children.length - 1
+            previewLayerCount: previewScene.children.length - 1
         });
         _showPath();
     }
@@ -1416,6 +1493,7 @@ define([
 
     return {
         init                : init,
+        animate             : animate,
         appendModel         : appendModel,
         setRotation         : setRotation,
         setScale            : setScale,
