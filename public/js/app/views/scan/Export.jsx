@@ -5,9 +5,18 @@ define([
     'use strict';
 
     return React.createClass({
+
+        getDefaultProps: function() {
+            return {
+                lang: {},
+                onExport: function() {}
+            };
+        },
+
         _onExport: function(e) {
             this.props.onExport(e);
         },
+
         render : function() {
             var lang = this.props.lang;
 
@@ -20,13 +29,6 @@ define([
                     </div>
                 </div>
             );
-        },
-
-        getDefaultProps: function() {
-            return {
-                lang: React.PropTypes.object,
-                onExport: React.PropTypes.func
-            };
         }
     });
 });
