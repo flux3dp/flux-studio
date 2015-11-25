@@ -1,203 +1,104 @@
 define([
+    'jquery',
     'react',
-    'jsx!widgets/Select'
-], function(React, SelectView) {
+    'helpers/api/config',
+    'jsx!widgets/List',
+    'jsx!widgets/Dialog-Menu'
+], function($, React, config, List, DialogMenu) {
     'use strict';
 
     return React.createClass({
-        // UI events
-        _onScanClick: function (e) {
-            this.props.onScanClick(e, this.refs);
+
+        getDefaultProps: function() {
+            return {
+                className: {},
+                lang: {},
+                getSetting: function(setting) {}
+            };
         },
 
-        _onCancelClick: function (e) {
-            this.props.onCancelClick(e);
+        openSubPopup: function(e) {
+            this.refs.dialogMenu.toggleSubPopup(e);
         },
 
-        _onSaveClick: function (e) {
-            this.props.onSaveClick(e);
+        getSettings: function() {
+            return this.state.defaults;
         },
 
-        _onConvertClick: function (e) {
-            this.props.onConvertClick(e);
-        },
+        _onPickupResolution: function(e) {
+            var $me = $(e.target).parents('li'),
+                settings = {
+                    resolution: $me.data('meta')
+                };
 
-        _onScanAgainClick: function (e) {
-            this.props.onScanAgainClick(e);
-        },
+            this.props.getSetting(settings);
 
-        _getButtonsConfig: function(lang) {
-            var self = this,
-                props = self.props,
-                cx = React.addons.classSet,
-                basicStyle = {
-                    'btn': true,
-                    'btn-action': true,
-                    'btn-full-width': true,
-                    'fa': true
-                },
-                buttons = [
-                    // scan | multiscan
-                    {
-                        eventName: 'running-scan',
-                        label: (
-                            0 < props.scanTimes
-                            ? lang.scan.start_multiscan
-                            : lang.scan.start_scan
-                        ),
-                        eventHandler: self._onScanClick,
-                        basicStyle: JSON.parse(JSON.stringify(basicStyle)),
-                        specificStyle: {
-                            'fa-bullseye': true,
-                            // limits 2 times
-                            'btn-disabled': 2 === props.scanTimes || true === props.disabledScanButton
-                        },
-                        display: true === props.showScanButton
-                    },
-                    // cancel scan
-                    {
-                        eventName: 'cancel-scan',
-                        label: lang.scan.cancel_scan,
-                        eventHandler: self._onCancelClick,
-                        basicStyle: JSON.parse(JSON.stringify(basicStyle)),
-                        specificStyle: {
-                            'fa-stop': true,
-                            'btn-disabled': false
-                        },
-                        display: false === props.showScanButton
-                    },
-                    // convert
-                    {
-                        eventName: 'convert-scan',
-                        label: lang.scan.convert_to_stl,
-                        eventHandler: self._onConvertClick,
-                        basicStyle: JSON.parse(JSON.stringify(basicStyle)),
-                        specificStyle: {
-                            'fa-bullseye': true,
-                            'btn-disabled': true === props.isScanStarted || true === props.disabledConvertButton
-                        },
-                        display: 0 < props.scanTimes
-                    },
-                    // save (export)
-                    {
-                        eventName: 'export',
-                        label: lang.scan.do_save,
-                        eventHandler: self._onSaveClick,
-                        basicStyle: JSON.parse(JSON.stringify(basicStyle)),
-                        specificStyle: {
-                            'fa-bullseye': true,
-                            'btn-disabled': true === props.isScanStarted
-                        },
-                        display: 0 < props.scanTimes
-                    },
-                    // scan again
-                    {
-                        eventName: 'scan-again',
-                        label: lang.scan.scan_again,
-                        eventHandler: self._onScanAgainClick,
-                        basicStyle: JSON.parse(JSON.stringify(basicStyle)),
-                        specificStyle: {
-                            'fa-bullseye': true,
-                            'btn-disabled': true === props.isScanStarted
-                        },
-                        display: 0 < props.scanTimes
-                    }
-                ];
+            config().write('scan-defaults', settings);
 
-            return buttons.map(function(button) {
-                var styles = button.basicStyle;
-
-                for (var key in button.specificStyle) {
-                    styles[key] = button.specificStyle[key];
-                }
-
-                styles = cx(styles);
-
-                if (true === button.display) {
-                    return (
-                        <button data-ga-event={button.eventName} onClick={button.eventHandler} className={styles}>
-                            {button.label}
-                        </button>
-                    );
-                }
-                else {
-                    return '';
-                }
-
+            this.setState({
+                defaults: settings
             });
+
+            this.openSubPopup(e);
         },
 
-        _renderButtons: function(lang) {
-            var props = this.props,
-                buttons = this._getButtonsConfig(lang);
+        getInitialState: function() {
+            var defaultSettings = {
+                    resolution: this.props.lang.scan.resolution[0]
+                },
+                defaults = config().read('scan-defaults') || defaultSettings;
 
-            return (
-                <div className="action-buttons">
-                    {buttons}
-                </div>
-            );
+            return {
+                defaults: defaults
+            };
+        },
+
+
+
+        _getResolutionOptions: function(lang) {
+            var resolution = JSON.parse(JSON.stringify(lang.scan.resolution)),
+                options = [];
+
+            resolution.forEach(function(opt, i) {
+                options.push({
+                    data: opt,
+                    label: (
+                        <div className="resolution-item">
+                            <span className="caption">{opt.text}</span>
+                            <span className="time">{opt.time}</span>
+                        </div>
+                    )
+                });
+            });
+
+            return {
+                label: (
+                    <div>
+                        <span className="caption">{this.state.defaults.resolution.text}</span>
+                        <span>{lang.scan.quality}</span>
+                    </div>
+                ),
+                content: (
+                    <List items={options} onClick={this._onPickupResolution}/>
+                )
+            };
         },
 
         render: function() {
             var props = this.props,
-                start_scan_text,
-                cx = React.addons.classSet,
                 lang = props.lang,
-                buttons = this._renderButtons(lang);
+                resolutionOptions = this._getResolutionOptions(lang),
+                cx = React.addons.classSet,
+                className = props.className,
+                items = [resolutionOptions];
+
+            className['setup-panel'] = true;
 
             return (
-                <div className="setup-panel operating-panel">
-                    <div className="main">
-                        <div className="time">
-                            {lang.scan.remaining_time}
-                        </div>
-                        <div className="setup">
-                            <div className="icon print-speed"></div>
-                            <div className="controls">
-                                <div className="label">{lang.scan.scan_params.scan_speed.text}</div>
-                                <div className="control">
-                                    <SelectView name="scan_speed" ref="scan_speed" className="span12" options={lang.scan.scan_params.scan_speed.options}/>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="setup">
-                            <div className="icon material"></div>
-                            <div className="controls">
-                                <div className="label">{lang.scan.scan_params.luminance.text}</div>
-                                <div className="control">
-                                    <SelectView ref="luminance" className="luminance span12" options={lang.scan.scan_params.luminance.options}/>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="setup last-setup">
-                            <div className="icon material"></div>
-                            <div className="controls">
-                                <div className="label">{lang.scan.scan_params.object.text}</div>
-                                <div className="control">
-                                    <SelectView ref="object_height" className="object-height span12" options={lang.scan.scan_params.object.options}/>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {buttons}
+                <div className={cx(className)}>
+                    <DialogMenu ref="dialogMenu" items={items}/>
                 </div>
             );
-        },
-
-        getDefaultProps: function() {
-            return {
-                onScanClick: React.PropTypes.func,
-                onCancelClick: React.PropTypes.func,
-                onSaveClick: React.PropTypes.func,
-                onConvertClick: React.PropTypes.func,
-                onScanAgainClick: React.PropTypes.func,
-                scanTimes: React.PropTypes.number,
-                isScanStarted: React.PropTypes.bool,
-                showScanButton: React.PropTypes.bool,
-                disabledScanButton: React.PropTypes.bool,
-                disabledConvertButton: React.PropTypes.bool
-            };
         }
 
     });
