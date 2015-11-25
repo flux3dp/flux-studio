@@ -561,7 +561,42 @@ define(function() {
             complete: '掃描進度',
             remaining_time: '剩餘時間',
             elapsed_time: '已用時間',
-            do_save: '儲存⋯',
+            do_save: '儲存 STL',
+            go: 'Go',
+            rollback: 'Back',
+            error: 'Error',
+            confirm: '確認',
+            quality: 'QUALITY',
+            resolution: [{
+                id: 'best',
+                text: 'Best',
+                time: '~60min',
+                value: 1200
+            },
+            {
+                id: 'high',
+                text: 'High',
+                time: '~40min',
+                value: 800
+            },
+            {
+                id: 'normal',
+                text: 'Normal',
+                time: '~20min',
+                value: 400
+            },
+            {
+                id: 'low',
+                text: 'Low',
+                time: '~10min',
+                value: 200
+            },
+            {
+                id: 'draft',
+                text: 'Draft',
+                time: '~5min',
+                value: 100
+            }],
             save_mode: [
                 {
                     value: 'stl',

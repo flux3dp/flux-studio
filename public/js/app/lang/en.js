@@ -557,12 +557,47 @@ define(function() {
             cancel_scan: 'Cancel',
             convert_to_stl: 'Convert',
             scan_again: 'Scan Again',
-            start_multiscan: ' Multiscan',
+            start_multiscan: 'Extra Scan',
             convert_to_3d_model: 'Convert to 3D model...',
             complete: 'Completed',
             remaining_time: 'Remaining Time',
             elapsed_time: 'Elapsed Time',
-            do_save: 'Save',
+            do_save: 'Save STL',
+            go: 'Go',
+            rollback: 'Back',
+            error: 'Error',
+            confirm: 'Confirm',
+            quality: 'QUALITY',
+            resolution: [{
+                id: 'best',
+                text: 'Best',
+                time: '~60min',
+                value: 1200
+            },
+            {
+                id: 'high',
+                text: 'High',
+                time: '~40min',
+                value: 800
+            },
+            {
+                id: 'normal',
+                text: 'Normal',
+                time: '~20min',
+                value: 400
+            },
+            {
+                id: 'low',
+                text: 'Low',
+                time: '~10min',
+                value: 200
+            },
+            {
+                id: 'draft',
+                text: 'Draft',
+                time: '~5min',
+                value: 100
+            }],
             save_mode: [
                 {
                     value: 'stl',
