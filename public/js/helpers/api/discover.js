@@ -16,15 +16,18 @@ define([
 
         var onMessage = function(data) {
             var someFn = function(el) {
-                    return el.serial === data.serial;
+                    return el.uuid === data.uuid;
                 },
                 findIndex = function(el) {
-                    return el.serial === data.serial;
+                    return el.uuid === data.uuid;
                 },
                 existing_key = printers.findIndex(findIndex);
 
             if (false === printers.some(someFn)) {
                 printers.push(data);
+            }
+            else {
+                printers[existing_key] = data;
             }
 
             if (false === data.alive && -1 < existing_key) {
