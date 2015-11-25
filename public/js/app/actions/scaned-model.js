@@ -241,6 +241,8 @@ define([
 
         material = new THREE.PointCloudMaterial({
             size: 0.5,
+            opacity: 0.3,
+            transparent: true,
             vertexColors: THREE.VertexColors
         });
 
@@ -329,6 +331,7 @@ define([
         add: addMesh,
         attachControl: attachControl,
         update: render,
-        loadStl: loadStl
+        loadStl: loadStl,
+        render: render
     };
 });
