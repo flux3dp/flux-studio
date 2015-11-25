@@ -58,12 +58,12 @@
     .operating-panel {
         margin: 0 0 0 30px;
         position: static;
-        width: 305px;
-        z-index: 1;
         align-self: center;
+        width: auto;
+        z-index: 1;
 
         .disabled-pointer {
-            opacity: 0.3;
+            opacity: .3;
         }
 
         .custom-presets-wrapper {
@@ -128,15 +128,8 @@
             }
         }
 
-        .display-text {
-            display: inline-block;
-            font-size: 1.8rem;
-            line-height: 40px;
-            padding: 0 16px 0 6px;
-
-            .caption {
-                padding: 0 .3em 0 0;
-            }
+        .caption {
+            padding: 0 .3em 0 0;
         }
 
         .popup-selection {
@@ -176,22 +169,6 @@
                     width: 257px;
                 }
             }
-
-            .popup {
-                @include flexbox();
-                visibility: hidden;
-                align-self: center;
-
-                .arrow {
-                    position: relative;
-                    right: -1px;
-                    align-self: center;
-
-                    polygon {
-                        fill: #B3B3B3;
-                    }
-                }
-            }
         }
 
         .object-height-input {
@@ -210,10 +187,6 @@
             }
         }
 
-        .material-list {
-            width: 116px;
-        }
-
         .btn-advance {
             background: rgba(0,0,0,0);
             border-radius: 0;
@@ -221,13 +194,12 @@
             font-size: 1.8rem;
             line-height: 40px;
             margin: 0;
-            padding: 0 16px 0 6px;
+            padding: 0;
             text-align: left;
             width: 100%;
         }
 
         li {
-            color: #b3b3b3;
             font-size: 16px;
             line-height: 40px;
         }
@@ -395,13 +367,14 @@
     .action-buttons {
         bottom: 28px;
         position: fixed;
-        right: 78px;
+        right: 20px;
+        width: 87px;
 
         .btn.btn-disabled {
             background: #CCC;
         }
 
-        .btn-default {
+        .btn {
             background: #B3B3B3;
             border: none;
             border-radius: 0;
@@ -412,7 +385,7 @@
             font-weight: normal;
             height: 100px;
             line-height: 1.2em;
-            margin: 0;
+            margin: -20px 0 0 0;
             min-width: 87px;
             position: relative;
             width: 87px;
@@ -420,13 +393,15 @@
             &:hover {
                 background: #000;
             }
+
+            &:nth-child(odd) {
+                left: -45px;
+            }
         }
 
         .btn-go {
             background: #4D4D4D;
             font-size: 35px;
-            left: 50px;
-            top: -21px;
         }
     }
 
