@@ -401,7 +401,7 @@ var mode = {
                         <SliderControl
                             id="perimeters"
                             key="perimeters"
-                            label={lang.spiral}
+                            label={lang.shellSurface}
                             min={0}
                             max={20}
                             step={1}
@@ -465,7 +465,7 @@ var mode = {
 
                         <SwitchControl
                             id="spiral_vase"
-                            label={lang.shellSurface}
+                            label={lang.spiral}
                             default={advancedSetting.spiral_vase === 1}
                             onChange={this._handleControlValueChange} />
 
@@ -741,7 +741,7 @@ var mode = {
 
                     <div className="right">
                         {button2}
-                        {button4}                        
+                        {button4}
                     </div>
 
                 </div>

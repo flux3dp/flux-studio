@@ -2,8 +2,9 @@ define([
     'jquery',
     'react',
     'app/actions/print',
-    'plugins/classnames/index'
-], function($, React, printController, ClassNames) {
+    'plugins/classnames/index',
+    'helpers/device-master'
+], function($, React, printController, ClassNames, DeviceMaster) {
     'use strict';
 
     var lang;
@@ -103,6 +104,12 @@ define([
             });
         },
 
+        _handleTest: function() {
+            console.log(DeviceMaster.getPassword());
+            DeviceMaster.setPassword('456');
+            console.log(DeviceMaster.getPassword());
+        },
+
         _onOpenSubPopup: function(e) {
             var $me = $(e.currentTarget),
                 $popupOpen = $('.popup-open:checked').not($me);
@@ -111,7 +118,7 @@ define([
         },
 
         _renderQuanlity: function() {
-            var _quality = ['high', 'good', 'normal', 'quick', 'fast'],
+            var _quality = ['high', 'med', 'low'],
                 qualitySelection;
 
             qualitySelection = _quality.map(function(quality) {
@@ -261,9 +268,9 @@ define([
 
                         {support}
 
-                        {advanced}
-
                         {preview}
+
+                        {advanced}
                     </ul>
                 </div>
             );

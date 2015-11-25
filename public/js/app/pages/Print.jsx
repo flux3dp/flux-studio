@@ -288,8 +288,13 @@ define([
                     }
                 },
 
-                _handleQualitySelected: function(quality) {
-
+                _handleQualitySelected: function(level) {
+                    var quality = {
+                        high: 0.1,
+                        med: 0.2,
+                        low: 0.3
+                    };
+                    director.setParameter('layer_height', quality[level]);
                 },
 
                 _renderAdvancedPanel: function() {

@@ -4175,7 +4175,7 @@ input.switch:checked ~ label:after {
             .print-studio .leftPanel .popup-selection .display-text p {
                 display: block;
                 margin: 0;
-                width: 175px; }
+                width: 185px; }
         .print-studio .leftPanel .popup-selection .popup {
             visibility: hidden;
             align-self: center;
@@ -4248,7 +4248,6 @@ input.switch:checked ~ label:after {
                 background-color: #F9F9F9; }
             .print-studio .leftPanel .popup-selection .popup .content.quality {
                 width: 160px;
-                height: 220px;
                 z-index: 1000;
                 background-color: #B3B3B3; }
                 .print-studio .leftPanel .popup-selection .popup .content.quality ul {

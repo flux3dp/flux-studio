@@ -413,11 +413,9 @@ define(function() {
                 preview: '預覽'
             },
             quality: {
-                high: 'High Quality',
-                good: 'Good Quality',
-                normal: 'Normal Quality',
-                quick: 'Quick Quality',
-                fast: 'Fast Quality'
+                high: 'HIGH QUALITY',
+                med: 'MEDIUM QUALITY',
+                low: 'LOW QUALITY'
             },
             quick_print: 'Quick Print',
             scale: '比例',

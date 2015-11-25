@@ -414,10 +414,8 @@ define(function() {
             },
             quality: {
                 high: 'HIGH QUALITY',
-                good: 'GOOD QUALITY',
-                normal: 'NORMAL QUALITY',
-                quick: 'QUICK QUALITY',
-                fast: 'FAST QUALITY'
+                med: 'MEDIUM QUALITY',
+                low: 'LOW QUALITY'
             },
             quick_print: 'Quick Print',
             scale: 'Scale',
