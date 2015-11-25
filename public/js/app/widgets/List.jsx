@@ -7,7 +7,7 @@ define(['react'], function(React){
             return {
                 name: '',
                 id: '',
-                emptyMessage: ''
+                emptyMessage: '',
                 className: '',
                 items: [],
                 onClick: function() {},
