@@ -9,6 +9,7 @@ define([
     'jsx!widgets/Unit-Input',
     'jsx!widgets/Button-Group',
     'jsx!widgets/Alert',
+    'jsx!widgets/Dialog-Menu',
     'helpers/api/config',
     'helpers/round',
 ], function(
@@ -22,6 +23,7 @@ define([
     UnitInput,
     ButtonGroup,
     Alert,
+    DialogMenu,
     config,
     round
 ) {
@@ -155,10 +157,7 @@ define([
         },
 
         openSubPopup: function(e) {
-            var $me = $(e.currentTarget),
-                $popupOpen = $('.popup-open:checked').not($me);
-
-            $popupOpen.removeAttr('checked');
+            this.refs.dialogMenu.toggleSubPopup(e);
         },
 
         _refreshObjectHeight: function(e, value) {
@@ -291,63 +290,47 @@ define([
         },
 
         _renderObjectHeight: function(lang) {
-            return (
-                <label className="popup-selection">
-                    <input className="popup-open" name="popup-open" type="checkbox" onClick={this.openSubPopup}/>
-                    <div className="display-text">
-                        <p>
-                            <span className="caption">{lang.laser.print_params.object_height.text}</span>
-                            <span>{this.state.defaults.objectHeight}</span>
-                            <span>{lang.laser.print_params.object_height.unit}</span>
-                        </p>
+            return {
+                label: (
+                    <div>
+                        <span className="caption">{lang.laser.print_params.object_height.text}</span>
+                        <span>{this.state.defaults.objectHeight}</span>
+                        <span>{lang.laser.print_params.object_height.unit}</span>
                     </div>
-                    <label className="popup">
-                        <svg className="arrow" version="1.1" xmlns="http://www.w3.org/2000/svg"
-                            width="36.8" height="20">
-                            <polygon points="0,10 36.8,0 36.8,20"/>
-                        </svg>
-                        <ul className="object-height-input">
-                            <li>
-                                <UnitInput
-                                    defaultUnit="mm"
-                                    defaultValue={this.state.defaults.objectHeight}
-                                    getValue={this._refreshObjectHeight}
-                                    min={0}
-                                    max={150}
-                                />
-                            </li>
-                        </ul>
-                    </label>
-                </label>
-            )
+                ),
+                content: (
+                    <div className="object-height-input">
+                        <UnitInput
+                            defaultUnit="mm"
+                            defaultValue={this.state.defaults.objectHeight}
+                            getValue={this._refreshObjectHeight}
+                            min={0}
+                            max={150}
+                        />
+                    </div>
+                )
+            };
         },
 
         _renderMaterialSelection: function(lang) {
             var props = this.props;
 
-            return (
-                <label className="popup-selection">
-                    <input className="popup-open" name="popup-open" type="checkbox" onClick={this.openSubPopup}/>
-                    <div className="display-text">
-                        <p>
-                            <span className="caption">{lang.laser.advanced.form.object_options.text}</span>
-                            <span>{this.state.defaults.material.label}</span>
-                        </p>
+            return {
+                label: (
+                    <div>
+                        <span className="caption">{lang.laser.advanced.form.object_options.text}</span>
+                        <span>{this.state.defaults.material.label}</span>
                     </div>
-                    <label className="popup">
-                        <svg className="arrow" version="1.1" xmlns="http://www.w3.org/2000/svg"
-                            width="36.8" height="20">
-                            <polygon points="0,10 36.8,0 36.8,20"/>
-                        </svg>
-                        <List
-                            className="material-list"
-                            ref="materials"
-                            items={this.state.materials}
-                            onClick={this._onPickupMaterial}
-                        />
-                    </label>
-                </label>
-            );
+                ),
+                content: (
+                    <List
+                        className="material-list"
+                        ref="materials"
+                        items={this.state.materials}
+                        onClick={this._onPickupMaterial}
+                    />
+                )
+            };
         },
 
         _renderShading: function(lang) {
@@ -358,18 +341,20 @@ define([
                     'display-text': true,
                     'disabled-pointer': 'svg' === this.props.imageFormat
                 });
-
-            return (
-                <TextToggle
-                    ref="shading"
-                    className={classes}
-                    displayText={lang.laser.print_params.shading.text}
-                    textOn={lang.laser.print_params.shading.textOn}
-                    textOff={lang.laser.print_params.shading.textOff}
-                    defaultChecked={checked}
-                    onClick={this._onShadingChanged}
-                />
-            );
+            return {
+                label: (
+                    <TextToggle
+                        ref="shading"
+                        className={classes}
+                        displayText={lang.laser.print_params.shading.text}
+                        textOn={lang.laser.print_params.shading.textOn}
+                        textOff={lang.laser.print_params.shading.textOff}
+                        defaultChecked={checked}
+                        onClick={this._onShadingChanged}
+                    />
+                ),
+                content: ''
+            };
         },
 
         _renderAlert: function(lang) {
@@ -397,6 +382,21 @@ define([
             );
         },
 
+        _renderAdvancedButton: function(lang) {
+            return {
+                label: (
+                    <button
+                        className="btn btn-advance"
+                        data-ga-event="open-laser-advanced-panel"
+                        onClick={this._togglePanel('advanced', true)}
+                    >
+                        {lang.laser.button_advanced}
+                    </button>
+                ),
+                content: ''
+            };
+        },
+
         render: function() {
             var props = this.props,
                 lang = props.lang,
@@ -404,28 +404,20 @@ define([
                 advancedPanel = this._renderAdvancedPanel(lang, this.state.defaults.material),
                 material = this._renderMaterialSelection(lang),
                 objectHeight = this._renderObjectHeight(lang),
-                customPresets = this._renderCustomPresets(lang),
                 shading = this._renderShading(lang),
-                alert = this._renderAlert(lang);
+                advancedButton = this._renderAdvancedButton(lang),
+                customPresets = this._renderCustomPresets(lang),
+                alert = this._renderAlert(lang),
+                items = [
+                    material,
+                    objectHeight,
+                    shading,
+                    advancedButton
+                ];
 
             return (
                 <div className="setup-panel operating-panel">
-                    <ul className="main">
-                        <li>
-                            {material}
-                        </li>
-                        <li>
-                            {objectHeight}
-                        </li>
-                        <li>
-                            {shading}
-                        </li>
-                        <li>
-                            <button className="btn btn-advance" data-ga-event="open-laser-advanced-panel" onClick={this._togglePanel('advanced', true)}>
-                                {lang.laser.button_advanced}
-                            </button>
-                        </li>
-                    </ul>
+                    <DialogMenu ref="dialogMenu" items={items}/>
 
                     {advancedPanel}
                     {customPresets}
