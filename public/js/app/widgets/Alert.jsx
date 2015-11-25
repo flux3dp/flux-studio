@@ -3,6 +3,15 @@ define(['react', 'jsx!widgets/Button-Group'], function(React, ButtonGroup) {
 
     return React.createClass({
 
+        getDefaultProps: function () {
+            return {
+                lang: {},
+                caption: '',
+                message: '',
+                buttons: []
+            };
+        },
+
         render: function() {
             var buttonsGroup = (
                     <ButtonGroup buttons={this.props.buttons}/>
@@ -20,15 +29,6 @@ define(['react', 'jsx!widgets/Button-Group'], function(React, ButtonGroup) {
                     {buttonsGroup}
                 </div>
             );
-        },
-
-        getDefaultProps: function () {
-            return {
-                lang: {},
-                caption: React.PropTypes.string,
-                message: React.PropTypes.string,
-                buttons: React.PropTypes.array
-            };
-        },
+        }
     });
 });
