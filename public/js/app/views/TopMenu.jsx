@@ -5,18 +5,59 @@ define([
     'app/stores/Alert-Store',
     'app//constants/Alert-Constants',
     'jsx!widgets/Notification-Modal',
-], function(React, Notifier, AlertActions, AlertStore, AlertConstants, Modal) {
+    'jsx!views/Print-Selector',
+    'helpers/api/discover',
+    'helpers/api/config'
+], function(
+    React,
+    Notifier,
+    AlertActions,
+    AlertStore,
+    AlertConstants,
+    Modal,
+    PrinterSelector,
+    Discover,
+    Config
+) {
     'use strict';
 
     return function(args) {
         args = args || {};
+        var lang = args.state.lang,
+            genericClassName = {
+                'item': true
+            },
+            options = [
+                {
+                    name: 'print',
+                    displayName: 'PRINT',
+                    className: genericClassName,
+                    label: lang.menu.print,
+                    imgSrc: '/img/menu/icon_print.svg'
+                },
+                {
+                    name: 'laser',
+                    displayName: 'LASER',
+                    className: genericClassName,
+                    label: lang.menu.laser,
+                    imgSrc: '/img/menu/icon_laser.svg'
+                },
+                {
+                    name: 'scan',
+                    displayName: 'SCAN',
+                    className: genericClassName,
+                    label: lang.menu.scan,
+                    imgSrc: '/img/menu/icon_scan.svg'
+                }
+            ];
+
         return React.createClass({
 
             getInitialState: function() {
                 return {
-                    lang        : args.state.lang,
                     sourceId    : '',
-                    showModal   : false
+                    showModal   : false,
+                    deviceList  : []
                 };
             },
 
@@ -81,64 +122,87 @@ define([
                 AlertActions.notifyRetry(this.state.sourceId);
             },
 
-            _handleModalOpen: function() {
+            _handleShowDeviceList: function() {
+                var self = this,
+                    options = [],
+                    devices = [],
+                    refreshOption = function(devices) {
 
+                        self.setState({
+                            deviceList: devices
+                        });
+                    };
+
+                if (false === window.FLUX.debug) {
+                    Config().read('printers', {
+                        onFinished: function(response) {
+                            options = JSON.parse(response || '[]');
+
+                            refreshOption(options);
+                        }
+                    });
+                }
+                else {
+                    Discover(function(printers) {
+                        refreshOption(printers);
+                    });
+                }
+            },
+
+            _handleSelectDevice: function(uuid) {
+                console.log(uuid);
+            },
+
+            _renderStudioFunctions: function() {
+                var ClassNames = React.addons.classSet,
+                    menuItems;
+
+                menuItems = options.map(function(opt, i) {
+                    var isActiveItem = -1 < location.hash.indexOf(opt.name),
+                        itemClass = '',
+                        label = '';
+
+                    if ('' !== opt.label) {
+                        label = (<p>{opt.label}</p>);
+                    }
+
+                    opt.className.active = isActiveItem;
+                    itemClass = ClassNames(opt.className);
+
+                    return (
+                        <li className={itemClass} key={'menu' + i}
+                            data-display-name={opt.displayName}
+                            onClick={this._handleNavigation.bind(null, opt.name)}>
+                            <img src={opt.imgSrc} />
+                            {label}
+                        </li>
+                    );
+                }, this);
+
+                return menuItems;
+            },
+
+            _renderDeviceList: function() {
+                var list = this.state.deviceList.map(function(device) {
+                    return (
+                        <li name={device.uuid} onClick={this._handleSelectDevice.bind(null, device.uuid)}>
+                            <label className="name">{device.name}</label>
+                            <label className="status">Working / Print / 35%</label>
+                        </li>
+                    )
+                }, this);
+
+                return (
+                    <ul>{list}</ul>
+                );
             },
 
             render : function() {
-                var self = this,
-                    lang = this.state.lang,
-                    cx = React.addons.classSet,
-                    genericClassName = {
-                        'item': true
-                    },
-                    options = [
-                        {
-                            name: 'print',
-                            displayName: 'PRINT',
-                            className: genericClassName,
-                            label: lang.menu.print,
-                            imgSrc: '/img/menu/icon_print.svg'
-                        },
-                        {
-                            name: 'laser',
-                            displayName: 'LASER',
-                            className: genericClassName,
-                            label: lang.menu.laser,
-                            imgSrc: '/img/menu/icon_laser.svg'
-                        },
-                        {
-                            name: 'scan',
-                            displayName: 'SCAN',
-                            className: genericClassName,
-                            label: lang.menu.scan,
-                            imgSrc: '/img/menu/icon_scan.svg'
-                        }
-                    ],
-                    menuItems = options.map(function(opt, i) {
-                        var isActiveItem = -1 < location.hash.indexOf(opt.name),
-                            itemClass = '',
-                            label = '';
-
-                        if ('' !== opt.label) {
-                            label = (<p>{opt.label}</p>);
-                        }
-
-                        opt.className.active = isActiveItem;
-                        itemClass = cx(opt.className);
-
-                        return (
-                            <li className={itemClass} key={'menu' + i} data-display-name={opt.displayName} onClick={self._handleNavigation.bind(null, opt.name)}>
-                                <img src={opt.imgSrc} />
-                                {label}
-                            </li>
-                        );
-                    }, this),
+                var menuItems = this._renderStudioFunctions(),
+                    deviceList = this._renderDeviceList(),
                     currentWorkingFunction = options.filter(function(el) {
                         return -1 < location.hash.search(el.name);
-                    })[0];
-
-                currentWorkingFunction = currentWorkingFunction || {};
+                    })[0] || {};
 
                 return (
                     <div>
@@ -168,12 +232,23 @@ define([
                             onRetry={this._handleRetry}
                             onClose={this._handleModalClose} />
 
-                        <a href="#studio/settings" className="setting inner-menu">
-                            <div className="item" onClick={self._handleNavigation.bind(null, 'settings')}>
-                                <img src="/img/menu/icon_setting.svg" />
-                                <p>{lang.menu.setting}</p>
+                        <div className="device" onMouseEnter={this._handleShowDeviceList}>
+                            <img src="/img/btn-device.svg" />
+                            <p>{lang.menu.device}</p>
+                            <div className="menu">
+                                <svg width="36" height="15"
+                                     className="arrow"
+                                     viewBox="0 0 36 15" version="1.1"
+                                     xmlns="http://www.w3.org/2000/svg">
+
+                                    <polygon points="36,0 0,15 0,0"/>
+
+                                </svg>
+                                <div className="device-list">
+                                    {deviceList}
+                                </div>
                             </div>
-                        </a>
+                        </div>
                     </div>
                 );
             }

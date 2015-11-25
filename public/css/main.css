@@ -3161,22 +3161,87 @@ input[type=range]:focus::-webkit-slider-runnable-track {
             height: 3.2rem;
             margin: 0 auto;
             transform-origin: 50% 50%;
-            width: 3.2rem; }
+            width: 3.2rem;
+            transition: all 0.25s; }
         .top-menu .item p,
         .top-menu .item:last-child {
             margin: 0; }
         .top-menu .item:hover img {
-            -webkit-filter: invert(1) opacity(0.25); }
-    .top-menu .setting {
+            transform: rotate(180deg); }
+    .top-menu .device {
         font-size: 1rem;
         line-height: 2rem;
         position: absolute;
         right: 24px;
         text-decoration: none;
+        text-align: right;
         top: 24px; }
-        .top-menu .setting img {
-            display: block;
-            width: 2.75rem; }
+        .top-menu .device img {
+            height: 3.6rem;
+            margin: 0 auto;
+            transform-origin: 50% 50%;
+            width: 3.6rem;
+            transition: all 0.25s;
+            transform: rotate(60deg); }
+        .top-menu .device:hover img {
+            transform: rotate(240deg); }
+        .top-menu .device p {
+            margin: 0;
+            font-weight: 500;
+            font-size: 12px;
+            line-height: 12px;
+            color: #B3B3B3; }
+        .top-menu .device .menu {
+            background: #fff;
+            position: relative;
+            top: -50px;
+            right: 100px;
+            display: none; }
+            .top-menu .device .menu .arrow {
+                right: -72px;
+                position: absolute;
+                transform: translateX(-100%);
+                top: 0; }
+                .top-menu .device .menu .arrow polygon {
+                    fill: #fff; }
+            .top-menu .device .menu .device-list {
+                padding: 0.8rem;
+                list-style: none;
+                margin: 0;
+                text-align: left;
+                cursor: pointer;
+                height: 160px; }
+                .top-menu .device .menu .device-list .select-printer {
+                    position: relative; }
+                .top-menu .device .menu .device-list ul {
+                    margin: 0;
+                    padding: 0;
+                    border: 1px solid #B3B3B3;
+                    color: #B3B3B3;
+                    font-weight: 500;
+                    font-size: 12px;
+                    font-family: Helvetica Neue;
+                    overflow-y: scroll;
+                    height: 100%; }
+                    .top-menu .device .menu .device-list ul li {
+                        display: -webkit-box;
+                        /* OLD - iOS 6-, Safari 3.1-6 */
+                        display: -webkit-flex;
+                        /* NEW - Chrome */
+                        display: flex;
+                        /* NEW, Spec - Opera 12.1, Firefox 20+ */
+                        line-height: 2.8rem;
+                        z-index: 1; }
+                        .top-menu .device .menu .device-list ul li .name {
+                            width: 12rem;
+                            padding: 0 0 0 0.8rem; }
+                        .top-menu .device .menu .device-list ul li .status {
+                            width: 16rem; }
+                        .top-menu .device .menu .device-list ul li:hover {
+                            background-color: #B3B3B3;
+                            color: #FFF; }
+        .top-menu .device:hover .menu {
+            display: block; }
 
 .accordion .accordion-body {
     display: block;

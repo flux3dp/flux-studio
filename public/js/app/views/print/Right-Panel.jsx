@@ -10,13 +10,13 @@ define([
 
     return React.createClass({
         propTypes: {
-            lang: React.PropTypes.object,
-            hasObject: React.PropTypes.bool,
-            onPreviewClick: React.PropTypes.func,
-            onDownloadGCode: React.PropTypes.func,
-            onDownloadFCode: React.PropTypes.func,
-            onPrintClick: React.PropTypes.func,
-            onCameraPositionChange: React.PropTypes.func
+            lang                    : React.PropTypes.object,
+            hasObject               : React.PropTypes.bool,
+            onPreviewClick          : React.PropTypes.func,
+            onDownloadGCode         : React.PropTypes.func,
+            onDownloadFCode         : React.PropTypes.func,
+            onGoClick               : React.PropTypes.func,
+            onCameraPositionChange  : React.PropTypes.func
         },
 
         getInitialState: function() {
@@ -44,7 +44,7 @@ define([
 
         _handleGo: function(e) {
             e.preventDefault();
-            this.props.onPrintClick();
+            this.props.onGoClick();
         },
 
         _handleGetGCode: function() {
@@ -107,11 +107,13 @@ define([
 
             return (
                 <div className='rightPanel'>
+                    {/*
                     <a className="btn" onClick={this._handleGetGCode}>Gcode</a><p/>
                     <a className="btn" onClick={this._handleTest}>Notify</a>
                     <a className="btn" onClick={this._showInfo}>Info</a>
                     <a className="btn" onClick={this._showWarning}>Warning</a>
                     <a className="btn" onClick={this._showError}>Error</a>
+                    */}
 
                     <div id="cameraViewController" className="cameraViewController"></div>
                     {actionButtons}

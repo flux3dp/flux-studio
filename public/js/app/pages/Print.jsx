@@ -136,7 +136,7 @@ define([
                     this.setState({ showAdvancedSetting: !this.state.showAdvancedSetting });
                 },
 
-                _handlePrintClick: function() {
+                _handleGoClick: function() {
                     this.setState({
                         openPrinterSelectorWindow: true
                     });
@@ -350,7 +350,7 @@ define([
                             lang                    = {lang}
                             camera                  = {this.state.camera}
                             hasObject               = {this.state.hasObject}
-                            onPrintClick            = {this._handlePrintClick}
+                            onGoClick               = {this._handleGoClick}
                             onDownloadGCode         = {this._handleDownloadGCode}
                             onCameraPositionChange  = {this._handleCameraPositionChange}
                             onDownloadFCode         = {this._handleDownloadFCode} />
