@@ -566,6 +566,9 @@ define(function() {
             rollback: 'Back',
             error: 'Error',
             confirm: '確認',
+            caution: '警告',
+            cancel: 'Cancel',
+            delete_mesh: '真的要刪除嗎?',
             quality: 'QUALITY',
             resolution: [{
                 id: 'best',
