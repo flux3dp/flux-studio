@@ -3,6 +3,18 @@ define(['react'], function(React){
 
     return React.createClass({
 
+        getDefaultProps: function() {
+            return {
+                name: '',
+                id: '',
+                emptyMessage: ''
+                className: '',
+                items: [],
+                onClick: function() {},
+                ondblclick: function() {}
+            };
+        },
+
         render: function() {
 
             var list_items = this.props.items.map(function(opt, i){
