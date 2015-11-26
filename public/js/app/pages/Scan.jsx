@@ -292,8 +292,7 @@ define([
                         showCamera: false
                     });
 
-                    openProgressBar(onScan);
-                    // checkLenOpened();
+                    checkLenOpened();
                 },
 
                 _onScanAgain: function(e) {
