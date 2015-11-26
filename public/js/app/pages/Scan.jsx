@@ -292,7 +292,8 @@ define([
                         showCamera: false
                     });
 
-                    checkLenOpened();
+                    openProgressBar(onScan);
+                    // checkLenOpened();
                 },
 
                 _onScanAgain: function(e) {
@@ -578,6 +579,7 @@ define([
                         true === this.state.gettingStarted ?
                         <ActionButtons
                             className={className}
+                            meshes={this.state.meshes}
                             lang={lang}
                             hasConvert={this.state.hasConvert}
                             scanTimes={this.state.scanTimes}
@@ -738,7 +740,6 @@ define([
 
                     thumbnails = meshes.map(function(mesh, i) {
                         var onChooseMesh = function(e) {
-                                console.log(e.shiftKey);
                                 var me = e.currentTarget,
                                     mesh = self._getMesh(parseInt(me.dataset.index, 10));
 

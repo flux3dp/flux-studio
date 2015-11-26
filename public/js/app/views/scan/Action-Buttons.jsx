@@ -9,6 +9,8 @@ define([
         getDefaultProps: function() {
             return {
                 lang: {},
+                scanUpperLimit: 5,
+                meshes: [],
                 scanTimes: 0,
                 className: {},
                 hasConvert: false,
@@ -22,7 +24,9 @@ define([
 
         _getActionButtons: function(lang) {
             var self = this,
-                buttons = [];
+                buttons = [],
+                cx = React.addons.classSet,
+                className;
 
             // has been scan but doesn't convert
             if (0 < self.props.scanTimes && false === self.props.hasConvert) {
@@ -31,9 +35,15 @@ define([
                     className: 'btn-action btn-hexagon btn-scan-again',
                     onClick: self.props.onScanAgainClick
                 });
+                className = {
+                    'btn-action': true,
+                    'btn-hexagon': true,
+                    'btn-multi-scan': true,
+                    'btn-disabled': (this.props.scanUpperLimit === this.props.meshes.length)
+                };
                 buttons.push({
                     label: lang.scan.start_multiscan,
-                    className: 'btn-action btn-hexagon btn-multi-scan',
+                    className: cx(className),
                     onClick: self.props.onScanClick
                 });
                 buttons.push({
