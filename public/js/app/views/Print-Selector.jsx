@@ -132,7 +132,14 @@ define([
         },
 
         _renderPrinterItem: function(printer) {
-            var meta = JSON.stringify(printer || {});
+            var meta;
+
+            try {
+                meta = JSON.stringify(printer || {});
+            }
+            catch (ex) {
+                console.log(ex);
+            }
 
             return (
                 <label className="device printer-item" data-meta={meta}>
