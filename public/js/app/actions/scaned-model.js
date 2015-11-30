@@ -157,7 +157,7 @@ define([
                             objectChange(objectScreenPosition, matrixValue);
                         }
                     });
-                    transformControl.setSpace('local');
+                    transformControl.setSpace('world');
 
                     transformControl.attach(mesh);
                     scene.add(transformControl);
@@ -230,8 +230,6 @@ define([
         cylinder.rotateX(90 * Math.PI / 180);
         cylinder.position.set(matrixValue.position.x, matrixValue.position.y, matrixValue.position.center.z);
         mesh.add(cylinder);
-
-        console.log(mesh, cylinder);
 
         attachControl(cylinder, function(objectScreenPosition, matrixValue) {
             var currentScale = {
