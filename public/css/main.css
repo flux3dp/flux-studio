@@ -5580,17 +5580,96 @@ input.switch:checked ~ label:after {
     .scan-studio .scan-printer-selection {
         position: relative; }
     .scan-studio .manipulation-panel {
+        display: -webkit-box;
+        /* OLD - iOS 6-, Safari 3.1-6 */
+        display: -webkit-flex;
+        /* NEW - Chrome */
+        display: flex;
+        /* NEW, Spec - Opera 12.1, Firefox 20+ */
+        font-size: 20px;
+        margin: 0;
         position: absolute;
-        top: 20px; }
-    .scan-studio .manipulation-panel {
-        right: 20px;
-        width: 80px; }
+        transition: all 0.1s ease;
+        width: 270px;
+        z-index: 1; }
+        .scan-studio .manipulation-panel .wrapper,
         .scan-studio .manipulation-panel .btn {
-            margin: 5px 0; }
-        .scan-studio .manipulation-panel .on {
-            background: #424242;
-            border: #fff solid 1px;
-            color: #fff; }
+            width: 100%; }
+        .scan-studio .manipulation-panel .btn {
+            display: -webkit-box;
+            /* OLD - iOS 6-, Safari 3.1-6 */
+            display: -webkit-flex;
+            /* NEW - Chrome */
+            display: flex;
+            /* NEW, Spec - Opera 12.1, Firefox 20+ */
+            background: #fff;
+            color: #A4A4A4;
+            font-size: 20px;
+            text-align: left;
+            align-items: center; }
+            .scan-studio .manipulation-panel .btn img {
+                height: 32px;
+                margin: 0 11px 0 0; }
+        .scan-studio .manipulation-panel .btn-pressed {
+            background: #000; }
+        .scan-studio .manipulation-panel .accordion-body {
+            overflow: visible;
+            position: relative; }
+            .scan-studio .manipulation-panel .accordion-body .icon-locker {
+                bottom: 0;
+                cursor: pointer;
+                height: 20px;
+                left: 100%;
+                margin: auto;
+                position: absolute;
+                top: 0;
+                width: 20px; }
+        .scan-studio .manipulation-panel .arrow {
+            align-self: center; }
+            .scan-studio .manipulation-panel .arrow polygon {
+                fill: #fff; }
+        .scan-studio .manipulation-panel .caption,
+        .scan-studio .manipulation-panel .controls {
+            margin: 0; }
+        .scan-studio .manipulation-panel .controls {
+            background: #FFFFFF;
+            display: block;
+            margin: 0 0 3px 0;
+            padding: 0 20px; }
+        .scan-studio .manipulation-panel .control {
+            display: -webkit-box;
+            /* OLD - iOS 6-, Safari 3.1-6 */
+            display: -webkit-flex;
+            /* NEW - Chrome */
+            display: flex;
+            /* NEW, Spec - Opera 12.1, Firefox 20+ */
+            color: #B3B3B3;
+            font-size: 13px;
+            height: 40px;
+            line-height: 40px;
+            margin: 0 0 10px 0;
+            align-items: center;
+            justify-content: space-around; }
+            .scan-studio .manipulation-panel .control .header {
+                color: #E0E0DF;
+                width: 20%; }
+            .scan-studio .manipulation-panel .control input {
+                width: 90%; }
+        .scan-studio .manipulation-panel .caption {
+            display: -webkit-box;
+            /* OLD - iOS 6-, Safari 3.1-6 */
+            display: -webkit-flex;
+            /* NEW - Chrome */
+            display: flex;
+            /* NEW, Spec - Opera 12.1, Firefox 20+ */
+            color: #B3B3B3;
+            font-size: 12px;
+            line-height: 30px;
+            justify-content: space-between; }
+        .scan-studio .manipulation-panel input {
+            border: 1px solid #E0E0DF;
+            color: #B3B3B3;
+            font-size: 15px; }
     .scan-studio .starting-section {
         height: 100%;
         width: 100%; }
