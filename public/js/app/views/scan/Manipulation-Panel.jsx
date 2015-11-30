@@ -19,17 +19,13 @@ define([
                     rotation: {}
                 },
                 selectedMeshes: [],
-                onSmooth: function() {},
                 onCropOn: function() {},
                 onCropOff: function() {},
                 onClearNoise: function() {},
-                onAutoMerge: function() {},
                 onManualMerge: function() {},
                 onReset: function() {},
                 switchTransformMode: function() {},
-                onChange: function(objectMatrix) {},
-                enableMerge: false,
-                enableAutoMerge: false
+                onChange: function(objectMatrix) {}
             };
         },
 
@@ -53,17 +49,9 @@ define([
                 onCropping: !onCropping
             });
         },
-        _onAutoMerge: function(e) {
-            console.log('auto merge');
-            this.props.onAutoMerge(e);
-        },
+
         _onManualMerge: function(e) {
-            console.log('manual merge');
             this.props.onManualMerge(e);
-        },
-        _onReset: function(e) {
-            console.log('reset');
-            this.props.onReset(e);
         },
 
         _onTransform: function(e) {
@@ -97,7 +85,7 @@ define([
                         </p>
                         <label className="accordion-body">
                             <div className="control">
-                                <button className="btn btn-action btn-merge">
+                                <button className="btn btn-action btn-merge" onClick={this._onManualMerge}>
                                     <img src="/img/icon-merge.png"/>
                                     {lang.scan.manipulation.manual_merge}
                                 </button>
