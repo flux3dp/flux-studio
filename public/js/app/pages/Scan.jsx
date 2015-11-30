@@ -141,7 +141,8 @@ define([
                             },
                             name: '',
                             index: self.state.scanTimes,
-                            choose: false
+                            choose: false,
+                            display: true
                         });
 
                     }
@@ -150,62 +151,116 @@ define([
                     }
                 },
 
+                _onRollbackClick: function(e) {
+                    var self = this,
+                        meshes = self.state.meshes;
+
+                    meshes.forEach(function(mesh) {
+                        mesh.display = true;
+                        mesh.choose = false;
+                        mesh.model.material.opacity = 0.3;
+                    });
+
+                    scanedModel.remove(self.state.stlMesh);
+
+                    self.setState({
+                        meshes: meshes,
+                        selectedMeshes: [],
+                        hasConvert: false
+                    });
+                },
+
                 _onConvert: function(e) {
                     var self = this,
-                        last_point_cloud = self.state.scanModelingWebSocket.History.getLatest(),
-                        file_format = 'stl',
-                        onClose = function(e) {
+                        fileFormat = 'stl',
+                        onClose = function(stlMesh) {
                             self.state.meshes.forEach(function(mesh, e) {
-                                scanedModel.remove(mesh.model);
+                                mesh.model.material.opacity = 0;
+                                mesh.transformMethods.hide();
                             });
                             self._openBlocker(false);
                             self.setState({
-                                meshes: [],
-                                saveFileType: 'stl',
-                                hasConvert: true
+                                saveFileType: fileFormat,
+                                hasConvert: true,
+                                stlMesh: stlMesh,
+                                meshes: self._switchMeshes(false, false)
                             });
+                            self._switchMeshes(true, false);
+                        },
+                        exportSTL = function(outputName) {
+                            self.state.scanModelingWebSocket.export(
+                                outputName,
+                                fileFormat,
+                                {
+                                    onFinished: function(blob) {
+                                        self.setState({
+                                            stlBlob: blob
+                                        });
+
+                                        scanedModel.loadStl(blob, onClose);
+
+                                        self._openBlocker(false);
+                                    }
+                                }
+                            );
                         };
 
                     self._openBlocker(true);
 
-                    // merge every mesh
+                    this._mergeAll(exportSTL, false);
+                },
 
+                _switchMeshes: function(display, choose) {
+                    var meshes = this.state.meshes;
 
-                    self.state.scanModelingWebSocket.export(
-                        last_point_cloud.name,
-                        file_format,
-                        {
-                            onFinished: function(blob) {
-                                self.setState({
-                                    stlBlob: blob
-                                });
+                    meshes.forEach(function(mesh) {
+                        mesh.display = display;
+                        mesh.choose = choose;
+                    });
 
-                                scanedModel.loadStl(blob, onClose);
-                            }
-                        }
-                    );
+                    return meshes;
+                },
+
+                _mergeAll: function(callback, display) {
+                    display = ('boolean' === typeof display ? display : false);
+                    callback = callback || function() {};
+
+                    var self = this,
+                        meshes = self._switchMeshes(display, true);
+
+                    self.setState({
+                        meshes: meshes,
+                        selectedMeshes: meshes
+                    }, function() {
+                        // merge each mesh
+                        this._doManualMerge(meshes, callback);
+
+                        self.setState({
+                            selectedMeshes: []
+                        });
+                    });
                 },
 
                 _onSave: function(e) {
                     var self = this,
-                        doExport = function() {
-                            var last_point_cloud = self.state.scanModelingWebSocket.History.getLatest(),
-                                file_format = self.state.saveFileType,
-                                file_name = (new Date()).getTime() + '.' + file_format;
+                        exportPCD = function(outputName) {
+                            var fileFormat = self.state.saveFileType,
+                                fileName = (new Date()).getTime() + '.' + fileFormat;
 
                             self._openBlocker(true);
 
                             if (self.state.stlBlob instanceof Blob) {
-                                saveAs(self.state.stlBlob, file_name);
+                                saveAs(self.state.stlBlob, fileName);
                                 self._openBlocker(false);
                             }
                             else {
                                 self.state.scanModelingWebSocket.export(
-                                    last_point_cloud.name,
-                                    file_format,
+                                    outputName,
+                                    fileFormat,
                                     {
                                         onFinished: function(blob) {
-                                            saveAs(blob, file_name);
+                                            saveAs(blob, fileName);
+                                            self._switchMeshes('pcd' === fileFormat, false);
                                             onClose();
                                         }
                                     }
@@ -216,7 +271,8 @@ define([
                             self._openBlocker(false);
                         };
 
-                    doExport();
+                    self._openBlocker(true);
+                    this._mergeAll(exportPCD, true);
                 },
 
                 _handleScan: function(e) {
@@ -304,7 +360,8 @@ define([
                         stage: stage
                     });
 
-                    checkLenOpened();
+                    openProgressBar(onScan);
+                    // checkLenOpened();
                 },
 
                 _onScanAgain: function(e) {
@@ -396,7 +453,7 @@ define([
                         endIndex = selectedMeshes.length - 1,
                         currentIndex = 0,
                         isEnd = function() {
-                            return (endIndex === currentIndex);
+                            return (endIndex <= currentIndex);
                         },
                         doingApplyTransform = function() {
                             currentMesh = selectedMeshes[currentIndex];
@@ -432,15 +489,13 @@ define([
                         currentMesh,
                         matrixValue;
 
-                    if (false === isEnd()) {
-                        doingApplyTransform();
-                    }
+                    doingApplyTransform();
                 },
 
-                _doManualMerge: function() {
+                _doManualMerge: function(selectedMeshes, callback) {
                     var self = this,
                         meshes = this.state.meshes,
-                        selectedMeshes = this.state.selectedMeshes,
+                        selectedMeshes = selectedMeshes || this.state.selectedMeshes,
                         outputName = '';
 
                     this._doApplyTransform(function(response) {
@@ -450,10 +505,10 @@ define([
                                     doingMerge();
                                 }
                                 else {
-                                    doingDump(outputName);
+                                    afterMerge(outputName);
                                 }
                             },
-                            doingDump = function(outputName) {
+                            afterMerge = callback || function(outputName) {
                                 var mesh,
                                     updatedMeshes = [];
 
@@ -531,12 +586,17 @@ define([
                             baseMesh,
                             targetMesh;
 
-                        self.setState({
-                            // take merge as scan
-                            scanTimes: self.state.scanTimes + 1
-                        }, function() {
-                            doingMerge();
-                        });
+                        if (1 < self.state.scanTimes) {
+                            self.setState({
+                                // take merge as scan
+                                scanTimes: self.state.scanTimes + 1
+                            }, function() {
+                                doingMerge();
+                            });
+                        }
+                        else {
+                            afterMerge(selectedMeshes[currentIndex].name);
+                        }
                     });
                 },
 
@@ -911,7 +971,8 @@ define([
 
                         itemClass = {
                             'mesh-thumbnail-item': true,
-                            'choose': mesh.choose
+                            'choose': mesh.choose,
+                            'hide': !mesh.display
                         };
 
                         return {
@@ -968,6 +1029,7 @@ define([
                             onClose: function() {}
                         },
                         stlBlob: undefined,
+                        stlMesh: undefined,
                         objectDialogPosition: {
                             left: 0,
                             top: 0
