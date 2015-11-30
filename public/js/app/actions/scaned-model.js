@@ -96,7 +96,7 @@ define([
             mesh.up = new THREE.Vector3(0, 0, 1);
 
             addMesh(mesh);
-            callback();
+            callback(mesh);
             render();
         });
     }
