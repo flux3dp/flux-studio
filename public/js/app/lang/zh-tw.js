@@ -611,61 +611,30 @@ define(function() {
                     label: 'PCD'
                 },
             ],
-            scan_params: {
-                scan_speed: {
-                    text: '掃描速度',
-                    options: [
-                        {
-                            value: '400',
-                            label: '快',
-                            selected: true
-                        },
-                        {
-                            value: '800',
-                            label: '慢'
-                        }
-                    ]
-                },
-                object: {
-                    text: '物體類型',
-                    options: [
-                        {
-                            value: 'auto',
-                            label: '自動',
-                            selected: true
-                        },
-                        {
-                            value: 'manually',
-                            label: '手動'
-                        }
-                    ]
-                },
-                luminance: {
-                    text: '環境光源',
-                    options: [
-                        {
-                            value: 'light',
-                            label: '較亮',
-                            selected: true
-                        },
-                        {
-                            value: 'normal',
-                            label: '普通'
-                        },
-                        {
-                            value: 'dark',
-                            label: '較暗'
-                        }
-                    ]
-                }
-            },
             manipulation: {
-                smooth: '平滑化',
+                filter: 'FILTER',
+                position: '位置',
+                size: '尺寸',
+                rotate: '旋轉',
                 crop: '剪裁',
                 auto_merge: '自動合併',
                 manual_merge: '手動合併',
-                clear_noise: '去除噪點',
-                reset: '重設'
+                clear_noise: '去除噪點'
+            },
+            size: {
+                x: 'X',
+                y: 'Y',
+                z: 'Z'
+            },
+            rotate: {
+                x: 'X',
+                y: 'Y',
+                z: 'Z'
+            },
+            translate: {
+                x: 'X',
+                y: 'Y',
+                z: 'Z'
             }
         },
         select_printer: {

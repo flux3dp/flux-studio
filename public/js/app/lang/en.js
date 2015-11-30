@@ -612,61 +612,30 @@ define(function() {
                     label: 'PCD'
                 },
             ],
-            scan_params: {
-                scan_speed: {
-                    text: 'Scan Speed',
-                    options: [
-                        {
-                            value: '400',
-                            label: 'Fast Scan',
-                            selected: true
-                        },
-                        {
-                            value: '800',
-                            label: 'Delegate Scan'
-                        }
-                    ]
-                },
-                object: {
-                    text: 'Object',
-                    options: [
-                        {
-                            value: 'auto',
-                            label: 'Auto',
-                            selected: true
-                        },
-                        {
-                            value: 'manually',
-                            label: 'Manually'
-                        }
-                    ]
-                },
-                luminance: {
-                    text: 'Luminance',
-                    options: [
-                        {
-                            value: 'light',
-                            label: 'Light',
-                            selected: true
-                        },
-                        {
-                            value: 'normal',
-                            label: 'Normal'
-                        },
-                        {
-                            value: 'dark',
-                            label: 'Dark'
-                        }
-                    ]
-                }
-            },
             manipulation: {
-                smooth: 'Smooth',
+                filter: 'FILTER',
+                position: 'POSITION',
+                size: 'SIZE',
+                rotate: 'ROTATE',
                 crop: 'Crop',
                 auto_merge: 'Auto Merge',
-                manual_merge: 'Manual Merge',
-                clear_noise: 'Clear Noise',
-                reset: 'Reset'
+                manual_merge: 'Merge',
+                clear_noise: 'Denoise'
+            },
+            size: {
+                x: 'X',
+                y: 'Y',
+                z: 'Z'
+            },
+            rotate: {
+                x: 'X',
+                y: 'Y',
+                z: 'Z'
+            },
+            translate: {
+                x: 'X',
+                y: 'Y',
+                z: 'Z'
             }
         },
         select_printer: {
