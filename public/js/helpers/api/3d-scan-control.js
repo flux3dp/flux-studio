@@ -38,7 +38,7 @@ define([
                     }
 
                     if (true === is_ready) {
-                        events.onMessage(data);
+                        (events.onMessage || function() {})(data);
                     }
                 },
                 onError: errorHandler,
