@@ -14,6 +14,7 @@ define([
     'jsx!views/scan/Progress-Bar',
     'jsx!views/scan/Action-Buttons',
     'helpers/shortcuts',
+    'helpers/round',
     'helpers/array-findindex',
     'plugins/file-saver/file-saver.min'
 ], function(
@@ -31,7 +32,8 @@ define([
     Export,
     ProgressBar,
     ActionButtons,
-    shortcuts
+    shortcuts,
+    round
 ) {
     'use strict';
 
@@ -95,17 +97,31 @@ define([
                     return parseInt(this.refs.setupPanel.getSettings().resolution.value, 10);
                 },
 
-                _onRendering: function(views, chunk_length) {
+                _refreshObjectDialogPosition: function(objectScreenPosition, matrix) {
+                    var self = this,
+                        state = self.state;
+
+                    self.setState({
+                        selectedObject: matrix,
+                        objectDialogPosition: {
+                            left: objectScreenPosition.x,
+                            top: objectScreenPosition.y
+                        }
+                    });
+                },
+
+                _onRendering: function(views, chunk_length, mesh) {
                     var self = this,
                         scan_speed = self._getScanSpeed(),
                         progressRemainingTime = self.props.progressRemainingTime / scan_speed * (scan_speed - chunk_length),
                         progressElapsedTime = parseInt(((new Date()).getTime() - self.state.scanStartTime) / 1000, 10),
                         progressPercentage,
                         meshes = self.state.meshes,
-                        mesh = self._getMesh(self.state.scanTimes);
+                        mesh = mesh || self._getMesh(self.state.scanTimes),
+                        model, transformMethods;
 
                     progressPercentage = Math.min(
-                        (chunk_length / scan_speed * 100).toString().substr(0, 5),
+                        round(chunk_length / scan_speed * 100, -2),
                         100
                     );
 
@@ -116,8 +132,12 @@ define([
                     });
 
                     if ('undefined' === typeof mesh) {
+                        model = scanedModel.appendModel(views);
+                        transformMethods = scanedModel.attachControl(model, self._refreshObjectDialogPosition);
+
                         meshes.push({
-                            model: scanedModel.appendModel(views),
+                            model: model,
+                            transformMethods: transformMethods,
                             name: '',
                             index: self.state.scanTimes,
                             choose: false
@@ -214,8 +234,6 @@ define([
 
                                     mesh.name = upload_name;
 
-                                    self._openBlocker(false);
-
                                     // update scan times
                                     self.setState({
                                         openProgressBar: false,
@@ -284,12 +302,12 @@ define([
 
                     self.state.scanControlImageMethods.stop();
 
-                    self._openBlocker(true);
                     self.setState({
                         scanStartTime: (new Date()).getTime(),
                         scanTimes: self.state.scanTimes + 1,
                         isScanStarted: true,
-                        showCamera: false
+                        showCamera: false,
+                        stage: stage
                     });
 
                     checkLenOpened();
@@ -299,26 +317,25 @@ define([
                     this.setState(this.getInitialState());
                 },
 
-                _doClearNoise: function() {
+                _doClearNoise: function(mesh) {
                     var self = this,
-                        last_point_cloud = self.state.scanModelingWebSocket.History.getLatest(),
                         delete_noise_name = 'clear-noise-' + (new Date()).getTime(),
                         onStarting = function(data) {
                             self._openBlocker(true);
                         },
                         onDumpFinished = function(data) {
-                            var mesh;
+                            var newMesh;
 
-                            mesh = self._getMesh(self.state.scanTimes);
-                            mesh.name = delete_noise_name;
+                            newMesh = self._getMesh(self.state.scanTimes);
+                            newMesh.name = delete_noise_name;
                             self._openBlocker(false);
                         },
                         onDumpReceiving = function(data, len) {
-                            self._onRendering(data, len);
+                            self._onRendering(data, len, mesh);
                         };
 
                     self.state.scanModelingWebSocket.delete_noise(
-                        last_point_cloud.name,
+                        mesh.name,
                         delete_noise_name,
                         0.3,
                         {
@@ -329,17 +346,15 @@ define([
                     );
                 },
 
-                _doCropOn: function() {
-                    var mesh = this._getMesh(this.state.scanTimes);
+                _doCropOn: function(mesh) {
+                    mesh.transformMethods.hide();
                     this.setState({
                         cylinder: scanedModel.cylinder.create(mesh.model)
                     });
                 },
 
-                _doCropOff: function() {
+                _doCropOff: function(mesh) {
                     var self = this,
-                        mesh = this._getMesh(this.state.scanTimes),
-                        last_point_cloud = self.state.scanModelingWebSocket.History.getLatest(),
                         cut_name = 'cut-' + (new Date()).getTime(),
                         cylider_box = new THREE.Box3().setFromObject(self.state.cylinder),
                         opts = {
@@ -348,6 +363,7 @@ define([
                             },
                             onReceiving: self._onRendering,
                             onFinished: function(data) {
+                                mesh.transformMethods.show();
                                 self._openBlocker(false);
                             }
                         },
@@ -363,7 +379,7 @@ define([
                     if (window.confirm('Do crop?')) {
 
                         self.state.scanModelingWebSocket.cut(
-                            last_point_cloud.name,
+                            mesh.name,
                             cut_name,
                             args,
                             opts
@@ -372,7 +388,7 @@ define([
                         mesh.name = cut_name;
                     }
 
-                    scanedModel.cylinder.remove(self.state.cylinder);
+                    scanedModel.cylinder.remove(mesh.model);
                     self.setState({
                         cylinder: undefined
                     });
@@ -469,6 +485,23 @@ define([
                     );
                 },
 
+                _switchTransformMode: function(mode, e) {
+                    var self = this,
+                        methods = self.state.selectedMeshes[0].transformMethods;
+
+                    switch (mode) {
+                    case 'scale':
+                        methods.show().scale();
+                        break;
+                    case 'rotate':
+                        methods.show().rotate();
+                        break;
+                    case 'translate':
+                        methods.show().translate();
+                        break;
+                    }
+                },
+
                 _openConfirm: function(open, opts) {
                     opts = opts || {};
 
@@ -517,23 +550,33 @@ define([
                     );
                 },
 
-                _renderManipulationPanel: function() {
+                _renderManipulationPanel: function(lang) {
                     var state = this.state,
-                        lang = args.state.lang,
-                        display = 1 > state.scanTimes;
+                        refreshMatrix = function(mesh, matrix) {
+                            mesh.model.position.set(matrix.position.x , matrix.position.y , matrix.position.z);
+                            mesh.model.rotation.set(matrix.rotation.x , matrix.rotation.y , matrix.rotation.z);
+
+                            scanedModel.render();
+                        };
 
                     return (
+                        0 < state.selectedMeshes.length ?
                         <ManipulationPanel
                             lang = {lang}
-                            display={display}
+                            selectedMeshes={state.selectedMeshes}
+                            switchTransformMode={this._switchTransformMode}
                             onCropOn={this._doCropOn}
                             onCropOff={this._doCropOff}
                             onClearNoise={this._doClearNoise}
                             onAutoMerge={this._doAutoMerge}
                             onManualMerge={this._doManualMerge}
-                            enableMerge={this.state.enableMerge}
+                            enableMerge={state.enableMerge}
                             enableAutoMerge={state.autoMerge}
-                        />
+                            object={state.selectedObject}
+                            position={state.objectDialogPosition}
+                            onChange={refreshMatrix}
+                        /> :
+                        ''
                     );
                 },
 
@@ -740,14 +783,22 @@ define([
                     thumbnails = meshes.map(function(mesh, i) {
                         var onChooseMesh = function(e) {
                                 var me = e.currentTarget,
-                                    mesh = self._getMesh(parseInt(me.dataset.index, 10));
+                                    mesh = self._getMesh(parseInt(me.dataset.index, 10)),
+                                    position = scanedModel.toScreenPosition(mesh.model),
+                                    selectedMeshes;
 
                                 if (false === e.shiftKey) {
                                     meshes.forEach(function(mesh, key) {
                                         if (key !== i) {
+                                            mesh.transformMethods.hide();
                                             mesh.choose = false;
                                             mesh.model.material.opacity = 0.3;
                                         }
+                                    });
+                                }
+                                else {
+                                    meshes.forEach(function(mesh, key) {
+                                        mesh.transformMethods.hide();
                                     });
                                 }
 
@@ -756,15 +807,29 @@ define([
 
                                 mesh.model.material.opacity = (true === mesh.choose ? 1 : 0.3);
 
-                                self.setState({
-                                    selectedMeshes: meshes.filter(function(mesh) {
-                                            return mesh.choose;
-                                        })
+                                selectedMeshes = meshes.filter(function(mesh) {
+                                    return true === mesh.choose;
                                 });
 
-                                scanedModel.render();
+                                self.setState({
+                                    selectedMeshes: selectedMeshes,
+                                    selectedObject: scanedModel.matrix(mesh.model),
+                                    objectDialogPosition: {
+                                        left: position.x,
+                                        top: position.y
+                                    }
+                                }, function() {
+                                    scanedModel.cylinder.remove();
 
-                                self.forceUpdate();
+                                    if (1 === selectedMeshes.length && true === mesh.choose) {
+                                        mesh.transformMethods.show();
+                                    }
+                                    else {
+                                        mesh.transformMethods.hide();
+                                    }
+
+                                    scanedModel.render();
+                                });
                             },
                             onDeleteMesh = function(e) {
                                 var deleteMesh = function() {
@@ -849,7 +914,17 @@ define([
                             message: '',
                             onClose: function() {}
                         },
-                        stlBlob: undefined
+                        stlBlob: undefined,
+                        objectDialogPosition: {
+                            left: 0,
+                            top: 0
+                        },
+                        selectedObject: {
+                            position: {},
+                            size: {},
+                            rotate: {},
+                        },
+                        stage: undefined // three stage (scene, camera, renderer)
                     };
                 },
 
@@ -864,7 +939,7 @@ define([
                     scanedModel.destroy();
                 },
 
-                render : function() {
+                render: function() {
                     var state = this.state,
                         lang = state.lang,
                         progressBar = this._renderProgressBar(lang),
@@ -882,9 +957,9 @@ define([
                             {scanStage}
                             {actionButtons}
                             {progressBar}
-                            {printerBlocker}
                             {alert}
                             {confirm}
+                            {printerBlocker}
                         </div>
                     );
                 }
