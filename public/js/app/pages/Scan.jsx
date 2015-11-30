@@ -133,15 +133,17 @@ define([
 
                     if ('undefined' === typeof mesh) {
                         model = scanedModel.appendModel(views);
-                        transformMethods = scanedModel.attachControl(model, self._refreshObjectDialogPosition);
 
                         meshes.push({
                             model: model,
-                            transformMethods: transformMethods,
+                            transformMethods: {
+                                hide: function() {}
+                            },
                             name: '',
                             index: self.state.scanTimes,
                             choose: false
                         });
+
                     }
                     else {
                         mesh.model = scanedModel.updateMesh(mesh.model, views);
@@ -160,9 +162,7 @@ define([
                             self.setState({
                                 meshes: [],
                                 saveFileType: 'stl',
-                                hasConvert: true,
-                                disabledConvertButton: true,
-                                disabledScanButton: true
+                                hasConvert: true
                             });
                         };
 
@@ -225,12 +225,6 @@ define([
                             var upload_name = 'scan-' + (new Date()).getTime(),
                                 onUploadFinished = function() {
                                     var mesh = self._getMesh(self.state.scanTimes);
-
-                                    if (0 < self.state.scanTimes) {
-                                        self.setState({
-                                            enableMerge: true
-                                        });
-                                    }
 
                                     mesh.name = upload_name;
 
@@ -334,7 +328,7 @@ define([
                             self._onRendering(data, len, mesh);
                         };
 
-                    self.state.scanModelingWebSocket.delete_noise(
+                    self.state.scanModelingWebSocket.deleteNoise(
                         mesh.name,
                         delete_noise_name,
                         0.3,
@@ -394,95 +388,156 @@ define([
                     });
                 },
 
+                _doApplyTransform: function(nextAction) {
+                    nextAction = nextAction || function() {};
+
+                    var self = this,
+                        selectedMeshes = this.state.selectedMeshes,
+                        endIndex = selectedMeshes.length - 1,
+                        currentIndex = 0,
+                        isEnd = function() {
+                            return (endIndex === currentIndex);
+                        },
+                        doingApplyTransform = function() {
+                            currentMesh = selectedMeshes[currentIndex];
+                            matrixValue = scanedModel.matrix(currentMesh.model);
+                            params = {
+                                pX: matrixValue.position.center.x,
+                                pY: matrixValue.position.center.y,
+                                pZ: matrixValue.position.center.z,
+                                rX: matrixValue.rotation.x,
+                                rY: matrixValue.rotation.y,
+                                rZ: matrixValue.rotation.z
+                            };
+
+                            // baseName, outName, params, onFinished
+                            self.state.scanModelingWebSocket.applyTransform(
+                                currentMesh.name,
+                                currentMesh.name,
+                                params,
+                                onFinished
+                            );
+
+                        },
+                        onFinished = function() {
+                            if (false === isEnd()) {
+                                currentIndex++;
+                                doingApplyTransform();
+                            }
+                            else {
+                                nextAction();
+                            }
+                        },
+                        params,
+                        currentMesh,
+                        matrixValue;
+
+                    if (false === isEnd()) {
+                        doingApplyTransform();
+                    }
+                },
+
                 _doManualMerge: function() {
                     var self = this,
                         meshes = this.state.meshes,
-                        output_name = 'merge-' + (new Date()).getTime(),
-                        onMergeFinished = function(data) {
-                            self.setState({
-                                enableMerge: false
-                            });
+                        selectedMeshes = this.state.selectedMeshes,
+                        outputName = '';
 
-                            meshes[0].model.material.transparent = false;
-                            scanedModel.remove(meshes[1].model);
-                            meshes.splice(-1);
-
-                            self._openBlocker(false);
-                        },
-                        onMergeStarting = function() {
-                            self._openBlocker(true);
-                        },
-                        target_rotation = meshes[1].model.rotation,
-                        box = new THREE.Box3().setFromObject(meshes[1].model),
-                        position = {
-                            x: box.center().x,
-                            y: box.center().y,
-                            z: box.center().z
-                        },
-                        rotation = {
-                            x: target_rotation.x,
-                            y: target_rotation.y,
-                            z: target_rotation.z
-                        };
-
-                    self.state.scanModelingWebSocket.merge(
-                        meshes[0].name,
-                        meshes[1].name,
-                        position,
-                        rotation,
-                        output_name,
-                        {
-                            onStarting: onMergeStarting,
-                            onReceiving: self._onRendering,
-                            onFinished: onMergeFinished
-                        }
-                    );
-                },
-
-                _doAutoMerge: function() {
-                    var self = this,
-                        meshes = this.state.meshes,
-                        mesh = this._getMesh(this.state.scanTimes),
-                        output_name = 'automerge-' + (new Date()).getTime(),
-                        onMergeFinished = function(data) {
-                            var transform_methods = scanedModel.attachControl(self._getMesh(self.state.scanTimes).model);
-                            transform_methods.rotate();
-                            // update scan times
-                            self.setState({
-                                autoMerge: false
-                            });
-
-                            shortcuts.on(
-                                ['r'],
-                                function(e) {
-                                    transform_methods.rotate();
+                    this._doApplyTransform(function(response) {
+                        var onMergeFinished = function(data) {
+                                if (false === isEnd()) {
+                                    currentIndex++;
+                                    doingMerge();
                                 }
-                            );
-
-                            shortcuts.on(
-                                ['t'],
-                                function(e) {
-                                    transform_methods.translate();
+                                else {
+                                    doingDump(outputName);
                                 }
-                            );
+                            },
+                            doingDump = function(outputName) {
+                                var mesh,
+                                    updatedMeshes = [];
 
-                            mesh.name = output_name;
-                            self._openBlocker(false);
-                        },
-                        onMergeStarting = function() {
-                            self._openBlocker(true);
-                        };
+                                self.state.scanModelingWebSocket.dump(
+                                    outputName,
+                                    {
+                                        onReceiving: self._onRendering,
+                                        onFinished: function(response) {
 
-                    self.state.scanModelingWebSocket.autoMerge(
-                        meshes[0].name,
-                        meshes[1].name,
-                        output_name,
-                        {
-                            onStarting: onMergeStarting,
-                            onReceiving: self._onRendering,
-                            onFinished: onMergeFinished
-                        }
-                    );
+                                            // TODO: BLACK MAGIC!!! i've no idea why the state.meshes doesn't update?
+                                            var timer = setInterval(function() {
+                                                if (self.state.scanTimes === self.state.meshes.length) {
+                                                    mesh = self._getMesh(self.state.scanTimes);
+                                                    mesh.name = outputName;
+
+                                                    self.state.selectedMeshes.forEach(function(selectedMesh, i) {
+                                                        scanedModel.remove(selectedMesh.model);
+                                                    });
+
+                                                    for (var i = self.state.meshes.length - 1; i >= 0; i--) {
+                                                        if (true === self.state.meshes[i].choose) {
+                                                            self.state.meshes.splice(i, 1);
+                                                        }
+                                                    }
+
+                                                    self.setState({
+                                                        meshes: self.state.meshes,
+                                                        selectedMeshes: []
+                                                    });
+
+                                                    self._openBlocker(false);
+
+                                                    clearInterval(timer);
+                                                }
+                                            }, 100);
+
+                                        }
+                                    }
+                                );
+                            },
+                            onMergeStarting = function() {
+                                self._openBlocker(true);
+                            },
+                            isEnd = function() {
+                                return (endIndex === currentIndex);
+                            },
+                            currentIndex = 0,
+                            endIndex = selectedMeshes.length - 2,
+                            doingMerge = function() {
+                                baseMesh = selectedMeshes[currentIndex];
+                                targetMesh = selectedMeshes[currentIndex + 1];
+                                baseName = baseMesh.name;
+
+                                if ('' === outputName) {
+                                    outputName = 'merge-' + (new Date()).getTime();
+                                }
+                                else {
+                                    baseName = outputName;
+                                }
+
+                                if ('undefined' !== typeof targetMesh) {
+                                    self.state.scanModelingWebSocket.merge(
+                                        baseName,
+                                        targetMesh.name,
+                                        outputName,
+                                        {
+                                            onStarting: onMergeStarting,
+                                            onReceiving: self._onRendering,
+                                            onFinished: onMergeFinished
+                                        }
+                                    );
+                                }
+                            },
+                            baseName,
+                            baseMesh,
+                            targetMesh;
+
+                        self.setState({
+                            // take merge as scan
+                            scanTimes: self.state.scanTimes + 1
+                        }, function() {
+                            doingMerge();
+                        });
+                    });
                 },
 
                 _switchTransformMode: function(mode, e) {
@@ -560,7 +615,7 @@ define([
                         };
 
                     return (
-                        0 < state.selectedMeshes.length ?
+                        0 < state.selectedMeshes.length && false === state.openBlocker ?
                         <ManipulationPanel
                             lang = {lang}
                             selectedMeshes={state.selectedMeshes}
@@ -568,10 +623,7 @@ define([
                             onCropOn={this._doCropOn}
                             onCropOff={this._doCropOff}
                             onClearNoise={this._doClearNoise}
-                            onAutoMerge={this._doAutoMerge}
                             onManualMerge={this._doManualMerge}
-                            enableMerge={state.enableMerge}
-                            enableAutoMerge={state.autoMerge}
                             object={state.selectedObject}
                             position={state.objectDialogPosition}
                             onChange={refreshMatrix}
@@ -782,10 +834,15 @@ define([
 
                     thumbnails = meshes.map(function(mesh, i) {
                         var onChooseMesh = function(e) {
+                                e.preventDefault();
+
                                 var me = e.currentTarget,
                                     mesh = self._getMesh(parseInt(me.dataset.index, 10)),
                                     position = scanedModel.toScreenPosition(mesh.model),
+                                    transformMethods = scanedModel.attachControl(mesh.model, self._refreshObjectDialogPosition),
                                     selectedMeshes;
+
+                                mesh.transformMethods = transformMethods;
 
                                 if (false === e.shiftKey) {
                                     meshes.forEach(function(mesh, key) {
@@ -895,12 +952,8 @@ define([
                         progressRemainingTime: this.props.progressRemainingTime,    // 20 minutes
                         progressElapsedTime: 0,
                         printerIsReady: false,
-                        autoMerge: true,
-                        enableMerge: false,
                         isScanStarted: false,   // scan getting started
                         showCamera: true,
-                        disabledScanButton: false,
-                        disabledConvertButton: false,
                         scanStartTime: undefined,   // when the scan started
                         scanMethods: undefined,
                         scanCtrlWebSocket: undefined,
