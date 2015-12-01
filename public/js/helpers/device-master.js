@@ -63,28 +63,38 @@ define([
             d.resolve(DeviceConstants.READY);
         }
         else {
-
             getReport().then(function(report) {
                 _status = report.st_label;
                 if(_status === DeviceConstants.IDLE) {
-                    uploadFile(blob);
-                    _status = DeviceConstants.PRINTING;
-                    d.resolve(_status);
+                    _go(blob).then(function(status) {
+                        console.log('go is done');
+                        d.resolve(status);
+                    });
                 }
                 else if (_status === DeviceConstants.RUNNING) {
                     _status = DeviceConstants.RUNNING;
                     d.resolve(_status);
                 }
-                else if(_status === DeviceConstants.COMPLETED) {
+                else if(_status === DeviceConstants.COMPLETED || _status === DeviceConstants.ABORTED) {
                     _do(DeviceConstants.QUIT).then(function() {
                         uploadFile(blob);
-                        _status = DeviceConstants.PRINTING;
+                        _status = DeviceConstants.RUNNING;
                         d.resolve(_status);
                     });
                 }
             });
         }
 
+        return d.promise();
+    }
+
+    function _go(blob) {
+        var d = $.Deferred();
+        uploadFile(blob).then(function() {
+            console.log('upload is done');
+            _status = DeviceConstants.RUNNING;
+            d.resolve(_status);
+        });
         return d.promise();
     }
 
@@ -164,26 +174,29 @@ define([
         actions =  {
 
             'RESUME': function() {
-                _device.print.resume();
-                d.resolve('');
+                _device.actions.resume().then(function() {
+                    d.resolve('');
+                });
             },
 
             'PAUSE': function() {
-                _device.print.pause();
-                d.resolve('');
+                console.log('pause hit');
+                _device.actions.pause().then(function() {
+                    d.resolve('');
+                });
             },
 
             'STOP': function() {
                 _device.actions.abort().then(function() {
-                    return _device.actions.quit();
-                }).then(function() {
                     _status = DeviceConstants.READY;
                     d.resolve('');
                 });
             },
 
             'QUIT': function() {
-                return _device.actions.quit();
+                _device.actions.quit().then(function(result) {
+                    d.resolve('');
+                });
             },
 
             'REPORT': function() {
@@ -206,7 +219,7 @@ define([
     }
 
     function _isPrinting() {
-        return _status === DeviceConstants.PRINTING;
+        return _status === DeviceConstants.RUNNING;
     }
 
     function _existConnection(uuid) {
@@ -221,6 +234,12 @@ define([
                 return _devices[i];
             }
         }
+    }
+
+    function _watch() {
+        setInterval(getReport().then(function(report) {
+            console.log(report);
+        }), 1000);
     }
 
     // Core
@@ -242,6 +261,7 @@ define([
             this.resume             = resume;
             this.pause              = pause;
             this.stop               = stop;
+            this.quit               = quit;
             this.setPassword        = setPassword;
             this.getStatus          = getStatus;
             this.getReport          = getReport;
