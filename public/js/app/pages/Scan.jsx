@@ -726,7 +726,8 @@ define([
                 _renderActionButtons: function(lang) {
                     var className = {
                         'hide': this.state.isScanStarted,
-                        'action-buttons': true
+                        'action-buttons': true,
+                        'beehive-buttons': true
                     };
 
                     return (
