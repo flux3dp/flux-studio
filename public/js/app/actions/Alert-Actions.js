@@ -1,5 +1,5 @@
 define([
-    'app//constants/Alert-Constants',
+    'app/constants/Alert-Constants',
     'app/dispatcher/Alert-Dispatcher'
 ], function(
     AlertConstants,

@@ -3,8 +3,11 @@ define([
     'react',
     'plugins/classnames/index',
     'helpers/api/control',
-    'helpers/api/3d-scan-control'
-], function($, React, ClassNames, control, scanControl, director) {
+    'helpers/api/3d-scan-control',
+    'helpers/device-master',
+    'app/actions/Alert-Actions',
+    'app/constants/device-constants'
+], function($, React, ClassNames, control, scanControl, DeviceMaster, AlertActions, DeviceConstants) {
     'use strict';
 
     var controller,
@@ -16,7 +19,8 @@ define([
         filesInfo = [],
         cameraSource,
         remote,
-        report;
+        report,
+        lastError = '';
 
     var mode = {
         preview: 1,
@@ -33,21 +37,16 @@ define([
         }
     };
 
-    var status = {
-        ready   : 0,
-        printing: 1,
-        paused  : 2
-    };
-
     return React.createClass({
 
         propTypes: {
-            lang            : React.PropTypes.object,
-            onClose         : React.PropTypes.func,
-            selectedPrinter : React.PropTypes.object,
-            previewUrl      : React.PropTypes.string,
-            fcode           : React.PropTypes.object,
-            controller      : React.PropTypes.object
+            lang                : React.PropTypes.object,
+            onClose             : React.PropTypes.func,
+            selectedPrinter     : React.PropTypes.object,
+            previewUrl          : React.PropTypes.string,
+            fCode               : React.PropTypes.object,
+            controller          : React.PropTypes.object,
+            controllerStatus    : React.PropTypes.object
         },
 
         getInitialState: function() {
@@ -62,7 +61,7 @@ define([
                 directoryContent    : {},
                 cameraImageUrl      : '',
                 selectedFileName    : '',
-                currentStatus       : status.ready,
+                currentStatus       : DeviceConstants.READY,
                 printerStatus       : ''
             };
         },
@@ -89,6 +88,10 @@ define([
 
         _closeConnection: function(c) {
             if(typeof c !== 'undefined') { c.connection.close(false); }
+        },
+
+        _hasFCode: function() {
+            return this.props.fCode instanceof Blob;
         },
 
         _handleClose: function() {
@@ -163,56 +166,77 @@ define([
         },
 
         _handleGo: function() {
-            if(this.state.currentStatus === status.ready) {
+            if(!this._hasFCode()) {
+                AlertActions.showInfo('there is nothing to print (need localisation)');
+                return;
+            }
+
+            if(this.state.currentStatus === DeviceConstants.READY) {
                 var blob = this.props.fCode;
-                remote = controller.upload(blob.size, blob, {
-                    onFinished: function(result) {
-                        console.log(result);
+                DeviceMaster.go(blob).then(function(status) {
+                    if(status === DeviceConstants.PRINTING || status === DeviceConstants.RUNNING) {
+                        this.setState({ currentStatus: DeviceConstants.PRINTING }, function() {
+                            this._startReport();
+                        });
                     }
-                });
-                this.setState({ currentStatus: status.printing }, function() {
-                    this._startReport();
-                });
+                }.bind(this));
             }
             else {
-                this.setState({ currentStatus: status.printing }, function() {
-                    remote.resume();
+                this.setState({ currentStatus: DeviceConstants.PRINTING }, function() {
+                    DeviceMaster.resume();
                 });
             }
         },
 
         _handlePause: function() {
-            this.setState({ currentStatus: status.paused }, function() {
-                remote.pause();
+            this.setState({ currentStatus: DeviceConstants.PAUSED }, function() {
+                DeviceMaster.pause();
             });
         },
 
         _handleStop: function() {
-            controller.abort();
-            controller.quit().then(function() {
-                this._stopReport();
-                this.setState({ currentStatus: status.ready });
+            if(!this._hasFCode()) {
+                AlertActions.showInfo('there is nothing to stop (need localisation)');
+                return;
+            }
+            this._stopReport();
+            DeviceMaster.stop().then(function() {
+                this.setState({ currentStatus: DeviceConstants.READY });
             }.bind(this));
+            // controller.abort();
+            // controller.quit().then(function() {
+            //     this.setState({ currentStatus: DeviceConstants.READY });
+            // }.bind(this));
         },
 
         _startReport: function() {
-            var self = this;
+            var self = this,
+                lastReport = '';
             report = setInterval(function() {
-                controller.report({
-                    onFinished: function(data) {
-                        self._processReport(data);
+                DeviceMaster.getReport().then(function(report) {
+                    self._processReport(report);
+                    if(report.st_label === DeviceConstants.PAUSED) {
+                        self.setState({ currentStatus: DeviceConstants.PAUSED});
+                    }
+                    else if(report.st_label === DeviceConstants.ABORTED) {
+                        DeviceMaster.stop();
+                        self.setState({ currentStatus: DeviceConstants.READY });
                     }
                 });
             }, 5000);
         },
 
-        _processReport: function(data) {
-            var _data = data.replace(/NaN/g, ''),
-                printer = JSON.parse(_data);
-
+        _processReport: function(report) {
+            console.log(report.error);
+            if(report.error) {
+                if(lastError != report.error[0]) {
+                    lastError = report.error[0];
+                    AlertActions.showError(lastError);
+                }
+            }
             this.setState({
-                temperature: printer.rt,
-                printerStatus: printer.st_label
+                temperature: report.rt,
+                printerStatus: report.st_label
             });
         },
 
@@ -328,7 +352,7 @@ define([
                 <div className="wrapper">
                     <img className="camera-image" src={this.state.cameraImageUrl} />
                 </div>
-            )
+            );
         },
 
         _renderSpinner: function() {
@@ -373,10 +397,16 @@ define([
             }
         },
 
-        _renderCommand: function() {
-            var self = this;
-            var commands = {
-                '0': function() {
+        _renderOperation: function() {
+            var self = this,
+                operation,
+                wait,
+                commands;
+
+            console.log('current status is', this.state.currentStatus);
+
+            commands = {
+                'READY': function() {
                     return (
                         <div className="controls center" onClick={self._handleGo}>
                             <div className="icon"><i className="fa fa-play fa-2x"></i></div>
@@ -385,7 +415,7 @@ define([
                     );
                 },
 
-                '1': function() {
+                'PRINTING': function() {
                     return (
                         <div className="controls center" onClick={self._handlePause}>
                             <div className="icon"><i className="fa fa-pause fa-2x"></i></div>
@@ -394,7 +424,7 @@ define([
                     );
                 },
 
-                '2': function() {
+                'PAUSED': function() {
                     return (
                         <div className="controls center" onClick={self._handleGo}>
                             <div className="icon"><i className="fa fa-play fa-2x"></i></div>
@@ -402,27 +432,45 @@ define([
                         </div>
                     );
                 },
-            }
+            };
 
             if(typeof commands[this.state.currentStatus] !== 'function') {
                 throw new Error('Invalid Status');
             }
 
-            return commands[this.state.currentStatus]();
+            operation = (
+                <div className="operation">
+                    <div className="controls left" onClick={this._handleStop}>
+                        <div className="icon"><i className="fa fa-stop fa-2x"></i></div>
+                        <div className="description">STOP</div>
+                    </div>
+                    {commands[this.state.currentStatus]()}
+                    <div className="controls right">
+                        <div className="icon"><i className="fa fa-circle fa-2x"></i></div>
+                        <div className="description">RECORD</div>
+                    </div>
+                </div>
+            );
+
+            wait = (<div className="wait">Connecting, please wait...</div>);
+
+            return this.props.controllerStatus === DeviceConstants.CONNECTED ? operation : wait;
         },
 
         render: function() {
+
             var lang        = this.props.lang.monitor,
+                name        = this.props.selectedPrinter.name,
                 content     = this._renderContent(),
                 waitIcon    = this.state.waiting ? this._renderSpinner() : '',
-                command     = this._renderCommand();
+                operation   = this._renderOperation();
 
             return (
                 <div className="flux-monitor">
                     <div className="main">
                         <div className="header">
                             <div className="title">
-                                <span>Someone's Flux</span>
+                                <span>{name}</span>
                                 <div className="close" onClick={this._handleClose}>
                                     <div className="x"></div>
                                 </div>
@@ -438,17 +486,7 @@ define([
                                 {waitIcon}
                             </div>
                         </div>
-                        <div className="operation">
-                            <div className="controls left" onClick={this._handleStop}>
-                                <div className="icon"><i className="fa fa-stop fa-2x"></i></div>
-                                <div className="description">STOP</div>
-                            </div>
-                            {command}
-                            <div className="controls right">
-                                <div className="icon"><i className="fa fa-circle fa-2x"></i></div>
-                                <div className="description">RECORD</div>
-                            </div>
-                        </div>
+                        {operation}
                     </div>
                     <div className="sub">
                         <div className="wrapper">
@@ -461,7 +499,7 @@ define([
                                 </div>
                             </div>
                             <div className="row">
-                                <div className="temperature">{this.state.temperature}</div>
+                                <div className="temperature">{this.state.temperature} &#8451;</div>
                                 <div className="time-left right">1 hour 30 min</div>
                             </div>
                         </div>

@@ -403,7 +403,9 @@ define(function() {
                 support_on: 'SUPPORT ON',
                 support_off: 'SUPPORT OFF',
                 advanced: 'ADVANCED',
-                plaTitle: 'PICK THE COLOR OF THE FILAMENT'
+                preview: 'PREVIEW',
+                plaTitle: 'PICK THE COLOR OF THE FILAMENT',
+                transparent: 'TRANSPARENT'
             },
             right_panel: {
                 get: 'Get',
@@ -411,11 +413,9 @@ define(function() {
                 preview: '預覽'
             },
             quality: {
-                high: 'High Quality',
-                good: 'Good Quality',
-                normal: 'Normal Quality',
-                quick: 'Quick Quality',
-                fast: 'Fast Quality'
+                high: 'HIGH QUALITY',
+                med: 'MEDIUM QUALITY',
+                low: 'LOW QUALITY'
             },
             quick_print: 'Quick Print',
             scale: '比例',
@@ -654,7 +654,8 @@ define(function() {
         monitor: {
             change_filament: 'CHANGE FILLAMENT',
             browse_file: 'BROWSE FILE',
-            monitor: 'MONITOR'
+            monitor: 'MONITOR',
+            currentTemperature: 'Current Temp'
         },
         alert: {
             caption: '錯誤',
@@ -676,6 +677,13 @@ define(function() {
             purple: 'PURPLE',
             yellow: 'YELLOW',
             transparent: 'TRANSPARENT'
+        },
+        message: {
+            connecting: 'Connecting...',
+            connected: 'Connected',
+            machineNotConnected: 'Machine is not connected',
+            notPrinting: 'Printing is not in progress',
+            nothingToPrint: 'Nothing to print (source blob missing)'
         }
     };
 });

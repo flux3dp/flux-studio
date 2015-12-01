@@ -40,7 +40,8 @@ define([
 
             self.selected_printer = meta;
 
-            self._auth(meta.serial, '', opts);
+            // self._auth(meta.serial, '', opts);
+            self._auth(meta.uuid, '', opts);
         },
 
         _submit: function(e) {
@@ -133,7 +134,14 @@ define([
         },
 
         _renderPrinterItem: function(printer) {
-            var meta = JSON.stringify(printer);
+            var meta;
+            try {
+                meta = JSON.stringify(printer);
+            }
+            catch(ex) {
+                console.log(printer);
+            }
+
 
             return (
                 <label className="device printer-item" data-meta={meta}>

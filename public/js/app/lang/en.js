@@ -287,7 +287,7 @@ define(function() {
                 name: 'Name',
                 loadPreset: 'LOAD',
                 apply: 'APPLY',
-                saveAsPreset: 'SAVE AS',
+                saveAsPreset: 'SAVE',
                 cancel: 'CANCEL',
                 saveAndApply: 'SAVE & APPLY'
             },
@@ -403,6 +403,7 @@ define(function() {
                 support_on: 'SUPPORT ON',
                 support_off: 'SUPPORT OFF',
                 advanced: 'ADVANCED',
+                preview: 'PREVIEW',
                 plaTitle: 'PICK THE COLOR OF THE FILAMENT',
                 transparent: 'TRANSPARENT'
             },
@@ -413,10 +414,8 @@ define(function() {
             },
             quality: {
                 high: 'HIGH QUALITY',
-                good: 'GOOD QUALITY',
-                normal: 'NORMAL QUALITY',
-                quick: 'QUICK QUALITY',
-                fast: 'FAST QUALITY'
+                med: 'MEDIUM QUALITY',
+                low: 'LOW QUALITY'
             },
             quick_print: 'Quick Print',
             scale: 'Scale',
@@ -655,7 +654,8 @@ define(function() {
         monitor: {
             change_filament: 'CHANGE FILLAMENT',
             browse_file: 'BROWSE FILE',
-            monitor: 'MONITOR'
+            monitor: 'MONITOR',
+            currentTemperature: 'Current Temp'
         },
         alert: {
             caption: 'Error',
@@ -677,6 +677,13 @@ define(function() {
             purple: 'PURPLE',
             yellow: 'YELLOW',
             transparent: 'TRANSPARENT'
+        },
+        message: {
+            connecting: 'Connecting...',
+            connected: 'Connected',
+            machineNotConnected: 'Machine is not connected',
+            notPrinting: 'Printing is not in progress',
+            nothingToPrint: 'Nothing to print (source blob missing)'
         }
     };
 });

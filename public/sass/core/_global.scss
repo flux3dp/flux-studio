@@ -11,6 +11,7 @@ body {
     min-height: 100%;
     padding: 0;
     -webkit-user-select: none;
+    overflow: hidden;
 }
 
 body {
@@ -436,6 +437,49 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         color: #fff;
         background-color: #c9302c;
         border-color: #ac2925;
+    }
+
+    .action-buttons {
+        bottom: 28px;
+        position: fixed;
+        right: 78px;
+
+        .btn {
+            display: block;
+            margin: 0 0 5px 0;
+        }
+
+        .btn.btn-disabled {
+            background: #CCC;
+        }
+
+        .btn-default {
+            background: #B3B3B3;
+            border: none;
+            border-radius: 0;
+            color: #EEE;
+            display: block;
+            font-size: 21px;
+            font-style: italic;
+            font-weight: normal;
+            height: 100px;
+            line-height: 1.2em;
+            margin: 0;
+            min-width: 87px;
+            position: relative;
+            width: 87px;
+
+            &:hover {
+                background: #000;
+            }
+        }
+
+        .btn-go {
+            background: #4D4D4D;
+            font-size: 35px;
+            left: 50px;
+            top: -21px;
+        }
     }
 }
 
