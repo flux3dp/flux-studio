@@ -107,6 +107,7 @@
         text-decoration: none;
         text-align: right;
         top: 24px;
+        cursor: pointer;
 
         img {
             height: 3.6rem;
@@ -169,8 +170,9 @@
                     li {
                         @include flexbox();
                         line-height: 2.8rem;
-                        z-index: 1;
-
+                        label {
+                            cursor: pointer;
+                        }
                         .name {
                             width: 12rem;
                             padding: 0 0 0 0.8rem;
@@ -186,10 +188,7 @@
                     }
                 }
             }
-        }
-
-        &:hover {
-            .menu {
+            &.show {
                 display: block;
             }
         }

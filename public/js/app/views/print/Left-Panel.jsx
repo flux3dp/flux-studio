@@ -105,9 +105,9 @@ define([
         },
 
         _handleTest: function() {
-            console.log(DeviceMaster.getPassword());
-            DeviceMaster.setPassword('456');
-            console.log(DeviceMaster.getPassword());
+            DeviceMaster.getStatus().then(function(status) {
+                console.log(status);
+            });
         },
 
         _onOpenSubPopup: function(e) {
@@ -271,6 +271,10 @@ define([
                         {preview}
 
                         {advanced}
+
+                        <li>
+                            <a onClick={this._handleTest}>test</a>
+                        </li>
                     </ul>
                 </div>
             );

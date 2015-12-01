@@ -654,7 +654,8 @@ define(function() {
         monitor: {
             change_filament: 'CHANGE FILLAMENT',
             browse_file: 'BROWSE FILE',
-            monitor: 'MONITOR'
+            monitor: 'MONITOR',
+            currentTemperature: 'Current Temp'
         },
         alert: {
             caption: 'Error',
@@ -676,6 +677,13 @@ define(function() {
             purple: 'PURPLE',
             yellow: 'YELLOW',
             transparent: 'TRANSPARENT'
+        },
+        message: {
+            connecting: 'Connecting...',
+            connected: 'Connected',
+            machineNotConnected: 'Machine is not connected',
+            notPrinting: 'Printing is not in progress',
+            nothingToPrint: 'Nothing to print (source blob missing)'
         }
     };
 });

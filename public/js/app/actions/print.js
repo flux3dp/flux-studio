@@ -859,8 +859,8 @@ define([
                 openObjectDialogue: true
             }, function() {
                 var objectDialogue = document.getElementsByClassName('object-dialogue')[0],
-                    objectDialogueWidth = parseInt($(objectDialogue).css('width').replace('px', '')),
-                    objectDialogueHeight = parseInt($(objectDialogue).css('height').replace('px', '')),
+                    objectDialogueWidth = parseInt($(objectDialogue).width()),
+                    objectDialogueHeight = parseInt($(objectDialogue).height()),
                     leftOffset = parseInt(position.x),
                     topOffset = (parseInt(position.y) - objectDialogueHeight / 2),
                     marginTop = container.offsetHeight / 2 - position.y;
@@ -1107,7 +1107,7 @@ define([
             fileName = defaultFileName;
         }
 
-        fileName = fileName + '.fcode';
+        fileName = fileName + '.fc';
 
         selectObject(null);
         var d = $.Deferred();

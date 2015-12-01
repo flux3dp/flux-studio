@@ -571,9 +571,9 @@ input.switch:checked ~ label:after {
                 color: #B3B3B3;
 
                 input {
-                    margin-left: 70px;
+                    float: right;
                     height: 40px;
-                    width: 288px;
+                    width: 300px;
                     border: 2px solid #E0E0E0;
                 }
             }

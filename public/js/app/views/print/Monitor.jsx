@@ -4,8 +4,10 @@ define([
     'plugins/classnames/index',
     'helpers/api/control',
     'helpers/api/3d-scan-control',
+    'helpers/device-master',
     'app/actions/Alert-Actions',
-], function($, React, ClassNames, control, scanControl, AlertActions) {
+    'app/constants/device-constants'
+], function($, React, ClassNames, control, scanControl, DeviceMaster, AlertActions, DeviceConstants) {
     'use strict';
 
     var controller,
@@ -17,7 +19,8 @@ define([
         filesInfo = [],
         cameraSource,
         remote,
-        report;
+        report,
+        lastError = '';
 
     var mode = {
         preview: 1,
@@ -32,12 +35,6 @@ define([
         onReady: function() {
 
         }
-    };
-
-    var status = {
-        ready   : 0,
-        printing: 1,
-        paused  : 2
     };
 
     return React.createClass({
@@ -64,7 +61,7 @@ define([
                 directoryContent    : {},
                 cameraImageUrl      : '',
                 selectedFileName    : '',
-                currentStatus       : status.ready,
+                currentStatus       : DeviceConstants.READY,
                 printerStatus       : ''
             };
         },
@@ -174,27 +171,26 @@ define([
                 return;
             }
 
-            if(this.state.currentStatus === status.ready) {
+            if(this.state.currentStatus === DeviceConstants.READY) {
                 var blob = this.props.fCode;
-                remote = controller.upload(blob.size, blob, {
-                    onFinished: function(result) {
-                        console.log(result);
+                DeviceMaster.go(blob).then(function(status) {
+                    if(status === DeviceConstants.PRINTING || status === DeviceConstants.RUNNING) {
+                        this.setState({ currentStatus: DeviceConstants.PRINTING }, function() {
+                            this._startReport();
+                        });
                     }
-                });
-                this.setState({ currentStatus: status.printing }, function() {
-                    this._startReport();
-                });
+                }.bind(this));
             }
             else {
-                this.setState({ currentStatus: status.printing }, function() {
-                    remote.resume();
+                this.setState({ currentStatus: DeviceConstants.PRINTING }, function() {
+                    DeviceMaster.resume();
                 });
             }
         },
 
         _handlePause: function() {
-            this.setState({ currentStatus: status.paused }, function() {
-                remote.pause();
+            this.setState({ currentStatus: DeviceConstants.PAUSED }, function() {
+                DeviceMaster.pause();
             });
         },
 
@@ -204,30 +200,43 @@ define([
                 return;
             }
             this._stopReport();
-            controller.abort();
-            controller.quit().then(function() {
-                this.setState({ currentStatus: status.ready });
+            DeviceMaster.stop().then(function() {
+                this.setState({ currentStatus: DeviceConstants.READY });
             }.bind(this));
+            // controller.abort();
+            // controller.quit().then(function() {
+            //     this.setState({ currentStatus: DeviceConstants.READY });
+            // }.bind(this));
         },
 
         _startReport: function() {
-            var self = this;
+            var self = this,
+                lastReport = '';
             report = setInterval(function() {
-                controller.report({
-                    onFinished: function(data) {
-                        self._processReport(data);
+                DeviceMaster.getReport().then(function(report) {
+                    self._processReport(report);
+                    if(report.st_label === DeviceConstants.PAUSED) {
+                        self.setState({ currentStatus: DeviceConstants.PAUSED});
+                    }
+                    else if(report.st_label === DeviceConstants.ABORTED) {
+                        DeviceMaster.stop();
+                        self.setState({ currentStatus: DeviceConstants.READY });
                     }
                 });
             }, 5000);
         },
 
-        _processReport: function(data) {
-            var _data = data.replace(/NaN/g, ''),
-                printer = JSON.parse(_data);
-
+        _processReport: function(report) {
+            console.log(report.error);
+            if(report.error) {
+                if(lastError != report.error[0]) {
+                    lastError = report.error[0];
+                    AlertActions.showError(lastError);
+                }
+            }
             this.setState({
-                temperature: printer.rt,
-                printerStatus: printer.st_label
+                temperature: report.rt,
+                printerStatus: report.st_label
             });
         },
 
@@ -394,8 +403,10 @@ define([
                 wait,
                 commands;
 
+            console.log('current status is', this.state.currentStatus);
+
             commands = {
-                '0': function() {
+                'READY': function() {
                     return (
                         <div className="controls center" onClick={self._handleGo}>
                             <div className="icon"><i className="fa fa-play fa-2x"></i></div>
@@ -404,7 +415,7 @@ define([
                     );
                 },
 
-                '1': function() {
+                'PRINTING': function() {
                     return (
                         <div className="controls center" onClick={self._handlePause}>
                             <div className="icon"><i className="fa fa-pause fa-2x"></i></div>
@@ -413,7 +424,7 @@ define([
                     );
                 },
 
-                '2': function() {
+                'PAUSED': function() {
                     return (
                         <div className="controls center" onClick={self._handleGo}>
                             <div className="icon"><i className="fa fa-play fa-2x"></i></div>
@@ -443,11 +454,11 @@ define([
 
             wait = (<div className="wait">Connecting, please wait...</div>);
 
-            return this.props.controllerStatus.status === 'connected' ? operation : wait;
+            return this.props.controllerStatus === DeviceConstants.CONNECTED ? operation : wait;
         },
 
         render: function() {
-            console.log('from monitor',this.props.controllerStatus);
+
             var lang        = this.props.lang.monitor,
                 name        = this.props.selectedPrinter.name,
                 content     = this._renderContent(),
@@ -488,7 +499,7 @@ define([
                                 </div>
                             </div>
                             <div className="row">
-                                <div className="temperature">{this.state.temperature}</div>
+                                <div className="temperature">{this.state.temperature} &#8451;</div>
                                 <div className="time-left right">1 hour 30 min</div>
                             </div>
                         </div>

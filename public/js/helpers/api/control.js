@@ -32,14 +32,18 @@ define([
                         break;
                     }
                 },
-                onError: opts.onError,
+                // onError: opts.onError,
+                onError: function(response) {
+                    events.onError(response);
+                },
                 onClose: function(response) {
                     isConnected = false;
                 }
             }),
             lastOrder = '',
             events = {
-                onMessage: function() {}
+                onMessage: function() {},
+                onError: function() {}
             },
             genericOptions = function(opts) {
                 var emptyFunction = function() {};
@@ -113,6 +117,10 @@ define([
                 opts = genericOptions(opts);
 
                 events.onMessage = function(response) {
+                    opts.onFinished(response);
+                };
+
+                events.onError = function(response) {
                     opts.onFinished(response);
                 };
 
@@ -194,6 +202,9 @@ define([
                         else if ('ok' === data.status) {
                             self.start(opts);
                         }
+                        else if(data.status === 'error') {
+                            opts.onError(data);
+                        }
                     },
                     doUpload = function() {
                         events.onMessage = uploading;
@@ -234,6 +245,9 @@ define([
                 events.onMessage = function(result) {
                     d.resolve(result);
                 };
+                events.onError = function(result) {
+                    d.resolve(result);
+                };
 
                 ws.send('abort');
                 lastOrder = 'abort';
@@ -243,6 +257,10 @@ define([
             start: function() {
                 var d = $.Deferred();
                 events.onMessage = function(result) {
+                    d.resolve(result);
+                };
+
+                events.onError = function(result) {
                     d.resolve(result);
                 };
 
@@ -267,6 +285,10 @@ define([
                 events.onMessage = function(result) {
                     d.resolve(result);
                 };
+
+                events.onError = function(result) {
+                    d.resolve(result);
+                }
 
                 ws.send('quit');
                 lastOrder = 'quit';

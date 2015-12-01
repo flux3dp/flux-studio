@@ -16,6 +16,7 @@ define([
     'helpers/api/config',
     'jsx!views/Print-Selector',
     'helpers/nwjs/menu-factory',
+    'helpers/device-master'
 ], function($,
     React,
     display,
@@ -32,7 +33,8 @@ define([
     Modal,
     Config,
     PrinterSelector,
-    menuFactory
+    menuFactory,
+    DeviceMaster
 ) {
 
     return function(args) {
@@ -92,7 +94,7 @@ define([
                         rotation                    : {},
                         scale                       : {},
                         previewUrl                  : '',
-                        printerControllerStatus     : {}
+                        printerControllerStatus     : ''
                     });
                 },
 
@@ -185,8 +187,8 @@ define([
                     this.setState({ showAdvancedSetting: closeAdvancedSetting });
                 },
 
-                _handleShowMonitor: function(e) {
-
+                _handleShowMonitor: function(isOn) {
+                    this.setState({ showMonitor: isOn });
                 },
 
                 _handleTogglePrintPause: function(printPaused) {
@@ -253,15 +255,9 @@ define([
                         });
                     }.bind(this));
 
-                    printerController = PrinterController(selectedPrinter.serial, {
-                        onConnect: this._handlePrinterConnection
-                    });
-                },
-
-                _handlePrinterConnection: function(connectionStatus) {
-                    this.setState({
-                        printerControllerStatus: connectionStatus
-                    });
+                    DeviceMaster.selectDevice(selectedPrinter.uuid).then(function(status) {
+                        this.setState({ printerControllerStatus: status });
+                    }.bind(this));
                 },
 
                 _handlePreviewLayerChange: function(targetLayer) {

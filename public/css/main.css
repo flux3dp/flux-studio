@@ -3175,7 +3175,8 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         right: 24px;
         text-decoration: none;
         text-align: right;
-        top: 24px; }
+        top: 24px;
+        cursor: pointer; }
         .top-menu .device img {
             height: 3.6rem;
             margin: 0 auto;
@@ -3230,8 +3231,9 @@ input[type=range]:focus::-webkit-slider-runnable-track {
                         /* NEW - Chrome */
                         display: flex;
                         /* NEW, Spec - Opera 12.1, Firefox 20+ */
-                        line-height: 2.8rem;
-                        z-index: 1; }
+                        line-height: 2.8rem; }
+                        .top-menu .device .menu .device-list ul li label {
+                            cursor: pointer; }
                         .top-menu .device .menu .device-list ul li .name {
                             width: 12rem;
                             padding: 0 0 0 0.8rem; }
@@ -3240,8 +3242,8 @@ input[type=range]:focus::-webkit-slider-runnable-track {
                         .top-menu .device .menu .device-list ul li:hover {
                             background-color: #B3B3B3;
                             color: #FFF; }
-        .top-menu .device:hover .menu {
-            display: block; }
+            .top-menu .device .menu.show {
+                display: block; }
 
 .accordion .accordion-body {
     display: block;
@@ -3897,9 +3899,9 @@ input.switch:checked ~ label:after {
             line-height: 40px;
             color: #B3B3B3; }
             .print-studio .advanced-panel .preset-wrapper .preset-name input {
-                margin-left: 70px;
+                float: right;
                 height: 40px;
-                width: 288px;
+                width: 300px;
                 border: 2px solid #E0E0E0; }
 
 .print-studio .flux-monitor {

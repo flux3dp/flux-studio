@@ -40,7 +40,8 @@ define(['helpers/websocket'], function(Websocket) {
             send: function(serial, password) {
                 password = password || '';
 
-                var args = JSON.stringify({ serial: serial, password: password });
+                // var args = JSON.stringify({ serial: serial, password: password });
+                var args = JSON.stringify({ uuid: serial, password: password });
 
                 timer = setInterval(function() {
                     if (true === getResponse) {

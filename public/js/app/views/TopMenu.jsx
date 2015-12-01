@@ -7,7 +7,9 @@ define([
     'jsx!widgets/Notification-Modal',
     'jsx!views/Print-Selector',
     'helpers/api/discover',
-    'helpers/api/config'
+    'helpers/api/config',
+    'helpers/device-master',
+    'plugins/classnames/index'
 ], function(
     React,
     Notifier,
@@ -17,7 +19,9 @@ define([
     Modal,
     PrinterSelector,
     Discover,
-    Config
+    Config,
+    DeviceMaster,
+    ClassNames
 ) {
     'use strict';
 
@@ -55,20 +59,27 @@ define([
 
             getInitialState: function() {
                 return {
-                    sourceId    : '',
-                    showModal   : false,
-                    deviceList  : []
+                    sourceId        : '',
+                    showModal       : false,
+                    deviceList      : [],
+                    refresh         : '',
+                    showDeviceList  : false
                 };
             },
 
             componentDidMount: function() {
                 AlertStore.onNotify(this._handleNotification);
                 AlertStore.onPopup(this._handlePopup);
+                DeviceMaster.setLanguageSource(lang);
             },
 
             componentWillUnmount: function() {
                 AlertStore.removeNotifyListener(this._handleNotification);
                 AlertStore.removePopupListener(this._handlePopup);
+            },
+
+            _closeDeviceList: function() {
+
             },
 
             _handleNotification: function(type, message) {
@@ -124,10 +135,7 @@ define([
 
             _handleShowDeviceList: function() {
                 var self = this,
-                    options = [],
-                    devices = [],
                     refreshOption = function(devices) {
-
                         self.setState({
                             deviceList: devices
                         });
@@ -147,10 +155,16 @@ define([
                         refreshOption(printers);
                     });
                 }
+
+                this.setState({ showDeviceList: !this.state.showDeviceList });
             },
 
-            _handleSelectDevice: function(uuid) {
-                console.log(uuid);
+            _handleSelectDevice: function(uuid, e) {
+                e.preventDefault();
+                // this._closeDeviceList();
+                DeviceMaster.setPassword('flux');
+                DeviceMaster.selectDevice(uuid);
+                this.setState({ showDeviceList: false });
             },
 
             _renderStudioFunctions: function() {
@@ -185,7 +199,9 @@ define([
             _renderDeviceList: function() {
                 var list = this.state.deviceList.map(function(device) {
                     return (
-                        <li name={device.uuid} onClick={this._handleSelectDevice.bind(null, device.uuid)}>
+                        <li
+                            name={device.uuid}
+                            onClick={this._handleSelectDevice.bind(null, device.uuid)}>
                             <label className="name">{device.name}</label>
                             <label className="status">Working / Print / 35%</label>
                         </li>
@@ -200,9 +216,14 @@ define([
             render : function() {
                 var menuItems = this._renderStudioFunctions(),
                     deviceList = this._renderDeviceList(),
-                    currentWorkingFunction = options.filter(function(el) {
-                        return -1 < location.hash.search(el.name);
-                    })[0] || {};
+                    currentWorkingFunction,
+                    menuClass;
+
+                currentWorkingFunction = options.filter(function(el) {
+                    return -1 < location.hash.search(el.name);
+                })[0] || {};
+
+                menuClass = ClassNames('menu', { show: this.state.showDeviceList });
 
                 return (
                     <div>
@@ -232,10 +253,10 @@ define([
                             onRetry={this._handleRetry}
                             onClose={this._handleModalClose} />
 
-                        <div className="device" onMouseEnter={this._handleShowDeviceList}>
+                        <div className="device" onClick={this._handleShowDeviceList}>
                             <img src="/img/btn-device.svg" />
                             <p>{lang.menu.device}</p>
-                            <div className="menu">
+                            <div className={menuClass}>
                                 <svg width="36" height="15"
                                      className="arrow"
                                      viewBox="0 0 36 15" version="1.1"

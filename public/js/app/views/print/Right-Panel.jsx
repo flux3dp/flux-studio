@@ -51,13 +51,6 @@ define([
             this.props.onDownloadGCode();
         },
 
-        _handleTest: function(e) {
-            e.preventDefault();
-            AlertActions.showError('fatal error 123');
-            AlertActions.showInfo('some info');
-            AlertActions.showWarning('some warning');
-        },
-
         _showInfo: function() {
             AlertActions.showPopupInfo('a1','核子廢料的處理是各國共同關注的問題');
         },
@@ -107,9 +100,9 @@ define([
 
             return (
                 <div className='rightPanel'>
-                    {/*
                     <a className="btn" onClick={this._handleGetGCode}>Gcode</a><p/>
-                    <a className="btn" onClick={this._handleTest}>Notify</a>
+                    {
+                    /*<a className="btn" onClick={this._handleTest}>Notify</a>
                     <a className="btn" onClick={this._showInfo}>Info</a>
                     <a className="btn" onClick={this._showWarning}>Warning</a>
                     <a className="btn" onClick={this._showError}>Error</a>
