@@ -355,6 +355,7 @@ define([
 
     function addOrbitControls() {
         orbitControl = new THREE.OrbitControls(camera, renderer.domElement);
+        orbitControl.target = new THREE.Vector3(0, 0, 35);
         orbitControl.rotateSpeed = 2.0;
         orbitControl.zoomSpeed = 1.2;
         orbitControl.panSpeed = 1.8;

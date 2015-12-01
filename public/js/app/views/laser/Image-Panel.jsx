@@ -27,10 +27,10 @@ define([
         _onTransform: function(e) {
             var type = e.currentTarget.dataset.type,
                 newParams = {
-                    angle: this.refs.objectAngle.getDOMNode().value,
+                    angle: parseFloat(this.refs.objectAngle.getDOMNode().value, 10),
                     position: {
-                        x: this.refs.objectPosX.getDOMNode().value,
-                        y: this.refs.objectPosY.getDOMNode().value
+                        x: parseFloat(this.refs.objectPosX.getDOMNode().value, 10),
+                        y: parseFloat(this.refs.objectPosY.getDOMNode().value, 10)
                     },
                     size: {
                         width: this.refs.objectSizeW.value(),
@@ -40,7 +40,7 @@ define([
                 ratio;
 
             if ('undefined' !== typeof this.refs.threshold) {
-                newParams['threshold'] = this.refs.threshold.getDOMNode().value;
+                newParams['threshold'] = parseInt(this.refs.threshold.getDOMNode().value, 10);
             }
 
             if (true === this.state.lockSize) {
