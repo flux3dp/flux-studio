@@ -89,7 +89,15 @@ define([
                     specular: 0x111111,
                     shininess: 100
                 }),
-                mesh = new THREE.Mesh(geometry, material);
+                mesh = new THREE.Mesh(geometry, material),
+                wfh = new THREE.WireframeHelper( mesh, 0x0fff00 );
+
+            if (true === window.FLUX.debug) {
+                wfh.material.depthTest = false;
+                wfh.material.opacity = 0.25;
+                wfh.material.transparent = true;
+                mesh.add( wfh );
+            }
 
             material.side = THREE.DoubleSide;
 
