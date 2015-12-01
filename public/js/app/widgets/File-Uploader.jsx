@@ -4,6 +4,21 @@ define([
     'use strict';
 
     return React.createClass({
+        getDefaultProps: function() {
+            return {
+                lang: React.PropTypes.object,
+                sizeMaxLimit: React.PropTypes.number,
+                accept: '',
+                multiple: React.PropTypes.bool,
+                className: {},
+                // events
+                onReadFileStarted: React.PropTypes.func,
+                onReadingFile: React.PropTypes.func,
+                onReadEnd: React.PropTypes.func,
+                onError: React.PropTypes.func
+            };
+        },
+
         // public events
         getFileExtension: function(fileName) {
             return fileName.split('.').pop();
@@ -28,7 +43,9 @@ define([
                             url: blobUrl.createObjectURL(blob),
                             extension: self.getFileExtension(thisFile.name),
                             type: thisFile.type,
-                            size: thisFile.size
+                            size: thisFile.size,
+                            index: fileIndex,
+                            totalFiles: files.length
                         });
 
                         fileIndex++;
@@ -106,21 +123,6 @@ define([
                     onChange={self._onReadFile}
                 />
             );
-        },
-
-        getDefaultProps: function() {
-            return {
-                lang: React.PropTypes.object,
-                sizeMaxLimit: React.PropTypes.number,
-                accept: '',
-                multiple: React.PropTypes.bool,
-                className: {},
-                // events
-                onReadFileStarted: React.PropTypes.func,
-                onReadingFile: React.PropTypes.func,
-                onReadEnd: React.PropTypes.func,
-                onError: React.PropTypes.func
-            };
         }
 
     });

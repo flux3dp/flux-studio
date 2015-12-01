@@ -9,14 +9,19 @@ define([
 ], function(Websocket, fileSystem, PointCloudHelper) {
     'use strict';
 
-    return function(serial, opts) {
+    return function(uuid, opts) {
         opts = opts || {};
         opts.onError = opts.onError || function() {};
         opts.onClose = opts.onClose || function() {};
         opts.onReady = opts.onReady || function() {};
 
-        var ws = new Websocket({
-                method: '3d-scan-control/' + serial,
+        var errorHandler = function(data) {
+                is_ready = false;
+                is_error = true;
+                opts.onError(data);
+            },
+            ws = new Websocket({
+                method: '3d-scan-control/' + uuid,
                 onMessage: function(data) {
 
                     switch (data.status) {
@@ -33,22 +38,19 @@ define([
                     }
 
                     if (true === is_ready) {
-                        events.onMessage(data);
+                        (events.onMessage || function() {})(data);
                     }
                 },
                 onError: errorHandler,
                 onClose: opts.onClose
             }),
-            errorHandler = function(data) {
-                is_ready = false;
-                is_error = true;
-                opts.onError(data);
-            },
             is_error = false,
             is_ready = false,
-            IMAGE_INTERVAL = 200,
-            events = {
-                onMessage: function() {}
+            events,
+            initialEvents = function() {
+                events = {
+                    onMessage: undefined
+                };
             },
             retry = function() {
                 if (true === is_error) {
@@ -60,27 +62,47 @@ define([
                     ws.send('take_control');
                 }
             },
+            fetchImage = function(goFetch) {
+                if ('boolean' === typeof goFetch && true === goFetch) {
+                    return function() {
+                        ws.send('image');
+                    };
+                }
+                else {
+                    return function() {};
+                }
+            },
             wait_for_connected_timer,
             image_timer,
             stopGettingImage = function(callback) {
                 callback = callback || function() {};
 
-                var timer = setInterval(function() {
-                    if ('undefined' !== typeof image_timer) {
-                        clearInterval(image_timer);
-                        image_timer = undefined;
-                    }
-                    else {
-                        callback();
-                        clearInterval(timer);
-                    }
-                }, 100);
+                if ('undefined' === typeof events.onMessage) {
+                    callback();
+                }
+                else {
+                    events.onMessage = function(data) {
+                        if ('ok' === data.status) {
+                            initialEvents();
+                            callback();
+                        }
+                    };
+                }
+
             };
+
+        initialEvents();
+
+        setInterval(function() {
+            ws.send('ping');
+        }, 60000);
 
         return {
             connection: ws,
             getImage: function(imageHandler) {
-                var allow_to_get = true,
+                var goFetch = function() {
+                        ws.send('image');
+                    },
                     image_length = 0,
                     mime_type = '',
                     image_blobs = [],
@@ -92,8 +114,12 @@ define([
                                 break;
                             case 'ok':
                                 imageHandler(image_blobs, mime_type);
-                                allow_to_get = true;
                                 image_blobs = [];
+
+                                setTimeout(function() {
+                                    goFetch();
+                                }, 1000);
+
                                 break;
                             default:
                                 if (data instanceof Blob) {
@@ -106,24 +132,8 @@ define([
                         };
                     };
 
-                image_timer = setInterval(function() {
-                    // if disconnect shortly then fire again when reconnected
-                    if (ws.readyState.OPEN !== ws.getReadyState()) {
-                        ws.onOpen(function() {
-                            ws.send('image');
-                            allow_to_get = false;
-                        });
-                    }
-
-                    // wait for last process finished
-                    if (true === allow_to_get) {
-                        ws.send('image');
-                        allow_to_get = false;
-                    }
-
-                }, IMAGE_INTERVAL);
-
                 fetch();
+                goFetch();
 
                 return {
                     retry: retry,
@@ -132,7 +142,6 @@ define([
                 };
             },
             scan: function(resolution, opts) {
-
                 opts = opts || {};
                 opts.onRendering = opts.onRendering || function() {};
                 opts.onFinished = opts.onFinished || function() {};
@@ -143,8 +152,6 @@ define([
                     _opts = {
                         onProgress: opts.onRendering
                     },
-                    go_next = true,
-                    got_chunk = false,
                     timer,
                     onResolutionMessage = function() {
                         events.onMessage = function(data) {
@@ -154,39 +161,35 @@ define([
                         };
                     },
                     onScanMessage = function() {
+                        var runScan = function() {
+                            ws.send('scan');
+                        };
+
                         events.onMessage = function(data) {
-                            switch (data.status) {
-                            case 'chunk':
+                            if (data instanceof Blob) {
+                                pointCloud.push(data, next_left, next_right, _opts);
+                            }
+                            else if ('chunk' === data.status) {
                                 next_left = parseInt(data.left, 10) * 24;
                                 next_right = parseInt(data.right, 10) * 24;
-                                got_chunk = true;
-                                break;
-                            case 'ok':
+                            }
+                            else if ('ok' === data.status) {
                                 resolution--;
-                                go_next = (0 < resolution);
-                                got_chunk = false;
-                                break;
-                            default:
-                                if (data instanceof Blob && true === got_chunk) {
-                                    pointCloud.push(data, next_left, next_right, _opts);
+
+                                if (0 === parseInt(resolution, 10)) {
+                                    initialEvents();
+                                    opts.onFinished(pointCloud.get());
                                 }
                                 else {
-                                    // TODO: unexception data
+                                    runScan();
                                 }
+                            }
+                            else {
+                                // TODO: unexception data
                             }
                         };
 
-                        timer = setInterval(function() {
-                            if (true === go_next) {
-                                go_next = false;
-                                ws.send('scan');
-                            }
-
-                            if (0 >= resolution) {
-                                opts.onFinished(pointCloud.get());
-                                clearInterval(timer);
-                            }
-                        }, 100);
+                        runScan();
                     },
                     scanStarted = function() {
                         onResolutionMessage();
@@ -199,10 +202,31 @@ define([
                     retry: retry,
                     take_control: takeControl,
                     stop: function() {
-                        clearInterval(timer);
                         events.onMessage = function() {};
                     }
                 };
+            },
+            check: function(opts) {
+                opts = opts || {};
+                opts.onPass = opts.onPass || function() {};
+                opts.onFail = opts.onFail || function() {};
+
+                var checkStarted = function() {
+                    events.onMessage = function(data) {
+                        initialEvents();
+
+                        if ('good' === data.message) {
+                            opts.onPass();
+                        }
+                        else {
+                            opts.onFail(data.message);
+                        }
+                    };
+
+                    ws.send('scan_check');
+                };
+
+                stopGettingImage(checkStarted);
             }
         };
     };

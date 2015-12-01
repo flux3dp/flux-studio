@@ -9,14 +9,14 @@ define([
 ], function($, Websocket, convertToTypedArray) {
     'use strict';
 
-    return function(serial, opts) {
+    return function(uuid, opts) {
         opts = opts || {};
         opts.onError = opts.onError || function() {};
         opts.onConnect = opts.onConnect || function() {};
 
         var isConnected = false,
             ws = new Websocket({
-                method: 'control/' + serial,
+                method: 'control/' + uuid,
                 onMessage: function(data) {
                     switch (data.status) {
                     case 'connecting':
@@ -194,7 +194,8 @@ define([
 
                                 fileReader.onloadend = function(e) {
                                     ws.send(this.result);
-                                }
+                                };
+
                                 fileReader.readAsArrayBuffer(chunk);
                             }
 

@@ -37,11 +37,10 @@ define(['helpers/websocket'], function(Websocket) {
 
         return {
             connection: ws,
-            send: function(serial, password) {
+            send: function(uuid, password) {
                 password = password || '';
 
-                // var args = JSON.stringify({ serial: serial, password: password });
-                var args = JSON.stringify({ uuid: serial, password: password });
+                var args = JSON.stringify({ uuid: uuid, password: password });
 
                 timer = setInterval(function() {
                     if (true === getResponse) {

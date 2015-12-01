@@ -2561,6 +2561,9 @@ input[type=range]:focus::-webkit-slider-runnable-track {
 .pull-right {
     float: right; }
 
+.disabled-pointer {
+    pointer-events: none; }
+
 /**
  * ref: http://tobiasahlin.com/spinkit/
  */
@@ -2733,7 +2736,14 @@ input[type=range]:focus::-webkit-slider-runnable-track {
 /* special shape button */
 .btn-hexagon {
     -webkit-clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); }
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    -webkit-transition: none;
+    transition: none; }
+    .btn-hexagon:active {
+        background-color: inherit;
+        background-image: none;
+        box-shadow: none;
+        color: inherit; }
 
 /* button helper */
 .btn-multiline-text {
@@ -2899,6 +2909,60 @@ input[type=range]:focus::-webkit-slider-runnable-track {
     height: 40px;
     padding: 2px 5px;
     width: 100%; }
+
+.ui-dialog-menu {
+    list-style: none;
+    margin: 0;
+    padding: 0; }
+    .ui-dialog-menu .ui-dialog-menu-item {
+        height: 40px;
+        line-height: 40px;
+        display: -webkit-box;
+        /* OLD - iOS 6-, Safari 3.1-6 */
+        display: -webkit-flex;
+        /* NEW - Chrome */
+        display: flex;
+        /* NEW, Spec - Opera 12.1, Firefox 20+ */ }
+    .ui-dialog-menu .dialog-opener {
+        display: none; }
+        .ui-dialog-menu .dialog-opener:checked ~ .dialog-label {
+            background: #B3B3B3;
+            color: #E0E0DF; }
+        .ui-dialog-menu .dialog-opener:checked ~ .dialog-window {
+            display: -webkit-box;
+            /* OLD - iOS 6-, Safari 3.1-6 */
+            display: -webkit-flex;
+            /* NEW - Chrome */
+            display: flex;
+            /* NEW, Spec - Opera 12.1, Firefox 20+ */ }
+    .ui-dialog-menu .dialog-label {
+        color: #B3B3B3;
+        font-size: 1.8rem;
+        margin: 0;
+        min-width: 200px;
+        padding: 0 6px;
+        text-overflow: ellipsis;
+        word-break: break-all;
+        white-space: nowrap;
+        overflow: hidden; }
+    .ui-dialog-menu .dialog-window {
+        display: none;
+        align-self: center; }
+        .ui-dialog-menu .dialog-window ul {
+            padding: 0;
+            list-style: none; }
+        .ui-dialog-menu .dialog-window li {
+            color: #E0E0DF;
+            font-size: 1.8rem; }
+        .ui-dialog-menu .dialog-window .dialog-window-content {
+            background: #B3B3B3;
+            padding: 5px 20px; }
+        .ui-dialog-menu .dialog-window .arrow {
+            position: relative;
+            right: -1px;
+            align-self: center; }
+            .ui-dialog-menu .dialog-window .arrow polygon {
+                fill: #B3B3B3; }
 
 /**
  * global advanced panel
@@ -5061,6 +5125,9 @@ input.switch:checked ~ label:after {
         height: 175px;
         overflow: scroll;
         width: 252px; }
+        .initialization .select-wifi .wifi-list .spinner-roller {
+            height: 5em;
+            width: 5em; }
         .initialization .select-wifi .wifi-list .row-fluid {
             display: -webkit-box;
             /* OLD - iOS 6-, Safari 3.1-6 */
@@ -5075,6 +5142,7 @@ input.switch:checked ~ label:after {
             flex: 2;
             justify-content: space-between; }
         .initialization .select-wifi .wifi-list .wifi-ssid {
+            text-overflow: ellipsis;
             width: calc(100% - 50px); }
         .initialization .select-wifi .wifi-list span {
             display: block;
@@ -5109,7 +5177,10 @@ input.switch:checked ~ label:after {
         justify-content: space-around; }
         .initialization .h-form .control input {
             height: 36px;
-            width: 250px; }
+            width: 250px;
+            flex: 3; }
+        .initialization .h-form .control label {
+            flex: 1; }
 
 /**
  * Laser
@@ -5171,8 +5242,11 @@ input.switch:checked ~ label:after {
 .laser-studio .operating-panel {
     margin: 0 0 0 30px;
     position: static;
-    width: 305px;
-    align-self: center; }
+    align-self: center;
+    width: auto;
+    z-index: 1; }
+    .laser-studio .operating-panel .disabled-pointer {
+        opacity: .3; }
     .laser-studio .operating-panel .custom-presets-wrapper {
         background: #FFF;
         overflow: scroll;
@@ -5222,6 +5296,8 @@ input.switch:checked ~ label:after {
                 max-width: 66px;
                 min-width: 66px;
                 width: 66px; }
+    .laser-studio .operating-panel .caption {
+        padding: 0 0.3em 0 0; }
     .laser-studio .operating-panel .popup-selection {
         display: -webkit-box;
         /* OLD - iOS 6-, Safari 3.1-6 */
@@ -5246,32 +5322,10 @@ input.switch:checked ~ label:after {
                 color: #E0E0DF; }
             .laser-studio .operating-panel .popup-selection .popup-open:checked ~ .popup {
                 visibility: visible; }
-        .laser-studio .operating-panel .popup-selection .display-text {
-            display: inline-block;
-            font-size: 1.8rem;
-            line-height: 40px;
-            padding: 0 16px 0 6px; }
-            .laser-studio .operating-panel .popup-selection .display-text .caption {
-                padding: 0 0.3em 0 0; }
-            .laser-studio .operating-panel .popup-selection .display-text p {
-                display: block;
-                margin: 0;
-                width: 257px; }
-        .laser-studio .operating-panel .popup-selection .popup {
-            display: -webkit-box;
-            /* OLD - iOS 6-, Safari 3.1-6 */
-            display: -webkit-flex;
-            /* NEW - Chrome */
-            display: flex;
-            /* NEW, Spec - Opera 12.1, Firefox 20+ */
-            visibility: hidden;
-            align-self: center; }
-            .laser-studio .operating-panel .popup-selection .popup .arrow {
-                position: relative;
-                right: -1px;
-                align-self: center; }
-                .laser-studio .operating-panel .popup-selection .popup .arrow polygon {
-                    fill: #B3B3B3; }
+        .laser-studio .operating-panel .popup-selection .display-text p {
+            display: block;
+            margin: 0;
+            width: 257px; }
     .laser-studio .operating-panel .object-height-input {
         width: 164px; }
         .laser-studio .operating-panel .object-height-input .ui-control-unit-input input[type="text"] {
@@ -5282,8 +5336,6 @@ input.switch:checked ~ label:after {
             line-height: 32px;
             padding: 0 5px;
             width: 100%; }
-    .laser-studio .operating-panel .material-list {
-        width: 116px; }
     .laser-studio .operating-panel .btn-advance {
         background: transparent;
         border-radius: 0;
@@ -5291,11 +5343,10 @@ input.switch:checked ~ label:after {
         font-size: 1.8rem;
         line-height: 40px;
         margin: 0;
-        padding: 0 16px 0 6px;
+        padding: 0;
         text-align: left;
         width: 100%; }
     .laser-studio .operating-panel li {
-        color: #b3b3b3;
         font-size: 16px;
         line-height: 40px; }
     .laser-studio .operating-panel .main {
@@ -5422,6 +5473,36 @@ input.switch:checked ~ label:after {
         color: #B3B3B3;
         font-size: 15px; }
 
+.laser-studio .action-buttons {
+    bottom: 28px;
+    position: fixed;
+    right: 20px;
+    width: 87px; }
+    .laser-studio .action-buttons .btn.btn-disabled {
+        background: #CCC; }
+    .laser-studio .action-buttons .btn {
+        background: #B3B3B3;
+        border: none;
+        border-radius: 0;
+        color: #EEE;
+        display: block;
+        font-size: 21px;
+        font-style: italic;
+        font-weight: normal;
+        height: 100px;
+        line-height: 1.2em;
+        margin: -20px 0 0 0;
+        min-width: 87px;
+        position: relative;
+        width: 87px; }
+        .laser-studio .action-buttons .btn:hover {
+            background: #000; }
+        .laser-studio .action-buttons .btn:nth-child(odd) {
+            left: -45px; }
+    .laser-studio .action-buttons .btn-go {
+        background: #4D4D4D;
+        font-size: 35px; }
+
 .laser-studio .advanced-panel {
     background: #FFF;
     padding: 20px 20px 0;
@@ -5429,14 +5510,13 @@ input.switch:checked ~ label:after {
     .laser-studio .advanced-panel .form {
         margin: 0 0 10px 0; }
     .laser-studio .advanced-panel .footer {
-        margin-bottom: 0;
-        position: static;
-        margin: 0 0 10px 0; }
+        margin: 0 0 10px 0;
+        position: static; }
         .laser-studio .advanced-panel .footer .btn {
-            flex: initial;
             line-height: 30px;
             margin: 0 10px 0 0;
-            padding: 0 10px; }
+            padding: 0 10px;
+            flex: initial; }
             .laser-studio .advanced-panel .footer .btn.btn-cancel {
                 margin: 0; }
 
@@ -5470,94 +5550,280 @@ input.switch:checked ~ label:after {
         .laser-studio .control .value-text::after {
             content: attr(data-tail); }
 
-.scan-studio .model-displayer {
-    height: 100%;
-    width: 100%; }
-    .scan-studio .model-displayer .camera-image {
+.scan-studio {
+    background: #E0E0E0; }
+    .scan-studio .mesh-thumbnail {
+        cursor: pointer;
+        list-style: none;
+        margin: 0 0 0 30px;
+        padding: 0;
+        z-index: 1; }
+        .scan-studio .mesh-thumbnail .mesh-thumbnail-item {
+            background: #9B9B9B;
+            box-shadow: 0 3px 5px 0px rgba(0, 0, 0, 0.5);
+            color: #fff;
+            font-size: 15px;
+            line-height: 30px;
+            margin: 0 0 17px 0;
+            position: relative;
+            text-align: center;
+            width: 99px; }
+            .scan-studio .mesh-thumbnail .mesh-thumbnail-item::before {
+                content: "#"; }
+            .scan-studio .mesh-thumbnail .mesh-thumbnail-item:hover {
+                background: #777; }
+        .scan-studio .mesh-thumbnail .mesh-thumbnail-close {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 50%;
+            height: 20px;
+            position: absolute;
+            width: 20px;
+            right: -10px;
+            top: -10px; }
+            .scan-studio .mesh-thumbnail .mesh-thumbnail-close::before {
+                line-height: 20px; }
+        .scan-studio .mesh-thumbnail .choose {
+            background: #333; }
+    .scan-studio .action-buttons {
+        bottom: 28px;
+        position: fixed;
+        right: 20px;
+        width: 87px; }
+        .scan-studio .action-buttons .btn {
+            font-size: 18px;
+            height: 100px;
+            line-height: 23px;
+            margin: -20px 0 0 0;
+            position: relative;
+            width: 87px; }
+            .scan-studio .action-buttons .btn:nth-child(even) {
+                left: -43px; }
+            .scan-studio .action-buttons .btn:first-child {
+                margin: 0; }
+        .scan-studio .action-buttons .btn-scan {
+            background: #474747;
+            font-size: 35px; }
+        .scan-studio .action-buttons .btn-scan-again {
+            background: #BABABA; }
+        .scan-studio .action-buttons .btn-rollback,
+        .scan-studio .action-buttons .btn-multi-scan {
+            background: #979797; }
+        .scan-studio .action-buttons .btn-save-stl,
+        .scan-studio .action-buttons .btn-convert {
+            background: #474747; }
+    .scan-studio .model-displayer {
+        bottom: 0;
         height: 100%;
+        left: 0;
+        position: absolute;
+        right: 0;
+        top: 0;
         width: 100%;
-        object-fit: contain; }
-
-.scan-studio .scan-printer-selection {
-    position: relative; }
-
-.scan-studio .setup-panel,
-.scan-studio .manipulation-panel {
-    position: absolute;
-    top: 20px; }
-
-.scan-studio .manipulation-panel {
-    right: 20px;
-    width: 80px; }
-    .scan-studio .manipulation-panel .btn {
-        margin: 5px 0; }
-    .scan-studio .manipulation-panel .on {
-        background: #424242;
-        border: #fff solid 1px;
-        color: #fff; }
-
-.scan-studio .setup-panel {
-    left: 20px;
-    width: 182px; }
-    .scan-studio .setup-panel .action-buttons .btn {
-        display: block;
-        margin: 0 0 5px 0; }
-
-.scan-studio .starting-section {
-    height: 100%;
-    width: 100%; }
-
-.scan-studio .starting-section {
-    position: relative; }
-
-.scan-studio .operating-section {
-    height: 100%;
-    position: relative;
-    width: 100%; }
-
-.scan-studio .scan-progress {
-    background: #eee;
-    border-radius: 5px;
-    bottom: 10px;
-    height: 150px;
-    left: 15px;
-    margin: auto;
-    padding: 10px;
-    position: absolute;
-    width: 40%; }
-    .scan-studio .scan-progress .progress {
-        height: 20px; }
-    .scan-studio .scan-progress .progress-bar {
-        background-color: #5BC0DE;
-        background-image: -webkit-linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
-        background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
-        background-size: 40px 40px;
-        height: 100%;
-        -webkit-background-size: 40px 40px; }
-    .scan-studio .scan-progress .progress-status {
+        z-index: 0; }
+        .scan-studio .model-displayer .camera-image {
+            height: 100%;
+            width: 100%;
+            object-fit: contain; }
+    .scan-studio .scan-printer-selection {
+        position: relative; }
+    .scan-studio .manipulation-panel {
         display: -webkit-box;
         /* OLD - iOS 6-, Safari 3.1-6 */
         display: -webkit-flex;
         /* NEW - Chrome */
         display: flex;
-        /* NEW, Spec - Opera 12.1, Firefox 20+ */ }
-        .scan-studio .scan-progress .progress-status span {
-            flex: 1; }
-
-.scan-studio .scan-model-save-as {
-    background: #eee;
-    border-radius: 5px;
-    height: 150px;
-    padding: 10px;
-    width: 60%; }
-    .scan-studio .scan-model-save-as .file-formats {
-        margin: 0 0 10px 0; }
-        .scan-studio .scan-model-save-as .file-formats label {
-            float: left; }
-
-.scan-studio .modal-printer-selecter {
-    position: static;
-    z-index: 1; }
+        /* NEW, Spec - Opera 12.1, Firefox 20+ */
+        font-size: 20px;
+        margin: 0;
+        position: absolute;
+        transition: all 0.1s ease;
+        width: 270px;
+        z-index: 1; }
+        .scan-studio .manipulation-panel .wrapper,
+        .scan-studio .manipulation-panel .btn {
+            width: 100%; }
+        .scan-studio .manipulation-panel .btn {
+            display: -webkit-box;
+            /* OLD - iOS 6-, Safari 3.1-6 */
+            display: -webkit-flex;
+            /* NEW - Chrome */
+            display: flex;
+            /* NEW, Spec - Opera 12.1, Firefox 20+ */
+            background: #fff;
+            color: #A4A4A4;
+            font-size: 20px;
+            text-align: left;
+            align-items: center; }
+            .scan-studio .manipulation-panel .btn img {
+                height: 32px;
+                margin: 0 11px 0 0; }
+        .scan-studio .manipulation-panel .btn-pressed {
+            background: #000; }
+        .scan-studio .manipulation-panel .accordion-body {
+            overflow: visible;
+            position: relative; }
+            .scan-studio .manipulation-panel .accordion-body .icon-locker {
+                bottom: 0;
+                cursor: pointer;
+                height: 20px;
+                left: 100%;
+                margin: auto;
+                position: absolute;
+                top: 0;
+                width: 20px; }
+        .scan-studio .manipulation-panel .arrow {
+            align-self: center; }
+            .scan-studio .manipulation-panel .arrow polygon {
+                fill: #fff; }
+        .scan-studio .manipulation-panel .caption,
+        .scan-studio .manipulation-panel .controls {
+            margin: 0; }
+        .scan-studio .manipulation-panel .controls {
+            background: #FFFFFF;
+            display: block;
+            margin: 0 0 3px 0;
+            padding: 0 20px; }
+        .scan-studio .manipulation-panel .control {
+            display: -webkit-box;
+            /* OLD - iOS 6-, Safari 3.1-6 */
+            display: -webkit-flex;
+            /* NEW - Chrome */
+            display: flex;
+            /* NEW, Spec - Opera 12.1, Firefox 20+ */
+            color: #B3B3B3;
+            font-size: 13px;
+            height: 40px;
+            line-height: 40px;
+            margin: 0 0 10px 0;
+            align-items: center;
+            justify-content: space-around; }
+            .scan-studio .manipulation-panel .control .header {
+                color: #E0E0DF;
+                width: 20%; }
+            .scan-studio .manipulation-panel .control input {
+                width: 90%; }
+        .scan-studio .manipulation-panel .caption {
+            display: -webkit-box;
+            /* OLD - iOS 6-, Safari 3.1-6 */
+            display: -webkit-flex;
+            /* NEW - Chrome */
+            display: flex;
+            /* NEW, Spec - Opera 12.1, Firefox 20+ */
+            color: #B3B3B3;
+            font-size: 12px;
+            line-height: 30px;
+            justify-content: space-between; }
+        .scan-studio .manipulation-panel input {
+            border: 1px solid #E0E0DF;
+            color: #B3B3B3;
+            font-size: 15px; }
+    .scan-studio .starting-section {
+        height: 100%;
+        width: 100%; }
+    .scan-studio .starting-section {
+        position: relative; }
+    .scan-studio .operating-section {
+        display: -webkit-box;
+        /* OLD - iOS 6-, Safari 3.1-6 */
+        display: -webkit-flex;
+        /* NEW - Chrome */
+        display: flex;
+        /* NEW, Spec - Opera 12.1, Firefox 20+ */
+        height: 100%;
+        position: relative;
+        width: 100%;
+        align-items: center; }
+    .scan-studio .popup-selection {
+        display: -webkit-box;
+        /* OLD - iOS 6-, Safari 3.1-6 */
+        display: -webkit-flex;
+        /* NEW - Chrome */
+        display: flex;
+        /* NEW, Spec - Opera 12.1, Firefox 20+ */
+        height: 40px;
+        position: relative; }
+        .scan-studio .popup-selection ul {
+            background: #B3B3B3;
+            list-style: none;
+            padding: 0 10px 10px 10px; }
+            .scan-studio .popup-selection ul li {
+                color: #E0E0DF;
+                cursor: pointer;
+                margin: 10px 0 0 0; }
+        .scan-studio .popup-selection .popup-open {
+            display: none; }
+            .scan-studio .popup-selection .popup-open:checked ~ .display-text {
+                background: #B3B3B3;
+                color: #E0E0DF; }
+            .scan-studio .popup-selection .popup-open:checked ~ .popup {
+                visibility: visible; }
+        .scan-studio .popup-selection .display-text p {
+            display: block;
+            margin: 0;
+            width: 257px; }
+        .scan-studio .popup-selection .popup {
+            display: -webkit-box;
+            /* OLD - iOS 6-, Safari 3.1-6 */
+            display: -webkit-flex;
+            /* NEW - Chrome */
+            display: flex;
+            /* NEW, Spec - Opera 12.1, Firefox 20+ */
+            visibility: hidden;
+            align-self: center; }
+            .scan-studio .popup-selection .popup .arrow {
+                position: relative;
+                right: -1px;
+                align-self: center; }
+                .scan-studio .popup-selection .popup .arrow polygon {
+                    fill: #B3B3B3; }
+    .scan-studio .setup-panel {
+        margin: 0 0 0 30px;
+        position: static;
+        z-index: 1; }
+        .scan-studio .setup-panel .caption {
+            padding: 0 0.3em 0 0;
+            text-transform: uppercase; }
+    .scan-studio .scan-progress {
+        background: #eee;
+        border-radius: 5px;
+        bottom: 10px;
+        height: 150px;
+        left: 15px;
+        margin: auto;
+        padding: 10px;
+        position: absolute;
+        width: 40%; }
+        .scan-studio .scan-progress .progress {
+            height: 20px; }
+        .scan-studio .scan-progress .progress-bar {
+            background-color: #5BC0DE;
+            background-image: -webkit-linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
+            background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
+            background-size: 40px 40px;
+            height: 100%;
+            -webkit-background-size: 40px 40px; }
+        .scan-studio .scan-progress .progress-status {
+            display: -webkit-box;
+            /* OLD - iOS 6-, Safari 3.1-6 */
+            display: -webkit-flex;
+            /* NEW - Chrome */
+            display: flex;
+            /* NEW, Spec - Opera 12.1, Firefox 20+ */ }
+            .scan-studio .scan-progress .progress-status span {
+                flex: 1; }
+    .scan-studio .scan-model-save-as {
+        background: #eee;
+        border-radius: 5px;
+        height: 150px;
+        padding: 10px;
+        width: 60%; }
+        .scan-studio .scan-model-save-as .file-formats {
+            margin: 0 0 10px 0; }
+            .scan-studio .scan-model-save-as .file-formats label {
+                float: left; }
+    .scan-studio .modal-printer-selecter {
+        position: static;
+        z-index: 1; }
 
 .device-studio {
     margin-left: 10px; }

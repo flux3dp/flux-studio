@@ -26,3 +26,74 @@
     padding: 2px 5px;
     width: 100%;
 }
+
+.ui-dialog-menu {
+    $fontSize: 1.8rem;
+    $backGroundColor: #B3B3B3;
+    $primaryColor: #E0E0DF;
+
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    .ui-dialog-menu-item {
+        height: 40px;
+        line-height: 40px;
+        @include flexbox();
+    }
+
+    .dialog-opener {
+        display: none;
+
+        &:checked ~ .dialog-label {
+            background: $backGroundColor;
+            color: $primaryColor;
+        }
+
+        &:checked ~ .dialog-window {
+            @include flexbox();
+        }
+    }
+
+    .dialog-label {
+        color: $backGroundColor;
+        font-size: $fontSize;
+        margin: 0;
+        min-width: 200px;
+        padding: 0 6px;
+        text-overflow: ellipsis;
+        word-break: break-all;
+        white-space: nowrap;
+        overflow: hidden;
+    }
+
+    .dialog-window {
+        display: none;
+        align-self: center;
+
+        ul {
+            padding: 0;
+            list-style: none;
+        }
+
+        li {
+            color: #E0E0DF;
+            font-size: $fontSize;
+        }
+
+        .dialog-window-content {
+            background: $backGroundColor;
+            padding: 5px 20px;
+        }
+
+        .arrow {
+            position: relative;
+            right: -1px;
+            align-self: center;
+
+            polygon {
+                fill: #B3B3B3;
+            }
+        }
+    }
+}

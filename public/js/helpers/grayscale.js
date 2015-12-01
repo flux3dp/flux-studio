@@ -8,10 +8,12 @@ define(function() {
         opts = opts || {};
         opts.is_rgba = ('boolean' === typeof opts.is_rgba ? opts.is_rgba : false);
         opts.threshold = ('number' === typeof opts.threshold ? opts.threshold : 128);
+        opts.is_shading = ('boolean' === typeof opts.is_shading ? opts.is_shading : true);
         opts.is_svg = ('boolean' === typeof opts.is_svg ? opts.is_svg : false);
 
         var binary = [],
             WHITE = 255,
+            BLACK = 0,
             grayscale,
             red, green, blue, alpha;
 
@@ -24,6 +26,11 @@ define(function() {
                 blue = (1 - alpha) * data[i + 2] + alpha * data[i + 2];
                 // refers to http://en.wikipedia.org/wiki/Grayscale
                 grayscale = parseInt(red * 0.299 + green * 0.587 + blue * 0.114, 10);
+
+                // is shading?
+                if (false === opts.is_shading && opts.threshold > grayscale) {
+                    grayscale = BLACK;
+                }
 
                 grayscale = (opts.threshold > grayscale ? grayscale : WHITE);
 

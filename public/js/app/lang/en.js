@@ -94,7 +94,7 @@ define(function() {
                 great: 'Great!',
                 upload_via_usb: 'You can setup Wi-Fi later, or use USB drive to print.',
                 back: 'Back',
-                ok: 'OK!'
+                ok: 'OK'
             },
 
             // errors
@@ -452,6 +452,12 @@ define(function() {
                 object_height: {
                     text: 'OBJECT HEIGHT',
                     unit: 'mm'
+                },
+                shading: {
+                    text: 'SHADING',
+                    textOn: 'ON',
+                    textOff: 'OFF',
+                    checked: true
                 }
             },
             object_params: {
@@ -550,12 +556,50 @@ define(function() {
             cancel_scan: 'Cancel',
             convert_to_stl: 'Convert',
             scan_again: 'Scan Again',
-            start_multiscan: ' Multiscan',
+            start_multiscan: 'Extra Scan',
             convert_to_3d_model: 'Convert to 3D model...',
             complete: 'Completed',
             remaining_time: 'Remaining Time',
             elapsed_time: 'Elapsed Time',
-            do_save: 'Save',
+            do_save: 'Save STL',
+            go: 'Go',
+            rollback: 'Back',
+            error: 'Error',
+            confirm: 'Confirm',
+            caution: 'Caution',
+            cancel: 'Cancel',
+            delete_mesh: 'Delete?',
+            quality: 'QUALITY',
+            resolution: [{
+                id: 'best',
+                text: 'Best',
+                time: '~60min',
+                value: 1200
+            },
+            {
+                id: 'high',
+                text: 'High',
+                time: '~40min',
+                value: 800
+            },
+            {
+                id: 'normal',
+                text: 'Normal',
+                time: '~20min',
+                value: 400
+            },
+            {
+                id: 'low',
+                text: 'Low',
+                time: '~10min',
+                value: 200
+            },
+            {
+                id: 'draft',
+                text: 'Draft',
+                time: '~5min',
+                value: 100
+            }],
             save_mode: [
                 {
                     value: 'stl',
@@ -567,61 +611,30 @@ define(function() {
                     label: 'PCD'
                 },
             ],
-            scan_params: {
-                scan_speed: {
-                    text: 'Scan Speed',
-                    options: [
-                        {
-                            value: '400',
-                            label: 'Fast Scan',
-                            selected: true
-                        },
-                        {
-                            value: '800',
-                            label: 'Delegate Scan'
-                        }
-                    ]
-                },
-                object: {
-                    text: 'Object',
-                    options: [
-                        {
-                            value: 'auto',
-                            label: 'Auto',
-                            selected: true
-                        },
-                        {
-                            value: 'manually',
-                            label: 'Manually'
-                        }
-                    ]
-                },
-                luminance: {
-                    text: 'Luminance',
-                    options: [
-                        {
-                            value: 'light',
-                            label: 'Light',
-                            selected: true
-                        },
-                        {
-                            value: 'normal',
-                            label: 'Normal'
-                        },
-                        {
-                            value: 'dark',
-                            label: 'Dark'
-                        }
-                    ]
-                }
-            },
             manipulation: {
-                smooth: 'Smooth',
+                filter: 'FILTER',
+                position: 'POSITION',
+                size: 'SIZE',
+                rotate: 'ROTATE',
                 crop: 'Crop',
                 auto_merge: 'Auto Merge',
-                manual_merge: 'Manual Merge',
-                clear_noise: 'Clear Noise',
-                reset: 'Reset'
+                manual_merge: 'Merge',
+                clear_noise: 'Denoise'
+            },
+            size: {
+                x: 'X',
+                y: 'Y',
+                z: 'Z'
+            },
+            rotate: {
+                x: 'X',
+                y: 'Y',
+                z: 'Z'
+            },
+            translate: {
+                x: 'X',
+                y: 'Y',
+                z: 'Z'
             }
         },
         select_printer: {
