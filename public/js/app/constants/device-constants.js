@@ -1,8 +1,9 @@
 define([], function(){
     return {
         // Status
-        PRINTING        : 'PRINTING',
+        RUNNING         : 'RUNNING',
         READY           : 'READY',
+        PAUSING         : 'PAUSING',
         PAUSED          : 'PAUSED',
         CONNECTED       : 'CONNECTED',
         DISCONNECTED    : 'DISCONNECTED',
@@ -15,12 +16,16 @@ define([], function(){
         RUNNING         : 'RUNNING',
         OK              : 'OK',
         IDLE            : 'IDLE',
+        COMPLETED       : 'COMPLETED',
+        IDLE            : 'IDLE',
+        RESUMING        : 'RESUMING',
 
         // Command
         RESUME          : 'RESUME',
         PAUSE           : 'PAUSE',
         STOP            : 'STOP',
         REPORT          : 'REPORT',
+        ABORT           : 'ABORT',
         QUIT            : 'QUIT'
     };
 });

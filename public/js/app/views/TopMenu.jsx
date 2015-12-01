@@ -161,7 +161,6 @@ define([
 
             _handleSelectDevice: function(uuid, e) {
                 e.preventDefault();
-                // this._closeDeviceList();
                 DeviceMaster.setPassword('flux');
                 DeviceMaster.selectDevice(uuid);
                 this.setState({ showDeviceList: false });
