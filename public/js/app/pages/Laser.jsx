@@ -273,7 +273,7 @@ define([
                         }];
 
                     return (
-                        <ButtonGroup buttons={buttons} className="action-buttons"/>
+                        <ButtonGroup buttons={buttons} className="beehive-buttons action-buttons"/>
                     );
                 },
 

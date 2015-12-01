@@ -89,7 +89,15 @@ define([
                     specular: 0x111111,
                     shininess: 100
                 }),
-                mesh = new THREE.Mesh(geometry, material);
+                mesh = new THREE.Mesh(geometry, material),
+                wfh = new THREE.WireframeHelper( mesh, 0x0fff00 );
+
+            if (true === window.FLUX.debug) {
+                wfh.material.depthTest = false;
+                wfh.material.opacity = 0.25;
+                wfh.material.transparent = true;
+                mesh.add( wfh );
+            }
 
             material.side = THREE.DoubleSide;
 
@@ -355,6 +363,7 @@ define([
 
     function addOrbitControls() {
         orbitControl = new THREE.OrbitControls(camera, renderer.domElement);
+        orbitControl.target = new THREE.Vector3(0, 0, 35);
         orbitControl.rotateSpeed = 2.0;
         orbitControl.zoomSpeed = 1.2;
         orbitControl.panSpeed = 1.8;

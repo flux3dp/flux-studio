@@ -357,47 +357,6 @@
         }
     }
 
-    .action-buttons {
-        bottom: 28px;
-        position: fixed;
-        right: 20px;
-        width: 87px;
-
-        .btn.btn-disabled {
-            background: #CCC;
-        }
-
-        .btn {
-            background: #B3B3B3;
-            border: none;
-            border-radius: 0;
-            color: #EEE;
-            display: block;
-            font-size: 21px;
-            font-style: italic;
-            font-weight: normal;
-            height: 100px;
-            line-height: 1.2em;
-            margin: -20px 0 0 0;
-            min-width: 87px;
-            position: relative;
-            width: 87px;
-
-            &:hover {
-                background: #000;
-            }
-
-            &:nth-child(odd) {
-                left: -45px;
-            }
-        }
-
-        .btn-go {
-            background: #4D4D4D;
-            font-size: 35px;
-        }
-    }
-
     .advanced-panel {
         background: #FFF;
         padding: 20px 20px 0;

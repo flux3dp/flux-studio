@@ -4,17 +4,19 @@ var gui = require('nw.gui'),
     os = require('os'),
     spawn = require('child_process').spawn,
     exec = require('child_process').exec,
+    cwd = process.cwd(),
     ghost;
 
+console.log(process);
 if ('Windows_NT' === os.type()) {
-    fs.chmodSync(process.cwd() + '/ghost/ghost.exe', 0777);
+    fs.chmodSync(cwd + '/lib/ghost/ghost/ghost.exe', 0777);
+    ghost = spawn(cwd + '/lib/ghost/ghost/ghost.exe', ['-s']);
+    // TODO: has to assign env root for slic3r
 }
 else {
-    fs.chmodSync(process.cwd() + '/ghost/ghost', 0777);
+    fs.chmodSync(cwd + '/lib/ghost/ghost/ghost', 0777);
+    ghost = spawn(cwd + '/lib/ghost/ghost/ghost', ['-s', '--slic3r', cwd + '/lib/Slic3r.app/Contents/MacOS/slic3r']);
 }
-
-
-ghost = spawn(process.cwd() + '/ghost/ghost', ['-s', '-d']);
 
 ghost.stdout.on('data', function(data) {
     console.log('stdout: ' + data);

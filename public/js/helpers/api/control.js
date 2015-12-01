@@ -141,9 +141,11 @@ define([
                         self.position({
                             onFinished: function(response) {
                                 if ('PlayTask' === response.location) {
+                                    console.log('reporting');
                                     reporting();
                                 }
                                 else {
+                                    console.log('do upload');
                                     doUpload();
                                 }
                             }
@@ -267,6 +269,36 @@ define([
 
                 ws.send('start');
                 lastOrder = 'start';
+
+                return d.promise();
+            },
+            pause: function() {
+                var d = $.Deferred();
+                events.onMessage = function(result) {
+                    d.resolve(result);
+                };
+
+                events.onError = function(result) {
+                    d.resolve(result);
+                };
+
+                ws.send('pause');
+                lastOrder = 'pause';
+
+                return d.promise();
+            },
+            resume: function() {
+                var d = $.Deferred();
+                events.onMessage = function(result) {
+                    d.resolve(result);
+                };
+
+                events.onError = function(result) {
+                    d.resolve(result);
+                };
+
+                ws.send('resume');
+                lastOrder = 'resume';
 
                 return d.promise();
             },

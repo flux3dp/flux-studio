@@ -165,16 +165,19 @@ define([
 
                 var ratio = PLATFORM_DIAMETER_PIXEL / DIAMETER, // 1(px) : N(mm)
                     r = DIAMETER / 2,
+                    freetrans = $target_image.data('freetrans'),
                     px;
 
                 n = parseFloat(n, 10) + r;
                 px = n * ratio;
 
                 if ('x' === axis) {
-                    px -= ($target_image.width() / 2);
+                    px -= ($target_image.width() * freetrans.scalex / 2);
+                    px -= ($target_image.width() * (1 - freetrans.scalex));
                 }
                 else {
-                    px -= ($target_image.height() / 2);
+                    px -= ($target_image.height() * freetrans.scaley  / 2);
+                    px -= ($target_image.height() * (1 - freetrans.scaley));
                 }
 
                 return round(px, -2);

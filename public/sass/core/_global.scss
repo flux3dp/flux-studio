@@ -439,21 +439,17 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         border-color: #ac2925;
     }
 
-    .action-buttons {
+    .beehive-buttons {
         bottom: 28px;
         position: fixed;
-        right: 78px;
-
-        .btn {
-            display: block;
-            margin: 0 0 5px 0;
-        }
+        right: 20px;
+        width: 87px;
 
         .btn.btn-disabled {
             background: #CCC;
         }
 
-        .btn-default {
+        .btn {
             background: #B3B3B3;
             border: none;
             border-radius: 0;
@@ -464,7 +460,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
             font-weight: normal;
             height: 100px;
             line-height: 1.2em;
-            margin: 0;
+            margin: -20px 0 0 0;
             min-width: 87px;
             position: relative;
             width: 87px;
@@ -472,13 +468,15 @@ input[type=range]:focus::-webkit-slider-runnable-track {
             &:hover {
                 background: #000;
             }
+
+            &:nth-child(odd) {
+                left: -45px;
+            }
         }
 
         .btn-go {
             background: #4D4D4D;
             font-size: 35px;
-            left: 50px;
-            top: -21px;
         }
     }
 }

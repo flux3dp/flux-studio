@@ -3,6 +3,7 @@
 Desktop.ini
 node_modules
 _tools/nwjs-shell-builder
+public/lib
 
 # Thumbnail cache files
 ._*

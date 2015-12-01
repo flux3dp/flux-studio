@@ -1,5 +1,7 @@
 #!/bin/bash
+# ref: https://github.com/Gisto/nwjs-shell-builder
 DIR="$( cd "../$( dirname "$0" )" && pwd)"
+PACKAGE_NAME="FLUX_Studio"
 
 ./nwjs-shell-builder/nwjs-build.sh --clean
 
@@ -7,12 +9,12 @@ while true; do
     read -p "==> Build for which OS? (Windows[W], OSX[O]) "
     case $REPLY in
         [Ww] )
-            ./nwjs-shell-builder/nwjs-build.sh --src=$DIR/public --name=fluxAPP --version="1.0.0" --nw=0.12.3 --target="2 3" --build
+            ./nwjs-shell-builder/nwjs-build.sh --src=$DIR/public --name="$PACKAGE_NAME" --win-icon=$DIR/public/icon.png --version="1.0.0" --nw=0.12.3 --target="2 3" --build
 
             break;;
 
         [Oo] )
-            ./nwjs-shell-builder/nwjs-build.sh --src=$DIR/public --name=fluxAPP --version="1.0.0" --nw=0.12.3 --target="4 5" --build
+            ./nwjs-shell-builder/nwjs-build.sh --src=$DIR/public --name="$PACKAGE_NAME" --osx-icon=$DIR/public/logo.icns --version="1.0.0" --nw=0.12.3 --target="4 5" --build
 
             break;;
 
