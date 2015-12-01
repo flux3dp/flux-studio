@@ -94,7 +94,7 @@ define(function() {
                 great: 'Great!',
                 upload_via_usb: 'You can setup Wi-Fi later, or use USB drive to print.',
                 back: 'Back',
-                ok: 'OK!'
+                ok: 'OK'
             },
 
             // errors
@@ -403,7 +403,9 @@ define(function() {
                 support_on: 'SUPPORT ON',
                 support_off: 'SUPPORT OFF',
                 advanced: 'ADVANCED',
-                plaTitle: 'PICK THE COLOR OF THE FILAMENT'
+                preview: 'PREVIEW',
+                plaTitle: 'PICK THE COLOR OF THE FILAMENT',
+                transparent: 'TRANSPARENT'
             },
             right_panel: {
                 get: 'Get',
@@ -411,11 +413,9 @@ define(function() {
                 preview: '預覽'
             },
             quality: {
-                high: 'High Quality',
-                good: 'Good Quality',
-                normal: 'Normal Quality',
-                quick: 'Quick Quality',
-                fast: 'Fast Quality'
+                high: 'HIGH QUALITY',
+                med: 'MEDIUM QUALITY',
+                low: 'LOW QUALITY'
             },
             quick_print: 'Quick Print',
             scale: '比例',
@@ -452,6 +452,12 @@ define(function() {
                 object_height: {
                     text: '物體高度',
                     unit: 'mm'
+                },
+                shading: {
+                    text: 'SHADING',
+                    textOn: 'ON',
+                    textOff: 'OFF',
+                    checked: true
                 }
             },
             object_params: {
@@ -555,7 +561,45 @@ define(function() {
             complete: '掃描進度',
             remaining_time: '剩餘時間',
             elapsed_time: '已用時間',
-            do_save: '儲存⋯',
+            do_save: '儲存 STL',
+            go: 'Go',
+            rollback: 'Back',
+            error: 'Error',
+            confirm: '確認',
+            caution: '警告',
+            cancel: 'Cancel',
+            delete_mesh: '真的要刪除嗎?',
+            quality: 'QUALITY',
+            resolution: [{
+                id: 'best',
+                text: 'Best',
+                time: '~60min',
+                value: 1200
+            },
+            {
+                id: 'high',
+                text: 'High',
+                time: '~40min',
+                value: 800
+            },
+            {
+                id: 'normal',
+                text: 'Normal',
+                time: '~20min',
+                value: 400
+            },
+            {
+                id: 'low',
+                text: 'Low',
+                time: '~10min',
+                value: 200
+            },
+            {
+                id: 'draft',
+                text: 'Draft',
+                time: '~5min',
+                value: 100
+            }],
             save_mode: [
                 {
                     value: 'stl',
@@ -567,61 +611,30 @@ define(function() {
                     label: 'PCD'
                 },
             ],
-            scan_params: {
-                scan_speed: {
-                    text: '掃描速度',
-                    options: [
-                        {
-                            value: '400',
-                            label: '快',
-                            selected: true
-                        },
-                        {
-                            value: '800',
-                            label: '慢'
-                        }
-                    ]
-                },
-                object: {
-                    text: '物體類型',
-                    options: [
-                        {
-                            value: 'auto',
-                            label: '自動',
-                            selected: true
-                        },
-                        {
-                            value: 'manually',
-                            label: '手動'
-                        }
-                    ]
-                },
-                luminance: {
-                    text: '環境光源',
-                    options: [
-                        {
-                            value: 'light',
-                            label: '較亮',
-                            selected: true
-                        },
-                        {
-                            value: 'normal',
-                            label: '普通'
-                        },
-                        {
-                            value: 'dark',
-                            label: '較暗'
-                        }
-                    ]
-                }
-            },
             manipulation: {
-                smooth: '平滑化',
+                filter: 'FILTER',
+                position: '位置',
+                size: '尺寸',
+                rotate: '旋轉',
                 crop: '剪裁',
                 auto_merge: '自動合併',
                 manual_merge: '手動合併',
-                clear_noise: '去除噪點',
-                reset: '重設'
+                clear_noise: '去除噪點'
+            },
+            size: {
+                x: 'X',
+                y: 'Y',
+                z: 'Z'
+            },
+            rotate: {
+                x: 'X',
+                y: 'Y',
+                z: 'Z'
+            },
+            translate: {
+                x: 'X',
+                y: 'Y',
+                z: 'Z'
             }
         },
         select_printer: {
@@ -654,7 +667,8 @@ define(function() {
         monitor: {
             change_filament: 'CHANGE FILLAMENT',
             browse_file: 'BROWSE FILE',
-            monitor: 'MONITOR'
+            monitor: 'MONITOR',
+            currentTemperature: 'Current Temp'
         },
         alert: {
             caption: '錯誤',
@@ -676,6 +690,13 @@ define(function() {
             purple: 'PURPLE',
             yellow: 'YELLOW',
             transparent: 'TRANSPARENT'
+        },
+        message: {
+            connecting: 'Connecting...',
+            connected: 'Connected',
+            machineNotConnected: 'Machine is not connected',
+            notPrinting: 'Printing is not in progress',
+            nothingToPrint: 'Nothing to print (source blob missing)'
         }
     };
 });

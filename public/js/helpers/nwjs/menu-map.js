@@ -153,7 +153,7 @@ define([
             ]
         });
 
-        if (true === location.hash.startsWith('#studio')) {
+        if ('true' === config().read('printer-is-ready')) {
             menuMap.push({
                 label: lang.file.label,
                 subItems: [

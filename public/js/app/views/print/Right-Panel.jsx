@@ -2,19 +2,21 @@ define([
     'jquery',
     'react',
     'app/actions/perspective-camera',
+    'jsx!widgets/Button-Group',
     'app/actions/Alert-Actions',
     'app/stores/Alert-Store'
-], function($, React, objectController, AlertActions, AlertStore) {
+], function($, React, PerspectiveCamera, ButtonGroup, AlertActions, AlertStore) {
     'use strict';
 
     return React.createClass({
         propTypes: {
-            lang: React.PropTypes.object,
-            onPreviewClick: React.PropTypes.func,
-            onDownloadGCode: React.PropTypes.func,
-            onDownloadFCode: React.PropTypes.func,
-            onPrintClick: React.PropTypes.func,
-            onCameraPositionChange: React.PropTypes.func
+            lang                    : React.PropTypes.object,
+            hasObject               : React.PropTypes.bool,
+            onPreviewClick          : React.PropTypes.func,
+            onDownloadGCode         : React.PropTypes.func,
+            onDownloadFCode         : React.PropTypes.func,
+            onGoClick               : React.PropTypes.func,
+            onCameraPositionChange  : React.PropTypes.func
         },
 
         getInitialState: function() {
@@ -24,22 +26,16 @@ define([
         },
 
         componentDidMount: function() {
-            objectController.init(this);
+            PerspectiveCamera.init(this);
             AlertStore.onRetry(this._handleRetry);
         },
 
         componentWillReceiveProps: function(nextProps) {
-            objectController.setCameraPosition(nextProps.camera);
+            PerspectiveCamera.setCameraPosition(nextProps.camera);
         },
 
         _handleRetry: function(id) {
             console.log('sending retry with ID:' + id);
-        },
-
-        _handlePreviewClick: function(e) {
-            e.preventDefault();
-            this.setState({ previewOn: !this.state.previewOn });
-            this.props.onPreviewClick(!this.state.previewOn);
         },
 
         _handleGetFCode: function() {
@@ -48,18 +44,11 @@ define([
 
         _handleGo: function(e) {
             e.preventDefault();
-            this.props.onPrintClick();
+            this.props.onGoClick();
         },
 
         _handleGetGCode: function() {
             this.props.onDownloadGCode();
-        },
-
-        _handleTest: function(e) {
-            e.preventDefault();
-            AlertActions.showError('fatal error 123');
-            AlertActions.showInfo('some info');
-            AlertActions.showWarning('some warning');
         },
 
         _showInfo: function() {
@@ -78,36 +67,49 @@ define([
             this.props.onCameraPositionChange(position, rotation);
         },
 
+        _renderActionButtons: function(lang) {
+            var cx = React.addons.classSet,
+                buttons = [{
+                    label: lang.laser.get_fcode,
+                    className: cx({
+                        'btn-disabled': !this.props.hasObject,
+                        'btn-default': true,
+                        'btn-hexagon': true,
+                        'btn-get-fcode': true
+                    }),
+                    onClick: this._handleGetFCode
+                }, {
+                    label: lang.laser.go,
+                    className: cx({
+                        'btn-disabled': !this.props.hasObject,
+                        'btn-default': true,
+                        'btn-hexagon': true,
+                        'btn-go': true
+                    }),
+                    onClick: this._handleGo
+                }];
+
+            return (
+                <ButtonGroup buttons={buttons} className="beehive-buttons action-buttons"/>
+            );
+        },
+
         render: function() {
-            var lang = this.props.lang.print.right_panel;
+            var lang            = this.props.lang,
+                actionButtons   = this._renderActionButtons(lang);
+
             return (
                 <div className='rightPanel'>
-                    <a className="btn" onClick={this._handlePreviewClick}>{lang.preview}</a>
                     <a className="btn" onClick={this._handleGetGCode}>Gcode</a><p/>
-                    <a className="btn" onClick={this._handleTest}>Notify</a>
+                    {
+                    /*<a className="btn" onClick={this._handleTest}>Notify</a>
                     <a className="btn" onClick={this._showInfo}>Info</a>
                     <a className="btn" onClick={this._showWarning}>Warning</a>
                     <a className="btn" onClick={this._showError}>Error</a>
+                    */}
 
                     <div id="cameraViewController" className="cameraViewController"></div>
-                    <svg viewBox="-70 0 400 370">
-
-                        <g onClick={this._handleGetFCode}>
-                            <path className="btn get-gcode" d="M86.602,0 l86.602,50 l0,100 l-86.602,50 l-86.602,-50, l0,-100z" fill="#999"></path>
-                            <text className="txt-get-gcode" x="0" y="0" fill="#EEE">
-                                <tspan x="55" y="85">{lang.get}</tspan>
-                                <tspan x="25" y="130">FCode</tspan>
-                            </text>
-                        </g>
-
-                        <g onClick={this._handleGo}>
-                            <path className="btn go" d="M180.602,160 l86.602,50 l0,100 l-86.602,50 l-86.602,-50, l0,-100z" fill="#555"></path>
-                            <text className="txt-go" x="0" y="0" fill="#EEE">
-                                <tspan className="go" x="140" y="280">{lang.go}</tspan>
-                            </text>
-                        </g>
-
-                    </svg>
+                    {actionButtons}
                 </div>
             );
         }

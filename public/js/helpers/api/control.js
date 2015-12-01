@@ -9,19 +9,22 @@ define([
 ], function($, Websocket, convertToTypedArray) {
     'use strict';
 
-    return function(serial, opts) {
+    return function(uuid, opts) {
         opts = opts || {};
         opts.onError = opts.onError || function() {};
+        opts.onConnect = opts.onConnect || function() {};
 
         var isConnected = false,
             ws = new Websocket({
-                method: 'control/' + serial,
+                method: 'control/' + uuid,
                 onMessage: function(data) {
                     switch (data.status) {
                     case 'connecting':
+                        opts.onConnect(data);
                         // ignore it
                         break;
                     case 'connected':
+                        opts.onConnect(data);
                         break;
                     default:
                         isConnected = true;
@@ -29,14 +32,18 @@ define([
                         break;
                     }
                 },
-                onError: opts.onError,
+                // onError: opts.onError,
+                onError: function(response) {
+                    events.onError(response);
+                },
                 onClose: function(response) {
                     isConnected = false;
                 }
             }),
             lastOrder = '',
             events = {
-                onMessage: function() {}
+                onMessage: function() {},
+                onError: function() {}
             },
             genericOptions = function(opts) {
                 var emptyFunction = function() {};
@@ -113,6 +120,10 @@ define([
                     opts.onFinished(response);
                 };
 
+                events.onError = function(response) {
+                    opts.onFinished(response);
+                };
+
                 ws.send('report');
             },
             upload: function(filesize, print_data, opts) {
@@ -130,9 +141,11 @@ define([
                         self.position({
                             onFinished: function(response) {
                                 if ('PlayTask' === response.location) {
+                                    console.log('reporting');
                                     reporting();
                                 }
                                 else {
+                                    console.log('do upload');
                                     doUpload();
                                 }
                             }
@@ -183,13 +196,17 @@ define([
 
                                 fileReader.onloadend = function(e) {
                                     ws.send(this.result);
-                                }
+                                };
+
                                 fileReader.readAsArrayBuffer(chunk);
                             }
 
                         }
                         else if ('ok' === data.status) {
                             self.start(opts);
+                        }
+                        else if(data.status === 'error') {
+                            opts.onError(data);
                         }
                     },
                     doUpload = function() {
@@ -231,6 +248,9 @@ define([
                 events.onMessage = function(result) {
                     d.resolve(result);
                 };
+                events.onError = function(result) {
+                    d.resolve(result);
+                };
 
                 ws.send('abort');
                 lastOrder = 'abort';
@@ -243,8 +263,42 @@ define([
                     d.resolve(result);
                 };
 
+                events.onError = function(result) {
+                    d.resolve(result);
+                };
+
                 ws.send('start');
                 lastOrder = 'start';
+
+                return d.promise();
+            },
+            pause: function() {
+                var d = $.Deferred();
+                events.onMessage = function(result) {
+                    d.resolve(result);
+                };
+
+                events.onError = function(result) {
+                    d.resolve(result);
+                };
+
+                ws.send('pause');
+                lastOrder = 'pause';
+
+                return d.promise();
+            },
+            resume: function() {
+                var d = $.Deferred();
+                events.onMessage = function(result) {
+                    d.resolve(result);
+                };
+
+                events.onError = function(result) {
+                    d.resolve(result);
+                };
+
+                ws.send('resume');
+                lastOrder = 'resume';
 
                 return d.promise();
             },
@@ -264,6 +318,10 @@ define([
                 events.onMessage = function(result) {
                     d.resolve(result);
                 };
+
+                events.onError = function(result) {
+                    d.resolve(result);
+                }
 
                 ws.send('quit');
                 lastOrder = 'quit';

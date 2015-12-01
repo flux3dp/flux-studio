@@ -31,9 +31,6 @@ define([
                     if(!this.state.selectedPrinter.name) {
                         this.setState({ openPrinterSelectorWindow: true });
                     }
-                    // statusChecker = setInterval(() => {
-                    //     this._getStatus();
-                    // }, 1000)
                 },
                 componentWillUnmount: function() {
                     if ('undefined' !== typeof this.props.scan_ctrl_websocket &&
@@ -127,10 +124,7 @@ define([
                                 console.log('error', data);
                             },
                             onReady: function() {
-                                // self.setState({
-                                //     printerIsReady: true
-                                // });
-                                //self._openBlocker(false);
+                                // TODO: to be implement
                             }
                         },
                         timer = setInterval(function() {
@@ -138,7 +132,7 @@ define([
 
                             if (state.selectedPrinter) {
                                 self.setProps({
-                                    scan_ctrl_websocket: scanControl(state.selectedPrinter.serial, opt)
+                                    scan_ctrl_websocket: scanControl(state.selectedPrinter.uuid, opt)
                                 });
                                 self._refreshCamera();
                                 clearInterval(timer);
@@ -160,7 +154,7 @@ define([
                         selectedPrinter: selectedPrinter,
                         openPrinterSelectorWindow: false
                     });
-                    deviceController = deviceControl(this.state.selectedPrinter.serial);
+                    deviceController = deviceControl(this.state.selectedPrinter.uuid);
                 },
                 _handleCancelBrowseFile: function(e) {
                     this.setState({ listFile: false });

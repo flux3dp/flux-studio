@@ -86,6 +86,11 @@
             overflow: scroll;
             width: 252px;
 
+            .spinner-roller {
+                height: 5em;
+                width: 5em;
+            }
+
             .row-fluid {
                 @include flexbox();
                 cursor: pointer;
@@ -97,6 +102,7 @@
             }
 
             .wifi-ssid {
+                text-overflow: ellipsis;
                 width: calc(100% - 50px);
             }
 
@@ -153,6 +159,11 @@
             input {
                 height: 36px;
                 width: 250px;
+                flex: 3;
+            }
+
+            label {
+                flex: 1;
             }
         }
     }

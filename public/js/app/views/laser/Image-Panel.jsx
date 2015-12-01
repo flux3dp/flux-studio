@@ -27,10 +27,10 @@ define([
         _onTransform: function(e) {
             var type = e.currentTarget.dataset.type,
                 newParams = {
-                    angle: this.refs.objectAngle.getDOMNode().value,
+                    angle: parseFloat(this.refs.objectAngle.getDOMNode().value, 10),
                     position: {
-                        x: this.refs.objectPosX.getDOMNode().value,
-                        y: this.refs.objectPosY.getDOMNode().value
+                        x: parseFloat(this.refs.objectPosX.getDOMNode().value, 10),
+                        y: parseFloat(this.refs.objectPosY.getDOMNode().value, 10)
                     },
                     size: {
                         width: this.refs.objectSizeW.value(),
@@ -40,7 +40,7 @@ define([
                 ratio;
 
             if ('undefined' !== typeof this.refs.threshold) {
-                newParams['threshold'] = this.refs.threshold.getDOMNode().value;
+                newParams['threshold'] = parseInt(this.refs.threshold.getDOMNode().value, 10);
             }
 
             if (true === this.state.lockSize) {
@@ -142,70 +142,70 @@ define([
                         <polygon points="0,10 36.8,0 36.8,20"/>
                     </svg>
                     <div>
-                    <label className="controls accordion">
-                        <input type="checkbox" className="accordion-switcher"/>
-                        <p className="caption">
-                            {lang.laser.object_params.position.text}
-                            <span className="value">{props.position.x} , {props.position.y}</span>
-                        </p>
-                        <label className="accordion-body">
-                            <div className="control">
-                                <span className="text-center header">X</span>
-                                <input type="number" ref="objectPosX" data-type="x"
-                                    defaultValue={props.position.x} value={props.position.x}
-                                    onChange={this._onTransform}/>
-                            </div>
-                            <div className="control">
-                                <span className="text-center header">Y</span>
-                                <input type="number" ref="objectPosY" data-type="y"
-                                    defaultValue={props.position.y} value={props.position.y}
-                                    onChange={this._onTransform}/>
-                            </div>
+                        <label className="controls accordion">
+                            <input type="checkbox" className="accordion-switcher"/>
+                            <p className="caption">
+                                {lang.laser.object_params.position.text}
+                                <span className="value">{props.position.x} , {props.position.y}</span>
+                            </p>
+                            <label className="accordion-body">
+                                <div className="control">
+                                    <span className="text-center header">X</span>
+                                    <input type="number" ref="objectPosX" data-type="x"
+                                        defaultValue={props.position.x} value={props.position.x}
+                                        onChange={this._onTransform}/>
+                                </div>
+                                <div className="control">
+                                    <span className="text-center header">Y</span>
+                                    <input type="number" ref="objectPosY" data-type="y"
+                                        defaultValue={props.position.y} value={props.position.y}
+                                        onChange={this._onTransform}/>
+                                </div>
+                            </label>
                         </label>
-                    </label>
-                    <label className="controls accordion">
-                        <input type="checkbox" className="accordion-switcher"/>
-                        <p className="caption">
-                            {lang.laser.object_params.size.text}
-                            <span className="value">{state.size.width} x {state.size.height}mm</span>
-                        </p>
-                        <label className="accordion-body">
-                            <div className="control">
-                                <span className="text-center header">{lang.laser.object_params.size.unit.width}</span>
-                                <UnitInput
-                                    dataAttrs={{ type: 'width' }}
-                                    ref="objectSizeW"
-                                    defaultValue={state.size.width}
-                                    onChange={this._onTransform}
-                                />
-                            </div>
-                            <div className="control">
-                                <span className="text-center header">{lang.laser.object_params.size.unit.height}</span>
-                                <UnitInput
-                                    dataAttrs={{ type: 'height' }}
-                                    ref="objectSizeH"
-                                    defaultValue={state.size.height}
-                                    onChange={this._onTransform}
-                                />
-                            </div>
-                            <img className="icon-locker" src={lockerImage.size} onClick={this._lockRatio('lockSize')}/>
+                        <label className="controls accordion">
+                            <input type="checkbox" className="accordion-switcher"/>
+                            <p className="caption">
+                                {lang.laser.object_params.size.text}
+                                <span className="value">{state.size.width} x {state.size.height}mm</span>
+                            </p>
+                            <label className="accordion-body">
+                                <div className="control">
+                                    <span className="text-center header">{lang.laser.object_params.size.unit.width}</span>
+                                    <UnitInput
+                                        dataAttrs={{ type: 'width' }}
+                                        ref="objectSizeW"
+                                        defaultValue={state.size.width}
+                                        getValue={this._onTransform}
+                                    />
+                                </div>
+                                <div className="control">
+                                    <span className="text-center header">{lang.laser.object_params.size.unit.height}</span>
+                                    <UnitInput
+                                        dataAttrs={{ type: 'height' }}
+                                        ref="objectSizeH"
+                                        defaultValue={state.size.height}
+                                        getValue={this._onTransform}
+                                    />
+                                </div>
+                                <img className="icon-locker" src={lockerImage.size} onClick={this._lockRatio('lockSize')}/>
+                            </label>
                         </label>
-                    </label>
-                    <label className="controls accordion">
-                        <input type="checkbox" className="accordion-switcher"/>
-                        <p className="caption">
-                            {lang.laser.object_params.rotate.text}
-                            <span className="value">{props.angle}°</span>
-                        </p>
-                        <label className="accordion-body">
-                            <div className="control">
-                                <input type="number" min="0" max="360" ref="objectAngle" data-type="angle"
-                                    defaultValue={props.angle} value={props.angle}
-                                    onChange={this._onTransform}/>
-                            </div>
+                        <label className="controls accordion">
+                            <input type="checkbox" className="accordion-switcher"/>
+                            <p className="caption">
+                                {lang.laser.object_params.rotate.text}
+                                <span className="value">{props.angle}°</span>
+                            </p>
+                            <label className="accordion-body">
+                                <div className="control">
+                                    <input type="number" min="0" max="360" ref="objectAngle" data-type="angle"
+                                        defaultValue={props.angle} value={props.angle}
+                                        onChange={this._onTransform}/>
+                                </div>
+                            </label>
                         </label>
-                    </label>
-                    {thresholdRange}
+                        {thresholdRange}
                     </div>
                 </div>
             );

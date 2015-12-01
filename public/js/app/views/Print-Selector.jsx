@@ -40,7 +40,7 @@ define([
 
             self.selected_printer = meta;
 
-            self._auth(meta.serial, '', opts);
+            self._auth(meta.uuid, '', opts);
         },
 
         _submit: function(e) {
@@ -64,10 +64,10 @@ define([
 
             password = self.refs.password.getDOMNode().value;
 
-            touch_socket = self._auth(selected_printer.serial, password, opts);
+            touch_socket = self._auth(selected_printer.uuid, password, opts);
         },
 
-        _auth: function(serial, password, opts) {
+        _auth: function(uuid, password, opts) {
             opts = opts || {};
             opts.onError = opts.onError || function() {};
 
@@ -89,11 +89,10 @@ define([
                 waiting: true
             });
 
-            touch_socket = touch(_opts).send(serial, password);
+            touch_socket = touch(_opts).send(uuid, password);
         },
 
         _handleClose: function(e) {
-            // React.unmountComponentAtNode(View);
             this.props.onClose();
         },
 
@@ -133,11 +132,18 @@ define([
         },
 
         _renderPrinterItem: function(printer) {
-            var meta = JSON.stringify(printer);
+            var meta;
+
+            try {
+                meta = JSON.stringify(printer);
+            }
+            catch (ex) {
+                console.log(ex, printer);
+            }
 
             return (
                 <label className="device printer-item" data-meta={meta}>
-                    <input type="radio" name="printer-group" value={printer.serial}/>
+                    <input type="radio" name="printer-group" value={printer.uuid}/>
                     <div className="col device-name">{printer.name}</div>
                     <div className="col module">UNKNOWN</div>
                     <div className="col status">UNKNOWN</div>
@@ -244,9 +250,9 @@ define([
             if (false === window.FLUX.debug) {
                 config().read('printers', {
                     onFinished: function(response) {
-                        options = JSON.parse(response || '{}');
+                        response = response || [];
 
-                        refreshOption(options);
+                        refreshOption(response);
                     }
                 });
             }

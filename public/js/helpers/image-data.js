@@ -61,7 +61,7 @@ function(grayScale, convertToTypedArray) {
                     onload,
                     false
                 );
-            }
+            };
 
         img.addEventListener(
             'load',

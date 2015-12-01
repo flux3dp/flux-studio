@@ -85,6 +85,7 @@
             margin: 0 auto;
             transform-origin: 50% 50%;
             width: 3.2rem;
+            transition: all .25s;
         }
 
         p,
@@ -93,21 +94,103 @@
         }
 
         &:hover img {
-            -webkit-filter: invert(1) opacity(0.25);
+            // -webkit-filter: invert(1) opacity(0.25);
+            transform: rotate(180deg);
         }
     }
 
-    .setting {
+    .device {
         font-size: 1rem;
         line-height: 2rem;
         position: absolute;
         right: 24px;
         text-decoration: none;
+        text-align: right;
         top: 24px;
+        cursor: pointer;
 
         img {
-            display: block;
-            width: 2.75rem;
+            height: 3.6rem;
+            margin: 0 auto;
+            transform-origin: 50% 50%;
+            width: 3.6rem;
+            transition: all .25s;
+            transform: rotate(60deg);
+        }
+        &:hover img {
+            transform: rotate(240deg);
+        }
+        p {
+            margin: 0;
+            font-weight: 500;
+            font-size: 12px;
+            line-height: 12px;
+            color: #B3B3B3;
+        }
+
+        .menu {
+            background: #fff;
+            position: relative;
+            top: -50px;
+            right: 100px;
+            display: none;
+
+            .arrow {
+                right: -72px;
+                position: absolute;
+                transform: translateX(-100%);
+                top: 0;
+
+                polygon {
+                    fill: #fff;
+                }
+            }
+
+            .device-list {
+                padding: 0.8rem;
+                list-style: none;
+                margin: 0;
+                text-align: left;
+                cursor: pointer;
+                height: 160px;
+                .select-printer {
+                    position: relative;
+                }
+                ul {
+                    margin: 0;
+                    padding: 0;
+                    border: 1px solid #B3B3B3;
+                    color: #B3B3B3;
+                    font-weight: 500;
+                    font-size: 12px;
+                    font-family: Helvetica Neue;
+                    overflow-y: scroll;
+                    height: 100%;
+
+                    li {
+                        @include flexbox();
+                        line-height: 2.8rem;
+                        label {
+                            cursor: pointer;
+                        }
+                        .name {
+                            width: 12rem;
+                            padding: 0 0 0 0.8rem;
+                        }
+
+                        .status {
+                            width: 16rem;
+                        }
+                        &:hover {
+                            background-color: #B3B3B3;
+                            color: #FFF;
+                        }
+                    }
+                }
+            }
+            &.show {
+                display: block;
+            }
         }
     }
 }

@@ -50,7 +50,7 @@ define([
 
                 if (null !== $target_image) {
                     // delete svg blob from history
-                    if ('svg' === self.props.fileFormat && true === $img.hasClass('svg')) {
+                    if ('svg' === self.state.fileFormat && true === $img.hasClass('svg')) {
                         svgWebSocket.History.deleteAt($img.data('name'));
                     }
 
@@ -58,11 +58,11 @@ define([
 
                     if (0 === $img_container.length) {
                         $target_image = null;
-                        state['hasImage'] = false;
+                        state.hasImage = false;
 
                         menuFactory.items.execute.enabled = false;
                         menuFactory.items.saveGCode.enabled = false;
-                        self.props.fileFormat = undefined;
+                        self.state.fileFormat = undefined;
                     }
                     else {
                         $target_image = $img_container[0];
@@ -81,6 +81,7 @@ define([
                         width: box.width,
                         grayscale: {
                             is_rgba: true,
+                            is_shading: self.refs.setupPanel.isShading(),
                             threshold: parseInt(threshold, 10)
                         },
                         onComplete: function(result) {
@@ -90,7 +91,7 @@ define([
                 );
             },
             sendToMachine = function(blob) {
-                var control_methods = control(self.state.selectedPrinter.serial);
+                var control_methods = control(self.state.selectedPrinter.uuid);
                 control_methods.upload(blob.size, blob);
             },
             sendToBitmapAPI = function(args, settings, callback) {
@@ -164,16 +165,19 @@ define([
 
                 var ratio = PLATFORM_DIAMETER_PIXEL / DIAMETER, // 1(px) : N(mm)
                     r = DIAMETER / 2,
+                    freetrans = $target_image.data('freetrans'),
                     px;
 
                 n = parseFloat(n, 10) + r;
                 px = n * ratio;
 
                 if ('x' === axis) {
-                    px -= ($target_image.width() / 2);
+                    px -= ($target_image.width() * freetrans.scalex / 2);
+                    px -= ($target_image.width() * (1 - freetrans.scalex));
                 }
                 else {
-                    px -= ($target_image.height() / 2);
+                    px -= ($target_image.height() * freetrans.scaley  / 2);
+                    px -= ($target_image.height() * (1 - freetrans.scaley));
                 }
 
                 return round(px, -2);
@@ -201,7 +205,7 @@ define([
                     position = {
                         x: convertToRealCoordinate(el_position.center.x, 'x'),
                         y: convertToRealCoordinate(el_position.center.y, 'y')
-                    }
+                    };
                     size = {
                         width: round(el_position.width / PLATFORM_DIAMETER_PIXEL * DIAMETER, -2),
                         height: round(el_position.height / PLATFORM_DIAMETER_PIXEL * DIAMETER, -2)
@@ -238,7 +242,7 @@ define([
                             });
 
                             $target_image.one('transitionend', function() {
-                                $target_image.removeClass('bounce').parent().find('.ft-controls').removeClass('bounce');;
+                                $target_image.removeClass('bounce').parent().find('.ft-controls').removeClass('bounce');
                             });
                         }, 300);
                     }
@@ -304,13 +308,14 @@ define([
                                     threshold: $img.data('threshold') || 128
                                 },
                                 grayscaleOpts = {
-                                    is_svg: ('svg' === self.props.fileFormat),
+                                    is_svg: ('svg' === self.state.fileFormat),
+                                    is_shading: self.refs.setupPanel.isShading(),
                                     threshold: 255
                                 },
                                 src = $img.data('base'),
                                 previewImageSize;
 
-                            if ('svg' === self.props.fileFormat) {
+                            if ('svg' === self.state.fileFormat) {
                                 previewImageSize = svgWebSocket.computePreviewImageSize({
                                     width: box.width,
                                     height: box.height
@@ -332,7 +337,7 @@ define([
                                         sub_data.height = result.size.height;
                                         sub_data.width = result.size.width;
 
-                                        if ('svg' === self.props.fileFormat) {
+                                        if ('svg' === self.state.fileFormat) {
                                             sub_data.svg_data = svgWebSocket.History.findByName($img.data('name'))[0].data;
                                         }
 
@@ -343,7 +348,7 @@ define([
 
                                         if (args.length === $ft_controls.length) {
                                             // sending data
-                                            if ('svg' === self.props.fileFormat) {
+                                            if ('svg' === self.state.fileFormat) {
                                                 sendToSVGAPI(args, settings, _callback);
                                             }
                                             else {
@@ -396,6 +401,10 @@ define([
                 });
                 $ftControls = $img.parent().find('.ft-controls');
                 $ftControls.width(size.width).height(size.height);
+
+                if (file.index === file.totalFiles - 1) {
+                    self._openBlocker(false);
+                }
 
                 // set default image
                 if (null === $target_image) {
@@ -492,6 +501,7 @@ define([
                         type: file.type,
                         grayscale: {
                             is_rgba: true,
+                            is_shading: self.refs.setupPanel.isShading(),
                             threshold: 128
                         },
                         onComplete: function(result) {
@@ -585,7 +595,7 @@ define([
                 shortcuts.off(['cmd', 'del']);
             },
             resetFileFormat: function() {
-                self.setProps({
+                self.setState({
                     fileFormat: undefined
                 });
             },
@@ -593,11 +603,13 @@ define([
                 var firstFile = e.target.files.item(0),
                     setupPanel = self.refs.setupPanel,
                     extension = self.refs.fileUploader.getFileExtension(firstFile.name),
-                    currentFileFormat = self.props.fileFormat;
+                    currentFileFormat = self.state.fileFormat;
+
+                self._openBlocker(true);
 
                 if ('string' !== typeof currentFileFormat) {
                     currentFileFormat = ('svg' === extension ? 'svg' : 'bitmap');
-                    self.setProps({
+                    self.setState({
                         fileFormat: currentFileFormat
                     });
                 }
@@ -614,7 +626,7 @@ define([
                     parserSocket;
 
                 // go svg process
-                if ('svg' === self.props.fileFormat) {
+                if ('svg' === self.state.fileFormat) {
                     if ('svg' === file.extension) {
                         parserSocket = svgWebSocket;
                     }
@@ -635,7 +647,7 @@ define([
                 self.setState({
                     step: 'start',
                     hasImage: 0 < files.length,
-                    mode: ('svg' === self.props.fileFormat ? 'cut' : 'engrave')
+                    mode: ('svg' === self.state.fileFormat ? 'cut' : 'engrave')
                 });
 
                 menuFactory.items.execute.enabled = true;
@@ -688,6 +700,10 @@ define([
             setPlatform: function(el) {
                 $laser_platform = $(el);
                 PLATFORM_DIAMETER_PIXEL = $laser_platform.width();
+            },
+            refreshImage: refreshImage,
+            getCurrentImages: function() {
+                return $('.' + LASER_IMG_CLASS);
             }
         };
     };

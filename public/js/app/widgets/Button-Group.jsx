@@ -3,6 +3,13 @@ define(['react'], function(React){
 
     return React.createClass({
 
+        getDefaultProps: function () {
+            return {
+                buttons: [],
+                className: ''
+            };
+        },
+
         render: function() {
             var className,
                 buttons = this.props.buttons.map(function(opt, i) {
@@ -42,13 +49,6 @@ define(['react'], function(React){
             }
 
             return (<div className={className}>{buttons}</div>);
-        },
-
-        getDefaultProps: function () {
-            return {
-                buttons: React.PropTypes.array,
-                className: React.PropTypes.string
-            };
-        },
+        }
     });
 });

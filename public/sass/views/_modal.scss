@@ -35,6 +35,8 @@
         height: 25rem;
         background-color: #FFFFFF;
         position: relative;
+        max-height: 100%;
+        overflow: hidden;
 
         .modal-content {
             height: 80%;
@@ -58,14 +60,18 @@
                 color: #B3B3B3;
                 display: inline-block;
                 padding: 0 21px;
-                min-width: 400px;
             }
         }
 
-        .btn {
-            color: #B3B3B3;
-            border: 1px solid #B3B3B3;
-            width: 13rem;
+        .modal-actions {
+            text-align: center;
+
+            .btn {
+                color: #B3B3B3;
+                border: 1px solid #B3B3B3;
+                width: 13rem;
+                margin: 0 5px;
+            }
         }
     }
 
@@ -116,5 +122,4 @@
             }
         }
     }
-
 }

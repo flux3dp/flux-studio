@@ -9,6 +9,7 @@ define([
     'jsx!widgets/Unit-Input',
     'jsx!widgets/Button-Group',
     'jsx!widgets/Alert',
+    'jsx!widgets/Dialog-Menu',
     'helpers/api/config',
     'helpers/round',
 ], function(
@@ -22,6 +23,7 @@ define([
     UnitInput,
     ButtonGroup,
     Alert,
+    DialogMenu,
     config,
     round
 ) {
@@ -31,8 +33,19 @@ define([
 
         getDefaultProps: function() {
             return {
-                defaults: React.PropTypes.object
+                defaults: {},
+                imageFormat: 'bitmap',  // svg, bitmap
+                onShadingChanged: function() {}
             };
+        },
+
+        isShading: function() {
+            if ('undefined' === typeof this.refs.shading) {
+                return true;
+            }
+            else {
+                return this.refs.shading.isChecked();
+            }
         },
 
         // UI Events
@@ -139,11 +152,12 @@ define([
             }
         },
 
-        openSubPopup: function(e) {
-            var $me = $(e.currentTarget),
-                $popupOpen = $('.popup-open:checked').not($me);
+        _onShadingChanged: function(e) {
+            this.props.onShadingChanged(e);
+        },
 
-            $popupOpen.removeAttr('checked');
+        openSubPopup: function(e) {
+            this.refs.dialogMenu.toggleSubPopup(e);
         },
 
         _refreshObjectHeight: function(e, value) {
@@ -212,34 +226,34 @@ define([
                         emptyMessage="N/A"
                     />
                     <div className="control">
-                            <span className="label">{advancedLang.form.laser_speed.text}</span>
-                            <input
-                                type="range"
-                                ref="presetSpeed"
-                                min={advancedLang.form.laser_speed.min}
-                                max={advancedLang.form.laser_speed.max}
-                                step={advancedLang.form.laser_speed.step}
-                                value={this.state.chooseSpeed || 0}
-                                className="readonly"
-                            />
-                            <span className="value-text" ref="presetSpeedDisplay" data-tail={advancedLang.form.laser_speed.unit}>
-                                {this.state.chooseSpeed || 0}
-                            </span>
+                        <span className="label">{advancedLang.form.laser_speed.text}</span>
+                        <input
+                            type="range"
+                            ref="presetSpeed"
+                            min={advancedLang.form.laser_speed.min}
+                            max={advancedLang.form.laser_speed.max}
+                            step={advancedLang.form.laser_speed.step}
+                            value={this.state.chooseSpeed || 0}
+                            className="readonly"
+                        />
+                        <span className="value-text" ref="presetSpeedDisplay" data-tail={advancedLang.form.laser_speed.unit}>
+                            {this.state.chooseSpeed || 0}
+                        </span>
                     </div>
                     <div className="control">
-                            <span className="label">{advancedLang.form.power.text}</span>
-                            <input
-                                type="range"
-                                ref="presetPower"
-                                min={advancedLang.form.power.min}
-                                max={advancedLang.form.power.max}
-                                step={advancedLang.form.power.step}
-                                value={this.state.choosePower || 0}
-                                className="readonly"
-                            />
-                            <span className="value-text" ref="presetPowerDisplay" data-tail="%">
-                                {round(this.state.choosePower / advancedLang.form.power.max * 100, -2) || 0}
-                            </span>
+                        <span className="label">{advancedLang.form.power.text}</span>
+                        <input
+                            type="range"
+                            ref="presetPower"
+                            min={advancedLang.form.power.min}
+                            max={advancedLang.form.power.max}
+                            step={advancedLang.form.power.step}
+                            value={this.state.choosePower || 0}
+                            className="readonly"
+                        />
+                        <span className="value-text" ref="presetPowerDisplay" data-tail="%">
+                            {round(this.state.choosePower / advancedLang.form.power.max * 100, -2) || 0}
+                        </span>
                     </div>
                     <ButtonGroup
                         className="btn-h-group custom-preset-buttons"
@@ -276,64 +290,71 @@ define([
         },
 
         _renderObjectHeight: function(lang) {
-            return (
-                <label className="popup-selection">
-                    <input className="popup-open" name="popup-open" type="checkbox" onClick={this.openSubPopup}/>
-                    <div className="display-text">
-                        <p>
-                            <span className="caption">{lang.laser.print_params.object_height.text}</span>
-                            <span>{this.state.defaults.objectHeight}</span>
-                            <span>{lang.laser.print_params.object_height.unit}</span>
-                        </p>
+            return {
+                label: (
+                    <div>
+                        <span className="caption">{lang.laser.print_params.object_height.text}</span>
+                        <span>{this.state.defaults.objectHeight}</span>
+                        <span>{lang.laser.print_params.object_height.unit}</span>
                     </div>
-                    <label className="popup">
-                        <svg className="arrow" version="1.1" xmlns="http://www.w3.org/2000/svg"
-                            width="36.8" height="20">
-                            <polygon points="0,10 36.8,0 36.8,20"/>
-                        </svg>
-                        <ul className="object-height-input">
-                            <li>
-                                <UnitInput
-                                    defaultUnit="mm"
-                                    defaultValue={this.state.defaults.objectHeight}
-                                    getValue={this._refreshObjectHeight}
-                                />
-                            </li>
-                            <li>
-                                AUTO
-                            </li>
-                        </ul>
-                    </label>
-                </label>
-            )
+                ),
+                content: (
+                    <div className="object-height-input">
+                        <UnitInput
+                            defaultUnit="mm"
+                            defaultValue={this.state.defaults.objectHeight}
+                            getValue={this._refreshObjectHeight}
+                            min={0}
+                            max={150}
+                        />
+                    </div>
+                )
+            };
         },
 
         _renderMaterialSelection: function(lang) {
             var props = this.props;
 
-            return (
-                <label className="popup-selection">
-                    <input className="popup-open" name="popup-open" type="checkbox" onClick={this.openSubPopup}/>
-                    <div className="display-text">
-                        <p>
-                            <span className="caption">{lang.laser.advanced.form.object_options.text}</span>
-                            <span>{this.state.defaults.material.label}</span>
-                        </p>
+            return {
+                label: (
+                    <div>
+                        <span className="caption">{lang.laser.advanced.form.object_options.text}</span>
+                        <span>{this.state.defaults.material.label}</span>
                     </div>
-                    <label className="popup">
-                        <svg className="arrow" version="1.1" xmlns="http://www.w3.org/2000/svg"
-                            width="36.8" height="20">
-                            <polygon points="0,10 36.8,0 36.8,20"/>
-                        </svg>
-                        <List
-                            className="material-list"
-                            ref="materials"
-                            items={this.state.materials}
-                            onClick={this._onPickupMaterial}
-                        />
-                    </label>
-                </label>
-            );
+                ),
+                content: (
+                    <List
+                        className="material-list"
+                        ref="materials"
+                        items={this.state.materials}
+                        onClick={this._onPickupMaterial}
+                    />
+                )
+            };
+        },
+
+        _renderShading: function(lang) {
+            var props = this.props,
+                cx = React.addons.classSet,
+                checked = ('undefined' !== typeof this.props.imageFormat && 'svg' === this.props.imageFormat ? false : this.isShading()),
+                classes = cx({
+                    'display-text': true,
+                    'disabled-pointer': 'svg' === this.props.imageFormat
+                });
+            return {
+                label: (
+                    <TextToggle
+                        ref="shading"
+                        className={classes}
+                        displayText={lang.laser.print_params.shading.text}
+                        textOn={lang.laser.print_params.shading.textOn}
+                        textOff={lang.laser.print_params.shading.textOff}
+                        defaultChecked={checked}
+                        onClick={this._onShadingChanged}
+                    />
+                ),
+                content: ''
+            };
         },
 
         _renderAlert: function(lang) {
@@ -361,6 +382,21 @@ define([
             );
         },
 
+        _renderAdvancedButton: function(lang) {
+            return {
+                label: (
+                    <button
+                        className="btn btn-advance"
+                        data-ga-event="open-laser-advanced-panel"
+                        onClick={this._togglePanel('advanced', true)}
+                    >
+                        {lang.laser.button_advanced}
+                    </button>
+                ),
+                content: ''
+            };
+        },
+
         render: function() {
             var props = this.props,
                 lang = props.lang,
@@ -368,24 +404,20 @@ define([
                 advancedPanel = this._renderAdvancedPanel(lang, this.state.defaults.material),
                 material = this._renderMaterialSelection(lang),
                 objectHeight = this._renderObjectHeight(lang),
+                shading = this._renderShading(lang),
+                advancedButton = this._renderAdvancedButton(lang),
                 customPresets = this._renderCustomPresets(lang),
-                alert = this._renderAlert(lang);
+                alert = this._renderAlert(lang),
+                items = [
+                    material,
+                    objectHeight,
+                    shading,
+                    advancedButton
+                ];
 
             return (
                 <div className="setup-panel operating-panel">
-                    <ul className="main">
-                        <li>
-                            {material}
-                        </li>
-                        <li>
-                            {objectHeight}
-                        </li>
-                        <li>
-                            <button className="btn btn-advance" data-ga-event="open-laser-advanced-panel" onClick={this._togglePanel('advanced', true)}>
-                                {lang.laser.button_advanced}
-                            </button>
-                        </li>
-                    </ul>
+                    <DialogMenu ref="dialogMenu" items={items}/>
 
                     {advancedPanel}
                     {customPresets}

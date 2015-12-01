@@ -4,12 +4,26 @@ define([
     'use strict';
 
     return React.createClass({
+
+        getDefaultProps: function() {
+            return {
+                textOn: '',
+                textOff: '',
+                defaultChecked: false,
+                defaultValue: '',
+                displayText: '',
+                className: '',
+                // events
+                onClick: function() {}
+            };
+        },
+
         // UI events
         _onClick: function(e) {
-            var checked = !this.state.checked;
+            this.state.checked = !this.state.checked;
 
             this.setState({
-                checked: checked
+                checked: this.state.checked
             });
 
             this.props.onClick(e);
@@ -25,45 +39,35 @@ define([
             var props = this.props,
                 lang = props.lang,
                 stateStyle = (true === this.state.checked ? 'on' : 'off'),
-                checkBox = (
-                    <label className="ui ui-control-text-toggle">
-                        <span>{props.displayText}</span>
-                        <input
-                            refs="toggle"
-                            type="checkbox"
-                            className={stateStyle}
-                            defaultValue={props.defaultValue}
-                            checked={this.state.checked}
-                            onClick={this._onClick}
-                        />
-                        <span data-text-on={props.textOn} data-text-off={props.textOff}></span>
-                    </label>
-                );
+                defaultClassName = 'ui ui-control-text-toggle',
+                className = defaultClassName + ('string' === typeof this.props.className ? ' ' + this.props.className : '');
 
             return (
-                <div className={props.className}>
-                    {checkBox}
-                </div>
+                <label className={className}>
+                    <span className="caption">{props.displayText}</span>
+                    <input
+                        refs="toggle"
+                        type="checkbox"
+                        className={stateStyle}
+                        defaultValue={props.defaultValue}
+                        checked={this.state.checked}
+                        onClick={this._onClick}
+                    />
+                    <span className="status" data-text-on={props.textOn} data-text-off={props.textOff}></span>
+                </label>
             );
-        },
-
-        getDefaultProps: function() {
-            return {
-                textOn: '',
-                textOff: '',
-                checked: false,
-                defaultValue: '',
-                displayText: '',
-                className: '',
-                // events
-                onClick: React.PropTypes.func
-            };
         },
 
         getInitialState: function() {
             return {
-                checked: this.props.checked
+                checked: this.props.defaultChecked
             };
+        },
+
+        componentWillReceiveProps: function(nextProps) {
+            this.setState({
+                checked: nextProps.defaultChecked
+            });
         }
 
     });

@@ -43,10 +43,10 @@ var mode = {
             // Infill
             fill_density                        : 10,
             fill_pattern                        : 'auto',
-            spiral_vase                         : false,
+            spiral_vase                         : 0,
 
             // Support
-            support_material                    : true,
+            support_material                    : 1,
             support_material_spacing            : 2.5,
             support_material_threshold          : 60,
             support_material_pattern            : 'auto',
@@ -80,6 +80,7 @@ var mode = {
             return {
                 mode                : 1,
                 selectedTab         : 1,
+                custom              : this.props.setting.custom || '',
 
                 // Presets
                 selectedPreset      : '',
@@ -113,8 +114,41 @@ var mode = {
         },
 
         _updateCustomField: function() {
-            var custom = this._JSONToKeyValue(advancedSetting);
-            this.setState({ custom: custom });
+            var keys = Object.keys(advancedSetting),
+                custom = this.state.custom.length === 0 ? [] : this.state.custom.split('\n'),
+                _entry, _keys, lineNumber;
+
+            for(var i = 0; i < keys.length; i++) {
+                _keys = keys[i];
+                _entry = _keys + ' = ' + advancedSetting[_keys];
+                lineNumber = this._getLineNumber(custom, _keys);
+
+                if(lineNumber >= 0) {
+                    custom[lineNumber] = _entry;
+                }
+                else {
+                    if(hiddenPresets.indexOf(_keys) === -1)
+                    custom.push(_entry);
+                }
+            }
+            this.setState({ custom: custom.join('\n') });
+        },
+
+        _getLineNumber: function(array, key) {
+            var entry,
+                _key,
+                lineNumber = -1;
+
+            for(var i = 0; i < array.length; i++) {
+                entry = array[i].split('=');
+                _key = entry[0].replace(/ /g, '');
+                if(key === _key) {
+                    lineNumber = i;
+                    break;
+                }
+            }
+
+            return lineNumber;
         },
 
         _getPresets: function(callback) {
@@ -144,7 +178,6 @@ var mode = {
 
         _listPresets: function(presets) {
             if(presets.length === 0) { return; }
-            // var p = JSON.parse(presets);
 
             this.setState({
                 presets: presets,
@@ -171,22 +204,24 @@ var mode = {
             var settings = this.state.custom.split('\n');
             var _key, _value;
 
-            settings.forEach(function(setting) {
-                setting = setting.split('=');
+            settings.forEach(function(line) {
+                var setting = line.split('=');
 
                 if(setting.length === 2) {
                     _key = setting[0].replace(/ /g, '');
                     _value = setting[1].trim();
 
-                    if(this._isValidSlicerParameter(_key)) {
+                    if(this._isPartOfAdvancedSetting(_key)) {
                         advancedSetting[_key] = parseFloat(_value) || _value;
                     }
                 }
             }.bind(this));
+
+            advancedSetting.custom = this.state.custom;
         },
 
-        _isValidSlicerParameter: function(property) {
-            return configs.indexOf(property) >= 0;
+        _isPartOfAdvancedSetting: function(property) {
+            return Object.keys(advancedSetting).indexOf(property) >= 0;
         },
 
         _handleNavigate: function(selectedTab, e) {
@@ -194,6 +229,7 @@ var mode = {
             this.setState({
                 selectedTab: selectedTab
             });
+            this._handleApply(false);
         },
 
         _handleParameterChange: function(key, e) {
@@ -233,7 +269,12 @@ var mode = {
         },
 
         _handleControlValueChange: function(id, value) {
-            advancedSetting[id] = value;
+            if(typeof(value) === 'boolean') {
+                advancedSetting[id] = value ? 1 : 0;
+            }
+            else {
+                advancedSetting[id] = value;
+            }
             this._updateCustomField();
         },
 
@@ -244,19 +285,15 @@ var mode = {
             this._handleBackToSetting();
         },
 
-        _handleApply: function(e) {
-            e.preventDefault();
-            if(this.state.selectedTab === tab.Custom) {
-                this._processCustomInput();
-            }
+        _handleApply: function(closeWindow) {
+            closeWindow = closeWindow || true;
+            this._processCustomInput();
 
             var _settings = {};
             Object.keys(advancedSetting).forEach(function(name) {
-                if(hiddenPresets.indexOf(name) < 0) {
-                    _settings[name] = advancedSetting[name];
-                }
+                _settings[name] = advancedSetting[name];
             });
-            this.props.onApply(_settings);
+            this.props.onApply(_settings, closeWindow);
         },
 
         _handleCloseAdvancedSetting: function(e) {
@@ -428,8 +465,8 @@ var mode = {
 
                         <SwitchControl
                             id="spiral_vase"
-                            label={lang.shellSurface}
-                            default={advancedSetting.spiralVase}
+                            label={lang.spiral}
+                            default={advancedSetting.spiral_vase === 1}
                             onChange={this._handleControlValueChange} />
 
                     </div>
@@ -448,7 +485,7 @@ var mode = {
                         <SwitchControl
                             id="support_material"
                             label={lang.generalSupport}
-                            default={advancedSetting.support_material}
+                            default={advancedSetting.support_material === 1}
                             onChange={this._handleControlValueChange} />
 
                         <SliderControl
@@ -699,12 +736,12 @@ var mode = {
 
                     <div className="left">
                         {button1}
+                        {button3}
                     </div>
 
                     <div className="right">
-                        {button3}
-                        {button4}
                         {button2}
+                        {button4}
                     </div>
 
                 </div>

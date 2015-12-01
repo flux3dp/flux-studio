@@ -1,8 +1,104 @@
 .scan-studio {
+    background: #E0E0E0;
+
+    .mesh-thumbnail {
+        cursor: pointer;
+        list-style: none;
+        margin: 0 0 0 30px;
+        padding: 0;
+        z-index: 1;
+
+        .mesh-thumbnail-item {
+            background: #9B9B9B;
+            box-shadow: 0 3px 5px 0px rgba(0, 0, 0, .5);
+            color: #fff;
+            font-size: 15px;
+            line-height: 30px;
+            margin: 0 0 17px 0;
+            position: relative;
+            text-align: center;
+            width: 99px;
+
+            &::before {
+                content: "#";
+            }
+
+            &:hover {
+                background: #777;
+            }
+        }
+
+        .mesh-thumbnail-close {
+            background: rgba(0, 0, 0, .3);
+            border-radius: 50%;
+            height: 20px;
+            position: absolute;
+            width: 20px;
+            right: -10px;
+            top: -10px;
+
+            &::before {
+                line-height: 20px;
+            }
+        }
+
+        .choose {
+            background: #333;
+        }
+    }
+
+    .action-buttons {
+
+        .btn {
+            font-size: 18px;
+            height: 100px;
+            line-height: 23px;
+            margin: -20px 0 0 0;
+            position: relative;
+            width: 87px;
+
+            &:nth-child(even) {
+                left: -43px;
+            }
+
+            &:nth-child(odd) {
+                left: 0;
+            }
+
+            &:first-child {
+                margin: 0;
+            }
+        }
+
+        .btn-scan {
+            background: #474747;
+            font-size: 35px;
+        }
+
+        .btn-scan-again {
+            background: #BABABA;
+        }
+
+        .btn-rollback,
+        .btn-multi-scan {
+            background: #979797;
+        }
+
+        .btn-save-stl,
+        .btn-convert {
+            background: #474747;
+        }
+    }
 
     .model-displayer {
+        bottom: 0;
         height: 100%;
+        left: 0;
+        position: absolute;
+        right: 0;
+        top: 0;
         width: 100%;
+        z-index: 0;
 
         .camera-image {
             height: 100%;
@@ -15,36 +111,106 @@
         position: relative;
     }
 
-    .setup-panel,
     .manipulation-panel {
+        @include flexbox();
+        font-size: 20px;
+        margin: 0;
         position: absolute;
-        top: 20px;
-    }
+        transition: all .1s ease;
+        width: 270px;
+        z-index: 1;
 
-    .manipulation-panel {
-        right: 20px;
-        width: 80px;
+        .wrapper,
+        .btn {
+            width: 100%;
+        }
 
         .btn {
-            margin: 5px 0;
-        }
+            @include flexbox();
+            background: #fff;
+            color: #A4A4A4;
+            font-size: 20px;
+            text-align: left;
+            align-items: center;
 
-        .on {
-            background: #424242;
-            border: #fff solid 1px;
-            color: #fff;
-        }
-    }
-
-    .setup-panel {
-        left: 20px;
-        width: 182px;
-
-        .action-buttons {
-            .btn {
-                display: block;
-                margin: 0 0 5px 0;
+            img {
+                height: 32px;
+                margin: 0 11px 0 0;
             }
+        }
+
+        .btn-pressed {
+            background: #000;
+        }
+
+        .accordion-body {
+            overflow: visible;
+            position: relative;
+
+            .icon-locker {
+                bottom: 0;
+                cursor: pointer;
+                height: 20px;
+                left: 100%;
+                margin: auto;
+                position: absolute;
+                top: 0;
+                width: 20px;
+            }
+        }
+
+        .arrow {
+            align-self: center;
+
+            polygon {
+                fill: #fff;
+            }
+        }
+
+        .caption,
+        .controls {
+            margin: 0;
+        }
+
+        .controls {
+            background: #FFFFFF;
+            display: block;
+            margin: 0 0 3px 0;
+            padding: 0 20px;
+        }
+
+        .control {
+            @include flexbox();
+            color: #B3B3B3;
+            font-size: 13px;
+            height: 40px;
+            line-height: 40px;
+            margin: 0 0 10px 0;
+            align-items: center;
+            justify-content: space-around;
+
+            .header {
+                color: #E0E0DF;
+                width: 20%;
+            }
+
+            input {
+                width: 90%;
+            }
+        }
+
+        .caption {
+            @include flexbox();
+            color: #B3B3B3;
+            font-size: 12px;
+            line-height: 30px;
+            justify-content: space-between;
+        }
+
+        input {
+            border: 1px solid #E0E0DF;
+            color: #B3B3B3;
+            font-size: 15px;
         }
     }
 
@@ -58,9 +224,77 @@
     }
 
     .operating-section {
+        @include flexbox();
         height: 100%;
         position: relative;
         width: 100%;
+        align-items: center;
+    }
+
+    .popup-selection {
+        @include flexbox();
+        height: 40px;
+        position: relative;
+
+        ul {
+            background: #B3B3B3;
+            list-style: none;
+            padding: 0 10px 10px 10px;
+
+            li {
+                color: #E0E0DF;
+                cursor: pointer;
+                margin: 10px 0 0 0;
+            }
+        }
+
+        .popup-open {
+            display: none;
+
+            &:checked ~ .display-text {
+                background: #B3B3B3;
+                color: #E0E0DF;
+            }
+
+            &:checked ~ .popup {
+                visibility: visible;
+            }
+        }
+
+        .display-text {
+            p {
+                display: block;
+                margin: 0;
+                width: 257px;
+            }
+        }
+
+        .popup {
+            @include flexbox();
+            visibility: hidden;
+            align-self: center;
+
+            .arrow {
+                position: relative;
+                right: -1px;
+                align-self: center;
+
+                polygon {
+                    fill: #B3B3B3;
+                }
+            }
+        }
+    }
+
+    .setup-panel {
+        margin: 0 0 0 30px;
+        position: static;
+        z-index: 1;
+
+        .caption {
+            padding: 0 .3em 0 0;
+            text-transform: uppercase;
+        }
     }
 
     .scan-progress {

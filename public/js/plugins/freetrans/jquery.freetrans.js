@@ -183,8 +183,8 @@
                 var ml = settings._p.divs.ml = container.find('.ft-scaler-ml');
                 var mr = settings._p.divs.mr = container.find('.ft-scaler-mr');
                 settings._p.divs.container = container;
-                settings._p.cwid = controls.width();
-                settings._p.chgt = controls.height();
+                settings._p.cwid = sel.width();
+                settings._p.chgt = sel.height();
 
                 sel.data('freetrans', settings);
 

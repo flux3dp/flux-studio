@@ -43,20 +43,26 @@ define([
                         name,
                         point_cloud.left.size / 24,
                         point_cloud.right.size / 24 || 0
-                    ];
+                    ],
+                    chunk,
+                    fileReader,
+                    CHUNK_PKG_SIZE = 4096;
 
                 events.onMessage = function(data) {
                     switch (data.status) {
                     case 'continue':
-                        var reader = new FileReader();
+                        // split up to pieces
+                        for (var i = 0; i < point_cloud.total.size; i += CHUNK_PKG_SIZE) {
+                            chunk = point_cloud.total.slice(i, i + CHUNK_PKG_SIZE);
 
-                        reader.onloadend = function(e) {
-                            var data = e.target.result;
+                            fileReader = new FileReader();
 
-                            ws.send(data);
-                        };
+                            fileReader.onloadend = function(e) {
+                                ws.send(this.result);
+                            };
 
-                        reader.readAsArrayBuffer(point_cloud.total);
+                            fileReader.readAsArrayBuffer(chunk);
+                        }
 
                         break;
                     case 'ok':
@@ -133,7 +139,7 @@ define([
                 opts.onStarting();
 
             },
-            delete_noise: function(in_name, out_name, c, opts) {
+            deleteNoise: function(in_name, out_name, c, opts) {
 
                 opts.onFinished = opts.onFinished || function() {};
                 opts.onStarting = opts.onStarting || function() {};
@@ -196,7 +202,7 @@ define([
                 opts.onStarting();
                 ws.send(args.join(' '));
             },
-            merge: function(base, target, position, rotation, output, opts) {
+            merge: function(base, target, output, opts) {
                 opts.onStarting = opts.onStarting || function() {};
                 opts.onFinished = opts.onFinished || function() {};
 
@@ -206,12 +212,6 @@ define([
                         order_name,
                         base,
                         target,
-                        position.x,
-                        position.y,
-                        position.z,
-                        rotation.x,
-                        rotation.y,
-                        rotation.z,
                         output
                     ];
 
@@ -219,10 +219,7 @@ define([
 
                     switch (data.status) {
                     case 'ok':
-                        self.dump(
-                            output,
-                            opts
-                        );
+                        opts.onFinished();
                         break;
                     }
 
@@ -260,11 +257,11 @@ define([
                     if (true === data instanceof Blob) {
                         pointCloud.push(data, next_left, next_right, _opts);
                     }
-                    else if ('undefined' !== typeof data.status && 'continue' === data.status) {
+                    else if ('continue' === data.status) {
                         next_left = parseInt(data.left, 10) * 24;
                         next_right = parseInt(data.right, 10) * 24;
                     }
-                    else if ('undefined' !== typeof data.status && 'ok' === data.status) {
+                    else if ('ok' === data.status) {
                         History.push(name, pointCloud.get().total);
                         opts.onFinished(pointCloud.get());
                     }
@@ -307,6 +304,46 @@ define([
                 };
 
                 ws.send(args.join(' '));
+            },
+            /**
+             * apply changes for 3d object
+             *
+             * @param {String}   baseName   - source name
+             * @param {String}   outName    - output name
+             * @param {Json}     params     - the parameters that apply for
+             * @param {Function} onFinished - finished callback
+             *
+             */
+            applyTransform: function(baseName, outName, params, onFinished) {
+                onFinished = onFinished || function() {};
+
+                var args = [
+                    'apply_transform',
+                    baseName,
+                    params.pX || 0,
+                    params.pY || 0,
+                    params.pZ || 0,
+                    params.rX || 0,
+                    params.rY || 0,
+                    params.rZ || 0,
+                    outName
+                ],
+                doTransform = function() {
+                    events.onMessage = function(data) {
+
+                        if ('ok' === data.status) {
+                            onFinished(data);
+                        }
+                        else {
+                            // TODO: unexception result?
+                        }
+
+                    };
+
+                    ws.send(args.join(' '));
+                };
+
+                doTransform();
             }
         };
     };
