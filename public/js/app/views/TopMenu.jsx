@@ -133,6 +133,10 @@ define([
                 AlertActions.notifyRetry(this.state.sourceId);
             },
 
+            _handleAbort: function() {
+                AlertActions.notifyAbort(this.state.sourceId);
+            },
+
             _handleShowDeviceList: function() {
                 var self = this,
                     refreshOption = function(devices) {
@@ -250,6 +254,7 @@ define([
                             open={this.state.showModal}
                             message={this.state.message}
                             onRetry={this._handleRetry}
+                            onAbort={this._handleAbort}
                             onClose={this._handleModalClose} />
 
                         <div className="device" onClick={this._handleShowDeviceList}>
