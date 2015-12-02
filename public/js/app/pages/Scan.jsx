@@ -272,7 +272,7 @@ define([
                         };
 
                     self._openBlocker(true);
-                    this._mergeAll(exportPCD, true);
+                    this._mergeAll(exportPCD, false);
                 },
 
                 _handleScan: function(e) {
