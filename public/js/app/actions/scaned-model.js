@@ -36,37 +36,35 @@ define([
         container = document.getElementById('model-displayer');
         $(container).find('canvas').show();
 
-        if ('undefined' === typeof scene) {
-            scene = new THREE.Scene();
-            window.scene = scene;
+        scene = new THREE.Scene();
+        window.scene = scene;
 
-            camera = new THREE.PerspectiveCamera( fov, container.offsetWidth / container.offsetHeight, 1, far );
-            camera.up = new THREE.Vector3(0, 0, 1);
-            camera.position.set(-100, 100, 120);
-            camera.lookAt( new THREE.Vector3( -5, -5, 0 ) );
+        camera = new THREE.PerspectiveCamera( fov, container.offsetWidth / container.offsetHeight, 1, far );
+        camera.up = new THREE.Vector3(0, 0, 1);
+        camera.position.set(-100, 100, 120);
+        camera.lookAt( new THREE.Vector3( -5, -5, 0 ) );
 
-            scene.add(camera);
+        scene.add(camera);
 
-            // add circular grid helper
-            addCircularGridHelper();
+        // add circular grid helper
+        addCircularGridHelper();
 
-            // add light
-            addLights();
+        // add light
+        addLights();
 
-            renderer = new THREE.WebGLRenderer({
-                antialias: false
-            });
-            renderer.setClearColor( 0xE0E0E0, 1 );
-            renderer.setPixelRatio(window.devicePixelRatio);
-            renderer.setSize(container.offsetWidth, container.offsetHeight);
-            container.appendChild(renderer.domElement);
+        renderer = new THREE.WebGLRenderer({
+            antialias: false
+        });
+        renderer.setClearColor( 0xE0E0E0, 1 );
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.setSize(container.offsetWidth, container.offsetHeight);
+        container.appendChild(renderer.domElement);
 
-            addOrbitControls();
+        addOrbitControls();
 
-            window.addEventListener('resize', onWindowResize, false);
+        window.addEventListener('resize', onWindowResize, false);
 
-            render();
-        }
+        render();
 
         return {
             scene: scene,
