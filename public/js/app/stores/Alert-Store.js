@@ -7,11 +7,13 @@ define([
     Dispatcher,
     AlertConstants,
     EventEmitter
-){
+) {
+    'use strict';
 
     var NOTIFY_EVENT = 'notify',
         POPUP_EVENT = 'popup',
         NOTIFY_RETRY = 'retry',
+        NOTIFY_ABORT = 'abort',
         AlertStore;
 
     AlertStore = Object.assign(EventEmitter.prototype, {
@@ -28,6 +30,10 @@ define([
             this.on(NOTIFY_RETRY, callback);
         },
 
+        onAbort(callback) {
+            this.on(NOTIFY_ABORT, callback);
+        },
+
         removeNotifyListener(callback) {
             this.removeListener(NOTIFY_EVENT, callback);
         },
@@ -40,9 +46,13 @@ define([
             this.removeListener(NOTIFY_RETRY, callback);
         },
 
+        removeAbortListener(callback) {
+            this.removeListener(NOTIFY_ABORT, callback);
+        },
+
         dispatcherIndex: Dispatcher.register(function(payload) {
-            var actionType = payload.actionType;
-            var action = {
+            var actionType = payload.actionType,
+                action = {
 
                 'SHOW_INFO': function() {
                     AlertStore.emit(NOTIFY_EVENT, AlertConstants.INFO, payload.message);
@@ -68,8 +78,20 @@ define([
                     AlertStore.emit(POPUP_EVENT, AlertConstants.ERROR, payload.id, payload.message);
                 },
 
+                'SHOW_POPUP_RETRY': function() {
+                    AlertStore.emit(POPUP_EVENT, AlertConstants.RETRY_CANCEL, payload.id, payload.message);
+                },
+
+                'SHOW_POPUP_RETRY_ABORT': function() {
+                    AlertStore.emit(POPUP_EVENT, AlertConstants.RETRY_ABORT_CANCEL, payload.id, payload.message);
+                },
+
                 'NOTIFY_RETRY': function() {
                     AlertStore.emit(NOTIFY_RETRY, payload.id);
+                },
+
+                'NOTIFY_ABORT': function() {
+                    AlertStore.emit(NOTIFY_ABORT, payload.id);
                 }
 
             };

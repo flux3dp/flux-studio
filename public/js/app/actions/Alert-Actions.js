@@ -4,7 +4,9 @@ define([
 ], function(
     AlertConstants,
     AlertDispatcher
-){
+) {
+    'use strict';
+
     return {
 
         showInfo: function(message) {
@@ -43,9 +45,27 @@ define([
             });
         },
 
+        showPopupRetry: function(id, message) {
+            AlertDispatcher.dispatch({
+                actionType: AlertConstants.SHOW_POPUP_RETRY, message, id
+            });
+        },
+
+        showPopupRetryAbort: function(id, message) {
+            AlertDispatcher.dispatch({
+                actionType: AlertConstants.SHOW_POPUP_RETRY_ABORT, message, id
+            });
+        },
+
         notifyRetry: function(id) {
             AlertDispatcher.dispatch({
                 actionType: AlertConstants.NOTIFY_RETRY, id
+            });
+        },
+
+        notifyAbort: function(id) {
+            AlertDispatcher.dispatch({
+                actionType: AlertConstants.NOTIFY_ABORT, id
             });
         }
 
