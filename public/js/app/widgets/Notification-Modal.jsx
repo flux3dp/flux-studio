@@ -33,9 +33,13 @@ define([
 
             getDefaultProps: function() {
                 return {
-                    type: AlertConstants.INFO,
-                    escapable: false,
-                    open: true
+                    type      : AlertConstants.INFO,
+                    escapable : false,
+                    open      : true,
+                    onRetry   : function() {},
+                    onAbort   : function() {},
+                    onYes     : function() {},
+                    onClose   : function() {}
                 };
             },
 

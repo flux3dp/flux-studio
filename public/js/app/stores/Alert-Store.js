@@ -1,6 +1,6 @@
 define([
-    'app/dispatcher/Alert-Dispatcher',
-    'app/constants/Alert-Constants',
+    'app/dispatcher/alert-dispatcher',
+    'app/constants/alert-constants',
     'events',
     'helpers/object-assign'
 ], function(
@@ -10,10 +10,11 @@ define([
 ) {
     'use strict';
 
-    var NOTIFY_EVENT = 'notify',
-        POPUP_EVENT = 'popup',
-        NOTIFY_RETRY = 'retry',
+    var NOTIFY_EVENT    = 'notify',
+        POPUP_EVENT     = 'popup',
+        NOTIFY_RETRY    = 'retry',
         NOTIFY_ABORT = 'abort',
+        NOTIFY_ANSWER   = 'answer',
         AlertStore;
 
     AlertStore = Object.assign(EventEmitter.prototype, {
@@ -32,6 +33,10 @@ define([
 
         onAbort(callback) {
             this.on(NOTIFY_ABORT, callback);
+        },
+
+        onAnswer(callback) {
+            this.on(NOTIFY_ANSWER, callback);
         },
 
         removeNotifyListener(callback) {
@@ -86,17 +91,31 @@ define([
                     AlertStore.emit(POPUP_EVENT, AlertConstants.RETRY_ABORT_CANCEL, payload.id, payload.message);
                 },
 
+                'SHOW_POPUP_YES_NO': function() {
+                    AlertStore.emit(POPUP_EVENT, AlertConstants.YES_NO, payload.id, payload.message);
+                },
+
+                'SHOW_POPUP_QUESTION': function() {
+                    AlertStore.emit(POPUP_EVENT, AlertConstants.QUESTION, payload.id, payload.message);
+                },
+
                 'NOTIFY_RETRY': function() {
                     AlertStore.emit(NOTIFY_RETRY, payload.id);
                 },
 
                 'NOTIFY_ABORT': function() {
                     AlertStore.emit(NOTIFY_ABORT, payload.id);
+                },
+
+                'NOTIFY_ANSWER': function() {
+                    AlertStore.emit(NOTIFY_ANSWER, payload.id, payload.isYes);
                 }
 
             };
 
-            action[actionType]();
+            if(!!action[actionType]) {
+                action[actionType]();
+            }
         })
 
     });

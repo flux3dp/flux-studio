@@ -16,7 +16,10 @@ define(function(){
         SHOW_POPUP_ERROR       : 'SHOW_POPUP_ERROR',
         SHOW_POPUP_RETRY       : 'SHOW_POPUP_RETRY',
         SHOW_POPUP_RETRY_ABORT : 'SHOW_POPUP_RETRY_ABORT',
+        SHOW_POPUP_YES_NO      : 'SHOW_POPUP_YES_NO',
+        SHOW_POPUP_QUESTION    : 'SHOW_POPUP_QUESTION',
         NOTIFY_RETRY           : 'NOTIFY_RETRY',
-        NOTIFY_ABORT           : 'NOTIFY_ABORT'
+        NOTIFY_ABORT           : 'NOTIFY_ABORT',
+        QUESTION               : 'QUESTION'
     };
 });
