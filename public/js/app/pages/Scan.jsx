@@ -360,8 +360,7 @@ define([
                         stage: stage
                     });
 
-                    openProgressBar(onScan);
-                    // checkLenOpened();
+                    checkLenOpened();
                 },
 
                 _onScanAgain: function(e) {
@@ -495,7 +494,7 @@ define([
                 _doManualMerge: function(selectedMeshes, callback) {
                     var self = this,
                         meshes = this.state.meshes,
-                        selectedMeshes = selectedMeshes || this.state.selectedMeshes,
+                        selectedMeshes = (true === selectedMeshes instanceof Array ? selectedMeshes : this.state.selectedMeshes),
                         outputName = '';
 
                     this._doApplyTransform(function(response) {
