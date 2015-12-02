@@ -1,108 +1,165 @@
 define([
     'jquery',
     'react',
-    'helpers/shortcuts'
-], function($, React, shortcuts) {
+    'helpers/shortcuts',
+    'app/constants/Alert-Constants',
+    'jsx!widgets/Modal',
+    'jsx!widgets/Alert'
+], function($, React, shortcuts, AlertConstants, Modal, Alert) {
     'use strict';
 
-    var lang;
+    var lang,
+        acceptableTypes = [
+            AlertConstants.INFO,
+            AlertConstants.WARNING,
+            AlertConstants.ERROR,
+            AlertConstants.YES_NO,
+            AlertConstants.RETRY_CANCEL,
+            AlertConstants.RETRY_ABORT_CANCEL
+        ],
+        View = React.createClass({
 
-    return React.createClass({
+            propTypes: {
+                open        : React.PropTypes.bool,
+                lang        : React.PropTypes.object,
+                type        : React.PropTypes.oneOf(acceptableTypes),
+                escapable   : React.PropTypes.bool,
+                message     : React.PropTypes.string,
+                onRetry     : React.PropTypes.func,
+                onAbort     : React.PropTypes.func,
+                onYes       : React.PropTypes.func,
+                onClose     : React.PropTypes.func
+            },
 
-        propTypes: {
-            open        : React.PropTypes.bool,
-            lang        : React.PropTypes.object,
-            type        : React.PropTypes.string,   // 0 (Info), 1 (Warning), 2 (Error)
-            hasRetry    : React.PropTypes.bool,
-            escapable   : React.PropTypes.bool,
-            message     : React.PropTypes.string,
-            onRetry     : React.PropTypes.func,
-            onClose     : React.PropTypes.func
-        },
+            getDefaultProps: function() {
+                return {
+                    type: AlertConstants.INFO,
+                    escapable: false,
+                    open: true
+                };
+            },
 
-        getDefaultProps: function() {
-            return {
-                type: 'INFO',
-                escapable: true,
-                open: true
-            };
-        },
+            componentWillMount: function() {
+                lang = this.props.lang.alert;
+            },
 
-        componentWillMount: function() {
-            lang = this.props.lang.alert;
-        },
+            componentDidMount: function() {
+                var self = this;
 
-        componentDidMount: function() {
-            var self = this;
-            shortcuts.on(['esc'], function(e) {
+                shortcuts.on(['esc'], function(e) {
                     self.props.onClose(e);
-            });
-        },
+                });
+            },
 
-        componentWillUnmount: function() {
-            shortcuts.off(['esc']);
-        },
+            componentWillUnmount: function() {
+                shortcuts.off(['esc']);
+            },
 
-        _onClose: function(e) {
-            React.unmountComponentAtNode(View);
-            this.props.onClose(e);
-        },
+            // button actions
+            _onClose: function(e) {
+                this.props.onClose(e);
+            },
 
-        _onEscapeOnBackground: function(e) {
-            var self = this;
+            _onYes: function(e) {
+                this.props.onYes(e);
+                this._onClose(e);
+            },
 
-            if (this.props.escapable) {
-                self.props.onClose(e);
+            _onRetry: function(e) {
+                this.props.onRetry(e);
+                this._onClose(e);
+            },
+
+            _onAbort: function(e) {
+                this.props.onAbort(e);
+                this._onClose(e);
+            },
+
+            _getTypeTitle: function() {
+                var types = {};
+                types[AlertConstants.INFO] = lang.info;
+                types[AlertConstants.WARNING] = lang.warning;
+                types[AlertConstants.ERROR] = lang.error;
+                types[AlertConstants.RETRY_CANCEL] = lang.error;
+
+                return types[this.props.type] || '';
+            },
+
+            _getCloseButtonCaption: function() {
+                var caption = lang.cancel;
+
+                switch (this.props.type) {
+                case AlertConstants.YES_NO:
+                    caption = lang.no;
+                    break;
+                case AlertConstants.INFO:
+                case AlertConstants.WARNING:
+                case AlertConstants.ERROR:
+                    caption = lang.ok;
+                    break;
+                }
+
+                return caption;
+            },
+
+            _getButtons: function() {
+                var buttons = [];
+
+                buttons.push({
+                    label: this._getCloseButtonCaption(),
+                    onClick: this.props.onClose
+                });
+
+                switch (this.props.type) {
+                case AlertConstants.YES_NO:
+                    buttons.push({
+                        label: lang.yes,
+                        onClick: this._onYes
+                    });
+                    break;
+                case AlertConstants.RETRY_CANCEL:
+                    buttons.push({
+                        label: lang.retry,
+                        onClick: this._onRetry
+                    });
+                    break;
+                case AlertConstants.RETRY_ABORT_CANCEL:
+                    buttons.push({
+                        label: lang.abort,
+                        onClick: this._onAbort
+                    });
+                    buttons.push({
+                        label: lang.retry,
+                        onClick: this._onRetry
+                    });
+                    break;
+                }
+
+                return buttons;
+            },
+
+            render: function() {
+                if(!this.props.open) {
+                    return (<div/>);
+                }
+
+                var typeTitle = this._getTypeTitle(),
+                    buttons = this._getButtons(),
+                    content = (
+                        <Alert
+                            lang={lang}
+                            caption={typeTitle}
+                            message={this.props.message}
+                            buttons={buttons}
+                        />
+                    );
+
+                return (
+                    <Modal content={content} disabledEscapeOnBackground={this.props.escapable}/>
+                );
             }
-        },
 
-        _renderTypeTitle: function() {
-            var types = {
-                'INFO': lang.info,
-                'WARNING': lang.warning,
-                'ERROR': lang.error
-            };
+        });
 
-            return(
-                <h4>{types[this.props.type]}</h4>
-            );
-        },
-
-        _renderFooter: function() {
-            var retryBtn = typeof(this.props.onRetry) !== 'undefined' ? <a className="btn" onClick={this.props.onRetry}>RETRY</a> : '';
-            return (
-                <div>
-                    <a className="btn" onClick={this.props.onClose}>{this.props.lang.print.cancel}</a>
-                    {retryBtn}
-                </div>
-            );
-        },
-
-        render: function() {
-            if(!this.props.open) {
-                return (<div></div>);
-            }
-
-            var typeTitle = this._renderTypeTitle(),
-                footer = this._renderFooter();
-
-            return (
-                <div className="modal-window">
-                    <div className="modal-background" onClick={this._onEscapeOnBackground}/>
-                    <div className="notification">
-                        <div className="modal-content">
-                            <div className="wrapper">
-                                {typeTitle}
-                                {this.props.message}
-                            </div>
-                        </div>
-                        <div className="modal-actions button-group">
-                            {footer}
-                        </div>
-                    </div>
-                </div>
-            );
-        }
-
-    });
+    return View;
 });
