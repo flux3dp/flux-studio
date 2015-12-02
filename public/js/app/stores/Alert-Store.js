@@ -1,6 +1,6 @@
 define([
-    'app/dispatcher/Alert-Dispatcher',
-    'app/constants/Alert-Constants',
+    'app/dispatcher/alert-dispatcher',
+    'app/constants/alert-constants',
     'events',
     'helpers/object-assign'
 ], function(
@@ -9,9 +9,10 @@ define([
     EventEmitter
 ){
 
-    var NOTIFY_EVENT = 'notify',
-        POPUP_EVENT = 'popup',
-        NOTIFY_RETRY = 'retry',
+    var NOTIFY_EVENT    = 'notify',
+        POPUP_EVENT     = 'popup',
+        NOTIFY_RETRY    = 'retry',
+        NOTIFY_ANSWER   = 'answer',
         AlertStore;
 
     AlertStore = Object.assign(EventEmitter.prototype, {
@@ -26,6 +27,10 @@ define([
 
         onRetry(callback) {
             this.on(NOTIFY_RETRY, callback);
+        },
+
+        onAnswer(callback) {
+            this.on(NOTIFY_ANSWER, callback);
         },
 
         removeNotifyListener(callback) {
@@ -68,13 +73,23 @@ define([
                     AlertStore.emit(POPUP_EVENT, AlertConstants.ERROR, payload.id, payload.message);
                 },
 
+                'SHOW_POPUP_QUESTION': function() {
+                    AlertStore.emit(POPUP_EVENT, AlertConstants.QUESTION, payload.id, payload.message);
+                },
+
                 'NOTIFY_RETRY': function() {
                     AlertStore.emit(NOTIFY_RETRY, payload.id);
+                },
+
+                'NOTIFY_ANSWER': function() {
+                    AlertStore.emit(NOTIFY_ANSWER, payload.id, payload.isYes);
                 }
 
             };
 
-            action[actionType]();
+            if(!!action[actionType]) {
+                action[actionType]();
+            }
         })
 
     });

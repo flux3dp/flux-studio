@@ -9,6 +9,9 @@ define([], function(){
         SHOW_POPUP_INFO     : 'SHOW_POPUP_INFO',
         SHOW_POPUP_WARNING  : 'SHOW_POPUP_WARNING',
         SHOW_POPUP_ERROR    : 'SHOW_POPUP_ERROR',
-        NOTIFY_RETRY        : 'NOTIFY_RETRY'
+        SHOW_POPUP_QUESTION : 'SHOW_POPUP_QUESTION',
+        NOTIFY_RETRY        : 'NOTIFY_RETRY',
+        NOTIFY_ANSWER       : 'NOTIFY_ANSWER',
+        QUESTION            : 'QUESTION'
     };
 });
