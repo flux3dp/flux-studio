@@ -1,9 +1,9 @@
 define([
     'react',
     'lib/jquery.growl',
-    'app/actions/Alert-Actions',
-    'app/stores/Alert-Store',
-    'app//constants/Alert-Constants',
+    'app/actions/alert-actions',
+    'app/stores/alert-store',
+    'app//constants/alert-constants',
     'jsx!widgets/Notification-Modal',
     'jsx!views/Print-Selector',
     'helpers/api/discover',

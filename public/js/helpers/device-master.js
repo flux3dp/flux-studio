@@ -1,7 +1,7 @@
 define([
     'jquery',
     'helpers/i18n',
-    'app/actions/Alert-Actions',
+    'app/actions/alert-actions',
     'helpers/api/control',
     'app/constants/device-constants'
 ],function(

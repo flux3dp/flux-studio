@@ -2,7 +2,7 @@ define([
     'jquery',
     'react',
     'helpers/shortcuts',
-    'app/constants/Alert-Constants',
+    'app/constants/alert-constants',
     'jsx!widgets/Modal',
     'jsx!widgets/Alert'
 ], function($, React, shortcuts, AlertConstants, Modal, Alert) {
