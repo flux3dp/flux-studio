@@ -82,7 +82,7 @@ define([
                         message: '',
                         percentage: 0,
                         type: '',
-                        onClose: function() {}
+                        onFinished: function() {}
                     }
                 };
             },
@@ -90,9 +90,9 @@ define([
             componentDidMount: function() {
                 AlertStore.onNotify(this._handleNotification);
                 AlertStore.onPopup(this._handlePopup);
-                ProgressStore.onOpened(this._handleProgress);
-                ProgressStore.onUpdating(this._handleProgress);
-                ProgressStore.onFinished(this._handleProgressFinish);
+                ProgressStore.onOpened(this._handleProgress).
+                    onUpdating(this._handleProgress).
+                    onClosed(this._handleProgressFinish);
                 DeviceMaster.setLanguageSource(lang);
             },
 
@@ -100,9 +100,9 @@ define([
                 AlertStore.removeNotifyListener(this._handleNotification);
                 AlertStore.removePopupListener(this._handlePopup);
                 // progress
-                ProgressStore.removeOpenedListener(this._handleProgress);
-                ProgressStore.removeUpdatingListener(this._handleProgress);
-                ProgressStore.removeFinishedListener(this._handleProgressFinish);
+                ProgressStore.removeOpenedListener(this._handleProgress).
+                    removeUpdatingListener(this._handleProgress).
+                    removeClosedListener(this._handleProgressFinish);
             },
 
             _handleProgress: function(payload) {
@@ -115,7 +115,7 @@ define([
                         message: payload.message || '',
                         percentage: payload.percentage || 0,
                         type: payload.type || self.state.progress.type || ProgressConstants.WAITING,
-                        onClose: payload.onClose || self.state.progress.onClose || function() {}
+                        onFinished: payload.onFinished || self.state.progress.onFinished || function() {}
                     }
                 });
             },
@@ -123,7 +123,7 @@ define([
             _handleProgressFinish: function() {
                 var self = this;
 
-                self.state.progress.onClose();
+                self.state.progress.onFinished();
 
                 self.setState({
                     progress: {
