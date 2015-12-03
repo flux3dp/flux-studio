@@ -25,7 +25,7 @@ define(['react', 'jsx!widgets/Button-Group'], function(React, ButtonGroup) {
             return (
                 <div className="modal-alert">
                     {caption}
-                    <p className="message">{this.props.message}</p>
+                    <div className="message">{this.props.message}</div>
                     {buttonsGroup}
                 </div>
             );
