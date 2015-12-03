@@ -1,9 +1,15 @@
 define([
     'react',
     'lib/jquery.growl',
+    // alert dialog
     'app/actions/alert-actions',
     'app/stores/alert-store',
-    'app//constants/alert-constants',
+    'app/constants/alert-constants',
+    // progress dialog
+    'app/actions/progress-actions',
+    'app/stores/progress-store',
+    'app/constants/progress-constants',
+    'jsx!widgets/Progress',
     'jsx!widgets/Notification-Modal',
     'jsx!views/Print-Selector',
     'helpers/api/discover',
@@ -16,6 +22,10 @@ define([
     AlertActions,
     AlertStore,
     AlertConstants,
+    ProgressActions,
+    ProgressStore,
+    ProgressConstants,
+    Progress,
     Modal,
     PrinterSelector,
     Discover,
@@ -64,23 +74,62 @@ define([
                     deviceList      : [],
                     refresh         : '',
                     showDeviceList  : false,
-                    customText      : ''
+                    customText      : '',
+                    // progress
+                    progress: {
+                        open: false,
+                        caption: '',
+                        message: '',
+                        percentage: 0,
+                        type: '',
+                        onClose: function() {}
+                    }
                 };
             },
 
             componentDidMount: function() {
                 AlertStore.onNotify(this._handleNotification);
                 AlertStore.onPopup(this._handlePopup);
+                ProgressStore.onOpened(this._handleProgress);
+                ProgressStore.onUpdating(this._handleProgress);
+                ProgressStore.onFinished(this._handleProgressFinish);
                 DeviceMaster.setLanguageSource(lang);
             },
 
             componentWillUnmount: function() {
                 AlertStore.removeNotifyListener(this._handleNotification);
                 AlertStore.removePopupListener(this._handlePopup);
+                // progress
+                ProgressStore.removeOpenedListener(this._handleProgress);
+                ProgressStore.removeUpdatingListener(this._handleProgress);
+                ProgressStore.removeFinishedListener(this._handleProgressFinish);
             },
 
-            _closeDeviceList: function() {
+            _handleProgress: function(payload) {
+                var self = this;
 
+                this.setState({
+                    progress: {
+                        open: true,
+                        caption: payload.caption || self.state.progress.caption || '',
+                        message: payload.message || '',
+                        percentage: payload.percentage || 0,
+                        type: payload.type || self.state.progress.type || ProgressConstants.WAITING,
+                        onClose: payload.onClose || self.state.progress.onClose || function() {}
+                    }
+                });
+            },
+
+            _handleProgressFinish: function() {
+                var self = this;
+
+                self.state.progress.onClose();
+
+                self.setState({
+                    progress: {
+                        open: false
+                    }
+                });
             },
 
             _handleNotification: function(type, message) {
@@ -263,6 +312,16 @@ define([
                                 </ul>
                             </div>
                         </div>
+
+                        <Progress
+                            lang={lang}
+                            isOpen={this.state.progress.open}
+                            caption={this.state.progress.caption}
+                            message={this.state.progress.message}
+                            type={this.state.progress.type}
+                            percentage={this.state.progress.percentage}
+                            onFinished={this._handleProgressFinish}
+                        />
 
                         <Modal
                             lang={lang}
