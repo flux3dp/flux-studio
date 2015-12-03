@@ -85,7 +85,7 @@ define([
 
             _onCustom: function(e, reactid) {
                 this.props.onCustom(e);
-                this._onClose.apply(null, [e, reactid, 'abort']);
+                this._onClose.apply(null, [e, reactid, 'custom']);
             },
 
             _getTypeTitle: function() {
