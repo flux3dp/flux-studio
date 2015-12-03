@@ -63,6 +63,12 @@ define([
             });
         },
 
+        showPopupCustom: function(id, message, customText) {
+            AlertDispatcher.dispatch({
+                actionType: AlertConstants.SHOW_POPUP_CUSTOM, message, id, customText
+            });
+        },
+
         showPopupQuestion: function(id, message) {
             AlertDispatcher.dispatch({
                 actionType: AlertConstants.SHOW_POPUP_QUESTION, message, id
@@ -90,6 +96,12 @@ define([
         notifyCancel: function(id) {
             AlertDispatcher.dispatch({
                 actionType: AlertConstants.NOTIFY_CANCEL, id
+            });
+        },
+
+        notifyCustom: function(id) {
+            AlertDispatcher.dispatch({
+                actionType: AlertConstants.NOTIFY_CUSTOM, id
             });
         },
 

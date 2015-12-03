@@ -15,7 +15,8 @@ define([
             AlertConstants.ERROR,
             AlertConstants.YES_NO,
             AlertConstants.RETRY_CANCEL,
-            AlertConstants.RETRY_ABORT_CANCEL
+            AlertConstants.RETRY_ABORT_CANCEL,
+            AlertConstants.CUSTOM_CANCEL
         ],
         View = React.createClass({
 
@@ -23,11 +24,13 @@ define([
                 open        : React.PropTypes.bool,
                 lang        : React.PropTypes.object,
                 type        : React.PropTypes.oneOf(acceptableTypes),
+                customText  : React.PropTypes.string,
                 escapable   : React.PropTypes.bool,
                 message     : React.PropTypes.string,
                 onRetry     : React.PropTypes.func,
                 onAbort     : React.PropTypes.func,
                 onYes       : React.PropTypes.func,
+                onCustom    : React.PropTypes.func,
                 onClose     : React.PropTypes.func
             },
 
@@ -39,6 +42,7 @@ define([
                     onRetry   : function() {},
                     onAbort   : function() {},
                     onYes     : function() {},
+                    onCustom  : function() {},
                     onClose   : function() {}
                 };
             },
@@ -79,6 +83,11 @@ define([
                 this._onClose.apply(null, [e, reactid, 'abort']);
             },
 
+            _onCustom: function(e, reactid) {
+                this.props.onCustom(e);
+                this._onClose.apply(null, [e, reactid, 'abort']);
+            },
+
             _getTypeTitle: function() {
                 var types = {};
                 types[AlertConstants.INFO]               = lang.info;
@@ -86,6 +95,7 @@ define([
                 types[AlertConstants.ERROR]              = lang.error;
                 types[AlertConstants.RETRY_CANCEL]       = lang.error;
                 types[AlertConstants.RETRY_ABORT_CANCEL] = lang.error;
+                types[AlertConstants.CUSTOM_CANCEL]      = lang.error;
 
                 return types[this.props.type] || '';
             },
@@ -136,6 +146,12 @@ define([
                     buttons.push({
                         label: lang.retry,
                         onClick: this._onRetry
+                    });
+                    break;
+                case AlertConstants.CUSTOM_CANCEL:
+                    buttons.push({
+                        label: this.props.customText,
+                        onClick: this._onCustom
                     });
                     break;
                 }

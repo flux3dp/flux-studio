@@ -63,7 +63,8 @@ define([
                     showModal       : false,
                     deviceList      : [],
                     refresh         : '',
-                    showDeviceList  : false
+                    showDeviceList  : false,
+                    customText      : ''
                 };
             },
 
@@ -112,12 +113,13 @@ define([
                 types[type]();
             },
 
-            _handlePopup: function(type, id, message) {
+            _handlePopup: function(type, id, message, customText) {
                 this.setState({
                     showModal   : true,
                     type        : type,
                     sourceId    : id,
-                    message     : message
+                    message     : message,
+                    customText  : customText
                 });
             },
 
@@ -145,6 +147,10 @@ define([
 
             _handleYes: function() {
                 AlertActions.notifyYes(this.state.sourceId);
+            },
+
+            _handleCustom: function() {
+                AlertActions.notifyCustom(this.state.sourceId);
             },
 
             _handleShowDeviceList: function() {
@@ -262,10 +268,12 @@ define([
                             lang={lang}
                             type={this.state.type}
                             open={this.state.showModal}
+                            customText={this.state.customText}
                             message={this.state.message}
                             onRetry={this._handleRetry}
                             onAbort={this._handleAbort}
                             onYes={this._handleYes}
+                            onCustom={this._handleCustom}
                             onClose={this._handleModalClose} />
 
                         <div className="device" onClick={this._handleShowDeviceList}>
