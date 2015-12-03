@@ -2,6 +2,8 @@ define([
     'jquery',
     'react',
     'app/actions/laser',
+    'app/actions/progress-actions',
+    'app/stores/progress-store',
     'jsx!widgets/Select',
     'jsx!views/laser/Setup-Panel',
     'jsx!views/laser/Image-Panel',
@@ -15,6 +17,8 @@ define([
     $,
     React,
     laserEvents,
+    ProgressActions,
+    ProgressStore,
     SelectView,
     SetupPanel,
     ImagePanel,
@@ -77,10 +81,15 @@ define([
                     };
                 },
 
-                _openBlocker: function(is_open) {
-                    this.setState({
-                        openBlocker: is_open
-                    })
+                _openBlocker: function(isOpen, onFinished) {
+                    onFinished = onFinished || function() {};
+
+                    if (true === isOpen) {
+                        ProgressActions.open('', '', '', onFinished);
+                    }
+                    else {
+                        ProgressActions.close();
+                    }
                 },
 
                 _inactiveSelectImage: function(e) {
@@ -184,14 +193,6 @@ define([
                     );
                 },
 
-                _renderBlocker: function(lang) {
-                    return (
-                        true === this.state.openBlocker ?
-                        <Modal content={<div className="spinner-flip spinner-reverse"/>}/> :
-                        ''
-                    );
-                },
-
                 _renderAlert: function(lang) {
                     var self = this,
                         onClose = function() {
@@ -287,7 +288,6 @@ define([
                             ''
                         ),
                         uploader = this._renderFileUploader(lang),
-                        blocker = this._renderBlocker(lang),
                         actionButtons = this._renderActionButtons(lang),
                         alert = this._renderAlert(lang);
 
@@ -301,7 +301,6 @@ define([
                             </div>
 
                             {uploader}
-                            {blocker}
                             {alert}
                         </div>
                     );
