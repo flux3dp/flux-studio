@@ -8,13 +8,13 @@ define([
     'use strict';
 
     return {
-        open: function(type, caption, message, onClose) {
+        open: function(type, caption, message, onFinished) {
             ProgressDispatcher.dispatch({
                 actionType: ProgressConstants.OPEN_EVENT,
                 type: type,
                 caption: caption,
                 message: message,
-                onClose: onClose
+                onFinished: onFinished
             });
         },
 
