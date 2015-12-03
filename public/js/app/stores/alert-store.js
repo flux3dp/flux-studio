@@ -16,6 +16,7 @@ define([
         NOTIFY_ABORT    = 'abort',
         NOTIFY_YES      = 'yes',
         NOTIFY_CANCEL   = 'cancel', // including the "no", "cancel", "ok" button fired
+        NOTIFY_CUSTOM   = 'custom',
         NOTIFY_ANSWER   = 'answer',
         AlertStore;
 
@@ -43,6 +44,10 @@ define([
 
         onAbort(callback) {
             this.on(NOTIFY_ABORT, callback);
+        },
+
+        onCustom(callback) {
+            this.on(NOTIFY_CUSTOM, callback);
         },
 
         onAnswer(callback) {
@@ -105,6 +110,10 @@ define([
                     AlertStore.emit(POPUP_EVENT, AlertConstants.YES_NO, payload.id, payload.message);
                 },
 
+                'SHOW_POPUP_CUSTOM': function() {
+                    AlertStore.emit(POPUP_EVENT, AlertConstants.CUSTOM_CANCEL, payload.id, payload.message, payload.customText);
+                },
+
                 'SHOW_POPUP_QUESTION': function() {
                     AlertStore.emit(POPUP_EVENT, AlertConstants.QUESTION, payload.id, payload.message);
                 },
@@ -123,6 +132,10 @@ define([
 
                 'NOTIFY_CANCEL': function() {
                     AlertStore.emit(NOTIFY_CANCEL, payload.id);
+                },
+
+                'NOTIFY_CUSTOM': function() {
+                    AlertStore.emit(NOTIFY_CUSTOM, payload.id);
                 },
 
                 'NOTIFY_ANSWER': function() {
