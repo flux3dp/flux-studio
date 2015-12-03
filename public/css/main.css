@@ -3077,10 +3077,10 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         text-align: center;
         align-items: center;
         justify-content: center; }
-        .modal-window .modal-alert h2 {
-            margin: 0; }
-        .modal-window .modal-alert p {
-            margin: 1.6rem 0; }
+        .modal-window .modal-alert .caption,
+        .modal-window .modal-alert .message {
+            margin: 0 0 1.6rem 0;
+            width: 100%; }
     .modal-window .message {
         word-break: break-all;
         word-wrap: break-word; }
@@ -3098,6 +3098,26 @@ input[type=range]:focus::-webkit-slider-runnable-track {
             flex: 1; }
             .modal-window .btn-h-group .btn:last-child {
                 margin: 0; }
+
+.modal-progress .spinner-roller {
+    background: linear-gradient(to right, #DEDEDC 10%, rgba(255, 255, 255, 0) 42%);
+    height: 7em;
+    margin: 0 auto 1.6rem auto;
+    width: 7em; }
+    .modal-progress .spinner-roller::after {
+        background: #fff; }
+
+.modal-progress .progress-bar {
+    background: #ccc;
+    height: 2rem;
+    overflow: hidden; }
+    .modal-progress .progress-bar .current-progress {
+        background: #777;
+        content: "";
+        display: block;
+        height: 100%;
+        transition: width 0.3s ease;
+        width: 0; }
 
 /**
  * the view of printer selector

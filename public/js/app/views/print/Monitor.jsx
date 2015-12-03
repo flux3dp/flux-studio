@@ -5,7 +5,7 @@ define([
     'helpers/api/control',
     'helpers/api/3d-scan-control',
     'helpers/device-master',
-    'app/actions/Alert-Actions',
+    'app/actions/alert-actions',
     'app/constants/device-constants'
 ], function($, React, ClassNames, control, scanControl, DeviceMaster, AlertActions, DeviceConstants) {
     'use strict';

@@ -1,9 +1,15 @@
 define([
     'react',
     'lib/jquery.growl',
-    'app/actions/Alert-Actions',
-    'app/stores/Alert-Store',
-    'app//constants/Alert-Constants',
+    // alert dialog
+    'app/actions/alert-actions',
+    'app/stores/alert-store',
+    'app/constants/alert-constants',
+    // progress dialog
+    'app/actions/progress-actions',
+    'app/stores/progress-store',
+    'app/constants/progress-constants',
+    'jsx!widgets/Progress',
     'jsx!widgets/Notification-Modal',
     'jsx!views/Print-Selector',
     'helpers/api/discover',
@@ -16,6 +22,10 @@ define([
     AlertActions,
     AlertStore,
     AlertConstants,
+    ProgressActions,
+    ProgressStore,
+    ProgressConstants,
+    Progress,
     Modal,
     PrinterSelector,
     Discover,
@@ -63,23 +73,63 @@ define([
                     showModal       : false,
                     deviceList      : [],
                     refresh         : '',
-                    showDeviceList  : false
+                    showDeviceList  : false,
+                    customText      : '',
+                    // progress
+                    progress: {
+                        open: false,
+                        caption: '',
+                        message: '',
+                        percentage: 0,
+                        type: '',
+                        onFinished: function() {}
+                    }
                 };
             },
 
             componentDidMount: function() {
                 AlertStore.onNotify(this._handleNotification);
                 AlertStore.onPopup(this._handlePopup);
+                ProgressStore.onOpened(this._handleProgress).
+                    onUpdating(this._handleProgress).
+                    onClosed(this._handleProgressFinish);
                 DeviceMaster.setLanguageSource(lang);
             },
 
             componentWillUnmount: function() {
                 AlertStore.removeNotifyListener(this._handleNotification);
                 AlertStore.removePopupListener(this._handlePopup);
+                // progress
+                ProgressStore.removeOpenedListener(this._handleProgress).
+                    removeUpdatingListener(this._handleProgress).
+                    removeClosedListener(this._handleProgressFinish);
             },
 
-            _closeDeviceList: function() {
+            _handleProgress: function(payload) {
+                var self = this;
 
+                this.setState({
+                    progress: {
+                        open: true,
+                        caption: payload.caption || self.state.progress.caption || '',
+                        message: payload.message || '',
+                        percentage: payload.percentage || 0,
+                        type: payload.type || self.state.progress.type || ProgressConstants.WAITING,
+                        onFinished: payload.onFinished || self.state.progress.onFinished || function() {}
+                    }
+                });
+            },
+
+            _handleProgressFinish: function() {
+                var self = this;
+
+                self.state.progress.onFinished();
+
+                self.setState({
+                    progress: {
+                        open: false
+                    }
+                });
             },
 
             _handleNotification: function(type, message) {
@@ -112,12 +162,13 @@ define([
                 types[type]();
             },
 
-            _handlePopup: function(type, id, message) {
+            _handlePopup: function(type, id, message, customText) {
                 this.setState({
                     showModal   : true,
                     type        : type,
                     sourceId    : id,
-                    message     : message
+                    message     : message,
+                    customText  : customText
                 });
             },
 
@@ -125,12 +176,30 @@ define([
                 location.hash = '#studio/' + address;
             },
 
-            _handleModalClose: function() {
+            _handleModalClose: function(e, reactid, from) {
+                var from = from || '';
+
                 this.setState({ showModal: false });
+
+                if ('' === from) {
+                    AlertActions.notifyCancel(this.state.sourceId);
+                }
             },
 
             _handleRetry: function() {
                 AlertActions.notifyRetry(this.state.sourceId);
+            },
+
+            _handleAbort: function() {
+                AlertActions.notifyAbort(this.state.sourceId);
+            },
+
+            _handleYes: function() {
+                AlertActions.notifyYes(this.state.sourceId);
+            },
+
+            _handleCustom: function() {
+                AlertActions.notifyCustom(this.state.sourceId);
             },
 
             _handleShowDeviceList: function() {
@@ -244,12 +313,26 @@ define([
                             </div>
                         </div>
 
+                        <Progress
+                            lang={lang}
+                            isOpen={this.state.progress.open}
+                            caption={this.state.progress.caption}
+                            message={this.state.progress.message}
+                            type={this.state.progress.type}
+                            percentage={this.state.progress.percentage}
+                            onFinished={this._handleProgressFinish}
+                        />
+
                         <Modal
                             lang={lang}
                             type={this.state.type}
                             open={this.state.showModal}
+                            customText={this.state.customText}
                             message={this.state.message}
                             onRetry={this._handleRetry}
+                            onAbort={this._handleAbort}
+                            onYes={this._handleYes}
+                            onCustom={this._handleCustom}
                             onClose={this._handleModalClose} />
 
                         <div className="device" onClick={this._handleShowDeviceList}>

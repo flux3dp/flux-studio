@@ -3,8 +3,8 @@ define([
     'react',
     'app/actions/perspective-camera',
     'jsx!widgets/Button-Group',
-    'app/actions/Alert-Actions',
-    'app/stores/Alert-Store'
+    'app/actions/alert-actions',
+    'app/stores/alert-store'
 ], function($, React, PerspectiveCamera, ButtonGroup, AlertActions, AlertStore) {
     'use strict';
 

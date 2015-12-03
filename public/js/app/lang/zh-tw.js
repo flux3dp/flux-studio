@@ -675,7 +675,14 @@ define(function() {
             duplicated_preset_name: '重複的Preset名稱',
             info: '訊息',
             warning: '警告',
-            error: '錯誤'
+            error: '錯誤',
+            retry: '重試',
+            abort: '放棄',
+            cancel: '取消',
+            ok: 'Ok',
+            yes: ' 是',
+            no: '否',
+            stop: '停止'
         },
         color: {
             green: 'GREEN',

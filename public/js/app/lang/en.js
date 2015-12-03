@@ -675,7 +675,14 @@ define(function() {
             duplicated_preset_name: 'Duplicated preset name',
             info: 'INFO',
             warning: 'WARNING',
-            error: 'ERROR'
+            error: 'ERROR',
+            retry: 'Retry',
+            abort: 'Abort',
+            cancel: 'Cancel',
+            ok: 'Ok',
+            yes: 'Yes',
+            no: 'No',
+            stop: 'Stop'
         },
         color: {
             green: 'GREEN',
