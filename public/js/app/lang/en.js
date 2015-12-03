@@ -681,7 +681,8 @@ define(function() {
             cancel: 'Cancel',
             ok: 'Ok',
             yes: 'Yes',
-            no: 'No'
+            no: 'No',
+            stop: 'Stop'
         },
         color: {
             green: 'GREEN',

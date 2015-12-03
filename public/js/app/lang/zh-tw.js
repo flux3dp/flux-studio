@@ -681,7 +681,8 @@ define(function() {
             cancel: '取消',
             ok: 'Ok',
             yes: ' 是',
-            no: '否'
+            no: '否',
+            stop: '停止'
         },
         color: {
             green: 'GREEN',
