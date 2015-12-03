@@ -144,9 +144,9 @@ define([
 
             };
 
-            // if(!!action[actionType]) {
+            if(!!action[actionType]) {
                 action[actionType]();
-            // }
+            }
         })
 
     });
