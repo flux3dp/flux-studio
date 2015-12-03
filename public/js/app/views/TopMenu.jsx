@@ -125,8 +125,14 @@ define([
                 location.hash = '#studio/' + address;
             },
 
-            _handleModalClose: function() {
+            _handleModalClose: function(e, reactid, from) {
+                var from = from || '';
+
                 this.setState({ showModal: false });
+
+                if ('' === from) {
+                    AlertActions.notifyCancel(this.state.sourceId);
+                }
             },
 
             _handleRetry: function() {
@@ -135,6 +141,10 @@ define([
 
             _handleAbort: function() {
                 AlertActions.notifyAbort(this.state.sourceId);
+            },
+
+            _handleYes: function() {
+                AlertActions.notifyYes(this.state.sourceId);
             },
 
             _handleShowDeviceList: function() {
@@ -255,6 +265,7 @@ define([
                             message={this.state.message}
                             onRetry={this._handleRetry}
                             onAbort={this._handleAbort}
+                            onYes={this._handleYes}
                             onClose={this._handleModalClose} />
 
                         <div className="device" onClick={this._handleShowDeviceList}>
