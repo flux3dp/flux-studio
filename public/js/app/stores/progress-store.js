@@ -24,7 +24,7 @@ define([
             return Store;
         },
 
-        onFinished: function(callback) {
+        onClosed: function(callback) {
             this.on(ProgressConstants.FINISH_EVENT, callback);
             return Store;
         },
@@ -39,7 +39,7 @@ define([
             return Store;
         },
 
-        removeFinishedListener: function(callback) {
+        removeClosedListener: function(callback) {
             this.removeListener(ProgressConstants.FINISH_EVENT, callback);
             return Store;
         },
