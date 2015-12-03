@@ -81,10 +81,11 @@ define([
 
             _getTypeTitle: function() {
                 var types = {};
-                types[AlertConstants.INFO] = lang.info;
-                types[AlertConstants.WARNING] = lang.warning;
-                types[AlertConstants.ERROR] = lang.error;
-                types[AlertConstants.RETRY_CANCEL] = lang.error;
+                types[AlertConstants.INFO]               = lang.info;
+                types[AlertConstants.WARNING]            = lang.warning;
+                types[AlertConstants.ERROR]              = lang.error;
+                types[AlertConstants.RETRY_CANCEL]       = lang.error;
+                types[AlertConstants.RETRY_ABORT_CANCEL] = lang.error;
 
                 return types[this.props.type] || '';
             },
