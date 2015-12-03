@@ -14,6 +14,8 @@ define([
         POPUP_EVENT     = 'popup',
         NOTIFY_RETRY    = 'retry',
         NOTIFY_ABORT    = 'abort',
+        NOTIFY_YES      = 'yes',
+        NOTIFY_CANCEL   = 'cancel', // including the "no", "cancel", "ok" button fired
         NOTIFY_ANSWER   = 'answer',
         AlertStore;
 
@@ -29,6 +31,14 @@ define([
 
         onRetry(callback) {
             this.on(NOTIFY_RETRY, callback);
+        },
+
+        onYes(callback) {
+            this.on(NOTIFY_YES, callback);
+        },
+
+        onCancel(callback) {
+            this.on(NOTIFY_CANCEL, callback);
         },
 
         onAbort(callback) {
@@ -105,6 +115,14 @@ define([
 
                 'NOTIFY_ABORT': function() {
                     AlertStore.emit(NOTIFY_ABORT, payload.id);
+                },
+
+                'NOTIFY_YES': function() {
+                    AlertStore.emit(NOTIFY_YES, payload.id);
+                },
+
+                'NOTIFY_CANCEL': function() {
+                    AlertStore.emit(NOTIFY_CANCEL, payload.id);
                 },
 
                 'NOTIFY_ANSWER': function() {

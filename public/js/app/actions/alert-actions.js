@@ -81,6 +81,18 @@ define([
             });
         },
 
+        notifyYes: function(id) {
+            AlertDispatcher.dispatch({
+                actionType: AlertConstants.NOTIFY_YES, id
+            });
+        },
+
+        notifyCancel: function(id) {
+            AlertDispatcher.dispatch({
+                actionType: AlertConstants.NOTIFY_CANCEL, id
+            });
+        },
+
         notifyAnswer: function(id, isYes) {
             AlertDispatcher.dispatch({
                 actionType: AlertConstants.NOTIFY_ANSWER, id, isYes

@@ -60,23 +60,23 @@ define([
             },
 
             // button actions
-            _onClose: function(e) {
-                this.props.onClose(e);
+            _onClose: function(e, reactid, from) {
+                this.props.onClose.apply(null, [e, reactid, from]);
             },
 
-            _onYes: function(e) {
+            _onYes: function(e, reactid) {
                 this.props.onYes(e);
-                this._onClose(e);
+                this._onClose.apply(null, [e, reactid, 'yes']);
             },
 
-            _onRetry: function(e) {
+            _onRetry: function(e, reactid) {
                 this.props.onRetry(e);
-                this._onClose(e);
+                this._onClose.apply(null, [e, reactid, 'retry']);
             },
 
-            _onAbort: function(e) {
+            _onAbort: function(e, reactid) {
                 this.props.onAbort(e);
-                this._onClose(e);
+                this._onClose.apply(null, [e, reactid, 'abort']);
             },
 
             _getTypeTitle: function() {

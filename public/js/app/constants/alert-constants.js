@@ -20,6 +20,8 @@ define(function(){
         SHOW_POPUP_QUESTION    : 'SHOW_POPUP_QUESTION',
         NOTIFY_RETRY           : 'NOTIFY_RETRY',
         NOTIFY_ABORT           : 'NOTIFY_ABORT',
+        NOTIFY_YES             : 'NOTIFY_YES',
+        NOTIFY_CANCEL          : 'NOTIFY_CANCEL',
         QUESTION               : 'QUESTION'
     };
 });
