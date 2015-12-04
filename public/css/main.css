@@ -3119,6 +3119,32 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         transition: width 0.3s ease;
         width: 0; }
 
+.modal-input-lightbox .modal-alert {
+    display: block;
+    min-height: 18rem;
+    text-align: left;
+    width: 32.2rem; }
+
+.modal-input-lightbox .control {
+    display: -webkit-box;
+    /* OLD - iOS 6-, Safari 3.1-6 */
+    display: -webkit-flex;
+    /* NEW - Chrome */
+    display: flex;
+    /* NEW, Spec - Opera 12.1, Firefox 20+ */
+    justify-content: space-between;
+    align-items: center; }
+    .modal-input-lightbox .control .inputHeader {
+        color: #ccc; }
+
+.modal-input-lightbox .btn-h-group {
+    border: none;
+    border-top: 1px solid #ccc;
+    bottom: 0;
+    left: 0;
+    padding: 1.6rem 0;
+    right: 0; }
+
 /**
  * the view of printer selector
  */
