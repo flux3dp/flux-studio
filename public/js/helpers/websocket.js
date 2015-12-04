@@ -46,7 +46,6 @@ define(['helpers/is-json'], function(isJson) {
                 _ws.onmessage = function(result) {
                     var data = (true === isJson(result.data) ? JSON.parse(result.data) : result.data);
 
-                    // TODO: logging
                     received_data.push(result.data);
 
                     if ('error' === data.status) {
@@ -55,13 +54,15 @@ define(['helpers/is-json'], function(isJson) {
                     else if ('fatal' === data.status) {
                         options.onFatal(data);
                     }
+                    else if ('pong' === data.status) {
+                        // it's a heartbeat response. ignore it.
+                    }
                     else {
                         options.onMessage(data);
                     }
                 };
 
                 _ws.onclose = function(result) {
-                    // TODO: logging
                     options.onClose(result);
 
                     if (true === options.autoReconnect) {
@@ -86,13 +87,23 @@ define(['helpers/is-json'], function(isJson) {
 
         ws = createWebSocket(socketOptions);
 
+        setInterval(function() {
+            if (null !== ws && readyState.OPEN === ws.readyState) {
+                ws.send('ping');
+            }
+        }, 60000);
+
         return {
             readyState: readyState,
 
             send: function(data) {
                 var self = this;
 
-                if (readyState.OPEN !== ws.readyState) {
+                if (null === ws) {
+                    ws = createWebSocket(socketOptions);
+                }
+
+                if (null === ws || readyState.OPEN !== ws.readyState) {
                     ws.onopen = function() {
                         ws.send(data);
                     };
