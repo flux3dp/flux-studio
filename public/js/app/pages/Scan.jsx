@@ -41,10 +41,56 @@ define([
         args = args || {};
 
         var View = React.createClass({
+                progressRemainingTime: 1200, // 20 minutes
 
-                getDefaultProps: function () {
+                getInitialState: function() {
                     return {
-                        progressRemainingTime: 1200 // 20 minutes
+                        lang: args.state.lang,
+                        gettingStarted: false,  // selecting machine
+                        scanTimes: 0,   // how many scan executed
+                        selectedPrinter: undefined, // which machine selected
+                        confirm: {
+                            show: false,
+                            caption: '',
+                            message: '',
+                            onOK: function() {},
+                            onCancel: function() {}
+                        },
+                        openAlert: false,
+                        openProgressBar: false,
+                        openBlocker: false,
+                        hasConvert: false,  // point cloud into stl
+                        progressPercentage: 0,
+                        progressRemainingTime: this.progressRemainingTime,    // 20 minutes
+                        progressElapsedTime: 0,
+                        printerIsReady: false,
+                        isScanStarted: false,   // scan getting started
+                        showCamera: true,
+                        scanStartTime: undefined,   // when the scan started
+                        scanMethods: undefined,
+                        scanCtrlWebSocket: undefined,
+                        scanModelingWebSocket: undefined,
+                        meshes: [],
+                        selectedMeshes: [],
+                        cylinder: undefined,
+                        saveFileType: 'pcd',
+                        error: {
+                            caption: '',
+                            message: '',
+                            onClose: function() {}
+                        },
+                        stlBlob: undefined,
+                        stlMesh: undefined,
+                        objectDialogPosition: {
+                            left: 0,
+                            top: 0
+                        },
+                        selectedObject: {
+                            position: {},
+                            size: {},
+                            rotate: {},
+                        },
+                        stage: undefined // three stage (scene, camera, renderer)
                     };
                 },
 
@@ -113,7 +159,7 @@ define([
                 _onRendering: function(views, chunk_length, mesh) {
                     var self = this,
                         scan_speed = self._getScanSpeed(),
-                        progressRemainingTime = self.props.progressRemainingTime / scan_speed * (scan_speed - chunk_length),
+                        progressRemainingTime = self.progressRemainingTime / scan_speed * (scan_speed - chunk_length),
                         progressElapsedTime = parseInt(((new Date()).getTime() - self.state.scanStartTime) / 1000, 10),
                         progressPercentage,
                         meshes = self.state.meshes,
@@ -275,31 +321,34 @@ define([
                     this._mergeAll(exportPCD, false);
                 },
 
+                _onScanFinished: function(point_cloud) {
+                    console.log(point_cloud);
+                    var self = this,
+                        upload_name = 'scan-' + (new Date()).getTime(),
+                        onUploadFinished = function() {
+                            var mesh = self._getMesh(self.state.scanTimes);
+
+                            mesh.name = upload_name;
+
+                            // update scan times
+                            self.setState({
+                                openProgressBar: false,
+                                isScanStarted: false
+                            });
+                        };
+
+                    self.state.scanModelingWebSocket.upload(
+                        upload_name,
+                        point_cloud,
+                        {
+                            onFinished: onUploadFinished
+                        }
+                    );
+
+                },
+
                 _handleScan: function(e) {
                     var self = this,
-                        onScanFinished = function(point_cloud) {
-                            var upload_name = 'scan-' + (new Date()).getTime(),
-                                onUploadFinished = function() {
-                                    var mesh = self._getMesh(self.state.scanTimes);
-
-                                    mesh.name = upload_name;
-
-                                    // update scan times
-                                    self.setState({
-                                        openProgressBar: false,
-                                        isScanStarted: false
-                                    });
-                                };
-
-                            self.state.scanModelingWebSocket.upload(
-                                upload_name,
-                                point_cloud,
-                                {
-                                    onFinished: onUploadFinished
-                                }
-                            );
-
-                        },
                         openProgressBar = function(callback) {
                             callback();
 
@@ -333,7 +382,7 @@ define([
                         onScan = function() {
                             var opts = {
                                     onRendering: self._onRendering,
-                                    onFinished: onScanFinished
+                                    onFinished: self._onScanFinished
                                 },
                                 scan_speed = self._getScanSpeed();
 
@@ -365,6 +414,16 @@ define([
 
                 _onScanAgain: function(e) {
                     this.setState(this.getInitialState());
+                    scanedModel.clear();
+                },
+
+                _onScanStop: function(e) {
+                    this.setState({
+                        isScanStarted: false,
+                        progressPercentage: 100 // total complete
+                    });
+
+                    this.state.scanMethods.stop(this._onScanFinished);
                 },
 
                 _doClearNoise: function(mesh) {
@@ -763,6 +822,7 @@ define([
                             percentage={this.state.progressPercentage}
                             remainingTime={this.state.progressRemainingTime}
                             elapsedTime={this.state.progressElapsedTime}
+                            onStop={this._onScanStop}
                         /> :
                         ''
                     );
@@ -990,57 +1050,6 @@ define([
                         <List className="mesh-thumbnail" items={thumbnails}/> :
                         ''
                     );
-                },
-
-                getInitialState: function() {
-                    return {
-                        lang: args.state.lang,
-                        gettingStarted: false,  // selecting machine
-                        scanTimes: 0,   // how many scan executed
-                        selectedPrinter: undefined, // which machine selected
-                        confirm: {
-                            show: false,
-                            caption: '',
-                            message: '',
-                            onOK: function() {},
-                            onCancel: function() {}
-                        },
-                        openAlert: false,
-                        openProgressBar: false,
-                        openBlocker: false,
-                        hasConvert: false,  // point cloud into stl
-                        progressPercentage: 0,
-                        progressRemainingTime: this.props.progressRemainingTime,    // 20 minutes
-                        progressElapsedTime: 0,
-                        printerIsReady: false,
-                        isScanStarted: false,   // scan getting started
-                        showCamera: true,
-                        scanStartTime: undefined,   // when the scan started
-                        scanMethods: undefined,
-                        scanCtrlWebSocket: undefined,
-                        scanModelingWebSocket: undefined,
-                        meshes: [],
-                        selectedMeshes: [],
-                        cylinder: undefined,
-                        saveFileType: 'pcd',
-                        error: {
-                            caption: '',
-                            message: '',
-                            onClose: function() {}
-                        },
-                        stlBlob: undefined,
-                        stlMesh: undefined,
-                        objectDialogPosition: {
-                            left: 0,
-                            top: 0
-                        },
-                        selectedObject: {
-                            position: {},
-                            size: {},
-                            rotate: {},
-                        },
-                        stage: undefined // three stage (scene, camera, renderer)
-                    };
                 },
 
                 componentWillUnmount: function() {
