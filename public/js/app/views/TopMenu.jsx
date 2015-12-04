@@ -185,7 +185,8 @@ define([
 
                 self.setState({
                     progress: {
-                        open: false
+                        open: false,
+                        onFinished: self.state.progress.onFinished
                     }
                 });
             },
