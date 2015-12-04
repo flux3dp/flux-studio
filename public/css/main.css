@@ -2649,6 +2649,26 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         -webkit-transform: rotate(360deg);
         transform: rotate(360deg); } }
 
+.amination-breath {
+    -webkit-animation: breath 2s infinite ease;
+    animation: breath 2s infinite ease; }
+
+@-webkit-keyframes breath {
+    0% {
+        opacity: 0; }
+    50% {
+        opacity: 1; }
+    100% {
+        opacity: 0; } }
+
+@keyframes breath {
+    0% {
+        opacity: 0; }
+    50% {
+        opacity: 1; }
+    100% {
+        opacity: 0; } }
+
 /**
  * buttons
  */
@@ -2733,10 +2753,12 @@ input[type=range]:focus::-webkit-slider-runnable-track {
 
 /* special shape button */
 .btn-hexagon {
+    height: 100px;
     -webkit-clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
     clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
     -webkit-transition: none;
-    transition: none; }
+    transition: none;
+    width: 87px; }
     .btn-hexagon:active {
         background-color: inherit;
         background-image: none;
@@ -5795,33 +5817,23 @@ input.switch:checked ~ label:after {
             padding: 0 0.3em 0 0;
             text-transform: uppercase; }
     .scan-studio .scan-progress {
-        background: #eee;
-        border-radius: 5px;
-        bottom: 10px;
-        height: 150px;
-        left: 15px;
-        margin: auto;
-        padding: 10px;
-        position: absolute;
-        width: 40%; }
-        .scan-studio .scan-progress .progress {
-            height: 20px; }
-        .scan-studio .scan-progress .progress-bar {
-            background-color: #5BC0DE;
-            background-image: -webkit-linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
-            background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
-            background-size: 40px 40px;
-            height: 100%;
-            -webkit-background-size: 40px 40px; }
+        bottom: 28px;
+        position: fixed;
+        right: 20px; }
         .scan-studio .scan-progress .progress-status {
             display: -webkit-box;
             /* OLD - iOS 6-, Safari 3.1-6 */
             display: -webkit-flex;
             /* NEW - Chrome */
             display: flex;
-            /* NEW, Spec - Opera 12.1, Firefox 20+ */ }
-            .scan-studio .scan-progress .progress-status span {
-                flex: 1; }
+            /* NEW, Spec - Opera 12.1, Firefox 20+ */
+            align-items: center; }
+            .scan-studio .scan-progress .progress-status .progress-text {
+                margin: 0 10px 0 0; }
+            .scan-studio .scan-progress .progress-status .btn-stop-scan {
+                background: #474747;
+                color: #eee;
+                font-size: 35px; }
     .scan-studio .scan-model-save-as {
         background: #eee;
         border-radius: 5px;
