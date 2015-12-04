@@ -27,7 +27,12 @@ define([
                 printers.push(data);
             }
             else {
-                printers[existing_key] = data;
+                // if existing. update attributes
+                for (var key in data) {
+                    if (true === data.hasOwnProperty(key)) {
+                        printers[existing_key][key] = data[key];
+                    }
+                }
             }
 
             if (false === data.alive && -1 < existing_key) {
