@@ -9,7 +9,12 @@ define([
     'app/actions/progress-actions',
     'app/stores/progress-store',
     'app/constants/progress-constants',
+    // input lightbox dialog
+    'app/actions/input-lightbox-actions',
+    'app/stores/input-lightbox-store',
+    'app/constants/input-lightbox-constants',
     'jsx!widgets/Progress',
+    'jsx!widgets/Input-Lightbox',
     'jsx!widgets/Notification-Modal',
     'jsx!views/Print-Selector',
     'helpers/api/discover',
@@ -19,13 +24,20 @@ define([
 ], function(
     React,
     Notifier,
+    // alert
     AlertActions,
     AlertStore,
     AlertConstants,
+    // progress
     ProgressActions,
     ProgressStore,
     ProgressConstants,
+    // input lightbox
+    InputLightboxActions,
+    InputLightboxStore,
+    InputLightboxConstants,
     Progress,
+    InputLightbox,
     Modal,
     PrinterSelector,
     Discover,
@@ -77,12 +89,23 @@ define([
                     customText      : '',
                     // progress
                     progress: {
-                        open: false,
-                        caption: '',
-                        message: '',
-                        percentage: 0,
-                        type: '',
-                        onFinished: function() {}
+                        open       : false,
+                        caption    : '',
+                        message    : '',
+                        percentage : 0,
+                        type       : '',
+                        onFinished : function() {}
+                    },
+                    // input lightbox
+                    inputLightbox: {
+                        open         : false,
+                        type         : '',
+                        caption      : '',
+                        inputHeader  : '',
+                        defaultValue : '',
+                        confirmText  : '',
+                        onClose      : function() {},
+                        onSubmit     : function() {}
                     }
                 };
             },
@@ -93,6 +116,7 @@ define([
                 ProgressStore.onOpened(this._handleProgress).
                     onUpdating(this._handleProgress).
                     onClosed(this._handleProgressFinish);
+                InputLightboxStore.onInputLightBoxOpened(this._handleInputLightBoxOpen);
                 DeviceMaster.setLanguageSource(lang);
             },
 
@@ -103,6 +127,40 @@ define([
                 ProgressStore.removeOpenedListener(this._handleProgress).
                     removeUpdatingListener(this._handleProgress).
                     removeClosedListener(this._handleProgressFinish);
+
+                // input lightbox
+                InputLightboxStore.removeOpenedListener(this._handleInputLightBoxOpen);
+            },
+
+            _handleInputLightBoxOpen: function(payload) {
+                this.setState({
+                    inputLightbox: {
+                        open         : true,
+                        type         : payload.type,
+                        caption      : payload.caption,
+                        inputHeader  : payload.inputHeader,
+                        defaultValue : payload.defaultValue,
+                        confirmText  : payload.confirmText,
+                        onClose      : payload.onClose || function() {},
+                        onSubmit     : payload.onSubmit || function() {}
+                    }
+                });
+            },
+
+            _handleInputLightBoxClosed: function(e, reactid, from) {
+                this.setState({
+                    inputLightbox: {
+                        open: false
+                    }
+                });
+
+                if ('' === from && 'function' === typeof this.state.inputLightbox) {
+                    this.state.inputLightbox.onClose();
+                }
+            },
+
+            _handleInputLightBoxSubmit: function(value) {
+                this.state.inputLightbox.onSubmit(value);
             },
 
             _handleProgress: function(payload) {
@@ -321,6 +379,17 @@ define([
                             type={this.state.progress.type}
                             percentage={this.state.progress.percentage}
                             onFinished={this._handleProgressFinish}
+                        />
+
+                        <InputLightbox
+                            isOpen={this.state.inputLightbox.open}
+                            caption={this.state.inputLightbox.caption}
+                            type={this.state.inputLightbox.type}
+                            inputHeader={this.state.inputLightbox.inputHeader}
+                            defaultValue={this.state.inputLightbox.defaultValue}
+                            confirmText={this.state.inputLightbox.confirmText}
+                            onClose={this._handleInputLightBoxClosed}
+                            onSubmit={this._handleInputLightBoxSubmit}
                         />
 
                         <Modal
