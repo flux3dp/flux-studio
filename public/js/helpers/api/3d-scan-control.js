@@ -9,6 +9,8 @@ define([
 ], function(Websocket, fileSystem, PointCloudHelper) {
     'use strict';
 
+    var ws;
+
     return function(uuid, opts) {
         opts = opts || {};
         opts.onError = opts.onError || function() {};
@@ -20,30 +22,6 @@ define([
                 is_error = true;
                 opts.onError(data);
             },
-            ws = new Websocket({
-                method: '3d-scan-control/' + uuid,
-                onMessage: function(data) {
-
-                    switch (data.status) {
-                    case 'ready':
-                        is_ready = true;
-                        is_error = false;
-                        opts.onReady();
-                        break;
-                    case 'connected':
-                        // wait for machine ready
-                        break;
-                    default:
-                        break;
-                    }
-
-                    if (true === is_ready) {
-                        (events.onMessage || function() {})(data);
-                    }
-                },
-                onError: errorHandler,
-                onClose: opts.onClose
-            }),
             is_error = false,
             is_ready = false,
             events,
@@ -90,6 +68,31 @@ define([
                 }
 
             };
+
+        ws = ws || new Websocket({
+            method: '3d-scan-control/' + uuid,
+            onMessage: function(data) {
+
+                switch (data.status) {
+                case 'ready':
+                    is_ready = true;
+                    is_error = false;
+                    opts.onReady();
+                    break;
+                case 'connected':
+                    // wait for machine ready
+                    break;
+                default:
+                    break;
+                }
+
+                if (true === is_ready) {
+                    (events.onMessage || function() {})(data);
+                }
+            },
+            onError: errorHandler,
+            onClose: opts.onClose
+        });
 
         initialEvents();
 
@@ -201,8 +204,10 @@ define([
                 return {
                     retry: retry,
                     take_control: takeControl,
-                    stop: function() {
-                        events.onMessage = function() {};
+                    stop: function(callback) {
+                        callback = callback || function() {};
+                        callback(pointCloud.get());
+                        initialEvents();
                     }
                 };
             },
