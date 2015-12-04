@@ -96,10 +96,6 @@ define([
 
         initialEvents();
 
-        setInterval(function() {
-            ws.send('ping');
-        }, 60000);
-
         return {
             connection: ws,
             getImage: function(imageHandler) {
