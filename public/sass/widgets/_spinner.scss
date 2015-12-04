@@ -105,3 +105,32 @@
         transform: rotate(360deg);
     }
 }
+
+.amination-breath {
+    -webkit-animation: breath 2s infinite ease;
+    animation: breath 2s infinite ease;
+}
+
+@-webkit-keyframes breath {
+    0% {
+        opacity: 0;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+
+@keyframes breath {
+    0% {
+        opacity: 0;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+}
