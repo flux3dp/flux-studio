@@ -322,7 +322,6 @@ define([
                 },
 
                 _onScanFinished: function(point_cloud) {
-                    console.log(point_cloud);
                     var self = this,
                         upload_name = 'scan-' + (new Date()).getTime(),
                         onUploadFinished = function() {
