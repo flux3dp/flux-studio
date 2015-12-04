@@ -5,35 +5,38 @@
 define(['helpers/websocket'], function(Websocket) {
     'use strict';
 
+    var ws;
+
     return function(opts) {
         opts = opts || {};
         opts.onSuccess = opts.onSuccess || function() {};
         opts.onFail = opts.onFail || function() {};
 
-        var ws = new Websocket({
-                method: 'touch',
-                autoReconnect: false,
-                onMessage: function(data) {
-                    var is_success = (
-                            true === (data.has_response || false) &&
-                            true === (data.reachable || false) &&
-                            true === (data.auth || false)
-                        );
-
-                    if (true === is_success) {
-                        opts.onSuccess(data);
-                    }
-                    else {
-                        opts.onFail(data);
-                    }
-
-                    getResponse = true;
-                    clearInterval(timer);
-                },
-                onError: opts.onError
-            }),
-            getResponse = true,
+        var getResponse = true,
             timer;
+
+        ws = ws || new Websocket({
+            method: 'touch',
+            autoReconnect: false,
+            onMessage: function(data) {
+                var is_success = (
+                        true === (data.has_response || false) &&
+                        true === (data.reachable || false) &&
+                        true === (data.auth || false)
+                    );
+
+                if (true === is_success) {
+                    opts.onSuccess(data);
+                }
+                else {
+                    opts.onFail(data);
+                }
+
+                getResponse = true;
+                clearInterval(timer);
+            },
+            onError: opts.onError
+        });
 
         return {
             connection: ws,
