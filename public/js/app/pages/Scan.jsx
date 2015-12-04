@@ -13,6 +13,8 @@ define([
     'jsx!views/scan/Export',
     'jsx!views/scan/Progress-Bar',
     'jsx!views/scan/Action-Buttons',
+    'app/actions/alert-actions',
+    'app/stores/alert-store',
     'helpers/shortcuts',
     'helpers/round',
     'helpers/array-findindex',
@@ -32,6 +34,8 @@ define([
     Export,
     ProgressBar,
     ActionButtons,
+    AlertActions,
+    AlertStore,
     shortcuts,
     round
 ) {
@@ -94,9 +98,35 @@ define([
                     };
                 },
 
+                componentDidMount: function() {
+                    AlertStore.onRetry(this._retry);
+                    AlertStore.onCancel(this._cancelScan);
+                },
+
+                componentWillUnmount: function() {
+                    AlertStore.removeRetryListener(this._retry);
+
+                    if ('undefined' !== typeof this.state.scanCtrlWebSocket &&
+                        'undefined' !== typeof this.state.scanModelingWebSocket
+                    ) {
+                        this.state.scanCtrlWebSocket.connection.close(false);
+                        this.state.scanModelingWebSocket.connection.close(false);
+                    }
+
+                    scanedModel.destroy();
+                },
+
                 // ui events
-                _rescan: function(e) {
-                    this.setState(this.getInitialState());
+                _retry: function(id) {
+                    var self = this;
+
+                    if ('scan-retry' === id) {
+                        self.state.scanCtrlWebSocket.retry();
+                    }
+                },
+
+                _cancelScan: function() {
+                    this._onScanAgain();
                 },
 
                 _refreshCamera: function() {
@@ -832,14 +862,7 @@ define([
                         opts = {
                             onError: function(data) {
                                 self._openBlocker(false);
-                                self.setState({
-                                    openAlert: true,
-                                    gettingStarted: false,
-                                    error: {
-                                        caption: lang.scan.error,
-                                        message: data.error
-                                    }
-                                });
+                                AlertActions.showPopupRetry('scan-retry', data.error);
                             },
                             onReady: function() {
                                 self.setState({
@@ -1049,17 +1072,6 @@ define([
                         <List className="mesh-thumbnail" items={thumbnails}/> :
                         ''
                     );
-                },
-
-                componentWillUnmount: function() {
-                    if ('undefined' !== typeof this.state.scanCtrlWebSocket &&
-                        'undefined' !== typeof this.state.scanModelingWebSocket
-                    ) {
-                        this.state.scanCtrlWebSocket.connection.close(false);
-                        this.state.scanModelingWebSocket.connection.close(false);
-                    }
-
-                    scanedModel.destroy();
                 },
 
                 render: function() {
