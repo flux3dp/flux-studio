@@ -149,3 +149,31 @@
         }
     }
 }
+
+.modal-input-lightbox {
+    .modal-alert {
+        display: block;
+        min-height: 18rem;
+        text-align: left;
+        width: 32.2rem;
+    }
+
+    .control {
+        @include flexbox();
+        justify-content: space-between;
+        align-items: center;
+
+        .inputHeader {
+            color: #ccc;
+        }
+    }
+
+    .btn-h-group {
+        border: none;
+        border-top: 1px solid #ccc;
+        bottom: 0;
+        left: 0;
+        padding: 1.6rem 0;
+        right: 0;
+    }
+}
