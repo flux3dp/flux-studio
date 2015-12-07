@@ -4,9 +4,11 @@
 define([
     'helpers/nwjs/gui',
     'helpers/i18n',
+    'helpers/check-firmware',
     'helpers/api/config',
-    'helpers/api/discover'
-], function(gui, i18n, config, discover) {
+    'helpers/api/discover',
+    'app/actions/alert-actions'
+], function(gui, i18n, checkFirmware, config, discover, AlertActions) {
     'use strict';
 
     var emptyFunction = function(object) {
@@ -242,7 +244,11 @@ define([
                             label: lang.device.check_firmware_update,
                             enabled: true,
                             onClick: function() {
-                                // TODO: go to check firmware update
+                                checkFirmware(printer).done(function(response) {
+                                    if (true === response.needUpdate) {
+                                        AlertActions.showFirmwareUpdate(printer, response);
+                                    }
+                                });
                             }
                         }]
                     });
