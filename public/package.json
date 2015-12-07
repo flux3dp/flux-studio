@@ -8,7 +8,6 @@
     "window": {
         "title": "FLUX Studio",
         "icon": "icon.png",
-        // "toolbar": false,
         "frame": true,
         "width": 1280,
         "height": 640,

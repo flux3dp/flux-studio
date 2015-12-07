@@ -30,16 +30,6 @@ define([
                     onMessage: undefined
                 };
             },
-            retry = function() {
-                if (true === is_error) {
-                    ws.send('retry');
-                }
-            },
-            takeControl = function() {
-                if (true === is_error) {
-                    ws.send('take_control');
-                }
-            },
             fetchImage = function(goFetch) {
                 if ('boolean' === typeof goFetch && true === goFetch) {
                     return function() {
@@ -135,8 +125,6 @@ define([
                 goFetch();
 
                 return {
-                    retry: retry,
-                    take_control: takeControl,
                     stop: stopGettingImage
                 };
             },
@@ -198,8 +186,6 @@ define([
                 stopGettingImage(scanStarted);
 
                 return {
-                    retry: retry,
-                    take_control: takeControl,
                     stop: function(callback) {
                         callback = callback || function() {};
                         callback(pointCloud.get());
@@ -228,7 +214,21 @@ define([
                 };
 
                 stopGettingImage(checkStarted);
-            }
+            },
+
+            retry: function(callback) {
+                events.onMessage = function(data) {
+                    initialEvents();
+
+                    callback(data);
+                };
+
+                ws.send('retry');
+            },
+
+            takeControl: function(callback) {
+                ws.send('take_control');
+            },
         };
     };
 });

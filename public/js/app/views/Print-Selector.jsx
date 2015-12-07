@@ -141,12 +141,13 @@ define([
                 console.log(ex, printer);
             }
 
+            // TODO: convert st_id and head_module into plain text
             return (
                 <label className="device printer-item" data-meta={meta}>
                     <input type="radio" name="printer-group" value={printer.uuid}/>
                     <div className="col device-name">{printer.name}</div>
-                    <div className="col module">UNKNOWN</div>
-                    <div className="col status">UNKNOWN</div>
+                    <div className="col module">{printer.head_module || 'UNKNOWN'}</div>
+                    <div className="col status">{printer.st_id || 'UNKNOWN'}</div>
                 </label>
             );
         },

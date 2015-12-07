@@ -4,8 +4,9 @@
 define([
     'helpers/nwjs/gui',
     'helpers/i18n',
-    'helpers/api/config'
-], function(gui, i18n, config) {
+    'helpers/api/config',
+    'helpers/api/discover'
+], function(gui, i18n, config, discover) {
     'use strict';
 
     var emptyFunction = function(object) {
@@ -106,11 +107,16 @@ define([
             newDevice: {
                 label: lang.device.new,
                 enabled: true,
-                onClick: emptyFunction,
+                onClick: function() {
+                    location.hash = '#initialize/wifi/connect-machine';
+                },
                 key: 'n',
                 modifiers: 'cmd'
             }
-        };
+        },
+        deviceGroup = [
+            items.newDevice
+        ];
 
     function bindMap() {
         menuMap = [];
@@ -187,9 +193,7 @@ define([
             },
             {
                 label: lang.device.label,
-                subItems: [
-                    items.newDevice
-                ]
+                subItems: deviceGroup
             },
             {
                 label: lang.window.label,
@@ -211,6 +215,38 @@ define([
                         }
                     }
                 ]
+            });
+
+            discover(function(printers) {
+                deviceGroup = [items.newDevice, separator];
+
+                printers.forEach(function(printer) {
+                    deviceGroup.push({
+                        label: printer.name,
+                        enabled: true,
+                        subItems: [{
+                            label: lang.device.device_monitor,
+                            enabled: true,
+                            onClick: function() {
+                                // TODO: go to monitor
+                            }
+                        },
+                        {
+                            label: lang.device.change_filament,
+                            enabled: true,
+                            onClick: function() {
+                                // TODO: go to change filament
+                            }
+                        },
+                        {
+                            label: lang.device.check_firmware_update,
+                            enabled: true,
+                            onClick: function() {
+                                // TODO: go to check firmware update
+                            }
+                        }]
+                    });
+                });
             });
         }
 
