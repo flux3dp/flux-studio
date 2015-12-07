@@ -115,19 +115,20 @@ define([
                     },
                     // firmware update
                     firmware: {
-                        open: true,
+                        open: false,
                         type: 'firmware',
+                        releaseNote: '',
                         latestVersion: '',
-                        releaseNote: ''
                         updateFile: undefined,
-                        machine: {}
+                        device: {}
                     }
                 };
             },
 
             componentDidMount: function() {
                 AlertStore.onNotify(this._handleNotification);
-                AlertStore.onPopup(this._handlePopup);
+                AlertStore.onPopup(this._showFirmwareUpdate);
+                AlertStore.onFirmwareUpdate(this._showFirmwareUpdate);
                 ProgressStore.onOpened(this._handleProgress).
                     onUpdating(this._handleProgress).
                     onClosed(this._handleProgressFinish);
@@ -148,7 +149,14 @@ define([
             },
 
             _showFirmwareUpdate: function(payload) {
-
+                this.setState({
+                    firmware: {
+                        open: true,
+                        device: payload.device,
+                        latestVersion: payload.updateInfo.latest_version,
+                        releaseNote: payload.updateInfo.changelog,
+                    }
+                });
             },
 
             _handleFirmwareClose: function() {
@@ -156,7 +164,7 @@ define([
                     firmware: {
                         open: false
                     }
-                })
+                });
             },
 
             _handleFirmwareInstall: function() {
@@ -406,7 +414,9 @@ define([
                         <UpdateDialog
                             open={this.state.firmware.open}
                             type="firmware"
-                            latestVersion={window.FLUX.version}
+                            device={this.state.firmware.device}
+                            latestVersion={this.state.firmware.latestVersion}
+                            releaseNote={this.state.firmware.releaseNote}
                             onClose={this._handleFirmwareClose}
                             onInstall={this._handleFirmwareInstall}
                         />
