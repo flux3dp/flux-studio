@@ -11,6 +11,22 @@ define(function() {
             module: 'MODULE',
             status: 'STATUS'
         },
+        update: {
+            release_note: 'Release Note:',
+            firmware: {
+                caption: 'An Firmware Update to FLUX is available',
+                message_pattern_1: '"%s" is now ready for firmware update.',
+                message_pattern_2: 'FLUX Firmware %s is now available - You have %s.'
+            },
+            software: {
+                caption: 'An Software Update to FLUX is available',
+                message_pattern_1: 'FLUX Studio is now ready for software update.',
+                message_pattern_2: 'FLUX Software %s is now available - You have %s.'
+            },
+            skip: 'Skip This Version',
+            later: 'LATER',
+            install: 'INSTALL'
+        },
         topmenu: {
             flux: {
                 label: 'Flux',
