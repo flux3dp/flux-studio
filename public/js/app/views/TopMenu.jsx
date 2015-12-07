@@ -1,4 +1,5 @@
 define([
+    'jquery',
     'react',
     'lib/jquery.growl',
     // alert dialog
@@ -17,11 +18,13 @@ define([
     'jsx!widgets/Input-Lightbox',
     'jsx!widgets/Notification-Modal',
     'jsx!views/Print-Selector',
+    'jsx!views/Update-Dialog',
     'helpers/api/discover',
     'helpers/api/config',
     'helpers/device-master',
     'plugins/classnames/index'
 ], function(
+    $,
     React,
     Notifier,
     // alert
@@ -40,6 +43,7 @@ define([
     InputLightbox,
     Modal,
     PrinterSelector,
+    UpdateDialog,
     Discover,
     Config,
     DeviceMaster,
@@ -80,6 +84,8 @@ define([
         return React.createClass({
 
             getInitialState: function() {
+                var self = this;
+
                 return {
                     sourceId        : '',
                     showModal       : false,
@@ -106,6 +112,15 @@ define([
                         confirmText  : '',
                         onClose      : function() {},
                         onSubmit     : function() {}
+                    },
+                    // firmware update
+                    firmware: {
+                        open: true,
+                        type: 'firmware',
+                        latestVersion: '',
+                        releaseNote: ''
+                        updateFile: undefined,
+                        machine: {}
                     }
                 };
             },
@@ -130,6 +145,22 @@ define([
 
                 // input lightbox
                 InputLightboxStore.removeOpenedListener(this._handleInputLightBoxOpen);
+            },
+
+            _showFirmwareUpdate: function(payload) {
+
+            },
+
+            _handleFirmwareClose: function() {
+                this.setState({
+                    firmware: {
+                        open: false
+                    }
+                })
+            },
+
+            _handleFirmwareInstall: function() {
+                // TODO: to be implement
             },
 
             _handleInputLightBoxOpen: function(payload) {
@@ -371,6 +402,14 @@ define([
                                 </ul>
                             </div>
                         </div>
+
+                        <UpdateDialog
+                            open={this.state.firmware.open}
+                            type="firmware"
+                            latestVersion={window.FLUX.version}
+                            onClose={this._handleFirmwareClose}
+                            onInstall={this._handleFirmwareInstall}
+                        />
 
                         <Progress
                             lang={lang}
