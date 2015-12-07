@@ -13,6 +13,7 @@
         <section class="content">
             <div class="spinner-flip absolute-center"></div>
         </section>
+        <div class="software-update"></update>
     </div>
 </body>
 <script>
@@ -23,8 +24,7 @@
             head = document.querySelector('head'),
             body = document.querySelector('body'),
             process = process,
-            goStarted = function(ghostPort) {
-
+            getStarted = function(ghostPort) {
                 window.FLUX.ghostPort = ghostPort || 8000;
                 script.setAttribute('src', 'js/require.js');
                 script.dataset.main = 'js/main.js?v=' + window.FLUX.timestamp;
@@ -35,26 +35,30 @@
         // set global definition
         window.FLUX = {
             debug: -1 !== location.search.indexOf('debug'),
-            timestamp: (new Date()).getTime()
+            timestamp: (new Date()).getTime(),
+            os: ('undefined' === typeof requireNode ? undefined : os)
         };
 
         // it's not node-webkit
         if ('undefined' === typeof process) {
-            goStarted();
+            getStarted();
         }
         else {
             timer = setInterval(function() {
                 var nodeProcess = process || {},
                     env = nodeProcess.env || {};
 
-                if ('undefined' !== typeof env.ghostPort) {
+                if ('undefined' !== typeof env.ghostPort &&
+                    'undefined' !== typeof env.osType &&
+                    'undefined' !== typeof env.arch
+                ) {
                     clearInterval(timer);
-                    goStarted(env.ghostPort);
+                    getStarted(env.ghostPort);
                 }
                 else {
                     // TODO: load fail?
                 }
-            }, 1000);
+            }, 0);
         }
 
         cssLink.setAttribute('rel', 'stylesheet');
@@ -62,9 +66,11 @@
         head.appendChild(cssLink);
         head.appendChild(cssLink);
 
-        analytics.setAttribute('src', 'https://www.google-analytics.com/analytics.js');
-        analytics.setAttribute('async', true);
-        body.appendChild(analytics);
+        if (true === navigator.onLine) {
+            analytics.setAttribute('src', 'https://www.google-analytics.com/analytics.js');
+            analytics.setAttribute('async', true);
+            body.appendChild(analytics);
+        }
     })();
 </script>
 
