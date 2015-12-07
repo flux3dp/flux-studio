@@ -36,33 +36,33 @@ var mode = {
 
             // Layers
             layer_height                        : 0.2,
-            first_layer_height                  : 0.25,
+            first_layer_height                  : 0.35,
             perimeters                          : 3,
             top_solid_layers                    : 3,
             bottom_solid_layers                 : 3,
 
             // Infill
-            fill_density                        : 10,
-            fill_pattern                        : 'auto',
+            fill_density                        : 20,
+            fill_pattern                        : 'honeycomb',
             spiral_vase                         : 0,
 
             // Support
             support_material                    : 1,
-            support_material_spacing            : 2.5,
-            support_material_threshold          : 60,
+            support_material_spacing            : 2,
+            support_material_threshold          : 55,
             support_material_pattern            : 'auto',
             support_material_contact_distance   : 0.2,
             raft_layers                         : 4,
 
             // Speed
-            travel_speed                        : 150,
-            support_material_speed              : 80,
-            infill_speed                        : 80,
-            first_layer_speed                   : 30,
+            travel_speed                        : 80,
+            support_material_speed              : 40,
+            infill_speed                        : 50,
+            first_layer_speed                   : 20,
             solid_infill_speed                  : 20,
-            perimeter_speed                     : 70,
-            external_perimeter_speed            : 50,
-            bridge_speed                        : 60,
+            perimeter_speed                     : 30,
+            external_perimeter_speed            : 20,
+            bridge_speed                        : 40,
 
             // Custom
             custom                              : ''
@@ -496,8 +496,8 @@ var mode = {
                             id="support_material_spacing"
                             key="support_material_spacing"
                             label={lang.spacing}
-                            min={0.1}
-                            max={50}
+                            min={0}
+                            max={5}
                             step={0.1}
                             default={advancedSetting.support_material_spacing}
                             onChange={this._handleControlValueChange} />
@@ -523,9 +523,9 @@ var mode = {
                             id="support_material_contact_distance"
                             key="support_material_contact_distance"
                             label={lang.zDistance}
-                            min={0.05}
-                            max={20}
-                            step={0.01}
+                            min={0}
+                            max={5}
+                            step={0.1}
                             default={advancedSetting.support_material_contact_distance}
                             onChange={this._handleControlValueChange} />
 
