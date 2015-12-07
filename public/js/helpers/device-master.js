@@ -1,7 +1,7 @@
 define([
     'jquery',
     'helpers/i18n',
-    'app/actions/Alert-Actions',
+    'app/actions/alert-actions',
     'app/constants/device-constants',
     'helpers/api/control',
     'helpers/api/3d-scan-control',
@@ -34,6 +34,7 @@ define([
     function selectDevice(device) {
         var d = $.Deferred()
             uuid = device.uuid;
+            // console.log('exist connection', _existConnection(uuid));
         if(_existConnection(uuid)) {
             _device = _switchDevice(uuid);
             d.resolve(DeviceConstants.CONNECTED);
@@ -47,22 +48,16 @@ define([
                 onConnect: function(response) {
                     if(response.status.toUpperCase() === DeviceConstants.CONNECTED) {
                         d.resolve(DeviceConstants.CONNECTED);
+                        _devices.push(_device);
+                    }
+                },
+                onError: function(response) {
+                    if(response.error === DeviceConstants.TIMEOUT) {
+                        d.resolve(DeviceConstants.TIMEOUT);
                     }
                 }
             });
-            _devices.push(_device);
         }
-
-        var _opts = {
-            onSuccess: function(data) {
-                console.log('success', data);
-            },
-            onFail: function(data) {
-                console.log('error', data);
-            }
-        };
-
-        // Touch(_opts).send(uuid, _password);
 
         return d.promise();
     }
@@ -281,8 +276,10 @@ define([
                 //     }
                 // }
                 if(_errors[device.serial] !== device.error_label && device.error_label) {
-                    AlertActions.showError(device.name + ': ' + device.error_label)
-                    _errors[device.serial] = device.error_label;
+                    if(window.debug) {
+                        AlertActions.showError(device.name + ': ' + device.error_label)
+                        _errors[device.serial] = device.error_label;
+                    }
                 }
                 else if(!device.error_label) {
                     _errors[device.serial] = '';

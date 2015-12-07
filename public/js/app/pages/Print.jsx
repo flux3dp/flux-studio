@@ -112,11 +112,10 @@ define([
                         }
                     });
 
-                    GlobalStore.onShowMonitor(this._handleShowMonitor);
-                    // GlobalStore.onShowMonitor(function(isOn) {
-                    //     console.log(isOn);
-                    // });
+                    var s = Config().read('advanced-settings');
+                    advancedSetting = !!s ? s : '{}';
 
+                    GlobalStore.onShowMonitor(this._handleShowMonitor);
                     $importBtn = this.refs.importBtn.getDOMNode();
 
                     nwjsMenu.import.enabled = true;
@@ -184,6 +183,7 @@ define([
                 },
 
                 _handleApplyAdvancedSetting: function(setting) {
+                    Config().write('advanced-settings', JSON.stringify(setting));
                     advancedSetting = setting;
                     director.setAdvanceParameter(setting);
                 },
@@ -260,7 +260,12 @@ define([
                     }.bind(this));
 
                     DeviceMaster.selectDevice(selectedPrinter).then(function(status) {
-                        this.setState({ printerControllerStatus: status });
+                        if(status === DeviceConstants.CONNECTED) {
+                            this.setState({ printerControllerStatus: status });
+                        }
+                        else if (status === DeviceConstants.TIMEOUT) {
+                            AlertActions.showPopupError(_id, _lang.message.connectionTimeout);
+                        }
                     }.bind(this));
                 },
 
@@ -327,7 +332,7 @@ define([
                     return (
                         <div className="importWindow">
                             <div className="arrowBox">
-                                <div className="file-importer">
+                                <div title={lang.print.importTitle} className="file-importer">
                                     <div className="import-btn">{lang.print.import}</div>
                                     <input type="file" accept=".stl" onChange={this._handleImport} />
                                 </div>

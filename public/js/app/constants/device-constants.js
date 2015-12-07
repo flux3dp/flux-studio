@@ -25,6 +25,7 @@ define([], function(){
         WRONG_HEADER    : 'WRONG_HEADER',
         TILT            : 'TILT',
         FAN_FAILURE     : 'FAN_FAILURE',
+        TIMEOUT         : 'TIMEOUT',
 
         // Command
         RESUME          : 'RESUME',

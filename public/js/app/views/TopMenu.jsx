@@ -10,7 +10,8 @@ define([
     'helpers/api/config',
     'helpers/device-master',
     'plugins/classnames/index',
-    'app/actions/global-actions'
+    'app/actions/global-actions',
+    'app/constants/device-constants'
 ], function(
     React,
     Notifier,
@@ -23,13 +24,15 @@ define([
     Config,
     DeviceMaster,
     ClassNames,
-    GlobalActions
+    GlobalActions,
+    DeviceConstants
 ) {
     'use strict';
 
     return function(args) {
         args = args || {};
-        var lang = args.state.lang,
+        var _id = 'TopMenu',
+            lang = args.state.lang,
             genericClassName = {
                 'item': true
             },
@@ -177,9 +180,14 @@ define([
 
             _handleSelectDevice: function(device, e) {
                 e.preventDefault();
-                // DeviceMaster.setPassword('flux');
+                AlertActions.showInfo(lang.message.connecting);
                 DeviceMaster.selectDevice(device).then(function(status) {
-                    GlobalActions.showMonitor(true);
+                    if(status === DeviceConstants.CONNECTED) {
+                        GlobalActions.showMonitor(true);
+                    }
+                    else if (status === DeviceConstants.TIMEOUT) {
+                        AlertActions.showPopupError(_id, lang.message.connectionTimeout);
+                    }
                 });
 
                 this.setState({ showDeviceList: false });

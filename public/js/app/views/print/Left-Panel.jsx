@@ -3,11 +3,16 @@ define([
     'react',
     'app/actions/print',
     'plugins/classnames/index',
-    'helpers/device-master'
-], function($, React, printController, ClassNames, DeviceMaster) {
+    'helpers/device-master',
+    'helpers/api/config',
+], function($, React, printController, ClassNames, DeviceMaster, Config) {
     'use strict';
 
-    var lang;
+    var lang,
+        settings = {
+            raftOn: true,
+            supportOn: true
+        };
 
     return React.createClass({
 
@@ -24,9 +29,12 @@ define([
         },
 
         getInitialState: function() {
+            var s = Config().read('left-panel');
+            settings = !!s ? s : settings;
+
             return {
-                raftOn              : true,
-                supportOn           : true,
+                raftOn              : settings.raftOn,
+                supportOn           : settings.supportOn,
                 previewOn           : false,
                 previewCurrentLayer : 0,
                 previewLayerCount   : this.props.previewLayerCount,
@@ -60,6 +68,8 @@ define([
             this.setState({
                 raftOn: !this.state.raftOn
             });
+            settings.raftOn = !this.state.raftOn;
+            Config().write('left-panel', settings);
             this.props.onRaftClick(!this.state.raftOn);
         },
 
@@ -67,6 +77,8 @@ define([
             this.setState({
                 supportOn: !this.state.supportOn
             });
+            settings.supportOn = !this.state.supportOn;
+            Config().write('left-panel', settings);
             this.props.onSupportClick(!this.state.supportOn);
         },
 
