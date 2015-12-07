@@ -75,6 +75,14 @@ define([
             });
         },
 
+        showFirmwareUpdate: function(device, updateInfo) {
+            AlertDispatcher.dispatch({
+                actionType: AlertConstants.SHOW_POPUP_FIRMWARE_UPDATE,
+                device: device,
+                updateInfo: updateInfo
+            });
+        },
+
         notifyRetry: function(id) {
             AlertDispatcher.dispatch({
                 actionType: AlertConstants.NOTIFY_RETRY, id

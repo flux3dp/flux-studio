@@ -10,17 +10,22 @@ define([
 ) {
     'use strict';
 
-    var NOTIFY_EVENT    = 'notify',
-        POPUP_EVENT     = 'popup',
-        NOTIFY_RETRY    = 'retry',
-        NOTIFY_ABORT    = 'abort',
-        NOTIFY_YES      = 'yes',
-        NOTIFY_CANCEL   = 'cancel', // including the "no", "cancel", "ok" button fired
-        NOTIFY_CUSTOM   = 'custom',
-        NOTIFY_ANSWER   = 'answer',
+    var NOTIFY_EVENT          = 'notify',
+        POPUP_EVENT           = 'popup',
+        FIRMWARE_UPDATE_EVENT = 'firmware_update',
+        NOTIFY_RETRY          = 'retry',
+        NOTIFY_ABORT          = 'abort',
+        NOTIFY_YES            = 'yes',
+        NOTIFY_CANCEL         = 'cancel', // including the "no", "cancel", "ok" button fired
+        NOTIFY_CUSTOM         = 'custom',
+        NOTIFY_ANSWER         = 'answer',
         AlertStore;
 
     AlertStore = Object.assign(EventEmitter.prototype, {
+
+        onFirmwareUpdate(callback) {
+            this.on(FIRMWARE_UPDATE_EVENT, callback);
+        },
 
         onNotify(callback) {
             this.on(NOTIFY_EVENT, callback);
@@ -140,6 +145,10 @@ define([
 
                 'NOTIFY_ANSWER': function() {
                     AlertStore.emit(NOTIFY_ANSWER, payload.id, payload.isYes);
+                },
+
+                'SHOW_POPUP_FIRMWARE_UPDATE': function() {
+                    AlertStore.emit(FIRMWARE_UPDATE_EVENT, payload);
                 }
 
             };
