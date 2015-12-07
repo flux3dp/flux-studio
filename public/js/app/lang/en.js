@@ -668,7 +668,18 @@ define(function() {
             change_filament: 'CHANGE FILLAMENT',
             browse_file: 'BROWSE FILE',
             monitor: 'MONITOR',
-            currentTemperature: 'Current Temp'
+            currentTemperature: 'Current Temp',
+            nothingToPrint: 'There is nothing to print',
+            go: 'GO',
+            pause: 'PAUSE',
+            stop: 'STOP',
+            record: 'RECORD',
+            connecting: 'Connecting, please wait...',
+            headerOffline: 'Device head is not connected or missing',
+            headerTilt: 'Device head is tilted, please connect all 6 magnents',
+            unknownHead: 'Device head is unknown, please connect to a correct header',
+            fanFailure: 'Fan failed / stucked, you can spin it with a pancil',
+            shake: 'Head encountered unexpected shake'
         },
         alert: {
             caption: 'Error',
@@ -676,12 +687,12 @@ define(function() {
             info: 'INFO',
             warning: 'WARNING',
             error: 'ERROR',
-            retry: 'Retry',
-            abort: 'Abort',
-            cancel: 'Cancel',
-            ok: 'Ok',
-            yes: 'Yes',
-            no: 'No'
+            retry: 'RETRY',
+            abort: 'ABORT',
+            cancel: 'CANCEL',
+            ok: 'OK',
+            yes: 'YES',
+            no: 'NO'
         },
         color: {
             green: 'GREEN',

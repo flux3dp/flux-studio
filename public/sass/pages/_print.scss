@@ -1185,6 +1185,9 @@ input.switch:checked ~ label:after {
         bottom: 65px;
         right: 240px;
     }
+    .modal-window {
+        z-index: 99;
+    }
 }
 
 .close {

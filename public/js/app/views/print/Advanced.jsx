@@ -7,6 +7,7 @@ define([
     'jsx!widgets/Radio-Control',
     'plugins/classnames/index',
     'helpers/api/config',
+    'helpers/object-assign'
 ], function($, React, SliderControl, DropdownControl, SwitchControl, RadioControl, ClassNames, Config) {
 
 var mode = {
@@ -90,6 +91,7 @@ var mode = {
 
         componentWillMount: function() {
             lang = this.props.lang.print.advanced;
+            Object.assign(advancedSetting, this.props.setting);
             this._updateCustomField();
         },
 
@@ -229,7 +231,7 @@ var mode = {
             this.setState({
                 selectedTab: selectedTab
             });
-            this._handleApply(false);
+            this._handleApply(true);
         },
 
         _handleParameterChange: function(key, e) {
@@ -285,15 +287,17 @@ var mode = {
             this._handleBackToSetting();
         },
 
-        _handleApply: function(closeWindow) {
-            closeWindow = closeWindow || true;
+        _handleApply: function(showAdvancedSetting) {
             this._processCustomInput();
 
             var _settings = {};
             Object.keys(advancedSetting).forEach(function(name) {
                 _settings[name] = advancedSetting[name];
             });
-            this.props.onApply(_settings, closeWindow);
+            this.props.onApply(_settings);
+            if(!showAdvancedSetting) {
+                this.props.onClose();
+            }
         },
 
         _handleCloseAdvancedSetting: function(e) {
@@ -378,7 +382,7 @@ var mode = {
                             key="layer_height"
                             label={lang.layerHeight}
                             min={0.02}
-                            max={20}
+                            max={0.4}
                             step={0.01}
                             default={advancedSetting.layer_height}
                             onChange={this._handleControlValueChange} />
@@ -709,7 +713,7 @@ var mode = {
 
                 case mode.setup:
                     button1 = (<a className="btn" onClick={this._handleLoadPreset}>{lang.loadPreset}</a>);
-                    button2 = (<a className="btn" onClick={this._handleApply}>{lang.apply}</a>);
+                    button2 = (<a className="btn" onClick={this._handleApply.bind(null, false)}>{lang.apply}</a>);
                     button3 = (<a className="btn" onClick={this._handleOpenSaveAsPreset}>{lang.saveAsPreset}</a>);
                     button4 = (<a className="btn" onClick={this._handleCloseAdvancedSetting}>{lang.cancel}</a>);
                     break;

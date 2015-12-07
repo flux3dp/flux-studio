@@ -6,8 +6,9 @@ define([
     'helpers/api/3d-scan-control',
     'helpers/device-master',
     'app/actions/alert-actions',
+    'app/stores/alert-store',
     'app/constants/device-constants'
-], function($, React, ClassNames, control, scanControl, DeviceMaster, AlertActions, DeviceConstants) {
+], function($, React, ClassNames, control, scanControl, DeviceMaster, AlertActions, AlertStore, DeviceConstants) {
     'use strict';
 
     var controller,
@@ -17,12 +18,14 @@ define([
         scrollSize = 10,
         currentLevelFiles = [],
         filesInfo = [],
+        _id = 'MONITOR',
         cameraSource,
         remote,
-        report,
+        reporter,
         status,
         operationStatus,
         lastError = '',
+        lang,
         refreshTime = 5000;
 
     var mode = {
@@ -87,15 +90,21 @@ define([
                     }
                 };
 
-            pathArray = [];
-            controller = this.props.controller;
+            pathArray   = [];
+            controller  = this.props.controller;
+            lang        = this.props.lang.monitor;
 
             this._startReport();
         },
 
+        componentDidMount: function() {
+            AlertStore.onRetry(this._handleRetry);
+            AlertStore.onCancel(this._handleCancel);
+        },
+
         componentWillUnmount: function() {
-            if(cameraSource) { cameraSource.stop(); }
-            this._closeConnection(scanController);
+            DeviceMaster.stopCamera();
+            clearInterval(reporter);
         },
 
         _closeConnection: function(c) {
@@ -110,8 +119,22 @@ define([
             this.props.onClose();
         },
 
+        _handleRetry: function(id) {
+            if(id === _id) {
+                if(this.state.currentStatus === DeviceConstants.PAUSED) {
+                    DeviceMaster.resume();
+                }
+            }
+        },
+
+        _handleCancel: function(id) {
+            if(id === _id) {
+                this.props.onClose();
+            }
+        },
+
         _handleBrowseFile: function() {
-            this._closeConnection(scanController);
+            DeviceMaster.stopCamera();
             this._retrieveList('');
             filesInfo = [];
             this.setState({
@@ -139,6 +162,9 @@ define([
         _handleBrowseUpLevel: function() {
             if(pathArray.length === 0) {
                 this.setState({ mode: mode.preview });
+                DeviceMaster.stop().then(function() {
+                    this._startReport();
+                }.bind(this));
                 return;
             }
             pathArray.pop();
@@ -160,32 +186,26 @@ define([
         },
 
         _handleTurnOnCamera: function(e) {
-            var self = this,
-                opts = {
-                onReady: function() {
-                    self.setState({
-                        mode: mode.camera
-                    });
-                    cameraSource = scanController.getImage(self._processImage);
-                },
-                onError: function() {
-
-                }
-            };
-
-            scanController = scanControl(this.props.selectedPrinter.uuid, opts);
-            this.setState({ waiting: true });
+            DeviceMaster.startCamera(this._processImage);
+            this._stopReport();
+            this.setState({
+                waiting: true,
+                mode: mode.camera
+            });
         },
 
         _handleGo: function() {
-            if(!this._hasFCode()) {
-                AlertActions.showInfo('there is nothing to print (need localisation)');
-                return;
-            }
+            // if(!this._hasFCode()) {
+            //     AlertActions.showInfo(lang.nothingToPrint);
+            //     return;
+            // }
 
             if(this.state.currentStatus === DeviceConstants.READY) {
                 var blob = this.props.fCode;
-                DeviceMaster.go(blob);
+                this._stopReport();
+                DeviceMaster.go(blob).then(function() {
+                    this._startReport();
+                }.bind(this));
                 this.setState({ currentStatus: DeviceConstants.PRINTING });
             }
             else {
@@ -198,22 +218,17 @@ define([
         },
 
         _handleStop: function() {
-            if(!this._hasFCode()) {
-                AlertActions.showInfo('there is nothing to stop (need localisation)');
-                return;
-            }
             DeviceMaster.stop();
         },
 
         _startReport: function() {
-            var self = this,
-                lastReport = '';
+            var self = this;
 
             DeviceMaster.getReport().then(function(report) {
                 self._processReport(report);
             });
 
-            report = setInterval(function() {
+            reporter = setInterval(function() {
                 DeviceMaster.getReport().then(function(report) {
                     self._processReport(report);
                 });
@@ -221,12 +236,16 @@ define([
         },
 
         _processReport: function(report) {
-            console.log(report.error);
             status = report.st_label;
 
             if(report.error && this._isError(status)) {
-                if(lastError != report.error) {
+                if(lastError !== report.error) {
                     lastError = report.error;
+
+                    if(lastError === DeviceConstants.AUTH_ERROR) {
+                        clearInterval(reporter);
+                        DeviceMaster.setPassword('flux');
+                    }
                     AlertActions.showError(lastError);
                 }
             }
@@ -238,12 +257,32 @@ define([
             else if(status === DeviceConstants.IDLE) {
                 status = DeviceConstants.READY;
             }
+            else if(status === DeviceConstants.PAUSED) {
+                if(report.error[0] === DeviceConstants.HEADER_OFFLINE) {
+                    AlertActions.showPopupRetry(_id, lang.headerOffline);
+                }
+                else if (report.error[0] === DeviceConstants.HEADER_ERROR) {
+                    if(report.error[1] === DeviceConstants.TILT) {
+                        AlertActions.showPopupRetry(_id, lang.headerTilt);
+                    }
+                    else if (report.error[1] === DeviceConstants.FAN_FAILURE) {
+                        AlertActions.showPopupRetry(_id, lang.fanFailure);
+                    }
+                    else if (report.error[1] === DeviceConstants.SHAKE) {
+                        AlertActions.showPopupRetry(_id, lang.shake);
+                    }
+                }
+                else if (report.error[0] === DeviceConstants.WRONG_HEADER) {
+                    AlertActions.showPopupRetry(_id, lang.unknownHead);
+                }
+            }
             else {
                 status = report.st_label;
             }
 
             this.setState({
                 temperature: report.rt,
+                targetTemperature: report.tt,
                 currentStatus: status
             });
         },
@@ -253,7 +292,7 @@ define([
         },
 
         _stopReport: function() {
-            clearInterval(report);
+            clearInterval(reporter);
         },
 
         _processImage: function(image_blobs, mime_type) {
@@ -377,9 +416,7 @@ define([
 
         _renderContent: function() {
             if(this.state.mode !== mode.camera) {
-                if(cameraSource) {
-                    cameraSource.stop();
-                }
+                DeviceMaster.stopCamera();
             }
 
             switch(this.state.mode) {
@@ -413,69 +450,74 @@ define([
             var self = this,
                 operation,
                 wait,
-                commands;
+                go,
+                pause,
+                commands,
+                action;
 
-            console.log('current status is', this.state.currentStatus);
+            // console.log('current status is', this.state.currentStatus);
+
+            go = (
+                <div className="controls center" onClick={self._handleGo}>
+                    <div className="icon"><i className="fa fa-play fa-2x"></i></div>
+                    <div className="description">{lang.go}</div>
+                </div>
+            );
+
+            pause = (
+                <div className="controls center" onClick={self._handlePause}>
+                    <div className="icon"><i className="fa fa-pause fa-2x"></i></div>
+                    <div className="description">{lang.pause}</div>
+                </div>
+            );
 
             commands = {
                 'READY': function() {
-                    return (
-                        <div className="controls center" onClick={self._handleGo}>
-                            <div className="icon"><i className="fa fa-play fa-2x"></i></div>
-                            <div className="description">GO</div>
-                        </div>
-                    );
+                    return go;
                 },
 
                 'RUNNING': function() {
-                    return (
-                        <div className="controls center" onClick={self._handlePause}>
-                            <div className="icon"><i className="fa fa-pause fa-2x"></i></div>
-                            <div className="description">PAUSE</div>
-                        </div>
-                    );
+                    return pause;
+                },
+
+                'STARTING': function() {
+                    return pause;
                 },
 
                 'PAUSED': function() {
-                    return (
-                        <div className="controls center" onClick={self._handleGo}>
-                            <div className="icon"><i className="fa fa-play fa-2x"></i></div>
-                            <div className="description">GO</div>
-                        </div>
-                    );
+                    return go;
                 },
             };
 
-            // if(typeof commands[this.state.currentStatus] !== 'function') {
-            //     throw new Error('Invalid Status');
-            // }
+            action = !!commands[this.state.currentStatus] ? commands[this.state.currentStatus]() : '';
 
             operation = (
                 <div className="operation">
                     <div className="controls left" onClick={this._handleStop}>
                         <div className="icon"><i className="fa fa-stop fa-2x"></i></div>
-                        <div className="description">STOP</div>
+                        <div className="description">{lang.stop}</div>
                     </div>
-                    {commands[this.state.currentStatus]()}
+                    {action}
                     <div className="controls right">
                         <div className="icon"><i className="fa fa-circle fa-2x"></i></div>
-                        <div className="description">RECORD</div>
+                        <div className="description">{lang.record}</div>
                     </div>
                 </div>
             );
 
-            wait = (<div className="wait">Connecting, please wait...</div>);
+            wait = (<div className="wait">{lang.connecting}</div>);
 
             return this.props.controllerStatus === DeviceConstants.CONNECTED ? operation : wait;
         },
 
         render: function() {
 
-            var lang        = this.props.lang.monitor,
-                name        = this.props.selectedPrinter.name,
+            var name        = DeviceMaster.getSelectedDevice().name,
                 content     = this._renderContent(),
                 waitIcon    = this.state.waiting ? this._renderSpinner() : '',
-                operation   = this._renderOperation();
+                operation   = this._renderOperation(),
+                subClass    = ClassNames('sub', {'hide': this.props.controllerStatus !== DeviceConstants.CONNECTED }),
+                temperature = this.state.temperature ? (this.state.temperature + ' / ' + this.state.targetTemperature) : '';
 
             return (
                 <div className="flux-monitor">
@@ -500,7 +542,7 @@ define([
                         </div>
                         {operation}
                     </div>
-                    <div className="sub">
+                    <div className={subClass}>
                         <div className="wrapper">
                             <div className="row">
                                 <div className="head-info">
@@ -511,7 +553,7 @@ define([
                                 </div>
                             </div>
                             <div className="row">
-                                <div className="temperature">{this.state.temperature} &#8451;</div>
+                                <div className="temperature">{temperature} &#8451;</div>
                                 <div className="time-left right">1 hour 30 min</div>
                             </div>
                         </div>

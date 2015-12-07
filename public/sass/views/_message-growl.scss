@@ -37,9 +37,9 @@
   filter: alpha(opacity=80);
   position: relative;
   border-radius: 4px;
-  -webkit-transition: all 0.4s ease-in-out;
-  -moz-transition: all 0.4s ease-in-out;
-  transition: all 0.4s ease-in-out; }
+  -webkit-transition: all 0.2s ease-in-out;
+  -moz-transition: all 0.2s ease-in-out;
+  transition: all 0.2s ease-in-out; }
   .growl.growl-incoming {
     opacity: 0;
     filter: alpha(opacity=0); }

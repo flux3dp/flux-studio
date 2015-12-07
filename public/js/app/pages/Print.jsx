@@ -16,7 +16,9 @@ define([
     'helpers/api/config',
     'jsx!views/Print-Selector',
     'helpers/nwjs/menu-factory',
-    'helpers/device-master'
+    'helpers/device-master',
+    'app/stores/global-store',
+    'app/constants/device-constants'
 ], function($,
     React,
     display,
@@ -34,21 +36,15 @@ define([
     Config,
     PrinterSelector,
     menuFactory,
-    DeviceMaster
+    DeviceMaster,
+    GlobalStore,
+    DeviceConstants
 ) {
 
     return function(args) {
         args = args || {};
 
-        var advancedSetting = {
-                infill: 0,
-                layerHeight: 0,
-                travelingSpeed: 0,
-                extrudingSpeed: 0,
-                temperature: 0,
-                support: '',
-                advancedSettings: ' '
-            },
+        var advancedSetting = {},
             _scale = {
                 locked  : true,
                 x       : 1,
@@ -105,6 +101,7 @@ define([
                             var options = JSON.parse(response || '{}');
                             if(!$.isEmptyObject(options)) {
                                 advancedSetting = options;
+                                console.log(advancedSetting);
                             }
                         }
                     });
@@ -114,6 +111,11 @@ define([
                             director.removeSelected();
                         }
                     });
+
+                    GlobalStore.onShowMonitor(this._handleShowMonitor);
+                    // GlobalStore.onShowMonitor(function(isOn) {
+                    //     console.log(isOn);
+                    // });
 
                     $importBtn = this.refs.importBtn.getDOMNode();
 
@@ -181,14 +183,16 @@ define([
                     this.setState({ showAdvancedSetting: false });
                 },
 
-                _handleApplyAdvancedSetting: function(setting, closeAdvancedSetting) {
+                _handleApplyAdvancedSetting: function(setting) {
                     advancedSetting = setting;
                     director.setAdvanceParameter(setting);
-                    this.setState({ showAdvancedSetting: closeAdvancedSetting });
                 },
 
                 _handleShowMonitor: function(isOn) {
-                    this.setState({ showMonitor: isOn });
+                    this.setState({
+                        showMonitor: isOn,
+                        printerControllerStatus: DeviceConstants.CONNECTED
+                    });
                 },
 
                 _handleTogglePrintPause: function(printPaused) {
@@ -255,7 +259,7 @@ define([
                         });
                     }.bind(this));
 
-                    DeviceMaster.selectDevice(selectedPrinter.uuid).then(function(status) {
+                    DeviceMaster.selectDevice(selectedPrinter).then(function(status) {
                         this.setState({ printerControllerStatus: status });
                     }.bind(this));
                 },
@@ -291,6 +295,8 @@ define([
                         low: 0.3
                     };
                     director.setParameter('layer_height', quality[level]);
+                    advancedSetting.layer_height = quality[level];
+                    console.log(level);
                 },
 
                 _renderAdvancedPanel: function() {

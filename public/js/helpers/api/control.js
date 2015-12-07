@@ -36,6 +36,9 @@ define([
                 onError: function(response) {
                     events.onError(response);
                 },
+                onFatal: function(response) {
+                    events.onError(response);
+                },
                 onClose: function(response) {
                     isConnected = false;
                 }
@@ -154,7 +157,6 @@ define([
                     reporting = function() {
                         self.report({
                             onFinished: function(response) {
-
                                 if(typeof(response) === 'string') {
                                     try {
                                         response = JSON.parse(response);
@@ -203,7 +205,9 @@ define([
 
                         }
                         else if ('ok' === data.status) {
-                            self.start(opts);
+                            self.start(opts).then(function() {
+                                opts.onFinished(data);
+                            });
                         }
                         else if(data.status === 'error') {
                             opts.onError(data);

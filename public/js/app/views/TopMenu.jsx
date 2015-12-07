@@ -9,7 +9,8 @@ define([
     'helpers/api/discover',
     'helpers/api/config',
     'helpers/device-master',
-    'plugins/classnames/index'
+    'plugins/classnames/index',
+    'app/actions/global-actions'
 ], function(
     React,
     Notifier,
@@ -21,7 +22,8 @@ define([
     Discover,
     Config,
     DeviceMaster,
-    ClassNames
+    ClassNames,
+    GlobalActions
 ) {
     'use strict';
 
@@ -63,8 +65,7 @@ define([
                     showModal       : false,
                     deviceList      : [],
                     refresh         : '',
-                    showDeviceList  : false,
-                    customText      : ''
+                    showDeviceList  : false
                 };
             },
 
@@ -113,13 +114,12 @@ define([
                 types[type]();
             },
 
-            _handlePopup: function(type, id, message, customText) {
+            _handlePopup: function(type, id, message) {
                 this.setState({
                     showModal   : true,
                     type        : type,
                     sourceId    : id,
-                    message     : message,
-                    customText  : customText
+                    message     : message
                 });
             },
 
@@ -149,10 +149,6 @@ define([
                 AlertActions.notifyYes(this.state.sourceId);
             },
 
-            _handleCustom: function() {
-                AlertActions.notifyCustom(this.state.sourceId);
-            },
-
             _handleShowDeviceList: function() {
                 var self = this,
                     refreshOption = function(devices) {
@@ -179,10 +175,13 @@ define([
                 this.setState({ showDeviceList: !this.state.showDeviceList });
             },
 
-            _handleSelectDevice: function(uuid, e) {
+            _handleSelectDevice: function(device, e) {
                 e.preventDefault();
-                DeviceMaster.setPassword('flux');
-                DeviceMaster.selectDevice(uuid);
+                // DeviceMaster.setPassword('flux');
+                DeviceMaster.selectDevice(device).then(function(status) {
+                    GlobalActions.showMonitor(true);
+                });
+
                 this.setState({ showDeviceList: false });
             },
 
@@ -220,7 +219,7 @@ define([
                     return (
                         <li
                             name={device.uuid}
-                            onClick={this._handleSelectDevice.bind(null, device.uuid)}>
+                            onClick={this._handleSelectDevice.bind(null, device)}>
                             <label className="name">{device.name}</label>
                             <label className="status">Working / Print / 35%</label>
                         </li>
@@ -268,12 +267,10 @@ define([
                             lang={lang}
                             type={this.state.type}
                             open={this.state.showModal}
-                            customText={this.state.customText}
                             message={this.state.message}
                             onRetry={this._handleRetry}
                             onAbort={this._handleAbort}
                             onYes={this._handleYes}
-                            onCustom={this._handleCustom}
                             onClose={this._handleModalClose} />
 
                         <div className="device" onClick={this._handleShowDeviceList}>

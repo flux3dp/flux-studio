@@ -668,7 +668,18 @@ define(function() {
             change_filament: 'CHANGE FILLAMENT',
             browse_file: 'BROWSE FILE',
             monitor: 'MONITOR',
-            currentTemperature: 'Current Temp'
+            currentTemperature: 'Current Temp',
+            nothingToPrint: 'There is nothing to print',
+            go: '開始',
+            pause: '暫停',
+            stop: 'STOP',
+            record: 'RECORD',
+            connecting: 'Connecting, please wait...',
+            headerOffline: '沒有偵測到列印工具頭',
+            headerTilt: '請確認磁鐵關節正確的附著',
+            unknownHead: '請更換成列印工具頭',
+            fanFailure: 'Fan failed / stucked, 請用細針戳一下',
+            shake: 'Head encountered unexpected shake'
         },
         alert: {
             caption: '錯誤',

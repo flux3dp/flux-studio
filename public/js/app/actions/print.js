@@ -6,6 +6,8 @@ define([
     'helpers/api/3d-print-slicing',
     'helpers/api/control',
     'helpers/file-system',
+    'app/actions/alert-actions',
+    'app/constants/device-constants',
     'threeOrbitControls',
     'threeTrackballControls',
     'threeTransformControls',
@@ -14,7 +16,17 @@ define([
     'plugins/file-saver/file-saver.min',
     'lib/Canvas-To-Blob'
 
-], function($, fileSystem, display, websocket, printSlicing, printerController, FileSystem) {
+], function(
+    $,
+    fileSystem,
+    display,
+    websocket,
+    printSlicing,
+    printerController,
+    FileSystem,
+    AlertActions,
+    DeviceConstants
+) {
     'use strict';
 
     var THREE = window.THREE || {},
@@ -779,7 +791,8 @@ define([
             return `${key}=${settings[key]} \n`;
         });
         //slicer.setParameter('advancedSettings', _settings.join('\n')).then(function(result) {
-        slicer.setParameter('advancedSettings', settings.custom).then(function(result) {
+        slicer.setParameter('advancedSettings', settings.custom).then(function(result, errors) {
+            console.log(result, errors);
             if (result.status === 'error') {
                 index = keys.length;
                 // todo: error logging
@@ -966,6 +979,7 @@ define([
             var index;
             scene.remove(SELECTED.outlineMesh);
             scene.remove(SELECTED);
+            outlineScene.remove(SELECTED.outlineMesh);
             index = objects.indexOf(SELECTED);
             if (index > -1) {
                 objects.splice(index, 1);
@@ -973,7 +987,10 @@ define([
 
             //  model in backend
             slicer.delete(SELECTED.uuid, function(result) {
-                // todo: if error
+                console.log(result);
+                if(result.status.toUpperCase() === DeviceConstants.ERROR) {
+                    AlertActions.showPopupError('slicer', result.error);
+                }
             });
 
             transformControl.detach(SELECTED);

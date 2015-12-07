@@ -251,7 +251,7 @@ define([
 
         render: function() {
             var quality     = this._renderQuanlity(),
-                material    = this._renderMaterialPallet(),
+                material    = '',
                 raft        = this._renderRaft(),
                 support     = this._renderSupport(),
                 advanced    = this._renderAdvanced(),
