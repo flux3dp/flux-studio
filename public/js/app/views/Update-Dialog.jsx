@@ -14,9 +14,10 @@ define([
             return {
                 open: false,
                 type: 'software',
-                machineName: '',
+                device: {},
                 latestVersion: '',
                 releaseNote: '',
+                updateFile: undefined,
                 onClose: function() {},
                 onInstall: function() {}
             };
@@ -71,10 +72,12 @@ define([
                 return <div/>;
             }
 
+            this.props.device = this.props.device || {};
+
             var lang = i18n.get(),
                 caption = lang.update[this.props.type].caption,
-                message1 = sprintf(lang.update[this.props.type].message_pattern_1, this.props.machineName),
-                message2 = sprintf(lang.update[this.props.type].message_pattern_2, this.props.latestVersion, window.FLUX.version),
+                message1 = sprintf(lang.update[this.props.type].message_pattern_1, this.props.device.name),
+                message2 = sprintf(lang.update[this.props.type].message_pattern_2, this.props.latestVersion, this.props.device.version),
                 buttons = this._getButtons(lang),
                 content = (
                     <div className="update-wrapper">
