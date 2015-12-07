@@ -177,3 +177,55 @@
         right: 0;
     }
 }
+
+.modal-update {
+    color: #989898;
+
+    .update-wrapper {
+        background: #fff;
+        padding: 20px;
+        width: 32.2rem;
+    }
+
+    .caption {
+        color: #626262;
+        font-size: 15px;
+        line-height: 18px;
+    }
+
+    .caption,
+    .update-brief,
+    .release-note-content {
+        margin: 0 0 20px 0;
+    }
+
+    .update-brief {
+        font-size: 12px;
+        line-height: 18px;
+
+        p {
+            margin: 0;
+        }
+    }
+
+    .release-note-caption {
+        margin: 0;
+    }
+
+    .release-note-content {
+        border: 2px solid #989898;
+        height: 90px;
+        overflow: scroll;
+        padding: 3px;
+    }
+
+    .action-button {
+        @include flexbox();
+        justify-content: space-between;
+    }
+
+    .btn-h-group {
+        position: static;
+        width: 50%;
+    }
+}
