@@ -22,29 +22,40 @@
             cssLink = document.createElement('link'),
             head = document.querySelector('head'),
             body = document.querySelector('body'),
-            timer;
+            process = process,
+            goStarted = function(ghostPort) {
 
-        // set global definition
-        timer = setInterval(function() {
-            var nodeProcess = process || {},
-                env = nodeProcess.env || {};
-
-            if ('undefined' !== typeof env.ghostPort) {
-                window.FLUX.ghostPort = env.ghostPort;
+                window.FLUX.ghostPort = ghostPort || 8000;
                 script.setAttribute('src', 'js/require.js');
                 script.dataset.main = 'js/main.js?v=' + window.FLUX.timestamp;
                 body.appendChild(script);
-                clearInterval(timer);
-            }
-            else {
-                // TODO: load fail?
-            }
-        }, 1000);
+            },
+            timer;
 
+        // set global definition
         window.FLUX = {
             debug: -1 !== location.search.indexOf('debug'),
             timestamp: (new Date()).getTime()
         };
+
+        // it's not node-webkit
+        if ('undefined' === typeof process) {
+            goStarted();
+        }
+        else {
+            timer = setInterval(function() {
+                var nodeProcess = process || {},
+                    env = nodeProcess.env || {};
+
+                if ('undefined' !== typeof env.ghostPort) {
+                    clearInterval(timer);
+                    goStarted(env.ghostPort);
+                }
+                else {
+                    // TODO: load fail?
+                }
+            }, 1000);
+        }
 
         cssLink.setAttribute('rel', 'stylesheet');
         cssLink.setAttribute('href', 'css/main.css?v=' + window.FLUX.timestamp);
