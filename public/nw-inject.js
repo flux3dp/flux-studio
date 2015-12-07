@@ -1,5 +1,6 @@
 var fs = require('fs'),
     os = require('os'),
+    osType = os.type(),
     spawn = require('child_process').spawn,
     exec = require('child_process').exec,
     cwd = process.cwd(),
@@ -23,7 +24,7 @@ var fs = require('fs'),
             ],
             ghostCmd = '';
 
-        if ('Windows_NT' === os.type()) {
+        if ('Windows_NT' === osType) {
             // TODO: has to assign env root for slic3r
             args[slic3rPathIndex] = cwd + '/lib/Slic3r.app/Contents/MacOS/slic3r';
             ghostCmd = cwd + '/lib/ghost/ghost/ghost.exe';
@@ -49,6 +50,7 @@ var fs = require('fs'),
         });
 
         process.env.ghostPort = port;
+
     },
     probe = function(port, callback) {
         var socket = new net.Socket(),
@@ -78,6 +80,29 @@ var fs = require('fs'),
             // stop trying and response error
         }
     };
+
+switch (osType) {
+case 'Windows_NT':
+    process.env.osType = 'windows';
+    break;
+case 'Linux':
+    process.env.osType = 'linux';
+    break;
+case 'Darwin':
+    process.env.osType = 'osx';
+    break;
+}
+
+process.env.arch = 'x86';
+switch (os.arch()) {
+case 'x64':
+    process.env.arch = 'x64';
+    break;
+case 'Linux':
+case 'Darwin':
+    process.env.arch = 'x86';
+    break;
+}
 
 // find port
 probe(currentPort, findPort);
