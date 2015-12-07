@@ -93,11 +93,6 @@ function(React, $, Backbone, display, config) {
                     os: ''
                 },
                 ignoreVersions = config().read('software-update-ignore-list') || [],
-                findVersion = function(latestVersion) {
-                    return function(ignoreVersion) {
-                        return latestVersion === ignoreVersion;
-                    };
-                },
                 fetchProfile = function() {
                     var deferred = $.Deferred();
 
@@ -127,7 +122,7 @@ function(React, $, Backbone, display, config) {
                 };
 
             fetchProfile().then(fetchLatestVersion).done(function(currentProflie, currentVersion) {
-                var isIgnore = ignoreVersions.some(findVersion(currentVersion.latest_version)),
+                var isIgnore = -1 < ignoreVersions.indexOf(currentVersion.latest_version),
                     props = {};
 
                 if (false === isIgnore &&
