@@ -130,7 +130,7 @@ define([
             }.bind(this));
 
             return (
-                <li>
+                <li title={lang.qualityTitle}>
                     <label className="popup-selection">
                         <input className="popup-open" name="popup-open" type="checkbox" onClick={this._onOpenSubPopup}/>
                         <div className="display-text">
@@ -198,7 +198,7 @@ define([
 
         _renderRaft: function() {
             return (
-                <li onClick={this._handleToggleRaft}>
+                <li title={lang.raftTitle} onClick={this._handleToggleRaft}>
                     <div>{this.state.raftOn ? lang.raft_on : lang.raft_off}</div>
                 </li>
             );
@@ -206,7 +206,7 @@ define([
 
         _renderSupport: function() {
             return (
-                <li onClick={this._handleToggleSupport}>
+                <li title={lang.supportTitle} onClick={this._handleToggleSupport}>
                     <div>{this.state.supportOn ? lang.support_on : lang.support_off}</div>
                 </li>
             );
@@ -214,7 +214,7 @@ define([
 
         _renderAdvanced: function() {
             return (
-                <li onClick={this._handleOpenAdvancedSetting}>
+                <li title={lang.advancedTitle} onClick={this._handleOpenAdvancedSetting}>
                     <div>{this.props.lang.print.left_panel.advanced}</div>
                 </li>
             );
@@ -222,7 +222,7 @@ define([
 
         _renderPreview: function() {
             return (
-                <li onClick={this._handleOpenPreview}>
+                <li title={lang.previewTitle} onClick={this._handleOpenPreview}>
                     <label className="popup-selection">
                         <input ref="preview" className="popup-open" name="popup-open" type="checkbox" onClick={this._onOpenSubPopup}/>
                         <div className="display-text">

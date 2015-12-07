@@ -32,7 +32,7 @@ define(['react'], function(React){
                     }
                     else {
                         content = (
-                            <button className={className} onClick={opt.onClick}>{opt.label}</button>
+                            <button title={opt.title} className={className} onClick={opt.onClick}>{opt.label}</button>
                         );
                     }
 

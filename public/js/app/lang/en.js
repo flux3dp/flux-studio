@@ -405,7 +405,12 @@ define(function() {
                 advanced: 'ADVANCED',
                 preview: 'PREVIEW',
                 plaTitle: 'PICK THE COLOR OF THE FILAMENT',
-                transparent: 'TRANSPARENT'
+                transparent: 'TRANSPARENT',
+                qualityTitle: 'It will affect the outcome surface smoothness of your object. Better qualities need more time',
+                raftTitle: 'A Raft are layers built under your part and help it stick to the base plate',
+                supportTitle: 'A Support is a generated structure to support overhanging part of your object, to prevent filament dropping',
+                previewTitle: 'Preview the actual path of toolhead during printing task',
+                advancedTitle: 'Detail 3d printing parameters, you may acheive better result than default by adjusting them'
             },
             right_panel: {
                 get: 'Get',
@@ -431,7 +436,11 @@ define(function() {
             pause: 'PAUSE',
             continue: 'CONTINUE',
             restart: 'RESTART',
-            download_prompt: 'please enter file name'
+            download_prompt: 'please enter file name',
+            importTitle: 'Import 3D models ( .stl )',
+            getFcodeTitle: 'Save toolhead path and config into FCode file ( *.fc )',
+            goTitle: 'Print it out',
+            deviceTitle: 'Show device monitor'
         },
         laser: {
             import: 'Import',

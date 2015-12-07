@@ -90,6 +90,7 @@ define([
                         'btn-hexagon': true,
                         'btn-get-fcode': true
                     }),
+                    title: lang.print.getFcodeTitle,
                     onClick: this._handleGetFCode
                 }, {
                     label: lang.laser.go,
@@ -99,6 +100,7 @@ define([
                         'btn-hexagon': true,
                         'btn-go': true
                     }),
+                    title: lang.print.goTitle,
                     onClick: this._handleGo
                 }];
 
