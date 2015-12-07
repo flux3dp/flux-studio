@@ -17,7 +17,8 @@ define([
     'jsx!views/Print-Selector',
     'helpers/nwjs/menu-factory',
     'helpers/device-master'
-], function($,
+], function(
+    $,
     React,
     display,
     director,
