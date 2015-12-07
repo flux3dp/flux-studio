@@ -14,7 +14,7 @@ define([
         opts.onError = opts.onError || function() {};
         opts.onConnect = opts.onConnect || function() {};
 
-        var timeout = 3000,
+        var timeout = 10000,
             timmer,
             isConnected = false,
             ws = new Websocket({

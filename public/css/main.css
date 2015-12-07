@@ -4012,7 +4012,8 @@ input.switch:checked ~ label:after {
                     position: absolute;
                     bottom: 0;
                     text-align: center;
-                    width: 100%; }
+                    width: 100%;
+                    overflow: hidden; }
                 .print-studio .flux-monitor .main .body .content .name.selected {
                     padding: 0 8px;
                     border-radius: 5px;

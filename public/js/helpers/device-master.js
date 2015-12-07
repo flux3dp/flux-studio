@@ -145,6 +145,18 @@ define([
         return _do(DeviceConstants.QUIT);
     }
 
+    function ls(path) {
+        var d = $.Deferred();
+        _device.actions.ls(path).then(function(result) {
+            d.resolve(result);
+        });
+        return d.promise();
+    }
+
+    function fileInfo(path, fileNameWithPath) {
+        return _device.actions.fileInfo(path, fileNameWithPath);
+    }
+
     function startCamera(callback) {
         _device.scanController = ScanController(_device.uuid, {
             onReady: function() {
@@ -154,16 +166,6 @@ define([
 
             }
         });
-
-        // _device.actions = Object.assign(_device.actions, ScanController(_device.uuid, {
-        //     onReady: function() {
-        //         console.log('camera ready');
-        //         _device.cameraSource = _device.actions.getImage(function(image_blob, mime_type) {
-        //             console.log('calling back');
-        //             callback(image_blob, mime_type);
-        //         });
-        //     }
-        // }));
     }
 
     function stopCamera() {
@@ -270,11 +272,6 @@ define([
     function _scanDeviceError(devices) {
         devices.forEach(function(device) {
             if(typeof(_errors[device.serial]) === 'string')  {
-                // if(device.name === 'Yellow') {
-                //     if(device.error_label) {
-                //         console.log(device.error_label);
-                //     }
-                // }
                 if(_errors[device.serial] !== device.error_label && device.error_label) {
                     if(window.debug) {
                         AlertActions.showError(device.name + ': ' + device.error_label)
@@ -294,7 +291,7 @@ define([
     // Core
 
     function DeviceSingleton() {
-        if(_instance !== null){
+        if(_instance !== null) {
             throw new Error('Cannot instantiate more than one DeviceSingleton, use DeviceSingleton.get_instance()');
         }
 
@@ -316,6 +313,8 @@ define([
             this.getSelectedDevice  = getSelectedDevice;
             this.startCamera        = startCamera;
             this.stopCamera         = stopCamera;
+            this.ls                 = ls;
+            this.fileInfo           = fileInfo;
 
             Discover(function(devices) {
                 _scanDeviceError(devices);

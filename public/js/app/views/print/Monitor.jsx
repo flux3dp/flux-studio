@@ -11,27 +11,30 @@ define([
 ], function($, React, ClassNames, control, scanControl, DeviceMaster, AlertActions, AlertStore, DeviceConstants) {
     'use strict';
 
-    var controller,
+    var _id = 'MONITOR',
+        controller,
         scanController,
         pathArray,
         start,
         scrollSize = 10,
         currentLevelFiles = [],
         filesInfo = [],
-        _id = 'MONITOR',
+        history = [],
         cameraSource,
         remote,
         reporter,
         status,
         operationStatus,
+        lastAction,
         lastError = '',
+        previewUrl = '',
         lang,
         refreshTime = 5000;
 
     var mode = {
-        preview: 1,
-        browse_file: 2,
-        camera: 3
+        PREVIEW: 'PREVIEW',
+        BROWSE_FILE: 'BROWSE_FILE',
+        CAMERA: 'CAMERA'
     };
 
     var opts = {
@@ -71,7 +74,7 @@ define([
                 printStatus         : false,
                 printError          : false,
                 waiting             : false,
-                mode                : mode.preview,
+                mode                : mode.PREVIEW,
                 directoryContent    : {},
                 cameraImageUrl      : '',
                 selectedFileName    : '',
@@ -93,6 +96,7 @@ define([
             pathArray   = [];
             controller  = this.props.controller;
             lang        = this.props.lang.monitor;
+            previewUrl  = this.props.previewUrl;
 
             this._startReport();
         },
@@ -100,11 +104,13 @@ define([
         componentDidMount: function() {
             AlertStore.onRetry(this._handleRetry);
             AlertStore.onCancel(this._handleCancel);
+            this._addHistory();
         },
 
         componentWillUnmount: function() {
             DeviceMaster.stopCamera();
             clearInterval(reporter);
+            history = [];
         },
 
         _closeConnection: function(c) {
@@ -137,13 +143,17 @@ define([
             DeviceMaster.stopCamera();
             this._retrieveList('');
             filesInfo = [];
+            pathArray = [];
             this.setState({
-                mode: mode.browse_file,
+                mode: mode.BROWSE_FILE,
                 waiting: true
+            }, function() {
+                this._addHistory();
             });
+            this._stopReport();
         },
 
-        _handleSelectFile: function(pathName) {
+        _handleSelectFolder: function(pathName) {
             var dir = this.state.directoryContent.directories;
             // if it's a directory
             if(dir.some(function(d) {
@@ -154,14 +164,12 @@ define([
                 this._retrieveList(pathArray.join('/'));
                 this.setState({ waiting: true });
             }
-            else {
-
-            }
+            this._addHistory();
         },
 
         _handleBrowseUpLevel: function() {
             if(pathArray.length === 0) {
-                this.setState({ mode: mode.preview });
+                this.setState({ mode: mode.PREVIEW });
                 DeviceMaster.stop().then(function() {
                     this._startReport();
                 }.bind(this));
@@ -171,8 +179,58 @@ define([
             this._retrieveList(pathArray.join('/'));
         },
 
+        _handleBack: function() {
+            var self = this;
+            if(history.length > 1) {
+                history.pop();
+            }
+
+            // history.pop();
+
+            console.log(history);
+            lastAction = history[history.length - 1];
+            console.log('processing', lastAction);
+            previewUrl = '';
+            var actions = {
+
+                'PREVIEW' : function() {
+                    // get file preview image uri
+                    previewUrl = self.props.previewUrl;
+                },
+
+                'BROWSE_FILE': function() {
+
+                    pathArray = lastAction.path;
+
+                    pathArray.pop();
+                    console.log('browsing folder', pathArray.join('/'));
+                    self._retrieveList(pathArray.join('/'));
+                },
+
+                'CAMERA': function() {
+
+                }
+            };
+
+            // if(lastAction) {
+            //     if(actions[lastAction.mode]) {
+            //         actions[lastAction.mode]();
+            //         this.setState({ mode: lastAction.mode });
+            //     }
+            // }
+
+            if(actions[lastAction.mode]) {
+                actions[lastAction.mode]();
+                this.setState({ mode: lastAction.mode });
+            }
+
+            if(history.length === 0) {
+                this._addHistory();
+            }
+        },
+
         _handleScroll: function(e) {
-            if(this.state.mode === mode.brwose_file) {
+            if(this.state.mode === mode.BROWSE_FILE) {
                 var onNeedData = e.target.scrollHeight === e.target.offsetHeight + e.target.scrollTop;
                 if(onNeedData) {
                     start = start + scrollSize;
@@ -181,8 +239,13 @@ define([
             }
         },
 
-        _handleFileSelect: function(fileName) {
-            this.setState({ selectedFileName: fileName });
+        _handleSelectFile: function(fileName) {
+            this.setState({
+                selectedFileName: fileName,
+                mode: mode.PREVIEW
+            }, function() {
+                this._addHistory();
+            });
         },
 
         _handleTurnOnCamera: function(e) {
@@ -190,7 +253,7 @@ define([
             this._stopReport();
             this.setState({
                 waiting: true,
-                mode: mode.camera
+                mode: mode.CAMERA
             });
         },
 
@@ -219,6 +282,15 @@ define([
 
         _handleStop: function() {
             DeviceMaster.stop();
+        },
+
+        _addHistory: function() {
+            history.push({
+                mode: this.state.mode,
+                previewUrl: previewUrl,
+                path: pathArray.slice()
+            });
+            console.log(history);
         },
 
         _startReport: function() {
@@ -311,7 +383,7 @@ define([
                 filesInfo = [];
             }
 
-            controller.ls(path).then(function(result) {
+            DeviceMaster.ls(path).then(function(result) {
                 currentLevelFiles = result.files;
                 self._retrieveFileInfo(path).then(function(info) {
                     filesInfo = filesInfo.concat(info);
@@ -321,6 +393,17 @@ define([
                     });
                 });
             });
+
+            // controller.ls(path).then(function(result) {
+            //     currentLevelFiles = result.files;
+            //     self._retrieveFileInfo(path).then(function(info) {
+            //         filesInfo = filesInfo.concat(info);
+            //         self.setState({
+            //             directoryContent: result,
+            //             waiting: false
+            //         });
+            //     });
+            // });
         },
 
         _retrieveFileInfo: function(path) {
@@ -344,8 +427,8 @@ define([
         _iterateFileInfo: function(path, startIndex, endIndex, returnArray, callback) {
             var self = this,
                 opt = {};
-            if(startIndex < endIndex) {
-                controller.fileInfo(path, currentLevelFiles[startIndex], opt).then(function(r) {
+            if(startIndex <= endIndex) {
+                DeviceMaster.fileInfo(path, currentLevelFiles[startIndex], opt).then(function(r) {
                     returnArray.push(r);
                     return self._iterateFileInfo(path, startIndex + 1, endIndex, returnArray, callback);
                 });
@@ -370,7 +453,7 @@ define([
 
             folders = content.directories.map(function(item) {
                 return (
-                    <div className="folder" onDoubleClick={this._handleSelectFile.bind(this, item)}>
+                    <div className="folder" onClick={this._handleSelectFolder.bind(this, item)}>
                         <div className="name">{item}</div>
                     </div>
                 );
@@ -381,7 +464,7 @@ define([
                     fileNameClass = ClassNames('name', {'selected': self.state.selectedFileName === item[0]});
 
                 return (
-                    <div className="file" onClick={self._handleFileSelect.bind(null, item[0])}>
+                    <div title={item[0]} className="file" onClick={self._handleSelectFile.bind(null, item[0])}>
                         <div className="image-wrapper">
                             <img src={imgSrc} />
                         </div>
@@ -415,15 +498,15 @@ define([
         },
 
         _renderContent: function() {
-            if(this.state.mode !== mode.camera) {
+            if(this.state.mode !== mode.CAMERA) {
                 DeviceMaster.stopCamera();
             }
 
             switch(this.state.mode) {
-                case mode.preview:
+                case mode.PREVIEW:
                 var divStyle = {
                         backgroundColor: '#E0E0E0',
-                        backgroundImage: 'url(' + this.props.previewUrl + ')',
+                        backgroundImage: 'url(' + previewUrl + ')',
                         backgroundSize: 'cover',
                         backgroundPosition: '50% 50%',
                         width: '100%',
@@ -432,11 +515,11 @@ define([
                     return (<div style={divStyle} />);
                     break;
 
-                case mode.browse_file:
+                case mode.BROWSE_FILE:
                     return this._renderDirectoryContent(this.state.directoryContent);
                     break;
 
-                case mode.camera:
+                case mode.CAMERA:
                     return this._renderCameraContent();
                     break;
 
@@ -528,7 +611,7 @@ define([
                                 <div className="close" onClick={this._handleClose}>
                                     <div className="x"></div>
                                 </div>
-                                <div className="back" onClick={this._handleBrowseUpLevel}>
+                                <div className="back" onClick={this._handleBack}>
                                     <i className="fa fa-angle-left"></i>
                                 </div>
                             </div>

@@ -180,7 +180,7 @@ define([
 
             _handleSelectDevice: function(device, e) {
                 e.preventDefault();
-                AlertActions.showInfo(lang.message.connecting);
+                // AlertActions.showInfo(lang.message.connecting);
                 DeviceMaster.selectDevice(device).then(function(status) {
                     if(status === DeviceConstants.CONNECTED) {
                         GlobalActions.showMonitor(true);

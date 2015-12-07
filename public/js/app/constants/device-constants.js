@@ -33,6 +33,7 @@ define([], function(){
         STOP            : 'STOP',
         REPORT          : 'REPORT',
         ABORT           : 'ABORT',
-        QUIT            : 'QUIT'
+        QUIT            : 'QUIT',
+        LS              : 'LS'
     };
 });
