@@ -470,6 +470,7 @@ define([
                             open={this.state.firmware.open}
                             type="firmware"
                             device={this.state.firmware.device}
+                            currentVersion={this.state.firmware.device.version}
                             latestVersion={this.state.firmware.latestVersion}
                             releaseNote={this.state.firmware.releaseNote}
                             onClose={this._handleFirmwareClose}
