@@ -107,7 +107,7 @@ define([
 
                                 setTimeout(function() {
                                     goFetch();
-                                }, 1000);
+                                }, 200);
 
                                 break;
                             default:
