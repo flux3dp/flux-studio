@@ -37,12 +37,13 @@ define([
              * upload fcode
              *
              * @param {ArrayBuffer} data       - binary data with array buffer type
+             * @param {Int}         size       - binary data with array buffer type
              * @param {Function}    onFinished - fired when process finished
              */
-            upload: function(data, onFinished) {
+            upload: function(data, size, onFinished) {
                 var args = [
                     'upload',
-                    data.byteLength
+                    size
                 ];
 
                 events.onMessage = function(response) {
