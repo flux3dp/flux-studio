@@ -488,6 +488,7 @@ define([
     }
 
     function onTransform(e) {
+        if(previewMode) { return; }
         switch (e.type) {
             case 'mouseDown':
                 transformMode = true;

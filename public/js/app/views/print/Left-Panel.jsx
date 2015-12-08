@@ -100,7 +100,9 @@ define([
         },
 
         _handleOpenPreview: function(e) {
-            e.preventDefault();
+            // e.preventDefault();
+            // var src = this.refs.preview.getDOMNode();
+            // $(src).prop('checked', !this.state.previewOn);
             if(e.target.type === 'range') { return; }
             if(this.props.hasObject) {
                 var src = this.refs.preview.getDOMNode();
@@ -114,12 +116,6 @@ define([
             this.props.onPreviewLayerChange(e.target.value);
             this.setState({
                 previewCurrentLayer: e.target.value
-            });
-        },
-
-        _handleTest: function() {
-            DeviceMaster.getStatus().then(function(status) {
-                console.log(status);
             });
         },
 
@@ -233,13 +229,13 @@ define([
         _renderPreview: function() {
             return {
                 label: (
-                    <div className="display-text">
+                    <div className="display-text" onClick={this._handleOpenPreview}>
                         <span>{lang.preview}</span>
                     </div>
                 ),
                 content: (
                     <div className="preview-panel">
-                        <input className="range" type="range" value={this.state.previewCurrentLayer} min="0" max={this.state.previewLayerCount} onChange={this._handlePreviewLayerChange} />
+                        <input ref="preview" className="range" type="range" value={this.state.previewCurrentLayer} min="0" max={this.state.previewLayerCount} onChange={this._handlePreviewLayerChange} />
                         <div className="layer-count">
                             {this.state.previewCurrentLayer}
                         </div>
@@ -250,7 +246,6 @@ define([
 
         render: function() {
             var quality     = this._renderQuanlity(),
-                material    = '',
                 raft        = this._renderRaft(),
                 support     = this._renderSupport(),
                 advanced    = this._renderAdvanced(),
