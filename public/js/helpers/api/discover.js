@@ -21,7 +21,7 @@ define([
     return function(id, getPrinters) {
         getPrinters = getPrinters || function() {};
 
-        if (-1 === idList.indexOf(id)) {
+        if (0 === idList.length || -1 === idList.indexOf(id)) {
             idList.push(id);
             dispatchers.push({
                 id: id,
