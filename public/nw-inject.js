@@ -23,7 +23,7 @@ var fs = requireNode('fs'),
                 '--port',
                 port,
                 '--assets',
-                cwd + 'lib/ghost/assets'
+                cwd + '/lib/ghost/assets'
             ],
             ghostCmd = '';
 
