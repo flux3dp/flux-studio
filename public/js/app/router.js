@@ -133,6 +133,7 @@ function(React, $, Backbone, display, config) {
                     props = {
                         open: true,
                         type: 'software',
+                        currentVersion: currentProflie.version,
                         latestVersion: currentVersion.latest_version,
                         releaseNote: currentVersion.changelog,
                         onClose: function() {},
