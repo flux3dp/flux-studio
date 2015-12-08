@@ -3187,7 +3187,8 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         .modal-update .update-brief p {
             margin: 0; }
     .modal-update .release-note-caption {
-        margin: 0; }
+        margin: 0;
+        font-weight: normal; }
     .modal-update .release-note-content {
         border: 2px solid #989898;
         height: 90px;
