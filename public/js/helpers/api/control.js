@@ -14,14 +14,17 @@ define([
         opts.onError = opts.onError || function() {};
         opts.onConnect = opts.onConnect || function() {};
 
-        var isConnected = false,
+        var timeout = 10000,
+            timmer,
+            isConnected = false,
             ws = new Websocket({
                 method: 'control/' + uuid,
                 onMessage: function(data) {
+                    clearTimeout(timmer);
                     switch (data.status) {
                     case 'connecting':
                         opts.onConnect(data);
-                        // ignore it
+                        timmer = setTimeout(isTimeout, timeout);
                         break;
                     case 'connected':
                         opts.onConnect(data);
@@ -34,6 +37,9 @@ define([
                 },
                 // onError: opts.onError,
                 onError: function(response) {
+                    events.onError(response);
+                },
+                onFatal: function(response) {
                     events.onError(response);
                 },
                 onClose: function(response) {
@@ -53,6 +59,13 @@ define([
                 opts.onFinished = opts.onFinished || function() {};
 
                 return opts;
+            },
+            isTimeout = function() {
+                var error = JSON.parse(
+                    '{"status": "error", "error": "TIMEOUT", "info": "connection timeoout"}'
+                );
+                opts.onError(error);
+                console.log('timeout?', error);
             };
 
         return {
@@ -154,7 +167,6 @@ define([
                     reporting = function() {
                         self.report({
                             onFinished: function(response) {
-
                                 if(typeof(response) === 'string') {
                                     try {
                                         response = JSON.parse(response);
@@ -203,7 +215,9 @@ define([
 
                         }
                         else if ('ok' === data.status) {
-                            self.start(opts);
+                            self.start(opts).then(function() {
+                                opts.onFinished(data);
+                            });
                         }
                         else if(data.status === 'error') {
                             opts.onError(data);

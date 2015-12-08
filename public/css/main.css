@@ -3093,7 +3093,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         flex-direction: column;
         min-height: 25rem;
         min-width: 32.2rem;
-        overflow: scroll;
+        overflow: auto;
         padding: 1.6rem 2.8rem 4.4rem 2.8rem;
         position: relative;
         text-align: center;
@@ -3477,9 +3477,9 @@ input[type=range]:focus::-webkit-slider-runnable-track {
     filter: alpha(opacity=80);
     position: relative;
     border-radius: 4px;
-    -webkit-transition: all 0.4s ease-in-out;
-    -moz-transition: all 0.4s ease-in-out;
-    transition: all 0.4s ease-in-out; }
+    -webkit-transition: all 0.2s ease-in-out;
+    -moz-transition: all 0.2s ease-in-out;
+    transition: all 0.2s ease-in-out; }
 
 .growl.growl-incoming {
     opacity: 0;
@@ -4118,7 +4118,8 @@ input.switch:checked ~ label:after {
                     position: absolute;
                     bottom: 0;
                     text-align: center;
-                    width: 100%; }
+                    width: 100%;
+                    overflow: hidden; }
                 .print-studio .flux-monitor .main .body .content .name.selected {
                     padding: 0 8px;
                     border-radius: 5px;
@@ -4551,6 +4552,9 @@ input.switch:checked ~ label:after {
 .print-studio .select-printer {
     bottom: 65px;
     right: 240px; }
+
+.print-studio .modal-window {
+    z-index: 99; }
 
 .close {
     position: absolute;

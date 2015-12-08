@@ -2,14 +2,21 @@ define([
     'jquery',
     'helpers/i18n',
     'app/actions/alert-actions',
+    'app/constants/device-constants',
     'helpers/api/control',
-    'app/constants/device-constants'
+    'helpers/api/3d-scan-control',
+    'helpers/api/touch',
+    'helpers/api/discover',
+    'helpers/object-assign'
 ],function(
     $,
     i18n,
     AlertActions,
+    DeviceConstants,
     DeviceController,
-    DeviceConstants
+    ScanController,
+    Touch,
+    Discover
 ){
     var _instance = null,
         _password = '',
@@ -17,31 +24,41 @@ define([
         _status = DeviceConstants.READY,
         _device,
         _devices = [],
+        _errors = {},
         _status;
 
     function setLanguageSource(lang) {
         _lang = lang;
     }
 
-    function selectDevice(uuid) {
-
-        var d = $.Deferred();
+    function selectDevice(device) {
+        var d = $.Deferred()
+            uuid = device.uuid;
+            // console.log('exist connection', _existConnection(uuid));
         if(_existConnection(uuid)) {
-            _device = _getDeviceConnection(uuid);
+            _device = _switchDevice(uuid);
             d.resolve(DeviceConstants.CONNECTED);
         }
         else {
+            console.log(device);
             _device = {};
             _device.uuid = uuid;
+            _device.name = device.name;
             _device.actions = DeviceController(uuid, {
                 onConnect: function(response) {
                     if(response.status.toUpperCase() === DeviceConstants.CONNECTED) {
                         d.resolve(DeviceConstants.CONNECTED);
+                        _devices.push(_device);
+                    }
+                },
+                onError: function(response) {
+                    if(response.error === DeviceConstants.TIMEOUT) {
+                        d.resolve(DeviceConstants.TIMEOUT);
                     }
                 }
             });
-            _devices.push(_device);
         }
+
         return d.promise();
     }
 
@@ -49,7 +66,6 @@ define([
         var d = $.Deferred();
         _device.print = _device.actions.upload(blob.size, blob, {
             onFinished: function(result) {
-                log('uploadFile', result);
                 d.resolve(result);
             }
         });
@@ -67,7 +83,6 @@ define([
                 _status = report.st_label;
                 if(_status === DeviceConstants.IDLE) {
                     _go(blob).then(function(status) {
-                        console.log('go is done');
                         d.resolve(status);
                     });
                 }
@@ -91,7 +106,6 @@ define([
     function _go(blob) {
         var d = $.Deferred();
         uploadFile(blob).then(function() {
-            console.log('upload is done');
             _status = DeviceConstants.RUNNING;
             d.resolve(_status);
         });
@@ -131,6 +145,37 @@ define([
         return _do(DeviceConstants.QUIT);
     }
 
+    function ls(path) {
+        var d = $.Deferred();
+        _device.actions.ls(path).then(function(result) {
+            d.resolve(result);
+        });
+        return d.promise();
+    }
+
+    function fileInfo(path, fileNameWithPath) {
+        return _device.actions.fileInfo(path, fileNameWithPath);
+    }
+
+    function startCamera(callback) {
+        _device.scanController = ScanController(_device.uuid, {
+            onReady: function() {
+                _device.cameraSource = _device.scanController.getImage(callback);
+            },
+            onError: function() {
+
+            }
+        });
+    }
+
+    function stopCamera() {
+        if(_device.cameraSource) {
+            _device.cameraSource.stop();
+            _device.scanController.quit();
+            _device.cameraSource = null;
+        }
+    }
+
     // set functions
 
     function setPassword(password) {
@@ -139,33 +184,15 @@ define([
 
     // get functions
 
-    function getStatus() {
-        if(_device === null) {
-            AlertActions.showError(_lang.message.machineNotConnected);
-            return $.Deferred().resolve(_lang.message.machineNotConnected).promise();
-        }
-        return _device.getStatus();
-    }
-
     function getReport() {
         return _do(DeviceConstants.REPORT);
     }
 
-    // Private Functions
-
-    function _deviceConnected(response) {
-        var d = $.Deferred();
-        if(response.status === 'connected') {
-            return d.resolve(DeviceConstants.CONNECTED);
-        }
-        return d.promise();
+    function getSelectedDevice() {
+        return _device;
     }
 
-    // function _deviceConnectFailed(ex) {
-    //     console.log(ex);
-    //     AlertActions.showError(ex);
-    //     return $.Deferred().resolve(ex).promise();
-    // }
+    // Private Functions
 
     function _do(command) {
         var d = $.Deferred(),
@@ -228,7 +255,7 @@ define([
         });
     }
 
-    function _getDeviceConnection(uuid) {
+    function _switchDevice(uuid) {
         for(var i = 0; i < _devices.length; i++) {
             if(_devices[i].uuid === uuid) {
                 return _devices[i];
@@ -242,10 +269,29 @@ define([
         }), 1000);
     }
 
+    function _scanDeviceError(devices) {
+        devices.forEach(function(device) {
+            if(typeof(_errors[device.serial]) === 'string')  {
+                if(_errors[device.serial] !== device.error_label && device.error_label) {
+                    if(window.debug) {
+                        AlertActions.showError(device.name + ': ' + device.error_label)
+                        _errors[device.serial] = device.error_label;
+                    }
+                }
+                else if(!device.error_label) {
+                    _errors[device.serial] = '';
+                }
+            }
+            else {
+                _errors[device.serial] = '';
+            }
+        });
+    }
+
     // Core
 
     function DeviceSingleton() {
-        if(_instance !== null){
+        if(_instance !== null) {
             throw new Error('Cannot instantiate more than one DeviceSingleton, use DeviceSingleton.get_instance()');
         }
 
@@ -263,8 +309,16 @@ define([
             this.stop               = stop;
             this.quit               = quit;
             this.setPassword        = setPassword;
-            this.getStatus          = getStatus;
             this.getReport          = getReport;
+            this.getSelectedDevice  = getSelectedDevice;
+            this.startCamera        = startCamera;
+            this.stopCamera         = stopCamera;
+            this.ls                 = ls;
+            this.fileInfo           = fileInfo;
+
+            Discover(function(devices) {
+                _scanDeviceError(devices);
+            });
         }
     };
 

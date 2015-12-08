@@ -7,6 +7,7 @@ define([
     'jsx!widgets/Radio-Control',
     'plugins/classnames/index',
     'helpers/api/config',
+    'helpers/object-assign'
 ], function($, React, SliderControl, DropdownControl, SwitchControl, RadioControl, ClassNames, Config) {
 
 var mode = {
@@ -35,33 +36,33 @@ var mode = {
 
             // Layers
             layer_height                        : 0.2,
-            first_layer_height                  : 0.25,
+            first_layer_height                  : 0.35,
             perimeters                          : 3,
             top_solid_layers                    : 3,
             bottom_solid_layers                 : 3,
 
             // Infill
-            fill_density                        : 10,
-            fill_pattern                        : 'auto',
+            fill_density                        : 20,
+            fill_pattern                        : 'honeycomb',
             spiral_vase                         : 0,
 
             // Support
             support_material                    : 1,
-            support_material_spacing            : 2.5,
-            support_material_threshold          : 60,
+            support_material_spacing            : 2,
+            support_material_threshold          : 55,
             support_material_pattern            : 'auto',
             support_material_contact_distance   : 0.2,
             raft_layers                         : 4,
 
             // Speed
-            travel_speed                        : 150,
-            support_material_speed              : 80,
-            infill_speed                        : 80,
-            first_layer_speed                   : 30,
+            travel_speed                        : 80,
+            support_material_speed              : 40,
+            infill_speed                        : 50,
+            first_layer_speed                   : 20,
             solid_infill_speed                  : 20,
-            perimeter_speed                     : 70,
-            external_perimeter_speed            : 50,
-            bridge_speed                        : 60,
+            perimeter_speed                     : 30,
+            external_perimeter_speed            : 20,
+            bridge_speed                        : 40,
 
             // Custom
             custom                              : ''
@@ -90,6 +91,7 @@ var mode = {
 
         componentWillMount: function() {
             lang = this.props.lang.print.advanced;
+            Object.assign(advancedSetting, this.props.setting);
             this._updateCustomField();
         },
 
@@ -229,7 +231,7 @@ var mode = {
             this.setState({
                 selectedTab: selectedTab
             });
-            this._handleApply(false);
+            this._handleApply(true);
         },
 
         _handleParameterChange: function(key, e) {
@@ -285,15 +287,17 @@ var mode = {
             this._handleBackToSetting();
         },
 
-        _handleApply: function(closeWindow) {
-            closeWindow = closeWindow || true;
+        _handleApply: function(showAdvancedSetting) {
             this._processCustomInput();
 
             var _settings = {};
             Object.keys(advancedSetting).forEach(function(name) {
                 _settings[name] = advancedSetting[name];
             });
-            this.props.onApply(_settings, closeWindow);
+            this.props.onApply(_settings);
+            if(!showAdvancedSetting) {
+                this.props.onClose();
+            }
         },
 
         _handleCloseAdvancedSetting: function(e) {
@@ -354,7 +358,7 @@ var mode = {
                             id="temperature"
                             key="temperature"
                             label={lang.temperature}
-                            min={10}
+                            min={170}
                             max={230}
                             step={1}
                             default={advancedSetting.temperature}
@@ -377,9 +381,9 @@ var mode = {
                             id="layer_height"
                             key="layer_height"
                             label={lang.layerHeight}
-                            min={0.02}
-                            max={20}
-                            step={0.01}
+                            min={0.05}
+                            max={0.4}
+                            step={0.05}
                             default={advancedSetting.layer_height}
                             onChange={this._handleControlValueChange} />
 
@@ -387,9 +391,9 @@ var mode = {
                             id="first_layer_height"
                             key="first_layer_height"
                             label={lang.firstLayerHeight}
-                            min={0.02}
+                            min={0.05}
                             max={0.4}
-                            step={0.01}
+                            step={0.05}
                             default={advancedSetting.first_layer_height}
                             onChange={this._handleControlValueChange} />
 
@@ -402,8 +406,8 @@ var mode = {
                             id="perimeters"
                             key="perimeters"
                             label={lang.shellSurface}
-                            min={0}
-                            max={20}
+                            min={1}
+                            max={6}
                             step={1}
                             default={advancedSetting.perimeters}
                             onChange={this._handleControlValueChange} />
@@ -412,8 +416,8 @@ var mode = {
                             id="top_solid_layers"
                             key="top_solid_layers"
                             label={lang.solidLayerTop}
-                            min={0}
-                            max={20}
+                            min={1}
+                            max={6}
                             step={1}
                             default={advancedSetting.top_solid_layers}
                             onChange={this._handleControlValueChange} />
@@ -422,8 +426,8 @@ var mode = {
                             id="bottom_solid_layers"
                             key="bottom_solid_layers"
                             label={lang.solidLayerBottom}
-                            min={0}
-                            max={20}
+                            min={1}
+                            max={6}
                             step={1}
                             default={advancedSetting.bottom_solid_layers}
                             onChange={this._handleControlValueChange} />
@@ -492,8 +496,8 @@ var mode = {
                             id="support_material_spacing"
                             key="support_material_spacing"
                             label={lang.spacing}
-                            min={0.1}
-                            max={50}
+                            min={0}
+                            max={5}
                             step={0.1}
                             default={advancedSetting.support_material_spacing}
                             onChange={this._handleControlValueChange} />
@@ -519,9 +523,9 @@ var mode = {
                             id="support_material_contact_distance"
                             key="support_material_contact_distance"
                             label={lang.zDistance}
-                            min={0.05}
-                            max={20}
-                            step={0.01}
+                            min={0}
+                            max={5}
+                            step={0.1}
                             default={advancedSetting.support_material_contact_distance}
                             onChange={this._handleControlValueChange} />
 
@@ -534,8 +538,8 @@ var mode = {
                             id="raft_layers"
                             key="raft_layers"
                             label={lang.raftLayers}
-                            min={0}
-                            max={20}
+                            min={1}
+                            max={6}
                             step={1}
                             default={advancedSetting.raft_layers}
                             onChange={this._handleControlValueChange} />
@@ -556,7 +560,7 @@ var mode = {
                             id="travel_speed"
                             key="travel_speed"
                             label={lang.traveling}
-                            min={1}
+                            min={10}
                             max={150}
                             step={1}
                             default={advancedSetting.travel_speed}
@@ -570,7 +574,7 @@ var mode = {
                             id="support_material_speed"
                             key="support_material_speed"
                             label={lang.support}
-                            min={1}
+                            min={10}
                             max={150}
                             step={1}
                             default={advancedSetting.support_material_speed}
@@ -580,7 +584,7 @@ var mode = {
                             id="infill_speed"
                             key="infill_speed"
                             label={lang.infill}
-                            min={1}
+                            min={10}
                             max={150}
                             step={1}
                             default={advancedSetting.infill_speed}
@@ -709,7 +713,7 @@ var mode = {
 
                 case mode.setup:
                     button1 = (<a className="btn" onClick={this._handleLoadPreset}>{lang.loadPreset}</a>);
-                    button2 = (<a className="btn" onClick={this._handleApply}>{lang.apply}</a>);
+                    button2 = (<a className="btn" onClick={this._handleApply.bind(null, false)}>{lang.apply}</a>);
                     button3 = (<a className="btn" onClick={this._handleOpenSaveAsPreset}>{lang.saveAsPreset}</a>);
                     button4 = (<a className="btn" onClick={this._handleCloseAdvancedSetting}>{lang.cancel}</a>);
                     break;

@@ -22,7 +22,9 @@ define([
     'helpers/api/discover',
     'helpers/api/config',
     'helpers/device-master',
-    'plugins/classnames/index'
+    'plugins/classnames/index',
+    'app/actions/global-actions',
+    'app/constants/device-constants'
 ], function(
     $,
     React,
@@ -47,13 +49,16 @@ define([
     Discover,
     Config,
     DeviceMaster,
-    ClassNames
+    ClassNames,
+    GlobalActions,
+    DeviceConstants
 ) {
     'use strict';
 
     return function(args) {
         args = args || {};
-        var lang = args.state.lang,
+        var _id = 'TopMenu',
+            lang = args.state.lang,
             genericClassName = {
                 'item': true
             },
@@ -121,7 +126,8 @@ define([
                         latestVersion: '',
                         updateFile: undefined,
                         device: {}
-                    }
+                    },
+                    showDeviceList  : false
                 };
             },
 
@@ -260,13 +266,12 @@ define([
                 types[type]();
             },
 
-            _handlePopup: function(type, id, message, customText) {
+            _handlePopup: function(type, id, message) {
                 this.setState({
                     showModal   : true,
                     type        : type,
                     sourceId    : id,
-                    message     : message,
-                    customText  : customText
+                    message     : message
                 });
             },
 
@@ -296,10 +301,6 @@ define([
                 AlertActions.notifyYes(this.state.sourceId);
             },
 
-            _handleCustom: function() {
-                AlertActions.notifyCustom(this.state.sourceId);
-            },
-
             _handleShowDeviceList: function() {
                 var self = this,
                     refreshOption = function(devices) {
@@ -326,10 +327,18 @@ define([
                 this.setState({ showDeviceList: !this.state.showDeviceList });
             },
 
-            _handleSelectDevice: function(uuid, e) {
+            _handleSelectDevice: function(device, e) {
                 e.preventDefault();
-                DeviceMaster.setPassword('flux');
-                DeviceMaster.selectDevice(uuid);
+                // AlertActions.showInfo(lang.message.connecting);
+                DeviceMaster.selectDevice(device).then(function(status) {
+                    if(status === DeviceConstants.CONNECTED) {
+                        GlobalActions.showMonitor(true);
+                    }
+                    else if (status === DeviceConstants.TIMEOUT) {
+                        AlertActions.showPopupError(_id, lang.message.connectionTimeout);
+                    }
+                });
+
                 this.setState({ showDeviceList: false });
             },
 
@@ -367,7 +376,7 @@ define([
                     return (
                         <li
                             name={device.uuid}
-                            onClick={this._handleSelectDevice.bind(null, device.uuid)}>
+                            onClick={this._handleSelectDevice.bind(null, device)}>
                             <label className="name">{device.name}</label>
                             <label className="status">Working / Print / 35%</label>
                         </li>
@@ -446,12 +455,10 @@ define([
                             lang={lang}
                             type={this.state.type}
                             open={this.state.showModal}
-                            customText={this.state.customText}
                             message={this.state.message}
                             onRetry={this._handleRetry}
                             onAbort={this._handleAbort}
                             onYes={this._handleYes}
-                            onCustom={this._handleCustom}
                             onClose={this._handleModalClose} />
 
                         <div className="device" onClick={this._handleShowDeviceList}>

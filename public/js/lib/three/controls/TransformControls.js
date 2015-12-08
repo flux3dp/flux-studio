@@ -807,6 +807,8 @@
 
 			var planeIntersect = intersectObjects( pointer, [ scope.gizmo[_mode].activePlane ] );
 
+			var sensitivity = 15;
+
 			point.copy( planeIntersect.point );
 
 			if ( _mode == "translate" ) {
@@ -859,7 +861,7 @@
 
 					if ( scope.axis == "XYZ") {
 
-						scale = 1 + ( ( point.y ) / 50 );
+						scale = 1 + ( ( point.y ) / sensitivity );
 
 						scope.object.scale.x = oldScale.x * scale;
 						scope.object.scale.y = oldScale.y * scale;
@@ -869,8 +871,8 @@
 
 						point.applyMatrix4( tempMatrix.getInverse( worldRotationMatrix ) );
 
-						if ( scope.axis == "X" ) scope.object.scale.x = oldScale.x * ( 1 + point.x / 50 );
-						if ( scope.axis == "Y" ) scope.object.scale.y = oldScale.y * ( 1 + point.y / 50 );
+						if ( scope.axis == "X" ) scope.object.scale.x = oldScale.x * ( 1 + point.x / sensitivity );
+						if ( scope.axis == "Y" ) scope.object.scale.y = oldScale.y * ( 1 + point.y / sensitivity );
 						if ( scope.axis == "Z" ) scope.object.scale.z = oldScale.z * ( 1 + point.z / 50 );
 
 					}

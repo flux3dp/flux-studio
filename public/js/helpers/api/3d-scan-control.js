@@ -102,6 +102,7 @@ define([
                                 mime_type = data.mime;
                                 break;
                             case 'ok':
+                                console.log('is ok from controller');
                                 imageHandler(image_blobs, mime_type);
                                 image_blobs = [];
 
@@ -229,6 +230,21 @@ define([
             takeControl: function(callback) {
                 ws.send('take_control');
             },
+
+            quit: function(opts) {
+                var d = $.Deferred();
+                events.onMessage = function(result) {
+                    d.resolve(result);
+                };
+
+                events.onError = function(result) {
+                    d.resolve(result);
+                }
+
+                ws.send('quit');
+
+                return d.promise();
+            }
         };
     };
 });

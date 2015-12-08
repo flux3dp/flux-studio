@@ -3,11 +3,16 @@ define([
     'react',
     'app/actions/print',
     'plugins/classnames/index',
-    'helpers/device-master'
-], function($, React, printController, ClassNames, DeviceMaster) {
+    'helpers/device-master',
+    'helpers/api/config',
+], function($, React, printController, ClassNames, DeviceMaster, Config) {
     'use strict';
 
-    var lang;
+    var lang,
+        settings = {
+            raftOn: true,
+            supportOn: true
+        };
 
     return React.createClass({
 
@@ -24,9 +29,12 @@ define([
         },
 
         getInitialState: function() {
+            var s = Config().read('left-panel');
+            settings = !!s ? s : settings;
+
             return {
-                raftOn              : true,
-                supportOn           : true,
+                raftOn              : settings.raftOn,
+                supportOn           : settings.supportOn,
                 previewOn           : false,
                 previewCurrentLayer : 0,
                 previewLayerCount   : this.props.previewLayerCount,
@@ -60,6 +68,8 @@ define([
             this.setState({
                 raftOn: !this.state.raftOn
             });
+            settings.raftOn = !this.state.raftOn;
+            Config().write('left-panel', settings);
             this.props.onRaftClick(!this.state.raftOn);
         },
 
@@ -67,6 +77,8 @@ define([
             this.setState({
                 supportOn: !this.state.supportOn
             });
+            settings.supportOn = !this.state.supportOn;
+            Config().write('left-panel', settings);
             this.props.onSupportClick(!this.state.supportOn);
         },
 
@@ -130,7 +142,7 @@ define([
             }.bind(this));
 
             return (
-                <li>
+                <li title={lang.qualityTitle}>
                     <label className="popup-selection">
                         <input className="popup-open" name="popup-open" type="checkbox" onClick={this._onOpenSubPopup}/>
                         <div className="display-text">
@@ -198,7 +210,7 @@ define([
 
         _renderRaft: function() {
             return (
-                <li onClick={this._handleToggleRaft}>
+                <li title={lang.raftTitle} onClick={this._handleToggleRaft}>
                     <div>{this.state.raftOn ? lang.raft_on : lang.raft_off}</div>
                 </li>
             );
@@ -206,7 +218,7 @@ define([
 
         _renderSupport: function() {
             return (
-                <li onClick={this._handleToggleSupport}>
+                <li title={lang.supportTitle} onClick={this._handleToggleSupport}>
                     <div>{this.state.supportOn ? lang.support_on : lang.support_off}</div>
                 </li>
             );
@@ -214,7 +226,7 @@ define([
 
         _renderAdvanced: function() {
             return (
-                <li onClick={this._handleOpenAdvancedSetting}>
+                <li title={lang.advancedTitle} onClick={this._handleOpenAdvancedSetting}>
                     <div>{this.props.lang.print.left_panel.advanced}</div>
                 </li>
             );
@@ -222,7 +234,7 @@ define([
 
         _renderPreview: function() {
             return (
-                <li onClick={this._handleOpenPreview}>
+                <li title={lang.previewTitle} onClick={this._handleOpenPreview}>
                     <label className="popup-selection">
                         <input ref="preview" className="popup-open" name="popup-open" type="checkbox" onClick={this._onOpenSubPopup}/>
                         <div className="display-text">
@@ -251,7 +263,7 @@ define([
 
         render: function() {
             var quality     = this._renderQuanlity(),
-                material    = this._renderMaterialPallet(),
+                material    = '',
                 raft        = this._renderRaft(),
                 support     = this._renderSupport(),
                 advanced    = this._renderAdvanced(),

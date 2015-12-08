@@ -27,7 +27,11 @@ define([
 
         componentDidMount: function() {
             PerspectiveCamera.init(this);
-            AlertStore.onRetry(this._handleRetry);
+            // AlertStore.onRetry(this._handleRetry);
+            // AlertStore.onAnswer(this._handleAnswer);
+            // AlertStore.onAbort(this._handleGeneric);
+            // AlertStore.onCancel(this._handleGeneric);
+            // AlertStore.onRetry(this._handleGeneric);
         },
 
         componentWillReceiveProps: function(nextProps) {
@@ -36,6 +40,14 @@ define([
 
         _handleRetry: function(id) {
             console.log('sending retry with ID:' + id);
+        },
+
+        _handleAnswer: function(id, isYes) {
+            console.log(id, isYes);
+        },
+
+        _handleGeneric: function(id, message) {
+            console.log(id, message);
         },
 
         _handleGetFCode: function() {
@@ -52,7 +64,8 @@ define([
         },
 
         _showInfo: function() {
-            AlertActions.showPopupInfo('a1','核子廢料的處理是各國共同關注的問題');
+            // AlertActions.showPopupRetryAbort('a1','核子廢料的處理是各國共同關注的問題');
+            AlertActions.showPopupRetry('abc', '123');
         },
 
         _showWarning: function() {
@@ -77,6 +90,7 @@ define([
                         'btn-hexagon': true,
                         'btn-get-fcode': true
                     }),
+                    title: lang.print.getFcodeTitle,
                     onClick: this._handleGetFCode
                 }, {
                     label: lang.laser.go,
@@ -86,6 +100,7 @@ define([
                         'btn-hexagon': true,
                         'btn-go': true
                     }),
+                    title: lang.print.goTitle,
                     onClick: this._handleGo
                 }];
 
@@ -101,12 +116,10 @@ define([
             return (
                 <div className='rightPanel'>
                     <a className="btn" onClick={this._handleGetGCode}>Gcode</a><p/>
-                    {
-                    /*<a className="btn" onClick={this._handleTest}>Notify</a>
+                    <a className="btn" onClick={this._handleTest}>Notify</a>
                     <a className="btn" onClick={this._showInfo}>Info</a>
                     <a className="btn" onClick={this._showWarning}>Warning</a>
                     <a className="btn" onClick={this._showError}>Error</a>
-                    */}
 
                     <div id="cameraViewController" className="cameraViewController"></div>
                     {actionButtons}

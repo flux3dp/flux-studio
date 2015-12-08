@@ -424,7 +424,12 @@ define(function() {
                 advanced: 'ADVANCED',
                 preview: 'PREVIEW',
                 plaTitle: 'PICK THE COLOR OF THE FILAMENT',
-                transparent: 'TRANSPARENT'
+                transparent: 'TRANSPARENT',
+                qualityTitle: 'It will affect the outcome surface smoothness of your object. Better qualities need more time',
+                raftTitle: 'A Raft are layers built under your part and help it stick to the base plate',
+                supportTitle: 'A Support is a generated structure to support overhanging part of your object, to prevent filament dropping',
+                previewTitle: 'Preview the actual path of toolhead during printing task',
+                advancedTitle: 'Detail 3d printing parameters, you may acheive better result than default by adjusting them'
             },
             right_panel: {
                 get: 'Get',
@@ -450,7 +455,11 @@ define(function() {
             pause: 'PAUSE',
             continue: 'CONTINUE',
             restart: 'RESTART',
-            download_prompt: 'please enter file name'
+            download_prompt: 'please enter file name',
+            importTitle: 'Import 3D models ( .stl )',
+            getFcodeTitle: 'Save toolhead path and config into FCode file ( *.fc )',
+            goTitle: 'Print it out',
+            deviceTitle: 'Show device monitor'
         },
         laser: {
             import: 'Import',
@@ -686,7 +695,18 @@ define(function() {
             change_filament: 'CHANGE FILLAMENT',
             browse_file: 'BROWSE FILE',
             monitor: 'MONITOR',
-            currentTemperature: 'Current Temp'
+            currentTemperature: 'Current Temp',
+            nothingToPrint: 'There is nothing to print',
+            go: 'GO',
+            pause: 'PAUSE',
+            stop: 'STOP',
+            record: 'RECORD',
+            connecting: 'Connecting, please wait...',
+            headerOffline: 'Device head is not connected or missing',
+            headerTilt: 'Device head is tilted, please connect all 6 magnents',
+            unknownHead: 'Device head is unknown, please connect to a correct header',
+            fanFailure: 'Fan failed / stucked, you can spin it with a pancil',
+            shake: 'Head encountered unexpected shake'
         },
         alert: {
             caption: 'Error',
@@ -694,12 +714,12 @@ define(function() {
             info: 'INFO',
             warning: 'WARNING',
             error: 'ERROR',
-            retry: 'Retry',
-            abort: 'Abort',
-            cancel: 'Cancel',
-            ok: 'Ok',
-            yes: 'Yes',
-            no: 'No',
+            retry: 'RETRY',
+            abort: 'ABORT',
+            cancel: 'CANCEL',
+            ok: 'OK',
+            yes: 'YES',
+            no: 'NO',
             stop: 'Stop'
         },
         color: {
@@ -721,7 +741,8 @@ define(function() {
             connected: 'Connected',
             machineNotConnected: 'Machine is not connected',
             notPrinting: 'Printing is not in progress',
-            nothingToPrint: 'Nothing to print (source blob missing)'
+            nothingToPrint: 'Nothing to print (source blob missing)',
+            connectionTimeout: 'device is not responding, connection timeout'
         }
     };
 });

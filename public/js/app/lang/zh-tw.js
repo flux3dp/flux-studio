@@ -424,7 +424,12 @@ define(function() {
                 advanced: 'ADVANCED',
                 preview: 'PREVIEW',
                 plaTitle: 'PICK THE COLOR OF THE FILAMENT',
-                transparent: 'TRANSPARENT'
+                transparent: 'TRANSPARENT',
+                qualityTitle: 'It will affect the outcome surface smoothness of your object. Better qualities need more time',
+                raftTitle: 'A Raft are layers built under your part and help it stick to the base plate',
+                supportTitle: 'A Support is a generated structure to support overhanging part of your object, to prevent filament dropping',
+                previewTitle: 'Preview the actual path of toolhead during printing task',
+                advancedTitle: 'Detail 3d printing parameters, you may acheive better result than default by adjusting them'
             },
             right_panel: {
                 get: 'Get',
@@ -450,7 +455,11 @@ define(function() {
             pause: '暫停',
             continue: '繼續',
             restart: '重新開始',
-            download_prompt: '請輸入檔案名稱'
+            download_prompt: '請輸入檔案名稱',
+            importTitle: 'Import 3D models ( .stl )',
+            getFcodeTitle: 'Save toolhead path and config into FCode file ( *.fc )',
+            goTitle: 'Print it out',
+            deviceTitle: 'Show device monitor'
         },
         laser: {
             import: '打開⋯',
@@ -686,7 +695,18 @@ define(function() {
             change_filament: 'CHANGE FILLAMENT',
             browse_file: 'BROWSE FILE',
             monitor: 'MONITOR',
-            currentTemperature: 'Current Temp'
+            currentTemperature: 'Current Temp',
+            nothingToPrint: 'There is nothing to print',
+            go: '開始',
+            pause: '暫停',
+            stop: 'STOP',
+            record: 'RECORD',
+            connecting: 'Connecting, please wait...',
+            headerOffline: '沒有偵測到列印工具頭',
+            headerTilt: '請確認磁鐵關節正確的附著',
+            unknownHead: '請更換成列印工具頭',
+            fanFailure: 'Fan failed / stucked, 請用細針戳一下',
+            shake: 'Head encountered unexpected shake'
         },
         alert: {
             caption: '錯誤',
@@ -721,7 +741,8 @@ define(function() {
             connected: 'Connected',
             machineNotConnected: 'Machine is not connected',
             notPrinting: 'Printing is not in progress',
-            nothingToPrint: 'Nothing to print (source blob missing)'
+            nothingToPrint: 'Nothing to print (source blob missing)',
+            connectionTimeout: 'device is not responding, connection timeout'
         }
     };
 });

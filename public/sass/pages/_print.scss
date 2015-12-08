@@ -636,6 +636,7 @@ input.switch:checked ~ label:after {
                         bottom: 0;
                         text-align: center;
                         width: 100%;
+                        overflow: hidden;
                     }
                     .name.selected {
                         padding: 0 8px;
@@ -1184,6 +1185,9 @@ input.switch:checked ~ label:after {
     .select-printer {
         bottom: 65px;
         right: 240px;
+    }
+    .modal-window {
+        z-index: 99;
     }
 }
 

@@ -19,6 +19,13 @@ define([], function(){
         COMPLETED       : 'COMPLETED',
         IDLE            : 'IDLE',
         RESUMING        : 'RESUMING',
+        AUTH_ERROR      : 'AUTH_ERROR',
+        HEADER_OFFLINE  : 'HEADER_OFFLINE',
+        HEADER_ERROR    : 'HEADER_ERROR',
+        WRONG_HEADER    : 'WRONG_HEADER',
+        TILT            : 'TILT',
+        FAN_FAILURE     : 'FAN_FAILURE',
+        TIMEOUT         : 'TIMEOUT',
 
         // Command
         RESUME          : 'RESUME',
@@ -26,6 +33,7 @@ define([], function(){
         STOP            : 'STOP',
         REPORT          : 'REPORT',
         ABORT           : 'ABORT',
-        QUIT            : 'QUIT'
+        QUIT            : 'QUIT',
+        LS              : 'LS'
     };
 });
