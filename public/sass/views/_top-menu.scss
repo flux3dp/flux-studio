@@ -92,11 +92,6 @@
         &:last-child {
             margin: 0;
         }
-
-        &:hover img {
-            // -webkit-filter: invert(1) opacity(0.25);
-            transform: rotate(180deg);
-        }
     }
 
     .device {

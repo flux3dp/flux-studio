@@ -3334,8 +3334,6 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         .top-menu .item p,
         .top-menu .item:last-child {
             margin: 0; }
-        .top-menu .item:hover img {
-            transform: rotate(180deg); }
     .top-menu .device {
         font-size: 1rem;
         line-height: 2rem;
