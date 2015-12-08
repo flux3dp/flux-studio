@@ -4,9 +4,21 @@ define([
     'jsx!widgets/Select',
     'jsx!widgets/List',
     'helpers/api/discover',
+    'helpers/device-master',
     'helpers/api/touch',
-    'helpers/api/config'
-], function(React, $, SelectView, ListView, discover, touch, config) {
+    'helpers/api/config',
+    'app/constants/device-constants'
+], function(
+    React,
+    $,
+    SelectView,
+    ListView,
+    discover,
+    DeviceMaster,
+    touch,
+    config,
+    DeviceConstants
+) {
     'use strict';
 
     var View = React.createClass({
@@ -34,7 +46,7 @@ define([
                 waiting: false,
                 showPassword: false,
                 loadFinished: false,
-                discoverMethods: undefined
+                discoverMethods: {}
             };
         },
 
@@ -96,10 +108,6 @@ define([
                 _opts = {
                     onSuccess: function(data) {
                         self._returnSelectedPrinter();
-                        self.setState({
-                            showPassword: false,
-                            waiting: false
-                        });
                     },
                     onFail: function(data) {
                         opts.onError();
@@ -137,7 +145,26 @@ define([
         },
 
         _returnSelectedPrinter: function() {
-            this.props.onGettingPrinter(this.selected_printer);
+            var self = this;
+
+            if ('00000000000000000000000000000000' === self.selected_printer.uuid) {
+                self.props.onGettingPrinter(self.selected_printer);
+            }
+            else {
+                DeviceMaster.selectDevice(self.selected_printer).then(function(status) {
+                    if(status === DeviceConstants.CONNECTED) {
+                        self.props.onGettingPrinter(self.selected_printer);
+                        self.setState({
+                            showPassword: false,
+                            waiting: false
+                        });
+                    }
+                    else if (status === DeviceConstants.TIMEOUT) {
+                        AlertActions.showPopupError('printer-selector', lang.message.connectionTimeout);
+                    }
+                });
+            }
+
         },
 
         _renderAuthFailure: function(lang) {
@@ -251,18 +278,32 @@ define([
                     });
                 };
 
-            self.setState({
-                discoverMethods: discover(
-                    'printer-selector',
-                    function(printers) {
-                        refreshOption(printers);
+            if (false === window.FLUX.debug) {
+                config().read('printers', {
+                    onFinished: function(response) {
+                        response = response || [];
+
+                        refreshOption(response);
                     }
-                )
-            });
+                });
+            }
+            else {
+                self.setState({
+                    discoverMethods: discover(
+                        'printer-selector',
+                        function(printers) {
+                            refreshOption(printers);
+                        }
+                    )
+                });
+            }
+
         },
 
         componentWillUnmount: function() {
-            this.state.discoverMethods.removeListener('printer-selector');
+            if ('function' === typeof this.state.discoverMethods.removeListener) {
+                this.state.discoverMethods.removeListener('printer-selector');
+            }
         }
     });
 
