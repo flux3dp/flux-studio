@@ -361,7 +361,6 @@ define([
                     selectedDevice: selectedDevice,
                     previewUrl: previewUrl
                 });
-                console.log(selectedDevice, fcode);
             },
 
             _handleMonitorClose: function() {

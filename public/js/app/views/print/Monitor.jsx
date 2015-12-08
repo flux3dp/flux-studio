@@ -268,8 +268,6 @@ define([
                 previewUrl: previewUrl,
                 path: pathArray.slice()
             });
-            console.log(this.state.mode, pathArray.join('/'));
-            console.log(history);
         },
 
         _startReport: function() {
