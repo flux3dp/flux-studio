@@ -398,13 +398,13 @@ define([
                                     self._openBlocker(false);
                                     self.setState({
                                         openAlert: true,
-                                        isScanStarted: false,
-                                        showCamera: true,
                                         error: {
                                             caption: self.state.lang.scan.error,
-                                            message: message
-                                        },
-                                        scanTimes: self.state.scanTimes - 1
+                                            message: message,
+                                            onClose: function() {
+                                                openProgressBar(onScan);
+                                            }
+                                        }
                                     });
                                 }
                             };
