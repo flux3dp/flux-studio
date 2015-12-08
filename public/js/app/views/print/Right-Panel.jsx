@@ -27,11 +27,6 @@ define([
 
         componentDidMount: function() {
             PerspectiveCamera.init(this);
-            // AlertStore.onRetry(this._handleRetry);
-            // AlertStore.onAnswer(this._handleAnswer);
-            // AlertStore.onAbort(this._handleGeneric);
-            // AlertStore.onCancel(this._handleGeneric);
-            // AlertStore.onRetry(this._handleGeneric);
         },
 
         componentWillReceiveProps: function(nextProps) {
@@ -70,7 +65,6 @@ define([
         },
 
         _showInfo: function() {
-            // AlertActions.showPopupRetryAbort('a1','核子廢料的處理是各國共同關注的問題');
             AlertActions.showPopupRetry('abc', '123');
         },
 

@@ -54,7 +54,8 @@ define([
         leftPanelWidth = 275,
         ddHelper = 0,
         defaultFileName = '',
-        cameraLight;
+        cameraLight,
+        _id = 'PRINT.JS';
 
     var s = {
         diameter: 170,
@@ -298,7 +299,6 @@ define([
             mesh.name = 'custom';
             mesh.plane_boundary = planeBoundary(mesh);
 
-            alignCenter();
             addSizeProperty(mesh);
             groundIt(mesh);
             selectObject(mesh);
@@ -794,16 +794,13 @@ define([
     }
 
     function setAdvanceParameter(settings) {
-        var _settings = Object.keys(settings).map(function(key) {
-            return `${key}=${settings[key]} \n`;
-        });
+        // var _settings = Object.keys(settings).map(function(key) {
+        //     return `${key}=${settings[key]} \n`;
+        // });
         //slicer.setParameter('advancedSettings', _settings.join('\n')).then(function(result) {
         slicer.setParameter('advancedSettings', settings.custom).then(function(result, errors) {
-            console.log(result, errors);
-            if (result.status === 'error') {
-                index = keys.length;
-                // todo: error logging
-                console.log(result.error);
+            if(errors.length > 0) {
+                AlertActions.showPopupError(_id, errors.join('\n'));
             }
         });
         blobExpired = true;
