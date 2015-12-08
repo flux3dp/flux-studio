@@ -126,8 +126,7 @@ define([
                         latestVersion: '',
                         updateFile: undefined,
                         device: {}
-                    },
-                    showDeviceList  : false
+                    }
                 };
             },
 
