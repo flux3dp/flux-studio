@@ -34,6 +34,7 @@ define([
 
         getDefaultProps: function() {
             return {
+                uniqleId: '',
                 lang: i18n.get(),
                 className: '',
                 onGettingPrinter: function() {},
@@ -43,6 +44,7 @@ define([
 
         getInitialState: function() {
             return {
+                discoverId: 'printer-selector-' + (this.props.uniqleId || ''),
                 printOptions: [],
                 authFailure: false,
                 waiting: false,
@@ -194,7 +196,6 @@ define([
                 console.log(ex, printer);
             }
 
-            // TODO: convert st_id and head_module into plain text
             return (
                 <label className="device printer-item" data-meta={meta}>
                     <input type="radio" name="printer-group" value={printer.uuid}/>
@@ -294,7 +295,7 @@ define([
             else {
                 self.setState({
                     discoverMethods: discover(
-                        'printer-selector',
+                        self.state.discoverId,
                         function(printers) {
                             refreshOption(printers);
                         }
@@ -306,7 +307,7 @@ define([
 
         componentWillUnmount: function() {
             if ('function' === typeof this.state.discoverMethods.removeListener) {
-                this.state.discoverMethods.removeListener('printer-selector');
+                this.state.discoverMethods.removeListener(this.state.discoverId);
             }
         }
     });

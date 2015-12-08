@@ -309,6 +309,7 @@ define([
                 _renderPrinterSelectorWindow: function() {
                     var content = (
                         <PrinterSelector
+                            uniqleId="print"
                             lang={lang}
                             onClose={this._handlePrinterSelectorWindowClose}
                             onGettingPrinter={this._handlePrinterSelected} />

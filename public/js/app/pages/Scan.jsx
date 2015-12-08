@@ -892,7 +892,12 @@ define([
                             self._openBlocker(true);
                         },
                         content = (
-                            <PrinterSelector className="scan-printer-selection" lang={lang} onGettingPrinter={onGettingPrinter}/>
+                            <PrinterSelector
+                                uniqleId="scan"
+                                className="scan-printer-selection"
+                                lang={lang}
+                                onGettingPrinter={onGettingPrinter}
+                            />
                         ),
                         className = {
                             'modal-printer-selecter': true

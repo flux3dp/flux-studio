@@ -179,6 +179,7 @@ define([
                         },
                         content = (
                             <PrinterSelector
+                                uniqleId="laser"
                                 className="laser-device-selection-popup"
                                 lang={lang}
                                 onClose={onClose}
