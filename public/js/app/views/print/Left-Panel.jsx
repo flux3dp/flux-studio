@@ -100,9 +100,6 @@ define([
         },
 
         _handleOpenPreview: function(e) {
-            // e.preventDefault();
-            // var src = this.refs.preview.getDOMNode();
-            // $(src).prop('checked', !this.state.previewOn);
             if(e.target.type === 'range') { return; }
             if(this.props.hasObject) {
                 var src = this.refs.preview.getDOMNode();

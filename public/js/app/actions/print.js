@@ -255,6 +255,7 @@ define([
                 reactSrc.setState({
                     openWaitWindow: false
                 });
+                callback();
             });
 
             geometry.center();
@@ -312,7 +313,6 @@ define([
             });
 
             render();
-            callback();
         });
     }
 
@@ -351,6 +351,7 @@ define([
 
     function onDropFile(e) {
         e.preventDefault();
+        if(previewMode) { return; }
         var files = e.dataTransfer.files;
         if(files.length > 0) {
             appendModels(files, 0, function() {
@@ -362,7 +363,7 @@ define([
 
     function onDragEnter(e) {
         e.preventDefault();
-
+        if(previewMode) { return; }
         if(e.type === 'dragenter') {
             ddHelper++;
         }
@@ -373,6 +374,7 @@ define([
 
     function onDragLeave(e) {
         e.preventDefault();
+        if(previewMode) { return; }
         ddHelper--;
 
         if(ddHelper === 0) {
@@ -386,6 +388,7 @@ define([
 
     function onMouseDown(e) {
         e.preventDefault();
+        if(previewMode) { return; }
         setMousePosition(e);
 
         if (previewMode) {
@@ -1088,7 +1091,7 @@ define([
 
     function sendGCodeParameters() {
         var d = $.Deferred();
-        _syncObjectParameter(objects, 0).then(function() {
+        _syncObjectParameter(objects, 0, function() {
             d.resolve('');
         });
         return d.promise();
@@ -1375,8 +1378,9 @@ define([
     // Private Functions ---
 
     // sync parameters with server
-    function _syncObjectParameter(objects, index) {
-        var d = $.Deferred();
+    function _syncObjectParameter(objects, index, callback) {
+
+        // var d = $.Deferred();
         index = index || 0;
         if (index < objects.length) {
             slicer.set(
@@ -1395,13 +1399,12 @@ define([
                     index = objects.length;
                 }
                 if (index < objects.length) {
-                    return d.resolve(_syncObjectParameter(objects, index + 1));
+                    _syncObjectParameter(objects, index + 1, callback);
                 }
             });
         } else {
-            d.resolve('');
+            callback();
         }
-        return d.promise();
     }
 
     function _addShadowedLight(x, y, z, color, intensity) {
