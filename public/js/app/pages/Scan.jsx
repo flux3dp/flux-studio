@@ -109,6 +109,7 @@ define([
                     if ('undefined' !== typeof this.state.scanCtrlWebSocket &&
                         'undefined' !== typeof this.state.scanModelingWebSocket
                     ) {
+                        this.state.scanControlImageMethods.stop();
                         this.state.scanCtrlWebSocket.connection.close(false);
                         this.state.scanModelingWebSocket.connection.close(false);
                     }
@@ -793,11 +794,10 @@ define([
 
                     camera_image_class = cx({
                         'camera-image' : true,
-                        'hide' : 0 < state.scanTimes
+                        'hide' : false === state.printerIsReady
                     });
 
                     return (
-                        true === state.printerIsReady ?
                         <section ref="operatingSection" className="operating-section">
                             {meshThumbnails}
                             <div id="model-displayer" className="model-displayer">
@@ -805,8 +805,7 @@ define([
                             </div>
                             {settingPanel}
                             {manipulationPanel}
-                        </section> :
-                        ''
+                        </section>
                     );
                 },
 
@@ -874,6 +873,7 @@ define([
                             }
                         },
                         onGettingPrinter = function(auth_printer) {
+                            console.log(self.state.gettingStarted, auth_printer);
                             self.setState({
                                 gettingStarted: true,
                                 selectedPrinter: auth_printer,
@@ -1082,9 +1082,9 @@ define([
                         alert = this._renderAlert(lang),
                         confirm = this._renderConfirm(lang),
                         cx = React.addons.classSet,
-                        selectPrinter = this._renderPrinterSelectorWindow(lang),
                         actionButtons = this._renderActionButtons(lang),
-                        scanStage = this._renderStageSection(lang);
+                        scanStage = this._renderStageSection(lang),
+                        selectPrinter = this._renderPrinterSelectorWindow(lang);
 
                     return (
                         <div className="studio-container scan-studio">
