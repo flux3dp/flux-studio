@@ -251,17 +251,6 @@ define([
                         });
                     }.bind(this));
 
-
-
-                    // director.getFCode().then(function(fcode) {
-                    //     console.log(fcode);
-                    //     this.setState({
-                    //         openPrinterSelectorWindow: false,
-                    //         showMonitor: true,
-                    //         fcode: fcode
-                    //     });
-                    // }.bind(this));
-
                     DeviceMaster.selectDevice(selectedPrinter).then(function(status) {
                         if(status === DeviceConstants.CONNECTED) {
                             this.setState({ printerControllerStatus: status });
