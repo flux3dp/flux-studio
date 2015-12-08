@@ -5,6 +5,7 @@ define([
     'jsx!widgets/List',
     'helpers/api/discover',
     'helpers/device-master',
+    'helpers/i18n',
     'helpers/api/touch',
     'helpers/api/config',
     'app/constants/device-constants'
@@ -15,6 +16,7 @@ define([
     ListView,
     discover,
     DeviceMaster,
+    i18n,
     touch,
     config,
     DeviceConstants
@@ -32,10 +34,10 @@ define([
 
         getDefaultProps: function() {
             return {
-                lang: React.PropTypes.object,
-                className: React.PropTypes.string,
-                onGettingPrinter: React.PropTypes.func,
-                onClose: React.PropTypes.func
+                lang: i18n.get(),
+                className: '',
+                onGettingPrinter: function() {},
+                onClose: function() {}
             };
         },
 
@@ -181,7 +183,9 @@ define([
         },
 
         _renderPrinterItem: function(printer) {
-            var meta;
+            var meta,
+                lang = this.props.lang,
+                status = lang.machine_status;
 
             try {
                 meta = JSON.stringify(printer);
@@ -196,7 +200,7 @@ define([
                     <input type="radio" name="printer-group" value={printer.uuid}/>
                     <div className="col device-name">{printer.name}</div>
                     <div className="col module">{printer.head_module || 'UNKNOWN'}</div>
-                    <div className="col status">{printer.st_id || 'UNKNOWN'}</div>
+                    <div className="col status">{status[printer.st_id] || status.unknown}</div>
                 </label>
             );
         },
