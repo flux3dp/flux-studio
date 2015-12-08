@@ -293,16 +293,19 @@ define([
                     };
                     director.setParameter('layer_height', quality[level]);
                     advancedSetting.layer_height = quality[level];
-                    console.log(level);
                 },
 
                 _renderAdvancedPanel: function() {
-                    return (
+                    var content = (
                         <AdvancedPanel
                             lang        = {lang}
                             setting     = {advancedSetting}
                             onClose     = {this._handleCloseAdvancedSetting}
                             onApply     = {this._handleApplyAdvancedSetting} />
+                    );
+
+                    return (
+                        <Modal content={content}/>
                     );
                 },
 
