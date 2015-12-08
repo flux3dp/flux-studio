@@ -2,6 +2,7 @@ define([
     'jquery',
     'react',
     'app/actions/laser',
+    'app/actions/progress-actions',
     'jsx!widgets/Select',
     'jsx!views/laser/Setup-Panel',
     'jsx!views/laser/Image-Panel',
@@ -15,6 +16,7 @@ define([
     $,
     React,
     laserEvents,
+    ProgressActions,
     SelectView,
     SetupPanel,
     ImagePanel,
@@ -77,10 +79,15 @@ define([
                     };
                 },
 
-                _openBlocker: function(is_open) {
-                    this.setState({
-                        openBlocker: is_open
-                    })
+                _openBlocker: function(isOpen, onFinished) {
+                    onFinished = onFinished || function() {};
+
+                    if (true === isOpen) {
+                        ProgressActions.open('', '', '', onFinished);
+                    }
+                    else {
+                        ProgressActions.close();
+                    }
                 },
 
                 _inactiveSelectImage: function(e) {
@@ -172,6 +179,7 @@ define([
                         },
                         content = (
                             <PrinterSelector
+                                uniqleId="laser"
                                 className="laser-device-selection-popup"
                                 lang={lang}
                                 onClose={onClose}
@@ -181,14 +189,6 @@ define([
 
                     return (
                         <Modal content={content} onClose={onClose}/>
-                    );
-                },
-
-                _renderBlocker: function(lang) {
-                    return (
-                        true === this.state.openBlocker ?
-                        <Modal content={<div className="spinner-flip spinner-reverse"/>}/> :
-                        ''
                     );
                 },
 
@@ -287,7 +287,6 @@ define([
                             ''
                         ),
                         uploader = this._renderFileUploader(lang),
-                        blocker = this._renderBlocker(lang),
                         actionButtons = this._renderActionButtons(lang),
                         alert = this._renderAlert(lang);
 
@@ -301,7 +300,6 @@ define([
                             </div>
 
                             {uploader}
-                            {blocker}
                             {alert}
                         </div>
                     );

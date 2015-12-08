@@ -5,6 +5,24 @@ define([
 
     return React.createClass({
 
+            propTypes: {
+                lang: React.PropTypes.object,
+                percentage: React.PropTypes.number,
+                remainingTime: React.PropTypes.number,
+                elapsedTime: React.PropTypes.number,
+                onStop: React.PropTypes.func
+            },
+
+            getDefaultProps: function() {
+                return {
+                    lang: {},
+                    percentage: 0,
+                    remainingTime: 0,
+                    elapsedTime: 0,
+                    onStop: function() {}
+                };
+            },
+
             _paddingZero: function(str, len) {
                 var zero = new Array(len + 1),
                     afterPadding = zero.join(0) + str;
@@ -23,16 +41,13 @@ define([
                 var self = this,
                     lang = self.props.lang;
 
-                // TODO: temporary hide remaining time
                 return (
-                    <p className="progress-status">
-                        <span>{lang.scan.complete}:</span>
-                        <span>{self.props.percentage}%</span>
-                        <span className="hide">{lang.scan.remaining_time}:</span>
-                        <span className="hide">{self._formatSecondToTime(self.props.remainingTime)}</span>
-                        <span>{lang.scan.elapsed_time}:</span>
-                        <span>{self._formatSecondToTime(self.props.elapsedTime)}</span>
-                    </p>
+                    <div className="progress-status">
+                        <span className="progress-text">{self.props.percentage}%,</span>
+                        <span className="progress-text">{self._formatSecondToTime(self.props.remainingTime)}</span>
+                        <span className="progress-text">{lang.scan.remaining_time}</span>
+                        <button className="btn btn-hexagon btn-stop-scan" onClick={this.props.onStop}>{lang.scan.stop_scan}</button>
+                    </div>
                 );
             },
 
@@ -41,42 +56,25 @@ define([
 
                 return (
                     <p>
-                        <span>{lang.scan.complete}</span>
+                        <span className="amination-breath">{lang.scan.processing}</span>
                     </p>
                 );
             },
 
             render : function() {
                 var lang = this.props.lang,
-                    is_finished = (100 <= this.props.percentage),
-                    style = {
-                        width: Math.min(this.props.percentage, 100) + '%'
-                    },
+                    isFinish = (100 <= this.props.percentage),
                     content = (
-                        true === is_finished ?
+                        true === isFinish ?
                         this._renderFinish() :
                         this._renderProgress()
                     );
 
                 return (
                     <div className="scan-progress">
-                        <h4>{lang.scan.convert_to_3d_model}</h4>
-                        <div className="progress">
-                            <div className="progress-bar progress-bar-striped active" style={style}/>
-                        </div>
-
                         {content}
                     </div>
                 );
-            },
-
-            getDefaultProps: function() {
-                return {
-                    lang: React.PropTypes.object,
-                    percentage: React.PropTypes.number,
-                    remainingTime: React.PropTypes.number,
-                    elapsedTime: React.PropTypes.number
-                };
             }
 
         });

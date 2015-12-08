@@ -32,20 +32,20 @@ define(['react'], function(React){
                     }
                     else {
                         content = (
-                            <button className={className} onClick={opt.onClick}>{opt.label}</button>
+                            <button title={opt.title} className={className} onClick={opt.onClick}>{opt.label}</button>
                         );
                     }
 
                     return content;
                 }, this);
 
-            className = '';
+            className = 'button-group';
 
             if ('string' === typeof this.props.className && '' !== this.props.className) {
                 className += ' ' + this.props.className;
             }
             else {
-                className = 'btn-h-group';
+                className += ' btn-h-group';
             }
 
             return (<div className={className}>{buttons}</div>);

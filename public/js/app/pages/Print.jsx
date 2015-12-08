@@ -16,8 +16,14 @@ define([
     'helpers/api/config',
     'jsx!views/Print-Selector',
     'helpers/nwjs/menu-factory',
-    'helpers/device-master'
-], function($,
+    'helpers/device-master',
+    'app/stores/global-store',
+    'app/actions/global-actions',
+    'app/constants/device-constants',
+    'app/app-settings',
+    'helpers/object-assign'
+], function(
+    $,
     React,
     display,
     director,
@@ -34,21 +40,17 @@ define([
     Config,
     PrinterSelector,
     menuFactory,
-    DeviceMaster
+    DeviceMaster,
+    GlobalStore,
+    GlobalActions,
+    DeviceConstants,
+    AppSettings
 ) {
 
     return function(args) {
         args = args || {};
 
-        var advancedSetting = {
-                infill: 0,
-                layerHeight: 0,
-                travelingSpeed: 0,
-                extrudingSpeed: 0,
-                temperature: 0,
-                support: '',
-                advancedSettings: ' '
-            },
+        var advancedSetting = {},
             _scale = {
                 locked  : true,
                 x       : 1,
@@ -79,7 +81,6 @@ define([
                     return ({
                         showPreviewModeList         : false,
                         showAdvancedSetting         : false,
-                        showMonitor                 : false,
                         modelSelected               : null,
                         openPrinterSelectorWindow   : false,
                         openObjectDialogue          : false,
@@ -93,27 +94,27 @@ define([
                         camera                      : {},
                         rotation                    : {},
                         scale                       : {},
-                        previewUrl                  : '',
                         printerControllerStatus     : ''
                     });
                 },
 
                 componentDidMount: function() {
                     director.init(this);
-                    Config().read('advanced-options', {
-                        onFinished: function(response) {
-                            var options = JSON.parse(response || '{}');
-                            if(!$.isEmptyObject(options)) {
-                                advancedSetting = options;
-                            }
-                        }
-                    });
-
                     $(document).keydown(function(e) {
                         if(e.metaKey && e.keyCode === 8 || e.keyCode === 46) {
                             director.removeSelected();
                         }
                     });
+
+                    var s = Config().read('advanced-settings');
+                    if(!s) {
+                        advancedSetting = {};
+                        advancedSetting.custom = AppSettings.custom;
+                    }
+                    else {
+                        advancedSetting = s;
+                    }
+                    // advancedSetting = !!s ? s : '{}';
 
                     $importBtn = this.refs.importBtn.getDOMNode();
 
@@ -181,14 +182,10 @@ define([
                     this.setState({ showAdvancedSetting: false });
                 },
 
-                _handleApplyAdvancedSetting: function(setting, closeAdvancedSetting) {
+                _handleApplyAdvancedSetting: function(setting) {
+                    Config().write('advanced-settings', JSON.stringify(setting));
                     advancedSetting = setting;
                     director.setAdvanceParameter(setting);
-                    this.setState({ showAdvancedSetting: closeAdvancedSetting });
-                },
-
-                _handleShowMonitor: function(isOn) {
-                    this.setState({ showMonitor: isOn });
                 },
 
                 _handleTogglePrintPause: function(printPaused) {
@@ -247,16 +244,20 @@ define([
                 _handlePrinterSelected: function(printer) {
                     selectedPrinter = printer;
 
-                    director.getFCode().then(function(fcode) {
+                    director.getFCode().then(function(fcode, previewUrl) {
+                        GlobalActions.showMonitor(selectedPrinter, fcode, previewUrl);
                         this.setState({
-                            openPrinterSelectorWindow: false,
-                            showMonitor: true,
-                            fcode: fcode
+                            openPrinterSelectorWindow: false
                         });
                     }.bind(this));
 
-                    DeviceMaster.selectDevice(selectedPrinter.uuid).then(function(status) {
-                        this.setState({ printerControllerStatus: status });
+                    DeviceMaster.selectDevice(selectedPrinter).then(function(status) {
+                        if(status === DeviceConstants.CONNECTED) {
+                            this.setState({ printerControllerStatus: status });
+                        }
+                        else if (status === DeviceConstants.TIMEOUT) {
+                            AlertActions.showPopupError(_id, _lang.message.connectionTimeout);
+                        }
                     }.bind(this));
                 },
 
@@ -291,21 +292,27 @@ define([
                         low: 0.3
                     };
                     director.setParameter('layer_height', quality[level]);
+                    advancedSetting.layer_height = quality[level];
                 },
 
                 _renderAdvancedPanel: function() {
-                    return (
+                    var content = (
                         <AdvancedPanel
                             lang        = {lang}
                             setting     = {advancedSetting}
                             onClose     = {this._handleCloseAdvancedSetting}
                             onApply     = {this._handleApplyAdvancedSetting} />
                     );
+
+                    return (
+                        <Modal content={content} onClose={this._handleCloseAdvancedSetting}/>
+                    );
                 },
 
                 _renderPrinterSelectorWindow: function() {
                     var content = (
                         <PrinterSelector
+                            uniqleId="print"
                             lang={lang}
                             onClose={this._handlePrinterSelectorWindowClose}
                             onGettingPrinter={this._handlePrinterSelected} />
@@ -321,7 +328,7 @@ define([
                     return (
                         <div className="importWindow">
                             <div className="arrowBox">
-                                <div className="file-importer">
+                                <div title={lang.print.importTitle} className="file-importer">
                                     <div className="import-btn">{lang.print.import}</div>
                                     <input type="file" accept=".stl" onChange={this._handleImport} />
                                 </div>
@@ -355,24 +362,6 @@ define([
                             onDownloadGCode         = {this._handleDownloadGCode}
                             onCameraPositionChange  = {this._handleCameraPositionChange}
                             onDownloadFCode         = {this._handleDownloadFCode} />
-                    );
-                },
-
-                _renderMonitorPanel: function() {
-                    var content = (
-                        <Monitor
-                            lang                = {lang}
-                            previewUrl          = {this.state.previewUrl}
-                            selectedPrinter     = {selectedPrinter}
-                            fCode               = {this.state.fcode}
-                            controller          = {printerController}
-                            controllerStatus    = {this.state.printerControllerStatus}
-                            onClose             = {this._handleMonitorClose} />
-                    );
-                    return (
-                        <Modal {...this.props}
-                            content={content}
-                            onClose={this._handleMonitorClose} />
                     );
                 },
 
@@ -422,7 +411,6 @@ define([
                         importWindow            = this.state.openImportWindow ? this._renderImportWindow() : '',
                         leftPanel               = this._renderLeftPanel(),
                         rightPanel              = this._renderRightPanel(),
-                        monitorPanel            = this.state.showMonitor ? this._renderMonitorPanel() : '',
                         objectDialogue          = this.state.openObjectDialogue ? this._renderObjectDialogue() : '',
                         printerSelectorWindow   = this.state.openPrinterSelectorWindow ? this._renderPrinterSelectorWindow() : '',
                         waitWindow              = this.state.openWaitWindow ? this._renderWaitWindow() : '',
@@ -438,8 +426,6 @@ define([
                             {leftPanel}
 
                             {rightPanel}
-
-                            {monitorPanel}
 
                             {objectDialogue}
 

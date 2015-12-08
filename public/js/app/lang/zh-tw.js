@@ -11,6 +11,22 @@ define(function() {
             module: 'MODULE',
             status: 'STATUS'
         },
+        update: {
+            release_note: 'Release Note:',
+            firmware: {
+                caption: 'An Firmware Update to FLUX is available',
+                message_pattern_1: '"%s" is now ready for firmware update.',
+                message_pattern_2: 'FLUX Firmware %s is now available - You have %s.'
+            },
+            software: {
+                caption: 'An Software Update to FLUX is available',
+                message_pattern_1: 'FLUX Studio is now ready for software update.',
+                message_pattern_2: 'FLUX Software %s is now available - You have %s.'
+            },
+            skip: 'Skip This Version',
+            later: 'LATER',
+            install: 'INSTALL'
+        },
         topmenu: {
             flux: {
                 label: 'Flux',
@@ -42,7 +58,10 @@ define(function() {
             },
             device: {
                 label: 'Device',
-                new: 'Add New Device...'
+                new: 'Add New Device...',
+                device_monitor: 'Device Monitor',
+                change_filament: 'Change Filament',
+                check_firmware_update: 'Check Firmware Update'
             },
             window: {
                 label: 'Window',
@@ -405,7 +424,12 @@ define(function() {
                 advanced: 'ADVANCED',
                 preview: 'PREVIEW',
                 plaTitle: 'PICK THE COLOR OF THE FILAMENT',
-                transparent: 'TRANSPARENT'
+                transparent: 'TRANSPARENT',
+                qualityTitle: 'It will affect the outcome surface smoothness of your object. Better qualities need more time',
+                raftTitle: 'A Raft are layers built under your part and help it stick to the base plate',
+                supportTitle: 'A Support is a generated structure to support overhanging part of your object, to prevent filament dropping',
+                previewTitle: 'Preview the actual path of toolhead during printing task',
+                advancedTitle: 'Detail 3d printing parameters, you may acheive better result than default by adjusting them'
             },
             right_panel: {
                 get: 'Get',
@@ -431,7 +455,11 @@ define(function() {
             pause: '暫停',
             continue: '繼續',
             restart: '重新開始',
-            download_prompt: '請輸入檔案名稱'
+            download_prompt: '請輸入檔案名稱',
+            importTitle: 'Import 3D models ( .stl )',
+            getFcodeTitle: 'Save toolhead path and config into FCode file ( *.fc )',
+            goTitle: 'Print it out',
+            deviceTitle: 'Show device monitor'
         },
         laser: {
             import: '打開⋯',
@@ -553,12 +581,11 @@ define(function() {
         },
         scan: {
             start_scan: '開始掃瞄',
-            cancel_scan: '取消',
+            stop_scan: '取消',
             convert_to_stl: '轉換成 STL',
             scan_again: '再次掃描',
             start_multiscan: '多次掃描',
-            convert_to_3d_model: '掃描中⋯',
-            complete: '掃描進度',
+            processing: '處理中...',
             remaining_time: '剩餘時間',
             elapsed_time: '已用時間',
             do_save: '儲存 STL',
@@ -668,14 +695,32 @@ define(function() {
             change_filament: 'CHANGE FILLAMENT',
             browse_file: 'BROWSE FILE',
             monitor: 'MONITOR',
-            currentTemperature: 'Current Temp'
+            currentTemperature: 'Current Temp',
+            nothingToPrint: 'There is nothing to print',
+            go: '開始',
+            pause: '暫停',
+            stop: 'STOP',
+            record: 'RECORD',
+            connecting: 'Connecting, please wait...',
+            headerOffline: '沒有偵測到列印工具頭',
+            headerTilt: '請確認磁鐵關節正確的附著',
+            unknownHead: '請更換成列印工具頭',
+            fanFailure: 'Fan failed / stucked, 請用細針戳一下',
+            shake: 'Head encountered unexpected shake'
         },
         alert: {
             caption: '錯誤',
             duplicated_preset_name: '重複的Preset名稱',
             info: '訊息',
             warning: '警告',
-            error: '錯誤'
+            error: '錯誤',
+            retry: '重試',
+            abort: '放棄',
+            cancel: '取消',
+            ok: 'Ok',
+            yes: ' 是',
+            no: '否',
+            stop: '停止'
         },
         color: {
             green: 'GREEN',
@@ -696,7 +741,20 @@ define(function() {
             connected: 'Connected',
             machineNotConnected: 'Machine is not connected',
             notPrinting: 'Printing is not in progress',
-            nothingToPrint: 'Nothing to print (source blob missing)'
+            nothingToPrint: 'Nothing to print (source blob missing)',
+            connectionTimeout: 'device is not responding, connection timeout',
+            filamentRunout: 'filament run out, please refill filament'
+        },
+        machine_status: {
+            1: 'Unknown Head',
+            2: 'Head failed ER 2',
+            4: 'Head failed ER 4',
+            8: 'Head failed ER 8',
+            16: 'Shake',
+            64: 'Overheat',
+            32: 'Head Tilted',
+            128: 'Fan Stopped',
+            unknown: 'UNKNOWN'
         }
     };
 });

@@ -13,6 +13,9 @@ define([
     'jsx!views/scan/Export',
     'jsx!views/scan/Progress-Bar',
     'jsx!views/scan/Action-Buttons',
+    'app/actions/alert-actions',
+    'app/stores/alert-store',
+    'app/actions/progress-actions',
     'helpers/shortcuts',
     'helpers/round',
     'helpers/array-findindex',
@@ -32,6 +35,9 @@ define([
     Export,
     ProgressBar,
     ActionButtons,
+    AlertActions,
+    AlertStore,
+    ProgressActions,
     shortcuts,
     round
 ) {
@@ -41,16 +47,89 @@ define([
         args = args || {};
 
         var View = React.createClass({
+                progressRemainingTime: 1200, // 20 minutes
 
-                getDefaultProps: function () {
+                getInitialState: function() {
                     return {
-                        progressRemainingTime: 1200 // 20 minutes
+                        lang: args.state.lang,
+                        gettingStarted: false,  // selecting machine
+                        scanTimes: 0,   // how many scan executed
+                        selectedPrinter: undefined, // which machine selected
+                        confirm: {
+                            show: false,
+                            caption: '',
+                            message: '',
+                            onOK: function() {},
+                            onCancel: function() {}
+                        },
+                        openAlert: false,
+                        openProgressBar: false,
+                        blocker: false,
+                        hasConvert: false,  // point cloud into stl
+                        progressPercentage: 0,
+                        progressRemainingTime: this.progressRemainingTime,    // 20 minutes
+                        progressElapsedTime: 0,
+                        printerIsReady: false,
+                        isScanStarted: false,   // scan getting started
+                        showCamera: true,
+                        scanStartTime: undefined,   // when the scan started
+                        scanMethods: undefined,
+                        scanCtrlWebSocket: undefined,
+                        scanModelingWebSocket: undefined,
+                        meshes: [],
+                        selectedMeshes: [],
+                        cylinder: undefined,
+                        saveFileType: 'pcd',
+                        error: {
+                            caption: '',
+                            message: '',
+                            onClose: function() {}
+                        },
+                        stlBlob: undefined,
+                        stlMesh: undefined,
+                        objectDialogPosition: {
+                            left: 0,
+                            top: 0
+                        },
+                        selectedObject: {
+                            position: {},
+                            size: {},
+                            rotate: {},
+                        },
+                        stage: undefined // three stage (scene, camera, renderer)
                     };
                 },
 
+                componentDidMount: function() {
+                    AlertStore.onRetry(this._retry);
+                    AlertStore.onCancel(this._cancelScan);
+                },
+
+                componentWillUnmount: function() {
+                    AlertStore.removeRetryListener(this._retry);
+
+                    if ('undefined' !== typeof this.state.scanCtrlWebSocket &&
+                        'undefined' !== typeof this.state.scanModelingWebSocket
+                    ) {
+                        this.state.scanControlImageMethods.stop();
+                        this.state.scanCtrlWebSocket.connection.close(false);
+                        this.state.scanModelingWebSocket.connection.close(false);
+                    }
+
+                    scanedModel.destroy();
+                },
+
                 // ui events
-                _rescan: function(e) {
-                    this.setState(this.getInitialState());
+                _retry: function(id) {
+                    var self = this;
+
+                    if ('scan-retry' === id) {
+                        self.state.scanCtrlWebSocket.retry();
+                    }
+                },
+
+                _cancelScan: function() {
+                    this._onScanAgain();
                 },
 
                 _refreshCamera: function() {
@@ -113,7 +192,7 @@ define([
                 _onRendering: function(views, chunk_length, mesh) {
                     var self = this,
                         scan_speed = self._getScanSpeed(),
-                        progressRemainingTime = self.props.progressRemainingTime / scan_speed * (scan_speed - chunk_length),
+                        progressRemainingTime = self.progressRemainingTime / scan_speed * (scan_speed - chunk_length),
                         progressElapsedTime = parseInt(((new Date()).getTime() - self.state.scanStartTime) / 1000, 10),
                         progressPercentage,
                         meshes = self.state.meshes,
@@ -275,31 +354,33 @@ define([
                     this._mergeAll(exportPCD, false);
                 },
 
+                _onScanFinished: function(point_cloud) {
+                    var self = this,
+                        upload_name = 'scan-' + (new Date()).getTime(),
+                        onUploadFinished = function() {
+                            var mesh = self._getMesh(self.state.scanTimes);
+
+                            mesh.name = upload_name;
+
+                            // update scan times
+                            self.setState({
+                                openProgressBar: false,
+                                isScanStarted: false
+                            });
+                        };
+
+                    self.state.scanModelingWebSocket.upload(
+                        upload_name,
+                        point_cloud,
+                        {
+                            onFinished: onUploadFinished
+                        }
+                    );
+
+                },
+
                 _handleScan: function(e) {
                     var self = this,
-                        onScanFinished = function(point_cloud) {
-                            var upload_name = 'scan-' + (new Date()).getTime(),
-                                onUploadFinished = function() {
-                                    var mesh = self._getMesh(self.state.scanTimes);
-
-                                    mesh.name = upload_name;
-
-                                    // update scan times
-                                    self.setState({
-                                        openProgressBar: false,
-                                        isScanStarted: false
-                                    });
-                                };
-
-                            self.state.scanModelingWebSocket.upload(
-                                upload_name,
-                                point_cloud,
-                                {
-                                    onFinished: onUploadFinished
-                                }
-                            );
-
-                        },
                         openProgressBar = function(callback) {
                             callback();
 
@@ -317,13 +398,13 @@ define([
                                     self._openBlocker(false);
                                     self.setState({
                                         openAlert: true,
-                                        isScanStarted: false,
-                                        showCamera: true,
                                         error: {
                                             caption: self.state.lang.scan.error,
-                                            message: message
-                                        },
-                                        scanTimes: self.state.scanTimes - 1
+                                            message: message,
+                                            onClose: function() {
+                                                openProgressBar(onScan);
+                                            }
+                                        }
                                     });
                                 }
                             };
@@ -333,7 +414,7 @@ define([
                         onScan = function() {
                             var opts = {
                                     onRendering: self._onRendering,
-                                    onFinished: onScanFinished
+                                    onFinished: self._onScanFinished
                                 },
                                 scan_speed = self._getScanSpeed();
 
@@ -365,6 +446,16 @@ define([
 
                 _onScanAgain: function(e) {
                     this.setState(this.getInitialState());
+                    scanedModel.clear();
+                },
+
+                _onScanStop: function(e) {
+                    this.setState({
+                        isScanStarted: false,
+                        progressPercentage: 100 // total complete
+                    });
+
+                    this.state.scanMethods.stop(this._onScanFinished);
                 },
 
                 _doClearNoise: function(mesh) {
@@ -631,9 +722,16 @@ define([
                 },
 
                 _openBlocker: function(is_open) {
+                    if (true === is_open) {
+                        ProgressActions.open();
+                    }
+                    else {
+                        ProgressActions.close();
+                    }
+
                     this.setState({
-                        openBlocker: is_open
-                    })
+                        blocker: is_open
+                    });
                 },
 
                 _onScanCancel: function(e) {
@@ -674,7 +772,7 @@ define([
                         };
 
                     return (
-                        0 < state.selectedMeshes.length && false === state.openBlocker ?
+                        0 < state.selectedMeshes.length && false === state.blocker ?
                         <ManipulationPanel
                             lang = {lang}
                             selectedMeshes={state.selectedMeshes}
@@ -705,11 +803,10 @@ define([
 
                     camera_image_class = cx({
                         'camera-image' : true,
-                        'hide' : 0 < state.scanTimes
+                        'hide' : 0 < this.state.scanTimes
                     });
 
                     return (
-                        true === state.printerIsReady ?
                         <section ref="operatingSection" className="operating-section">
                             {meshThumbnails}
                             <div id="model-displayer" className="model-displayer">
@@ -717,8 +814,7 @@ define([
                             </div>
                             {settingPanel}
                             {manipulationPanel}
-                        </section> :
-                        ''
+                        </section>
                     );
                 },
 
@@ -763,6 +859,7 @@ define([
                             percentage={this.state.progressPercentage}
                             remainingTime={this.state.progressRemainingTime}
                             elapsedTime={this.state.progressElapsedTime}
+                            onStop={this._onScanStop}
                         /> :
                         ''
                     );
@@ -773,14 +870,7 @@ define([
                         opts = {
                             onError: function(data) {
                                 self._openBlocker(false);
-                                self.setState({
-                                    openAlert: true,
-                                    gettingStarted: false,
-                                    error: {
-                                        caption: lang.scan.error,
-                                        message: data.error
-                                    }
-                                });
+                                AlertActions.showPopupRetry('scan-retry', data.error);
                             },
                             onReady: function() {
                                 self.setState({
@@ -802,7 +892,12 @@ define([
                             self._openBlocker(true);
                         },
                         content = (
-                            <PrinterSelector className="scan-printer-selection" lang={lang} onGettingPrinter={onGettingPrinter}/>
+                            <PrinterSelector
+                                uniqleId="scan"
+                                className="scan-printer-selection"
+                                lang={lang}
+                                onGettingPrinter={onGettingPrinter}
+                            />
                         ),
                         className = {
                             'modal-printer-selecter': true
@@ -873,14 +968,6 @@ define([
                     return (
                         true === self.state.confirm.show ?
                         <Modal content={content} disabledEscapeOnBackground={true}/> :
-                        ''
-                    );
-                },
-
-                _renderBlocker: function(lang) {
-                    return (
-                        true === this.state.openBlocker ?
-                        <Modal content={<div className="spinner-flip spinner-reverse"/>}/> :
                         ''
                     );
                 },
@@ -992,79 +1079,16 @@ define([
                     );
                 },
 
-                getInitialState: function() {
-                    return {
-                        lang: args.state.lang,
-                        gettingStarted: false,  // selecting machine
-                        scanTimes: 0,   // how many scan executed
-                        selectedPrinter: undefined, // which machine selected
-                        confirm: {
-                            show: false,
-                            caption: '',
-                            message: '',
-                            onOK: function() {},
-                            onCancel: function() {}
-                        },
-                        openAlert: false,
-                        openProgressBar: false,
-                        openBlocker: false,
-                        hasConvert: false,  // point cloud into stl
-                        progressPercentage: 0,
-                        progressRemainingTime: this.props.progressRemainingTime,    // 20 minutes
-                        progressElapsedTime: 0,
-                        printerIsReady: false,
-                        isScanStarted: false,   // scan getting started
-                        showCamera: true,
-                        scanStartTime: undefined,   // when the scan started
-                        scanMethods: undefined,
-                        scanCtrlWebSocket: undefined,
-                        scanModelingWebSocket: undefined,
-                        meshes: [],
-                        selectedMeshes: [],
-                        cylinder: undefined,
-                        saveFileType: 'pcd',
-                        error: {
-                            caption: '',
-                            message: '',
-                            onClose: function() {}
-                        },
-                        stlBlob: undefined,
-                        stlMesh: undefined,
-                        objectDialogPosition: {
-                            left: 0,
-                            top: 0
-                        },
-                        selectedObject: {
-                            position: {},
-                            size: {},
-                            rotate: {},
-                        },
-                        stage: undefined // three stage (scene, camera, renderer)
-                    };
-                },
-
-                componentWillUnmount: function() {
-                    if ('undefined' !== typeof this.state.scanCtrlWebSocket &&
-                        'undefined' !== typeof this.state.scanModelingWebSocket
-                    ) {
-                        this.state.scanCtrlWebSocket.connection.close(false);
-                        this.state.scanModelingWebSocket.connection.close(false);
-                    }
-
-                    scanedModel.destroy();
-                },
-
                 render: function() {
                     var state = this.state,
                         lang = state.lang,
                         progressBar = this._renderProgressBar(lang),
-                        printerBlocker = this._renderBlocker(lang),
                         alert = this._renderAlert(lang),
                         confirm = this._renderConfirm(lang),
                         cx = React.addons.classSet,
-                        selectPrinter = this._renderPrinterSelectorWindow(lang),
                         actionButtons = this._renderActionButtons(lang),
-                        scanStage = this._renderStageSection(lang);
+                        scanStage = this._renderStageSection(lang),
+                        selectPrinter = this._renderPrinterSelectorWindow(lang);
 
                     return (
                         <div className="studio-container scan-studio">
@@ -1074,7 +1098,6 @@ define([
                             {progressBar}
                             {alert}
                             {confirm}
-                            {printerBlocker}
                         </div>
                     );
                 }

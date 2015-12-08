@@ -2,9 +2,10 @@ define([
     'react',
     'jquery',
     'backbone',
-    'helpers/display'
+    'helpers/display',
+    'helpers/api/config'
 ],
-function(React, $, Backbone, display) {
+function(React, $, Backbone, display, config) {
     'use strict';
 
     var _display = function(view, args, el) {
@@ -43,6 +44,8 @@ function(React, $, Backbone, display) {
             routes.forEach(function(route) {
                 router.route.apply(router, route);
             });
+
+            this.checkSoftwareUpdate();
         },
 
         home: function(name) {
@@ -80,6 +83,80 @@ function(React, $, Backbone, display) {
                         }
                     }
                 );
+            });
+        },
+
+        checkSoftwareUpdate: function() {
+            var data = {
+                    os: ''
+                },
+                ignoreVersions = config().read('software-update-ignore-list') || [],
+                fetchProfile = function() {
+                    var deferred = $.Deferred();
+
+                    $.ajax({
+                        url: 'package.json'
+                    }).then(function(response) {
+                        if(typeof(response) === 'object') {
+                            deferred.resolve(response);
+                        }
+                        else {
+                            deferred.resolve(JSON.parse(response));
+                        }
+                    });
+
+                    return deferred;
+                },
+                fetchLatestVersion = function(currentProflie) {
+                    var deferred = $.Deferred();
+
+                    data.os = (window.FLUX.osType || '') + '-' + (window.FLUX.arch || '');
+
+                    $.ajax({
+                        url: 'http://software.flux3dp.com/check-update/',
+                        data: data
+                    }).then(function(response) {
+                        deferred.resolve(currentProflie, response);
+                    });
+
+                    return deferred;
+                };
+
+            fetchProfile().then(fetchLatestVersion).done(function(currentProflie, currentVersion) {
+                var isIgnore = -1 < ignoreVersions.indexOf(currentVersion.latest_version),
+                    props = {};
+
+                if (false === isIgnore &&
+                    null !== currentVersion.latest_version &&
+                    currentVersion.latest_version !== currentProflie.version
+                ) {
+                    props = {
+                        open: true,
+                        type: 'software',
+                        currentVersion: currentProflie.version,
+                        latestVersion: currentVersion.latest_version,
+                        releaseNote: currentVersion.changelog,
+                        onClose: function() {},
+                        onInstall: function() {
+                            if ('undefined' !== typeof requireNode) {
+                                requireNode('nw.gui').Shell.openExternal('https://flux3dp.com/downloads/');
+                            }
+                            else {
+                                window.open('https://flux3dp.com/downloads/');
+                            }
+                        }
+                    };
+
+                    require(['jsx!views/Update-Dialog'], function(view) {
+                        display(
+                            function() { return view; },
+                            {
+                                props: props
+                            },
+                            $('.software-update')[0]
+                        );
+                    });
+                }
             });
         },
 

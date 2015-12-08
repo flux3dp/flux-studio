@@ -11,6 +11,22 @@ define(function() {
             module: 'MODULE',
             status: 'STATUS'
         },
+        update: {
+            release_note: 'Release Note:',
+            firmware: {
+                caption: 'An Firmware Update to FLUX is available',
+                message_pattern_1: '"%s" is now ready for firmware update.',
+                message_pattern_2: 'FLUX Firmware %s is now available - You have %s.'
+            },
+            software: {
+                caption: 'An Software Update to FLUX is available',
+                message_pattern_1: 'FLUX Studio is now ready for software update.',
+                message_pattern_2: 'FLUX Software %s is now available - You have %s.'
+            },
+            skip: 'Skip This Version',
+            later: 'LATER',
+            install: 'INSTALL'
+        },
         topmenu: {
             flux: {
                 label: 'Flux',
@@ -42,7 +58,10 @@ define(function() {
             },
             device: {
                 label: 'Device',
-                new: 'Add New Device...'
+                new: 'Add New Device...',
+                device_monitor: 'Device Monitor',
+                change_filament: 'Change Filament',
+                check_firmware_update: 'Check Firmware Update'
             },
             window: {
                 label: 'Window',
@@ -405,7 +424,12 @@ define(function() {
                 advanced: 'ADVANCED',
                 preview: 'PREVIEW',
                 plaTitle: 'PICK THE COLOR OF THE FILAMENT',
-                transparent: 'TRANSPARENT'
+                transparent: 'TRANSPARENT',
+                qualityTitle: 'It will affect the outcome surface smoothness of your object. Better qualities need more time',
+                raftTitle: 'A Raft are layers built under your part and help it stick to the base plate',
+                supportTitle: 'A Support is a generated structure to support overhanging part of your object, to prevent filament dropping',
+                previewTitle: 'Preview the actual path of toolhead during printing task',
+                advancedTitle: 'Detail 3d printing parameters, you may acheive better result than default by adjusting them'
             },
             right_panel: {
                 get: 'Get',
@@ -431,7 +455,11 @@ define(function() {
             pause: 'PAUSE',
             continue: 'CONTINUE',
             restart: 'RESTART',
-            download_prompt: 'please enter file name'
+            download_prompt: 'please enter file name',
+            importTitle: 'Import 3D models ( .stl )',
+            getFcodeTitle: 'Save toolhead path and config into FCode file ( *.fc )',
+            goTitle: 'Print it out',
+            deviceTitle: 'Show device monitor'
         },
         laser: {
             import: 'Import',
@@ -553,13 +581,12 @@ define(function() {
         },
         scan: {
             start_scan: 'Scan',
-            cancel_scan: 'Cancel',
+            stop_scan: 'Stop',
             convert_to_stl: 'Convert',
             scan_again: 'Scan Again',
             start_multiscan: 'Extra Scan',
-            convert_to_3d_model: 'Convert to 3D model...',
-            complete: 'Completed',
-            remaining_time: 'Remaining Time',
+            processing: 'Processing...',
+            remaining_time: 'Left',
             elapsed_time: 'Elapsed Time',
             do_save: 'Save STL',
             go: 'Go',
@@ -668,14 +695,32 @@ define(function() {
             change_filament: 'CHANGE FILLAMENT',
             browse_file: 'BROWSE FILE',
             monitor: 'MONITOR',
-            currentTemperature: 'Current Temp'
+            currentTemperature: 'Current Temp',
+            nothingToPrint: 'There is nothing to print',
+            go: 'GO',
+            pause: 'PAUSE',
+            stop: 'STOP',
+            record: 'RECORD',
+            connecting: 'Connecting, please wait...',
+            headerOffline: 'Device head is not connected or missing',
+            headerTilt: 'Device head is tilted, please connect all 6 magnents',
+            unknownHead: 'Device head is unknown, please connect to a correct header',
+            fanFailure: 'Fan failed / stucked, you can spin it with a pancil',
+            shake: 'Head encountered unexpected shake'
         },
         alert: {
             caption: 'Error',
             duplicated_preset_name: 'Duplicated preset name',
             info: 'INFO',
             warning: 'WARNING',
-            error: 'ERROR'
+            error: 'ERROR',
+            retry: 'RETRY',
+            abort: 'ABORT',
+            cancel: 'CANCEL',
+            ok: 'OK',
+            yes: 'YES',
+            no: 'NO',
+            stop: 'Stop'
         },
         color: {
             green: 'GREEN',
@@ -696,7 +741,20 @@ define(function() {
             connected: 'Connected',
             machineNotConnected: 'Machine is not connected',
             notPrinting: 'Printing is not in progress',
-            nothingToPrint: 'Nothing to print (source blob missing)'
+            nothingToPrint: 'Nothing to print (source blob missing)',
+            connectionTimeout: 'device is not responding, connection timeout',
+            filamentRunout: 'filament run out, please refill filament'
+        },
+        machine_status: {
+            1: 'Unknown Head',
+            2: 'Head failed ER 2',
+            4: 'Head failed ER 4',
+            8: 'Head failed ER 8',
+            16: 'Shake',
+            64: 'Overheat',
+            32: 'Head Tilted',
+            128: 'Fan Stopped',
+            unknown: 'UNKNOWN'
         }
     };
 });

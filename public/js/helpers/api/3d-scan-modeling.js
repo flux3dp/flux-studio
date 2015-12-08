@@ -9,27 +9,30 @@ define([
 ], function(Websocket, PointCloudHelper, history) {
     'use strict';
 
+    var ws;
+
     return function(opts) {
         opts = opts || {};
         opts.onError = opts.onError || function() {};
         opts.onFatal = opts.onFatal || function() {};
         opts.onClose = opts.onClose || function() {};
 
-        var ws = new Websocket({
-                method: '3d-scan-modeling',
-                onMessage: function(data) {
-
-                    events.onMessage(data);
-
-                },
-                onError: opts.onError,
-                onFatal: opts.onFatal,
-                onClose: opts.onClose
-            }),
-            events = {
+        var events = {
                 onMessage: function() {}
             },
             History = history();
+
+        ws = ws || new Websocket({
+            method: '3d-scan-modeling',
+            onMessage: function(data) {
+
+                events.onMessage(data);
+
+            },
+            onError: opts.onError,
+            onFatal: opts.onFatal,
+            onClose: opts.onClose
+        });
 
         return {
             connection: ws,

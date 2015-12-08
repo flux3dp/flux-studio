@@ -18,6 +18,10 @@ define([
                     events.onMessage(data);
                     lastMessage = data;
                 },
+                onError: function(data) {
+                    events.onError(data);
+                    lastMessage = data;
+                },
                 onClose: function(message) {
                     lastMessage = message;
                 }
@@ -25,7 +29,8 @@ define([
             lastOrder = '',
             lastMessage = '',
             events = {
-                onMessage: function() {}
+                onMessage: function() {},
+                onError: function() {}
             };
 
         return {
@@ -66,6 +71,9 @@ define([
                 events.onMessage = function(result) {
                     callback(result);
                 };
+                events.onError = function(result) {
+                    callback(result);
+                };
                 ws.send('delete ' + name);
                 lastOrder = 'delete';
             },
@@ -85,10 +93,15 @@ define([
                 lastOrder = 'go';
             },
             setParameter: function(name, value) {
-                var d = $.Deferred();
+                var d = $.Deferred(),
+                    errors = [];
                 events.onMessage = function(result) {
-                    d.resolve(result);
+                    d.resolve(result, errors);
                 };
+
+                events.onError = function(result) {
+                    errors.push(result.error);
+                }
 
                 if(name === 'advancedSettings' && value !== '') {
                     ws.send(`advanced_setting ${value}`);

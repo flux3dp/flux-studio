@@ -6,11 +6,12 @@ define(['helpers/websocket'], function(Websocket) {
     'use strict';
 
     return function(opts) {
-        opts = opts || {};
-        opts.onSuccess = opts.onSuccess || function() {};
-        opts.onFail = opts.onFail || function() {};
-
-        var ws = new Websocket({
+        var events = {
+                onSuccess: opts.onSuccess || function() {},
+                onFail: opts.onFail || function() {},
+                onError: opts.onError || function() {}
+            },
+            ws = new Websocket({
                 method: 'touch',
                 autoReconnect: false,
                 onMessage: function(data) {
@@ -21,19 +22,15 @@ define(['helpers/websocket'], function(Websocket) {
                         );
 
                     if (true === is_success) {
-                        opts.onSuccess(data);
+                        events.onSuccess(data);
                     }
                     else {
-                        opts.onFail(data);
+                        events.onFail(data);
                     }
 
-                    getResponse = true;
-                    clearInterval(timer);
                 },
-                onError: opts.onError
-            }),
-            getResponse = true,
-            timer;
+                onError: events.onError
+            });
 
         return {
             connection: ws,
@@ -42,12 +39,7 @@ define(['helpers/websocket'], function(Websocket) {
 
                 var args = JSON.stringify({ uuid: uuid, password: password });
 
-                timer = setInterval(function() {
-                    if (true === getResponse) {
-                        getResponse = false;
-                        ws.send(args);
-                    }
-                }, 0);
+                ws.send(args);
             }
         };
     };

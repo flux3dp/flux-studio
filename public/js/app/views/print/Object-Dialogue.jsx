@@ -33,24 +33,7 @@ define([
         },
 
         componentDidMount: function() {
-            // for rotation and scale content accordion
-            // var allPanels = $('.accordion > dd'),
-            //     self = this;
-
-            // $('.accordion > dt > a').click(function() {
-            //     var mode = $(this)[0].id;
-            //     if(mode !== _mode) {
-            //         allPanels.slideUp();
-            //         _mode = mode;
-            //         $(this).parent().next().slideDown();
-            //         self.props.onModeChange(mode);
-            //     }
-            //
-            //     return false;
-            // });
-
             this._openAccordion(this.props.mode);
-
             refSize = this.props.model.size.clone();
         },
 
@@ -226,7 +209,7 @@ define([
                             onClick={this._handleModeChange}/>
                         <p className="caption">
                             {lang.print.rotate}
-                            <span className="value">80 x 70 x 60 &#176;</span>
+                            <span className="value">{rotation.enteredX} x {rotation.enteredY} x {rotation.enteredZ} &#176;</span>
                         </p>
                         <label className="accordion-body">
 

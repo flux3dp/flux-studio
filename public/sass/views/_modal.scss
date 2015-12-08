@@ -82,19 +82,20 @@
         flex-direction: column;
         min-height: 25rem;
         min-width: 32.2rem;
-        overflow: scroll;
+        overflow: auto;
         padding: 1.6rem 2.8rem 4.4rem 2.8rem;
         position: relative;
         text-align: center;
         align-items: center;
         justify-content: center;
 
-        h2 {
-            margin: 0;
+        .caption,
+        .message {
+            margin: 0 0 1.6rem 0;
+            width: 100%;
         }
-
-        p {
-            margin: 1.6rem 0;
+        pre.message {
+            font-family: "Helvetica Neue", "HelveticaNeue-Light", "Helvetica Neue Light", Helvetica, Arial, "Lucida Grande", sans-serif, "Microsoft JhengHei", "微軟正黑體";
         }
     }
 
@@ -121,5 +122,114 @@
                 margin: 0;
             }
         }
+    }
+}
+
+.modal-progress {
+    .spinner-roller {
+        background: linear-gradient(to right, #DEDEDC 10%, rgba(255, 255, 255, 0) 42%);
+        height: 7em;
+        margin: 0 auto 1.6rem auto;
+        width: 7em;
+
+        &::after {
+            background: #fff;
+        }
+    }
+
+    .progress-bar {
+        background: #ccc;
+        height: 2rem;
+        overflow: hidden;
+
+        .current-progress {
+            background: #777;
+            content: "";
+            display: block;
+            height: 100%;
+            transition: width .3s ease;
+            width: 0;
+        }
+    }
+}
+
+.modal-input-lightbox {
+    .modal-alert {
+        display: block;
+        min-height: 18rem;
+        text-align: left;
+        width: 32.2rem;
+    }
+
+    .control {
+        @include flexbox();
+        justify-content: space-between;
+        align-items: center;
+
+        .inputHeader {
+            color: #ccc;
+        }
+    }
+
+    .btn-h-group {
+        border: none;
+        border-top: 1px solid #ccc;
+        bottom: 0;
+        left: 0;
+        padding: 1.6rem 0;
+        right: 0;
+    }
+}
+
+.modal-update {
+    color: #989898;
+
+    .update-wrapper {
+        background: #fff;
+        padding: 20px;
+        width: 32.2rem;
+    }
+
+    .caption {
+        color: #626262;
+        font-size: 15px;
+        line-height: 18px;
+    }
+
+    .caption,
+    .update-brief,
+    .release-note-content {
+        margin: 0 0 20px 0;
+    }
+
+    .update-brief {
+        font-size: 12px;
+        line-height: 18px;
+
+        p {
+            margin: 0;
+        }
+    }
+
+    .release-note-caption {
+        margin: 0;
+        font-weight: normal;
+    }
+
+    .release-note-content {
+        border: 2px solid #989898;
+        height: 90px;
+        overflow: scroll;
+        padding: 3px;
+    }
+
+    .action-button {
+        @include flexbox();
+        justify-content: space-between;
+    }
+
+    .btn-h-group {
+        position: static;
+        width: 50%;
     }
 }

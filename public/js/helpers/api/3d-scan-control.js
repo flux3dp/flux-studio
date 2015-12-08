@@ -9,6 +9,8 @@ define([
 ], function(Websocket, fileSystem, PointCloudHelper) {
     'use strict';
 
+    var ws;
+
     return function(uuid, opts) {
         opts = opts || {};
         opts.onError = opts.onError || function() {};
@@ -20,30 +22,6 @@ define([
                 is_error = true;
                 opts.onError(data);
             },
-            ws = new Websocket({
-                method: '3d-scan-control/' + uuid,
-                onMessage: function(data) {
-
-                    switch (data.status) {
-                    case 'ready':
-                        is_ready = true;
-                        is_error = false;
-                        opts.onReady();
-                        break;
-                    case 'connected':
-                        // wait for machine ready
-                        break;
-                    default:
-                        break;
-                    }
-
-                    if (true === is_ready) {
-                        (events.onMessage || function() {})(data);
-                    }
-                },
-                onError: errorHandler,
-                onClose: opts.onClose
-            }),
             is_error = false,
             is_ready = false,
             events,
@@ -51,16 +29,6 @@ define([
                 events = {
                     onMessage: undefined
                 };
-            },
-            retry = function() {
-                if (true === is_error) {
-                    ws.send('retry');
-                }
-            },
-            takeControl = function() {
-                if (true === is_error) {
-                    ws.send('take_control');
-                }
             },
             fetchImage = function(goFetch) {
                 if ('boolean' === typeof goFetch && true === goFetch) {
@@ -91,11 +59,32 @@ define([
 
             };
 
-        initialEvents();
+        ws = ws || new Websocket({
+            method: '3d-scan-control/' + uuid,
+            onMessage: function(data) {
 
-        setInterval(function() {
-            ws.send('ping');
-        }, 60000);
+                switch (data.status) {
+                case 'ready':
+                    is_ready = true;
+                    is_error = false;
+                    opts.onReady();
+                    break;
+                case 'connected':
+                    // wait for machine ready
+                    break;
+                default:
+                    break;
+                }
+
+                if (true === is_ready) {
+                    (events.onMessage || function() {})(data);
+                }
+            },
+            onError: errorHandler,
+            onClose: opts.onClose
+        });
+
+        initialEvents();
 
         return {
             connection: ws,
@@ -118,7 +107,7 @@ define([
 
                                 setTimeout(function() {
                                     goFetch();
-                                }, 1000);
+                                }, 200);
 
                                 break;
                             default:
@@ -136,8 +125,6 @@ define([
                 goFetch();
 
                 return {
-                    retry: retry,
-                    take_control: takeControl,
                     stop: stopGettingImage
                 };
             },
@@ -199,10 +186,10 @@ define([
                 stopGettingImage(scanStarted);
 
                 return {
-                    retry: retry,
-                    take_control: takeControl,
-                    stop: function() {
-                        events.onMessage = function() {};
+                    stop: function(callback) {
+                        callback = callback || function() {};
+                        callback(pointCloud.get());
+                        initialEvents();
                     }
                 };
             },
@@ -227,6 +214,35 @@ define([
                 };
 
                 stopGettingImage(checkStarted);
+            },
+
+            retry: function(callback) {
+                events.onMessage = function(data) {
+                    initialEvents();
+
+                    callback(data);
+                };
+
+                ws.send('retry');
+            },
+
+            takeControl: function(callback) {
+                ws.send('take_control');
+            },
+
+            quit: function(opts) {
+                var d = $.Deferred();
+                events.onMessage = function(result) {
+                    d.resolve(result);
+                };
+
+                events.onError = function(result) {
+                    d.resolve(result);
+                }
+
+                ws.send('quit');
+
+                return d.promise();
             }
         };
     };
