@@ -65,11 +65,11 @@ define([
         ws.onMessage(onMessage);
 
         Array.observe(printers, function(changes) {
-            getPrinters(printers);
+            sendFoundPrinter();
         });
 
         if (0 < printers.length) {
-            getPrinters(printers);
+            sendFoundPrinter();
         }
 
         return {
