@@ -3410,6 +3410,8 @@ input[type=range]:focus::-webkit-slider-runnable-track {
                             color: #FFF; }
             .top-menu .device .menu.show {
                 display: block; }
+    .top-menu .always-top .modal-window {
+        z-index: 99999; }
 
 .accordion .accordion-body {
     display: block;
@@ -3533,6 +3535,175 @@ input[type=range]:focus::-webkit-slider-runnable-track {
 .growl .growl-message {
     font-size: 14px;
     line-height: 18px; }
+
+.flux-monitor {
+    position: absolute;
+    left: 50%;
+    top: 100px; }
+    .flux-monitor .main {
+        background-color: white;
+        height: 40rem;
+        width: 31rem;
+        left: -50%;
+        position: relative; }
+        .flux-monitor .main .title {
+            height: 5rem;
+            text-align: center; }
+            .flux-monitor .main .title span {
+                font-size: 1.8rem;
+                color: #999;
+                line-height: 5rem; }
+            .flux-monitor .main .title .back {
+                font-size: 3rem;
+                position: absolute;
+                top: 0px;
+                left: 15px;
+                color: #BBB;
+                cursor: pointer; }
+            .flux-monitor .main .title .back:hover {
+                color: #333; }
+            .flux-monitor .main .title .close {
+                right: 12px;
+                top: 9px; }
+        .flux-monitor .main .body {
+            height: 70%; }
+            .flux-monitor .main .body .content {
+                padding: 0 20px;
+                overflow-y: auto; }
+                .flux-monitor .main .body .content img {
+                    width: 100%; }
+                .flux-monitor .main .body .content .image-wrapper {
+                    position: absolute;
+                    margin-left: auto;
+                    margin-right: auto;
+                    width: 100%; }
+                .flux-monitor .main .body .content .name {
+                    font-size: 1rem;
+                    position: absolute;
+                    bottom: 0;
+                    text-align: center;
+                    width: 100%;
+                    overflow: hidden; }
+                .flux-monitor .main .body .content .name.selected {
+                    padding: 0 8px;
+                    border-radius: 5px;
+                    color: white;
+                    background: #0950D0; }
+                .flux-monitor .main .body .content .folder {
+                    color: #BBB;
+                    display: inline-block;
+                    width: 33%;
+                    height: 80px;
+                    position: relative;
+                    background-image: url("../../img/folder.svg");
+                    background-repeat: no-repeat;
+                    background-size: 72px 60px;
+                    background-position: top;
+                    margin-top: 10px;
+                    cursor: pointer; }
+                .flux-monitor .main .body .content .folder:hover {
+                    color: #333; }
+                .flux-monitor .main .body .content .file {
+                    text-align: center;
+                    color: #BBB;
+                    display: inline-block;
+                    width: 33%;
+                    height: 80px;
+                    position: relative;
+                    background-repeat: no-repeat;
+                    background-size: 72px 60px;
+                    background-position: top;
+                    margin-top: 10px;
+                    cursor: pointer; }
+                    .flux-monitor .main .body .content .file img {
+                        width: 60px; }
+                .flux-monitor .main .body .content .file:hover {
+                    color: #333; }
+                .flux-monitor .main .body .content .spinner-wrapper {
+                    position: absolute;
+                    width: calc(100% - 20px);
+                    margin: auto;
+                    top: 200px; }
+                .flux-monitor .main .body .content .camera-image {
+                    width: 100%;
+                    height: 249px; }
+            .flux-monitor .main .body .close {
+                right: 20px; }
+        .flux-monitor .main .operation {
+            margin-top: 15px; }
+            .flux-monitor .main .operation .controls {
+                position: absolute;
+                color: #BBB;
+                text-align: center;
+                width: 60px;
+                cursor: pointer; }
+                .flux-monitor .main .operation .controls .description {
+                    padding-top: 5px;
+                    font-size: 1.2rem; }
+            .flux-monitor .main .operation .controls:hover {
+                color: #333; }
+            .flux-monitor .main .operation .left {
+                left: 2rem; }
+            .flux-monitor .main .operation .center {
+                margin: auto;
+                left: 0;
+                right: 0; }
+            .flux-monitor .main .operation .right {
+                right: 2rem; }
+        .flux-monitor .main .wait {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 1.2rem;
+            color: #B3B3B3; }
+    .flux-monitor .sub {
+        background-color: white;
+        height: 10rem;
+        width: 31rem;
+        left: -50%;
+        position: relative;
+        margin-top: 5px; }
+        .flux-monitor .sub .wrapper {
+            padding: 1.5rem 1.5rem 0 1.5rem; }
+            .flux-monitor .sub .wrapper .row {
+                font-size: 1.2rem;
+                color: #888; }
+                .flux-monitor .sub .wrapper .row div {
+                    display: inline-block; }
+                .flux-monitor .sub .wrapper .row .right {
+                    float: right; }
+        .flux-monitor .sub .actions {
+            position: absolute;
+            text-align: center;
+            margin-left: auto;
+            margin-right: auto;
+            display: inline-block;
+            bottom: 1rem;
+            width: 100%; }
+        .flux-monitor .sub .btn {
+            font-size: 1rem;
+            color: #FFF;
+            background-color: #BBB;
+            border-radius: 0;
+            margin: 0 0.25rem;
+            padding: 0 12px;
+            transition: none; }
+            .flux-monitor .sub .btn .filament {
+                width: 12rem; }
+            .flux-monitor .sub .btn .file {
+                width: 8rem; }
+            .flux-monitor .sub .btn .monitor {
+                width: 8rem; }
+        .flux-monitor .sub .btn:hover {
+            background-color: #333; }
+    .flux-monitor ul {
+        list-style: none;
+        float: left;
+        display: block;
+        width: 100%; }
+    .flux-monitor li {
+        display: inline;
+        width: 25%;
+        float: left; }
 
 .print-studio {
     padding: 0; }
@@ -4070,174 +4241,6 @@ input.switch:checked ~ label:after {
                 width: 300px;
                 border: 2px solid #E0E0E0; }
 
-.print-studio .flux-monitor {
-    position: absolute;
-    left: 50%;
-    top: 100px; }
-    .print-studio .flux-monitor .main {
-        background-color: white;
-        height: 40rem;
-        width: 31rem;
-        left: -50%;
-        position: relative; }
-        .print-studio .flux-monitor .main .title {
-            height: 5rem;
-            text-align: center; }
-            .print-studio .flux-monitor .main .title span {
-                font-size: 1.8rem;
-                color: #999;
-                line-height: 5rem; }
-            .print-studio .flux-monitor .main .title .back {
-                font-size: 3rem;
-                position: absolute;
-                top: 0px;
-                left: 15px;
-                color: #BBB;
-                cursor: pointer; }
-            .print-studio .flux-monitor .main .title .back:hover {
-                color: #333; }
-            .print-studio .flux-monitor .main .title .close {
-                right: 12px;
-                top: 9px; }
-        .print-studio .flux-monitor .main .body {
-            height: 70%; }
-            .print-studio .flux-monitor .main .body .content {
-                padding: 0 20px;
-                overflow-y: auto; }
-                .print-studio .flux-monitor .main .body .content img {
-                    width: 100%; }
-                .print-studio .flux-monitor .main .body .content .image-wrapper {
-                    position: absolute;
-                    margin-left: auto;
-                    margin-right: auto;
-                    width: 100%; }
-                .print-studio .flux-monitor .main .body .content .name {
-                    font-size: 1rem;
-                    position: absolute;
-                    bottom: 0;
-                    text-align: center;
-                    width: 100%;
-                    overflow: hidden; }
-                .print-studio .flux-monitor .main .body .content .name.selected {
-                    padding: 0 8px;
-                    border-radius: 5px;
-                    color: white;
-                    background: #0950D0; }
-                .print-studio .flux-monitor .main .body .content .folder {
-                    color: #BBB;
-                    display: inline-block;
-                    width: 33%;
-                    height: 80px;
-                    position: relative;
-                    background-image: url("../../img/folder.svg");
-                    background-repeat: no-repeat;
-                    background-size: 72px 60px;
-                    background-position: top;
-                    margin-top: 10px;
-                    cursor: pointer; }
-                .print-studio .flux-monitor .main .body .content .folder:hover {
-                    color: #333; }
-                .print-studio .flux-monitor .main .body .content .file {
-                    text-align: center;
-                    color: #BBB;
-                    display: inline-block;
-                    width: 33%;
-                    height: 80px;
-                    position: relative;
-                    background-repeat: no-repeat;
-                    background-size: 72px 60px;
-                    background-position: top;
-                    margin-top: 10px;
-                    cursor: pointer; }
-                    .print-studio .flux-monitor .main .body .content .file img {
-                        width: 60px; }
-                .print-studio .flux-monitor .main .body .content .file:hover {
-                    color: #333; }
-                .print-studio .flux-monitor .main .body .content .spinner-wrapper {
-                    position: absolute;
-                    width: calc(100% - 20px);
-                    margin: auto;
-                    top: 200px; }
-                .print-studio .flux-monitor .main .body .content .camera-image {
-                    width: 100%;
-                    height: 249px; }
-            .print-studio .flux-monitor .main .body .close {
-                right: 20px; }
-        .print-studio .flux-monitor .main .operation {
-            margin-top: 15px; }
-            .print-studio .flux-monitor .main .operation .controls {
-                position: absolute;
-                color: #BBB;
-                text-align: center;
-                width: 60px;
-                cursor: pointer; }
-                .print-studio .flux-monitor .main .operation .controls .description {
-                    padding-top: 5px;
-                    font-size: 1.2rem; }
-            .print-studio .flux-monitor .main .operation .controls:hover {
-                color: #333; }
-            .print-studio .flux-monitor .main .operation .left {
-                left: 2rem; }
-            .print-studio .flux-monitor .main .operation .center {
-                margin: auto;
-                left: 0;
-                right: 0; }
-            .print-studio .flux-monitor .main .operation .right {
-                right: 2rem; }
-        .print-studio .flux-monitor .main .wait {
-            text-align: center;
-            margin-top: 30px;
-            font-size: 1.2rem;
-            color: #B3B3B3; }
-    .print-studio .flux-monitor .sub {
-        background-color: white;
-        height: 10rem;
-        width: 31rem;
-        left: -50%;
-        position: relative;
-        margin-top: 5px; }
-        .print-studio .flux-monitor .sub .wrapper {
-            padding: 1.5rem 1.5rem 0 1.5rem; }
-            .print-studio .flux-monitor .sub .wrapper .row {
-                font-size: 1.2rem;
-                color: #888; }
-                .print-studio .flux-monitor .sub .wrapper .row div {
-                    display: inline-block; }
-                .print-studio .flux-monitor .sub .wrapper .row .right {
-                    float: right; }
-        .print-studio .flux-monitor .sub .actions {
-            position: absolute;
-            margin-left: auto;
-            margin-right: auto;
-            display: inline-block;
-            bottom: 1rem;
-            width: 100%; }
-        .print-studio .flux-monitor .sub .btn {
-            font-size: 1rem;
-            color: #FFF;
-            background-color: #BBB;
-            border-radius: 0;
-            margin: 0 0.25rem;
-            padding: 0 12px;
-            transition: none; }
-            .print-studio .flux-monitor .sub .btn .filament {
-                width: 12rem; }
-            .print-studio .flux-monitor .sub .btn .file {
-                width: 8rem; }
-            .print-studio .flux-monitor .sub .btn .monitor {
-                width: 8rem; }
-        .print-studio .flux-monitor .sub .btn:hover {
-            background-color: #333; }
-    .print-studio .flux-monitor ul {
-        list-style: none;
-        float: left;
-        display: block;
-        width: 100%; }
-    .print-studio .flux-monitor li {
-        display: inline;
-        width: 25%;
-        float: left; }
-
 .print-studio .preview-panel {
     position: relative;
     width: 50px;
@@ -4550,9 +4553,6 @@ input.switch:checked ~ label:after {
 .print-studio .select-printer {
     bottom: 65px;
     right: 240px; }
-
-.print-studio .modal-window {
-    z-index: 99; }
 
 .close {
     position: absolute;

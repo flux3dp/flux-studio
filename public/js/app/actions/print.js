@@ -659,7 +659,8 @@ define([
 
     function getFCode() {
         var d = $.Deferred();
-        var ids = [];
+        var ids = [],
+            previewUrl;
 
         if(objects.length === 0) {
             d.resolve('');
@@ -677,7 +678,7 @@ define([
 
         _setProgressMessage('Saving File Preview');
         getBlobFromScene().then(function(blob) {
-            reactSrc.setState({ previewUrl: URL.createObjectURL(blob) });
+            previewUrl = URL.createObjectURL(blob);
             return slicer.uploadPreviewImage(blob);
         }).then(function(response) {
             if (response.status === 'ok') {
@@ -687,7 +688,7 @@ define([
                             blobExpired = false;
                             responseBlob = result;
                             _setProgressMessage('');
-                            d.resolve(result);
+                            d.resolve(result, previewUrl);
                         }
                         else {
                             if (result.status !== 'error') {

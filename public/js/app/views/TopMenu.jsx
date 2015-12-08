@@ -24,7 +24,10 @@ define([
     'helpers/device-master',
     'plugins/classnames/index',
     'app/actions/global-actions',
-    'app/constants/device-constants'
+    'app/stores/global-store',
+    'app/constants/device-constants',
+    'jsx!views/print/Monitor',
+    'jsx!widgets/Modal'
 ], function(
     $,
     React,
@@ -43,7 +46,7 @@ define([
     InputLightboxConstants,
     Progress,
     InputLightbox,
-    Modal,
+    NotificationModal,
     PrinterSelector,
     UpdateDialog,
     Discover,
@@ -51,7 +54,10 @@ define([
     DeviceMaster,
     ClassNames,
     GlobalActions,
-    DeviceConstants
+    GlobalStore,
+    DeviceConstants,
+    Monitor,
+    Modal
 ) {
     'use strict';
 
@@ -93,11 +99,14 @@ define([
 
                 return {
                     sourceId        : '',
-                    showModal       : false,
+                    showNotificationModal       : false,
+                    showMonitor     : false,
                     deviceList      : [],
                     refresh         : '',
                     showDeviceList  : false,
                     customText      : '',
+                    fcode           : {},
+                    previewUrl      : '',
                     // progress
                     progress: {
                         open       : false,
@@ -132,12 +141,13 @@ define([
 
             componentDidMount: function() {
                 AlertStore.onNotify(this._handleNotification);
-                AlertStore.onPopup(this._showFirmwareUpdate);
+                AlertStore.onPopup(this._handlePopup);
                 AlertStore.onFirmwareUpdate(this._showFirmwareUpdate);
                 ProgressStore.onOpened(this._handleProgress).
                     onUpdating(this._handleProgress).
                     onClosed(this._handleProgressFinish);
                 InputLightboxStore.onInputLightBoxOpened(this._handleInputLightBoxOpen);
+                GlobalStore.onShowMonitor(this._handleOpenMonitor);
                 DeviceMaster.setLanguageSource(lang);
             },
 
@@ -267,7 +277,7 @@ define([
 
             _handlePopup: function(type, id, message) {
                 this.setState({
-                    showModal   : true,
+                    showNotificationModal   : true,
                     type        : type,
                     sourceId    : id,
                     message     : message
@@ -278,10 +288,10 @@ define([
                 location.hash = '#studio/' + address;
             },
 
-            _handleModalClose: function(e, reactid, from) {
+            _handleNotificationModalClose: function(e, reactid, from) {
                 var from = from || '';
 
-                this.setState({ showModal: false });
+                this.setState({ showNotificationModal: false });
 
                 if ('' === from) {
                     AlertActions.notifyCancel(this.state.sourceId);
@@ -331,7 +341,7 @@ define([
                 // AlertActions.showInfo(lang.message.connecting);
                 DeviceMaster.selectDevice(device).then(function(status) {
                     if(status === DeviceConstants.CONNECTED) {
-                        GlobalActions.showMonitor(true);
+                        GlobalActions.showMonitor(device);
                     }
                     else if (status === DeviceConstants.TIMEOUT) {
                         AlertActions.showPopupError(_id, lang.message.connectionTimeout);
@@ -339,6 +349,22 @@ define([
                 });
 
                 this.setState({ showDeviceList: false });
+            },
+
+            _handleOpenMonitor: function(selectedDevice, fcode, previewUrl) {
+                this.setState({
+                    fcode: fcode,
+                    showMonitor: true,
+                    selectedDevice: selectedDevice,
+                    previewUrl: previewUrl
+                });
+                console.log(selectedDevice, fcode);
+            },
+
+            _handleMonitorClose: function() {
+                this.setState({
+                    showMonitor: false
+                });
             },
 
             _renderStudioFunctions: function() {
@@ -387,9 +413,27 @@ define([
                 );
             },
 
+            _renderMonitorPanel: function() {
+                var content = (
+                    <Monitor
+                        lang                = {lang}
+                        selectedDevice      = {this.state.selectedDevice}
+                        fCode               = {this.state.fcode}
+                        previewUrl          = {this.state.previewUrl}
+                        onClose             ={this._handleMonitorClose} />
+                );
+                return (
+                    <Modal
+                        {...this.props}
+                        lang    = {lang}
+                        content ={content} />
+                );
+            },
+
             render : function() {
-                var menuItems = this._renderStudioFunctions(),
-                    deviceList = this._renderDeviceList(),
+                var menuItems       = this._renderStudioFunctions(),
+                    deviceList      = this._renderDeviceList(),
+                    monitorPanel    = this.state.showMonitor ? this._renderMonitorPanel() : '',
                     currentWorkingFunction,
                     menuClass;
 
@@ -450,15 +494,15 @@ define([
                             onSubmit={this._handleInputLightBoxSubmit}
                         />
 
-                        <Modal
+                        <NotificationModal
                             lang={lang}
                             type={this.state.type}
-                            open={this.state.showModal}
+                            open={this.state.showNotificationModal}
                             message={this.state.message}
                             onRetry={this._handleRetry}
                             onAbort={this._handleAbort}
                             onYes={this._handleYes}
-                            onClose={this._handleModalClose} />
+                            onClose={this._handleNotificationModalClose} />
 
                         <div title={lang.print.deviceTitle} className="device" onClick={this._handleShowDeviceList}>
                             <img src="/img/btn-device.svg" />
@@ -477,6 +521,8 @@ define([
                                 </div>
                             </div>
                         </div>
+
+                        {monitorPanel}
                     </div>
                 );
             }

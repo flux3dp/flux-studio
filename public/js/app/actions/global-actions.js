@@ -7,11 +7,17 @@ define([
 ) {
     return {
 
-        showMonitor: function(isOn) {
+        showMonitor: function(printer, fcode, previewUrl) {
             Dispatcher.dispatch({
-                actionType: GlobalConstants.SHOW_MONITOR, isOn
+                actionType: GlobalConstants.SHOW_MONITOR, printer, fcode, previewUrl
             });
-        }
+        },
+
+        closeMonitor: function() {
+            Dispatcher.dispatch({
+                actionType: GlobalConstants.SHOW_MONITOR
+            });
+        },
 
     };
 });
