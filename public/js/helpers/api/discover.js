@@ -21,12 +21,20 @@ define([
     return function(id, getPrinters) {
         getPrinters = getPrinters || function() {};
 
-        if (0 === idList.length || -1 === idList.indexOf(id)) {
+        var index = idList.indexOf(id);
+
+        if (0 === idList.length || -1 === index) {
             idList.push(id);
             dispatchers.push({
                 id: id,
                 sender: getPrinters
             });
+        }
+        else {
+            dispatchers[index] = {
+                id: id,
+                sender: getPrinters
+            };
         }
 
         var onMessage = function(data) {
