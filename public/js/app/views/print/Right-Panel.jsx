@@ -115,17 +115,27 @@ define([
             );
         },
 
-        render: function() {
-            var lang            = this.props.lang,
-                actionButtons   = this._renderActionButtons(lang);
-
+        _renderTestButtons: function() {
             return (
-                <div className='rightPanel'>
+                <div>
                     <a className="btn" onClick={this._handleGetGCode}>Gcode</a><p/>
                     <a className="btn" onClick={this._handleTest}>Notify</a>
                     <a className="btn" onClick={this._showInfo}>Info</a>
                     <a className="btn" onClick={this._showWarning}>Warning</a>
                     <a className="btn" onClick={this._showError}>Error</a>
+                </div>
+            )
+        },
+
+        render: function() {
+            var lang            = this.props.lang,
+                testButtons     = window.FLUX.debug ? this._renderTestButtons() : '',
+                actionButtons   = this._renderActionButtons(lang);
+
+            return (
+                <div className='rightPanel'>
+
+                    {testButtons}
 
                     <div id="cameraViewController" className="cameraViewController"></div>
                     {actionButtons}
