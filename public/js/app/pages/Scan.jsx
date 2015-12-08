@@ -794,7 +794,7 @@ define([
 
                     camera_image_class = cx({
                         'camera-image' : true,
-                        'hide' : false === state.printerIsReady
+                        'hide' : 0 < this.state.scanTimes
                     });
 
                     return (
@@ -873,7 +873,6 @@ define([
                             }
                         },
                         onGettingPrinter = function(auth_printer) {
-                            console.log(self.state.gettingStarted, auth_printer);
                             self.setState({
                                 gettingStarted: true,
                                 selectedPrinter: auth_printer,
