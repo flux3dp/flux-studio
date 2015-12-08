@@ -99,7 +99,12 @@ function(React, $, Backbone, display, config) {
                     $.ajax({
                         url: 'package.json'
                     }).then(function(response) {
-                        deferred.resolve(JSON.parse(response));
+                        if(typeof(response) === 'object') {
+                            deferred.resolve(response);
+                        }
+                        else {
+                            deferred.resolve(JSON.parse(response));
+                        }
                     });
 
                     return deferred;
