@@ -5,7 +5,8 @@ define([
     'plugins/classnames/index',
     'helpers/device-master',
     'helpers/api/config',
-], function($, React, printController, ClassNames, DeviceMaster, Config) {
+    'jsx!widgets/Dialog-Menu'
+], function($, React, printController, ClassNames, DeviceMaster, Config, DialogMenu) {
     'use strict';
 
     var lang,
@@ -141,29 +142,20 @@ define([
                 );
             }.bind(this));
 
-            return (
-                <li title={lang.qualityTitle}>
-                    <label className="popup-selection">
-                        <input className="popup-open" name="popup-open" type="checkbox" onClick={this._onOpenSubPopup}/>
-                        <div className="display-text">
-                            <p>
-                                <span>{this.state.quality}</span>
-                            </p>
-                        </div>
-                        <label className="popup">
-                            <svg className="arrow dark" version="1.1" xmlns="http://www.w3.org/2000/svg"
-                                width="36.8" height="30">
-                                <polygon points="0,15 36.8,0 36.8,30"/>
-                            </svg>
-                            <div className="content quality">
-                                <ul>
-                                    {qualitySelection}
-                                </ul>
-                            </div>
-                        </label>
-                    </label>
-                </li>
-            );
+            return {
+                label: (
+                    <div className="display-text">
+                        <span>{this.state.quality}</span>
+                    </div>
+                ),
+                content: (
+                    <div className="content quality">
+                        <ul>
+                            {qualitySelection}
+                        </ul>
+                    </div>
+                )
+            }
         },
 
         _renderMaterialPallet: function() {
@@ -209,56 +201,51 @@ define([
         },
 
         _renderRaft: function() {
-            return (
-                <li title={lang.raftTitle} onClick={this._handleToggleRaft}>
-                    <div>{this.state.raftOn ? lang.raft_on : lang.raft_off}</div>
-                </li>
-            );
+            return {
+                label: (
+                    <div title={lang.raftTitle} onClick={this._handleToggleRaft}>
+                        <div>{this.state.raftOn ? lang.raft_on : lang.raft_off}</div>
+                    </div>
+                )
+            };
         },
 
         _renderSupport: function() {
-            return (
-                <li title={lang.supportTitle} onClick={this._handleToggleSupport}>
-                    <div>{this.state.supportOn ? lang.support_on : lang.support_off}</div>
-                </li>
-            );
+            return {
+                label: (
+                    <div title={lang.supportTitle} onClick={this._handleToggleSupport}>
+                        <div>{this.state.supportOn ? lang.support_on : lang.support_off}</div>
+                    </div>
+                )
+            };
         },
 
         _renderAdvanced: function() {
-            return (
-                <li title={lang.advancedTitle} onClick={this._handleOpenAdvancedSetting}>
-                    <div>{this.props.lang.print.left_panel.advanced}</div>
-                </li>
-            );
+            return {
+                label: (
+                    <div title={lang.advancedTitle} onClick={this._handleOpenAdvancedSetting}>
+                        <div>{this.props.lang.print.left_panel.advanced}</div>
+                    </div>
+                )
+            };
         },
 
         _renderPreview: function() {
-            return (
-                <li title={lang.previewTitle} onClick={this._handleOpenPreview}>
-                    <label className="popup-selection">
-                        <input ref="preview" className="popup-open" name="popup-open" type="checkbox" onClick={this._onOpenSubPopup}/>
-                        <div className="display-text">
-                            <p>
-                                <span>{lang.preview}</span>
-                            </p>
+            return {
+                label: (
+                    <div className="display-text">
+                        <span>{lang.preview}</span>
+                    </div>
+                ),
+                content: (
+                    <div className="preview-panel">
+                        <input className="range" type="range" value={this.state.previewCurrentLayer} min="0" max={this.state.previewLayerCount} onChange={this._handlePreviewLayerChange} />
+                        <div className="layer-count">
+                            {this.state.previewCurrentLayer}
                         </div>
-                        <label className="popup">
-                            <svg className="arrow dark" version="1.1" xmlns="http://www.w3.org/2000/svg"
-                                width="36.8" height="30">
-                                <polygon points="0,15 36.8,0 36.8,30"/>
-                            </svg>
-                            <div className="content preview">
-                                <div className="preview-panel">
-                                    <input className="range" type="range" value={this.state.previewCurrentLayer} min="0" max={this.state.previewLayerCount} onChange={this._handlePreviewLayerChange} />
-                                    <div className="layer-count">
-                                        {this.state.previewCurrentLayer}
-                                    </div>
-                                </div>
-                            </div>
-                        </label>
-                    </label>
-                </li>
-            );
+                    </div>
+                )
+            };
         },
 
         render: function() {
@@ -267,27 +254,18 @@ define([
                 raft        = this._renderRaft(),
                 support     = this._renderSupport(),
                 advanced    = this._renderAdvanced(),
-                preview     = this._renderPreview();
+                preview     = this._renderPreview(),
+                items = [
+                    quality,
+                    raft,
+                    support,
+                    advanced,
+                    preview
+                ];
 
             return (
                 <div className='leftPanel'>
-                    <ul>
-                        {quality}
-
-                        {material}
-
-                        {raft}
-
-                        {support}
-
-                        {preview}
-
-                        {advanced}
-
-                        <li>
-                            <a onClick={this._handleTest}>test</a>
-                        </li>
-                    </ul>
+                    <DialogMenu ref="dialogMenu" items={items}/>
                 </div>
             );
         }
