@@ -35,7 +35,7 @@
             debug: -1 !== location.search.indexOf('debug'),
             timestamp: (new Date()).getTime(),
             os: ('undefined' === typeof requireNode ? undefined : os),
-            ghostPort: 8000
+            ghostPort: location.port || 8000
         };
 
         // it's not node-webkit
