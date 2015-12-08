@@ -219,41 +219,46 @@ define([
                 ]
             });
 
-            discover(function(printers) {
-                deviceGroup = [items.newDevice, separator];
+            if ('undefined' !== typeof requireNode) {
+                discover(
+                    'menu-map',
+                    function(printers) {
+                        deviceGroup = [items.newDevice, separator];
 
-                printers.forEach(function(printer) {
-                    deviceGroup.push({
-                        label: printer.name,
-                        enabled: true,
-                        subItems: [{
-                            label: lang.device.device_monitor,
-                            enabled: true,
-                            onClick: function() {
-                                // TODO: go to monitor
-                            }
-                        },
-                        {
-                            label: lang.device.change_filament,
-                            enabled: true,
-                            onClick: function() {
-                                // TODO: go to change filament
-                            }
-                        },
-                        {
-                            label: lang.device.check_firmware_update,
-                            enabled: true,
-                            onClick: function() {
-                                checkFirmware(printer).done(function(response) {
-                                    if (true === response.needUpdate) {
-                                        AlertActions.showFirmwareUpdate(printer, response);
+                        printers.forEach(function(printer) {
+                            deviceGroup.push({
+                                label: printer.name,
+                                enabled: true,
+                                subItems: [{
+                                    label: lang.device.device_monitor,
+                                    enabled: true,
+                                    onClick: function() {
+                                        // TODO: go to monitor
                                     }
-                                });
-                            }
-                        }]
-                    });
-                });
-            });
+                                },
+                                {
+                                    label: lang.device.change_filament,
+                                    enabled: true,
+                                    onClick: function() {
+                                        // TODO: go to change filament
+                                    }
+                                },
+                                {
+                                    label: lang.device.check_firmware_update,
+                                    enabled: true,
+                                    onClick: function() {
+                                        checkFirmware(printer).done(function(response) {
+                                            if (true === response.needUpdate) {
+                                                AlertActions.showFirmwareUpdate(printer, response);
+                                            }
+                                        });
+                                    }
+                                }]
+                            });
+                        });
+                    }
+                );
+            }
         }
 
         menuMap.push({

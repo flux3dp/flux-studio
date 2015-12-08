@@ -318,9 +318,12 @@ define([
                     });
                 }
                 else {
-                    Discover(function(printers) {
-                        refreshOption(printers);
-                    });
+                    Discover(
+                        'top-menu',
+                        function(printers) {
+                            refreshOption(printers);
+                        }
+                    );
                 }
 
                 this.setState({ showDeviceList: !this.state.showDeviceList });

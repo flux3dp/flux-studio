@@ -9,10 +9,25 @@ define([
     'use strict';
 
     var ws,
-        printers = [];
+        printers = [],
+        dispatchers = [],
+        idList = [],
+        sendFoundPrinter = function() {
+            dispatchers.forEach(function(dispatcher) {
+                dispatcher.sender(printers);
+            });
+        };
 
-    return function(getPrinters) {
+    return function(id, getPrinters) {
         getPrinters = getPrinters || function() {};
+
+        if (-1 === idList.indexOf(id)) {
+            idList.push(id);
+            dispatchers.push({
+                id: id,
+                sender: getPrinters
+            });
+        }
 
         var onMessage = function(data) {
             var someFn = function(el) {
@@ -59,6 +74,12 @@ define([
 
         return {
             connection: ws,
+            removeListener: function(id) {
+                var index = idList.indexOf(id);
+
+                idList = idList.splice(index, 1);
+                dispatchers = dispatchers.splice(index, 1);
+            },
             sendAggressive: function() {
                 ws.send('aggressive');
             }

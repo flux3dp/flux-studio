@@ -258,9 +258,12 @@ define([
                 });
             }
             else {
-                discover(function(printers) {
-                    refreshOption(printers);
-                });
+                discover(
+                    'printer-selector',
+                    function(printers) {
+                        refreshOption(printers);
+                    }
+                );
             }
         }
 

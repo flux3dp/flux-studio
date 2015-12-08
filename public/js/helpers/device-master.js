@@ -316,9 +316,12 @@ define([
             this.ls                 = ls;
             this.fileInfo           = fileInfo;
 
-            Discover(function(devices) {
-                _scanDeviceError(devices);
-            });
+            Discover(
+                'device-master',
+                function(devices) {
+                    _scanDeviceError(devices);
+                }
+            );
         }
     };
 
