@@ -4144,7 +4144,8 @@ input.switch:checked ~ label:after {
     width: 440px; }
     .print-studio .advanced-panel .content-wrapper {
         height: 415px;
-        overflow-y: auto; }
+        overflow-y: auto;
+        padding: 0 0 70px 0; }
     .print-studio .advanced-panel .tab-list {
         display: table;
         list-style: none;
@@ -4178,6 +4179,7 @@ input.switch:checked ~ label:after {
         letter-spacing: 0.5px;
         margin-bottom: 15px; }
     .print-studio .advanced-panel .footer {
+        background: #fff;
         border-top: 1px solid #DDD;
         bottom: 0;
         height: 70px;
@@ -4271,33 +4273,34 @@ input.switch:checked ~ label:after {
         padding: 15px 0;
         text-align: center; }
 
-.print-studio .importWindow .arrowBox {
-    background: #fff;
-    cursor: pointer;
-    height: 50px;
-    position: absolute;
-    width: 200px; }
-    .print-studio .importWindow .arrowBox .import-btn {
-        color: #ccc;
-        font-size: 2em;
-        font-weight: bold;
-        letter-spacing: 2px;
-        margin-top: 0.4rem;
-        text-align: center; }
-
-.print-studio .importWindow .arrowBox:after {
-    border: solid transparent;
-    border-color: rgba(255, 255, 255, 0);
-    border-top-color: #fff;
-    border-width: 20px;
-    content: " ";
-    height: 0;
-    left: 50%;
-    margin-left: -20px;
-    pointer-events: none;
-    position: absolute;
-    top: 100%;
-    width: 0; }
+.print-studio .importWindow {
+    z-index: 1; }
+    .print-studio .importWindow .arrowBox {
+        background: #fff;
+        cursor: pointer;
+        height: 50px;
+        position: absolute;
+        width: 200px; }
+        .print-studio .importWindow .arrowBox .import-btn {
+            color: #ccc;
+            font-size: 2em;
+            font-weight: bold;
+            letter-spacing: 2px;
+            margin-top: 0.4rem;
+            text-align: center; }
+    .print-studio .importWindow .arrowBox:after {
+        border: solid transparent;
+        border-color: rgba(255, 255, 255, 0);
+        border-top-color: #fff;
+        border-width: 20px;
+        content: " ";
+        height: 0;
+        left: 50%;
+        margin-left: -20px;
+        pointer-events: none;
+        position: absolute;
+        top: 100%;
+        width: 0; }
 
 .print-studio .hide {
     display: none; }
@@ -4427,7 +4430,8 @@ input.switch:checked ~ label:after {
     height: 100%;
     position: absolute;
     right: 0;
-    width: 275px; }
+    width: 275px;
+    z-index: 1; }
     .print-studio .rightPanel svg {
         bottom: 50px;
         height: 230px;
