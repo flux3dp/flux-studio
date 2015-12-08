@@ -18,6 +18,26 @@ define([
             onGettingPrinter: React.PropTypes.func
         },
 
+        getDefaultProps: function() {
+            return {
+                lang: React.PropTypes.object,
+                className: React.PropTypes.string,
+                onGettingPrinter: React.PropTypes.func,
+                onClose: React.PropTypes.func
+            };
+        },
+
+        getInitialState: function() {
+            return {
+                printOptions: [],
+                authFailure: false,
+                waiting: false,
+                showPassword: false,
+                loadFinished: false,
+                discoverMethods: undefined
+            };
+        },
+
         _goBackToPrinterList: function() {
             this.setState({
                 authFailure: false,
@@ -29,13 +49,14 @@ define([
             var self = this,
                 $el = $(e.target.parentNode),
                 meta = $el.data('meta'),
+                onError = function() {
+                    self.setState({
+                        showPassword: true,
+                        waiting: false
+                    });
+                },
                 opts = {
-                    onError: function() {
-                        self.setState({
-                            showPassword: true,
-                            waiting: false
-                        });
-                    }
+                    onError: onError
                 };
 
             self.selected_printer = meta;
@@ -76,6 +97,7 @@ define([
                     onSuccess: function(data) {
                         self._returnSelectedPrinter();
                         self.setState({
+                            showPassword: false,
                             waiting: false
                         });
                     },
@@ -215,25 +237,6 @@ define([
             );
         },
 
-        getInitialState: function() {
-            return {
-                printOptions: [],
-                authFailure: false,
-                waiting: false,
-                showPassword: false,
-                loadFinished: false
-            };
-        },
-
-        getDefaultProps: function() {
-            return {
-                lang: React.PropTypes.object,
-                className: React.PropTypes.string,
-                onGettingPrinter: React.PropTypes.func,
-                onClose: React.PropTypes.func
-            };
-        },
-
         componentWillMount: function () {
             var self = this,
                 options = [],
@@ -248,25 +251,19 @@ define([
                     });
                 };
 
-            if (false === window.FLUX.debug) {
-                config().read('printers', {
-                    onFinished: function(response) {
-                        response = response || [];
-
-                        refreshOption(response);
-                    }
-                });
-            }
-            else {
-                discover(
+            self.setState({
+                discoverMethods: discover(
                     'printer-selector',
                     function(printers) {
                         refreshOption(printers);
                     }
-                );
-            }
-        }
+                )
+            });
+        },
 
+        componentWillUnmount: function() {
+            this.state.discoverMethods.removeListener('printer-selector');
+        }
     });
 
     return View;
