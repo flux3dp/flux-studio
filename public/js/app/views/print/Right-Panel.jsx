@@ -121,12 +121,6 @@ define([
 
             return (
                 <div className='rightPanel'>
-                    <a className="btn" onClick={this._handleGetGCode}>Gcode</a><p/>
-                    <a className="btn" onClick={this._handleTest}>Notify</a>
-                    <a className="btn" onClick={this._showInfo}>Info</a>
-                    <a className="btn" onClick={this._showWarning}>Warning</a>
-                    <a className="btn" onClick={this._showError}>Error</a>
-
                     <div id="cameraViewController" className="cameraViewController"></div>
                     {actionButtons}
                 </div>
