@@ -15,6 +15,7 @@ define([
     'jsx!views/scan/Action-Buttons',
     'app/actions/alert-actions',
     'app/stores/alert-store',
+    'app/actions/progress-actions',
     'helpers/shortcuts',
     'helpers/round',
     'helpers/array-findindex',
@@ -36,6 +37,7 @@ define([
     ActionButtons,
     AlertActions,
     AlertStore,
+    ProgressActions,
     shortcuts,
     round
 ) {
@@ -62,7 +64,7 @@ define([
                         },
                         openAlert: false,
                         openProgressBar: false,
-                        openBlocker: false,
+                        blocker: false,
                         hasConvert: false,  // point cloud into stl
                         progressPercentage: 0,
                         progressRemainingTime: this.progressRemainingTime,    // 20 minutes
@@ -720,9 +722,16 @@ define([
                 },
 
                 _openBlocker: function(is_open) {
+                    if (true === is_open) {
+                        ProgressActions.open();
+                    }
+                    else {
+                        ProgressActions.close();
+                    }
+
                     this.setState({
-                        openBlocker: is_open
-                    })
+                        blocker: is_open
+                    });
                 },
 
                 _onScanCancel: function(e) {
@@ -763,7 +772,7 @@ define([
                         };
 
                     return (
-                        0 < state.selectedMeshes.length && false === state.openBlocker ?
+                        0 < state.selectedMeshes.length && false === state.blocker ?
                         <ManipulationPanel
                             lang = {lang}
                             selectedMeshes={state.selectedMeshes}
@@ -958,14 +967,6 @@ define([
                     );
                 },
 
-                _renderBlocker: function(lang) {
-                    return (
-                        true === this.state.openBlocker ?
-                        <Modal content={<div className="spinner-flip spinner-reverse"/>}/> :
-                        ''
-                    );
-                },
-
                 _renderMeshThumbnail: function(lang) {
                     var self = this,
                         thumbnails = [],
@@ -1077,7 +1078,6 @@ define([
                     var state = this.state,
                         lang = state.lang,
                         progressBar = this._renderProgressBar(lang),
-                        printerBlocker = this._renderBlocker(lang),
                         alert = this._renderAlert(lang),
                         confirm = this._renderConfirm(lang),
                         cx = React.addons.classSet,
@@ -1093,7 +1093,6 @@ define([
                             {progressBar}
                             {alert}
                             {confirm}
-                            {printerBlocker}
                         </div>
                     );
                 }
