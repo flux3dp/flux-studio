@@ -34,7 +34,7 @@ define([
     function selectDevice(device) {
         var d = $.Deferred()
             uuid = device.uuid;
-            // console.log('exist connection', _existConnection(uuid));
+
         if(_existConnection(uuid)) {
             _device = _switchDevice(uuid);
             d.resolve(DeviceConstants.CONNECTED);
