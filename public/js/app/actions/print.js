@@ -53,7 +53,8 @@ define([
         previewMode = false,
         leftPanelWidth = 275,
         ddHelper = 0,
-        defaultFileName = '';
+        defaultFileName = '',
+        cameraLight;
 
     var s = {
         diameter: 170,
@@ -76,8 +77,8 @@ define([
 
     var commonMaterial = new THREE.MeshPhongMaterial({
         color: s.colorUnselected,
-        specular: 0x111111,
-        shininess: 100
+        specular: 0x888888,
+        shininess: 1
     });
 
     // var advancedParameters = ['layerHeight', 'infill', 'travelingSpeed', 'extrudingSpeed', 'temperature', 'advancedSettings'];
@@ -131,9 +132,14 @@ define([
         scene.add(new THREE.AmbientLight(0x777777));
 
         _addShadowedLight(1, 1, 1, 0xffffff, 1.35);
-        _addShadowedLight(0.5, 1, -1, 0xffaa00, 1);
+        _addShadowedLight(0.5, 1, -1, 0xffffff, 1);
         _addShadowedLight(-1, -1, -1, 0xffffff, 1.35);
-        _addShadowedLight(-0.5, -1, 1, 0xffaa00, 1);
+        _addShadowedLight(-0.5, -1, 1, 0xffffff, 1);
+
+        cameraLight = new THREE.PointLight( 0xFFFFFF, 0.8, 300 );
+        cameraLight.position.set(0,0,0);
+        scene.cameraLight = cameraLight;
+        scene.add(cameraLight);
 
         // renderer
         renderer = new THREE.WebGLRenderer();
@@ -1229,7 +1235,7 @@ define([
         return d.promise();
     }
 
-    function updateOrbitControl(e) {
+    function updateOrbitControl() {
         setObjectDialoguePosition();
         render();
         setImportWindowPosition();
@@ -1237,6 +1243,10 @@ define([
             camera: camera
         });
         panningOffset = camera.position.clone().sub(camera.position.raw);
+
+        if(scene.cameraLight) {
+            scene.cameraLight.position.copy(camera.position);
+        }
     }
 
     function clearSelection() {

@@ -463,7 +463,7 @@ define([
                             onYes={this._handleYes}
                             onClose={this._handleModalClose} />
 
-                        <div className="device" onClick={this._handleShowDeviceList}>
+                        <div title={lang.print.deviceTitle} className="device" onClick={this._handleShowDeviceList}>
                             <img src="/img/btn-device.svg" />
                             <p>{lang.menu.device}</p>
                             <div className={menuClass}>
