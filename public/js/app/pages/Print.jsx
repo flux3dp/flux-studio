@@ -305,7 +305,7 @@ define([
                     );
 
                     return (
-                        <Modal content={content}/>
+                        <Modal content={content} onClose={this._handleCloseAdvancedSetting}/>
                     );
                 },
 
