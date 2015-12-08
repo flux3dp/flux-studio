@@ -102,13 +102,12 @@ define([
                                 mime_type = data.mime;
                                 break;
                             case 'ok':
-                                console.log('is ok from controller');
                                 imageHandler(image_blobs, mime_type);
                                 image_blobs = [];
 
                                 setTimeout(function() {
                                     goFetch();
-                                }, 1000);
+                                }, 200);
 
                                 break;
                             default:

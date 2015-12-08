@@ -53,7 +53,9 @@ define([
         previewMode = false,
         leftPanelWidth = 275,
         ddHelper = 0,
-        defaultFileName = '';
+        defaultFileName = '',
+        cameraLight,
+        _id = 'PRINT.JS';
 
     var s = {
         diameter: 170,
@@ -76,8 +78,8 @@ define([
 
     var commonMaterial = new THREE.MeshPhongMaterial({
         color: s.colorUnselected,
-        specular: 0x111111,
-        shininess: 100
+        specular: 0x888888,
+        shininess: 1
     });
 
     // var advancedParameters = ['layerHeight', 'infill', 'travelingSpeed', 'extrudingSpeed', 'temperature', 'advancedSettings'];
@@ -131,9 +133,14 @@ define([
         scene.add(new THREE.AmbientLight(0x777777));
 
         _addShadowedLight(1, 1, 1, 0xffffff, 1.35);
-        _addShadowedLight(0.5, 1, -1, 0xffaa00, 1);
+        _addShadowedLight(0.5, 1, -1, 0xffffff, 1);
         _addShadowedLight(-1, -1, -1, 0xffffff, 1.35);
-        _addShadowedLight(-0.5, -1, 1, 0xffaa00, 1);
+        _addShadowedLight(-0.5, -1, 1, 0xffffff, 1);
+
+        cameraLight = new THREE.PointLight( 0xFFFFFF, 0.8, 300 );
+        cameraLight.position.set(0,0,0);
+        scene.cameraLight = cameraLight;
+        scene.add(cameraLight);
 
         // renderer
         renderer = new THREE.WebGLRenderer();
@@ -292,7 +299,6 @@ define([
             mesh.name = 'custom';
             mesh.plane_boundary = planeBoundary(mesh);
 
-            alignCenter();
             addSizeProperty(mesh);
             groundIt(mesh);
             selectObject(mesh);
@@ -653,7 +659,8 @@ define([
 
     function getFCode() {
         var d = $.Deferred();
-        var ids = [];
+        var ids = [],
+            previewUrl;
 
         if(objects.length === 0) {
             d.resolve('');
@@ -671,7 +678,7 @@ define([
 
         _setProgressMessage('Saving File Preview');
         getBlobFromScene().then(function(blob) {
-            reactSrc.setState({ previewUrl: URL.createObjectURL(blob) });
+            previewUrl = URL.createObjectURL(blob);
             return slicer.uploadPreviewImage(blob);
         }).then(function(response) {
             if (response.status === 'ok') {
@@ -681,7 +688,7 @@ define([
                             blobExpired = false;
                             responseBlob = result;
                             _setProgressMessage('');
-                            d.resolve(result);
+                            d.resolve(result, previewUrl);
                         }
                         else {
                             if (result.status !== 'error') {
@@ -787,16 +794,13 @@ define([
     }
 
     function setAdvanceParameter(settings) {
-        var _settings = Object.keys(settings).map(function(key) {
-            return `${key}=${settings[key]} \n`;
-        });
+        // var _settings = Object.keys(settings).map(function(key) {
+        //     return `${key}=${settings[key]} \n`;
+        // });
         //slicer.setParameter('advancedSettings', _settings.join('\n')).then(function(result) {
         slicer.setParameter('advancedSettings', settings.custom).then(function(result, errors) {
-            console.log(result, errors);
-            if (result.status === 'error') {
-                index = keys.length;
-                // todo: error logging
-                console.log(result.error);
+            if(errors.length > 0) {
+                AlertActions.showPopupError(_id, errors.join('\n'));
             }
         });
         blobExpired = true;
@@ -1229,7 +1233,7 @@ define([
         return d.promise();
     }
 
-    function updateOrbitControl(e) {
+    function updateOrbitControl() {
         setObjectDialoguePosition();
         render();
         setImportWindowPosition();
@@ -1237,6 +1241,10 @@ define([
             camera: camera
         });
         panningOffset = camera.position.clone().sub(camera.position.raw);
+
+        if(scene.cameraLight) {
+            scene.cameraLight.position.copy(camera.position);
+        }
     }
 
     function clearSelection() {

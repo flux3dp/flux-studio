@@ -18,7 +18,10 @@ define([
     'helpers/nwjs/menu-factory',
     'helpers/device-master',
     'app/stores/global-store',
-    'app/constants/device-constants'
+    'app/actions/global-actions',
+    'app/constants/device-constants',
+    'app/app-settings',
+    'helpers/object-assign'
 ], function(
     $,
     React,
@@ -39,7 +42,9 @@ define([
     menuFactory,
     DeviceMaster,
     GlobalStore,
-    DeviceConstants
+    GlobalActions,
+    DeviceConstants,
+    AppSettings
 ) {
 
     return function(args) {
@@ -76,7 +81,6 @@ define([
                     return ({
                         showPreviewModeList         : false,
                         showAdvancedSetting         : false,
-                        showMonitor                 : false,
                         modelSelected               : null,
                         openPrinterSelectorWindow   : false,
                         openObjectDialogue          : false,
@@ -90,23 +94,12 @@ define([
                         camera                      : {},
                         rotation                    : {},
                         scale                       : {},
-                        previewUrl                  : '',
                         printerControllerStatus     : ''
                     });
                 },
 
                 componentDidMount: function() {
                     director.init(this);
-                    Config().read('advanced-options', {
-                        onFinished: function(response) {
-                            var options = JSON.parse(response || '{}');
-                            if(!$.isEmptyObject(options)) {
-                                advancedSetting = options;
-                                console.log(advancedSetting);
-                            }
-                        }
-                    });
-
                     $(document).keydown(function(e) {
                         if(e.metaKey && e.keyCode === 8 || e.keyCode === 46) {
                             director.removeSelected();
@@ -114,9 +107,15 @@ define([
                     });
 
                     var s = Config().read('advanced-settings');
-                    advancedSetting = !!s ? s : '{}';
+                    if(!s) {
+                        advancedSetting = {};
+                        advancedSetting.custom = AppSettings.custom;
+                    }
+                    else {
+                        advancedSetting = s;
+                    }
+                    // advancedSetting = !!s ? s : '{}';
 
-                    GlobalStore.onShowMonitor(this._handleShowMonitor);
                     $importBtn = this.refs.importBtn.getDOMNode();
 
                     nwjsMenu.import.enabled = true;
@@ -189,13 +188,6 @@ define([
                     director.setAdvanceParameter(setting);
                 },
 
-                _handleShowMonitor: function(isOn) {
-                    this.setState({
-                        showMonitor: isOn,
-                        printerControllerStatus: DeviceConstants.CONNECTED
-                    });
-                },
-
                 _handleTogglePrintPause: function(printPaused) {
                     console.log(printPaused ? 'print paused' : 'continue printing');
                 },
@@ -252,11 +244,10 @@ define([
                 _handlePrinterSelected: function(printer) {
                     selectedPrinter = printer;
 
-                    director.getFCode().then(function(fcode) {
+                    director.getFCode().then(function(fcode, previewUrl) {
+                        GlobalActions.showMonitor(selectedPrinter, fcode, previewUrl);
                         this.setState({
-                            openPrinterSelectorWindow: false,
-                            showMonitor: true,
-                            fcode: fcode
+                            openPrinterSelectorWindow: false
                         });
                     }.bind(this));
 
@@ -302,22 +293,26 @@ define([
                     };
                     director.setParameter('layer_height', quality[level]);
                     advancedSetting.layer_height = quality[level];
-                    console.log(level);
                 },
 
                 _renderAdvancedPanel: function() {
-                    return (
+                    var content = (
                         <AdvancedPanel
                             lang        = {lang}
                             setting     = {advancedSetting}
                             onClose     = {this._handleCloseAdvancedSetting}
                             onApply     = {this._handleApplyAdvancedSetting} />
                     );
+
+                    return (
+                        <Modal content={content} onClose={this._handleCloseAdvancedSetting}/>
+                    );
                 },
 
                 _renderPrinterSelectorWindow: function() {
                     var content = (
                         <PrinterSelector
+                            uniqleId="print"
                             lang={lang}
                             onClose={this._handlePrinterSelectorWindowClose}
                             onGettingPrinter={this._handlePrinterSelected} />
@@ -370,24 +365,6 @@ define([
                     );
                 },
 
-                _renderMonitorPanel: function() {
-                    var content = (
-                        <Monitor
-                            lang                = {lang}
-                            previewUrl          = {this.state.previewUrl}
-                            selectedPrinter     = {selectedPrinter}
-                            fCode               = {this.state.fcode}
-                            controller          = {printerController}
-                            controllerStatus    = {this.state.printerControllerStatus}
-                            onClose             = {this._handleMonitorClose} />
-                    );
-                    return (
-                        <Modal {...this.props}
-                            content={content}
-                            onClose={this._handleMonitorClose} />
-                    );
-                },
-
                 _renderObjectDialogue: function() {
                     return (
                         <ObjectDialogue
@@ -434,7 +411,6 @@ define([
                         importWindow            = this.state.openImportWindow ? this._renderImportWindow() : '',
                         leftPanel               = this._renderLeftPanel(),
                         rightPanel              = this._renderRightPanel(),
-                        monitorPanel            = this.state.showMonitor ? this._renderMonitorPanel() : '',
                         objectDialogue          = this.state.openObjectDialogue ? this._renderObjectDialogue() : '',
                         printerSelectorWindow   = this.state.openPrinterSelectorWindow ? this._renderPrinterSelectorWindow() : '',
                         waitWindow              = this.state.openWaitWindow ? this._renderWaitWindow() : '',
@@ -450,8 +426,6 @@ define([
                             {leftPanel}
 
                             {rightPanel}
-
-                            {monitorPanel}
 
                             {objectDialogue}
 

@@ -5,38 +5,32 @@
 define(['helpers/websocket'], function(Websocket) {
     'use strict';
 
-    var ws;
-
     return function(opts) {
-        opts = opts || {};
-        opts.onSuccess = opts.onSuccess || function() {};
-        opts.onFail = opts.onFail || function() {};
-
-        var getResponse = true,
-            timer;
-
-        ws = ws || new Websocket({
-            method: 'touch',
-            autoReconnect: false,
-            onMessage: function(data) {
-                var is_success = (
-                        true === (data.has_response || false) &&
-                        true === (data.reachable || false) &&
-                        true === (data.auth || false)
-                    );
-
-                if (true === is_success) {
-                    opts.onSuccess(data);
-                }
-                else {
-                    opts.onFail(data);
-                }
-
-                getResponse = true;
-                clearInterval(timer);
+        var events = {
+                onSuccess: opts.onSuccess || function() {},
+                onFail: opts.onFail || function() {},
+                onError: opts.onError || function() {}
             },
-            onError: opts.onError
-        });
+            ws = new Websocket({
+                method: 'touch',
+                autoReconnect: false,
+                onMessage: function(data) {
+                    var is_success = (
+                            true === (data.has_response || false) &&
+                            true === (data.reachable || false) &&
+                            true === (data.auth || false)
+                        );
+
+                    if (true === is_success) {
+                        events.onSuccess(data);
+                    }
+                    else {
+                        events.onFail(data);
+                    }
+
+                },
+                onError: events.onError
+            });
 
         return {
             connection: ws,
@@ -45,12 +39,7 @@ define(['helpers/websocket'], function(Websocket) {
 
                 var args = JSON.stringify({ uuid: uuid, password: password });
 
-                timer = setInterval(function() {
-                    if (true === getResponse) {
-                        getResponse = false;
-                        ws.send(args);
-                    }
-                }, 0);
+                ws.send(args);
             }
         };
     };

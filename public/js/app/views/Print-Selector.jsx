@@ -4,9 +4,23 @@ define([
     'jsx!widgets/Select',
     'jsx!widgets/List',
     'helpers/api/discover',
+    'helpers/device-master',
+    'helpers/i18n',
     'helpers/api/touch',
-    'helpers/api/config'
-], function(React, $, SelectView, ListView, discover, touch, config) {
+    'helpers/api/config',
+    'app/constants/device-constants'
+], function(
+    React,
+    $,
+    SelectView,
+    ListView,
+    discover,
+    DeviceMaster,
+    i18n,
+    touch,
+    config,
+    DeviceConstants
+) {
     'use strict';
 
     var View = React.createClass({
@@ -16,6 +30,28 @@ define([
         propTypes: {
             onClose: React.PropTypes.func,
             onGettingPrinter: React.PropTypes.func
+        },
+
+        getDefaultProps: function() {
+            return {
+                uniqleId: '',
+                lang: i18n.get(),
+                className: '',
+                onGettingPrinter: function() {},
+                onClose: function() {}
+            };
+        },
+
+        getInitialState: function() {
+            return {
+                discoverId: 'printer-selector-' + (this.props.uniqleId || ''),
+                printOptions: [],
+                authFailure: false,
+                waiting: false,
+                showPassword: false,
+                loadFinished: false,
+                discoverMethods: {}
+            };
         },
 
         _goBackToPrinterList: function() {
@@ -29,13 +65,14 @@ define([
             var self = this,
                 $el = $(e.target.parentNode),
                 meta = $el.data('meta'),
+                onError = function() {
+                    self.setState({
+                        showPassword: true,
+                        waiting: false
+                    });
+                },
                 opts = {
-                    onError: function() {
-                        self.setState({
-                            showPassword: true,
-                            waiting: false
-                        });
-                    }
+                    onError: onError
                 };
 
             self.selected_printer = meta;
@@ -75,9 +112,6 @@ define([
                 _opts = {
                     onSuccess: function(data) {
                         self._returnSelectedPrinter();
-                        self.setState({
-                            waiting: false
-                        });
                     },
                     onFail: function(data) {
                         opts.onError();
@@ -115,7 +149,26 @@ define([
         },
 
         _returnSelectedPrinter: function() {
-            this.props.onGettingPrinter(this.selected_printer);
+            var self = this;
+
+            if ('00000000000000000000000000000000' === self.selected_printer.uuid) {
+                self.props.onGettingPrinter(self.selected_printer);
+            }
+            else {
+                DeviceMaster.selectDevice(self.selected_printer).then(function(status) {
+                    if(status === DeviceConstants.CONNECTED) {
+                        self.props.onGettingPrinter(self.selected_printer);
+                        self.setState({
+                            showPassword: false,
+                            waiting: false
+                        });
+                    }
+                    else if (status === DeviceConstants.TIMEOUT) {
+                        AlertActions.showPopupError('printer-selector', lang.message.connectionTimeout);
+                    }
+                });
+            }
+
         },
 
         _renderAuthFailure: function(lang) {
@@ -132,7 +185,9 @@ define([
         },
 
         _renderPrinterItem: function(printer) {
-            var meta;
+            var meta,
+                lang = this.props.lang,
+                status = lang.machine_status;
 
             try {
                 meta = JSON.stringify(printer);
@@ -141,13 +196,12 @@ define([
                 console.log(ex, printer);
             }
 
-            // TODO: convert st_id and head_module into plain text
             return (
                 <label className="device printer-item" data-meta={meta}>
                     <input type="radio" name="printer-group" value={printer.uuid}/>
                     <div className="col device-name">{printer.name}</div>
                     <div className="col module">{printer.head_module || 'UNKNOWN'}</div>
-                    <div className="col status">{printer.st_id || 'UNKNOWN'}</div>
+                    <div className="col status">{status[printer.st_id] || status.unknown}</div>
                 </label>
             );
         },
@@ -215,25 +269,6 @@ define([
             );
         },
 
-        getInitialState: function() {
-            return {
-                printOptions: [],
-                authFailure: false,
-                waiting: false,
-                showPassword: false,
-                loadFinished: false
-            };
-        },
-
-        getDefaultProps: function() {
-            return {
-                lang: React.PropTypes.object,
-                className: React.PropTypes.string,
-                onGettingPrinter: React.PropTypes.func,
-                onClose: React.PropTypes.func
-            };
-        },
-
         componentWillMount: function () {
             var self = this,
                 options = [],
@@ -258,12 +293,23 @@ define([
                 });
             }
             else {
-                discover(function(printers) {
-                    refreshOption(printers);
+                self.setState({
+                    discoverMethods: discover(
+                        self.state.discoverId,
+                        function(printers) {
+                            refreshOption(printers);
+                        }
+                    )
                 });
             }
-        }
 
+        },
+
+        componentWillUnmount: function() {
+            if ('function' === typeof this.state.discoverMethods.removeListener) {
+                this.state.discoverMethods.removeListener(this.state.discoverId);
+            }
+        }
     });
 
     return View;

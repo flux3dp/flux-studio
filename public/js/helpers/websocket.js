@@ -17,7 +17,7 @@ define(['helpers/is-json'], function(isJson) {
             defaultOptions = {
                 hostname: location.hostname,
                 method: '',
-                port: window.FLUX.ghostPort || location.port || 8000,
+                port: window.FLUX.ghostPort,
                 autoReconnect: true,
                 onMessage: defaultCallback,
                 onError: defaultCallback,

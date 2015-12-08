@@ -23,9 +23,7 @@
             cssLink = document.createElement('link'),
             head = document.querySelector('head'),
             body = document.querySelector('body'),
-            process = process,
             getStarted = function(ghostPort) {
-                window.FLUX.ghostPort = ghostPort || 8000;
                 script.setAttribute('src', 'js/require.js');
                 script.dataset.main = 'js/main.js?v=' + window.FLUX.timestamp;
                 body.appendChild(script);
@@ -36,11 +34,12 @@
         window.FLUX = {
             debug: -1 !== location.search.indexOf('debug'),
             timestamp: (new Date()).getTime(),
-            os: ('undefined' === typeof requireNode ? undefined : os)
+            os: ('undefined' === typeof requireNode ? undefined : os),
+            ghostPort: location.port || 8000
         };
 
         // it's not node-webkit
-        if ('undefined' === typeof process) {
+        if ('undefined' === typeof requireNode) {
             getStarted();
         }
         else {
@@ -52,13 +51,13 @@
                     'undefined' !== typeof env.osType &&
                     'undefined' !== typeof env.arch
                 ) {
+                    window.FLUX.ghostPort = env.ghostPort;
+                    window.FLUX.osType = env.osType;
+                    window.FLUX.arch = env.arch;
                     clearInterval(timer);
                     getStarted(env.ghostPort);
                 }
-                else {
-                    // TODO: load fail?
-                }
-            }, 0);
+            }, 100);
         }
 
         cssLink.setAttribute('rel', 'stylesheet');

@@ -15,6 +15,7 @@ define([
                 open: false,
                 type: 'software',
                 device: {},
+                currentVersion: '',
                 latestVersion: '',
                 releaseNote: '',
                 updateFile: undefined,
@@ -77,7 +78,7 @@ define([
             var lang = i18n.get(),
                 caption = lang.update[this.props.type].caption,
                 message1 = sprintf(lang.update[this.props.type].message_pattern_1, this.props.device.name),
-                message2 = sprintf(lang.update[this.props.type].message_pattern_2, this.props.latestVersion, this.props.device.version),
+                message2 = sprintf(lang.update[this.props.type].message_pattern_2, this.props.latestVersion, this.props.currentVersion),
                 buttons = this._getButtons(lang),
                 content = (
                     <div className="update-wrapper">

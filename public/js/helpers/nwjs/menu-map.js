@@ -7,8 +7,21 @@ define([
     'helpers/check-firmware',
     'helpers/api/config',
     'helpers/api/discover',
-    'app/actions/alert-actions'
-], function(gui, i18n, checkFirmware, config, discover, AlertActions) {
+    'app/actions/alert-actions',
+    'app/actions/global-actions',
+    'helpers/device-master',
+    'app/constants/device-constants'
+], function(
+    gui,
+    i18n,
+    checkFirmware,
+    config,
+    discover,
+    AlertActions,
+    GlobalActions,
+    DeviceMaster,
+    DeviceConstants
+) {
     'use strict';
 
     var emptyFunction = function(object) {
@@ -20,6 +33,15 @@ define([
         },
         lang = i18n.get().topmenu,
         menuMap = [],
+        newDevice = {
+            label: lang.device.new,
+            enabled: true,
+            onClick: function() {
+                location.hash = '#initialize/wifi/connect-machine';
+            },
+            key: 'n',
+            modifiers: 'cmd'
+        },
         items = {
             import: {
                 label: lang.file.import,
@@ -106,19 +128,13 @@ define([
                 enabled: false,
                 onClick: emptyFunction
             },
-            newDevice: {
-                label: lang.device.new,
+            newDevice: newDevice,
+            device: {
+                label: lang.device.label,
                 enabled: true,
-                onClick: function() {
-                    location.hash = '#initialize/wifi/connect-machine';
-                },
-                key: 'n',
-                modifiers: 'cmd'
+                subItems: [newDevice, separator]
             }
-        },
-        deviceGroup = [
-            items.newDevice
-        ];
+        };
 
     function bindMap() {
         menuMap = [];
@@ -193,10 +209,7 @@ define([
                     items.viewPreview
                 ]
             },
-            {
-                label: lang.device.label,
-                subItems: deviceGroup
-            },
+            items.device,
             {
                 label: lang.window.label,
                 subItems: [
@@ -219,41 +232,70 @@ define([
                 ]
             });
 
-            discover(function(printers) {
-                deviceGroup = [items.newDevice, separator];
+            if ('undefined' !== typeof requireNode) {
+                var deviceGroup = [
+                        newDevice,
+                        separator
+                    ],
+                    deviceRefreshTimer;
 
-                printers.forEach(function(printer) {
-                    deviceGroup.push({
-                        label: printer.name,
-                        enabled: true,
-                        subItems: [{
-                            label: lang.device.device_monitor,
-                            enabled: true,
-                            onClick: function() {
-                                // TODO: go to monitor
-                            }
-                        },
-                        {
-                            label: lang.device.change_filament,
-                            enabled: true,
-                            onClick: function() {
-                                // TODO: go to change filament
-                            }
-                        },
-                        {
-                            label: lang.device.check_firmware_update,
-                            enabled: true,
-                            onClick: function() {
-                                checkFirmware(printer).done(function(response) {
-                                    if (true === response.needUpdate) {
-                                        AlertActions.showFirmwareUpdate(printer, response);
+                discover(
+                    'menu-map',
+                    function(printers) {
+                        deviceGroup = [
+                            newDevice,
+                            separator
+                        ];
+
+                        printers.forEach(function(printer) {
+                            deviceGroup.push({
+                                label: printer.name,
+                                enabled: true,
+                                subItems: [{
+                                    label: lang.device.device_monitor,
+                                    enabled: true,
+                                    onClick: function() {
+                                        DeviceMaster.selectDevice(printer).then(function(status) {
+                                            if(status === DeviceConstants.CONNECTED) {
+                                                GlobalActions.showMonitor(printer);
+                                            }
+                                            else if (status === DeviceConstants.TIMEOUT) {
+                                                AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
+                                            }
+                                        });
                                     }
-                                });
-                            }
-                        }]
-                    });
-                });
-            });
+                                },
+                                {
+                                    label: lang.device.change_filament,
+                                    enabled: true,
+                                    onClick: function() {
+                                        // TODO: go to change filament
+                                    }
+                                },
+                                {
+                                    label: lang.device.check_firmware_update,
+                                    enabled: true,
+                                    onClick: function() {
+                                        checkFirmware(printer).done(function(response) {
+                                            if (true === response.needUpdate) {
+                                                AlertActions.showFirmwareUpdate(printer, response);
+                                            }
+                                        });
+                                    }
+                                }]
+                            });
+                        });
+
+                        if ('undefined' === typeof deviceRefreshTimer) {
+                            clearTimeout(deviceRefreshTimer);
+                            setTimeout(function() {
+                                items.device.subItems = deviceGroup;
+                                clearTimeout(deviceRefreshTimer);
+                            }, 10000);
+                        }
+                    }
+                );
+            }
         }
 
         menuMap.push({

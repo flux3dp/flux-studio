@@ -87,9 +87,7 @@ function(React, $, Backbone, display, config) {
         },
 
         checkSoftwareUpdate: function() {
-            var _process,
-                _env,
-                data = {
+            var data = {
                     os: ''
                 },
                 ignoreVersions = config().read('software-update-ignore-list') || [],
@@ -99,7 +97,12 @@ function(React, $, Backbone, display, config) {
                     $.ajax({
                         url: 'package.json'
                     }).then(function(response) {
-                        deferred.resolve(JSON.parse(response));
+                        if(typeof(response) === 'object') {
+                            deferred.resolve(response);
+                        }
+                        else {
+                            deferred.resolve(JSON.parse(response));
+                        }
                     });
 
                     return deferred;
@@ -107,9 +110,7 @@ function(React, $, Backbone, display, config) {
                 fetchLatestVersion = function(currentProflie) {
                     var deferred = $.Deferred();
 
-                    _process = ('undefined' !== typeof process ? process : {});
-                    _env = _process.env || {};
-                    data.os = (_env.osType || '') + '-' + (_env.arch || '');
+                    data.os = (window.FLUX.osType || '') + '-' + (window.FLUX.arch || '');
 
                     $.ajax({
                         url: 'http://software.flux3dp.com/check-update/',
@@ -132,6 +133,7 @@ function(React, $, Backbone, display, config) {
                     props = {
                         open: true,
                         type: 'software',
+                        currentVersion: currentProflie.version,
                         latestVersion: currentVersion.latest_version,
                         releaseNote: currentVersion.changelog,
                         onClose: function() {},

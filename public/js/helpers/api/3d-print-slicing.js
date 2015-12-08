@@ -100,7 +100,7 @@ define([
                 };
 
                 events.onError = function(result) {
-                    errors.push(result);
+                    errors.push(result.error);
                 }
 
                 if(name === 'advancedSettings' && value !== '') {

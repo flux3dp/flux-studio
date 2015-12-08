@@ -34,13 +34,12 @@ define([
     function selectDevice(device) {
         var d = $.Deferred()
             uuid = device.uuid;
-            // console.log('exist connection', _existConnection(uuid));
+
         if(_existConnection(uuid)) {
             _device = _switchDevice(uuid);
             d.resolve(DeviceConstants.CONNECTED);
         }
         else {
-            console.log(device);
             _device = {};
             _device.uuid = uuid;
             _device.name = device.name;
@@ -316,9 +315,12 @@ define([
             this.ls                 = ls;
             this.fileInfo           = fileInfo;
 
-            Discover(function(devices) {
-                _scanDeviceError(devices);
-            });
+            Discover(
+                'device-master',
+                function(devices) {
+                    _scanDeviceError(devices);
+                }
+            );
         }
     };
 

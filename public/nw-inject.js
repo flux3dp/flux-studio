@@ -1,13 +1,16 @@
-var fs = require('fs'),
-    os = require('os'),
+// avoid name conflict
+window.requireNode = window.require || function() {};
+
+var fs = requireNode('fs'),
+    os = requireNode('os'),
     osType = os.type(),
-    spawn = require('child_process').spawn,
-    exec = require('child_process').exec,
+    spawn = requireNode('child_process').spawn,
+    exec = requireNode('child_process').exec,
     cwd = process.cwd(),
-    net = require('net'),
+    net = requireNode('net'),
     currentPort = 8000,
     maxPort = 65535,
-    gui = require('nw.gui'),
+    gui = requireNode('nw.gui'),
     currentWindow = gui.Window.get(),
     ghost,
     appWindow,
@@ -20,7 +23,7 @@ var fs = require('fs'),
                 '--port',
                 port,
                 '--assets',
-                cwd + 'lib/ghost/assets'
+                cwd + '/lib/ghost/assets'
             ],
             ghostCmd = '';
 
@@ -50,7 +53,6 @@ var fs = require('fs'),
         });
 
         process.env.ghostPort = port;
-
     },
     probe = function(port, callback) {
         var socket = new net.Socket(),
@@ -116,6 +118,4 @@ currentWindow.on('close', function() {
     this.close(true);
 });
 
-// avoid name conflict
-window.requireNode = window.require || function() {};
 delete window.require;

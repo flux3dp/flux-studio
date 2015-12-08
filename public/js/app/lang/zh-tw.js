@@ -742,7 +742,19 @@ define(function() {
             machineNotConnected: 'Machine is not connected',
             notPrinting: 'Printing is not in progress',
             nothingToPrint: 'Nothing to print (source blob missing)',
-            connectionTimeout: 'device is not responding, connection timeout'
+            connectionTimeout: 'device is not responding, connection timeout',
+            filamentRunout: 'filament run out, please refill filament'
+        },
+        machine_status: {
+            1: 'Unknown Head',
+            2: 'Head failed ER 2',
+            4: 'Head failed ER 4',
+            8: 'Head failed ER 8',
+            16: 'Shake',
+            64: 'Overheat',
+            32: 'Head Tilted',
+            128: 'Fan Stopped',
+            unknown: 'UNKNOWN'
         }
     };
 });

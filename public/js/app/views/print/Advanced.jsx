@@ -32,7 +32,7 @@ var mode = {
         advancedSetting = {
             // General
             engine                              : '',
-            temperature                         : 200,
+            temperature                         : 220,
 
             // Layers
             layer_height                        : 0.2,

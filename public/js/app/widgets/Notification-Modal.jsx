@@ -176,7 +176,9 @@ define([
                     );
 
                 return (
-                    <Modal content={content} disabledEscapeOnBackground={this.props.escapable}/>
+                    <div className="always-top">
+                        <Modal content={content} disabledEscapeOnBackground={this.props.escapable}/>
+                    </div>
                 );
             }
 

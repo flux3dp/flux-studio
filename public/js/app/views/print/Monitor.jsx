@@ -58,12 +58,9 @@ define([
 
         propTypes: {
             lang                : React.PropTypes.object,
-            onClose             : React.PropTypes.func,
-            selectedPrinter     : React.PropTypes.object,
-            previewUrl          : React.PropTypes.string,
+            selectedDevice      : React.PropTypes.object,
             fCode               : React.PropTypes.object,
-            controller          : React.PropTypes.object,
-            controllerStatus    : React.PropTypes.object
+            previewUrl          : React.PropTypes.string
         },
 
         getInitialState: function() {
@@ -134,9 +131,9 @@ define([
         },
 
         _handleCancel: function(id) {
-            if(id === _id) {
-                this.props.onClose();
-            }
+            // if(id === _id) {
+            //     this.props.onClose();
+            // }
         },
 
         _handleBrowseFile: function() {
@@ -163,8 +160,8 @@ define([
                 start = 0;
                 this._retrieveList(pathArray.join('/'));
                 this.setState({ waiting: true });
+                this._addHistory();
             }
-            this._addHistory();
         },
 
         _handleBrowseUpLevel: function() {
@@ -184,25 +181,19 @@ define([
             if(history.length > 1) {
                 history.pop();
             }
-
-            // history.pop();
-
-            console.log(history);
             lastAction = history[history.length - 1];
-            console.log('processing', lastAction);
-            previewUrl = '';
             var actions = {
 
                 'PREVIEW' : function() {
                     // get file preview image uri
-                    previewUrl = self.props.previewUrl;
+                    // previewUrl = URL.createObjectURL(self.props.fCode);
                 },
 
                 'BROWSE_FILE': function() {
 
                     pathArray = lastAction.path;
 
-                    pathArray.pop();
+                    // pathArray.pop();
                     console.log('browsing folder', pathArray.join('/'));
                     self._retrieveList(pathArray.join('/'));
                 },
@@ -212,20 +203,10 @@ define([
                 }
             };
 
-            // if(lastAction) {
-            //     if(actions[lastAction.mode]) {
-            //         actions[lastAction.mode]();
-            //         this.setState({ mode: lastAction.mode });
-            //     }
-            // }
-
             if(actions[lastAction.mode]) {
+                console.log('processing mode: ' + lastAction.mode + ' path: ' + lastAction.path.join('/'));
                 actions[lastAction.mode]();
                 this.setState({ mode: lastAction.mode });
-            }
-
-            if(history.length === 0) {
-                this._addHistory();
             }
         },
 
@@ -254,15 +235,12 @@ define([
             this.setState({
                 waiting: true,
                 mode: mode.CAMERA
+            }, function() {
+                this._addHistory();
             });
         },
 
         _handleGo: function() {
-            // if(!this._hasFCode()) {
-            //     AlertActions.showInfo(lang.nothingToPrint);
-            //     return;
-            // }
-
             if(this.state.currentStatus === DeviceConstants.READY) {
                 var blob = this.props.fCode;
                 this._stopReport();
@@ -290,7 +268,6 @@ define([
                 previewUrl: previewUrl,
                 path: pathArray.slice()
             });
-            console.log(history);
         },
 
         _startReport: function() {
@@ -347,6 +324,9 @@ define([
                 else if (report.error[0] === DeviceConstants.WRONG_HEADER) {
                     AlertActions.showPopupRetry(_id, lang.unknownHead);
                 }
+                else if (report.error[0] === DeviceConstants.FILAMENT_RUNOUT) {
+                    AlertActions.showPopupRetry(_id, lang.filamentRunout);
+                }
             }
             else {
                 status = report.st_label;
@@ -393,17 +373,6 @@ define([
                     });
                 });
             });
-
-            // controller.ls(path).then(function(result) {
-            //     currentLevelFiles = result.files;
-            //     self._retrieveFileInfo(path).then(function(info) {
-            //         filesInfo = filesInfo.concat(info);
-            //         self.setState({
-            //             directoryContent: result,
-            //             waiting: false
-            //         });
-            //     });
-            // });
         },
 
         _retrieveFileInfo: function(path) {
@@ -504,14 +473,14 @@ define([
 
             switch(this.state.mode) {
                 case mode.PREVIEW:
-                var divStyle = {
-                        backgroundColor: '#E0E0E0',
-                        backgroundImage: 'url(' + previewUrl + ')',
-                        backgroundSize: 'cover',
-                        backgroundPosition: '50% 50%',
-                        width: '100%',
-                        height: '100%'
-                    };
+                    var divStyle = {
+                            backgroundColor: '#E0E0E0',
+                            backgroundImage: !previewUrl ? '' : 'url(' + previewUrl + ')',
+                            backgroundSize: 'cover',
+                            backgroundPosition: '50% 50%',
+                            width: '100%',
+                            height: '100%'
+                        };
                     return (<div style={divStyle} />);
                     break;
 
@@ -590,7 +559,7 @@ define([
 
             wait = (<div className="wait">{lang.connecting}</div>);
 
-            return this.props.controllerStatus === DeviceConstants.CONNECTED ? operation : wait;
+            return operation;// this.props.controllerStatus === DeviceConstants.CONNECTED ? operation : wait;
         },
 
         render: function() {
@@ -599,7 +568,7 @@ define([
                 content     = this._renderContent(),
                 waitIcon    = this.state.waiting ? this._renderSpinner() : '',
                 operation   = this._renderOperation(),
-                subClass    = ClassNames('sub', {'hide': this.props.controllerStatus !== DeviceConstants.CONNECTED }),
+                subClass    = ClassNames('sub', {'hide': false }),
                 temperature = this.state.temperature ? (this.state.temperature + ' / ' + this.state.targetTemperature) : '';
 
             return (
