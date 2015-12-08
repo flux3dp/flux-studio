@@ -2,6 +2,7 @@ define([
     'jquery',
     'helpers/api/bitmap-laser-parser',
     'helpers/api/svg-laser-parser',
+    'helpers/api/fcode-reader',
     'helpers/convertToTypedArray',
     'helpers/element-angle',
     'helpers/api/control',
@@ -9,8 +10,13 @@ define([
     'jsx!widgets/Modal',
     'helpers/shortcuts',
     'helpers/image-data',
+    'helpers/i18n',
     'helpers/round',
     'helpers/nwjs/menu-factory',
+    'app/actions/alert-actions',
+    'app/actions/global-actions',
+    'helpers/device-master',
+    'app/constants/device-constants',
     'freetrans',
     'helpers/jquery.box',
     'plugins/file-saver/file-saver.min'
@@ -18,6 +24,7 @@ define([
     $,
     bitmapLaserParser,
     svgLaserParser,
+    fcodeReader,
     convertToTypedArray,
     elementAngle,
     control,
@@ -25,8 +32,13 @@ define([
     Modal,
     shortcuts,
     imageData,
+    i18n,
     round,
-    menuFactory
+    menuFactory,
+    AlertActions,
+    GlobalActions,
+    DeviceMaster,
+    DeviceConstants
 ) {
     'use strict';
 
@@ -91,8 +103,27 @@ define([
                 );
             },
             sendToMachine = function(blob) {
-                var control_methods = control(self.state.selectedPrinter.uuid);
-                control_methods.upload(blob.size, blob);
+                var lang = i18n.get(),
+                    blobUrl = window.URL,
+                    fcodeReaderMethods = fcodeReader(),
+                    goToMonitor = function(thumbnailBlob) {
+                        DeviceMaster.selectDevice(self.state.selectedPrinter).then(function(status) {
+                            if(status === DeviceConstants.CONNECTED) {
+                                GlobalActions.showMonitor(self.state.selectedPrinter, blob, blobUrl.createObjectURL(thumbnailBlob));
+                            }
+                            else if (status === DeviceConstants.TIMEOUT) {
+                                AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
+                            }
+                        });
+                    },
+                    parseFCode = function() {
+                        fcodeReaderMethods.getThumbnail(goToMonitor, goToMonitor);
+                    },
+                    uploadFCode = function() {
+                        fcodeReaderMethods.upload(blob, blob.size, parseFCode);
+                    };
+
+                uploadFCode();
             },
             sendToBitmapAPI = function(args, settings, callback) {
                 callback = callback || function() {};
