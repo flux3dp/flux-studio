@@ -26,6 +26,7 @@ define([], function(){
         TILT            : 'TILT',
         FAN_FAILURE     : 'FAN_FAILURE',
         TIMEOUT         : 'TIMEOUT',
+        FILAMENT_RUNOUT : 'FILAMENT_RUNOUT',
 
         // Command
         RESUME          : 'RESUME',

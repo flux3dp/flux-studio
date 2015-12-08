@@ -188,4 +188,10 @@
             }
         }
     }
+
+    .always-top {
+        .modal-window {
+            z-index: 99999;
+        }
+    }
 }

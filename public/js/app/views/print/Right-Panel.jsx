@@ -38,6 +38,12 @@ define([
             PerspectiveCamera.setCameraPosition(nextProps.camera);
         },
 
+        _handleTest: function() {
+            AlertActions.showInfo('hello');
+            AlertActions.showWarning('warning');
+            AlertActions.showError('error');
+        },
+
         _handleRetry: function(id) {
             console.log('sending retry with ID:' + id);
         },

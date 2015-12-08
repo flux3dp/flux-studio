@@ -40,7 +40,6 @@ define([
             d.resolve(DeviceConstants.CONNECTED);
         }
         else {
-            console.log(device);
             _device = {};
             _device.uuid = uuid;
             _device.name = device.name;
