@@ -19,7 +19,9 @@ define([
     'helpers/device-master',
     'app/stores/global-store',
     'app/actions/global-actions',
-    'app/constants/device-constants'
+    'app/constants/device-constants',
+    'app/app-settings',
+    'helpers/object-assign'
 ], function(
     $,
     React,
@@ -41,7 +43,8 @@ define([
     DeviceMaster,
     GlobalStore,
     GlobalActions,
-    DeviceConstants
+    DeviceConstants,
+    AppSettings
 ) {
 
     return function(args) {
@@ -97,16 +100,6 @@ define([
 
                 componentDidMount: function() {
                     director.init(this);
-                    Config().read('advanced-options', {
-                        onFinished: function(response) {
-                            var options = JSON.parse(response || '{}');
-                            if(!$.isEmptyObject(options)) {
-                                advancedSetting = options;
-                                console.log(advancedSetting);
-                            }
-                        }
-                    });
-
                     $(document).keydown(function(e) {
                         if(e.metaKey && e.keyCode === 8 || e.keyCode === 46) {
                             director.removeSelected();
@@ -114,7 +107,14 @@ define([
                     });
 
                     var s = Config().read('advanced-settings');
-                    advancedSetting = !!s ? s : '{}';
+                    if(!s) {
+                        advancedSetting = {};
+                        advancedSetting.custom = AppSettings.custom;
+                    }
+                    else {
+                        advancedSetting = s;
+                    }
+                    // advancedSetting = !!s ? s : '{}';
 
                     $importBtn = this.refs.importBtn.getDOMNode();
 
@@ -250,17 +250,6 @@ define([
                             openPrinterSelectorWindow: false
                         });
                     }.bind(this));
-
-
-
-                    // director.getFCode().then(function(fcode) {
-                    //     console.log(fcode);
-                    //     this.setState({
-                    //         openPrinterSelectorWindow: false,
-                    //         showMonitor: true,
-                    //         fcode: fcode
-                    //     });
-                    // }.bind(this));
 
                     DeviceMaster.selectDevice(selectedPrinter).then(function(status) {
                         if(status === DeviceConstants.CONNECTED) {

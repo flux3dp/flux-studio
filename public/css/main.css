@@ -3103,6 +3103,8 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         .modal-window .modal-alert .message {
             margin: 0 0 1.6rem 0;
             width: 100%; }
+        .modal-window .modal-alert pre.message {
+            font-family: "Helvetica Neue", "HelveticaNeue-Light", "Helvetica Neue Light", Helvetica, Arial, "Lucida Grande", sans-serif, "Microsoft JhengHei", "微軟正黑體"; }
     .modal-window .message {
         word-break: break-all;
         word-wrap: break-word; }
