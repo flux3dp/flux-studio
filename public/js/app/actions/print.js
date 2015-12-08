@@ -299,7 +299,6 @@ define([
             mesh.name = 'custom';
             mesh.plane_boundary = planeBoundary(mesh);
 
-            alignCenter();
             addSizeProperty(mesh);
             groundIt(mesh);
             selectObject(mesh);
