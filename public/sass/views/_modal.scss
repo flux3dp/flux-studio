@@ -78,37 +78,37 @@
     .modal-alert {
         @include flexbox();
         background: #FFF;
-        box-shadow: 0 10px 20px rgba(0, 0, 0, .7);
         flex-direction: column;
         min-height: 25rem;
-        min-width: 32.2rem;
         overflow: auto;
-        padding: 1.6rem 2.8rem 4.4rem 2.8rem;
+        padding: 1.6rem 2.8rem;
         position: relative;
         text-align: center;
         align-items: center;
-        justify-content: center;
+        justify-content: space-between;
+        width: 32.2rem;
+
+        .caption {
+            margin: 0 0 1.6rem 0;
+        }
 
         .caption,
         .message {
-            margin: 0 0 1.6rem 0;
             width: 100%;
-        }
-        pre.message {
-            font-family: "Helvetica Neue", "HelveticaNeue-Light", "Helvetica Neue Light", Helvetica, Arial, "Lucida Grande", sans-serif, "Microsoft JhengHei", "微軟正黑體";
         }
     }
 
     .message {
+        font-family: "Helvetica Neue", "HelveticaNeue-Light", "Helvetica Neue Light", Helvetica, Arial, "Lucida Grande", sans-serif, "Microsoft JhengHei", "微軟正黑體";
+        margin: 0;
+        padding: 0;
+        position: relative;
         word-break: break-all;
         word-wrap: break-word;
     }
 
     .btn-h-group {
-        bottom: 1.6rem;
-        left: 2.8rem;
-        position: absolute;
-        right: 2.8rem;
+        width: 100%;
 
         .btn {
             font-size: 1.3rem;
@@ -150,6 +150,21 @@
             transition: width .3s ease;
             width: 0;
         }
+    }
+}
+
+// progress dialog size
+.modal-progress-nonstop {
+    .spinner-roller {
+        height: 13rem;
+        margin: auto;
+        width: 13rem;
+    }
+
+    .modal-alert {
+        height: 20rem;
+        min-height: 20rem;
+        width: 20rem;
     }
 }
 
