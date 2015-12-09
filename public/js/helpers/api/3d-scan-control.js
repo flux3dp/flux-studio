@@ -3,13 +3,12 @@
  * Ref: https://github.com/flux3dp/fluxghost/wiki/websocket-3dscan-control
  */
 define([
+    'jquery',
     'helpers/websocket',
     'helpers/file-system',
     'helpers/point-cloud'
-], function(Websocket, fileSystem, PointCloudHelper) {
+], function($, Websocket, fileSystem, PointCloudHelper) {
     'use strict';
-
-    var ws;
 
     return function(uuid, opts) {
         opts = opts || {};
@@ -17,7 +16,8 @@ define([
         opts.onClose = opts.onClose || function() {};
         opts.onReady = opts.onReady || function() {};
 
-        var errorHandler = function(data) {
+        var ws,
+            errorHandler = function(data) {
                 is_ready = false;
                 is_error = true;
                 opts.onError(data);
@@ -59,7 +59,7 @@ define([
 
             };
 
-        ws = ws || new Websocket({
+        ws = new Websocket({
             method: '3d-scan-control/' + uuid,
             onMessage: function(data) {
 
@@ -193,27 +193,21 @@ define([
                     }
                 };
             },
-            check: function(opts) {
-                opts = opts || {};
-                opts.onPass = opts.onPass || function() {};
-                opts.onFail = opts.onFail || function() {};
+            check: function() {
+                var $deferred = $.Deferred(),
+                    checkStarted = function() {
+                        events.onMessage = function(data) {
+                            initialEvents();
 
-                var checkStarted = function() {
-                    events.onMessage = function(data) {
-                        initialEvents();
+                            $deferred.resolve(data);
+                        };
 
-                        if ('good' === data.message) {
-                            opts.onPass();
-                        }
-                        else {
-                            opts.onFail(data.message);
-                        }
+                        ws.send('scan_check');
                     };
 
-                    ws.send('scan_check');
-                };
-
                 stopGettingImage(checkStarted);
+
+                return $deferred;
             },
 
             retry: function(callback) {
@@ -238,7 +232,7 @@ define([
 
                 events.onError = function(result) {
                     d.resolve(result);
-                }
+                };
 
                 ws.send('quit');
 
