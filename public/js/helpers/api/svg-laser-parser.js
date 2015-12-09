@@ -320,8 +320,8 @@ define([
 
                 events.onMessage = function(data) {
 
-                    if ('processing' === data.status) {
-                        opts.onProgressing();
+                    if ('computing' === data.status) {
+                        opts.onProgressing(data);
                     }
                     else if ('complete' === data.status) {
                         total_length = data.length;
