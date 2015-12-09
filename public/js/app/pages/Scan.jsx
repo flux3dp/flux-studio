@@ -245,7 +245,8 @@ define([
                     self.setState({
                         meshes: meshes,
                         selectedMeshes: [],
-                        hasConvert: false
+                        hasConvert: false,
+                        stlBlob: undefined
                     });
                 },
 
@@ -322,7 +323,7 @@ define([
 
                 _onSave: function(e) {
                     var self = this,
-                        exportPCD = function(outputName) {
+                        exportFile = function(outputName) {
                             var fileFormat = self.state.saveFileType,
                                 fileName = (new Date()).getTime() + '.' + fileFormat;
 
@@ -339,19 +340,17 @@ define([
                                     {
                                         onFinished: function(blob) {
                                             saveAs(blob, fileName);
-                                            self._switchMeshes('pcd' === fileFormat, false);
-                                            onClose();
+                                            self._openBlocker(false);
                                         }
                                     }
                                 );
                             }
-                        },
-                        onClose = function(e) {
-                            self._openBlocker(false);
+
+                            self._switchMeshes(true, false);
                         };
 
                     self._openBlocker(true);
-                    this._mergeAll(exportPCD, false);
+                    this._mergeAll(exportFile, false);
                 },
 
                 _onScanFinished: function(point_cloud) {
@@ -409,7 +408,18 @@ define([
                                 }
                             };
 
-                            self.state.scanCtrlWebSocket.check(opts);
+                            self.state.scanCtrlWebSocket.check().done(function(data) {
+                                switch (data.message) {
+                                case 'good':
+                                case 'no object':
+                                    opts.onPass();
+                                    break;
+                                case 'not open':
+                                case 'no laser':
+                                    opts.onFail(data.message);
+                                    break;
+                                }
+                            });
                         },
                         onScan = function() {
                             var opts = {
@@ -1042,8 +1052,13 @@ define([
 
                                     self.setState({
                                         meshes: meshes,
-                                        scanTimes: (0 === meshes.length ? 0 : self.state.scanTimes)
+                                        scanTimes: (0 === meshes.length ? 0 : self.state.scanTimes),
+                                        selectedMeshes: (0 === meshes.length ? [] : self.state.selectedMeshes)
                                     });
+
+                                    if (0 === meshes.length) {
+                                        self._refreshCamera();
+                                    }
                                 };
 
                                 self._openConfirm(
@@ -1064,8 +1079,8 @@ define([
 
                         return {
                             label: (
-                                <div className={cx(itemClass)} data-index={mesh.index} onClick={onChooseMesh}>
-                                    {mesh.index}
+                                <div className={cx(itemClass)}>
+                                    <div className="mesh-thumbnail-no" data-index={mesh.index} onClick={onChooseMesh}>{mesh.index}</div>
                                     <div className="mesh-thumbnail-close fa fa-times" onClick={onDeleteMesh}></div>
                                 </div>
                             )
