@@ -114,6 +114,7 @@ define([
                         message    : '',
                         percentage : 0,
                         type       : '',
+                        hasStop    : undefined,
                         onFinished : function() {}
                     },
                     // input lightbox
@@ -218,7 +219,15 @@ define([
             },
 
             _handleProgress: function(payload) {
-                var self = this;
+                var self = this,
+                    hasStop;
+
+                if ('boolean' === typeof self.state.progress.hasStop) {
+                    hasStop = self.state.progress.hasStop;
+                }
+                else {
+                    hasStop = ('boolean' === typeof payload.hasStop ? payload.hasStop : true);
+                }
 
                 this.setState({
                     progress: {
@@ -227,6 +236,7 @@ define([
                         message: payload.message || '',
                         percentage: payload.percentage || 0,
                         type: payload.type || self.state.progress.type || ProgressConstants.WAITING,
+                        hasStop: hasStop,
                         onFinished: payload.onFinished || self.state.progress.onFinished || function() {}
                     }
                 });
@@ -483,6 +493,7 @@ define([
                             message={this.state.progress.message}
                             type={this.state.progress.type}
                             percentage={this.state.progress.percentage}
+                            hasStop={this.state.progress.hasStop}
                             onFinished={this._handleProgressFinish}
                         />
 
