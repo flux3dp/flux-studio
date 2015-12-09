@@ -65,9 +65,12 @@ a {
 }
 
 .content {
+    @include flexbox();
+    background: #fff;
     height: 100%;
     overflow: hidden;
     width: 100%;
+    position: relative;
 }
 
 .horizontal-menu .menu-item {
@@ -355,6 +358,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
 /* studio */
 .studio-container {
     height: 100%;
+    width: 100%;
 
     .btn-h-group {
         padding: 10px 0 10px 10px;
