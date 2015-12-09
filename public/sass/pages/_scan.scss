@@ -18,6 +18,11 @@
             position: relative;
             text-align: center;
             width: 99px;
+        }
+
+        .mesh-thumbnail-no {
+            height: 100%;
+            width: 100%;
 
             &::before {
                 content: "#";
