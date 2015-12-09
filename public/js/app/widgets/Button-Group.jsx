@@ -48,7 +48,11 @@ define(['react'], function(React){
                 className += ' btn-h-group';
             }
 
-            return (<div className={className}>{buttons}</div>);
+            return (
+                0 < this.props.buttons.length ?
+                <div className={className}>{buttons}</div> :
+                <span/>
+            );
         }
     });
 });
