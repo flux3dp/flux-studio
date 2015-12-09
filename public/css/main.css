@@ -3540,14 +3540,11 @@ input[type=range]:focus::-webkit-slider-runnable-track {
     line-height: 18px; }
 
 .flux-monitor {
-    position: absolute;
-    left: 50%;
-    top: 100px; }
+    left: 50%; }
     .flux-monitor .main {
         background-color: white;
         height: 40rem;
         width: 31rem;
-        left: -50%;
         position: relative; }
         .flux-monitor .main .title {
             height: 5rem;
@@ -3662,7 +3659,6 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         background-color: white;
         height: 10rem;
         width: 31rem;
-        left: -50%;
         position: relative;
         margin-top: 5px; }
         .flux-monitor .sub .wrapper {
