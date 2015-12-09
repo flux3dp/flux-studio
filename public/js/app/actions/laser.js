@@ -17,6 +17,8 @@ define([
     'app/actions/global-actions',
     'helpers/device-master',
     'app/constants/device-constants',
+    'app/actions/progress-actions',
+    'app/constants/progress-constants',
     'freetrans',
     'helpers/jquery.box',
     'plugins/file-saver/file-saver.min'
@@ -38,7 +40,9 @@ define([
     AlertActions,
     GlobalActions,
     DeviceMaster,
-    DeviceConstants
+    DeviceConstants,
+    ProgressActions,
+    ProgressConstants
 ) {
     'use strict';
 
@@ -125,6 +129,9 @@ define([
 
                 uploadFCode();
             },
+            ExportGCodeProgressing = function(data) {
+                ProgressActions.updating(data.message, data.percentage * 100);
+            },
             sendToBitmapAPI = function(args, settings, callback) {
                 callback = callback || function() {};
 
@@ -136,6 +143,7 @@ define([
                     },
                     onUploadFinish = function() {
                         laserParser.getGCode({
+                            onProgressing: ExportGCodeProgressing,
                             onFinished: callback
                         });
                     };
@@ -167,6 +175,7 @@ define([
                         laserParser.getGCode(
                             names,
                             {
+                                onProgressing: ExportGCodeProgressing,
                                 onFinished: callback
                             }
                         );
@@ -291,12 +300,13 @@ define([
             $target_image = null, // changing when image clicked
             printer = null,
             printer_selecting = false,
-            handleLaser = function(settings, callback) {
+            handleLaser = function(settings, callback, progressType) {
+                progressType = progressType || ProgressConstants.NONSTOP;
 
                 var $ft_controls = $laser_platform.find('.ft-controls'),
                     _callback = function() {
                         callback.apply(null, arguments);
-                        self._openBlocker(false);
+                        ProgressActions.close();
                     },
                     getPoint = function($el, position) {
                         var containerOffset = $laser_platform.offset(),
@@ -392,7 +402,7 @@ define([
                         });
                     };
 
-                self._openBlocker(true);
+                ProgressActions.open(progressType, '', 'Processing...', false);
 
                 doLaser(settings);
             };
@@ -434,7 +444,7 @@ define([
                 $ftControls.width(size.width).height(size.height);
 
                 if (file.index === file.totalFiles - 1) {
-                    self._openBlocker(false);
+                    ProgressActions.close();
                 }
 
                 // set default image
@@ -537,6 +547,10 @@ define([
                         },
                         onComplete: function(result) {
                             file.url = result.canvas.toDataURL('svg' === file.extension ? 'image/svg+xml' : 'image/png');
+                            self.state.images.push(file);
+                            self.setState({
+                                images: self.state.images
+                            });
                             setupImage(file, size, objectUrl, name);
                         }
                     });
@@ -607,11 +621,13 @@ define([
                     settings,
                     function(blob, filemode) {
                         var extension = ('-f' === filemode ? 'fc' : 'gcode'),
-                            file_name = (new Date()).getTime() + '.' + extension;
+                            // split by . and get unless the last then join as string
+                            fileName = self.state.images[0].name.split('.').slice(0, -1).join(''),
+                            fullName = fileName + '.' + extension;
 
-                        saveAs(blob, file_name);
-                        self._openBlocker(false);
-                    }
+                        saveAs(blob, fullName);
+                    },
+                    ProgressConstants.STEPPING
                 );
             },
             destroySocket: function() {
@@ -636,7 +652,7 @@ define([
                     extension = self.refs.fileUploader.getFileExtension(firstFile.name),
                     currentFileFormat = self.state.fileFormat;
 
-                self._openBlocker(true);
+                ProgressActions.open(ProgressConstants.NONSTOP);
 
                 if ('string' !== typeof currentFileFormat) {
                     currentFileFormat = ('svg' === extension ? 'svg' : 'bitmap');
