@@ -8,6 +8,7 @@ define([
     'helpers/file-system',
     'app/actions/alert-actions',
     'app/constants/device-constants',
+    // non-return value
     'threeOrbitControls',
     'threeTrackballControls',
     'threeTransformControls',
