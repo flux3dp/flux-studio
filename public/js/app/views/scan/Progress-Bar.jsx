@@ -23,6 +23,12 @@ define([
                 };
             },
 
+            getInitialState: function() {
+                return {
+                    stop: false
+                };
+            },
+
             _paddingZero: function(str, len) {
                 var zero = new Array(len + 1),
                     afterPadding = zero.join(0) + str;
@@ -37,6 +43,16 @@ define([
                 return this._paddingZero(minutes, 2) + 'm' + this._paddingZero(seconds, 2) + 's';
             },
 
+            _onStop: function() {
+                var self = this;
+
+                self.setState({
+                    stop: true
+                }, function() {
+                    self.props.onStop();
+                });
+            },
+
             _renderProgress: function() {
                 var self = this,
                     lang = self.props.lang;
@@ -46,7 +62,7 @@ define([
                         <span className="progress-text">{self.props.percentage}%,</span>
                         <span className="progress-text">{self._formatSecondToTime(self.props.remainingTime)}</span>
                         <span className="progress-text">{lang.scan.remaining_time}</span>
-                        <button className="btn btn-hexagon btn-stop-scan" onClick={this.props.onStop}>{lang.scan.stop_scan}</button>
+                        <button className="btn btn-hexagon btn-stop-scan" onClick={this._onStop}>{lang.scan.stop_scan}</button>
                     </div>
                 );
             },
@@ -64,6 +80,11 @@ define([
             render : function() {
                 var lang = this.props.lang,
                     isFinish = (100 <= this.props.percentage),
+                    cx = React.addons.classSet,
+                    className = {
+                        'scan-progress': true,
+                        'hide': true === this.state.stop
+                    },
                     content = (
                         true === isFinish ?
                         this._renderFinish() :
@@ -71,7 +92,7 @@ define([
                     );
 
                 return (
-                    <div className="scan-progress">
+                    <div className={cx(className)}>
                         {content}
                     </div>
                 );
