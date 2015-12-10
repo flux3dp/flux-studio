@@ -143,10 +143,10 @@ a {
         content: attr(data-tip);
         display: block;
         font-size: 11px;
-        height: 24px;
         left: -15px;
         line-height: 24px;
         min-width: 75px;
+        padding: 5px;
         position: absolute;
         text-align: center;
         white-space: nowrap;
