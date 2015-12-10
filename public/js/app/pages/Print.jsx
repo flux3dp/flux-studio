@@ -21,6 +21,7 @@ define([
     'app/actions/global-actions',
     'app/constants/device-constants',
     'app/app-settings',
+    'app/actions/alert-actions',
     'helpers/object-assign'
 ], function(
     $,
@@ -44,7 +45,8 @@ define([
     GlobalStore,
     GlobalActions,
     DeviceConstants,
-    AppSettings
+    AppSettings,
+    AlertActions
 ) {
 
     return function(args) {
@@ -114,7 +116,6 @@ define([
                     else {
                         advancedSetting = s;
                     }
-                    // advancedSetting = !!s ? s : '{}';
 
                     $importBtn = this.refs.importBtn.getDOMNode();
 
