@@ -98,7 +98,7 @@ define([
                         isTransforming              : false,
                         hasOutOfBoundsObject        : false,
                         hasObject                   : false,
-                        raftOn                      : advancedSettings.raft === 1,
+                        raftOn                      : advancedSettings.raft_layers !== 0,
                         supportOn                   : advancedSettings.support_material === 1,
                         previewLayerCount           : 0,
                         progressMessage             : '',
@@ -133,9 +133,9 @@ define([
                 _handleRaftClick: function() {
                     var isOn = !this.state.raftOn;
                     director.setParameter('raft', isOn ? '1' : '0');
-                    advancedSettings.raft = isOn ? 1 : 0;
+                    advancedSettings.raft_layers = isOn ? advancedSettings.raft : 0;
                     this.setState({ raftOn: isOn });
-                    this._handleApplyAdvancedSetting();
+                    Config().write('advanced-settings', JSON.stringify(advancedSettings));
                 },
 
                 _handleSupportClick: function() {
@@ -143,7 +143,7 @@ define([
                     director.setParameter('support', isOn ? '1' : '0');
                     advancedSettings.support_material = isOn ? 1 : 0;
                     this.setState({ supportOn: isOn });
-                    this._handleApplyAdvancedSetting();
+                    Config().write('advanced-settings', JSON.stringify(advancedSettings));
                 },
 
                 _handleToggleAdvancedSettingPanel: function() {
@@ -195,21 +195,15 @@ define([
                 },
 
                 _handleApplyAdvancedSetting: function(setting) {
-                    console.log('applying ad setting');
                     setting = setting || advancedSettings;
                     Config().write('advanced-settings', JSON.stringify(setting));
                     advancedSettings = setting;
+                    this.setState({ supportOn: setting.support_material === 1 });
                     return director.setAdvanceParameter(setting);
                 },
 
                 _handleTogglePrintPause: function(printPaused) {
                     console.log(printPaused ? 'print paused' : 'continue printing');
-                },
-
-                _handlePrintCancel: function(e) {
-                },
-
-                _handlePrintRestart: function(e) {
                 },
 
                 _handleImport: function(e) {
