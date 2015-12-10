@@ -4674,7 +4674,7 @@ input.switch:checked ~ label:after {
     text-align: center; }
 
 .settings .nav li.nav-item {
-    width: 50%;
+    width: 100%;
     height: 47px;
     line-height: 47px;
     display: inline;
