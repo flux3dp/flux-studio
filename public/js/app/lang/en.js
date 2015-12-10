@@ -597,6 +597,7 @@ define(function() {
             cancel: 'Cancel',
             delete_mesh: 'Delete?',
             quality: 'QUALITY',
+            scan_again_confirm: 'Do you want to discard current scan result?',
             resolution: [{
                 id: 'best',
                 text: 'Best',
