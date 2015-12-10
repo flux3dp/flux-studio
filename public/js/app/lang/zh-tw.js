@@ -6,6 +6,9 @@ define(function() {
         app : {
             name : 'Flux Studio - zh-tw'
         },
+        support: {
+            no_webgl: 'Does not seem to support WebGL'
+        },
         device_selection: {
             device_name: 'DEVICE NAME',
             module: 'MODULE',

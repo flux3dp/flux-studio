@@ -6,6 +6,9 @@ define(function() {
         app : {
             name : 'Flux Studio - en'
         },
+        support: {
+            no_webgl: '無法在本台電腦開啟 WebGL, 請使用其他可以支援的電腦'
+        },
         device_selection: {
             device_name: 'DEVICE NAME',
             module: 'MODULE',
