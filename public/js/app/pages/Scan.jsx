@@ -455,8 +455,13 @@ define([
                 },
 
                 _onScanAgain: function(e) {
-                    this.setState(this.getInitialState());
-                    scanedModel.clear();
+                    var self = this;
+
+                    AlertStore.onYes(function(id) {
+                        self.setState(self.getInitialState());
+                        scanedModel.clear();
+                    });
+                    AlertActions.showPopupYesNo('scan-again', self.state.lang.scan.scan_again_confirm);
                 },
 
                 _onScanStop: function(e) {
