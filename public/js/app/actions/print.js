@@ -7,7 +7,9 @@ define([
     'helpers/api/control',
     'helpers/file-system',
     'app/actions/alert-actions',
+    'app/actions/progress-actions',
     'app/constants/device-constants',
+    'app/constants/progress-constants',
     'threeOrbitControls',
     'threeTrackballControls',
     'threeTransformControls',
@@ -25,7 +27,9 @@ define([
     printerController,
     FileSystem,
     AlertActions,
-    DeviceConstants
+    ProgressActions,
+    DeviceConstants,
+    ProgressConstants
 ) {
     'use strict';
 
@@ -620,11 +624,13 @@ define([
     function getGCode() {
         var d = $.Deferred();
         var ids = [];
+
         objects.forEach(function(obj) {
             ids.push(obj.uuid);
         });
 
-        _setProgressMessage('Saving File Preview');
+        ProgressActions.open(ProgressConstants.STEPPING, 'Caption', 'Saving File Preview');
+
         getBlobFromScene().then(function(blob) {
             reactSrc.setState({ previewUrl: URL.createObjectURL(blob) });
             return slicer.uploadPreviewImage(blob);
@@ -635,7 +641,7 @@ define([
                         if (result instanceof Blob) {
                             blobExpired = false;
                             responseBlob = result;
-                            _setProgressMessage('');
+                            ProgressActions.close();
                             d.resolve(result);
                         }
                         else {
@@ -643,10 +649,10 @@ define([
                                 var serverMessage = `${result.status}: ${result.message} (${parseInt(result.percentage * 100)}%)`,
                                     drawingMessage = `FInishing up... (100%)`,
                                     message = result.status !== 'complete' ? serverMessage : drawingMessage;
-                                _setProgressMessage(message);
+                                ProgressActions.updating(message, parseInt(result.percentage * 100));
                             }
                             else {
-                                _setProgressMessage('');
+                                ProgressActions.close();
                             }
                         }
                     });
@@ -681,7 +687,12 @@ define([
             ids.push(obj.uuid);
         });
 
-        _setProgressMessage('Saving File Preview');
+        ProgressActions.open('', '', '', function() {
+            console.log('??');
+        });
+
+        ProgressActions.open(ProgressConstants.STEPPING, 'Caption', 'Saving File Preview');
+
         getBlobFromScene().then(function(blob) {
             previewUrl = URL.createObjectURL(blob);
             return slicer.uploadPreviewImage(blob);
@@ -692,7 +703,7 @@ define([
                         if (result instanceof Blob) {
                             blobExpired = false;
                             responseBlob = result;
-                            _setProgressMessage('');
+                            ProgressActions.close();
                             d.resolve(result, previewUrl);
                         }
                         else {
@@ -700,10 +711,10 @@ define([
                                 var serverMessage = `${result.status}: ${result.message} (${parseInt(result.percentage * 100)}%)`,
                                     drawingMessage = `FInishing up... (100%)`,
                                     message = result.status !== 'complete' ? serverMessage : drawingMessage;
-                                _setProgressMessage(message);
+                                ProgressActions.updating(message, parseInt(result.percentage * 100));
                             }
                             else {
-                                _setProgressMessage('');
+                                ProgressActions.close();
                             }
                         }
                     });
@@ -1204,7 +1215,8 @@ define([
             //     previewMode: isOn
             // });
             previewMode = isOn;
-            _setProgressMessage('generating preview...');
+            // _setProgressMessage('generating preview...');
+
             isOn ? _showPreview() : _hidePreview();
         }
     }
