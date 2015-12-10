@@ -36,14 +36,35 @@ define([
         return {
             connection: ws,
             upload: function(name, file) {
-                var d = $.Deferred();
+                var d = $.Deferred(),
+                    CHUNK_PKG_SIZE = 4096;
+
                 events.onMessage = function(result) {
                     switch (result.status) {
                     case 'ok':
                         d.resolve(result);
                         break;
                     case 'continue':
-                        ws.send(file);
+                        var fileReader,
+                            chunk,
+                            length = file.length || file.size;
+
+                        for (var i = 0; i < length; i += CHUNK_PKG_SIZE) {
+                            chunk = file.slice(i, i + CHUNK_PKG_SIZE);
+
+                            if (file instanceof Array) {
+                                chunk = convertToTypedArray(chunk, Uint8Array);
+                            }
+
+                            fileReader = new FileReader();
+
+                            fileReader.onloadend = function(e) {
+                                ws.send(this.result);
+                            };
+
+                            fileReader.readAsArrayBuffer(chunk);
+                        }
+
                         break;
                     default:
                         // TODO: do something?

@@ -2527,7 +2527,8 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         bottom: 28px;
         position: fixed;
         right: 20px;
-        width: 87px; }
+        width: 87px;
+        pointer-events: auto; }
         .studio-container .beehive-buttons .btn.btn-disabled {
             background: #CCC; }
         .studio-container .beehive-buttons .btn {
@@ -4422,7 +4423,8 @@ input.switch:checked ~ label:after {
     position: absolute;
     right: 0;
     width: 170px;
-    z-index: 1; }
+    z-index: 1;
+    pointer-events: none; }
     .print-studio .rightPanel svg {
         bottom: 50px;
         height: 230px;
@@ -4445,7 +4447,8 @@ input.switch:checked ~ label:after {
     .print-studio .rightPanel .cameraViewController {
         bottom: 55%;
         height: 100px;
-        position: absolute; }
+        position: absolute;
+        pointer-events: auto; }
 
 .print-studio .object-dialogue.through {
     pointer-events: none; }

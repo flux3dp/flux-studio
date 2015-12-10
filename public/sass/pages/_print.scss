@@ -811,6 +811,7 @@ input.switch:checked ~ label:after {
         right: 0;
         width: 170px;
         z-index: 1;
+        pointer-events: none;
 
         svg {
             bottom: 50px;
@@ -842,6 +843,7 @@ input.switch:checked ~ label:after {
             bottom: 55%;
             height: 100px;
             position: absolute;
+            pointer-events: auto;
         }
     }
 
