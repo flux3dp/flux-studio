@@ -791,27 +791,19 @@ input.switch:checked ~ label:after {
                     height: 255px;
                     width: 403px;
                 }
-
-                .content.quality {
-                    background-color: #B3B3B3;
-                    width: 160px;
-                    z-index: 1000;
-
-                    ul {
-                        background-color: #B3B3B3;
-                        color: #B3B3B3;
-                        li {
-                            color: #E0E0DF;
-                            font-size: 16px;
-                        }
-                    }
-                }
                 .content.preview {
                     width: 50px;
                 }
             }
         }
 
+        .content.quality {
+            ul {
+                li {
+                    cursor: pointer;
+                }
+            }
+        }
     }
     .rightPanel {
         height: 100%;

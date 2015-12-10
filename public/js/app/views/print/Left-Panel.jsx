@@ -10,16 +10,29 @@ define([
     'use strict';
 
     var lang,
-        settings = {
-            raftOn: true,
-            supportOn: true
-        };
+        settings,
+        constants;
+
+    settings = {
+        raftOn: true,
+        supportOn: true
+    };
+
+    constants = {
+        QUALITY     : 'QUALITY',
+        RAFT_ON     : 'RAFT_ON',
+        SUPPORT_ON  : 'SUPPORT_ON',
+        ADVANCED    : 'ADVANCED',
+        PREVIEW     : 'PREVIEW'
+    };
 
     return React.createClass({
 
         propTypes: {
             lang                        : React.PropTypes.object,
             previewMode                 : React.PropTypes.bool,
+            hasObject                   : React.PropTypes.bool,
+            hasOutOfBoundsObject        : React.PropTypes.bool,
             previewLayerCount           : React.PropTypes.number,
             onQualitySelected           : React.PropTypes.func,
             onRaftClick                 : React.PropTypes.func,
@@ -59,18 +72,14 @@ define([
                     previewCurrentLayer: nextProps.previewLayerCount
                 });
             }
+
+            // if(!nextProps.hasObject || nextProps.hasOutOfBoundsObject) {
+            //     this._closePreview();
+            // }
         },
 
         _closePopup: function() {
             $('.popup-open:checked').removeAttr('checked');
-        },
-
-        _handleToggleRaft: function() {
-            this.props.onRaftClick();
-        },
-
-        _handleToggleSupport: function() {
-            this.props.onSupportClick();
         },
 
         _handleSetColor: function(color) {
@@ -78,28 +87,52 @@ define([
             this._closePopup();
         },
 
-        _handleSelectQuality: function(quality) {
-            this.props.onQualitySelected(quality);
-            this.setState({ quality: lang.quality[quality] });
-            this._closePopup();
-        },
+        _handleActions: function(source, arg, e) {
+            var self = this,
+                actions = {
 
-        _handleOpenAdvancedSetting: function() {
-            this._closePopup();
-            this.props.onShowAdvancedSettingPanel();
-        },
+                    'QUALITY': function() {
+                        self.props.onQualitySelected(arg);
+                        self.setState({ quality: lang.quality[arg] });
+                        $('.dialog-opener').prop('checked', false);
+                    },
 
-        _handleOpenPreview: function(e) {
-            if(e.target.type === 'range') { return; }
-            if(this.props.hasObject) {
-                var src = this.refs.preview.getDOMNode();
-                $(src).prop('checked', !this.state.previewOn);
-                this.setState({ previewOn: !this.state.previewOn });
-                this.props.onPreviewClick(!this.state.previewOn);
+                    'RAFT_ON': function() {
+                        self.props.onRaftClick();
+                    },
+
+                    'SUPPORT_ON': function() {
+                        self.props.onSupportClick();
+                    },
+
+                    'ADVANCED': function() {
+                        self._closePopup();
+                        self.props.onShowAdvancedSettingPanel();
+                    },
+
+                    'PREVIEW': function() {
+                        if(e.target.type === 'range' || !self.props.hasObject || self.props.hasOutOfBoundsObject) {
+                            e.preventDefault();
+                            return;
+                        }
+                        if(self.props.hasObject) {
+                            // var src = self.refs.preview.getDOMNode();
+                            // $(src).prop('checked', !self.state.previewOn);
+                            self.setState({ previewOn: !self.state.previewOn });
+                            self.props.onPreviewClick(!self.state.previewOn);
+                        }
+                    },
+                };
+
+            if(source !== constants.PREVIEW) {
+                self._closePreview();
             }
+
+            self._closePopup();
+            actions[source]();
         },
 
-        _handlePreviewLayerChange(e) {
+        _handlePreviewLayerChange: function(e) {
             this.props.onPreviewLayerChange(e.target.value);
             this.setState({
                 previewCurrentLayer: e.target.value
@@ -113,13 +146,18 @@ define([
             $popupOpen.removeAttr('checked');
         },
 
+        _closePreview: function() {
+            this.setState({ previewOn: false });
+            this.props.onPreviewClick(false);
+        },
+
         _renderQuanlity: function() {
             var _quality = ['high', 'med', 'low'],
                 qualitySelection;
 
             qualitySelection = _quality.map(function(quality) {
                 return (
-                    <li onClick={this._handleSelectQuality.bind(null, quality)}>
+                    <li onClick={this._handleActions.bind(null, constants.QUALITY, quality)}>
                         {lang.quality[quality]}
                     </li>
                 );
@@ -186,7 +224,7 @@ define([
         _renderRaft: function() {
             return {
                 label: (
-                    <div title={lang.raftTitle} onClick={this._handleToggleRaft}>
+                    <div title={lang.raftTitle} onClick={this._handleActions.bind(null, constants.RAFT_ON, '')}>
                         <div>{this.props.raftOn ? lang.raft_on : lang.raft_off}</div>
                     </div>
                 )
@@ -196,7 +234,7 @@ define([
         _renderSupport: function() {
             return {
                 label: (
-                    <div title={lang.supportTitle} onClick={this._handleToggleSupport}>
+                    <div title={lang.supportTitle} onClick={this._handleActions.bind(null, constants.SUPPORT_ON, '')}>
                         <div>{this.props.supportOn ? lang.support_on : lang.support_off}</div>
                     </div>
                 )
@@ -206,7 +244,7 @@ define([
         _renderAdvanced: function() {
             return {
                 label: (
-                    <div title={lang.advancedTitle} onClick={this._handleOpenAdvancedSetting}>
+                    <div title={lang.advancedTitle} onClick={this._handleActions.bind(null, constants.ADVANCED, '')}>
                         <div>{this.props.lang.print.left_panel.advanced}</div>
                     </div>
                 )
@@ -216,7 +254,7 @@ define([
         _renderPreview: function() {
             return {
                 label: (
-                    <div className="display-text" onClick={this._handleOpenPreview}>
+                    <div className="display-text" onClick={this._handleActions.bind(null, constants.PREVIEW, '')}>
                         <span>{lang.preview}</span>
                     </div>
                 ),

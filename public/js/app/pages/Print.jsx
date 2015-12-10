@@ -96,6 +96,8 @@ define([
                         openWaitWindow              : false,
                         openImportWindow            : true,
                         isTransforming              : false,
+                        hasOutOfBoundsObject        : false,
+                        hasObject                   : false,
                         raftOn                      : advancedSettings.raft === 1,
                         supportOn                   : advancedSettings.support_material === 1,
                         previewLayerCount           : 0,
@@ -196,7 +198,7 @@ define([
                     console.log('applying ad setting');
                     setting = setting || advancedSettings;
                     Config().write('advanced-settings', JSON.stringify(setting));
-                    advancedSetting = setting;
+                    advancedSettings = setting;
                     return director.setAdvanceParameter(setting);
                 },
 
@@ -304,14 +306,14 @@ define([
                         low: 0.3
                     };
                     director.setParameter('layer_height', quality[level]);
-                    advancedSetting.layer_height = quality[level];
+                    advancedSettings.layer_height = quality[level];
                 },
 
                 _renderAdvancedPanel: function() {
                     var content = (
                         <AdvancedPanel
                             lang        = {lang}
-                            setting     = {advancedSetting}
+                            setting     = {advancedSettings}
                             onClose     = {this._handleCloseAdvancedSetting}
                             onApply     = {this._handleApplyAdvancedSetting} />
                     );
@@ -372,6 +374,7 @@ define([
                             lang                    = {lang}
                             camera                  = {this.state.camera}
                             hasObject               = {this.state.hasObject}
+                            hasOutOfBoundsObject    = {this.state.hasOutOfBoundsObject}
                             onGoClick               = {this._handleGoClick}
                             onDownloadGCode         = {this._handleDownloadGCode}
                             onCameraPositionChange  = {this._handleCameraPositionChange}

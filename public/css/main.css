@@ -2964,7 +2964,8 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         text-overflow: ellipsis;
         word-break: break-all;
         white-space: nowrap;
-        overflow: hidden; }
+        overflow: hidden;
+        cursor: pointer; }
     .ui-dialog-menu .dialog-window {
         display: none;
         align-self: center; }
@@ -4411,18 +4412,10 @@ input.switch:checked ~ label:after {
                 background-color: #F9F9F9;
                 height: 255px;
                 width: 403px; }
-            .print-studio .leftPanel .popup-selection .popup .content.quality {
-                background-color: #B3B3B3;
-                width: 160px;
-                z-index: 1000; }
-                .print-studio .leftPanel .popup-selection .popup .content.quality ul {
-                    background-color: #B3B3B3;
-                    color: #B3B3B3; }
-                    .print-studio .leftPanel .popup-selection .popup .content.quality ul li {
-                        color: #E0E0DF;
-                        font-size: 16px; }
             .print-studio .leftPanel .popup-selection .popup .content.preview {
                 width: 50px; }
+    .print-studio .leftPanel .content.quality ul li {
+        cursor: pointer; }
 
 .print-studio .rightPanel {
     height: 100%;

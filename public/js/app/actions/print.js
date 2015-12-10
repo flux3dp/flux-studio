@@ -55,6 +55,7 @@ define([
         ddHelper = 0,
         defaultFileName = '',
         cameraLight,
+        outOfBoundCount = 0,
         _id = 'PRINT.JS';
 
     var s = {
@@ -1082,6 +1083,14 @@ define([
             });
 
             sourceMesh.outlineMesh.material.color.setHex(sourceMesh.position.isOutOfBounds ? s.colorOutside : s.colorSelected);
+
+            var hasOutOfBoundsObject = objects.some(function(o) {
+                return o.position.isOutOfBounds;
+            });
+
+            reactSrc.setState({
+                hasOutOfBoundsObject: hasOutOfBoundsObject
+            });
         }
     }
 
