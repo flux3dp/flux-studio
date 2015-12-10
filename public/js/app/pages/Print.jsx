@@ -356,6 +356,7 @@ define([
                         <LeftPanel
                             lang                        = {lang}
                             hasObject                   = {this.state.hasObject}
+                            hasOutOfBoundsObject        = {this.state.hasOutOfBoundsObject}
                             previewLayerCount           = {this.state.previewLayerCount}
                             raftOn                      = {this.state.raftOn}
                             supportOn                   = {this.state.supportOn}
