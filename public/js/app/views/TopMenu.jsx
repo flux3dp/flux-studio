@@ -2,6 +2,8 @@ define([
     'jquery',
     'react',
     'lib/jquery.growl',
+    'app/app-settings',
+    'helpers/detect-webgl',
     // alert dialog
     'app/actions/alert-actions',
     'app/stores/alert-store',
@@ -32,6 +34,8 @@ define([
     $,
     React,
     Notifier,
+    appSettings,
+    detectWebgl,
     // alert
     AlertActions,
     AlertStore,
@@ -295,7 +299,12 @@ define([
             },
 
             _handleNavigation: function(address) {
-                location.hash = '#studio/' + address;
+                if (-1 < appSettings.needWebGL.indexOf(address) && false === detectWebgl()) {
+                    AlertActions.showPopupError('no-webgl-support', lang.support.no_webgl);
+                }
+                else {
+                    location.hash = '#studio/' + address;
+                }
             },
 
             _handleNotificationModalClose: function(e, reactid, from) {
@@ -381,12 +390,15 @@ define([
 
             _renderStudioFunctions: function() {
                 var ClassNames = React.addons.classSet,
+                    itemClass = '',
+                    label = '',
+                    isActiveItem,
                     menuItems;
 
                 menuItems = options.map(function(opt, i) {
-                    var isActiveItem = -1 < location.hash.indexOf(opt.name),
-                        itemClass = '',
-                        label = '';
+                    isActiveItem = -1 < location.hash.indexOf(opt.name);
+                    itemClass = '';
+                    label = '';
 
                     if ('' !== opt.label) {
                         label = (<p>{opt.label}</p>);
@@ -398,7 +410,8 @@ define([
                     return (
                         <li className={itemClass} key={'menu' + i}
                             data-display-name={opt.displayName}
-                            onClick={this._handleNavigation.bind(null, opt.name)}>
+                            onClick={this._handleNavigation.bind(null, opt.name)}
+                        >
                             <img src={opt.imgSrc} />
                             {label}
                         </li>
