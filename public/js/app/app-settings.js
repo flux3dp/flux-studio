@@ -82,6 +82,7 @@ perimeter_speed = 30
 perimeters = 3
 post_process =
 pressure_advance = 0
+raft = 1
 raft_layers = 4
 resolution = 0.01
 retract_before_travel = 2

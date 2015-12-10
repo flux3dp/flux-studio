@@ -231,7 +231,6 @@ var mode = {
             this.setState({
                 selectedTab: selectedTab
             });
-            this._handleApply(true);
         },
 
         _handleParameterChange: function(key, e) {

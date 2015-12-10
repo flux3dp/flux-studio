@@ -798,10 +798,6 @@ define([
     }
 
     function setAdvanceParameter(settings) {
-        // var _settings = Object.keys(settings).map(function(key) {
-        //     return `${key}=${settings[key]} \n`;
-        // });
-        //slicer.setParameter('advancedSettings', _settings.join('\n')).then(function(result) {
         slicer.setParameter('advancedSettings', settings.custom).then(function(result, errors) {
             if(errors.length > 0) {
                 AlertActions.showPopupError(_id, errors.join('\n'));

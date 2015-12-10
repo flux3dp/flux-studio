@@ -4141,7 +4141,7 @@ input.switch:checked ~ label:after {
     position: relative;
     width: 440px; }
     .print-studio .advanced-panel .content-wrapper {
-        height: 415px;
+        min-height: 415px;
         overflow-y: auto;
         padding: 0 0 70px 0; }
     .print-studio .advanced-panel .tab-list {
@@ -4428,7 +4428,7 @@ input.switch:checked ~ label:after {
     height: 100%;
     position: absolute;
     right: 0;
-    width: 275px;
+    width: 170px;
     z-index: 1; }
     .print-studio .rightPanel svg {
         bottom: 50px;

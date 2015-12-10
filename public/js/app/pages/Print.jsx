@@ -50,7 +50,7 @@ define([
     return function(args) {
         args = args || {};
 
-        var advancedSetting = {},
+        var advancedSettings = {},
             _scale = {
                 locked  : true,
                 x       : 1,
@@ -78,15 +78,26 @@ define([
             view = React.createClass({
 
                 getInitialState: function() {
+                    var s1 = Config().read('advanced-settings');
+                    if(!s) {
+                        advancedSettings = {};
+                        advancedSettings.custom = AppSettings.custom;
+                    }
+                    else {
+                        advancedSettings = s1;
+                    }
+
                     return ({
                         showPreviewModeList         : false,
-                        showAdvancedSetting         : false,
+                        showAdvancedSettings        : false,
                         modelSelected               : null,
                         openPrinterSelectorWindow   : false,
                         openObjectDialogue          : false,
                         openWaitWindow              : false,
                         openImportWindow            : true,
                         isTransforming              : false,
+                        raftOn                      : advancedSettings.raft === 1,
+                        supportOn                   : advancedSettings.support_material === 1,
                         previewLayerCount           : 0,
                         progressMessage             : '',
                         fcode                       : {},
@@ -106,16 +117,6 @@ define([
                         }
                     });
 
-                    var s = Config().read('advanced-settings');
-                    if(!s) {
-                        advancedSetting = {};
-                        advancedSetting.custom = AppSettings.custom;
-                    }
-                    else {
-                        advancedSetting = s;
-                    }
-                    // advancedSetting = !!s ? s : '{}';
-
                     $importBtn = this.refs.importBtn.getDOMNode();
 
                     nwjsMenu.import.enabled = true;
@@ -127,16 +128,24 @@ define([
                     director.setParameter('printSpeed', speed);
                 },
 
-                _handleRaftClick: function(state) {
-                    director.setParameter('raft', state ? '1' : '0');
+                _handleRaftClick: function() {
+                    var isOn = !this.state.raftOn;
+                    director.setParameter('raft', isOn ? '1' : '0');
+                    advancedSettings.raft = isOn ? 1 : 0;
+                    this.setState({ raftOn: isOn });
+                    this._handleApplyAdvancedSetting();
                 },
 
-                _handleSupportClick: function(state) {
-                    director.setParameter('support', state ? '1' : '0');
+                _handleSupportClick: function() {
+                    var isOn = !this.state.supportOn;
+                    director.setParameter('support', isOn ? '1' : '0');
+                    advancedSettings.support_material = isOn ? 1 : 0;
+                    this.setState({ supportOn: isOn });
+                    this._handleApplyAdvancedSetting();
                 },
 
                 _handleToggleAdvancedSettingPanel: function() {
-                    this.setState({ showAdvancedSetting: !this.state.showAdvancedSetting });
+                    this.setState({ showAdvancedSettings: !this.state.showAdvancedSettings });
                 },
 
                 _handleGoClick: function() {
@@ -144,6 +153,7 @@ define([
                         openPrinterSelectorWindow: true
                     });
                     director.clearSelection();
+                    this._handleApplyAdvancedSetting();
                 },
 
                 _handleRotationChange: function(src) {
@@ -179,13 +189,15 @@ define([
                 },
 
                 _handleCloseAdvancedSetting: function() {
-                    this.setState({ showAdvancedSetting: false });
+                    this.setState({ showAdvancedSettings: false });
                 },
 
                 _handleApplyAdvancedSetting: function(setting) {
+                    console.log('applying ad setting');
+                    setting = setting || advancedSettings;
                     Config().write('advanced-settings', JSON.stringify(setting));
                     advancedSetting = setting;
-                    director.setAdvanceParameter(setting);
+                    return director.setAdvanceParameter(setting);
                 },
 
                 _handleTogglePrintPause: function(printPaused) {
@@ -251,14 +263,14 @@ define([
                         });
                     }.bind(this));
 
-                    DeviceMaster.selectDevice(selectedPrinter).then(function(status) {
-                        if(status === DeviceConstants.CONNECTED) {
-                            this.setState({ printerControllerStatus: status });
-                        }
-                        else if (status === DeviceConstants.TIMEOUT) {
-                            AlertActions.showPopupError(_id, _lang.message.connectionTimeout);
-                        }
-                    }.bind(this));
+                    // DeviceMaster.selectDevice(selectedPrinter).then(function(status) {
+                    //     if(status === DeviceConstants.CONNECTED) {
+                    //         this.setState({ printerControllerStatus: status });
+                    //     }
+                    //     else if (status === DeviceConstants.TIMEOUT) {
+                    //         AlertActions.showPopupError(_id, _lang.message.connectionTimeout);
+                    //     }
+                    // }.bind(this));
                 },
 
                 _handlePreviewLayerChange: function(targetLayer) {
@@ -343,6 +355,8 @@ define([
                             lang                        = {lang}
                             hasObject                   = {this.state.hasObject}
                             previewLayerCount           = {this.state.previewLayerCount}
+                            raftOn                      = {this.state.raftOn}
+                            supportOn                   = {this.state.supportOn}
                             onQualitySelected           = {this._handleQualitySelected}
                             onRaftClick                 = {this._handleRaftClick}
                             onSupportClick              = {this._handleSupportClick}
@@ -407,7 +421,7 @@ define([
                 },
 
                 render: function() {
-                    var advancedPanel           = this.state.showAdvancedSetting ? this._renderAdvancedPanel() : '',
+                    var advancedPanel           = this.state.showAdvancedSettings ? this._renderAdvancedPanel() : '',
                         importWindow            = this.state.openImportWindow ? this._renderImportWindow() : '',
                         leftPanel               = this._renderLeftPanel(),
                         rightPanel              = this._renderRightPanel(),

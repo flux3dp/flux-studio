@@ -66,21 +66,11 @@ define([
         },
 
         _handleToggleRaft: function() {
-            this.setState({
-                raftOn: !this.state.raftOn
-            });
-            settings.raftOn = !this.state.raftOn;
-            Config().write('left-panel', settings);
-            this.props.onRaftClick(!this.state.raftOn);
+            this.props.onRaftClick();
         },
 
         _handleToggleSupport: function() {
-            this.setState({
-                supportOn: !this.state.supportOn
-            });
-            settings.supportOn = !this.state.supportOn;
-            Config().write('left-panel', settings);
-            this.props.onSupportClick(!this.state.supportOn);
+            this.props.onSupportClick();
         },
 
         _handleSetColor: function(color) {
@@ -197,7 +187,7 @@ define([
             return {
                 label: (
                     <div title={lang.raftTitle} onClick={this._handleToggleRaft}>
-                        <div>{this.state.raftOn ? lang.raft_on : lang.raft_off}</div>
+                        <div>{this.props.raftOn ? lang.raft_on : lang.raft_off}</div>
                     </div>
                 )
             };
@@ -207,7 +197,7 @@ define([
             return {
                 label: (
                     <div title={lang.supportTitle} onClick={this._handleToggleSupport}>
-                        <div>{this.state.supportOn ? lang.support_on : lang.support_off}</div>
+                        <div>{this.props.supportOn ? lang.support_on : lang.support_off}</div>
                     </div>
                 )
             };
