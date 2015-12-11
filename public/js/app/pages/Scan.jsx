@@ -16,6 +16,7 @@ define([
     'app/actions/alert-actions',
     'app/stores/alert-store',
     'app/actions/progress-actions',
+    'app/constants/progress-constants',
     'helpers/shortcuts',
     'helpers/round',
     'helpers/array-findindex',
@@ -38,6 +39,7 @@ define([
     AlertActions,
     AlertStore,
     ProgressActions,
+    ProgressConstants,
     shortcuts,
     round
 ) {
@@ -123,8 +125,13 @@ define([
                 _retry: function(id) {
                     var self = this;
 
-                    if ('scan-retry' === id) {
+                    switch (id) {
+                    case 'scan-retry':
                         self.state.scanCtrlWebSocket.retry();
+                        break;
+                    case 'calibrate':
+                        self._onCalibrate();
+                        break;
                     }
                 },
 
@@ -285,7 +292,7 @@ define([
                             );
                         };
 
-                    self._openBlocker(true);
+                    self._openBlocker(true, ProgressConstants.NONSTOP);
 
                     this._mergeAll(exportSTL, false);
                 },
@@ -327,8 +334,6 @@ define([
                             var fileFormat = self.state.saveFileType,
                                 fileName = (new Date()).getTime() + '.' + fileFormat;
 
-                            self._openBlocker(true);
-
                             if (self.state.stlBlob instanceof Blob) {
                                 saveAs(self.state.stlBlob, fileName);
                                 self._openBlocker(false);
@@ -349,7 +354,7 @@ define([
                             self._switchMeshes(true, false);
                         };
 
-                    self._openBlocker(true);
+                    self._openBlocker(true, ProgressConstants.NONSTOP);
                     this._mergeAll(exportFile, false);
                 },
 
@@ -376,6 +381,12 @@ define([
                         }
                     );
 
+                },
+
+                _handleCheck: function(callback) {
+                    callback = callback || function() {};
+
+                    this.state.scanCtrlWebSocket.check().done(callback);
                 },
 
                 _handleScan: function(e) {
@@ -408,7 +419,7 @@ define([
                                 }
                             };
 
-                            self.state.scanCtrlWebSocket.check().done(function(data) {
+                            self._handleCheck(function(data) {
                                 switch (data.message) {
                                 case 'good':
                                 case 'no object':
@@ -418,6 +429,8 @@ define([
                                 case 'no laser':
                                     opts.onFail(data.message);
                                     break;
+                                default:
+                                    opts.onFail(data.message);
                                 }
                             });
                         },
@@ -477,7 +490,7 @@ define([
                     var self = this,
                         delete_noise_name = 'clear-noise-' + (new Date()).getTime(),
                         onStarting = function(data) {
-                            self._openBlocker(true);
+                            self._openBlocker(true, ProgressConstants.NONSTOP);
                         },
                         onDumpFinished = function(data) {
                             var newMesh;
@@ -515,7 +528,7 @@ define([
                         cylider_box = new THREE.Box3().setFromObject(self.state.cylinder),
                         opts = {
                             onStarting: function() {
-                                self._openBlocker(true);
+                                self._openBlocker(true, ProgressConstants.NONSTOP);
                             },
                             onReceiving: self._onRendering,
                             onFinished: function(data) {
@@ -655,7 +668,7 @@ define([
                                 );
                             },
                             onMergeStarting = function() {
-                                self._openBlocker(true);
+                                self._openBlocker(true, ProgressConstants.NONSTOP);
                             },
                             isEnd = function() {
                                 return (endIndex === currentIndex);
@@ -736,9 +749,9 @@ define([
                     });
                 },
 
-                _openBlocker: function(is_open) {
+                _openBlocker: function(is_open, type, message, hasStop) {
                     if (true === is_open) {
-                        ProgressActions.open();
+                        ProgressActions.open(type, '', message, hasStop);
                     }
                     else {
                         ProgressActions.close();
@@ -763,6 +776,64 @@ define([
                     });
                 },
 
+                _onCalibrate: function() {
+                    var self = this,
+                        opts = {
+                            onPass: function() {
+                                var scanCtrlWebSocket = self.state.scanCtrlWebSocket,
+                                    calibrateDeferred = scanCtrlWebSocket.calibrate(true),
+                                    then = function(data) {
+                                        if ('ok' === data.status) {
+                                            self._refreshCamera();
+                                            self._openBlocker(false);
+                                        }
+                                        else if ('fail' === data.status) {
+                                            self._openBlocker(false);
+                                            AlertActions.showPopupError(
+                                                'calibrate-fail',
+                                                self.state.lang.scan.calibrate_fail
+                                            );
+
+                                        }
+                                        else {
+                                            calibrateDeferred = scanCtrlWebSocket.calibrate(false).then(then);
+                                        }
+                                    };
+
+                                calibrateDeferred.then(then);
+                            },
+                            onFail: function(message) {
+                                self._openBlocker(false);
+                                AlertActions.showPopupRetry(
+                                    'calibrate',
+                                    // TODO: replace the content
+                                    (
+                                        <div>
+                                            <img className="calibrate-image" src="/img/calibration-guide.jpg"/>
+                                            <p>{message}</p>
+                                        </div>
+                                    )
+                                );
+                            }
+                        };
+
+                    self._handleCheck(function(data) {
+                        switch (data.message) {
+                        case 'good':
+                            opts.onPass();
+                            break;
+                        case 'no object':
+                        case 'not open':
+                        case 'no laser':
+                        default:
+                            self._refreshCamera();
+                            opts.onFail(data.message);
+                        }
+                    });
+
+                    self._openBlocker(true, ProgressConstants.WAITING, self.state.lang.scan.calibration_is_running);
+                },
+
                 // render sections
                 _renderSettingPanel: function() {
                     var self = this,
@@ -773,7 +844,7 @@ define([
                         };
 
                     return (
-                        <SetupPanel className={className} ref="setupPanel" lang={lang}/>
+                        <SetupPanel className={className} ref="setupPanel" lang={lang} onCalibrate={this._onCalibrate}/>
                     );
                 },
 
@@ -904,7 +975,7 @@ define([
                                 scanModelingWebSocket: scanModeling(opts)
                             });
 
-                            self._openBlocker(true);
+                            self._openBlocker(true, ProgressConstants.NONSTOP);
                         },
                         content = (
                             <PrinterSelector
