@@ -21,6 +21,7 @@ define(function(){
         SHOW_POPUP_CUSTOM          : 'SHOW_POPUP_CUSTOM',
         SHOW_POPUP_QUESTION        : 'SHOW_POPUP_QUESTION',
         SHOW_POPUP_FIRMWARE_UPDATE : 'SHOW_POPUP_FIRMWARE_UPDATE',
+        SHOW_POPUP_CHANGE_FILAMENT : 'SHOW_POPUP_CHANGE_FILAMENT',
         NOTIFY_RETRY               : 'NOTIFY_RETRY',
         NOTIFY_ABORT               : 'NOTIFY_ABORT',
         NOTIFY_YES                 : 'NOTIFY_YES',
