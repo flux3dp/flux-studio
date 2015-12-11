@@ -601,6 +601,9 @@ define(function() {
             delete_mesh: '真的要刪除嗎?',
             quality: 'QUALITY',
             scan_again_confirm: 'Do you want to discard current scan result?',
+            calibrate: '校正',
+            calibrate_fail: '校正失敗',
+            calibration_is_running: '校正進行中',
             resolution: [{
                 id: 'best',
                 text: 'Best',

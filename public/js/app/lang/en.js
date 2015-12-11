@@ -601,6 +601,9 @@ define(function() {
             delete_mesh: 'Delete?',
             quality: 'QUALITY',
             scan_again_confirm: 'Do you want to discard current scan result?',
+            calibrate: 'Calibrate',
+            calibrate_fail: 'Calibrate Fail',
+            calibration_is_running: 'Calibration is running',
             resolution: [{
                 id: 'best',
                 text: 'Best',
