@@ -21,6 +21,7 @@ define([
     'jsx!widgets/Notification-Modal',
     'jsx!views/Print-Selector',
     'jsx!views/Update-Dialog',
+    'jsx!views/Change-Filament',
     'helpers/api/discover',
     'helpers/api/config',
     'helpers/device-master',
@@ -53,6 +54,7 @@ define([
     NotificationModal,
     PrinterSelector,
     UpdateDialog,
+    ChangeFilament,
     Discover,
     Config,
     DeviceMaster,
@@ -140,6 +142,12 @@ define([
                         latestVersion: '',
                         updateFile: undefined,
                         device: {}
+                    },
+                    // change filament
+                    changeFilament: {
+                        open: false,
+                        device: {},
+                        onClose: function() {}
                     }
                 };
             },
@@ -148,6 +156,7 @@ define([
                 AlertStore.onNotify(this._handleNotification);
                 AlertStore.onPopup(this._handlePopup);
                 AlertStore.onFirmwareUpdate(this._showFirmwareUpdate);
+                AlertStore.onChangeFilament(this._showChangeFilament);
                 ProgressStore.onOpened(this._handleProgress).
                     onUpdating(this._handleProgress).
                     onClosed(this._handleProgressFinish);
@@ -166,6 +175,23 @@ define([
 
                 // input lightbox
                 InputLightboxStore.removeOpenedListener(this._handleInputLightBoxOpen);
+            },
+
+            _showChangeFilament: function(payload) {
+                this.setState({
+                    changeFilament: {
+                        open: true,
+                        device: payload.device
+                    }
+                });
+            },
+
+            _hideChangeFilament: function() {
+                this.setState({
+                    changeFilament: {
+                        open: false
+                    }
+                });
             },
 
             _showFirmwareUpdate: function(payload) {
@@ -360,7 +386,6 @@ define([
 
             _handleSelectDevice: function(device, e) {
                 e.preventDefault();
-                // AlertActions.showInfo(lang.message.connecting);
                 DeviceMaster.selectDevice(device).then(function(status) {
                     if(status === DeviceConstants.CONNECTED) {
                         GlobalActions.showMonitor(device);
@@ -519,6 +544,12 @@ define([
                             confirmText={this.state.inputLightbox.confirmText}
                             onClose={this._handleInputLightBoxClosed}
                             onSubmit={this._handleInputLightBoxSubmit}
+                        />
+
+                        <ChangeFilament
+                            open={this.state.changeFilament.open}
+                            device={this.state.changeFilament.device}
+                            onClose={this._hideChangeFilament}
                         />
 
                         <NotificationModal
