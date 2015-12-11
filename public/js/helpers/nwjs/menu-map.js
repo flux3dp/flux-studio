@@ -269,7 +269,7 @@ define([
                                     label: lang.device.change_filament,
                                     enabled: true,
                                     onClick: function() {
-                                        // TODO: go to change filament
+                                        AlertActions.showChangeFilament(printer);
                                     }
                                 },
                                 {
