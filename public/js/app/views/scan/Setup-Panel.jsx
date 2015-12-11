@@ -13,7 +13,19 @@ define([
             return {
                 className: {},
                 lang: {},
-                getSetting: function(setting) {}
+                getSetting: function(setting) {},
+                onCalibrate: function() {}
+            };
+        },
+
+        getInitialState: function() {
+            var defaultSettings = {
+                    resolution: this.props.lang.scan.resolution[0]
+                },
+                defaults = config().read('scan-defaults') || defaultSettings;
+
+            return {
+                defaults: defaults
             };
         },
 
@@ -41,19 +53,6 @@ define([
 
             this.openSubPopup(e);
         },
-
-        getInitialState: function() {
-            var defaultSettings = {
-                    resolution: this.props.lang.scan.resolution[0]
-                },
-                defaults = config().read('scan-defaults') || defaultSettings;
-
-            return {
-                defaults: defaults
-            };
-        },
-
-
 
         _getResolutionOptions: function(lang) {
             var resolution = JSON.parse(JSON.stringify(lang.scan.resolution)),
@@ -84,13 +83,26 @@ define([
             };
         },
 
+        _getCalibrate: function(lang) {
+            return {
+                label: (
+                    <div>
+                        <button className="btn btn-default btn-calibrate caption" onClick={this.props.onCalibrate}>
+                            {lang.scan.calibrate}
+                        </button>
+                    </div>
+                )
+            };
+        },
+
         render: function() {
             var props = this.props,
                 lang = props.lang,
                 resolutionOptions = this._getResolutionOptions(lang),
+                calibrate = this._getCalibrate(lang),
                 cx = React.addons.classSet,
                 className = props.className,
-                items = [resolutionOptions];
+                items = [resolutionOptions, calibrate];
 
             className['setup-panel'] = true;
 
