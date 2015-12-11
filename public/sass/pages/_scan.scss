@@ -38,9 +38,9 @@
             border-radius: 50%;
             height: 20px;
             position: absolute;
-            width: 20px;
             right: -10px;
             top: -10px;
+            width: 20px;
 
             &::before {
                 line-height: 20px;
@@ -299,6 +299,19 @@
         .caption {
             padding: 0 .3em 0 0;
             text-transform: uppercase;
+        }
+
+        .btn-calibrate {
+            background: rgba(0, 0, 0, 0);
+            border: none;
+            font-size: inherit;
+            margin: 0;
+
+            &:active,
+            &:hover {
+                box-shadow: none;
+                color: inherit;
+            }
         }
     }
 

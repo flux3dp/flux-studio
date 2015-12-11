@@ -2116,6 +2116,9 @@ a {
     font-size: 12px;
     text-decoration: underline; }
 
+img {
+    max-width: 100%; }
+
 /**
  * structure
  */
@@ -2311,10 +2314,10 @@ a {
         content: attr(data-tip);
         display: block;
         font-size: 11px;
-        height: 24px;
         left: -15px;
         line-height: 24px;
         min-width: 75px;
+        padding: 5px;
         position: absolute;
         text-align: center;
         white-space: nowrap;
@@ -2966,6 +2969,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
             /* NEW, Spec - Opera 12.1, Firefox 20+ */ }
     .ui-dialog-menu .dialog-label {
         color: #B3B3B3;
+        cursor: pointer;
         font-size: 1.8rem;
         margin: 0;
         min-width: 200px;
@@ -3305,8 +3309,8 @@ input[type=range]:focus::-webkit-slider-runnable-track {
             transition: all 0.25s; }
         .top-menu .brand-logo .func-name {
             color: #B3B3B3;
-            font-family: "HelveticaNeue-Thin";
             font-size: 40px;
+            font-weight: lighter;
             line-height: 49px;
             padding: 0 0 0 21px; }
         .top-menu .brand-logo .menu {
@@ -5673,9 +5677,9 @@ input.switch:checked ~ label:after {
             border-radius: 50%;
             height: 20px;
             position: absolute;
-            width: 20px;
             right: -10px;
-            top: -10px; }
+            top: -10px;
+            width: 20px; }
             .scan-studio .mesh-thumbnail .mesh-thumbnail-close::before {
                 line-height: 20px; }
         .scan-studio .mesh-thumbnail .choose {
@@ -5876,6 +5880,15 @@ input.switch:checked ~ label:after {
         .scan-studio .setup-panel .caption {
             padding: 0 0.3em 0 0;
             text-transform: uppercase; }
+        .scan-studio .setup-panel .btn-calibrate {
+            background: transparent;
+            border: none;
+            font-size: inherit;
+            margin: 0; }
+            .scan-studio .setup-panel .btn-calibrate:active,
+            .scan-studio .setup-panel .btn-calibrate:hover {
+                box-shadow: none;
+                color: inherit; }
     .scan-studio .scan-progress {
         bottom: 28px;
         position: fixed;
