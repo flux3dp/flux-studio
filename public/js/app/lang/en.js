@@ -762,6 +762,25 @@ define(function() {
             32: 'Head Tilted',
             128: 'Fan Stopped',
             unknown: 'UNKNOWN'
+        },
+        change_filament: {
+            home_caption: 'Change Filament',
+            load_filament_caption: 'LOAD FILAMENT',
+            unload_filament_caption: 'UNLOAD FILAMENT',
+            cancel: 'CANCEL',
+            load_filament: 'Load Filament',
+            unload_filament: 'Unload Filament',
+            next: 'NEXT',
+            heating_nozzle: 'Heating nozzle',
+            emerging: [
+                'Loading filament',
+                'Press STOP when you see material is emerging.'
+            ],
+            unloading: 'Unloading Filament',
+            stop: 'STOP',
+            loaded: 'Filament Loaded',
+            unloaded: 'Filament Unloaded',
+            ok: 'OK'
         }
     };
 });
