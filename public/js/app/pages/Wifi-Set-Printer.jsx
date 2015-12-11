@@ -49,7 +49,9 @@ define([
 
                         setMachine.name(name, {
                             onSuccess: function(response) {
-                                setPassword(password);
+                                if ('' !== password) {
+                                    setPassword(password);
+                                }
                             }
                         });
                     },
@@ -64,7 +66,7 @@ define([
 
                 if (true === isValid) {
 
-                    if (true === self.state.settingPrinter.password) {
+                    if (true === self.state.settingPrinter.password && '' !== password) {
                         self.setState({
                             openAlert: true,
                             alertContent: {
@@ -79,7 +81,6 @@ define([
                     else {
                         startSetting();
                     }
-
 
                 }
             },
