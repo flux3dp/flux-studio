@@ -3230,6 +3230,62 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         position: static;
         width: 50%; }
 
+.modal-change-filament .modal-alert {
+    width: 440px;
+    min-height: 320px;
+    padding: 22px 0 0 0; }
+
+.modal-change-filament .caption,
+.modal-change-filament .message {
+    margin: 0 0 20px 0;
+    padding: 0 19px; }
+
+.modal-change-filament .caption {
+    color: #626262;
+    font-size: 15px;
+    line-height: 17px;
+    text-align: left; }
+
+.modal-change-filament .message {
+    color: #989898;
+    font-size: 15px;
+    line-height: 21px; }
+    .modal-change-filament .message p {
+        margin: 0; }
+
+.modal-change-filament .message-container p:last-of-type {
+    margin: 0 0 12.5px 0; }
+
+.modal-change-filament .way-to-go .btn {
+    width: 100%; }
+    .modal-change-filament .way-to-go .btn:first-child {
+        margin: 0 0 24px 0; }
+
+.modal-change-filament .spinner-roller {
+    height: 61.5px;
+    margin: 0 auto;
+    width: 61.5px; }
+
+.modal-change-filament .button-group {
+    border: none;
+    border-top: 1px solid #E0E0DF;
+    display: block;
+    height: 73px;
+    padding: 19px;
+    position: relative; }
+    .modal-change-filament .button-group .btn {
+        margin: 0;
+        padding: 0 10px; }
+    .modal-change-filament .button-group .btn:first-child:not([class*="btn-alone"]),
+    .modal-change-filament .button-group .btn-alone-left {
+        position: absolute;
+        left: 19px; }
+    .modal-change-filament .button-group .btn:last-child:not([class*="btn-alone"]),
+    .modal-change-filament .button-group .btn-alone-right {
+        position: absolute;
+        right: 19px;
+        min-width: 60px; }
+
 /**
  * the view of printer selector
  */
