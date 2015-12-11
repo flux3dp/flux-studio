@@ -83,6 +83,9 @@ define([
                             break;
                     }
                 };
+                events.onError = function(result) {
+                    d.resolve(result);
+                };
                 lastOrder = 'ls';
                 ws.send(lastOrder + ' ' + path);
 
@@ -107,6 +110,9 @@ define([
                         default:
                             break;
                     }
+                };
+                events.onError = function(result) {
+                    d.resolve(result);
                 };
 
                 return d.promise();

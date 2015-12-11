@@ -24,6 +24,7 @@ define([
         remote,
         reporter,
         status,
+        usbExist = false,
         operationStatus,
         lastAction,
         lastError = '',
@@ -37,14 +38,7 @@ define([
         CAMERA: 'CAMERA'
     };
 
-    var opts = {
-        onError: function(data) {
-
-        },
-        onReady: function() {
-
-        }
-    };
+    var opts = {};
 
     operationStatus = [
         DeviceConstants.RUNNING,
@@ -60,7 +54,8 @@ define([
             lang                : React.PropTypes.object,
             selectedDevice      : React.PropTypes.object,
             fCode               : React.PropTypes.object,
-            previewUrl          : React.PropTypes.string
+            previewUrl          : React.PropTypes.string,
+            onClose             : React.PropTypes.func
         },
 
         getInitialState: function() {
@@ -83,7 +78,7 @@ define([
             var self = this;
                 opts = {
                     onError: function(data) {
-                        console.log('error', data);
+                        AlertActions.showError(data);
                     },
                     onReady: function() {
                         self.setState({ waiting: false });
@@ -91,7 +86,6 @@ define([
                 };
 
             pathArray   = [];
-            controller  = this.props.controller;
             lang        = this.props.lang.monitor;
             previewUrl  = this.props.previewUrl;
 
@@ -131,16 +125,18 @@ define([
         },
 
         _handleCancel: function(id) {
-            // if(id === _id) {
-            //     this.props.onClose();
-            // }
         },
 
         _handleBrowseFile: function() {
             DeviceMaster.stopCamera();
-            this._retrieveList('');
             filesInfo = [];
             pathArray = [];
+
+            DeviceMaster.ls('USB').then(function(result) {
+                usbExist = result.status === 'ok';
+                this._retrieveList('');
+            }.bind(this));
+
             this.setState({
                 mode: mode.BROWSE_FILE,
                 waiting: true
@@ -190,11 +186,7 @@ define([
                 },
 
                 'BROWSE_FILE': function() {
-
                     pathArray = lastAction.path;
-
-                    // pathArray.pop();
-                    console.log('browsing folder', pathArray.join('/'));
                     self._retrieveList(pathArray.join('/'));
                 },
 
@@ -204,7 +196,6 @@ define([
             };
 
             if(actions[lastAction.mode]) {
-                console.log('processing mode: ' + lastAction.mode + ' path: ' + lastAction.path.join('/'));
                 actions[lastAction.mode]();
                 this.setState({ mode: lastAction.mode });
             }
@@ -297,6 +288,9 @@ define([
                     }
                     AlertActions.showError(lastError);
                 }
+                if(report.error === DeviceConstants.UNKNOWN_ERROR) {
+                    DeviceMaster.quit();
+                }
             }
 
             if(status === DeviceConstants.ABORTED || status === DeviceConstants.COMPLETED) {
@@ -364,9 +358,21 @@ define([
             }
 
             DeviceMaster.ls(path).then(function(result) {
+                if(result.error) {
+                    AlertActions.showPopupError(result.error);
+                    result.directories = [];
+                    self.setState({
+                        directoryContent: result,
+                        waiting: false
+                    });
+                }
                 currentLevelFiles = result.files;
                 self._retrieveFileInfo(path).then(function(info) {
                     filesInfo = filesInfo.concat(info);
+                    if(path === '' && !usbExist) {
+                        var i = result.directories.indexOf('USB');
+                        result.directories.splice(i, 1);
+                    }
                     self.setState({
                         directoryContent: result,
                         waiting: false
@@ -394,21 +400,19 @@ define([
         },
 
         _iterateFileInfo: function(path, startIndex, endIndex, returnArray, callback) {
-            var self = this,
-                opt = {};
+            var self = this;
+
             if(startIndex <= endIndex) {
-                DeviceMaster.fileInfo(path, currentLevelFiles[startIndex], opt).then(function(r) {
-                    returnArray.push(r);
-                    return self._iterateFileInfo(path, startIndex + 1, endIndex, returnArray, callback);
+                DeviceMaster.fileInfo(path, currentLevelFiles[startIndex], opts).then(function(r) {
+                    if(!r.error) {
+                        returnArray.push(r);
+                        return self._iterateFileInfo(path, startIndex + 1, endIndex, returnArray, callback);
+                    }
                 });
             }
             else {
                 callback(returnArray);
             }
-
-            opt.onError = function(error) {
-                console.log('error happened', error);
-            };
         },
 
         _renderDirectoryContent: function(content) {

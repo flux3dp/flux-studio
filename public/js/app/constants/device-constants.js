@@ -27,6 +27,7 @@ define([], function(){
         FAN_FAILURE     : 'FAN_FAILURE',
         TIMEOUT         : 'TIMEOUT',
         FILAMENT_RUNOUT : 'FILAMENT_RUNOUT',
+        UNKNOWN_ERROR   : 'UNKNOWN_ERROR',
 
         // Command
         RESUME          : 'RESUME',
