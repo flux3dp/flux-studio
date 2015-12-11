@@ -210,6 +210,20 @@ define([
                 return $deferred;
             },
 
+            calibrate: function(send) {
+                var $deferred = $.Deferred();
+
+                if (true === send) {
+                    ws.send('calibrate');
+                }
+
+                events.onMessage = function(data) {
+                    $deferred.resolve(data);
+                };
+
+                return $deferred.promise();
+            },
+
             retry: function(callback) {
                 events.onMessage = function(data) {
                     initialEvents();
