@@ -117,6 +117,12 @@ define([
             AlertDispatcher.dispatch({
                 actionType: AlertConstants.NOTIFY_ANSWER, id, isYes
             });
+        },
+
+        closePopup: function() {
+            AlertDispatcher.dispatch({
+                actionType: AlertConstants.CLOSE_POPUP
+            });
         }
 
     };

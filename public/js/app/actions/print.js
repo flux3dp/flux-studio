@@ -48,7 +48,8 @@ define([
     var movingOffsetX, movingOffsetY, panningOffset, originalCameraPosition, originalCameraRotation,
         scaleBeforeTransformX, scaleBeforeTransformY, scaleBeforeTransformZ;
 
-    var responseBlob, printPath,
+    var _id = 'PRINT.JS',
+        responseBlob, printPath,
         previewScene,
         previewColors = [],
         blobExpired = true,
@@ -60,7 +61,7 @@ define([
         defaultFileName = '',
         cameraLight,
         outOfBoundCount = 0,
-        _id = 'PRINT.JS';
+        lang = {};
 
     var s = {
         diameter: 170,
@@ -182,15 +183,6 @@ define([
 
         panningOffset = new THREE.Vector3();
 
-        // var _g = new THREE.BoxGeometry(20, 20, 20);
-        // var _m = new THREE.MeshBasicMaterial({
-        //     color: 0xAAAAAA,
-        //     wireframe: false
-        // });
-        // var _cube = new THREE.Mesh(_g, _m);
-        // var axes = new THREE.AxisHelper( 100 ); // this will be on top
-        // outlineScene.add(_cube);
-
         render();
         setImportWindowPosition();
 
@@ -247,6 +239,7 @@ define([
             openWaitWindow: true,
             openImportWindow: false
         });
+        lang = reactSrc.state.lang;
 
         loader.load(model_file_path, function(geometry) {
 
@@ -629,7 +622,7 @@ define([
             ids.push(obj.uuid);
         });
 
-        ProgressActions.open(ProgressConstants.STEPPING, 'Caption', 'Saving File Preview');
+        ProgressActions.open(ProgressConstants.STEPPING, lang.monitor.processing, lang.monitor.savingPreview);
 
         getBlobFromScene().then(function(blob) {
             reactSrc.setState({ previewUrl: URL.createObjectURL(blob) });
@@ -687,10 +680,6 @@ define([
             ids.push(obj.uuid);
         });
 
-        ProgressActions.open('', '', '', function() {
-            console.log('??');
-        });
-
         ProgressActions.open(ProgressConstants.STEPPING, 'Caption', 'Saving File Preview');
 
         getBlobFromScene().then(function(blob) {
@@ -708,10 +697,15 @@ define([
                         }
                         else {
                             if (result.status !== 'error') {
-                                var serverMessage = `${result.status}: ${result.message} (${parseInt(result.percentage * 100)}%)`,
-                                    drawingMessage = `FInishing up... (100%)`,
-                                    message = result.status !== 'complete' ? serverMessage : drawingMessage;
-                                ProgressActions.updating(message, parseInt(result.percentage * 100));
+                                var progress = `${result.status}: ${result.message} (${parseInt(result.percentage * 100)}%)`,
+                                    complete = `FInishing up...`;
+
+                                if(result.status !== 'complete') {
+                                    ProgressActions.updating(progress, parseInt(result.percentage * 100));
+                                }
+                                else {
+                                    ProgressActions.updating(complete, 100);
+                                }
                             }
                             else {
                                 ProgressActions.close();

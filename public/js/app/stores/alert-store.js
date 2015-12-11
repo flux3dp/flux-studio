@@ -12,6 +12,7 @@ define([
 
     var NOTIFY_EVENT          = 'notify',
         POPUP_EVENT           = 'popup',
+        CLOSE_POPUP           = 'closePopup',
         FIRMWARE_UPDATE_EVENT = 'firmware_update',
         NOTIFY_RETRY          = 'retry',
         NOTIFY_ABORT          = 'abort',
@@ -57,6 +58,10 @@ define([
 
         onAnswer(callback) {
             this.on(NOTIFY_ANSWER, callback);
+        },
+
+        onClosePopup(callback) {
+            this.on(CLOSE_POPUP, callback);
         },
 
         removeNotifyListener(callback) {
@@ -149,6 +154,10 @@ define([
 
                 'SHOW_POPUP_FIRMWARE_UPDATE': function() {
                     AlertStore.emit(FIRMWARE_UPDATE_EVENT, payload);
+                },
+
+                'CLOSE_POPUP': function() {
+                    AlertStore.emit(CLOSE_POPUP);
                 }
 
             };

@@ -702,11 +702,16 @@ define(function() {
             stop: 'STOP',
             record: 'RECORD',
             connecting: 'Connecting, please wait...',
-            headerOffline: 'Device head is not connected or missing',
-            headerTilt: 'Device head is tilted, please connect all 6 magnents',
-            unknownHead: 'Device head is unknown, please connect to a correct header',
-            fanFailure: 'Fan failed / stucked, you can spin it with a pancil',
-            shake: 'Head encountered unexpected shake'
+            HEAD_OFFLINE: 'Device head is not connected or missing',
+            TILT: 'Device head is tilted, please connect all 6 magnents',
+            WRONG_HEAD: 'Device head is unknown, please connect to a correct header',
+            FAN_FAILURE: 'Fan failed / stucked, you can spin it with a pancil',
+            SHAKE: 'Head encountered unexpected shake',
+            USER_OPERATION: 'machine operated by (other) user',
+            FILAMENT_RUNOUT: 'filament run out, please refill filament',
+            RESOURCE_BUSY: 'Machine is busy',
+            processing: 'Processing',
+            savingPreview: 'Saving preview image'
         },
         alert: {
             caption: 'Error',
@@ -742,8 +747,7 @@ define(function() {
             machineNotConnected: 'Machine is not connected',
             notPrinting: 'Printing is not in progress',
             nothingToPrint: 'Nothing to print (source blob missing)',
-            connectionTimeout: 'device is not responding, connection timeout',
-            filamentRunout: 'filament run out, please refill filament'
+            connectionTimeout: 'device is not responding, connection timeout'
         },
         machine_status: {
             1: 'Unknown Head',

@@ -702,11 +702,16 @@ define(function() {
             stop: 'STOP',
             record: 'RECORD',
             connecting: 'Connecting, please wait...',
-            headerOffline: '沒有偵測到列印工具頭',
-            headerTilt: '請確認磁鐵關節正確的附著',
-            unknownHead: '請更換成列印工具頭',
-            fanFailure: 'Fan failed / stucked, 請用細針戳一下',
-            shake: 'Head encountered unexpected shake'
+            HEAD_OFFLINE: '沒有偵測到列印工具頭',
+            TILT: '請確認磁鐵關節正確的附著',
+            WRONG_HEAD: '請更換成列印工具頭',
+            FAN_FAILURE: 'Fan failed / stucked, 請用細針戳一下',
+            SHAKE: 'Head encountered unexpected shake',
+            USER_OPERATION: 'machine operated by (other) user',
+            FILAMENT_RUNOUT: 'filament run out, please refill filament',
+            RESOURCE_BUSY: 'Machine is busy',
+            processing: 'Processing',
+            savingPreview: 'Saving preview image'
         },
         alert: {
             caption: '錯誤',
@@ -742,8 +747,7 @@ define(function() {
             machineNotConnected: 'Machine is not connected',
             notPrinting: 'Printing is not in progress',
             nothingToPrint: 'Nothing to print (source blob missing)',
-            connectionTimeout: 'device is not responding, connection timeout',
-            filamentRunout: 'filament run out, please refill filament'
+            connectionTimeout: 'device is not responding, connection timeout'
         },
         machine_status: {
             1: 'Unknown Head',

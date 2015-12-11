@@ -12,22 +12,24 @@ define([
     'use strict';
 
     var _id = 'MONITOR',
-        controller,
-        scanController,
         pathArray,
         start,
         scrollSize = 10,
         currentLevelFiles = [],
         filesInfo = [],
         history = [],
-        cameraSource,
-        remote,
         reporter,
         status,
         usbExist = false,
+        showingPopup = false,
+        messageViewed = false,
         operationStatus,
         lastAction,
+        mainError = '',
+        subError = '',
         lastError = '',
+        errorMessage = '',
+        lastMessage = '',
         previewUrl = '',
         lang,
         refreshTime = 5000;
@@ -42,7 +44,7 @@ define([
 
     operationStatus = [
         DeviceConstants.RUNNING,
-        DeviceConstants.PAUSING,
+        // DeviceConstants.PAUSING,
         DeviceConstants.PAUSED,
         DeviceConstants.RESUMING,
         DeviceConstants.ABORTED,
@@ -102,6 +104,7 @@ define([
             DeviceMaster.stopCamera();
             clearInterval(reporter);
             history = [];
+            messageViewed = false;
         },
 
         _closeConnection: function(c) {
@@ -125,6 +128,8 @@ define([
         },
 
         _handleCancel: function(id) {
+            messageViewed = true;
+            showingPopup = false;
         },
 
         _handleBrowseFile: function() {
@@ -220,7 +225,7 @@ define([
             });
         },
 
-        _handleTurnOnCamera: function(e) {
+        _handleTurnOnCamera: function() {
             DeviceMaster.startCamera(this._processImage);
             this._stopReport();
             this.setState({
@@ -276,54 +281,70 @@ define([
         },
 
         _processReport: function(report) {
-            status = report.st_label;
+            errorMessage    = '';
+            mainError       = '';
+            subError        = '';
+            status          = report.st_label;
 
-            if(report.error && this._isError(status)) {
-                if(lastError !== report.error) {
-                    lastError = report.error;
-
-                    if(lastError === DeviceConstants.AUTH_ERROR) {
-                        clearInterval(reporter);
-                        DeviceMaster.setPassword('flux');
-                    }
-                    AlertActions.showError(lastError);
+            if(report.error) {
+                if(typeof(report.error) === 'string') {
+                    mainError = report.error;
                 }
-                if(report.error === DeviceConstants.UNKNOWN_ERROR) {
-                    DeviceMaster.quit();
+                else {
+                    mainError = report.error[0];
+                    subError = report.error[1] || '';
                 }
             }
 
-            if(status === DeviceConstants.ABORTED || status === DeviceConstants.COMPLETED) {
+            console.log('status: ' + status, 'main: ' + mainError, 'sub: ' + subError);
+
+            // check for error
+            if(report.error && this._isError(status)) {
+                if(lastError !== mainError) {
+                    AlertActions.showPopupError(_id, mainError + '\n' + subError);
+                    lastError = mainError
+                    showingPopup = true;
+                    messageViewed = false;
+                }
+            }
+            else if(status === DeviceConstants.PAUSED || status === DeviceConstants.PAUSING) {
+                if (mainError === DeviceConstants.HEAD_ERROR) {
+                    errorMessage = lang[subError];
+                }
+                else {
+                    errorMessage = lang[mainError];
+                }
+
+                if(lastMessage !== errorMessage) {
+                    messageViewed = false;
+                    lastMessage = errorMessage;
+                }
+
+                if(!messageViewed) {
+                    AlertActions.showPopupRetry(_id, errorMessage);
+                    showingPopup = true;
+                }
+            }
+
+            // actions responded to status
+            if(lastError === DeviceConstants.AUTH_ERROR) {
+                clearInterval(reporter);
+            }
+            else if (lastError === DeviceConstants.UNKNOWN_ERROR) {
+                DeviceMaster.quit();
+            }
+            else if(status === DeviceConstants.ABORTED || status === DeviceConstants.COMPLETED) {
                 DeviceMaster.quit();
                 status = DeviceConstants.READY;
             }
             else if(status === DeviceConstants.IDLE) {
                 status = DeviceConstants.READY;
             }
-            else if(status === DeviceConstants.PAUSED) {
-                if(report.error[0] === DeviceConstants.HEADER_OFFLINE) {
-                    AlertActions.showPopupRetry(_id, lang.headerOffline);
-                }
-                else if (report.error[0] === DeviceConstants.HEADER_ERROR) {
-                    if(report.error[1] === DeviceConstants.TILT) {
-                        AlertActions.showPopupRetry(_id, lang.headerTilt);
-                    }
-                    else if (report.error[1] === DeviceConstants.FAN_FAILURE) {
-                        AlertActions.showPopupRetry(_id, lang.fanFailure);
-                    }
-                    else if (report.error[1] === DeviceConstants.SHAKE) {
-                        AlertActions.showPopupRetry(_id, lang.shake);
-                    }
-                }
-                else if (report.error[0] === DeviceConstants.WRONG_HEADER) {
-                    AlertActions.showPopupRetry(_id, lang.unknownHead);
-                }
-                else if (report.error[0] === DeviceConstants.FILAMENT_RUNOUT) {
-                    AlertActions.showPopupRetry(_id, lang.filamentRunout);
-                }
-            }
-            else {
-                status = report.st_label;
+
+            console.log('showing popup ', showingPopup, 'message viewed:' + messageViewed + '\n');
+            if(showingPopup && status === DeviceConstants.RUNNING && !messageViewed) {
+                showingPopup = false;
+                AlertActions.closePopup();
             }
 
             this.setState({
