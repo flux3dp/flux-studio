@@ -90,16 +90,13 @@ define([
 
             pathArray   = [];
             lang        = this.props.lang.monitor;
-            // previewUrl  = this.props.previewUrl;
 
             if(!this.props.fCode) {
                 DeviceMaster.getPreviewUrl().then(function(previewUrl) {
-                    // console.log(previewUrl);
                     this.setState({ previewUrl: previewUrl });
+                    this._startReport();
                 }.bind(this));
             }
-
-            // this._startReport();
         },
 
         componentDidMount: function() {

@@ -197,6 +197,9 @@ define([
             if(result instanceof Blob) {
                 d.resolve(window.URL.createObjectURL(result));
             }
+            else {
+                d.resolve('');
+            }
         });
         return d.promise();
     }

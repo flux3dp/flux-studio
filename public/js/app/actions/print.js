@@ -52,6 +52,7 @@ define([
         responseBlob, printPath,
         previewScene,
         previewColors = [],
+        previewUrl = '',
         blobExpired = true,
         transformMode = false,
         shiftPressed = false,
@@ -663,8 +664,7 @@ define([
 
     function getFCode() {
         var d = $.Deferred();
-        var ids = [],
-            previewUrl;
+        var ids = [];
 
         if(objects.length === 0) {
             d.resolve('');
@@ -672,7 +672,7 @@ define([
         }
 
         if(!blobExpired) {
-            d.resolve(responseBlob);
+            d.resolve(responseBlob, previewUrl);
             return d.promise();
         }
 

@@ -356,12 +356,10 @@ define([
                     if(result instanceof Blob) {
                         d.resolve(result);
                     }
-                    // console.log(result);
                 };
 
                 events.onError = function(result) {
-                    // d.resolve(result);
-                    console.log(result);
+                    d.resolve('');
                 }
 
                 ws.send('play info');

@@ -119,6 +119,8 @@ define([
                         }
                     });
 
+                    this._handleApplyAdvancedSetting();
+
                     $importBtn = this.refs.importBtn.getDOMNode();
 
                     nwjsMenu.import.enabled = true;
@@ -155,7 +157,6 @@ define([
                         openPrinterSelectorWindow: true
                     });
                     director.clearSelection();
-                    this._handleApplyAdvancedSetting();
                 },
 
                 _handleRotationChange: function(src) {
