@@ -56,7 +56,7 @@ define([
             lang                : React.PropTypes.object,
             selectedDevice      : React.PropTypes.object,
             fCode               : React.PropTypes.object,
-            previewUrl          : React.PropTypes.string,
+            // previewUrl          : React.PropTypes.string,
             onClose             : React.PropTypes.func
         },
 
@@ -72,7 +72,8 @@ define([
                 directoryContent    : {},
                 cameraImageUrl      : '',
                 selectedFileName    : '',
-                currentStatus       : DeviceConstants.READY
+                currentStatus       : DeviceConstants.READY,
+                previewUrl          : this.props.previewUrl
             };
         },
 
@@ -89,9 +90,16 @@ define([
 
             pathArray   = [];
             lang        = this.props.lang.monitor;
-            previewUrl  = this.props.previewUrl;
+            // previewUrl  = this.props.previewUrl;
 
-            this._startReport();
+            if(!this.props.fCode) {
+                DeviceMaster.getPreviewUrl().then(function(previewUrl) {
+                    // console.log(previewUrl);
+                    this.setState({ previewUrl: previewUrl });
+                }.bind(this));
+            }
+
+            // this._startReport();
         },
 
         componentDidMount: function() {
@@ -296,7 +304,7 @@ define([
                 }
             }
 
-            console.log('status: ' + status, 'main: ' + mainError, 'sub: ' + subError);
+            // console.log('status: ' + status, 'main: ' + mainError, 'sub: ' + subError);
 
             // check for error
             if(report.error && this._isError(status)) {
@@ -341,7 +349,7 @@ define([
                 status = DeviceConstants.READY;
             }
 
-            console.log('showing popup ', showingPopup, 'message viewed:' + messageViewed + '\n');
+            // console.log('showing popup ', showingPopup, 'message viewed:' + messageViewed + '\n');
             if(showingPopup && status === DeviceConstants.RUNNING && !messageViewed) {
                 showingPopup = false;
                 AlertActions.closePopup();
@@ -500,7 +508,7 @@ define([
                 case mode.PREVIEW:
                     var divStyle = {
                             backgroundColor: '#E0E0E0',
-                            backgroundImage: !previewUrl ? '' : 'url(' + previewUrl + ')',
+                            backgroundImage: !this.state.previewUrl ? '' : 'url(' + this.state.previewUrl + ')',
                             backgroundSize: 'cover',
                             backgroundPosition: '50% 50%',
                             width: '100%',

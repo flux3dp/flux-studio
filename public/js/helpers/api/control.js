@@ -347,6 +347,27 @@ define([
                 lastOrder = 'quit';
 
                 return d.promise();
+            },
+            getPreview: function() {
+                var d = $.Deferred(),
+                    blob;
+
+                events.onMessage = function(result) {
+                    if(result instanceof Blob) {
+                        d.resolve(result);
+                    }
+                    // console.log(result);
+                };
+
+                events.onError = function(result) {
+                    // d.resolve(result);
+                    console.log(result);
+                }
+
+                ws.send('play info');
+                lastOrder = 'play info';
+
+                return d.promise();
             }
         };
     };
