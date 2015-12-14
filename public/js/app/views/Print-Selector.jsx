@@ -136,11 +136,6 @@ define([
                 options = self.state.printOptions,
                 content = (
                     <div className="device-wrapper">
-                        <div className="device">
-                            <div className="col device-name">{lang.device_selection.device_name}</div>
-                            <div className="col module">{lang.device_selection.module}</div>
-                            <div className="col status">{lang.device_selection.status}</div>
-                        </div>
                         <ListView className="printer-list" items={options} ondblclick={self._selectPrinter}/>
                     </div>
                 );
@@ -187,7 +182,8 @@ define([
         _renderPrinterItem: function(printer) {
             var meta,
                 lang = this.props.lang,
-                status = lang.machine_status;
+                status = lang.machine_status,
+                headModule = lang.head_module;
 
             try {
                 meta = JSON.stringify(printer);
@@ -200,8 +196,8 @@ define([
                 <label className="device printer-item" data-meta={meta}>
                     <input type="radio" name="printer-group" value={printer.uuid}/>
                     <div className="col device-name">{printer.name}</div>
-                    <div className="col module">{printer.head_module || 'UNKNOWN'}</div>
-                    <div className="col status">{status[printer.st_id] || status.unknown}</div>
+                    <div className="col module">{headModule[printer.head_module] || headModule.UNKNOWN}</div>
+                    <div className="col status">{status[printer.st_id] || status.UNKNOWN}</div>
                 </label>
             );
         },
