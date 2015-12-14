@@ -1,39 +1,59 @@
 define([
     'jquery',
     'helpers/i18n',
+    'helpers/sprintf',
     'app/actions/alert-actions',
+    'app/actions/progress-actions',
+    'app/constants/progress-constants',
+    'app/actions/input-lightbox-actions',
     'app/constants/device-constants',
     'helpers/api/control',
     'helpers/api/3d-scan-control',
     'helpers/api/touch',
     'helpers/api/discover',
     'helpers/object-assign'
-],function(
+], function(
     $,
     i18n,
+    sprintf,
     AlertActions,
+    ProgressActions,
+    ProgressConstants,
+    InputLightboxActions,
     DeviceConstants,
     DeviceController,
     ScanController,
     Touch,
     Discover
-){
-    var _instance = null,
+) {
+    'use strict';
+
+    var _lang = i18n.get(),
+        _instance = null,
         _password = '',
-        _lang,
         _status = DeviceConstants.READY,
         _device,
         _devices = [],
-        _errors = {},
-        _status;
+        _errors = {};
 
-    function setLanguageSource(lang) {
-        _lang = lang;
-    }
-
-    function selectDevice(device) {
-        var d = $.Deferred()
-            uuid = device.uuid;
+    function selectDevice(device, deferred) {
+        var d = deferred || $.Deferred(),
+            uuid = device.uuid,
+            goAuth = function(uuid) {
+                InputLightboxActions.open('auth', {
+                    caption      : sprintf(_lang.input_machine_password.require_password, _device.name),
+                    inputHeader  : _lang.input_machine_password.password,
+                    confirmText  : _lang.input_machine_password.connect,
+                    onSubmit     : function(password) {
+                        auth(uuid, password).done(function(data) {
+                            selectDevice(device, d);
+                        }).
+                        fail(function(data) {
+                            goAuth(uuid);
+                        });
+                    }
+                });
+            };
 
         if(_existConnection(uuid)) {
             _device = _switchDevice(uuid);
@@ -51,12 +71,48 @@ define([
                     }
                 },
                 onError: function(response) {
-                    if(response.error === DeviceConstants.TIMEOUT) {
+                    // TODO: shouldn't do replace
+                    response.error = response.error.replace(/^.*\:\s+(\w+)$/g, '$1');
+
+                    switch (response.error) {
+                    case DeviceConstants.TIMEOUT:
                         d.resolve(DeviceConstants.TIMEOUT);
+                        break;
+                    case DeviceConstants.AUTH_ERROR:
+                    case DeviceConstants.AUTH_FAILED:
+                        goAuth(_device.uuid);
+                        break;
                     }
                 }
             });
         }
+
+        return d.promise();
+    }
+
+    function auth(uuid, password) {
+        ProgressActions.open(ProgressConstants.NONSTOP);
+
+        var d = $.Deferred(),
+            closeProgress = function() {
+                ProgressActions.close();
+            },
+            opts = {
+                onError: function(data) {
+                    d.reject(data);
+                    closeProgress();
+                },
+                onSuccess: function(data) {
+                    d.resolve(data);
+                    closeProgress();
+                },
+                onFail: function(data) {
+                    d.reject(data);
+                    closeProgress();
+                }
+            };
+
+        Touch(opts).send(uuid, password);
 
         return d.promise();
     }
@@ -299,7 +355,6 @@ define([
 
     DeviceSingleton.prototype = {
         init: function() {
-            this.setLanguageSource  = setLanguageSource;
             this.selectDevice       = selectDevice;
             this.uploadFile         = uploadFile;
             this.go                 = go;
