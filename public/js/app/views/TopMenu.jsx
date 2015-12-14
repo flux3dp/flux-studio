@@ -178,12 +178,14 @@ define([
             },
 
             _showChangeFilament: function(payload) {
-                this.setState({
-                    changeFilament: {
-                        open: true,
-                        device: payload.device
-                    }
-                });
+                if (false === this.state.changeFilament.open) {
+                    this.setState({
+                        changeFilament: {
+                            open: true,
+                            device: payload.device
+                        }
+                    });
+                }
             },
 
             _hideChangeFilament: function() {
@@ -200,7 +202,7 @@ define([
                         open: true,
                         device: payload.device,
                         latestVersion: payload.updateInfo.latest_version,
-                        releaseNote: payload.updateInfo.changelog,
+                        releaseNote: payload.updateInfo.changelog
                     }
                 });
             },
@@ -208,7 +210,8 @@ define([
             _handleFirmwareClose: function() {
                 this.setState({
                     firmware: {
-                        open: false
+                        open: false,
+                        device: this.state.firmware.device
                     }
                 });
             },
