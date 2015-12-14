@@ -33,6 +33,15 @@ define([
         },
         lang = i18n.get().topmenu,
         menuMap = [],
+        parentIndex = {
+            ABOUT  : 0,
+            FILE   : 1,
+            EDIT   : 2,
+            VIEW   : 3,
+            DEVICE : 4,
+            WINDOW : 5,
+            HELP   : 6
+        },
         newDevice = {
             label: lang.device.new,
             enabled: true,
@@ -48,91 +57,104 @@ define([
                 enabled: true,
                 onClick: emptyFunction,
                 key: 'i',
-                modifiers: 'cmd'
+                modifiers: 'cmd',
+                parent: parentIndex.FILE
             },
             recent: {
                 label: lang.file.recent,
                 enabled: true,
-                onClick: emptyFunction
+                onClick: emptyFunction,
+                parent: parentIndex.FILE
             },
             execute: {
                 label: lang.file.execute,
                 enabled: false,
-                onClick: emptyFunction
+                onClick: emptyFunction,
+                parent: parentIndex.FILE
             },
             saveGCode: {
                 label: lang.file.save_gcode,
                 enabled: false,
                 onClick: emptyFunction,
                 key: 's',
-                modifiers: 'cmd'
+                modifiers: 'cmd',
+                parent: parentIndex.FILE
             },
             copy: {
                 label: lang.edit.copy,
                 enabled: false,
                 onClick: emptyFunction,
                 key: 'c',
-                modifiers: 'cmd'
+                modifiers: 'cmd',
+                parent: parentIndex.EDIT
             },
             cut: {
                 label: lang.edit.cut,
                 enabled: false,
                 onClick: emptyFunction,
                 key: 'x',
-                modifiers: 'cmd'
+                modifiers: 'cmd',
+                parent: parentIndex.EDIT
             },
             paste: {
                 label: lang.edit.paste,
                 enabled: false,
                 onClick: emptyFunction,
                 key: 'v',
-                modifiers: 'cmd'
+                modifiers: 'cmd',
+                parent: parentIndex.EDIT
             },
             duplicate: {
                 label: lang.edit.duplicate,
                 enabled: false,
                 onClick: emptyFunction,
                 key: 'd',
-                modifiers: 'cmd'
+                modifiers: 'cmd',
+                parent: parentIndex.EDIT
             },
             scale: {
                 label: lang.edit.scale,
                 enabled: false,
                 onClick: emptyFunction,
                 key: 's',
-                modifiers: 'cmd+alt'
+                modifiers: 'cmd+alt',
+                parent: parentIndex.EDIT
             },
             rotate: {
                 label: lang.edit.rotate,
                 enabled: false,
                 onClick: emptyFunction,
                 key: 'r',
-                modifiers: 'cmd+alt'
+                modifiers: 'cmd+alt',
+                parent: parentIndex.EDIT
             },
             clear: {
                 label: lang.edit.clear,
                 enabled: false,
                 onClick: emptyFunction,
                 key: 'x',
-                modifiers: 'cmd+shift'
+                modifiers: 'cmd+shift',
+                parent: parentIndex.EDIT
             },
             viewStandard: {
                 label: lang.view.standard,
                 enabled: true,
                 onClick: emptyFunction,
                 type: 'checkbox',
-                checked: true
+                checked: true,
+                parent: parentIndex.VIEW
             },
             viewPreview: {
                 label: lang.view.preview,
                 enabled: false,
-                onClick: emptyFunction
+                onClick: emptyFunction,
+                parent: parentIndex.VIEW
             },
-            newDevice: newDevice,
             device: {
                 label: lang.device.label,
                 enabled: true,
-                subItems: [newDevice, separator]
+                subItems: [newDevice, separator],
+                parent: parentIndex.DEVICE
             }
         };
 
@@ -237,61 +259,62 @@ define([
                         newDevice,
                         separator
                     ],
+                    renew = false,
                     deviceRefreshTimer;
 
                 discover(
                     'menu-map',
                     function(printers) {
-                        deviceGroup = [
-                            newDevice,
-                            separator
-                        ];
-
                         printers.forEach(function(printer) {
-                            deviceGroup.push({
-                                label: printer.name,
-                                enabled: true,
-                                subItems: [{
-                                    label: lang.device.device_monitor,
+                            renew = deviceGroup.some(function(_printer) { return _printer.uuid === printer.uuid; });
+
+                            if (false === renew) {
+                                deviceGroup.push({
+                                    uuid: printer.uuid,
+                                    label: printer.name,
                                     enabled: true,
-                                    onClick: function() {
-                                        DeviceMaster.selectDevice(printer).then(function(status) {
-                                            if(status === DeviceConstants.CONNECTED) {
-                                                GlobalActions.showMonitor(printer);
-                                            }
-                                            else if (status === DeviceConstants.TIMEOUT) {
-                                                AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
-                                            }
-                                        });
-                                    }
-                                },
-                                {
-                                    label: lang.device.change_filament,
-                                    enabled: true,
-                                    onClick: function() {
-                                        AlertActions.showChangeFilament(printer);
-                                    }
-                                },
-                                {
-                                    label: lang.device.check_firmware_update,
-                                    enabled: true,
-                                    onClick: function() {
-                                        checkFirmware(printer).done(function(response) {
-                                            if (true === response.needUpdate) {
-                                                AlertActions.showFirmwareUpdate(printer, response);
-                                            }
-                                        });
-                                    }
-                                }]
-                            });
+                                    subItems: [{
+                                        label: lang.device.device_monitor,
+                                        enabled: true,
+                                        onClick: function() {
+                                            DeviceMaster.selectDevice(printer).then(function(status) {
+                                                if(status === DeviceConstants.CONNECTED) {
+                                                    GlobalActions.showMonitor(printer);
+                                                }
+                                                else if (status === DeviceConstants.TIMEOUT) {
+                                                    AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
+                                                }
+                                            });
+                                        }
+                                    },
+                                    {
+                                        label: lang.device.change_filament,
+                                        enabled: true,
+                                        onClick: function() {
+                                            AlertActions.showChangeFilament(printer);
+                                        }
+                                    },
+                                    {
+                                        label: lang.device.check_firmware_update,
+                                        enabled: true,
+                                        onClick: function() {
+                                            checkFirmware(printer).done(function(response) {
+                                                if (true === response.needUpdate) {
+                                                    AlertActions.showFirmwareUpdate(printer, response);
+                                                }
+                                            });
+                                        }
+                                    }]
+                                });
+                            }
                         });
 
-                        if ('undefined' === typeof deviceRefreshTimer) {
+                        if ('undefined' === typeof deviceRefreshTimer && true === renew) {
                             clearTimeout(deviceRefreshTimer);
                             setTimeout(function() {
                                 items.device.subItems = deviceGroup;
                                 clearTimeout(deviceRefreshTimer);
-                            }, 10000);
+                            }, 5000);
                         }
                     }
                 );
