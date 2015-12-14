@@ -46,7 +46,13 @@ define(['helpers/is-json'], function(isJson) {
                 _ws.onmessage = function(result) {
                     var data = (true === isJson(result.data) ? JSON.parse(result.data) : result.data);
 
-                    received_data.push(result.data);
+                    if ('string' === typeof data) {
+                        data = result.data.replace(/NaN(,)/g, 'null$1');
+                    }
+
+                    data = (true === isJson(data) ? JSON.parse(data) : data);
+
+                    received_data.push(data);
 
                     if ('error' === data.status) {
                         options.onError(data);
