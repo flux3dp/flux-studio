@@ -3166,10 +3166,18 @@ input[type=range]:focus::-webkit-slider-runnable-track {
     width: 20rem; }
 
 .modal-input-lightbox .modal-alert {
-    display: block;
     min-height: 18rem;
     text-align: left;
+    padding: 1.6rem 0 0 0;
     width: 32.2rem; }
+    .modal-input-lightbox .modal-alert .caption {
+        color: #626262;
+        font-size: 15px;
+        line-height: 18px; }
+    .modal-input-lightbox .modal-alert .caption,
+    .modal-input-lightbox .modal-alert .message {
+        padding: 0 1.6rem;
+        margin: 0 0 20px 0; }
 
 .modal-input-lightbox .control {
     display: -webkit-box;
@@ -3181,7 +3189,11 @@ input[type=range]:focus::-webkit-slider-runnable-track {
     justify-content: space-between;
     align-items: center; }
     .modal-input-lightbox .control .inputHeader {
-        color: #ccc; }
+        color: #ccc;
+        flex: 1; }
+    .modal-input-lightbox .control input {
+        flex: 2;
+        padding: 3px; }
 
 .modal-input-lightbox .btn-h-group {
     border: none;
@@ -3333,10 +3345,11 @@ input[type=range]:focus::-webkit-slider-runnable-track {
     .select-printer .printer-list {
         list-style: none;
         margin: 0 auto;
-        max-height: calc(100% - 2.8rem);
+        max-height: 100%;
         overflow-x: hidden;
         overflow-y: scroll;
-        padding: 0; }
+        padding: 0;
+        will-change: transform; }
         .select-printer .printer-list .printer-item {
             cursor: pointer; }
             .select-printer .printer-list .printer-item [name="printer-group"] {
