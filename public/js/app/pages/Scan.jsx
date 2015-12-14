@@ -196,6 +196,20 @@ define([
                     });
                 },
 
+                _newMesh: function(args) {
+                    args = args || {};
+                    return {
+                        model: args.model || undefined,
+                        transformMethods: {
+                            hide: function() {}
+                        },
+                        name: '',
+                        index: args.index,
+                        choose: false,
+                        display: true
+                    };
+                },
+
                 _onRendering: function(views, chunk_length, mesh) {
                     var self = this,
                         scan_speed = self._getScanSpeed(),
@@ -220,17 +234,17 @@ define([
                     if ('undefined' === typeof mesh) {
                         model = scanedModel.appendModel(views);
 
-                        meshes.push({
+                        meshes.push(self._newMesh({
                             model: model,
-                            transformMethods: {
-                                hide: function() {}
-                            },
-                            name: '',
-                            index: self.state.scanTimes,
-                            choose: false,
-                            display: true
-                        });
+                            index: self.state.scanTimes
+                        }));
 
+                        self.setState({
+                            meshes: meshes,
+                            progressPercentage: progressPercentage,
+                            progressRemainingTime: progressRemainingTime,
+                            progressElapsedTime: progressElapsedTime
+                        });
                     }
                     else {
                         mesh.model = scanedModel.updateMesh(mesh.model, views);
@@ -253,7 +267,8 @@ define([
                         meshes: meshes,
                         selectedMeshes: [],
                         hasConvert: false,
-                        stlBlob: undefined
+                        stlBlob: undefined,
+                        saveFileType: 'pcd'
                     });
                 },
 
@@ -320,7 +335,7 @@ define([
                         selectedMeshes: meshes
                     }, function() {
                         // merge each mesh
-                        this._doManualMerge(meshes, callback);
+                        this._doManualMerge(meshes, callback, false);
 
                         self.setState({
                             selectedMeshes: []
@@ -575,6 +590,7 @@ define([
                         },
                         doingApplyTransform = function() {
                             currentMesh = selectedMeshes[currentIndex];
+
                             matrixValue = scanedModel.matrix(currentMesh.model);
                             params = {
                                 pX: matrixValue.position.center.x,
@@ -610,7 +626,9 @@ define([
                     doingApplyTransform();
                 },
 
-                _doManualMerge: function(selectedMeshes, callback) {
+                _doManualMerge: function(selectedMeshes, callback, isNewMesh) {
+                    isNewMesh = ('boolean' === typeof isNewMesh ? isNewMesh : true);
+
                     var self = this,
                         meshes = this.state.meshes,
                         selectedMeshes = (true === selectedMeshes instanceof Array ? selectedMeshes : this.state.selectedMeshes),
@@ -628,41 +646,39 @@ define([
                             },
                             afterMerge = callback || function(outputName) {
                                 var mesh,
-                                    updatedMeshes = [];
+                                    updatedMeshes = [],
+                                    deferred = $.Deferred(),
+                                    onUpdate = function(response) {
+                                        mesh = self._getMesh(self.state.scanTimes);
+                                        mesh.name = outputName;
+                                    };
+
+                                deferred.done(onUpdate);
 
                                 self.state.scanModelingWebSocket.dump(
                                     outputName,
                                     {
-                                        onReceiving: self._onRendering,
+                                        onReceiving: function(typedArray, blobs_len) {
+                                            self._onRendering(typedArray, blobs_len);
+                                            deferred.resolve();
+                                        },
                                         onFinished: function(response) {
+                                            self.state.selectedMeshes.forEach(function(selectedMesh, i) {
+                                                scanedModel.remove(selectedMesh.model);
+                                            });
 
-                                            // TODO: BLACK MAGIC!!! i've no idea why the state.meshes doesn't update?
-                                            var timer = setInterval(function() {
-                                                if (self.state.scanTimes === self.state.meshes.length) {
-                                                    mesh = self._getMesh(self.state.scanTimes);
-                                                    mesh.name = outputName;
-
-                                                    self.state.selectedMeshes.forEach(function(selectedMesh, i) {
-                                                        scanedModel.remove(selectedMesh.model);
-                                                    });
-
-                                                    for (var i = self.state.meshes.length - 1; i >= 0; i--) {
-                                                        if (true === self.state.meshes[i].choose) {
-                                                            self.state.meshes.splice(i, 1);
-                                                        }
-                                                    }
-
-                                                    self.setState({
-                                                        meshes: self.state.meshes,
-                                                        selectedMeshes: []
-                                                    });
-
-                                                    self._openBlocker(false);
-
-                                                    clearInterval(timer);
+                                            for (var i = self.state.meshes.length - 1; i >= 0; i--) {
+                                                if (true === self.state.meshes[i].choose) {
+                                                    self.state.meshes.splice(i, 1);
                                                 }
-                                            }, 100);
+                                            }
 
+                                            self.setState({
+                                                meshes: self.state.meshes,
+                                                selectedMeshes: []
+                                            });
+
+                                            self._openBlocker(false);
                                         }
                                     }
                                 );
@@ -704,10 +720,10 @@ define([
                             baseMesh,
                             targetMesh;
 
-                        if (1 < self.state.scanTimes) {
+                        if (1 < self.state.scanTimes && 1 < meshes.length) {
                             self.setState({
                                 // take merge as scan
-                                scanTimes: self.state.scanTimes + 1
+                                scanTimes: (true === isNewMesh ? self.state.scanTimes + 1 : self.state.scanTimes)
                             }, function() {
                                 doingMerge();
                             });
