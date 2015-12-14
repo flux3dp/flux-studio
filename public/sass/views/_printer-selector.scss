@@ -29,6 +29,9 @@
         .col {
             height: 2.8rem;
             line-height: 2.8rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         .device-name {
