@@ -761,7 +761,18 @@ define(function() {
             64: 'Overheat',
             32: 'Head Tilted',
             128: 'Fan Stopped',
-            unknown: 'UNKNOWN'
+            36: 'Paused ( ST_STARTING_PAUSED )',
+            38: 'Pausing ( ST_STARTING_PAUSING )',
+            48: 'Paused  ( ST_RUNNING_PAUSED )',
+            50: 'Pausing  ( ST_RUNNING_PAUSING )',
+            6: 'Resuming ( ST_STARING_RESUMING )',
+            18: 'Resuming ( ST_RUNNING_RESUMING )',
+            66: 'Completing',
+            UNKNOWN: 'UNKNOWN'
+        },
+        head_module: {
+            EXTUDER: 'Print',
+            UNKNOWN: ''
         },
         change_filament: {
             home_caption: 'Change Filament',
@@ -781,6 +792,11 @@ define(function() {
             loaded: 'Filament Loaded',
             unloaded: 'Filament Unloaded',
             ok: 'OK'
+        },
+        input_machine_password: {
+            require_password: '"%s" requires a password',
+            connect: 'CONNECT',
+            password: 'Password'
         }
     };
 });
