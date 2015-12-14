@@ -3327,7 +3327,10 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         justify-content: 1; }
         .select-printer .device .col {
             height: 2.8rem;
-            line-height: 2.8rem; }
+            line-height: 2.8rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap; }
         .select-printer .device .device-name {
             padding: 0 0 0 1.7rem;
             flex: calc(12 / 28.7 * 100%); }
