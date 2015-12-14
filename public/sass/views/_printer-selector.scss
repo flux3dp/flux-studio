@@ -59,10 +59,11 @@
     .printer-list {
         list-style: none;
         margin: 0 auto;
-        max-height: calc(100% - 2.8rem);
+        max-height: 100%;
         overflow-x: hidden;
         overflow-y: scroll;
         padding: 0;
+        will-change: transform;
 
         .printer-item {
             cursor: pointer;
