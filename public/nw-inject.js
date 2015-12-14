@@ -1,4 +1,5 @@
 // avoid name conflict
+console.log(window.require);
 window.requireNode = window.require || function() {};
 
 var fs = requireNode('fs'),
@@ -8,7 +9,7 @@ var fs = requireNode('fs'),
     exec = requireNode('child_process').exec,
     cwd = process.cwd(),
     net = requireNode('net'),
-    currentPort = 8000,
+    currentPort = 10000,
     maxPort = 65535,
     gui = requireNode('nw.gui'),
     currentWindow = gui.Window.get(),
