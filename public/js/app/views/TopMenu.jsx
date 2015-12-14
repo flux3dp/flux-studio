@@ -162,7 +162,6 @@ define([
                     onClosed(this._handleProgressFinish);
                 InputLightboxStore.onInputLightBoxOpened(this._handleInputLightBoxOpen);
                 GlobalStore.onShowMonitor(this._handleOpenMonitor);
-                DeviceMaster.setLanguageSource(lang);
             },
 
             componentWillUnmount: function() {
@@ -390,7 +389,7 @@ define([
             _handleSelectDevice: function(device, e) {
                 e.preventDefault();
                 DeviceMaster.selectDevice(device).then(function(status) {
-                    if(status === DeviceConstants.CONNECTED) {
+                    if (status === DeviceConstants.CONNECTED) {
                         GlobalActions.showMonitor(device);
                     }
                     else if (status === DeviceConstants.TIMEOUT) {
