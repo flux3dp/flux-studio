@@ -1,5 +1,4 @@
 // avoid name conflict
-console.log(window.require);
 window.requireNode = window.require || function() {};
 
 var fs = requireNode('fs'),
