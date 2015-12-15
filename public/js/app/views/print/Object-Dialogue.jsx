@@ -154,10 +154,7 @@ define([
 
             return (
                 <div className={dialogueClass} style={this.props.style}>
-                    <svg className="arrow" version="1.1" xmlns="http://www.w3.org/2000/svg"
-                        width="36.8" height="20">
-                        <polygon points="0,10 36.8,0 36.8,20"/>
-                    </svg>
+                    <div className="arrow"/>
                     <div>
 
                     <label className="controls accordion">
@@ -196,9 +193,8 @@ define([
                                         getValue={this._handleResize} />
                             </div>
 
+                            <div className={lockClass} onClick={this._handleToggleScaleLock}/>
                         </label>
-
-                        <div className={lockClass} onClick={this._handleToggleScaleLock}></div>
                     </label>
 
                     <label className="controls accordion">
