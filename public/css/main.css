@@ -5569,8 +5569,8 @@ input.switch:checked ~ label:after {
 
 .laser-studio .laser-object .ft-widget {
     cursor: move;
-    position: fixed;
-    will-change: top,left,transform; }
+    max-width: inherit;
+    position: fixed; }
 
 .laser-studio .laser-object .ft-rotator,
 .laser-studio .laser-object .ft-rotator-line,
@@ -5614,6 +5614,7 @@ input.switch:checked ~ label:after {
     font-size: 20px;
     transition: all 0.1s ease;
     width: 230px;
+    will-change: top,left,transform;
     z-index: 1; }
     .laser-studio .object-position .accordion-body {
         overflow: visible;

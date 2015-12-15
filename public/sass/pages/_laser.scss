@@ -237,8 +237,8 @@
 
         .ft-widget {
             cursor: move;
+            max-width: inherit;
             position: fixed;
-            will-change: top,left,transform;
         }
 
         .ft-rotator,
@@ -292,6 +292,7 @@
         font-size: 20px;
         transition: all .1s ease;
         width: 230px;
+        will-change: top,left,transform;
         z-index: 1;
 
         .accordion-body {
