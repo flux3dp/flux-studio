@@ -11,7 +11,7 @@
     <div class="wrapper">
         <section class="top-menu"></section>
         <section class="content">
-            <div class="spinner-flip absolute-center"></div>
+            <div class="spinner-roller spinner-roller-reverse absolute-center"></div>
         </section>
         <div class="software-update"></update>
     </div>
@@ -34,6 +34,7 @@
         window.FLUX = {
             debug: -1 !== location.search.indexOf('debug'),
             timestamp: (new Date()).getTime(),
+            onLine: navigator.onLine,
             os: ('undefined' === typeof requireNode ? undefined : os),
             ghostPort: location.port || 8000
         };
@@ -65,7 +66,7 @@
         head.appendChild(cssLink);
         head.appendChild(cssLink);
 
-        if (true === navigator.onLine) {
+        if (true === window.FLUX.onLine) {
             analytics.setAttribute('src', 'https://www.google-analytics.com/analytics.js');
             analytics.setAttribute('async', true);
             body.appendChild(analytics);

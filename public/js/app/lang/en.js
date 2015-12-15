@@ -6,6 +6,9 @@ define(function() {
         app : {
             name : 'Flux Studio - en'
         },
+        support: {
+            no_webgl: '無法在本台電腦開啟 WebGL, 請使用其他可以支援的電腦'
+        },
         device_selection: {
             device_name: 'DEVICE NAME',
             module: 'MODULE',
@@ -597,6 +600,10 @@ define(function() {
             cancel: 'Cancel',
             delete_mesh: 'Delete?',
             quality: 'QUALITY',
+            scan_again_confirm: 'Do you want to discard current scan result?',
+            calibrate: 'Calibrate',
+            calibrate_fail: 'Calibrate Fail',
+            calibration_is_running: 'Calibration is running',
             resolution: [{
                 id: 'best',
                 text: 'Best',
@@ -758,7 +765,42 @@ define(function() {
             64: 'Overheat',
             32: 'Head Tilted',
             128: 'Fan Stopped',
-            unknown: 'UNKNOWN'
+            36: 'Paused ( ST_STARTING_PAUSED )',
+            38: 'Pausing ( ST_STARTING_PAUSING )',
+            48: 'Paused  ( ST_RUNNING_PAUSED )',
+            50: 'Pausing  ( ST_RUNNING_PAUSING )',
+            6: 'Resuming ( ST_STARING_RESUMING )',
+            18: 'Resuming ( ST_RUNNING_RESUMING )',
+            66: 'Completing',
+            UNKNOWN: 'UNKNOWN'
+        },
+        head_module: {
+            EXTUDER: 'Print',
+            UNKNOWN: ''
+        },
+        change_filament: {
+            home_caption: 'Change Filament',
+            load_filament_caption: 'LOAD FILAMENT',
+            unload_filament_caption: 'UNLOAD FILAMENT',
+            cancel: 'CANCEL',
+            load_filament: 'Load Filament',
+            unload_filament: 'Unload Filament',
+            next: 'NEXT',
+            heating_nozzle: 'Heating nozzle',
+            emerging: [
+                'Loading filament',
+                'Press STOP when you see material is emerging.'
+            ],
+            unloading: 'Unloading Filament',
+            stop: 'STOP',
+            loaded: 'Filament Loaded',
+            unloaded: 'Filament Unloaded',
+            ok: 'OK'
+        },
+        input_machine_password: {
+            require_password: '"%s" requires a password',
+            connect: 'CONNECT',
+            password: 'Password'
         }
     };
 });

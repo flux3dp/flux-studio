@@ -54,7 +54,6 @@ define([
 
                 buttons.push({
                     label: lang.alert.cancel,
-                    type: 'link',
                     onClick: this._onClose
                 });
 

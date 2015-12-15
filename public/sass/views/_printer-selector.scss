@@ -29,6 +29,9 @@
         .col {
             height: 2.8rem;
             line-height: 2.8rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         .device-name {
@@ -59,10 +62,11 @@
     .printer-list {
         list-style: none;
         margin: 0 auto;
-        max-height: calc(100% - 2.8rem);
+        max-height: 100%;
         overflow-x: hidden;
         overflow-y: scroll;
         padding: 0;
+        will-change: transform;
 
         .printer-item {
             cursor: pointer;

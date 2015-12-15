@@ -248,12 +248,39 @@ define([
         },
 
         _computePosition: function(position) {
-            var manipulationPanel = this.refs.manipulationPanel.getDOMNode();
+            var manipulationPanel = this.refs.manipulationPanel.getDOMNode(),
+                windowSize = {
+                    height: window.innerHeight,
+                    width: window.innerWidth
+                },
+                panelSize = {
+                    height: manipulationPanel.offsetHeight,
+                    width: manipulationPanel.offsetWidth
+                }
+                position = {
+                    top: position.top - (panelSize.height / 2),
+                    left: position.left + (panelSize.width / 2)
+                };
 
-            return {
-                top: position.top - (manipulationPanel.offsetHeight / 2),
-                left: position.left + (manipulationPanel.offsetWidth / 2)
+            // check top/bottom
+            if (position.top + panelSize.height > windowSize.height) {
+                position.top = windowSize.height - panelSize.height;
             }
+
+            if (0 > position.top) {
+                position.top = 0;
+            }
+
+            // check left/right
+            if (0 > position.left) {
+                position.left = 0;
+            }
+
+            if (position.left - panelSize.width > windowSize.width) {
+                position.left = windowSize.width - (panelSize.width * 1.5);
+            }
+
+            return position;
         },
 
         componentDidMount: function() {

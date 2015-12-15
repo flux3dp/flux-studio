@@ -45,9 +45,12 @@ define(['helpers/api/config', 'helpers/local-storage'], function(config, localSt
                 localStorage.set('printers', printers);
             },
             add: function(printer) {
-                var settedPrinters = methods.settedPrinter.get();
+                var settedPrinters = methods.settedPrinter.get(),
+                    findPrinter = function(existingPrinter) {
+                        return existingPrinter.uuid === printer.uuid;
+                    };
 
-                if ('object' === typeof printer) {
+                if ('object' === typeof printer && false === settedPrinters.some(findPrinter)) {
                     settedPrinters.push(printer);
                 }
 

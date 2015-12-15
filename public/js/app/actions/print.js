@@ -10,6 +10,7 @@ define([
     'app/actions/progress-actions',
     'app/constants/device-constants',
     'app/constants/progress-constants',
+    // non-return value
     'threeOrbitControls',
     'threeTrackballControls',
     'threeTransformControls',

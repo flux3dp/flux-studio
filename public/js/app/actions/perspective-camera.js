@@ -1,8 +1,8 @@
 define([
     'jquery',
     'threeOrbitControls'
-
 ], function ($) {
+    'use strict';
 
     var THREE = window.THREE || {},
         container,

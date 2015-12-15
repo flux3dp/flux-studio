@@ -1,4 +1,6 @@
-define([], function(){
+define(function() {
+    'use strict';
+
     return {
         // Status
         RUNNING         : 'RUNNING',
@@ -13,16 +15,17 @@ define([], function(){
         UNKNOWN         : 'UNKNOWN',
         COMPLETED       : 'COMPLETED',
         FATAL           : 'FATAL',
-        RUNNING         : 'RUNNING',
         OK              : 'OK',
-        IDLE            : 'IDLE',
-        COMPLETED       : 'COMPLETED',
         IDLE            : 'IDLE',
         RESUMING        : 'RESUMING',
         AUTH_ERROR      : 'AUTH_ERROR',
         HEAD_OFFLINE    : 'HEAD_OFFLINE',
         HEAD_ERROR      : 'HEAD_ERROR',
         WRONG_HEAD      : 'WRONG_HEAD',
+        AUTH_FAILED     : 'AUTH_FAILED',
+        HEADER_OFFLINE  : 'HEADER_OFFLINE',
+        HEADER_ERROR    : 'HEADER_ERROR',
+        WRONG_HEADER    : 'WRONG_HEADER',
         TILT            : 'TILT',
         FAN_FAILURE     : 'FAN_FAILURE',
         TIMEOUT         : 'TIMEOUT',

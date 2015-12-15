@@ -40,16 +40,18 @@ define([
                     events.onError(response);
                 },
                 onFatal: function(response) {
+                    clearTimeout(timmer);
                     events.onError(response);
                 },
                 onClose: function(response) {
                     isConnected = false;
-                }
+                },
+                autoReconnect: false
             }),
             lastOrder = '',
             events = {
                 onMessage: function() {},
-                onError: function() {}
+                onError: opts.onError
             },
             genericOptions = function(opts) {
                 var emptyFunction = function() {};
@@ -61,11 +63,12 @@ define([
                 return opts;
             },
             isTimeout = function() {
-                var error = JSON.parse(
-                    '{"status": "error", "error": "TIMEOUT", "info": "connection timeoout"}'
-                );
+                var error = {
+                    "status": "error",
+                    "error": "TIMEOUT",
+                    "info": "connection timeoout"
+                };
                 opts.onError(error);
-                console.log('timeout?', error);
             };
 
         return {

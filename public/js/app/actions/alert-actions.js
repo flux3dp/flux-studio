@@ -83,6 +83,13 @@ define([
             });
         },
 
+        showChangeFilament: function(device) {
+            AlertDispatcher.dispatch({
+                actionType: AlertConstants.SHOW_POPUP_CHANGE_FILAMENT,
+                device: device
+            });
+        },
+
         notifyRetry: function(id) {
             AlertDispatcher.dispatch({
                 actionType: AlertConstants.NOTIFY_RETRY, id

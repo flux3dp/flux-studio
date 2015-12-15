@@ -32,7 +32,7 @@ define(['react'], function(React){
                     }
                     else {
                         content = (
-                            <button title={opt.title} className={className} onClick={opt.onClick}>{opt.label}</button>
+                            <button title={opt.title} className={className} type={opt.type || 'button'} onClick={opt.onClick}>{opt.label}</button>
                         );
                     }
 
@@ -48,7 +48,11 @@ define(['react'], function(React){
                 className += ' btn-h-group';
             }
 
-            return (<div className={className}>{buttons}</div>);
+            return (
+                0 < this.props.buttons.length ?
+                <div className={className}>{buttons}</div> :
+                <span/>
+            );
         }
     });
 });

@@ -2116,6 +2116,9 @@ a {
     font-size: 12px;
     text-decoration: underline; }
 
+img {
+    max-width: 100%; }
+
 /**
  * structure
  */
@@ -2123,9 +2126,17 @@ a {
     height: 100%; }
 
 .content {
+    display: -webkit-box;
+    /* OLD - iOS 6-, Safari 3.1-6 */
+    display: -webkit-flex;
+    /* NEW - Chrome */
+    display: flex;
+    /* NEW, Spec - Opera 12.1, Firefox 20+ */
+    background: #fff;
     height: 100%;
     overflow: hidden;
-    width: 100%; }
+    width: 100%;
+    position: relative; }
 
 .horizontal-menu .menu-item {
     float: left;
@@ -2303,10 +2314,10 @@ a {
         content: attr(data-tip);
         display: block;
         font-size: 11px;
-        height: 24px;
         left: -15px;
         line-height: 24px;
         min-width: 75px;
+        padding: 5px;
         position: absolute;
         text-align: center;
         white-space: nowrap;
@@ -2469,7 +2480,8 @@ input[type=range]:focus::-webkit-slider-runnable-track {
 
 /* studio */
 .studio-container {
-    height: 100%; }
+    height: 100%;
+    width: 100%; }
     .studio-container .btn-h-group {
         padding: 10px 0 10px 10px; }
         .studio-container .btn-h-group .btn {
@@ -2595,22 +2607,17 @@ input[type=range]:focus::-webkit-slider-runnable-track {
 
 .spinner-roller {
     font-size: 10px;
-    margin: 50px auto;
     text-indent: -9999em;
     width: 11em;
     height: 11em;
     border-radius: 50%;
     background: #ffffff;
-    background: -moz-linear-gradient(left, #ffffff 10%, rgba(255, 255, 255, 0) 42%);
     background: -webkit-linear-gradient(left, #ffffff 10%, rgba(255, 255, 255, 0) 42%);
-    background: -o-linear-gradient(left, #ffffff 10%, rgba(255, 255, 255, 0) 42%);
-    background: -ms-linear-gradient(left, #ffffff 10%, rgba(255, 255, 255, 0) 42%);
     background: linear-gradient(to right, #ffffff 10%, rgba(255, 255, 255, 0) 42%);
     position: relative;
     -webkit-animation: load3 1.4s infinite linear;
     animation: load3 1.4s infinite linear;
     -webkit-transform: translateZ(0);
-    -ms-transform: translateZ(0);
     transform: translateZ(0); }
     .spinner-roller:before {
         width: 50%;
@@ -2633,6 +2640,11 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         left: 0;
         bottom: 0;
         right: 0; }
+
+.spinner-roller-reverse {
+    background: linear-gradient(to right, #DEDEDC 10%, rgba(255, 255, 255, 0) 42%); }
+    .spinner-roller-reverse::after {
+        background: #fff; }
 
 @-webkit-keyframes load3 {
     0% {
@@ -2958,6 +2970,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
             /* NEW, Spec - Opera 12.1, Firefox 20+ */ }
     .ui-dialog-menu .dialog-label {
         color: #B3B3B3;
+        cursor: pointer;
         font-size: 1.8rem;
         margin: 0;
         min-width: 200px;
@@ -3091,30 +3104,29 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         display: flex;
         /* NEW, Spec - Opera 12.1, Firefox 20+ */
         background: #FFF;
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.7);
         flex-direction: column;
         min-height: 25rem;
-        min-width: 32.2rem;
         overflow: auto;
-        padding: 1.6rem 2.8rem 4.4rem 2.8rem;
+        padding: 1.6rem 2.8rem;
         position: relative;
         text-align: center;
         align-items: center;
-        justify-content: center; }
+        justify-content: space-between;
+        width: 32.2rem; }
+        .modal-window .modal-alert .caption {
+            margin: 0 0 1.6rem 0; }
         .modal-window .modal-alert .caption,
         .modal-window .modal-alert .message {
-            margin: 0 0 1.6rem 0;
             width: 100%; }
-        .modal-window .modal-alert pre.message {
-            font-family: "Helvetica Neue", "HelveticaNeue-Light", "Helvetica Neue Light", Helvetica, Arial, "Lucida Grande", sans-serif, "Microsoft JhengHei", "微軟正黑體"; }
     .modal-window .message {
+        font-family: "Helvetica Neue", "HelveticaNeue-Light", "Helvetica Neue Light", Helvetica, Arial, "Lucida Grande", sans-serif, "Microsoft JhengHei", "微軟正黑體";
+        margin: 0;
+        padding: 0;
+        position: relative;
         word-break: break-all;
         word-wrap: break-word; }
     .modal-window .btn-h-group {
-        bottom: 1.6rem;
-        left: 2.8rem;
-        position: absolute;
-        right: 2.8rem; }
+        width: 100%; }
         .modal-window .btn-h-group .btn {
             font-size: 1.3rem;
             height: 2.8rem;
@@ -3145,11 +3157,29 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         transition: width 0.3s ease;
         width: 0; }
 
+.modal-progress-nonstop .spinner-roller {
+    height: 13rem;
+    margin: auto;
+    width: 13rem; }
+
+.modal-progress-nonstop .modal-alert {
+    height: 20rem;
+    min-height: 20rem;
+    width: 20rem; }
+
 .modal-input-lightbox .modal-alert {
-    display: block;
     min-height: 18rem;
     text-align: left;
+    padding: 1.6rem 0 0 0;
     width: 32.2rem; }
+    .modal-input-lightbox .modal-alert .caption {
+        color: #626262;
+        font-size: 15px;
+        line-height: 18px; }
+    .modal-input-lightbox .modal-alert .caption,
+    .modal-input-lightbox .modal-alert .message {
+        padding: 0 1.6rem;
+        margin: 0 0 20px 0; }
 
 .modal-input-lightbox .control {
     display: -webkit-box;
@@ -3161,7 +3191,11 @@ input[type=range]:focus::-webkit-slider-runnable-track {
     justify-content: space-between;
     align-items: center; }
     .modal-input-lightbox .control .inputHeader {
-        color: #ccc; }
+        color: #ccc;
+        flex: 1; }
+    .modal-input-lightbox .control input {
+        flex: 2;
+        padding: 3px; }
 
 .modal-input-lightbox .btn-h-group {
     border: none;
@@ -3210,6 +3244,62 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         position: static;
         width: 50%; }
 
+.modal-change-filament .modal-alert {
+    width: 440px;
+    min-height: 320px;
+    padding: 22px 0 0 0; }
+
+.modal-change-filament .caption,
+.modal-change-filament .message {
+    margin: 0 0 20px 0;
+    padding: 0 19px; }
+
+.modal-change-filament .caption {
+    color: #626262;
+    font-size: 15px;
+    line-height: 17px;
+    text-align: left; }
+
+.modal-change-filament .message {
+    color: #989898;
+    font-size: 15px;
+    line-height: 21px; }
+    .modal-change-filament .message p {
+        margin: 0; }
+
+.modal-change-filament .message-container p:last-of-type {
+    margin: 0 0 12.5px 0; }
+
+.modal-change-filament .way-to-go .btn {
+    width: 100%; }
+    .modal-change-filament .way-to-go .btn:first-child {
+        margin: 0 0 24px 0; }
+
+.modal-change-filament .spinner-roller {
+    height: 61.5px;
+    margin: 0 auto;
+    width: 61.5px; }
+
+.modal-change-filament .button-group {
+    border: none;
+    border-top: 1px solid #E0E0DF;
+    display: block;
+    height: 73px;
+    padding: 19px;
+    position: relative; }
+    .modal-change-filament .button-group .btn {
+        margin: 0;
+        padding: 0 10px; }
+    .modal-change-filament .button-group .btn:first-child:not([class*="btn-alone"]),
+    .modal-change-filament .button-group .btn-alone-left {
+        position: absolute;
+        left: 19px; }
+    .modal-change-filament .button-group .btn:last-child:not([class*="btn-alone"]),
+    .modal-change-filament .button-group .btn-alone-right {
+        position: absolute;
+        right: 19px;
+        min-width: 60px; }
+
 /**
  * the view of printer selector
  */
@@ -3239,7 +3329,10 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         justify-content: 1; }
         .select-printer .device .col {
             height: 2.8rem;
-            line-height: 2.8rem; }
+            line-height: 2.8rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap; }
         .select-printer .device .device-name {
             padding: 0 0 0 1.7rem;
             flex: calc(12 / 28.7 * 100%); }
@@ -3257,10 +3350,11 @@ input[type=range]:focus::-webkit-slider-runnable-track {
     .select-printer .printer-list {
         list-style: none;
         margin: 0 auto;
-        max-height: calc(100% - 2.8rem);
+        max-height: 100%;
         overflow-x: hidden;
         overflow-y: scroll;
-        padding: 0; }
+        padding: 0;
+        will-change: transform; }
         .select-printer .printer-list .printer-item {
             cursor: pointer; }
             .select-printer .printer-list .printer-item [name="printer-group"] {
@@ -3289,8 +3383,8 @@ input[type=range]:focus::-webkit-slider-runnable-track {
             transition: all 0.25s; }
         .top-menu .brand-logo .func-name {
             color: #B3B3B3;
-            font-family: "HelveticaNeue-Thin";
             font-size: 40px;
+            font-weight: lighter;
             line-height: 49px;
             padding: 0 0 0 21px; }
         .top-menu .brand-logo .menu {
@@ -5475,7 +5569,8 @@ input.switch:checked ~ label:after {
 
 .laser-studio .laser-object .ft-widget {
     cursor: move;
-    position: fixed; }
+    position: fixed;
+    will-change: top,left,transform; }
 
 .laser-studio .laser-object .ft-rotator,
 .laser-studio .laser-object .ft-rotator-line,
@@ -5632,18 +5727,21 @@ input.switch:checked ~ label:after {
             position: relative;
             text-align: center;
             width: 99px; }
-            .scan-studio .mesh-thumbnail .mesh-thumbnail-item::before {
+        .scan-studio .mesh-thumbnail .mesh-thumbnail-no {
+            height: 100%;
+            width: 100%; }
+            .scan-studio .mesh-thumbnail .mesh-thumbnail-no::before {
                 content: "#"; }
-            .scan-studio .mesh-thumbnail .mesh-thumbnail-item:hover {
+            .scan-studio .mesh-thumbnail .mesh-thumbnail-no:hover {
                 background: #777; }
         .scan-studio .mesh-thumbnail .mesh-thumbnail-close {
             background: rgba(0, 0, 0, 0.3);
             border-radius: 50%;
             height: 20px;
             position: absolute;
-            width: 20px;
             right: -10px;
-            top: -10px; }
+            top: -10px;
+            width: 20px; }
             .scan-studio .mesh-thumbnail .mesh-thumbnail-close::before {
                 line-height: 20px; }
         .scan-studio .mesh-thumbnail .choose {
@@ -5844,6 +5942,15 @@ input.switch:checked ~ label:after {
         .scan-studio .setup-panel .caption {
             padding: 0 0.3em 0 0;
             text-transform: uppercase; }
+        .scan-studio .setup-panel .btn-calibrate {
+            background: transparent;
+            border: none;
+            font-size: inherit;
+            margin: 0; }
+            .scan-studio .setup-panel .btn-calibrate:active,
+            .scan-studio .setup-panel .btn-calibrate:hover {
+                box-shadow: none;
+                color: inherit; }
     .scan-studio .scan-progress {
         bottom: 28px;
         position: fixed;

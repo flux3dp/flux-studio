@@ -33,6 +33,61 @@ define([
         args = args || {};
 
         var view = React.createClass({
+
+                getInitialState: function() {
+                    return {
+                        step: '',
+                        mode: 'engrave',
+                        hasImage: false,
+                        selectedImage: false,
+                        fileFormat: undefined,
+                        selectedPrinter: 0,
+                        openPrinterSelectorWindow: false,
+                        openBlocker: false,
+                        openAlert: false,
+                        alertContents: {},
+                        settings: {},
+                        laserEvents: laserEvents.call(this, args),
+                        imagePanel: {},
+                        position: {},
+                        size: {},
+                        angle: 0,
+                        threshold: 128,
+                        images: []
+                    };
+                },
+
+                componentDidMount: function() {
+                    var self = this,
+                        $operationTable = $(self.refs.operationTable.getDOMNode());
+
+                    $operationTable.on('dragover dragend', function(e) {
+                        e.preventDefault();
+                    });
+                    $operationTable.on('drop', self._onDropUpload);
+
+                    self.state.laserEvents.setPlatform(self.refs.laserObject.getDOMNode());
+
+
+                    self.state.laserEvents.menuFactory.items.import.onClick = function() {
+                        self.refs.setupPanel.refs.fileUploader.getDOMNode().click();
+                    };
+
+                    self.state.laserEvents.menuFactory.items.execute.enabled = false;
+                    self.state.laserEvents.menuFactory.items.execute.onClick = function() {
+                        self.refs.setupPanel._onRunLaser();
+                    };
+
+                    self.state.laserEvents.menuFactory.items.saveGCode.enabled = false;
+                    self.state.laserEvents.menuFactory.items.saveGCode.onClick = function() {
+                        self.refs.setupPanel._onExport();
+                    };
+                },
+
+                componentWillUnmount: function () {
+                    this.state.laserEvents.destroySocket();
+                },
+
                 // UI events
                 _onRunLaser: function() {
                     this.setState({
@@ -77,17 +132,6 @@ define([
                         power: defaultSettings.material.data.power / max,
                         shading: (true === self.refs.setupPanel.isShading() ? 0 : 1)
                     };
-                },
-
-                _openBlocker: function(isOpen, onFinished) {
-                    onFinished = onFinished || function() {};
-
-                    if (true === isOpen) {
-                        ProgressActions.open('', '', '', onFinished);
-                    }
-                    else {
-                        ProgressActions.close();
-                    }
                 },
 
                 _inactiveSelectImage: function(e) {
@@ -303,60 +347,8 @@ define([
                             {alert}
                         </div>
                     );
-                },
-
-                getInitialState: function() {
-                    return {
-                        step: '',
-                        mode: 'engrave',
-                        hasImage: false,
-                        selectedImage: false,
-                        fileFormat: undefined,
-                        selectedPrinter: 0,
-                        openPrinterSelectorWindow: false,
-                        openBlocker: false,
-                        openAlert: false,
-                        alertContents: {},
-                        settings: {},
-                        laserEvents: laserEvents.call(this, args),
-                        imagePanel: {},
-                        position: {},
-                        size: {},
-                        angle: 0,
-                        threshold: 128
-                    };
-                },
-
-                componentDidMount: function() {
-                    var self = this,
-                        $operationTable = $(self.refs.operationTable.getDOMNode());
-
-                    $operationTable.on('dragover dragend', function(e) {
-                        e.preventDefault();
-                    });
-                    $operationTable.on('drop', self._onDropUpload);
-
-                    self.state.laserEvents.setPlatform(self.refs.laserObject.getDOMNode());
-
-
-                    self.state.laserEvents.menuFactory.items.import.onClick = function() {
-                        self.refs.setupPanel.refs.fileUploader.getDOMNode().click();
-                    };
-
-                    self.state.laserEvents.menuFactory.items.execute.enabled = false;
-                    self.state.laserEvents.menuFactory.items.execute.onClick = function() {
-                        self.refs.setupPanel._onRunLaser();
-                    };
-
-                    self.state.laserEvents.menuFactory.items.saveGCode.enabled = false;
-                    self.state.laserEvents.menuFactory.items.saveGCode.onClick = function() {
-                        self.refs.setupPanel._onExport();
-                    };
-                },
-
-                componentWillUnmount: function () {
-                    this.state.laserEvents.destroySocket();
                 }
+
             });
 
         return view;

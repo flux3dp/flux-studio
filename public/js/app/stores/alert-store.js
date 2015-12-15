@@ -14,6 +14,7 @@ define([
         POPUP_EVENT           = 'popup',
         CLOSE_POPUP           = 'closePopup',
         FIRMWARE_UPDATE_EVENT = 'firmware_update',
+        CHANGE_FILAMENT_EVENT = 'change_filament',
         NOTIFY_RETRY          = 'retry',
         NOTIFY_ABORT          = 'abort',
         NOTIFY_YES            = 'yes',
@@ -23,6 +24,10 @@ define([
         AlertStore;
 
     AlertStore = Object.assign(EventEmitter.prototype, {
+
+        onChangeFilament(callback) {
+            this.on(CHANGE_FILAMENT_EVENT, callback);
+        },
 
         onFirmwareUpdate(callback) {
             this.on(FIRMWARE_UPDATE_EVENT, callback);
@@ -158,6 +163,10 @@ define([
 
                 'CLOSE_POPUP': function() {
                     AlertStore.emit(CLOSE_POPUP);
+                },
+
+                'SHOW_POPUP_CHANGE_FILAMENT': function() {
+                    AlertStore.emit(CHANGE_FILAMENT_EVENT, payload);
                 }
 
             };
