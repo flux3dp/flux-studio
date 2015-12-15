@@ -801,6 +801,12 @@ define(function() {
             require_password: '"%s" requires a password',
             connect: 'CONNECT',
             password: 'Password'
+        },
+        tutorial: {
+            clickToImport: 'Click to import STL file',
+            selectQuality: 'Select quality preferred',
+            clickGo: 'Click GO and preview',
+            startPrint: 'Click go and start printing'
         }
     };
 });

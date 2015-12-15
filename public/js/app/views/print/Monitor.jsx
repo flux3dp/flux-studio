@@ -242,6 +242,7 @@ define([
         },
 
         _handleGo: function() {
+            this._stopReport();
             if(this.state.currentStatus === DeviceConstants.READY) {
                 var blob = this.props.fCode;
                 this._stopReport();
@@ -329,6 +330,9 @@ define([
                     AlertActions.showPopupRetry(_id, errorMessage);
                     showingPopup = true;
                 }
+            }
+            else if (status === DeviceConstants.UNKNOWN_STATUS) {
+                DeviceMaster.quit();
             }
 
             // actions responded to status
@@ -540,7 +544,7 @@ define([
             // console.log('current status is', this.state.currentStatus);
 
             go = (
-                <div className="controls center" onClick={self._handleGo}>
+                <div className="controls center go-btn" onClick={self._handleGo}>
                     <div className="icon"><i className="fa fa-play fa-2x"></i></div>
                     <div className="description">{lang.go}</div>
                 </div>

@@ -165,7 +165,7 @@ define([
 
             return {
                 label: (
-                    <div className="display-text">
+                    <div className="display-text quality-select">
                         <span>{this.state.quality}</span>
                     </div>
                 ),
