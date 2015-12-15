@@ -1,7 +1,9 @@
 define([
     'jquery',
     'react',
-    'jsx!widgets/List'
+    'jsx!widgets/List',
+    // non-return
+    'helpers/object-assign'
 ],
 function(
     $,
@@ -45,15 +47,24 @@ function(
                     'arrow-bottom': 'BOTTOM' === self.props.arrowDirection,
                 }),
                 listItems = [],
-                disablePopup = false;
+                disablePopup = false,
+                itemLabelClassName;
 
             items.forEach(function(opt, i) {
+                opt.labelClass = opt.labelClass || {};
+
                 if (opt.content) {
                     disablePopup = false;
                 }
                 else {
                     disablePopup = true;
                 }
+
+                itemLabelClassName = {
+                    'dialog-label': true
+                };
+
+                itemLabelClassName = Object.assign(itemLabelClassName, opt.labelClass);
 
                 if (opt.label) {
                     listItems.push({
@@ -65,7 +76,7 @@ function(
                                     type="checkbox"
                                     disabled={disablePopup}
                                 />
-                                <div className="dialog-label">
+                                <div className={cx(itemLabelClassName)}>
                                     {opt.label}
                                 </div>
                                 <label className="dialog-window">
