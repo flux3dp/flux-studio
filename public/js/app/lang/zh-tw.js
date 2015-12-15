@@ -718,7 +718,11 @@ define(function() {
             FILAMENT_RUNOUT: 'filament run out, please refill filament',
             RESOURCE_BUSY: 'Machine is busy',
             processing: 'Processing',
-            savingPreview: 'Saving preview image'
+            savingPreview: 'Saving preview image',
+            hour: '小時',
+            minute: '分',
+            left: '完成',
+            temperature: '溫度'
         },
         alert: {
             caption: '錯誤',
