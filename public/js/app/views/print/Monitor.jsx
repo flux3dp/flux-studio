@@ -42,6 +42,7 @@ define([
         timeLeft =  0,
         progress = '',
         temperature = '',
+        stateId = 0,
 
         refreshTime = 5000;
 
@@ -117,6 +118,7 @@ define([
         componentDidMount: function() {
             AlertStore.onRetry(this._handleRetry);
             AlertStore.onCancel(this._handleCancel);
+            AlertStore.onYes(this._handleYes);
             this._addHistory();
         },
 
@@ -167,6 +169,12 @@ define([
         _handleCancel: function(id) {
             messageViewed = true;
             showingPopup = false;
+        },
+
+        _handleYes: function(id) {
+            if(id === DeviceConstants.KICK) {
+                DeviceMaster.kick();
+            }
         },
 
         _handleBrowseFile: function() {
@@ -293,7 +301,12 @@ define([
         },
 
         _handleStop: function() {
-            DeviceMaster.stop();
+            if(stateId < 0) {
+                AlertActions.showPopupYesNo('KICK', lang.forceStop);
+            }
+            else {
+                DeviceMaster.stop();
+            }
         },
 
         _addHistory: function() {
@@ -323,6 +336,7 @@ define([
             mainError       = '';
             subError        = '';
             status          = report.st_label;
+            stateId         = report.st_id;
 
             if(report.error) {
                 if(typeof(report.error) === 'string') {
@@ -382,7 +396,6 @@ define([
                 status = DeviceConstants.READY;
             }
 
-            // console.log('showing popup ', showingPopup, 'message viewed:' + messageViewed + '\n');
             if(showingPopup && status === DeviceConstants.RUNNING && !messageViewed) {
                 showingPopup = false;
                 AlertActions.closePopup();

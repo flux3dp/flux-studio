@@ -45,6 +45,7 @@ define(function() {
         REPORT          : 'REPORT',
         ABORT           : 'ABORT',
         QUIT            : 'QUIT',
+        KICK            : 'KICK',
         LS              : 'LS'
     };
 });

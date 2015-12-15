@@ -722,7 +722,8 @@ define(function() {
             hour: '小時',
             minute: '分',
             left: '完成',
-            temperature: '溫度'
+            temperature: '溫度',
+            forceStop: '強制停止機器?'
         },
         alert: {
             caption: '錯誤',

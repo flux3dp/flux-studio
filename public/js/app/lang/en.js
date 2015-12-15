@@ -722,7 +722,8 @@ define(function() {
             hour: 'hr',
             minute: 'min',
             left: 'left',
-            temperature: 'Temperature'
+            temperature: 'Temperature',
+            forceStop: 'Force stopping device?'
         },
         alert: {
             caption: 'Error',

@@ -200,6 +200,10 @@ define([
         return _do(DeviceConstants.QUIT);
     }
 
+    function kick() {
+        return _do(DeviceConstants.KICK);
+    }
+
     function ls(path) {
         var d = $.Deferred();
         _device.actions.ls(path).then(function(result) {
@@ -285,7 +289,13 @@ define([
 
             'QUIT': function() {
                 _device.actions.quit().then(function(result) {
-                    d.resolve('');
+                    d.resolve(result);
+                });
+            },
+
+            'KICK': function() {
+                _device.actions.reset().then(function(result) {
+                    d.resolve(result);
                 });
             },
 
@@ -370,6 +380,7 @@ define([
             this.pause              = pause;
             this.stop               = stop;
             this.quit               = quit;
+            this.kick               = kick;
             this.setPassword        = setPassword;
             this.getReport          = getReport;
             this.getSelectedDevice  = getSelectedDevice;
