@@ -2573,7 +2573,8 @@ input[type=range]:focus::-webkit-slider-runnable-track {
     float: right; }
 
 .disabled-pointer {
-    pointer-events: none; }
+    pointer-events: none;
+    opacity: .4; }
 
 /**
  * ref: http://tobiasahlin.com/spinkit/
@@ -2971,7 +2972,6 @@ input[type=range]:focus::-webkit-slider-runnable-track {
     .ui-dialog-menu .dialog-label {
         color: #B3B3B3;
         cursor: pointer;
-        cursor: pointer;
         font-size: 1.8rem;
         margin: 0;
         min-width: 200px;
@@ -3007,11 +3007,12 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         .ui-dialog-menu .dialog-window .arrow {
             background: #B3B3B3;
             height: 20px;
-            position: relative;
+            transform: translateX(1px);
             width: 28px;
             align-self: center;
-            -webkit-clip-path: polygon(0 51%, 100% 100%, 100% 0);
-            clip-path: polygon(0 51%, 100% 100%, 100% 0); }
+            -webkit-clip-path: polygon(0 50%, 100% 100%, 100% 0);
+            clip-path: polygon(0 50%, 100% 100%, 100% 0);
+            z-index: -1; }
 
 /**
  * global advanced panel
@@ -5343,8 +5344,6 @@ input.switch:checked ~ label:after {
     align-self: center;
     width: auto;
     z-index: 1; }
-    .laser-studio .operating-panel .disabled-pointer {
-        opacity: .3; }
     .laser-studio .operating-panel .custom-presets-wrapper {
         background: #FFF;
         overflow: scroll;
