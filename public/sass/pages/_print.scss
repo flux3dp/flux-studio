@@ -647,51 +647,6 @@ input.switch:checked ~ label:after {
         align-self: center;
         margin: 0 0 0 30px;
         z-index: 1;
-
-        // .popup-selection {
-        //     @include flexbox();
-        //     display: block;
-        //     height: 40px;
-        //     position: relative;
-
-        //     ul {
-        //         background: #B3B3B3;
-        //         list-style: none;
-        //         padding: 0 10px 10px 10px;
-
-        //         li {
-        //             cursor: pointer;
-        //             margin: 10px 0 0 0;
-        //         }
-        //     }
-
-        //     .popup-open {
-        //         display: none;
-
-        //         &:checked ~ .display-text {
-        //             background: #B3B3B3;
-        //             color: #E0E0DF;
-        //         }
-
-        //         &:checked ~ .popup {
-        //             visibility: visible;
-        //         }
-        //     }
-
-        //     .display-text {
-        //         cursor: pointer;
-        //         display: inline-block;
-        //         line-height: 40px;
-        //         padding: 0 16px 0 6px;
-        //         width: 100%;
-
-        //         p {
-        //             display: block;
-        //             margin: 0;
-        //             width: 185px;
-        //         }
-        //     }
-        // }
     }
     .rightPanel {
         height: 100%;
