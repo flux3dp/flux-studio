@@ -19,4 +19,29 @@
         height: auto;
         transform: scaleY(1);
     }
+
+    .header {
+        color: #E0E0DF;
+        width: auto;
+    }
+
+    input {
+        border: 2px solid #E0E0DF;
+        color: #B3B3B3;
+        font-size: 15px;
+        margin: 0 0 0 10px;
+        width: 140px;
+    }
+
+    .caption {
+        &:hover {
+            cursor: pointer;
+            -webkit-filter: brightness(80%);
+            filter: brightness(80%);
+        }
+
+        .value {
+            color: #E0E0DF;
+        }
+    }
 }

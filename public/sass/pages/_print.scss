@@ -735,26 +735,17 @@ input.switch:checked ~ label:after {
             display: block;
             margin: 0 0 3px 0;
             padding: 0 20px;
+            width: 204px;
         }
 
         .control {
             @include flexbox();
             color: #B3B3B3;
-            font-size: 13px;
             height: 40px;
             line-height: 40px;
             margin: 0 0 10px 0;
             align-items: center;
             justify-content: space-around;
-
-            .header {
-                color: #E0E0DF;
-                width: 45%;
-            }
-
-            input {
-                width: 80%;
-            }
         }
 
         .caption {
@@ -765,25 +756,20 @@ input.switch:checked ~ label:after {
             justify-content: space-between;
         }
 
-        input {
-            border: 1px solid #E0E0DF;
-            color: #B3B3B3;
-            font-size: 15px;
-        }
-
         .accordion {
             .lock {
                 background-image: url("../../img/lock.svg");
                 background-position: top;
                 background-repeat: no-repeat;
                 background-size: 12px 36px;
+                bottom: 0;
                 color: #BBB;
                 cursor: pointer;
-                display: inline-block;
                 height: 36px;
+                margin: auto;
                 position: absolute;
-                right: 16px;
-                top: 38%;
+                left: 100%;
+                top: 0;
                 width: 12px;
             }
             .lock.unlock {

@@ -21,13 +21,19 @@
     .file-importer {
         @include flexbox();
         background: #fff;
-        color: #E1E1E0;
-        font-size: 23px;
-        height: 37.8px;
+        color: #B3B3B3;
+        font-size: 32px;
+        font-weight: bold;
+        height: 50px;
+        letter-spacing: 2px;
         top: -78px;
-        width: 126.9px;
+        width: 200px;
         align-items: center;
         justify-content: center;
+
+        &:hover {
+            color: #888;
+        }
 
         &:after {
             border: solid rgba(0, 0, 0, 0);
@@ -58,9 +64,9 @@
     .operating-panel {
         margin: 0 0 0 30px;
         position: static;
-        align-self: center;
         width: auto;
         z-index: 1;
+        align-self: center;
 
         .custom-presets-wrapper {
             background: #FFF;
@@ -286,8 +292,8 @@
         font-size: 20px;
         transition: all .1s ease;
         width: 230px;
-        will-change: top,left,transform;
         z-index: 1;
+        will-change: top,left,transform;
 
         .accordion-body {
             overflow: visible;
@@ -306,11 +312,7 @@
         }
 
         .arrow {
-            align-self: center;
-
-            polygon {
-                fill: #fff;
-            }
+            transform: translateY(55px);
         }
 
         .caption,
@@ -323,18 +325,16 @@
             display: block;
             margin: 0 0 3px 0;
             padding: 0 20px;
+            width: 240px;
         }
 
         .control {
+            font-size: 20px;
             margin: 0 0 10px 0;
 
-            .header {
-                color: #E0E0DF;
-                width: 45%;
-            }
-
-            input {
-                width: 80%;
+            .input-fullsize {
+                margin: 0;
+                width: 100%;
             }
         }
 
@@ -344,12 +344,6 @@
             font-size: 12px;
             line-height: 30px;
             justify-content: space-between;
-        }
-
-        input {
-            border: 1px solid #E0E0DF;
-            color: #B3B3B3;
-            font-size: 15px;
         }
     }
 

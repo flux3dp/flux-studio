@@ -2576,6 +2576,21 @@ input[type=range]:focus::-webkit-slider-runnable-track {
     pointer-events: none;
     opacity: .4; }
 
+.arrow {
+    background: #fff;
+    height: 20px;
+    width: 28px; }
+
+.arrow,
+.arrow-left {
+    -webkit-clip-path: polygon(0 50%, 100% 100%, 100% 0);
+    clip-path: polygon(0 50%, 100% 100%, 100% 0);
+    transform: translateX(1px); }
+
+.arrow-right {
+    -webkit-clip-path: polygon(0 0, 0 100%, 100% 50%);
+    clip-path: polygon(0 0, 0 100%, 100% 50%); }
+
 /**
  * ref: http://tobiasahlin.com/spinkit/
  */
@@ -3006,13 +3021,8 @@ input[type=range]:focus::-webkit-slider-runnable-track {
                     background: #555; }
         .ui-dialog-menu .dialog-window .arrow {
             background: #B3B3B3;
-            height: 20px;
             transform: translateX(1px);
-            width: 28px;
-            align-self: center;
-            -webkit-clip-path: polygon(0 50%, 100% 100%, 100% 0);
-            clip-path: polygon(0 50%, 100% 100%, 100% 0);
-            z-index: -1; }
+            align-self: center; }
 
 /**
  * global advanced panel
@@ -3136,6 +3146,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
     .modal-window .message {
         font-family: "Helvetica Neue", "HelveticaNeue-Light", "Helvetica Neue Light", Helvetica, Arial, "Lucida Grande", sans-serif, "Microsoft JhengHei", "微軟正黑體";
         margin: 0;
+        overflow: hidden;
         padding: 0;
         position: relative;
         word-break: break-all;
@@ -3354,9 +3365,9 @@ input[type=range]:focus::-webkit-slider-runnable-track {
             white-space: nowrap; }
         .select-printer .device .device-name {
             padding: 0 0 0 1.7rem;
-            flex: calc(12 / 28.7 * 100%); }
+            flex: calc(11 / 28.7 * 100%); }
         .select-printer .device .module {
-            flex: calc(7 / 28.7 * 100%); }
+            flex: calc(3 / 28.7 * 100%); }
         .select-printer .device .status {
             flex: calc(5 / 28.7 * 100%); }
         .select-printer .device .close {
@@ -3413,12 +3424,12 @@ input[type=range]:focus::-webkit-slider-runnable-track {
             padding: 0.65rem 2.6rem;
             position: relative;
             top: 27px; }
-            .top-menu .brand-logo .menu .arrow {
+            .top-menu .brand-logo .menu .arrow-flat {
                 left: 0;
                 position: absolute;
                 transform: translateX(-100%);
                 top: 0; }
-                .top-menu .brand-logo .menu .arrow polygon {
+                .top-menu .brand-logo .menu .arrow-flat polygon {
                     fill: #fff; }
             .top-menu .brand-logo .menu .inner-menu {
                 display: -webkit-box;
@@ -3547,6 +3558,25 @@ input[type=range]:focus::-webkit-slider-runnable-track {
 .accordion .accordion-switcher:checked ~ .accordion-body {
     height: auto;
     transform: scaleY(1); }
+
+.accordion .header {
+    color: #E0E0DF;
+    width: auto; }
+
+.accordion input {
+    border: 2px solid #E0E0DF;
+    color: #B3B3B3;
+    font-size: 15px;
+    margin: 0 0 0 10px;
+    width: 140px; }
+
+.accordion .caption:hover {
+    cursor: pointer;
+    -webkit-filter: brightness(80%);
+    filter: brightness(80%); }
+
+.accordion .caption .value {
+    color: #E0E0DF; }
 
 /* jQuery Growl
  * Copyright 2015 Kevin Sylvestre
@@ -4491,7 +4521,8 @@ input.switch:checked ~ label:after {
         background: #FFFFFF;
         display: block;
         margin: 0 0 3px 0;
-        padding: 0 20px; }
+        padding: 0 20px;
+        width: 204px; }
     .print-studio .object-dialogue .control {
         display: -webkit-box;
         /* OLD - iOS 6-, Safari 3.1-6 */
@@ -4500,17 +4531,11 @@ input.switch:checked ~ label:after {
         display: flex;
         /* NEW, Spec - Opera 12.1, Firefox 20+ */
         color: #B3B3B3;
-        font-size: 13px;
         height: 40px;
         line-height: 40px;
         margin: 0 0 10px 0;
         align-items: center;
         justify-content: space-around; }
-        .print-studio .object-dialogue .control .header {
-            color: #E0E0DF;
-            width: 45%; }
-        .print-studio .object-dialogue .control input {
-            width: 80%; }
     .print-studio .object-dialogue .caption {
         display: -webkit-box;
         /* OLD - iOS 6-, Safari 3.1-6 */
@@ -4522,22 +4547,19 @@ input.switch:checked ~ label:after {
         font-size: 12px;
         line-height: 30px;
         justify-content: space-between; }
-    .print-studio .object-dialogue input {
-        border: 1px solid #E0E0DF;
-        color: #B3B3B3;
-        font-size: 15px; }
     .print-studio .object-dialogue .accordion .lock {
         background-image: url("../../img/lock.svg");
         background-position: top;
         background-repeat: no-repeat;
         background-size: 12px 36px;
+        bottom: 0;
         color: #BBB;
         cursor: pointer;
-        display: inline-block;
         height: 36px;
+        margin: auto;
         position: absolute;
-        right: 16px;
-        top: 38%;
+        left: 100%;
+        top: 0;
         width: 12px; }
     .print-studio .object-dialogue .accordion .lock.unlock {
         background-image: url("../../img/unlock.svg");
@@ -5308,13 +5330,17 @@ input.switch:checked ~ label:after {
     display: flex;
     /* NEW, Spec - Opera 12.1, Firefox 20+ */
     background: #fff;
-    color: #E1E1E0;
-    font-size: 23px;
-    height: 37.8px;
+    color: #B3B3B3;
+    font-size: 32px;
+    font-weight: bold;
+    height: 50px;
+    letter-spacing: 2px;
     top: -78px;
-    width: 126.9px;
+    width: 200px;
     align-items: center;
     justify-content: center; }
+    .laser-studio .file-importer:hover {
+        color: #888; }
     .laser-studio .file-importer:after {
         border: solid transparent;
         border-color: rgba(255, 255, 255, 0);
@@ -5341,9 +5367,9 @@ input.switch:checked ~ label:after {
 .laser-studio .operating-panel {
     margin: 0 0 0 30px;
     position: static;
-    align-self: center;
     width: auto;
-    z-index: 1; }
+    z-index: 1;
+    align-self: center; }
     .laser-studio .operating-panel .custom-presets-wrapper {
         background: #FFF;
         overflow: scroll;
@@ -5521,8 +5547,8 @@ input.switch:checked ~ label:after {
     font-size: 20px;
     transition: all 0.1s ease;
     width: 230px;
-    will-change: top,left,transform;
-    z-index: 1; }
+    z-index: 1;
+    will-change: top,left,transform; }
     .laser-studio .object-position .accordion-body {
         overflow: visible;
         position: relative; }
@@ -5536,9 +5562,7 @@ input.switch:checked ~ label:after {
             top: 0;
             width: 20px; }
     .laser-studio .object-position .arrow {
-        align-self: center; }
-        .laser-studio .object-position .arrow polygon {
-            fill: #fff; }
+        transform: translateY(55px); }
     .laser-studio .object-position .caption,
     .laser-studio .object-position .controls {
         margin: 0; }
@@ -5546,14 +5570,14 @@ input.switch:checked ~ label:after {
         background: #FFFFFF;
         display: block;
         margin: 0 0 3px 0;
-        padding: 0 20px; }
+        padding: 0 20px;
+        width: 240px; }
     .laser-studio .object-position .control {
+        font-size: 20px;
         margin: 0 0 10px 0; }
-        .laser-studio .object-position .control .header {
-            color: #E0E0DF;
-            width: 45%; }
-        .laser-studio .object-position .control input {
-            width: 80%; }
+        .laser-studio .object-position .control .input-fullsize {
+            margin: 0;
+            width: 100%; }
     .laser-studio .object-position .caption {
         display: -webkit-box;
         /* OLD - iOS 6-, Safari 3.1-6 */
@@ -5565,10 +5589,6 @@ input.switch:checked ~ label:after {
         font-size: 12px;
         line-height: 30px;
         justify-content: space-between; }
-    .laser-studio .object-position input {
-        border: 1px solid #E0E0DF;
-        color: #B3B3B3;
-        font-size: 15px; }
 
 .laser-studio .advanced-panel {
     background: #FFF;
@@ -5758,7 +5778,7 @@ input.switch:checked ~ label:after {
             display: flex;
             /* NEW, Spec - Opera 12.1, Firefox 20+ */
             color: #B3B3B3;
-            font-size: 13px;
+            font-size: 20px;
             height: 40px;
             line-height: 40px;
             margin: 0 0 10px 0;
