@@ -507,7 +507,7 @@ define([
                             <span className="func-name">{currentWorkingFunction.displayName}</span>
                             <div className="menu">
                                 <svg width="36" height="15"
-                                     className="arrow"
+                                     className="arrow-flat"
                                      viewBox="0 0 36 15" version="1.1"
                                      xmlns="http://www.w3.org/2000/svg">
 
