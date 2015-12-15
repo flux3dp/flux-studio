@@ -1206,12 +1206,6 @@ define([
         if (objects.length === 0) {
             return;
         } else {
-            // reactSrc.setState({
-            //     previewMode: isOn
-            // });
-            previewMode = isOn;
-            // _setProgressMessage('generating preview...');
-
             isOn ? _showPreview() : _hidePreview();
         }
     }
@@ -1446,6 +1440,7 @@ define([
     }
 
     function _hidePreview() {
+        previewMode = false;
         render();
         _setProgressMessage('');
     }
@@ -1454,6 +1449,7 @@ define([
         selectObject(null);
 
         var drawPath = function() {
+            previewMode = true;
             slicer.getPath().then(function(result) {
                 printPath = result;
                 _drawPath();
@@ -1461,12 +1457,13 @@ define([
         };
 
         if (blobExpired) {
-            getGCode().then(function(blob) {
+            getFCode().then(function(blob) {
                 if (blob instanceof Blob) {
                     drawPath();
                 }
             });
         } else {
+            previewMode = true;
             if (previewScene.children.length <= 1) {
                 drawPath();
             } else {
