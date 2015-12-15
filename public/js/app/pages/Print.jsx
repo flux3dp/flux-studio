@@ -80,13 +80,16 @@ define([
             view = React.createClass({
 
                 getInitialState: function() {
-                    var s1 = Config().read('advanced-settings');
-                    if(!s) {
+                    var _setting = Config().read('advanced-settings');
+
+                    if(!_setting) {
                         advancedSettings = {};
+                        advancedSettings.raft_layers = 4;
+                        advancedSettings.support_material = 1;
                         advancedSettings.custom = AppSettings.custom;
                     }
                     else {
-                        advancedSettings = s1;
+                        advancedSettings = _setting;
                     }
 
                     return ({
@@ -115,19 +118,22 @@ define([
 
                 componentDidMount: function() {
                     director.init(this);
-                    $(document).keydown(function(e) {
-                        if(e.metaKey && e.keyCode === 8 || e.keyCode === 46) {
-                            director.removeSelected();
-                        }
-                    });
 
                     this._handleApplyAdvancedSetting();
+
+                    // events
 
                     $importBtn = this.refs.importBtn.getDOMNode();
 
                     nwjsMenu.import.enabled = true;
                     nwjsMenu.import.onClick = function() { $importBtn.click(); };
                     nwjsMenu.saveGCode.onClick = this._handleDownloadGCode;
+
+                    $(document).keydown(function(e) {
+                        if(e.metaKey && e.keyCode === 8 || e.keyCode === 46) {
+                            director.removeSelected();
+                        }
+                    });
                 },
 
                 _handleSpeedChange: function(speed) {
@@ -261,15 +267,6 @@ define([
                             openPrinterSelectorWindow: false
                         });
                     }.bind(this));
-
-                    // DeviceMaster.selectDevice(selectedPrinter).then(function(status) {
-                    //     if(status === DeviceConstants.CONNECTED) {
-                    //         this.setState({ printerControllerStatus: status });
-                    //     }
-                    //     else if (status === DeviceConstants.TIMEOUT) {
-                    //         AlertActions.showPopupError(_id, _lang.message.connectionTimeout);
-                    //     }
-                    // }.bind(this));
                 },
 
                 _handlePreviewLayerChange: function(targetLayer) {
