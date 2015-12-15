@@ -191,6 +191,19 @@ define([
         return _device;
     }
 
+    function getPreviewUrl() {
+        var d = $.Deferred();
+        _device.actions.getPreview().then(function(result) {
+            if(result instanceof Blob) {
+                d.resolve(window.URL.createObjectURL(result));
+            }
+            else {
+                d.resolve('');
+            }
+        });
+        return d.promise();
+    }
+
     // Private Functions
 
     function _do(command) {
@@ -314,6 +327,7 @@ define([
             this.stopCamera         = stopCamera;
             this.ls                 = ls;
             this.fileInfo           = fileInfo;
+            this.getPreviewUrl      = getPreviewUrl;
 
             Discover(
                 'device-master',

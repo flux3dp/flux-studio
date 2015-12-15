@@ -50,7 +50,7 @@ define([
     return function(args) {
         args = args || {};
 
-        var advancedSetting = {},
+        var advancedSettings = {},
             _scale = {
                 locked  : true,
                 x       : 1,
@@ -78,15 +78,28 @@ define([
             view = React.createClass({
 
                 getInitialState: function() {
+                    var s1 = Config().read('advanced-settings');
+                    if(!s) {
+                        advancedSettings = {};
+                        advancedSettings.custom = AppSettings.custom;
+                    }
+                    else {
+                        advancedSettings = s1;
+                    }
+
                     return ({
                         showPreviewModeList         : false,
-                        showAdvancedSetting         : false,
+                        showAdvancedSettings        : false,
                         modelSelected               : null,
                         openPrinterSelectorWindow   : false,
                         openObjectDialogue          : false,
                         openWaitWindow              : false,
                         openImportWindow            : true,
                         isTransforming              : false,
+                        hasOutOfBoundsObject        : false,
+                        hasObject                   : false,
+                        raftOn                      : advancedSettings.raft_layers !== 0,
+                        supportOn                   : advancedSettings.support_material === 1,
                         previewLayerCount           : 0,
                         progressMessage             : '',
                         fcode                       : {},
@@ -106,15 +119,7 @@ define([
                         }
                     });
 
-                    var s = Config().read('advanced-settings');
-                    if(!s) {
-                        advancedSetting = {};
-                        advancedSetting.custom = AppSettings.custom;
-                    }
-                    else {
-                        advancedSetting = s;
-                    }
-                    // advancedSetting = !!s ? s : '{}';
+                    this._handleApplyAdvancedSetting();
 
                     $importBtn = this.refs.importBtn.getDOMNode();
 
@@ -127,16 +132,24 @@ define([
                     director.setParameter('printSpeed', speed);
                 },
 
-                _handleRaftClick: function(state) {
-                    director.setParameter('raft', state ? '1' : '0');
+                _handleRaftClick: function() {
+                    var isOn = !this.state.raftOn;
+                    director.setParameter('raft', isOn ? '1' : '0');
+                    advancedSettings.raft_layers = isOn ? advancedSettings.raft : 0;
+                    this.setState({ raftOn: isOn });
+                    Config().write('advanced-settings', JSON.stringify(advancedSettings));
                 },
 
-                _handleSupportClick: function(state) {
-                    director.setParameter('support', state ? '1' : '0');
+                _handleSupportClick: function() {
+                    var isOn = !this.state.supportOn;
+                    director.setParameter('support', isOn ? '1' : '0');
+                    advancedSettings.support_material = isOn ? 1 : 0;
+                    this.setState({ supportOn: isOn });
+                    Config().write('advanced-settings', JSON.stringify(advancedSettings));
                 },
 
                 _handleToggleAdvancedSettingPanel: function() {
-                    this.setState({ showAdvancedSetting: !this.state.showAdvancedSetting });
+                    this.setState({ showAdvancedSettings: !this.state.showAdvancedSettings });
                 },
 
                 _handleGoClick: function() {
@@ -179,23 +192,19 @@ define([
                 },
 
                 _handleCloseAdvancedSetting: function() {
-                    this.setState({ showAdvancedSetting: false });
+                    this.setState({ showAdvancedSettings: false });
                 },
 
                 _handleApplyAdvancedSetting: function(setting) {
+                    setting = setting || advancedSettings;
                     Config().write('advanced-settings', JSON.stringify(setting));
-                    advancedSetting = setting;
-                    director.setAdvanceParameter(setting);
+                    advancedSettings = setting;
+                    this.setState({ supportOn: setting.support_material === 1 });
+                    return director.setAdvanceParameter(setting);
                 },
 
                 _handleTogglePrintPause: function(printPaused) {
                     console.log(printPaused ? 'print paused' : 'continue printing');
-                },
-
-                _handlePrintCancel: function(e) {
-                },
-
-                _handlePrintRestart: function(e) {
                 },
 
                 _handleImport: function(e) {
@@ -251,14 +260,14 @@ define([
                         });
                     }.bind(this));
 
-                    DeviceMaster.selectDevice(selectedPrinter).then(function(status) {
-                        if(status === DeviceConstants.CONNECTED) {
-                            this.setState({ printerControllerStatus: status });
-                        }
-                        else if (status === DeviceConstants.TIMEOUT) {
-                            AlertActions.showPopupError(_id, _lang.message.connectionTimeout);
-                        }
-                    }.bind(this));
+                    // DeviceMaster.selectDevice(selectedPrinter).then(function(status) {
+                    //     if(status === DeviceConstants.CONNECTED) {
+                    //         this.setState({ printerControllerStatus: status });
+                    //     }
+                    //     else if (status === DeviceConstants.TIMEOUT) {
+                    //         AlertActions.showPopupError(_id, _lang.message.connectionTimeout);
+                    //     }
+                    // }.bind(this));
                 },
 
                 _handlePreviewLayerChange: function(targetLayer) {
@@ -292,14 +301,14 @@ define([
                         low: 0.3
                     };
                     director.setParameter('layer_height', quality[level]);
-                    advancedSetting.layer_height = quality[level];
+                    advancedSettings.layer_height = quality[level];
                 },
 
                 _renderAdvancedPanel: function() {
                     var content = (
                         <AdvancedPanel
                             lang        = {lang}
-                            setting     = {advancedSetting}
+                            setting     = {advancedSettings}
                             onClose     = {this._handleCloseAdvancedSetting}
                             onApply     = {this._handleApplyAdvancedSetting} />
                     );
@@ -342,7 +351,10 @@ define([
                         <LeftPanel
                             lang                        = {lang}
                             hasObject                   = {this.state.hasObject}
+                            hasOutOfBoundsObject        = {this.state.hasOutOfBoundsObject}
                             previewLayerCount           = {this.state.previewLayerCount}
+                            raftOn                      = {this.state.raftOn}
+                            supportOn                   = {this.state.supportOn}
                             onQualitySelected           = {this._handleQualitySelected}
                             onRaftClick                 = {this._handleRaftClick}
                             onSupportClick              = {this._handleSupportClick}
@@ -358,6 +370,7 @@ define([
                             lang                    = {lang}
                             camera                  = {this.state.camera}
                             hasObject               = {this.state.hasObject}
+                            hasOutOfBoundsObject    = {this.state.hasOutOfBoundsObject}
                             onGoClick               = {this._handleGoClick}
                             onDownloadGCode         = {this._handleDownloadGCode}
                             onCameraPositionChange  = {this._handleCameraPositionChange}
@@ -407,7 +420,7 @@ define([
                 },
 
                 render: function() {
-                    var advancedPanel           = this.state.showAdvancedSetting ? this._renderAdvancedPanel() : '',
+                    var advancedPanel           = this.state.showAdvancedSettings ? this._renderAdvancedPanel() : '',
                         importWindow            = this.state.openImportWindow ? this._renderImportWindow() : '',
                         leftPanel               = this._renderLeftPanel(),
                         rightPanel              = this._renderRightPanel(),

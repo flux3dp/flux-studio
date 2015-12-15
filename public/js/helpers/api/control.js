@@ -83,6 +83,9 @@ define([
                             break;
                     }
                 };
+                events.onError = function(result) {
+                    d.resolve(result);
+                };
                 lastOrder = 'ls';
                 ws.send(lastOrder + ' ' + path);
 
@@ -107,6 +110,9 @@ define([
                         default:
                             break;
                     }
+                };
+                events.onError = function(result) {
+                    d.resolve(result);
                 };
 
                 return d.promise();
@@ -339,6 +345,25 @@ define([
 
                 ws.send('quit');
                 lastOrder = 'quit';
+
+                return d.promise();
+            },
+            getPreview: function() {
+                var d = $.Deferred(),
+                    blob;
+
+                events.onMessage = function(result) {
+                    if(result instanceof Blob) {
+                        d.resolve(result);
+                    }
+                };
+
+                events.onError = function(result) {
+                    d.resolve('');
+                }
+
+                ws.send('play info');
+                lastOrder = 'play info';
 
                 return d.promise();
             }

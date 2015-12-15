@@ -12,11 +12,12 @@ define([
         propTypes: {
             lang                    : React.PropTypes.object,
             hasObject               : React.PropTypes.bool,
+            hasOutOfBoundsObject    : React.PropTypes.bool,
             onPreviewClick          : React.PropTypes.func,
             onDownloadGCode         : React.PropTypes.func,
             onDownloadFCode         : React.PropTypes.func,
             onGoClick               : React.PropTypes.func,
-            onCameraPositionChange  : React.PropTypes.func
+            onCameraPositionChange  : React.PropTypes.func,
         },
 
         getInitialState: function() {
@@ -85,7 +86,7 @@ define([
                 buttons = [{
                     label: lang.laser.get_fcode,
                     className: cx({
-                        'btn-disabled': !this.props.hasObject,
+                        'btn-disabled': !this.props.hasObject || this.props.hasOutOfBoundsObject,
                         'btn-default': true,
                         'btn-hexagon': true,
                         'btn-get-fcode': true
@@ -95,7 +96,7 @@ define([
                 }, {
                     label: lang.laser.go,
                     className: cx({
-                        'btn-disabled': !this.props.hasObject,
+                        'btn-disabled': !this.props.hasObject || this.props.hasOutOfBoundsObject,
                         'btn-default': true,
                         'btn-hexagon': true,
                         'btn-go': true

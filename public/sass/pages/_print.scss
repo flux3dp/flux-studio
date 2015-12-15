@@ -438,9 +438,8 @@ input.switch:checked ~ label:after {
         width: 440px;
 
         .content-wrapper {
-            height: 415px;
+            height: 427px;
             overflow-y: auto;
-            padding: 0 0 70px 0;
         }
 
         .tab-list {
@@ -493,7 +492,6 @@ input.switch:checked ~ label:after {
             height: 70px;
             left: 0;
             margin-bottom: 0;
-            position: absolute;
             right: 0;
             text-align: center;
 
@@ -791,34 +789,27 @@ input.switch:checked ~ label:after {
                     height: 255px;
                     width: 403px;
                 }
-
-                .content.quality {
-                    background-color: #B3B3B3;
-                    width: 160px;
-                    z-index: 1000;
-
-                    ul {
-                        background-color: #B3B3B3;
-                        color: #B3B3B3;
-                        li {
-                            color: #E0E0DF;
-                            font-size: 16px;
-                        }
-                    }
-                }
                 .content.preview {
                     width: 50px;
                 }
             }
         }
 
+        .content.quality {
+            ul {
+                li {
+                    cursor: pointer;
+                }
+            }
+        }
     }
     .rightPanel {
         height: 100%;
         position: absolute;
         right: 0;
-        width: 275px;
+        width: 170px;
         z-index: 1;
+        pointer-events: none;
 
         svg {
             bottom: 50px;
@@ -850,6 +841,7 @@ input.switch:checked ~ label:after {
             bottom: 55%;
             height: 100px;
             position: absolute;
+            pointer-events: auto;
         }
     }
 

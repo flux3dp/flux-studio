@@ -2527,7 +2527,8 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         bottom: 28px;
         position: fixed;
         right: 20px;
-        width: 87px; }
+        width: 87px;
+        pointer-events: auto; }
         .studio-container .beehive-buttons .btn.btn-disabled {
             background: #CCC; }
         .studio-container .beehive-buttons .btn {
@@ -2964,7 +2965,8 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         text-overflow: ellipsis;
         word-break: break-all;
         white-space: nowrap;
-        overflow: hidden; }
+        overflow: hidden;
+        cursor: pointer; }
     .ui-dialog-menu .dialog-window {
         display: none;
         align-self: center; }
@@ -3540,14 +3542,11 @@ input[type=range]:focus::-webkit-slider-runnable-track {
     line-height: 18px; }
 
 .flux-monitor {
-    position: absolute;
-    left: 50%;
-    top: 100px; }
+    left: 50%; }
     .flux-monitor .main {
         background-color: white;
         height: 40rem;
         width: 31rem;
-        left: -50%;
         position: relative; }
         .flux-monitor .main .title {
             height: 5rem;
@@ -3662,7 +3661,6 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         background-color: white;
         height: 10rem;
         width: 31rem;
-        left: -50%;
         position: relative;
         margin-top: 5px; }
         .flux-monitor .sub .wrapper {
@@ -4145,9 +4143,8 @@ input.switch:checked ~ label:after {
     position: relative;
     width: 440px; }
     .print-studio .advanced-panel .content-wrapper {
-        height: 415px;
-        overflow-y: auto;
-        padding: 0 0 70px 0; }
+        height: 427px;
+        overflow-y: auto; }
     .print-studio .advanced-panel .tab-list {
         display: table;
         list-style: none;
@@ -4187,7 +4184,6 @@ input.switch:checked ~ label:after {
         height: 70px;
         left: 0;
         margin-bottom: 0;
-        position: absolute;
         right: 0;
         text-align: center; }
         .print-studio .advanced-panel .footer div {
@@ -4415,25 +4411,18 @@ input.switch:checked ~ label:after {
                 background-color: #F9F9F9;
                 height: 255px;
                 width: 403px; }
-            .print-studio .leftPanel .popup-selection .popup .content.quality {
-                background-color: #B3B3B3;
-                width: 160px;
-                z-index: 1000; }
-                .print-studio .leftPanel .popup-selection .popup .content.quality ul {
-                    background-color: #B3B3B3;
-                    color: #B3B3B3; }
-                    .print-studio .leftPanel .popup-selection .popup .content.quality ul li {
-                        color: #E0E0DF;
-                        font-size: 16px; }
             .print-studio .leftPanel .popup-selection .popup .content.preview {
                 width: 50px; }
+    .print-studio .leftPanel .content.quality ul li {
+        cursor: pointer; }
 
 .print-studio .rightPanel {
     height: 100%;
     position: absolute;
     right: 0;
-    width: 275px;
-    z-index: 1; }
+    width: 170px;
+    z-index: 1;
+    pointer-events: none; }
     .print-studio .rightPanel svg {
         bottom: 50px;
         height: 230px;
@@ -4456,7 +4445,8 @@ input.switch:checked ~ label:after {
     .print-studio .rightPanel .cameraViewController {
         bottom: 55%;
         height: 100px;
-        position: absolute; }
+        position: absolute;
+        pointer-events: auto; }
 
 .print-studio .object-dialogue.through {
     pointer-events: none; }
@@ -4684,7 +4674,7 @@ input.switch:checked ~ label:after {
     text-align: center; }
 
 .settings .nav li.nav-item {
-    width: 50%;
+    width: 100%;
     height: 47px;
     line-height: 47px;
     display: inline;

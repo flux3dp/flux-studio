@@ -7,7 +7,9 @@ define([
     'helpers/api/control',
     'helpers/file-system',
     'app/actions/alert-actions',
+    'app/actions/progress-actions',
     'app/constants/device-constants',
+    'app/constants/progress-constants',
     'threeOrbitControls',
     'threeTrackballControls',
     'threeTransformControls',
@@ -25,7 +27,9 @@ define([
     printerController,
     FileSystem,
     AlertActions,
-    DeviceConstants
+    ProgressActions,
+    DeviceConstants,
+    ProgressConstants
 ) {
     'use strict';
 
@@ -44,9 +48,11 @@ define([
     var movingOffsetX, movingOffsetY, panningOffset, originalCameraPosition, originalCameraRotation,
         scaleBeforeTransformX, scaleBeforeTransformY, scaleBeforeTransformZ;
 
-    var responseBlob, printPath,
+    var _id = 'PRINT.JS',
+        responseBlob, printPath,
         previewScene,
         previewColors = [],
+        previewUrl = '',
         blobExpired = true,
         transformMode = false,
         shiftPressed = false,
@@ -55,7 +61,8 @@ define([
         ddHelper = 0,
         defaultFileName = '',
         cameraLight,
-        _id = 'PRINT.JS';
+        outOfBoundCount = 0,
+        lang = {};
 
     var s = {
         diameter: 170,
@@ -177,15 +184,6 @@ define([
 
         panningOffset = new THREE.Vector3();
 
-        // var _g = new THREE.BoxGeometry(20, 20, 20);
-        // var _m = new THREE.MeshBasicMaterial({
-        //     color: 0xAAAAAA,
-        //     wireframe: false
-        // });
-        // var _cube = new THREE.Mesh(_g, _m);
-        // var axes = new THREE.AxisHelper( 100 ); // this will be on top
-        // outlineScene.add(_cube);
-
         render();
         setImportWindowPosition();
 
@@ -242,6 +240,7 @@ define([
             openWaitWindow: true,
             openImportWindow: false
         });
+        lang = reactSrc.state.lang;
 
         loader.load(model_file_path, function(geometry) {
 
@@ -255,6 +254,7 @@ define([
                 reactSrc.setState({
                     openWaitWindow: false
                 });
+                callback();
             });
 
             geometry.center();
@@ -312,7 +312,6 @@ define([
             });
 
             render();
-            callback();
         });
     }
 
@@ -351,6 +350,7 @@ define([
 
     function onDropFile(e) {
         e.preventDefault();
+        if(previewMode) { return; }
         var files = e.dataTransfer.files;
         if(files.length > 0) {
             appendModels(files, 0, function() {
@@ -362,7 +362,7 @@ define([
 
     function onDragEnter(e) {
         e.preventDefault();
-
+        if(previewMode) { return; }
         if(e.type === 'dragenter') {
             ddHelper++;
         }
@@ -373,6 +373,7 @@ define([
 
     function onDragLeave(e) {
         e.preventDefault();
+        if(previewMode) { return; }
         ddHelper--;
 
         if(ddHelper === 0) {
@@ -386,6 +387,7 @@ define([
 
     function onMouseDown(e) {
         e.preventDefault();
+        if(previewMode) { return; }
         setMousePosition(e);
 
         if (previewMode) {
@@ -488,6 +490,7 @@ define([
     }
 
     function onTransform(e) {
+        if(previewMode) { return; }
         switch (e.type) {
             case 'mouseDown':
                 transformMode = true;
@@ -615,11 +618,13 @@ define([
     function getGCode() {
         var d = $.Deferred();
         var ids = [];
+
         objects.forEach(function(obj) {
             ids.push(obj.uuid);
         });
 
-        _setProgressMessage('Saving File Preview');
+        ProgressActions.open(ProgressConstants.STEPPING, lang.monitor.processing, lang.monitor.savingPreview);
+
         getBlobFromScene().then(function(blob) {
             reactSrc.setState({ previewUrl: URL.createObjectURL(blob) });
             return slicer.uploadPreviewImage(blob);
@@ -630,7 +635,7 @@ define([
                         if (result instanceof Blob) {
                             blobExpired = false;
                             responseBlob = result;
-                            _setProgressMessage('');
+                            ProgressActions.close();
                             d.resolve(result);
                         }
                         else {
@@ -638,10 +643,10 @@ define([
                                 var serverMessage = `${result.status}: ${result.message} (${parseInt(result.percentage * 100)}%)`,
                                     drawingMessage = `FInishing up... (100%)`,
                                     message = result.status !== 'complete' ? serverMessage : drawingMessage;
-                                _setProgressMessage(message);
+                                ProgressActions.updating(message, parseInt(result.percentage * 100));
                             }
                             else {
-                                _setProgressMessage('');
+                                ProgressActions.close();
                             }
                         }
                     });
@@ -659,8 +664,7 @@ define([
 
     function getFCode() {
         var d = $.Deferred();
-        var ids = [],
-            previewUrl;
+        var ids = [];
 
         if(objects.length === 0) {
             d.resolve('');
@@ -668,7 +672,7 @@ define([
         }
 
         if(!blobExpired) {
-            d.resolve(responseBlob);
+            d.resolve(responseBlob, previewUrl);
             return d.promise();
         }
 
@@ -676,7 +680,8 @@ define([
             ids.push(obj.uuid);
         });
 
-        _setProgressMessage('Saving File Preview');
+        ProgressActions.open(ProgressConstants.STEPPING, 'Caption', 'Saving File Preview');
+
         getBlobFromScene().then(function(blob) {
             previewUrl = URL.createObjectURL(blob);
             return slicer.uploadPreviewImage(blob);
@@ -687,18 +692,23 @@ define([
                         if (result instanceof Blob) {
                             blobExpired = false;
                             responseBlob = result;
-                            _setProgressMessage('');
+                            ProgressActions.close();
                             d.resolve(result, previewUrl);
                         }
                         else {
                             if (result.status !== 'error') {
-                                var serverMessage = `${result.status}: ${result.message} (${parseInt(result.percentage * 100)}%)`,
-                                    drawingMessage = `FInishing up... (100%)`,
-                                    message = result.status !== 'complete' ? serverMessage : drawingMessage;
-                                _setProgressMessage(message);
+                                var progress = `${result.status}: ${result.message} (${parseInt(result.percentage * 100)}%)`,
+                                    complete = `FInishing up...`;
+
+                                if(result.status !== 'complete') {
+                                    ProgressActions.updating(progress, parseInt(result.percentage * 100));
+                                }
+                                else {
+                                    ProgressActions.updating(complete, 100);
+                                }
                             }
                             else {
-                                _setProgressMessage('');
+                                ProgressActions.close();
                             }
                         }
                     });
@@ -794,10 +804,6 @@ define([
     }
 
     function setAdvanceParameter(settings) {
-        // var _settings = Object.keys(settings).map(function(key) {
-        //     return `${key}=${settings[key]} \n`;
-        // });
-        //slicer.setParameter('advancedSettings', _settings.join('\n')).then(function(result) {
         slicer.setParameter('advancedSettings', settings.custom).then(function(result, errors) {
             if(errors.length > 0) {
                 AlertActions.showPopupError(_id, errors.join('\n'));
@@ -1082,12 +1088,20 @@ define([
             });
 
             sourceMesh.outlineMesh.material.color.setHex(sourceMesh.position.isOutOfBounds ? s.colorOutside : s.colorSelected);
+
+            var hasOutOfBoundsObject = objects.some(function(o) {
+                return o.position.isOutOfBounds;
+            });
+
+            reactSrc.setState({
+                hasOutOfBoundsObject: hasOutOfBoundsObject
+            });
         }
     }
 
     function sendGCodeParameters() {
         var d = $.Deferred();
-        _syncObjectParameter(objects, 0).then(function() {
+        _syncObjectParameter(objects, 0, function() {
             d.resolve('');
         });
         return d.promise();
@@ -1195,7 +1209,8 @@ define([
             //     previewMode: isOn
             // });
             previewMode = isOn;
-            _setProgressMessage('generating preview...');
+            // _setProgressMessage('generating preview...');
+
             isOn ? _showPreview() : _hidePreview();
         }
     }
@@ -1374,8 +1389,9 @@ define([
     // Private Functions ---
 
     // sync parameters with server
-    function _syncObjectParameter(objects, index) {
-        var d = $.Deferred();
+    function _syncObjectParameter(objects, index, callback) {
+
+        // var d = $.Deferred();
         index = index || 0;
         if (index < objects.length) {
             slicer.set(
@@ -1394,13 +1410,12 @@ define([
                     index = objects.length;
                 }
                 if (index < objects.length) {
-                    return d.resolve(_syncObjectParameter(objects, index + 1));
+                    _syncObjectParameter(objects, index + 1, callback);
                 }
             });
         } else {
-            d.resolve('');
+            callback();
         }
-        return d.promise();
     }
 
     function _addShadowedLight(x, y, z, color, intensity) {

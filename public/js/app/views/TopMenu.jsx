@@ -142,6 +142,7 @@ define([
             componentDidMount: function() {
                 AlertStore.onNotify(this._handleNotification);
                 AlertStore.onPopup(this._handlePopup);
+                AlertStore.onClosePopup(this._handleClosePopup);
                 AlertStore.onFirmwareUpdate(this._showFirmwareUpdate);
                 ProgressStore.onOpened(this._handleProgress).
                     onUpdating(this._handleProgress).
@@ -282,6 +283,10 @@ define([
                     sourceId    : id,
                     message     : message
                 });
+            },
+
+            _handleClosePopup: function() {
+                this.setState({ showNotificationModal: false });
             },
 
             _handleNavigation: function(address) {
