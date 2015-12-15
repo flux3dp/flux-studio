@@ -69,10 +69,7 @@ function(
                                     {opt.label}
                                 </div>
                                 <label className="dialog-window">
-                                    <svg className={arrowClassName} version="1.1" xmlns="http://www.w3.org/2000/svg"
-                                        width="46.8" height="30">
-                                        <polygon points="0,15 46.8,0 46.8,30"/>
-                                    </svg>
+                                    <div className={arrowClassName}/>
                                     <div className="dialog-window-content">
                                         {opt.content}
                                     </div>
