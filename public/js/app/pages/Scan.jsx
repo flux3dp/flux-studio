@@ -104,7 +104,7 @@ define([
 
                 componentDidMount: function() {
                     AlertStore.onRetry(this._retry);
-                    AlertStore.onAbort(this._retry);
+                    AlertStore.onAbort(this._abort);
                     AlertStore.onCancel(this._cancelScan);
                 },
 
@@ -159,7 +159,7 @@ define([
                                 var blob = new Blob(image_blobs, {type: mime_type}),
                                     url = (window.URL || window.webkitURL),
                                     objectUrl = url.createObjectURL(blob),
-                                    img = self.refs.camera_image.getDOMNode();
+                                    img;
 
                                 if (false === self.state.showCamera) {
                                     self.setState({
@@ -167,14 +167,18 @@ define([
                                     });
                                 }
 
-                                img.onload = function() {
-                                    // release the object URL once the image has loaded
-                                    url.revokeObjectURL(objectUrl);
-                                    blob = null;
-                                };
+                                if (true === self.isMounted()) {
+                                    img = self.refs.camera_image.getDOMNode();
 
-                                // trigger the image to load
-                                img.src = objectUrl;
+                                    img.onload = function() {
+                                        // release the object URL once the image has loaded
+                                        url.revokeObjectURL(objectUrl);
+                                        blob = null;
+                                    };
+
+                                    // trigger the image to load
+                                    img.src = objectUrl;
+                                }
                             }
                         )
                     });
@@ -885,7 +889,7 @@ define([
                         };
 
                     return (
-                        0 < state.selectedMeshes.length && false === state.blocker ?
+                        0 < state.selectedMeshes.length && false === state.blocker && false === state.isScanStarted ?
                         <ManipulationPanel
                             lang = {lang}
                             selectedMeshes={state.selectedMeshes}
@@ -1177,7 +1181,7 @@ define([
                         itemClass = {
                             'mesh-thumbnail-item': true,
                             'choose': mesh.choose,
-                            'hide': !mesh.display
+                            'hide': !mesh.display || true === this.state.isScanStarted
                         };
 
                         return {
