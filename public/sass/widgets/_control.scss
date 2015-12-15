@@ -58,7 +58,6 @@
     .dialog-label {
         color: $backGroundColor;
         cursor: pointer;
-        cursor: pointer;
         font-size: $fontSize;
         margin: 0;
         min-width: 200px;
@@ -97,7 +96,6 @@
 
         .dialog-window-content {
             background: $backGroundColor;
-            // padding: 5px 20px;
             padding: 5px;
 
             li {
@@ -112,11 +110,12 @@
         .arrow {
             background: #B3B3B3;
             height: 20px;
-            position: relative;
+            transform: translateX(1px);
             width: 28px;
             align-self: center;
-            -webkit-clip-path: polygon(0 51%, 100% 100%, 100% 0);
-            clip-path: polygon(0 51%, 100% 100%, 100% 0);
+            -webkit-clip-path: polygon(0 50%, 100% 100%, 100% 0);
+            clip-path: polygon(0 50%, 100% 100%, 100% 0);
+            z-index: -1;
         }
     }
 }
