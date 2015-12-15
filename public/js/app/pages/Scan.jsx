@@ -104,6 +104,7 @@ define([
 
                 componentDidMount: function() {
                     AlertStore.onRetry(this._retry);
+                    AlertStore.onAbort(this._retry);
                     AlertStore.onCancel(this._cancelScan);
                 },
 
@@ -126,7 +127,7 @@ define([
                     var self = this;
 
                     switch (id) {
-                    case 'scan-retry':
+                    case 'scan-retry-abort':
                         self.state.scanCtrlWebSocket.retry();
                         break;
                     case 'calibrate':
@@ -135,8 +136,18 @@ define([
                     }
                 },
 
+                _abort: function(id) {
+                    var self = this;
+
+                    switch (id) {
+                    case 'scan-retry-abort':
+                        self.state.scanCtrlWebSocket.takeControl();
+                        break;
+                    }
+                },
+
                 _cancelScan: function() {
-                    this._onScanAgain();
+                    this.setState(this.getInitialState());
                 },
 
                 _refreshCamera: function() {
@@ -972,7 +983,7 @@ define([
                         opts = {
                             onError: function(data) {
                                 self._openBlocker(false);
-                                AlertActions.showPopupRetry('scan-retry', data.error);
+                                AlertActions.showPopupRetryAbort('scan-retry-abort', data.error);
                             },
                             onReady: function() {
                                 self.setState({
