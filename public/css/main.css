@@ -4270,6 +4270,39 @@ input.switch:checked ~ label:after {
     margin-top: 0.05em; }
 
 /* Advanced Panel */
+.print-studio .tour-mask {
+    bottom: 0;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+    z-index: 9999;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    background-color: rgba(0, 0, 0, 0.3); }
+    .print-studio .tour-mask .base {
+        position: relative;
+        left: 744px;
+        top: 388px;
+        width: 200px;
+        height: 200px;
+        border: solid 1px black;
+        background-color: rgba(255, 255, 255, 0.3); }
+    .print-studio .tour-mask .tour-description {
+        top: -70px;
+        position: relative;
+        text-align: center;
+        font-size: 16px;
+        font-weight: bold;
+        color: white; }
+
+.print-studio .btn-tutorial {
+    position: absolute;
+    top: 30px;
+    right: 30px;
+    z-index: 99999; }
+
 .print-studio .import-indicator {
     background-color: rgba(0, 0, 0, 0.5);
     border: 7px dashed #DDD;

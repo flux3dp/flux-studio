@@ -31,6 +31,7 @@ define(function() {
         TIMEOUT         : 'TIMEOUT',
         FILAMENT_RUNOUT : 'FILAMENT_RUNOUT',
         UNKNOWN_ERROR   : 'UNKNOWN_ERROR',
+        UNKNOWN_STATUS  : 'UNKNOWN_STATUS',
         USER_OPERATION  : 'USER_OPERATION',
 
         // Command

@@ -47,6 +47,10 @@ define([
                 existing_key = printers.findIndex(findIndex);
 
             if (false === printers.some(someFn)) {
+                if(typeof data === 'string') {
+                    data = data.replace(/NaN/g, null);
+                    data = JSON.parse(data);
+                }
                 printers.push(data);
             }
             else {
