@@ -1181,7 +1181,7 @@ define([
                         itemClass = {
                             'mesh-thumbnail-item': true,
                             'choose': mesh.choose,
-                            'hide': !mesh.display || true === this.state.isScanStarted
+                            'hide': !mesh.display || true === self.state.isScanStarted
                         };
 
                         return {
