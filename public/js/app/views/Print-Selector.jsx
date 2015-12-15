@@ -204,7 +204,7 @@ define([
 
         _renderSpinner: function() {
             return (
-                <div className="spinner-flip"/>
+                <div className="spinner-roller spinner-roller-reverse absolute-center"/>
             );
         },
 

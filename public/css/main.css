@@ -3312,6 +3312,8 @@ input[type=range]:focus::-webkit-slider-runnable-track {
     position: absolute;
     width: 30.3rem;
     z-index: 1; }
+    .select-printer .spinner-roller {
+        position: absolute; }
     .select-printer .device-wrapper {
         position: relative; }
     .select-printer .arrow {

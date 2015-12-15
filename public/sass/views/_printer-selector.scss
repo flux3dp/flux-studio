@@ -11,6 +11,10 @@
     width: 30.3rem;
     z-index: 1;
 
+    .spinner-roller {
+        position: absolute;
+    }
+
     .device-wrapper {
         position: relative;
     }
