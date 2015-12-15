@@ -113,10 +113,9 @@
         .btn {
             font-size: 1.3rem;
             height: 2.8rem;
-            line-height: 2.8rem;
+            line-height: calc(2.8rem - 4px);    // borders are 2px
             margin: 0 .6rem 0 0;
             max-width: 13rem;
-            flex: 1;
 
             &:last-child {
                 margin: 0;
@@ -126,6 +125,10 @@
 }
 
 .modal-progress {
+    .modal-alert {
+        min-height: 18rem;
+    }
+
     .spinner-roller {
         background: linear-gradient(to right, #DEDEDC 10%, rgba(255, 255, 255, 0) 42%);
         height: 7em;
