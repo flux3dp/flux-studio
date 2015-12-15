@@ -149,6 +149,8 @@ define([
 
                     self._saveLastestSet({ material: chooseMaterial });
                 }
+
+                self.openSubPopup(e);
             }
         },
 
