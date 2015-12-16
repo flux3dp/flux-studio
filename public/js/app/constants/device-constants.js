@@ -34,6 +34,10 @@ define(function() {
         UNKNOWN_STATUS  : 'UNKNOWN_STATUS',
         USER_OPERATION  : 'USER_OPERATION',
 
+        // Print head
+        EXTRUDER        : 'EXTRUDER',
+        PRINTER         : 'PRINTER',
+
         // Command
         RESUME          : 'RESUME',
         PAUSE           : 'PAUSE',
@@ -41,6 +45,7 @@ define(function() {
         REPORT          : 'REPORT',
         ABORT           : 'ABORT',
         QUIT            : 'QUIT',
+        KICK            : 'KICK',
         LS              : 'LS'
     };
 });

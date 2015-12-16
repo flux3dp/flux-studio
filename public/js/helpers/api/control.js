@@ -352,18 +352,21 @@ define([
                 return d.promise();
             },
             getPreview: function() {
-                var d = $.Deferred(),
-                    blob;
+                var d       = $.Deferred(),
+                    data    = [];
 
                 events.onMessage = function(result) {
-                    if(result instanceof Blob) {
-                        d.resolve(result);
+                    if(result.status === 'ok') {
+                        d.resolve(data);
+                    }
+                    else {
+                        data.push(result);
                     }
                 };
 
                 events.onError = function(result) {
                     d.resolve('');
-                }
+                };
 
                 ws.send('play info');
                 lastOrder = 'play info';

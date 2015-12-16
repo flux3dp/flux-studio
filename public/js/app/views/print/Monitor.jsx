@@ -24,14 +24,26 @@ define([
         showingPopup = false,
         messageViewed = false,
         operationStatus,
+        previewUrl = '',
+        lang,
         lastAction,
+
+        // error display
         mainError = '',
         subError = '',
         lastError = '',
         errorMessage = '',
         lastMessage = '',
-        previewUrl = '',
-        lang,
+        headInfo = '',
+
+        // for monitor temperature, time...
+        progress = 0,
+        totalTimeInSeconds = 0,
+        timeLeft =  0,
+        progress = '',
+        temperature = '',
+        stateId = 0,
+
         refreshTime = 5000;
 
     var mode = {
@@ -56,22 +68,19 @@ define([
             lang                : React.PropTypes.object,
             selectedDevice      : React.PropTypes.object,
             fCode               : React.PropTypes.object,
-            // previewUrl          : React.PropTypes.string,
+            previewUrl          : React.PropTypes.string,
             onClose             : React.PropTypes.func
         },
 
         getInitialState: function() {
             return {
-                desiredTemperature  : 280,
-                currentTemperature  : 0,
-                printingProgress    : 0,
-                printStatus         : false,
-                printError          : false,
                 waiting             : false,
                 mode                : mode.PREVIEW,
                 directoryContent    : {},
                 cameraImageUrl      : '',
                 selectedFileName    : '',
+                headInfo            : '',
+                progress            : '',
                 currentStatus       : DeviceConstants.READY,
                 previewUrl          : this.props.previewUrl
             };
@@ -92,8 +101,15 @@ define([
             lang        = this.props.lang.monitor;
 
             if(!this.props.fCode) {
-                DeviceMaster.getPreviewUrl().then(function(previewUrl) {
-                    this.setState({ previewUrl: previewUrl });
+                DeviceMaster.getPreviewInfo().then(function(info) {
+                    info = info || [];
+                    info[0] = info[0] || {};
+
+                    if(info[0].TIME_COST) {
+                        totalTimeInSeconds = info[0].TIME_COST;
+                        // console.log(totalTimeInSeconds);
+                        // this._updateTotalTime(parseInt(info[0].TIME_COST));
+                    }
                     this._startReport();
                 }.bind(this));
             }
@@ -102,6 +118,7 @@ define([
         componentDidMount: function() {
             AlertStore.onRetry(this._handleRetry);
             AlertStore.onCancel(this._handleCancel);
+            AlertStore.onYes(this._handleYes);
             this._addHistory();
         },
 
@@ -120,6 +137,23 @@ define([
             return this.props.fCode instanceof Blob;
         },
 
+        _formatTime(timeInSeconds) {
+            var hour = 0,
+                min = 0,
+                time = '';
+
+            if(timeInSeconds > 360) {
+                hour = parseInt(timeInSeconds / 3600);
+                min = parseInt((timeInSeconds % 3600) / 60);
+                time = `${hour} ${lang.hour} ${min} ${lang.minute}`;
+            }
+            else if(timeInSeconds > 60) {
+                time = `${parseInt(timeInSeconds / 60)} ${lang.minute}`;
+            }
+
+            return time;
+        },
+
         _handleClose: function() {
             this.props.onClose();
         },
@@ -135,6 +169,12 @@ define([
         _handleCancel: function(id) {
             messageViewed = true;
             showingPopup = false;
+        },
+
+        _handleYes: function(id) {
+            if(id === DeviceConstants.KICK) {
+                DeviceMaster.kick();
+            }
         },
 
         _handleBrowseFile: function() {
@@ -261,7 +301,12 @@ define([
         },
 
         _handleStop: function() {
-            DeviceMaster.stop();
+            if(stateId < 0) {
+                AlertActions.showPopupYesNo('KICK', lang.forceStop);
+            }
+            else {
+                DeviceMaster.stop();
+            }
         },
 
         _addHistory: function() {
@@ -291,6 +336,7 @@ define([
             mainError       = '';
             subError        = '';
             status          = report.st_label;
+            stateId         = report.st_id;
 
             if(report.error) {
                 if(typeof(report.error) === 'string') {
@@ -308,7 +354,7 @@ define([
             if(report.error && this._isError(status)) {
                 if(lastError !== mainError) {
                     AlertActions.showPopupError(_id, mainError + '\n' + subError);
-                    lastError = mainError
+                    lastError = mainError;
                     showingPopup = true;
                     messageViewed = false;
                 }
@@ -350,16 +396,35 @@ define([
                 status = DeviceConstants.READY;
             }
 
-            // console.log('showing popup ', showingPopup, 'message viewed:' + messageViewed + '\n');
             if(showingPopup && status === DeviceConstants.RUNNING && !messageViewed) {
                 showingPopup = false;
                 AlertActions.closePopup();
             }
 
+            if(report.prog) {
+                progress = parseInt(report.prog * 100);
+                timeLeft = this._formatTime(totalTimeInSeconds * (1 - report.prog));
+                progress = `${progress}%, ${timeLeft} ${lang.left}`;
+            }
+            else {
+                progress = '';
+            }
+
+            if(report.rt) {
+                temperature = `${lang.temperature} ${report.rt} °C`;
+            }
+
+            if(report.module) {
+                if(report.module === DeviceConstants.EXTRUDER) {
+                    headInfo = DeviceConstants.PRINTER;
+                }
+            }
+
             this.setState({
-                temperature: report.rt,
-                targetTemperature: report.tt,
-                currentStatus: status
+                temperature: temperature,
+                currentStatus: status,
+                progress: progress,
+                headInfo: headInfo
             });
         },
 
@@ -602,8 +667,7 @@ define([
                 content     = this._renderContent(),
                 waitIcon    = this.state.waiting ? this._renderSpinner() : '',
                 operation   = this._renderOperation(),
-                subClass    = ClassNames('sub', {'hide': false }),
-                temperature = this.state.temperature ? (this.state.temperature + ' / ' + this.state.targetTemperature) : '';
+                subClass    = ClassNames('sub', {'hide': false });
 
             return (
                 <div className="flux-monitor">
@@ -632,15 +696,15 @@ define([
                         <div className="wrapper">
                             <div className="row">
                                 <div className="head-info">
-                                    3D PRINTER
+                                    {this.state.headInfo}
                                 </div>
                                 <div className="status right">
                                     {this.state.currentStatus}
                                 </div>
                             </div>
                             <div className="row">
-                                <div className="temperature">{temperature} &#8451;</div>
-                                <div className="time-left right">1 hour 30 min</div>
+                                <div className="temperature">{this.state.temperature}</div>
+                                <div className="time-left right">{this.state.progress}</div>
                             </div>
                         </div>
                         <div className="actions center">
