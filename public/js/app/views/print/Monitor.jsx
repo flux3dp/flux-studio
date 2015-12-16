@@ -346,8 +346,6 @@ define([
                 }
             }
 
-            // console.log('status: ' + status, 'main: ' + mainError, 'sub: ' + subError);
-
             // check for error
             if(report.error && this._isError(status)) {
                 if(lastError !== mainError) {
@@ -411,11 +409,17 @@ define([
             if(report.rt) {
                 temperature = `${lang.temperature} ${report.rt} °C`;
             }
+            else {
+                temperature = '';
+            }
 
             if(report.module) {
                 if(report.module === DeviceConstants.EXTRUDER) {
                     headInfo = DeviceConstants.PRINTER;
                 }
+            }
+            else {
+                headInfo = '';
             }
 
             this.setState({
