@@ -382,6 +382,10 @@ define([
                     this.setState({ tutorialOn: false });
                 },
 
+                _handleCloseAllView: function() {
+                    GlobalActions.closeAllView();
+                },
+
                 _renderAdvancedPanel: function() {
                     var content = (
                         <AdvancedPanel
@@ -414,7 +418,7 @@ define([
                 _renderImportWindow: function() {
                     return (
                         <div className="importWindow">
-                            <div className="arrowBox">
+                            <div className="arrowBox" onClick={this._handleCloseAllView}>
                                 <div title={lang.print.importTitle} className="file-importer">
                                     <div className="import-btn">{lang.print.import}</div>
                                     <input type="file" accept=".stl" onChange={this._handleImport} />

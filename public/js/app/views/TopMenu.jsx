@@ -158,11 +158,14 @@ define([
                 AlertStore.onClosePopup(this._handleClosePopup);
                 AlertStore.onFirmwareUpdate(this._showFirmwareUpdate);
                 AlertStore.onChangeFilament(this._showChangeFilament);
+
                 ProgressStore.onOpened(this._handleProgress).
                     onUpdating(this._handleProgress).
                     onClosed(this._handleProgressFinish);
                 InputLightboxStore.onInputLightBoxOpened(this._handleInputLightBoxOpen);
+
                 GlobalStore.onShowMonitor(this._handleOpenMonitor);
+                GlobalStore.onCloseAllView(this._handleCloseAllView);
             },
 
             componentWillUnmount: function() {
@@ -418,6 +421,11 @@ define([
                 this.setState({
                     showMonitor: false
                 });
+            },
+
+            _handleCloseAllView: function() {
+                $('.device > .menu').removeClass('show');
+                $('.dialog-opener').prop('checked','');
             },
 
             _renderStudioFunctions: function() {
