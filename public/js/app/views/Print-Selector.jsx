@@ -263,10 +263,7 @@ define([
             return (
                 <div className={wrapperClass}>
                     {content}
-                    <svg className="arrow" version="1.1" xmlns="http://www.w3.org/2000/svg"
-                        width="36.8" height="20">
-                        <polygon points="0,0 0,20 36.8,10"/>
-                    </svg>
+                    <div className="arrow arrow-right"/>
                 </div>
             );
         },
