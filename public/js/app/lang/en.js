@@ -445,8 +445,8 @@ define(function() {
                 low: 'LOW QUALITY'
             },
             quick_print: 'Quick Print',
-            scale: 'Scale',
-            rotate: 'Rotate',
+            scale: 'SCALE',
+            rotate: 'ROTATE',
             align_center: 'Align Center',
             delete: 'Delete',
             reset: 'Reset',
@@ -465,7 +465,7 @@ define(function() {
             deviceTitle: 'Show device monitor'
         },
         laser: {
-            import: 'Import',
+            import: 'IMPORT',
             save: 'Save',
             custom: 'Custom',
             presets: 'Presets',
@@ -498,15 +498,15 @@ define(function() {
                 size: {
                     text: 'SIZE',
                     unit: {
-                        width: 'Width',
-                        height: 'Height'
+                        width: 'W',
+                        height: 'H'
                     }
                 },
                 rotate: {
                     text: 'ROTATE'
                 },
                 threshold: {
-                    text: 'Threshold',
+                    text: 'THRESHOLD',
                     default: 128
                 }
             },
@@ -718,7 +718,12 @@ define(function() {
             FILAMENT_RUNOUT: 'filament run out, please refill filament',
             RESOURCE_BUSY: 'Machine is busy',
             processing: 'Processing',
-            savingPreview: 'Saving preview image'
+            savingPreview: 'Saving preview image',
+            hour: 'hr',
+            minute: 'min',
+            left: 'left',
+            temperature: 'Temperature',
+            forceStop: 'Force stopping device?'
         },
         alert: {
             caption: 'Error',
@@ -757,25 +762,27 @@ define(function() {
             connectionTimeout: 'device is not responding, connection timeout'
         },
         machine_status: {
-            1: 'Unknown Head',
-            2: 'Head failed ER 2',
-            4: 'Head failed ER 4',
-            8: 'Head failed ER 8',
-            16: 'Shake',
-            64: 'Overheat',
-            32: 'Head Tilted',
-            128: 'Fan Stopped',
-            36: 'Paused ( ST_STARTING_PAUSED )',
-            38: 'Pausing ( ST_STARTING_PAUSING )',
-            48: 'Paused  ( ST_RUNNING_PAUSED )',
-            50: 'Pausing  ( ST_RUNNING_PAUSING )',
-            6: 'Resuming ( ST_STARING_RESUMING )',
-            18: 'Resuming ( ST_RUNNING_RESUMING )',
+            '-2': 'Scanning',
+            '-1': 'Occupied',
+            0: 'Idle',
+            1: 'Initiating',
+            2: 'ST_TRANSFORM',
+            4: 'Starting',
+            6: 'Resuming',
+            16: 'Working',
+            18: 'Resuming',
+            32: 'Paused',
+            36: 'Paused',
+            38: 'Pausing',
+            48: 'Paused',
+            50: 'Pausing',
+            64: 'Completed',
             66: 'Completing',
+            128: 'Aborted',
             UNKNOWN: 'UNKNOWN'
         },
         head_module: {
-            EXTUDER: 'Print',
+            EXTRUDER: 'Print',
             UNKNOWN: ''
         },
         change_filament: {
@@ -801,6 +808,12 @@ define(function() {
             require_password: '"%s" requires a password',
             connect: 'CONNECT',
             password: 'Password'
+        },
+        tutorial: {
+            clickToImport: 'Click to import STL file',
+            selectQuality: 'Select quality preferred',
+            clickGo: 'Click GO and preview',
+            startPrint: 'Click go and start printing'
         }
     };
 });

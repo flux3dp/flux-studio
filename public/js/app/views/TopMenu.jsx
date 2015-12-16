@@ -158,11 +158,14 @@ define([
                 AlertStore.onClosePopup(this._handleClosePopup);
                 AlertStore.onFirmwareUpdate(this._showFirmwareUpdate);
                 AlertStore.onChangeFilament(this._showChangeFilament);
+
                 ProgressStore.onOpened(this._handleProgress).
                     onUpdating(this._handleProgress).
                     onClosed(this._handleProgressFinish);
                 InputLightboxStore.onInputLightBoxOpened(this._handleInputLightBoxOpen);
+
                 GlobalStore.onShowMonitor(this._handleOpenMonitor);
+                GlobalStore.onCloseAllView(this._handleCloseAllView);
             },
 
             componentWillUnmount: function() {
@@ -420,6 +423,11 @@ define([
                 });
             },
 
+            _handleCloseAllView: function() {
+                $('.device > .menu').removeClass('show');
+                $('.dialog-opener').prop('checked','');
+            },
+
             _renderStudioFunctions: function() {
                 var ClassNames = React.addons.classSet,
                     itemClass = '',
@@ -507,7 +515,7 @@ define([
                             <span className="func-name">{currentWorkingFunction.displayName}</span>
                             <div className="menu">
                                 <svg width="36" height="15"
-                                     className="arrow"
+                                     className="arrow-flat"
                                      viewBox="0 0 36 15" version="1.1"
                                      xmlns="http://www.w3.org/2000/svg">
 

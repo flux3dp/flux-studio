@@ -31,7 +31,12 @@ define(function() {
         TIMEOUT         : 'TIMEOUT',
         FILAMENT_RUNOUT : 'FILAMENT_RUNOUT',
         UNKNOWN_ERROR   : 'UNKNOWN_ERROR',
+        UNKNOWN_STATUS  : 'UNKNOWN_STATUS',
         USER_OPERATION  : 'USER_OPERATION',
+
+        // Print head
+        EXTRUDER        : 'EXTRUDER',
+        PRINTER         : 'PRINTER',
 
         // Command
         RESUME          : 'RESUME',
@@ -40,6 +45,7 @@ define(function() {
         REPORT          : 'REPORT',
         ABORT           : 'ABORT',
         QUIT            : 'QUIT',
+        KICK            : 'KICK',
         LS              : 'LS'
     };
 });

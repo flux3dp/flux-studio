@@ -37,9 +37,9 @@
     padding: 0;
 
     .ui-dialog-menu-item {
+        @include flexbox();
         height: 40px;
         line-height: 40px;
-        @include flexbox();
     }
 
     .dialog-opener {
@@ -61,21 +61,32 @@
         font-size: $fontSize;
         margin: 0;
         min-width: 200px;
+        overflow: hidden;
         padding: 0 6px;
         text-overflow: ellipsis;
-        word-break: break-all;
         white-space: nowrap;
-        overflow: hidden;
-        cursor: pointer;
+        word-break: break-all;
+
+        &:hover .btn,
+        &:hover {
+            background: #B3B3B3;
+            color: #E0E0DF;
+        }
+
+        .btn {
+            transition: initial;
+        }
     }
 
     .dialog-window {
+        cursor: pointer;
         display: none;
         align-self: center;
+        z-index: 1;
 
         ul {
-            padding: 0;
             list-style: none;
+            padding: 0;
         }
 
         li {
@@ -85,17 +96,21 @@
 
         .dialog-window-content {
             background: $backGroundColor;
-            padding: 5px 20px;
+            padding: 5px;
+
+            li {
+                padding: 0 15px;
+
+                &:hover {
+                    background: #555;
+                }
+            }
         }
 
         .arrow {
-            position: relative;
-            right: -1px;
+            background: #B3B3B3;
+            transform: translateX(1px);
             align-self: center;
-
-            polygon {
-                fill: #B3B3B3;
-            }
         }
     }
 }

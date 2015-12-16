@@ -11,6 +11,10 @@
     width: 30.3rem;
     z-index: 1;
 
+    .spinner-roller {
+        position: absolute;
+    }
+
     .device-wrapper {
         position: relative;
     }
@@ -36,11 +40,11 @@
 
         .device-name {
             padding: 0 0 0 1.7rem;
-            flex: calc(12 / 28.7 * 100%);
+            flex: calc(11 / 28.7 * 100%);
         }
 
         .module {
-            flex: calc(7 / 28.7 * 100%);
+            flex: calc(3 / 28.7 * 100%);
         }
 
         .status {

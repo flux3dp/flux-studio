@@ -200,6 +200,10 @@ define([
         return _do(DeviceConstants.QUIT);
     }
 
+    function kick() {
+        return _do(DeviceConstants.KICK);
+    }
+
     function ls(path) {
         var d = $.Deferred();
         _device.actions.ls(path).then(function(result) {
@@ -247,15 +251,10 @@ define([
         return _device;
     }
 
-    function getPreviewUrl() {
+    function getPreviewInfo() {
         var d = $.Deferred();
         _device.actions.getPreview().then(function(result) {
-            if(result instanceof Blob) {
-                d.resolve(window.URL.createObjectURL(result));
-            }
-            else {
-                d.resolve('');
-            }
+            d.resolve(result);
         });
         return d.promise();
     }
@@ -290,7 +289,13 @@ define([
 
             'QUIT': function() {
                 _device.actions.quit().then(function(result) {
-                    d.resolve('');
+                    d.resolve(result);
+                });
+            },
+
+            'KICK': function() {
+                _device.actions.reset().then(function(result) {
+                    d.resolve(result);
                 });
             },
 
@@ -375,6 +380,7 @@ define([
             this.pause              = pause;
             this.stop               = stop;
             this.quit               = quit;
+            this.kick               = kick;
             this.setPassword        = setPassword;
             this.getReport          = getReport;
             this.getSelectedDevice  = getSelectedDevice;
@@ -382,7 +388,7 @@ define([
             this.stopCamera         = stopCamera;
             this.ls                 = ls;
             this.fileInfo           = fileInfo;
-            this.getPreviewUrl      = getPreviewUrl;
+            this.getPreviewInfo     = getPreviewInfo;
 
             Discover(
                 'device-master',

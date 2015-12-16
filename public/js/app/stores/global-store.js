@@ -11,6 +11,7 @@ define([
 
     var SHOW_MONITOR_EVENT  = 'showMonitorEvent',
         CLOSE_MONITOR_EVENT = 'closeMonitorEvent',
+        CLOSE_ALL_VIEW_EVENT = 'closeAllViewEvent',
         GlobalStore;
 
     GlobalStore = Object.assign(EventEmitter.prototype, {
@@ -23,6 +24,10 @@ define([
             this.on(CLOSE_MONITOR_EVENT, callback);
         },
 
+        onCloseAllView(callback) {
+            this.on(CLOSE_ALL_VIEW_EVENT, callback);
+        },
+
         dispatcherIndex: Dispatcher.register(function(payload) {
             var actionType = payload.actionType;
             var action = {
@@ -33,6 +38,10 @@ define([
 
                 'CLOSE_MONITOR': function() {
                     GlobalStore.emit(CLOSE_MONITOR_EVENT);
+                },
+
+                'CLOSE_ALL_VIEW': function() {
+                    GlobalStore.emit(CLOSE_ALL_VIEW_EVENT);
                 }
 
             };

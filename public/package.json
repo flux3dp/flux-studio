@@ -11,8 +11,8 @@
         "frame": true,
         "width": 1280,
         "height": 640,
-        "min_width": 640,
-        "min_height": 480
+        "min_width": 1000,
+        "min_height": 600
     },
     "webkit": {
         "plugin": true

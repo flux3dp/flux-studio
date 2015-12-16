@@ -235,6 +235,12 @@ define([
             },
 
             takeControl: function(callback) {
+                events.onMessage = function(data) {
+                    initialEvents();
+
+                    callback(data);
+                };
+
                 ws.send('take_control');
             },
 

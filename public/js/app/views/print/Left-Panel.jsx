@@ -165,16 +165,14 @@ define([
 
             return {
                 label: (
-                    <div className="display-text">
+                    <div className="display-text quality-select">
                         <span>{this.state.quality}</span>
                     </div>
                 ),
                 content: (
-                    <div className="content quality">
-                        <ul>
-                            {qualitySelection}
-                        </ul>
-                    </div>
+                    <ul>
+                        {qualitySelection}
+                    </ul>
                 )
             }
         },
@@ -209,7 +207,7 @@ define([
                                 width="36.8" height="30">
                                 <polygon points="0,15 36.8,0 36.8,30"/>
                             </svg>
-                            <div className="content color light">
+                            <div className="color light">
                                 <div className="title">{lang.plaTitle}</div>
                                 <div className="colorSets">
                                     {colorSet}

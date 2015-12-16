@@ -420,6 +420,47 @@ input.switch:checked ~ label:after {
 
 /* Advanced Panel */
 .print-studio {
+
+    .tour-mask {
+        bottom: 0;
+        left: 0;
+        position: absolute;
+        right: 0;
+        top: 0;
+        z-index: 9999;
+        width: 100%;
+        height: 100%;
+        cursor: pointer;
+        background-color:rgba(0, 0, 0, 0.3);
+
+        .base {
+        	position: relative;
+        	left: 744px;
+        	top: 388px;
+        	width: 200px;
+        	height: 200px;
+        	border: solid 1px black;
+        	background-color:rgba(255, 255, 255, 0.3);
+        }
+
+        .tour-description {
+            top: -70px;
+            position: relative;
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+            color: white;
+        }
+
+    }
+
+    .btn-tutorial {
+        position: absolute;
+        top: 30px;
+        right: 30px;
+        z-index: 99999;
+    }
+
     .import-indicator {
         background-color: rgba(0,0,0,0.5);
         border: 7px dashed #DDD;
@@ -647,161 +688,6 @@ input.switch:checked ~ label:after {
         align-self: center;
         margin: 0 0 0 30px;
         z-index: 1;
-
-        .popup-selection {
-            @include flexbox();
-            display: block;
-            height: 40px;
-            position: relative;
-
-            ul {
-                background: #B3B3B3;
-                list-style: none;
-                padding: 0 10px 10px 10px;
-
-                li {
-                    cursor: pointer;
-                    margin: 10px 0 0 0;
-                }
-            }
-
-            .popup-open {
-                display: none;
-
-                &:checked ~ .display-text {
-                    background: #B3B3B3;
-                    color: #E0E0DF;
-                }
-
-                &:checked ~ .popup {
-                    visibility: visible;
-                }
-            }
-
-            .display-text {
-                cursor: pointer;
-                display: inline-block;
-                line-height: 40px;
-                padding: 0 16px 0 6px;
-                width: 100%;
-
-                p {
-                    display: block;
-                    margin: 0;
-                    width: 185px;
-                }
-            }
-
-            .popup {
-                @include flexbox();
-                visibility: hidden;
-                align-self: center;
-
-                .arrow {
-                    position: relative;
-                    right: -1px;
-                    align-self: center;
-                }
-
-                .arrow.light > polygon {
-                    fill: #F9F9F9;
-                }
-
-                .arrow.dark > polygon {
-                    fill: #B3B3B3;
-                }
-
-                .content {
-
-                    .title {
-                        color: #B3B3B3;
-                        font-size: 16px;
-                        line-height: 18px;
-                        padding: 15px;
-                    }
-
-                    .colorSets {
-                        padding: 0 15px 15px 15px;
-                    }
-
-                    .set {
-                        display: inline-block;
-                        position: relative;
-                        position: relative;
-                        width: 120px;
-                        z-index: 1000;
-
-                        .color {
-                            display: inline-block;
-                            height: 38px;
-                            width: 6.5px;
-                        }
-                        .description {
-                            color: #B3B3B3;
-                            cursor: pointer;
-                            display: inline-block;
-                            font-size: 16px;
-                            line-height: 38px;
-                            padding-left: 3.5px;
-                            position: absolute;
-                        }
-                        .green {
-                            background-color: #61C46D;
-                        }
-                        .red {
-                            background-color: #E32B32;
-                        }
-                        .black {
-                            background-color: #2E2E2E;
-                        }
-                        .turquoise {
-                            background-color: #44C1BA;
-                        }
-                        .orange {
-                            background-color: #F7931D;
-                        }
-                        .gray {
-                            background-color: #808080;
-                        }
-                        .blue {
-                            background-color: #29ABE2;
-                        }
-                        .brown {
-                            background-color: #A37D53;
-                        }
-                        .white {
-                            background-color: #FFFFFF;
-                        }
-                        .purple {
-                            background-color: #A952A5;
-                        }
-                        .yellow {
-                            background-color: #FCEE22;
-                        }
-                        .transparent {
-                            border: 1px solid #E7E7E7;
-                        }
-                    }
-                }
-
-                .content.color {
-                    background-color: #F9F9F9;
-                    height: 255px;
-                    width: 403px;
-                }
-                .content.preview {
-                    width: 50px;
-                }
-            }
-        }
-
-        .content.quality {
-            ul {
-                li {
-                    cursor: pointer;
-                }
-            }
-        }
     }
     .rightPanel {
         height: 100%;
@@ -890,26 +776,17 @@ input.switch:checked ~ label:after {
             display: block;
             margin: 0 0 3px 0;
             padding: 0 20px;
+            width: 204px;
         }
 
         .control {
             @include flexbox();
             color: #B3B3B3;
-            font-size: 13px;
             height: 40px;
             line-height: 40px;
             margin: 0 0 10px 0;
             align-items: center;
             justify-content: space-around;
-
-            .header {
-                color: #E0E0DF;
-                width: 45%;
-            }
-
-            input {
-                width: 80%;
-            }
         }
 
         .caption {
@@ -920,25 +797,20 @@ input.switch:checked ~ label:after {
             justify-content: space-between;
         }
 
-        input {
-            border: 1px solid #E0E0DF;
-            color: #B3B3B3;
-            font-size: 15px;
-        }
-
         .accordion {
             .lock {
                 background-image: url("../../img/lock.svg");
                 background-position: top;
                 background-repeat: no-repeat;
                 background-size: 12px 36px;
+                bottom: 0;
                 color: #BBB;
                 cursor: pointer;
-                display: inline-block;
                 height: 36px;
+                margin: auto;
                 position: absolute;
-                right: 16px;
-                top: 38%;
+                left: 100%;
+                top: 0;
                 width: 12px;
             }
             .lock.unlock {
