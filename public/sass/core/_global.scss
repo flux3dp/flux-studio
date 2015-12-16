@@ -490,6 +490,11 @@ input[type=range]:focus::-webkit-slider-runnable-track {
     }
 }
 
+.select-printer {
+    bottom: 2.3rem;
+    right: 15rem;
+}
+
 
 // pull
 .pull-left {
@@ -509,6 +514,8 @@ input[type=range]:focus::-webkit-slider-runnable-track {
 // arrows
 .arrow {
     background: #fff;
+    min-height: 10px;
+    min-width: 14px;
     height: 20px;
     width: 28px;
 }
@@ -523,4 +530,5 @@ input[type=range]:focus::-webkit-slider-runnable-track {
 .arrow-right {
     -webkit-clip-path: polygon(0 0, 0 100%, 100% 50%);
     clip-path: polygon(0 0, 0 100%, 100% 50%);
+    transform: translateX(-1px);
 }

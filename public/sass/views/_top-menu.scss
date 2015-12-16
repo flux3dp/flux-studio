@@ -131,14 +131,9 @@
             display: none;
 
             .arrow {
-                right: -72px;
+                left: 100%;
                 position: absolute;
-                transform: translateX(-100%);
                 top: 0;
-
-                polygon {
-                    fill: #fff;
-                }
             }
 
             .device-list {

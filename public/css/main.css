@@ -2566,6 +2566,10 @@ input[type=range]:focus::-webkit-slider-runnable-track {
             background: #4D4D4D;
             font-size: 35px; }
 
+.select-printer {
+    bottom: 2.3rem;
+    right: 15rem; }
+
 .pull-left {
     float: left; }
 
@@ -2578,6 +2582,8 @@ input[type=range]:focus::-webkit-slider-runnable-track {
 
 .arrow {
     background: #fff;
+    min-height: 10px;
+    min-width: 14px;
     height: 20px;
     width: 28px; }
 
@@ -2589,7 +2595,8 @@ input[type=range]:focus::-webkit-slider-runnable-track {
 
 .arrow-right {
     -webkit-clip-path: polygon(0 0, 0 100%, 100% 50%);
-    clip-path: polygon(0 0, 0 100%, 100% 50%); }
+    clip-path: polygon(0 0, 0 100%, 100% 50%);
+    transform: translateX(-1px); }
 
 /**
  * ref: http://tobiasahlin.com/spinkit/
@@ -3494,12 +3501,9 @@ input[type=range]:focus::-webkit-slider-runnable-track {
             right: 100px;
             display: none; }
             .top-menu .device .menu .arrow {
-                right: -72px;
+                left: 100%;
                 position: absolute;
-                transform: translateX(-100%);
                 top: 0; }
-                .top-menu .device .menu .arrow polygon {
-                    fill: #fff; }
             .top-menu .device .menu .device-list {
                 padding: 0.8rem;
                 list-style: none;
@@ -3907,10 +3911,10 @@ input[type=range]:focus::-webkit-slider-runnable-track {
     background-color: #f0f0f0; }
 
 .print-studio header li div {
-    padding: 15px 20px;
     color: #4a4a4a;
     cursor: pointer;
-    font-size: 14px; }
+    font-size: 14px;
+    padding: 15px 20px; }
 
 .print-studio header .actions > div {
     display: inline-block; }
@@ -4271,36 +4275,36 @@ input.switch:checked ~ label:after {
 
 /* Advanced Panel */
 .print-studio .tour-mask {
+    background-color: rgba(0, 0, 0, 0.3);
     bottom: 0;
+    cursor: pointer;
+    height: 100%;
     left: 0;
     position: absolute;
     right: 0;
     top: 0;
-    z-index: 9999;
     width: 100%;
-    height: 100%;
-    cursor: pointer;
-    background-color: rgba(0, 0, 0, 0.3); }
+    z-index: 9999; }
     .print-studio .tour-mask .base {
-        position: relative;
-        left: 744px;
-        top: 388px;
-        width: 200px;
-        height: 200px;
+        background-color: rgba(255, 255, 255, 0.3);
         border: solid 1px black;
-        background-color: rgba(255, 255, 255, 0.3); }
-    .print-studio .tour-mask .tour-description {
-        top: -70px;
+        height: 200px;
+        left: 744px;
         position: relative;
-        text-align: center;
+        top: 388px;
+        width: 200px; }
+    .print-studio .tour-mask .tour-description {
+        color: white;
         font-size: 16px;
         font-weight: bold;
-        color: white; }
+        position: relative;
+        text-align: center;
+        top: -70px; }
 
 .print-studio .btn-tutorial {
     position: absolute;
-    top: 30px;
     right: 30px;
+    top: 30px;
     z-index: 99999; }
 
 .print-studio .import-indicator {
@@ -4480,17 +4484,17 @@ input.switch:checked ~ label:after {
     display: none; }
 
 .print-studio .leftPanel {
-    align-self: center;
     margin: 0 0 0 30px;
-    z-index: 1; }
+    z-index: 1;
+    align-self: center; }
 
 .print-studio .rightPanel {
     height: 100%;
+    pointer-events: none;
     position: absolute;
     right: 0;
     width: 170px;
-    z-index: 1;
-    pointer-events: none; }
+    z-index: 1; }
     .print-studio .rightPanel svg {
         bottom: 50px;
         height: 230px;
@@ -4513,8 +4517,8 @@ input.switch:checked ~ label:after {
     .print-studio .rightPanel .cameraViewController {
         bottom: 55%;
         height: 100px;
-        position: absolute;
-        pointer-events: auto; }
+        pointer-events: auto;
+        position: absolute; }
 
 .print-studio .object-dialogue.through {
     pointer-events: none; }
@@ -4589,18 +4593,14 @@ input.switch:checked ~ label:after {
         color: #BBB;
         cursor: pointer;
         height: 36px;
+        left: 100%;
         margin: auto;
         position: absolute;
-        left: 100%;
         top: 0;
         width: 12px; }
     .print-studio .object-dialogue .accordion .lock.unlock {
         background-image: url("../../img/unlock.svg");
         background-size: 24px 36px; }
-
-.print-studio .select-printer {
-    bottom: 65px;
-    right: 240px; }
 
 .close {
     cursor: pointer;
@@ -4628,10 +4628,7 @@ input.switch:checked ~ label:after {
 
 .onoffswitch {
     position: relative;
-    width: 50px;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none; }
+    width: 50px; }
 
 .onoffswitch-checkbox {
     display: none; }
@@ -4692,7 +4689,7 @@ input.switch:checked ~ label:after {
     margin-left: 0; }
 
 .onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-switch {
-    right: 0px; }
+    right: 0; }
 
 .settings-studio {
     background-color: #F5F5F5; }
@@ -5351,10 +5348,6 @@ input.switch:checked ~ label:after {
 .laser-studio .hasShadow .modal-body {
     box-shadow: 0 4px 40px 0px rgba(0, 0, 0, 0.5); }
 
-.laser-studio .laser-device-selection-popup {
-    bottom: 4.3rem;
-    right: 15rem; }
-
 .laser-studio .file-importer {
     display: -webkit-box;
     /* OLD - iOS 6-, Safari 3.1-6 */
@@ -5579,7 +5572,6 @@ input.switch:checked ~ label:after {
     /* NEW, Spec - Opera 12.1, Firefox 20+ */
     font-size: 20px;
     transition: all 0.1s ease;
-    width: 230px;
     z-index: 1;
     will-change: top,left,transform; }
     .laser-studio .object-position .accordion-body {
@@ -5745,7 +5737,10 @@ input.switch:checked ~ label:after {
             width: 100%;
             object-fit: contain; }
     .scan-studio .scan-printer-selection {
-        position: relative; }
+        overflow: hidden;
+        position: relative;
+        top: 0;
+        right: 0; }
     .scan-studio .manipulation-panel {
         display: -webkit-box;
         /* OLD - iOS 6-, Safari 3.1-6 */
