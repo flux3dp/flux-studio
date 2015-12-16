@@ -2,14 +2,11 @@
     $panelWidth: 31rem;
     $white: #FFF;
     $light-grey: #DDD;
-    position: absolute;
     left: 50%;
-    top: 100px;
     .main {
         background-color: white;
         height: 40rem;
         width: $panelWidth;
-        left: -50%;
         position: relative;
         .title {
             height: 5rem;
@@ -87,7 +84,6 @@
                     width: 33%;
                     height: 80px;
                     position: relative;
-                    // background-image: url('../../img/folder.svg');
                     background-repeat: no-repeat;
                     background-size: 72px 60px;
                     background-position: top;
@@ -154,7 +150,6 @@
         background-color: white;
         height: 10rem;
         width: $panelWidth;
-        left: -50%;
         position: relative;
         margin-top: 5px;
         .wrapper {

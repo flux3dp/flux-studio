@@ -26,6 +26,8 @@ define(function(){
         NOTIFY_YES                 : 'NOTIFY_YES',
         NOTIFY_CANCEL              : 'NOTIFY_CANCEL',
         NOTIFY_CUSTOM              : 'NOTIFY_CUSTOM',
-        QUESTION                   : 'QUESTION'
+        QUESTION                   : 'QUESTION',
+        CLOSE_POPUP                : 'CLOSE_POPUP',
+        SHOW_POPUP_CHANGE_FILAMENT : 'SHOW_POPUP_CHANGE_FILAMENT'
     };
 });

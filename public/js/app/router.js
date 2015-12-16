@@ -3,9 +3,11 @@ define([
     'jquery',
     'backbone',
     'helpers/display',
-    'helpers/api/config'
+    'helpers/api/config',
+    'app/app-settings',
+    'helpers/detect-webgl'
 ],
-function(React, $, Backbone, display, config) {
+function(React, $, Backbone, display, config, appSettings, detectWebgl) {
     'use strict';
 
     var _display = function(view, args, el) {
@@ -171,6 +173,8 @@ function(React, $, Backbone, display, config) {
 
             var requests = args.split('/'),
                 child_view = requests.splice(0, 1)[0],
+                // if something needs webgl then add to the list below
+                needWebGL = appSettings.needWebGL,
                 map = {
                     'print': this.print,
                     'settings': this.settings,
@@ -185,9 +189,14 @@ function(React, $, Backbone, display, config) {
                 func = map[page];
             }
 
-            func(child_view, requests);
-
             this.appendSideBar();
+
+            if (false === detectWebgl() && -1 < needWebGL.indexOf(page)) {
+                location.hash = '#studio/laser';
+            }
+            else {
+                func(child_view, requests);
+            }
         },
 
         scan: function(step) {

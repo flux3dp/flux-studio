@@ -83,6 +83,13 @@ define([
             });
         },
 
+        showChangeFilament: function(device) {
+            AlertDispatcher.dispatch({
+                actionType: AlertConstants.SHOW_POPUP_CHANGE_FILAMENT,
+                device: device
+            });
+        },
+
         notifyRetry: function(id) {
             AlertDispatcher.dispatch({
                 actionType: AlertConstants.NOTIFY_RETRY, id
@@ -116,6 +123,12 @@ define([
         notifyAnswer: function(id, isYes) {
             AlertDispatcher.dispatch({
                 actionType: AlertConstants.NOTIFY_ANSWER, id, isYes
+            });
+        },
+
+        closePopup: function() {
+            AlertDispatcher.dispatch({
+                actionType: AlertConstants.CLOSE_POPUP
             });
         }
 

@@ -11,6 +11,10 @@
     width: 30.3rem;
     z-index: 1;
 
+    .spinner-roller {
+        position: absolute;
+    }
+
     .device-wrapper {
         position: relative;
     }
@@ -29,15 +33,18 @@
         .col {
             height: 2.8rem;
             line-height: 2.8rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         .device-name {
             padding: 0 0 0 1.7rem;
-            flex: calc(12 / 28.7 * 100%);
+            flex: calc(11 / 28.7 * 100%);
         }
 
         .module {
-            flex: calc(7 / 28.7 * 100%);
+            flex: calc(3 / 28.7 * 100%);
         }
 
         .status {
@@ -59,10 +66,11 @@
     .printer-list {
         list-style: none;
         margin: 0 auto;
-        max-height: calc(100% - 2.8rem);
+        max-height: 100%;
         overflow-x: hidden;
         overflow-y: scroll;
         padding: 0;
+        will-change: transform;
 
         .printer-item {
             cursor: pointer;

@@ -2,6 +2,8 @@ define([
     'jquery',
     'react',
     'lib/jquery.growl',
+    'app/app-settings',
+    'helpers/detect-webgl',
     // alert dialog
     'app/actions/alert-actions',
     'app/stores/alert-store',
@@ -19,6 +21,7 @@ define([
     'jsx!widgets/Notification-Modal',
     'jsx!views/Print-Selector',
     'jsx!views/Update-Dialog',
+    'jsx!views/Change-Filament',
     'helpers/api/discover',
     'helpers/api/config',
     'helpers/device-master',
@@ -32,6 +35,8 @@ define([
     $,
     React,
     Notifier,
+    appSettings,
+    detectWebgl,
     // alert
     AlertActions,
     AlertStore,
@@ -49,6 +54,7 @@ define([
     NotificationModal,
     PrinterSelector,
     UpdateDialog,
+    ChangeFilament,
     Discover,
     Config,
     DeviceMaster,
@@ -114,6 +120,7 @@ define([
                         message    : '',
                         percentage : 0,
                         type       : '',
+                        hasStop    : undefined,
                         onFinished : function() {}
                     },
                     // input lightbox
@@ -135,6 +142,12 @@ define([
                         latestVersion: '',
                         updateFile: undefined,
                         device: {}
+                    },
+                    // change filament
+                    changeFilament: {
+                        open: false,
+                        device: {},
+                        onClose: function() {}
                     }
                 };
             },
@@ -142,13 +155,17 @@ define([
             componentDidMount: function() {
                 AlertStore.onNotify(this._handleNotification);
                 AlertStore.onPopup(this._handlePopup);
+                AlertStore.onClosePopup(this._handleClosePopup);
                 AlertStore.onFirmwareUpdate(this._showFirmwareUpdate);
+                AlertStore.onChangeFilament(this._showChangeFilament);
+
                 ProgressStore.onOpened(this._handleProgress).
                     onUpdating(this._handleProgress).
                     onClosed(this._handleProgressFinish);
                 InputLightboxStore.onInputLightBoxOpened(this._handleInputLightBoxOpen);
+
                 GlobalStore.onShowMonitor(this._handleOpenMonitor);
-                DeviceMaster.setLanguageSource(lang);
+                GlobalStore.onCloseAllView(this._handleCloseAllView);
             },
 
             componentWillUnmount: function() {
@@ -163,13 +180,32 @@ define([
                 InputLightboxStore.removeOpenedListener(this._handleInputLightBoxOpen);
             },
 
+            _showChangeFilament: function(payload) {
+                if (false === this.state.changeFilament.open) {
+                    this.setState({
+                        changeFilament: {
+                            open: true,
+                            device: payload.device
+                        }
+                    });
+                }
+            },
+
+            _hideChangeFilament: function() {
+                this.setState({
+                    changeFilament: {
+                        open: false
+                    }
+                });
+            },
+
             _showFirmwareUpdate: function(payload) {
                 this.setState({
                     firmware: {
                         open: true,
                         device: payload.device,
                         latestVersion: payload.updateInfo.latest_version,
-                        releaseNote: payload.updateInfo.changelog,
+                        releaseNote: payload.updateInfo.changelog
                     }
                 });
             },
@@ -177,7 +213,8 @@ define([
             _handleFirmwareClose: function() {
                 this.setState({
                     firmware: {
-                        open: false
+                        open: false,
+                        device: this.state.firmware.device
                     }
                 });
             },
@@ -218,7 +255,15 @@ define([
             },
 
             _handleProgress: function(payload) {
-                var self = this;
+                var self = this,
+                    hasStop;
+
+                if ('boolean' === typeof self.state.progress.hasStop) {
+                    hasStop = self.state.progress.hasStop;
+                }
+                else {
+                    hasStop = ('boolean' === typeof payload.hasStop ? payload.hasStop : true);
+                }
 
                 this.setState({
                     progress: {
@@ -227,6 +272,7 @@ define([
                         message: payload.message || '',
                         percentage: payload.percentage || 0,
                         type: payload.type || self.state.progress.type || ProgressConstants.WAITING,
+                        hasStop: hasStop,
                         onFinished: payload.onFinished || self.state.progress.onFinished || function() {}
                     }
                 });
@@ -284,8 +330,17 @@ define([
                 });
             },
 
+            _handleClosePopup: function() {
+                this.setState({ showNotificationModal: false });
+            },
+
             _handleNavigation: function(address) {
-                location.hash = '#studio/' + address;
+                if (-1 < appSettings.needWebGL.indexOf(address) && false === detectWebgl()) {
+                    AlertActions.showPopupError('no-webgl-support', lang.support.no_webgl);
+                }
+                else {
+                    location.hash = '#studio/' + address;
+                }
             },
 
             _handleNotificationModalClose: function(e, reactid, from) {
@@ -341,9 +396,8 @@ define([
 
             _handleSelectDevice: function(device, e) {
                 e.preventDefault();
-                // AlertActions.showInfo(lang.message.connecting);
                 DeviceMaster.selectDevice(device).then(function(status) {
-                    if(status === DeviceConstants.CONNECTED) {
+                    if (status === DeviceConstants.CONNECTED) {
                         GlobalActions.showMonitor(device);
                     }
                     else if (status === DeviceConstants.TIMEOUT) {
@@ -369,14 +423,22 @@ define([
                 });
             },
 
+            _handleCloseAllView: function() {
+                $('.device > .menu').removeClass('show');
+                $('.dialog-opener').prop('checked','');
+            },
+
             _renderStudioFunctions: function() {
                 var ClassNames = React.addons.classSet,
+                    itemClass = '',
+                    label = '',
+                    isActiveItem,
                     menuItems;
 
                 menuItems = options.map(function(opt, i) {
-                    var isActiveItem = -1 < location.hash.indexOf(opt.name),
-                        itemClass = '',
-                        label = '';
+                    isActiveItem = -1 < location.hash.indexOf(opt.name);
+                    itemClass = '';
+                    label = '';
 
                     if ('' !== opt.label) {
                         label = (<p>{opt.label}</p>);
@@ -388,7 +450,8 @@ define([
                     return (
                         <li className={itemClass} key={'menu' + i}
                             data-display-name={opt.displayName}
-                            onClick={this._handleNavigation.bind(null, opt.name)}>
+                            onClick={this._handleNavigation.bind(null, opt.name)}
+                        >
                             <img src={opt.imgSrc} />
                             {label}
                         </li>
@@ -452,7 +515,7 @@ define([
                             <span className="func-name">{currentWorkingFunction.displayName}</span>
                             <div className="menu">
                                 <svg width="36" height="15"
-                                     className="arrow"
+                                     className="arrow-flat"
                                      viewBox="0 0 36 15" version="1.1"
                                      xmlns="http://www.w3.org/2000/svg">
 
@@ -483,6 +546,7 @@ define([
                             message={this.state.progress.message}
                             type={this.state.progress.type}
                             percentage={this.state.progress.percentage}
+                            hasStop={this.state.progress.hasStop}
                             onFinished={this._handleProgressFinish}
                         />
 
@@ -495,6 +559,12 @@ define([
                             confirmText={this.state.inputLightbox.confirmText}
                             onClose={this._handleInputLightBoxClosed}
                             onSubmit={this._handleInputLightBoxSubmit}
+                        />
+
+                        <ChangeFilament
+                            open={this.state.changeFilament.open}
+                            device={this.state.changeFilament.device}
+                            onClose={this._hideChangeFilament}
                         />
 
                         <NotificationModal

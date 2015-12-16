@@ -78,45 +78,45 @@
     .modal-alert {
         @include flexbox();
         background: #FFF;
-        box-shadow: 0 10px 20px rgba(0, 0, 0, .7);
         flex-direction: column;
         min-height: 25rem;
-        min-width: 32.2rem;
         overflow: auto;
-        padding: 1.6rem 2.8rem 4.4rem 2.8rem;
+        padding: 1.6rem 2.8rem;
         position: relative;
         text-align: center;
         align-items: center;
-        justify-content: center;
+        justify-content: space-between;
+        width: 32.2rem;
+
+        .caption {
+            margin: 0 0 1.6rem 0;
+        }
 
         .caption,
         .message {
-            margin: 0 0 1.6rem 0;
             width: 100%;
-        }
-        pre.message {
-            font-family: "Helvetica Neue", "HelveticaNeue-Light", "Helvetica Neue Light", Helvetica, Arial, "Lucida Grande", sans-serif, "Microsoft JhengHei", "微軟正黑體";
         }
     }
 
     .message {
+        font-family: "Helvetica Neue", "HelveticaNeue-Light", "Helvetica Neue Light", Helvetica, Arial, "Lucida Grande", sans-serif, "Microsoft JhengHei", "微軟正黑體";
+        margin: 0;
+        overflow: hidden;
+        padding: 0;
+        position: relative;
         word-break: break-all;
         word-wrap: break-word;
     }
 
     .btn-h-group {
-        bottom: 1.6rem;
-        left: 2.8rem;
-        position: absolute;
-        right: 2.8rem;
+        width: 100%;
 
         .btn {
             font-size: 1.3rem;
             height: 2.8rem;
-            line-height: 2.8rem;
+            line-height: calc(2.8rem - 4px);    // borders are 2px
             margin: 0 .6rem 0 0;
             max-width: 13rem;
-            flex: 1;
 
             &:last-child {
                 margin: 0;
@@ -126,6 +126,10 @@
 }
 
 .modal-progress {
+    .modal-alert {
+        min-height: 18rem;
+    }
+
     .spinner-roller {
         background: linear-gradient(to right, #DEDEDC 10%, rgba(255, 255, 255, 0) 42%);
         height: 7em;
@@ -153,12 +157,39 @@
     }
 }
 
+// progress dialog size
+.modal-progress-nonstop {
+    .spinner-roller {
+        height: 13rem;
+        margin: auto;
+        width: 13rem;
+    }
+
+    .modal-alert {
+        height: 20rem;
+        min-height: 20rem;
+        width: 20rem;
+    }
+}
+
 .modal-input-lightbox {
     .modal-alert {
-        display: block;
         min-height: 18rem;
         text-align: left;
+        padding: 1.6rem 0 0 0;
         width: 32.2rem;
+
+        .caption {
+            color: #626262;
+            font-size: 15px;
+            line-height: 18px;
+        }
+
+        .caption,
+        .message {
+            padding: 0 1.6rem;
+            margin: 0 0 20px 0;
+        }
     }
 
     .control {
@@ -168,6 +199,12 @@
 
         .inputHeader {
             color: #ccc;
+            flex: 1;
+        }
+
+        input {
+            flex: 2;
+            padding: 3px;
         }
     }
 
@@ -231,5 +268,85 @@
     .btn-h-group {
         position: static;
         width: 50%;
+    }
+}
+
+.modal-change-filament {
+    .modal-alert {
+        width: 440px;
+        min-height: 320px;
+        padding: 22px 0 0 0;
+    }
+
+    .caption,
+    .message {
+        margin: 0 0 20px 0;
+        padding: 0 19px;
+    }
+
+    .caption {
+        color: #626262;
+        font-size: 15px;
+        line-height: 17px;
+        text-align: left;
+    }
+
+    .message {
+        color: #989898;
+        font-size: 15px;
+        line-height: 21px;
+
+        p {
+            margin: 0;
+        }
+    }
+
+    .message-container {
+        p:last-of-type {
+            margin: 0 0 12.5px 0;
+        }
+    }
+
+    .way-to-go {
+        .btn {
+            width: 100%;
+
+            &:first-child {
+                margin: 0 0 24px 0;
+            }
+        }
+    }
+
+    .spinner-roller {
+        height: 61.5px;
+        margin: 0 auto;
+        width: 61.5px;
+    }
+
+    .button-group {
+        border: none;
+        border-top: 1px solid #E0E0DF;
+        display: block;
+        height: 73px;
+        padding: 19px;
+        position: relative;
+
+        .btn {
+            margin: 0;
+            padding: 0 10px;
+        }
+
+        .btn:first-child:not([class*="btn-alone"]),
+        .btn-alone-left {
+            position: absolute;
+            left: 19px;
+        }
+
+        .btn:last-child:not([class*="btn-alone"]),
+        .btn-alone-right {
+            position: absolute;
+            right: 19px;
+            min-width: 60px;
+        }
     }
 }

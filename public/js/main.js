@@ -87,7 +87,6 @@ requirejs([
     'backbone',
     'app/router',
     'app/actions/global',
-    'domReady!',
     'helpers/tracker',
     'threejs'
 ], function($, Backbone, Router, globalEvents) {

@@ -10,6 +10,8 @@ define(function() {
             }
         },
 
+        needWebGL: ['print', 'scan'],
+
         params: {
             printing : {
 

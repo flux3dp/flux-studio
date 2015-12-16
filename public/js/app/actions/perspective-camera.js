@@ -1,14 +1,14 @@
 define([
     'jquery',
     'threeOrbitControls'
-
 ], function ($) {
+    'use strict';
 
     var THREE = window.THREE || {},
         container,
         reactSrc;
 
-    var controllerWidth = 275,
+    var controllerWidth = 175,
         controllerHeight = 100;
 
     var camera, scene, renderer;

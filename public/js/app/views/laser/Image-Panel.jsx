@@ -29,8 +29,8 @@ define([
                 newParams = {
                     angle: parseFloat(this.refs.objectAngle.getDOMNode().value, 10),
                     position: {
-                        x: parseFloat(this.refs.objectPosX.getDOMNode().value, 10),
-                        y: parseFloat(this.refs.objectPosY.getDOMNode().value, 10)
+                        x: this.refs.objectPosX.value(),
+                        y: this.refs.objectPosY.value()
                     },
                     size: {
                         width: this.refs.objectSizeW.value(),
@@ -137,29 +137,36 @@ define([
 
             return (
                 <div ref="imagePanel" className={props.className} style={style}>
-                    <svg className="arrow" version="1.1" xmlns="http://www.w3.org/2000/svg"
-                        width="36.8" height="20">
-                        <polygon points="0,10 36.8,0 36.8,20"/>
-                    </svg>
+                    <div className="arrow"/>
                     <div>
                         <label className="controls accordion">
                             <input type="checkbox" className="accordion-switcher"/>
                             <p className="caption">
                                 {lang.laser.object_params.position.text}
-                                <span className="value">{props.position.x} , {props.position.y}</span>
+                                <span className="value">{props.position.x} , {props.position.y}mm</span>
                             </p>
                             <label className="accordion-body">
                                 <div className="control">
                                     <span className="text-center header">X</span>
-                                    <input type="number" ref="objectPosX" data-type="x"
-                                        defaultValue={props.position.x} value={props.position.x}
-                                        onChange={this._onTransform}/>
+                                    <UnitInput
+                                        min={-170}
+                                        max={170}
+                                        dataAttrs={{ type: 'x' }}
+                                        ref="objectPosX"
+                                        defaultValue={props.position.x}
+                                        getValue={this._onTransform}
+                                    />
                                 </div>
                                 <div className="control">
                                     <span className="text-center header">Y</span>
-                                    <input type="number" ref="objectPosY" data-type="y"
-                                        defaultValue={props.position.y} value={props.position.y}
-                                        onChange={this._onTransform}/>
+                                    <UnitInput
+                                        min={-170}
+                                        max={170}
+                                        dataAttrs={{ type: 'y' }}
+                                        ref="objectPosY"
+                                        defaultValue={props.position.y}
+                                        getValue={this._onTransform}
+                                    />
                                 </div>
                             </label>
                         </label>
@@ -203,7 +210,7 @@ define([
                             </p>
                             <label className="accordion-body">
                                 <div className="control">
-                                    <input type="number" min="0" max="360" ref="objectAngle" data-type="angle"
+                                    <input type="number" className="input-fullsize" min="0" max="360" ref="objectAngle" data-type="angle"
                                         defaultValue={props.angle} value={props.angle}
                                         onChange={this._onTransform}/>
                                 </div>

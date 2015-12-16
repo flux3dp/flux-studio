@@ -40,16 +40,18 @@ define([
                     events.onError(response);
                 },
                 onFatal: function(response) {
+                    clearTimeout(timmer);
                     events.onError(response);
                 },
                 onClose: function(response) {
                     isConnected = false;
-                }
+                },
+                autoReconnect: false
             }),
             lastOrder = '',
             events = {
                 onMessage: function() {},
-                onError: function() {}
+                onError: opts.onError
             },
             genericOptions = function(opts) {
                 var emptyFunction = function() {};
@@ -61,11 +63,12 @@ define([
                 return opts;
             },
             isTimeout = function() {
-                var error = JSON.parse(
-                    '{"status": "error", "error": "TIMEOUT", "info": "connection timeoout"}'
-                );
+                var error = {
+                    "status": "error",
+                    "error": "TIMEOUT",
+                    "info": "connection timeoout"
+                };
                 opts.onError(error);
-                console.log('timeout?', error);
             };
 
         return {
@@ -82,6 +85,9 @@ define([
                         default:
                             break;
                     }
+                };
+                events.onError = function(result) {
+                    d.resolve(result);
                 };
                 lastOrder = 'ls';
                 ws.send(lastOrder + ' ' + path);
@@ -107,6 +113,9 @@ define([
                         default:
                             break;
                     }
+                };
+                events.onError = function(result) {
+                    d.resolve(result);
                 };
 
                 return d.promise();
@@ -339,6 +348,28 @@ define([
 
                 ws.send('quit');
                 lastOrder = 'quit';
+
+                return d.promise();
+            },
+            getPreview: function() {
+                var d       = $.Deferred(),
+                    data    = [];
+
+                events.onMessage = function(result) {
+                    if(result.status === 'ok') {
+                        d.resolve(data);
+                    }
+                    else {
+                        data.push(result);
+                    }
+                };
+
+                events.onError = function(result) {
+                    d.resolve('');
+                };
+
+                ws.send('play info');
+                lastOrder = 'play info';
 
                 return d.promise();
             }

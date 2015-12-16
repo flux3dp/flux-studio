@@ -2116,6 +2116,9 @@ a {
     font-size: 12px;
     text-decoration: underline; }
 
+img {
+    max-width: 100%; }
+
 /**
  * structure
  */
@@ -2123,9 +2126,17 @@ a {
     height: 100%; }
 
 .content {
+    display: -webkit-box;
+    /* OLD - iOS 6-, Safari 3.1-6 */
+    display: -webkit-flex;
+    /* NEW - Chrome */
+    display: flex;
+    /* NEW, Spec - Opera 12.1, Firefox 20+ */
+    background: #fff;
     height: 100%;
     overflow: hidden;
-    width: 100%; }
+    width: 100%;
+    position: relative; }
 
 .horizontal-menu .menu-item {
     float: left;
@@ -2303,10 +2314,10 @@ a {
         content: attr(data-tip);
         display: block;
         font-size: 11px;
-        height: 24px;
         left: -15px;
         line-height: 24px;
         min-width: 75px;
+        padding: 5px;
         position: absolute;
         text-align: center;
         white-space: nowrap;
@@ -2469,7 +2480,8 @@ input[type=range]:focus::-webkit-slider-runnable-track {
 
 /* studio */
 .studio-container {
-    height: 100%; }
+    height: 100%;
+    width: 100%; }
     .studio-container .btn-h-group {
         padding: 10px 0 10px 10px; }
         .studio-container .btn-h-group .btn {
@@ -2527,7 +2539,8 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         bottom: 28px;
         position: fixed;
         right: 20px;
-        width: 87px; }
+        width: 87px;
+        pointer-events: auto; }
         .studio-container .beehive-buttons .btn.btn-disabled {
             background: #CCC; }
         .studio-container .beehive-buttons .btn {
@@ -2560,7 +2573,23 @@ input[type=range]:focus::-webkit-slider-runnable-track {
     float: right; }
 
 .disabled-pointer {
-    pointer-events: none; }
+    pointer-events: none;
+    opacity: .4; }
+
+.arrow {
+    background: #fff;
+    height: 20px;
+    width: 28px; }
+
+.arrow,
+.arrow-left {
+    -webkit-clip-path: polygon(0 50%, 100% 100%, 100% 0);
+    clip-path: polygon(0 50%, 100% 100%, 100% 0);
+    transform: translateX(1px); }
+
+.arrow-right {
+    -webkit-clip-path: polygon(0 0, 0 100%, 100% 50%);
+    clip-path: polygon(0 0, 0 100%, 100% 50%); }
 
 /**
  * ref: http://tobiasahlin.com/spinkit/
@@ -2594,22 +2623,17 @@ input[type=range]:focus::-webkit-slider-runnable-track {
 
 .spinner-roller {
     font-size: 10px;
-    margin: 50px auto;
     text-indent: -9999em;
     width: 11em;
     height: 11em;
     border-radius: 50%;
     background: #ffffff;
-    background: -moz-linear-gradient(left, #ffffff 10%, rgba(255, 255, 255, 0) 42%);
     background: -webkit-linear-gradient(left, #ffffff 10%, rgba(255, 255, 255, 0) 42%);
-    background: -o-linear-gradient(left, #ffffff 10%, rgba(255, 255, 255, 0) 42%);
-    background: -ms-linear-gradient(left, #ffffff 10%, rgba(255, 255, 255, 0) 42%);
     background: linear-gradient(to right, #ffffff 10%, rgba(255, 255, 255, 0) 42%);
     position: relative;
     -webkit-animation: load3 1.4s infinite linear;
     animation: load3 1.4s infinite linear;
     -webkit-transform: translateZ(0);
-    -ms-transform: translateZ(0);
     transform: translateZ(0); }
     .spinner-roller:before {
         width: 50%;
@@ -2632,6 +2656,11 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         left: 0;
         bottom: 0;
         right: 0; }
+
+.spinner-roller-reverse {
+    background: linear-gradient(to right, #DEDEDC 10%, rgba(255, 255, 255, 0) 42%); }
+    .spinner-roller-reverse::after {
+        background: #fff; }
 
 @-webkit-keyframes load3 {
     0% {
@@ -2935,14 +2964,14 @@ input[type=range]:focus::-webkit-slider-runnable-track {
     margin: 0;
     padding: 0; }
     .ui-dialog-menu .ui-dialog-menu-item {
-        height: 40px;
-        line-height: 40px;
         display: -webkit-box;
         /* OLD - iOS 6-, Safari 3.1-6 */
         display: -webkit-flex;
         /* NEW - Chrome */
         display: flex;
-        /* NEW, Spec - Opera 12.1, Firefox 20+ */ }
+        /* NEW, Spec - Opera 12.1, Firefox 20+ */
+        height: 40px;
+        line-height: 40px; }
     .ui-dialog-menu .dialog-opener {
         display: none; }
         .ui-dialog-menu .dialog-opener:checked ~ .dialog-label {
@@ -2957,32 +2986,43 @@ input[type=range]:focus::-webkit-slider-runnable-track {
             /* NEW, Spec - Opera 12.1, Firefox 20+ */ }
     .ui-dialog-menu .dialog-label {
         color: #B3B3B3;
+        cursor: pointer;
         font-size: 1.8rem;
         margin: 0;
         min-width: 200px;
+        overflow: hidden;
         padding: 0 6px;
         text-overflow: ellipsis;
-        word-break: break-all;
         white-space: nowrap;
-        overflow: hidden; }
+        word-break: break-all; }
+        .ui-dialog-menu .dialog-label:hover .btn,
+        .ui-dialog-menu .dialog-label:hover {
+            background: #B3B3B3;
+            color: #E0E0DF; }
+        .ui-dialog-menu .dialog-label .btn {
+            transition: initial; }
     .ui-dialog-menu .dialog-window {
+        cursor: pointer;
         display: none;
-        align-self: center; }
+        align-self: center;
+        z-index: 1; }
         .ui-dialog-menu .dialog-window ul {
-            padding: 0;
-            list-style: none; }
+            list-style: none;
+            padding: 0; }
         .ui-dialog-menu .dialog-window li {
             color: #E0E0DF;
             font-size: 1.8rem; }
         .ui-dialog-menu .dialog-window .dialog-window-content {
             background: #B3B3B3;
-            padding: 5px 20px; }
+            padding: 5px; }
+            .ui-dialog-menu .dialog-window .dialog-window-content li {
+                padding: 0 15px; }
+                .ui-dialog-menu .dialog-window .dialog-window-content li:hover {
+                    background: #555; }
         .ui-dialog-menu .dialog-window .arrow {
-            position: relative;
-            right: -1px;
+            background: #B3B3B3;
+            transform: translateX(1px);
             align-self: center; }
-            .ui-dialog-menu .dialog-window .arrow polygon {
-                fill: #B3B3B3; }
 
 /**
  * global advanced panel
@@ -3089,39 +3129,41 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         display: flex;
         /* NEW, Spec - Opera 12.1, Firefox 20+ */
         background: #FFF;
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.7);
         flex-direction: column;
         min-height: 25rem;
-        min-width: 32.2rem;
         overflow: auto;
-        padding: 1.6rem 2.8rem 4.4rem 2.8rem;
+        padding: 1.6rem 2.8rem;
         position: relative;
         text-align: center;
         align-items: center;
-        justify-content: center; }
+        justify-content: space-between;
+        width: 32.2rem; }
+        .modal-window .modal-alert .caption {
+            margin: 0 0 1.6rem 0; }
         .modal-window .modal-alert .caption,
         .modal-window .modal-alert .message {
-            margin: 0 0 1.6rem 0;
             width: 100%; }
-        .modal-window .modal-alert pre.message {
-            font-family: "Helvetica Neue", "HelveticaNeue-Light", "Helvetica Neue Light", Helvetica, Arial, "Lucida Grande", sans-serif, "Microsoft JhengHei", "微軟正黑體"; }
     .modal-window .message {
+        font-family: "Helvetica Neue", "HelveticaNeue-Light", "Helvetica Neue Light", Helvetica, Arial, "Lucida Grande", sans-serif, "Microsoft JhengHei", "微軟正黑體";
+        margin: 0;
+        overflow: hidden;
+        padding: 0;
+        position: relative;
         word-break: break-all;
         word-wrap: break-word; }
     .modal-window .btn-h-group {
-        bottom: 1.6rem;
-        left: 2.8rem;
-        position: absolute;
-        right: 2.8rem; }
+        width: 100%; }
         .modal-window .btn-h-group .btn {
             font-size: 1.3rem;
             height: 2.8rem;
-            line-height: 2.8rem;
+            line-height: calc(2.8rem - 4px);
             margin: 0 0.6rem 0 0;
-            max-width: 13rem;
-            flex: 1; }
+            max-width: 13rem; }
             .modal-window .btn-h-group .btn:last-child {
                 margin: 0; }
+
+.modal-progress .modal-alert {
+    min-height: 18rem; }
 
 .modal-progress .spinner-roller {
     background: linear-gradient(to right, #DEDEDC 10%, rgba(255, 255, 255, 0) 42%);
@@ -3143,11 +3185,29 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         transition: width 0.3s ease;
         width: 0; }
 
+.modal-progress-nonstop .spinner-roller {
+    height: 13rem;
+    margin: auto;
+    width: 13rem; }
+
+.modal-progress-nonstop .modal-alert {
+    height: 20rem;
+    min-height: 20rem;
+    width: 20rem; }
+
 .modal-input-lightbox .modal-alert {
-    display: block;
     min-height: 18rem;
     text-align: left;
+    padding: 1.6rem 0 0 0;
     width: 32.2rem; }
+    .modal-input-lightbox .modal-alert .caption {
+        color: #626262;
+        font-size: 15px;
+        line-height: 18px; }
+    .modal-input-lightbox .modal-alert .caption,
+    .modal-input-lightbox .modal-alert .message {
+        padding: 0 1.6rem;
+        margin: 0 0 20px 0; }
 
 .modal-input-lightbox .control {
     display: -webkit-box;
@@ -3159,7 +3219,11 @@ input[type=range]:focus::-webkit-slider-runnable-track {
     justify-content: space-between;
     align-items: center; }
     .modal-input-lightbox .control .inputHeader {
-        color: #ccc; }
+        color: #ccc;
+        flex: 1; }
+    .modal-input-lightbox .control input {
+        flex: 2;
+        padding: 3px; }
 
 .modal-input-lightbox .btn-h-group {
     border: none;
@@ -3208,6 +3272,62 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         position: static;
         width: 50%; }
 
+.modal-change-filament .modal-alert {
+    width: 440px;
+    min-height: 320px;
+    padding: 22px 0 0 0; }
+
+.modal-change-filament .caption,
+.modal-change-filament .message {
+    margin: 0 0 20px 0;
+    padding: 0 19px; }
+
+.modal-change-filament .caption {
+    color: #626262;
+    font-size: 15px;
+    line-height: 17px;
+    text-align: left; }
+
+.modal-change-filament .message {
+    color: #989898;
+    font-size: 15px;
+    line-height: 21px; }
+    .modal-change-filament .message p {
+        margin: 0; }
+
+.modal-change-filament .message-container p:last-of-type {
+    margin: 0 0 12.5px 0; }
+
+.modal-change-filament .way-to-go .btn {
+    width: 100%; }
+    .modal-change-filament .way-to-go .btn:first-child {
+        margin: 0 0 24px 0; }
+
+.modal-change-filament .spinner-roller {
+    height: 61.5px;
+    margin: 0 auto;
+    width: 61.5px; }
+
+.modal-change-filament .button-group {
+    border: none;
+    border-top: 1px solid #E0E0DF;
+    display: block;
+    height: 73px;
+    padding: 19px;
+    position: relative; }
+    .modal-change-filament .button-group .btn {
+        margin: 0;
+        padding: 0 10px; }
+    .modal-change-filament .button-group .btn:first-child:not([class*="btn-alone"]),
+    .modal-change-filament .button-group .btn-alone-left {
+        position: absolute;
+        left: 19px; }
+    .modal-change-filament .button-group .btn:last-child:not([class*="btn-alone"]),
+    .modal-change-filament .button-group .btn-alone-right {
+        position: absolute;
+        right: 19px;
+        min-width: 60px; }
+
 /**
  * the view of printer selector
  */
@@ -3220,6 +3340,8 @@ input[type=range]:focus::-webkit-slider-runnable-track {
     position: absolute;
     width: 30.3rem;
     z-index: 1; }
+    .select-printer .spinner-roller {
+        position: absolute; }
     .select-printer .device-wrapper {
         position: relative; }
     .select-printer .arrow {
@@ -3237,12 +3359,15 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         justify-content: 1; }
         .select-printer .device .col {
             height: 2.8rem;
-            line-height: 2.8rem; }
+            line-height: 2.8rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap; }
         .select-printer .device .device-name {
             padding: 0 0 0 1.7rem;
-            flex: calc(12 / 28.7 * 100%); }
+            flex: calc(11 / 28.7 * 100%); }
         .select-printer .device .module {
-            flex: calc(7 / 28.7 * 100%); }
+            flex: calc(3 / 28.7 * 100%); }
         .select-printer .device .status {
             flex: calc(5 / 28.7 * 100%); }
         .select-printer .device .close {
@@ -3255,10 +3380,11 @@ input[type=range]:focus::-webkit-slider-runnable-track {
     .select-printer .printer-list {
         list-style: none;
         margin: 0 auto;
-        max-height: calc(100% - 2.8rem);
+        max-height: 100%;
         overflow-x: hidden;
         overflow-y: scroll;
-        padding: 0; }
+        padding: 0;
+        will-change: transform; }
         .select-printer .printer-list .printer-item {
             cursor: pointer; }
             .select-printer .printer-list .printer-item [name="printer-group"] {
@@ -3287,8 +3413,8 @@ input[type=range]:focus::-webkit-slider-runnable-track {
             transition: all 0.25s; }
         .top-menu .brand-logo .func-name {
             color: #B3B3B3;
-            font-family: "HelveticaNeue-Thin";
             font-size: 40px;
+            font-weight: lighter;
             line-height: 49px;
             padding: 0 0 0 21px; }
         .top-menu .brand-logo .menu {
@@ -3298,12 +3424,12 @@ input[type=range]:focus::-webkit-slider-runnable-track {
             padding: 0.65rem 2.6rem;
             position: relative;
             top: 27px; }
-            .top-menu .brand-logo .menu .arrow {
+            .top-menu .brand-logo .menu .arrow-flat {
                 left: 0;
                 position: absolute;
                 transform: translateX(-100%);
                 top: 0; }
-                .top-menu .brand-logo .menu .arrow polygon {
+                .top-menu .brand-logo .menu .arrow-flat polygon {
                     fill: #fff; }
             .top-menu .brand-logo .menu .inner-menu {
                 display: -webkit-box;
@@ -3433,6 +3559,25 @@ input[type=range]:focus::-webkit-slider-runnable-track {
     height: auto;
     transform: scaleY(1); }
 
+.accordion .header {
+    color: #E0E0DF;
+    width: auto; }
+
+.accordion input {
+    border: 2px solid #E0E0DF;
+    color: #B3B3B3;
+    font-size: 15px;
+    margin: 0 0 0 10px;
+    width: 140px; }
+
+.accordion .caption:hover {
+    cursor: pointer;
+    -webkit-filter: brightness(80%);
+    filter: brightness(80%); }
+
+.accordion .caption .value {
+    color: #E0E0DF; }
+
 /* jQuery Growl
  * Copyright 2015 Kevin Sylvestre
  * 1.3.1
@@ -3540,14 +3685,11 @@ input[type=range]:focus::-webkit-slider-runnable-track {
     line-height: 18px; }
 
 .flux-monitor {
-    position: absolute;
-    left: 50%;
-    top: 100px; }
+    left: 50%; }
     .flux-monitor .main {
         background-color: white;
         height: 40rem;
         width: 31rem;
-        left: -50%;
         position: relative; }
         .flux-monitor .main .title {
             height: 5rem;
@@ -3662,7 +3804,6 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         background-color: white;
         height: 10rem;
         width: 31rem;
-        left: -50%;
         position: relative;
         margin-top: 5px; }
         .flux-monitor .sub .wrapper {
@@ -4129,6 +4270,39 @@ input.switch:checked ~ label:after {
     margin-top: 0.05em; }
 
 /* Advanced Panel */
+.print-studio .tour-mask {
+    bottom: 0;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+    z-index: 9999;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    background-color: rgba(0, 0, 0, 0.3); }
+    .print-studio .tour-mask .base {
+        position: relative;
+        left: 744px;
+        top: 388px;
+        width: 200px;
+        height: 200px;
+        border: solid 1px black;
+        background-color: rgba(255, 255, 255, 0.3); }
+    .print-studio .tour-mask .tour-description {
+        top: -70px;
+        position: relative;
+        text-align: center;
+        font-size: 16px;
+        font-weight: bold;
+        color: white; }
+
+.print-studio .btn-tutorial {
+    position: absolute;
+    top: 30px;
+    right: 30px;
+    z-index: 99999; }
+
 .print-studio .import-indicator {
     background-color: rgba(0, 0, 0, 0.5);
     border: 7px dashed #DDD;
@@ -4145,9 +4319,8 @@ input.switch:checked ~ label:after {
     position: relative;
     width: 440px; }
     .print-studio .advanced-panel .content-wrapper {
-        height: 415px;
-        overflow-y: auto;
-        padding: 0 0 70px 0; }
+        height: 427px;
+        overflow-y: auto; }
     .print-studio .advanced-panel .tab-list {
         display: table;
         list-style: none;
@@ -4187,7 +4360,6 @@ input.switch:checked ~ label:after {
         height: 70px;
         left: 0;
         margin-bottom: 0;
-        position: absolute;
         right: 0;
         text-align: center; }
         .print-studio .advanced-panel .footer div {
@@ -4311,129 +4483,14 @@ input.switch:checked ~ label:after {
     align-self: center;
     margin: 0 0 0 30px;
     z-index: 1; }
-    .print-studio .leftPanel .popup-selection {
-        display: -webkit-box;
-        /* OLD - iOS 6-, Safari 3.1-6 */
-        display: -webkit-flex;
-        /* NEW - Chrome */
-        display: flex;
-        /* NEW, Spec - Opera 12.1, Firefox 20+ */
-        display: block;
-        height: 40px;
-        position: relative; }
-        .print-studio .leftPanel .popup-selection ul {
-            background: #B3B3B3;
-            list-style: none;
-            padding: 0 10px 10px 10px; }
-            .print-studio .leftPanel .popup-selection ul li {
-                cursor: pointer;
-                margin: 10px 0 0 0; }
-        .print-studio .leftPanel .popup-selection .popup-open {
-            display: none; }
-            .print-studio .leftPanel .popup-selection .popup-open:checked ~ .display-text {
-                background: #B3B3B3;
-                color: #E0E0DF; }
-            .print-studio .leftPanel .popup-selection .popup-open:checked ~ .popup {
-                visibility: visible; }
-        .print-studio .leftPanel .popup-selection .display-text {
-            cursor: pointer;
-            display: inline-block;
-            line-height: 40px;
-            padding: 0 16px 0 6px;
-            width: 100%; }
-            .print-studio .leftPanel .popup-selection .display-text p {
-                display: block;
-                margin: 0;
-                width: 185px; }
-        .print-studio .leftPanel .popup-selection .popup {
-            display: -webkit-box;
-            /* OLD - iOS 6-, Safari 3.1-6 */
-            display: -webkit-flex;
-            /* NEW - Chrome */
-            display: flex;
-            /* NEW, Spec - Opera 12.1, Firefox 20+ */
-            visibility: hidden;
-            align-self: center; }
-            .print-studio .leftPanel .popup-selection .popup .arrow {
-                position: relative;
-                right: -1px;
-                align-self: center; }
-            .print-studio .leftPanel .popup-selection .popup .arrow.light > polygon {
-                fill: #F9F9F9; }
-            .print-studio .leftPanel .popup-selection .popup .arrow.dark > polygon {
-                fill: #B3B3B3; }
-            .print-studio .leftPanel .popup-selection .popup .content .title {
-                color: #B3B3B3;
-                font-size: 16px;
-                line-height: 18px;
-                padding: 15px; }
-            .print-studio .leftPanel .popup-selection .popup .content .colorSets {
-                padding: 0 15px 15px 15px; }
-            .print-studio .leftPanel .popup-selection .popup .content .set {
-                display: inline-block;
-                position: relative;
-                position: relative;
-                width: 120px;
-                z-index: 1000; }
-                .print-studio .leftPanel .popup-selection .popup .content .set .color {
-                    display: inline-block;
-                    height: 38px;
-                    width: 6.5px; }
-                .print-studio .leftPanel .popup-selection .popup .content .set .description {
-                    color: #B3B3B3;
-                    cursor: pointer;
-                    display: inline-block;
-                    font-size: 16px;
-                    line-height: 38px;
-                    padding-left: 3.5px;
-                    position: absolute; }
-                .print-studio .leftPanel .popup-selection .popup .content .set .green {
-                    background-color: #61C46D; }
-                .print-studio .leftPanel .popup-selection .popup .content .set .red {
-                    background-color: #E32B32; }
-                .print-studio .leftPanel .popup-selection .popup .content .set .black {
-                    background-color: #2E2E2E; }
-                .print-studio .leftPanel .popup-selection .popup .content .set .turquoise {
-                    background-color: #44C1BA; }
-                .print-studio .leftPanel .popup-selection .popup .content .set .orange {
-                    background-color: #F7931D; }
-                .print-studio .leftPanel .popup-selection .popup .content .set .gray {
-                    background-color: #808080; }
-                .print-studio .leftPanel .popup-selection .popup .content .set .blue {
-                    background-color: #29ABE2; }
-                .print-studio .leftPanel .popup-selection .popup .content .set .brown {
-                    background-color: #A37D53; }
-                .print-studio .leftPanel .popup-selection .popup .content .set .white {
-                    background-color: #FFFFFF; }
-                .print-studio .leftPanel .popup-selection .popup .content .set .purple {
-                    background-color: #A952A5; }
-                .print-studio .leftPanel .popup-selection .popup .content .set .yellow {
-                    background-color: #FCEE22; }
-                .print-studio .leftPanel .popup-selection .popup .content .set .transparent {
-                    border: 1px solid #E7E7E7; }
-            .print-studio .leftPanel .popup-selection .popup .content.color {
-                background-color: #F9F9F9;
-                height: 255px;
-                width: 403px; }
-            .print-studio .leftPanel .popup-selection .popup .content.quality {
-                background-color: #B3B3B3;
-                width: 160px;
-                z-index: 1000; }
-                .print-studio .leftPanel .popup-selection .popup .content.quality ul {
-                    background-color: #B3B3B3;
-                    color: #B3B3B3; }
-                    .print-studio .leftPanel .popup-selection .popup .content.quality ul li {
-                        color: #E0E0DF;
-                        font-size: 16px; }
-            .print-studio .leftPanel .popup-selection .popup .content.preview {
-                width: 50px; }
 
 .print-studio .rightPanel {
     height: 100%;
     position: absolute;
     right: 0;
-    width: 275px;
-    z-index: 1; }
+    width: 170px;
+    z-index: 1;
+    pointer-events: none; }
     .print-studio .rightPanel svg {
         bottom: 50px;
         height: 230px;
@@ -4456,7 +4513,8 @@ input.switch:checked ~ label:after {
     .print-studio .rightPanel .cameraViewController {
         bottom: 55%;
         height: 100px;
-        position: absolute; }
+        position: absolute;
+        pointer-events: auto; }
 
 .print-studio .object-dialogue.through {
     pointer-events: none; }
@@ -4496,7 +4554,8 @@ input.switch:checked ~ label:after {
         background: #FFFFFF;
         display: block;
         margin: 0 0 3px 0;
-        padding: 0 20px; }
+        padding: 0 20px;
+        width: 204px; }
     .print-studio .object-dialogue .control {
         display: -webkit-box;
         /* OLD - iOS 6-, Safari 3.1-6 */
@@ -4505,17 +4564,11 @@ input.switch:checked ~ label:after {
         display: flex;
         /* NEW, Spec - Opera 12.1, Firefox 20+ */
         color: #B3B3B3;
-        font-size: 13px;
         height: 40px;
         line-height: 40px;
         margin: 0 0 10px 0;
         align-items: center;
         justify-content: space-around; }
-        .print-studio .object-dialogue .control .header {
-            color: #E0E0DF;
-            width: 45%; }
-        .print-studio .object-dialogue .control input {
-            width: 80%; }
     .print-studio .object-dialogue .caption {
         display: -webkit-box;
         /* OLD - iOS 6-, Safari 3.1-6 */
@@ -4527,22 +4580,19 @@ input.switch:checked ~ label:after {
         font-size: 12px;
         line-height: 30px;
         justify-content: space-between; }
-    .print-studio .object-dialogue input {
-        border: 1px solid #E0E0DF;
-        color: #B3B3B3;
-        font-size: 15px; }
     .print-studio .object-dialogue .accordion .lock {
         background-image: url("../../img/lock.svg");
         background-position: top;
         background-repeat: no-repeat;
         background-size: 12px 36px;
+        bottom: 0;
         color: #BBB;
         cursor: pointer;
-        display: inline-block;
         height: 36px;
+        margin: auto;
         position: absolute;
-        right: 16px;
-        top: 38%;
+        left: 100%;
+        top: 0;
         width: 12px; }
     .print-studio .object-dialogue .accordion .lock.unlock {
         background-image: url("../../img/unlock.svg");
@@ -4684,7 +4734,7 @@ input.switch:checked ~ label:after {
     text-align: center; }
 
 .settings .nav li.nav-item {
-    width: 50%;
+    width: 100%;
     height: 47px;
     line-height: 47px;
     display: inline;
@@ -5313,13 +5363,17 @@ input.switch:checked ~ label:after {
     display: flex;
     /* NEW, Spec - Opera 12.1, Firefox 20+ */
     background: #fff;
-    color: #E1E1E0;
-    font-size: 23px;
-    height: 37.8px;
+    color: #B3B3B3;
+    font-size: 32px;
+    font-weight: bold;
+    height: 50px;
+    letter-spacing: 2px;
     top: -78px;
-    width: 126.9px;
+    width: 200px;
     align-items: center;
     justify-content: center; }
+    .laser-studio .file-importer:hover {
+        color: #888; }
     .laser-studio .file-importer:after {
         border: solid transparent;
         border-color: rgba(255, 255, 255, 0);
@@ -5346,11 +5400,9 @@ input.switch:checked ~ label:after {
 .laser-studio .operating-panel {
     margin: 0 0 0 30px;
     position: static;
-    align-self: center;
     width: auto;
-    z-index: 1; }
-    .laser-studio .operating-panel .disabled-pointer {
-        opacity: .3; }
+    z-index: 1;
+    align-self: center; }
     .laser-studio .operating-panel .custom-presets-wrapper {
         background: #FFF;
         overflow: scroll;
@@ -5397,9 +5449,7 @@ input.switch:checked ~ label:after {
                 font-size: 15px;
                 height: 30px;
                 line-height: 26px;
-                max-width: 66px;
-                min-width: 66px;
-                width: 66px; }
+                min-width: 66px; }
     .laser-studio .operating-panel .caption {
         padding: 0 0.3em 0 0; }
     .laser-studio .operating-panel .popup-selection {
@@ -5485,6 +5535,7 @@ input.switch:checked ~ label:after {
 
 .laser-studio .laser-object .ft-widget {
     cursor: move;
+    max-width: inherit;
     position: fixed; }
 
 .laser-studio .laser-object .ft-rotator,
@@ -5529,7 +5580,8 @@ input.switch:checked ~ label:after {
     font-size: 20px;
     transition: all 0.1s ease;
     width: 230px;
-    z-index: 1; }
+    z-index: 1;
+    will-change: top,left,transform; }
     .laser-studio .object-position .accordion-body {
         overflow: visible;
         position: relative; }
@@ -5543,9 +5595,7 @@ input.switch:checked ~ label:after {
             top: 0;
             width: 20px; }
     .laser-studio .object-position .arrow {
-        align-self: center; }
-        .laser-studio .object-position .arrow polygon {
-            fill: #fff; }
+        transform: translateY(55px); }
     .laser-studio .object-position .caption,
     .laser-studio .object-position .controls {
         margin: 0; }
@@ -5553,14 +5603,14 @@ input.switch:checked ~ label:after {
         background: #FFFFFF;
         display: block;
         margin: 0 0 3px 0;
-        padding: 0 20px; }
+        padding: 0 20px;
+        width: 240px; }
     .laser-studio .object-position .control {
+        font-size: 20px;
         margin: 0 0 10px 0; }
-        .laser-studio .object-position .control .header {
-            color: #E0E0DF;
-            width: 45%; }
-        .laser-studio .object-position .control input {
-            width: 80%; }
+        .laser-studio .object-position .control .input-fullsize {
+            margin: 0;
+            width: 100%; }
     .laser-studio .object-position .caption {
         display: -webkit-box;
         /* OLD - iOS 6-, Safari 3.1-6 */
@@ -5572,10 +5622,6 @@ input.switch:checked ~ label:after {
         font-size: 12px;
         line-height: 30px;
         justify-content: space-between; }
-    .laser-studio .object-position input {
-        border: 1px solid #E0E0DF;
-        color: #B3B3B3;
-        font-size: 15px; }
 
 .laser-studio .advanced-panel {
     background: #FFF;
@@ -5642,18 +5688,21 @@ input.switch:checked ~ label:after {
             position: relative;
             text-align: center;
             width: 99px; }
-            .scan-studio .mesh-thumbnail .mesh-thumbnail-item::before {
+        .scan-studio .mesh-thumbnail .mesh-thumbnail-no {
+            height: 100%;
+            width: 100%; }
+            .scan-studio .mesh-thumbnail .mesh-thumbnail-no::before {
                 content: "#"; }
-            .scan-studio .mesh-thumbnail .mesh-thumbnail-item:hover {
+            .scan-studio .mesh-thumbnail .mesh-thumbnail-no:hover {
                 background: #777; }
         .scan-studio .mesh-thumbnail .mesh-thumbnail-close {
             background: rgba(0, 0, 0, 0.3);
             border-radius: 50%;
             height: 20px;
             position: absolute;
-            width: 20px;
             right: -10px;
-            top: -10px; }
+            top: -10px;
+            width: 20px; }
             .scan-studio .mesh-thumbnail .mesh-thumbnail-close::before {
                 line-height: 20px; }
         .scan-studio .mesh-thumbnail .choose {
@@ -5762,7 +5811,7 @@ input.switch:checked ~ label:after {
             display: flex;
             /* NEW, Spec - Opera 12.1, Firefox 20+ */
             color: #B3B3B3;
-            font-size: 13px;
+            font-size: 20px;
             height: 40px;
             line-height: 40px;
             margin: 0 0 10px 0;
@@ -5854,6 +5903,15 @@ input.switch:checked ~ label:after {
         .scan-studio .setup-panel .caption {
             padding: 0 0.3em 0 0;
             text-transform: uppercase; }
+        .scan-studio .setup-panel .btn-calibrate {
+            background: transparent;
+            border: none;
+            font-size: inherit;
+            margin: 0; }
+            .scan-studio .setup-panel .btn-calibrate:active,
+            .scan-studio .setup-panel .btn-calibrate:hover {
+                box-shadow: none;
+                color: inherit; }
     .scan-studio .scan-progress {
         bottom: 28px;
         position: fixed;

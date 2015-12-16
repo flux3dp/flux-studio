@@ -41,6 +41,7 @@ define([
                             data: fileReader.result,
                             blob: blob,
                             url: blobUrl.createObjectURL(blob),
+                            name: thisFile.name,
                             extension: self.getFileExtension(thisFile.name),
                             type: thisFile.type,
                             size: thisFile.size,

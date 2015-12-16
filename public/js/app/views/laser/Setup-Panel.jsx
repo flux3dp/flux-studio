@@ -149,6 +149,8 @@ define([
 
                     self._saveLastestSet({ material: chooseMaterial });
                 }
+
+                self.openSubPopup(e);
             }
         },
 
@@ -338,8 +340,7 @@ define([
                 cx = React.addons.classSet,
                 checked = ('undefined' !== typeof this.props.imageFormat && 'svg' === this.props.imageFormat ? false : this.isShading()),
                 classes = cx({
-                    'display-text': true,
-                    'disabled-pointer': 'svg' === this.props.imageFormat
+                    'display-text': true
                 });
             return {
                 label: (
@@ -353,6 +354,9 @@ define([
                         onClick={this._onShadingChanged}
                     />
                 ),
+                labelClass: {
+                    'disabled-pointer': 'svg' === this.props.imageFormat
+                },
                 content: ''
             };
         },

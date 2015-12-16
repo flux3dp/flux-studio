@@ -6,6 +6,9 @@ define(function() {
         app : {
             name : 'Flux Studio - en'
         },
+        support: {
+            no_webgl: '無法在本台電腦開啟 WebGL, 請使用其他可以支援的電腦'
+        },
         device_selection: {
             device_name: 'DEVICE NAME',
             module: 'MODULE',
@@ -442,8 +445,8 @@ define(function() {
                 low: 'LOW QUALITY'
             },
             quick_print: 'Quick Print',
-            scale: 'Scale',
-            rotate: 'Rotate',
+            scale: 'SCALE',
+            rotate: 'ROTATE',
             align_center: 'Align Center',
             delete: 'Delete',
             reset: 'Reset',
@@ -462,7 +465,7 @@ define(function() {
             deviceTitle: 'Show device monitor'
         },
         laser: {
-            import: 'Import',
+            import: 'IMPORT',
             save: 'Save',
             custom: 'Custom',
             presets: 'Presets',
@@ -495,15 +498,15 @@ define(function() {
                 size: {
                     text: 'SIZE',
                     unit: {
-                        width: 'Width',
-                        height: 'Height'
+                        width: 'W',
+                        height: 'H'
                     }
                 },
                 rotate: {
                     text: 'ROTATE'
                 },
                 threshold: {
-                    text: 'Threshold',
+                    text: 'THRESHOLD',
                     default: 128
                 }
             },
@@ -597,6 +600,10 @@ define(function() {
             cancel: 'Cancel',
             delete_mesh: 'Delete?',
             quality: 'QUALITY',
+            scan_again_confirm: 'Do you want to discard current scan result?',
+            calibrate: 'Calibrate',
+            calibrate_fail: 'Calibrate Fail',
+            calibration_is_running: 'Calibration is running',
             resolution: [{
                 id: 'best',
                 text: 'Best',
@@ -702,11 +709,21 @@ define(function() {
             stop: 'STOP',
             record: 'RECORD',
             connecting: 'Connecting, please wait...',
-            headerOffline: 'Device head is not connected or missing',
-            headerTilt: 'Device head is tilted, please connect all 6 magnents',
-            unknownHead: 'Device head is unknown, please connect to a correct header',
-            fanFailure: 'Fan failed / stucked, you can spin it with a pancil',
-            shake: 'Head encountered unexpected shake'
+            HEAD_OFFLINE: 'Device head is not connected or missing',
+            TILT: 'Device head is tilted, please connect all 6 magnents',
+            WRONG_HEAD: 'Device head is unknown, please connect to a correct header',
+            FAN_FAILURE: 'Fan failed / stucked, you can spin it with a pancil',
+            SHAKE: 'Head encountered unexpected shake',
+            USER_OPERATION: 'machine operated by (other) user',
+            FILAMENT_RUNOUT: 'filament run out, please refill filament',
+            RESOURCE_BUSY: 'Machine is busy',
+            processing: 'Processing',
+            savingPreview: 'Saving preview image',
+            hour: 'hr',
+            minute: 'min',
+            left: 'left',
+            temperature: 'Temperature',
+            forceStop: 'Force stopping device?'
         },
         alert: {
             caption: 'Error',
@@ -742,19 +759,61 @@ define(function() {
             machineNotConnected: 'Machine is not connected',
             notPrinting: 'Printing is not in progress',
             nothingToPrint: 'Nothing to print (source blob missing)',
-            connectionTimeout: 'device is not responding, connection timeout',
-            filamentRunout: 'filament run out, please refill filament'
+            connectionTimeout: 'device is not responding, connection timeout'
         },
         machine_status: {
-            1: 'Unknown Head',
-            2: 'Head failed ER 2',
-            4: 'Head failed ER 4',
-            8: 'Head failed ER 8',
-            16: 'Shake',
-            64: 'Overheat',
-            32: 'Head Tilted',
-            128: 'Fan Stopped',
-            unknown: 'UNKNOWN'
+            '-2': 'Scanning',
+            '-1': 'Occupied',
+            0: 'Idle',
+            1: 'Initiating',
+            2: 'ST_TRANSFORM',
+            4: 'Starting',
+            6: 'Resuming',
+            16: 'Working',
+            18: 'Resuming',
+            32: 'Paused',
+            36: 'Paused',
+            38: 'Pausing',
+            48: 'Paused',
+            50: 'Pausing',
+            64: 'Completed',
+            66: 'Completing',
+            128: 'Aborted',
+            UNKNOWN: 'UNKNOWN'
+        },
+        head_module: {
+            EXTRUDER: 'Print',
+            UNKNOWN: ''
+        },
+        change_filament: {
+            home_caption: 'Change Filament',
+            load_filament_caption: 'LOAD FILAMENT',
+            unload_filament_caption: 'UNLOAD FILAMENT',
+            cancel: 'CANCEL',
+            load_filament: 'Load Filament',
+            unload_filament: 'Unload Filament',
+            next: 'NEXT',
+            heating_nozzle: 'Heating nozzle',
+            emerging: [
+                'Loading filament',
+                'Press STOP when you see material is emerging.'
+            ],
+            unloading: 'Unloading Filament',
+            stop: 'STOP',
+            loaded: 'Filament Loaded',
+            unloaded: 'Filament Unloaded',
+            ok: 'OK'
+        },
+        input_machine_password: {
+            require_password: '"%s" requires a password',
+            connect: 'CONNECT',
+            password: 'Password'
+        },
+        tutorial: {
+            clickToImport: 'Click to import STL file',
+            selectQuality: 'Select quality preferred',
+            clickGo: 'Click GO and preview',
+            startPrint: 'Click go and start printing'
         }
     };
 });

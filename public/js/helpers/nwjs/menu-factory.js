@@ -5,8 +5,9 @@ define([
     'helpers/nwjs/gui',
     'helpers/nwjs/menu-map',
     'helpers/i18n',
-    'helpers/observe'
-], function(gui, menuMap, i18n, observe) {
+    'helpers/observe',
+    'helpers/api/discover'
+], function(gui, menuMap, i18n, observe, discover) {
     'use strict';
 
     var emptyFunction = function(object) {
@@ -83,6 +84,13 @@ define([
 
         refresh: function() {
             NWjsWindow.menu = mainmenu;
+        },
+
+        updateMenu: function(menu, parentIndex) {
+            var menuItem = mainmenu.items[parentIndex],
+                subMenu = methods.createSubMenu(menu.subItems);
+
+            menuItem.submenu = subMenu;
         }
 
     };
@@ -100,12 +108,20 @@ define([
         methods.refresh();
     }
 
-    initialize(menuMap.all);
-
-    observe(menuMap.items, function(changes) {
-        menuMap.all = menuMap.refresh();
+    if ('undefined' !== typeof requireNode) {
         initialize(menuMap.all);
-    });
+
+        for (var key in menuMap.items) {
+            if (true === menuMap.items.hasOwnProperty(key)) {
+                (function(menuItem) {
+                    observe(menuItem, function(changes) {
+                        menuMap.all = menuMap.refresh();
+                        methods.updateMenu(menuMap.all[menuItem.parent], menuItem.parent);
+                    });
+                })(menuMap.items[key]);
+            }
+        }
+    }
 
     return {
         items: menuMap.items,

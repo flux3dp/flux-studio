@@ -1,4 +1,6 @@
-define([], function(){
+define(function() {
+    'use strict';
+
     return {
         // Status
         RUNNING         : 'RUNNING',
@@ -13,13 +15,14 @@ define([], function(){
         UNKNOWN         : 'UNKNOWN',
         COMPLETED       : 'COMPLETED',
         FATAL           : 'FATAL',
-        RUNNING         : 'RUNNING',
         OK              : 'OK',
-        IDLE            : 'IDLE',
-        COMPLETED       : 'COMPLETED',
         IDLE            : 'IDLE',
         RESUMING        : 'RESUMING',
         AUTH_ERROR      : 'AUTH_ERROR',
+        HEAD_OFFLINE    : 'HEAD_OFFLINE',
+        HEAD_ERROR      : 'HEAD_ERROR',
+        WRONG_HEAD      : 'WRONG_HEAD',
+        AUTH_FAILED     : 'AUTH_FAILED',
         HEADER_OFFLINE  : 'HEADER_OFFLINE',
         HEADER_ERROR    : 'HEADER_ERROR',
         WRONG_HEADER    : 'WRONG_HEADER',
@@ -27,6 +30,13 @@ define([], function(){
         FAN_FAILURE     : 'FAN_FAILURE',
         TIMEOUT         : 'TIMEOUT',
         FILAMENT_RUNOUT : 'FILAMENT_RUNOUT',
+        UNKNOWN_ERROR   : 'UNKNOWN_ERROR',
+        UNKNOWN_STATUS  : 'UNKNOWN_STATUS',
+        USER_OPERATION  : 'USER_OPERATION',
+
+        // Print head
+        EXTRUDER        : 'EXTRUDER',
+        PRINTER         : 'PRINTER',
 
         // Command
         RESUME          : 'RESUME',
@@ -35,6 +45,7 @@ define([], function(){
         REPORT          : 'REPORT',
         ABORT           : 'ABORT',
         QUIT            : 'QUIT',
+        KICK            : 'KICK',
         LS              : 'LS'
     };
 });

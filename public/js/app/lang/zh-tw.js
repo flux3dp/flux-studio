@@ -6,6 +6,9 @@ define(function() {
         app : {
             name : 'Flux Studio - zh-tw'
         },
+        support: {
+            no_webgl: 'Does not seem to support WebGL'
+        },
         device_selection: {
             device_name: 'DEVICE NAME',
             module: 'MODULE',
@@ -597,6 +600,10 @@ define(function() {
             cancel: 'Cancel',
             delete_mesh: '真的要刪除嗎?',
             quality: 'QUALITY',
+            scan_again_confirm: 'Do you want to discard current scan result?',
+            calibrate: '校正',
+            calibrate_fail: '校正失敗',
+            calibration_is_running: '校正進行中',
             resolution: [{
                 id: 'best',
                 text: 'Best',
@@ -702,11 +709,21 @@ define(function() {
             stop: 'STOP',
             record: 'RECORD',
             connecting: 'Connecting, please wait...',
-            headerOffline: '沒有偵測到列印工具頭',
-            headerTilt: '請確認磁鐵關節正確的附著',
-            unknownHead: '請更換成列印工具頭',
-            fanFailure: 'Fan failed / stucked, 請用細針戳一下',
-            shake: 'Head encountered unexpected shake'
+            HEAD_OFFLINE: '沒有偵測到列印工具頭',
+            TILT: '請確認磁鐵關節正確的附著',
+            WRONG_HEAD: '請更換成列印工具頭',
+            FAN_FAILURE: 'Fan failed / stucked, 請用細針戳一下',
+            SHAKE: 'Head encountered unexpected shake',
+            USER_OPERATION: 'machine operated by (other) user',
+            FILAMENT_RUNOUT: 'filament run out, please refill filament',
+            RESOURCE_BUSY: 'Machine is busy',
+            processing: 'Processing',
+            savingPreview: 'Saving preview image',
+            hour: '小時',
+            minute: '分',
+            left: '完成',
+            temperature: '溫度',
+            forceStop: '強制停止機器?'
         },
         alert: {
             caption: '錯誤',
@@ -742,19 +759,61 @@ define(function() {
             machineNotConnected: 'Machine is not connected',
             notPrinting: 'Printing is not in progress',
             nothingToPrint: 'Nothing to print (source blob missing)',
-            connectionTimeout: 'device is not responding, connection timeout',
-            filamentRunout: 'filament run out, please refill filament'
+            connectionTimeout: 'device is not responding, connection timeout'
         },
         machine_status: {
-            1: 'Unknown Head',
-            2: 'Head failed ER 2',
-            4: 'Head failed ER 4',
-            8: 'Head failed ER 8',
-            16: 'Shake',
-            64: 'Overheat',
-            32: 'Head Tilted',
-            128: 'Fan Stopped',
-            unknown: 'UNKNOWN'
+            '-2': 'Scanning',
+            '-1': 'Occupied',
+            0: 'Idle',
+            1: 'Initiating',
+            2: 'ST_TRANSFORM',
+            4: 'Starting',
+            6: 'Resuming',
+            16: 'Working',
+            18: 'Resuming',
+            32: 'Paused',
+            36: 'Paused',
+            38: 'Pausing',
+            48: 'Paused',
+            50: 'Pausing',
+            64: 'Completed',
+            66: 'Completing',
+            128: 'Aborted',
+            UNKNOWN: 'UNKNOWN'
+        },
+        head_module: {
+            EXTRUDER: 'Print',
+            UNKNOWN: ''
+        },
+        change_filament: {
+            home_caption: 'Change Filament',
+            load_filament_caption: 'LOAD FILAMENT',
+            unload_filament_caption: 'UNLOAD FILAMENT',
+            cancel: 'CANCEL',
+            load_filament: 'Load Filament',
+            unload_filament: 'Unload Filament',
+            next: 'NEXT',
+            heating_nozzle: 'Heating nozzle',
+            emerging: [
+                'Loading filament',
+                'Press STOP when you see material is emerging.'
+            ],
+            unloading: 'Unloading Filament',
+            stop: 'STOP',
+            loaded: 'Filament Loaded',
+            unloaded: 'Filament Unloaded',
+            ok: 'OK'
+        },
+        input_machine_password: {
+            require_password: '"%s" requires a password',
+            connect: 'CONNECT',
+            password: 'Password'
+        },
+        tutorial: {
+            clickToImport: 'Click to import STL file',
+            selectQuality: 'Select quality preferred',
+            clickGo: 'Click GO and preview',
+            startPrint: 'Click go and start printing'
         }
     };
 });

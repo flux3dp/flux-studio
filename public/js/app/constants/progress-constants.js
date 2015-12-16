@@ -5,6 +5,7 @@ define(function() {
         // progress dialog types
         WAITING      : 'WAITING',
         STEPPING     : 'STEPPING',
+        NONSTOP      : 'NONSTOP',
 
         // events
         OPEN_EVENT   : 'OPEN',

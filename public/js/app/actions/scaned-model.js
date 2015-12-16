@@ -125,6 +125,25 @@ define([
         scene.add(circularGridHelper);
     }
 
+    function refreshPosition(mesh, objectChange, delay) {
+        return function() {
+            var matrixValue = matrix(mesh),
+                timer,
+                objectScreenPosition = toScreenPosition(mesh, camera, container);
+
+            if (true === delay) {
+                clearTimeout(timer);
+                // delay 0.1s
+                timer = setTimeout(function() {
+                    objectChange(objectScreenPosition, matrixValue);
+                }, 100);
+            }
+            else {
+                objectChange(objectScreenPosition, matrixValue);
+            }
+        };
+    }
+
     function attachControl(mesh, objectChange, delay) {
         delay = ('boolean' === typeof delay ? delay : true);
         objectChange = objectChange || function() {};
@@ -140,6 +159,8 @@ define([
                     var transformControl = new THREE.TransformControls( camera, renderer.domElement ),
                         timer;
 
+                    mesh.onObjectChange = refreshPosition(mesh, objectChange, delay);
+
                     transformControl.addEventListener('change', render);
                     transformControl.addEventListener('mouseDown', function(e) {
                         orbitControl.enabled = false;
@@ -147,22 +168,9 @@ define([
                     transformControl.addEventListener('mouseUp', function(e) {
                         orbitControl.enabled = true;
                     });
-                    transformControl.addEventListener('objectChange', function(e) {
-                        var matrixValue = matrix(mesh),
-                            objectScreenPosition = toScreenPosition(mesh, camera, container);
-
+                    transformControl.addEventListener('objectChange', function() {
                         orbitControl.enabled = false;
-
-                        if (true === delay) {
-                            clearTimeout(timer);
-                            // delay 0.1s
-                            timer = setTimeout(function() {
-                                objectChange(objectScreenPosition, matrixValue);
-                            }, 100);
-                        }
-                        else {
-                            objectChange(objectScreenPosition, matrixValue);
-                        }
+                        mesh.onObjectChange();
                     });
                     transformControl.setSpace('world');
 
@@ -416,6 +424,10 @@ define([
         scene.children.forEach(function(el) {
             if ('undefined' !== typeof el.transformControl) {
                 el.transformControl.update();
+            }
+
+            if ('function' === typeof el.onObjectChange) {
+                el.onObjectChange();
             }
         });
 

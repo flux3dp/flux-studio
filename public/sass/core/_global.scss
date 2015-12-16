@@ -57,6 +57,10 @@ a {
     text-decoration: underline;
 }
 
+img {
+    max-width: 100%;
+}
+
 /**
  * structure
  */
@@ -65,9 +69,12 @@ a {
 }
 
 .content {
+    @include flexbox();
+    background: #fff;
     height: 100%;
     overflow: hidden;
     width: 100%;
+    position: relative;
 }
 
 .horizontal-menu .menu-item {
@@ -140,10 +147,10 @@ a {
         content: attr(data-tip);
         display: block;
         font-size: 11px;
-        height: 24px;
         left: -15px;
         line-height: 24px;
         min-width: 75px;
+        padding: 5px;
         position: absolute;
         text-align: center;
         white-space: nowrap;
@@ -355,6 +362,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
 /* studio */
 .studio-container {
     height: 100%;
+    width: 100%;
 
     .btn-h-group {
         padding: 10px 0 10px 10px;
@@ -444,6 +452,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         position: fixed;
         right: 20px;
         width: 87px;
+        pointer-events: auto;
 
         .btn.btn-disabled {
             background: #CCC;
@@ -494,4 +503,24 @@ input[type=range]:focus::-webkit-slider-runnable-track {
 // particular needs
 .disabled-pointer {
     pointer-events: none;
+    opacity: .4;
+}
+
+// arrows
+.arrow {
+    background: #fff;
+    height: 20px;
+    width: 28px;
+}
+
+.arrow,
+.arrow-left {
+    -webkit-clip-path: polygon(0 50%, 100% 100%, 100% 0);
+    clip-path: polygon(0 50%, 100% 100%, 100% 0);
+    transform: translateX(1px);
+}
+
+.arrow-right {
+    -webkit-clip-path: polygon(0 0, 0 100%, 100% 50%);
+    clip-path: polygon(0 0, 0 100%, 100% 50%);
 }

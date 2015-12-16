@@ -19,5 +19,11 @@ define([
             });
         },
 
+        closeAllView: function() {
+            Dispatcher.dispatch({
+                actionType: GlobalConstants.CLOSE_ALL_VIEW
+            });
+        }
+
     };
 });

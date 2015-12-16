@@ -16,6 +16,7 @@ define([
     'app/actions/alert-actions',
     'app/stores/alert-store',
     'app/actions/progress-actions',
+    'app/constants/progress-constants',
     'helpers/shortcuts',
     'helpers/round',
     'helpers/array-findindex',
@@ -38,6 +39,7 @@ define([
     AlertActions,
     AlertStore,
     ProgressActions,
+    ProgressConstants,
     shortcuts,
     round
 ) {
@@ -102,6 +104,7 @@ define([
 
                 componentDidMount: function() {
                     AlertStore.onRetry(this._retry);
+                    AlertStore.onAbort(this._abort);
                     AlertStore.onCancel(this._cancelScan);
                 },
 
@@ -123,13 +126,28 @@ define([
                 _retry: function(id) {
                     var self = this;
 
-                    if ('scan-retry' === id) {
+                    switch (id) {
+                    case 'scan-retry-abort':
                         self.state.scanCtrlWebSocket.retry();
+                        break;
+                    case 'calibrate':
+                        self._onCalibrate();
+                        break;
+                    }
+                },
+
+                _abort: function(id) {
+                    var self = this;
+
+                    switch (id) {
+                    case 'scan-retry-abort':
+                        self.state.scanCtrlWebSocket.takeControl();
+                        break;
                     }
                 },
 
                 _cancelScan: function() {
-                    this._onScanAgain();
+                    this.setState(this.getInitialState());
                 },
 
                 _refreshCamera: function() {
@@ -141,7 +159,7 @@ define([
                                 var blob = new Blob(image_blobs, {type: mime_type}),
                                     url = (window.URL || window.webkitURL),
                                     objectUrl = url.createObjectURL(blob),
-                                    img = self.refs.camera_image.getDOMNode();
+                                    img;
 
                                 if (false === self.state.showCamera) {
                                     self.setState({
@@ -149,14 +167,18 @@ define([
                                     });
                                 }
 
-                                img.onload = function() {
-                                    // release the object URL once the image has loaded
-                                    url.revokeObjectURL(objectUrl);
-                                    blob = null;
-                                };
+                                if (true === self.isMounted()) {
+                                    img = self.refs.camera_image.getDOMNode();
 
-                                // trigger the image to load
-                                img.src = objectUrl;
+                                    img.onload = function() {
+                                        // release the object URL once the image has loaded
+                                        url.revokeObjectURL(objectUrl);
+                                        blob = null;
+                                    };
+
+                                    // trigger the image to load
+                                    img.src = objectUrl;
+                                }
                             }
                         )
                     });
@@ -189,6 +211,20 @@ define([
                     });
                 },
 
+                _newMesh: function(args) {
+                    args = args || {};
+                    return {
+                        model: args.model || undefined,
+                        transformMethods: {
+                            hide: function() {}
+                        },
+                        name: '',
+                        index: args.index,
+                        choose: false,
+                        display: true
+                    };
+                },
+
                 _onRendering: function(views, chunk_length, mesh) {
                     var self = this,
                         scan_speed = self._getScanSpeed(),
@@ -213,17 +249,17 @@ define([
                     if ('undefined' === typeof mesh) {
                         model = scanedModel.appendModel(views);
 
-                        meshes.push({
+                        meshes.push(self._newMesh({
                             model: model,
-                            transformMethods: {
-                                hide: function() {}
-                            },
-                            name: '',
-                            index: self.state.scanTimes,
-                            choose: false,
-                            display: true
-                        });
+                            index: self.state.scanTimes
+                        }));
 
+                        self.setState({
+                            meshes: meshes,
+                            progressPercentage: progressPercentage,
+                            progressRemainingTime: progressRemainingTime,
+                            progressElapsedTime: progressElapsedTime
+                        });
                     }
                     else {
                         mesh.model = scanedModel.updateMesh(mesh.model, views);
@@ -245,7 +281,9 @@ define([
                     self.setState({
                         meshes: meshes,
                         selectedMeshes: [],
-                        hasConvert: false
+                        hasConvert: false,
+                        stlBlob: undefined,
+                        saveFileType: 'pcd'
                     });
                 },
 
@@ -284,7 +322,7 @@ define([
                             );
                         };
 
-                    self._openBlocker(true);
+                    self._openBlocker(true, ProgressConstants.NONSTOP);
 
                     this._mergeAll(exportSTL, false);
                 },
@@ -312,7 +350,7 @@ define([
                         selectedMeshes: meshes
                     }, function() {
                         // merge each mesh
-                        this._doManualMerge(meshes, callback);
+                        this._doManualMerge(meshes, callback, false);
 
                         self.setState({
                             selectedMeshes: []
@@ -322,11 +360,9 @@ define([
 
                 _onSave: function(e) {
                     var self = this,
-                        exportPCD = function(outputName) {
+                        exportFile = function(outputName) {
                             var fileFormat = self.state.saveFileType,
                                 fileName = (new Date()).getTime() + '.' + fileFormat;
-
-                            self._openBlocker(true);
 
                             if (self.state.stlBlob instanceof Blob) {
                                 saveAs(self.state.stlBlob, fileName);
@@ -339,19 +375,17 @@ define([
                                     {
                                         onFinished: function(blob) {
                                             saveAs(blob, fileName);
-                                            self._switchMeshes('pcd' === fileFormat, false);
-                                            onClose();
+                                            self._openBlocker(false);
                                         }
                                     }
                                 );
                             }
-                        },
-                        onClose = function(e) {
-                            self._openBlocker(false);
+
+                            self._switchMeshes(true, false);
                         };
 
-                    self._openBlocker(true);
-                    this._mergeAll(exportPCD, false);
+                    self._openBlocker(true, ProgressConstants.NONSTOP);
+                    this._mergeAll(exportFile, false);
                 },
 
                 _onScanFinished: function(point_cloud) {
@@ -377,6 +411,12 @@ define([
                         }
                     );
 
+                },
+
+                _handleCheck: function(callback) {
+                    callback = callback || function() {};
+
+                    this.state.scanCtrlWebSocket.check().done(callback);
                 },
 
                 _handleScan: function(e) {
@@ -409,7 +449,20 @@ define([
                                 }
                             };
 
-                            self.state.scanCtrlWebSocket.check(opts);
+                            self._handleCheck(function(data) {
+                                switch (data.message) {
+                                case 'good':
+                                case 'no object':
+                                    opts.onPass();
+                                    break;
+                                case 'not open':
+                                case 'no laser':
+                                    opts.onFail(data.message);
+                                    break;
+                                default:
+                                    opts.onFail(data.message);
+                                }
+                            });
                         },
                         onScan = function() {
                             var opts = {
@@ -445,8 +498,13 @@ define([
                 },
 
                 _onScanAgain: function(e) {
-                    this.setState(this.getInitialState());
-                    scanedModel.clear();
+                    var self = this;
+
+                    AlertStore.onYes(function(id) {
+                        self.setState(self.getInitialState());
+                        scanedModel.clear();
+                    });
+                    AlertActions.showPopupYesNo('scan-again', self.state.lang.scan.scan_again_confirm);
                 },
 
                 _onScanStop: function(e) {
@@ -462,7 +520,7 @@ define([
                     var self = this,
                         delete_noise_name = 'clear-noise-' + (new Date()).getTime(),
                         onStarting = function(data) {
-                            self._openBlocker(true);
+                            self._openBlocker(true, ProgressConstants.NONSTOP);
                         },
                         onDumpFinished = function(data) {
                             var newMesh;
@@ -500,7 +558,7 @@ define([
                         cylider_box = new THREE.Box3().setFromObject(self.state.cylinder),
                         opts = {
                             onStarting: function() {
-                                self._openBlocker(true);
+                                self._openBlocker(true, ProgressConstants.NONSTOP);
                             },
                             onReceiving: self._onRendering,
                             onFinished: function(data) {
@@ -547,6 +605,7 @@ define([
                         },
                         doingApplyTransform = function() {
                             currentMesh = selectedMeshes[currentIndex];
+
                             matrixValue = scanedModel.matrix(currentMesh.model);
                             params = {
                                 pX: matrixValue.position.center.x,
@@ -582,7 +641,9 @@ define([
                     doingApplyTransform();
                 },
 
-                _doManualMerge: function(selectedMeshes, callback) {
+                _doManualMerge: function(selectedMeshes, callback, isNewMesh) {
+                    isNewMesh = ('boolean' === typeof isNewMesh ? isNewMesh : true);
+
                     var self = this,
                         meshes = this.state.meshes,
                         selectedMeshes = (true === selectedMeshes instanceof Array ? selectedMeshes : this.state.selectedMeshes),
@@ -600,47 +661,45 @@ define([
                             },
                             afterMerge = callback || function(outputName) {
                                 var mesh,
-                                    updatedMeshes = [];
+                                    updatedMeshes = [],
+                                    deferred = $.Deferred(),
+                                    onUpdate = function(response) {
+                                        mesh = self._getMesh(self.state.scanTimes);
+                                        mesh.name = outputName;
+                                    };
+
+                                deferred.done(onUpdate);
 
                                 self.state.scanModelingWebSocket.dump(
                                     outputName,
                                     {
-                                        onReceiving: self._onRendering,
+                                        onReceiving: function(typedArray, blobs_len) {
+                                            self._onRendering(typedArray, blobs_len);
+                                            deferred.resolve();
+                                        },
                                         onFinished: function(response) {
+                                            self.state.selectedMeshes.forEach(function(selectedMesh, i) {
+                                                scanedModel.remove(selectedMesh.model);
+                                            });
 
-                                            // TODO: BLACK MAGIC!!! i've no idea why the state.meshes doesn't update?
-                                            var timer = setInterval(function() {
-                                                if (self.state.scanTimes === self.state.meshes.length) {
-                                                    mesh = self._getMesh(self.state.scanTimes);
-                                                    mesh.name = outputName;
-
-                                                    self.state.selectedMeshes.forEach(function(selectedMesh, i) {
-                                                        scanedModel.remove(selectedMesh.model);
-                                                    });
-
-                                                    for (var i = self.state.meshes.length - 1; i >= 0; i--) {
-                                                        if (true === self.state.meshes[i].choose) {
-                                                            self.state.meshes.splice(i, 1);
-                                                        }
-                                                    }
-
-                                                    self.setState({
-                                                        meshes: self.state.meshes,
-                                                        selectedMeshes: []
-                                                    });
-
-                                                    self._openBlocker(false);
-
-                                                    clearInterval(timer);
+                                            for (var i = self.state.meshes.length - 1; i >= 0; i--) {
+                                                if (true === self.state.meshes[i].choose) {
+                                                    self.state.meshes.splice(i, 1);
                                                 }
-                                            }, 100);
+                                            }
 
+                                            self.setState({
+                                                meshes: self.state.meshes,
+                                                selectedMeshes: []
+                                            });
+
+                                            self._openBlocker(false);
                                         }
                                     }
                                 );
                             },
                             onMergeStarting = function() {
-                                self._openBlocker(true);
+                                self._openBlocker(true, ProgressConstants.NONSTOP);
                             },
                             isEnd = function() {
                                 return (endIndex === currentIndex);
@@ -676,10 +735,10 @@ define([
                             baseMesh,
                             targetMesh;
 
-                        if (1 < self.state.scanTimes) {
+                        if (1 < self.state.scanTimes && 1 < meshes.length) {
                             self.setState({
                                 // take merge as scan
-                                scanTimes: self.state.scanTimes + 1
+                                scanTimes: (true === isNewMesh ? self.state.scanTimes + 1 : self.state.scanTimes)
                             }, function() {
                                 doingMerge();
                             });
@@ -721,9 +780,9 @@ define([
                     });
                 },
 
-                _openBlocker: function(is_open) {
+                _openBlocker: function(is_open, type, message, hasStop) {
                     if (true === is_open) {
-                        ProgressActions.open();
+                        ProgressActions.open(type, '', message, hasStop);
                     }
                     else {
                         ProgressActions.close();
@@ -748,6 +807,64 @@ define([
                     });
                 },
 
+                _onCalibrate: function() {
+                    var self = this,
+                        opts = {
+                            onPass: function() {
+                                var scanCtrlWebSocket = self.state.scanCtrlWebSocket,
+                                    calibrateDeferred = scanCtrlWebSocket.calibrate(true),
+                                    then = function(data) {
+                                        if ('ok' === data.status) {
+                                            self._refreshCamera();
+                                            self._openBlocker(false);
+                                        }
+                                        else if ('fail' === data.status) {
+                                            self._openBlocker(false);
+                                            AlertActions.showPopupError(
+                                                'calibrate-fail',
+                                                self.state.lang.scan.calibrate_fail
+                                            );
+
+                                        }
+                                        else {
+                                            calibrateDeferred = scanCtrlWebSocket.calibrate(false).then(then);
+                                        }
+                                    };
+
+                                calibrateDeferred.then(then);
+                            },
+                            onFail: function(message) {
+                                self._openBlocker(false);
+                                AlertActions.showPopupRetry(
+                                    'calibrate',
+                                    // TODO: replace the content
+                                    (
+                                        <div>
+                                            <img className="calibrate-image" src="/img/calibration-guide.jpg"/>
+                                            <p>{message}</p>
+                                        </div>
+                                    )
+                                );
+                            }
+                        };
+
+                    self._handleCheck(function(data) {
+                        switch (data.message) {
+                        case 'good':
+                            opts.onPass();
+                            break;
+                        case 'no object':
+                        case 'not open':
+                        case 'no laser':
+                        default:
+                            self._refreshCamera();
+                            opts.onFail(data.message);
+                        }
+                    });
+
+                    self._openBlocker(true, ProgressConstants.WAITING, self.state.lang.scan.calibration_is_running);
+                },
+
                 // render sections
                 _renderSettingPanel: function() {
                     var self = this,
@@ -758,7 +875,7 @@ define([
                         };
 
                     return (
-                        <SetupPanel className={className} ref="setupPanel" lang={lang}/>
+                        <SetupPanel className={className} ref="setupPanel" lang={lang} onCalibrate={this._onCalibrate}/>
                     );
                 },
 
@@ -772,7 +889,7 @@ define([
                         };
 
                     return (
-                        0 < state.selectedMeshes.length && false === state.blocker ?
+                        0 < state.selectedMeshes.length && false === state.blocker && false === state.isScanStarted ?
                         <ManipulationPanel
                             lang = {lang}
                             selectedMeshes={state.selectedMeshes}
@@ -870,7 +987,7 @@ define([
                         opts = {
                             onError: function(data) {
                                 self._openBlocker(false);
-                                AlertActions.showPopupRetry('scan-retry', data.error);
+                                AlertActions.showPopupRetryAbort('scan-retry-abort', data.error);
                             },
                             onReady: function() {
                                 self.setState({
@@ -889,7 +1006,7 @@ define([
                                 scanModelingWebSocket: scanModeling(opts)
                             });
 
-                            self._openBlocker(true);
+                            self._openBlocker(true, ProgressConstants.NONSTOP);
                         },
                         content = (
                             <PrinterSelector
@@ -1042,8 +1159,13 @@ define([
 
                                     self.setState({
                                         meshes: meshes,
-                                        scanTimes: (0 === meshes.length ? 0 : self.state.scanTimes)
+                                        scanTimes: (0 === meshes.length ? 0 : self.state.scanTimes),
+                                        selectedMeshes: (0 === meshes.length ? [] : self.state.selectedMeshes)
                                     });
+
+                                    if (0 === meshes.length) {
+                                        self._refreshCamera();
+                                    }
                                 };
 
                                 self._openConfirm(
@@ -1059,13 +1181,13 @@ define([
                         itemClass = {
                             'mesh-thumbnail-item': true,
                             'choose': mesh.choose,
-                            'hide': !mesh.display
+                            'hide': !mesh.display || true === self.state.isScanStarted
                         };
 
                         return {
                             label: (
-                                <div className={cx(itemClass)} data-index={mesh.index} onClick={onChooseMesh}>
-                                    {mesh.index}
+                                <div className={cx(itemClass)}>
+                                    <div className="mesh-thumbnail-no" data-index={mesh.index} onClick={onChooseMesh}>{mesh.index}</div>
                                     <div className="mesh-thumbnail-close fa fa-times" onClick={onDeleteMesh}></div>
                                 </div>
                             )
