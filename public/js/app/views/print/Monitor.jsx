@@ -107,8 +107,6 @@ define([
 
                     if(info[0].TIME_COST) {
                         totalTimeInSeconds = info[0].TIME_COST;
-                        // console.log(totalTimeInSeconds);
-                        // this._updateTotalTime(parseInt(info[0].TIME_COST));
                     }
                     this._startReport();
                 }.bind(this));
@@ -388,7 +386,7 @@ define([
             else if (lastError === DeviceConstants.UNKNOWN_ERROR) {
                 DeviceMaster.quit();
             }
-            else if(status === DeviceConstants.ABORTED || status === DeviceConstants.COMPLETED) {
+            else if(stateId === 64 || stateId === 128) {
                 DeviceMaster.quit();
                 status = DeviceConstants.READY;
             }
@@ -401,7 +399,7 @@ define([
                 AlertActions.closePopup();
             }
 
-            if(report.prog) {
+            if(report.prog && !!totalTimeInSeconds) {
                 progress = parseInt(report.prog * 100);
                 timeLeft = this._formatTime(totalTimeInSeconds * (1 - report.prog));
                 progress = `${progress}%, ${timeLeft} ${lang.left}`;

@@ -642,7 +642,7 @@ define([
                         else {
                             if (result.status !== 'error') {
                                 var serverMessage = `${result.status}: ${result.message} (${parseInt(result.percentage * 100)}%)`,
-                                    drawingMessage = `FInishing up... (100%)`,
+                                    drawingMessage = `Finishing up... (100%)`,
                                     message = result.status !== 'complete' ? serverMessage : drawingMessage;
                                 ProgressActions.updating(message, parseInt(result.percentage * 100));
                             }
@@ -681,7 +681,7 @@ define([
             ids.push(obj.uuid);
         });
 
-        ProgressActions.open(ProgressConstants.STEPPING, 'Caption', 'Saving File Preview');
+        ProgressActions.open(ProgressConstants.STEPPING, lang.print.rendering, lang.print.savingFilePreview);
 
         getBlobFromScene().then(function(blob) {
             previewUrl = URL.createObjectURL(blob);
@@ -699,7 +699,7 @@ define([
                         else {
                             if (result.status !== 'error') {
                                 var progress = `${result.status}: ${result.message} (${parseInt(result.percentage * 100)}%)`,
-                                    complete = `FInishing up...`;
+                                    complete = lang.print.finishingUp;
 
                                 if(result.status !== 'complete') {
                                     ProgressActions.updating(progress, parseInt(result.percentage * 100));

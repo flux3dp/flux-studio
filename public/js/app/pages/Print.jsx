@@ -166,6 +166,7 @@ define([
                         ];
                         AlertActions.showPopupYesNo('tour', 'Want a tour?');
                         AlertStore.onYes(this._handleTakeTutorial);
+                        AlertStore.onCancel(this._handleCloseTutorial);
                     }
                 },
 
@@ -173,6 +174,13 @@ define([
                     if(answer === 'tour') {
                         this.setState({ tutorialOn: true });
                         tutorialMode = true;
+                    }
+                },
+
+                _handleCancelTutorial: function(answer) {
+                    if(answer === 'tour') {
+                        this.setState({ tutorialOn: false });
+                        tutorialMode = false;
                     }
                 },
 

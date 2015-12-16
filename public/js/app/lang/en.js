@@ -462,7 +462,10 @@ define(function() {
             importTitle: 'Import 3D models ( .stl )',
             getFcodeTitle: 'Save toolhead path and config into FCode file ( *.fc )',
             goTitle: 'Print it out',
-            deviceTitle: 'Show device monitor'
+            deviceTitle: 'Show device monitor',
+            rendering: 'Rendering',
+            finishingUp: 'Finishing up...',
+            savingFilePreview: 'Saving file preview'
         },
         laser: {
             import: 'IMPORT',
