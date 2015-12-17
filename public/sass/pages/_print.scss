@@ -526,6 +526,16 @@ input.switch:checked ~ label:after {
             letter-spacing: 0.5px;
             margin-bottom: 15px;
         }
+
+        .preset-wrapper {
+            .footer {
+                .left,
+                .right {
+                    padding: 4% 0;
+                }
+            }
+        }
+
         .footer {
             background: #fff;
             border-top: 1px solid $border-color;
@@ -539,22 +549,24 @@ input.switch:checked ~ label:after {
             div {
                 line-height: 10px;
             }
+
+            .right,
+            .left {
+                .btn:first-child {
+                    margin: 0 10px 0 0;
+                }
+            }
+
             .right {
                 float: right;
-                padding: 4% 0;
-                padding-right: 16px;
-                a {
-                    margin-left: 10px;
-                }
+                padding: 4% 16px 4% 0;
             }
+
             .left {
                 float: left;
-                padding: 4% 0;
-                padding-left: 16px;
-                a {
-                    margin-right: 10px;
-                }
+                padding: 4% 0 4% 16px;
             }
+
             .btn {
                 border: 2px solid #E0E0DF;
                 border-radius: 0;
@@ -653,16 +665,22 @@ input.switch:checked ~ label:after {
 
         .arrowBox {
             background: #fff;
+            color: #B3B3B3;
             cursor: pointer;
             height: 50px;
             position: absolute;
             width: 200px;
+            animation: upanddown 5s ease infinite alternate;
+
+            &:hover {
+                color: #888;
+            }
+
             .import-btn {
-                color: #ccc;
                 font-size: 2em;
                 font-weight: bold;
                 letter-spacing: 2px;
-                margin-top: 0.4rem;
+                margin-top: .4rem;
                 text-align: center;
             }
         }
