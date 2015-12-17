@@ -311,7 +311,8 @@ define(function() {
                 apply: 'APPLY',
                 saveAsPreset: 'SAVE',
                 cancel: 'CANCEL',
-                saveAndApply: 'SAVE & APPLY'
+                saveAndApply: 'SAVE & APPLY',
+                delete: 'DELETE'
             },
             mode: [
                 {
