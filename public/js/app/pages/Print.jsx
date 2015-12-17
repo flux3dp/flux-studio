@@ -387,16 +387,12 @@ define([
                 },
 
                 _renderAdvancedPanel: function() {
-                    var content = (
+                    return (
                         <AdvancedPanel
                             lang        = {lang}
                             setting     = {advancedSettings}
                             onClose     = {this._handleCloseAdvancedSetting}
                             onApply     = {this._handleApplyAdvancedSetting} />
-                    );
-
-                    return (
-                        <Modal content={content} onClose={this._handleCloseAdvancedSetting}/>
                     );
                 },
 
