@@ -282,26 +282,15 @@ define([
                     });
                 };
 
-            if (false === window.FLUX.debug) {
-                config().read('printers', {
-                    onFinished: function(response) {
-                        response = response || [];
 
-                        refreshOption(response);
+            self.setState({
+                discoverMethods: discover(
+                    self.state.discoverId,
+                    function(printers) {
+                        refreshOption(printers);
                     }
-                });
-            }
-            else {
-                self.setState({
-                    discoverMethods: discover(
-                        self.state.discoverId,
-                        function(printers) {
-                            refreshOption(printers);
-                        }
-                    )
-                });
-            }
-
+                )
+            });
         },
 
         componentWillUnmount: function() {
