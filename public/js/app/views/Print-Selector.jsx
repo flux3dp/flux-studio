@@ -136,7 +136,7 @@ define([
                 options = self.state.printOptions,
                 content = (
                     <div className="device-wrapper">
-                        <ListView className="printer-list" items={options} ondblclick={self._selectPrinter}/>
+                        <ListView className="printer-list" items={options} onClick={self._selectPrinter}/>
                     </div>
                 );
 
