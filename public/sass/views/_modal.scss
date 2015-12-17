@@ -92,6 +92,10 @@
             margin: 0 0 1.6rem 0;
         }
 
+        .message {
+            margin: 0 0 20px 0;
+        }
+
         .caption,
         .message {
             width: 100%;
@@ -128,6 +132,12 @@
 .modal-progress {
     .modal-alert {
         min-height: 18rem;
+    }
+
+    .message p {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
 
     .spinner-roller {
@@ -213,8 +223,9 @@
         border-top: 1px solid #ccc;
         bottom: 0;
         left: 0;
-        padding: 1.6rem 0;
+        padding: 1.6rem 1.6rem 1.6rem 0;
         right: 0;
+        justify-content: flex-end;
     }
 }
 
