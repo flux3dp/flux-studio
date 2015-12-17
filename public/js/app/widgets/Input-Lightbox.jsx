@@ -79,7 +79,7 @@ define([
                 return (
                     <label className="control">
                         <span className="inputHeader">{this.props.inputHeader}</span>
-                        <input type={type} ref="inputField" defaultValue={this.props.defaultValue}/>
+                        <input type={type} ref="inputField" defaultValue={this.props.defaultValue} autoFocus={true}/>
                     </label>
                 );
             },
