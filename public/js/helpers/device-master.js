@@ -117,7 +117,7 @@ define([
         return d.promise();
     }
 
-    function uploadFile(file, blob, uploadPath) {
+    function uploadFile(blob, file, uploadPath) {
         var d = $.Deferred();
 
         if(uploadPath) {

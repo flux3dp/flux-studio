@@ -166,7 +166,7 @@ define([
                         ];
                         AlertActions.showPopupYesNo('tour', 'Want a tour?');
                         AlertStore.onYes(this._handleTakeTutorial);
-                        AlertStore.onCancel(this._handleCloseTutorial);
+                        AlertStore.onCancel(this._handleCancelTutorial);
                     }
                 },
 

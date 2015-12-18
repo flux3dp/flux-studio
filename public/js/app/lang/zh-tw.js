@@ -286,6 +286,7 @@ define(function() {
                 auto: 'auto',                       // do not change
                 line: 'line',                       // do not change
                 rectilinear: 'rectilinear',         // do not change
+                rectilinearGrid: 'rectilinear-grid',// do not change
                 honeycomb: 'honeycomb',             // do not change
                 blackMagic: 'Black Magic',
                 spiral: 'Spiral',

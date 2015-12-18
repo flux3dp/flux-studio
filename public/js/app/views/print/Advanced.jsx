@@ -50,7 +50,7 @@ var mode = {
             support_material                    : 1,
             support_material_spacing            : 2,
             support_material_threshold          : 55,
-            support_material_pattern            : 'auto',
+            support_material_pattern            : 'rectilinear-grid',
             support_material_contact_distance   : 0.2,
             raft_layers                         : 4,
             raft                                : 4,
@@ -464,7 +464,7 @@ var mode = {
                         <DropdownControl
                             id="fill_pattern"
                             label={lang.pattern}
-                            options={[lang.auto, lang.line, lang.rectilinear, lang.honeycomb]}
+                            options={[lang.rectilinear, lang.line, lang.rectilinear, lang.honeycomb]}
                             default={advancedSetting.fill_pattern}
                             onChange={this._handleControlValueChange} />
 
@@ -521,7 +521,7 @@ var mode = {
                         <DropdownControl
                             id="support_material_pattern"
                             label={lang.pattern}
-                            options={[lang.auto, lang.line, lang.rectilinear, lang.honeycomb]}
+                            options={[lang.rectilinearGrid, lang.line, lang.rectilinear, lang.honeycomb]}
                             default={advancedSetting.support_material_pattern}
                             onChange={this._handleControlValueChange} />
 
