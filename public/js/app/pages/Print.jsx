@@ -92,7 +92,7 @@ define([
                     if(!_setting) {
                         advancedSettings = {};
                         advancedSettings.raft_layers = 4;
-                        advancedSettings.support_material = 1;
+                        advancedSettings.support_material = 0;
                         advancedSettings.custom = AppSettings.custom;
                         tutorialMode = true;
                     }

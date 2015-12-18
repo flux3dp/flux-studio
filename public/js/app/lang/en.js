@@ -711,6 +711,7 @@ define(function() {
             pause: 'PAUSE',
             stop: 'STOP',
             record: 'RECORD',
+            camera: 'CAMERA',
             connecting: 'Connecting, please wait...',
             HEAD_OFFLINE: 'Device head is not connected or missing',
             TILT: 'Device head is tilted, please connect all 6 magnents',
@@ -726,7 +727,14 @@ define(function() {
             minute: 'min',
             left: 'left',
             temperature: 'Temperature',
-            forceStop: 'Force stopping device?'
+            forceStop: 'Force stopping device?',
+            upload: 'UPLOAD',
+            download: 'DOWNLOAD',
+            fileNotDownloadable: 'this file type is not supported for download',
+            cannotPreview: 'Can not preview file',
+            extensionNotSupported: 'file extension not supported',
+            fileExistContinue: 'file already exist, continue ? (will replace)',
+            confirmGToF: 'Uploaded GCode will be converted to FCode, continue (will replace if exist)'
         },
         alert: {
             caption: 'Error',
