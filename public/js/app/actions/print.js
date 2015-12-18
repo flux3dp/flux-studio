@@ -698,7 +698,7 @@ define([
                         }
                         else {
                             if (result.status !== 'error') {
-                                var progress = `${result.status}: ${result.message} (${parseInt(result.percentage * 100)}%)`,
+                                var progress = `${result.status}: ${result.message} ${'\n' + parseInt(result.percentage * 100)}%`,
                                     complete = lang.print.finishingUp;
 
                                 if(result.status !== 'complete') {

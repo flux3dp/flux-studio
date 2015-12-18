@@ -41,6 +41,7 @@ define([
         lang,
         lastAction,
         fileToBeUpload = {},
+        initializing = false,
         rootMode = DeviceConstants.IDLE,
 
         // error display
@@ -60,7 +61,7 @@ define([
         temperature = '',
         statusId = 0,
 
-        refreshTime = 5000;
+        refreshTime = 3000;
 
     var mode = {
         PREVIEW: 'PREVIEW',
@@ -440,7 +441,9 @@ define([
             this._stopReport();
             if(this.state.currentStatus === DeviceConstants.READY) {
                 var blob = this.props.fCode;
+
                 if(blob) {
+                    this.setState({ currentStatus: DeviceConstants.UPLOADING });
                     DeviceMaster.go(blob).then(function() {
                         this._getPrintingInfo();
                     }.bind(this));
@@ -450,8 +453,8 @@ define([
                         this._getPrintingInfo();
                     }.bind(this));
                 }
+                initializing = true;
 
-                this.setState({ currentStatus: DeviceConstants.PRINTING });
             }
             else {
                 DeviceMaster.resume();
@@ -498,7 +501,7 @@ define([
             mainError       = '';
             subError        = '';
             status          = report.st_label;
-            statusId         = report.st_id;
+            statusId        = report.st_id;
 
             rootMode = statusId === DeviceConstants.status.IDLE ? DeviceConstants.IDLE : DeviceConstants.RUNNING;
 
@@ -517,14 +520,19 @@ define([
                 DeviceMaster.quit();
                 return;
             }
+            else if(statusId === DeviceConstants.status.RUNNING) {
+                initializing = false;
+            }
 
             // check for error
             if(report.error && this._isError(status)) {
-                if(lastError !== mainError) {
-                    AlertActions.showPopupError(_id, mainError + '\n' + subError);
-                    lastError = mainError;
-                    showingPopup = true;
-                    messageViewed = false;
+                if(lastError !== mainError && statusId !== DeviceConstants.status.ABORTED && !initializing) {
+                    if(mainError !== 'USER_OPERATION') {
+                        AlertActions.showPopupError(_id, mainError + '\n' + subError);
+                        lastError = mainError;
+                        showingPopup = true;
+                        messageViewed = false;
+                    }
                 }
             }
             else if(status === DeviceConstants.PAUSED || status === DeviceConstants.PAUSING) {
@@ -854,8 +862,12 @@ define([
 
             action = !!commands[this.state.currentStatus] ? commands[this.state.currentStatus]() : '';
 
+            if(!this.props.fCode && !this.state.selectedFileName) {
+                action = '';
+            }
+
             leftButton = this.state.mode === mode.BROWSE_FILE ? upload : stop;
-            middleButton = this.state.mode === mode.BROWSE_FILE ? download: action;
+            middleButton = this.state.mode === mode.BROWSE_FILE ? download : action;
 
             operation = (
                 <div className="operation">

@@ -33,6 +33,7 @@ define(function() {
         UNKNOWN_ERROR   : 'UNKNOWN_ERROR',
         UNKNOWN_STATUS  : 'UNKNOWN_STATUS',
         USER_OPERATION  : 'USER_OPERATION',
+        UPLOADING       : 'UPLOADING',
 
         // folder
         NOT_EXIST       : 'NOT_EXIST',
