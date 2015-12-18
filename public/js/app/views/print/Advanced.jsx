@@ -72,10 +72,11 @@ var mode = {
     return React.createClass({
 
         propTypes: {
-            lang: React.PropTypes.object,
-            setting: React.PropTypes.object,
-            onClose: React.PropTypes.func,
-            onApply: React.PropTypes.func
+            lang            : React.PropTypes.object,
+            setting         : React.PropTypes.object,
+            onValueChange   : React.PropTypes.func,
+            onClose         : React.PropTypes.func,
+            onApply         : React.PropTypes.funcs
         },
 
         getInitialState: function() {
@@ -168,7 +169,9 @@ var mode = {
                 name = this.refs.presetName.getDOMNode().value;
                 p = presets === '' ? {} : presets;
 
+            // this._presetName();
             p[name] = JSON.stringify(advancedSetting);
+            // p[name] = advancedSetting.custom;
             Config().write('preset-settings', JSON.stringify(p), {
                 onFinished: function() {
                     self._handleBackToSetting();
@@ -284,13 +287,18 @@ var mode = {
             if(id === 'raft_layers') {
                 advancedSetting.raft = value;
             }
+            else if (id === 'layer_height') {
+                this.props.onValueChange(id, value);
+            }
         },
 
         _handleApplyPreset: function() {
             var p = this.state.presets[this.state.selectedPreset];
             advancedSetting = JSON.parse(p);
-            this._updateCustomField();
-            this._handleBackToSetting();
+            this.setState({ custom: advancedSetting.custom }, function() {
+                this._updateCustomField();
+                this._handleBackToSetting();
+            });
         },
 
         _handleApply: function(showAdvancedSetting) {
@@ -788,8 +796,8 @@ var mode = {
                 );
             });
 
-            var preset = this.state.presets[this.state.selectedPreset] || '{}',
-                presetContent = this._JSONToKeyValue(JSON.parse(preset));
+            var preset = this.state.presets[this.state.selectedPreset] || '{}';
+                presetContent = JSON.parse(preset);
 
             return (
                 <div id="advanced-panel" className="advanced-panel">
@@ -798,7 +806,7 @@ var mode = {
                         <div className="preset-list">
                             {entries}
                         </div>
-                        <textarea className="preset-content" value={presetContent} disabled />
+                        <textarea className="preset-content" value={presetContent.custom} disabled />
                         {footer}
                     </div>
                 </div>

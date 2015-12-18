@@ -443,7 +443,8 @@ define(function() {
             quality: {
                 high: 'HIGH QUALITY',
                 med: 'MEDIUM QUALITY',
-                low: 'LOW QUALITY'
+                low: 'LOW QUALITY',
+                custom: 'CUSTOM QUALITY'
             },
             quick_print: 'Quick Print',
             scale: '比例',

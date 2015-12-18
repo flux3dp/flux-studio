@@ -112,7 +112,8 @@ define([
                         hasOutOfBoundsObject        : false,
                         hasObject                   : false,
                         tutorialOn                  : false,
-                        currentTutorialStep            : 0,
+                        currentTutorialStep         : 0,
+                        layerHeight                 : 0.1,
                         raftOn                      : advancedSettings.raft_layers !== 0,
                         supportOn                   : advancedSettings.support_material === 1,
                         previewLayerCount           : 0,
@@ -349,14 +350,15 @@ define([
                     }
                 },
 
-                _handleQualitySelected: function(level) {
-                    var quality = {
-                        high: 0.1,
-                        med: 0.2,
-                        low: 0.3
-                    };
-                    director.setParameter('layer_height', quality[level]);
-                    advancedSettings.layer_height = quality[level];
+                _handleAdvancedValueChange: function(key, value) {
+                    if(key === 'layer_height') {
+                        this.setState({ layerHeight: value });
+                    }
+                },
+
+                _handleQualitySelected: function(layerHeight) {
+                    director.setParameter('layer_height', layerHeight);
+                    advancedSettings.layer_height = layerHeight;
                 },
 
                 _handleTutorialStep: function() {
@@ -397,10 +399,11 @@ define([
                 _renderAdvancedPanel: function() {
                     var content = (
                         <AdvancedPanel
-                            lang        = {lang}
-                            setting     = {advancedSettings}
-                            onClose     = {this._handleCloseAdvancedSetting}
-                            onApply     = {this._handleApplyAdvancedSetting} />
+                            lang            = {lang}
+                            setting         = {advancedSettings}
+                            onValueChange   = {this._handleAdvancedValueChange}
+                            onClose         = {this._handleCloseAdvancedSetting}
+                            onApply         = {this._handleApplyAdvancedSetting} />
                     );
 
                     return (
@@ -445,6 +448,7 @@ define([
                             previewLayerCount           = {this.state.previewLayerCount}
                             raftOn                      = {this.state.raftOn}
                             supportOn                   = {this.state.supportOn}
+                            layerHeight                 = {this.state.layerHeight}
                             onQualitySelected           = {this._handleQualitySelected}
                             onRaftClick                 = {this._handleRaftClick}
                             onSupportClick              = {this._handleSupportClick}
