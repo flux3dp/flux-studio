@@ -735,7 +735,8 @@ define(function() {
             cannotPreview: '無法預覽此檔案',
             extensionNotSupported: '上傳檔案不支援此檔案格式',
             fileExistContinue: 'file already exist, continue (will replace)',
-            confirmGToF: 'Uploaded GCode will be converted to FCode, continue (will replace if exist)'
+            confirmGToF: 'Uploaded GCode will be converted to FCode, continue (will replace if exist)',
+            almostDone: 'almost done'
         },
         alert: {
             caption: '錯誤',

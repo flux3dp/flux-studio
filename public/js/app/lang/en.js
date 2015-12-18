@@ -735,7 +735,8 @@ define(function() {
             cannotPreview: 'Can not preview file',
             extensionNotSupported: 'file extension not supported',
             fileExistContinue: 'file already exist, continue ? (will replace)',
-            confirmGToF: 'Uploaded GCode will be converted to FCode, continue (will replace if exist)'
+            confirmGToF: 'Uploaded GCode will be converted to FCode, continue (will replace if exist)',
+            almostDone: 'almost done'
         },
         alert: {
             caption: 'Error',

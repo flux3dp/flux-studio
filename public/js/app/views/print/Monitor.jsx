@@ -183,6 +183,11 @@ define([
                     time = `${parseInt(timeInSeconds / 60)} ${lang.minute}`;
                 }
             }
+            else {
+                if(!withSeconds) {
+                    time = lang.almostDone;
+                }
+            }
 
             return time;
         },
