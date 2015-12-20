@@ -122,11 +122,17 @@ define([
                     buttons = [{
                         label: lang.initialize.connect,
                         className: 'btn-action btn-large',
+                        dataAttrs: {
+                            'ga-event': 'set-password-to-connect-to-wifi'
+                        },
                         onClick: self._handleSetPassword
                     },
                     {
                         label: lang.initialize.cancel,
                         className: 'btn-link btn-large',
+                        dataAttrs: {
+                            'ga-event': 'cancel-connect-to-wifi'
+                        },
                         onClick: function(e) {
                             e.preventDefault();
 
@@ -197,6 +203,9 @@ define([
                     buttons = [{
                         label: lang.initialize.confirm,
                         className: 'btn-action',
+                        dataAttrs: {
+                            'ga-event': 'confirm'
+                        },
                         onClick: state.alertContent.onClick
                     }],
                     content = (
@@ -219,17 +228,26 @@ define([
                     buttons = [{
                         label: lang.initialize.next,
                         className: 'btn-action btn-large' + (true === this.state.selectedWifi ? '' : ' btn-disabled'),
+                        dataAttrs: {
+                            'ga-event': 'pickup-a-wifi'
+                        },
                         onClick: this._confirmWifi
                     },
                     {
                         label: lang.initialize.set_machine_generic.set_station_mode,
                         className: 'btn-action btn-large btn-set-station-mode',
+                        dataAttrs: {
+                            'ga-event': 'set-as-station-mode'
+                        },
                         onClick: this._setAsStationMode
                     },
                     {
                         label: lang.initialize.skip,
                         className: 'btn-link btn-large',
                         type: 'link',
+                        dataAttrs: {
+                            'ga-event': 'use-device-with-usb'
+                        },
                         href: '#initialize/wifi/setup-complete/with-usb'
                     }],
                     passwordForm = this._renderPasswordForm(lang),

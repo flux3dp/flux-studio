@@ -55,11 +55,17 @@ define([
 
                 buttons.push({
                     label: lang.alert.cancel,
+                    dataAttrs: {
+                        'ga-event': 'cancel'
+                    },
                     onClick: this._onClose
                 });
 
                 buttons.push({
                     label: this.props.confirmText || lang.alert.confirm,
+                    dataAttrs: {
+                        'ga-event': 'confirm'
+                    },
                     onClick: this._onSubmit
                 });
 

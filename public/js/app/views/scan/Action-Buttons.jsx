@@ -35,6 +35,9 @@ define([
                 buttons.push({
                     label: lang.scan.go,
                     className: 'btn-action btn-hexagon btn-scan',
+                    dataAttrs: {
+                        'ga-event': 'go-scan'
+                    },
                     onClick: self.props.onScanClick
                 });
                 break;
@@ -42,6 +45,9 @@ define([
                 buttons.push({
                     label: lang.scan.scan_again,
                     className: 'btn-action btn-hexagon btn-scan-again',
+                    dataAttrs: {
+                        'ga-event': 'scan-again'
+                    },
                     onClick: self.props.onScanAgainClick
                 });
 
@@ -55,12 +61,17 @@ define([
                 buttons.push({
                     label: lang.scan.start_multiscan,
                     className: cx(className),
-                    // onClick: self.props.onScanClick
+                    dataAttrs: {
+                        'ga-event': 'going-to-multiscan'
+                    },
                     onClick: self.props.onMultiScanClick
                 });
                 buttons.push({
                     label: lang.scan.convert_to_stl,
                     className: 'btn-action btn-hexagon btn-convert',
+                    dataAttrs: {
+                        'ga-event': 'convert-to-stl'
+                    },
                     onClick: self.props.onConvertClick
                 });
 
@@ -68,6 +79,9 @@ define([
                     buttons.push({
                         label: 'Save PCD',
                         className: 'btn-action btn-hexagon btn-save-pcd',
+                        dataAttrs: {
+                            'ga-event': 'save-as-pcd'
+                        },
                         onClick: self.props.onSaveClick
                     });
                 }
@@ -76,16 +90,25 @@ define([
                 buttons.push({
                     label: lang.scan.scan_again,
                     className: 'btn-action btn-hexagon btn-scan-again',
+                    dataAttrs: {
+                        'ga-event': 'scan-again'
+                    },
                     onClick: self.props.onScanAgainClick
                 });
                 buttons.push({
                     label: lang.scan.rollback,
                     className: 'btn-action btn-hexagon btn-rollback',
+                    dataAttrs: {
+                        'ga-event': 'rollback'
+                    },
                     onClick: self.props.onRollbackClick
                 });
                 buttons.push({
                     label: lang.scan.do_save,
                     className: 'btn-action btn-hexagon btn-save-stl',
+                    dataAttrs: {
+                        'ga-event': 'save-stl'
+                    },
                     onClick: self.props.onSaveClick
                 });
                 break;
@@ -99,11 +122,17 @@ define([
                 buttons.push({
                     label: lang.scan.cancel,
                     className: 'btn-action btn-hexagon btn-cancel',
+                    dataAttrs: {
+                        'ga-event': 'cancel-multiscan'
+                    },
                     onClick: self.props.onCancelMultiScanClick
                 });
                 buttons.push({
                     label: lang.scan.start_multiscan,
                     className: cx(className),
+                    dataAttrs: {
+                        'ga-event': 'go-to-multiscan'
+                    },
                     onClick: self.props.onScanClick
                 });
                 break;

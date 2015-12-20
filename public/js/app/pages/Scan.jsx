@@ -1158,6 +1158,9 @@ define([
                         },
                         buttons = [{
                             label: lang.scan.confirm,
+                            dataAttrs: {
+                                'ga-event': 'confirm'
+                            },
                             onClick: onClose
                         }],
                         content = (

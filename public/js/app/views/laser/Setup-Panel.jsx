@@ -176,6 +176,9 @@ define([
                 buttons = [{
                     label: lang.laser.advanced.apply,
                     className: 'btn-default' + (false === self.state.hasSelectedPreset ? ' btn-disabled' : ''),
+                    dataAttrs: {
+                        'ga-event': 'apply-custom-laser-preset'
+                    },
                     onClick: function(e) {
                         var elCustomPresets = self.refs.customPresets.getDOMNode();
 
@@ -186,6 +189,9 @@ define([
                 },
                 {
                     label: lang.laser.advanced.cancel,
+                    dataAttrs: {
+                        'ga-event': 'cancel-custom-laser-preset'
+                    },
                     onClick: function(e) {
                         self._togglePanel('customPresets', false)();
                     }
@@ -366,6 +372,9 @@ define([
         _renderAlert: function(lang) {
             var buttons = [{
                 label: lang.laser.confirm,
+                dataAttrs: {
+                    'ga-event': 'confirm'
+                },
                 onClick: this._togglePanel('alert', false)
             }],
             content = (

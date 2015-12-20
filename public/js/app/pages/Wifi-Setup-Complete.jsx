@@ -68,7 +68,7 @@ define([
                     ),
                     backToWifiSelect = (
                         'with-usb' === this.props.other ?
-                        <button className="btn btn-link btn-large" onClick={this._goBack}>
+                        <button className="btn btn-link btn-large" data-ga-event="back" onClick={this._goBack}>
                             {lang.initialize.setting_completed.back}
                         </button> :
                         ''
@@ -78,7 +78,7 @@ define([
                             <h1 className="headline">{article.caption}</h1>
                             <p className="notice">{article.content}</p>
                             <div className="btn-v-group">
-                                <button className="btn btn-action btn-large" onClick={this._onStart}>
+                                <button className="btn btn-action btn-large" data-ga-event="start" onClick={this._onStart}>
                                     {startText}
                                 </button>
                                 {backToWifiSelect}

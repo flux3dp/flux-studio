@@ -1,12 +1,23 @@
 /**
  * initialize machine helper
  */
-define(['helpers/api/config', 'helpers/local-storage'], function(config, localStorage) {
+define([
+    'helpers/api/config',
+    'helpers/local-storage',
+    'helpers/nwjs/menu-factory'
+], function(
+    config,
+    localStorage,
+    menuFactory
+) {
     'use strict';
 
     var methods = {
         completeSettingUp: function(redirect) {
+            var completed = methods.hasBeenCompleted();
+
             redirect = ('boolean' === typeof redirect ? redirect : true);
+            console.log('completeSettingUp', completed);
 
             config().write('printer-is-ready', true, {
                 onFinished: function() {
@@ -16,6 +27,11 @@ define(['helpers/api/config', 'helpers/local-storage'], function(config, localSt
 
                     methods.settingPrinter.clear();
                     methods.settingWifi.clear();
+
+                    if (false === completed) {
+                        console.log('completed', completed, menuFactory.methods.refresh);
+                        menuFactory.methods.refresh();
+                    }
 
                     if (true === redirect) {
                         location.hash = '#studio/print/';

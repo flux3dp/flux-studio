@@ -10,7 +10,6 @@ define([
     'jsx!widgets/File-Uploader',
     'jsx!widgets/Modal',
     'jsx!views/Print-Selector',
-    'jsx!widgets/Alert',
     'jsx!widgets/Button-Group',
     'helpers/api/config',
     'helpers/dnd-handler'
@@ -26,7 +25,6 @@ define([
     FileUploader,
     Modal,
     PrinterSelector,
-    Alert,
     ButtonGroup,
     config,
     dndHandler
@@ -68,7 +66,7 @@ define([
 
 
                     self.state.laserEvents.menuFactory.items.import.onClick = function() {
-                        self.refs.setupPanel.refs.fileUploader.getDOMNode().click();
+                        self.refs.fileUploader.getDOMNode().click();
                     };
 
                     self.state.laserEvents.menuFactory.items.execute.enabled = false;
@@ -135,8 +133,6 @@ define([
 
                         self.state.laserEvents.refreshImage($el, $el.data('threshold') || 128);
                     });
-
-                    console.log(self.refs.setupPanel.isShading());
                 },
 
                 // Private events
@@ -291,6 +287,9 @@ define([
                                 'btn-hexagon': true,
                                 'btn-get-fcode': true
                             }),
+                            dataAttrs: {
+                                'ga-event': 'get-laser-fcode'
+                            },
                             onClick: this._onExport
                         }, {
                             label: lang.laser.go,
@@ -300,6 +299,9 @@ define([
                                 'btn-hexagon': true,
                                 'btn-go': true
                             }),
+                            dataAttrs: {
+                                'ga-event': 'laser-goto-monitor'
+                            },
                             onClick: this._onRunLaser
                         }];
 

@@ -96,10 +96,10 @@ define([
                     caption: lang.change_filament.home_caption,
                     message: (
                         <div className="way-to-go">
-                            <button className="btn btn-default" onClick={this._next.bind(null, steps.GUIDE, types.LOAD)}>
+                            <button className="btn btn-default" data-ga-event="load-filament" onClick={this._next.bind(null, steps.GUIDE, types.LOAD)}>
                                 {lang.change_filament.load_filament_caption}
                             </button>
-                            <button className="btn btn-default" onClick={this._next.bind(null, steps.HEATING, types.UNLOAD)}>
+                            <button className="btn btn-default" data-ga-event="unload-filament" onClick={this._next.bind(null, steps.HEATING, types.UNLOAD)}>
                                 {lang.change_filament.unload_filament_caption}
                             </button>
                         </div>
@@ -107,6 +107,9 @@ define([
                     buttons: [{
                         label: lang.change_filament.cancel,
                         className: 'btn-default btn-alone-left',
+                        dataAttrs: {
+                            'ga-event': 'cancel'
+                        },
                         onClick: this.props.onClose
                     }]
                 };
@@ -119,10 +122,16 @@ define([
                     ),
                     buttons: [{
                         label: lang.change_filament.cancel,
+                        dataAttrs: {
+                            'ga-event': 'cancel'
+                        },
                         onClick: this.props.onClose
                     },
                     {
                         label: lang.change_filament.next,
+                        dataAttrs: {
+                            'ga-event': 'heatup'
+                        },
                         onClick: this._next.bind(null, steps.HEATING, '')
                     }]
                 };
@@ -149,6 +158,9 @@ define([
                     buttons: [{
                         label: lang.change_filament.cancel,
                         className: 'btn-default btn-alone-left',
+                        dataAttrs: {
+                            'ga-event': 'stop-heating'
+                        },
                         onClick: this.props.onClose
                     }]
                 };
@@ -174,10 +186,16 @@ define([
                     ),
                     buttons: [{
                         label: lang.change_filament.cancel,
+                        dataAttrs: {
+                            'ga-event': 'cancel'
+                        },
                         onClick: this.props.onClose
                     },
                     {
                         label: lang.change_filament.stop,
+                        dataAttrs: {
+                            'ga-event': 'stop-emerging'
+                        },
                         onClick: this._onStop
                     }]
                 };
@@ -199,10 +217,16 @@ define([
                     ),
                     buttons: [{
                         label: lang.change_filament.cancel,
+                        dataAttrs: {
+                            'ga-event': 'cancel'
+                        },
                         onClick: this.props.onClose
                     },
                     {
                         label: lang.change_filament.stop,
+                        dataAttrs: {
+                            'ga-event': 'stop-unload'
+                        },
                         onClick: this._onStop
                     }]
                 };
@@ -218,6 +242,9 @@ define([
                     buttons: [{
                         label: lang.change_filament.ok,
                         className: 'btn-default btn-alone-right',
+                        dataAttrs: {
+                            'ga-event': 'completed'
+                        },
                         onClick: this.props.onClose
                     }]
                 };
@@ -240,6 +267,9 @@ define([
                             buttons: [{
                                 label: lang.change_filament.cancel,
                                 className: 'btn-default btn-alone-left',
+                                dataAttrs: {
+                                    'ga-event': 'cancel'
+                                },
                                 onClick: self.props.onClose
                             }]
                         };

@@ -753,17 +753,17 @@ define([
             switch(this.state.mode) {
 
                 case mode.setup:
-                    buttons[0] = (<button className="btn btn-default" onClick={this._handleLoadPreset}>{lang.loadPreset}</button>);
-                    buttons[1] = (<button className="btn btn-default" onClick={this._handleApply.bind(null, false)}>{lang.apply}</button>);
-                    buttons[2] = (<button className="btn btn-default" onClick={this._handleOpenSaveAsPreset}>{lang.saveAsPreset}</button>);
-                    buttons[3] = (<button className="btn btn-default" onClick={this._handleCloseAdvancedSetting}>{lang.cancel}</button>);
+                    buttons[0] = (<button className="btn btn-default" data-ga-event="load-preset" onClick={this._handleLoadPreset}>{lang.loadPreset}</button>);
+                    buttons[1] = (<button className="btn btn-default" data-ga-event="apply-preset" onClick={this._handleApply.bind(null, false)}>{lang.apply}</button>);
+                    buttons[2] = (<button className="btn btn-default" data-ga-event="save-preset" onClick={this._handleOpenSaveAsPreset}>{lang.saveAsPreset}</button>);
+                    buttons[3] = (<button className="btn btn-default" data-ga-event="cancel-preset" onClick={this._handleCloseAdvancedSetting}>{lang.cancel}</button>);
                     break;
 
                 case mode.load:
-                    buttons[0] = (<button className="btn btn-default" onClick={this._handleDeletePreset}>{lang.delete}</button>);
-                    buttons[1] = (<button className="btn btn-default" onClick={this._handleApplyPreset}>{lang.apply}</button>);
+                    buttons[0] = (<button className="btn btn-default" data-ga-event="delete-preset" onClick={this._handleDeletePreset}>{lang.delete}</button>);
+                    buttons[1] = (<button className="btn btn-default" data-ga-event="apply-preset" onClick={this._handleApplyPreset}>{lang.apply}</button>);
                     buttons[2] = '';
-                    buttons[3] = (<button className="btn btn-default" onClick={this._handleBackToSetting}>{lang.cancel}</button>);
+                    buttons[3] = (<button className="btn btn-default" data-ga-event="back-to-preset-setting" onClick={this._handleBackToSetting}>{lang.cancel}</button>);
                     break;
 
                 default:
