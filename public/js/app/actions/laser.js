@@ -6,8 +6,6 @@ define([
     'helpers/convertToTypedArray',
     'helpers/element-angle',
     'helpers/api/control',
-    'jsx!views/Print-Selector',
-    'jsx!widgets/Modal',
     'helpers/shortcuts',
     'helpers/image-data',
     'helpers/i18n',
@@ -30,8 +28,6 @@ define([
     convertToTypedArray,
     elementAngle,
     control,
-    PrinterSelector,
-    Modal,
     shortcuts,
     imageData,
     i18n,
@@ -337,6 +333,7 @@ define([
                                 bottom_right = getPoint($el.find('.ft-scaler-bottom.ft-scaler-right'), 'bottom-right'),
                                 $img = $el.parents('.ft-container').find('img'),
                                 box = $img.box(),
+                                isShading = self.refs.setupPanel.isShading(),
                                 width = 0,
                                 height = 0,
                                 sub_data = {
@@ -350,8 +347,8 @@ define([
                                 },
                                 grayscaleOpts = {
                                     is_svg: ('svg' === self.state.fileFormat),
-                                    is_shading: self.refs.setupPanel.isShading(),
-                                    threshold: 255
+                                    is_shading: isShading,
+                                    threshold: $img.data('threshold') || 128
                                 },
                                 src = $img.data('base'),
                                 previewImageSize;
