@@ -675,8 +675,8 @@ define(function() {
         select_printer: {
             choose_printer: 'Choose a printer',
             notification: 'Please enter the password',
-            submit: 'Submit',
-            please_enter_password: 'Enter the password',
+            submit: 'SUBMIT',
+            please_enter_password: 'password',
             auth_failure: 'Authentication fail',
             retry: 'Retry'
         },
