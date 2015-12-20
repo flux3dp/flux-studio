@@ -8,17 +8,19 @@ define([
 
         getDefaultProps: function() {
             return {
+                // mode: NOT_SCAN, SCANNED, MULTI_SCAN, CONVERTED
+                mode: 'NOT_SCAN',
                 lang: {},
-                scanUpperLimit: 5,
-                meshes: [],
-                scanTimes: 0,
                 className: {},
                 hasConvert: false,
+                disabledScan: false,
                 onScanClick: function() {}, // scan/multi scan
                 onSaveClick: function() {}, // save as stl
                 onRollbackClick: function() {}, // rollback to pcd
                 onConvertClick: function() {},  // convert from point cloud to stl
-                onScanAgainClick: function() {} // start over
+                onScanAgainClick: function() {}, // start over
+                onMultiScanClick: function() {}, // ready to multi scan
+                onCancelMultiScanClick: function() {}   // cancel multi scan
             };
         },
 
@@ -28,23 +30,33 @@ define([
                 cx = React.addons.classSet,
                 className;
 
-            // has been scan but doesn't convert
-            if (0 < self.props.scanTimes && false === self.props.hasConvert) {
+            switch (self.props.mode) {
+            case 'NOT_SCAN':
+                buttons.push({
+                    label: lang.scan.go,
+                    className: 'btn-action btn-hexagon btn-scan',
+                    onClick: self.props.onScanClick
+                });
+                break;
+            case 'SCANNED':
                 buttons.push({
                     label: lang.scan.scan_again,
                     className: 'btn-action btn-hexagon btn-scan-again',
                     onClick: self.props.onScanAgainClick
                 });
+
                 className = {
                     'btn-action': true,
                     'btn-hexagon': true,
                     'btn-multi-scan': true,
-                    'btn-disabled': (this.props.scanUpperLimit === this.props.meshes.length)
+                    'btn-disabled': (true === this.props.disabledScan)
                 };
+
                 buttons.push({
                     label: lang.scan.start_multiscan,
                     className: cx(className),
-                    onClick: self.props.onScanClick
+                    // onClick: self.props.onScanClick
+                    onClick: self.props.onMultiScanClick
                 });
                 buttons.push({
                     label: lang.scan.convert_to_stl,
@@ -59,9 +71,8 @@ define([
                         onClick: self.props.onSaveClick
                     });
                 }
-            }
-            // has been scan and does convert
-            else if (0 < self.props.scanTimes && true === self.props.hasConvert) {
+                break;
+            case 'CONVERTED':
                 buttons.push({
                     label: lang.scan.scan_again,
                     className: 'btn-action btn-hexagon btn-scan-again',
@@ -77,14 +88,25 @@ define([
                     className: 'btn-action btn-hexagon btn-save-stl',
                     onClick: self.props.onSaveClick
                 });
-            }
-            // nothing started
-            else {
+                break;
+            case 'MULTI_SCAN':
+                className = {
+                    'btn-action': true,
+                    'btn-hexagon': true,
+                    'btn-multi-scan': true
+                };
+
                 buttons.push({
-                    label: lang.scan.go,
-                    className: 'btn-action btn-hexagon btn-scan',
+                    label: lang.scan.cancel,
+                    className: 'btn-action btn-hexagon btn-cancel',
+                    onClick: self.props.onCancelMultiScanClick
+                });
+                buttons.push({
+                    label: lang.scan.start_multiscan,
+                    className: cx(className),
                     onClick: self.props.onScanClick
                 });
+                break;
             }
 
             return buttons;
