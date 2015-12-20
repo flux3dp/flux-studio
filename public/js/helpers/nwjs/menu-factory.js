@@ -83,7 +83,7 @@ define([
         },
 
         refresh: function() {
-            NWjsWindow.menu = mainmenu;
+            initialize(menuMap.refresh());
         },
 
         updateMenu: function(menu, parentIndex) {
@@ -105,7 +105,7 @@ define([
             methods.appendToMenu(menu.label, subMenu);
         });
 
-        methods.refresh();
+        NWjsWindow.menu = mainmenu;
     }
 
     if ('undefined' !== typeof requireNode) {
