@@ -9,7 +9,8 @@ define([
 
     var acceptableTypes = [
             Constants.TYPE_TEXT,
-            Constants.TYPE_NUMBER
+            Constants.TYPE_NUMBER,
+            Constants.TYPE_PASSWORD
         ],
         View = React.createClass({
 
@@ -71,6 +72,7 @@ define([
 
                 typeMap[Constants.TYPE_TEXT] = 'text';
                 typeMap[Constants.TYPE_NUMBER] = 'number';
+                typeMap[Constants.TYPE_PASSWORD] = 'password';
 
                 if ('string' === typeof typeMap[this.props.type]) {
                     type = typeMap[this.props.type];
