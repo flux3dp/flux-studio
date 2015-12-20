@@ -4,11 +4,14 @@
  */
 define([
     'helpers/websocket',
-    'helpers/array-findindex'
+    'helpers/array-findindex',
+    'helpers/object-assign'
 ], function(Websocket) {
     'use strict';
 
-    var ws,
+    var ws = ws || new Websocket({
+            method: 'discover'
+        }),
         printers = [],
         dispatchers = [],
         idList = [],
@@ -16,7 +19,62 @@ define([
             dispatchers.forEach(function(dispatcher) {
                 dispatcher.sender(printers);
             });
-        };
+        },
+        findIndex,
+        onMessage = function(data) {
+            findIndex = function(el) {
+                return el.uuid === data.uuid;
+            };
+            var existing_key = printers.findIndex(findIndex);
+
+            if (-1 === existing_key) {
+                if (typeof data === 'string') {
+                    data = data.replace(/NaN/g, null);
+                    data = JSON.parse(data);
+                }
+
+                printers.push(data);
+            }
+            else {
+                // if existing. update attributes
+                for (var key in data) {
+                    if (true === data.hasOwnProperty(key)) {
+                        printers[existing_key][key] = data[key];
+                    }
+                }
+            }
+
+            if (false === data.alive && -1 < existing_key) {
+                // delete it from printers
+                printers.splice(existing_key, 1);
+            }
+
+            updateTime = (new Date()).getTime();
+
+            // set a sleep
+            if (SLEEP < updateTime - (lastUpdateTime || 0)) {
+                sendFoundPrinter();
+                lastUpdateTime = updateTime;
+                clearTimeout(timer);
+                timer = null;
+            }
+            else {
+                timer = timer || setTimeout(function() {
+                    sendFoundPrinter();
+                    lastUpdateTime = updateTime;
+                    clearTimeout(timer);
+                    timer = null;
+                }, SLEEP);
+            }
+
+            sendFoundPrinter();
+        },
+        SLEEP = 3000,
+        lastUpdateTime,
+        updateTime,
+        timer;
+
+    ws.onMessage(onMessage);
 
     return function(id, getPrinters) {
         getPrinters = getPrinters || function() {};
@@ -37,51 +95,8 @@ define([
             };
         }
 
-        var onMessage = function(data) {
-            var someFn = function(el) {
-                    return el.uuid === data.uuid;
-                },
-                findIndex = function(el) {
-                    return el.uuid === data.uuid;
-                },
-                existing_key = printers.findIndex(findIndex);
-
-            if (false === printers.some(someFn)) {
-                if(typeof data === 'string') {
-                    data = data.replace(/NaN/g, null);
-                    data = JSON.parse(data);
-                }
-                printers.push(data);
-            }
-            else {
-                // if existing. update attributes
-                for (var key in data) {
-                    if (true === data.hasOwnProperty(key)) {
-                        printers[existing_key][key] = data[key];
-                    }
-                }
-            }
-
-            if (false === data.alive && -1 < existing_key) {
-                // delete it from printers
-                printers.splice(existing_key, 1);
-            }
-        };
-
-        if ('undefined' === typeof ws) {
-            ws = new Websocket({
-                method: 'discover'
-            });
-        }
-
-        ws.onMessage(onMessage);
-
-        Array.observe(printers, function(changes) {
-            sendFoundPrinter();
-        });
-
         if (0 < printers.length) {
-            sendFoundPrinter();
+            getPrinters(printers);
         }
 
         return {
