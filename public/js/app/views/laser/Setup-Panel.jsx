@@ -121,6 +121,7 @@ define([
             opts = opts || {};
             opts.material = opts.material || this.state.defaults.material;
             opts.objectHeight = opts.objectHeight || this.state.defaults.objectHeight;
+            opts.isShading = ('boolean' === typeof opts.isShading ? opts.isShading : this.state.defaults.isShading);
 
             var self = this,
                 state = {
@@ -156,6 +157,7 @@ define([
 
         _onShadingChanged: function(e) {
             this.props.onShadingChanged(e);
+            this._saveLastestSet({ isShading: this.isShading() });
         },
 
         openSubPopup: function(e) {
@@ -338,7 +340,7 @@ define([
         _renderShading: function(lang) {
             var props = this.props,
                 cx = React.addons.classSet,
-                checked = ('undefined' !== typeof this.props.imageFormat && 'svg' === this.props.imageFormat ? false : this.isShading()),
+                checked = ('undefined' !== typeof this.props.imageFormat && 'svg' === this.props.imageFormat ? false : this.state.defaults.isShading),
                 classes = cx({
                     'display-text': true
                 });
