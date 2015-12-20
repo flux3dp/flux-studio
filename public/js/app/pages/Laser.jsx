@@ -2,6 +2,7 @@ define([
     'jquery',
     'react',
     'app/actions/laser',
+    'app/actions/alert-actions',
     'app/actions/progress-actions',
     'jsx!widgets/Select',
     'jsx!views/laser/Setup-Panel',
@@ -11,11 +12,13 @@ define([
     'jsx!views/Print-Selector',
     'jsx!widgets/Alert',
     'jsx!widgets/Button-Group',
-    'helpers/api/config'
+    'helpers/api/config',
+    'helpers/dnd-handler'
 ], function(
     $,
     React,
     laserEvents,
+    AlertActions,
     ProgressActions,
     SelectView,
     SetupPanel,
@@ -25,7 +28,8 @@ define([
     PrinterSelector,
     Alert,
     ButtonGroup,
-    config
+    config,
+    dndHandler
 ) {
     'use strict';
 
@@ -44,8 +48,6 @@ define([
                         selectedPrinter: 0,
                         openPrinterSelectorWindow: false,
                         openBlocker: false,
-                        openAlert: false,
-                        alertContents: {},
                         settings: {},
                         laserEvents: laserEvents.call(this, args),
                         imagePanel: {},
@@ -58,13 +60,9 @@ define([
                 },
 
                 componentDidMount: function() {
-                    var self = this,
-                        $operationTable = $(self.refs.operationTable.getDOMNode());
+                    var self = this;
 
-                    $operationTable.on('dragover dragend', function(e) {
-                        e.preventDefault();
-                    });
-                    $operationTable.on('drop', self._onDropUpload);
+                    dndHandler.plug(document, self._onDropUpload);
 
                     self.state.laserEvents.setPlatform(self.refs.laserObject.getDOMNode());
 
@@ -86,6 +84,7 @@ define([
 
                 componentWillUnmount: function () {
                     this.state.laserEvents.destroySocket();
+                    dndHandler.unplug(document);
                 },
 
                 // UI events
@@ -103,10 +102,28 @@ define([
                 _onDropUpload: function(e) {
                     e.preventDefault();
 
-                    var updatedFiles = e.originalEvent.dataTransfer.files;
+                    var uploadedFiles = e.originalEvent.dataTransfer.files,
+                        checkFiles = function(files) {
+                            var allowedfiles = [],
+                                checker = /^image\/\w+$/,
+                                file;
 
-                    e.target.files = updatedFiles;
-                    this.refs.fileUploader.readFiles(e, updatedFiles);
+                            for (var i = 0; i < files.length; i++) {
+                                file = files.item(i);
+
+                                file.isImage = checker.test(file.type);
+
+                                if (true === file.isPCD) {
+                                    allowedfiles.push(file);
+                                }
+                            }
+
+                            return allowedfiles;
+                        };
+                    console.log(uploadedFiles, checkFiles(uploadedFiles));
+
+                    e.target.files = uploadedFiles;
+                    this.refs.fileUploader.readFiles(e, uploadedFiles);
                 },
 
                 _onShadingChanged: function(e) {
@@ -118,6 +135,8 @@ define([
 
                         self.state.laserEvents.refreshImage($el, $el.data('threshold') || 128);
                     });
+
+                    console.log(self.refs.setupPanel.isShading());
                 },
 
                 // Private events
@@ -130,7 +149,7 @@ define([
                         object_height: defaultSettings.objectHeight,
                         laser_speed: defaultSettings.material.data.laser_speed,
                         power: defaultSettings.material.data.power / max,
-                        shading: (true === self.refs.setupPanel.isShading() ? 0 : 1)
+                        shading: (true === self.refs.setupPanel.isShading() ? 1 : 0)
                     };
                 },
 
@@ -168,6 +187,7 @@ define([
                         closeSubPopup = function(e) {
                             if ('operation-table' === e.currentTarget.id) {
                                 self.refs.setupPanel.openSubPopup(e);
+                                self._inactiveSelectImage(e);
                             }
                         },
                         setupPanelDefaults;
@@ -181,6 +201,7 @@ define([
                             }
 
                             setupPanelDefaults.objectHeight = setupPanelDefaults.objectHeight || 0;
+                            setupPanelDefaults.isShading = ('boolean' === typeof setupPanelDefaults.isShading ? setupPanelDefaults.isShading : true);
 
                             if ('' === response) {
                                 config().write('laser-defaults', setupPanelDefaults);
@@ -191,7 +212,7 @@ define([
                     return (
                         <div ref="laserStage" className="laser-stage">
                             <section ref="operationTable" id="operation-table" className="operation-table" onClick={closeSubPopup}>
-                                <div ref="laserObject" className="laser-object border-circle" onClick={this._inactiveSelectImage}/>
+                                <div ref="laserObject" className="laser-object border-circle"/>
                                 {imagePanel}
                             </section>
                             <SetupPanel
@@ -236,46 +257,12 @@ define([
                     );
                 },
 
-                _renderAlert: function(lang) {
-                    var self = this,
-                        onClose = function() {
-                            self.setState({
-                                openAlert: false
-                            });
-                        },
-                        buttons = [
-                            {
-                                label: lang.laser.close_alert,
-                                onClick: onClose
-                            }
-                        ],
-                        content = (
-                            <Alert
-                                lang={lang}
-                                caption={self.state.alertContents.caption}
-                                message={self.state.alertContents.message}
-                                buttons={buttons}
-                            />
-                        );
-
-                    return (
-                        true === self.state.openAlert ?
-                        <Modal content={content} disabledEscapeOnBackground={true} onClose={onClose}/> :
-                        ''
-                    );
-                },
-
                 _renderFileUploader: function(lang) {
                     var self = this,
                         uploadStyle = false === self.state.hasImage ? 'file-importer absolute-center' : 'hide',
                         onError = function(msg) {
-                            self.setState({
-                                openAlert: true,
-                                alertContents: {
-                                    caption: 'Error',
-                                    message: msg
-                                }
-                            });
+                            ProgressActions.close();
+                            AlertActions.showPopupError('laser-upload-error', msg);
                         };
 
                     return (
@@ -331,8 +318,7 @@ define([
                             ''
                         ),
                         uploader = this._renderFileUploader(lang),
-                        actionButtons = this._renderActionButtons(lang),
-                        alert = this._renderAlert(lang);
+                        actionButtons = this._renderActionButtons(lang);
 
                     return (
                         <div className="studio-container laser-studio">
@@ -344,7 +330,6 @@ define([
                             </div>
 
                             {uploader}
-                            {alert}
                         </div>
                     );
                 }
