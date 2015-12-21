@@ -218,21 +218,23 @@ define([
 
                 return round(px, -2);
             },
+            outOfRange = function(point) {
+                var platform_pos = $laser_platform.box(true),
+                    limit = platform_pos.width / 2,
+                    x = Math.pow((platform_pos.center.x - point.x), 2),
+                    y = Math.pow((platform_pos.center.y - point.y), 2),
+                    range = Math.sqrt(x + y);
+
+                return range > limit;
+            },
             sleep,
             refreshObjectParams = function(e, $el) {
                 var el_position, el_offset_position,
                     last_x, last_y,
                     $controlPoints,
+                    platform_pos = $laser_platform.box(true),
                     position, size, angle, threshold,
-                    outOfRange = function(point, limit) {
-                        var x = Math.pow((platform_pos.center.x - point.x), 2),
-                            y = Math.pow((platform_pos.center.y - point.y), 2),
-                            range = Math.sqrt(x + y);
-
-                        return range > limit;
-                    },
-                    rollback = true,
-                    platform_pos = $laser_platform.box(true);
+                    rollback = true;
 
                 if (null !== $el) {
                     el_position = $el.box();
@@ -258,7 +260,7 @@ define([
                         var elPosition = $(el).box(true);
 
                         rollback = (
-                            false === outOfRange(elPosition.center, platform_pos.width / 2) ?
+                            false === outOfRange(elPosition.center) ?
                             false :
                             rollback
                         );
@@ -707,6 +709,7 @@ define([
             imageTransform: function(e, params) {
                 var $el = $(e.currentTarget),
                     type = $el.data('type'),
+                    box = $el.box(),
                     val = $el.val(),
                     freetrans = $target_image.data('freetrans'),
                     args = {};
@@ -734,6 +737,8 @@ define([
                 case 'angle':
                     args.angle = val;
                 }
+
+                refreshObjectParams(e, $target_image);
 
                 refreshImagePanelPos();
                 self.setState(params);
