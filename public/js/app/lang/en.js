@@ -61,7 +61,7 @@ define(function() {
             },
             device: {
                 label: 'Device',
-                new: 'Add New Device...',
+                new: 'USB Configuration',
                 device_monitor: 'Device Monitor',
                 change_filament: 'Change Filament',
                 check_firmware_update: 'Check Firmware Update',
