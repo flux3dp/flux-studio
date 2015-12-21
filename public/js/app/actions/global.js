@@ -9,17 +9,22 @@ define([
     'use strict';
 
     // prevent delete (back) behavior
-    shortcuts.on(['DEL'], function(e) {
-        if ('BODY' === e.target.tagName) {
-            e.preventDefault();
-        }
-    });
+    var preventBackKeyDefaultBehavior = function() {
+        shortcuts.on(['DEL'], function(e) {
+            if ('BODY' === e.target.tagName) {
+                e.preventDefault();
+            }
+        });
+    };
+
+    preventBackKeyDefaultBehavior();
 
     // detached keyup and keydown event
     window.addEventListener('popstate', function(e) {
         window.GA('send', 'pageview', location.hash);
         shortcuts.disableAll();
         menuFactory.methods.refresh();
+        preventBackKeyDefaultBehavior();
     });
 
     // listener of all ga event
