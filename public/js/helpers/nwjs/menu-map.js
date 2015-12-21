@@ -8,6 +8,7 @@ define([
     'helpers/api/config',
     'helpers/api/discover',
     'app/actions/alert-actions',
+    'app/actions/initialize-machine',
     'app/actions/global-actions',
     'helpers/device-master',
     'app/constants/device-constants'
@@ -18,6 +19,7 @@ define([
     config,
     discover,
     AlertActions,
+    initializeMachine,
     GlobalActions,
     DeviceMaster,
     DeviceConstants
@@ -156,7 +158,21 @@ define([
                 subItems: [newDevice, separator],
                 parent: parentIndex.DEVICE
             }
-        };
+        },
+        deviceGroup = [
+            newDevice,
+            separator
+        ],
+        renew = false,
+        deviceExists = function(basePrinter) {
+            return function(_printer) {
+                return _printer.uuid === basePrinter.uuid;
+            };
+        },
+        defaultDevice = initializeMachine.defaultPrinter.get(),
+        defaultDeviceChange = function() {},
+        deviceRefreshTimer,
+        doDiscover;
 
     function bindMap() {
         menuMap = [];
@@ -169,10 +185,8 @@ define([
                     label: 'Reset',
                     enable: true,
                     onClick: function() {
-                        config().write('printer-is-ready', false, {
-                            onFinished: function() {
-                                location.reload();
-                            }
+                        initializeMachine.reset(function() {
+                            location.reload();
                         });
                     }
                 },
@@ -199,7 +213,7 @@ define([
             ]
         });
 
-        if ('true' === config().read('printer-is-ready')) {
+        if (true === initializeMachine.hasBeenCompleted()) {
             menuMap.push({
                 label: lang.file.label,
                 subItems: [
@@ -255,69 +269,97 @@ define([
             });
 
             if ('undefined' !== typeof requireNode) {
-                var deviceGroup = [
-                        newDevice,
-                        separator
-                    ],
-                    renew = false,
-                    deviceRefreshTimer;
+                deviceGroup = [
+                    newDevice,
+                    separator
+                ];
+                renew = false;
+                deviceExists = function(basePrinter) {
+                    return function(_printer) {
+                        return _printer.uuid === basePrinter.uuid;
+                    };
+                };
+                defaultDevice = initializeMachine.defaultPrinter.get();
 
-                discover(
-                    'menu-map',
-                    function(printers) {
-                        printers.forEach(function(printer) {
-                            renew = deviceGroup.some(function(_printer) { return _printer.uuid === printer.uuid; });
+                doDiscover = function() {
+                    discover(
+                        'menu-map',
+                        function(printers) {
+                            printers.forEach(function(printer) {
+                                renew = deviceGroup.some(deviceExists(printer));
 
-                            if (false === renew) {
-                                deviceGroup.push({
-                                    uuid: printer.uuid,
-                                    label: printer.name,
-                                    enabled: true,
-                                    subItems: [{
-                                        label: lang.device.device_monitor,
+                                if (false === renew) {
+                                    deviceGroup.push({
+                                        isPrinter: true,
+                                        uuid: printer.uuid,
+                                        label: printer.name,
                                         enabled: true,
-                                        onClick: function() {
-                                            DeviceMaster.selectDevice(printer).then(function(status) {
-                                                if(status === DeviceConstants.CONNECTED) {
-                                                    GlobalActions.showMonitor(printer);
+                                        subItems: [{
+                                            label: lang.device.device_monitor,
+                                            enabled: true,
+                                            onClick: function() {
+                                                DeviceMaster.selectDevice(printer).then(function(status) {
+                                                    if(status === DeviceConstants.CONNECTED) {
+                                                        GlobalActions.showMonitor(printer);
+                                                    }
+                                                    else if (status === DeviceConstants.TIMEOUT) {
+                                                        AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
+                                                    }
+                                                });
+                                            }
+                                        },
+                                        {
+                                            label: lang.device.change_filament,
+                                            enabled: true,
+                                            onClick: function() {
+                                                AlertActions.showChangeFilament(printer);
+                                            }
+                                        },
+                                        {
+                                            label: lang.device.check_firmware_update,
+                                            enabled: true,
+                                            onClick: function() {
+                                                checkFirmware(printer).done(function(response) {
+                                                    if (true === response.needUpdate) {
+                                                        AlertActions.showFirmwareUpdate(printer, response);
+                                                    }
+                                                });
+                                            }
+                                        },
+                                        {
+                                            label: lang.device.default_device,
+                                            enabled: true,
+                                            type: 'checkbox',
+                                            onClick: function() {
+                                                console.log(this.checked, printer);
+                                                if (false === this.checked) {
+                                                    initializeMachine.defaultPrinter.clear();
                                                 }
-                                                else if (status === DeviceConstants.TIMEOUT) {
-                                                    AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
+                                                else {
+                                                    initializeMachine.defaultPrinter.set(printer);
                                                 }
-                                            });
-                                        }
-                                    },
-                                    {
-                                        label: lang.device.change_filament,
-                                        enabled: true,
-                                        onClick: function() {
-                                            AlertActions.showChangeFilament(printer);
-                                        }
-                                    },
-                                    {
-                                        label: lang.device.check_firmware_update,
-                                        enabled: true,
-                                        onClick: function() {
-                                            checkFirmware(printer).done(function(response) {
-                                                if (true === response.needUpdate) {
-                                                    AlertActions.showFirmwareUpdate(printer, response);
-                                                }
-                                            });
-                                        }
-                                    }]
-                                });
-                            }
-                        });
 
-                        if ('undefined' === typeof deviceRefreshTimer && true === renew) {
-                            clearTimeout(deviceRefreshTimer);
-                            setTimeout(function() {
-                                items.device.subItems = deviceGroup;
+                                                defaultDeviceChange(this, printer);
+                                            },
+                                            parent: parentIndex.DEVICE,
+                                            checked: (defaultDevice.uuid === printer.uuid)
+                                        }]
+                                    });
+                                }
+                            });
+
+                            if ('undefined' === typeof deviceRefreshTimer && true === renew) {
                                 clearTimeout(deviceRefreshTimer);
-                            }, 5000);
+                                deviceRefreshTimer = setTimeout(function() {
+                                    items.device.subItems = deviceGroup;
+                                    clearTimeout(deviceRefreshTimer);
+                                }, 5000);
+                            }
                         }
-                    }
-                );
+                    );
+                };
+
+                doDiscover();
             }
         }
 
@@ -348,9 +390,13 @@ define([
     menuMap = bindMap();
 
     return {
+        parentIndex: parentIndex,
         all: menuMap,
         items: items,
-        refresh: bindMap
+        refresh: bindMap,
+        onDefaultDeviceChange: function(func) {
+            defaultDeviceChange = func || function() {};
+        }
     };
 
 });
