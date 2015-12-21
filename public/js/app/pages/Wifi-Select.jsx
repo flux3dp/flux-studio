@@ -16,6 +16,7 @@ define([
         return React.createClass({
 
             scanWifi: true,
+            deferred: $.Deferred(),
 
             // Private methods
             _openAlert: function(open, detail) {
@@ -51,8 +52,11 @@ define([
                 wifi.plain_password = self.refs.password.getDOMNode().value;
 
                 initializeMachine.settingWifi.set(wifi);
+                self.scanWifi = false;
 
-                location.hash = '#initialize/wifi/set-password';
+                self.deferred.done(function() {
+                    location.hash = '#initialize/wifi/set-password';
+                });
             },
 
             // UI events
@@ -67,7 +71,11 @@ define([
                     });
                 }
                 else {
-                    location.hash = '#initialize/wifi/setup-complete/with-wifi';
+                    self.scanWifi = false;
+
+                    self.deferred.done(function() {
+                        location.hash = '#initialize/wifi/setup-complete/with-wifi';
+                    });
                 }
             },
 
@@ -91,7 +99,11 @@ define([
 
                 usb.setAPMode({
                     onSuccess: function(response) {
-                        location.hash = 'initialize/wifi/setup-complete/station-mode';
+                        self.scanWifi = false;
+
+                        self.deferred.done(function() {
+                            location.hash = 'initialize/wifi/setup-complete/station-mode';
+                        });
                     },
                     onError: function() {
                         self._openAlert(true, {
@@ -193,7 +205,7 @@ define([
                         items={this.state.wifiOptions}
                     /> :
                     <div className="wifi-list">
-                        <div className="spinner-roller"/>
+                        <div className="spinner-roller absolute-center"/>
                     </div>
                 );
             },
@@ -313,6 +325,9 @@ define([
                                 if (true === self.scanWifi) {
                                     getWifi();
                                 }
+                                else {
+                                    self.deferred.resolve();
+                                }
                             }
                         });
                     };
@@ -322,8 +337,8 @@ define([
             },
 
             componentWillUnmount: function() {
-                this.scanWifi = false;
-            },
+
+            }
         });
     };
 });
