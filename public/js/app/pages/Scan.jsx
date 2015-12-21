@@ -13,6 +13,7 @@ define([
     'jsx!views/scan/Export',
     'jsx!views/scan/Progress-Bar',
     'jsx!views/scan/Action-Buttons',
+    'jsx!widgets/File-Uploader',
     'app/actions/alert-actions',
     'app/stores/alert-store',
     'app/actions/progress-actions',
@@ -20,6 +21,7 @@ define([
     'helpers/shortcuts',
     'helpers/round',
     'helpers/dnd-handler',
+    'helpers/nwjs/menu-factory',
     // non-return
     'helpers/array-findindex',
     'plugins/file-saver/file-saver.min'
@@ -38,13 +40,15 @@ define([
     Export,
     ProgressBar,
     ActionButtons,
+    FileUploader,
     AlertActions,
     AlertStore,
     ProgressActions,
     ProgressConstants,
     shortcuts,
     round,
-    dndHandler
+    dndHandler,
+    menuFactory
 ) {
     'use strict';
 
@@ -108,13 +112,20 @@ define([
                 },
 
                 componentDidMount: function() {
-                    AlertStore.onRetry(this._retry);
-                    AlertStore.onCancel(this._cancelScan);
-                    dndHandler.plug(document, this._importPCD);
+                    var self = this;
 
-                    this.setState({
+                    AlertStore.onRetry(self._retry);
+                    AlertStore.onCancel(self._cancelScan);
+                    dndHandler.plug(document, self._importPCD);
+
+                    self.setState({
                         stage: scanedModel.init()
                     });
+
+                    menuFactory.items.import.enabled = false;
+                    menuFactory.items.import.onClick = function() {
+                        self.refs.fileUploader.getDOMNode().click();
+                    };
                 },
 
                 componentWillUnmount: function() {
@@ -153,7 +164,7 @@ define([
                     if ('scan-modeling-error' === id) {
                         // TODO: modeling error
                     }
-                    else if ('no-pcd-upload-quota' === id) {
+                    else if ('over-quota' === id) {
                         // TODO: over upload quota
                     }
                     else {
@@ -161,12 +172,13 @@ define([
                     }
                 },
 
-                _importPCD: function(e) {
+                _importPCD: function(e, files) {
                     var self = this,
+                        lang = self.state.lang,
                         fileReader,
                         meshes = self.state.meshes,
                         allowedfiles = [],
-                        uploadFiles = e.originalEvent.dataTransfer.files,
+                        uploadFiles,
                         checkFiles = function(files) {
                             var allowedfiles = [],
                                 checker = /.*[.]pcd$/,
@@ -191,13 +203,19 @@ define([
                         },
                         uploadQuota;
 
+                    if ('undefined' === typeof files) {
+                        uploadFiles = e.originalEvent.dataTransfer.files;
+                    }
+                    else {
+                        uploadFiles = files;
+                    }
+
                     allowedfiles = checkFiles(uploadFiles);
 
                     uploadQuota = self.MAX_MESHES - meshes.length - allowedfiles.length;
 
-                    console.log(uploadQuota);
                     if (0 > uploadQuota) {
-                        AlertActions.showPopupError('no-pcd-upload-quota', '最多只能容納5組點雲');
+                        AlertActions.showPopupError('over-quota', lang.scan.over_quota);
                         return;
                     }
 
@@ -1127,6 +1145,7 @@ define([
                                 scanModelingWebSocket: scanModeling(ModelingOpts)
                             });
 
+                            menuFactory.items.import.enabled = true;
                             self._openBlocker(true, ProgressConstants.NONSTOP);
                         },
                         content = (
@@ -1338,6 +1357,11 @@ define([
 
                     return (
                         <div className="studio-container scan-studio">
+                            <FileUploader
+                                ref="fileUploader"
+                                className={{ hide: true }}
+                                onReadEnd={this._importPCD}
+                            />
                             {selectPrinter}
                             {scanStage}
                             {actionButtons}
