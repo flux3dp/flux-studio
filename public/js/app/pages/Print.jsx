@@ -146,7 +146,7 @@ define([
                 _registerKeyEvents: function() {
                     $(document).keydown(function(e) {
                         // delete event
-                        if(e.metaKey && e.keyCode === 8 || e.keyCode === 46) {
+                        if(e.metaKey && e.keyCode === 8 || e.keyCode === 46 || e.keyCode === 8) {
                             director.removeSelected();
                         }
 
