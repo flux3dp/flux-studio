@@ -586,6 +586,7 @@ define(function() {
         scan: {
             start_scan: '開始掃瞄',
             stop_scan: '取消',
+            over_quota: '超過可容納點雲',
             convert_to_stl: '轉換成 STL',
             scan_again: '再次掃描',
             start_multiscan: '多次掃描',

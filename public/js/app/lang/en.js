@@ -586,6 +586,7 @@ define(function() {
         scan: {
             start_scan: 'Scan',
             stop_scan: 'Stop',
+            over_quota: 'Over quota',
             convert_to_stl: 'Convert',
             scan_again: 'Scan Again',
             start_multiscan: 'Extra Scan',
