@@ -13,11 +13,15 @@ define([
     'use strict';
 
     var methods = {
+        reset: function(callback) {
+            callback = ('function' === typeof callback ? callback : function() {});
+            config().write('printer-is-ready', false);
+            callback();
+        },
         completeSettingUp: function(redirect) {
             var completed = methods.hasBeenCompleted();
 
             redirect = ('boolean' === typeof redirect ? redirect : true);
-            console.log('completeSettingUp', completed);
 
             config().write('printer-is-ready', true, {
                 onFinished: function() {
@@ -40,7 +44,7 @@ define([
             });
         },
         hasBeenCompleted: function() {
-            return config().read('printer-is-ready') || false;
+            return ('true' === config().read('printer-is-ready') ? true : false);
         },
         settingPrinter: {
             get: function() {
@@ -97,6 +101,17 @@ define([
             },
             clear: function() {
                 localStorage.removeAt('setting-wifi');
+            }
+        },
+        defaultPrinter: {
+            set: function(printer) {
+                config().write('default-printer', JSON.stringify(printer));
+            },
+            get: function() {
+                return config().read('default-printer') || {};
+            },
+            clear: function() {
+                localStorage.removeAt('default-printer');
             }
         }
     };
