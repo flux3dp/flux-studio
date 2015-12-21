@@ -813,27 +813,28 @@ define([
         blobExpired = true;
     }
 
-    function setRotation(x, y, z, needRender) {
+    function setRotation(x, y, z, needRender, src) {
+        src = src || SELECTED;
         var _x = parseInt(x) || 0,
             _y = parseInt(y) || 0,
             _z = parseInt(z) || 0;
-        SELECTED.rotation.enteredX = x;
-        SELECTED.rotation.enteredY = y;
-        SELECTED.rotation.enteredZ = z;
-        SELECTED.rotation.x = degreeToRadian(_x);
-        SELECTED.rotation.y = degreeToRadian(_y);
-        SELECTED.rotation.z = degreeToRadian(_z);
-        SELECTED.outlineMesh.rotation.x = degreeToRadian(_x);
-        SELECTED.outlineMesh.rotation.y = degreeToRadian(_y);
-        SELECTED.outlineMesh.rotation.z = degreeToRadian(_z);
+        src.rotation.enteredX = x;
+        src.rotation.enteredY = y;
+        src.rotation.enteredZ = z;
+        src.rotation.x = degreeToRadian(_x);
+        src.rotation.y = degreeToRadian(_y);
+        src.rotation.z = degreeToRadian(_z);
+        src.outlineMesh.rotation.x = degreeToRadian(_x);
+        src.outlineMesh.rotation.y = degreeToRadian(_y);
+        src.outlineMesh.rotation.z = degreeToRadian(_z);
 
         if (needRender) {
             reactSrc.setState({
-                modelSelected: SELECTED.uuid ? SELECTED : null
+                modelsrc: src.uuid ? src : null
             });
-            SELECTED.plane_boundary = planeBoundary(SELECTED);
-            groundIt(SELECTED);
-            checkOutOfBounds(SELECTED);
+            src.plane_boundary = planeBoundary(src);
+            groundIt(src);
+            checkOutOfBounds(src);
             render();
         }
     }
@@ -1010,15 +1011,19 @@ define([
 
     function duplicateSelected() {
         if(SELECTED) {
-            // reactSrc.setState({ openWaitWindow: true });
             var mesh = new THREE.Mesh(SELECTED.geometry, SELECTED.material);
             mesh.up = new THREE.Vector3(0, 0, 1);
 
             slicer.duplicate(SELECTED.uuid, mesh.uuid).then(function(result) {
-                console.log(result);
                 if(result.status.toUpperCase() === DeviceConstants.OK) {
+
                     Object.assign(mesh.scale, SELECTED.scale);
-                    Object.assign(mesh.rotation, SELECTED.rotation);
+                    mesh.rotation.enteredX = SELECTED.rotation.enteredX;
+                    mesh.rotation.enteredY = SELECTED.rotation.enteredY;
+                    mesh.rotation.enteredZ = SELECTED.rotation.enteredZ;
+                    mesh.rotation.x = SELECTED.rotation.x;
+                    mesh.rotation.y = SELECTED.rotation.y;
+                    mesh.rotation.z = SELECTED.rotation.z;
 
                     mesh.name = 'custom';
                     mesh.plane_boundary = planeBoundary(mesh);
@@ -1034,7 +1039,7 @@ define([
                     render();
                 }
                 else {
-                    AlertActions.showPopupError('duplicateError', result.error)
+                    AlertActions.showPopupError('duplicateError', result.error);
                 }
             });
         }
@@ -1394,6 +1399,7 @@ define([
         var outlineMesh = new THREE.Mesh(mesh.geometry, outlineMaterial);
         outlineMesh.position.set(mesh.position.x, mesh.position.y, mesh.position.z);
         outlineMesh.scale.set(mesh.scale.x, mesh.scale.y, mesh.scale.z);
+        outlineMesh.rotation.set(mesh.rotation.x, mesh.rotation.y, mesh.rotation.z);
         mesh.outlineMesh = outlineMesh;
         outlineScene.add(outlineMesh);
 
