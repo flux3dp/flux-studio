@@ -137,9 +137,11 @@ define([
                     if ('undefined' !== typeof self.state.scanCtrlWebSocket &&
                         'undefined' !== typeof self.state.scanModelingWebSocket
                     ) {
-                        self.state.scanControlImageMethods.stop(function() {
-                           self.state.scanCtrlWebSocket.connection.close(false);
-                        });
+                        if ('undefined' !== typeof self.state.scanControlImageMethods) {
+                            self.state.scanControlImageMethods.stop(function() {
+                               self.state.scanCtrlWebSocket.connection.close(false);
+                            });
+                        }
                         self.state.scanModelingWebSocket.connection.close(false);
                     }
 
@@ -168,7 +170,7 @@ define([
                         // TODO: over upload quota
                     }
                     else {
-                        this.setState(this.getInitialState());
+                        window.history.go(-1);
                     }
                 },
 
