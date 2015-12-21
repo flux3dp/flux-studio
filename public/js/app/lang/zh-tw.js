@@ -64,7 +64,8 @@ define(function() {
                 new: 'Add New Device...',
                 device_monitor: 'Device Monitor',
                 change_filament: 'Change Filament',
-                check_firmware_update: 'Check Firmware Update'
+                check_firmware_update: 'Check Firmware Update',
+                default_device: 'Default Device'
             },
             window: {
                 label: 'Window',
