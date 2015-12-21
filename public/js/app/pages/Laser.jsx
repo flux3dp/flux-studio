@@ -180,7 +180,7 @@ define([
                             ''
                         ),
                         closeSubPopup = function(e) {
-                            if ('operation-table' === e.currentTarget.id) {
+                            if ('true' === e.currentTarget.dataset.closeImagePanel) {
                                 self.refs.setupPanel.openSubPopup(e);
                                 self._inactiveSelectImage(e);
                             }
@@ -206,8 +206,8 @@ define([
 
                     return (
                         <div ref="laserStage" className="laser-stage">
-                            <section ref="operationTable" id="operation-table" className="operation-table" onClick={closeSubPopup}>
-                                <div ref="laserObject" className="laser-object border-circle"/>
+                            <section ref="operationTable" data-close-image-panel="true" className="operation-table" onClick={closeSubPopup}>
+                                <div ref="laserObject" data-close-image-panel="true" className="laser-object border-circle" onClick={closeSubPopup}/>
                                 {imagePanel}
                             </section>
                             <SetupPanel
