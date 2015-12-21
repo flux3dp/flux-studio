@@ -5293,9 +5293,11 @@ input.switch:checked ~ label:after {
     .initialization .select-wifi .wifi-list {
         height: 175px;
         overflow: scroll;
+        position: relative;
         width: 252px; }
         .initialization .select-wifi .wifi-list .spinner-roller {
             height: 5em;
+            position: absolute;
             width: 5em; }
         .initialization .select-wifi .wifi-list .row-fluid {
             display: -webkit-box;
@@ -5324,9 +5326,12 @@ input.switch:checked ~ label:after {
             font-size: 1.2405951937882669rem; }
     .initialization .select-wifi .btn-set-station-mode {
         line-height: 22px; }
-    .initialization .connecting-wifi .spinner-roller {
-        height: 52px;
-        width: 52px; }
+    .initialization .connecting-wifi {
+        position: relative; }
+        .initialization .connecting-wifi .spinner-roller {
+            height: 52px;
+            margin: 0 auto 20px auto;
+            width: 52px; }
     .initialization .setting-completed .headline {
         margin: 0 0 12px 0; }
     .initialization .setting-completed .notice {
