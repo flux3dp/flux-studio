@@ -33,7 +33,6 @@ define([
                     methods.settingWifi.clear();
 
                     if (false === completed) {
-                        console.log('completed', completed, menuFactory.methods.refresh);
                         menuFactory.methods.refresh();
                     }
 
