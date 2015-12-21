@@ -33,12 +33,15 @@ define([
                     onError     = function(response) {
                         // TODO: show error message
                     },
+                    goNext = function() {
+                        self.state.settingPrinter.name = name;
+                        initializeMachine.settingPrinter.set(self.state.settingPrinter);
+                        location.hash = '#initialize/wifi/select';
+                    },
                     setPassword = function(password) {
                         setMachine.password(password, {
                             onSuccess: function(response) {
-                                self.state.settingPrinter.name = name;
-                                initializeMachine.settingPrinter.set(self.state.settingPrinter);
-                                location.hash = '#initialize/wifi/select';
+                                goNext();
                             }
                         });
                     },
@@ -51,6 +54,9 @@ define([
                             onSuccess: function(response) {
                                 if ('' !== password) {
                                     setPassword(password);
+                                }
+                                else {
+                                    goNext();
                                 }
                             }
                         });
