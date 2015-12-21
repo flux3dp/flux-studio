@@ -108,6 +108,26 @@ define([
         NWjsWindow.menu = mainmenu;
     }
 
+    function singleCheckDefaultDevice(checkedMenuItem, checkedPrinter) {
+        var subItems = menuMap.all[menuMap.parentIndex.DEVICE].subItems,
+            defaultDeviceCheckBox;
+
+        subItems.forEach(function(subItem) {
+            if (true === subItem.isPrinter) {
+                defaultDeviceCheckBox = subItem.subItems[3];
+
+                if (subItem.uuid !== checkedPrinter.uuid) {
+                    defaultDeviceCheckBox.checked = false;
+                }
+                else {
+                    defaultDeviceCheckBox.checked = !defaultDeviceCheckBox.checked;
+                }
+            }
+        });
+
+        methods.updateMenu(menuMap.all[menuMap.parentIndex.DEVICE], menuMap.parentIndex.DEVICE);
+    }
+
     if ('undefined' !== typeof requireNode) {
         initialize(menuMap.all);
 
@@ -121,6 +141,10 @@ define([
                 })(menuMap.items[key]);
             }
         }
+
+        menuMap.onDefaultDeviceChange(function(menuItem, checkedPrinter) {
+            singleCheckDefaultDevice(menuItem, checkedPrinter);
+        });
     }
 
     return {
