@@ -101,7 +101,6 @@ define([
                     }
 
                     return ({
-                        showPreviewModeList         : false,
                         showAdvancedSettings        : false,
                         modelSelected               : null,
                         openPrinterSelectorWindow   : false,
@@ -140,12 +139,25 @@ define([
                     nwjsMenu.import.onClick = function() { $importBtn.click(); };
                     nwjsMenu.saveGCode.onClick = this._handleDownloadGCode;
 
+                    this._registerKeyEvents();
+                    this._registerTutorial();
+                },
+
+                _registerKeyEvents: function() {
                     $(document).keydown(function(e) {
+                        // delete event
                         if(e.metaKey && e.keyCode === 8 || e.keyCode === 46) {
                             director.removeSelected();
                         }
-                    });
 
+                        // copy event
+                        if(e.metaKey && e.keyCode === 68) {
+                            director.duplicateSelected();
+                        }
+                    });
+                },
+
+                _registerTutorial: function() {
                     if(tutorialMode) {
                         tourGuide = [
                             {

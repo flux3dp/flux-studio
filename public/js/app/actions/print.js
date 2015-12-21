@@ -17,8 +17,8 @@ define([
     'threeSTLLoader',
     'threeCircularGridHelper',
     'plugins/file-saver/file-saver.min',
-    'lib/Canvas-To-Blob'
-
+    'lib/Canvas-To-Blob',
+    'helpers/object-assign'
 ], function(
     $,
     fileSystem,
@@ -192,20 +192,6 @@ define([
         slicer = printSlicing();
 
         registerDropToImport();
-    }
-
-    function animate() {
-
-        requestAnimationFrame( animate );
-
-        // controls.update();
-        render();
-
-        // renderer.clear();
-        // renderer.render( scene, camera );
-        // renderer.clearDepth();
-        // renderer.render( scene2, camera );
-
     }
 
     function uploadStl(name, file) {
@@ -701,7 +687,10 @@ define([
                                 var progress = `${result.status}: ${result.message} ${'\n' + parseInt(result.percentage * 100)}%`,
                                     complete = lang.print.finishingUp;
 
-                                if(result.status !== 'complete') {
+                                if(result.status === 'warning') {
+                                    AlertActions.showWarning(result.message);
+                                }
+                                else if(result.status !== 'complete') {
                                     ProgressActions.updating(progress, parseInt(result.percentage * 100));
                                 }
                                 else {
@@ -1019,6 +1008,38 @@ define([
         }
     }
 
+    function duplicateSelected() {
+        if(SELECTED) {
+            // reactSrc.setState({ openWaitWindow: true });
+            var mesh = new THREE.Mesh(SELECTED.geometry, SELECTED.material);
+            mesh.up = new THREE.Vector3(0, 0, 1);
+
+            slicer.duplicate(SELECTED.uuid, mesh.uuid).then(function(result) {
+                console.log(result);
+                if(result.status.toUpperCase() === DeviceConstants.OK) {
+                    Object.assign(mesh.scale, SELECTED.scale);
+                    Object.assign(mesh.rotation, SELECTED.rotation);
+
+                    mesh.name = 'custom';
+                    mesh.plane_boundary = planeBoundary(mesh);
+
+                    addSizeProperty(mesh);
+                    groundIt(mesh);
+                    createOutline(mesh);
+
+                    scene.add(mesh);
+                    outlineScene.add(mesh.outlineMesh);
+                    objects.push(mesh);
+
+                    render();
+                }
+                else {
+                    AlertActions.showPopupError('duplicateError', result.error)
+                }
+            });
+        }
+    }
+
     function addPoint(x, y, z, r) {
         var geometry = new THREE.SphereGeometry(r || 5, 32, 32);
         var material = new THREE.MeshBasicMaterial({
@@ -1143,7 +1164,10 @@ define([
             fileName = defaultFileName;
         }
 
-        fileName = fileName + '.fc';
+        fileName = fileName.split('.');
+        fileName.pop();
+        fileName.push('.fc');
+        fileName = fileName.join('.');
 
         selectObject(null);
         var d = $.Deferred();
@@ -1531,12 +1555,12 @@ define([
 
     return {
         init                : init,
-        animate             : animate,
         appendModel         : appendModel,
         setRotation         : setRotation,
         setScale            : setScale,
         alignCenter         : alignCenter,
         removeSelected      : removeSelected,
+        duplicateSelected   : duplicateSelected,
         sendGCodeParameters : sendGCodeParameters,
         setSize             : setSize,
         downloadGCode       : downloadGCode,

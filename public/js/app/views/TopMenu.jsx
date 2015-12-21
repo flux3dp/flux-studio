@@ -305,7 +305,8 @@ define([
                     WARNING: function() {
                         $.growl.warning({
                             title: self.state.lang.alert.warning,
-                            message: message
+                            message: message,
+                            fixed: true
                         });
                     },
 
