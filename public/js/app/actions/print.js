@@ -211,17 +211,7 @@ define([
     function appendModel(fileEntry, file, callback) {
         var loader = new THREE.STLLoader();
         var model_file_path = fileEntry.toURL();
-        callback = callback || function(){};
-
-        if(defaultFileName === '') {
-            var lastIndex = fileEntry.name.lastIndexOf('.');
-            if(lastIndex > 0) {
-                defaultFileName = fileEntry.name.substring(0, 20);
-            }
-            else {
-                defaultFileName = fileEntry.name;
-            }
-        }
+        callback = callback || function() {};
 
         reactSrc.setState({
             openWaitWindow: true,
@@ -260,9 +250,7 @@ define([
                 console.log('this model has been scaled for better printing ratio');
             }
 
-            // SELECTED = mesh;
             mesh.scale.set(scale, scale, scale);
-            // setScale(scale, scale, scale, false, false);
             mesh.scale._x = scale;
             mesh.scale._y = scale;
             mesh.scale._z = scale;
@@ -284,6 +272,7 @@ define([
                 mesh.geometry = new THREE.Geometry().fromBufferGeometry(mesh.geometry);
             }
             mesh.name = 'custom';
+            mesh.fileName = fileEntry.name;
             mesh.plane_boundary = planeBoundary(mesh);
 
             addSizeProperty(mesh);
@@ -298,6 +287,7 @@ define([
                 hasObject: true
             });
 
+            setDefaultFileName();
             render();
         });
     }
@@ -975,6 +965,15 @@ define([
         }
     }
 
+    function setDefaultFileName() {
+        if(objects.length) {
+            defaultFileName = objects[0].fileName;
+            defaultFileName = defaultFileName.split('.');
+            defaultFileName.pop();
+            defaultFileName = defaultFileName.join('.');
+        }
+    }
+
     function removeSelected() {
         if (SELECTED) {
             var index;
@@ -988,7 +987,6 @@ define([
 
             //  model in backend
             slicer.delete(SELECTED.uuid, function(result) {
-                console.log(result);
                 if(result.status.toUpperCase() === DeviceConstants.ERROR) {
                     AlertActions.showPopupError('slicer', result.error);
                 }
@@ -997,6 +995,8 @@ define([
             transformControl.detach(SELECTED);
             selectObject(null);
             render();
+
+            setDefaultFileName();
 
             if(objects.length === 0) {
                 reactSrc.setState({
@@ -1169,10 +1169,7 @@ define([
             fileName = defaultFileName;
         }
 
-        fileName = fileName.split('.');
-        fileName.pop();
-        fileName.push('.fc');
-        fileName = fileName.join('.');
+        fileName = fileName + '.fc';
 
         selectObject(null);
         var d = $.Deferred();
