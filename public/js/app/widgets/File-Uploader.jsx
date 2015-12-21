@@ -6,16 +6,16 @@ define([
     return React.createClass({
         getDefaultProps: function() {
             return {
-                lang: React.PropTypes.object,
-                sizeMaxLimit: React.PropTypes.number,
+                lang: {},
+                sizeMaxLimit: 400000,
                 accept: '',
-                multiple: React.PropTypes.bool,
+                multiple: true,
                 className: {},
                 // events
-                onReadFileStarted: React.PropTypes.func,
-                onReadingFile: React.PropTypes.func,
-                onReadEnd: React.PropTypes.func,
-                onError: React.PropTypes.func
+                onReadFileStarted: function() {},
+                onReadingFile: function() {},
+                onReadEnd: function() {},
+                onError: function() {}
             };
         },
 
