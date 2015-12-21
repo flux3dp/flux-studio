@@ -975,7 +975,7 @@ define([
     }
 
     function removeSelected() {
-        if (SELECTED) {
+        if (SELECTED.outlineMesh) {
             var index;
             scene.remove(SELECTED.outlineMesh);
             scene.remove(SELECTED);
