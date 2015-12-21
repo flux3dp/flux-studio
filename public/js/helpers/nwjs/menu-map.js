@@ -35,14 +35,15 @@ define([
         },
         lang = i18n.get().topmenu,
         menuMap = [],
+        windowIndex = ('windows' === window.FLUX.osType ? 1 : 0),
         parentIndex = {
-            ABOUT  : 0,
-            FILE   : 1,
-            EDIT   : 2,
-            VIEW   : 3,
-            DEVICE : 4,
-            WINDOW : 5,
-            HELP   : 6
+            ABOUT  : 0 - windowIndex,
+            FILE   : 1 - windowIndex,
+            EDIT   : 2 - windowIndex,
+            VIEW   : 3 - windowIndex,
+            DEVICE : 4 - windowIndex,
+            WINDOW : 5 - windowIndex,
+            HELP   : 6 - windowIndex
         },
         newDevice = {
             label: lang.device.new,
@@ -172,57 +173,66 @@ define([
         defaultDevice = initializeMachine.defaultPrinter.get(),
         defaultDeviceChange = function() {},
         deviceRefreshTimer,
-        doDiscover;
+        doDiscover,
+        aboutSubItems = [{
+            label: 'Reset',
+            enable: true,
+            onClick: function() {
+                initializeMachine.reset(function() {
+                    location.reload();
+                });
+            }
+        },
+        {
+            label: lang.flux.about,
+            enabled: true,
+            onClick: emptyFunction
+        },
+        {
+            label: lang.flux.preferences,
+            enabled: true,
+            onClick: function() {
+                location.hash = '#studio/settings';
+            }
+        },
+        separator,
+        {
+            label: lang.flux.quit,
+            enabled: true,
+            onClick: function() {
+                if (true === window.confirm('Quit?')) {
+                    gui.App.quit();
+                }
+            }
+        }],
+        subItems;
 
     function bindMap() {
         menuMap = [];
 
-        menuMap.push({
-            label: lang.flux.label,
-            subItems: [
-                // TODO: remove when it's going to production
-                {
-                    label: 'Reset',
-                    enable: true,
-                    onClick: function() {
-                        initializeMachine.reset(function() {
-                            location.reload();
-                        });
-                    }
-                },
-                {
-                    label: lang.flux.about,
-                    enabled: true,
-                    onClick: emptyFunction
-                },
-                {
-                    label: lang.flux.preferences,
-                    enabled: true,
-                    onClick: emptyFunction
-                },
-                separator,
-                {
-                    label: lang.flux.quit,
-                    enabled: true,
-                    onClick: function() {
-                        if (true === window.confirm('Quit?')) {
-                            gui.App.quit();
-                        }
-                    }
-                }
-            ]
-        });
+        if ('windows' !== window.FLUX.osType) {
+            menuMap.push({
+                label: lang.flux.label,
+                subItems: aboutSubItems
+            });
+        }
 
         if (true === initializeMachine.hasBeenCompleted()) {
+            subItems = [
+                items.import,
+                items.recent,
+                separator,
+                items.execute,
+                items.saveGCode
+            ];
+
+            if ('windows' === window.FLUX.osType) {
+                subItems = subItems.concat(aboutSubItems);
+            }
+
             menuMap.push({
                 label: lang.file.label,
-                subItems: [
-                    items.import,
-                    items.recent,
-                    separator,
-                    items.execute,
-                    items.saveGCode
-                ]
+                subItems: subItems
             },
             {
                 label: lang.edit.label,
