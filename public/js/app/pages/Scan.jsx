@@ -176,9 +176,17 @@ define([
                     var self = this,
                         lang = self.state.lang,
                         fileReader,
+                        fileName,
                         meshes = self.state.meshes,
                         allowedfiles = [],
                         uploadFiles,
+                        file,
+                        blob,
+                        scanTimes,
+                        typedArray,
+                        fileReader,
+                        model,
+                        doImport,
                         checkFiles = function(files) {
                             var allowedfiles = [],
                                 checker = /.*[.]pcd$/,
@@ -214,46 +222,55 @@ define([
 
                     uploadQuota = self.MAX_MESHES - meshes.length - allowedfiles.length;
 
-                    if (0 > uploadQuota) {
+                    if (true === this.state.gettingStarted && 0 > uploadQuota) {
                         AlertActions.showPopupError('over-quota', lang.scan.over_quota);
                         return;
                     }
 
                     if (true === this.state.gettingStarted && false === cantUpload(allowedfiles)) {
+                        self._openBlocker(true, ProgressConstants.NONSTOP);
 
-                        var file = allowedfiles[0],
-                            blob = new Blob([file]),
-                            scanTimes = self.state.scanTimes + 1,
-                            typedArray,
-                            fileReader,
-                            model;
+                        doImport = function() {
+                            file = allowedfiles.pop();
+                            fileName = (new Date).getTime();
+                            blob = new Blob([file]);
+                            scanTimes = self.state.scanTimes + 1;
 
-                        self.state.scanModelingWebSocket.import(file.name, 'pcd', blob, blob.size).done(function(pointCloud) {
-                            self.state.scanControlImageMethods.stop();
+                            self.state.scanModelingWebSocket.import(fileName, 'pcd', blob, blob.size).done(function(pointCloud) {
+                                self.state.scanControlImageMethods.stop();
 
-                            fileReader = new FileReader();
+                                fileReader = new FileReader();
 
-                            fileReader.onload = function() {
-                                typedArray = new Float32Array(this.result);
-                                model = scanedModel.appendModel(typedArray);
+                                fileReader.onload = function() {
+                                    typedArray = new Float32Array(this.result);
+                                    model = scanedModel.appendModel(typedArray);
 
-                                meshes.push(self._newMesh({
-                                    name: file.name,
-                                    model: model,
-                                    index: scanTimes
-                                }));
+                                    meshes.push(self._newMesh({
+                                        name: fileName,
+                                        model: model,
+                                        index: scanTimes
+                                    }));
 
-                                self.setState({
-                                    scanTimes: scanTimes,
-                                    showCamera: false
-                                });
-                            };
+                                    self.setState({
+                                        scanTimes: scanTimes,
+                                        showCamera: false
+                                    }, function() {
+                                        if (0 < allowedfiles.length) {
+                                            doImport();
+                                        }
+                                        else {
+                                            self._openBlocker(false);
+                                        }
+                                    });
+                                };
 
-                            fileReader.readAsArrayBuffer(pointCloud.total);
+                                fileReader.readAsArrayBuffer(pointCloud.total);
 
 
-                        });
+                            });
+                        };
 
+                        doImport();
                     }
                 },
 
