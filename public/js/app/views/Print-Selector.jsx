@@ -10,6 +10,7 @@ define([
     'helpers/api/config',
     'app/constants/device-constants',
     'app/actions/alert-actions',
+    'app/actions/initialize-machine',
     'app/stores/alert-store',
     'app/actions/progress-actions',
     'app/constants/progress-constants',
@@ -27,6 +28,7 @@ define([
     config,
     DeviceConstants,
     AlertActions,
+    initializeMachine,
     AlertStore,
     ProgressActions,
     ProgressConstants,
@@ -60,8 +62,16 @@ define([
                 discoverId: 'printer-selector-' + (this.props.uniqleId || ''),
                 printOptions: [],
                 loadFinished: false,
+                noDefaultPrinter: ('undefined' === typeof initializeMachine.defaultPrinter.get().uuid),
                 discoverMethods: {}
             };
+        },
+
+        componentDidMount: function() {
+            if (false === this.state.noDefaultPrinter) {
+                this.selected_printer = initializeMachine.defaultPrinter.get();
+                this._returnSelectedPrinter();
+            }
         },
 
         _selectPrinter: function(printer, e) {
@@ -189,7 +199,8 @@ define([
                 showPassword = self.state.showPassword,
                 cx = React.addons.classSet,
                 wrapperClass = ['select-printer'],
-                content = self._renderPrinterSelection(lang);
+                content = self._renderPrinterSelection(lang),
+                noDefaultPrinter = self.state.noDefaultPrinter;
 
             if ('string' === typeof self.props.className) {
                 wrapperClass.push(self.props.className);
@@ -198,10 +209,12 @@ define([
             wrapperClass = cx.apply(null, wrapperClass);
 
             return (
+                true === noDefaultPrinter ?
                 <div className={wrapperClass}>
                     {content}
                     <div className="arrow arrow-right"/>
-                </div>
+                </div> :
+                <span/>
             );
         },
 
