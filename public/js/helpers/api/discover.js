@@ -4,9 +4,10 @@
  */
 define([
     'helpers/websocket',
+    'helpers/api/config',
     'helpers/array-findindex',
     'helpers/object-assign'
-], function(Websocket) {
+], function(Websocket, config) {
     'use strict';
 
     var ws = ws || new Websocket({
