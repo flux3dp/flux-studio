@@ -118,7 +118,6 @@ define([
 
                             return allowedfiles;
                         };
-                    console.log(uploadedFiles, checkFiles(uploadedFiles));
 
                     e.target.files = uploadedFiles;
                     this.refs.fileUploader.readFiles(e, uploadedFiles);
