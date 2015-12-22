@@ -94,14 +94,14 @@ define([
 
                 return d.promise();
             },
-            fileInfo: function(path, fileNameWithPath, opt) {
+            fileInfo: function(path, fileName, opt) {
                 opts = genericOptions(opts);
                 var d = $.Deferred(),
                     data = [];
 
-                data.push(fileNameWithPath);
+                data.push(fileName);
                 lastOrder = 'fileinfo';
-                ws.send(lastOrder + ' ' + path + '/' + fileNameWithPath);
+                ws.send(lastOrder + ' ' + path + '/' + fileName);
                 events.onMessage = function(result) {
                     if(result instanceof Blob) {
                         data.push(result);
@@ -255,6 +255,57 @@ define([
                     }
                 };
             },
+            uploadToDirectory: function(blob, uploadPath, fileName) {
+                var d = $.Deferred(),
+                    CHUNK_PKG_SIZE = 4096;
+
+                events.onMessage = function(result) {
+                    switch (result.status) {
+                    case 'ok':
+                        d.resolve(result);
+                        break;
+                    case 'continue':
+                        var fileReader,
+                            chunk,
+                            length = blob.length || blob.size;
+
+                        for (var i = 0; i < length; i += CHUNK_PKG_SIZE) {
+                            chunk = blob.slice(i, i + CHUNK_PKG_SIZE);
+
+                            if (blob instanceof Array) {
+                                chunk = convertToTypedArray(chunk, Uint8Array);
+                            }
+
+                            fileReader = new FileReader();
+
+                            fileReader.onloadend = function(e) {
+                                ws.send(this.result);
+                            };
+
+                            fileReader.readAsArrayBuffer(chunk);
+                        }
+
+                        break;
+                    default:
+                        // TODO: do something?
+                        break;
+                    }
+                };
+
+                events.onError = function(error) {
+                    console.log(error);
+                };
+
+                var ext = fileName.split('.');
+                if(ext[ext.length - 1] === 'fc') {
+                    ws.send(`upload application/fcode ${blob.size} ${uploadPath}/${fileName}`);
+                }
+                else if(ext[ext.length - 1] === 'gcode') {
+                    ws.send(`upload text/gcode ${blob.size} ${uploadPath}/${fileName} 1`);
+                }
+
+                return d.promise();
+            },
             getStatus: function() {
                 var d = $.Deferred();
                 events.onMessage = function(result) {
@@ -370,6 +421,21 @@ define([
 
                 ws.send('play info');
                 lastOrder = 'play info';
+
+                return d.promise();
+            },
+            select: function(path, fileName) {
+                var d = $.Deferred();
+
+                events.onMessage = function(result) {
+                    d.resolve(result);
+                };
+
+                events.onError = function(result) {
+                    d.resolve(result);
+                };
+
+                ws.send(`select ${path.join('/')}/${fileName}`);
 
                 return d.promise();
             }

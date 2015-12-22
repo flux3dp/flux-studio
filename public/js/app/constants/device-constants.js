@@ -33,6 +33,14 @@ define(function() {
         UNKNOWN_ERROR   : 'UNKNOWN_ERROR',
         UNKNOWN_STATUS  : 'UNKNOWN_STATUS',
         USER_OPERATION  : 'USER_OPERATION',
+        UPLOADING       : 'UPLOADING',
+
+        // folder
+        NOT_EXIST       : 'NOT_EXIST',
+        PREVIEW         : 'PREVIEW',
+        DOWNLOAD        : 'DOWNLOAD',
+        UPLOAD          : 'UPLOAD',
+        SELECT          : 'SELECT',
 
         // Print head
         EXTRUDER        : 'EXTRUDER',
@@ -46,6 +54,23 @@ define(function() {
         ABORT           : 'ABORT',
         QUIT            : 'QUIT',
         KICK            : 'KICK',
-        LS              : 'LS'
+        LS              : 'LS',
+
+        status : {
+            IDLE                    : 0,
+            INIT                    : 1,
+            STARTING                : 4,
+            RESUME_TO_STARTING      : 6,
+            RUNNING                 : 16,
+            RESUME_TO_RUNNING       : 18,
+            PAUSED                  : 32,
+            PAUSED_FROM_STARTING    : 36,
+            PAUSING_FROM_STARTING   : 38,
+            PAUSED_FROM_RUNNING     : 48,
+            PAUSING_FROM_RUNNING    : 50,
+            COMPLETED               : 64,
+            COMPLETING              : 68,
+            ABORTED                 : 128
+        }
     };
 });

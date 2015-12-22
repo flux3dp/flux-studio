@@ -12,7 +12,7 @@
             height: 5rem;
             text-align: center;
             span {
-                font-size: 1.8rem;
+                font-size: 1.6rem;
                 color: #999;
                 line-height: 5rem;
             }
@@ -23,6 +23,13 @@
                 left: 15px;
                 color: #BBB;
                 cursor: pointer;
+
+                img {
+                    width: 28px;
+                    position: relative;
+                    top: 7px;
+                    left: 4px;
+                }
             }
             .back:hover {
                 color: #333;
@@ -34,9 +41,10 @@
         }
         .body {
             height: 70%;
-            .content {
+            .device-content {
                 padding: 0 20px;
                 overflow-y: auto;
+                height: 100%;
                 img {
                     width: 100%;
                 }
@@ -106,6 +114,40 @@
                     width: 100%;
                     height: 249px;
                 }
+                .status-info {
+                    position: absolute;
+                    width: 332px;
+                    height: 100px;
+                    bottom: 84px;
+                    opacity: 0.5;
+                    padding: 10px;
+
+                    .verticle-align {
+                        position: relative;
+                        top: 50%;
+                        transform: translateY(-50%);
+                        color: #FFF;
+
+                        div {
+                            margin: 5px 0;
+                            font-size: 1.2rem;
+                        }
+
+                        .status-info-duration {
+                            // float: left;
+                        }
+                    }
+                    .status-info-progress {
+                        float: right;
+                        bottom: -8px;
+                        position: relative;
+                        font-size: 1.2em;
+                        color: #FFF;
+                    }
+                }
+                .status-info.running {
+                    background-color: #AAA;
+                }
             }
             .close {
                 right: 20px;
@@ -121,11 +163,18 @@
                 cursor: pointer;
                 .description {
                     padding-top: 5px;
-                    font-size: 1.2rem;
+                    font-size: 1rem;
+                    &.on {
+                        color: #333;
+                    }
                 }
             }
             .controls:hover {
                 color: #333;
+                cursor: pointer;
+                >div {
+                    opacity: 1;
+                }
             }
             .left {
                 left: 2rem;
@@ -138,6 +187,52 @@
             .right {
                 right: 2rem;
             }
+            .btn-control {
+                cursor: pointer;
+                background-size: 50px;
+                background-position: 3px 0px;
+                height: 33px;
+                opacity: 0.4;
+                background-repeat: no-repeat;
+                cursor: pointer;
+            }
+            .btn-go {
+                background-image: url("/img/btn-run.svg");
+            }
+            .btn-stop {
+                background-image: url("/img/btn-stop.svg");
+            }
+            .btn-pause {
+                background-image: url("/img/btn-pause.svg");
+            }
+            .btn-download {
+                background-image: url("/img/btn-download.svg");
+            }
+            .btn-upload {
+                background-image: url("/img/btn-upload.svg");
+            }
+            .btn-camera {
+                background-image: url("/img/btn-camera.svg");
+                &.on {
+                    opacity: 1;
+                    &~div {
+                        opacity: 1;
+                    }
+                }
+            }
+            input {
+                bottom: 0;
+                display: block;
+                left: 0;
+                margin: auto;
+                position: absolute;
+                right: 0;
+                top: -20px;
+                cursor: pointer;
+                opacity: 0;
+                width: 100%;
+                height: 200px;
+            }
         }
         .wait {
             text-align: center;
@@ -148,7 +243,7 @@
     }
     .sub {
         background-color: white;
-        height: 10rem;
+        height: 6rem;
         width: $panelWidth;
         position: relative;
         margin-top: 5px;

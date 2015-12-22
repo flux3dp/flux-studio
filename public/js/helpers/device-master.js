@@ -117,13 +117,22 @@ define([
         return d.promise();
     }
 
-    function uploadFile(blob) {
+    function uploadFile(blob, file, uploadPath) {
         var d = $.Deferred();
-        _device.print = _device.actions.upload(blob.size, blob, {
-            onFinished: function(result) {
+
+        if(uploadPath) {
+            _device.actions.uploadToDirectory(blob, uploadPath, file.name).then(function(result) {
+                console.log('from dm', result);
                 d.resolve(result);
-            }
-        });
+            });
+        }
+        else {
+            _device.print = _device.actions.upload(blob.size, blob, {
+                onFinished: function(result) {
+                    d.resolve(result);
+                }
+            });
+        }
 
         return d.promise();
     }
@@ -163,6 +172,21 @@ define([
         uploadFile(blob).then(function() {
             _status = DeviceConstants.RUNNING;
             d.resolve(_status);
+        });
+        return d.promise();
+    }
+
+    function goFromFile(path, fileName) {
+        var d = $.Deferred();
+        _device.actions.select(path, fileName).then(function(selectResult) {
+            if(selectResult.status.toUpperCase() === DeviceConstants.OK) {
+                _device.actions.start().then(function(startResult) {
+                    d.resolve(startResult);
+                });
+            }
+            else {
+                d.resolve({status: 'error'});
+            }
         });
         return d.promise();
     }
@@ -212,8 +236,8 @@ define([
         return d.promise();
     }
 
-    function fileInfo(path, fileNameWithPath) {
-        return _device.actions.fileInfo(path, fileNameWithPath);
+    function fileInfo(path, fileName) {
+        return _device.actions.fileInfo(path, fileName);
     }
 
     function startCamera(callback) {
@@ -376,6 +400,7 @@ define([
             this.selectDevice       = selectDevice;
             this.uploadFile         = uploadFile;
             this.go                 = go;
+            this.goFromFile         = goFromFile;
             this.resume             = resume;
             this.pause              = pause;
             this.stop               = stop;

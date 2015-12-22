@@ -286,6 +286,7 @@ define(function() {
                 auto: 'auto',                       // do not change
                 line: 'line',                       // do not change
                 rectilinear: 'rectilinear',         // do not change
+                rectilinearGrid: 'rectilinear-grid',// do not change
                 honeycomb: 'honeycomb',             // do not change
                 blackMagic: 'Black Magic',
                 spiral: 'Spiral',
@@ -442,7 +443,8 @@ define(function() {
             quality: {
                 high: 'HIGH QUALITY',
                 med: 'MEDIUM QUALITY',
-                low: 'LOW QUALITY'
+                low: 'LOW QUALITY',
+                custom: 'CUSTOM QUALITY'
             },
             quick_print: 'Quick Print',
             scale: 'SCALE',
@@ -462,7 +464,10 @@ define(function() {
             importTitle: 'Import 3D models ( .stl )',
             getFcodeTitle: 'Save toolhead path and config into FCode file ( *.fc )',
             goTitle: 'Print it out',
-            deviceTitle: 'Show device monitor'
+            deviceTitle: 'Show device monitor',
+            rendering: 'Rendering',
+            finishingUp: 'Finishing up...',
+            savingFilePreview: 'Saving file preview'
         },
         laser: {
             import: 'IMPORT',
@@ -708,6 +713,7 @@ define(function() {
             pause: 'PAUSE',
             stop: 'STOP',
             record: 'RECORD',
+            camera: 'CAMERA',
             connecting: 'Connecting, please wait...',
             HEAD_OFFLINE: 'Device head is not connected or missing',
             TILT: 'Device head is tilted, please connect all 6 magnents',
@@ -723,7 +729,15 @@ define(function() {
             minute: 'min',
             left: 'left',
             temperature: 'Temperature',
-            forceStop: 'Force stopping device?'
+            forceStop: 'Force stopping device?',
+            upload: 'UPLOAD',
+            download: 'DOWNLOAD',
+            fileNotDownloadable: 'this file type is not supported for download',
+            cannotPreview: 'Can not preview file',
+            extensionNotSupported: 'file extension not supported',
+            fileExistContinue: 'file already exist, continue ? (will replace)',
+            confirmGToF: 'Uploaded GCode will be converted to FCode, continue (will replace if exist)',
+            almostDone: 'almost done'
         },
         alert: {
             caption: 'Error',

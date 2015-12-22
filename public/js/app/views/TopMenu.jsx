@@ -166,6 +166,12 @@ define([
 
                 GlobalStore.onShowMonitor(this._handleOpenMonitor);
                 GlobalStore.onCloseAllView(this._handleCloseAllView);
+
+                $(document).keydown(function(e) {
+                    if(e.keyCode === 8) {
+                        e.preventDefault();
+                    }
+                });
             },
 
             componentWillUnmount: function() {
@@ -429,8 +435,7 @@ define([
             },
 
             _renderStudioFunctions: function() {
-                var ClassNames = React.addons.classSet,
-                    itemClass = '',
+                var itemClass = '',
                     label = '',
                     isActiveItem,
                     menuItems;
@@ -450,8 +455,7 @@ define([
                     return (
                         <li className={itemClass} key={'menu' + i}
                             data-display-name={opt.displayName}
-                            onClick={this._handleNavigation.bind(null, opt.name)}
-                        >
+                            onClick={this._handleNavigation.bind(null, opt.name)}>
                             <img src={opt.imgSrc} />
                             {label}
                         </li>
@@ -462,13 +466,26 @@ define([
             },
 
             _renderDeviceList: function() {
+                var meta,
+                    // lang = this.props.lang,
+                    status = lang.machine_status,
+                    headModule = lang.head_module,
+                    statusText,
+                    headText;
+
                 var list = this.state.deviceList.map(function(device) {
+                    statusText = status[device.st_id] || status.UNKNOWN,
+                    headText = headModule[device.head_module] || headModule.UNKNOWN;
+                    if (16 === device.st_id && 'number' === typeof device.st_prog) {
+                        statusText += ' - ' + (parseInt(device.st_prog * 1000) * 0.1).toFixed(1) + '%';
+                    }
+
                     return (
                         <li
                             name={device.uuid}
                             onClick={this._handleSelectDevice.bind(null, device)}>
                             <label className="name">{device.name}</label>
-                            <label className="status">Working / Print / 35%</label>
+                            <label className="status">{headText} {statusText}</label>
                         </li>
                     )
                 }, this);

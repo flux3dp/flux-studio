@@ -9,6 +9,7 @@ define([
         lastModifiedAxis,
         _size,
         _ratio = 1,
+        _maxLength = 210,
         _mode = 'size';
 
     return React.createClass({
@@ -71,6 +72,19 @@ define([
             });
         },
 
+        _getLargestPropertyValue(src) {
+            var p, x, y, z;
+            p = 'x';
+            x = src.x;
+            y = src.y;
+            z = src.z;
+
+            if(x < y) { p = 'y'; }
+            if(y < z) { p = 'z'; }
+
+            return p;
+        },
+
         _handleResize: function(src, value) {
             if(src.keyCode !== 13) {
                 return;
@@ -80,6 +94,12 @@ define([
 
             if(this.state.scaleLocked) {
                 _ratio = value / _size[axis];
+
+                if(_size.x * _ratio > _maxLength || _size.y * _ratio > _maxLength || _size.z * _ratio > _maxLength) {
+                    axis = this._getLargestPropertyValue(_size);
+                    _ratio = _maxLength / _size[axis];
+                }
+
                 _size.x *= _ratio;
                 _size.y *= _ratio;
                 _size.z *= _ratio;
@@ -89,27 +109,10 @@ define([
                 _size[axis] = value;
             }
 
-            // _size[axis] = value;
-            // _size['entered' + axis] = value;
-            //
-            // _size[lastModifiedAxis] /= _ratio;
-            // _ratio = 1;
             this._updateSizeProperty(_size);
             this.props.onResize(_size);
 
             this.setState({ size: _size });
-
-            // var axis    = src.target.id,
-            //     _value  = this._getNumberOnly(src.target.value);
-            //
-            // _size['entered' + axis.toUpperCase()] = src.target.value;
-            // lastModifiedAxis = src.target.id;
-            //
-            // if(this.state.scaleLocked) {
-            //     _ratio = _value / _size[axis];
-            // }
-            //
-            // this.setState({ size: _size });
         },
 
         _handleUpdateSize: function(e) {
@@ -172,6 +175,7 @@ define([
                             <div className="control">
                                 <span className="text-center header">X</span>
                                     <UnitInput
+                                        max={210}
                                         defaultValue={_size.x}
                                         dataAttrs={{id: 'x'}}
                                         getValue={this._handleResize} />
@@ -180,6 +184,7 @@ define([
                             <div className="control">
                                 <span className="text-center header">Y</span>
                                     <UnitInput
+                                        max={210}
                                         defaultValue={_size.y}
                                         dataAttrs={{id: 'y'}}
                                         getValue={this._handleResize} />
@@ -188,6 +193,7 @@ define([
                             <div className="control">
                                 <span className="text-center header">Z</span>
                                     <UnitInput
+                                        max={210}
                                         defaultValue={_size.z}
                                         dataAttrs={{id: 'z'}}
                                         getValue={this._handleResize} />

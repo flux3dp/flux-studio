@@ -17,8 +17,8 @@ define([
     'threeSTLLoader',
     'threeCircularGridHelper',
     'plugins/file-saver/file-saver.min',
-    'lib/Canvas-To-Blob'
-
+    'lib/Canvas-To-Blob',
+    'helpers/object-assign'
 ], function(
     $,
     fileSystem,
@@ -194,20 +194,6 @@ define([
         registerDropToImport();
     }
 
-    function animate() {
-
-        requestAnimationFrame( animate );
-
-        // controls.update();
-        render();
-
-        // renderer.clear();
-        // renderer.render( scene, camera );
-        // renderer.clearDepth();
-        // renderer.render( scene2, camera );
-
-    }
-
     function uploadStl(name, file) {
         // pass to slicer
         var d = $.Deferred();
@@ -225,17 +211,7 @@ define([
     function appendModel(fileEntry, file, callback) {
         var loader = new THREE.STLLoader();
         var model_file_path = fileEntry.toURL();
-        callback = callback || function(){};
-
-        if(defaultFileName === '') {
-            var lastIndex = fileEntry.name.lastIndexOf('.');
-            if(lastIndex > 0) {
-                defaultFileName = fileEntry.name.substring(0, 20);
-            }
-            else {
-                defaultFileName = fileEntry.name;
-            }
-        }
+        callback = callback || function() {};
 
         reactSrc.setState({
             openWaitWindow: true,
@@ -274,9 +250,7 @@ define([
                 console.log('this model has been scaled for better printing ratio');
             }
 
-            // SELECTED = mesh;
             mesh.scale.set(scale, scale, scale);
-            // setScale(scale, scale, scale, false, false);
             mesh.scale._x = scale;
             mesh.scale._y = scale;
             mesh.scale._z = scale;
@@ -298,6 +272,7 @@ define([
                 mesh.geometry = new THREE.Geometry().fromBufferGeometry(mesh.geometry);
             }
             mesh.name = 'custom';
+            mesh.fileName = fileEntry.name;
             mesh.plane_boundary = planeBoundary(mesh);
 
             addSizeProperty(mesh);
@@ -312,6 +287,7 @@ define([
                 hasObject: true
             });
 
+            setDefaultFileName();
             render();
         });
     }
@@ -642,7 +618,7 @@ define([
                         else {
                             if (result.status !== 'error') {
                                 var serverMessage = `${result.status}: ${result.message} (${parseInt(result.percentage * 100)}%)`,
-                                    drawingMessage = `FInishing up... (100%)`,
+                                    drawingMessage = `Finishing up... (100%)`,
                                     message = result.status !== 'complete' ? serverMessage : drawingMessage;
                                 ProgressActions.updating(message, parseInt(result.percentage * 100));
                             }
@@ -681,7 +657,7 @@ define([
             ids.push(obj.uuid);
         });
 
-        ProgressActions.open(ProgressConstants.STEPPING, 'Caption', 'Saving File Preview');
+        ProgressActions.open(ProgressConstants.STEPPING, lang.print.rendering, lang.print.savingFilePreview);
 
         getBlobFromScene().then(function(blob) {
             previewUrl = URL.createObjectURL(blob);
@@ -698,10 +674,13 @@ define([
                         }
                         else {
                             if (result.status !== 'error') {
-                                var progress = `${result.status}: ${result.message} (${parseInt(result.percentage * 100)}%)`,
-                                    complete = `FInishing up...`;
+                                var progress = `${result.status}: ${result.message} ${'\n' + parseInt(result.percentage * 100)}%`,
+                                    complete = lang.print.finishingUp;
 
-                                if(result.status !== 'complete') {
+                                if(result.status === 'warning') {
+                                    AlertActions.showWarning(result.message);
+                                }
+                                else if(result.status !== 'complete') {
                                     ProgressActions.updating(progress, parseInt(result.percentage * 100));
                                 }
                                 else {
@@ -824,27 +803,28 @@ define([
         blobExpired = true;
     }
 
-    function setRotation(x, y, z, needRender) {
+    function setRotation(x, y, z, needRender, src) {
+        src = src || SELECTED;
         var _x = parseInt(x) || 0,
             _y = parseInt(y) || 0,
             _z = parseInt(z) || 0;
-        SELECTED.rotation.enteredX = x;
-        SELECTED.rotation.enteredY = y;
-        SELECTED.rotation.enteredZ = z;
-        SELECTED.rotation.x = degreeToRadian(_x);
-        SELECTED.rotation.y = degreeToRadian(_y);
-        SELECTED.rotation.z = degreeToRadian(_z);
-        SELECTED.outlineMesh.rotation.x = degreeToRadian(_x);
-        SELECTED.outlineMesh.rotation.y = degreeToRadian(_y);
-        SELECTED.outlineMesh.rotation.z = degreeToRadian(_z);
+        src.rotation.enteredX = x;
+        src.rotation.enteredY = y;
+        src.rotation.enteredZ = z;
+        src.rotation.x = degreeToRadian(_x);
+        src.rotation.y = degreeToRadian(_y);
+        src.rotation.z = degreeToRadian(_z);
+        src.outlineMesh.rotation.x = degreeToRadian(_x);
+        src.outlineMesh.rotation.y = degreeToRadian(_y);
+        src.outlineMesh.rotation.z = degreeToRadian(_z);
 
         if (needRender) {
             reactSrc.setState({
-                modelSelected: SELECTED.uuid ? SELECTED : null
+                modelsrc: src.uuid ? src : null
             });
-            SELECTED.plane_boundary = planeBoundary(SELECTED);
-            groundIt(SELECTED);
-            checkOutOfBounds(SELECTED);
+            src.plane_boundary = planeBoundary(src);
+            groundIt(src);
+            checkOutOfBounds(src);
             render();
         }
     }
@@ -985,8 +965,17 @@ define([
         }
     }
 
+    function setDefaultFileName() {
+        if(objects.length) {
+            defaultFileName = objects[0].fileName;
+            defaultFileName = defaultFileName.split('.');
+            defaultFileName.pop();
+            defaultFileName = defaultFileName.join('.');
+        }
+    }
+
     function removeSelected() {
-        if (SELECTED) {
+        if (SELECTED.outlineMesh) {
             var index;
             scene.remove(SELECTED.outlineMesh);
             scene.remove(SELECTED);
@@ -998,7 +987,6 @@ define([
 
             //  model in backend
             slicer.delete(SELECTED.uuid, function(result) {
-                console.log(result);
                 if(result.status.toUpperCase() === DeviceConstants.ERROR) {
                     AlertActions.showPopupError('slicer', result.error);
                 }
@@ -1008,6 +996,8 @@ define([
             selectObject(null);
             render();
 
+            setDefaultFileName();
+
             if(objects.length === 0) {
                 reactSrc.setState({
                     openImportWindow: true,
@@ -1016,6 +1006,42 @@ define([
                     setImportWindowPosition();
                 });
             }
+        }
+    }
+
+    function duplicateSelected() {
+        if(SELECTED) {
+            var mesh = new THREE.Mesh(SELECTED.geometry, SELECTED.material);
+            mesh.up = new THREE.Vector3(0, 0, 1);
+
+            slicer.duplicate(SELECTED.uuid, mesh.uuid).then(function(result) {
+                if(result.status.toUpperCase() === DeviceConstants.OK) {
+
+                    Object.assign(mesh.scale, SELECTED.scale);
+                    mesh.rotation.enteredX = SELECTED.rotation.enteredX;
+                    mesh.rotation.enteredY = SELECTED.rotation.enteredY;
+                    mesh.rotation.enteredZ = SELECTED.rotation.enteredZ;
+                    mesh.rotation.x = SELECTED.rotation.x;
+                    mesh.rotation.y = SELECTED.rotation.y;
+                    mesh.rotation.z = SELECTED.rotation.z;
+
+                    mesh.name = 'custom';
+                    mesh.plane_boundary = planeBoundary(mesh);
+
+                    addSizeProperty(mesh);
+                    groundIt(mesh);
+                    createOutline(mesh);
+
+                    scene.add(mesh);
+                    outlineScene.add(mesh.outlineMesh);
+                    objects.push(mesh);
+
+                    render();
+                }
+                else {
+                    AlertActions.showPopupError('duplicateError', result.error);
+                }
+            });
         }
     }
 
@@ -1370,6 +1396,7 @@ define([
         var outlineMesh = new THREE.Mesh(mesh.geometry, outlineMaterial);
         outlineMesh.position.set(mesh.position.x, mesh.position.y, mesh.position.z);
         outlineMesh.scale.set(mesh.scale.x, mesh.scale.y, mesh.scale.z);
+        outlineMesh.rotation.set(mesh.rotation.x, mesh.rotation.y, mesh.rotation.z);
         mesh.outlineMesh = outlineMesh;
         outlineScene.add(outlineMesh);
 
@@ -1531,12 +1558,12 @@ define([
 
     return {
         init                : init,
-        animate             : animate,
         appendModel         : appendModel,
         setRotation         : setRotation,
         setScale            : setScale,
         alignCenter         : alignCenter,
         removeSelected      : removeSelected,
+        duplicateSelected   : duplicateSelected,
         sendGCodeParameters : sendGCodeParameters,
         setSize             : setSize,
         downloadGCode       : downloadGCode,

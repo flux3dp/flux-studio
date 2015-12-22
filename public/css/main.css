@@ -3382,7 +3382,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         margin: 0 auto;
         max-height: 100%;
         overflow-x: hidden;
-        overflow-y: scroll;
+        overflow-y: auto;
         padding: 0;
         will-change: transform; }
         .select-printer .printer-list .printer-item {
@@ -3695,7 +3695,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
             height: 5rem;
             text-align: center; }
             .flux-monitor .main .title span {
-                font-size: 1.8rem;
+                font-size: 1.6rem;
                 color: #999;
                 line-height: 5rem; }
             .flux-monitor .main .title .back {
@@ -3705,6 +3705,11 @@ input[type=range]:focus::-webkit-slider-runnable-track {
                 left: 15px;
                 color: #BBB;
                 cursor: pointer; }
+                .flux-monitor .main .title .back img {
+                    width: 28px;
+                    position: relative;
+                    top: 7px;
+                    left: 4px; }
             .flux-monitor .main .title .back:hover {
                 color: #333; }
             .flux-monitor .main .title .close {
@@ -3712,29 +3717,30 @@ input[type=range]:focus::-webkit-slider-runnable-track {
                 top: 9px; }
         .flux-monitor .main .body {
             height: 70%; }
-            .flux-monitor .main .body .content {
+            .flux-monitor .main .body .device-content {
                 padding: 0 20px;
-                overflow-y: auto; }
-                .flux-monitor .main .body .content img {
+                overflow-y: auto;
+                height: 100%; }
+                .flux-monitor .main .body .device-content img {
                     width: 100%; }
-                .flux-monitor .main .body .content .image-wrapper {
+                .flux-monitor .main .body .device-content .image-wrapper {
                     position: absolute;
                     margin-left: auto;
                     margin-right: auto;
                     width: 100%; }
-                .flux-monitor .main .body .content .name {
+                .flux-monitor .main .body .device-content .name {
                     font-size: 1rem;
                     position: absolute;
                     bottom: 0;
                     text-align: center;
                     width: 100%;
                     overflow: hidden; }
-                .flux-monitor .main .body .content .name.selected {
+                .flux-monitor .main .body .device-content .name.selected {
                     padding: 0 8px;
                     border-radius: 5px;
                     color: white;
                     background: #0950D0; }
-                .flux-monitor .main .body .content .folder {
+                .flux-monitor .main .body .device-content .folder {
                     color: #BBB;
                     display: inline-block;
                     width: 33%;
@@ -3746,9 +3752,9 @@ input[type=range]:focus::-webkit-slider-runnable-track {
                     background-position: top;
                     margin-top: 10px;
                     cursor: pointer; }
-                .flux-monitor .main .body .content .folder:hover {
+                .flux-monitor .main .body .device-content .folder:hover {
                     color: #333; }
-                .flux-monitor .main .body .content .file {
+                .flux-monitor .main .body .device-content .file {
                     text-align: center;
                     color: #BBB;
                     display: inline-block;
@@ -3760,18 +3766,41 @@ input[type=range]:focus::-webkit-slider-runnable-track {
                     background-position: top;
                     margin-top: 10px;
                     cursor: pointer; }
-                    .flux-monitor .main .body .content .file img {
+                    .flux-monitor .main .body .device-content .file img {
                         width: 60px; }
-                .flux-monitor .main .body .content .file:hover {
+                .flux-monitor .main .body .device-content .file:hover {
                     color: #333; }
-                .flux-monitor .main .body .content .spinner-wrapper {
+                .flux-monitor .main .body .device-content .spinner-wrapper {
                     position: absolute;
                     width: calc(100% - 20px);
                     margin: auto;
                     top: 200px; }
-                .flux-monitor .main .body .content .camera-image {
+                .flux-monitor .main .body .device-content .camera-image {
                     width: 100%;
                     height: 249px; }
+                .flux-monitor .main .body .device-content .status-info {
+                    position: absolute;
+                    width: 332px;
+                    height: 100px;
+                    bottom: 84px;
+                    opacity: 0.5;
+                    padding: 10px; }
+                    .flux-monitor .main .body .device-content .status-info .verticle-align {
+                        position: relative;
+                        top: 50%;
+                        transform: translateY(-50%);
+                        color: #FFF; }
+                        .flux-monitor .main .body .device-content .status-info .verticle-align div {
+                            margin: 5px 0;
+                            font-size: 1.2rem; }
+                    .flux-monitor .main .body .device-content .status-info .status-info-progress {
+                        float: right;
+                        bottom: -8px;
+                        position: relative;
+                        font-size: 1.2em;
+                        color: #FFF; }
+                .flux-monitor .main .body .device-content .status-info.running {
+                    background-color: #AAA; }
             .flux-monitor .main .body .close {
                 right: 20px; }
         .flux-monitor .main .operation {
@@ -3784,9 +3813,14 @@ input[type=range]:focus::-webkit-slider-runnable-track {
                 cursor: pointer; }
                 .flux-monitor .main .operation .controls .description {
                     padding-top: 5px;
-                    font-size: 1.2rem; }
+                    font-size: 1rem; }
+                    .flux-monitor .main .operation .controls .description.on {
+                        color: #333; }
             .flux-monitor .main .operation .controls:hover {
-                color: #333; }
+                color: #333;
+                cursor: pointer; }
+                .flux-monitor .main .operation .controls:hover > div {
+                    opacity: 1; }
             .flux-monitor .main .operation .left {
                 left: 2rem; }
             .flux-monitor .main .operation .center {
@@ -3795,6 +3829,42 @@ input[type=range]:focus::-webkit-slider-runnable-track {
                 right: 0; }
             .flux-monitor .main .operation .right {
                 right: 2rem; }
+            .flux-monitor .main .operation .btn-control {
+                cursor: pointer;
+                background-size: 50px;
+                background-position: 3px 0px;
+                height: 33px;
+                opacity: 0.4;
+                background-repeat: no-repeat;
+                cursor: pointer; }
+            .flux-monitor .main .operation .btn-go {
+                background-image: url("/img/btn-run.svg"); }
+            .flux-monitor .main .operation .btn-stop {
+                background-image: url("/img/btn-stop.svg"); }
+            .flux-monitor .main .operation .btn-pause {
+                background-image: url("/img/btn-pause.svg"); }
+            .flux-monitor .main .operation .btn-download {
+                background-image: url("/img/btn-download.svg"); }
+            .flux-monitor .main .operation .btn-upload {
+                background-image: url("/img/btn-upload.svg"); }
+            .flux-monitor .main .operation .btn-camera {
+                background-image: url("/img/btn-camera.svg"); }
+                .flux-monitor .main .operation .btn-camera.on {
+                    opacity: 1; }
+                    .flux-monitor .main .operation .btn-camera.on ~ div {
+                        opacity: 1; }
+            .flux-monitor .main .operation input {
+                bottom: 0;
+                display: block;
+                left: 0;
+                margin: auto;
+                position: absolute;
+                right: 0;
+                top: -20px;
+                cursor: pointer;
+                opacity: 0;
+                width: 100%;
+                height: 200px; }
         .flux-monitor .main .wait {
             text-align: center;
             margin-top: 30px;
@@ -3802,7 +3872,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
             color: #B3B3B3; }
     .flux-monitor .sub {
         background-color: white;
-        height: 10rem;
+        height: 6rem;
         width: 31rem;
         position: relative;
         margin-top: 5px; }

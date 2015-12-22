@@ -22,6 +22,10 @@ define([
                     events.onError(data);
                     lastMessage = data;
                 },
+                onFatal: function(data) {
+                    events.onFatal(data);
+                    lastMessage = data;
+                },
                 onClose: function(message) {
                     lastMessage = message;
                 }
@@ -176,6 +180,25 @@ define([
 
                 ws.send('upload_image ' + file.size);
                 lastOrder = 'upload_image';
+
+                return d.promise();
+            },
+            duplicate: function(oldName, newName) {
+                var d = $.Deferred();
+
+                events.onMessage = function(result) {
+                    d.resolve(result);
+                };
+
+                events.onError = function(result) {
+                    d.resolve(result);
+                };
+
+                events.onFatal = function(result) {
+                    d.resolve(result);
+                };
+
+                ws.send(`duplicate ${oldName} ${newName}`);
 
                 return d.promise();
             }

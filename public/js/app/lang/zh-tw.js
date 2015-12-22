@@ -286,6 +286,7 @@ define(function() {
                 auto: 'auto',                       // do not change
                 line: 'line',                       // do not change
                 rectilinear: 'rectilinear',         // do not change
+                rectilinearGrid: 'rectilinear-grid',// do not change
                 honeycomb: 'honeycomb',             // do not change
                 blackMagic: 'Black Magic',
                 spiral: 'Spiral',
@@ -442,7 +443,8 @@ define(function() {
             quality: {
                 high: 'HIGH QUALITY',
                 med: 'MEDIUM QUALITY',
-                low: 'LOW QUALITY'
+                low: 'LOW QUALITY',
+                custom: 'CUSTOM QUALITY'
             },
             quick_print: 'Quick Print',
             scale: '比例',
@@ -462,7 +464,10 @@ define(function() {
             importTitle: 'Import 3D models ( .stl )',
             getFcodeTitle: 'Save toolhead path and config into FCode file ( *.fc )',
             goTitle: 'Print it out',
-            deviceTitle: 'Show device monitor'
+            deviceTitle: 'Show device monitor',
+            rendering: 'Rendering',
+            finishingUp: 'Finishing up...',
+            savingFilePreview: 'Saving file preview'
         },
         laser: {
             import: '打開⋯',
@@ -708,6 +713,7 @@ define(function() {
             pause: '暫停',
             stop: 'STOP',
             record: 'RECORD',
+            camera: 'CAMERA',
             connecting: 'Connecting, please wait...',
             HEAD_OFFLINE: '沒有偵測到列印工具頭',
             TILT: '請確認磁鐵關節正確的附著',
@@ -723,7 +729,15 @@ define(function() {
             minute: '分',
             left: '完成',
             temperature: '溫度',
-            forceStop: '強制停止機器?'
+            forceStop: '強制停止機器?',
+            upload: '上傳',
+            download: '下載',
+            fileNotDownloadable: '下載不支援此檔案格式',
+            cannotPreview: '無法預覽此檔案',
+            extensionNotSupported: '上傳檔案不支援此檔案格式',
+            fileExistContinue: 'file already exist, continue (will replace)',
+            confirmGToF: 'Uploaded GCode will be converted to FCode, continue (will replace if exist)',
+            almostDone: 'almost done'
         },
         alert: {
             caption: '錯誤',
