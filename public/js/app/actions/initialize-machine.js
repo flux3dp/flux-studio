@@ -93,7 +93,7 @@ define([
         },
         settingWifi: {
             get: function() {
-                return localStorage.get('setting-wifi');
+                return localStorage.get('setting-wifi') || {};
             },
             set: function(wifi) {
                 localStorage.set('setting-wifi', wifi);
