@@ -91,33 +91,32 @@ define(function() {
             // specific caption/content
             select_language: '請選擇你想使用的語言',
             change_password: '要更改密碼嗎?',
-            connect_flux: '用 USB 連接你的電腦',
-            name_your_flux: '命名你的 FLUX',
-            why_need_name: '當工作站模式啟動時，這將會被用作 Wi-Fi 名稱',
-            wifi_setup: 'Wi-Fi Setup',
+            connect_flux: '用 USB 連接你的電腦與 FLUX',
+            name_your_flux: '給你的 FLUX 一個名字',
+            wifi_setup: '設定無線網路',
             select_preferred_wifi: '選擇你偏好的網路',
             requires_wifi_password: '需要密碼',
-            connecting: '連接中...',
+            connecting: '連接中',
 
             // page specific
             set_machine_generic: {
-                printer_name: 'Name',
+                printer_name: '名稱',
                 printer_name_placeholder: '請輸入名稱',
-                password: 'Password',
-                set_station_mode: 'Set station mode',
+                password: '密碼',
+                set_station_mode: '設定成無線基地台',
                 password_placeholder: '請輸入密碼'
             },
 
             setting_completed: {
                 start: '開始使用',
-                is_ready: '“%s” 準備好了',
-                station_ready_statement: '你的 FLUX 已成為 Wi-Fi 熱點，你可以藉由無線連接“%s”這個熱點操作 FLUX',
-                brilliant: 'Brilliant!',
-                begin_journey: 'You can begin the journey with your FLUX now.',
-                great: 'Great!',
-                upload_via_usb: 'You can setup Wi-Fi later, or use USB drive to print.',
-                back: 'Back',
-                ok: 'OK'
+                is_ready: '“%s” 準備完成',
+                station_ready_statement: '你的 FLUX 已成為 Wi-Fi 熱點，你可以藉由無線連接 “%s” 這個熱點操作 FLUX',
+                brilliant: '太棒了!',
+                begin_journey: '你可以開始使用 FLUX 隨心所欲地進行創作囉！',
+                great: 'Let\'s Begin 開始使用 FLUX',
+                upload_via_usb: '你可以稍後再設定 Wi-Fi 選項, 或使用 USB 隨身碟列印。',
+                back: '回到 Wi-Fi 設定',
+                ok: '開始使用'
             },
 
             // errors
