@@ -96,14 +96,11 @@ define([
                     usb = usbConfig();
 
                 self._openBlocker(true)();
+                self.scanWifi = false;
 
                 usb.setAPMode({
                     onSuccess: function(response) {
-                        self.scanWifi = false;
-
-                        self.deferred.done(function() {
-                            location.hash = 'initialize/wifi/setup-complete/station-mode';
-                        });
+                        location.hash = 'initialize/wifi/setup-complete/station-mode';
                     },
                     onError: function() {
                         self._openAlert(true, {
@@ -113,7 +110,6 @@ define([
                         })();
                     }
                 });
-
             },
 
             // Lifecycle
@@ -179,12 +175,13 @@ define([
             },
 
             _renderWifiItem: function(wifi) {
-                var lockClassName = 'fa ' + (true === wifi.password ? 'fa-lock' : ''),
+                var settingWifi = initializeMachine.settingWifi.get(),
+                    lockClassName = 'fa ' + (true === wifi.password ? 'fa-lock' : ''),
                     meta = JSON.stringify(wifi);
 
                 return (
                     <label data-meta={meta}>
-                        <input type="radio" name="wifi-spot" value={wifi.ssid} defaultChecked={false}/>
+                        <input type="radio" name="wifi-spot" value={wifi.ssid} defaultChecked={settingWifi.ssid === wifi.ssid}/>
                         <div className="row-fluid">
                             <span className="wifi-ssid">{wifi.ssid}</span>
                             <span className={lockClassName}></span>
@@ -284,10 +281,10 @@ define([
             },
 
             componentDidMount : function() {
-
                 var self = this,
                     usb = usbConfig(),
                     wifiOptions = [],
+                    settingWifi = initializeMachine.settingWifi.get(),
                     getWifi = function() {
                         wifiOptions = [];
 
@@ -317,6 +314,12 @@ define([
                                         label: {item}
                                     });
 
+                                    if (settingWifi.ssid === el.ssid) {
+                                        self.setState({
+                                            selectedWifi: true
+                                        });
+                                    }
+
                                     self.setState({
                                         wifiOptions: wifiOptions
                                     });
@@ -327,6 +330,7 @@ define([
                                 }
                                 else {
                                     self.deferred.resolve();
+                                    self.deferred = $.Deferred();
                                 }
                             }
                         });

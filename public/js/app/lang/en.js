@@ -93,7 +93,6 @@ define(function() {
             change_password: 'Change password?',
             connect_flux: 'Connect FLUX to Your Computer by USB Cable',
             name_your_flux: 'Name Your FLUX',
-            why_need_name: 'This will be used as Wi-Fi ap name if station mode is enabled.',
             wifi_setup: 'Wi-Fi Setup',
             select_preferred_wifi: 'Select your preferred network.',
             requires_wifi_password: 'requires a password.',

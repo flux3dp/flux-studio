@@ -164,12 +164,6 @@ define([
 
                 GlobalStore.onShowMonitor(this._handleOpenMonitor);
                 GlobalStore.onCloseAllView(this._handleCloseAllView);
-
-                $(document).keydown(function(e) {
-                    if(e.keyCode === 8) {
-                        e.preventDefault();
-                    }
-                });
             },
 
             componentWillUnmount: function() {
@@ -465,7 +459,6 @@ define([
 
             _renderDeviceList: function() {
                 var meta,
-                    // lang = this.props.lang,
                     status = lang.machine_status,
                     headModule = lang.head_module,
                     statusText,
@@ -474,6 +467,7 @@ define([
                 var list = this.state.deviceList.map(function(device) {
                     statusText = status[device.st_id] || status.UNKNOWN,
                     headText = headModule[device.head_module] || headModule.UNKNOWN;
+
                     if (16 === device.st_id && 'number' === typeof device.st_prog) {
                         statusText += ' - ' + (parseInt(device.st_prog * 1000) * 0.1).toFixed(1) + '%';
                     }
@@ -593,8 +587,10 @@ define([
                             onClose={this._handleNotificationModalClose} />
 
                         <div title={lang.print.deviceTitle} className="device" onClick={this._handleShowDeviceList}>
-                            <img src="/img/btn-device.svg" />
-                            <p>{lang.menu.device}</p>
+                            <p className="device-icon">
+                                <img src="/img/btn-device.svg"/>
+                                <span>{lang.menu.device}</span>
+                            </p>
                             <div className={menuClass}>
                                 <div className="arrow arrow-right"/>
                                 <div className="device-list">

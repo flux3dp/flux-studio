@@ -75,6 +75,7 @@ define([
                     ),
                     content = (
                         <div className="setting-completed text-center">
+                            <img className="brand-image" src="/img/menu/main_logo.svg"/>
                             <h1 className="headline">{article.caption}</h1>
                             <p className="notice">{article.content}</p>
                             <div className="btn-v-group">

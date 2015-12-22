@@ -144,12 +144,14 @@ define([
                         });
                     };
 
-                laserParser.params.setEach(
-                    settings,
-                    {
-                        onFinished: onSetParamsFinished
-                    }
-                );
+                laserParser.clear().done(function(data) {
+                    laserParser.params.setEach(
+                        settings,
+                        {
+                            onFinished: onSetParamsFinished
+                        }
+                    );
+                });
             },
             sendToSVGAPI = function(args, settings, callback) {
                 callback = callback || function() {};

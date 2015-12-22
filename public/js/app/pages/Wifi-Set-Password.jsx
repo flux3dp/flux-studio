@@ -103,7 +103,6 @@ define([
                 var self = this,
                     buttons = [{
                         label: lang.initialize.confirm,
-                        className: 'btn-action',
                         dataAttrs: {
                             'ga-event': 'confirm'
                         },

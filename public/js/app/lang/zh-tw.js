@@ -39,7 +39,7 @@ define(function() {
             },
             file: {
                 label: 'File',
-                import: 'Import',
+                import: 'import',
                 recent: 'Recent',
                 execute: 'Execute',
                 save_gcode: 'Save Gcode'
@@ -91,33 +91,32 @@ define(function() {
             // specific caption/content
             select_language: '請選擇你想使用的語言',
             change_password: '要更改密碼嗎?',
-            connect_flux: '用 USB 連接你的電腦',
-            name_your_flux: '命名你的 FLUX',
-            why_need_name: '當工作站模式啟動時，這將會被用作 Wi-Fi 名稱',
-            wifi_setup: 'Wi-Fi Setup',
+            connect_flux: '用 USB 連接你的電腦與 FLUX',
+            name_your_flux: '給你的 FLUX 一個名字',
+            wifi_setup: '設定無線網路',
             select_preferred_wifi: '選擇你偏好的網路',
             requires_wifi_password: '需要密碼',
-            connecting: '連接中...',
+            connecting: '連接中',
 
             // page specific
             set_machine_generic: {
-                printer_name: 'Name',
+                printer_name: '名稱',
                 printer_name_placeholder: '請輸入名稱',
-                password: 'Password',
-                set_station_mode: 'Set station mode',
+                password: '密碼',
+                set_station_mode: '設定成無線基地台',
                 password_placeholder: '請輸入密碼'
             },
 
             setting_completed: {
                 start: '開始使用',
-                is_ready: '“%s” 準備好了',
-                station_ready_statement: '你的 FLUX 已成為 Wi-Fi 熱點，你可以藉由無線連接“%s”這個熱點操作 FLUX',
-                brilliant: 'Brilliant!',
-                begin_journey: 'You can begin the journey with your FLUX now.',
-                great: 'Great!',
-                upload_via_usb: 'You can setup Wi-Fi later, or use USB drive to print.',
-                back: 'Back',
-                ok: 'OK'
+                is_ready: '“%s” 準備完成',
+                station_ready_statement: '你的 FLUX 已成為 Wi-Fi 熱點，你可以藉由無線連接 “%s” 這個熱點操作 FLUX',
+                brilliant: '太棒了!',
+                begin_journey: '你可以開始使用 FLUX 隨心所欲地進行創作囉！',
+                great: 'Let\'s Begin 開始使用 FLUX',
+                upload_via_usb: '你可以稍後再設定 Wi-Fi 選項, 或使用 USB 隨身碟列印。',
+                back: '回到 Wi-Fi 設定',
+                ok: '開始使用'
             },
 
             // errors
@@ -258,63 +257,65 @@ define(function() {
             }
         },
         print: {
-            import: '打開⋯',
+            import: '匯入',
             go_home: 'Go Home',
             save: '儲存⋯',
             normal_preview: 'Normal Preview',
             support_view: 'Support Preview',
             start_print: '列印',
             advanced: {
-                general: 'General',
-                layers: 'Layers',
-                infill: 'Infill',
-                support: 'Support',
-                speed: 'Speed',
-                custom: 'Custom',
-                slicingEngine: 'Slicing Engine',
+                general: '一般',
+                layers: '切層',
+                infill: '填充',
+                support: '支撐',
+                speed: '速度',
+                custom: '自訂',
+                slicingEngine: '切片引擎',
                 slic3r: 'Slic3r',
                 experiment: 'Experiment',
-                filament: 'Filament',
-                temperature: 'Temperature',
-                layerHeight: 'Layer Height',
-                firstLayerHeight: 'First Layer Height',
-                shell: 'Shell',
-                shellSurface: 'Shell Surface',
-                solidLayerTop: 'Solid Layer: Top',
-                solidLayerBottom: 'Solid Layer: Bottom',
-                density: 'Density',
-                pattern: 'Pattern',
+                filament: '線料',
+                temperature: '溫度',
+                layer_height_title: '層高',
+                layer_height: '一般層高',
+                firstLayerHeight: '底層層高',
+                shell: '物件外殼',
+                shellSurface: '物件外殼圈數',
+                solidLayerTop: '頂部實心層數',
+                solidLayerBottom: '底部實心層數',
+                density: '填充密度',
+                pattern: '填充圖樣',
                 auto: 'auto',                       // do not change
                 line: 'line',                       // do not change
                 rectilinear: 'rectilinear',         // do not change
                 rectilinearGrid: 'rectilinear-grid',// do not change
                 honeycomb: 'honeycomb',             // do not change
-                blackMagic: 'Black Magic',
-                spiral: 'Spiral',
-                generalSupport: 'General Support',
-                spacing: 'Spacing',
-                overhang: 'Overhang',
+                blackMagic: '黑魔法',
+                spiral: '螺旋',
+                generalSupport: '支撐',
+                spacing: '支撐距離',
+                overhang: '懸空角度',
                 zDistance: 'Z Distance',
-                raft: 'Raft',
-                raftLayers: 'Raft Layers',
-                movement: 'Movement',
-                structure: 'Structure',
-                traveling: 'Traveling',
-                surface: 'Surface',
-                firstLayer: 'First Layer',
-                solidLayers: 'Solid Layers',
-                innerShell: 'Inner Shell',
-                outerShell: 'Outer Shell',
-                bridge: 'Bridge',
+                support_pattern: '支撐圖樣',
+                raft: '底座',
+                raftLayers: '底座層數',
+                movement: '移動速度',
+                structure: '結構速度',
+                traveling: '移動',
+                surface: '表面速度',
+                firstLayer: '底層',
+                solidLayers: '實心層',
+                innerShell: '外殼內圈',
+                outerShell: '外殼外圈',
+                bridge: '架橋',
                 config: 'Config',
-                presets: 'Presets',
+                presets: '預設',
                 name: 'Name',
-                loadPreset: 'LOAD PRESET',
-                apply: 'APPLY',
-                saveAsPreset: 'SAVE AS PRESET',
-                cancel: 'CANCEL',
-                saveAndApply: 'SAVE & APPLY',
-                delete: 'DELETE'
+                loadPreset: '載入預設',
+                apply: '套用',
+                saveAsPreset: '存為預設',
+                cancel: '取消',
+                saveAndApply: '套用設定',
+                delete: '刪除'
             },
             mode: [
                 {
@@ -423,12 +424,12 @@ define(function() {
                 }
             },
             left_panel: {
-                raft_on: 'RAFT ON',
-                raft_off: 'RAFT OFF',
-                support_on: 'SUPPORT ON',
-                support_off: 'SUPPORT OFF',
-                advanced: 'ADVANCED',
-                preview: 'PREVIEW',
+                raft_on: '底座 ON',
+                raft_off: '底座 OFF',
+                support_on: '支撐 ON',
+                support_off: '支撐 OFF',
+                advanced: '進階選項',
+                preview: '預覽路徑',
                 plaTitle: 'PICK THE COLOR OF THE FILAMENT',
                 transparent: 'TRANSPARENT',
                 qualityTitle: 'It will affect the outcome surface smoothness of your object. Better qualities need more time',
@@ -443,13 +444,13 @@ define(function() {
                 preview: '預覽'
             },
             quality: {
-                high: 'HIGH QUALITY',
-                med: 'MEDIUM QUALITY',
-                low: 'LOW QUALITY',
-                custom: 'CUSTOM QUALITY'
+                high: '品質 精細',
+                med: '品質 中等',
+                low: '品質 快速',
+                custom: '品質 自訂'
             },
             quick_print: 'Quick Print',
-            scale: '比例',
+            scale: '尺寸',
             rotate: '旋轉',
             align_center: '置中',
             delete: '刪除',
@@ -469,10 +470,14 @@ define(function() {
             deviceTitle: 'Show device monitor',
             rendering: 'Rendering',
             finishingUp: 'Finishing up...',
-            savingFilePreview: 'Saving file preview'
+            savingFilePreview: 'Saving file preview',
+            uploading: 'Uploading to slicer',
+            uploaded: 'Uploaded, processing model',
+            importingModel: 'Importing Model',
+            wait: 'Please wait...'
         },
         laser: {
-            import: '打開⋯',
+            import: '匯入',
             save: '儲存⋯',
             custom: '自訂',
             presets: 'Presets',
@@ -492,7 +497,7 @@ define(function() {
                     unit: 'mm'
                 },
                 shading: {
-                    text: 'SHADING',
+                    text: '漸層',
                     textOn: 'ON',
                     textOff: 'OFF',
                     checked: true
@@ -518,7 +523,7 @@ define(function() {
                 }
             },
             advanced: {
-                label: '設定',
+                label: '進階選項',
                 form: {
                     object_options: {
                         text: '材質',
@@ -526,7 +531,7 @@ define(function() {
                         options: [
                             {
                                 value: 'wood',
-                                label: '木材',
+                                label: '木板',
                                 data: {
                                     laser_speed: 5,
                                     power: 255
