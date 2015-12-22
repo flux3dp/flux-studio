@@ -103,7 +103,9 @@ define([
                 var self = this,
                     buttons = [{
                         label: lang.initialize.confirm,
-                        className: 'btn-action',
+                        dataAttrs: {
+                            'ga-event': 'confirm'
+                        },
                         onClick: function(e) {
                             self._openAlert(false)();
                             location.hash = '#initialize/wifi/select';
@@ -130,7 +132,7 @@ define([
                         <div className="connecting-wifi text-center">
                             <h1>{lang.initialize.connecting}</h1>
                             <div className="spinner-roller"/>
-                            <button className="btn btn-action btn-large" onClick={this._onCancelConnection}>{lang.initialize.cancel}</button>
+                            <button className="btn btn-action btn-large" data-ga-event="cancel" onClick={this._onCancelConnection}>{lang.initialize.cancel}</button>
                             {alert}
                         </div>
                     );

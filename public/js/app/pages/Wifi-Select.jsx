@@ -16,6 +16,7 @@ define([
         return React.createClass({
 
             scanWifi: true,
+            deferred: $.Deferred(),
 
             // Private methods
             _openAlert: function(open, detail) {
@@ -51,8 +52,11 @@ define([
                 wifi.plain_password = self.refs.password.getDOMNode().value;
 
                 initializeMachine.settingWifi.set(wifi);
+                self.scanWifi = false;
 
-                location.hash = '#initialize/wifi/set-password';
+                self.deferred.done(function() {
+                    location.hash = '#initialize/wifi/set-password';
+                });
             },
 
             // UI events
@@ -67,7 +71,11 @@ define([
                     });
                 }
                 else {
-                    location.hash = '#initialize/wifi/setup-complete/with-wifi';
+                    self.scanWifi = false;
+
+                    self.deferred.done(function() {
+                        location.hash = '#initialize/wifi/setup-complete/with-wifi';
+                    });
                 }
             },
 
@@ -88,6 +96,7 @@ define([
                     usb = usbConfig();
 
                 self._openBlocker(true)();
+                self.scanWifi = false;
 
                 usb.setAPMode({
                     onSuccess: function(response) {
@@ -101,7 +110,6 @@ define([
                         })();
                     }
                 });
-
             },
 
             // Lifecycle
@@ -122,11 +130,17 @@ define([
                     buttons = [{
                         label: lang.initialize.connect,
                         className: 'btn-action btn-large',
+                        dataAttrs: {
+                            'ga-event': 'set-password-to-connect-to-wifi'
+                        },
                         onClick: self._handleSetPassword
                     },
                     {
                         label: lang.initialize.cancel,
                         className: 'btn-link btn-large',
+                        dataAttrs: {
+                            'ga-event': 'cancel-connect-to-wifi'
+                        },
                         onClick: function(e) {
                             e.preventDefault();
 
@@ -161,12 +175,13 @@ define([
             },
 
             _renderWifiItem: function(wifi) {
-                var lockClassName = 'fa ' + (true === wifi.password ? 'fa-lock' : ''),
+                var settingWifi = initializeMachine.settingWifi.get(),
+                    lockClassName = 'fa ' + (true === wifi.password ? 'fa-lock' : ''),
                     meta = JSON.stringify(wifi);
 
                 return (
                     <label data-meta={meta}>
-                        <input type="radio" name="wifi-spot" value={wifi.ssid} defaultChecked={false}/>
+                        <input type="radio" name="wifi-spot" value={wifi.ssid} defaultChecked={settingWifi.ssid === wifi.ssid}/>
                         <div className="row-fluid">
                             <span className="wifi-ssid">{wifi.ssid}</span>
                             <span className={lockClassName}></span>
@@ -187,7 +202,7 @@ define([
                         items={this.state.wifiOptions}
                     /> :
                     <div className="wifi-list">
-                        <div className="spinner-roller"/>
+                        <div className="spinner-roller absolute-center"/>
                     </div>
                 );
             },
@@ -197,6 +212,9 @@ define([
                     buttons = [{
                         label: lang.initialize.confirm,
                         className: 'btn-action',
+                        dataAttrs: {
+                            'ga-event': 'confirm'
+                        },
                         onClick: state.alertContent.onClick
                     }],
                     content = (
@@ -219,17 +237,26 @@ define([
                     buttons = [{
                         label: lang.initialize.next,
                         className: 'btn-action btn-large' + (true === this.state.selectedWifi ? '' : ' btn-disabled'),
+                        dataAttrs: {
+                            'ga-event': 'pickup-a-wifi'
+                        },
                         onClick: this._confirmWifi
                     },
                     {
                         label: lang.initialize.set_machine_generic.set_station_mode,
                         className: 'btn-action btn-large btn-set-station-mode',
+                        dataAttrs: {
+                            'ga-event': 'set-as-station-mode'
+                        },
                         onClick: this._setAsStationMode
                     },
                     {
                         label: lang.initialize.skip,
                         className: 'btn-link btn-large',
                         type: 'link',
+                        dataAttrs: {
+                            'ga-event': 'use-device-with-usb'
+                        },
                         href: '#initialize/wifi/setup-complete/with-usb'
                     }],
                     passwordForm = this._renderPasswordForm(lang),
@@ -254,10 +281,10 @@ define([
             },
 
             componentDidMount : function() {
-
                 var self = this,
                     usb = usbConfig(),
                     wifiOptions = [],
+                    settingWifi = initializeMachine.settingWifi.get(),
                     getWifi = function() {
                         wifiOptions = [];
 
@@ -287,6 +314,12 @@ define([
                                         label: {item}
                                     });
 
+                                    if (settingWifi.ssid === el.ssid) {
+                                        self.setState({
+                                            selectedWifi: true
+                                        });
+                                    }
+
                                     self.setState({
                                         wifiOptions: wifiOptions
                                     });
@@ -294,6 +327,10 @@ define([
 
                                 if (true === self.scanWifi) {
                                     getWifi();
+                                }
+                                else {
+                                    self.deferred.resolve();
+                                    self.deferred = $.Deferred();
                                 }
                             }
                         });
@@ -304,8 +341,8 @@ define([
             },
 
             componentWillUnmount: function() {
-                this.scanWifi = false;
-            },
+
+            }
         });
     };
 });

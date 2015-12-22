@@ -61,10 +61,11 @@ define(function() {
             },
             device: {
                 label: 'Device',
-                new: 'Add New Device...',
+                new: 'USB Configuration',
                 device_monitor: 'Device Monitor',
                 change_filament: 'Change Filament',
-                check_firmware_update: 'Check Firmware Update'
+                check_firmware_update: 'Check Firmware Update',
+                default_device: 'Default Device'
             },
             window: {
                 label: 'Window',
@@ -92,7 +93,6 @@ define(function() {
             change_password: 'Change password?',
             connect_flux: 'Connect FLUX to Your Computer by USB Cable',
             name_your_flux: 'Name Your FLUX',
-            why_need_name: 'This will be used as Wi-Fi ap name if station mode is enabled.',
             wifi_setup: 'Wi-Fi Setup',
             select_preferred_wifi: 'Select your preferred network.',
             requires_wifi_password: 'requires a password.',
@@ -286,6 +286,7 @@ define(function() {
                 auto: 'auto',                       // do not change
                 line: 'line',                       // do not change
                 rectilinear: 'rectilinear',         // do not change
+                rectilinearGrid: 'rectilinear-grid',// do not change
                 honeycomb: 'honeycomb',             // do not change
                 blackMagic: 'Black Magic',
                 spiral: 'Spiral',
@@ -311,7 +312,8 @@ define(function() {
                 apply: 'APPLY',
                 saveAsPreset: 'SAVE',
                 cancel: 'CANCEL',
-                saveAndApply: 'SAVE & APPLY'
+                saveAndApply: 'SAVE & APPLY',
+                delete: 'DELETE'
             },
             mode: [
                 {
@@ -442,7 +444,8 @@ define(function() {
             quality: {
                 high: 'HIGH QUALITY',
                 med: 'MEDIUM QUALITY',
-                low: 'LOW QUALITY'
+                low: 'LOW QUALITY',
+                custom: 'CUSTOM QUALITY'
             },
             quick_print: 'Quick Print',
             scale: 'SCALE',
@@ -462,7 +465,10 @@ define(function() {
             importTitle: 'Import 3D models ( .stl )',
             getFcodeTitle: 'Save toolhead path and config into FCode file ( *.fc )',
             goTitle: 'Print it out',
-            deviceTitle: 'Show device monitor'
+            deviceTitle: 'Show device monitor',
+            rendering: 'Rendering',
+            finishingUp: 'Finishing up...',
+            savingFilePreview: 'Saving file preview'
         },
         laser: {
             import: 'IMPORT',
@@ -585,6 +591,7 @@ define(function() {
         scan: {
             start_scan: 'Scan',
             stop_scan: 'Stop',
+            over_quota: 'Over quota',
             convert_to_stl: 'Convert',
             scan_again: 'Scan Again',
             start_multiscan: 'Extra Scan',
@@ -674,8 +681,8 @@ define(function() {
         select_printer: {
             choose_printer: 'Choose a printer',
             notification: 'Please enter the password',
-            submit: 'Submit',
-            please_enter_password: 'Enter the password',
+            submit: 'SUBMIT',
+            please_enter_password: 'password',
             auth_failure: 'Authentication fail',
             retry: 'Retry'
         },
@@ -708,6 +715,7 @@ define(function() {
             pause: 'PAUSE',
             stop: 'STOP',
             record: 'RECORD',
+            camera: 'CAMERA',
             connecting: 'Connecting, please wait...',
             HEAD_OFFLINE: 'Device head is not connected or missing',
             TILT: 'Device head is tilted, please connect all 6 magnents',
@@ -723,7 +731,15 @@ define(function() {
             minute: 'min',
             left: 'left',
             temperature: 'Temperature',
-            forceStop: 'Force stopping device?'
+            forceStop: 'Force stopping device?',
+            upload: 'UPLOAD',
+            download: 'DOWNLOAD',
+            fileNotDownloadable: 'this file type is not supported for download',
+            cannotPreview: 'Can not preview file',
+            extensionNotSupported: 'file extension not supported',
+            fileExistContinue: 'file already exist, continue ? (will replace)',
+            confirmGToF: 'Uploaded GCode will be converted to FCode, continue (will replace if exist)',
+            almostDone: 'almost done'
         },
         alert: {
             caption: 'Error',

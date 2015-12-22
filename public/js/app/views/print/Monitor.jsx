@@ -7,8 +7,20 @@ define([
     'helpers/device-master',
     'app/actions/alert-actions',
     'app/stores/alert-store',
-    'app/constants/device-constants'
-], function($, React, ClassNames, control, scanControl, DeviceMaster, AlertActions, AlertStore, DeviceConstants) {
+    'app/constants/device-constants',
+    'helpers/file-system',
+], function(
+    $,
+    React,
+    ClassNames,
+    control,
+    scanControl,
+    DeviceMaster,
+    AlertActions,
+    AlertStore,
+    DeviceConstants,
+    FileSystem
+) {
     'use strict';
 
     var _id = 'MONITOR',
@@ -23,10 +35,14 @@ define([
         usbExist = false,
         showingPopup = false,
         messageViewed = false,
+        fileNameLength = 12,
         operationStatus,
         previewUrl = '',
         lang,
         lastAction,
+        fileToBeUpload = {},
+        initializing = false,
+        rootMode = DeviceConstants.IDLE,
 
         // error display
         mainError = '',
@@ -37,14 +53,15 @@ define([
         headInfo = '',
 
         // for monitor temperature, time...
+        percentageDone = 0,
         progress = 0,
         totalTimeInSeconds = 0,
         timeLeft =  0,
         progress = '',
         temperature = '',
-        stateId = 0,
+        statusId = 0,
 
-        refreshTime = 5000;
+        refreshTime = 3000;
 
     var mode = {
         PREVIEW: 'PREVIEW',
@@ -53,10 +70,10 @@ define([
     };
 
     var opts = {};
+    var temp = [];
 
     operationStatus = [
         DeviceConstants.RUNNING,
-        // DeviceConstants.PAUSING,
         DeviceConstants.PAUSED,
         DeviceConstants.RESUMING,
         DeviceConstants.ABORTED,
@@ -68,7 +85,6 @@ define([
             lang                : React.PropTypes.object,
             selectedDevice      : React.PropTypes.object,
             fCode               : React.PropTypes.object,
-            previewUrl          : React.PropTypes.string,
             onClose             : React.PropTypes.func
         },
 
@@ -81,8 +97,7 @@ define([
                 selectedFileName    : '',
                 headInfo            : '',
                 progress            : '',
-                currentStatus       : DeviceConstants.READY,
-                previewUrl          : this.props.previewUrl
+                currentStatus       : DeviceConstants.READY
             };
         },
 
@@ -99,20 +114,9 @@ define([
 
             pathArray   = [];
             lang        = this.props.lang.monitor;
+            previewUrl  = this.props.previewUrl;
 
-            if(!this.props.fCode) {
-                DeviceMaster.getPreviewInfo().then(function(info) {
-                    info = info || [];
-                    info[0] = info[0] || {};
-
-                    if(info[0].TIME_COST) {
-                        totalTimeInSeconds = info[0].TIME_COST;
-                        // console.log(totalTimeInSeconds);
-                        // this._updateTotalTime(parseInt(info[0].TIME_COST));
-                    }
-                    this._startReport();
-                }.bind(this));
-            }
+            this._getPrintingInfo();
         },
 
         componentDidMount: function() {
@@ -129,29 +133,110 @@ define([
             messageViewed = false;
         },
 
-        _closeConnection: function(c) {
-            if(typeof c !== 'undefined') { c.connection.close(false); }
+        _getPrintingInfo: function() {
+            DeviceMaster.getPreviewInfo().then(function(info) {
+                info = info || [];
+                info[0] = info[0] || {};
+
+                if(!this._hasFCode()) {
+                    if(info[2] instanceof Blob) {
+                        previewUrl = window.URL.createObjectURL(info[2]);
+                    }
+                }
+
+                if(info[0].TIME_COST) {
+                    totalTimeInSeconds = info[0].TIME_COST;
+                }
+                this._startReport();
+            }.bind(this));
         },
 
         _hasFCode: function() {
             return this.props.fCode instanceof Blob;
         },
 
-        _formatTime(timeInSeconds) {
+        _formatTime(timeInSeconds, withSeconds) {
             var hour = 0,
                 min = 0,
+                sec = 0,
                 time = '';
 
-            if(timeInSeconds > 360) {
+            if(timeInSeconds > 3600) {
                 hour = parseInt(timeInSeconds / 3600);
                 min = parseInt((timeInSeconds % 3600) / 60);
-                time = `${hour} ${lang.hour} ${min} ${lang.minute}`;
+                sec = parseInt((timeInSeconds % 3600 % 60));
+
+                if(withSeconds) {
+                    time = `${hour}:${min}:${sec}`;
+                }
+                else {
+                    time = `${hour} ${lang.hour} ${min} ${lang.minute}`;
+                }
             }
             else if(timeInSeconds > 60) {
-                time = `${parseInt(timeInSeconds / 60)} ${lang.minute}`;
+                min = parseInt(timeInSeconds / 60);
+                sec = parseInt(timeInSeconds % 60);
+
+                if(withSeconds) {
+                    time = `${min}:${sec}`;
+                }
+                else {
+                    time = `${parseInt(timeInSeconds / 60)} ${lang.minute}`;
+                }
+            }
+            else {
+                if(!withSeconds) {
+                    time = lang.almostDone;
+                }
             }
 
             return time;
+        },
+
+        _refreshDirectory: function() {
+            console.log(pathArray.join('/'));
+            this._retrieveList(pathArray.join('/'));
+        },
+
+        _existFileInDirectory: function(path, fileName) {
+            var d = $.Deferred();
+            DeviceMaster.fileInfo(path, fileName).then(function(result) {
+                d.resolve(result.error !== DeviceConstants.NOT_EXIST);
+            });
+            return d.promise();
+        },
+
+        _doFileUpload: function(file) {
+            var self = this,
+                reader = new FileReader();
+
+            reader.readAsArrayBuffer(file);
+            reader.onload = function() {
+                var fileInfo = file.name.split('.'),
+                    ext = fileInfo[fileInfo.length - 1],
+                    type,
+                    isValid = false;
+
+                if(ext === 'fc') {
+                    type = {type: 'application/fcode'};
+                    isValid = true;
+                }
+                else if (ext === 'gcode') {
+                    type = {type: 'text/gcode'};
+                    isValid = true;
+                }
+
+                if(isValid) {
+                    var blob = new Blob([reader.result], type);
+                    DeviceMaster.uploadFile(file, blob, pathArray.join('/')).then(function(result) {
+                        console.log('upload result', result);
+                        self._refreshDirectory();
+                    });
+                }
+                else {
+                    AlertActions.showPopupInfo('', lang.extensionNotSupported);
+                }
+            };
         },
 
         _handleClose: function() {
@@ -174,6 +259,20 @@ define([
         _handleYes: function(id) {
             if(id === DeviceConstants.KICK) {
                 DeviceMaster.kick();
+            }
+            else if(id === 'uploadFile') {
+                var info    = fileToBeUpload.name.split('.'),
+                    ext     = info[info.length - 1];
+
+                if(ext === 'gcode') {
+                    AlertActions.showPopupYesNo('confirmGToF', lang.confirmGToF);
+                }
+                else {
+                    this._doFileUpload(fileToBeUpload);
+                }
+            }
+            else if(id === 'confirmGToF') {
+                this._doFileUpload(fileToBeUpload);
             }
         },
 
@@ -213,9 +312,7 @@ define([
         _handleBrowseUpLevel: function() {
             if(pathArray.length === 0) {
                 this.setState({ mode: mode.PREVIEW });
-                DeviceMaster.stop().then(function() {
-                    this._startReport();
-                }.bind(this));
+                this._startReport();
                 return;
             }
             pathArray.pop();
@@ -226,22 +323,24 @@ define([
             var self = this;
             if(history.length > 1) {
                 history.pop();
+                pathArray.pop();
+                temp.pop();
             }
             lastAction = history[history.length - 1];
+
             var actions = {
 
                 'PREVIEW' : function() {
-                    // get file preview image uri
-                    // previewUrl = URL.createObjectURL(self.props.fCode);
+                    self._startReport();
                 },
 
                 'BROWSE_FILE': function() {
-                    pathArray = lastAction.path;
-                    self._retrieveList(pathArray.join('/'));
+                    self._retrieveList(lastAction.path.join('/'));
+                    self._stopReport();
                 },
 
                 'CAMERA': function() {
-
+                    self._stopReport();
                 }
             };
 
@@ -256,21 +355,75 @@ define([
                 var onNeedData = e.target.scrollHeight === e.target.offsetHeight + e.target.scrollTop;
                 if(onNeedData) {
                     start = start + scrollSize;
-                    this._retrieveList(pathArray.join('/'));
+                    this._retrieveList(history[history.length-1].path.join('/'));
                 }
             }
         },
 
-        _handleSelectFile: function(fileName) {
-            this.setState({
-                selectedFileName: fileName,
-                mode: mode.PREVIEW
-            }, function() {
-                this._addHistory();
-            });
+        _handleSelectFile: function(fileName, action) {
+            if(action === DeviceConstants.SELECT) {
+                this.setState({ selectedFileName: fileName});
+            }
+            else {
+                start = 0;
+                DeviceMaster.fileInfo(pathArray.join('/'), fileName).then(function(info) {
+                    if(info[1] instanceof Blob) {
+                        previewUrl = URL.createObjectURL(info[1]);
+                        this.setState({
+                            mode: mode.PREVIEW
+                        }, function() {
+                            this._addHistory();
+                            this._startReport();
+                        });
+                    }
+                    else {
+                        AlertActions.showPopupInfo('', lang.cannotPreview);
+                    }
+
+                }.bind(this));
+            }
         },
 
-        _handleTurnOnCamera: function() {
+        _handleUpload: function(e) {
+            if(e.target.files.length > 0) {
+                fileToBeUpload = e.target.files[0];
+                this._existFileInDirectory(pathArray, fileToBeUpload.name).then(function(exist) {
+                    if(exist) {
+                        AlertActions.showPopupYesNo('uploadFile', lang.fileExistContinue);
+                    }
+                    else {
+                        var info = fileToBeUpload.name.split('.'),
+                            ext  = info[info.length - 1];
+
+                        if(ext === 'gcode') {
+                            AlertActions.showPopupYesNo('confirmGToF', lang.confirmGToF);
+                        }
+                        else {
+                            this._doFileUpload(fileToBeUpload);
+                        }
+                    }
+                }.bind(this));
+                e.target.value = null;
+            }
+        },
+
+        _handleDownload: function() {
+            start = 0;
+            DeviceMaster.fileInfo(pathArray.join('/'), this.state.selectedFileName).then(function(info) {
+                if(info[1] instanceof Blob) {
+                    saveAs(info[1], info[0]);
+                }
+                else {
+                    AlertActions.showPopupInfo('', lang.fileNotDownloadable);
+                }
+            }.bind(this));
+        },
+
+        _handleToggleCamera: function() {
+            if(this.state.mode === mode.CAMERA) {
+                this._handleBack();
+                return;
+            }
             DeviceMaster.startCamera(this._processImage);
             this._stopReport();
             this.setState({
@@ -285,11 +438,20 @@ define([
             this._stopReport();
             if(this.state.currentStatus === DeviceConstants.READY) {
                 var blob = this.props.fCode;
-                this._stopReport();
-                DeviceMaster.go(blob).then(function() {
-                    this._startReport();
-                }.bind(this));
-                this.setState({ currentStatus: DeviceConstants.PRINTING });
+
+                if(blob) {
+                    this.setState({ currentStatus: DeviceConstants.UPLOADING });
+                    DeviceMaster.go(blob).then(function() {
+                        this._getPrintingInfo();
+                    }.bind(this));
+                }
+                else {
+                    DeviceMaster.goFromFile(pathArray, this.state.selectedFileName).then(function(result) {
+                        this._getPrintingInfo();
+                    }.bind(this));
+                }
+                initializing = true;
+
             }
             else {
                 DeviceMaster.resume();
@@ -301,7 +463,7 @@ define([
         },
 
         _handleStop: function() {
-            if(stateId < 0) {
+            if(statusId < 0) {
                 AlertActions.showPopupYesNo('KICK', lang.forceStop);
             }
             else {
@@ -336,7 +498,9 @@ define([
             mainError       = '';
             subError        = '';
             status          = report.st_label;
-            stateId         = report.st_id;
+            statusId        = report.st_id;
+
+            rootMode = statusId === DeviceConstants.status.IDLE ? DeviceConstants.IDLE : DeviceConstants.RUNNING;
 
             if(report.error) {
                 if(typeof(report.error) === 'string') {
@@ -348,15 +512,24 @@ define([
                 }
             }
 
-            // console.log('status: ' + status, 'main: ' + mainError, 'sub: ' + subError);
+            // clear compelted first
+            if(statusId === DeviceConstants.status.COMPLETED) {
+                DeviceMaster.quit();
+                return;
+            }
+            else if(statusId === DeviceConstants.status.RUNNING) {
+                initializing = false;
+            }
 
             // check for error
             if(report.error && this._isError(status)) {
-                if(lastError !== mainError) {
-                    AlertActions.showPopupError(_id, mainError + '\n' + subError);
-                    lastError = mainError;
-                    showingPopup = true;
-                    messageViewed = false;
+                if(lastError !== mainError && statusId !== DeviceConstants.status.ABORTED && !initializing) {
+                    if(mainError !== 'USER_OPERATION') {
+                        AlertActions.showPopupError(_id, mainError + '\n' + subError);
+                        lastError = mainError;
+                        showingPopup = true;
+                        messageViewed = false;
+                    }
                 }
             }
             else if(status === DeviceConstants.PAUSED || status === DeviceConstants.PAUSING) {
@@ -388,7 +561,7 @@ define([
             else if (lastError === DeviceConstants.UNKNOWN_ERROR) {
                 DeviceMaster.quit();
             }
-            else if(status === DeviceConstants.ABORTED || status === DeviceConstants.COMPLETED) {
+            else if(statusId === DeviceConstants.status.COMPLETED || statusId === DeviceConstants.status.ABORTED) {
                 DeviceMaster.quit();
                 status = DeviceConstants.READY;
             }
@@ -401,10 +574,10 @@ define([
                 AlertActions.closePopup();
             }
 
-            if(report.prog) {
-                progress = parseInt(report.prog * 100);
+            if(report.prog && !!totalTimeInSeconds) {
+                percentageDone = parseInt(report.prog * 100);
                 timeLeft = this._formatTime(totalTimeInSeconds * (1 - report.prog));
-                progress = `${progress}%, ${timeLeft} ${lang.left}`;
+                progress = `${percentageDone}%, ${timeLeft} ${lang.left}`;
             }
             else {
                 progress = '';
@@ -413,11 +586,17 @@ define([
             if(report.rt) {
                 temperature = `${lang.temperature} ${report.rt} °C`;
             }
+            else {
+                temperature = '';
+            }
 
             if(report.module) {
                 if(report.module === DeviceConstants.EXTRUDER) {
                     headInfo = DeviceConstants.PRINTER;
                 }
+            }
+            else {
+                headInfo = '';
             }
 
             this.setState({
@@ -454,12 +633,14 @@ define([
 
             DeviceMaster.ls(path).then(function(result) {
                 if(result.error) {
-                    AlertActions.showPopupError(result.error);
-                    result.directories = [];
-                    self.setState({
-                        directoryContent: result,
-                        waiting: false
-                    });
+                    if(result.error !== DeviceConstants.NOT_EXIST) {
+                        AlertActions.showPopupError(result.error);
+                        result.directories = [];
+                        self.setState({
+                            directoryContent: result,
+                            waiting: false
+                        });
+                    }
                 }
                 currentLevelFiles = result.files;
                 self._retrieveFileInfo(path).then(function(info) {
@@ -501,8 +682,8 @@ define([
                 DeviceMaster.fileInfo(path, currentLevelFiles[startIndex], opts).then(function(r) {
                     if(!r.error) {
                         returnArray.push(r);
-                        return self._iterateFileInfo(path, startIndex + 1, endIndex, returnArray, callback);
                     }
+                    return self._iterateFileInfo(path, startIndex + 1, endIndex, returnArray, callback);
                 });
             }
             else {
@@ -521,7 +702,7 @@ define([
 
             folders = content.directories.map(function(item) {
                 return (
-                    <div className="folder" onClick={this._handleSelectFolder.bind(this, item)}>
+                    <div className="folder" onDoubleClick={this._handleSelectFolder.bind(this, item)}>
                         <div className="name">{item}</div>
                     </div>
                 );
@@ -532,11 +713,17 @@ define([
                     fileNameClass = ClassNames('name', {'selected': self.state.selectedFileName === item[0]});
 
                 return (
-                    <div title={item[0]} className="file" onClick={self._handleSelectFile.bind(null, item[0])}>
+                    <div
+                        title={item[0]}
+                        className="file"
+                        onClick={self._handleSelectFile.bind(null, item[0], DeviceConstants.SELECT)}
+                        onDoubleClick={self._handleSelectFile.bind(null, item[0], DeviceConstants.PREVIEW)}>
                         <div className="image-wrapper">
                             <img src={imgSrc} />
                         </div>
-                        <div className={fileNameClass}>{item[0]}</div>
+                        <div className={fileNameClass}>
+                            {item[0].length > fileNameLength ? item[0].substring(0, fileNameLength) + '...' : item[0]}
+                        </div>
                     </div>
                 );
             });
@@ -574,7 +761,7 @@ define([
                 case mode.PREVIEW:
                     var divStyle = {
                             backgroundColor: '#E0E0E0',
-                            backgroundImage: !this.state.previewUrl ? '' : 'url(' + this.state.previewUrl + ')',
+                            backgroundImage: !previewUrl ? '' : 'url(' + previewUrl + ')',
                             backgroundSize: 'cover',
                             backgroundPosition: '50% 50%',
                             width: '100%',
@@ -603,22 +790,52 @@ define([
                 wait,
                 go,
                 pause,
+                stop,
                 commands,
-                action;
+                action,
+                cameraClass,
+                cameraDescriptionClass,
+                upload,
+                download,
+                leftButton,
+                middleButton;
 
-            // console.log('current status is', this.state.currentStatus);
+            cameraClass = ClassNames('btn-camera btn-control', { 'on': this.state.mode === mode.CAMERA });
+            cameraDescriptionClass = ClassNames('description', { 'on': this.state.mode === mode.CAMERA });
 
             go = (
-                <div className="controls center go-btn" onClick={self._handleGo}>
-                    <div className="icon"><i className="fa fa-play fa-2x"></i></div>
+                <div className="controls center" onClick={self._handleGo}>
+                    <div className="btn-go btn-control"></div>
                     <div className="description">{lang.go}</div>
                 </div>
             );
 
             pause = (
                 <div className="controls center" onClick={self._handlePause}>
-                    <div className="icon"><i className="fa fa-pause fa-2x"></i></div>
+                    <div className="btn-pause btn-control"></div>
                     <div className="description">{lang.pause}</div>
+                </div>
+            );
+
+            stop = (
+                <div className="controls left" onClick={this._handleStop}>
+                    <div className="btn-stop btn-control"></div>
+                    <div className="description">{lang.stop}</div>
+                </div>
+            );
+
+            upload = (
+                <div className="controls left" onClick={this._handleUpload}>
+                    <div className="btn-upload btn-control"></div>
+                    <input className="upload-control" type="file" accept=".fc, .gcode" onChange={this._handleUpload} />
+                    <div className="description">{lang.upload}</div>
+                </div>
+            );
+
+            download = (
+                <div className="controls center" onClick={this._handleDownload}>
+                    <div className="btn-download btn-control"></div>
+                    <div className="description">{lang.download}</div>
                 </div>
             );
 
@@ -642,32 +859,85 @@ define([
 
             action = !!commands[this.state.currentStatus] ? commands[this.state.currentStatus]() : '';
 
+            if(!this.props.fCode && !this.state.selectedFileName) {
+                action = '';
+            }
+
+            leftButton = this.state.mode === mode.BROWSE_FILE ? upload : stop;
+            middleButton = this.state.mode === mode.BROWSE_FILE ? download : action;
+
             operation = (
                 <div className="operation">
-                    <div className="controls left" onClick={this._handleStop}>
-                        <div className="icon"><i className="fa fa-stop fa-2x"></i></div>
-                        <div className="description">{lang.stop}</div>
-                    </div>
-                    {action}
-                    <div className="controls right">
-                        <div className="icon"><i className="fa fa-circle fa-2x"></i></div>
-                        <div className="description">{lang.record}</div>
+                    {leftButton}
+                    {middleButton}
+                    <div className="controls right" onClick={this._handleToggleCamera}>
+                        <div className={cameraClass}></div>
+                        <div className={cameraDescriptionClass}>{lang.camera}</div>
                     </div>
                 </div>
             );
 
             wait = (<div className="wait">{lang.connecting}</div>);
 
-            return operation;// this.props.controllerStatus === DeviceConstants.CONNECTED ? operation : wait;
+            return operation;
+        },
+
+        _renderPrintingInfo: function() {
+            var _headInfo   = this.state.headInfo,
+                _duration   = totalTimeInSeconds === 0 ? '' : this._formatTime(totalTimeInSeconds, true),
+                _progress   = percentageDone === 0 ? '' : percentageDone + '%',
+                infoClass   = ClassNames('status-info', { 'running': statusId !== DeviceConstants.status.IDLE });
+
+            if(statusId === DeviceConstants.status.IDLE) {
+                _headInfo = '';
+                _duration = '';
+                _progress = '';
+            }
+
+            return (
+                <div className={infoClass}>
+                    <div className="verticle-align">
+                        <div>{_headInfo}</div>
+                        <div className="status-info-duration">{_duration}</div>
+                    </div>
+                    <div className="status-info-progress">{_progress}</div>
+                </div>
+            );
+        },
+
+        _renderNavigation: function() {
+            if(history.length > 1) {
+                return (
+                   <div className="back" onClick={this._handleBack}>
+                       <i className="fa fa-angle-left"></i>
+                   </div>
+               );
+            }
+            if(this.state.mode === mode.BROWSE_FILE) {
+                return (
+                   <div className="back" onClick={this._handleBack}>
+                       <i className="fa fa-angle-left"></i>
+                   </div>
+               );
+            }
+            else {
+                return (
+                    <div className="back" onClick={this._handleBrowseFile}>
+                        <img src="../../img/folder.svg" />
+                    </div>
+                );
+            }
         },
 
         render: function() {
 
-            var name        = DeviceMaster.getSelectedDevice().name,
-                content     = this._renderContent(),
-                waitIcon    = this.state.waiting ? this._renderSpinner() : '',
-                operation   = this._renderOperation(),
-                subClass    = ClassNames('sub', {'hide': false });
+            var name            = DeviceMaster.getSelectedDevice().name,
+                content         = this._renderContent(),
+                waitIcon        = this.state.waiting ? this._renderSpinner() : '',
+                operation       = this._renderOperation(),
+                navigation      = this._renderNavigation(),
+                subClass        = ClassNames('sub', { 'hide': false }),
+                printingInfo    = this.state.mode === mode.BROWSE_FILE ? '' : this._renderPrintingInfo();
 
             return (
                 <div className="flux-monitor">
@@ -678,17 +948,17 @@ define([
                                 <div className="close" onClick={this._handleClose}>
                                     <div className="x"></div>
                                 </div>
-                                <div className="back" onClick={this._handleBack}>
-                                    <i className="fa fa-angle-left"></i>
-                                </div>
+                                {navigation}
                             </div>
                         </div>
                         <div className="body">
-                            <div className="content" onScroll={this._handleScroll}>
+                            <div className="device-content" onScroll={this._handleScroll}>
                                 {/*<div className="close"></div>*/}
                                 {content}
                                 {waitIcon}
+                                {printingInfo}
                             </div>
+
                         </div>
                         {operation}
                     </div>
@@ -707,11 +977,15 @@ define([
                                 <div className="time-left right">{this.state.progress}</div>
                             </div>
                         </div>
-                        <div className="actions center">
-                            <a className="btn filament">{lang.change_filament}</a>
-                            <a className="btn file" onClick={this._handleBrowseFile}>{lang.browse_file}</a>
-                            <a className="btn monitor" onClick={this._handleTurnOnCamera}>{lang.monitor}</a>
-                        </div>
+                        {
+                            /*
+                            <div className="actions center">
+                                <a className="btn filament">{lang.change_filament}</a>
+                                <a className="btn file" onClick={this._handleBrowseFile}>{lang.browse_file}</a>
+                                <a className="btn monitor" onClick={this._handleToggleCamera}>{lang.monitor}</a>
+                            </div>
+                            */
+                        }
                     </div>
                 </div>
             );

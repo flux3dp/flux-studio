@@ -85,7 +85,7 @@ define([
                         </p>
                         <label className="accordion-body">
                             <div className="control">
-                                <button className="btn btn-action btn-merge" onClick={this._onManualMerge}>
+                                <button className="btn btn-action btn-merge" data-ga-event="manual-merge" onClick={this._onManualMerge}>
                                     <img src="/img/icon-merge.png"/>
                                     {lang.scan.manipulation.manual_merge}
                                 </button>
@@ -131,13 +131,13 @@ define([
                         </p>
                         <label className="accordion-body">
                             <div className="control">
-                                <button className={cx(cropClass)} onClick={this._onCrop}>
+                                <button className={cx(cropClass)} data-ga-event="crop" onClick={this._onCrop}>
                                     <img src="/img/icon-crop.png"/>
                                     {lang.scan.manipulation.crop}
                                 </button>
                             </div>
                             <div className="control">
-                                <button className="btn btn-action btn-denoise" onClick={this._onClearNoise}>
+                                <button className="btn btn-action btn-denoise" data-ga-event="denoise" onClick={this._onClearNoise}>
                                     <img src="/img/icon-denoise.png"/>
                                     {lang.scan.manipulation.clear_noise}
                                 </button>

@@ -1,11 +1,26 @@
 /**
  * initialize machine helper
  */
-define(['helpers/api/config', 'helpers/local-storage'], function(config, localStorage) {
+define([
+    'helpers/api/config',
+    'helpers/nwjs/menu-factory',
+    'helpers/local-storage'
+], function(
+    config,
+    menuFactory,
+    localStorage
+) {
     'use strict';
 
     var methods = {
+        reset: function(callback) {
+            callback = ('function' === typeof callback ? callback : function() {});
+            config().write('printer-is-ready', false);
+            callback();
+        },
         completeSettingUp: function(redirect) {
+            var completed = methods.hasBeenCompleted();
+
             redirect = ('boolean' === typeof redirect ? redirect : true);
 
             config().write('printer-is-ready', true, {
@@ -17,6 +32,10 @@ define(['helpers/api/config', 'helpers/local-storage'], function(config, localSt
                     methods.settingPrinter.clear();
                     methods.settingWifi.clear();
 
+                    if (false === completed && 'undefined' !== typeof menuFactory) {
+                        menuFactory.methods.refresh();
+                    }
+
                     if (true === redirect) {
                         location.hash = '#studio/print/';
                     }
@@ -24,7 +43,7 @@ define(['helpers/api/config', 'helpers/local-storage'], function(config, localSt
             });
         },
         hasBeenCompleted: function() {
-            return config().read('printer-is-ready') || false;
+            return ('true' === config().read('printer-is-ready') ? true : false);
         },
         settingPrinter: {
             get: function() {
@@ -74,13 +93,24 @@ define(['helpers/api/config', 'helpers/local-storage'], function(config, localSt
         },
         settingWifi: {
             get: function() {
-                return localStorage.get('setting-wifi');
+                return localStorage.get('setting-wifi') || {};
             },
             set: function(wifi) {
                 localStorage.set('setting-wifi', wifi);
             },
             clear: function() {
                 localStorage.removeAt('setting-wifi');
+            }
+        },
+        defaultPrinter: {
+            set: function(printer) {
+                config().write('default-printer', JSON.stringify(printer));
+            },
+            get: function() {
+                return config().read('default-printer') || {};
+            },
+            clear: function() {
+                localStorage.removeAt('default-printer');
             }
         }
     };

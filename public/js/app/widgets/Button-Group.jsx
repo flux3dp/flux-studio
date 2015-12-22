@@ -12,11 +12,19 @@ define(['react'], function(React){
 
         render: function() {
             var className,
-                buttons = this.props.buttons.map(function(opt, i) {
+                props = this.props,
+                buttons = props.buttons.map(function(opt, i) {
                     className = 'btn';
                     opt.type = opt.type || 'button';
 
-                    var content = '';
+                    var content = '',
+                        attrs = {};
+
+                    for (var key in opt.dataAttrs) {
+                        if (false === attrs.hasOwnProperty(key)) {
+                            attrs['data-' + key] = opt.dataAttrs[key];
+                        }
+                    }
 
                     if ('string' === typeof opt.className && '' !== opt.className) {
                         className += ' ' + opt.className;
@@ -27,12 +35,12 @@ define(['react'], function(React){
 
                     if ('link' === opt.type) {
                         content = (
-                            <a className={className} href={opt.href} onClick={opt.onClick}>{opt.label}</a>
+                            <a className={className} href={opt.href} {...attrs} onClick={opt.onClick}>{opt.label}</a>
                         );
                     }
                     else {
                         content = (
-                            <button title={opt.title} className={className} type={opt.type || 'button'} onClick={opt.onClick}>{opt.label}</button>
+                            <button title={opt.title} className={className} {...attrs} type={opt.type || 'button'} onClick={opt.onClick}>{opt.label}</button>
                         );
                     }
 

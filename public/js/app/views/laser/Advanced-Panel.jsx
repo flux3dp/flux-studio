@@ -25,32 +25,50 @@ define([
                     default: [{
                         label: lang.load_preset,
                         className: 'pull-left btn-default',
+                        dataAttrs: {
+                            'ga-event': 'load-laser-preset'
+                        },
                         onClick: this._onLoadPreset
                     },
                     {
                         label: lang.save_as_preset,
                         className: 'pull-left btn-default' + (true === this.state.materialHasChanged ? '' : ' btn-disabled'),
+                        dataAttrs: {
+                            'ga-event': 'save-as-preset'
+                        },
                         onClick: this._onSaveStarting
                     },
                     {
                         label: lang.cancel,
                         className: 'pull-right btn-default btn-cancel',
+                        dataAttrs: {
+                            'ga-event': 'cancel-current-preset'
+                        },
                         onClick: this._onCancel
                     },
                     {
                         label: lang.apply,
                         className: 'pull-right btn-default',
+                        dataAttrs: {
+                            'ga-event': 'apply-laser-preset'
+                        },
                         onClick: this._onApply
                     }],
                     save: [{
                         label: lang.save_and_apply,
-                        onClick: self._onSaveAndApply
+                        onClick: self._onSaveAndApply,
+                        dataAttrs: {
+                            'ga-event': 'save-and-apply-laser-preset'
+                        },
                     },
                     {
                         label: lang.cancel,
                         onClick: function() {
                             self._openSaveForm(false);
-                        }
+                        },
+                        dataAttrs: {
+                            'ga-event': 'cancel-save-laser-preset'
+                        },
                     }]
                 };
 

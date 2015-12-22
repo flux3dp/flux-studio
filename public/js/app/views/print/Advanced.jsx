@@ -5,12 +5,26 @@ define([
     'jsx!widgets/Dropdown-Control',
     'jsx!widgets/Switch-Control',
     'jsx!widgets/Radio-Control',
+    'jsx!widgets/Modal',
+    'app/actions/input-lightbox-actions',
     'plugins/classnames/index',
     'helpers/api/config',
     'helpers/object-assign'
-], function($, React, SliderControl, DropdownControl, SwitchControl, RadioControl, ClassNames, Config) {
+], function(
+    $,
+    React,
+    SliderControl,
+    DropdownControl,
+    SwitchControl,
+    RadioControl,
+    Modal,
+    InputLightboxActions,
+    ClassNames,
+    Config
+) {
+    'use strict';
 
-var mode = {
+    var mode = {
             'setup'     : 1,
             'load'      : 2,
             'save'      : 3
@@ -50,7 +64,7 @@ var mode = {
             support_material                    : 1,
             support_material_spacing            : 2,
             support_material_threshold          : 55,
-            support_material_pattern            : 'auto',
+            support_material_pattern            : 'rectilinear-grid',
             support_material_contact_distance   : 0.2,
             raft_layers                         : 4,
             raft                                : 4,
@@ -72,10 +86,11 @@ var mode = {
     return React.createClass({
 
         propTypes: {
-            lang: React.PropTypes.object,
-            setting: React.PropTypes.object,
-            onClose: React.PropTypes.func,
-            onApply: React.PropTypes.func
+            lang            : React.PropTypes.object,
+            setting         : React.PropTypes.object,
+            onValueChange   : React.PropTypes.func,
+            onClose         : React.PropTypes.func,
+            onApply         : React.PropTypes.funcs
         },
 
         getInitialState: function() {
@@ -163,12 +178,12 @@ var mode = {
             });
         },
 
-        _savePreset: function(presets) {
+        _savePreset: function(presetName, presets) {
             var self = this,
-                name = this.refs.presetName.getDOMNode().value;
                 p = presets === '' ? {} : presets;
 
-            p[name] = JSON.stringify(advancedSetting);
+            p[presetName] = JSON.stringify(advancedSetting);
+
             Config().write('preset-settings', JSON.stringify(p), {
                 onFinished: function() {
                     self._handleBackToSetting();
@@ -262,12 +277,19 @@ var mode = {
 
         _handleOpenSaveAsPreset: function() {
             this.setState({ mode: mode.save });
+
+            InputLightboxActions.open('save-print-preset', {
+                caption      : lang.saveAsPreset,
+                inputHeader  : lang.name,
+                confirmText  : lang.saveAndApply,
+                onSubmit     : this._handleSavePreset
+            });
         },
 
-        _handleSavePreset: function() {
+        _handleSavePreset: function(presetName) {
             var self = this;
             this._getPresets(function(presets) {
-                self._savePreset(presets);
+                self._savePreset(presetName, presets);
             });
         },
 
@@ -284,13 +306,18 @@ var mode = {
             if(id === 'raft_layers') {
                 advancedSetting.raft = value;
             }
+            else if (id === 'layer_height') {
+                this.props.onValueChange(id, value);
+            }
         },
 
         _handleApplyPreset: function() {
             var p = this.state.presets[this.state.selectedPreset];
             advancedSetting = JSON.parse(p);
-            this._updateCustomField();
-            this._handleBackToSetting();
+            this.setState({ custom: advancedSetting.custom }, function() {
+                this._updateCustomField();
+                this._handleBackToSetting();
+            });
         },
 
         _handleApply: function(showAdvancedSetting) {
@@ -304,6 +331,21 @@ var mode = {
             if(!showAdvancedSetting) {
                 this.props.onClose();
             }
+        },
+
+        _handleDeletePreset: function(e) {
+            var self = this,
+                presets = this.state.presets;
+
+            delete presets[this.state.selectedPreset];
+
+            self.setState({
+                presets: presets,
+                selectedPreset: Object.keys(presets)[0]
+            });
+
+            Config().write('preset-settings', JSON.stringify(presets));
+            console.log(presets);
         },
 
         _handleCloseAdvancedSetting: function(e) {
@@ -464,7 +506,7 @@ var mode = {
                         <DropdownControl
                             id="fill_pattern"
                             label={lang.pattern}
-                            options={[lang.auto, lang.line, lang.rectilinear, lang.honeycomb]}
+                            options={[lang.rectilinear, lang.line, lang.rectilinear, lang.honeycomb]}
                             default={advancedSetting.fill_pattern}
                             onChange={this._handleControlValueChange} />
 
@@ -521,7 +563,7 @@ var mode = {
                         <DropdownControl
                             id="support_material_pattern"
                             label={lang.pattern}
-                            options={[lang.auto, lang.line, lang.rectilinear, lang.honeycomb]}
+                            options={[lang.rectilinearGrid, lang.line, lang.rectilinear, lang.honeycomb]}
                             default={advancedSetting.support_material_pattern}
                             onChange={this._handleControlValueChange} />
 
@@ -713,29 +755,24 @@ var mode = {
         },
 
         _renderFooter: function() {
-            var button1, button2, button3;
+            var buttons = [];
 
             switch(this.state.mode) {
 
                 case mode.setup:
-                    button1 = (<a className="btn" onClick={this._handleLoadPreset}>{lang.loadPreset}</a>);
-                    button2 = (<a className="btn" onClick={this._handleApply.bind(null, false)}>{lang.apply}</a>);
-                    button3 = (<a className="btn" onClick={this._handleOpenSaveAsPreset}>{lang.saveAsPreset}</a>);
-                    button4 = (<a className="btn" onClick={this._handleCloseAdvancedSetting}>{lang.cancel}</a>);
+                    buttons[0] = (<button className="btn btn-default" data-ga-event="load-preset" onClick={this._handleLoadPreset}>{lang.loadPreset}</button>);
+                    buttons[1] = (<button className="btn btn-default" data-ga-event="apply-preset" onClick={this._handleApply.bind(null, false)}>{lang.apply}</button>);
+                    buttons[2] = (<button className="btn btn-default" data-ga-event="save-preset" onClick={this._handleOpenSaveAsPreset}>{lang.saveAsPreset}</button>);
+                    buttons[3] = (<button className="btn btn-default" data-ga-event="cancel-preset" onClick={this._handleCloseAdvancedSetting}>{lang.cancel}</button>);
                     break;
 
                 case mode.load:
-                    button1 = '';
-                    button2 = (<a className="btn" onClick={this._handleApplyPreset}>{lang.apply}</a>);
-                    button3 = (<a className="btn" onClick={this._handleBackToSetting}>{lang.cancel}</a>);
-                    button4 = '';
+                    buttons[0] = (<button className="btn btn-default" data-ga-event="delete-preset" onClick={this._handleDeletePreset}>{lang.delete}</button>);
+                    buttons[1] = (<button className="btn btn-default" data-ga-event="apply-preset" onClick={this._handleApplyPreset}>{lang.apply}</button>);
+                    buttons[2] = '';
+                    buttons[3] = (<button className="btn btn-default" data-ga-event="back-to-preset-setting" onClick={this._handleBackToSetting}>{lang.cancel}</button>);
                     break;
 
-                case mode.save:
-                    button1 = '';
-                    button2 = (<a className="btn" onClick={this._handleSavePreset}>{lang.saveAndApply}</a>);
-                    button3 = (<a className="btn" onClick={this._handleBackToSetting}>{lang.cancel}</a>);
-                    button4 = '';
                 default:
                     break;
 
@@ -745,13 +782,13 @@ var mode = {
                 <div className="footer">
 
                     <div className="left">
-                        {button1}
-                        {button3}
+                        {buttons[0]}
+                        {buttons[2]}
                     </div>
 
                     <div className="right">
-                        {button2}
-                        {button4}
+                        {buttons[1]}
+                        {buttons[3]}
                     </div>
 
                 </div>
@@ -788,8 +825,8 @@ var mode = {
                 );
             });
 
-            var preset = this.state.presets[this.state.selectedPreset] || '{}',
-                presetContent = this._JSONToKeyValue(JSON.parse(preset));
+            var preset = this.state.presets[this.state.selectedPreset] || '{}';
+                presetContent = JSON.parse(preset);
 
             return (
                 <div id="advanced-panel" className="advanced-panel">
@@ -798,7 +835,7 @@ var mode = {
                         <div className="preset-list">
                             {entries}
                         </div>
-                        <textarea className="preset-content" value={presetContent} disabled />
+                        <textarea className="preset-content" value={presetContent.custom} disabled />
                         {footer}
                     </div>
                 </div>
@@ -828,6 +865,10 @@ var mode = {
 
         render: function() {
             var self = this,
+                cx = React.addons.classSet,
+                className = {
+                    'hide': (this.state.mode === mode.save)
+                },
                 UI;
 
             switch(this.state.mode) {
@@ -838,13 +879,10 @@ var mode = {
                 case mode.load:
                     UI = self._renderLoadPresetUI(); break;
 
-                case mode.save:
-                    UI = self._renderSavePresetUI(); break;
-
                 default: break;
             }
 
-            return UI;
+            return <Modal className={className} content={UI} onClose={this._handleCloseAdvancedSetting}/>;
         }
 
     });

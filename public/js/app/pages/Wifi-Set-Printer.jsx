@@ -33,12 +33,15 @@ define([
                     onError     = function(response) {
                         // TODO: show error message
                     },
+                    goNext = function() {
+                        self.state.settingPrinter.name = name;
+                        initializeMachine.settingPrinter.set(self.state.settingPrinter);
+                        location.hash = '#initialize/wifi/select';
+                    },
                     setPassword = function(password) {
                         setMachine.password(password, {
                             onSuccess: function(response) {
-                                self.state.settingPrinter.name = name;
-                                initializeMachine.settingPrinter.set(self.state.settingPrinter);
-                                location.hash = '#initialize/wifi/select';
+                                goNext();
                             }
                         });
                     },
@@ -51,6 +54,9 @@ define([
                             onSuccess: function(response) {
                                 if ('' !== password) {
                                     setPassword(password);
+                                }
+                                else {
+                                    goNext();
                                 }
                             }
                         });
@@ -90,10 +96,16 @@ define([
                     buttons = [{
                         label: lang.initialize.confirm,
                         className: 'btn-action',
+                        dataAttrs: {
+                            'ga-event': 'confirm'
+                        },
                         onClick: self.state.alertContent.onClick
                     },
                     {
                         label: lang.initialize.cancel,
+                        dataAttrs: {
+                            'ga-event': 'cancel'
+                        },
                         onClick: function(e) {
                             self.setState({
                                 openAlert: false
@@ -138,7 +150,6 @@ define([
 
                         <form className="form h-form">
                             <h1 className="headline">{lang.initialize.name_your_flux}</h1>
-                            <p>{lang.initialize.why_need_name}</p>
 
                             <div className="controls">
                                 <p className="control">
@@ -159,10 +170,10 @@ define([
                                 </p>
                             </div>
                             <div className="btn-v-group">
-                                <button className="btn btn-action btn-large" onClick={this._handleSetPrinter} autoFocus={true}>
+                                <button className="btn btn-action btn-large" data-ga-event="next" onClick={this._handleSetPrinter} autoFocus={true}>
                                     {lang.initialize.next}
                                 </button>
-                                <a href="#initialize/wifi/setup-complete/with-usb" className="btn btn-link btn-large">
+                                <a href="#initialize/wifi/setup-complete/with-usb" data-ga-event="skip" className="btn btn-link btn-large">
                                     {lang.initialize.skip}
                                 </a>
                             </div>

@@ -9,7 +9,8 @@ define([
 
     var acceptableTypes = [
             Constants.TYPE_TEXT,
-            Constants.TYPE_NUMBER
+            Constants.TYPE_NUMBER,
+            Constants.TYPE_PASSWORD
         ],
         View = React.createClass({
 
@@ -54,11 +55,17 @@ define([
 
                 buttons.push({
                     label: lang.alert.cancel,
+                    dataAttrs: {
+                        'ga-event': 'cancel'
+                    },
                     onClick: this._onClose
                 });
 
                 buttons.push({
                     label: this.props.confirmText || lang.alert.confirm,
+                    dataAttrs: {
+                        'ga-event': 'confirm'
+                    },
                     onClick: this._onSubmit
                 });
 
@@ -71,6 +78,7 @@ define([
 
                 typeMap[Constants.TYPE_TEXT] = 'text';
                 typeMap[Constants.TYPE_NUMBER] = 'number';
+                typeMap[Constants.TYPE_PASSWORD] = 'password';
 
                 if ('string' === typeof typeMap[this.props.type]) {
                     type = typeMap[this.props.type];
@@ -79,7 +87,7 @@ define([
                 return (
                     <label className="control">
                         <span className="inputHeader">{this.props.inputHeader}</span>
-                        <input type={type} ref="inputField" defaultValue={this.props.defaultValue}/>
+                        <input type={type} ref="inputField" defaultValue={this.props.defaultValue} autoFocus={true}/>
                     </label>
                 );
             },

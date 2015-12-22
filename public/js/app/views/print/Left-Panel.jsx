@@ -11,7 +11,16 @@ define([
 
     var lang,
         settings,
+        quality,
+        layerHeight,
+        defaultQuality = 'high',
         constants;
+
+    quality = {
+        high: 0.1,
+        med: 0.2,
+        low: 0.3
+    };
 
     settings = {
         raftOn: true,
@@ -34,12 +43,14 @@ define([
             hasObject                   : React.PropTypes.bool,
             hasOutOfBoundsObject        : React.PropTypes.bool,
             previewLayerCount           : React.PropTypes.number,
+            raftLayers                  : React.PropTypes.number,
             onQualitySelected           : React.PropTypes.func,
             onRaftClick                 : React.PropTypes.func,
             onSupportClick              : React.PropTypes.func,
             onPreviewClick              : React.PropTypes.func,
             onPreviewLayerChange        : React.PropTypes.func,
-            onShowAdvancedSettingPanel  : React.PropTypes.func
+            onShowAdvancedSettingPanel  : React.PropTypes.func,
+            onValueChange               : React.PropTypes.func
         },
 
         getInitialState: function() {
@@ -52,7 +63,7 @@ define([
                 previewOn           : false,
                 previewCurrentLayer : 0,
                 previewLayerCount   : this.props.previewLayerCount,
-                quality             : 'HIGH QUALITY',
+                quality             : this.props.lang.print.quality[defaultQuality],
                 color               : 'WHITE'
             };
         },
@@ -60,6 +71,10 @@ define([
         componentWillMount: function() {
             lang = this.props.lang.print.left_panel;
             lang.quality = this.props.lang.print.quality;
+        },
+
+        componentDidMount: function() {
+            layerHeight = quality[defaultQuality];
         },
 
         componentWillReceiveProps: function(nextProps) {
@@ -73,9 +88,14 @@ define([
                 });
             }
 
-            // if(!nextProps.hasObject || nextProps.hasOutOfBoundsObject) {
-            //     this._closePreview();
-            // }
+            if(nextProps.layerHeight !== layerHeight) {
+                var _quality = {
+                    '0.1': lang.quality.high,
+                    '0.2': lang.quality.med,
+                    '0.3': lang.quality.low
+                };
+                this.setState({ quality: _quality[nextProps.layerHeight.toString()] || lang.quality.custom });
+            }
         },
 
         _closePopup: function() {
@@ -90,9 +110,9 @@ define([
         _handleActions: function(source, arg, e) {
             var self = this,
                 actions = {
-
                     'QUALITY': function() {
-                        self.props.onQualitySelected(arg);
+                        layerHeight = quality[arg];
+                        self.props.onQualitySelected(quality[arg]);
                         self.setState({ quality: lang.quality[arg] });
                         $('.dialog-opener').prop('checked', false);
                     },

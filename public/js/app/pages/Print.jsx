@@ -92,7 +92,7 @@ define([
                     if(!_setting) {
                         advancedSettings = {};
                         advancedSettings.raft_layers = 4;
-                        advancedSettings.support_material = 1;
+                        advancedSettings.support_material = 0;
                         advancedSettings.custom = AppSettings.custom;
                         tutorialMode = true;
                     }
@@ -101,7 +101,6 @@ define([
                     }
 
                     return ({
-                        showPreviewModeList         : false,
                         showAdvancedSettings        : false,
                         modelSelected               : null,
                         openPrinterSelectorWindow   : false,
@@ -112,7 +111,8 @@ define([
                         hasOutOfBoundsObject        : false,
                         hasObject                   : false,
                         tutorialOn                  : false,
-                        currentTutorialStep            : 0,
+                        currentTutorialStep         : 0,
+                        layerHeight                 : 0.1,
                         raftOn                      : advancedSettings.raft_layers !== 0,
                         supportOn                   : advancedSettings.support_material === 1,
                         previewLayerCount           : 0,
@@ -139,12 +139,25 @@ define([
                     nwjsMenu.import.onClick = function() { $importBtn.click(); };
                     nwjsMenu.saveGCode.onClick = this._handleDownloadGCode;
 
+                    this._registerKeyEvents();
+                    this._registerTutorial();
+                },
+
+                _registerKeyEvents: function() {
                     $(document).keydown(function(e) {
-                        if(e.metaKey && e.keyCode === 8 || e.keyCode === 46) {
+                        // delete event
+                        if(e.metaKey && e.keyCode === 8 || e.keyCode === 46 || e.keyCode === 8) {
                             director.removeSelected();
                         }
-                    });
 
+                        // copy event
+                        if(e.metaKey && e.keyCode === 68) {
+                            director.duplicateSelected();
+                        }
+                    });
+                },
+
+                _registerTutorial: function() {
                     if(tutorialMode) {
                         tourGuide = [
                             {
@@ -166,6 +179,7 @@ define([
                         ];
                         AlertActions.showPopupYesNo('tour', 'Want a tour?');
                         AlertStore.onYes(this._handleTakeTutorial);
+                        AlertStore.onCancel(this._handleCancelTutorial);
                     }
                 },
 
@@ -173,6 +187,13 @@ define([
                     if(answer === 'tour') {
                         this.setState({ tutorialOn: true });
                         tutorialMode = true;
+                    }
+                },
+
+                _handleCancelTutorial: function(answer) {
+                    if(answer === 'tour') {
+                        this.setState({ tutorialOn: false });
+                        tutorialMode = false;
                     }
                 },
 
@@ -341,14 +362,15 @@ define([
                     }
                 },
 
-                _handleQualitySelected: function(level) {
-                    var quality = {
-                        high: 0.1,
-                        med: 0.2,
-                        low: 0.3
-                    };
-                    director.setParameter('layer_height', quality[level]);
-                    advancedSettings.layer_height = quality[level];
+                _handleAdvancedValueChange: function(key, value) {
+                    if(key === 'layer_height') {
+                        this.setState({ layerHeight: value });
+                    }
+                },
+
+                _handleQualitySelected: function(layerHeight) {
+                    director.setParameter('layer_height', layerHeight);
+                    advancedSettings.layer_height = layerHeight;
                 },
 
                 _handleTutorialStep: function() {
@@ -387,16 +409,13 @@ define([
                 },
 
                 _renderAdvancedPanel: function() {
-                    var content = (
-                        <AdvancedPanel
-                            lang        = {lang}
-                            setting     = {advancedSettings}
-                            onClose     = {this._handleCloseAdvancedSetting}
-                            onApply     = {this._handleApplyAdvancedSetting} />
-                    );
-
                     return (
-                        <Modal content={content} onClose={this._handleCloseAdvancedSetting}/>
+                        <AdvancedPanel
+                            lang            = {lang}
+                            setting         = {advancedSettings}
+                            onValueChange   = {this._handleAdvancedValueChange}
+                            onClose         = {this._handleCloseAdvancedSetting}
+                            onApply         = {this._handleApplyAdvancedSetting} />
                     );
                 },
 
@@ -437,6 +456,7 @@ define([
                             previewLayerCount           = {this.state.previewLayerCount}
                             raftOn                      = {this.state.raftOn}
                             supportOn                   = {this.state.supportOn}
+                            layerHeight                 = {this.state.layerHeight}
                             onQualitySelected           = {this._handleQualitySelected}
                             onRaftClick                 = {this._handleRaftClick}
                             onSupportClick              = {this._handleSupportClick}

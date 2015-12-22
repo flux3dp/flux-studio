@@ -65,18 +65,6 @@ define([
             this.props.onDownloadGCode();
         },
 
-        _showInfo: function() {
-            AlertActions.showPopupRetry('abc', '123');
-        },
-
-        _showWarning: function() {
-            AlertActions.showPopupWarning('b2', '政府昨天核發核子廢料地下存放庫的建照，將花10億歐元');
-        },
-
-        _showError: function() {
-            AlertActions.showPopupError('c3', '核子廢料將地下存放庫，將花353億元台幣預計2023年啟用。');
-        },
-
         _updateCamera: function(position, rotation) {
             this.props.onCameraPositionChange(position, rotation);
         },
@@ -92,6 +80,9 @@ define([
                         'btn-get-fcode': true
                     }),
                     title: lang.print.getFcodeTitle,
+                    dataAttrs: {
+                        'ga-event': 'get-print-fcode'
+                    },
                     onClick: this._handleGetFCode
                 }, {
                     label: lang.laser.go,
@@ -102,6 +93,9 @@ define([
                         'btn-go': true
                     }),
                     title: lang.print.goTitle,
+                    dataAttrs: {
+                        'ga-event': 'print-goto-monitor'
+                    },
                     onClick: this._handleGo
                 }];
 

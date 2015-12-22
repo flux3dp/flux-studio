@@ -19,7 +19,6 @@ define([
     'jsx!widgets/Progress',
     'jsx!widgets/Input-Lightbox',
     'jsx!widgets/Notification-Modal',
-    'jsx!views/Print-Selector',
     'jsx!views/Update-Dialog',
     'jsx!views/Change-Filament',
     'helpers/api/discover',
@@ -52,7 +51,6 @@ define([
     Progress,
     InputLightbox,
     NotificationModal,
-    PrinterSelector,
     UpdateDialog,
     ChangeFilament,
     Discover,
@@ -429,8 +427,7 @@ define([
             },
 
             _renderStudioFunctions: function() {
-                var ClassNames = React.addons.classSet,
-                    itemClass = '',
+                var itemClass = '',
                     label = '',
                     isActiveItem,
                     menuItems;
@@ -450,8 +447,7 @@ define([
                     return (
                         <li className={itemClass} key={'menu' + i}
                             data-display-name={opt.displayName}
-                            onClick={this._handleNavigation.bind(null, opt.name)}
-                        >
+                            onClick={this._handleNavigation.bind(null, opt.name)}>
                             <img src={opt.imgSrc} />
                             {label}
                         </li>
@@ -462,13 +458,26 @@ define([
             },
 
             _renderDeviceList: function() {
+                var meta,
+                    status = lang.machine_status,
+                    headModule = lang.head_module,
+                    statusText,
+                    headText;
+
                 var list = this.state.deviceList.map(function(device) {
+                    statusText = status[device.st_id] || status.UNKNOWN,
+                    headText = headModule[device.head_module] || headModule.UNKNOWN;
+
+                    if (16 === device.st_id && 'number' === typeof device.st_prog) {
+                        statusText += ' - ' + (parseInt(device.st_prog * 1000) * 0.1).toFixed(1) + '%';
+                    }
+
                     return (
                         <li
                             name={device.uuid}
                             onClick={this._handleSelectDevice.bind(null, device)}>
                             <label className="name">{device.name}</label>
-                            <label className="status">Working / Print / 35%</label>
+                            <label className="status">{headText} {statusText}</label>
                         </li>
                     )
                 }, this);
@@ -578,17 +587,12 @@ define([
                             onClose={this._handleNotificationModalClose} />
 
                         <div title={lang.print.deviceTitle} className="device" onClick={this._handleShowDeviceList}>
-                            <img src="/img/btn-device.svg" />
-                            <p>{lang.menu.device}</p>
+                            <p className="device-icon">
+                                <img src="/img/btn-device.svg"/>
+                                <span>{lang.menu.device}</span>
+                            </p>
                             <div className={menuClass}>
-                                <svg width="36" height="15"
-                                     className="arrow"
-                                     viewBox="0 0 36 15" version="1.1"
-                                     xmlns="http://www.w3.org/2000/svg">
-
-                                    <polygon points="36,0 0,15 0,0"/>
-
-                                </svg>
+                                <div className="arrow arrow-right"/>
                                 <div className="device-list">
                                     {deviceList}
                                 </div>

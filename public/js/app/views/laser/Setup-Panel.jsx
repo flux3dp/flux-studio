@@ -11,6 +11,7 @@ define([
     'jsx!widgets/Alert',
     'jsx!widgets/Dialog-Menu',
     'helpers/api/config',
+    'helpers/i18n',
     'helpers/round',
 ], function(
     $,
@@ -25,6 +26,7 @@ define([
     Alert,
     DialogMenu,
     config,
+    i18n,
     round
 ) {
     'use strict';
@@ -33,9 +35,28 @@ define([
 
         getDefaultProps: function() {
             return {
+                lang: i18n.get(),
                 defaults: {},
                 imageFormat: 'bitmap',  // svg, bitmap
                 onShadingChanged: function() {}
+            };
+        },
+
+        getInitialState: function() {
+            var props = this.props,
+                lang = props.lang;
+
+            return {
+                openAdvancedPanel: false,
+                openCustomPresets: false,
+                hasSelectedPreset: false,
+                defaults: this.props.defaults,
+                materials: lang.laser.advanced.form.object_options.options,
+                showAlert: false,
+                alertContent: {
+                    caption: '',
+                    message: ''
+                }
             };
         },
 
@@ -121,6 +142,7 @@ define([
             opts = opts || {};
             opts.material = opts.material || this.state.defaults.material;
             opts.objectHeight = opts.objectHeight || this.state.defaults.objectHeight;
+            opts.isShading = ('boolean' === typeof opts.isShading ? opts.isShading : this.state.defaults.isShading);
 
             var self = this,
                 state = {
@@ -156,6 +178,7 @@ define([
 
         _onShadingChanged: function(e) {
             this.props.onShadingChanged(e);
+            this._saveLastestSet({ isShading: this.isShading() });
         },
 
         openSubPopup: function(e) {
@@ -174,6 +197,9 @@ define([
                 buttons = [{
                     label: lang.laser.advanced.apply,
                     className: 'btn-default' + (false === self.state.hasSelectedPreset ? ' btn-disabled' : ''),
+                    dataAttrs: {
+                        'ga-event': 'apply-custom-laser-preset'
+                    },
                     onClick: function(e) {
                         var elCustomPresets = self.refs.customPresets.getDOMNode();
 
@@ -184,6 +210,9 @@ define([
                 },
                 {
                     label: lang.laser.advanced.cancel,
+                    dataAttrs: {
+                        'ga-event': 'cancel-custom-laser-preset'
+                    },
                     onClick: function(e) {
                         self._togglePanel('customPresets', false)();
                     }
@@ -315,13 +344,21 @@ define([
         },
 
         _renderMaterialSelection: function(lang) {
-            var props = this.props;
+            var props = this.props,
+                state = this.state,
+                lang = props.lang,
+                materialOptions = lang.laser.advanced.form.object_options.options,
+                defaultMaterial;
+
+            defaultMaterial = materialOptions.filter(function(material) {
+                return material.value === state.defaults.material.value;
+            })[0] || state.defaults.material;
 
             return {
                 label: (
                     <div>
                         <span className="caption">{lang.laser.advanced.form.object_options.text}</span>
-                        <span>{this.state.defaults.material.label}</span>
+                        <span>{defaultMaterial.label}</span>
                     </div>
                 ),
                 content: (
@@ -338,7 +375,7 @@ define([
         _renderShading: function(lang) {
             var props = this.props,
                 cx = React.addons.classSet,
-                checked = ('undefined' !== typeof this.props.imageFormat && 'svg' === this.props.imageFormat ? false : this.isShading()),
+                checked = ('undefined' !== typeof this.props.imageFormat && 'svg' === this.props.imageFormat ? false : this.state.defaults.isShading),
                 classes = cx({
                     'display-text': true
                 });
@@ -364,6 +401,9 @@ define([
         _renderAlert: function(lang) {
             var buttons = [{
                 label: lang.laser.confirm,
+                dataAttrs: {
+                    'ga-event': 'confirm'
+                },
                 onClick: this._togglePanel('alert', false)
             }],
             content = (
@@ -414,8 +454,8 @@ define([
                 alert = this._renderAlert(lang),
                 items = [
                     material,
-                    objectHeight,
                     shading,
+                    objectHeight,
                     advancedButton
                 ];
 
@@ -428,24 +468,6 @@ define([
                     {alert}
                 </div>
             );
-        },
-
-        getInitialState: function() {
-            var props = this.props,
-                lang = props.lang;
-
-            return {
-                openAdvancedPanel: false,
-                openCustomPresets: false,
-                hasSelectedPreset: false,
-                defaults: this.props.defaults,
-                materials: lang.laser.advanced.form.object_options.options,
-                showAlert: false,
-                alertContent: {
-                    caption: '',
-                    message: ''
-                }
-            };
         }
 
     });

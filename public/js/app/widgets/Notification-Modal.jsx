@@ -129,28 +129,43 @@ define([
                 case AlertConstants.YES_NO:
                     buttons.push({
                         label: lang.yes,
+                        dataAttrs: {
+                            'ga-event': 'yes'
+                        },
                         onClick: this._onYes
                     });
                     break;
                 case AlertConstants.RETRY_CANCEL:
                     buttons.push({
                         label: lang.retry,
+                        dataAttrs: {
+                            'ga-event': 'cancel'
+                        },
                         onClick: this._onRetry
                     });
                     break;
                 case AlertConstants.RETRY_ABORT_CANCEL:
                     buttons.push({
                         label: lang.abort,
+                        dataAttrs: {
+                            'ga-event': 'abort'
+                        },
                         onClick: this._onAbort
                     });
                     buttons.push({
                         label: lang.retry,
+                        dataAttrs: {
+                            'ga-event': 'retry'
+                        },
                         onClick: this._onRetry
                     });
                     break;
                 case AlertConstants.CUSTOM_CANCEL:
                     buttons.push({
                         label: this.props.customText,
+                        dataAttrs: {
+                            'ga-event': 'cancel'
+                        },
                         onClick: this._onCustom
                     });
                     break;

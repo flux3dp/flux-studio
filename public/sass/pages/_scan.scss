@@ -113,7 +113,10 @@
     }
 
     .scan-printer-selection {
+        overflow: hidden;
         position: relative;
+        top: 0;
+        right: 0;
     }
 
     .manipulation-panel {

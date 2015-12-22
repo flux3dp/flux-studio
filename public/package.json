@@ -3,7 +3,7 @@
     "name": "FLUX Studio",
     "node-remote": "localhost",
     "description": "FLUX Studio",
-    "version": "0.1.0",
+    "version": "0.19.0",
     "inject-js-start": "nw-inject.js",
     "window": {
         "title": "FLUX Studio",
@@ -12,7 +12,8 @@
         "width": 1280,
         "height": 640,
         "min_width": 1000,
-        "min_height": 600
+        "min_height": 600,
+        "toolbar": false
     },
     "webkit": {
         "plugin": true

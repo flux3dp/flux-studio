@@ -62,6 +62,9 @@ define([
                 var self = this,
                     buttons = [{
                         label: lang.initialize.confirm,
+                        dataAttrs: {
+                            'ga-event': 'confirm'
+                        },
                         onClick: function() {
                             self.setState({
                                 openAlert: false
@@ -105,10 +108,10 @@ define([
                                 <h1 className="headline">{lang.initialize.connect_flux}</h1>
                                 <img className="scene" src="/img/wifi-plug-01.png"/>
                                 <div className="btn-v-group">
-                                    <button className="btn btn-action btn-large" onClick={this._onStartingSetUp} autoFocus={true}>
+                                    <button className="btn btn-action btn-large" data-ga-event="next" onClick={this._onStartingSetUp} autoFocus={true}>
                                         {lang.initialize.next}
                                     </button>
-                                    <a href="#initialize/wifi/setup-complete/with-usb" className="btn btn-link btn-large">
+                                    <a href="#initialize/wifi/setup-complete/with-usb" data-ga-event="skip" className="btn btn-link btn-large">
                                         {lang.initialize.skip}
                                     </a>
                                 </div>

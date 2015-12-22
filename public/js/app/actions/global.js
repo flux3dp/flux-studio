@@ -9,17 +9,28 @@ define([
     'use strict';
 
     // prevent delete (back) behavior
-    shortcuts.on(['DEL'], function(e) {
-        if ('BODY' === e.target.tagName) {
-            e.preventDefault();
+    var defaultKeyBehavior = function() {
+        shortcuts.on(['DEL'], function(e) {
+            if ('BODY' === e.target.tagName) {
+                e.preventDefault();
+            }
+        });
+
+        if (true === window.FLUX.debug && 'undefined' !== typeof requireNode) {
+            shortcuts.on(['ctrl', 'alt', 'd'], function(e) {
+                requireNode('nw.gui').Window.get().showDevTools();
+            });
         }
-    });
+    };
+
+    defaultKeyBehavior();
 
     // detached keyup and keydown event
     window.addEventListener('popstate', function(e) {
         window.GA('send', 'pageview', location.hash);
         shortcuts.disableAll();
         menuFactory.methods.refresh();
+        defaultKeyBehavior();
     });
 
     // listener of all ga event
