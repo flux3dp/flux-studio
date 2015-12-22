@@ -104,17 +104,27 @@
         top: 24px;
         cursor: pointer;
 
-        img {
-            height: 3.6rem;
-            margin: 0 auto;
-            transform-origin: 50% 50%;
+        .device-icon {
+            text-align: center;
+            position: absolute;
+            top: 0;
+            right: 0;
             width: 3.6rem;
-            transition: all .25s;
-            transform: rotate(60deg);
+
+            img {
+                height: 3.6rem;
+                margin: 0 0 7px 0;
+                transition: all .25s;
+                transform-origin: 50% 50%;
+                transform: rotate(60deg);
+                width: 3.6rem;
+            }
+
+            &:hover img {
+                transform: rotate(240deg);
+            }
         }
-        &:hover img {
-            transform: rotate(240deg);
-        }
+
         p {
             margin: 0;
             font-weight: 500;
@@ -126,7 +136,7 @@
         .menu {
             background: #fff;
             position: relative;
-            top: -50px;
+            top: 11px;
             right: 100px;
             display: none;
 

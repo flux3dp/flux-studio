@@ -587,8 +587,10 @@ define([
                             onClose={this._handleNotificationModalClose} />
 
                         <div title={lang.print.deviceTitle} className="device" onClick={this._handleShowDeviceList}>
-                            <img src="/img/btn-device.svg" />
-                            <p>{lang.menu.device}</p>
+                            <p className="device-icon">
+                                <img src="/img/btn-device.svg"/>
+                                <span>{lang.menu.device}</span>
+                            </p>
                             <div className={menuClass}>
                                 <div className="arrow arrow-right"/>
                                 <div className="device-list">

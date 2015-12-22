@@ -3494,15 +3494,21 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         text-align: right;
         top: 24px;
         cursor: pointer; }
-        .top-menu .device img {
-            height: 3.6rem;
-            margin: 0 auto;
-            transform-origin: 50% 50%;
-            width: 3.6rem;
-            transition: all 0.25s;
-            transform: rotate(60deg); }
-        .top-menu .device:hover img {
-            transform: rotate(240deg); }
+        .top-menu .device .device-icon {
+            text-align: center;
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 3.6rem; }
+            .top-menu .device .device-icon img {
+                height: 3.6rem;
+                margin: 0 0 7px 0;
+                transition: all 0.25s;
+                transform-origin: 50% 50%;
+                transform: rotate(60deg);
+                width: 3.6rem; }
+            .top-menu .device .device-icon:hover img {
+                transform: rotate(240deg); }
         .top-menu .device p {
             margin: 0;
             font-weight: 500;
@@ -3512,7 +3518,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         .top-menu .device .menu {
             background: #fff;
             position: relative;
-            top: -50px;
+            top: 11px;
             right: 100px;
             display: none; }
             .top-menu .device .menu .arrow {
