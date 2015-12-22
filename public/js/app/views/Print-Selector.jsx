@@ -51,7 +51,6 @@ define([
                 uniqleId: '',
                 lang: i18n.get(),
                 className: '',
-                openMonitor: false,
                 onGettingPrinter: function() {},
                 onClose: function() {}
             };
@@ -146,7 +145,7 @@ define([
         _returnSelectedPrinter: function() {
             var self = this;
 
-            if ('00000000000000000000000000000000' === self.selected_printer.uuid || false === self.props.openMonitor) {
+            if ('00000000000000000000000000000000' === self.selected_printer.uuid) {
                 self.props.onGettingPrinter(self.selected_printer);
                 ProgressActions.close();
             }
