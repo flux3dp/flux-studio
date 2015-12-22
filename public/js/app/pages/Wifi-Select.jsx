@@ -96,14 +96,11 @@ define([
                     usb = usbConfig();
 
                 self._openBlocker(true)();
+                self.scanWifi = false;
 
                 usb.setAPMode({
                     onSuccess: function(response) {
-                        self.scanWifi = false;
-
-                        self.deferred.done(function() {
-                            location.hash = 'initialize/wifi/setup-complete/station-mode';
-                        });
+                        location.hash = 'initialize/wifi/setup-complete/station-mode';
                     },
                     onError: function() {
                         self._openAlert(true, {
@@ -113,7 +110,6 @@ define([
                         })();
                     }
                 });
-
             },
 
             // Lifecycle
@@ -285,7 +281,6 @@ define([
             },
 
             componentDidMount : function() {
-
                 var self = this,
                     usb = usbConfig(),
                     wifiOptions = [],
@@ -335,6 +330,7 @@ define([
                                 }
                                 else {
                                     self.deferred.resolve();
+                                    self.deferred = $.Deferred();
                                 }
                             }
                         });
@@ -342,8 +338,6 @@ define([
 
 
                 getWifi();
-
-
             },
 
             componentWillUnmount: function() {
