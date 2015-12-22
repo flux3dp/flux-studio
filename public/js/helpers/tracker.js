@@ -11,7 +11,7 @@ define(function() {
         body.appendChild(tracker);
 
         window._trackJs = {
-            token: 'ecc92940e9344cb78af43529047e6f93',
+            token: '650f74d7a9224d2c8792376b3be58530',
             onError: function (payload, error) {
                 // List borrowed from the awesome @pamelafox
                 // https://gist.github.com/pamelafox/1878283
