@@ -204,7 +204,10 @@ define([
             getMachineNetwork: function(opts) {
                 opts = reorganizeOptions(opts);
 
-                ws.onError(opts.onError);
+                ws.onError(function(data) {
+                    sendCommand();
+                    opts.onError(data);
+                });
 
                 var sendCommand = function() {
                     ws.send('get network');
