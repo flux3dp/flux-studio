@@ -313,9 +313,6 @@ define([
             if(pathArray.length === 0) {
                 this.setState({ mode: mode.PREVIEW });
                 this._startReport();
-                // DeviceMaster.stop().then(function() {
-                //     this._startReport();
-                // }.bind(this));
                 return;
             }
             pathArray.pop();
