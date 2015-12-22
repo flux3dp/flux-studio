@@ -84,10 +84,12 @@
         .wifi-list {
             height: 175px;
             overflow: scroll;
+            position: relative;
             width: 252px;
 
             .spinner-roller {
                 height: 5em;
+                position: absolute;
                 width: 5em;
             }
 
@@ -130,8 +132,11 @@
     }
 
     .connecting-wifi {
+        position: relative;
+
         .spinner-roller {
             height: 52px;
+            margin: 0 auto 20px auto;
             width: 52px;
         }
     }

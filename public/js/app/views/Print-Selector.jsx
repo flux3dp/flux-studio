@@ -8,7 +8,14 @@ define([
     'helpers/i18n',
     'helpers/api/touch',
     'helpers/api/config',
-    'app/constants/device-constants'
+    'app/constants/device-constants',
+    'app/actions/alert-actions',
+    'app/actions/initialize-machine',
+    'app/stores/alert-store',
+    'app/actions/progress-actions',
+    'app/constants/progress-constants',
+    'app/actions/input-lightbox-actions',
+    'app/constants/input-lightbox-constants'
 ], function(
     React,
     $,
@@ -19,7 +26,14 @@ define([
     i18n,
     touch,
     config,
-    DeviceConstants
+    DeviceConstants,
+    AlertActions,
+    initializeMachine,
+    AlertStore,
+    ProgressActions,
+    ProgressConstants,
+    InputLightboxActions,
+    InputLightboxConstants
 ) {
     'use strict';
 
@@ -37,6 +51,7 @@ define([
                 uniqleId: '',
                 lang: i18n.get(),
                 className: '',
+                openMonitor: false,
                 onGettingPrinter: function() {},
                 onClose: function() {}
             };
@@ -46,65 +61,53 @@ define([
             return {
                 discoverId: 'printer-selector-' + (this.props.uniqleId || ''),
                 printOptions: [],
-                authFailure: false,
-                waiting: false,
-                showPassword: false,
                 loadFinished: false,
+                noDefaultPrinter: ('undefined' === typeof initializeMachine.defaultPrinter.get().uuid),
                 discoverMethods: {}
             };
         },
 
-        _goBackToPrinterList: function() {
-            this.setState({
-                authFailure: false,
-                showPassword: false
-            });
+        componentDidMount: function() {
+            if (false === this.state.noDefaultPrinter) {
+                this.selected_printer = initializeMachine.defaultPrinter.get();
+                this._returnSelectedPrinter();
+            }
         },
 
-        _selectPrinter: function(e) {
+        _selectPrinter: function(printer, e) {
+            e.preventDefault();
+
             var self = this,
-                $el = $(e.target.parentNode),
-                meta = $el.data('meta'),
+                lang = self.props.lang.select_printer,
                 onError = function() {
-                    self.setState({
-                        showPassword: true,
-                        waiting: false
+                    ProgressActions.close();
+                    InputLightboxActions.open('auth-device', {
+                        type         : InputLightboxConstants.TYPE_PASSWORD,
+                        caption      : lang.notification,
+                        inputHeader  : lang.please_enter_password,
+                        confirmText  : lang.submit,
+                        onSubmit     : function(password) {
+                            ProgressActions.open(ProgressConstants.NONSTOP);
+
+                            self._auth(printer.uuid, password, {
+                                onError: function() {
+                                    AlertActions.showPopupError('device-auth-fail', lang.auth_failure);
+                                }
+                            });
+                        }
                     });
                 },
                 opts = {
                     onError: onError
                 };
 
-            self.selected_printer = meta;
+            self.selected_printer = printer;
 
-            self._auth(meta.uuid, '', opts);
-        },
-
-        _submit: function(e) {
-            e.preventDefault();
-
-            var self = this,
-                opts = {
-                    onError: function(data) {
-                        self.setState({
-                            authFailure: true,
-                            waiting: false
-                        });
-                    }
-                },
-                selected_printer = self.selected_printer,
-                password, touch_socket;
-
-            self.setState({
-                waiting: true
-            });
-
-            password = self.refs.password.getDOMNode().value;
-
-            touch_socket = self._auth(selected_printer.uuid, password, opts);
+            self._auth(printer.uuid, '', opts);
         },
 
         _auth: function(uuid, password, opts) {
+            ProgressActions.open(ProgressConstants.NONSTOP);
             opts = opts || {};
             opts.onError = opts.onError || function() {};
 
@@ -114,14 +117,11 @@ define([
                         self._returnSelectedPrinter();
                     },
                     onFail: function(data) {
+                        ProgressActions.close();
                         opts.onError();
                     }
                 },
                 touch_socket;
-
-            self.setState({
-                waiting: true
-            });
 
             touch_socket = touch(_opts).send(uuid, password);
         },
@@ -136,7 +136,7 @@ define([
                 options = self.state.printOptions,
                 content = (
                     <div className="device-wrapper">
-                        <ListView className="printer-list" items={options} onClick={self._selectPrinter}/>
+                        <ListView className="printer-list" items={options}/>
                     </div>
                 );
 
@@ -146,17 +146,15 @@ define([
         _returnSelectedPrinter: function() {
             var self = this;
 
-            if ('00000000000000000000000000000000' === self.selected_printer.uuid) {
+            if ('00000000000000000000000000000000' === self.selected_printer.uuid || false === self.props.openMonitor) {
                 self.props.onGettingPrinter(self.selected_printer);
+                ProgressActions.close();
             }
             else {
                 DeviceMaster.selectDevice(self.selected_printer).then(function(status) {
-                    if(status === DeviceConstants.CONNECTED) {
+                    if (status === DeviceConstants.CONNECTED) {
                         self.props.onGettingPrinter(self.selected_printer);
-                        self.setState({
-                            showPassword: false,
-                            waiting: false
-                        });
+                        ProgressActions.close();
                     }
                     else if (status === DeviceConstants.TIMEOUT) {
                         AlertActions.showPopupError('printer-selector', lang.message.connectionTimeout);
@@ -164,19 +162,6 @@ define([
                 });
             }
 
-        },
-
-        _renderAuthFailure: function(lang) {
-            var lang = lang.select_printer;
-
-            return (
-                <div>
-                    <p>{lang.auth_failure}</p>
-                    <button className="btn btn-action btn-full-width sticky-bottom" onClick={this._goBackToPrinterList}>
-                        {lang.retry}
-                    </button>
-                </div>
-            );
         },
 
         _renderPrinterItem: function(printer) {
@@ -199,37 +184,12 @@ define([
             }
 
             return (
-                <label className="device printer-item" data-meta={meta}>
+                <label className="device printer-item" data-meta={meta} onClick={this._selectPrinter.bind(null, printer)}>
                     <input type="radio" name="printer-group" value={printer.uuid}/>
                     <div className="col device-name">{printer.name}</div>
                     <div className="col module">{headText}</div>
                     <div className="col status">{statusText}</div>
                 </label>
-            );
-        },
-
-        _renderSpinner: function() {
-            return (
-                <div className="spinner-roller spinner-roller-reverse absolute-center"/>
-            );
-        },
-
-        _renderEnterPassword: function(lang) {
-            var lang = lang.select_printer;
-
-            return (
-                <form className="form" onSubmit={this._submit}>
-                    <p className="text-center">{lang.notification}</p>
-                    <input
-                        type="password"
-                        ref="password"
-                        className="span12"
-                        defaultValue=""
-                        placeholder={lang.please_enter_password}
-                        autoFocus
-                    />
-                    <button className="btn btn-action btn-full-width sticky-bottom">{lang.submit}</button>
-                </form>
             );
         },
 
@@ -239,12 +199,8 @@ define([
                 showPassword = self.state.showPassword,
                 cx = React.addons.classSet,
                 wrapperClass = ['select-printer'],
-                authFailure = self.state.authFailure,
-                content = (
-                    false === showPassword ?
-                    self._renderPrinterSelection(lang) :
-                    self._renderEnterPassword(lang)
-                );
+                content = self._renderPrinterSelection(lang),
+                noDefaultPrinter = self.state.noDefaultPrinter;
 
             if ('string' === typeof self.props.className) {
                 wrapperClass.push(self.props.className);
@@ -252,59 +208,43 @@ define([
 
             wrapperClass = cx.apply(null, wrapperClass);
 
-            if (true === authFailure) {
-                content = self._renderAuthFailure(lang);
-            }
-
-            if (true === self.state.waiting) {
-                content = self._renderSpinner();
-            }
-
             return (
+                true === noDefaultPrinter ?
                 <div className={wrapperClass}>
                     {content}
-                    <svg className="arrow" version="1.1" xmlns="http://www.w3.org/2000/svg"
-                        width="36.8" height="20">
-                        <polygon points="0,0 0,20 36.8,10"/>
-                    </svg>
-                </div>
+                    <div className="arrow arrow-right"/>
+                </div> :
+                <span/>
             );
         },
 
         componentWillMount: function () {
             var self = this,
-                options = [],
+                _options = [],
                 refreshOption = function(options) {
+                    _options = [];
+
                     options.forEach(function(el) {
-                        el.label = self._renderPrinterItem(el);
+                        _options.push({
+                            label: self._renderPrinterItem(el)
+                        });
                     });
 
                     self.setState({
-                        printOptions: options,
+                        printOptions: _options,
                         loadFinished: true
                     });
                 };
 
-            if (false === window.FLUX.debug) {
-                config().read('printers', {
-                    onFinished: function(response) {
-                        response = response || [];
 
-                        refreshOption(response);
+            self.setState({
+                discoverMethods: discover(
+                    self.state.discoverId,
+                    function(printers) {
+                        refreshOption(printers);
                     }
-                });
-            }
-            else {
-                self.setState({
-                    discoverMethods: discover(
-                        self.state.discoverId,
-                        function(printers) {
-                            refreshOption(printers);
-                        }
-                    )
-                });
-            }
-
+                )
+            });
         },
 
         componentWillUnmount: function() {

@@ -165,7 +165,9 @@ define([
                 attrs = {};
 
             for (var key in props.dataAttrs) {
-                attrs['data-' + key] = props.dataAttrs[key];
+                if (false === attrs.hasOwnProperty(key)) {
+                    attrs['data-' + key] = props.dataAttrs[key];
+                }
             }
 
             return (

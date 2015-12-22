@@ -80,6 +80,9 @@ define([
                         'btn-get-fcode': true
                     }),
                     title: lang.print.getFcodeTitle,
+                    dataAttrs: {
+                        'ga-event': 'get-print-fcode'
+                    },
                     onClick: this._handleGetFCode
                 }, {
                     label: lang.laser.go,
@@ -90,6 +93,9 @@ define([
                         'btn-go': true
                     }),
                     title: lang.print.goTitle,
+                    dataAttrs: {
+                        'ga-event': 'print-goto-monitor'
+                    },
                     onClick: this._handleGo
                 }];
 

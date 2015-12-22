@@ -47,6 +47,9 @@ function(React, Modal, Alert, ProgressConstants) {
             case ProgressConstants.STEPPING:
                 buttons.push({
                     label: this.props.lang.alert.stop,
+                    dataAttrs: {
+                        'ga-event': 'stop'
+                    },
                     onClick: this.props.onFinished
                 });
                 break;

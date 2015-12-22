@@ -19,7 +19,6 @@ define([
     'jsx!widgets/Progress',
     'jsx!widgets/Input-Lightbox',
     'jsx!widgets/Notification-Modal',
-    'jsx!views/Print-Selector',
     'jsx!views/Update-Dialog',
     'jsx!views/Change-Filament',
     'helpers/api/discover',
@@ -52,7 +51,6 @@ define([
     Progress,
     InputLightbox,
     NotificationModal,
-    PrinterSelector,
     UpdateDialog,
     ChangeFilament,
     Discover,
@@ -598,14 +596,7 @@ define([
                             <img src="/img/btn-device.svg" />
                             <p>{lang.menu.device}</p>
                             <div className={menuClass}>
-                                <svg width="36" height="15"
-                                     className="arrow"
-                                     viewBox="0 0 36 15" version="1.1"
-                                     xmlns="http://www.w3.org/2000/svg">
-
-                                    <polygon points="36,0 0,15 0,0"/>
-
-                                </svg>
+                                <div className="arrow arrow-right"/>
                                 <div className="device-list">
                                     {deviceList}
                                 </div>

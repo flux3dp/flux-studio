@@ -61,10 +61,11 @@ define(function() {
             },
             device: {
                 label: 'Device',
-                new: 'Add New Device...',
+                new: 'USB Configuration',
                 device_monitor: 'Device Monitor',
                 change_filament: 'Change Filament',
-                check_firmware_update: 'Check Firmware Update'
+                check_firmware_update: 'Check Firmware Update',
+                default_device: 'Default Device'
             },
             window: {
                 label: 'Window',
@@ -312,7 +313,8 @@ define(function() {
                 apply: 'APPLY',
                 saveAsPreset: 'SAVE',
                 cancel: 'CANCEL',
-                saveAndApply: 'SAVE & APPLY'
+                saveAndApply: 'SAVE & APPLY',
+                delete: 'DELETE'
             },
             mode: [
                 {
@@ -590,6 +592,7 @@ define(function() {
         scan: {
             start_scan: 'Scan',
             stop_scan: 'Stop',
+            over_quota: 'Over quota',
             convert_to_stl: 'Convert',
             scan_again: 'Scan Again',
             start_multiscan: 'Extra Scan',
@@ -679,8 +682,8 @@ define(function() {
         select_printer: {
             choose_printer: 'Choose a printer',
             notification: 'Please enter the password',
-            submit: 'Submit',
-            please_enter_password: 'Enter the password',
+            submit: 'SUBMIT',
+            please_enter_password: 'password',
             auth_failure: 'Authentication fail',
             retry: 'Retry'
         },

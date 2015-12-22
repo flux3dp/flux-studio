@@ -62,7 +62,7 @@ define([
                         <span className="progress-text">{self.props.percentage}%,</span>
                         <span className="progress-text">{self._formatSecondToTime(self.props.remainingTime)}</span>
                         <span className="progress-text">{lang.scan.remaining_time}</span>
-                        <button className="btn btn-hexagon btn-stop-scan" onClick={this._onStop}>{lang.scan.stop_scan}</button>
+                        <button className="btn btn-hexagon btn-stop-scan" data-ga-event="stop-scan" onClick={this._onStop}>{lang.scan.stop_scan}</button>
                     </div>
                 );
             },

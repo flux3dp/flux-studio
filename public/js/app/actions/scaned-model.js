@@ -391,6 +391,8 @@ define([
         orbitControl.addEventListener('change', function(e) {
             if (true === orbitControl.enabled) {
                 render();
+
+                changeObjectDialogPosition();
             }
         });
     }
@@ -415,7 +417,17 @@ define([
 
         renderer.setSize(window.innerWidth, window.innerHeight);
 
+        changeObjectDialogPosition();
+
         render();
+    }
+
+    function changeObjectDialogPosition() {
+        scene.children.forEach(function(el) {
+            if ('function' === typeof el.onObjectChange) {
+                el.onObjectChange();
+            }
+        });
     }
 
     function render() {
@@ -424,10 +436,6 @@ define([
         scene.children.forEach(function(el) {
             if ('undefined' !== typeof el.transformControl) {
                 el.transformControl.update();
-            }
-
-            if ('function' === typeof el.onObjectChange) {
-                el.onObjectChange();
             }
         });
 

@@ -52,10 +52,16 @@ define([
         _getButtons: function(lang) {
             var buttons = [{
                 label: lang.update.later,
+                dataAttrs: {
+                    'ga-event': 'update-' + this.props.type.toLowerCase() + '-later'
+                },
                 onClick: this._onClose
             },
             {
                 label: lang.update.install,
+                dataAttrs: {
+                    'ga-event': 'install-new-' + this.props.type.toLowerCase()
+                },
                 onClick: this._onInstall
             }];
 
@@ -90,7 +96,7 @@ define([
                         <h4 className="release-note-caption">{lang.update.release_note}</h4>
                         <div className="release-note-content" dangerouslySetInnerHTML={this._getReleaseNote()}/>
                         <div className="action-button">
-                            <button className="btn btn-link" onClick={this._onSkip}>{lang.update.skip}</button>
+                            <button className="btn btn-link" data-ga-event={'skip-' + this.props.type.toLowerCase() + '-update'} onClick={this._onSkip}>{lang.update.skip}</button>
                             <ButtonGroup buttons={buttons}/>
                         </div>
                     </div>

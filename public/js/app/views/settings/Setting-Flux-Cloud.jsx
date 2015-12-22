@@ -37,7 +37,7 @@ define([
                             </div>
                             <div className="row-fluid">
                                 <div className="entry span9">
-                                    <button data-ga-event="save-password" className="btn btn-default pull-right" onClick={this._handleSetPassword}>{lang.settings.printer.save_password}</button>
+                                    <button data-ga-event="save-password" data-ga-event="save-password" className="btn btn-default pull-right" onClick={this._handleSetPassword}>{lang.settings.printer.save_password}</button>
                                 </div>
                             </div>
                         </div>
@@ -54,7 +54,7 @@ define([
                         passwordSection = this._renderChangePasswordSection(lang);
 
                     if(!this.state.showPasswordconfiguration) {
-                        passwordSection = (<a className="btn btn-default font3" onClick={this._handleConfigPassword}>{lang.settings.flux_cloud.change_password}</a>);
+                        passwordSection = (<a className="btn btn-default font3" data-ga-event="change-password" onClick={this._handleConfigPassword}>{lang.settings.flux_cloud.change_password}</a>);
                     }
 
                     return (
@@ -82,9 +82,6 @@ define([
                                     </div>
                                 </div>
                             </div>
-                            {/*<div className="row-fluid footer">
-                                <a className="btn btn-confirm btn-long">{lang.settings.done}</a>
-                            </div>*/}
                         </div>
                     );
                 }

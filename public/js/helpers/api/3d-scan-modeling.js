@@ -3,10 +3,11 @@
  * Ref: https://github.com/flux3dp/fluxghost/wiki/websocket-3dscan-modeling
  */
 define([
+    'jquery',
     'helpers/websocket',
     'helpers/point-cloud',
     'helpers/data-history'
-], function(Websocket, PointCloudHelper, history) {
+], function($, Websocket, PointCloudHelper, history) {
     'use strict';
 
     var ws;
@@ -20,7 +21,28 @@ define([
         var events = {
                 onMessage: function() {}
             },
-            History = history();
+            History = history(),
+            splitBinary = function(blob, callback) {
+                callback = callback || function() {};
+
+                var fileReader,
+                    chunk,
+                    CHUNK_PKG_SIZE = 4096,
+                    onLoaded = function(e) {
+                        callback(this.result);
+                    };
+
+                // split up to pieces
+                for (var i = 0; i < blob.size; i += CHUNK_PKG_SIZE) {
+                    chunk = blob.slice(i, i + CHUNK_PKG_SIZE);
+
+                    fileReader = new FileReader();
+
+                    fileReader.onloadend = onLoaded;
+
+                    fileReader.readAsArrayBuffer(chunk);
+                }
+            };
 
         ws = ws || new Websocket({
             method: '3d-scan-modeling',
@@ -28,11 +50,9 @@ define([
 
                 events.onMessage(data);
 
-            },
-            onError: opts.onError,
-            onFatal: opts.onFatal,
-            onClose: opts.onClose
+            }
         });
+        ws.onError(opts.onError).onFatal(opts.onFatal).onClose(opts.onClose);
 
         return {
             connection: ws,
@@ -55,17 +75,9 @@ define([
                     switch (data.status) {
                     case 'continue':
                         // split up to pieces
-                        for (var i = 0; i < point_cloud.total.size; i += CHUNK_PKG_SIZE) {
-                            chunk = point_cloud.total.slice(i, i + CHUNK_PKG_SIZE);
-
-                            fileReader = new FileReader();
-
-                            fileReader.onloadend = function(e) {
-                                ws.send(this.result);
-                            };
-
-                            fileReader.readAsArrayBuffer(chunk);
-                        }
+                        splitBinary(point_cloud.total, function(result) {
+                            ws.send(result);
+                        });
 
                         break;
                     case 'ok':
@@ -143,7 +155,7 @@ define([
 
             },
             deleteNoise: function(in_name, out_name, c, opts) {
-
+                opts = opts || {};
                 opts.onFinished = opts.onFinished || function() {};
                 opts.onStarting = opts.onStarting || function() {};
 
@@ -347,6 +359,54 @@ define([
                 };
 
                 doTransform();
+            },
+            /**
+             * import pcd file
+             *
+             * @param {String}   name       - source name
+             * @param {String}   fileType   - file type (only support pcd)
+             * @param {Blob}     file       - binary
+             * @param {Integer}  fileLength - file length
+             *
+             */
+            import: function(name, fileType, file, fileLength) {
+                var self = this,
+                    deferred = $.Deferred(),
+                    args = [
+                        'import_file',
+                        name,
+                        fileType,
+                        fileLength
+                    ],
+                    opts = {
+                        onFinished: function(pointCloud) {
+                            deferred.resolve(pointCloud);
+                        }
+                    };
+
+                events.onMessage = function(data) {
+
+                    switch (data.status) {
+                    case 'ok':
+                        self.dump(
+                            name,
+                            opts
+                        );
+                        break;
+                    case 'continue':
+                        splitBinary(file, function(result) {
+                            ws.send(result);
+                        });
+                        break;
+                    default:
+                        // TODO: unexception result?
+                    }
+
+                };
+
+                ws.send(args.join(' '));
+
+                return deferred.promise();
             }
         };
     };

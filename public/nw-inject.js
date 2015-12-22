@@ -29,12 +29,12 @@ var fs = requireNode('fs'),
 
         if ('Windows_NT' === osType) {
             // TODO: has to assign env root for slic3r
-            args[slic3rPathIndex] = cwd + '/lib/Slic3r.app/Contents/MacOS/slic3r';
-            ghostCmd = cwd + '/lib/ghost/ghost/ghost.exe';
+            args[slic3rPathIndex] = cwd + '/lib/Slic3r/slic3r-console.exe';
+            ghostCmd = cwd + '/lib/ghost/ghost.exe';
         }
         else {
             args[slic3rPathIndex] = cwd + '/lib/Slic3r.app/Contents/MacOS/slic3r';
-            ghostCmd = cwd + '/lib/ghost/ghost/ghost';
+            ghostCmd = cwd + '/lib/ghost/ghost';
         }
 
         fs.chmodSync(ghostCmd, 0777);

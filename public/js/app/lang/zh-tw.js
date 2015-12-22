@@ -61,10 +61,11 @@ define(function() {
             },
             device: {
                 label: 'Device',
-                new: 'Add New Device...',
+                new: 'USB Configuration',
                 device_monitor: 'Device Monitor',
                 change_filament: 'Change Filament',
-                check_firmware_update: 'Check Firmware Update'
+                check_firmware_update: 'Check Firmware Update',
+                default_device: 'Default Device'
             },
             window: {
                 label: 'Window',
@@ -312,7 +313,8 @@ define(function() {
                 apply: 'APPLY',
                 saveAsPreset: 'SAVE AS PRESET',
                 cancel: 'CANCEL',
-                saveAndApply: 'SAVE & APPLY'
+                saveAndApply: 'SAVE & APPLY',
+                delete: 'DELETE'
             },
             mode: [
                 {
@@ -590,6 +592,7 @@ define(function() {
         scan: {
             start_scan: '開始掃瞄',
             stop_scan: '取消',
+            over_quota: '超過可容納點雲',
             convert_to_stl: '轉換成 STL',
             scan_again: '再次掃描',
             start_multiscan: '多次掃描',

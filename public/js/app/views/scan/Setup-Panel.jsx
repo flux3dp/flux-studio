@@ -87,7 +87,7 @@ define([
             return {
                 label: (
                     <div>
-                        <button className="btn btn-default btn-calibrate caption" onClick={this.props.onCalibrate}>
+                        <button className="btn btn-default btn-calibrate caption" data-ga-event="calibrate" onClick={this.props.onCalibrate}>
                             {lang.scan.calibrate}
                         </button>
                     </div>

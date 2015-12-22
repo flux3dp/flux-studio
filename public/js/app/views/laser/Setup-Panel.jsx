@@ -121,6 +121,7 @@ define([
             opts = opts || {};
             opts.material = opts.material || this.state.defaults.material;
             opts.objectHeight = opts.objectHeight || this.state.defaults.objectHeight;
+            opts.isShading = ('boolean' === typeof opts.isShading ? opts.isShading : this.state.defaults.isShading);
 
             var self = this,
                 state = {
@@ -156,6 +157,7 @@ define([
 
         _onShadingChanged: function(e) {
             this.props.onShadingChanged(e);
+            this._saveLastestSet({ isShading: this.isShading() });
         },
 
         openSubPopup: function(e) {
@@ -174,6 +176,9 @@ define([
                 buttons = [{
                     label: lang.laser.advanced.apply,
                     className: 'btn-default' + (false === self.state.hasSelectedPreset ? ' btn-disabled' : ''),
+                    dataAttrs: {
+                        'ga-event': 'apply-custom-laser-preset'
+                    },
                     onClick: function(e) {
                         var elCustomPresets = self.refs.customPresets.getDOMNode();
 
@@ -184,6 +189,9 @@ define([
                 },
                 {
                     label: lang.laser.advanced.cancel,
+                    dataAttrs: {
+                        'ga-event': 'cancel-custom-laser-preset'
+                    },
                     onClick: function(e) {
                         self._togglePanel('customPresets', false)();
                     }
@@ -338,7 +346,7 @@ define([
         _renderShading: function(lang) {
             var props = this.props,
                 cx = React.addons.classSet,
-                checked = ('undefined' !== typeof this.props.imageFormat && 'svg' === this.props.imageFormat ? false : this.isShading()),
+                checked = ('undefined' !== typeof this.props.imageFormat && 'svg' === this.props.imageFormat ? false : this.state.defaults.isShading),
                 classes = cx({
                     'display-text': true
                 });
@@ -364,6 +372,9 @@ define([
         _renderAlert: function(lang) {
             var buttons = [{
                 label: lang.laser.confirm,
+                dataAttrs: {
+                    'ga-event': 'confirm'
+                },
                 onClick: this._togglePanel('alert', false)
             }],
             content = (

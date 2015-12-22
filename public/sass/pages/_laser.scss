@@ -13,11 +13,6 @@
         }
     }
 
-    .laser-device-selection-popup {
-        bottom: 4.3rem;
-        right: 15rem;
-    }
-
     .file-importer {
         @include flexbox();
         background: #fff;
@@ -291,7 +286,6 @@
         @include flexbox();
         font-size: 20px;
         transition: all .1s ease;
-        width: 230px;
         z-index: 1;
         will-change: top,left,transform;
 

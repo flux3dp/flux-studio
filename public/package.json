@@ -12,7 +12,8 @@
         "width": 1280,
         "height": 640,
         "min_width": 1000,
-        "min_height": 600
+        "min_height": 600,
+        "toolbar": false
     },
     "webkit": {
         "plugin": true
