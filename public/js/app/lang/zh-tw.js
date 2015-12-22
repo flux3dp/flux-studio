@@ -472,7 +472,7 @@ define(function() {
             savingFilePreview: 'Saving file preview'
         },
         laser: {
-            import: '打開⋯',
+            import: '匯入',
             save: '儲存⋯',
             custom: '自訂',
             presets: 'Presets',
@@ -492,7 +492,7 @@ define(function() {
                     unit: 'mm'
                 },
                 shading: {
-                    text: 'SHADING',
+                    text: '漸層',
                     textOn: 'ON',
                     textOff: 'OFF',
                     checked: true
@@ -518,7 +518,7 @@ define(function() {
                 }
             },
             advanced: {
-                label: '設定',
+                label: '進階選項',
                 form: {
                     object_options: {
                         text: '材質',
@@ -526,7 +526,7 @@ define(function() {
                         options: [
                             {
                                 value: 'wood',
-                                label: '木材',
+                                label: '木板',
                                 data: {
                                     laser_speed: 5,
                                     power: 255
