@@ -113,6 +113,7 @@ define([
             var self = this,
                 _opts = {
                     onSuccess: function(data) {
+                        ProgressActions.close();
                         self._returnSelectedPrinter();
                     },
                     onFail: function(data) {
@@ -147,13 +148,11 @@ define([
 
             if ('00000000000000000000000000000000' === self.selected_printer.uuid) {
                 self.props.onGettingPrinter(self.selected_printer);
-                ProgressActions.close();
             }
             else {
                 DeviceMaster.selectDevice(self.selected_printer).then(function(status) {
                     if (status === DeviceConstants.CONNECTED) {
                         self.props.onGettingPrinter(self.selected_printer);
-                        ProgressActions.close();
                     }
                     else if (status === DeviceConstants.TIMEOUT) {
                         AlertActions.showPopupError('printer-selector', lang.message.connectionTimeout);
