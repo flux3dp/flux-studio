@@ -150,7 +150,6 @@ define([
 
                         <form className="form h-form">
                             <h1 className="headline">{lang.initialize.name_your_flux}</h1>
-                            <p>{lang.initialize.why_need_name}</p>
 
                             <div className="controls">
                                 <p className="control">
