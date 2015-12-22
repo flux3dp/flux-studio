@@ -3,13 +3,22 @@
  * Ref: https://github.com/flux3dp/fluxghost/wiki/websocket-bitmap-laser-parser
  */
 define([
+    'jquery',
     'helpers/websocket',
     'helpers/convertToTypedArray',
     'helpers/is-json',
     'helpers/data-history',
     'helpers/api/set-params',
     'helpers/image-data'
-], function(Websocket, convertToTypedArray, isJson, history, setParams, imageData) {
+], function(
+    $,
+    Websocket,
+    convertToTypedArray,
+    isJson,
+    history,
+    setParams,
+    imageData
+) {
     'use strict';
 
     return function(opts) {
@@ -184,6 +193,21 @@ define([
 
                 opts.onStarting();
             },
+
+            clear: function() {
+                var deferred = $.Deferred();
+
+                events.onMessage = function(data) {
+                    if ('ok' === data.status) {
+                        deferred.resolve(data);
+                    }
+                };
+
+                ws.send('clear_imgs');
+
+                return deferred.promise();
+            },
+
             params: setParams(ws, events)
         };
     };
