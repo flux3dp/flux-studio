@@ -3,12 +3,12 @@
  */
 define([
     'helpers/api/config',
-    'helpers/local-storage',
-    'helpers/nwjs/menu-factory'
+    'helpers/nwjs/menu-factory',
+    'helpers/local-storage'
 ], function(
     config,
-    localStorage,
-    menuFactory
+    menuFactory,
+    localStorage
 ) {
     'use strict';
 
@@ -32,7 +32,7 @@ define([
                     methods.settingPrinter.clear();
                     methods.settingWifi.clear();
 
-                    if (false === completed) {
+                    if (false === completed && 'undefined' !== typeof menuFactory) {
                         menuFactory.methods.refresh();
                     }
 
