@@ -3096,6 +3096,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         top: 0;
         z-index: -1; }
     .modal-window .modal-body {
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3), 0 16px 40px rgba(0, 0, 0, 0.5);
         display: -webkit-box;
         /* OLD - iOS 6-, Safari 3.1-6 */
         display: -webkit-flex;
@@ -3144,9 +3145,9 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         /* NEW, Spec - Opera 12.1, Firefox 20+ */
         background: #FFF;
         flex-direction: column;
-        min-height: 25rem;
+        min-height: 100px;
         overflow: auto;
-        padding: 1.6rem 2.8rem;
+        padding: 1.6rem;
         position: relative;
         text-align: center;
         align-items: center;
@@ -3155,10 +3156,13 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         .modal-window .modal-alert .caption {
             margin: 0 0 1.6rem 0; }
         .modal-window .modal-alert .message {
-            margin: 0 0 20px 0; }
+            margin: 0 0 20px 0;
+            text-align: left; }
         .modal-window .modal-alert .caption,
         .modal-window .modal-alert .message {
             width: 100%; }
+        .modal-window .modal-alert .btn {
+            min-width: 50px; }
     .modal-window .message {
         font-family: "Helvetica Neue", "HelveticaNeue-Light", "Helvetica Neue Light", Helvetica, Arial, "Lucida Grande", sans-serif, "Microsoft JhengHei", "微軟正黑體";
         margin: 0;
