@@ -2955,13 +2955,15 @@ input[type=range]:focus::-webkit-slider-runnable-track {
     .controls input[type=range]:focus::-webkit-slider-runnable-track {
         background: #E0E0DF; }
 
-.ui-control-text-toggle input {
-    display: none; }
-    .ui-control-text-toggle input + span::after {
-        content: attr(data-text-off); }
-
-.ui-control-text-toggle input:checked + span::after {
-    content: attr(data-text-on); }
+.ui-control-text-toggle {
+    cursor: inherit;
+    display: block; }
+    .ui-control-text-toggle input {
+        display: none; }
+        .ui-control-text-toggle input + span::after {
+            content: attr(data-text-off); }
+    .ui-control-text-toggle input:checked + span::after {
+        content: attr(data-text-on); }
 
 .ui-control-text-input,
 .ui-control-unit-input {
