@@ -188,12 +188,13 @@ define([
                             message={this.props.message}
                             buttons={buttons}
                         />
-                    );
+                    ),
+                    className = {
+                        'shadow-modal': true
+                    };
 
                 return (
-                    <div className="always-top">
-                        <Modal content={content} disabledEscapeOnBackground={this.props.escapable}/>
-                    </div>
+                    <Modal className={className} content={content} disabledEscapeOnBackground={this.props.escapable}/>
                 );
             }
 
