@@ -141,7 +141,7 @@ define([
         _saveLastestSet: function(opts) {
             opts = opts || {};
             opts.material = opts.material || this.state.defaults.material;
-            opts.objectHeight = opts.objectHeight || this.state.defaults.objectHeight;
+            opts.objectHeight = ('number' === typeof opts.objectHeight ? opts.objectHeight : this.state.defaults.objectHeight);
             opts.isShading = ('boolean' === typeof opts.isShading ? opts.isShading : this.state.defaults.isShading);
 
             var self = this,
