@@ -25,7 +25,6 @@
     }
 
     .modal-body {
-        box-shadow: 0 4px 15px rgba(0, 0, 0, .3), 0 16px 40px rgba(0, 0, 0, .5);
         @include flexbox();
         max-height: 100%;
         overflow: hidden;
@@ -365,5 +364,11 @@
             right: 19px;
             min-width: 60px;
         }
+    }
+}
+
+.shadow-modal {
+    .modal-body {
+        box-shadow: 0 4px 15px rgba(0, 0, 0, .3), 0 16px 40px rgba(0, 0, 0, .5);
     }
 }
