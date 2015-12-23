@@ -34,6 +34,10 @@ define(function() {
         UNKNOWN_STATUS  : 'UNKNOWN_STATUS',
         USER_OPERATION  : 'USER_OPERATION',
         UPLOADING       : 'UPLOADING',
+        WAITING_HEAD    : 'WAITING_HEAD',
+        CORRECTING      : 'CORRECTING',
+        OCCUPIED        : 'OCCUPIED',
+        SCANNING        : 'SCANNING',
 
         // folder
         NOT_EXIST       : 'NOT_EXIST',
@@ -69,7 +73,7 @@ define(function() {
             PAUSED_FROM_RUNNING     : 48,
             PAUSING_FROM_RUNNING    : 50,
             COMPLETED               : 64,
-            COMPLETING              : 68,
+            COMPLETING              : 66,
             ABORTED                 : 128
         }
     };
