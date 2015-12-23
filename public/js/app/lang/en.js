@@ -485,6 +485,12 @@ define(function() {
             get_fcode: 'Get Fcode',
             name: 'Name',
             go: 'GO',
+            title: {
+                material: 'Select proper material to have the best engraving result.',
+                object_height: 'A Raft are layers built under your part and help it stick to the base plate.',
+                shading: 'Shading enables gradient effect of laser engraving. It takes longer time.',
+                advanced: 'Custom settings for power and speed'
+            },
             print_params: {
                 object_height: {
                     text: 'OBJECT HEIGHT',
