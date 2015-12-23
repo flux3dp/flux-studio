@@ -575,7 +575,7 @@ define([
                                             caption: self.state.lang.scan.error,
                                             message: message,
                                             onClose: function() {
-                                                openProgressBar(onScan);
+                                                self._refreshCamera();
                                             }
                                         }
                                     });
@@ -586,10 +586,10 @@ define([
                                 switch (data.message) {
                                 case 'good':
                                 case 'no object':
+                                case 'no laser':
                                     opts.onPass();
                                     break;
                                 case 'not open':
-                                case 'no laser':
                                     opts.onFail(data.message);
                                     break;
                                 default:
