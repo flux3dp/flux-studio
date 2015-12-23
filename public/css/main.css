@@ -3466,7 +3466,8 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         .top-menu .brand-logo:hover .menu {
             display: block; }
         .top-menu .brand-logo:hover .logo-icon {
-            transform: rotate(90deg); }
+            transform: rotate(90deg);
+            -webkit-filter: brightness(70%); }
         .top-menu .brand-logo:hover .func-name {
             display: none; }
     .top-menu .item {
