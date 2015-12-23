@@ -323,7 +323,7 @@ define([
         _renderObjectHeight: function(lang) {
             return {
                 label: (
-                    <div>
+                    <div title={lang.laser.title.object_height}>
                         <span className="caption">{lang.laser.print_params.object_height.text}</span>
                         <span>{this.state.defaults.objectHeight}</span>
                         <span>{lang.laser.print_params.object_height.unit}</span>
@@ -356,7 +356,7 @@ define([
 
             return {
                 label: (
-                    <div>
+                    <div title={lang.laser.title.material}>
                         <span className="caption">{lang.laser.advanced.form.object_options.text}</span>
                         <span>{defaultMaterial.label}</span>
                     </div>
@@ -384,6 +384,7 @@ define([
                     <TextToggle
                         ref="shading"
                         className={classes}
+                        title={lang.laser.title.shading}
                         displayText={lang.laser.print_params.shading.text}
                         textOn={lang.laser.print_params.shading.textOn}
                         textOff={lang.laser.print_params.shading.textOff}
@@ -432,6 +433,7 @@ define([
                     <button
                         className="btn btn-advance"
                         data-ga-event="open-laser-advanced-panel"
+                        title={lang.laser.title.advanced}
                         onClick={this._togglePanel('advanced', true)}
                     >
                         {lang.laser.button_advanced}
