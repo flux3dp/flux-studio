@@ -10,6 +10,8 @@ define([
     'app/actions/progress-actions',
     'app/constants/device-constants',
     'app/constants/progress-constants',
+    'helpers/i18n',
+    // 'loadImages',
     // non-return value
     'threeOrbitControls',
     'threeTrackballControls',
@@ -30,7 +32,8 @@ define([
     AlertActions,
     ProgressActions,
     DeviceConstants,
-    ProgressConstants
+    ProgressConstants,
+    I18n
 ) {
     'use strict';
 
@@ -62,8 +65,7 @@ define([
         ddHelper = 0,
         defaultFileName = '',
         cameraLight,
-        outOfBoundCount = 0,
-        lang = {};
+        lang = I18n.get();
 
     var s = {
         diameter: 170,
@@ -194,13 +196,18 @@ define([
         registerDropToImport();
     }
 
+    function _handleStop() {
+        console.log('stopped');
+    }
+
     function uploadStl(name, file) {
         // pass to slicer
         var d = $.Deferred();
         var reader = new FileReader();
+
         reader.onload = function() {
-            // var arrayBuffer = reader.result;
-            slicer.upload(name, file).then(function(result) {
+            slicer.upload(name, file, displayProgress).then(function(result) {
+                ProgressActions.updating('finishing up', 100);
                 d.resolve(result);
             });
         };
@@ -214,24 +221,22 @@ define([
         callback = callback || function() {};
 
         reactSrc.setState({
-            openWaitWindow: true,
             openImportWindow: false
         });
-        lang = reactSrc.state.lang;
+
+        ProgressActions.open(ProgressConstants.STEPPING, lang.print.importingModel, lang.print.wait);
 
         loader.load(model_file_path, function(geometry) {
-
             var mesh = new THREE.Mesh(geometry, commonMaterial);
             mesh.up = new THREE.Vector3(0, 0, 1);
 
+            ProgressActions.updating(lang.print.uploading, 40);
             uploadStl(mesh.uuid, file).then(function(result) {
                 if (result.status !== 'ok') {
-                    console.log(result.error);
+                    AlertActions.showPopupError('', result.status);
                 }
-                reactSrc.setState({
-                    openWaitWindow: false
-                });
                 callback();
+                ProgressActions.close();
             });
 
             geometry.center();
@@ -657,7 +662,15 @@ define([
             ids.push(obj.uuid);
         });
 
-        ProgressActions.open(ProgressConstants.STEPPING, lang.print.rendering, lang.print.savingFilePreview);
+        ProgressActions.open(
+            ProgressConstants.STEPPING,
+            lang.print.rendering,
+            lang.print.savingFilePreview,
+            true,
+            function() {
+                slicer.stop();
+            }
+        );
 
         getBlobFromScene().then(function(blob) {
             previewUrl = URL.createObjectURL(blob);
@@ -674,7 +687,7 @@ define([
                         }
                         else {
                             if (result.status !== 'error') {
-                                var progress = `${result.status}: ${result.message} ${'\n' + parseInt(result.percentage * 100)}%`,
+                                var progress = `${lang.slicer[result.status]} - ${'\n' + parseInt(result.percentage * 100)}% - ${result.message}`,
                                     complete = lang.print.finishingUp;
 
                                 if(result.status === 'warning') {
@@ -793,14 +806,8 @@ define([
     }
 
     function setParameter(name, value) {
-        slicer.setParameter(name, value).then(
-            function(result) {
-                if (result.status === 'error' || result.status === 'fatal') {
-                    // todo: error logging
-                }
-            }
-        );
         blobExpired = true;
+        return slicer.setParameter(name, value)
     }
 
     function setRotation(x, y, z, needRender, src) {
@@ -975,7 +982,7 @@ define([
     }
 
     function removeSelected() {
-        if (SELECTED.outlineMesh) {
+        if (SELECTED) {
             var index;
             scene.remove(SELECTED.outlineMesh);
             scene.remove(SELECTED);
@@ -1196,16 +1203,21 @@ define([
     function getBlobFromScene() {
         var ccp = camera.position.clone(),
             ccr = camera.rotation.clone(),
-            d = $.Deferred();
+            d = $.Deferred(),
+            ol = _getCameraLook(camera);
 
-        camera.position.set(originalCameraPosition.x, originalCameraPosition.y, originalCameraPosition.z);
+        // camera.position.set(originalCameraPosition.x, originalCameraPosition.y, originalCameraPosition.z);
+        camera.position.set(0, -215, 60);
         camera.rotation.set(originalCameraRotation.x, originalCameraRotation.y, originalCameraRotation.z, originalCameraRotation.order);
+        camera.lookAt(new THREE.Vector3(0,300,0));
         render();
 
         renderer.domElement.toBlob(function(blob) {
             camera.position.set(ccp.x, ccp.y, ccp.z);
             camera.rotation.set(ccr.x, ccr.y, ccr.z, ccr.order);
+            camera.lookAt(ol);
             render();
+            console.log(URL.createObjectURL(blob));
             d.resolve(blob);
         });
 
@@ -1408,12 +1420,16 @@ define([
         render();
     }
 
+    function displayProgress(step, total) {
+        if(step === total) {
+            ProgressActions.updating(lang.print.uploaded, 80);
+        }
+    }
+
     // Private Functions ---
 
     // sync parameters with server
     function _syncObjectParameter(objects, index, callback) {
-
-        // var d = $.Deferred();
         index = index || 0;
         if (index < objects.length) {
             slicer.set(
@@ -1441,7 +1457,6 @@ define([
     }
 
     function _addShadowedLight(x, y, z, color, intensity) {
-
         var directionalLight = new THREE.DirectionalLight(color, intensity);
         directionalLight.position.set(x, y, z);
 
@@ -1554,6 +1569,12 @@ define([
         objects.forEach(function(obj) {
             obj.outlineMesh.visible = false;
         });
+    }
+
+    function _getCameraLook(camera) {
+        var vector = new THREE.Vector3(0, 0, -1);
+        vector.applyEuler(camera.rotation, camera.eulerOrder);
+        return vector;
     }
 
     return {

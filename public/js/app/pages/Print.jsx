@@ -111,6 +111,7 @@ define([
                         hasOutOfBoundsObject        : false,
                         hasObject                   : false,
                         tutorialOn                  : false,
+                        leftPanelReady              : true,
                         currentTutorialStep         : 0,
                         layerHeight                 : 0.1,
                         raftOn                      : advancedSettings.raft_layers !== 0,
@@ -209,14 +210,16 @@ define([
                         `raft_layers = ${isOn ? 0 : advancedSettings.raft}`,
                         `raft_layers = ${isOn ? advancedSettings.raft : 0}`);
 
-                    console.log('raft layer is', advancedSettings.raft, advancedSettings.custom );
                     this.setState({ raftOn: isOn });
                     Config().write('advanced-settings', JSON.stringify(advancedSettings));
                 },
 
                 _handleSupportClick: function() {
+                    this.setState({ leftPanelReady: false });
                     var isOn = !this.state.supportOn;
-                    director.setParameter('support', isOn ? '1' : '0');
+                    director.setParameter('support', isOn ? '1' : '0').then(function() {
+                        this.setState({ leftPanelReady: true });
+                    }.bind(this));
                     advancedSettings.support_material = isOn ? 1 : 0;
                     // console.log('support on?', isOn);
                     advancedSettings.custom = advancedSettings.custom.replace(
@@ -464,6 +467,7 @@ define([
                     return (
                         <LeftPanel
                             lang                        = {lang}
+                            enable                      = {this.state.leftPanelReady}
                             hasObject                   = {this.state.hasObject}
                             hasOutOfBoundsObject        = {this.state.hasOutOfBoundsObject}
                             previewLayerCount           = {this.state.previewLayerCount}

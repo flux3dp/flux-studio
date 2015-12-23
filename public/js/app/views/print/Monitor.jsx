@@ -37,19 +37,22 @@ define([
         messageViewed = false,
         fileNameLength = 12,
         operationStatus,
+        displayStatus,
+        currentStatus,
         previewUrl = '',
         lang,
         lastAction,
         fileToBeUpload = {},
-        initializing = false,
-        rootMode = DeviceConstants.IDLE,
+        statusActions,
+        errorActions,
+        // initializing = false,
 
         // error display
         mainError = '',
         subError = '',
         lastError = '',
         errorMessage = '',
-        lastMessage = '',
+        // lastMessage = '',
         headInfo = '',
 
         // for monitor temperature, time...
@@ -78,6 +81,97 @@ define([
         DeviceConstants.RESUMING,
         DeviceConstants.ABORTED,
     ];
+
+    statusActions = {
+        'IDLE': function() {
+            displayStatus = lang.device.ready;
+            currentStatus = DeviceConstants.READY;
+        },
+
+        'INIT': function() {
+            displayStatus = lang.device.starting;
+            currentStatus = '';
+        },
+
+        'STARTING': function() {
+            displayStatus = lang.device.starting;
+            currentStatus = DeviceConstants.PAUSED;
+        },
+
+        'RUNNING': function() {
+            displayStatus = lang.device.scanning;
+            currentStatus = DeviceConstants.RUNNING;
+            lastError = '';
+        },
+
+        'PAUSED': function() {
+            displayStatus = lang.device.paused;
+            currentStatus = DeviceConstants.PAUSED;
+        },
+
+        'PAUSING': function() {
+            displayStatus = lang.device.paused;
+            currentStatus = DeviceConstants.PAUSED;
+        },
+
+        'WAITING_HEAD': function() {
+            displayStatus = lang.device.heating;
+            currentStatus = '';
+        },
+
+        'CORRECTING': function() {
+            displayStatus = lang.device.calibrating;
+            currentStatus = '';
+        },
+
+        'COMPLETING': function() {
+            displayStatus = lang.device.completing;
+            currentStatus = '';
+        },
+
+        'COMPLETED': function() {
+            displayStatus = lang.device.completed;
+            currentStatus = '';
+            DeviceMaster.quit();
+        },
+
+        'ABORTED': function() {
+            displayStatus = lang.device.completed;
+            currentStatus = '';
+            DeviceMaster.quit();
+        },
+
+        'RESUMING': function() {
+            displayStatus = lang.device.starting;
+            currentStatus = DeviceConstants.RUNNING;
+        },
+
+        'OCCUPIED': function() {
+            displayStatus = lang.device.occupied;
+            currentStatus = DeviceConstants.PAUSED;
+        },
+
+        'SCANNING': function() {
+            displayStatus = lang.device.scanning;
+            currentStatus = '';
+        }
+    };
+
+    errorActions = {
+        'UNKNOWN_STATUS': function() {
+            DeviceMaster.quit();
+        },
+
+        'AUTH_ERROR': function() {
+            clearInterval(reporter);
+        },
+
+        'USER_OPERATION': function(_statusId) {
+            if(_statusId === DeviceConstants.status.ABORTED) {
+                DeviceMaster.quit();
+            }
+        }
+    };
 
     return React.createClass({
 
@@ -113,7 +207,7 @@ define([
                 };
 
             pathArray   = [];
-            lang        = this.props.lang.monitor;
+            lang        = this.props.lang;
             previewUrl  = this.props.previewUrl;
 
             this._getPrintingInfo();
@@ -170,7 +264,7 @@ define([
                     time = `${hour}:${min}:${sec}`;
                 }
                 else {
-                    time = `${hour} ${lang.hour} ${min} ${lang.minute}`;
+                    time = `${hour} ${lang.monitor.hour} ${min} ${lang.monitor.minute}`;
                 }
             }
             else if(timeInSeconds > 60) {
@@ -181,12 +275,12 @@ define([
                     time = `${min}:${sec}`;
                 }
                 else {
-                    time = `${parseInt(timeInSeconds / 60)} ${lang.minute}`;
+                    time = `${parseInt(timeInSeconds / 60)} ${lang.monitor.minute}`;
                 }
             }
             else {
                 if(!withSeconds) {
-                    time = lang.almostDone;
+                    time = lang.monitor.almostDone;
                 }
             }
 
@@ -234,7 +328,7 @@ define([
                     });
                 }
                 else {
-                    AlertActions.showPopupInfo('', lang.extensionNotSupported);
+                    AlertActions.showPopupInfo('', lang.monitor.extensionNotSupported);
                 }
             };
         },
@@ -265,7 +359,7 @@ define([
                     ext     = info[info.length - 1];
 
                 if(ext === 'gcode') {
-                    AlertActions.showPopupYesNo('confirmGToF', lang.confirmGToF);
+                    AlertActions.showPopupYesNo('confirmGToF', lang.monitor.confirmGToF);
                 }
                 else {
                     this._doFileUpload(fileToBeUpload);
@@ -377,7 +471,7 @@ define([
                         });
                     }
                     else {
-                        AlertActions.showPopupInfo('', lang.cannotPreview);
+                        AlertActions.showPopupInfo('', lang.monitor.cannotPreview);
                     }
 
                 }.bind(this));
@@ -389,14 +483,14 @@ define([
                 fileToBeUpload = e.target.files[0];
                 this._existFileInDirectory(pathArray, fileToBeUpload.name).then(function(exist) {
                     if(exist) {
-                        AlertActions.showPopupYesNo('uploadFile', lang.fileExistContinue);
+                        AlertActions.showPopupYesNo('uploadFile', lang.monitor.fileExistContinue);
                     }
                     else {
                         var info = fileToBeUpload.name.split('.'),
                             ext  = info[info.length - 1];
 
                         if(ext === 'gcode') {
-                            AlertActions.showPopupYesNo('confirmGToF', lang.confirmGToF);
+                            AlertActions.showPopupYesNo('confirmGToF', lang.monitor.confirmGToF);
                         }
                         else {
                             this._doFileUpload(fileToBeUpload);
@@ -414,7 +508,7 @@ define([
                     saveAs(info[1], info[0]);
                 }
                 else {
-                    AlertActions.showPopupInfo('', lang.fileNotDownloadable);
+                    AlertActions.showPopupInfo('', lang.monitor.fileNotDownloadable);
                 }
             }.bind(this));
         },
@@ -438,7 +532,7 @@ define([
             this._stopReport();
             if(this.state.currentStatus === DeviceConstants.READY) {
                 var blob = this.props.fCode;
-
+                this.setState({ currentStatus: lang.device.starting });
                 if(blob) {
                     this.setState({ currentStatus: DeviceConstants.UPLOADING });
                     DeviceMaster.go(blob).then(function() {
@@ -450,11 +544,13 @@ define([
                         this._getPrintingInfo();
                     }.bind(this));
                 }
-                initializing = true;
+                // initializing = true;
 
             }
             else {
-                DeviceMaster.resume();
+                DeviceMaster.resume().then(function() {
+                    this._startReport();
+                }.bind(this));
             }
         },
 
@@ -464,7 +560,7 @@ define([
 
         _handleStop: function() {
             if(statusId < 0) {
-                AlertActions.showPopupYesNo('KICK', lang.forceStop);
+                AlertActions.showPopupYesNo('KICK', lang.monitor.forceStop);
             }
             else {
                 DeviceMaster.stop();
@@ -500,8 +596,9 @@ define([
             status          = report.st_label;
             statusId        = report.st_id;
 
-            rootMode = statusId === DeviceConstants.status.IDLE ? DeviceConstants.IDLE : DeviceConstants.RUNNING;
+            // rootMode = statusId === DeviceConstants.status.IDLE ? DeviceConstants.IDLE : DeviceConstants.RUNNING;
 
+            // jug down errors as main and sub error for later use
             if(report.error) {
                 if(typeof(report.error) === 'string') {
                     mainError = report.error;
@@ -512,79 +609,44 @@ define([
                 }
             }
 
-            // clear compelted first
-            if(statusId === DeviceConstants.status.COMPLETED) {
-                DeviceMaster.quit();
-                return;
-            }
-            else if(statusId === DeviceConstants.status.RUNNING) {
-                initializing = false;
+            if(errorActions[mainError]) {
+                errorActions[mainError](statusId);
             }
 
-            // check for error
-            if(report.error && this._isError(status)) {
-                if(lastError !== mainError && statusId !== DeviceConstants.status.ABORTED && !initializing) {
-                    if(mainError !== 'USER_OPERATION') {
-                        AlertActions.showPopupError(_id, mainError + '\n' + subError);
-                        lastError = mainError;
-                        showingPopup = true;
-                        messageViewed = false;
-                    }
-                }
-            }
-            else if(status === DeviceConstants.PAUSED || status === DeviceConstants.PAUSING) {
-                if (mainError === DeviceConstants.HEAD_ERROR) {
-                    errorMessage = lang[subError];
-                }
-                else {
-                    errorMessage = lang[mainError];
+            if(lastError !== mainError) {
+                messageViewed = false;
+                lastError = mainError;
+                var attr = [];
+                attr.push(mainError);
+                if(subError.length > 0) {
+                    attr.push(subError);
                 }
 
-                if(lastMessage !== errorMessage) {
-                    messageViewed = false;
-                    lastMessage = errorMessage;
-                }
-
-                if(!messageViewed) {
-                    AlertActions.showPopupRetry(_id, errorMessage);
-                    showingPopup = true;
-                }
+                console.log(attr.join('_'));
+                errorMessage = lang.monitor[attr.join('_')];
             }
-            else if (status === DeviceConstants.UNKNOWN_STATUS) {
-                DeviceMaster.quit();
+
+            if(!messageViewed && !showingPopup && mainError !== DeviceConstants.USER_OPERATION) {
+                AlertActions.showPopupRetry(_id, errorMessage);
+                showingPopup = true;
             }
 
             // actions responded to status
-            if(lastError === DeviceConstants.AUTH_ERROR) {
-                clearInterval(reporter);
-            }
-            else if (lastError === DeviceConstants.UNKNOWN_ERROR) {
-                DeviceMaster.quit();
-            }
-            else if(statusId === DeviceConstants.status.COMPLETED || statusId === DeviceConstants.status.ABORTED) {
-                DeviceMaster.quit();
-                status = DeviceConstants.READY;
-            }
-            else if(status === DeviceConstants.IDLE) {
-                status = DeviceConstants.READY;
-            }
-
-            if(showingPopup && status === DeviceConstants.RUNNING && !messageViewed) {
-                showingPopup = false;
-                AlertActions.closePopup();
+            if(statusActions[status]) {
+                statusActions[status]();
             }
 
             if(report.prog && !!totalTimeInSeconds) {
                 percentageDone = parseInt(report.prog * 100);
                 timeLeft = this._formatTime(totalTimeInSeconds * (1 - report.prog));
-                progress = `${percentageDone}%, ${timeLeft} ${lang.left}`;
+                progress = `${percentageDone}%, ${timeLeft} ${lang.monitor.left}`;
             }
             else {
                 progress = '';
             }
 
             if(report.rt) {
-                temperature = `${lang.temperature} ${report.rt} °C`;
+                temperature = `${lang.monitor.temperature} ${report.rt} °C`;
             }
             else {
                 temperature = '';
@@ -599,9 +661,26 @@ define([
                 headInfo = '';
             }
 
+
+            if(!report.error) {
+                AlertActions.closePopup();
+                showingPopup = false;
+                // if(statusId === DeviceConstants.status.RUNNING) {
+                //     displayStatus = lang.device.working;
+                //     currentStatus = DeviceConstants.RUNNING;
+                //     lastError = '';
+                // }
+            }
+
+            // if(showingPopup && status === DeviceConstants.RUNNING && !messageViewed) {
+            //     showingPopup = false;
+            //     AlertActions.closePopup();
+            // }
+
             this.setState({
                 temperature: temperature,
-                currentStatus: status,
+                currentStatus: currentStatus,
+                displayStatus: displayStatus,
                 progress: progress,
                 headInfo: headInfo
             });
@@ -806,21 +885,21 @@ define([
             go = (
                 <div className="controls center" onClick={self._handleGo}>
                     <div className="btn-go btn-control"></div>
-                    <div className="description">{lang.go}</div>
+                    <div className="description">{lang.monitor.go}</div>
                 </div>
             );
 
             pause = (
                 <div className="controls center" onClick={self._handlePause}>
                     <div className="btn-pause btn-control"></div>
-                    <div className="description">{lang.pause}</div>
+                    <div className="description">{lang.monitor.pause}</div>
                 </div>
             );
 
             stop = (
                 <div className="controls left" onClick={this._handleStop}>
                     <div className="btn-stop btn-control"></div>
-                    <div className="description">{lang.stop}</div>
+                    <div className="description">{lang.monitor.stop}</div>
                 </div>
             );
 
@@ -828,14 +907,14 @@ define([
                 <div className="controls left" onClick={this._handleUpload}>
                     <div className="btn-upload btn-control"></div>
                     <input className="upload-control" type="file" accept=".fc, .gcode" onChange={this._handleUpload} />
-                    <div className="description">{lang.upload}</div>
+                    <div className="description">{lang.monitor.upload}</div>
                 </div>
             );
 
             download = (
                 <div className="controls center" onClick={this._handleDownload}>
                     <div className="btn-download btn-control"></div>
-                    <div className="description">{lang.download}</div>
+                    <div className="description">{lang.monitor.download}</div>
                 </div>
             );
 
@@ -860,7 +939,9 @@ define([
             action = !!commands[this.state.currentStatus] ? commands[this.state.currentStatus]() : '';
 
             if(!this.props.fCode && !this.state.selectedFileName) {
-                action = '';
+                if(this.state.currentStatus === DeviceConstants.READY) {
+                    action = '';
+                }
             }
 
             leftButton = this.state.mode === mode.BROWSE_FILE ? upload : stop;
@@ -872,12 +953,12 @@ define([
                     {middleButton}
                     <div className="controls right" onClick={this._handleToggleCamera}>
                         <div className={cameraClass}></div>
-                        <div className={cameraDescriptionClass}>{lang.camera}</div>
+                        <div className={cameraDescriptionClass}>{lang.monitor.camera}</div>
                     </div>
                 </div>
             );
 
-            wait = (<div className="wait">{lang.connecting}</div>);
+            wait = (<div className="wait">{lang.monitor.connecting}</div>);
 
             return operation;
         },
@@ -969,7 +1050,7 @@ define([
                                     {this.state.headInfo}
                                 </div>
                                 <div className="status right">
-                                    {this.state.currentStatus}
+                                    {this.state.displayStatus}
                                 </div>
                             </div>
                             <div className="row">
@@ -980,9 +1061,9 @@ define([
                         {
                             /*
                             <div className="actions center">
-                                <a className="btn filament">{lang.change_filament}</a>
-                                <a className="btn file" onClick={this._handleBrowseFile}>{lang.browse_file}</a>
-                                <a className="btn monitor" onClick={this._handleToggleCamera}>{lang.monitor}</a>
+                                <a className="btn filament">{lang.monitor.change_filament}</a>
+                                <a className="btn file" onClick={this._handleBrowseFile}>{lang.monitor.browse_file}</a>
+                                <a className="btn monitor" onClick={this._handleToggleCamera}>{lang.monitor.monitor}</a>
                             </div>
                             */
                         }

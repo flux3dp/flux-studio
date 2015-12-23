@@ -11,12 +11,12 @@ define([
 
     var lang,
         settings,
-        quality,
+        qualityLevel,
         layerHeight,
         defaultQuality = 'high',
         constants;
 
-    quality = {
+    qualityLevel = {
         high: 0.1,
         med: 0.2,
         low: 0.3
@@ -39,6 +39,7 @@ define([
 
         propTypes: {
             lang                        : React.PropTypes.object,
+            enable                      : React.PropTypes.bool,
             previewMode                 : React.PropTypes.bool,
             hasObject                   : React.PropTypes.bool,
             hasOutOfBoundsObject        : React.PropTypes.bool,
@@ -76,7 +77,7 @@ define([
         },
 
         componentDidMount: function() {
-            layerHeight = quality[defaultQuality];
+            layerHeight = qualityLevel[defaultQuality];
         },
 
         componentWillReceiveProps: function(nextProps) {
@@ -92,11 +93,11 @@ define([
 
             if(nextProps.layerHeight !== layerHeight) {
                 var _quality = {
-                    '0.1': lang.quality.high,
-                    '0.2': lang.quality.med,
-                    '0.3': lang.quality.low
+                    '0.1': lang.qualityLevel.high,
+                    '0.2': lang.qualityLevel.med,
+                    '0.3': lang.qualityLevel.low
                 };
-                this.setState({ quality: _quality[nextProps.layerHeight.toString()] || lang.quality.custom });
+                this.setState({ quality: _quality[nextProps.layerHeight.toString()] || lang.qualityLevel.custom });
             }
         },
 
@@ -113,9 +114,9 @@ define([
             var self = this,
                 actions = {
                     'QUALITY': function() {
-                        layerHeight = quality[arg];
-                        self.props.onQualitySelected(quality[arg]);
-                        self.setState({ quality: lang.quality[arg] });
+                        layerHeight = qualityLevel[arg];
+                        self.props.onQualitySelected(qualityLevel[arg]);
+                        self.setState({ quality: lang.qualityLevel[arg] });
                         $('.dialog-opener').prop('checked', false);
                     },
 
@@ -295,6 +296,7 @@ define([
                 support     = this._renderSupport(),
                 advanced    = this._renderAdvanced(),
                 preview     = this._renderPreview(),
+                mask        = this.props.enable ? '' : (<div className="mask"></div>),
                 items = [
                     quality,
                     raft,
@@ -305,7 +307,9 @@ define([
 
             return (
                 <div className='leftPanel'>
+                    {mask}
                     <DialogMenu ref="dialogMenu" items={items}/>
+                    <div>enabled: {this.props.enable.toString()}</div>
                 </div>
             );
         }

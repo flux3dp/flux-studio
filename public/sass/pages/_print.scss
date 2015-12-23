@@ -706,6 +706,13 @@ input.switch:checked ~ label:after {
         margin: 0 0 0 30px;
         z-index: 1;
         align-self: center;
+        position: relative;
+        .mask {
+            z-index: 99;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+        }
     }
     .rightPanel {
         height: 100%;
