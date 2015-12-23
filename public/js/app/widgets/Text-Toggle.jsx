@@ -7,6 +7,7 @@ define([
 
         getDefaultProps: function() {
             return {
+                title: '',
                 textOn: '',
                 textOff: '',
                 defaultChecked: false,
@@ -43,7 +44,7 @@ define([
                 className = defaultClassName + ('string' === typeof this.props.className ? ' ' + this.props.className : '');
 
             return (
-                <label className={className}>
+                <label className={className} title={props.title}>
                     <span className="caption">{props.displayText}</span>
                     <input
                         refs="toggle"
