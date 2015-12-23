@@ -693,10 +693,12 @@ define(function() {
             retry: '重新選擇'
         },
         device: {
-            cameraOn: '啟用鏡頭',
-            cameraOff: '關閉鏡頭',
-            browseFiles: '瀏覽檔案',
+            camera_on: '啟用鏡頭',
+            camera_off: '關閉鏡頭',
+            browse_file: '瀏覽檔案',
             pause: '暫停',
+            paused: '已暫停',
+            pausing: '正在暫停',
             cancelTask: '終止任務',
             selectPrinter: '選擇成型機',
             retry: '重試',
@@ -706,10 +708,17 @@ define(function() {
             reset: '重設(kick)',
             abort: '取消工作',
             start: '開始',
-            noTask: '目前無任何工作',
-            pleaseWait: '請稍待...',
-            unknownCommand: '指令無法在此狀態下被執行',
-            quit: '中斷連結'
+            no_task: '目前無任何工作',
+            please_wait: '請稍待...',
+            unknown_command: '指令無法在此狀態下被執行',
+            quit: '中斷連結',
+            heating: '加熱中',
+            completing: '完成中',
+            calibrating: '校正中',
+            starting: '啟動中',
+            resuming: '恢復中',
+            scanning: '掃描',
+            occupied: '裝置被佔用'
         },
         monitor: {
             change_filament: 'CHANGE FILLAMENT',

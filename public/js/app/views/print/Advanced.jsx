@@ -294,6 +294,7 @@ define([
         },
 
         _handleControlValueChange: function(id, value) {
+            // console.log(id, value);
             if(typeof(value) === 'boolean') {
                 advancedSetting[id] = value ? 1 : 0;
             }
@@ -305,6 +306,7 @@ define([
             // for raft on off
             if(id === 'raft_layers') {
                 advancedSetting.raft = value;
+                this.props.onValueChange(id, value);
             }
             else if (id === 'layer_height') {
                 this.props.onValueChange(id, value);
@@ -423,12 +425,12 @@ define([
                 <div className="content-wrapper">
 
                     <div className="section">
-                        <div className="title">{lang.layerHeight}</div>
+                        <div className="title">{lang.layer_height_title}</div>
 
                         <SliderControl
                             id="layer_height"
                             key="layer_height"
-                            label={lang.layerHeight}
+                            label={lang.layer_height}
                             min={0.05}
                             max={0.4}
                             step={0.05}
@@ -586,7 +588,7 @@ define([
                             id="raft_layers"
                             key="raft_layers"
                             label={lang.raftLayers}
-                            min={1}
+                            min={0}
                             max={6}
                             step={1}
                             default={advancedSetting.raft_layers}

@@ -44,6 +44,8 @@ define([
             hasOutOfBoundsObject        : React.PropTypes.bool,
             previewLayerCount           : React.PropTypes.number,
             raftLayers                  : React.PropTypes.number,
+            supportOn                   : React.PropTypes.bool,
+            raftOn                      : React.PropTypes.bool,
             onQualitySelected           : React.PropTypes.func,
             onRaftClick                 : React.PropTypes.func,
             onSupportClick              : React.PropTypes.func,

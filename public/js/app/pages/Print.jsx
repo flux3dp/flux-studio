@@ -205,6 +205,11 @@ define([
                     var isOn = !this.state.raftOn;
                     director.setParameter('raft', isOn ? '1' : '0');
                     advancedSettings.raft_layers = isOn ? advancedSettings.raft : 0;
+                    advancedSettings.custom = advancedSettings.custom.replace(
+                        `raft_layers = ${isOn ? 0 : advancedSettings.raft}`,
+                        `raft_layers = ${isOn ? advancedSettings.raft : 0}`);
+
+                    console.log('raft layer is', advancedSettings.raft, advancedSettings.custom );
                     this.setState({ raftOn: isOn });
                     Config().write('advanced-settings', JSON.stringify(advancedSettings));
                 },
@@ -213,6 +218,10 @@ define([
                     var isOn = !this.state.supportOn;
                     director.setParameter('support', isOn ? '1' : '0');
                     advancedSettings.support_material = isOn ? 1 : 0;
+                    // console.log('support on?', isOn);
+                    advancedSettings.custom = advancedSettings.custom.replace(
+                        `support_material = ${isOn ? 0 : 1}`,
+                        `support_material = ${isOn ? 1 : 0}`);
                     this.setState({ supportOn: isOn });
                     Config().write('advanced-settings', JSON.stringify(advancedSettings));
                 },
@@ -267,7 +276,7 @@ define([
                 _handleApplyAdvancedSetting: function(setting) {
                     setting = setting || advancedSettings;
                     Config().write('advanced-settings', JSON.stringify(setting));
-                    advancedSettings = setting;
+                    Object.assign(advancedSettings, setting);
                     this.setState({ supportOn: setting.support_material === 1 });
                     return director.setAdvanceParameter(setting);
                 },
@@ -365,6 +374,10 @@ define([
                 _handleAdvancedValueChange: function(key, value) {
                     if(key === 'layer_height') {
                         this.setState({ layerHeight: value });
+                    }
+                    else if (key === 'raft_layers') {
+                        console.log(key, value !== '0');
+                        this.setState({ raftOn: value !== '0' });
                     }
                 },
 
