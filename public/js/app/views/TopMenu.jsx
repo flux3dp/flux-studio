@@ -371,23 +371,12 @@ define([
                         });
                     };
 
-                if (false === window.FLUX.debug) {
-                    Config().read('printers', {
-                        onFinished: function(response) {
-                            options = JSON.parse(response || '[]');
-
-                            refreshOption(options);
-                        }
-                    });
-                }
-                else {
-                    Discover(
-                        'top-menu',
-                        function(printers) {
-                            refreshOption(printers);
-                        }
-                    );
-                }
+                Discover(
+                    'top-menu',
+                    function(printers) {
+                        refreshOption(printers);
+                    }
+                );
 
                 this.setState({ showDeviceList: !this.state.showDeviceList });
             },

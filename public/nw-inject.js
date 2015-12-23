@@ -15,9 +15,8 @@ var fs = requireNode('fs'),
     ghost,
     appWindow,
     executeGhost = function(port) {
-        var slic3rPathIndex = 2,
+        var slic3rPathIndex = 1,
             args = [
-                '-s',
                 '--slic3r',
                 '',
                 '--port',

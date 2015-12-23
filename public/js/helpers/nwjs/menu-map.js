@@ -183,6 +183,7 @@ define([
                 });
             }
         },
+        separator,
         {
             label: lang.flux.about,
             enabled: true,
