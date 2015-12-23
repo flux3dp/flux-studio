@@ -409,7 +409,7 @@ define([
             };
 
         shortcuts.on(
-            ['cmd', 'del'],
+            ['del'],
             function(e) {
                 deleteImage();
             }
