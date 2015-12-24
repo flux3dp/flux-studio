@@ -73,8 +73,7 @@ img {
     height: 100%;
     overflow: hidden;
     width: 100%;
-    position: absolute;
-    z-index: 1;
+    position: relative;
 }
 
 .horizontal-menu .menu-item {
@@ -531,4 +530,10 @@ input[type=range]:focus::-webkit-slider-runnable-track {
     -webkit-clip-path: polygon(0 0, 0 100%, 100% 50%);
     clip-path: polygon(0 0, 0 100%, 100% 50%);
     transform: translateX(-1px);
+}
+
+.arrow-top-left-flat {
+    -webkit-clip-path: polygon(0 0, 100% 100%, 100% 0);
+    clip-path: polygon(0 0, 100% 100%, 100% 0);
+    transform: translateX(1px);
 }

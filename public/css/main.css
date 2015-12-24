@@ -2144,8 +2144,7 @@ img {
     height: 100%;
     overflow: hidden;
     width: 100%;
-    position: absolute;
-    z-index: 1; }
+    position: relative; }
 
 .horizontal-menu .menu-item {
     float: left;
@@ -2606,6 +2605,11 @@ input[type=range]:focus::-webkit-slider-runnable-track {
     -webkit-clip-path: polygon(0 0, 0 100%, 100% 50%);
     clip-path: polygon(0 0, 0 100%, 100% 50%);
     transform: translateX(-1px); }
+
+.arrow-top-left-flat {
+    -webkit-clip-path: polygon(0 0, 100% 100%, 100% 0);
+    clip-path: polygon(0 0, 100% 100%, 100% 0);
+    transform: translateX(1px); }
 
 /**
  * ref: http://tobiasahlin.com/spinkit/
@@ -3307,6 +3311,10 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         position: static;
         width: 50%; }
 
+.modal-change-filament .guide-image {
+    display: block;
+    margin: 0 auto; }
+
 .modal-change-filament .modal-alert {
     width: 440px;
     min-height: 320px;
@@ -3326,12 +3334,15 @@ input[type=range]:focus::-webkit-slider-runnable-track {
 .modal-change-filament .message {
     color: #989898;
     font-size: 15px;
-    line-height: 21px; }
+    line-height: 21px;
+    text-align: center; }
     .modal-change-filament .message p {
         margin: 0; }
 
-.modal-change-filament .message-container p:last-of-type {
-    margin: 0 0 12.5px 0; }
+.modal-change-filament .message-container {
+    text-align: center; }
+    .modal-change-filament .message-container p:last-of-type {
+        margin: 0 0 12.5px 0; }
 
 .modal-change-filament .way-to-go .btn {
     width: 100%; }
@@ -3462,13 +3473,11 @@ input[type=range]:focus::-webkit-slider-runnable-track {
             padding: 0.65rem 2.6rem;
             position: relative;
             top: 27px; }
-            .top-menu .brand-logo .menu .arrow-flat {
+            .top-menu .brand-logo .menu .arrow-top-left-flat {
                 left: 0;
                 position: absolute;
-                transform: translateX(-100%);
-                top: 0; }
-                .top-menu .brand-logo .menu .arrow-flat polygon {
-                    fill: #fff; }
+                top: 0;
+                transform: translateX(-98%); }
             .top-menu .brand-logo .menu .inner-menu {
                 display: -webkit-box;
                 /* OLD - iOS 6-, Safari 3.1-6 */
