@@ -4580,7 +4580,15 @@ input.switch:checked ~ label:after {
 .print-studio .leftPanel {
     margin: 0 0 0 30px;
     z-index: 1;
-    align-self: center; }
+    align-self: center;
+    position: relative; }
+    .print-studio .leftPanel .mask {
+        z-index: 99;
+        width: 100%;
+        height: 100%;
+        position: absolute; }
+    .print-studio .leftPanel .dialog-label .disable {
+        color: #C0C0C0; }
 
 .print-studio .rightPanel {
     height: 100%;

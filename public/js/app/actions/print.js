@@ -224,7 +224,7 @@ define([
             openImportWindow: false
         });
 
-        ProgressActions.open(ProgressConstants.STEPPING, lang.print.importingModel, lang.print.wait);
+        ProgressActions.open(ProgressConstants.STEPPING, lang.print.importingModel, lang.print.wait, false);
 
         loader.load(model_file_path, function(geometry) {
             var mesh = new THREE.Mesh(geometry, commonMaterial);
@@ -605,7 +605,7 @@ define([
             ids.push(obj.uuid);
         });
 
-        ProgressActions.open(ProgressConstants.STEPPING, lang.monitor.processing, lang.monitor.savingPreview);
+        ProgressActions.open(ProgressConstants.STEPPING, lang.monitor.processing, lang.monitor.savingPreview, false);
 
         getBlobFromScene().then(function(blob) {
             reactSrc.setState({ previewUrl: URL.createObjectURL(blob) });
@@ -666,10 +666,7 @@ define([
             ProgressConstants.STEPPING,
             lang.print.rendering,
             lang.print.savingFilePreview,
-            true,
-            function() {
-                slicer.stop();
-            }
+            false
         );
 
         getBlobFromScene().then(function(blob) {
@@ -1217,7 +1214,6 @@ define([
             camera.rotation.set(ccr.x, ccr.y, ccr.z, ccr.order);
             camera.lookAt(ol);
             render();
-            console.log(URL.createObjectURL(blob));
             d.resolve(blob);
         });
 

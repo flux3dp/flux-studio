@@ -176,6 +176,7 @@ define([
 
         _renderQuanlity: function() {
             var _quality = ['high', 'med', 'low'],
+                _class = ClassNames('display-text quality-select', {'disable': !this.props.enable}),
                 qualitySelection;
 
             qualitySelection = _quality.map(function(quality) {
@@ -188,7 +189,7 @@ define([
 
             return {
                 label: (
-                    <div className="display-text quality-select">
+                    <div className={_class}>
                         <span>{this.state.quality}</span>
                     </div>
                 ),
@@ -243,9 +244,10 @@ define([
         },
 
         _renderRaft: function() {
+            var _class = ClassNames({'disable': !this.props.enable});
             return {
                 label: (
-                    <div title={lang.raftTitle} onClick={this._handleActions.bind(null, constants.RAFT_ON, '')}>
+                    <div className={_class} title={lang.raftTitle} onClick={this._handleActions.bind(null, constants.RAFT_ON, '')}>
                         <div>{this.props.raftOn ? lang.raft_on : lang.raft_off}</div>
                     </div>
                 )
@@ -253,9 +255,10 @@ define([
         },
 
         _renderSupport: function() {
+            var _class = ClassNames({'disable': !this.props.enable});
             return {
                 label: (
-                    <div title={lang.supportTitle} onClick={this._handleActions.bind(null, constants.SUPPORT_ON, '')}>
+                    <div className={_class} title={lang.supportTitle} onClick={this._handleActions.bind(null, constants.SUPPORT_ON, '')}>
                         <div>{this.props.supportOn ? lang.support_on : lang.support_off}</div>
                     </div>
                 )
@@ -263,9 +266,10 @@ define([
         },
 
         _renderAdvanced: function() {
+            var _class = ClassNames({'disable': !this.props.enable});
             return {
                 label: (
-                    <div title={lang.advancedTitle} onClick={this._handleActions.bind(null, constants.ADVANCED, '')}>
+                    <div className={_class} title={lang.advancedTitle} onClick={this._handleActions.bind(null, constants.ADVANCED, '')}>
                         <div>{this.props.lang.print.left_panel.advanced}</div>
                     </div>
                 )
@@ -273,9 +277,10 @@ define([
         },
 
         _renderPreview: function() {
+            var _class = ClassNames('display-text', {'disable': !this.props.enable});
             return {
                 label: (
-                    <div className="display-text" onClick={this._handleActions.bind(null, constants.PREVIEW, '')}>
+                    <div className={_class} onClick={this._handleActions.bind(null, constants.PREVIEW, '')}>
                         <span>{lang.preview}</span>
                     </div>
                 ),
@@ -309,7 +314,6 @@ define([
                 <div className='leftPanel'>
                     {mask}
                     <DialogMenu ref="dialogMenu" items={items}/>
-                    <div>enabled: {this.props.enable.toString()}</div>
                 </div>
             );
         }

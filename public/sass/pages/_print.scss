@@ -713,6 +713,9 @@ input.switch:checked ~ label:after {
             height: 100%;
             position: absolute;
         }
+        .dialog-label .disable {
+            color: #C0C0C0;
+        }
     }
     .rightPanel {
         height: 100%;

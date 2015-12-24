@@ -131,10 +131,13 @@ define([
                 onFinished: function(result) {
                     d.resolve(result);
                 }
-            });
+            }, uploadProgress);
         }
 
         return d.promise();
+    }
+
+    function uploadProgress(step, total) {
     }
 
     function go(blob) {
