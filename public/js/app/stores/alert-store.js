@@ -13,7 +13,7 @@ define([
     var NOTIFY_EVENT          = 'notify',
         POPUP_EVENT           = 'popup',
         CLOSE_POPUP           = 'closePopup',
-        FIRMWARE_UPDATE_EVENT = 'firmware_update',
+        UPDATE_EVENT          = 'update',
         CHANGE_FILAMENT_EVENT = 'change_filament',
         NOTIFY_RETRY          = 'retry',
         NOTIFY_ABORT          = 'abort',
@@ -29,8 +29,8 @@ define([
             this.on(CHANGE_FILAMENT_EVENT, callback);
         },
 
-        onFirmwareUpdate(callback) {
-            this.on(FIRMWARE_UPDATE_EVENT, callback);
+        onUpdate(callback) {
+            this.on(UPDATE_EVENT, callback);
         },
 
         onNotify(callback) {
@@ -157,8 +157,8 @@ define([
                     AlertStore.emit(NOTIFY_ANSWER, payload.id, payload.isYes);
                 },
 
-                'SHOW_POPUP_FIRMWARE_UPDATE': function() {
-                    AlertStore.emit(FIRMWARE_UPDATE_EVENT, payload);
+                'SHOW_POPUP_UPDATE': function() {
+                    AlertStore.emit(UPDATE_EVENT, payload);
                 },
 
                 'CLOSE_POPUP': function() {

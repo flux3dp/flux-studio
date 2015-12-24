@@ -75,11 +75,13 @@ define([
             });
         },
 
-        showFirmwareUpdate: function(device, updateInfo) {
+        showUpdate: function(device, type, updateInfo, onInstall) {
             AlertDispatcher.dispatch({
                 actionType: AlertConstants.SHOW_POPUP_FIRMWARE_UPDATE,
                 device: device,
-                updateInfo: updateInfo
+                type: type,
+                updateInfo: updateInfo,
+                onInstall: onInstall
             });
         },
 

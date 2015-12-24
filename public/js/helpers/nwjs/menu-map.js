@@ -200,6 +200,8 @@ define([
         {
             label: lang.flux.quit,
             enabled: true,
+            key: 'q',
+            modifiers: 'cmd',
             onClick: function() {
                 if (true === window.confirm('Quit?')) {
                     gui.App.quit();
@@ -332,7 +334,10 @@ define([
                                             onClick: function() {
                                                 checkFirmware(printer).done(function(response) {
                                                     if (true === response.needUpdate) {
-                                                        AlertActions.showFirmwareUpdate(printer, response);
+                                                        AlertActions.showUpdate(printer, 'firmware', response, function() {
+                                                            // TODO: to be implement
+                                                            console.log('update firmware');
+                                                        });
                                                     }
                                                 });
                                             }
