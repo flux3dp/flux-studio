@@ -38,15 +38,11 @@
             position: relative;
             top: 27px;
 
-            .arrow-flat {
+            .arrow-top-left-flat {
                 left: 0;
                 position: absolute;
-                transform: translateX(-100%);
                 top: 0;
-
-                polygon {
-                    fill: #fff;
-                }
+                transform: translateX(-98%);
             }
 
             .inner-menu {
