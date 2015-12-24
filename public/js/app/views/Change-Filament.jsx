@@ -233,11 +233,15 @@ define([
             },
 
             _sectionCompleted: function() {
+                var messageText = (
+                    types.load === this.state.type ?
+                    lang.change_filament.loaded :
+                    lang.change_filament.unloaded
+                );
+
                 return {
                     message: (
-                        types.load === this.state.type ?
-                        lang.change_filament.loaded :
-                        lang.change_filament.unloaded
+                        <div className="message-container">{messageText}</div>
                     ),
                     buttons: [{
                         label: lang.change_filament.ok,
