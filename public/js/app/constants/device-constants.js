@@ -51,6 +51,7 @@ define(function() {
         // Print head
         EXTRUDER        : 'EXTRUDER',
         PRINTER         : 'PRINTER',
+        LASER           : 'LASER',
 
         // Command
         RESUME          : 'RESUME',

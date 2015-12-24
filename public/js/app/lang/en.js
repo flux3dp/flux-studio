@@ -457,8 +457,6 @@ define(function() {
             reset: 'Reset',
             cancel: 'CANCEL',
             done: 'DONE',
-            hour: 'hr',
-            minute: 'min',
             gram: 'g',
             pause: 'PAUSE',
             continue: 'CONTINUE',
@@ -754,8 +752,9 @@ define(function() {
             HEAD_ERROR_HARDWARE_FAILURE     : 'Something went wrong with toolhead\nPlease re-attach the toolhead',
             processing                      : 'Processing',
             savingPreview                   : 'Saving preview image',
-            hour                            : 'hr',
-            minute                          : 'min',
+            hour                            : 'h',
+            minute                          : 'm',
+            second                          : 's',
             left                            : 'left',
             temperature                     : 'Temperature',
             forceStop                       : 'Force stopping device?',
@@ -766,7 +765,15 @@ define(function() {
             extensionNotSupported           : 'file extension not supported',
             fileExistContinue               : 'file already exist, continue ? (will replace)',
             confirmGToF                     : 'Uploaded GCode will be converted to FCode, continue (will replace if exist)',
-            almostDone                      : 'almost done'
+            task : {
+                EXTRUDER                    : 'Printing Task',
+                LASER                       : 'Engraving Task'
+            },
+            device : {
+                EXTRUDER                    : 'Printing Toolhead',
+                LASER                       : 'Laser Toolhead'
+            }
+
         },
         alert: {
             caption: 'Error',

@@ -54,6 +54,7 @@ define([
         errorMessage = '',
         // lastMessage = '',
         headInfo = '',
+        taskInfo = '',
 
         // for monitor temperature, time...
         percentageDone = 0,
@@ -95,11 +96,11 @@ define([
 
         'STARTING': function() {
             displayStatus = lang.device.starting;
-            currentStatus = DeviceConstants.PAUSED;
+            currentStatus = '';
         },
 
         'RUNNING': function() {
-            displayStatus = lang.device.scanning;
+            displayStatus = lang.device.running;
             currentStatus = DeviceConstants.RUNNING;
             lastError = '';
         },
@@ -110,7 +111,7 @@ define([
         },
 
         'PAUSING': function() {
-            displayStatus = lang.device.paused;
+            displayStatus = lang.device.pausing;
             currentStatus = DeviceConstants.PAUSED;
         },
 
@@ -136,7 +137,7 @@ define([
         },
 
         'ABORTED': function() {
-            displayStatus = lang.device.completed;
+            displayStatus = lang.device.aborted;
             currentStatus = '';
             DeviceMaster.quit();
         },
@@ -189,7 +190,6 @@ define([
                 directoryContent    : {},
                 cameraImageUrl      : '',
                 selectedFileName    : '',
-                headInfo            : '',
                 progress            : '',
                 currentStatus       : DeviceConstants.READY
             };
@@ -229,6 +229,7 @@ define([
 
         _getPrintingInfo: function() {
             DeviceMaster.getPreviewInfo().then(function(info) {
+                var headInfo;
                 info = info || [];
                 info[0] = info[0] || {};
 
@@ -241,6 +242,9 @@ define([
                 if(info[0].TIME_COST) {
                     totalTimeInSeconds = info[0].TIME_COST;
                 }
+
+                taskInfo = lang.monitor.task[info[0].HEAD_TYPE];
+
                 this._startReport();
             }.bind(this));
         },
@@ -264,7 +268,7 @@ define([
                     time = `${hour}:${min}:${sec}`;
                 }
                 else {
-                    time = `${hour} ${lang.monitor.hour} ${min} ${lang.monitor.minute}`;
+                    time = `${hour}${lang.monitor.hour} ${min}${lang.monitor.minute}`;
                 }
             }
             else if(timeInSeconds > 60) {
@@ -275,12 +279,7 @@ define([
                     time = `${min}:${sec}`;
                 }
                 else {
-                    time = `${parseInt(timeInSeconds / 60)} ${lang.monitor.minute}`;
-                }
-            }
-            else {
-                if(!withSeconds) {
-                    time = lang.monitor.almostDone;
+                    time = `${min}${lang.monitor.minute} ${sec}${lang.monitor.second}`;
                 }
             }
 
@@ -652,37 +651,23 @@ define([
                 temperature = '';
             }
 
+            if(!report.error) {
+                AlertActions.closePopup();
+                showingPopup = false;
+            }
+
             if(report.module) {
-                if(report.module === DeviceConstants.EXTRUDER) {
-                    headInfo = DeviceConstants.PRINTER;
-                }
+                headInfo = lang.monitor.device[report.module];
             }
             else {
                 headInfo = '';
             }
 
-
-            if(!report.error) {
-                AlertActions.closePopup();
-                showingPopup = false;
-                // if(statusId === DeviceConstants.status.RUNNING) {
-                //     displayStatus = lang.device.working;
-                //     currentStatus = DeviceConstants.RUNNING;
-                //     lastError = '';
-                // }
-            }
-
-            // if(showingPopup && status === DeviceConstants.RUNNING && !messageViewed) {
-            //     showingPopup = false;
-            //     AlertActions.closePopup();
-            // }
-
             this.setState({
                 temperature: temperature,
                 currentStatus: currentStatus,
                 displayStatus: displayStatus,
-                progress: progress,
-                headInfo: headInfo
+                progress: progress
             });
         },
 
@@ -876,8 +861,10 @@ define([
                 cameraDescriptionClass,
                 upload,
                 download,
+                camera,
                 leftButton,
-                middleButton;
+                middleButton,
+                cameraButton;
 
             cameraClass = ClassNames('btn-camera btn-control', { 'on': this.state.mode === mode.CAMERA });
             cameraDescriptionClass = ClassNames('description', { 'on': this.state.mode === mode.CAMERA });
@@ -918,6 +905,13 @@ define([
                 </div>
             );
 
+            camera = (
+                <div className="controls right" onClick={this._handleToggleCamera}>
+                    <div className={cameraClass}></div>
+                    <div className={cameraDescriptionClass}>{lang.monitor.camera}</div>
+                </div>
+            );
+
             commands = {
                 'READY': function() {
                     return go;
@@ -946,15 +940,13 @@ define([
 
             leftButton = this.state.mode === mode.BROWSE_FILE ? upload : stop;
             middleButton = this.state.mode === mode.BROWSE_FILE ? download : action;
+            cameraButton = currentStatus !== DeviceConstants.READY ? '' : camera;
 
             operation = (
                 <div className="operation">
                     {leftButton}
                     {middleButton}
-                    <div className="controls right" onClick={this._handleToggleCamera}>
-                        <div className={cameraClass}></div>
-                        <div className={cameraDescriptionClass}>{lang.monitor.camera}</div>
-                    </div>
+                    {cameraButton}
                 </div>
             );
 
@@ -964,13 +956,12 @@ define([
         },
 
         _renderPrintingInfo: function() {
-            var _headInfo   = this.state.headInfo,
-                _duration   = totalTimeInSeconds === 0 ? '' : this._formatTime(totalTimeInSeconds, true),
+            var _duration   = totalTimeInSeconds === 0 ? '' : this._formatTime(totalTimeInSeconds, true),
                 _progress   = percentageDone === 0 ? '' : percentageDone + '%',
                 infoClass   = ClassNames('status-info', { 'running': statusId !== DeviceConstants.status.IDLE });
 
             if(statusId === DeviceConstants.status.IDLE) {
-                _headInfo = '';
+                taskInfo = '';
                 _duration = '';
                 _progress = '';
             }
@@ -978,7 +969,7 @@ define([
             return (
                 <div className={infoClass}>
                     <div className="verticle-align">
-                        <div>{_headInfo}</div>
+                        <div>{taskInfo}</div>
                         <div className="status-info-duration">{_duration}</div>
                     </div>
                     <div className="status-info-progress">{_progress}</div>
@@ -1047,7 +1038,7 @@ define([
                         <div className="wrapper">
                             <div className="row">
                                 <div className="head-info">
-                                    {this.state.headInfo}
+                                    {headInfo}
                                 </div>
                                 <div className="status right">
                                     {this.state.displayStatus}

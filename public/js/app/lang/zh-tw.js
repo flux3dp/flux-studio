@@ -457,8 +457,6 @@ define(function() {
             reset: '重設',
             cancel: '取消',
             done: '確認',
-            hour: '小時',
-            minute: '分鐘',
             gram: '公克',
             pause: '暫停',
             continue: '繼續',
@@ -757,6 +755,7 @@ define(function() {
             savingPreview                   : 'Saving preview image',
             hour                            : '小時',
             minute                          : '分',
+            second                          : '秒',
             left                            : '完成',
             temperature                     : '溫度',
             forceStop                       : '強制停止機器?',
@@ -767,7 +766,14 @@ define(function() {
             extensionNotSupported           : '上傳檔案不支援此檔案格式',
             fileExistContinue               : 'file already exist, continue (will replace)',
             confirmGToF                     : 'Uploaded GCode will be converted to FCode, continue (will replace if exist)',
-            almostDone                      : 'almost done'
+            task : {
+                EXTRUDER                    : '列印工作',
+                LASER                       : '雷雕工作'
+            },
+            device : {
+                EXTRUDER                    : '列印模組',
+                LASER                       : '雷射模組'
+            }
         },
         alert: {
             caption: '錯誤',
