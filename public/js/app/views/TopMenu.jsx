@@ -451,24 +451,27 @@ define([
                     status = lang.machine_status,
                     headModule = lang.head_module,
                     statusText,
-                    headText;
+                    headText,
+                    displayText;
 
                 var list = this.state.deviceList.map(function(device) {
-                    statusText = status[device.st_id] || status.UNKNOWN,
+                    statusText = status[device.st_id] || status.UNKNOWN;
                     headText = headModule[device.head_module] || headModule.UNKNOWN;
-
+                    
                     if (16 === device.st_id && 'number' === typeof device.st_prog) {
                         statusText += ' - ' + (parseInt(device.st_prog * 1000) * 0.1).toFixed(1) + '%';
                     }
+
+                    displayText = headText.length > 0 ? `${headText} / ${statusText}` : `${statusText}`;
 
                     return (
                         <li
                             name={device.uuid}
                             onClick={this._handleSelectDevice.bind(null, device)}>
                             <label className="name">{device.name}</label>
-                            <label className="status">{headText} {statusText}</label>
+                            <label className="status">{displayText}</label>
                         </li>
-                    )
+                    );
                 }, this);
 
                 return (

@@ -229,7 +229,6 @@ define([
 
         _getPrintingInfo: function() {
             DeviceMaster.getPreviewInfo().then(function(info) {
-                var headInfo;
                 info = info || [];
                 info[0] = info[0] || {};
 
