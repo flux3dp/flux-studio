@@ -228,11 +228,12 @@ define([
                             fileReader = new FileReader();
 
                             fileReader.onloadend = function(e) {
+                                callback(step++, total);
                                 ws.send(this.result);
                             };
 
                             fileReader.readAsArrayBuffer(chunk);
-                            callback(step++, total);
+
                         }
 
                     }
@@ -269,9 +270,13 @@ define([
                     }
                 };
             },
-            uploadToDirectory: function(blob, uploadPath, fileName) {
+            uploadToDirectory: function(blob, uploadPath, fileName, callback) {
                 var d = $.Deferred(),
                     CHUNK_PKG_SIZE = 4096;
+
+                var step = 0,
+                    total = parseInt(blob.size / CHUNK_PKG_SIZE);
+
 
                 events.onMessage = function(result) {
                     switch (result.status) {
@@ -294,6 +299,7 @@ define([
 
                             fileReader.onloadend = function(e) {
                                 ws.send(this.result);
+                                callback(step++, total);
                             };
 
                             fileReader.readAsArrayBuffer(chunk);

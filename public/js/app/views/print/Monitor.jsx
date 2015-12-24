@@ -45,6 +45,7 @@ define([
         fileToBeUpload = {},
         statusActions,
         errorActions,
+        uploadProgress = 0,
         // initializing = false,
 
         // error display
@@ -527,28 +528,31 @@ define([
         },
 
         _handleGo: function() {
+            var self = this;
             this._stopReport();
             if(this.state.currentStatus === DeviceConstants.READY) {
                 var blob = this.props.fCode;
-                this.setState({ currentStatus: lang.device.starting });
+                this.setState({ displayStatus: lang.device.starting });
                 if(blob) {
-                    this.setState({ currentStatus: DeviceConstants.UPLOADING });
-                    DeviceMaster.go(blob).then(function() {
-                        this._getPrintingInfo();
-                    }.bind(this));
+                    // this.setState({ displayStatus: DeviceConstants.UPLOADING });
+                    DeviceMaster.go(blob, function(progress) {
+                        self.setState({ displayStatus: `${lang.device.uploading} ${progress}%`});
+                    }).then(function() {
+                        self._getPrintingInfo();
+                    });
                 }
                 else {
                     DeviceMaster.goFromFile(pathArray, this.state.selectedFileName).then(function(result) {
-                        this._getPrintingInfo();
-                    }.bind(this));
+                        self._getPrintingInfo();
+                    });
                 }
                 // initializing = true;
 
             }
             else {
                 DeviceMaster.resume().then(function() {
-                    this._startReport();
-                }.bind(this));
+                    self._startReport();
+                });
             }
         },
 

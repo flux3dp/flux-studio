@@ -717,7 +717,8 @@ define(function() {
             resuming: 'Resuming',
             scanning: 'Scanning',
             occupied: 'Occupied',
-            running: 'Working'
+            running: 'Working',
+            uploading: 'Uploading'
         },
         monitor: {
             change_filament                 : 'CHANGE FILLAMENT',

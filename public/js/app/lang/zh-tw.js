@@ -717,7 +717,8 @@ define(function() {
             resuming: '恢復中',
             scanning: '掃描',
             occupied: '裝置被佔用',
-            running: '工作中'
+            running: '工作中',
+            uploading: '上傳中'
         },
         monitor: {
             change_filament                 : 'CHANGE FILLAMENT',
