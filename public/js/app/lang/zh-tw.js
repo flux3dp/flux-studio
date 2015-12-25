@@ -594,7 +594,8 @@ define(function() {
                 },
                 save_and_apply: '儲存並套用',
                 save_as_preset: '儲存',
-                load_preset: '載入',
+                save_as_preset_title: 'Save Preset',
+                load_preset_title: '載入',
                 apply: '套用',
                 cancel: '取消',
                 save: '儲存'

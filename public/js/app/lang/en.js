@@ -588,7 +588,8 @@ define(function() {
                 },
                 save_and_apply: 'SAVE & APPLY',
                 save_as_preset: 'SAVE',
-                load_preset: 'LOAD',
+                save_as_preset_title: 'Save Preset',
+                load_preset_title: 'Load Preset',
                 apply: 'APPLY',
                 cancel: 'CANCEL',
                 save: 'SAVE'
