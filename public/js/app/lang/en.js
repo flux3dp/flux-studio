@@ -85,7 +85,7 @@ define(function() {
             start: 'START',
             skip: 'Skip',
             cancel: 'CANCEL',
-            confirm: 'Confirm',
+            confirm: 'CONFIRM',
             connect: 'Connect',
 
             // specific caption/content
