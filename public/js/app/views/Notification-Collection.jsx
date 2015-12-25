@@ -219,7 +219,7 @@ define([
             },
 
             _handleInputLightBoxSubmit: function(value) {
-                this.state.inputLightbox.onSubmit(value);
+                return this.state.inputLightbox.onSubmit(value);
             },
 
             _handleProgress: function(payload) {
