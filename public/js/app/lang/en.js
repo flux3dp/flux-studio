@@ -307,15 +307,17 @@ define(function() {
                 innerShell: 'Inner Shell',
                 outerShell: 'Outer Shell',
                 bridge: 'Bridge',
-                config: 'Config',
+                config: 'Custom configuration',
                 presets: 'Presets',
                 name: 'Name',
-                loadPreset: 'LOAD',
                 apply: 'APPLY',
-                saveAsPreset: 'SAVE',
+                save: 'SAVE',
+                saveAsPreset: 'Save Preset',
                 cancel: 'CANCEL',
                 saveAndApply: 'SAVE & APPLY',
-                delete: 'DELETE'
+                delete: 'DELETE',
+                loadPreset: 'Load Preset',
+                savePreset: 'Save Preset'
             },
             mode: [
                 {

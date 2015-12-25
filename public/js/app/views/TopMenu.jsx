@@ -231,6 +231,7 @@ define([
                         defaultValue : payload.defaultValue,
                         confirmText  : payload.confirmText,
                         onClose      : payload.onClose || function() {},
+                        onCancel     : payload.onCancel || function() {},
                         onSubmit     : payload.onSubmit || function() {}
                     }
                 });
@@ -245,6 +246,9 @@ define([
 
                 if ('' === from && 'function' === typeof this.state.inputLightbox) {
                     this.state.inputLightbox.onClose();
+                }
+                else if(from === 'cancel' && typeof this.state.inputLightbox === 'object') {
+                    this.state.inputLightbox.onCancel();
                 }
             },
 

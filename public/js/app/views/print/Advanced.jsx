@@ -279,10 +279,12 @@ define([
             this.setState({ mode: mode.save });
 
             InputLightboxActions.open('save-print-preset', {
-                caption      : lang.saveAsPreset,
-                inputHeader  : lang.name,
-                confirmText  : lang.saveAndApply,
-                onSubmit     : this._handleSavePreset
+                caption     : lang.saveAsPreset,
+                inputHeader : lang.name,
+                confirmText : lang.save,
+                onSubmit    : this._handleSavePreset,
+                onClose     : this._handleBackToSetting,
+                onCancel    : this._handleBackToSetting
             });
         },
 
@@ -762,10 +764,10 @@ define([
             switch(this.state.mode) {
 
                 case mode.setup:
-                    buttons[0] = (<button className="btn btn-default" data-ga-event="load-preset" onClick={this._handleLoadPreset}>{lang.loadPreset}</button>);
-                    buttons[1] = (<button className="btn btn-default" data-ga-event="apply-preset" onClick={this._handleApply.bind(null, false)}>{lang.apply}</button>);
-                    buttons[2] = (<button className="btn btn-default" data-ga-event="save-preset" onClick={this._handleOpenSaveAsPreset}>{lang.saveAsPreset}</button>);
-                    buttons[3] = (<button className="btn btn-default" data-ga-event="cancel-preset" onClick={this._handleCloseAdvancedSetting}>{lang.cancel}</button>);
+                    buttons[0] = (<button className="btn btn-default" data-ga-event="load-preset" title={lang.loadPreset} onClick={this._handleLoadPreset}><i className="fa fa-folder-open-o"></i></button>);
+                    buttons[1] = (<button className="btn btn-default" data-ga-event="cancel-preset" onClick={this._handleCloseAdvancedSetting}>{lang.cancel}</button>);
+                    buttons[2] = (<button className="btn btn-default" data-ga-event="save-preset" title={lang.savePreset} onClick={this._handleOpenSaveAsPreset}><i className="fa fa-floppy-o"></i></button>);
+                    buttons[3] = (<button className="btn btn-default" data-ga-event="apply-preset" onClick={this._handleApply.bind(null, false)}>{lang.apply}</button>);
                     break;
 
                 case mode.load:
@@ -827,13 +829,13 @@ define([
                 );
             });
 
-            var preset = this.state.presets[this.state.selectedPreset] || '{}';
+            var preset = this.state.presets[this.state.selectedPreset] || '{}',
                 presetContent = JSON.parse(preset);
 
             return (
                 <div id="advanced-panel" className="advanced-panel">
                     <div className="preset-wrapper">
-                        <div className="preset-header">{lang.presets}</div>
+                        <div className="preset-header">{lang.loadPreset}</div>
                         <div className="preset-list">
                             {entries}
                         </div>

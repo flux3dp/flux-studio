@@ -310,12 +310,14 @@ define(function() {
                 config: 'Config',
                 presets: '預設',
                 name: 'Name',
-                loadPreset: '載入預設',
                 apply: '套用',
+                save: '儲存',
                 saveAsPreset: '存為預設',
                 cancel: '取消',
                 saveAndApply: '套用設定',
-                delete: '刪除'
+                delete: '刪除',
+                loadPreset: '載入預設',
+                savePreset: 'save preset'
             },
             mode: [
                 {

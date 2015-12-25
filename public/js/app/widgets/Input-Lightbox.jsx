@@ -44,6 +44,11 @@ define([
                 this.props.onClose.apply(null, [e, reactid, from]);
             },
 
+            _onCancel: function(e, reactid) {
+                e.preventDefault();
+                this._onClose.apply(null, [e, reactid, 'cancel']);
+            },
+
             _onSubmit: function(e, reactid) {
                 e.preventDefault();
                 this.props.onSubmit(this.refs.inputField.getDOMNode().value);
@@ -58,7 +63,7 @@ define([
                     dataAttrs: {
                         'ga-event': 'cancel'
                     },
-                    onClick: this._onClose
+                    onClick: this._onCancel
                 });
 
                 buttons.push({
