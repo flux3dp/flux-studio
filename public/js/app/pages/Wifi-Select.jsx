@@ -130,6 +130,7 @@ define([
                     buttons = [{
                         label: lang.initialize.connect,
                         className: 'btn-action btn-large',
+                        type: 'submit',
                         dataAttrs: {
                             'ga-event': 'set-password-to-connect-to-wifi'
                         },
@@ -150,7 +151,7 @@ define([
                         }
                     }],
                     content = (
-                        <form className="form form-wifi-password">
+                        <form className="form form-wifi-password" onSubmit={self._handleSetPassword}>
                             <div className="notice">
                                 <p>“{settingWifi.ssid}”</p>
                                 <p>{lang.initialize.requires_wifi_password}</p>
