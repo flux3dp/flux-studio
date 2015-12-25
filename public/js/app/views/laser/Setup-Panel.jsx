@@ -13,6 +13,7 @@ define([
     'helpers/api/config',
     'helpers/i18n',
     'helpers/round',
+    'plugins/classnames/index'
 ], function(
     $,
     React,
@@ -27,7 +28,8 @@ define([
     DialogMenu,
     config,
     i18n,
-    round
+    round,
+    ClassNames
 ) {
     'use strict';
 
@@ -194,9 +196,22 @@ define([
         _renderCustomPresets: function(lang) {
             var self = this,
                 customPresets = config().read('laser-custom-presets') || [],
-                buttons = [{
+                buttons = [
+                {
+                    label: lang.laser.advanced.cancel,
+                    dataAttrs: {
+                        'ga-event': 'cancel-custom-laser-preset'
+                    },
+                    onClick: function(e) {
+                        self._togglePanel('customPresets', false)();
+                    }
+                },
+                {
                     label: lang.laser.advanced.apply,
-                    className: 'btn-default' + (false === self.state.hasSelectedPreset ? ' btn-disabled' : ''),
+                    className: ClassNames({
+                        'btn-default': true,
+                        'btn-disabled': false === self.state.hasSelectedPreset
+                    }),
                     dataAttrs: {
                         'ga-event': 'apply-custom-laser-preset'
                     },
@@ -206,15 +221,6 @@ define([
                         self._saveLastestSet({ material: JSON.parse(elCustomPresets.dataset.selectedMaterial) });
                         self._togglePanel('customPresets', false)();
                         self._togglePanel('advanced', false)();
-                    }
-                },
-                {
-                    label: lang.laser.advanced.cancel,
-                    dataAttrs: {
-                        'ga-event': 'cancel-custom-laser-preset'
-                    },
-                    onClick: function(e) {
-                        self._togglePanel('customPresets', false)();
                     }
                 }],
                 selectPresetMaterial = function(e) {
