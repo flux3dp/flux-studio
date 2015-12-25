@@ -11,7 +11,6 @@ define([
     'app/constants/device-constants',
     'app/constants/progress-constants',
     'helpers/i18n',
-    // 'loadImages',
     // non-return value
     'threeOrbitControls',
     'threeTrackballControls',
@@ -914,8 +913,10 @@ define([
 
         if (!$.isEmptyObject(obj)) {
 
-            // boundary
-            // var model = toScreenPosition(obj, camera);
+            objects.forEach(function(o) {
+                o.outlineMesh.visible = false;
+            });
+            
             if(obj.outlineMesh) {
                 obj.outlineMesh.visible = true;
             }
