@@ -10,6 +10,7 @@ define([
     'app/actions/progress-actions',
     'app/constants/device-constants',
     'app/constants/progress-constants',
+    'helpers/i18n',
     // non-return value
     'threeOrbitControls',
     'threeTrackballControls',
@@ -30,7 +31,8 @@ define([
     AlertActions,
     ProgressActions,
     DeviceConstants,
-    ProgressConstants
+    ProgressConstants,
+    I18n
 ) {
     'use strict';
 
@@ -63,7 +65,7 @@ define([
         defaultFileName = '',
         cameraLight,
         outOfBoundCount = 0,
-        lang = {};
+        lang = I18n.get();
 
     var s = {
         diameter: 170,
@@ -217,7 +219,6 @@ define([
             openWaitWindow: true,
             openImportWindow: false
         });
-        lang = reactSrc.state.lang;
 
         loader.load(model_file_path, function(geometry) {
 

@@ -703,19 +703,30 @@ define(function() {
             cameraOff: '關閉鏡頭',
             browseFiles: '瀏覽檔案',
             pause: '暫停',
+            paused: '已暫停',
             cancelTask: '終止任務',
             selectPrinter: '選擇成型機',
             retry: '重試',
             status: '狀態',
             busy: '忙碌中',
-            ready: '就緒',
+            ready: '待命中',
             reset: '重設(kick)',
             abort: '取消工作',
             start: '開始',
             noTask: '目前無任何工作',
             pleaseWait: '請稍待...',
             unknownCommand: '指令無法在此狀態下被執行',
-            quit: '中斷連結'
+            quit: '中斷連結',
+            working: '工作中',
+            finishing: '完成中',
+            heating: '加熱中',
+            calibrating: '校正中',
+            initiating: '啟動中',
+            starting: '啟動中',
+            resuming: '恢復中',
+            unknown: '未知狀態',
+            occupied: '裝置被佔用',
+            scanning: '掃瞄'
         },
         monitor: {
             change_filament: 'CHANGE FILLAMENT',
@@ -842,6 +853,9 @@ define(function() {
             selectQuality: 'Select quality preferred',
             clickGo: 'Click GO and preview',
             startPrint: 'Click go and start printing'
+        },
+        slicer: {
+            computing: '計算中'
         }
     };
 });

@@ -697,6 +697,7 @@ define(function() {
             cameraOff: 'Close Camera',
             browseFiles: 'Browse Files',
             pause: 'Pause',
+            paused: 'Paused',
             cancelTask: 'Cancel Task',
             selectPrinter: 'Select Printer',
             retry: 'Retry',
@@ -709,7 +710,17 @@ define(function() {
             noTask: 'There are currently no task to do',
             pleaseWait: 'Please Wait...',
             unknownCommand: 'command cannot be executed in current status',
-            quit: 'Quit'
+            quit: 'Quit',
+            working: 'Working',
+            finishing: 'Finishing',
+            heating: 'Heating',
+            calibrating: 'Calibrating',
+            initiating: 'Initiating',
+            starting: 'Starting',
+            resuming: 'Resuming',
+            unknown: 'Unknown',
+            occupied: 'Occupied',
+            scanning: 'Scanning'
         },
         monitor: {
             change_filament: 'CHANGE FILLAMENT',
@@ -836,6 +847,9 @@ define(function() {
             selectQuality: 'Select quality preferred',
             clickGo: 'Click GO and preview',
             startPrint: 'Click go and start printing'
+        },
+        slicer: {
+            computing: 'Computing'
         }
     };
 });
