@@ -428,6 +428,7 @@ define([
                 data('name', name).
                 data('base', originalUrl).
                 data('size', size).
+                data('sizeLock', true).
                 width(size.width).
                 height(size.height);
 
@@ -439,6 +440,7 @@ define([
                     onRotate: instantRefresh,
                     onMove: instantRefresh,
                     onScale: instantRefresh,
+                    maintainAspectRatio: true,
                     angle: size.angle || 0
                 });
                 $ftControls = $img.parent().find('.ft-controls');
@@ -484,7 +486,8 @@ define([
                             });
 
                             self.setState({
-                                selectedImage: true
+                                selectedImage: true,
+                                sizeLock: $img.data('sizeLock')
                             });
 
                             $target_image.addClass('image-active');
@@ -714,8 +717,11 @@ define([
                     box = $el.box(),
                     val = $el.val(),
                     freetrans = $target_image.data('freetrans'),
-                    args = {};
+                    args = {
+                        maintainAspectRatio: params.sizeLock
+                    };
 
+                $target_image.data('sizeLock', params.sizeLock);
                 val = parseFloat(val, 10);
 
                 switch (type) {
