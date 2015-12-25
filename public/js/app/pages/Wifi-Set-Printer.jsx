@@ -3,8 +3,16 @@ define([
     'app/actions/initialize-machine',
     'helpers/api/usb-config',
     'jsx!widgets/Modal',
-    'jsx!widgets/Alert'
-], function(React, initializeMachine, usbConfig, Modal, Alert) {
+    'app/actions/alert-actions',
+    'app/stores/alert-store'
+], function(
+    React,
+    initializeMachine,
+    usbConfig,
+    Modal,
+    AlertActions,
+    AlertStore
+) {
     'use strict';
 
     return function(args) {
@@ -14,12 +22,10 @@ define([
 
             getInitialState: function() {
                 return {
-                    lang: args.state.lang,
-                    validPrinterName    : true,
-                    validPrinterPassword: true,
-                    settingPrinter: initializeMachine.settingPrinter.get(),
-                    openAlert: false,
-                    alertContent: {}
+                    lang                 : args.state.lang,
+                    validPrinterName     : true,
+                    validPrinterPassword : true,
+                    settingPrinter       : initializeMachine.settingPrinter.get()
                 }
             },
 
@@ -30,8 +36,9 @@ define([
                     name        = self.refs.name.getDOMNode().value,
                     password    = self.refs.password.getDOMNode().value,
                     usb         = usbConfig(),
+                    lang        = self.state.lang,
                     onError     = function(response) {
-                        // TODO: show error message
+                        AlertActions.showPopupError('set-machine-error', response.error);
                     },
                     goNext = function() {
                         self.state.settingPrinter.name = name;
@@ -73,16 +80,12 @@ define([
                 if (true === isValid) {
 
                     if (true === self.state.settingPrinter.password && '' !== password) {
-                        self.setState({
-                            openAlert: true,
-                            alertContent: {
-                                caption: '',
-                                message: self.state.lang.initialize.change_password,
-                                onClick: function(e) {
-                                    startSetting();
-                                }
-                            }
-                        });
+                        AlertStore.onCustom(startSetting);
+                        AlertActions.showPopupCustom(
+                            'change-password',
+                            lang.initialize.errors.keep_connect.content,
+                            lang.initialize.confirm
+                        );
                     }
                     else {
                         startSetting();
@@ -128,7 +131,7 @@ define([
                     wrapperClassName = {
                         'initialization': true
                     },
-                    alert = this._renderAlert(lang),
+                    // alert = this._renderAlert(lang),
                     cx = React.addons.classSet,
                     printerNameClass,
                     printerPasswordClass,
@@ -178,7 +181,6 @@ define([
                                 </a>
                             </div>
                         </form>
-                        {alert}
                     </div>
                 );
 
