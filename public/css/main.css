@@ -5626,9 +5626,6 @@ input.switch:checked ~ label:after {
         list-style: none;
         padding: 0; }
 
-.laser-studio .fa::before {
-    margin: 0 5px 0 0; }
-
 .laser-studio .stage {
     background: #E0E0E0; }
 
@@ -5754,7 +5751,7 @@ input.switch:checked ~ label:after {
             margin: 0 10px 0 0;
             padding: 0 10px;
             flex: initial; }
-            .laser-studio .advanced-panel .footer .btn.btn-cancel {
+            .laser-studio .advanced-panel .footer .btn.btn-apply {
                 margin: 0; }
 
 .laser-studio .control {
