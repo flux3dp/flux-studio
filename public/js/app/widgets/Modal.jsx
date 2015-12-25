@@ -31,7 +31,9 @@ define([
             shortcuts.on(
                 ['esc'],
                 function(e) {
-                    self.props.onClose(e);
+                    if (false === self.props.disabledEscapeOnBackground) {
+                        self.props.onClose(e);
+                    }
                 }
             );
         },
