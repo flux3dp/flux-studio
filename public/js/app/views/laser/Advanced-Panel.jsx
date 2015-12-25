@@ -1,82 +1,68 @@
 define([
-    'jquery',
     'react',
     'jsx!widgets/Select',
     'jsx!widgets/Button-Group',
     'jsx!widgets/Text-Input',
     'helpers/api/config',
+    'plugins/classnames/index',
     'helpers/round',
+    'app/actions/input-lightbox-actions',
     'plugins/jquery/serializeObject',
     'helpers/array-findindex',
-], function($, React, SelectView, ButtonGroup, TextInput, config, round) {
+], function(
+    React,
+    SelectView,
+    ButtonGroup,
+    TextInput,
+    config,
+    classNames,
+    round,
+    InputLightboxActions
+) {
     'use strict';
 
     return React.createClass({
-        // Private methods
-        _openSaveForm: function(open) {
-            this.setState({
-                openSaveWindow: open
-            });
-        },
 
+        // Private methods
         _getFooterButtons: function(lang) {
             var self = this,
-                buttonGroup = {
-                    default: [{
-                        label: lang.load_preset,
-                        className: 'pull-left btn-default',
-                        dataAttrs: {
-                            'ga-event': 'load-laser-preset'
-                        },
-                        onClick: this._onLoadPreset
+                buttonGroup = [{
+                    className: 'pull-left btn-default fa fa-folder-open-o',
+                    title: lang.load_preset_title,
+                    dataAttrs: {
+                        'ga-event': 'load-laser-preset'
                     },
-                    {
-                        label: lang.save_as_preset,
-                        className: 'pull-left btn-default' + (true === this.state.materialHasChanged ? '' : ' btn-disabled'),
-                        dataAttrs: {
-                            'ga-event': 'save-as-preset'
-                        },
-                        onClick: this._onSaveStarting
+                    onClick: this._onLoadPreset
+                },
+                {
+                    className: classNames({
+                        'pull-left btn-default fa fa-floppy-o': true,
+                        'btn-disabled': false === this.state.materialHasChanged
+                    }),
+                    title: lang.save_as_preset_title,
+                    dataAttrs: {
+                        'ga-event': 'save-as-preset'
                     },
-                    {
-                        label: lang.cancel,
-                        className: 'pull-right btn-default btn-cancel',
-                        dataAttrs: {
-                            'ga-event': 'cancel-current-preset'
-                        },
-                        onClick: this._onCancel
+                    onClick: this._onSaveAndApply
+                },
+                {
+                    label: lang.apply,
+                    className: 'pull-right btn-default btn-apply',
+                    dataAttrs: {
+                        'ga-event': 'apply-laser-preset'
                     },
-                    {
-                        label: lang.apply,
-                        className: 'pull-right btn-default',
-                        dataAttrs: {
-                            'ga-event': 'apply-laser-preset'
-                        },
-                        onClick: this._onApply
-                    }],
-                    save: [{
-                        label: lang.save_and_apply,
-                        onClick: self._onSaveAndApply,
-                        dataAttrs: {
-                            'ga-event': 'save-and-apply-laser-preset'
-                        },
+                    onClick: this._onApply
+                },
+                {
+                    label: lang.cancel,
+                    className: 'pull-right btn-default btn-cancel',
+                    dataAttrs: {
+                        'ga-event': 'cancel-current-preset'
                     },
-                    {
-                        label: lang.cancel,
-                        onClick: function() {
-                            self._openSaveForm(false);
-                        },
-                        dataAttrs: {
-                            'ga-event': 'cancel-save-laser-preset'
-                        },
-                    }]
-                };
+                    onClick: this._onCancel
+                }];
 
-            return (
-                false === this.state.openSaveWindow ?
-                buttonGroup.default :
-                buttonGroup.save
-            );
+            return buttonGroup;
         },
 
         _applySetting: function(e) {
@@ -93,18 +79,32 @@ define([
         },
 
         _onSaveAndApply: function(e) {
-            var lang = this.props.lang,
-                value = this.refs.presetName.value(),
-                refs = this.refs,
+            var self = this,
+                lang = self.props.lang,
+                refs = self.refs,
                 material = {
-                    value: value,
-                    label: value,
-                    data: this.state.defaultMaterial.data
+                    data: self.state.defaultMaterial.data
                 };
 
-            if (true === this.props.onSave(material)) {
-                this.props.onApply(material);
-            }
+            InputLightboxActions.open('save-laser-preset', {
+                caption      : lang.laser.save_as_preset,
+                inputHeader  : lang.laser.name,
+                confirmText  : lang.laser.advanced.save,
+                onSubmit     : function(presetName) {
+                    var canSave = ('' !== presetName);
+
+                    if (true === canSave) {
+                        material.value = presetName;
+                        material.label = presetName;
+
+                        if (true === self.props.onSave(material)) {
+                            self.props.onApply(material);
+                        }
+                    }
+
+                    return '' !== presetName;
+                }
+            });
         },
 
         _onApply: function(e) {
@@ -117,10 +117,6 @@ define([
                 };
 
             this.props.onApply(material);
-        },
-
-        _onSaveStarting: function(e) {
-            this._openSaveForm(true);
         },
 
         _changeRangeNumber: function(target) {
