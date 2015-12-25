@@ -8,7 +8,9 @@ define([
     'plugins/classnames/index',
     'app/constants/device-constants',
     'jsx!views/print/Monitor',
-    'jsx!widgets/Modal'
+    'jsx!widgets/Modal',
+    'app/actions/alert-actions',
+    'app/stores/alert-store'
 ], function(
     $,
     React,
@@ -19,7 +21,9 @@ define([
     ClassNames,
     DeviceConstants,
     Monitor,
-    Modal
+    Modal,
+    AlertActions,
+    AlertStore
 ) {
     'use strict';
 
@@ -76,6 +80,36 @@ define([
                 };
             },
 
+            componentDidMount: function() {
+                AlertStore.onCancel(this._toggleDeviceList.bind(null, false));
+                AlertStore.onRetry(this._waitForPrinters);
+            },
+
+            componentWillUnmount: function() {
+                AlertStore.removeCancelListener(this._toggleDeviceList.bind(null, false));
+                AlertStore.removeRetryListener(this._waitForPrinters);
+            },
+
+            _waitForPrinters: function() {
+                setTimeout(this._openAlertWithnoPrinters, 5000);
+            },
+
+            _openAlertWithnoPrinters: function() {
+                if (0 === this.state.deviceList.length && true === this.state.showDeviceList) {
+                    AlertActions.showPopupRetry('no-printer', lang.device_selection.no_printers);
+                }
+            },
+
+            _toggleDeviceList: function(open) {
+                this.setState({
+                    showDeviceList: open
+                });
+
+                if (true === open) {
+                    this._waitForPrinters();
+                }
+            },
+
             _handleNavigation: function(address) {
                 if (-1 < appSettings.needWebGL.indexOf(address) && false === detectWebgl()) {
                     AlertActions.showPopupError('no-webgl-support', lang.support.no_webgl);
@@ -100,7 +134,7 @@ define([
                     }
                 );
 
-                this.setState({ showDeviceList: !this.state.showDeviceList });
+                this._toggleDeviceList(!this.state.showDeviceList);
             },
 
             _handleSelectDevice: function(device, e) {
@@ -115,7 +149,7 @@ define([
                     }
                 });
 
-                this.setState({ showDeviceList: false });
+                this._toggleDeviceList(false);
             },
 
             _handleMonitorClose: function() {
@@ -160,25 +194,32 @@ define([
                     status = lang.machine_status,
                     headModule = lang.head_module,
                     statusText,
-                    headText;
+                    headText,
+                    deviceList = this.state.deviceList,
+                    options = deviceList.map(function(device) {
+                        statusText = status[device.st_id] || status.UNKNOWN,
+                        headText = headModule[device.head_module] || headModule.UNKNOWN;
 
-                var list = this.state.deviceList.map(function(device) {
-                    statusText = status[device.st_id] || status.UNKNOWN,
-                    headText = headModule[device.head_module] || headModule.UNKNOWN;
+                        if (16 === device.st_id && 'number' === typeof device.st_prog) {
+                            statusText += ' - ' + (parseInt(device.st_prog * 1000) * 0.1).toFixed(1) + '%';
+                        }
 
-                    if (16 === device.st_id && 'number' === typeof device.st_prog) {
-                        statusText += ' - ' + (parseInt(device.st_prog * 1000) * 0.1).toFixed(1) + '%';
-                    }
+                        return (
+                            <li
+                                name={device.uuid}
+                                onClick={this._handleSelectDevice.bind(null, device)}>
+                                <label className="name">{device.name}</label>
+                                <label className="status">{headText} {statusText}</label>
+                            </li>
+                        )
+                    }, this),
+                    list;
 
-                    return (
-                        <li
-                            name={device.uuid}
-                            onClick={this._handleSelectDevice.bind(null, device)}>
-                            <label className="name">{device.name}</label>
-                            <label className="status">{headText} {statusText}</label>
-                        </li>
-                    )
-                }, this);
+                list = (
+                    0 < options.length
+                    ? options :
+                    [<div className="spinner-roller spinner-roller-reverse"/>]
+                );
 
                 return (
                     <ul>{list}</ul>
