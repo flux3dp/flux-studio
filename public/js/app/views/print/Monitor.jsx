@@ -534,9 +534,13 @@ define([
                 var blob = this.props.fCode;
                 this.setState({ displayStatus: lang.device.starting });
                 if(blob) {
-                    // this.setState({ displayStatus: DeviceConstants.UPLOADING });
-                    DeviceMaster.go(blob, function(progress) {
-                        self.setState({ displayStatus: `${lang.device.uploading} ${progress}%`});
+                    DeviceMaster.go(blob, function(_progress) {
+                        if(_progress !== 100) {
+                            self.setState({ displayStatus: `${lang.device.uploading} ${_progress}%`});
+                        }
+                        else {
+                            self.setState({ displayStatus: `${lang.device.processing}`});
+                        }
                     }).then(function() {
                         self._getPrintingInfo();
                     });

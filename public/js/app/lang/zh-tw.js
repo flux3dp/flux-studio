@@ -718,7 +718,8 @@ define(function() {
             scanning: '掃描',
             occupied: '裝置被佔用',
             running: '工作中',
-            uploading: '上傳中'
+            uploading: '上傳中',
+            processing: '處理中'
         },
         monitor: {
             change_filament                 : 'CHANGE FILLAMENT',

@@ -718,7 +718,8 @@ define(function() {
             scanning: 'Scanning',
             occupied: 'Occupied',
             running: 'Working',
-            uploading: 'Uploading'
+            uploading: 'Uploading',
+            processing: 'Processing'
         },
         monitor: {
             change_filament                 : 'CHANGE FILLAMENT',

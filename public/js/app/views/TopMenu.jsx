@@ -457,7 +457,7 @@ define([
                 var list = this.state.deviceList.map(function(device) {
                     statusText = status[device.st_id] || status.UNKNOWN;
                     headText = headModule[device.head_module] || headModule.UNKNOWN;
-                    
+
                     if (16 === device.st_id && 'number' === typeof device.st_prog) {
                         statusText += ' - ' + (parseInt(device.st_prog * 1000) * 0.1).toFixed(1) + '%';
                     }
@@ -492,6 +492,7 @@ define([
                     <Modal
                         {...this.props}
                         lang    = {lang}
+                        className = {{'box-shadow': true}}
                         content ={content} />
                 );
             },

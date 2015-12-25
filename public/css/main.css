@@ -4364,6 +4364,9 @@ input.switch:checked ~ label:after {
     margin-left: 1.6em;
     margin-top: 0.05em; }
 
+.box-shadow .modal-body {
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3), 0 16px 40px rgba(0, 0, 0, 0.5); }
+
 /* Advanced Panel */
 .print-studio .tour-mask {
     background-color: rgba(0, 0, 0, 0.3);

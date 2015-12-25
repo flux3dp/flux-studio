@@ -869,7 +869,8 @@ define([
             var self = this,
                 cx = React.addons.classSet,
                 className = {
-                    'hide': (this.state.mode === mode.save)
+                    'hide': (this.state.mode === mode.save),
+                    'box-shadow': true
                 },
                 UI;
 
