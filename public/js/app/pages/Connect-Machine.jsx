@@ -4,7 +4,6 @@ define([
     'helpers/api/usb-config',
     'jsx!widgets/Modal',
     'app/actions/alert-actions',
-    'app/stores/alert-store',
     'app/actions/progress-actions',
     'app/constants/progress-constants'
 ], function(
@@ -13,7 +12,6 @@ define([
     usbConfig,
     Modal,
     AlertActions,
-    AlertStore,
     ProgressActions,
     ProgressConstants
 ) {
