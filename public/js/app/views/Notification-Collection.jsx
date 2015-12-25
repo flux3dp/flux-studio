@@ -64,11 +64,18 @@ define([
                 var self = this;
 
                 return {
-                    sourceId              : '',
-                    showNotificationModal : false,
+                    // monitor
                     showMonitor           : false,
                     fcode                 : {},
                     previewUrl            : '',
+
+                    // general popup
+                    showNotificationModal : false,
+                    type                  : '',
+                    sourceId              : '',
+                    message               : '',
+                    customText            : '',
+
                     // progress
                     progress: {
                         open       : false,
@@ -282,12 +289,13 @@ define([
                 types[type]();
             },
 
-            _handlePopup: function(type, id, message) {
+            _handlePopup: function(type, id, message, customText) {
                 this.setState({
                     showNotificationModal : true,
                     type                  : type,
                     sourceId              : id,
-                    message               : message
+                    message               : message,
+                    customText            : customText
                 });
             },
 
@@ -305,16 +313,22 @@ define([
                 }
             },
 
-            _handleRetry: function() {
-                AlertActions.notifyRetry(this.state.sourceId);
-            },
+            _handlePopupFeedBack: function(type) {
+                switch (type) {
+                case 'custom':
+                    AlertActions.notifyCustom(this.state.sourceId);
+                    break;
+                case 'retry':
+                    AlertActions.notifyRetry(this.state.sourceId);
+                    break;
+                case 'abort':
+                    AlertActions.notifyAbort(this.state.sourceId);
+                    break;
+                case 'yes':
+                    AlertActions.notifyYes(this.state.sourceId);
+                    break;
+                }
 
-            _handleAbort: function() {
-                AlertActions.notifyAbort(this.state.sourceId);
-            },
-
-            _handleYes: function() {
-                AlertActions.notifyYes(this.state.sourceId);
             },
 
             _handleOpenMonitor: function(selectedDevice, fcode, previewUrl) {
@@ -457,10 +471,13 @@ define([
                             type={this.state.type}
                             open={this.state.showNotificationModal}
                             message={this.state.message}
-                            onRetry={this._handleRetry}
-                            onAbort={this._handleAbort}
-                            onYes={this._handleYes}
-                            onClose={this._handleNotificationModalClose} />
+                            customText={this.state.customText}
+                            onRetry={this._handlePopupFeedBack.bind(null, 'retry')}
+                            onAbort={this._handlePopupFeedBack.bind(null, 'abort')}
+                            onYes={this._handlePopupFeedBack.bind(null, 'yes')}
+                            onCustom={this._handlePopupFeedBack.bind(null, 'custom')}
+                            onClose={this._handleNotificationModalClose}
+                        />
 
                         <Progress
                             lang={lang}
