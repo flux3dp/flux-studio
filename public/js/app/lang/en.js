@@ -124,7 +124,6 @@ define(function() {
                 error: 'Error',
 
                 keep_connect: {
-                    caption: 'Unable to detect FLUX device',
                     content: 'Please make sure your FLUX has been powered on and attached to micro-usb cord.'
                 },
 

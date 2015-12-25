@@ -124,7 +124,6 @@ define(function() {
                 error: 'Error',
 
                 keep_connect: {
-                    caption: '無法連接裝置',
                     content: '請確認電源已被開啟及已經由 micro-usb 連接'
                 },
 
