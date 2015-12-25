@@ -63,25 +63,16 @@ define([
                 y       : 1,
                 z       : 1
             },
-
-            _size = {
-                locked  : true,
-                x       : 0,
-                y       : 0,
-                z       : 0
-            },
             _rotation = {
                 x: 0,
                 y: 0,
                 z: 0
             },
             tourGuide = [],
-            _mode = 'size',
             lang = args.state.lang,
             selectedPrinter,
-            printerController,
             $importBtn,
-            guideStyle,
+            allowDeleteObject = true,
             tutorialMode = false,
             nwjsMenu = menuFactory.items,
             view = React.createClass({
@@ -116,6 +107,7 @@ define([
                         layerHeight                 : 0.1,
                         raftOn                      : advancedSettings.raft_layers !== 0,
                         supportOn                   : advancedSettings.support_material === 1,
+                        mode                        : 'size',
                         previewLayerCount           : 0,
                         progressMessage             : '',
                         fcode                       : {},
@@ -148,7 +140,9 @@ define([
                     $(document).keydown(function(e) {
                         // delete event
                         if(e.metaKey && e.keyCode === 8 || e.keyCode === 46 || e.keyCode === 8) {
-                            director.removeSelected();
+                            if(allowDeleteObject) {
+                                director.removeSelected();
+                            }
                         }
 
                         // copy event
@@ -424,6 +418,10 @@ define([
                     GlobalActions.closeAllView();
                 },
 
+                _handleObjectDialogueFocus: function(isFocused) {
+                    allowDeleteObject = !isFocused;
+                },
+
                 _renderAdvancedPanel: function() {
                     return (
                         <AdvancedPanel
@@ -503,12 +501,13 @@ define([
                             lang            = {lang}
                             model           = {this.state.modelSelected}
                             style           = {this.state.objectDialogueStyle}
-                            mode            = {_mode}
+                            mode            = {this.state.mode}
                             isTransforming  = {this.state.isTransforming}
                             scaleLocked     = {_scale.locked}
                             onRotate        = {this._handleRotationChange}
                             onResize        = {this._handleResize}
                             onScaleLock     = {this._handleToggleScaleLock}
+                            onFocus         = {this._handleObjectDialogueFocus}
                             onModeChange    = {this._handleModeChange} />
                     );
                 },

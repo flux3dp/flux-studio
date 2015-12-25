@@ -647,23 +647,17 @@ define([
                 progress = '';
             }
 
-            if(report.rt) {
-                temperature = `${lang.monitor.temperature} ${report.rt} °C`;
-            }
-            else {
-                temperature = '';
-            }
+            temperature = report.rt ? `${lang.monitor.temperature} ${report.rt} °C` : '';
+            headInfo = report.module ? lang.monitor.device[report.module] : '';
 
             if(!report.error) {
                 AlertActions.closePopup();
                 showingPopup = false;
             }
 
-            if(report.module) {
-                headInfo = lang.monitor.device[report.module];
-            }
-            else {
-                headInfo = '';
+            if(status === DeviceConstants.COMPLETED) {
+                temperature = '';
+                progress = '';
             }
 
             this.setState({
@@ -963,7 +957,7 @@ define([
                 _progress   = percentageDone === 0 ? '' : percentageDone + '%',
                 infoClass   = ClassNames('status-info', { 'running': statusId !== DeviceConstants.status.IDLE });
 
-            if(statusId === DeviceConstants.status.IDLE) {
+            if(statusId === DeviceConstants.status.IDLE || statusId === DeviceConstants.status.COMPLETED) {
                 taskInfo = '';
                 _duration = '';
                 _progress = '';

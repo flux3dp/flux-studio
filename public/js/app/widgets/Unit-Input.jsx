@@ -178,6 +178,7 @@ define([
                     defaultValue={displayValue}
                     onBlur={this._onBlur}
                     onKeyUp={this._onKeyUp}
+                    onFocus={this.props.onFocus}
                     {...attrs}
                 />
             );

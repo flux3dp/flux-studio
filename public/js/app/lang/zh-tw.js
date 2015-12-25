@@ -752,6 +752,7 @@ define(function() {
             HARDWARE_FAILURE                : '裝置錯誤\n請重新啟動機器',
             MAINBOARD_OFFLINE               : '裝置錯誤\n請重新啟動機器',
             HEAD_ERROR_HARDWARE_FAILURE     : '噴頭錯誤\n請重新裝載工作頭',
+            G28_FAILED                      : '歸零失敗\n請排除異物後重試',
             processing                      : 'Processing',
             savingPreview                   : 'Saving preview image',
             hour                            : '小時',

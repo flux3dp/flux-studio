@@ -751,6 +751,7 @@ define(function() {
             HARDWARE_FAILURE                : 'Something went wrong\nPlease restart the device',
             MAINBOARD_OFFLINE               : 'Something went wrong\nPlease restart the device',
             HEAD_ERROR_HARDWARE_FAILURE     : 'Something went wrong with toolhead\nPlease re-attach the toolhead',
+            G28_FAILED                      : 'Unable to home\nPlease remove the obstacle',
             processing                      : 'Processing',
             savingPreview                   : 'Saving preview image',
             hour                            : 'h',
