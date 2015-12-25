@@ -10,6 +10,7 @@ define(function() {
             no_webgl: 'Does not seem to support WebGL'
         },
         device_selection: {
+            no_printers: '未偵測到 FLUX 裝置, 請檢查您與機器的網路連線是否在同個網路下',
             device_name: 'DEVICE NAME',
             module: 'MODULE',
             status: 'STATUS'

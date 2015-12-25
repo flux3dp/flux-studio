@@ -10,6 +10,7 @@ define(function() {
             no_webgl: '無法在本台電腦開啟 WebGL, 請使用其他可以支援的電腦'
         },
         device_selection: {
+            no_printers: 'FLUX Device not detected. Please check if you and the FLUX device is under same network.',
             device_name: 'DEVICE NAME',
             module: 'MODULE',
             status: 'STATUS'
