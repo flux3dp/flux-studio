@@ -61,13 +61,13 @@ define([
                 discoverId: 'printer-selector-' + (this.props.uniqleId || ''),
                 printOptions: [],
                 loadFinished: false,
-                noDefaultPrinter: ('undefined' === typeof initializeMachine.defaultPrinter.get().uuid),
+                hadDefaultPrinter: ('string' === typeof initializeMachine.defaultPrinter.get().uuid),
                 discoverMethods: {}
             };
         },
 
         componentDidMount: function() {
-            if (false === this.state.noDefaultPrinter) {
+            if (true === this.state.hadDefaultPrinter) {
                 this.selected_printer = initializeMachine.defaultPrinter.get();
                 this._returnSelectedPrinter();
             }
@@ -170,7 +170,7 @@ define([
                 statusText = status[printer.st_id] || status.UNKNOWN,
                 headText = headModule[printer.head_module] || headModule.UNKNOWN;
 
-            if (16 === printer.st_id && 'number' === typeof printer.st_prog) {
+            if (DeviceConstants.status.RUNNING === printer.st_id && 'number' === typeof printer.st_prog) {
                 statusText += ' - ' + (parseInt(printer.st_prog * 1000) * 0.1).toFixed(1) + '%';
             }
 
@@ -198,7 +198,7 @@ define([
                 cx = React.addons.classSet,
                 wrapperClass = ['select-printer'],
                 content = self._renderPrinterSelection(lang),
-                noDefaultPrinter = self.state.noDefaultPrinter;
+                hadDefaultPrinter = self.state.hadDefaultPrinter;
 
             if ('string' === typeof self.props.className) {
                 wrapperClass.push(self.props.className);
@@ -207,18 +207,27 @@ define([
             wrapperClass = cx.apply(null, wrapperClass);
 
             return (
-                true === noDefaultPrinter ?
+                true === hadDefaultPrinter ?
+                <span/> :
                 <div className={wrapperClass}>
                     {content}
                     <div className="arrow arrow-right"/>
-                </div> :
-                <span/>
+                </div>
             );
         },
 
         componentWillMount: function () {
             var self = this,
+                lang = self.props.lang,
                 _options = [],
+                waitForPrinters = function() {
+                    setTimeout(openAlertWithnoPrinters, 5000);
+                },
+                openAlertWithnoPrinters = function() {
+                    if (0 === _options.length && false === self.state.hadDefaultPrinter) {
+                        AlertActions.showPopupRetry('no-printer', lang.device_selection.no_printers);
+                    }
+                },
                 refreshOption = function(options) {
                     _options = [];
 
@@ -232,8 +241,13 @@ define([
                         printOptions: _options,
                         loadFinished: true
                     });
+
+                    openAlertWithnoPrinters();
                 };
 
+            AlertStore.onRetry(function() {
+                waitForPrinters();
+            });
 
             self.setState({
                 discoverMethods: discover(
@@ -243,6 +257,8 @@ define([
                     }
                 )
             });
+
+            waitForPrinters();
         },
 
         componentWillUnmount: function() {
