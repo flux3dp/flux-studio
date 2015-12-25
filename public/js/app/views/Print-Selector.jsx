@@ -10,8 +10,8 @@ define([
     'helpers/api/config',
     'app/constants/device-constants',
     'app/actions/alert-actions',
-    'app/actions/initialize-machine',
     'app/stores/alert-store',
+    'app/actions/initialize-machine',
     'app/actions/progress-actions',
     'app/constants/progress-constants',
     'app/actions/input-lightbox-actions',
@@ -28,8 +28,8 @@ define([
     config,
     DeviceConstants,
     AlertActions,
-    initializeMachine,
     AlertStore,
+    initializeMachine,
     ProgressActions,
     ProgressConstants,
     InputLightboxActions,
@@ -71,6 +71,18 @@ define([
                 this.selected_printer = initializeMachine.defaultPrinter.get();
                 this._returnSelectedPrinter();
             }
+
+            AlertStore.onCancel(this._handleClose);
+            AlertStore.onRetry(this._waitForPrinters);
+        },
+
+        componentWillUnmount: function() {
+            if ('function' === typeof this.state.discoverMethods.removeListener) {
+                this.state.discoverMethods.removeListener(this.state.discoverId);
+            }
+
+            AlertStore.removeCancelListener(this._handleClose);
+            AlertStore.removeRetryListener(this._waitForPrinters);
         },
 
         _selectPrinter: function(printer, e) {
@@ -133,7 +145,12 @@ define([
         // renders
         _renderPrinterSelection: function(lang) {
             var self = this,
-                options = self.state.printOptions,
+                printOptions = self.state.printOptions,
+                options = (0 < printOptions ? printOptions : [{
+                    label: (
+                        <div className="spinner-roller spinner-roller-reverse"/>
+                    )
+                }]),
                 content = (
                     <div className="device-wrapper">
                         <ListView className="printer-list" items={options}/>
@@ -216,18 +233,22 @@ define([
             );
         },
 
+        _waitForPrinters: function() {
+            setTimeout(this._openAlertWithnoPrinters, 5000);
+        },
+
+        _openAlertWithnoPrinters: function() {
+            var lang = this.props.lang;
+
+            if (0 === this.state.printOptions.length && false === this.state.hadDefaultPrinter) {
+                AlertActions.showPopupRetry('no-printer', lang.device_selection.no_printers);
+            }
+        },
+
         componentWillMount: function () {
             var self = this,
                 lang = self.props.lang,
                 _options = [],
-                waitForPrinters = function() {
-                    setTimeout(openAlertWithnoPrinters, 5000);
-                },
-                openAlertWithnoPrinters = function() {
-                    if (0 === _options.length && false === self.state.hadDefaultPrinter) {
-                        AlertActions.showPopupRetry('no-printer', lang.device_selection.no_printers);
-                    }
-                },
                 refreshOption = function(options) {
                     _options = [];
 
@@ -242,12 +263,8 @@ define([
                         loadFinished: true
                     });
 
-                    openAlertWithnoPrinters();
+                    self._openAlertWithnoPrinters();
                 };
-
-            AlertStore.onRetry(function() {
-                waitForPrinters();
-            });
 
             self.setState({
                 discoverMethods: discover(
@@ -258,13 +275,7 @@ define([
                 )
             });
 
-            waitForPrinters();
-        },
-
-        componentWillUnmount: function() {
-            if ('function' === typeof this.state.discoverMethods.removeListener) {
-                this.state.discoverMethods.removeListener(this.state.discoverId);
-            }
+            self._waitForPrinters();
         }
     });
 
