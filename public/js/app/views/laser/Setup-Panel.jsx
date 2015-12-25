@@ -301,7 +301,11 @@ define([
 
             return (
                 true === self.state.openCustomPresets ?
-                <Modal className={{ hasShadow: true }} content={content} onClose={self._togglePanel('customPresets', false)}/> :
+                <Modal
+                    className={{ hasShadow: true }}
+                    content={content}
+                    onClose={self._togglePanel('customPresets', false)}
+                /> :
                 ''
             );
         },
@@ -321,7 +325,12 @@ define([
 
             return (
                 true === this.state.openAdvancedPanel ?
-                <Modal className={{ hasShadow: true }} content={content} onClose={this._togglePanel('advanced', false)}/> :
+                <Modal
+                    className={{ hasShadow: true }}
+                    disabledEscapeOnBackground={true}
+                    content={content}
+                    onClose={this._togglePanel('advanced', false)}
+                /> :
                 ''
             );
         },
