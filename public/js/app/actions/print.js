@@ -916,7 +916,7 @@ define([
             objects.forEach(function(o) {
                 o.outlineMesh.visible = false;
             });
-            
+
             if(obj.outlineMesh) {
                 obj.outlineMesh.visible = true;
             }
@@ -980,7 +980,7 @@ define([
     }
 
     function removeSelected() {
-        if (SELECTED) {
+        if (SELECTED && Object.keys(SELECTED).length > 0) {
             var index;
             scene.remove(SELECTED.outlineMesh);
             scene.remove(SELECTED);
