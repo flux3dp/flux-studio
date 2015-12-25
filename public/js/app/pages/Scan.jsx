@@ -131,6 +131,7 @@ define([
                 componentWillUnmount: function() {
                     var self = this;
 
+                    AlertStore.removeCancelListener(self._cancelScan);
                     AlertStore.removeRetryListener(self._retry);
                     dndHandler.unplug(document);
 
