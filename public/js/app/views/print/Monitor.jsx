@@ -9,6 +9,7 @@ define([
     'app/stores/alert-store',
     'app/constants/device-constants',
     'helpers/file-system',
+    'app/actions/global-actions',
 ], function(
     $,
     React,
@@ -19,7 +20,8 @@ define([
     AlertActions,
     AlertStore,
     DeviceConstants,
-    FileSystem
+    FileSystem,
+    GlobalActions
 ) {
     'use strict';
 
@@ -46,16 +48,17 @@ define([
         statusActions,
         errorActions,
         uploadProgress = 0,
-        // initializing = false,
 
         // error display
         mainError = '',
         subError = '',
         lastError = '',
         errorMessage = '',
-        // lastMessage = '',
         headInfo = '',
         taskInfo = '',
+
+        timeout = 20000,
+        timmer,
 
         // for monitor temperature, time...
         percentageDone = 0,
@@ -583,6 +586,7 @@ define([
 
         _startReport: function() {
             var self = this;
+            timmer = setTimeout(this._processTimeout, timeout);
 
             DeviceMaster.getReport().then(function(report) {
                 self._processReport(report);
@@ -595,6 +599,11 @@ define([
             }, refreshTime);
         },
 
+        _processTimeout: function() {
+            AlertActions.showPopupError('', lang.device.disconnectedError);
+            this._handleClose();
+        },
+
         _processReport: function(report) {
             errorMessage    = '';
             mainError       = '';
@@ -602,6 +611,8 @@ define([
             status          = report.st_label;
             statusId        = report.st_id;
 
+            clearTimeout(timmer);
+            timmer = setTimeout(this._processTimeout, timeout);
             // rootMode = statusId === DeviceConstants.status.IDLE ? DeviceConstants.IDLE : DeviceConstants.RUNNING;
 
             // jug down errors as main and sub error for later use

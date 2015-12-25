@@ -721,7 +721,8 @@ define(function() {
             occupied: 'Occupied',
             running: 'Working',
             uploading: 'Uploading',
-            processing: 'Processing'
+            processing: 'Processing',
+            disconnectedError: 'Device disconnected\nPlease confirm if network access of device is available'
         },
         monitor: {
             change_filament                 : 'CHANGE FILLAMENT',

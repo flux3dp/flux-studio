@@ -721,7 +721,8 @@ define(function() {
             occupied: '裝置被佔用',
             running: '工作中',
             uploading: '上傳中',
-            processing: '處理中'
+            processing: '處理中',
+            disconnectedError: '與機器連線暫時中斷\n請確認機器網路連線是否正常'
         },
         monitor: {
             change_filament                 : 'CHANGE FILLAMENT',

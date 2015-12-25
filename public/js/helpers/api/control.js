@@ -64,9 +64,9 @@ define([
             },
             isTimeout = function() {
                 var error = {
-                    "status": "error",
-                    "error": "TIMEOUT",
-                    "info": "connection timeoout"
+                    'status': 'error',
+                    'error': 'TIMEOUT',
+                    'info': 'connection timeoout'
                 };
                 opts.onError(error);
             };
