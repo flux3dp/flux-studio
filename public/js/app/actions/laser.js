@@ -411,7 +411,9 @@ define([
         shortcuts.on(
             ['del'],
             function(e) {
-                deleteImage();
+                if ('INPUT' !== e.target.tagName) {
+                    deleteImage();
+                }
             }
         );
 
