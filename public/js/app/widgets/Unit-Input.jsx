@@ -1,8 +1,9 @@
 define([
     'react',
     'helpers/unit-converter',
+    'app/constants/keycode-constants',
     'helpers/round'
-], function(React, unitConverter, round) {
+], function(React, unitConverter, keyCodeConstants, round) {
     'use strict';
 
     return React.createClass({
@@ -116,31 +117,24 @@ define([
         _onKeyUp: function(e) {
             e.preventDefault();
 
-            var KEY_RETURN = 13,
-                KEY_UP = 38,
-                KEY_DOWN = 40,
-                KEY_PLUS = 187,
-                KEY_MINUS = 189,
-                KEY_MULTIPLY = 56,
-                KEY_DIVIDE = 191,
-                addValue = undefined,
+            var addValue = undefined,
                 operatorAmount = 0,
                 value;
 
             switch (e.keyCode) {
-            case KEY_RETURN:
+            case keyCodeConstants.KEY_RETURN:
                 this._onBlur(e);
                 break;
-            case KEY_UP:
+            case keyCodeConstants.KEY_UP:
                 addValue = Math.abs(this.props.step);
                 break;
-            case KEY_DOWN:
+            case keyCodeConstants.KEY_DOWN:
                 addValue = -Math.abs(this.props.step);
                 break;
-            case KEY_PLUS:
-            case KEY_MINUS:
-            case KEY_MULTIPLY:
-            case KEY_DIVIDE:
+            case keyCodeConstants.KEY_PLUS:
+            case keyCodeConstants.KEY_MINUS:
+            case keyCodeConstants.KEY_MULTIPLY:
+            case keyCodeConstants.KEY_DIVIDE:
                 operatorAmount = Math.floor(e.currentTarget.value.split(this.operatorRegex).length / 2);
 
                 if (1 < operatorAmount) {
