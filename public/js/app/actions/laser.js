@@ -452,7 +452,6 @@ define([
 
                 // set default image
                 if (null === $target_image) {
-                    $target_image = $img;
                     refreshObjectParams({ freetransEventType: 'move' }, $img);
                 }
 
@@ -474,14 +473,14 @@ define([
                                 });
                             };
 
-                        $target_image = $img;
-
-                        if (false === $target_image.hasClass('image-active')) {
+                        if (false === $img.hasClass('image-active')) {
                             inactiveAllImage();
 
-                            refreshObjectParams({ freetransEventType: 'move' }, $target_image);
+                            $target_image = $img;
 
-                            $target_image.on('transitionend', function(e) {
+                            refreshObjectParams({ freetransEventType: 'move' }, $img);
+
+                            $img.on('transitionend', function(e) {
                                 refreshImagePanelPos();
                             });
 
@@ -490,7 +489,7 @@ define([
                                 sizeLock: $img.data('sizeLock')
                             });
 
-                            $target_image.addClass('image-active');
+                            $img.addClass('image-active');
                         }
 
                         menuFactory.items.copy.enabled = true;
@@ -570,6 +569,10 @@ define([
             menuFactory.items.copy.enabled = false;
             menuFactory.items.cut.enabled = false;
             menuFactory.items.duplicate.enabled = false;
+
+            if (0 === $('.image-active').length) {
+                $target_image = null;
+            }
 
             self.setState({
                 selectedImage: false
