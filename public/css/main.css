@@ -3454,7 +3454,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
 .top-menu {
     position: fixed;
     width: 100%;
-    z-index: 9999; }
+    z-index: 1; }
     .top-menu .brand-logo {
         cursor: pointer;
         left: 24px;
@@ -5782,7 +5782,8 @@ input.switch:checked ~ label:after {
     align-items: center;
     justify-content: space-around; }
     .laser-studio .control [type="range"] {
-        flex: 1 auto; }
+        flex: 1 auto;
+        margin: 0 10px 0 0; }
     .laser-studio .control .value-text {
         width: 120px; }
     .laser-studio .control .label {
