@@ -3,6 +3,7 @@ define([
     'jsx!widgets/Select',
     'jsx!widgets/Button-Group',
     'jsx!widgets/Text-Input',
+    'jsx!widgets/Unit-Input',
     'helpers/api/config',
     'plugins/classnames/index',
     'helpers/round',
@@ -14,6 +15,7 @@ define([
     SelectView,
     ButtonGroup,
     TextInput,
+    UnitInput,
     config,
     classNames,
     round,
@@ -22,6 +24,27 @@ define([
     'use strict';
 
     return React.createClass({
+
+        getDefaultProps: function() {
+            var self = this;
+
+            return {
+                lang: React.PropTypes.object,
+                defaultMaterial: React.PropTypes.object,
+                onLoadPreset: React.PropTypes.func,
+                onClose: React.PropTypes.func,
+                onSave: React.PropTypes.func,
+                onDone : React.PropTypes.func
+            };
+        },
+
+        getInitialState: function() {
+            return {
+                defaultMaterial: this.props.defaultMaterial,
+                materialHasChanged: false,
+                openSaveWindow: false
+            };
+        },
 
         // Private methods
         _getFooterButtons: function(lang) {
@@ -119,22 +142,49 @@ define([
             this.props.onApply(material);
         },
 
-        _changeRangeNumber: function(target) {
-            var self = this;
+        _changeInputNumber: function() {
+            var self = this,
+                lang = self.props.lang.laser.advanced,
+                speed = self.refs.speed,
+                power = self.refs.power,
+                defaultMaterial;
 
-            return function(e) {
-                var speedRange = self.refs.speedRange.getDOMNode(),
-                    powerRange = self.refs.powerRange.getDOMNode(),
-                    defaultMaterial = self.state.defaultMaterial;
-
-                // changed state
-                defaultMaterial.data.laser_speed = parseFloat(speedRange.value, 10);
-                defaultMaterial.data.power = parseFloat(powerRange.value, 10);
-
-                self.setState({
-                    materialHasChanged: true
-                });
+            console.log(speed.value(), power.value());
+            defaultMaterial = {
+                data: {
+                    laser_speed: speed.value(),
+                    power: power.value() / 100 * lang.form.power.max
+                }
             };
+            console.log(defaultMaterial, lang.form.power.max);
+
+            self._updateDefaultMaterial(defaultMaterial);
+        },
+
+        _changeRangeNumber: function() {
+            var self = this,
+                speedRange = self.refs.speedRange.getDOMNode(),
+                powerRange = self.refs.powerRange.getDOMNode(),
+                defaultMaterial;
+
+            defaultMaterial = {
+                data: {
+                    laser_speed: parseFloat(speedRange.value, 10),
+                    power: parseFloat(powerRange.value, 10)
+                }
+            };
+
+            self._updateDefaultMaterial(defaultMaterial);
+        },
+
+        _updateDefaultMaterial: function(defaultMaterial) {
+            defaultMaterial.label = this.state.defaultMaterial.label;
+            defaultMaterial.value = this.state.defaultMaterial.value;
+
+            this.setState({
+                defaultMaterial: defaultMaterial,
+                materialHasChanged: true
+            });
         },
 
         // Lifecycle
@@ -179,11 +229,21 @@ define([
                                 max={lang.form.laser_speed.max}
                                 step={lang.form.laser_speed.step}
                                 defaultValue={this.state.defaultMaterial.data.laser_speed}
-                                onChange={this._changeRangeNumber('speed')}
+                                value={this.state.defaultMaterial.data.laser_speed}
+                                onChange={this._changeRangeNumber}
                             />
-                            <span ref="speed" data-tail={lang.form.laser_speed.unit} className="value-text">
-                                {this.state.defaultMaterial.data.laser_speed}
-                            </span>
+                            <UnitInput
+                                ref="speed"
+                                className="value-text"
+                                step={0.1}
+                                min={lang.form.laser_speed.min}
+                                max={lang.form.laser_speed.max}
+                                defaultUnit="mm/s"
+                                defaultUnitType="speed"
+                                operators={['+', '-', '*']}
+                                defaultValue={this.state.defaultMaterial.data.laser_speed}
+                                getValue={this._changeInputNumber}
+                            />
                         </div>
                     </div>
                     <div className="controls clearfix">
@@ -198,11 +258,20 @@ define([
                                 max={lang.form.power.max}
                                 step={lang.form.power.step}
                                 defaultValue={this.state.defaultMaterial.data.power}
-                                onChange={this._changeRangeNumber('power')}
+                                value={this.state.defaultMaterial.data.power}
+                                onChange={this._changeRangeNumber}
                             />
-                            <span ref="power" data-tail="%" className="value-text">
-                                {round(this.state.defaultMaterial.data.power / lang.form.power.max * 100, -2)}
-                            </span>
+                            <UnitInput
+                                ref="power"
+                                className="value-text"
+                                min={0}
+                                max={100}
+                                step={1}
+                                defaultUnit="%"
+                                defaultUnitType="percentage"
+                                defaultValue={round(this.state.defaultMaterial.data.power / lang.form.power.max * 100, -2)}
+                                getValue={this._changeInputNumber}
+                            />
                         </div>
                     </div>
                 </form>
@@ -225,27 +294,6 @@ define([
                     {footer}
                 </div>
             );
-        },
-
-        getDefaultProps: function() {
-            var self = this;
-
-            return {
-                lang: React.PropTypes.object,
-                defaultMaterial: React.PropTypes.object,
-                onLoadPreset: React.PropTypes.func,
-                onClose: React.PropTypes.func,
-                onSave: React.PropTypes.func,
-                onDone : React.PropTypes.func
-            };
-        },
-
-        getInitialState: function() {
-            return {
-                defaultMaterial: this.props.defaultMaterial,
-                materialHasChanged: false,
-                openSaveWindow: false
-            };
         }
 
     });
