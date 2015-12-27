@@ -75,7 +75,7 @@ define([
                     validPrinterName: name !== '',
                 });
 
-                isValid = (name !== '');
+                isValid = (name !== '' && 0 === name.replace(/(\w| |_)+/g, '').length);
 
                 if (true === isValid) {
 
