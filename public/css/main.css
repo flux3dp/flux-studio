@@ -2853,11 +2853,13 @@ input[type=range]:focus::-webkit-slider-runnable-track {
     .controls .control {
         line-height: 40px;
         position: relative; }
-    .controls .control > div {
-        display: inline-block;
-        margin-right: 30px;
-        color: #B3B3B3;
-        size: 13px; }
+        .controls .control > div {
+            display: inline-block;
+            margin-right: 30px;
+            color: #B3B3B3;
+            size: 13px; }
+        .controls .control .error {
+            border: 2px solid #F00; }
     .controls .radio > div {
         width: 15px;
         height: 15px;
@@ -5464,13 +5466,17 @@ input.switch:checked ~ label:after {
         display: flex;
         /* NEW, Spec - Opera 12.1, Firefox 20+ */
         margin: 0 0 10px 0;
-        justify-content: space-around; }
+        justify-content: space-around;
+        align-items: center; }
         .initialization .h-form .control input {
             height: 36px;
             width: 250px;
             flex: 3; }
-        .initialization .h-form .control label {
-            flex: 1; }
+        .initialization .h-form .control label,
+        .initialization .h-form .control .input-head {
+            font-weight: 200;
+            flex: 1;
+            margin: 0 3px 0 0; }
 
 /**
  * Laser
