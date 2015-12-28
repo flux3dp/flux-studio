@@ -384,6 +384,7 @@ define([
                 _handleQualitySelected: function(layerHeight) {
                     director.setParameter('layer_height', layerHeight);
                     advancedSettings.layer_height = layerHeight;
+                    this.setState({ layerHeight: layerHeight });
                 },
 
                 _handleTutorialStep: function() {
