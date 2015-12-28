@@ -119,7 +119,7 @@ define([
         return d.promise();
     }
 
-    function uploadFile(blob, file, uploadPath, callback) {
+    function uploadFile(file, blob, uploadPath, callback) {
         var d = $.Deferred();
         // ProgressActions.open(ProgressConstants.STEPPING, lang.device.starting, '', false);
         if(uploadPath) {

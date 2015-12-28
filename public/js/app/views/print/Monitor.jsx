@@ -168,7 +168,7 @@ define([
         },
 
         'AUTH_ERROR': function() {
-            clearInterval(reporter);
+            this._stopReport();
         },
 
         'USER_OPERATION': function(_statusId) {
@@ -195,7 +195,8 @@ define([
                 cameraImageUrl      : '',
                 selectedFileName    : '',
                 progress            : '',
-                currentStatus       : DeviceConstants.READY
+                currentStatus       : DeviceConstants.READY,
+                displayStatus       : ''
             };
         },
 
@@ -226,9 +227,13 @@ define([
 
         componentWillUnmount: function() {
             DeviceMaster.stopCamera();
-            clearInterval(reporter);
+            this._stopReport();
             history = [];
             messageViewed = false;
+        },
+
+        shouldComponentUpdate: function(nextProps, nextState) {
+            return JSON.stringify(this.state) !== JSON.stringify(nextState);
         },
 
         _getPrintingInfo: function() {
@@ -689,6 +694,7 @@ define([
 
         _stopReport: function() {
             clearInterval(reporter);
+            clearTimeout(timmer);
         },
 
         _processImage: function(image_blobs, mime_type) {
@@ -767,6 +773,10 @@ define([
             }
         },
 
+        _imageError: function(src) {
+            src.target.src = 'http://localhost:8080/img/ph_s.png';
+        },
+
         _renderDirectoryContent: function(content) {
             if(!content.directories) {
                 return '';
@@ -795,7 +805,7 @@ define([
                         onClick={self._handleSelectFile.bind(null, item[0], DeviceConstants.SELECT)}
                         onDoubleClick={self._handleSelectFile.bind(null, item[0], DeviceConstants.PREVIEW)}>
                         <div className="image-wrapper">
-                            <img src={imgSrc} />
+                            <img src={imgSrc} onError={self._imageError.bind(this)}/>
                         </div>
                         <div className={fileNameClass}>
                             {item[0].length > fileNameLength ? item[0].substring(0, fileNameLength) + '...' : item[0]}
@@ -837,7 +847,7 @@ define([
                 case mode.PREVIEW:
                     var divStyle = {
                             backgroundColor: '#E0E0E0',
-                            backgroundImage: !previewUrl ? '' : 'url(' + previewUrl + ')',
+                            backgroundImage: !previewUrl ? 'url(/img/ph_l.png)' : 'url(' + previewUrl + ')',
                             backgroundSize: 'cover',
                             backgroundPosition: '50% 50%',
                             width: '100%',
