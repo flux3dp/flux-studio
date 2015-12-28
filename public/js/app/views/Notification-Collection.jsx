@@ -73,6 +73,7 @@ define([
                     showNotificationModal : false,
                     type                  : '',
                     sourceId              : '',
+                    caption               : '',
                     message               : '',
                     customText            : '',
 
@@ -289,11 +290,12 @@ define([
                 types[type]();
             },
 
-            _handlePopup: function(type, id, message, customText) {
+            _handlePopup: function(type, id, caption, message, customText) {
                 this.setState({
                     showNotificationModal : true,
                     type                  : type,
                     sourceId              : id,
+                    caption               : caption,
                     message               : message,
                     customText            : customText
                 });
@@ -470,6 +472,7 @@ define([
                             lang={lang}
                             type={this.state.type}
                             open={this.state.showNotificationModal}
+                            caption={this.state.caption}
                             message={this.state.message}
                             customText={this.state.customText}
                             onRetry={this._handlePopupFeedBack.bind(null, 'retry')}
