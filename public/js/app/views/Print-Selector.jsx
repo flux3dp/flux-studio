@@ -146,7 +146,7 @@ define([
         _renderPrinterSelection: function(lang) {
             var self = this,
                 printOptions = self.state.printOptions,
-                options = (0 < printOptions ? printOptions : [{
+                options = (0 < printOptions.length ? printOptions : [{
                     label: (
                         <div className="spinner-roller spinner-roller-reverse"/>
                     )
@@ -261,9 +261,9 @@ define([
                     self.setState({
                         printOptions: _options,
                         loadFinished: true
+                    }, function() {
+                        self._openAlertWithnoPrinters();
                     });
-
-                    self._openAlertWithnoPrinters();
                 };
 
             self.setState({
