@@ -67,13 +67,53 @@ define([
         },
 
         componentDidMount: function() {
+            var selectedPrinter = initializeMachine.defaultPrinter.get(),
+                self = this,
+                lang = self.props.lang,
+                _options = [],
+                refreshOption = function(options) {
+                    window.printers = options;
+                    _options = [];
+
+                    options.forEach(function(el) {
+                        _options.push({
+                            label: self._renderPrinterItem(el)
+                        });
+
+                        if (true === self.hadDefaultPrinter && el.uuid === selectedPrinter.uuid) {
+                            // update device stat
+                            initializeMachine.defaultPrinter.set(el);
+                        }
+                    });
+
+                    self.setState({
+                        printOptions: _options,
+                        loadFinished: true
+                    }, function() {
+                        self._openAlertWithnoPrinters();
+                    });
+                };
+
             if (true === this.state.hadDefaultPrinter) {
-                this.selected_printer = initializeMachine.defaultPrinter.get();
+                this._selectPrinter(selectedPrinter);
                 this._returnSelectedPrinter();
             }
 
             AlertStore.onCancel(this._handleClose);
             AlertStore.onRetry(this._waitForPrinters);
+            AlertStore.onYes(this._onYes);
+            AlertStore.onCancel(this._onCancel);
+
+            self.setState({
+                discoverMethods: discover(
+                    self.state.discoverId,
+                    function(printers) {
+                        refreshOption(printers);
+                    }
+                )
+            });
+
+            self._waitForPrinters();
         },
 
         componentWillUnmount: function() {
@@ -83,26 +123,47 @@ define([
 
             AlertStore.removeCancelListener(this._handleClose);
             AlertStore.removeRetryListener(this._waitForPrinters);
+            AlertStore.removeYesListener(this._onYes);
+            AlertStore.removeCancelListener(this._onCancel);
         },
 
-        _selectPrinter: function(printer, e) {
-            e.preventDefault();
+        _onYes: function(id) {
+            var self = this;
 
+            switch (id) {
+            case 'kick':
+                DeviceMaster.kick().done(function() {
+                    self._returnSelectedPrinter();
+                });
+                break;
+            case 'abort':
+                DeviceMaster.stop().done(function() {
+                    self._returnSelectedPrinter();
+                });
+                break;
+            }
+        },
+
+        _onCancel: function(id) {
+            return;
+        },
+
+        _selectPrinter: function(printer) {
             var self = this,
-                lang = self.props.lang.select_printer,
+                lang = self.props.lang,
                 onError = function() {
                     ProgressActions.close();
                     InputLightboxActions.open('auth-device', {
                         type         : InputLightboxConstants.TYPE_PASSWORD,
-                        caption      : lang.notification,
-                        inputHeader  : lang.please_enter_password,
-                        confirmText  : lang.submit,
+                        caption      : lang.select_printer.notification,
+                        inputHeader  : lang.select_printer.please_enter_password,
+                        confirmText  : lang.select_printer.submit,
                         onSubmit     : function(password) {
                             ProgressActions.open(ProgressConstants.NONSTOP);
 
                             self._auth(printer.uuid, password, {
                                 onError: function() {
-                                    AlertActions.showPopupError('device-auth-fail', lang.auth_failure);
+                                    AlertActions.showPopupError('device-auth-fail', lang.select_printer.auth_failure);
                                 }
                             });
                         }
@@ -113,8 +174,38 @@ define([
                 };
 
             self.selected_printer = printer;
+            DeviceMaster.selectDevice(printer);
 
-            self._auth(printer.uuid, '', opts);
+            switch (printer.st_id) {
+            case DeviceConstants.status.IDLE:
+                // no problem
+                self._auth(printer.uuid, '', opts);
+                break;
+            case DeviceConstants.status.SCAN:
+            case DeviceConstants.status.MAINTAIN:
+                // ask kick?
+                AlertActions.showPopupYesNo('kick', lang.message.device_is_used);
+                break;
+            case DeviceConstants.status.COMPLETED:
+            case DeviceConstants.status.ABORTED:
+                // quit
+                DeviceMaster.quit().done(function() {
+                    this._returnSelectedPrinter();
+                });
+                break;
+            case DeviceConstants.status.RUNNING:
+            case DeviceConstants.status.PAUSED:
+            case DeviceConstants.status.PAUSED_FROM_STARTING:
+            case DeviceConstants.status.PAUSED_FROM_RUNNING:
+                // ask for abort
+                AlertActions.showPopupYesNo('abort', lang.message.device_is_used);
+                break;
+            default:
+                // device busy
+                console.log('device busy');
+                AlertActions.showDeviceBusyPopup('on-select-printer');
+                break;
+            }
         },
 
         _auth: function(uuid, password, opts) {
@@ -243,39 +334,6 @@ define([
             if (0 === this.state.printOptions.length && false === this.state.hadDefaultPrinter) {
                 AlertActions.showPopupRetry('no-printer', lang.device_selection.no_printers);
             }
-        },
-
-        componentWillMount: function () {
-            var self = this,
-                lang = self.props.lang,
-                _options = [],
-                refreshOption = function(options) {
-                    _options = [];
-
-                    options.forEach(function(el) {
-                        _options.push({
-                            label: self._renderPrinterItem(el)
-                        });
-                    });
-
-                    self.setState({
-                        printOptions: _options,
-                        loadFinished: true
-                    }, function() {
-                        self._openAlertWithnoPrinters();
-                    });
-                };
-
-            self.setState({
-                discoverMethods: discover(
-                    self.state.discoverId,
-                    function(printers) {
-                        refreshOption(printers);
-                    }
-                )
-            });
-
-            self._waitForPrinters();
         }
     });
 
