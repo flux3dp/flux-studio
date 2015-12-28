@@ -690,6 +690,20 @@ define(function() {
                 x: 'X',
                 y: 'Y',
                 z: 'Z'
+            },
+            messages: {
+                'not open': {
+                    caption: '未偵測到鏡頭畫面',
+                    message: '請參考使用手冊，將掃描鏡頭拉出。'
+                },
+                'no object': {
+                    caption: '未偵測到校正工具',
+                    message: ''
+                },
+                'no laser': {
+                    caption: '未偵測到掃描雷射',
+                    message: '請參考使用手冊，按下雷射頭將其打開'
+                }
             }
         },
         select_printer: {

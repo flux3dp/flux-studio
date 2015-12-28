@@ -684,6 +684,20 @@ define(function() {
                 x: 'X',
                 y: 'Y',
                 z: 'Z'
+            },
+            messages: {
+                'not open': {
+                    caption: 'Camera not detect',
+                    message: 'Please pull off the scanning camera.'
+                },
+                'no object': {
+                    caption: 'Calibration tool not detected',
+                    message: ''
+                },
+                'no laser': {
+                    caption: 'Laser not detected',
+                    message: 'Press the laser heads to open it.'
+                }
             }
         },
         select_printer: {
