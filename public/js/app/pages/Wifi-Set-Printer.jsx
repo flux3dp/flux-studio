@@ -155,7 +155,7 @@ define([
                                 <label className="control" for="printer-name">
                                     <h4 className="input-head">{lang.initialize.set_machine_generic.printer_name}</h4>
                                     <input ref="name" id="printer-name" type="text" className={printerNameClass}
-                                        pattern="[a-zA-Z0-9 ’'_-]{1, }"
+                                        pattern="[a-zA-Z0-9 ’'_-]+"
                                         title={lang.initialize.invalid_device_name}
                                         required={true}
                                         autoFocus={true}
