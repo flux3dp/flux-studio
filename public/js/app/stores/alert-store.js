@@ -106,35 +106,39 @@ define([
                 },
 
                 'SHOW_POPUP_INFO': function() {
-                    AlertStore.emit(POPUP_EVENT, AlertConstants.INFO, payload.id, payload.message);
+                    AlertStore.emit(POPUP_EVENT, AlertConstants.INFO, payload.id, payload.caption, payload.message);
                 },
 
                 'SHOW_POPUP_WARNING': function() {
-                    AlertStore.emit(POPUP_EVENT, AlertConstants.WARNING, payload.id, payload.message);
+                    AlertStore.emit(POPUP_EVENT, AlertConstants.WARNING, payload.id, payload.caption, payload.message);
                 },
 
                 'SHOW_POPUP_ERROR': function() {
-                    AlertStore.emit(POPUP_EVENT, AlertConstants.ERROR, payload.id, payload.message);
+                    AlertStore.emit(POPUP_EVENT, AlertConstants.ERROR, payload.id, payload.caption, payload.message);
+                },
+
+                'SHOW_POPUP_DEVICE_BUSY': function() {
+                    AlertStore.emit(POPUP_EVENT, AlertConstants.ERROR, payload.id, payload.caption, payload.message);
                 },
 
                 'SHOW_POPUP_RETRY': function() {
-                    AlertStore.emit(POPUP_EVENT, AlertConstants.RETRY_CANCEL, payload.id, payload.message);
+                    AlertStore.emit(POPUP_EVENT, AlertConstants.RETRY_CANCEL, payload.id, payload.caption, payload.message);
                 },
 
                 'SHOW_POPUP_RETRY_ABORT': function() {
-                    AlertStore.emit(POPUP_EVENT, AlertConstants.RETRY_ABORT_CANCEL, payload.id, payload.message);
+                    AlertStore.emit(POPUP_EVENT, AlertConstants.RETRY_ABORT_CANCEL, payload.id, payload.caption, payload.message);
                 },
 
                 'SHOW_POPUP_YES_NO': function() {
-                    AlertStore.emit(POPUP_EVENT, AlertConstants.YES_NO, payload.id, payload.message);
+                    AlertStore.emit(POPUP_EVENT, AlertConstants.YES_NO, payload.id, payload.caption, payload.message);
                 },
 
                 'SHOW_POPUP_CUSTOM': function() {
-                    AlertStore.emit(POPUP_EVENT, AlertConstants.CUSTOM_CANCEL, payload.id, payload.message, payload.customText);
+                    AlertStore.emit(POPUP_EVENT, AlertConstants.CUSTOM_CANCEL, payload.id, payload.caption, payload.message, payload.customText);
                 },
 
                 'SHOW_POPUP_QUESTION': function() {
-                    AlertStore.emit(POPUP_EVENT, AlertConstants.QUESTION, payload.id, payload.message);
+                    AlertStore.emit(POPUP_EVENT, AlertConstants.QUESTION, payload.id, payload.caption, payload.message);
                 },
 
                 'NOTIFY_RETRY': function() {
