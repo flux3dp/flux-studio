@@ -794,7 +794,11 @@ define(function() {
             machineNotConnected: 'Machine is not connected',
             notPrinting: 'Printing is not in progress',
             nothingToPrint: 'Nothing to print (source blob missing)',
-            connectionTimeout: 'device is not responding, connection timeout'
+            connectionTimeout: 'device is not responding, connection timeout',
+            device_busy: {
+                caption: 'Device Busy',
+                message: 'The device is executing another task, try again later. If it stops working, please restart the device.'
+            }
         },
         machine_status: {
             '-2': 'Scanning',

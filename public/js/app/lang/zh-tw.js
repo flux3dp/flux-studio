@@ -800,7 +800,11 @@ define(function() {
             machineNotConnected: 'Machine is not connected',
             notPrinting: 'Printing is not in progress',
             nothingToPrint: 'Nothing to print (source blob missing)',
-            connectionTimeout: 'device is not responding, connection timeout'
+            connectionTimeout: 'device is not responding, connection timeout',
+            device_busy: {
+                caption: '裝置忙碌中',
+                message: '裝置正在進行另外一項工作，請稍候再試。如果裝置持續沒有回應，請將裝置重新啟動。'
+            }
         },
         machine_status: {
             '-2': 'Scanning',
