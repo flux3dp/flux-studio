@@ -388,6 +388,21 @@ define([
 
                 return d.promise();
             },
+            quitTask: function() {
+                var d = $.Deferred();
+                events.onMessage = function(result) {
+                    d.resolve(result);
+                };
+
+                events.onError = function(result) {
+                    d.reject(result);
+                }
+
+                ws.send('task quit');
+                lastOrder = 'task quit';
+
+                return d.promise();
+            },
             quit: function() {
                 var d = $.Deferred();
                 events.onMessage = function(result) {
@@ -398,8 +413,8 @@ define([
                     d.resolve(result);
                 }
 
-                ws.send('task quit');
-                lastOrder = 'task quit';
+                ws.send('play quit');
+                lastOrder = 'play quit';
 
                 return d.promise();
             },
