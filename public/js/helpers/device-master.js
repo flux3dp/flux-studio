@@ -65,7 +65,7 @@ define([
             _device.name = device.name;
             _device.actions = DeviceController(uuid, {
                 onConnect: function(response) {
-                    if(response.status.toUpperCase() === DeviceConstants.CONNECTED) {
+                    if (response.status.toUpperCase() === DeviceConstants.CONNECTED) {
                         d.resolve(DeviceConstants.CONNECTED);
                         _devices.push(_device);
                     }
@@ -259,6 +259,10 @@ define([
         }
     }
 
+    function maintain(type) {
+        return _device.actions.maintain(type);
+    }
+
     // set functions
 
     function setPassword(password) {
@@ -414,6 +418,7 @@ define([
             this.ls                 = ls;
             this.fileInfo           = fileInfo;
             this.getPreviewInfo     = getPreviewInfo;
+            this.maintain           = maintain;
 
             Discover(
                 'device-master',
