@@ -11,8 +11,8 @@ define([
     'use strict';
 
     var THREE = window.THREE || {},
-
         container, camera, scene, renderer, cylinder, orbitControl,
+        MESH_CHILD_INDEX = 5,
         settings = {
             diameter: 170,
             radius: 850,
@@ -466,7 +466,9 @@ define([
             return toScreenPosition(mesh, camera, container);
         },
         clear: function() {
-            container = camera = scene = renderer = cylinder = orbitControl = undefined;
+            for (var i = MESH_CHILD_INDEX; i < scene.children.length; i++) {
+                removeMesh(scene.children[i]);
+            }
         }
     };
 });
