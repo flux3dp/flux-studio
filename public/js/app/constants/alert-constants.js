@@ -21,6 +21,7 @@ define(function(){
         SHOW_POPUP_CUSTOM          : 'SHOW_POPUP_CUSTOM',
         SHOW_POPUP_QUESTION        : 'SHOW_POPUP_QUESTION',
         SHOW_POPUP_UPDATE          : 'SHOW_POPUP_UPDATE',
+        SHOW_POPUP_DEVICE_BUSY     : 'SHOW_POPUP_DEVICE_BUSY',
         NOTIFY_RETRY               : 'NOTIFY_RETRY',
         NOTIFY_ABORT               : 'NOTIFY_ABORT',
         NOTIFY_YES                 : 'NOTIFY_YES',
