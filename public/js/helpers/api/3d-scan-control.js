@@ -210,16 +210,24 @@ define([
                 return $deferred;
             },
 
-            calibrate: function(send) {
+            calibrate: function() {
                 var $deferred = $.Deferred();
 
-                if (true === send) {
-                    ws.send('calibrate');
-                }
-
                 events.onMessage = function(data) {
-                    $deferred.resolve(data);
+                    switch (data.status) {
+                    case 'continue':
+                        $deferred.notify(data);
+                        break;
+                    case 'ok':
+                        $deferred.resolve(data);
+                        break;
+                    case 'fail':
+                        $deferred.reject(data);
+                        break;
+                    }
                 };
+
+                ws.send('calibrate');
 
                 return $deferred.promise();
             },
