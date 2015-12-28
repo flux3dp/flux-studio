@@ -90,6 +90,7 @@ define(function() {
             connect: 'Connect',
 
             // specific caption/content
+            invalid_device_name: 'The name can only contains alphabet, numbers, blanks, and special characters  “-”, “_”, “’”, “\'”.',
             select_language: 'Select Language',
             change_password: 'Change password?',
             connect_flux: 'Connect FLUX to Your Computer by USB Cable',
@@ -102,7 +103,7 @@ define(function() {
             // page specific
             set_machine_generic: {
                 printer_name: 'Name',
-                printer_name_placeholder: 'Printer\'s Name',
+                printer_name_placeholder: 'Device\'s Name',
                 password: 'Password',
                 set_station_mode: 'Set station mode',
                 password_placeholder: 'Password'

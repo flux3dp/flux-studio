@@ -90,6 +90,7 @@ define(function() {
             connect: '連接',
 
             // specific caption/content
+            invalid_device_name: '機器名稱只能使用英文字母、數字、空格以及特殊字元 “-”, “_”, “’”, “\'”',
             select_language: '請選擇你想使用的語言',
             change_password: '要更改密碼嗎?',
             connect_flux: '用 USB 連接你的電腦與 FLUX',
