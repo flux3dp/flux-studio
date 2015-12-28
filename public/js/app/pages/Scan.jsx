@@ -1130,6 +1130,10 @@ define([
                                         self._openBlocker(false);
                                     });
                                 }
+                                else if ('DEVICE_BUSY' === data.error) {
+                                    self._openBlocker(false);
+                                    AlertActions.showDeviceBusyPopup('scan-device-busy');
+                                }
                                 else {
                                     self._openBlocker(false);
                                     AlertActions.showPopupRetry('scan-retry', data.error);
