@@ -6,7 +6,7 @@ PACKAGE_NAME="FLUX_Studio"
 ./nwjs-shell-builder/nwjs-build.sh --clean
 
 while true; do
-    read -p "==> Build for which OS? (Windows[W], OSX[O]) "
+    read -p "==> Build for which OS? (Windows[W], OSX[O], Linux[L]) "
     case $REPLY in
         [Ww] )
             ./nwjs-shell-builder/nwjs-build.sh --src=$DIR/public --name="$PACKAGE_NAME" --win-icon=$DIR/public/icon.png --version="1.0.0" --nw=0.12.3 --target="2 3" --build
@@ -15,6 +15,11 @@ while true; do
 
         [Oo] )
             ./nwjs-shell-builder/nwjs-build.sh --src=$DIR/public --name="$PACKAGE_NAME" --osx-icon=$DIR/public/logo.icns --version="1.0.0" --nw=0.12.3 --target="4 5" --build
+
+            break;;
+
+        [Ll] )
+            ./nwjs-shell-builder/nwjs-build.sh --src=$DIR/public --name="$PACKAGE_NAME" --osx-icon=$DIR/public/logo.icns --version="1.0.0" --nw=0.12.3 --target="0 1" --build
 
             break;;
 
