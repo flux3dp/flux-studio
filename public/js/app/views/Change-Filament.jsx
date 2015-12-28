@@ -63,14 +63,16 @@ define([
             },
 
             componentDidMount: function() {
-                DeviceMaster.selectDevice(this.props.device).then(function(status) {
-                    if (status !== DeviceConstants.CONNECTED) {
-                        // alert and close
-                        AlertActions.showPopupError('change-filament', status);
-                    }
-                });
+                if (true === this.props.open) {
+                    DeviceMaster.selectDevice(this.props.device).then(function(status) {
+                        if (status !== DeviceConstants.CONNECTED) {
+                            // alert and close
+                            AlertActions.showPopupError('change-filament', status);
+                        }
+                    });
 
-                AlertStore.onCancel(this._onCancel);
+                    AlertStore.onCancel(this._onCancel);
+                }
             },
 
             componentWillUnmount: function() {
