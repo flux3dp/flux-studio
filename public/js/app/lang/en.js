@@ -812,7 +812,8 @@ define(function() {
             device_busy: {
                 caption: 'Device Busy',
                 message: 'The device is executing another task, try again later. If it stops working, please restart the device.'
-            }
+            },
+            device_is_used: 'The device is being used, do you want to abort current task?'
         },
         machine_status: {
             '-2': 'Scanning',

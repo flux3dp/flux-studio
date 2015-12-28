@@ -818,7 +818,8 @@ define(function() {
             device_busy: {
                 caption: '裝置忙碌中',
                 message: '裝置正在進行另外一項工作，請稍候再試。如果裝置持續沒有回應，請將裝置重新啟動。'
-            }
+            },
+            device_is_used: '裝置正被使用中，是否要終止現在任務？'
         },
         machine_status: {
             '-2': 'Scanning',
