@@ -59,6 +59,8 @@ define(function() {
         QUIT            : 'QUIT',
         KICK            : 'KICK',
         LS              : 'LS',
+        LOAD_FILAMENT   : 'LOAD',
+        UNLOAD_FILAMENT : 'UNLOAD',
 
         status : {
             IDLE                    : 0,
