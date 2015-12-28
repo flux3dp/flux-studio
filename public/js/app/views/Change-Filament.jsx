@@ -111,7 +111,7 @@ define([
                         }
                     },
                     done = function(response) {
-                        DeviceMaster.quit().done(function() {
+                        DeviceMaster.quitTask().done(function() {
                             self._next(steps.COMPLETED);
                         });
                     },
