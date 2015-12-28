@@ -57,12 +57,15 @@ define(function() {
         REPORT          : 'REPORT',
         ABORT           : 'ABORT',
         QUIT            : 'QUIT',
+        QUIT_TASK       : 'QUIT_TASK',
         KICK            : 'KICK',
         LS              : 'LS',
         LOAD_FILAMENT   : 'LOAD',
         UNLOAD_FILAMENT : 'UNLOAD',
 
         status : {
+            SCAN                    : -2,
+            MAINTAIN                : -1,
             IDLE                    : 0,
             INIT                    : 1,
             STARTING                : 4,
