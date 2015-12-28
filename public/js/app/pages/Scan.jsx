@@ -170,6 +170,9 @@ define([
                     else if ('over-quota' === id) {
                         // TODO: over upload quota
                     }
+                    else if ('calibrate' === id) {
+                        // TODO: cancel calibrate
+                    }
                     else {
                         window.history.go(-1);
                     }
@@ -563,24 +566,9 @@ define([
                             });
                         },
                         checkLenOpened = function() {
-                            var opts = {
-                                onPass: function() {
-                                    self._openBlocker(false);
-                                    openProgressBar(onScan);
-                                },
-                                onFail: function(message) {
-                                    self._openBlocker(false);
-                                    self.setState({
-                                        openAlert: true,
-                                        error: {
-                                            caption: self.state.lang.scan.error,
-                                            message: message,
-                                            onClose: function() {
-                                                self._refreshCamera();
-                                            }
-                                        }
-                                    });
-                                }
+                            var onPass = function() {
+                                self._openBlocker(false);
+                                openProgressBar(onScan);
                             };
 
                             self._handleCheck(function(data) {
@@ -588,13 +576,12 @@ define([
                                 case 'good':
                                 case 'no object':
                                 case 'no laser':
-                                    opts.onPass();
+                                    onPass();
                                     break;
                                 case 'not open':
-                                    opts.onFail(data.message);
-                                    break;
                                 default:
-                                    opts.onFail(data.message);
+                                    self._onCalibrateFail(data.message, AlertActions.showPopupError);
+                                    break;
                                 }
                             });
                         },
@@ -955,58 +942,56 @@ define([
                     }
                 },
 
+                _onCalibrateFail: function(message, Popup) {
+                    var self = this,
+                        failMessage = self.state.lang.scan.messages[message] || {
+                            caption: '',
+                            message: message
+                        };
+                    self._openBlocker(false);
+                    Popup(
+                        'calibrate',
+                        (
+                            <div>
+                                <img className="calibrate-image" src="/img/calibration-guide.jpg"/>
+                                <p>{failMessage.message}</p>
+                            </div>
+                        ),
+                        failMessage.caption
+                    );
+                },
+
                 _onCalibrate: function() {
                     var self = this,
-                        opts = {
-                            onPass: function() {
-                                var scanCtrlWebSocket = self.state.scanCtrlWebSocket,
-                                    calibrateDeferred = scanCtrlWebSocket.calibrate(true),
-                                    then = function(data) {
-                                        if ('ok' === data.status) {
-                                            self._refreshCamera();
-                                            self._openBlocker(false);
-                                        }
-                                        else if ('fail' === data.status) {
-                                            self._openBlocker(false);
-                                            AlertActions.showPopupError(
-                                                'calibrate-fail',
-                                                self.state.lang.scan.calibrate_fail
-                                            );
+                        onPass = function() {
+                            var scanCtrlWebSocket = self.state.scanCtrlWebSocket,
+                                calibrateDeferred = scanCtrlWebSocket.calibrate(true),
+                                done = function(data) {
+                                    self._refreshCamera();
+                                    self._openBlocker(false);
+                                },
+                                fail = function(data) {
+                                    self._openBlocker(false);
+                                    AlertActions.showPopupError(
+                                        'calibrate-fail',
+                                        self.state.lang.scan.calibrate_fail
+                                    );
+                                };
 
-                                        }
-                                        else {
-                                            calibrateDeferred = scanCtrlWebSocket.calibrate(false).then(then);
-                                        }
-                                    };
-
-                                calibrateDeferred.then(then);
-                            },
-                            onFail: function(message) {
-                                self._openBlocker(false);
-                                AlertActions.showPopupRetry(
-                                    'calibrate',
-                                    // TODO: replace the content
-                                    (
-                                        <div>
-                                            <img className="calibrate-image" src="/img/calibration-guide.jpg"/>
-                                            <p>{message}</p>
-                                        </div>
-                                    )
-                                );
-                            }
+                            calibrateDeferred.done(done).fail(fail);
                         };
 
                     self._handleCheck(function(data) {
                         switch (data.message) {
                         case 'good':
-                            opts.onPass();
+                            onPass();
                             break;
                         case 'no object':
                         case 'not open':
                         case 'no laser':
                         default:
                             self._refreshCamera();
-                            opts.onFail(data.message);
+                            self._onCalibrateFail(data.message, AlertActions.showPopupRetry);
                         }
                     });
 
