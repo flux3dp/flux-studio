@@ -71,11 +71,11 @@ define([
                     setMachine,
                     isValid;
 
-                self.setState({
-                    validPrinterName: name !== '',
-                });
+                isValid = (name !== '' && false === /[^a-zA-Z0-9 ’'_-]+/g.test(name));
 
-                isValid = (name !== '' && 0 === name.replace(/(\w| |_)+/g, '').length);
+                self.setState({
+                    validPrinterName: isValid
+                });
 
                 if (true === isValid) {
 
@@ -131,49 +131,47 @@ define([
                     wrapperClassName = {
                         'initialization': true
                     },
-                    // alert = this._renderAlert(lang),
                     cx = React.addons.classSet,
                     printerNameClass,
                     printerPasswordClass,
                     content;
 
                 printerNameClass = cx({
-                    'required'  : true,
-                    'error'     : !this.state.validPrinterName
+                    'error': !this.state.validPrinterName
                 });
 
                 printerPasswordClass = cx({
-                    'required'  : true,
-                    'error'     : !this.state.validPrinterPassword
+                    'error': !this.state.validPrinterPassword
                 });
 
                 content = (
                     <div className="set-machine-generic text-center">
                         <img className="brand-image" src="/img/menu/main_logo.svg"/>
 
-                        <form className="form h-form">
+                        <form className="form h-form" onSubmit={this._handleSetPrinter}>
                             <h1 className="headline">{lang.initialize.name_your_flux}</h1>
 
                             <div className="controls">
-                                <p className="control">
-                                    <label for="printer-name">
-                                        {lang.initialize.set_machine_generic.printer_name}
-                                    </label>
+                                <label className="control" for="printer-name">
+                                    <h4 className="input-head">{lang.initialize.set_machine_generic.printer_name}</h4>
                                     <input ref="name" id="printer-name" type="text" className={printerNameClass}
-                                    autoFocus={true}
-                                    defaultValue={this.state.settingPrinter.name}
-                                    placeholder={lang.initialize.set_machine_generic.printer_name_placeholder}/>
-                                </p>
-                                <p className="control">
-                                    <label for="printer-password">
-                                        {lang.initialize.set_machine_generic.password}
-                                    </label>
+                                        pattern="[a-zA-Z0-9 ’'_-]{1, }"
+                                        title={lang.initialize.invalid_device_name}
+                                        required={true}
+                                        autoFocus={true}
+                                        autoComplete={false}
+                                        defaultValue={this.state.settingPrinter.name}
+                                        placeholder={lang.initialize.set_machine_generic.printer_name_placeholder}
+                                    />
+                                </label>
+                                <label className="control" for="printer-password">
+                                    <h4 className="input-head">{lang.initialize.set_machine_generic.password}</h4>
                                     <input ref="password" for="printer-password" type="password" className={printerPasswordClass}
                                     placeholder={lang.initialize.set_machine_generic.password_placeholder}/>
-                                </p>
+                                </label>
                             </div>
                             <div className="btn-v-group">
-                                <button className="btn btn-action btn-large" data-ga-event="next" onClick={this._handleSetPrinter} autoFocus={true}>
+                                <button type="submit" className="btn btn-action btn-large" data-ga-event="next">
                                     {lang.initialize.next}
                                 </button>
                                 <a href="#initialize/wifi/setup-complete/with-usb" data-ga-event="skip" className="btn btn-link btn-large">
