@@ -46,10 +46,12 @@ define([
             _onStop: function() {
                 var self = this;
 
+                self.props.onStop();
+
                 self.setState({
                     stop: true
                 }, function() {
-                    self.props.onStop();
+                    self.setState(self.getInitialState());
                 });
             },
 
