@@ -635,12 +635,17 @@ define([
                     AlertStore.onYes(function(id) {
                         self.setState(self.getInitialState());
                         scanedModel.clear();
+                        self.state.scanControlImageMethods.stop(function() {
+                           self.state.scanCtrlWebSocket.connection.close(false);
+                        });
                     });
                     AlertActions.showPopupYesNo('scan-again', self.state.lang.scan.scan_again_confirm);
                 },
 
                 _onScanStop: function(e) {
                     this.setState({
+                        openProgressBar: false,
+                        hasMultiScan: false,
                         isScanStarted: false,
                         progressPercentage: 100 // total complete
                     });
@@ -1118,15 +1123,6 @@ define([
                 },
 
                 _renderProgressBar: function(lang) {
-                    var self = this,
-                        content,
-                        onClose = function(e) {
-                            self.setState({
-                                openProgressBar: false,
-                                hasMultiScan: false
-                            });
-                        };
-
                     return (
                         true === this.state.openProgressBar ?
                         <ProgressBar
@@ -1144,8 +1140,15 @@ define([
                     var self = this,
                         ctrlOpts = {
                             onError: function(data) {
-                                self._openBlocker(false);
-                                AlertActions.showPopupRetry('scan-retry', data.error);
+                                if (-1 < data.info.toUpperCase().indexOf('ZOMBIE')) {
+                                    self.state.scanCtrlWebSocket.takeControl(function(response) {
+                                        self._openBlocker(false);
+                                    });
+                                }
+                                else {
+                                    self._openBlocker(false);
+                                    AlertActions.showPopupRetry('scan-retry', data.error);
+                                }
                             },
                             onReady: function() {
                                 self._refreshCamera();
