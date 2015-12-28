@@ -93,11 +93,11 @@ define([
 
             if(nextProps.layerHeight !== layerHeight) {
                 var _quality = {
-                    '0.1': lang.qualityLevel.high,
-                    '0.2': lang.qualityLevel.med,
-                    '0.3': lang.qualityLevel.low
+                    '0.1': lang.quality.high,
+                    '0.2': lang.quality.med,
+                    '0.3': lang.quality.low
                 };
-                this.setState({ quality: _quality[nextProps.layerHeight.toString()] || lang.qualityLevel.custom });
+                this.setState({ quality: _quality[nextProps.layerHeight.toString()] || lang.quality.custom });
             }
         },
 
@@ -116,7 +116,7 @@ define([
                     'QUALITY': function() {
                         layerHeight = qualityLevel[arg];
                         self.props.onQualitySelected(qualityLevel[arg]);
-                        self.setState({ quality: lang.qualityLevel[arg] });
+                        self.setState({ quality: lang.quality[arg] });
                         $('.dialog-opener').prop('checked', false);
                     },
 

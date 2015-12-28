@@ -274,7 +274,10 @@ define([
                     setting = setting || advancedSettings;
                     Config().write('advanced-settings', JSON.stringify(setting));
                     Object.assign(advancedSettings, setting);
-                    this.setState({ supportOn: setting.support_material === 1 });
+                    this.setState({
+                        supportOn: setting.support_material === 1,
+                        layerHeight: setting.layer_height
+                    });
                     return director.setAdvanceParameter(setting);
                 },
 
