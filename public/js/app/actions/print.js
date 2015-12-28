@@ -11,6 +11,7 @@ define([
     'app/constants/device-constants',
     'app/constants/progress-constants',
     'helpers/i18n',
+    'helpers/nwjs/menu-factory',
     // non-return value
     'threeOrbitControls',
     'threeTrackballControls',
@@ -32,7 +33,8 @@ define([
     ProgressActions,
     DeviceConstants,
     ProgressConstants,
-    I18n
+    I18n,
+    MenuFactory
 ) {
     'use strict';
 
@@ -913,6 +915,9 @@ define([
 
         if (!$.isEmptyObject(obj)) {
 
+            MenuFactory.items.duplicate.enabled = true;
+            MenuFactory.items.duplicate.onClick = duplicateSelected;
+
             objects.forEach(function(o) {
                 o.outlineMesh.visible = false;
             });
@@ -937,6 +942,7 @@ define([
             }
         }
         else {
+            MenuFactory.items.duplicate.enabled = false;
             transformMode = false;
             removeFromScene('TransformControl');
             _removeAllMeshOutline();

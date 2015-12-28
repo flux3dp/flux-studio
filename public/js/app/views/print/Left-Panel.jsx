@@ -19,7 +19,7 @@ define([
     qualityLevel = {
         high: 0.1,
         med: 0.2,
-        low: 0.3
+        low: 0.25
     };
 
     settings = {
@@ -95,9 +95,15 @@ define([
                 var _quality = {
                     '0.1': lang.quality.high,
                     '0.2': lang.quality.med,
-                    '0.3': lang.quality.low
+                    '0.25': lang.quality.low
                 };
-                this.setState({ quality: _quality[nextProps.layerHeight.toString()] || lang.quality.custom });
+                if(nextProps.layerHeight) {
+
+                    this.setState({ quality: _quality[nextProps.layerHeight.toString()] || lang.quality.custom });
+                }
+                else {
+                    console.log(nextProps);
+                }
             }
         },
 
