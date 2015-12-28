@@ -488,7 +488,7 @@ define(function() {
             start_engrave: 'Engrave',
             start_cut: 'Cut',
             close_alert: 'Close',
-            get_fcode: 'Get Fcode',
+            get_fcode: 'Save<br/>Task',
             name: 'Name',
             go: 'GO',
             print_params: {
@@ -731,6 +731,7 @@ define(function() {
             currentTemperature              : 'Current Temp',
             nothingToPrint                  : 'There is nothing to print',
             go                              : 'GO',
+            start                           : 'START',
             pause                           : 'PAUSE',
             stop                            : 'STOP',
             record                          : 'RECORD',

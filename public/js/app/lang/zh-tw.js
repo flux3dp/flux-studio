@@ -488,7 +488,7 @@ define(function() {
             start_engrave: '雕刻',
             start_cut: '切割',
             close_alert: '關閉',
-            get_fcode: 'Get Fcode',
+            get_fcode: '儲存<br/>工作',
             name: '名稱',
             go: 'GO',
             print_params: {
@@ -731,6 +731,7 @@ define(function() {
             currentTemperature              : 'Current Temp',
             nothingToPrint                  : 'There is nothing to print',
             go                              : '開始',
+            start                           : '開始',
             pause                           : '暫停',
             stop                            : 'STOP',
             record                          : 'RECORD',

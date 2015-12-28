@@ -121,10 +121,9 @@ define([
 
     function uploadFile(blob, file, uploadPath, callback) {
         var d = $.Deferred();
-        ProgressActions.open(ProgressConstants.STEPPING, lang.device.starting, '', false);
         if(uploadPath) {
+            ProgressActions.open(ProgressConstants.STEPPING, lang.device.starting, '', false);
             _device.actions.uploadToDirectory(blob, uploadPath, file.name, uploadProgress).then(function(result) {
-                // console.log('from dm', result);
                 ProgressActions.close();
                 d.resolve(result);
             });
@@ -132,7 +131,6 @@ define([
         else {
             _device.print = _device.actions.upload(blob.size, blob, {
                 onFinished: function(result) {
-                    ProgressActions.close();
                     d.resolve(result);
                 }
             }, function(step, total) {
