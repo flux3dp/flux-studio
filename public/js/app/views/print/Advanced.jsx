@@ -410,7 +410,7 @@ define([
                             id="temperature"
                             key="temperature"
                             label={lang.temperature}
-                            min={170}
+                            min={180}
                             max={230}
                             step={1}
                             default={advancedSetting.temperature}
@@ -434,7 +434,7 @@ define([
                             key="layer_height"
                             label={lang.layer_height}
                             min={0.05}
-                            max={0.4}
+                            max={0.3}
                             step={0.05}
                             default={advancedSetting.layer_height}
                             onChange={this._handleControlValueChange} />
@@ -443,8 +443,8 @@ define([
                             id="first_layer_height"
                             key="first_layer_height"
                             label={lang.firstLayerHeight}
-                            min={0.05}
-                            max={0.4}
+                            min={0.2}
+                            max={0.35}
                             step={0.05}
                             default={advancedSetting.first_layer_height}
                             onChange={this._handleControlValueChange} />
@@ -468,7 +468,7 @@ define([
                             id="top_solid_layers"
                             key="top_solid_layers"
                             label={lang.solidLayerTop}
-                            min={1}
+                            min={0}
                             max={6}
                             step={1}
                             default={advancedSetting.top_solid_layers}
@@ -478,7 +478,7 @@ define([
                             id="bottom_solid_layers"
                             key="bottom_solid_layers"
                             label={lang.solidLayerBottom}
-                            min={1}
+                            min={0}
                             max={6}
                             step={1}
                             default={advancedSetting.bottom_solid_layers}
@@ -516,7 +516,7 @@ define([
 
                     </div>
 
-                    <div className="section">
+                    {/*<div className="section">
                         <div className="title">{lang.blackMagic}</div>
 
                         <SwitchControl
@@ -525,7 +525,7 @@ define([
                             default={advancedSetting.spiral_vase === 1}
                             onChange={this._handleControlValueChange} />
 
-                    </div>
+                    </div>*/}
 
                 </div>
             );
@@ -548,7 +548,7 @@ define([
                             id="support_material_spacing"
                             key="support_material_spacing"
                             label={lang.spacing}
-                            min={0}
+                            min={0.4}
                             max={5}
                             step={0.1}
                             default={advancedSetting.support_material_spacing}
@@ -576,7 +576,7 @@ define([
                             key="support_material_contact_distance"
                             label={lang.zDistance}
                             min={0}
-                            max={5}
+                            max={1}
                             step={0.1}
                             default={advancedSetting.support_material_contact_distance}
                             onChange={this._handleControlValueChange} />
@@ -627,7 +627,7 @@ define([
                             key="support_material_speed"
                             label={lang.support}
                             min={10}
-                            max={150}
+                            max={100}
                             step={1}
                             default={advancedSetting.support_material_speed}
                             onChange={this._handleControlValueChange} />
@@ -637,7 +637,7 @@ define([
                             key="infill_speed"
                             label={lang.infill}
                             min={10}
-                            max={150}
+                            max={100}
                             step={1}
                             default={advancedSetting.infill_speed}
                             onChange={this._handleControlValueChange} />
@@ -652,7 +652,7 @@ define([
                             key="first_layer_speed"
                             label={lang.firstLayer}
                             min={1}
-                            max={150}
+                            max={100}
                             step={1}
                             default={advancedSetting.first_layer_speed}
                             onChange={this._handleControlValueChange} />
@@ -662,7 +662,7 @@ define([
                             key="solid_infill_speed"
                             label={lang.solidLayers}
                             min={1}
-                            max={150}
+                            max={100}
                             step={1}
                             default={advancedSetting.solid_infill_speed}
                             onChange={this._handleControlValueChange} />
@@ -672,7 +672,7 @@ define([
                             key="perimeter_speed"
                             label={lang.innerShell}
                             min={1}
-                            max={150}
+                            max={100}
                             step={1}
                             default={advancedSetting.perimeter_speed}
                             onChange={this._handleControlValueChange} />
@@ -682,7 +682,7 @@ define([
                             key="external_perimeter_speed"
                             label={lang.outerShell}
                             min={1}
-                            max={150}
+                            max={100}
                             step={1}
                             default={advancedSetting.external_perimeter_speed}
                             onChange={this._handleControlValueChange} />
@@ -692,7 +692,7 @@ define([
                             key="bridge_speed"
                             label={lang.bridge}
                             min={1}
-                            max={150}
+                            max={100}
                             step={1}
                             default={advancedSetting.bridge_speed}
                             onChange={this._handleControlValueChange} />

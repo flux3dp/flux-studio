@@ -269,7 +269,7 @@ define(function() {
                 infill: 'Infill',
                 support: 'Support',
                 speed: 'Speed',
-                custom: 'Custom',
+                custom: 'Expert',
                 slicingEngine: 'Slicing Engine',
                 slic3r: 'Slic3r',
                 experiment: 'Experiment',
