@@ -329,7 +329,7 @@ define([
 
                 if(isValid) {
                     var blob = new Blob([reader.result], type);
-                    DeviceMaster.uploadFile(file, blob, pathArray.join('/')).then(function(result) {
+                    DeviceMaster.uploadFile(blob, file, pathArray.join('/')).then(function(result) {
                         console.log('upload result', result);
                         self._refreshDirectory();
                     });

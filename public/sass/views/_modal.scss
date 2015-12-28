@@ -130,6 +130,7 @@
 }
 
 .modal-progress {
+    z-index: 99999;
     .modal-alert {
         min-height: 18rem;
     }

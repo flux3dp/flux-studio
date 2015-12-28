@@ -119,20 +119,20 @@ define([
         return d.promise();
     }
 
-    function uploadFile(file, blob, uploadPath, callback) {
+    function uploadFile(blob, file, uploadPath, callback) {
         var d = $.Deferred();
-        // ProgressActions.open(ProgressConstants.STEPPING, lang.device.starting, '', false);
+        ProgressActions.open(ProgressConstants.STEPPING, lang.device.starting, '', false);
         if(uploadPath) {
             _device.actions.uploadToDirectory(blob, uploadPath, file.name, uploadProgress).then(function(result) {
                 // console.log('from dm', result);
-                // ProgressActions.close();
+                ProgressActions.close();
                 d.resolve(result);
             });
         }
         else {
             _device.print = _device.actions.upload(blob.size, blob, {
                 onFinished: function(result) {
-                    // ProgressActions.close();
+                    ProgressActions.close();
                     d.resolve(result);
                 }
             }, function(step, total) {
@@ -150,8 +150,11 @@ define([
     function uploadProgress(step, total) {
         thisProgress = parseInt(step / total * 100);
         if(thisProgress !== lastProgress) {
-            console.log(parseInt(step / total * 100));
-            ProgressActions.updating(lang.device.uploading, parseInt(step / total * 100));
+            // update every 20%
+            if(parseInt(step / total * 100) % 20 === 0) {
+                console.log('update', parseInt(step / total * 100));
+                ProgressActions.updating(lang.device.uploading, parseInt(step / total * 100));
+            }
             if(parseInt(step / total * 100) === 100) {
                 ProgressActions.updating(lang.device.please_wait, 100);
             }
