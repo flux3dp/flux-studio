@@ -85,6 +85,10 @@ define([
             this.removeListener(NOTIFY_ABORT, callback);
         },
 
+        removeYesListener(callback) {
+            this.removeListener(NOTIFY_YES, callback);
+        },
+
         removeCancelListener(callback) {
             this.removeListener(NOTIFY_CANCEL, callback);
         },
