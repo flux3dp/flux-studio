@@ -140,20 +140,6 @@ define([
                 modifiers: 'cmd+shift',
                 parent: parentIndex.EDIT
             },
-            viewStandard: {
-                label: lang.view.standard,
-                enabled: true,
-                onClick: emptyFunction,
-                type: 'checkbox',
-                checked: true,
-                parent: parentIndex.VIEW
-            },
-            viewPreview: {
-                label: lang.view.preview,
-                enabled: false,
-                onClick: emptyFunction,
-                parent: parentIndex.VIEW
-            },
             device: {
                 label: lang.device.label,
                 enabled: true,
@@ -354,17 +340,26 @@ define([
                 {
                     label: lang.help.starting_guide,
                     enabled: true,
-                    onClick: emptyFunction
+                    onClick: function() {
+                        if ('undefined' !== typeof requireNode) {
+                            requireNode('nw.gui').Shell.openExternal('http://flux3dp.com/starting-guide');
+                        }
+                        else {
+                            window.open('http://flux3dp.com/starting-guide');
+                        }
+                    }
                 },
                 {
                     label: lang.help.online_support,
                     enabled: true,
-                    onClick: emptyFunction
-                },
-                {
-                    label: lang.help.troubleshooting,
-                    enabled: true,
-                    onClick: emptyFunction
+                    onClick: function() {
+                        if ('undefined' !== typeof requireNode) {
+                            requireNode('nw.gui').Shell.openExternal('http://flux3dp.com/support');
+                        }
+                        else {
+                            window.open('http://flux3dp.com/support');
+                        }
+                    }
                 }
             ]
         });
