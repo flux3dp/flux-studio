@@ -72,12 +72,12 @@ define([
 
                     self.state.laserEvents.menuFactory.items.execute.enabled = false;
                     self.state.laserEvents.menuFactory.items.execute.onClick = function() {
-                        self.refs.setupPanel._onRunLaser();
+                        self._onRunLaser();
                     };
 
                     self.state.laserEvents.menuFactory.items.saveGCode.enabled = false;
                     self.state.laserEvents.menuFactory.items.saveGCode.onClick = function() {
-                        self.refs.setupPanel._onExport();
+                        self._onExport();
                     };
                 },
 
