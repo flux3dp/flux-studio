@@ -2,6 +2,7 @@
  * nwjs menu factory
  */
 define([
+    'jquery',
     'helpers/nwjs/gui',
     'helpers/i18n',
     'helpers/check-firmware',
@@ -13,6 +14,7 @@ define([
     'helpers/device-master',
     'app/constants/device-constants'
 ], function(
+    $,
     gui,
     i18n,
     checkFirmware,
@@ -40,10 +42,9 @@ define([
             ABOUT  : 0 - windowIndex,
             FILE   : 1 - windowIndex,
             EDIT   : 2 - windowIndex,
-            VIEW   : 3 - windowIndex,
-            DEVICE : 4 - windowIndex,
-            WINDOW : 5 - windowIndex,
-            HELP   : 6 - windowIndex
+            DEVICE : 3 - windowIndex,
+            WINDOW : 4 - windowIndex,
+            HELP   : 5 - windowIndex
         },
         newDevice = {
             label: lang.device.new,
@@ -76,7 +77,7 @@ define([
                 parent: parentIndex.FILE
             },
             saveGCode: {
-                label: lang.file.save_gcode,
+                label: lang.file.save_fcode,
                 enabled: false,
                 onClick: emptyFunction,
                 key: 's',
@@ -175,19 +176,16 @@ define([
         deviceRefreshTimer,
         doDiscover,
         aboutSubItems = [{
-            label: 'Reset',
-            enable: true,
-            onClick: function() {
-                initializeMachine.reset(function() {
-                    location.reload();
-                });
-            }
-        },
-        separator,
-        {
             label: lang.flux.about,
             enabled: true,
-            onClick: emptyFunction
+            onClick: function() {
+                $.ajax({
+                    url: 'package.json',
+                    dataType: 'json'
+                }).done(function(response) {
+                    alert(lang.version + ':' + response.version);
+                });
+            }
         },
         {
             label: lang.flux.preferences,
@@ -203,7 +201,7 @@ define([
             key: 'q',
             modifiers: 'cmd',
             onClick: function() {
-                if (true === window.confirm('Quit?')) {
+                if (true === window.confirm(lang.sure_to_quit)) {
                     gui.App.quit();
                 }
             }
@@ -223,9 +221,7 @@ define([
         if (true === initializeMachine.hasBeenCompleted()) {
             subItems = [
                 items.import,
-                items.recent,
                 separator,
-                items.execute,
                 items.saveGCode
             ];
 
@@ -240,22 +236,9 @@ define([
             {
                 label: lang.edit.label,
                 subItems: [
-                    items.copy,
-                    items.cut,
-                    items.paste,
                     items.duplicate,
                     separator,
-                    items.scale,
-                    items.rotate,
-                    separator,
                     items.clear
-                ]
-            },
-            {
-                label: lang.view.label,
-                subItems: [
-                    items.viewStandard,
-                    items.viewPreview
                 ]
             },
             items.device,
@@ -326,20 +309,6 @@ define([
                                             enabled: true,
                                             onClick: function() {
                                                 AlertActions.showChangeFilament(printer);
-                                            }
-                                        },
-                                        {
-                                            label: lang.device.check_firmware_update,
-                                            enabled: true,
-                                            onClick: function() {
-                                                checkFirmware(printer).done(function(response) {
-                                                    if (true === response.needUpdate) {
-                                                        AlertActions.showUpdate(printer, 'firmware', response, function() {
-                                                            // TODO: to be implement
-                                                            console.log('update firmware');
-                                                        });
-                                                    }
-                                                });
                                             }
                                         },
                                         {
