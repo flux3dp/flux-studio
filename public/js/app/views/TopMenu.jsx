@@ -10,7 +10,8 @@ define([
     'jsx!views/print/Monitor',
     'jsx!widgets/Modal',
     'app/actions/alert-actions',
-    'app/stores/alert-store'
+    'app/stores/alert-store',
+    'app/actions/global-actions'
 ], function(
     $,
     React,
@@ -23,7 +24,8 @@ define([
     Monitor,
     Modal,
     AlertActions,
-    AlertStore
+    AlertStore,
+    GlobalActions
 ) {
     'use strict';
 
