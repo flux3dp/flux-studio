@@ -231,6 +231,7 @@ define([
                         defaultValue : payload.defaultValue,
                         confirmText  : payload.confirmText,
                         onClose      : payload.onClose || function() {},
+                        onCancel     : payload.onCancel || function() {},
                         onSubmit     : payload.onSubmit || function() {}
                     }
                 });
@@ -245,6 +246,9 @@ define([
 
                 if ('' === from && 'function' === typeof this.state.inputLightbox) {
                     this.state.inputLightbox.onClose();
+                }
+                else if(from === 'cancel' && typeof this.state.inputLightbox === 'object') {
+                    this.state.inputLightbox.onCancel();
                 }
             },
 
@@ -451,24 +455,27 @@ define([
                     status = lang.machine_status,
                     headModule = lang.head_module,
                     statusText,
-                    headText;
+                    headText,
+                    displayText;
 
                 var list = this.state.deviceList.map(function(device) {
-                    statusText = status[device.st_id] || status.UNKNOWN,
+                    statusText = status[device.st_id] || status.UNKNOWN;
                     headText = headModule[device.head_module] || headModule.UNKNOWN;
 
                     if (16 === device.st_id && 'number' === typeof device.st_prog) {
                         statusText += ' - ' + (parseInt(device.st_prog * 1000) * 0.1).toFixed(1) + '%';
                     }
 
+                    displayText = headText.length > 0 ? `${headText} / ${statusText}` : `${statusText}`;
+
                     return (
                         <li
                             name={device.uuid}
                             onClick={this._handleSelectDevice.bind(null, device)}>
                             <label className="name">{device.name}</label>
-                            <label className="status">{headText} {statusText}</label>
+                            <label className="status">{displayText}</label>
                         </li>
-                    )
+                    );
                 }, this);
 
                 return (
@@ -489,6 +496,7 @@ define([
                     <Modal
                         {...this.props}
                         lang    = {lang}
+                        className = {{'box-shadow': true}}
                         content ={content} />
                 );
             },

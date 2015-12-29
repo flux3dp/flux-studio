@@ -2565,7 +2565,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
                 left: -45px; }
         .studio-container .beehive-buttons .btn-go {
             background: #4D4D4D;
-            font-size: 35px; }
+            font-size: 23px; }
 
 .select-printer {
     bottom: 2.3rem;
@@ -3178,33 +3178,32 @@ input[type=range]:focus::-webkit-slider-runnable-track {
             .modal-window .btn-h-group .btn:last-child {
                 margin: 0; }
 
-.modal-progress .modal-alert {
-    min-height: 18rem; }
-
-.modal-progress .message p {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap; }
-
-.modal-progress .spinner-roller {
-    background: linear-gradient(to right, #DEDEDC 10%, rgba(255, 255, 255, 0) 42%);
-    height: 7em;
-    margin: 0 auto 1.6rem auto;
-    width: 7em; }
-    .modal-progress .spinner-roller::after {
-        background: #fff; }
-
-.modal-progress .progress-bar {
-    background: #ccc;
-    height: 2rem;
-    overflow: hidden; }
-    .modal-progress .progress-bar .current-progress {
-        background: #777;
-        content: "";
-        display: block;
-        height: 100%;
-        transition: width 0.3s ease;
-        width: 0; }
+.modal-progress {
+    z-index: 99999; }
+    .modal-progress .modal-alert {
+        min-height: 18rem; }
+    .modal-progress .message p {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap; }
+    .modal-progress .spinner-roller {
+        background: linear-gradient(to right, #DEDEDC 10%, rgba(255, 255, 255, 0) 42%);
+        height: 7em;
+        margin: 0 auto 1.6rem auto;
+        width: 7em; }
+        .modal-progress .spinner-roller::after {
+            background: #fff; }
+    .modal-progress .progress-bar {
+        background: #ccc;
+        height: 2rem;
+        overflow: hidden; }
+        .modal-progress .progress-bar .current-progress {
+            background: #777;
+            content: "";
+            display: block;
+            height: 100%;
+            transition: width 0.3s ease;
+            width: 0; }
 
 .modal-progress-nonstop .spinner-roller {
     height: 13rem;
@@ -4364,6 +4363,9 @@ input.switch:checked ~ label:after {
     margin-left: 1.6em;
     margin-top: 0.05em; }
 
+.box-shadow .modal-body {
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3), 0 16px 40px rgba(0, 0, 0, 0.5); }
+
 /* Advanced Panel */
 .print-studio .tour-mask {
     background-color: rgba(0, 0, 0, 0.3);
@@ -4580,7 +4582,15 @@ input.switch:checked ~ label:after {
 .print-studio .leftPanel {
     margin: 0 0 0 30px;
     z-index: 1;
-    align-self: center; }
+    align-self: center;
+    position: relative; }
+    .print-studio .leftPanel .mask {
+        z-index: 99;
+        width: 100%;
+        height: 100%;
+        position: absolute; }
+    .print-studio .leftPanel .dialog-label .disable {
+        color: #C0C0C0; }
 
 .print-studio .rightPanel {
     height: 100%;

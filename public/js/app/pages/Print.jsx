@@ -63,25 +63,16 @@ define([
                 y       : 1,
                 z       : 1
             },
-
-            _size = {
-                locked  : true,
-                x       : 0,
-                y       : 0,
-                z       : 0
-            },
             _rotation = {
                 x: 0,
                 y: 0,
                 z: 0
             },
             tourGuide = [],
-            _mode = 'size',
             lang = args.state.lang,
             selectedPrinter,
-            printerController,
             $importBtn,
-            guideStyle,
+            allowDeleteObject = true,
             tutorialMode = false,
             nwjsMenu = menuFactory.items,
             view = React.createClass({
@@ -111,10 +102,12 @@ define([
                         hasOutOfBoundsObject        : false,
                         hasObject                   : false,
                         tutorialOn                  : false,
+                        leftPanelReady              : true,
                         currentTutorialStep         : 0,
                         layerHeight                 : 0.1,
                         raftOn                      : advancedSettings.raft_layers !== 0,
                         supportOn                   : advancedSettings.support_material === 1,
+                        mode                        : 'size',
                         previewLayerCount           : 0,
                         progressMessage             : '',
                         fcode                       : {},
@@ -147,7 +140,9 @@ define([
                     $(document).keydown(function(e) {
                         // delete event
                         if(e.metaKey && e.keyCode === 8 || e.keyCode === 46 || e.keyCode === 8) {
-                            director.removeSelected();
+                            if(allowDeleteObject) {
+                                director.removeSelected();
+                            }
                         }
 
                         // copy event
@@ -205,14 +200,25 @@ define([
                     var isOn = !this.state.raftOn;
                     director.setParameter('raft', isOn ? '1' : '0');
                     advancedSettings.raft_layers = isOn ? advancedSettings.raft : 0;
+                    advancedSettings.custom = advancedSettings.custom.replace(
+                        `raft_layers = ${isOn ? 0 : advancedSettings.raft}`,
+                        `raft_layers = ${isOn ? advancedSettings.raft : 0}`);
+
                     this.setState({ raftOn: isOn });
                     Config().write('advanced-settings', JSON.stringify(advancedSettings));
                 },
 
                 _handleSupportClick: function() {
+                    this.setState({ leftPanelReady: false });
                     var isOn = !this.state.supportOn;
-                    director.setParameter('support', isOn ? '1' : '0');
+                    director.setParameter('support', isOn ? '1' : '0').then(function() {
+                        this.setState({ leftPanelReady: true });
+                    }.bind(this));
                     advancedSettings.support_material = isOn ? 1 : 0;
+                    // console.log('support on?', isOn);
+                    advancedSettings.custom = advancedSettings.custom.replace(
+                        `support_material = ${isOn ? 0 : 1}`,
+                        `support_material = ${isOn ? 1 : 0}`);
                     this.setState({ supportOn: isOn });
                     Config().write('advanced-settings', JSON.stringify(advancedSettings));
                 },
@@ -267,8 +273,11 @@ define([
                 _handleApplyAdvancedSetting: function(setting) {
                     setting = setting || advancedSettings;
                     Config().write('advanced-settings', JSON.stringify(setting));
-                    advancedSettings = setting;
-                    this.setState({ supportOn: setting.support_material === 1 });
+                    Object.assign(advancedSettings, setting);
+                    this.setState({
+                        supportOn: setting.support_material === 1,
+                        layerHeight: setting.layer_height
+                    });
                     return director.setAdvanceParameter(setting);
                 },
 
@@ -366,11 +375,16 @@ define([
                     if(key === 'layer_height') {
                         this.setState({ layerHeight: value });
                     }
+                    else if (key === 'raft_layers') {
+                        console.log(key, value !== '0');
+                        this.setState({ raftOn: value !== '0' });
+                    }
                 },
 
                 _handleQualitySelected: function(layerHeight) {
                     director.setParameter('layer_height', layerHeight);
                     advancedSettings.layer_height = layerHeight;
+                    this.setState({ layerHeight: layerHeight });
                 },
 
                 _handleTutorialStep: function() {
@@ -406,6 +420,10 @@ define([
 
                 _handleCloseAllView: function() {
                     GlobalActions.closeAllView();
+                },
+
+                _handleObjectDialogueFocus: function(isFocused) {
+                    allowDeleteObject = !isFocused;
                 },
 
                 _renderAdvancedPanel: function() {
@@ -451,6 +469,7 @@ define([
                     return (
                         <LeftPanel
                             lang                        = {lang}
+                            enable                      = {this.state.leftPanelReady}
                             hasObject                   = {this.state.hasObject}
                             hasOutOfBoundsObject        = {this.state.hasOutOfBoundsObject}
                             previewLayerCount           = {this.state.previewLayerCount}
@@ -486,12 +505,13 @@ define([
                             lang            = {lang}
                             model           = {this.state.modelSelected}
                             style           = {this.state.objectDialogueStyle}
-                            mode            = {_mode}
+                            mode            = {this.state.mode}
                             isTransforming  = {this.state.isTransforming}
                             scaleLocked     = {_scale.locked}
                             onRotate        = {this._handleRotationChange}
                             onResize        = {this._handleResize}
                             onScaleLock     = {this._handleToggleScaleLock}
+                            onFocus         = {this._handleObjectDialogueFocus}
                             onModeChange    = {this._handleModeChange} />
                     );
                 },

@@ -9,20 +9,22 @@ define([
         lastModifiedAxis,
         _size,
         _ratio = 1,
-        _maxLength = 210,
-        _mode = 'size';
+        _maxLength = 210;
 
     return React.createClass({
         propTypes: {
-            lang        : React.PropTypes.object,
-            model       : React.PropTypes.object,
-            mode        : React.PropTypes.string,
-            scaleLocked : React.PropTypes.bool,
-            onRotate    : React.PropTypes.func,
-            onScale     : React.PropTypes.func,
-            onScaleLock : React.PropTypes.func,
-            onResize    : React.PropTypes.func,
-            style       : React.PropTypes.object
+            lang            : React.PropTypes.object,
+            model           : React.PropTypes.object,
+            mode            : React.PropTypes.string,
+            scaleLocked     : React.PropTypes.bool,
+            onRotate        : React.PropTypes.func,
+            onScale         : React.PropTypes.func,
+            onScaleLock     : React.PropTypes.func,
+            onResize        : React.PropTypes.func,
+            onFocus         : React.PropTypes.func,
+            onModeChange    : React.PropTypes.func,
+            isTransforming  : React.PropTypes.func,
+            style           : React.PropTypes.object
         },
 
         getInitialState: function() {
@@ -36,6 +38,7 @@ define([
         componentDidMount: function() {
             this._openAccordion(this.props.mode);
             refSize = this.props.model.size.clone();
+            this.props.onFocus(false);
         },
 
         componentWillUpdate: function(nextProp, nextState) {
@@ -138,7 +141,8 @@ define([
 
         _handleModeChange: function(e) {
             this._openAccordion(e.target.name);
-            this.props.onModeChange(e.target.name)
+            this.props.onModeChange(e.target.name);
+            this.props.onFocus(false);
         },
 
         _getNumberOnly: function(string) {
@@ -147,6 +151,10 @@ define([
 
         _roundSizeToTwoDecimalPlace: function(src) {
             return parseFloat((Math.round(src * 100) / 100).toFixed(2));
+        },
+
+        _inputFocused: function(e) {
+            this.props.onFocus(true);
         },
 
         render: function() {
@@ -178,7 +186,8 @@ define([
                                         max={210}
                                         defaultValue={_size.x}
                                         dataAttrs={{id: 'x'}}
-                                        getValue={this._handleResize} />
+                                        getValue={this._handleResize}
+                                        onFocus={this._inputFocused} />
                             </div>
 
                             <div className="control">
@@ -187,7 +196,8 @@ define([
                                         max={210}
                                         defaultValue={_size.y}
                                         dataAttrs={{id: 'y'}}
-                                        getValue={this._handleResize} />
+                                        getValue={this._handleResize}
+                                        onFocus={this._inputFocused} />
                             </div>
 
                             <div className="control">
@@ -196,7 +206,8 @@ define([
                                         max={210}
                                         defaultValue={_size.z}
                                         dataAttrs={{id: 'z'}}
-                                        getValue={this._handleResize} />
+                                        getValue={this._handleResize}
+                                        onFocus={this._inputFocused} />
                             </div>
 
                             <div className={lockClass} onClick={this._handleToggleScaleLock}/>
@@ -217,12 +228,13 @@ define([
 
                             <div className="control">
                                 <span className="text-center header">X</span>
-                                    <input
-                                        id="x"
-                                        type="text"
-                                        onChange={this.props.onRotate.bind(this)}
-                                        onBlur={this.props.onRotate.bind(this)}
-                                        value={rotation.enteredX} />
+                                <input
+                                    id="x"
+                                    type="text"
+                                    onFocus={this._inputFocused}
+                                    onChange={this.props.onRotate.bind(this)}
+                                    onBlur={this.props.onRotate.bind(this)}
+                                    value={rotation.enteredX} />
                             </div>
 
                             <div className="control">
@@ -230,6 +242,7 @@ define([
                                 <input
                                     id="y"
                                     type="text"
+                                    onFocus={this._inputFocused}
                                     onChange={this.props.onRotate.bind(this)}
                                     onBlur={this.props.onRotate.bind(this)}
                                     value={rotation.enteredY} />
@@ -240,6 +253,7 @@ define([
                                 <input
                                     id="z"
                                     type="text"
+                                    onFocus={this._inputFocused}
                                     onChange={this.props.onRotate.bind(this)}
                                     onBlur={this.props.onRotate.bind(this)}
                                     value={rotation.enteredZ} />

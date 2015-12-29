@@ -39,7 +39,7 @@ define([
 
         return {
             connection: ws,
-            upload: function(name, file) {
+            upload: function(name, file, callback) {
                 var d = $.Deferred(),
                     CHUNK_PKG_SIZE = 4096;
 
@@ -52,6 +52,9 @@ define([
                         var fileReader,
                             chunk,
                             length = file.length || file.size;
+
+                        var step = 0,
+                            total = parseInt((file.length || file.size) / CHUNK_PKG_SIZE);
 
                         for (var i = 0; i < length; i += CHUNK_PKG_SIZE) {
                             chunk = file.slice(i, i + CHUNK_PKG_SIZE);
@@ -67,6 +70,7 @@ define([
                             };
 
                             fileReader.readAsArrayBuffer(chunk);
+                            callback(step++, total);
                         }
 
                         break;
@@ -75,7 +79,7 @@ define([
                         break;
                     }
 
-                };
+                }.bind(this);
 
                 ws.send('upload ' + name + ' ' + file.size);
                 lastOrder = 'upload';
@@ -199,6 +203,21 @@ define([
                 };
 
                 ws.send(`duplicate ${oldName} ${newName}`);
+
+                return d.promise();
+            },
+            stop: function() {
+                var d = $.Deferred();
+
+                events.onMessage = function(result) {
+                    d.resolve(result);
+                };
+
+                events.onError = function(result) {
+                    d.resolve(result);
+                };
+
+                ws.send(`stop`);
 
                 return d.promise();
             }

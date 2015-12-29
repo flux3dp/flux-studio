@@ -24,7 +24,7 @@ define([
                         openErrorWindow: false,
                         cameraOn: false,
                         listFile: false,
-                        status: lang.device.pleaseWait
+                        status: lang.device.please_wait
                     });
                 },
                 componentDidMount: function() {
@@ -82,11 +82,11 @@ define([
                         case 'CommandTask':
                             return lang.device.ready;
                         case 'NO_TASK':
-                            return lang.device.noTask;
+                            return lang.device.no_task;
                         case 'UNKNOW_COMMAND':
-                            return lang.device.unknownCommand;
+                            return lang.device.unknown_command;
                         default:
-                            return lang.device.pleaseWait;
+                            return lang.device.please_wait;
                     }
                 },
                 _executeCommand: function(command) {
@@ -197,9 +197,9 @@ define([
                             </div>
                             <div className="row-fluid">
                                 <div className="span6">
-                                    <a className="btn btn-default" onClick={this._handleCameraOn}>{lang.device.cameraOn}</a>
-                                    <a className="btn btn-default" onClick={this._handleBrowseFile}>{lang.device.browseFiles}</a>
-                                    <a className="btn btn-default" onClick={this._handlePrinterSelectionOn}>{lang.device.selectPrinter}</a>
+                                    <a className="btn btn-default" onClick={this._handleCameraOn}>{lang.device.camera_on}</a>
+                                    <a className="btn btn-default" onClick={this._handleBrowseFile}>{lang.device.browse_file}</a>
+                                    <a className="btn btn-default" onClick={this._handlePrinterSelectionOn}>{lang.device.select_printer}</a>
                                     <br/>
                                     <a className="btn btn-primary" onClick={this._handleStart}>{lang.device.start}</a>
                                     <a className="btn btn-warning" onClick={this._handleAbort}>{lang.device.abort}</a>
@@ -229,7 +229,7 @@ define([
                                 <img ref="camera_image" src={this.state.imageSrc} />
                             </div>
                             <div>
-                                <a className="btn btn-default" onClick={this._handleCameraOff}>{lang.device.cameraOff}</a>
+                                <a className="btn btn-default" onClick={this._handleCameraOff}>{lang.device.camera_off}</a>
                                 <a className="btn btn-default">{lang.device.pause}</a>
                                 <a className="btn btn-default">{lang.device.cancelTask}</a>
                             </div>

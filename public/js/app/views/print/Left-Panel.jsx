@@ -11,15 +11,15 @@ define([
 
     var lang,
         settings,
-        quality,
+        qualityLevel,
         layerHeight,
         defaultQuality = 'high',
         constants;
 
-    quality = {
+    qualityLevel = {
         high: 0.1,
         med: 0.2,
-        low: 0.3
+        low: 0.25
     };
 
     settings = {
@@ -39,11 +39,14 @@ define([
 
         propTypes: {
             lang                        : React.PropTypes.object,
+            enable                      : React.PropTypes.bool,
             previewMode                 : React.PropTypes.bool,
             hasObject                   : React.PropTypes.bool,
             hasOutOfBoundsObject        : React.PropTypes.bool,
             previewLayerCount           : React.PropTypes.number,
             raftLayers                  : React.PropTypes.number,
+            supportOn                   : React.PropTypes.bool,
+            raftOn                      : React.PropTypes.bool,
             onQualitySelected           : React.PropTypes.func,
             onRaftClick                 : React.PropTypes.func,
             onSupportClick              : React.PropTypes.func,
@@ -74,7 +77,7 @@ define([
         },
 
         componentDidMount: function() {
-            layerHeight = quality[defaultQuality];
+            layerHeight = qualityLevel[defaultQuality];
         },
 
         componentWillReceiveProps: function(nextProps) {
@@ -92,9 +95,15 @@ define([
                 var _quality = {
                     '0.1': lang.quality.high,
                     '0.2': lang.quality.med,
-                    '0.3': lang.quality.low
+                    '0.25': lang.quality.low
                 };
-                this.setState({ quality: _quality[nextProps.layerHeight.toString()] || lang.quality.custom });
+                if(nextProps.layerHeight) {
+
+                    this.setState({ quality: _quality[nextProps.layerHeight.toString()] || lang.quality.custom });
+                }
+                else {
+                    console.log(nextProps);
+                }
             }
         },
 
@@ -111,8 +120,8 @@ define([
             var self = this,
                 actions = {
                     'QUALITY': function() {
-                        layerHeight = quality[arg];
-                        self.props.onQualitySelected(quality[arg]);
+                        layerHeight = qualityLevel[arg];
+                        self.props.onQualitySelected(qualityLevel[arg]);
                         self.setState({ quality: lang.quality[arg] });
                         $('.dialog-opener').prop('checked', false);
                     },
@@ -173,6 +182,7 @@ define([
 
         _renderQuanlity: function() {
             var _quality = ['high', 'med', 'low'],
+                _class = ClassNames('display-text quality-select', {'disable': !this.props.enable}),
                 qualitySelection;
 
             qualitySelection = _quality.map(function(quality) {
@@ -185,7 +195,7 @@ define([
 
             return {
                 label: (
-                    <div className="display-text quality-select">
+                    <div className={_class}>
                         <span>{this.state.quality}</span>
                     </div>
                 ),
@@ -240,9 +250,10 @@ define([
         },
 
         _renderRaft: function() {
+            var _class = ClassNames({'disable': !this.props.enable});
             return {
                 label: (
-                    <div title={lang.raftTitle} onClick={this._handleActions.bind(null, constants.RAFT_ON, '')}>
+                    <div className={_class} title={lang.raftTitle} onClick={this._handleActions.bind(null, constants.RAFT_ON, '')}>
                         <div>{this.props.raftOn ? lang.raft_on : lang.raft_off}</div>
                     </div>
                 )
@@ -250,9 +261,10 @@ define([
         },
 
         _renderSupport: function() {
+            var _class = ClassNames({'disable': !this.props.enable});
             return {
                 label: (
-                    <div title={lang.supportTitle} onClick={this._handleActions.bind(null, constants.SUPPORT_ON, '')}>
+                    <div className={_class} title={lang.supportTitle} onClick={this._handleActions.bind(null, constants.SUPPORT_ON, '')}>
                         <div>{this.props.supportOn ? lang.support_on : lang.support_off}</div>
                     </div>
                 )
@@ -260,9 +272,10 @@ define([
         },
 
         _renderAdvanced: function() {
+            var _class = ClassNames({'disable': !this.props.enable});
             return {
                 label: (
-                    <div title={lang.advancedTitle} onClick={this._handleActions.bind(null, constants.ADVANCED, '')}>
+                    <div className={_class} title={lang.advancedTitle} onClick={this._handleActions.bind(null, constants.ADVANCED, '')}>
                         <div>{this.props.lang.print.left_panel.advanced}</div>
                     </div>
                 )
@@ -270,9 +283,10 @@ define([
         },
 
         _renderPreview: function() {
+            var _class = ClassNames('display-text', {'disable': !this.props.enable});
             return {
                 label: (
-                    <div className="display-text" onClick={this._handleActions.bind(null, constants.PREVIEW, '')}>
+                    <div className={_class} onClick={this._handleActions.bind(null, constants.PREVIEW, '')}>
                         <span>{lang.preview}</span>
                     </div>
                 ),
@@ -293,6 +307,7 @@ define([
                 support     = this._renderSupport(),
                 advanced    = this._renderAdvanced(),
                 preview     = this._renderPreview(),
+                mask        = this.props.enable ? '' : (<div className="mask"></div>),
                 items = [
                     quality,
                     raft,
@@ -303,6 +318,7 @@ define([
 
             return (
                 <div className='leftPanel'>
+                    {mask}
                     <DialogMenu ref="dialogMenu" items={items}/>
                 </div>
             );

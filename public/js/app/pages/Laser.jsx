@@ -291,7 +291,7 @@ define([
                             },
                             onClick: this._onExport
                         }, {
-                            label: lang.laser.go,
+                            label: lang.monitor.start,
                             className: cx({
                                 'btn-disabled': !this.state.hasImage,
                                 'btn-default': true,

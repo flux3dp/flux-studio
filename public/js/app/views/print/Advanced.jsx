@@ -279,10 +279,12 @@ define([
             this.setState({ mode: mode.save });
 
             InputLightboxActions.open('save-print-preset', {
-                caption      : lang.saveAsPreset,
-                inputHeader  : lang.name,
-                confirmText  : lang.saveAndApply,
-                onSubmit     : this._handleSavePreset
+                caption     : lang.saveAsPreset,
+                inputHeader : lang.name,
+                confirmText : lang.save,
+                onSubmit    : this._handleSavePreset,
+                onClose     : this._handleBackToSetting,
+                onCancel    : this._handleBackToSetting
             });
         },
 
@@ -294,6 +296,7 @@ define([
         },
 
         _handleControlValueChange: function(id, value) {
+            // console.log(id, value);
             if(typeof(value) === 'boolean') {
                 advancedSetting[id] = value ? 1 : 0;
             }
@@ -305,6 +308,7 @@ define([
             // for raft on off
             if(id === 'raft_layers') {
                 advancedSetting.raft = value;
+                this.props.onValueChange(id, value);
             }
             else if (id === 'layer_height') {
                 this.props.onValueChange(id, value);
@@ -406,7 +410,7 @@ define([
                             id="temperature"
                             key="temperature"
                             label={lang.temperature}
-                            min={170}
+                            min={180}
                             max={230}
                             step={1}
                             default={advancedSetting.temperature}
@@ -423,14 +427,14 @@ define([
                 <div className="content-wrapper">
 
                     <div className="section">
-                        <div className="title">{lang.layerHeight}</div>
+                        <div className="title">{lang.layer_height_title}</div>
 
                         <SliderControl
                             id="layer_height"
                             key="layer_height"
-                            label={lang.layerHeight}
+                            label={lang.layer_height}
                             min={0.05}
-                            max={0.4}
+                            max={0.3}
                             step={0.05}
                             default={advancedSetting.layer_height}
                             onChange={this._handleControlValueChange} />
@@ -439,8 +443,8 @@ define([
                             id="first_layer_height"
                             key="first_layer_height"
                             label={lang.firstLayerHeight}
-                            min={0.05}
-                            max={0.4}
+                            min={0.2}
+                            max={0.35}
                             step={0.05}
                             default={advancedSetting.first_layer_height}
                             onChange={this._handleControlValueChange} />
@@ -464,7 +468,7 @@ define([
                             id="top_solid_layers"
                             key="top_solid_layers"
                             label={lang.solidLayerTop}
-                            min={1}
+                            min={0}
                             max={6}
                             step={1}
                             default={advancedSetting.top_solid_layers}
@@ -474,7 +478,7 @@ define([
                             id="bottom_solid_layers"
                             key="bottom_solid_layers"
                             label={lang.solidLayerBottom}
-                            min={1}
+                            min={0}
                             max={6}
                             step={1}
                             default={advancedSetting.bottom_solid_layers}
@@ -512,7 +516,7 @@ define([
 
                     </div>
 
-                    <div className="section">
+                    {/*<div className="section">
                         <div className="title">{lang.blackMagic}</div>
 
                         <SwitchControl
@@ -521,7 +525,7 @@ define([
                             default={advancedSetting.spiral_vase === 1}
                             onChange={this._handleControlValueChange} />
 
-                    </div>
+                    </div>*/}
 
                 </div>
             );
@@ -544,7 +548,7 @@ define([
                             id="support_material_spacing"
                             key="support_material_spacing"
                             label={lang.spacing}
-                            min={0}
+                            min={0.4}
                             max={5}
                             step={0.1}
                             default={advancedSetting.support_material_spacing}
@@ -572,7 +576,7 @@ define([
                             key="support_material_contact_distance"
                             label={lang.zDistance}
                             min={0}
-                            max={5}
+                            max={1}
                             step={0.1}
                             default={advancedSetting.support_material_contact_distance}
                             onChange={this._handleControlValueChange} />
@@ -586,7 +590,7 @@ define([
                             id="raft_layers"
                             key="raft_layers"
                             label={lang.raftLayers}
-                            min={1}
+                            min={0}
                             max={6}
                             step={1}
                             default={advancedSetting.raft_layers}
@@ -623,7 +627,7 @@ define([
                             key="support_material_speed"
                             label={lang.support}
                             min={10}
-                            max={150}
+                            max={100}
                             step={1}
                             default={advancedSetting.support_material_speed}
                             onChange={this._handleControlValueChange} />
@@ -633,7 +637,7 @@ define([
                             key="infill_speed"
                             label={lang.infill}
                             min={10}
-                            max={150}
+                            max={100}
                             step={1}
                             default={advancedSetting.infill_speed}
                             onChange={this._handleControlValueChange} />
@@ -648,7 +652,7 @@ define([
                             key="first_layer_speed"
                             label={lang.firstLayer}
                             min={1}
-                            max={150}
+                            max={100}
                             step={1}
                             default={advancedSetting.first_layer_speed}
                             onChange={this._handleControlValueChange} />
@@ -658,7 +662,7 @@ define([
                             key="solid_infill_speed"
                             label={lang.solidLayers}
                             min={1}
-                            max={150}
+                            max={100}
                             step={1}
                             default={advancedSetting.solid_infill_speed}
                             onChange={this._handleControlValueChange} />
@@ -668,7 +672,7 @@ define([
                             key="perimeter_speed"
                             label={lang.innerShell}
                             min={1}
-                            max={150}
+                            max={100}
                             step={1}
                             default={advancedSetting.perimeter_speed}
                             onChange={this._handleControlValueChange} />
@@ -678,7 +682,7 @@ define([
                             key="external_perimeter_speed"
                             label={lang.outerShell}
                             min={1}
-                            max={150}
+                            max={100}
                             step={1}
                             default={advancedSetting.external_perimeter_speed}
                             onChange={this._handleControlValueChange} />
@@ -688,7 +692,7 @@ define([
                             key="bridge_speed"
                             label={lang.bridge}
                             min={1}
-                            max={150}
+                            max={100}
                             step={1}
                             default={advancedSetting.bridge_speed}
                             onChange={this._handleControlValueChange} />
@@ -760,10 +764,10 @@ define([
             switch(this.state.mode) {
 
                 case mode.setup:
-                    buttons[0] = (<button className="btn btn-default" data-ga-event="load-preset" onClick={this._handleLoadPreset}>{lang.loadPreset}</button>);
-                    buttons[1] = (<button className="btn btn-default" data-ga-event="apply-preset" onClick={this._handleApply.bind(null, false)}>{lang.apply}</button>);
-                    buttons[2] = (<button className="btn btn-default" data-ga-event="save-preset" onClick={this._handleOpenSaveAsPreset}>{lang.saveAsPreset}</button>);
-                    buttons[3] = (<button className="btn btn-default" data-ga-event="cancel-preset" onClick={this._handleCloseAdvancedSetting}>{lang.cancel}</button>);
+                    buttons[0] = (<button className="btn btn-default" data-ga-event="load-preset" title={lang.loadPreset} onClick={this._handleLoadPreset}><i className="fa fa-folder-open-o"></i></button>);
+                    buttons[1] = (<button className="btn btn-default" data-ga-event="cancel-preset" onClick={this._handleCloseAdvancedSetting}>{lang.cancel}</button>);
+                    buttons[2] = (<button className="btn btn-default" data-ga-event="save-preset" title={lang.savePreset} onClick={this._handleOpenSaveAsPreset}><i className="fa fa-floppy-o"></i></button>);
+                    buttons[3] = (<button className="btn btn-default" data-ga-event="apply-preset" onClick={this._handleApply.bind(null, false)}>{lang.apply}</button>);
                     break;
 
                 case mode.load:
@@ -825,13 +829,13 @@ define([
                 );
             });
 
-            var preset = this.state.presets[this.state.selectedPreset] || '{}';
+            var preset = this.state.presets[this.state.selectedPreset] || '{}',
                 presetContent = JSON.parse(preset);
 
             return (
                 <div id="advanced-panel" className="advanced-panel">
                     <div className="preset-wrapper">
-                        <div className="preset-header">{lang.presets}</div>
+                        <div className="preset-header">{lang.loadPreset}</div>
                         <div className="preset-list">
                             {entries}
                         </div>
@@ -867,7 +871,8 @@ define([
             var self = this,
                 cx = React.addons.classSet,
                 className = {
-                    'hide': (this.state.mode === mode.save)
+                    'hide': (this.state.mode === mode.save),
+                    'box-shadow': true
                 },
                 UI;
 
