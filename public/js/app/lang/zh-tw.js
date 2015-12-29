@@ -32,52 +32,42 @@ define(function() {
             install: 'INSTALL'
         },
         topmenu: {
+            version: '版本',
+            sure_to_quit: '確定要結束 FLUX Studio?',
             flux: {
                 label: 'Flux',
-                about: 'About FLUX studio',
-                preferences: 'Preferences',
-                quit: 'Quit'
+                about: '關於 FLUX studio',
+                preferences: '偏好設定',
+                quit: '結束'
             },
             file: {
-                label: 'File',
-                import: 'import',
-                recent: 'Recent',
-                execute: 'Execute',
-                save_gcode: 'Save Gcode'
+                label: '檔案',
+                import: '匯入',
+                save_gcode: '匯出 Gcode',
+                save_fcode: '匯出工作'
             },
             edit: {
-                label: 'Edit',
-                copy: 'Copy',
-                cut: 'Cut',
-                paste: 'Paste',
-                duplicate: 'Duplicate',
-                scale: 'Scale',
-                rotate: 'Rotate',
-                clear: 'Clear Scene'
-            },
-            view: {
-                label: 'View',
-                standard: 'Standard',
-                preview: 'Gcode Preview'
+                label: '編輯',
+                duplicate: '重製',
+                clear: '清除場景'
             },
             device: {
-                label: 'Device',
-                new: 'USB Configuration',
-                device_monitor: 'Device Monitor',
-                change_filament: 'Change Filament',
-                check_firmware_update: 'Check Firmware Update',
-                default_device: 'Default Device'
+                label: '裝置',
+                new: '新增裝置',
+                device_monitor: '狀態',
+                change_filament: '自動換料',
+                default_device: '設成預設裝置'
             },
             window: {
-                label: 'Window',
-                minimize: 'Minimize',
-                fullscreen: 'Fullscreen'
+                label: '視窗',
+                minimize: '最小化',
+                fullscreen: '全螢幕'
             },
             help: {
-                label: 'Help',
-                starting_guide: 'Starting Guide',
-                online_support: 'Online Support',
-                troubleshooting: 'Troubleshooting'
+                label: '說明',
+                starting_guide: '開始使用',
+                online_support: '線上支援',
+                troubleshooting: '錯誤排除'
             }
         },
         initialize: {
