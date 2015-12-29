@@ -722,7 +722,14 @@ define(function() {
             running: '工作中',
             uploading: '上傳中',
             processing: '處理中',
-            disconnectedError: '與機器連線暫時中斷\n請確認機器網路連線是否正常'
+            disconnectedError: '與機器連線暫時中斷\n請確認機器網路連線是否正常',
+            noTask: '目前無任何工作',
+            pleaseWait: '請稍待...',
+            unknownCommand: '指令無法在此狀態下被執行',
+            working: '工作中',
+            finishing: '完成中',
+            initiating: '啟動中',
+            unknown: '未知狀態'
         },
         monitor: {
             change_filament                 : 'CHANGE FILLAMENT',

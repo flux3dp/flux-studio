@@ -66,6 +66,10 @@ define([
         ddHelper = 0,
         defaultFileName = '',
         cameraLight,
+<<<<<<< HEAD
+=======
+        outOfBoundCount = 0,
+>>>>>>> 9d6e9b2a14fa97fd0176c65f4e46a779f3a9899f
         lang = I18n.get();
 
     var s = {

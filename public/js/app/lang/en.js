@@ -722,7 +722,14 @@ define(function() {
             running: 'Working',
             uploading: 'Uploading',
             processing: 'Processing',
-            disconnectedError: 'Device disconnected\nPlease confirm if network access of device is available'
+            disconnectedError: 'Device disconnected\nPlease confirm if network access of device is available',
+            noTask: 'There are currently no task to do',
+            pleaseWait: 'Please Wait...',
+            unknownCommand: 'command cannot be executed in current status',
+            working: 'Working',
+            finishing: 'Finishing',
+            initiating: 'Initiating',
+            unknown: 'Unknown'
         },
         monitor: {
             change_filament                 : 'CHANGE FILLAMENT',
@@ -741,7 +748,8 @@ define(function() {
             HEAD_ERROR_CALIBRATING          : 'Unable to calibrate toolhead\nplease re-attach the toolhead',
             HEAD_ERROR_FAN_FAILURE          : 'Fan failed / stucked\nyou can spin it with a pancil',
             HWARDWARE_ERROR_FILAMENT_RUNOUT : 'Ran out of filament\nPlease insert new material',
-            HWARDWARE_ERROR_0               : 'Ran out of filament\nPlease insert new material',HARDWARE_ERROR_PLATE_MISSING: '未偵測到工作平台\n請放上工作平台金屬板',
+            HWARDWARE_ERROR_0               : 'Ran out of filament\nPlease insert new material',
+            HARDWARE_ERROR_PLATE_MISSING    : '未偵測到工作平台\n請放上工作平台金屬板',
             HARDWARE_ERROR_ZPROBE_ERROR     : 'Unable to calibrate the base plate\nPlease remove left-over on the nozzle',
             CONVERGENCE_FAILED              : 'Unable to calibrate the base plate\nPlease remove left-over on the nozzle',
             HARDWARE_ERROR_HOME_FAILED      : 'Unable to home\nPlease remove the obstacle',
