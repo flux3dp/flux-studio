@@ -115,6 +115,7 @@ define([
                     var self = this;
 
                     AlertStore.onRetry(self._retry);
+                    AlertStore.onCancel(self._onCancel);
                     dndHandler.plug(document, self._importPCD);
 
                     self.setState({
@@ -131,6 +132,7 @@ define([
                     var self = this;
 
                     AlertStore.removeRetryListener(self._retry);
+                    AlertStore.removeCancelListener(self._onCancel);
                     dndHandler.unplug(document);
 
                     if ('undefined' !== typeof self.state.scanCtrlWebSocket &&
@@ -158,6 +160,15 @@ define([
                     case 'calibrate':
                         self._onCalibrate();
                         break;
+                    }
+                },
+
+                _onCancel: function(id) {
+                    var self = this;
+
+                    switch (id) {
+                    case 'scan-device-busy':
+                        history.back();
                     }
                 },
 
@@ -1133,7 +1144,6 @@ define([
                             }
                         },
                         onGettingPrinter = function(auth_printer) {
-                            console.log(auth_printer);
                             self.setState({
                                 gettingStarted: true,
                                 selectedPrinter: auth_printer,
