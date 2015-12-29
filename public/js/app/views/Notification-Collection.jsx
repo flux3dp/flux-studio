@@ -380,7 +380,8 @@ define([
                         var deferred = $.Deferred();
 
                         $.ajax({
-                            url: 'package.json'
+                            url: 'package.json',
+                            dataType: 'json'
                         }).then(function(response) {
                             if(typeof(response) === 'object') {
                                 deferred.resolve(response);
