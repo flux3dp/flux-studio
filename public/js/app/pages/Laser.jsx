@@ -77,7 +77,7 @@ define([
 
                     self.state.laserEvents.menuFactory.items.saveGCode.enabled = false;
                     self.state.laserEvents.menuFactory.items.saveGCode.onClick = function() {
-                        self._onExport();
+                        self._onExport('-g');
                     };
                 },
 
@@ -94,8 +94,8 @@ define([
                     });
                 },
 
-                _onExport: function() {
-                    this.state.laserEvents.export(this._fetchFormalSettings());
+                _onExport: function(filemode) {
+                    this.state.laserEvents.exportTaskCode(this._fetchFormalSettings(), filemode);
                 },
 
                 _onDropUpload: function(e) {
@@ -291,7 +291,7 @@ define([
                             dataAttrs: {
                                 'ga-event': 'get-laser-fcode'
                             },
-                            onClick: this._onExport
+                            onClick: this._onExport.bind(null, '-f')
                         }, {
                             label: lang.monitor.start,
                             className: cx({
