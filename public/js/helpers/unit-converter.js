@@ -5,20 +5,33 @@ define(function() {
     'use strict';
 
     var defaultUnitType = 'length',
-        acceptableUnits,
         defaultUnit,
+        currentUnitType,
         unitGroup = {
             length: [
                 'mm', 'cm', 'inch', '"'
             ],
             angle: [
                 '°', '%'
+            ],
+            speed: [
+                'mm/s', 'cm/s'
+            ],
+            percentage: [
+                '%'
             ]
         },
         symbolMap = {
-            '"': 'inch',
-            '°': 'degree',
-            '%': 'degree'
+            length: {
+                '"': 'inch'
+            },
+            angle: {
+                '°': 'degree',
+                '%': 'degree'
+            },
+            percentage: {
+                '%': 'percentage'
+            }
         },
         conversionRate = {
             'mm': {
@@ -40,6 +53,18 @@ define(function() {
                 onOutOfBoundary: function(currentValue) {
                     return currentValue % this.max;
                 }
+            },
+            'mm/s': {
+                from: 1,
+                to: 1
+            },
+            'cm/s': {
+                from: 10,
+                to: 0.1
+            },
+            'percentage': {
+                from: 1,
+                to: 1
             }
         },
         checkUnitAcceptable = function(unitName, rates) {
@@ -48,27 +73,30 @@ define(function() {
             }
         },
         initialize = function(unitType) {
-            acceptableUnits = unitGroup[unitType];
+            var acceptableUnits = unitGroup[unitType] || [];
+            currentUnitType = unitType;
             defaultUnit = acceptableUnits[0];
+
+            return {
+                acceptableUnits: acceptableUnits,
+                defaultUnit: defaultUnit
+            };
         };
 
     initialize(defaultUnitType);
 
     return {
         defaultUnit: defaultUnit,
-        acceptableUnits: acceptableUnits,
 
         setDefaultUnitType: function(unitType) {
-            initialize(defaultUnitType);
-
-            return this;
+            return initialize(unitType || defaultUnitType);
         },
 
         from: function(fromValue, fromUnitName) {
             fromUnitName = fromUnitName || defaultUnit;
 
-            if (true === symbolMap.hasOwnProperty(fromUnitName)) {
-                fromUnitName = symbolMap[fromUnitName];
+            if (true === (symbolMap[currentUnitType] || {}).hasOwnProperty(fromUnitName)) {
+                fromUnitName = symbolMap[currentUnitType][fromUnitName];
             }
 
             checkUnitAcceptable(fromUnitName, conversionRate);
@@ -81,8 +109,8 @@ define(function() {
                         toRate,
                         setting;
 
-                    if (true === symbolMap.hasOwnProperty(toUnitName)) {
-                        toUnitName = symbolMap[toUnitName];
+                    if (true === (symbolMap[currentUnitType] || {}).hasOwnProperty(toUnitName)) {
+                        toUnitName = symbolMap[currentUnitType][toUnitName];
                     }
 
                     checkUnitAcceptable(toUnitName, conversionRate);

@@ -206,10 +206,6 @@
         }
     }
 
-    .fa::before {
-        margin: 0 5px 0 0;
-    }
-
     .stage {
         background: #E0E0E0;
     }
@@ -360,7 +356,7 @@
                 padding: 0 10px;
                 flex: initial;
 
-                &.btn-cancel {
+                &.btn-apply {
                     margin: 0;
                 }
             }
@@ -378,6 +374,7 @@
 
         [type="range"] {
             flex: 1 auto;
+            margin: 0 10px 0 0;
         }
 
         .value-text {

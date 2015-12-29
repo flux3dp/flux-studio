@@ -47,10 +47,12 @@ function(React, $, Backbone, display, config, appSettings, detectWebgl) {
                 router.route.apply(router, route);
             });
 
-            this.checkSoftwareUpdate();
+            this.appendNotificationCollection();
         },
 
         home: function(name) {
+            this.appendSideBar(false);
+
             require(['jsx!pages/Home', 'app/app-settings'], function(view, settings) {
                 var args = {
                     props: {
@@ -76,6 +78,8 @@ function(React, $, Backbone, display, config, appSettings, detectWebgl) {
                 view_name = map[step];
             }
 
+            this.appendSideBar(false);
+
             require(['jsx!pages/' + view_name], function(view) {
                 _display(
                     view,
@@ -88,83 +92,20 @@ function(React, $, Backbone, display, config, appSettings, detectWebgl) {
             });
         },
 
-        checkSoftwareUpdate: function() {
-            var data = {
-                    os: ''
-                },
-                ignoreVersions = config().read('software-update-ignore-list') || [],
-                fetchProfile = function() {
-                    var deferred = $.Deferred();
-
-                    $.ajax({
-                        url: 'package.json'
-                    }).then(function(response) {
-                        if(typeof(response) === 'object') {
-                            deferred.resolve(response);
-                        }
-                        else {
-                            deferred.resolve(JSON.parse(response));
-                        }
-                    });
-
-                    return deferred;
-                },
-                fetchLatestVersion = function(currentProflie) {
-                    var deferred = $.Deferred();
-
-                    data.os = (window.FLUX.osType || '') + '-' + (window.FLUX.arch || '');
-
-                    $.ajax({
-                        url: 'http://software.flux3dp.com/check-update/',
-                        data: data
-                    }).then(function(response) {
-                        deferred.resolve(currentProflie, response);
-                    });
-
-                    return deferred;
-                };
-
-            fetchProfile().then(fetchLatestVersion).done(function(currentProflie, currentVersion) {
-                var isIgnore = -1 < ignoreVersions.indexOf(currentVersion.latest_version),
-                    props = {};
-
-                if (false === isIgnore &&
-                    null !== currentVersion.latest_version &&
-                    currentVersion.latest_version !== currentProflie.version
-                ) {
-                    props = {
-                        open: true,
-                        type: 'software',
-                        currentVersion: currentProflie.version,
-                        latestVersion: currentVersion.latest_version,
-                        releaseNote: currentVersion.changelog,
-                        onClose: function() {},
-                        onInstall: function() {
-                            if ('undefined' !== typeof requireNode) {
-                                requireNode('nw.gui').Shell.openExternal('https://flux3dp.com/downloads/');
-                            }
-                            else {
-                                window.open('https://flux3dp.com/downloads/');
-                            }
-                        }
-                    };
-
-                    require(['jsx!views/Update-Dialog'], function(view) {
-                        display(
-                            function() { return view; },
-                            {
-                                props: props
-                            },
-                            $('.software-update')[0]
-                        );
-                    });
-                }
+        appendNotificationCollection: function() {
+            require(['jsx!views/Notification-Collection'], function(view) {
+                display(view, {}, $('.notification')[0]);
             });
         },
 
-        appendSideBar: function() {
+        appendSideBar: function(show) {
+            show = ('boolean' === typeof show ? show : true);
             require(['jsx!views/TopMenu'], function(view) {
-                display(view, {}, $('.top-menu')[0]);
+                display(view, {
+                    props: {
+                        show: show
+                    }
+                }, $('.top-menu')[0]);
             });
         },
 

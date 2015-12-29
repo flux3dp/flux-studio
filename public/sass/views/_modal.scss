@@ -79,9 +79,9 @@
         @include flexbox();
         background: #FFF;
         flex-direction: column;
-        min-height: 25rem;
+        min-height: 100px;
         overflow: auto;
-        padding: 1.6rem 2.8rem;
+        padding: 1.6rem;
         position: relative;
         text-align: center;
         align-items: center;
@@ -94,11 +94,16 @@
 
         .message {
             margin: 0 0 20px 0;
+            text-align: left;
         }
 
         .caption,
         .message {
             width: 100%;
+        }
+
+        .btn {
+            min-width: 50px;
         }
     }
 
@@ -284,6 +289,11 @@
 }
 
 .modal-change-filament {
+    .guide-image {
+        display: block;
+        margin: 0 auto;
+    }
+
     .modal-alert {
         width: 440px;
         min-height: 320px;
@@ -307,6 +317,7 @@
         color: #989898;
         font-size: 15px;
         line-height: 21px;
+        text-align: center;
 
         p {
             margin: 0;
@@ -314,6 +325,8 @@
     }
 
     .message-container {
+        text-align: center;
+
         p:last-of-type {
             margin: 0 0 12.5px 0;
         }
@@ -360,5 +373,11 @@
             right: 19px;
             min-width: 60px;
         }
+    }
+}
+
+.shadow-modal {
+    .modal-body {
+        box-shadow: 0 4px 15px rgba(0, 0, 0, .3), 0 16px 40px rgba(0, 0, 0, .5);
     }
 }

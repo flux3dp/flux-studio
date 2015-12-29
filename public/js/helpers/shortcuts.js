@@ -3,9 +3,10 @@
  */
 define([
     'jquery',
+    'app/constants/keycode-constants',
     'helpers/array-unique',
-    'helpers/array-findindex',
-], function($) {
+    'helpers/array-findindex'
+], function($, keyCodeConstants) {
     'use strict';
 
     var root = window,
@@ -13,20 +14,20 @@ define([
             return (91 === keyCode || 93 === keyCode);
         },
         special_key_map = {
-            'CMD': -91,
-            'L_CMD': 91,
-            'R_CMD': 93,
-            'SHIFT': 16,
-            'CTRL': 17,
-            'ALT': 18,
-            'DEL': 8,
-            'ENTER': 13,    // return
-            'TAB': 9,
-            'ESC': 27,
-            'LEFT': 37,
-            'UP': 38,
-            'RIGHT': 39,
-            'DOWN': 40
+            'CMD'    : -91,
+            'L_CMD'  : keyCodeConstants.KEY_L_CMD,
+            'R_CMD'  : keyCodeConstants.KEY_R_CMD,
+            'SHIFT'  : keyCodeConstants.KEY_SHIFT,
+            'CTRL'   : keyCodeConstants.KEY_CTRL,
+            'ALT'    : keyCodeConstants.KEY_ALT,
+            'DEL'    : keyCodeConstants.KEY_DEL,
+            'RETURN' : keyCodeConstants.KEY_RETURN,
+            'TAB'    : keyCodeConstants.KEY_TAB,
+            'ESC'    : keyCodeConstants.KEY_ESC,
+            'LEFT'   : keyCodeConstants.KEY_LEFT,
+            'UP'     : keyCodeConstants.KEY_UP,
+            'RIGHT'  : keyCodeConstants.KEY_RIGHT,
+            'DOWN'   : keyCodeConstants.KEY_DOWN
         },
         events = [],
         keyCodeStatus = [],

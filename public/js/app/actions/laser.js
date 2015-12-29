@@ -409,9 +409,11 @@ define([
             };
 
         shortcuts.on(
-            ['cmd', 'del'],
+            ['del'],
             function(e) {
-                deleteImage();
+                if ('INPUT' !== e.target.tagName) {
+                    deleteImage();
+                }
             }
         );
 
@@ -428,6 +430,7 @@ define([
                 data('name', name).
                 data('base', originalUrl).
                 data('size', size).
+                data('sizeLock', true).
                 width(size.width).
                 height(size.height);
 
@@ -439,6 +442,7 @@ define([
                     onRotate: instantRefresh,
                     onMove: instantRefresh,
                     onScale: instantRefresh,
+                    maintainAspectRatio: true,
                     angle: size.angle || 0
                 });
                 $ftControls = $img.parent().find('.ft-controls');
@@ -450,7 +454,6 @@ define([
 
                 // set default image
                 if (null === $target_image) {
-                    $target_image = $img;
                     refreshObjectParams({ freetransEventType: 'move' }, $img);
                 }
 
@@ -472,22 +475,23 @@ define([
                                 });
                             };
 
-                        $target_image = $img;
-
-                        if (false === $target_image.hasClass('image-active')) {
+                        if (false === $img.hasClass('image-active')) {
                             inactiveAllImage();
 
-                            refreshObjectParams({ freetransEventType: 'move' }, $target_image);
+                            $target_image = $img;
 
-                            $target_image.on('transitionend', function(e) {
+                            refreshObjectParams({ freetransEventType: 'move' }, $img);
+
+                            $img.on('transitionend', function(e) {
                                 refreshImagePanelPos();
                             });
 
                             self.setState({
-                                selectedImage: true
+                                selectedImage: true,
+                                sizeLock: $img.data('sizeLock')
                             });
 
-                            $target_image.addClass('image-active');
+                            $img.addClass('image-active');
                         }
 
                         menuFactory.items.copy.enabled = true;
@@ -567,6 +571,10 @@ define([
             menuFactory.items.copy.enabled = false;
             menuFactory.items.cut.enabled = false;
             menuFactory.items.duplicate.enabled = false;
+
+            if (0 === $('.image-active').length) {
+                $target_image = null;
+            }
 
             self.setState({
                 selectedImage: false
@@ -714,8 +722,11 @@ define([
                     box = $el.box(),
                     val = $el.val(),
                     freetrans = $target_image.data('freetrans'),
-                    args = {};
+                    args = {
+                        maintainAspectRatio: params.sizeLock
+                    };
 
+                $target_image.data('sizeLock', params.sizeLock);
                 val = parseFloat(val, 10);
 
                 switch (type) {

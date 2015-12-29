@@ -26,6 +26,7 @@ define([
                 type        : React.PropTypes.oneOf(acceptableTypes),
                 customText  : React.PropTypes.string,
                 escapable   : React.PropTypes.bool,
+                caption     : React.PropTypes.string,
                 message     : React.PropTypes.string,
                 onRetry     : React.PropTypes.func,
                 onAbort     : React.PropTypes.func,
@@ -39,6 +40,8 @@ define([
                     type      : AlertConstants.INFO,
                     escapable : false,
                     open      : true,
+                    caption   : '',
+                    message   : '',
                     onRetry   : function() {},
                     onAbort   : function() {},
                     onYes     : function() {},
@@ -97,7 +100,7 @@ define([
                 types[AlertConstants.RETRY_ABORT_CANCEL] = lang.error;
                 types[AlertConstants.CUSTOM_CANCEL]      = lang.error;
 
-                return types[this.props.type] || '';
+                return this.props.caption || types[this.props.type] || '';
             },
 
             _getCloseButtonCaption: function() {
@@ -188,12 +191,13 @@ define([
                             message={this.props.message}
                             buttons={buttons}
                         />
-                    );
+                    ),
+                    className = {
+                        'shadow-modal': true
+                    };
 
                 return (
-                    <div className="always-top">
-                        <Modal content={content} disabledEscapeOnBackground={this.props.escapable}/>
-                    </div>
+                    <Modal className={className} content={content} disabledEscapeOnBackground={this.props.escapable}/>
                 );
             }
 

@@ -67,7 +67,7 @@ define([
             _device.name = device.name;
             _device.actions = DeviceController(uuid, {
                 onConnect: function(response) {
-                    if(response.status.toUpperCase() === DeviceConstants.CONNECTED) {
+                    if (response.status.toUpperCase() === DeviceConstants.CONNECTED) {
                         d.resolve(DeviceConstants.CONNECTED);
                         _devices.push(_device);
                     }
@@ -251,6 +251,10 @@ define([
         return _do(DeviceConstants.QUIT);
     }
 
+    function quitTask() {
+        return _do(DeviceConstants.QUIT_TASK);
+    }
+
     function kick() {
         return _do(DeviceConstants.KICK);
     }
@@ -284,6 +288,10 @@ define([
             _device.scanController.quit();
             _device.cameraSource = null;
         }
+    }
+
+    function maintain(type) {
+        return _device.actions.maintain(type);
     }
 
     // set functions
@@ -432,6 +440,7 @@ define([
             this.pause              = pause;
             this.stop               = stop;
             this.quit               = quit;
+            this.quitTask           = quitTask;
             this.kick               = kick;
             this.setPassword        = setPassword;
             this.getReport          = getReport;
@@ -441,6 +450,7 @@ define([
             this.ls                 = ls;
             this.fileInfo           = fileInfo;
             this.getPreviewInfo     = getPreviewInfo;
+            this.maintain           = maintain;
 
             Discover(
                 'device-master',

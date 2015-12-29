@@ -5,8 +5,9 @@
 define([
     'jquery',
     'helpers/websocket',
-    'helpers/convertToTypedArray'
-], function($, Websocket, convertToTypedArray) {
+    'helpers/convertToTypedArray',
+    'app/constants/device-constants'
+], function($, Websocket, convertToTypedArray, DeviceConstants) {
     'use strict';
 
     return function(uuid, opts) {
@@ -407,6 +408,21 @@ define([
 
                 return d.promise();
             },
+            quitTask: function() {
+                var d = $.Deferred();
+                events.onMessage = function(result) {
+                    d.resolve(result);
+                };
+
+                events.onError = function(result) {
+                    d.reject(result);
+                }
+
+                ws.send('task quit');
+                lastOrder = 'task quit';
+
+                return d.promise();
+            },
             quit: function() {
                 var d = $.Deferred();
                 events.onMessage = function(result) {
@@ -417,8 +433,8 @@ define([
                     d.resolve(result);
                 }
 
-                ws.send('quit');
-                lastOrder = 'quit';
+                ws.send('play quit');
+                lastOrder = 'play quit';
 
                 return d.promise();
             },
@@ -458,6 +474,50 @@ define([
                 ws.send(`select ${path.join('/')}/${fileName}`);
 
                 return d.promise();
+            },
+
+            /**
+             * maintain mode
+             * @param {string} type - [LOAD|UNLOAD]
+             */
+            maintain: function(type) {
+                var deferred = $.Deferred(),
+                    typeMap = {},
+                    args = [
+                        'task',
+                        'maintain'
+                    ],
+                    currentTask = 'begining';
+
+                typeMap[DeviceConstants.LOAD_FILAMENT]   = 'load_filament';
+                typeMap[DeviceConstants.UNLOAD_FILAMENT] = 'unload_filament';
+
+                events.onMessage = function(result) {
+                    if ('ok' === result.status && 'begining' === currentTask) {
+                        currentTask = typeMap[type];
+                        args = [
+                            'maintain',
+                            currentTask,
+                            0, // extruder id
+                            220 // temperature
+                        ];
+                        ws.send(args.join(' '));
+                    }
+                    else if ('loading' === result.status) {
+                        deferred.notify(result);
+                    }
+                    else {
+                        deferred.resolve(result);
+                    }
+                };
+
+                events.onError = function(result) {
+                    deferred.reject(result);
+                };
+
+                ws.send(args.join(' '));
+
+                return deferred.promise();
             }
         };
     };

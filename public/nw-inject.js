@@ -31,6 +31,10 @@ var fs = requireNode('fs'),
             args[slic3rPathIndex] = cwd + '/lib/Slic3r/slic3r-console.exe';
             ghostCmd = cwd + '/lib/ghost/ghost.exe';
         }
+        else if ('Linux' === osType) {
+            args[slic3rPathIndex] = cwd + '/lib/Slic3r/bin/slic3r';
+            ghostCmd = cwd + '/lib/ghost/ghost';
+        }
         else {
             args[slic3rPathIndex] = cwd + '/lib/Slic3r.app/Contents/MacOS/slic3r';
             ghostCmd = cwd + '/lib/ghost/ghost';

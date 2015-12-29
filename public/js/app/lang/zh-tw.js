@@ -10,6 +10,7 @@ define(function() {
             no_webgl: 'Does not seem to support WebGL'
         },
         device_selection: {
+            no_printers: '未偵測到 FLUX 裝置, 請檢查您與機器的網路連線是否在同個網路下',
             device_name: 'DEVICE NAME',
             module: 'MODULE',
             status: 'STATUS'
@@ -89,6 +90,7 @@ define(function() {
             connect: '連接',
 
             // specific caption/content
+            invalid_device_name: '機器名稱只能使用英文字母、數字、空格以及特殊字元 “-”, “_”, “’”, “\'”',
             select_language: '請選擇你想使用的語言',
             change_password: '要更改密碼嗎?',
             connect_flux: '用 USB 連接你的電腦與 FLUX',
@@ -124,7 +126,6 @@ define(function() {
                 error: 'Error',
 
                 keep_connect: {
-                    caption: '無法連接裝置',
                     content: '請確認電源已被開啟及已經由 micro-usb 連接'
                 },
 
@@ -491,6 +492,12 @@ define(function() {
             get_fcode: '儲存<br/>工作',
             name: '名稱',
             go: 'GO',
+            title: {
+                material: 'Select proper material to have the best engraving result.',
+                object_height: 'A Raft are layers built under your part and help it stick to the base plate.',
+                shading: 'Shading enables gradient effect of laser engraving. It takes longer time.',
+                advanced: 'Custom settings for power and speed'
+            },
             print_params: {
                 object_height: {
                     text: '物體高度',
@@ -588,7 +595,8 @@ define(function() {
                 },
                 save_and_apply: '儲存並套用',
                 save_as_preset: '儲存',
-                load_preset: '載入',
+                save_as_preset_title: 'Save Preset',
+                load_preset_title: '載入',
                 apply: '套用',
                 cancel: '取消',
                 save: '儲存'
@@ -682,6 +690,20 @@ define(function() {
                 x: 'X',
                 y: 'Y',
                 z: 'Z'
+            },
+            messages: {
+                'not open': {
+                    caption: '未偵測到鏡頭畫面',
+                    message: '請參考使用手冊，將掃描鏡頭拉出。'
+                },
+                'no object': {
+                    caption: '未偵測到校正工具',
+                    message: ''
+                },
+                'no laser': {
+                    caption: '未偵測到掃描雷射',
+                    message: '請參考使用手冊，按下雷射頭將其打開'
+                }
             }
         },
         select_printer: {
@@ -823,7 +845,12 @@ define(function() {
             machineNotConnected: 'Machine is not connected',
             notPrinting: 'Printing is not in progress',
             nothingToPrint: 'Nothing to print (source blob missing)',
-            connectionTimeout: 'device is not responding, connection timeout'
+            connectionTimeout: 'device is not responding, connection timeout',
+            device_busy: {
+                caption: '裝置忙碌中',
+                message: '裝置正在進行另外一項工作，請稍候再試。如果裝置持續沒有回應，請將裝置重新啟動。'
+            },
+            device_is_used: '裝置正被使用中，是否要終止現在任務？'
         },
         machine_status: {
             '-2': 'Scanning',

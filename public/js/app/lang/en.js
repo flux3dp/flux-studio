@@ -10,6 +10,7 @@ define(function() {
             no_webgl: '無法在本台電腦開啟 WebGL, 請使用其他可以支援的電腦'
         },
         device_selection: {
+            no_printers: 'FLUX Device not detected. Please check if you and the FLUX device is under same network.',
             device_name: 'DEVICE NAME',
             module: 'MODULE',
             status: 'STATUS'
@@ -85,10 +86,11 @@ define(function() {
             start: 'START',
             skip: 'Skip',
             cancel: 'CANCEL',
-            confirm: 'Confirm',
+            confirm: 'CONFIRM',
             connect: 'Connect',
 
             // specific caption/content
+            invalid_device_name: 'The name can only contains alphabet, numbers, blanks, and special characters  “-”, “_”, “’”, “\'”.',
             select_language: 'Select Language',
             change_password: 'Change password?',
             connect_flux: 'Connect FLUX to Your Computer by USB Cable',
@@ -101,7 +103,7 @@ define(function() {
             // page specific
             set_machine_generic: {
                 printer_name: 'Name',
-                printer_name_placeholder: 'Printer\'s Name',
+                printer_name_placeholder: 'Device\'s Name',
                 password: 'Password',
                 set_station_mode: 'Set station mode',
                 password_placeholder: 'Password'
@@ -124,7 +126,6 @@ define(function() {
                 error: 'Error',
 
                 keep_connect: {
-                    caption: 'Unable to detect FLUX device',
                     content: 'Please make sure your FLUX has been powered on and attached to micro-usb cord.'
                 },
 
@@ -491,6 +492,12 @@ define(function() {
             get_fcode: 'Save<br/>Task',
             name: 'Name',
             go: 'GO',
+            title: {
+                material: 'Select proper material to have the best engraving result.',
+                object_height: 'A Raft are layers built under your part and help it stick to the base plate.',
+                shading: 'Shading enables gradient effect of laser engraving. It takes longer time.',
+                advanced: 'Custom settings for power and speed'
+            },
             print_params: {
                 object_height: {
                     text: 'OBJECT HEIGHT',
@@ -588,7 +595,8 @@ define(function() {
                 },
                 save_and_apply: 'SAVE & APPLY',
                 save_as_preset: 'SAVE',
-                load_preset: 'LOAD',
+                save_as_preset_title: 'Save Preset',
+                load_preset_title: 'Load Preset',
                 apply: 'APPLY',
                 cancel: 'CANCEL',
                 save: 'SAVE'
@@ -682,6 +690,20 @@ define(function() {
                 x: 'X',
                 y: 'Y',
                 z: 'Z'
+            },
+            messages: {
+                'not open': {
+                    caption: 'Camera not detect',
+                    message: 'Please pull off the scanning camera.'
+                },
+                'no object': {
+                    caption: 'Calibration tool not detected',
+                    message: ''
+                },
+                'no laser': {
+                    caption: 'Laser not detected',
+                    message: 'Press the laser heads to open it.'
+                }
             }
         },
         select_printer: {
@@ -824,7 +846,12 @@ define(function() {
             machineNotConnected: 'Machine is not connected',
             notPrinting: 'Printing is not in progress',
             nothingToPrint: 'Nothing to print (source blob missing)',
-            connectionTimeout: 'device is not responding, connection timeout'
+            connectionTimeout: 'device is not responding, connection timeout',
+            device_busy: {
+                caption: 'Device Busy',
+                message: 'The device is executing another task, try again later. If it stops working, please restart the device.'
+            },
+            device_is_used: 'The device is being used, do you want to abort current task?'
         },
         machine_status: {
             '-2': 'Scanning',

@@ -1,11 +1,15 @@
 define([
     'app/constants/alert-constants',
-    'app/dispatcher/alert-dispatcher'
+    'app/dispatcher/alert-dispatcher',
+    'helpers/i18n'
 ], function(
     AlertConstants,
-    AlertDispatcher
+    AlertDispatcher,
+    i18n
 ) {
     'use strict';
+
+    var lang = i18n.get();
 
     return {
 
@@ -27,59 +31,74 @@ define([
             });
         },
 
-        showPopupInfo: function(id, message) {
+        showDeviceBusyPopup: function(id) {
             AlertDispatcher.dispatch({
-                actionType: AlertConstants.SHOW_POPUP_INFO, message, id
+                actionType: AlertConstants.SHOW_POPUP_DEVICE_BUSY,
+                caption: lang.message.device_busy.caption,
+                message: lang.message.device_busy.message,
+                id: id
             }, id);
         },
 
-        showPopupWarning: function(id, message) {
+        showPopupInfo: function(id, message, caption) {
             AlertDispatcher.dispatch({
-                actionType: AlertConstants.SHOW_POPUP_WARNING, message, id
+                actionType: AlertConstants.SHOW_POPUP_INFO, caption, message, id
+            }, id);
+        },
+
+        showPopupWarning: function(id, message, caption) {
+            AlertDispatcher.dispatch({
+                actionType: AlertConstants.SHOW_POPUP_WARNING, caption, message, id
             });
         },
 
-        showPopupError: function(id, message) {
+        showPopupError: function(id, message, caption) {
             AlertDispatcher.dispatch({
-                actionType: AlertConstants.SHOW_POPUP_ERROR, message, id
+                actionType: AlertConstants.SHOW_POPUP_ERROR, caption, message, id
             });
         },
 
-        showPopupRetry: function(id, message) {
+        showPopupRetry: function(id, message, caption) {
             AlertDispatcher.dispatch({
-                actionType: AlertConstants.SHOW_POPUP_RETRY, message, id
+                actionType: AlertConstants.SHOW_POPUP_RETRY, caption, message, id
             });
         },
 
-        showPopupRetryAbort: function(id, message) {
+        showPopupRetryAbort: function(id, message, caption) {
             AlertDispatcher.dispatch({
-                actionType: AlertConstants.SHOW_POPUP_RETRY_ABORT, message, id
+                actionType: AlertConstants.SHOW_POPUP_RETRY_ABORT, caption, message, id
             });
         },
 
-        showPopupYesNo: function(id, message) {
+        showPopupYesNo: function(id, message, caption) {
             AlertDispatcher.dispatch({
-                actionType: AlertConstants.SHOW_POPUP_YES_NO, message, id
+                actionType: AlertConstants.SHOW_POPUP_YES_NO, caption, message, id
             });
         },
 
-        showPopupCustom: function(id, message, customText) {
+        showPopupCustom: function(id, message, customText, caption) {
             AlertDispatcher.dispatch({
-                actionType: AlertConstants.SHOW_POPUP_CUSTOM, message, id, customText
+                actionType: AlertConstants.SHOW_POPUP_CUSTOM,
+                id: id,
+                caption: caption,
+                message: message,
+                customText: customText
             });
         },
 
-        showPopupQuestion: function(id, message) {
+        showPopupQuestion: function(id, message, caption) {
             AlertDispatcher.dispatch({
-                actionType: AlertConstants.SHOW_POPUP_QUESTION, message, id
+                actionType: AlertConstants.SHOW_POPUP_QUESTION, caption, message, id
             });
         },
 
-        showFirmwareUpdate: function(device, updateInfo) {
+        showUpdate: function(device, type, updateInfo, onInstall) {
             AlertDispatcher.dispatch({
                 actionType: AlertConstants.SHOW_POPUP_FIRMWARE_UPDATE,
                 device: device,
-                updateInfo: updateInfo
+                type: type,
+                updateInfo: updateInfo,
+                onInstall: onInstall
             });
         },
 

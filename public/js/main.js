@@ -1,5 +1,5 @@
 requirejs.config({
-    urlArgs: 'v=' + window.FLUX.timestamp,
+    urlArgs: (true === window.FLUX.debug ? 'v=' + window.FLUX.timestamp : ''),
     baseUrl: 'js/',
 
     paths: {

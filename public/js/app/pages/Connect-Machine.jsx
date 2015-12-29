@@ -2,9 +2,19 @@ define([
     'react',
     'app/actions/initialize-machine',
     'helpers/api/usb-config',
-    'jsx!widgets/Alert',
-    'jsx!widgets/Modal'
-], function(React, initializeMachine, usbConfig, Alert, Modal) {
+    'jsx!widgets/Modal',
+    'app/actions/alert-actions',
+    'app/actions/progress-actions',
+    'app/constants/progress-constants'
+], function(
+    React,
+    initializeMachine,
+    usbConfig,
+    Modal,
+    AlertActions,
+    ProgressActions,
+    ProgressConstants
+) {
     'use strict';
 
     return function(args) {
@@ -17,87 +27,44 @@ define([
                 var self = this,
                     lang = this.state.lang,
                     usb = usbConfig(),
-                    toggleBlocker = function(open) {
-                        self.setState({
-                            openBlocker: open
-                        });
-                    },
                     goNext = function(printer) {
                         // temporary store for setup
                         initializeMachine.settingPrinter.set(printer);
                         location.hash = '#initialize/wifi/set-printer';
                     };
 
-                toggleBlocker(true);
+                self._toggleBlocker(true);
 
                 usb.list({
                     onSuccess: function(response) {
-                        toggleBlocker(false);
+                        self._toggleBlocker(false);
                         goNext(response);
                     },
                     onError: function(response) {
-                        toggleBlocker(false);
-                        self.setState({
-                            openAlert: true,
-                            alertContent: {
-                                caption: lang.initialize.errors.keep_connect.caption,
-                                message: lang.initialize.errors.keep_connect.content
-                            }
-                        });
+                        self._toggleBlocker(false);
+                        AlertActions.showPopupError('connection-fail', lang.initialize.errors.keep_connect.content);
                     }
                 });
+            },
+
+            _toggleBlocker: function(open) {
+                if (true === open) {
+                    ProgressActions.open(ProgressConstants.NONSTOP);
+                }
+                else {
+                    ProgressActions.close();
+                }
             },
 
             // Lifecycle
             getInitialState: function() {
                 return {
-                    lang: args.state.lang,
-                    openBlocker: false,
-                    openAlert: false,
-                    alertContent: {}
+                    lang: args.state.lang
                 };
-            },
-
-            _renderAlert: function(lang) {
-                var self = this,
-                    buttons = [{
-                        label: lang.initialize.confirm,
-                        dataAttrs: {
-                            'ga-event': 'confirm'
-                        },
-                        onClick: function() {
-                            self.setState({
-                                openAlert: false
-                            });
-                        }
-                    }],
-                    content = (
-                        <Alert caption={this.state.alertContent.caption} message={this.state.alertContent.message} buttons={buttons}/>
-                    );
-
-                return (
-                    true === this.state.openAlert ?
-                    <Modal content={content}/> :
-                    ''
-                );
-            },
-
-            _renderBlocker: function() {
-                var content = (
-                    <div className="spinner-flip"/>
-                );
-
-                return (
-                    true === this.state.openBlocker ?
-                    <Modal content={content} disabledEscapeOnBackground={false}/> :
-                    ''
-                );
             },
 
             render : function() {
                 var lang = this.state.lang,
-                    blocker = this._renderBlocker(),
-                    alert = this._renderAlert(lang),
                     wrapperClassName = {
                         'initialization': true
                     },
@@ -116,8 +83,6 @@ define([
                                     </a>
                                 </div>
                             </div>
-                            {alert}
-                            {blocker}
                         </div>
                     );
 

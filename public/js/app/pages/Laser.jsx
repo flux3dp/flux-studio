@@ -51,6 +51,7 @@ define([
                         imagePanel: {},
                         position: {},
                         size: {},
+                        sizeLock: false,
                         angle: 0,
                         threshold: 128,
                         images: []
@@ -168,6 +169,7 @@ define([
                                 lang={lang}
                                 initialPosition={this.state.initialPosition}
                                 ref="imagePanel"
+                                sizeLock={this.state.sizeLock}
                                 mode={this.state.mode}
                                 className={image_panel_class}
                                 onThresholdChanged={this.state.laserEvents.thresholdChanged}

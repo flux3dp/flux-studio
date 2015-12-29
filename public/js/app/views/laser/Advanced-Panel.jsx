@@ -1,82 +1,91 @@
 define([
-    'jquery',
     'react',
     'jsx!widgets/Select',
     'jsx!widgets/Button-Group',
     'jsx!widgets/Text-Input',
+    'jsx!widgets/Unit-Input',
     'helpers/api/config',
+    'plugins/classnames/index',
     'helpers/round',
+    'app/actions/input-lightbox-actions',
     'plugins/jquery/serializeObject',
     'helpers/array-findindex',
-], function($, React, SelectView, ButtonGroup, TextInput, config, round) {
+], function(
+    React,
+    SelectView,
+    ButtonGroup,
+    TextInput,
+    UnitInput,
+    config,
+    classNames,
+    round,
+    InputLightboxActions
+) {
     'use strict';
 
     return React.createClass({
-        // Private methods
-        _openSaveForm: function(open) {
-            this.setState({
-                openSaveWindow: open
-            });
+
+        getDefaultProps: function() {
+            var self = this;
+
+            return {
+                lang: React.PropTypes.object,
+                defaultMaterial: React.PropTypes.object,
+                onLoadPreset: React.PropTypes.func,
+                onClose: React.PropTypes.func,
+                onSave: React.PropTypes.func,
+                onDone : React.PropTypes.func
+            };
         },
 
+        getInitialState: function() {
+            return {
+                defaultMaterial: this.props.defaultMaterial,
+                materialHasChanged: false,
+                openSaveWindow: false
+            };
+        },
+
+        // Private methods
         _getFooterButtons: function(lang) {
             var self = this,
-                buttonGroup = {
-                    default: [{
-                        label: lang.load_preset,
-                        className: 'pull-left btn-default',
-                        dataAttrs: {
-                            'ga-event': 'load-laser-preset'
-                        },
-                        onClick: this._onLoadPreset
+                buttonGroup = [{
+                    className: 'pull-left btn-default fa fa-folder-open-o',
+                    title: lang.load_preset_title,
+                    dataAttrs: {
+                        'ga-event': 'load-laser-preset'
                     },
-                    {
-                        label: lang.save_as_preset,
-                        className: 'pull-left btn-default' + (true === this.state.materialHasChanged ? '' : ' btn-disabled'),
-                        dataAttrs: {
-                            'ga-event': 'save-as-preset'
-                        },
-                        onClick: this._onSaveStarting
+                    onClick: this._onLoadPreset
+                },
+                {
+                    className: classNames({
+                        'pull-left btn-default fa fa-floppy-o': true,
+                        'btn-disabled': false === this.state.materialHasChanged
+                    }),
+                    title: lang.save_as_preset_title,
+                    dataAttrs: {
+                        'ga-event': 'save-as-preset'
                     },
-                    {
-                        label: lang.cancel,
-                        className: 'pull-right btn-default btn-cancel',
-                        dataAttrs: {
-                            'ga-event': 'cancel-current-preset'
-                        },
-                        onClick: this._onCancel
+                    onClick: this._onSaveAndApply
+                },
+                {
+                    label: lang.apply,
+                    className: 'pull-right btn-default btn-apply',
+                    dataAttrs: {
+                        'ga-event': 'apply-laser-preset'
                     },
-                    {
-                        label: lang.apply,
-                        className: 'pull-right btn-default',
-                        dataAttrs: {
-                            'ga-event': 'apply-laser-preset'
-                        },
-                        onClick: this._onApply
-                    }],
-                    save: [{
-                        label: lang.save_and_apply,
-                        onClick: self._onSaveAndApply,
-                        dataAttrs: {
-                            'ga-event': 'save-and-apply-laser-preset'
-                        },
+                    onClick: this._onApply
+                },
+                {
+                    label: lang.cancel,
+                    className: 'pull-right btn-default btn-cancel',
+                    dataAttrs: {
+                        'ga-event': 'cancel-current-preset'
                     },
-                    {
-                        label: lang.cancel,
-                        onClick: function() {
-                            self._openSaveForm(false);
-                        },
-                        dataAttrs: {
-                            'ga-event': 'cancel-save-laser-preset'
-                        },
-                    }]
-                };
+                    onClick: this._onCancel
+                }];
 
-            return (
-                false === this.state.openSaveWindow ?
-                buttonGroup.default :
-                buttonGroup.save
-            );
+            return buttonGroup;
         },
 
         _applySetting: function(e) {
@@ -93,18 +102,32 @@ define([
         },
 
         _onSaveAndApply: function(e) {
-            var lang = this.props.lang,
-                value = this.refs.presetName.value(),
-                refs = this.refs,
+            var self = this,
+                lang = self.props.lang,
+                refs = self.refs,
                 material = {
-                    value: value,
-                    label: value,
-                    data: this.state.defaultMaterial.data
+                    data: self.state.defaultMaterial.data
                 };
 
-            if (true === this.props.onSave(material)) {
-                this.props.onApply(material);
-            }
+            InputLightboxActions.open('save-laser-preset', {
+                caption      : lang.laser.save_as_preset,
+                inputHeader  : lang.laser.name,
+                confirmText  : lang.laser.advanced.save,
+                onSubmit     : function(presetName) {
+                    var canSave = ('' !== presetName);
+
+                    if (true === canSave) {
+                        material.value = presetName;
+                        material.label = presetName;
+
+                        if (true === self.props.onSave(material)) {
+                            self.props.onApply(material);
+                        }
+                    }
+
+                    return '' !== presetName;
+                }
+            });
         },
 
         _onApply: function(e) {
@@ -119,26 +142,49 @@ define([
             this.props.onApply(material);
         },
 
-        _onSaveStarting: function(e) {
-            this._openSaveForm(true);
+        _changeInputNumber: function() {
+            var self = this,
+                lang = self.props.lang.laser.advanced,
+                speed = self.refs.speed,
+                power = self.refs.power,
+                defaultMaterial;
+
+            console.log(speed.value(), power.value());
+            defaultMaterial = {
+                data: {
+                    laser_speed: speed.value(),
+                    power: power.value() / 100 * lang.form.power.max
+                }
+            };
+            console.log(defaultMaterial, lang.form.power.max);
+
+            self._updateDefaultMaterial(defaultMaterial);
         },
 
-        _changeRangeNumber: function(target) {
-            var self = this;
+        _changeRangeNumber: function() {
+            var self = this,
+                speedRange = self.refs.speedRange.getDOMNode(),
+                powerRange = self.refs.powerRange.getDOMNode(),
+                defaultMaterial;
 
-            return function(e) {
-                var speedRange = self.refs.speedRange.getDOMNode(),
-                    powerRange = self.refs.powerRange.getDOMNode(),
-                    defaultMaterial = self.state.defaultMaterial;
-
-                // changed state
-                defaultMaterial.data.laser_speed = parseFloat(speedRange.value, 10);
-                defaultMaterial.data.power = parseFloat(powerRange.value, 10);
-
-                self.setState({
-                    materialHasChanged: true
-                });
+            defaultMaterial = {
+                data: {
+                    laser_speed: parseFloat(speedRange.value, 10),
+                    power: parseFloat(powerRange.value, 10)
+                }
             };
+
+            self._updateDefaultMaterial(defaultMaterial);
+        },
+
+        _updateDefaultMaterial: function(defaultMaterial) {
+            defaultMaterial.label = this.state.defaultMaterial.label;
+            defaultMaterial.value = this.state.defaultMaterial.value;
+
+            this.setState({
+                defaultMaterial: defaultMaterial,
+                materialHasChanged: true
+            });
         },
 
         // Lifecycle
@@ -183,11 +229,21 @@ define([
                                 max={lang.form.laser_speed.max}
                                 step={lang.form.laser_speed.step}
                                 defaultValue={this.state.defaultMaterial.data.laser_speed}
-                                onChange={this._changeRangeNumber('speed')}
+                                value={this.state.defaultMaterial.data.laser_speed}
+                                onChange={this._changeRangeNumber}
                             />
-                            <span ref="speed" data-tail={lang.form.laser_speed.unit} className="value-text">
-                                {this.state.defaultMaterial.data.laser_speed}
-                            </span>
+                            <UnitInput
+                                ref="speed"
+                                className="value-text"
+                                step={0.1}
+                                min={lang.form.laser_speed.min}
+                                max={lang.form.laser_speed.max}
+                                defaultUnit="mm/s"
+                                defaultUnitType="speed"
+                                operators={['+', '-', '*']}
+                                defaultValue={this.state.defaultMaterial.data.laser_speed}
+                                getValue={this._changeInputNumber}
+                            />
                         </div>
                     </div>
                     <div className="controls clearfix">
@@ -202,11 +258,20 @@ define([
                                 max={lang.form.power.max}
                                 step={lang.form.power.step}
                                 defaultValue={this.state.defaultMaterial.data.power}
-                                onChange={this._changeRangeNumber('power')}
+                                value={this.state.defaultMaterial.data.power}
+                                onChange={this._changeRangeNumber}
                             />
-                            <span ref="power" data-tail="%" className="value-text">
-                                {round(this.state.defaultMaterial.data.power / lang.form.power.max * 100, -2)}
-                            </span>
+                            <UnitInput
+                                ref="power"
+                                className="value-text"
+                                min={0}
+                                max={100}
+                                step={1}
+                                defaultUnit="%"
+                                defaultUnitType="percentage"
+                                defaultValue={round(this.state.defaultMaterial.data.power / lang.form.power.max * 100, -2)}
+                                getValue={this._changeInputNumber}
+                            />
                         </div>
                     </div>
                 </form>
@@ -229,27 +294,6 @@ define([
                     {footer}
                 </div>
             );
-        },
-
-        getDefaultProps: function() {
-            var self = this;
-
-            return {
-                lang: React.PropTypes.object,
-                defaultMaterial: React.PropTypes.object,
-                onLoadPreset: React.PropTypes.func,
-                onClose: React.PropTypes.func,
-                onSave: React.PropTypes.func,
-                onDone : React.PropTypes.func
-            };
-        },
-
-        getInitialState: function() {
-            return {
-                defaultMaterial: this.props.defaultMaterial,
-                materialHasChanged: false,
-                openSaveWindow: false
-            };
         }
 
     });
