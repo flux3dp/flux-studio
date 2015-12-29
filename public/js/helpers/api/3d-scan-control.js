@@ -41,7 +41,6 @@ define([
                 }
             },
             wait_for_connected_timer,
-            image_timer,
             stopGettingImage = function(callback) {
                 callback = callback || function() {};
 
@@ -56,7 +55,6 @@ define([
                         }
                     };
                 }
-
             };
 
         ws = new Websocket({
@@ -261,7 +259,6 @@ define([
                 events.onError = function(result) {
                     d.resolve(result);
                 };
-
                 ws.send('quit');
 
                 return d.promise();
