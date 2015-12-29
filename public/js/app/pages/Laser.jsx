@@ -51,6 +51,7 @@ define([
                         imagePanel: {},
                         position: {},
                         size: {},
+                        sizeLock: false,
                         angle: 0,
                         threshold: 128,
                         images: []
@@ -71,12 +72,12 @@ define([
 
                     self.state.laserEvents.menuFactory.items.execute.enabled = false;
                     self.state.laserEvents.menuFactory.items.execute.onClick = function() {
-                        self.refs.setupPanel._onRunLaser();
+                        self._onRunLaser();
                     };
 
                     self.state.laserEvents.menuFactory.items.saveGCode.enabled = false;
                     self.state.laserEvents.menuFactory.items.saveGCode.onClick = function() {
-                        self.refs.setupPanel._onExport();
+                        self._onExport('-g');
                     };
                 },
 
@@ -93,8 +94,8 @@ define([
                     });
                 },
 
-                _onExport: function() {
-                    this.state.laserEvents.export(this._fetchFormalSettings());
+                _onExport: function(filemode) {
+                    this.state.laserEvents.exportTaskCode(this._fetchFormalSettings(), filemode);
                 },
 
                 _onDropUpload: function(e) {
@@ -168,6 +169,7 @@ define([
                                 lang={lang}
                                 initialPosition={this.state.initialPosition}
                                 ref="imagePanel"
+                                sizeLock={this.state.sizeLock}
                                 mode={this.state.mode}
                                 className={image_panel_class}
                                 onThresholdChanged={this.state.laserEvents.thresholdChanged}
@@ -289,9 +291,9 @@ define([
                             dataAttrs: {
                                 'ga-event': 'get-laser-fcode'
                             },
-                            onClick: this._onExport
+                            onClick: this._onExport.bind(null, '-f')
                         }, {
-                            label: lang.laser.go,
+                            label: lang.monitor.start,
                             className: cx({
                                 'btn-disabled': !this.state.hasImage,
                                 'btn-default': true,

@@ -151,7 +151,7 @@
                         scalex: 1,
                         scaley: 1,
                         angle: 0,
-                        maintainAspectRatio: false,
+                        maintainAspectRatio: options.maintainAspectRatio || false,
                         scaleLimit: 0.1,
                         'rot-origin': '50% 50%',
                         _p: {
@@ -562,6 +562,7 @@
                 delete opts._p;
 
                 data = $.extend(data, opts);
+                data.maintainAspectRatio = opts.maintainAspectRatio || false;
 
                 if(opts.matrix){
                     var nums = opts.matrix.match(/\.?\d+/g);

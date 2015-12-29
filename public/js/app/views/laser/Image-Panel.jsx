@@ -10,6 +10,32 @@ define([
 
     return React.createClass({
 
+        getInitialState: function () {
+            return {
+                initialPosition: {
+                    top: this.props.initialPosition.top,
+                    left: this.props.initialPosition.left
+                },
+                size: this.props.size,
+                sizeLock: this.props.sizeLock
+            };
+        },
+
+        getDefaultProps: function() {
+            return {
+                onThresholdChanged: function() {},
+                onTransform: function() {},
+                style: {},
+                sizeLock: true,
+                mode: '',
+                angle: 0,
+                position: {},
+                size: {},
+                threshold: 0,
+                initialPosition: {}
+            };
+        },
+
         // UI events
         _onThresholdChanged: function(e) {
             var self = this,
@@ -35,7 +61,8 @@ define([
                     size: {
                         width: this.refs.objectSizeW.value(),
                         height: this.refs.objectSizeH.value()
-                    }
+                    },
+                    sizeLock: !this.state.sizeLock
                 },
                 ratio;
 
@@ -43,7 +70,7 @@ define([
                 newParams['threshold'] = parseInt(this.refs.threshold.getDOMNode().value, 10);
             }
 
-            if (true === this.state.lockSize) {
+            if (true === this.state.sizeLock) {
                 switch (type) {
                 case 'width':
                     ratio = newParams.size.width / this.props.size.width;
@@ -68,8 +95,9 @@ define([
 
                 state = {};
                 state[which] = !self.state[which];
-
                 self.setState(state);
+
+                self._onTransform(e);
             };
         },
 
@@ -97,31 +125,6 @@ define([
             );
         },
 
-        getInitialState: function () {
-            return {
-                initialPosition: {
-                    top: this.props.initialPosition.top,
-                    left: this.props.initialPosition.left
-                },
-                size: this.props.size,
-                lockSize: false
-            };
-        },
-
-        getDefaultProps: function() {
-            return {
-                onThresholdChanged: React.PropTypes.func,
-                onTransform: React.PropTypes.func,
-                style: React.PropTypes.object,
-                mode: React.PropTypes.string,
-                angle: React.PropTypes.string,
-                position: React.PropTypes.object,
-                size: React.PropTypes.object,
-                threshold: React.PropTypes.string,
-                initialPosition: React.PropTypes.object
-            };
-        },
-
         render: function() {
             var props = this.props,
                 state = this.state,
@@ -132,7 +135,7 @@ define([
                     left: state.initialPosition.left
                 },
                 lockerImage = {
-                    size: (false === state.lockSize ? '/img/unlock.svg' : '/img/lock.svg')
+                    size: (false === state.sizeLock ? '/img/unlock.svg' : '/img/lock.svg')
                 };
 
             return (
@@ -199,7 +202,7 @@ define([
                                         getValue={this._onTransform}
                                     />
                                 </div>
-                                <img className="icon-locker" src={lockerImage.size} onClick={this._lockRatio('lockSize')}/>
+                                <img className="icon-locker" src={lockerImage.size} onClick={this._lockRatio('sizeLock')}/>
                             </label>
                         </label>
                         <label className="controls accordion">

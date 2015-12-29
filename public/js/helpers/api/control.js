@@ -5,8 +5,9 @@
 define([
     'jquery',
     'helpers/websocket',
-    'helpers/convertToTypedArray'
-], function($, Websocket, convertToTypedArray) {
+    'helpers/convertToTypedArray',
+    'app/constants/device-constants'
+], function($, Websocket, convertToTypedArray, DeviceConstants) {
     'use strict';
 
     return function(uuid, opts) {
@@ -64,9 +65,9 @@ define([
             },
             isTimeout = function() {
                 var error = {
-                    "status": "error",
-                    "error": "TIMEOUT",
-                    "info": "connection timeoout"
+                    'status': 'error',
+                    'error': 'TIMEOUT',
+                    'info': 'connection timeoout'
                 };
                 opts.onError(error);
             };
@@ -148,94 +149,109 @@ define([
 
                 ws.send('report');
             },
-            upload: function(filesize, print_data, opts) {
+            upload: function(filesize, print_data, opts, callback) {
                 opts = genericOptions(opts);
 
                 var self = this,
                     CHUNK_PKG_SIZE = 4096,
                     length = print_data.length || print_data.size,
-                    interrupt = function(cmd) {
-                        if ('start' === lastOrder) {
-                            ws.send(cmd);
-                        }
-                    },
-                    positioning = function() {
-                        self.position({
-                            onFinished: function(response) {
-                                if ('PlayTask' === response.location) {
-                                    console.log('reporting');
-                                    reporting();
-                                }
-                                else {
-                                    console.log('do upload');
-                                    doUpload();
-                                }
+                    interrupt,
+                    positioning,
+                    reporting,
+                    uploading,
+                    doUpload;
+
+                var step = 0,
+                    total = parseInt(filesize / CHUNK_PKG_SIZE);
+
+                interrupt = function(cmd) {
+                    if ('start' === lastOrder) {
+                        ws.send(cmd);
+                    }
+                };
+
+                positioning = function() {
+                    self.position({
+                        onFinished: function(response) {
+                            if ('PlayTask' === response.location) {
+                                console.log('reporting');
+                                reporting();
                             }
-                        });
-                    },
-                    reporting = function() {
-                        self.report({
-                            onFinished: function(response) {
-                                if(typeof(response) === 'string') {
-                                    try {
-                                        response = JSON.parse(response);
-                                    } catch (variable) {
-                                        response.status = 'ERROR';
-                                    } finally {
-                                        response.status = response.status.toUpperCase();
-                                    }
-                                }
-                                else {
+                            else {
+                                console.log('do upload');
+                                doUpload();
+                            }
+                        }
+                    });
+                };
+
+                reporting = function() {
+                    self.report({
+                        onFinished: function(response) {
+                            if(typeof(response) === 'string') {
+                                try {
+                                    response = JSON.parse(response);
+                                } catch (variable) {
+                                    response.status = 'ERROR';
+                                } finally {
                                     response.status = response.status.toUpperCase();
                                 }
+                            }
+                            else {
+                                response.status = response.status.toUpperCase();
+                            }
 
-                                if (true === response.status.startsWith('COMPLETED')) {
-                                    self.quit().then(function(data) {
-                                        console.log('do upload 1', data);
-                                        doUpload();
-                                    });
-                                }
-                                else {
-                                    console.log('do upload 2');
+                            if (true === response.status.startsWith('COMPLETED')) {
+                                self.quit().then(function(data) {
+                                    console.log('do upload 1', data);
                                     doUpload();
-                                }
+                                });
                             }
+                            else {
+                                console.log('do upload 2');
+                                doUpload();
+                            }
+                        }
+                    });
+                };
+
+                uploading = function(data) {
+                    if ('continue' === data.status) {
+                        var fileReader, chunk;
+
+                        for (var i = 0; i < length; i += CHUNK_PKG_SIZE) {
+                            chunk = print_data.slice(i, i + CHUNK_PKG_SIZE);
+
+                            if (print_data instanceof Array) {
+                                chunk = convertToTypedArray(chunk, Uint8Array);
+                            }
+
+                            fileReader = new FileReader();
+
+                            fileReader.onloadend = function(e) {
+                                callback(step++, total);
+                                ws.send(this.result);
+                            };
+
+                            fileReader.readAsArrayBuffer(chunk);
+
+                        }
+
+                    }
+                    else if ('ok' === data.status) {
+                        self.start(opts).then(function() {
+                            opts.onFinished(data);
                         });
-                    },
-                    uploading = function(data) {
-                        if ('continue' === data.status) {
-                            var fileReader, chunk;
+                    }
+                    else if(data.status === 'error') {
+                        opts.onError(data);
+                    }
+                };
 
-                            for (var i = 0; i < length; i += CHUNK_PKG_SIZE) {
-                                chunk = print_data.slice(i, i + CHUNK_PKG_SIZE);
-
-                                if (print_data instanceof Array) {
-                                    chunk = convertToTypedArray(chunk, Uint8Array);
-                                }
-
-                                fileReader = new FileReader();
-
-                                fileReader.onloadend = function(e) {
-                                    ws.send(this.result);
-                                };
-
-                                fileReader.readAsArrayBuffer(chunk);
-                            }
-
-                        }
-                        else if ('ok' === data.status) {
-                            self.start(opts).then(function() {
-                                opts.onFinished(data);
-                            });
-                        }
-                        else if(data.status === 'error') {
-                            opts.onError(data);
-                        }
-                    },
-                    doUpload = function() {
-                        events.onMessage = uploading;
-                        ws.send(lastOrder + ' application/fcode ' + filesize);
-                    };
+                doUpload = function() {
+                    events.onMessage = uploading;
+                    ws.send(lastOrder + ' application/fcode ' + filesize);
+                };
 
                 lastOrder = 'upload';
 
@@ -255,9 +271,13 @@ define([
                     }
                 };
             },
-            uploadToDirectory: function(blob, uploadPath, fileName) {
+            uploadToDirectory: function(blob, uploadPath, fileName, callback) {
                 var d = $.Deferred(),
                     CHUNK_PKG_SIZE = 4096;
+
+                var step = 0,
+                    total = parseInt(blob.size / CHUNK_PKG_SIZE);
+
 
                 events.onMessage = function(result) {
                     switch (result.status) {
@@ -280,6 +300,7 @@ define([
 
                             fileReader.onloadend = function(e) {
                                 ws.send(this.result);
+                                callback(step++, total);
                             };
 
                             fileReader.readAsArrayBuffer(chunk);
@@ -387,6 +408,21 @@ define([
 
                 return d.promise();
             },
+            quitTask: function() {
+                var d = $.Deferred();
+                events.onMessage = function(result) {
+                    d.resolve(result);
+                };
+
+                events.onError = function(result) {
+                    d.reject(result);
+                }
+
+                ws.send('task quit');
+                lastOrder = 'task quit';
+
+                return d.promise();
+            },
             quit: function() {
                 var d = $.Deferred();
                 events.onMessage = function(result) {
@@ -397,8 +433,8 @@ define([
                     d.resolve(result);
                 }
 
-                ws.send('quit');
-                lastOrder = 'quit';
+                ws.send('play quit');
+                lastOrder = 'play quit';
 
                 return d.promise();
             },
@@ -438,6 +474,50 @@ define([
                 ws.send(`select ${path.join('/')}/${fileName}`);
 
                 return d.promise();
+            },
+
+            /**
+             * maintain mode
+             * @param {string} type - [LOAD|UNLOAD]
+             */
+            maintain: function(type) {
+                var deferred = $.Deferred(),
+                    typeMap = {},
+                    args = [
+                        'task',
+                        'maintain'
+                    ],
+                    currentTask = 'begining';
+
+                typeMap[DeviceConstants.LOAD_FILAMENT]   = 'load_filament';
+                typeMap[DeviceConstants.UNLOAD_FILAMENT] = 'unload_filament';
+
+                events.onMessage = function(result) {
+                    if ('ok' === result.status && 'begining' === currentTask) {
+                        currentTask = typeMap[type];
+                        args = [
+                            'maintain',
+                            currentTask,
+                            0, // extruder id
+                            220 // temperature
+                        ];
+                        ws.send(args.join(' '));
+                    }
+                    else if ('loading' === result.status) {
+                        deferred.notify(result);
+                    }
+                    else {
+                        deferred.resolve(result);
+                    }
+                };
+
+                events.onError = function(result) {
+                    deferred.reject(result);
+                };
+
+                ws.send(args.join(' '));
+
+                return deferred.promise();
             }
         };
     };

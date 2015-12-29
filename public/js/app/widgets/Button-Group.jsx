@@ -35,12 +35,18 @@ define(['react'], function(React){
 
                     if ('link' === opt.type) {
                         content = (
-                            <a className={className} href={opt.href} {...attrs} onClick={opt.onClick}>{opt.label}</a>
+                            <a className={className} href={opt.href} {...attrs} onClick={opt.onClick} >{opt.label}</a>
                         );
                     }
                     else {
                         content = (
-                            <button title={opt.title} className={className} {...attrs} type={opt.type || 'button'} onClick={opt.onClick}>{opt.label}</button>
+                            <button
+                                title={opt.title}
+                                className={className}
+                                type={opt.type || 'button'}
+                                onClick={opt.onClick}
+                                dangerouslySetInnerHTML={{__html: opt.label}}
+                                {...attrs} ></button>
                         );
                     }
 

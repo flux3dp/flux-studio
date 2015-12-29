@@ -13,6 +13,7 @@ define([
     'helpers/api/config',
     'helpers/i18n',
     'helpers/round',
+    'plugins/classnames/index'
 ], function(
     $,
     React,
@@ -27,7 +28,8 @@ define([
     DialogMenu,
     config,
     i18n,
-    round
+    round,
+    ClassNames
 ) {
     'use strict';
 
@@ -141,7 +143,7 @@ define([
         _saveLastestSet: function(opts) {
             opts = opts || {};
             opts.material = opts.material || this.state.defaults.material;
-            opts.objectHeight = opts.objectHeight || this.state.defaults.objectHeight;
+            opts.objectHeight = ('number' === typeof opts.objectHeight ? opts.objectHeight : this.state.defaults.objectHeight);
             opts.isShading = ('boolean' === typeof opts.isShading ? opts.isShading : this.state.defaults.isShading);
 
             var self = this,
@@ -194,9 +196,22 @@ define([
         _renderCustomPresets: function(lang) {
             var self = this,
                 customPresets = config().read('laser-custom-presets') || [],
-                buttons = [{
+                buttons = [
+                {
+                    label: lang.laser.advanced.cancel,
+                    dataAttrs: {
+                        'ga-event': 'cancel-custom-laser-preset'
+                    },
+                    onClick: function(e) {
+                        self._togglePanel('customPresets', false)();
+                    }
+                },
+                {
                     label: lang.laser.advanced.apply,
-                    className: 'btn-default' + (false === self.state.hasSelectedPreset ? ' btn-disabled' : ''),
+                    className: ClassNames({
+                        'btn-default': true,
+                        'btn-disabled': false === self.state.hasSelectedPreset
+                    }),
                     dataAttrs: {
                         'ga-event': 'apply-custom-laser-preset'
                     },
@@ -206,15 +221,6 @@ define([
                         self._saveLastestSet({ material: JSON.parse(elCustomPresets.dataset.selectedMaterial) });
                         self._togglePanel('customPresets', false)();
                         self._togglePanel('advanced', false)();
-                    }
-                },
-                {
-                    label: lang.laser.advanced.cancel,
-                    dataAttrs: {
-                        'ga-event': 'cancel-custom-laser-preset'
-                    },
-                    onClick: function(e) {
-                        self._togglePanel('customPresets', false)();
                     }
                 }],
                 selectPresetMaterial = function(e) {
@@ -295,7 +301,11 @@ define([
 
             return (
                 true === self.state.openCustomPresets ?
-                <Modal className={{ hasShadow: true }} content={content} onClose={self._togglePanel('customPresets', false)}/> :
+                <Modal
+                    className={{ hasShadow: true }}
+                    content={content}
+                    onClose={self._togglePanel('customPresets', false)}
+                /> :
                 ''
             );
         },
@@ -315,7 +325,12 @@ define([
 
             return (
                 true === this.state.openAdvancedPanel ?
-                <Modal className={{ hasShadow: true }} content={content} onClose={this._togglePanel('advanced', false)}/> :
+                <Modal
+                    className={{ hasShadow: true }}
+                    disabledEscapeOnBackground={true}
+                    content={content}
+                    onClose={this._togglePanel('advanced', false)}
+                /> :
                 ''
             );
         },
@@ -323,7 +338,7 @@ define([
         _renderObjectHeight: function(lang) {
             return {
                 label: (
-                    <div>
+                    <div title={lang.laser.title.object_height}>
                         <span className="caption">{lang.laser.print_params.object_height.text}</span>
                         <span>{this.state.defaults.objectHeight}</span>
                         <span>{lang.laser.print_params.object_height.unit}</span>
@@ -356,7 +371,7 @@ define([
 
             return {
                 label: (
-                    <div>
+                    <div title={lang.laser.title.material}>
                         <span className="caption">{lang.laser.advanced.form.object_options.text}</span>
                         <span>{defaultMaterial.label}</span>
                     </div>
@@ -384,6 +399,7 @@ define([
                     <TextToggle
                         ref="shading"
                         className={classes}
+                        title={lang.laser.title.shading}
                         displayText={lang.laser.print_params.shading.text}
                         textOn={lang.laser.print_params.shading.textOn}
                         textOff={lang.laser.print_params.shading.textOff}
@@ -432,6 +448,7 @@ define([
                     <button
                         className="btn btn-advance"
                         data-ga-event="open-laser-advanced-panel"
+                        title={lang.laser.title.advanced}
                         onClick={this._togglePanel('advanced', true)}
                     >
                         {lang.laser.button_advanced}

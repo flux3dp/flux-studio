@@ -28,7 +28,9 @@ define([
 ) {
     'use strict';
 
-    var _lang = i18n.get(),
+    var lang = i18n.get(),
+        thisProgress,
+        lastProgress,
         _instance = null,
         _password = '',
         _status = DeviceConstants.READY,
@@ -41,9 +43,9 @@ define([
             uuid = device.uuid,
             goAuth = function(uuid) {
                 InputLightboxActions.open('auth', {
-                    caption      : sprintf(_lang.input_machine_password.require_password, _device.name),
-                    inputHeader  : _lang.input_machine_password.password,
-                    confirmText  : _lang.input_machine_password.connect,
+                    caption      : sprintf(lang.input_machine_password.require_password, _device.name),
+                    inputHeader  : lang.input_machine_password.password,
+                    confirmText  : lang.input_machine_password.connect,
                     onSubmit     : function(password) {
                         auth(uuid, password).done(function(data) {
                             selectDevice(device, d);
@@ -65,7 +67,9 @@ define([
             _device.name = device.name;
             _device.actions = DeviceController(uuid, {
                 onConnect: function(response) {
-                    if(response.status.toUpperCase() === DeviceConstants.CONNECTED) {
+                    d.notify(response);
+
+                    if (response.status.toUpperCase() === DeviceConstants.CONNECTED) {
                         d.resolve(DeviceConstants.CONNECTED);
                         _devices.push(_device);
                     }
@@ -117,12 +121,12 @@ define([
         return d.promise();
     }
 
-    function uploadFile(blob, file, uploadPath) {
+    function uploadFile(blob, file, uploadPath, callback) {
         var d = $.Deferred();
-
         if(uploadPath) {
-            _device.actions.uploadToDirectory(blob, uploadPath, file.name).then(function(result) {
-                console.log('from dm', result);
+            ProgressActions.open(ProgressConstants.STEPPING, lang.device.starting, '', false);
+            _device.actions.uploadToDirectory(blob, uploadPath, file.name, uploadProgress).then(function(result) {
+                ProgressActions.close();
                 d.resolve(result);
             });
         }
@@ -131,46 +135,71 @@ define([
                 onFinished: function(result) {
                     d.resolve(result);
                 }
+            }, function(step, total) {
+                thisProgress = parseInt(step / total * 100);
+                if(thisProgress !== lastProgress) {
+                    callback(parseInt(step / total * 100));
+                    lastProgress = thisProgress;
+                }
             });
         }
 
         return d.promise();
     }
 
-    function go(blob) {
+    function uploadProgress(step, total) {
+        thisProgress = parseInt(step / total * 100);
+        if(thisProgress !== lastProgress) {
+            // update every 20%
+            if(parseInt(step / total * 100) % 20 === 0) {
+                console.log('update', parseInt(step / total * 100));
+                ProgressActions.updating(lang.device.uploading, parseInt(step / total * 100));
+            }
+            if(parseInt(step / total * 100) === 100) {
+                ProgressActions.updating(lang.device.please_wait, 100);
+            }
+            lastProgress = thisProgress;
+        }
+
+    }
+
+    function go(blob, callbackProgress) {
         var d = $.Deferred();
         if(!blob) {
             d.resolve(DeviceConstants.READY);
         }
         else {
-            getReport().then(function(report) {
-                _status = report.st_label;
-                if(_status === DeviceConstants.IDLE) {
-                    _go(blob).then(function(status) {
-                        d.resolve(status);
-                    });
-                }
-                else if (_status === DeviceConstants.RUNNING) {
-                    _status = DeviceConstants.RUNNING;
-                    d.resolve(_status);
-                }
-                else if(_status === DeviceConstants.COMPLETED || _status === DeviceConstants.ABORTED) {
-                    _do(DeviceConstants.QUIT).then(function() {
-                        uploadFile(blob);
-                        _status = DeviceConstants.RUNNING;
-                        d.resolve(_status);
-                    });
-                }
+            _go(blob, callbackProgress).then(function(status) {
+                d.resolve(status);
             });
+            // getReport().then(function(report) {
+            //     _status = report.st_label;
+            //     if(_status === DeviceConstants.IDLE) {
+            //         _go(blob).then(function(status) {
+            //             d.resolve(status);
+            //         });
+            //     }
+            //     else if (_status === DeviceConstants.RUNNING) {
+            //         _status = DeviceConstants.RUNNING;
+            //         d.resolve(_status);
+            //     }
+            //     else if(_status === DeviceConstants.COMPLETED || _status === DeviceConstants.ABORTED) {
+            //         _do(DeviceConstants.QUIT).then(function() {
+            //             uploadFile(blob);
+            //             _status = DeviceConstants.RUNNING;
+            //             d.resolve(_status);
+            //         });
+            //     }
+            // });
         }
 
         return d.promise();
     }
 
-    function _go(blob) {
+    function _go(blob, callback) {
         var d = $.Deferred();
-        uploadFile(blob).then(function() {
-            _status = DeviceConstants.RUNNING;
+        uploadFile(blob, null, null, callback).then(function() {
+            // _status = DeviceConstants.RUNNING;
             d.resolve(_status);
         });
         return d.promise();
@@ -224,6 +253,10 @@ define([
         return _do(DeviceConstants.QUIT);
     }
 
+    function quitTask() {
+        return _do(DeviceConstants.QUIT_TASK);
+    }
+
     function kick() {
         return _do(DeviceConstants.KICK);
     }
@@ -240,23 +273,35 @@ define([
         return _device.actions.fileInfo(path, fileName);
     }
 
-    function startCamera(callback) {
+    function readyCamera() {
+        var d = $.Deferred();
         _device.scanController = ScanController(_device.uuid, {
             onReady: function() {
-                _device.cameraSource = _device.scanController.getImage(callback);
+                d.resolve('');
             },
-            onError: function() {
-
+            onError: function(error) {
+                AlertActions.showPopupError('', error);
             }
         });
+
+        return d.promise();
+    }
+
+    function startCamera(callback) {
+        _device.cameraSource = _device.scanController.getImage(callback);
     }
 
     function stopCamera() {
+        var d = $.Deferred();
         if(_device.cameraSource) {
             _device.cameraSource.stop();
-            _device.scanController.quit();
-            _device.cameraSource = null;
+            d.resolve('');
         }
+        return d.promise();
+    }
+
+    function maintain(type) {
+        return _device.actions.maintain(type);
     }
 
     // set functions
@@ -405,15 +450,18 @@ define([
             this.pause              = pause;
             this.stop               = stop;
             this.quit               = quit;
+            this.quitTask           = quitTask;
             this.kick               = kick;
             this.setPassword        = setPassword;
             this.getReport          = getReport;
             this.getSelectedDevice  = getSelectedDevice;
+            this.readyCamera        = readyCamera;
             this.startCamera        = startCamera;
             this.stopCamera         = stopCamera;
             this.ls                 = ls;
             this.fileInfo           = fileInfo;
             this.getPreviewInfo     = getPreviewInfo;
+            this.maintain           = maintain;
 
             Discover(
                 'device-master',

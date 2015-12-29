@@ -1,18 +1,35 @@
 define([
-    'jquery',
     'react',
     'app/actions/initialize-machine',
     'jsx!widgets/Button-Group',
     'jsx!widgets/Modal',
-    'jsx!widgets/Alert',
-    'helpers/api/usb-config'
-], function($, React, initializeMachine, ButtonGroup, Modal, Alert, usbConfig) {
+    'helpers/api/usb-config',
+    'app/actions/alert-actions',
+    'app/stores/alert-store'
+], function(
+    React,
+    initializeMachine,
+    ButtonGroup,
+    Modal,
+    usbConfig,
+    AlertActions,
+    AlertStore
+) {
     'use strict';
 
     return function(args) {
         args = args || {};
 
         var Page = React.createClass({
+
+            // Lifecycle
+            getInitialState: function() {
+                return {
+                    lang: args.state.lang,
+                    openAlert: false,
+                    alertContent: {}
+                };
+            },
 
             // UI events
             _onCancelConnection: function(e) {
@@ -40,14 +57,13 @@ define([
                         checkTimes--;
                     },
                     genericFailureHandler = function() {
-                        self._openAlert(true)();
-
-                        self.setState({
-                            alertContent: {
-                                caption: lang.initialize.errors.error,
-                                message: lang.initialize.errors.wifi_connection.connecting_fail
-                            }
+                        AlertStore.onCancel(function() {
+                            location.hash = '#initialize/wifi/select';
                         });
+                        AlertActions.showPopupError(
+                            'wifi-authenticate-fail',
+                            lang.initialize.errors.wifi_connection.connecting_fail
+                        );
                     },
                     checkNetworkStatus = function() {
                         var methods = usb.getMachineNetwork({
@@ -80,60 +96,16 @@ define([
 
             },
 
-            _openAlert: function(open) {
-                var self = this;
-
-                return function() {
-                    self.setState({
-                        openAlert: open
-                    });
-                }
-            },
-
-            // Lifecycle
-            getInitialState: function() {
-                return {
-                    lang: args.state.lang,
-                    openAlert: false,
-                    alertContent: {}
-                };
-            },
-
-            _renderAlert: function(lang) {
-                var self = this,
-                    buttons = [{
-                        label: lang.initialize.confirm,
-                        dataAttrs: {
-                            'ga-event': 'confirm'
-                        },
-                        onClick: function(e) {
-                            self._openAlert(false)();
-                            location.hash = '#initialize/wifi/select';
-                        }
-                    }],
-                    content = (
-                        <Alert caption={this.state.alertContent.caption} message={this.state.alertContent.message} buttons={buttons}/>
-                    );
-
-                return (
-                    true === this.state.openAlert ?
-                    <Modal content={content}/> :
-                    ''
-                );
-            },
-
             render: function() {
                 var wrapperClassName = {
                         'initialization': true
                     },
                     lang = this.state.lang,
-                    alert = this._renderAlert(lang),
                     content = (
                         <div className="connecting-wifi text-center">
                             <h1>{lang.initialize.connecting}</h1>
                             <div className="spinner-roller"/>
                             <button className="btn btn-action btn-large" data-ga-event="cancel" onClick={this._onCancelConnection}>{lang.initialize.cancel}</button>
-                            {alert}
                         </div>
                     );
 

@@ -13,7 +13,7 @@ define([
     var NOTIFY_EVENT          = 'notify',
         POPUP_EVENT           = 'popup',
         CLOSE_POPUP           = 'closePopup',
-        FIRMWARE_UPDATE_EVENT = 'firmware_update',
+        UPDATE_EVENT          = 'update',
         CHANGE_FILAMENT_EVENT = 'change_filament',
         NOTIFY_RETRY          = 'retry',
         NOTIFY_ABORT          = 'abort',
@@ -29,8 +29,8 @@ define([
             this.on(CHANGE_FILAMENT_EVENT, callback);
         },
 
-        onFirmwareUpdate(callback) {
-            this.on(FIRMWARE_UPDATE_EVENT, callback);
+        onUpdate(callback) {
+            this.on(UPDATE_EVENT, callback);
         },
 
         onNotify(callback) {
@@ -85,6 +85,14 @@ define([
             this.removeListener(NOTIFY_ABORT, callback);
         },
 
+        removeYesListener(callback) {
+            this.removeListener(NOTIFY_YES, callback);
+        },
+
+        removeCancelListener(callback) {
+            this.removeListener(NOTIFY_CANCEL, callback);
+        },
+
         dispatcherIndex: Dispatcher.register(function(payload) {
             var actionType = payload.actionType,
                 action = {
@@ -102,35 +110,39 @@ define([
                 },
 
                 'SHOW_POPUP_INFO': function() {
-                    AlertStore.emit(POPUP_EVENT, AlertConstants.INFO, payload.id, payload.message);
+                    AlertStore.emit(POPUP_EVENT, AlertConstants.INFO, payload.id, payload.caption, payload.message);
                 },
 
                 'SHOW_POPUP_WARNING': function() {
-                    AlertStore.emit(POPUP_EVENT, AlertConstants.WARNING, payload.id, payload.message);
+                    AlertStore.emit(POPUP_EVENT, AlertConstants.WARNING, payload.id, payload.caption, payload.message);
                 },
 
                 'SHOW_POPUP_ERROR': function() {
-                    AlertStore.emit(POPUP_EVENT, AlertConstants.ERROR, payload.id, payload.message);
+                    AlertStore.emit(POPUP_EVENT, AlertConstants.ERROR, payload.id, payload.caption, payload.message);
+                },
+
+                'SHOW_POPUP_DEVICE_BUSY': function() {
+                    AlertStore.emit(POPUP_EVENT, AlertConstants.ERROR, payload.id, payload.caption, payload.message);
                 },
 
                 'SHOW_POPUP_RETRY': function() {
-                    AlertStore.emit(POPUP_EVENT, AlertConstants.RETRY_CANCEL, payload.id, payload.message);
+                    AlertStore.emit(POPUP_EVENT, AlertConstants.RETRY_CANCEL, payload.id, payload.caption, payload.message);
                 },
 
                 'SHOW_POPUP_RETRY_ABORT': function() {
-                    AlertStore.emit(POPUP_EVENT, AlertConstants.RETRY_ABORT_CANCEL, payload.id, payload.message);
+                    AlertStore.emit(POPUP_EVENT, AlertConstants.RETRY_ABORT_CANCEL, payload.id, payload.caption, payload.message);
                 },
 
                 'SHOW_POPUP_YES_NO': function() {
-                    AlertStore.emit(POPUP_EVENT, AlertConstants.YES_NO, payload.id, payload.message);
+                    AlertStore.emit(POPUP_EVENT, AlertConstants.YES_NO, payload.id, payload.caption, payload.message);
                 },
 
                 'SHOW_POPUP_CUSTOM': function() {
-                    AlertStore.emit(POPUP_EVENT, AlertConstants.CUSTOM_CANCEL, payload.id, payload.message, payload.customText);
+                    AlertStore.emit(POPUP_EVENT, AlertConstants.CUSTOM_CANCEL, payload.id, payload.caption, payload.message, payload.customText);
                 },
 
                 'SHOW_POPUP_QUESTION': function() {
-                    AlertStore.emit(POPUP_EVENT, AlertConstants.QUESTION, payload.id, payload.message);
+                    AlertStore.emit(POPUP_EVENT, AlertConstants.QUESTION, payload.id, payload.caption, payload.message);
                 },
 
                 'NOTIFY_RETRY': function() {
@@ -157,8 +169,8 @@ define([
                     AlertStore.emit(NOTIFY_ANSWER, payload.id, payload.isYes);
                 },
 
-                'SHOW_POPUP_FIRMWARE_UPDATE': function() {
-                    AlertStore.emit(FIRMWARE_UPDATE_EVENT, payload);
+                'SHOW_POPUP_UPDATE': function() {
+                    AlertStore.emit(UPDATE_EVENT, payload);
                 },
 
                 'CLOSE_POPUP': function() {

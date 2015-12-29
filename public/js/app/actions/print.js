@@ -11,6 +11,7 @@ define([
     'app/constants/device-constants',
     'app/constants/progress-constants',
     'helpers/i18n',
+    'helpers/nwjs/menu-factory',
     // non-return value
     'threeOrbitControls',
     'threeTrackballControls',
@@ -32,21 +33,25 @@ define([
     ProgressActions,
     DeviceConstants,
     ProgressConstants,
-    I18n
+    I18n,
+    MenuFactory
 ) {
     'use strict';
 
     var THREE = window.THREE || {},
         container, slicer;
 
-    var camera, scene, outlineScene, renderer;
+    var camera, scene, outlineScene;
     var orbitControl, transformControl, reactSrc, controls;
 
     var objects = [],
         referenceMeshes = [];
-    var raycaster = new THREE.Raycaster();
-    var mouse = new THREE.Vector2(),
-        circularGridHelper, mouseDown, SELECTED;
+
+    var raycaster = new THREE.Raycaster(),
+        mouse = new THREE.Vector2(),
+        renderer = new THREE.WebGLRenderer();
+
+    var circularGridHelper, mouseDown, SELECTED;
 
     var movingOffsetX, movingOffsetY, panningOffset, originalCameraPosition, originalCameraRotation,
         scaleBeforeTransformX, scaleBeforeTransformY, scaleBeforeTransformZ;
@@ -153,7 +158,7 @@ define([
         scene.add(cameraLight);
 
         // renderer
-        renderer = new THREE.WebGLRenderer();
+        // renderer = new THREE.WebGLRenderer();
         renderer.autoClear = false;
         renderer.setClearColor(0xE0E0E0, 1);
         renderer.setPixelRatio(window.devicePixelRatio);
@@ -196,13 +201,18 @@ define([
         registerDropToImport();
     }
 
+    function _handleStop() {
+        console.log('stopped');
+    }
+
     function uploadStl(name, file) {
         // pass to slicer
         var d = $.Deferred();
         var reader = new FileReader();
+
         reader.onload = function() {
-            // var arrayBuffer = reader.result;
-            slicer.upload(name, file).then(function(result) {
+            slicer.upload(name, file, displayProgress).then(function(result) {
+                ProgressActions.updating('finishing up', 100);
                 d.resolve(result);
             });
         };
@@ -216,23 +226,22 @@ define([
         callback = callback || function() {};
 
         reactSrc.setState({
-            openWaitWindow: true,
             openImportWindow: false
         });
 
-        loader.load(model_file_path, function(geometry) {
+        ProgressActions.open(ProgressConstants.STEPPING, lang.print.importingModel, lang.print.wait, false);
 
+        loader.load(model_file_path, function(geometry) {
             var mesh = new THREE.Mesh(geometry, commonMaterial);
             mesh.up = new THREE.Vector3(0, 0, 1);
 
+            ProgressActions.updating(lang.print.uploading, 40);
             uploadStl(mesh.uuid, file).then(function(result) {
                 if (result.status !== 'ok') {
-                    console.log(result.error);
+                    AlertActions.showPopupError('', result.status);
                 }
-                reactSrc.setState({
-                    openWaitWindow: false
-                });
                 callback();
+                ProgressActions.close();
             });
 
             geometry.center();
@@ -601,7 +610,7 @@ define([
             ids.push(obj.uuid);
         });
 
-        ProgressActions.open(ProgressConstants.STEPPING, lang.monitor.processing, lang.monitor.savingPreview);
+        ProgressActions.open(ProgressConstants.STEPPING, lang.monitor.processing, lang.monitor.savingPreview, false);
 
         getBlobFromScene().then(function(blob) {
             reactSrc.setState({ previewUrl: URL.createObjectURL(blob) });
@@ -658,7 +667,12 @@ define([
             ids.push(obj.uuid);
         });
 
-        ProgressActions.open(ProgressConstants.STEPPING, lang.print.rendering, lang.print.savingFilePreview);
+        ProgressActions.open(
+            ProgressConstants.STEPPING,
+            lang.print.rendering,
+            lang.print.savingFilePreview,
+            false
+        );
 
         getBlobFromScene().then(function(blob) {
             previewUrl = URL.createObjectURL(blob);
@@ -675,7 +689,7 @@ define([
                         }
                         else {
                             if (result.status !== 'error') {
-                                var progress = `${result.status}: ${result.message} ${'\n' + parseInt(result.percentage * 100)}%`,
+                                var progress = `${lang.slicer[result.status]} - ${'\n' + parseInt(result.percentage * 100)}% - ${result.message}`,
                                     complete = lang.print.finishingUp;
 
                                 if(result.status === 'warning') {
@@ -794,14 +808,8 @@ define([
     }
 
     function setParameter(name, value) {
-        slicer.setParameter(name, value).then(
-            function(result) {
-                if (result.status === 'error' || result.status === 'fatal') {
-                    // todo: error logging
-                }
-            }
-        );
         blobExpired = true;
+        return slicer.setParameter(name, value)
     }
 
     function setRotation(x, y, z, needRender, src) {
@@ -911,8 +919,13 @@ define([
 
         if (!$.isEmptyObject(obj)) {
 
-            // boundary
-            // var model = toScreenPosition(obj, camera);
+            MenuFactory.items.duplicate.enabled = true;
+            MenuFactory.items.duplicate.onClick = duplicateSelected;
+
+            objects.forEach(function(o) {
+                o.outlineMesh.visible = false;
+            });
+
             if(obj.outlineMesh) {
                 obj.outlineMesh.visible = true;
             }
@@ -933,6 +946,7 @@ define([
             }
         }
         else {
+            MenuFactory.items.duplicate.enabled = false;
             transformMode = false;
             removeFromScene('TransformControl');
             _removeAllMeshOutline();
@@ -976,7 +990,7 @@ define([
     }
 
     function removeSelected() {
-        if (SELECTED.outlineMesh) {
+        if (SELECTED && Object.keys(SELECTED).length > 0) {
             var index;
             scene.remove(SELECTED.outlineMesh);
             scene.remove(SELECTED);
@@ -1197,15 +1211,19 @@ define([
     function getBlobFromScene() {
         var ccp = camera.position.clone(),
             ccr = camera.rotation.clone(),
-            d = $.Deferred();
+            d = $.Deferred(),
+            ol = _getCameraLook(camera);
 
-        camera.position.set(originalCameraPosition.x, originalCameraPosition.y, originalCameraPosition.z);
+        // camera.position.set(originalCameraPosition.x, originalCameraPosition.y, originalCameraPosition.z);
+        camera.position.set(0, -215, 60);
         camera.rotation.set(originalCameraRotation.x, originalCameraRotation.y, originalCameraRotation.z, originalCameraRotation.order);
+        camera.lookAt(new THREE.Vector3(0,300,0));
         render();
 
         renderer.domElement.toBlob(function(blob) {
             camera.position.set(ccp.x, ccp.y, ccp.z);
             camera.rotation.set(ccr.x, ccr.y, ccr.z, ccr.order);
+            camera.lookAt(ol);
             render();
             d.resolve(blob);
         });
@@ -1409,12 +1427,16 @@ define([
         render();
     }
 
+    function displayProgress(step, total) {
+        if(step === total) {
+            ProgressActions.updating(lang.print.uploaded, 80);
+        }
+    }
+
     // Private Functions ---
 
     // sync parameters with server
     function _syncObjectParameter(objects, index, callback) {
-
-        // var d = $.Deferred();
         index = index || 0;
         if (index < objects.length) {
             slicer.set(
@@ -1442,7 +1464,6 @@ define([
     }
 
     function _addShadowedLight(x, y, z, color, intensity) {
-
         var directionalLight = new THREE.DirectionalLight(color, intensity);
         directionalLight.position.set(x, y, z);
 
@@ -1557,6 +1578,19 @@ define([
         });
     }
 
+    function _getCameraLook(_camera) {
+        var vector = new THREE.Vector3(0, 0, -1);
+        vector.applyEuler(_camera.rotation, _camera.eulerOrder);
+        return vector;
+    }
+
+    function clear() {
+        objects = [];
+        referenceMeshes = [];
+        renderer.clear();
+        renderer.clearDepth();
+    }
+
     return {
         init                : init,
         appendModel         : appendModel,
@@ -1580,6 +1614,7 @@ define([
         changePreviewLayer  : changePreviewLayer,
         executePrint        : executePrint,
         setCameraPosition   : setCameraPosition,
-        clearSelection      : clearSelection
+        clearSelection      : clearSelection,
+        clear               : clear
     };
 });

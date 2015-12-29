@@ -146,20 +146,21 @@ define([
 
                 opts.onStarting();
             },
-            getGCode: function(opts) {
+            getTaskCode: function(opts) {
                 opts = opts || {};
                 opts.onStarting = opts.onStarting || function() {};
                 opts.onProgressing = opts.onProgressing || function() {};
                 opts.onFinished = opts.onFinished || function() {};
 
+                lastOrder = 'getTaskCode';
+
                 var self = this,
                     blobs = [],
                     args = [
                         'go',
-                        opts.filemode || '-f'
+                        opts.fileMode || '-f'
                     ],
                     total_length = 0,
-                    goGcode = window.FLUX.debug,
                     blob;
 
                 events.onMessage = function(data) {
@@ -176,20 +177,12 @@ define([
 
                         if (total_length === blob.size) {
                             opts.onFinished(blob, args[1]);
-                            blobs = [];
-
-                            if (true === goGcode) {
-                                args[1] = '-g';
-                                ws.send(args.join(' '));
-                                goGcode = false;
-                            }
                         }
                     }
 
                 };
 
                 ws.send(args.join(' '));
-                lastOrder = 'getGCode';
 
                 opts.onStarting();
             },

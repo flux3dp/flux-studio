@@ -85,7 +85,7 @@ define([
                     },
                     onClick: this._handleGetFCode
                 }, {
-                    label: lang.laser.go,
+                    label: lang.monitor.start,
                     className: cx({
                         'btn-disabled': !this.props.hasObject || this.props.hasOutOfBoundsObject,
                         'btn-default': true,

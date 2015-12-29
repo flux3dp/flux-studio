@@ -128,7 +128,7 @@ define([
             ExportGCodeProgressing = function(data) {
                 ProgressActions.updating(data.message, data.percentage * 100);
             },
-            sendToBitmapAPI = function(args, settings, callback) {
+            sendToBitmapAPI = function(args, settings, callback, fileMode) {
                 callback = callback || function() {};
 
                 var laserParser = bitmapWebSocket,
@@ -138,9 +138,10 @@ define([
                         });
                     },
                     onUploadFinish = function() {
-                        laserParser.getGCode({
+                        laserParser.getTaskCode({
                             onProgressing: ExportGCodeProgressing,
-                            onFinished: callback
+                            onFinished: callback,
+                            fileMode: fileMode
                         });
                     };
 
@@ -153,7 +154,7 @@ define([
                     );
                 });
             },
-            sendToSVGAPI = function(args, settings, callback) {
+            sendToSVGAPI = function(args, settings, callback, fileMode) {
                 callback = callback || function() {};
 
                 var laserParser = svgWebSocket,
@@ -170,11 +171,12 @@ define([
                             names.push(obj.name);
                         });
 
-                        laserParser.getGCode(
+                        laserParser.getTaskCode(
                             names,
                             {
                                 onProgressing: ExportGCodeProgressing,
-                                onFinished: callback
+                                onFinished: callback,
+                                fileMode: fileMode
                             }
                         );
                     };
@@ -300,7 +302,8 @@ define([
             $target_image = null, // changing when image clicked
             printer = null,
             printer_selecting = false,
-            handleLaser = function(settings, callback, progressType) {
+            handleLaser = function(settings, callback, progressType, fileMode) {
+                fileMode = fileMode || '-f';
                 progressType = progressType || ProgressConstants.NONSTOP;
 
                 var $ft_controls = $laser_platform.find('.ft-controls'),
@@ -391,10 +394,10 @@ define([
                                         if (args.length === $ft_controls.length) {
                                             // sending data
                                             if ('svg' === self.state.fileFormat) {
-                                                sendToSVGAPI(args, settings, _callback);
+                                                sendToSVGAPI(args, settings, _callback, fileMode);
                                             }
                                             else {
-                                                sendToBitmapAPI(args, settings, _callback);
+                                                sendToBitmapAPI(args, settings, _callback, fileMode);
                                             }
                                         }
                                     }
@@ -409,9 +412,11 @@ define([
             };
 
         shortcuts.on(
-            ['cmd', 'del'],
+            ['del'],
             function(e) {
-                deleteImage();
+                if ('INPUT' !== e.target.tagName) {
+                    deleteImage();
+                }
             }
         );
 
@@ -428,6 +433,7 @@ define([
                 data('name', name).
                 data('base', originalUrl).
                 data('size', size).
+                data('sizeLock', true).
                 width(size.width).
                 height(size.height);
 
@@ -439,6 +445,7 @@ define([
                     onRotate: instantRefresh,
                     onMove: instantRefresh,
                     onScale: instantRefresh,
+                    maintainAspectRatio: true,
                     angle: size.angle || 0
                 });
                 $ftControls = $img.parent().find('.ft-controls');
@@ -450,7 +457,6 @@ define([
 
                 // set default image
                 if (null === $target_image) {
-                    $target_image = $img;
                     refreshObjectParams({ freetransEventType: 'move' }, $img);
                 }
 
@@ -472,22 +478,23 @@ define([
                                 });
                             };
 
-                        $target_image = $img;
-
-                        if (false === $target_image.hasClass('image-active')) {
+                        if (false === $img.hasClass('image-active')) {
                             inactiveAllImage();
 
-                            refreshObjectParams({ freetransEventType: 'move' }, $target_image);
+                            $target_image = $img;
 
-                            $target_image.on('transitionend', function(e) {
+                            refreshObjectParams({ freetransEventType: 'move' }, $img);
+
+                            $img.on('transitionend', function(e) {
                                 refreshImagePanelPos();
                             });
 
                             self.setState({
-                                selectedImage: true
+                                selectedImage: true,
+                                sizeLock: $img.data('sizeLock')
                             });
 
-                            $target_image.addClass('image-active');
+                            $img.addClass('image-active');
                         }
 
                         menuFactory.items.copy.enabled = true;
@@ -568,6 +575,10 @@ define([
             menuFactory.items.cut.enabled = false;
             menuFactory.items.duplicate.enabled = false;
 
+            if (0 === $('.image-active').length) {
+                $target_image = null;
+            }
+
             self.setState({
                 selectedImage: false
             });
@@ -617,18 +628,19 @@ define([
                 );
             },
             sendToMachine: sendToMachine,
-            export: function(settings) {
+            exportTaskCode: function(settings, fileMode) {
                 handleLaser(
                     settings,
-                    function(blob, filemode) {
-                        var extension = ('-f' === filemode ? 'fc' : 'gcode'),
+                    function(blob, fileMode) {
+                        var extension = ('-f' === fileMode ? 'fc' : 'gcode'),
                             // split by . and get unless the last then join as string
                             fileName = self.state.images[0].name.split('.').slice(0, -1).join(''),
                             fullName = fileName + '.' + extension;
 
                         saveAs(blob, fullName);
                     },
-                    ProgressConstants.STEPPING
+                    ProgressConstants.STEPPING,
+                    fileMode || '-f'
                 );
             },
             destroySocket: function() {
@@ -714,8 +726,11 @@ define([
                     box = $el.box(),
                     val = $el.val(),
                     freetrans = $target_image.data('freetrans'),
-                    args = {};
+                    args = {
+                        maintainAspectRatio: params.sizeLock
+                    };
 
+                $target_image.data('sizeLock', params.sizeLock);
                 val = parseFloat(val, 10);
 
                 switch (type) {

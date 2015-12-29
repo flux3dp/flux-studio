@@ -156,10 +156,18 @@
     }
 
     .h-form {
+        width: 416px;
+
         .control {
             @include flexbox();
             margin: 0 0 10px 0;
             justify-content: space-around;
+            align-items: center;
+            flex-wrap: wrap;
+
+            .error {
+                border: 2px solid #c00;
+            }
 
             input {
                 height: 36px;
@@ -167,8 +175,20 @@
                 flex: 3;
             }
 
-            label {
+            label,
+            .input-head {
+                font-weight: 200;
                 flex: 1;
+                margin: 0 3px 0 0;
+            }
+
+            .error-message {
+                color: #c00;
+                font-size: 12px;
+                line-height: 20px;
+                padding: 0 0 0 104px;
+                text-align: left;
+                width: 100%;
             }
         }
     }

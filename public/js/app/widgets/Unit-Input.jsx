@@ -1,8 +1,9 @@
 define([
     'react',
     'helpers/unit-converter',
+    'app/constants/keycode-constants',
     'helpers/round'
-], function(React, unitConverter, round) {
+], function(React, unitConverter, keyCodeConstants, round) {
     'use strict';
 
     return React.createClass({
@@ -13,6 +14,7 @@ define([
                 defaultValue: '',
                 defaultUnit: unitConverter.defaultUnit,
                 defaultUnitType: unitConverter.defaultUnitType,
+                operators: ['+', '-', '*', '/'],
                 handleNumberFormat: function(value) {
                     return round(value, -2);
                 },
@@ -41,36 +43,52 @@ define([
 
         // Private methods
         _parseValue: function(value) {
-            var pattern = new RegExp('^(\\d+\\.?\\d{0,})(' + unitConverter.acceptableUnits.join('|') + ')?$'),
+            var unitConfig = unitConverter.setDefaultUnitType(this.props.defaultUnitType),
+                acceptableUnits = unitConfig.acceptableUnits,
+                pattern = new RegExp('^(-?\\d+\\.?\\d{0,})(' + acceptableUnits.join('|') + ')?$'),
                 matches = pattern.exec(value) || [],
                 defaultUnit = this.props.defaultUnit,
                 unit = matches[2] || defaultUnit,
-                value;
+                parsedValue = value;
 
             if (1 < matches.length) {
-                value = matches[1];
-                value = unitConverter.setDefaultUnitType(this.props.defaultUnitType)
-                    .from(value, unit)
-                    .to(defaultUnit);
+                parsedValue = matches[1];
+
+                try {
+                    parsedValue = unitConverter.from(parsedValue, unit).to(defaultUnit);
+                }
+                catch (ex) {
+                    console.error(ex);
+                }
+
             }
             else {
-                value = parseFloat(value, 10) || 0;
+                parsedValue = parseFloat(parsedValue, 10) || 0;
             }
 
-            return value;
+            return parsedValue;
         },
 
         _confirmValue: function(addValue) {
             addValue = parseFloat(addValue, 10) || 0;
 
             var el = this.refs.unitInput.getDOMNode(),
-                values = el.value.replace(/\s+/g, '').split(this.operatorRegex),
-                tempValue,
-                value;
+                value = el.value.replace(/\s+/g, ''),
+                isNegative = /^-.*/.test(value),
+                values,
+                tempValue;
 
-            if (3 <= values.length) {
+            if (true === isNegative) {
+                value = value.replace(/^-(.*)/, '$1');
+            }
+
+            values = value.split(this.operatorRegex);
+
+            if (3 <= values.length && -1 < this.props.operators.indexOf(values[1])) {
                 tempValue = this._parseValue(values[2]);
-                value = this._parseValue(values[0]);
+                value = this._parseValue(values[0] || 0);
+
+                value = value * (true === isNegative ? -1 : 1);
 
                 switch (values[1]) {
                 case '+':
@@ -116,32 +134,30 @@ define([
         _onKeyUp: function(e) {
             e.preventDefault();
 
-            var KEY_RETURN = 13,
-                KEY_UP = 38,
-                KEY_DOWN = 40,
-                KEY_PLUS = 187,
-                KEY_MINUS = 189,
-                KEY_MULTIPLY = 56,
-                KEY_DIVIDE = 191,
-                addValue = undefined,
+            var addValue = undefined,
                 operatorAmount = 0,
                 value;
 
             switch (e.keyCode) {
-            case KEY_RETURN:
+            case keyCodeConstants.KEY_RETURN:
                 this._onBlur(e);
                 break;
-            case KEY_UP:
+            case keyCodeConstants.KEY_UP:
                 addValue = Math.abs(this.props.step);
                 break;
-            case KEY_DOWN:
+            case keyCodeConstants.KEY_DOWN:
                 addValue = -Math.abs(this.props.step);
                 break;
-            case KEY_PLUS:
-            case KEY_MINUS:
-            case KEY_MULTIPLY:
-            case KEY_DIVIDE:
+            case keyCodeConstants.KEY_PLUS:
+            case keyCodeConstants.KEY_MINUS:
+            case keyCodeConstants.KEY_MULTIPLY:
+            case keyCodeConstants.KEY_DIVIDE:
                 operatorAmount = Math.floor(e.currentTarget.value.split(this.operatorRegex).length / 2);
+
+                // check negative number
+                if (true === /^-(.*)/.test(e.currentTarget.value)) {
+                    operatorAmount = operatorAmount - 1;
+                }
 
                 if (1 < operatorAmount) {
                     addValue = 0;
@@ -178,6 +194,7 @@ define([
                     defaultValue={displayValue}
                     onBlur={this._onBlur}
                     onKeyUp={this._onKeyUp}
+                    onFocus={this.props.onFocus}
                     {...attrs}
                 />
             );

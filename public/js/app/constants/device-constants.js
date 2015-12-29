@@ -14,6 +14,7 @@ define(function() {
         ABORTED         : 'ABORTED',
         UNKNOWN         : 'UNKNOWN',
         COMPLETED       : 'COMPLETED',
+        COMPLETING      : 'COMPLETING',
         FATAL           : 'FATAL',
         OK              : 'OK',
         IDLE            : 'IDLE',
@@ -38,6 +39,7 @@ define(function() {
         CORRECTING      : 'CORRECTING',
         OCCUPIED        : 'OCCUPIED',
         SCANNING        : 'SCANNING',
+        CALIBRATING     : 'CALIBRATING',
 
         // folder
         NOT_EXIST       : 'NOT_EXIST',
@@ -49,6 +51,7 @@ define(function() {
         // Print head
         EXTRUDER        : 'EXTRUDER',
         PRINTER         : 'PRINTER',
+        LASER           : 'LASER',
 
         // Command
         RESUME          : 'RESUME',
@@ -57,10 +60,15 @@ define(function() {
         REPORT          : 'REPORT',
         ABORT           : 'ABORT',
         QUIT            : 'QUIT',
+        QUIT_TASK       : 'QUIT_TASK',
         KICK            : 'KICK',
         LS              : 'LS',
+        LOAD_FILAMENT   : 'LOAD',
+        UNLOAD_FILAMENT : 'UNLOAD',
 
         status : {
+            SCAN                    : -2,
+            MAINTAIN                : -1,
             IDLE                    : 0,
             INIT                    : 1,
             STARTING                : 4,

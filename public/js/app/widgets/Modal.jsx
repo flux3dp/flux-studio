@@ -8,9 +8,10 @@ define([
     var View = React.createClass({
 
         propTypes: {
-            onOpen: React.PropTypes.func,
-            onClose: React.PropTypes.func,
-            content: React.PropTypes.element
+            onOpen      : React.PropTypes.func,
+            onClose     : React.PropTypes.func,
+            content     : React.PropTypes.element,
+            className   : React.PropTypes.object
         },
 
         getDefaultProps: function() {
@@ -31,7 +32,9 @@ define([
             shortcuts.on(
                 ['esc'],
                 function(e) {
-                    self.props.onClose(e);
+                    if (false === self.props.disabledEscapeOnBackground) {
+                        self.props.onClose(e);
+                    }
                 }
             );
         },

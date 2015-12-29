@@ -4,8 +4,23 @@ define([
     'helpers/i18n',
     'helpers/shortcuts',
     'jsx!widgets/Modal',
-    'jsx!widgets/Alert'
-], function($, React, i18n, shortcuts, Modal, Alert) {
+    'jsx!widgets/Alert',
+    'helpers/device-master',
+    'app/constants/device-constants',
+    'app/actions/alert-actions',
+    'app/stores/alert-store'
+], function(
+    $,
+    React,
+    i18n,
+    shortcuts,
+    Modal,
+    Alert,
+    DeviceMaster,
+    DeviceConstants,
+    AlertActions,
+    AlertStore
+) {
     'use strict';
 
     var lang = i18n.get(),
@@ -16,10 +31,6 @@ define([
             EMERGING  : 'EMERGING',
             UNLOADING : 'UNLOADING',
             COMPLETED : 'COMPLETED'
-        },
-        types = {
-            LOAD   : 'LOAD',
-            UNLOAD : 'UNLOAD'
         },
         View = React.createClass({
 
@@ -51,24 +62,72 @@ define([
                 }
             },
 
+            componentDidMount: function() {
+                if (true === this.props.open) {
+                    DeviceMaster.selectDevice(this.props.device).then(function(status) {
+                        if (status !== DeviceConstants.CONNECTED) {
+                            // alert and close
+                            AlertActions.showPopupError('change-filament', status);
+                        }
+                    });
+
+                    AlertStore.onCancel(this._onCancel);
+                }
+            },
+
+            componentWillUnmount: function() {
+                AlertStore.removeCancelListener(this._onCancel);
+            },
+
+            shouldComponentUpdate: function(nextProps, nextState) {
+                if (steps.HEATING === nextState.currentStep && steps.HEATING !== this.state.currentStep) {
+                    this._goMaintain(nextState.type);
+                }
+
+                return true;
+            },
+
+            _onCancel: function(id) {
+                this._onClose();
+            },
+
+            _goMaintain: function(type) {
+                var self = this,
+                    nextStep = (self.state.type === DeviceConstants.LOAD_FILAMENT ? steps.EMERGING : steps.UNLOADING),
+                    progress = function(response) {
+                        switch (response.nav) {
+                        case 'LOADING':
+                            self._next(steps.EMERGING);
+                            break;
+                        case 'UNLOADING':
+                            self._next(steps.UNLOADING);
+                            break;
+                        default:
+                            // update temperature
+                            self.setState({
+                                temperature: parseFloat(response.nav.replace('HEATING ', ''), 10)
+                            });
+                            break;
+                        }
+                    },
+                    done = function(response) {
+                        DeviceMaster.quitTask().done(function() {
+                            self._next(steps.COMPLETED);
+                        });
+                    },
+                    deferred = DeviceMaster.maintain(type).progress(progress).done(done).fail(function(response) {
+                        if ('RESOURCE_BUSY' === response.error) {
+                            AlertActions.showDeviceBusyPopup('change-filament-device-busy');
+                        }
+                        else {
+                            AlertActions.showPopupError('change-filament-device-error', response.error);
+                        }
+                    });
+            },
+
             _onClose: function(e) {
                 this.props.onClose(e);
                 React.unmountComponentAtNode(this.refs.modal.getDOMNode().parentNode);
-            },
-
-            _onStop: function() {
-                // TODO: to be implement
-                console.log('stop');
-            },
-
-            _onEmerging: function() {
-                // TODO: to be implement
-                console.log('emerging');
-            },
-
-            _onUnloading: function() {
-                // TODO: to be implement
-                console.log('unloading');
             },
 
             _next: function(nextStep, type) {
@@ -81,7 +140,7 @@ define([
             _makeCaption: function(caption) {
                 if ('undefined' === typeof caption) {
                     caption = (
-                        types.LOAD === this.state.type ?
+                        DeviceConstants.LOAD_FILAMENT === this.state.type ?
                         lang.change_filament.load_filament :
                         lang.change_filament.unload_filament
                     );
@@ -96,10 +155,18 @@ define([
                     caption: lang.change_filament.home_caption,
                     message: (
                         <div className="way-to-go">
-                            <button className="btn btn-default" data-ga-event="load-filament" onClick={this._next.bind(null, steps.GUIDE, types.LOAD)}>
+                            <button
+                                className="btn btn-default"
+                                data-ga-event="load-filament"
+                                onClick={this._next.bind(null, steps.GUIDE, DeviceConstants.LOAD_FILAMENT)}
+                            >
                                 {lang.change_filament.load_filament_caption}
                             </button>
-                            <button className="btn btn-default" data-ga-event="unload-filament" onClick={this._next.bind(null, steps.HEATING, types.UNLOAD)}>
+                            <button
+                                className="btn btn-default"
+                                data-ga-event="unload-filament"
+                                onClick={this._next.bind(null, steps.HEATING, DeviceConstants.UNLOAD_FILAMENT)}
+                            >
                                 {lang.change_filament.unload_filament_caption}
                             </button>
                         </div>
@@ -138,12 +205,7 @@ define([
             },
 
             _sectionHeating: function() {
-                // TODO: unloading start
-                var self = this,
-                    nextStep = (self.state.type === types.LOAD ? steps.EMERGING : steps.UNLOADING);
-                setTimeout(function() {
-                    self._next(nextStep);
-                }, 3000);
+                var self = this;
 
                 return {
                     message: (
@@ -167,15 +229,10 @@ define([
             },
 
             _sectionEmerging: function() {
-                // TODO: unloading start
-                var self = this;
-                setTimeout(function() {
-                    self._next(steps.COMPLETED);
-                }, 3000);
-
-                var emergingText = lang.change_filament.emerging.map(function(text) {
-                    return (<p>{text}</p>);
-                });
+                var self = this,
+                    emergingText = lang.change_filament.emerging.map(function(text) {
+                        return (<p>{text}</p>);
+                    });
 
                 return {
                     message: (
@@ -190,23 +247,12 @@ define([
                             'ga-event': 'cancel'
                         },
                         onClick: this.props.onClose
-                    },
-                    {
-                        label: lang.change_filament.stop,
-                        dataAttrs: {
-                            'ga-event': 'stop-emerging'
-                        },
-                        onClick: this._onStop
                     }]
                 };
             },
 
             _sectionUnloading: function() {
-                // TODO: unloading start
                 var self = this;
-                setTimeout(function() {
-                    self._next(steps.COMPLETED);
-                }, 3000);
 
                 return {
                     message: (
@@ -221,23 +267,20 @@ define([
                             'ga-event': 'cancel'
                         },
                         onClick: this.props.onClose
-                    },
-                    {
-                        label: lang.change_filament.stop,
-                        dataAttrs: {
-                            'ga-event': 'stop-unload'
-                        },
-                        onClick: this._onStop
                     }]
                 };
             },
 
             _sectionCompleted: function() {
+                var messageText = (
+                    DeviceConstants.LOAD_FILAMENT === this.state.type ?
+                    lang.change_filament.loaded :
+                    lang.change_filament.unloaded
+                );
+
                 return {
                     message: (
-                        types.load === this.state.type ?
-                        lang.change_filament.loaded :
-                        lang.change_filament.unloaded
+                        <div className="message-container">{messageText}</div>
                     ),
                     buttons: [{
                         label: lang.change_filament.ok,

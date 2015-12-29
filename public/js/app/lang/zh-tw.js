@@ -10,6 +10,7 @@ define(function() {
             no_webgl: 'Does not seem to support WebGL'
         },
         device_selection: {
+            no_printers: '未偵測到 FLUX 裝置, 請檢查您與機器的網路連線是否在同個網路下',
             device_name: 'DEVICE NAME',
             module: 'MODULE',
             status: 'STATUS'
@@ -31,52 +32,42 @@ define(function() {
             install: 'INSTALL'
         },
         topmenu: {
+            version: '版本',
+            sure_to_quit: '確定要結束 FLUX Studio?',
             flux: {
                 label: 'Flux',
-                about: 'About FLUX studio',
-                preferences: 'Preferences',
-                quit: 'Quit'
+                about: '關於 FLUX studio',
+                preferences: '偏好設定',
+                quit: '結束'
             },
             file: {
-                label: 'File',
-                import: 'import',
-                recent: 'Recent',
-                execute: 'Execute',
-                save_gcode: 'Save Gcode'
+                label: '檔案',
+                import: '匯入',
+                save_gcode: '匯出 Gcode',
+                save_fcode: '匯出工作'
             },
             edit: {
-                label: 'Edit',
-                copy: 'Copy',
-                cut: 'Cut',
-                paste: 'Paste',
-                duplicate: 'Duplicate',
-                scale: 'Scale',
-                rotate: 'Rotate',
-                clear: 'Clear Scene'
-            },
-            view: {
-                label: 'View',
-                standard: 'Standard',
-                preview: 'Gcode Preview'
+                label: '編輯',
+                duplicate: '重製',
+                clear: '清除場景'
             },
             device: {
-                label: 'Device',
-                new: 'USB Configuration',
-                device_monitor: 'Device Monitor',
-                change_filament: 'Change Filament',
-                check_firmware_update: 'Check Firmware Update',
-                default_device: 'Default Device'
+                label: '裝置',
+                new: '新增裝置',
+                device_monitor: '狀態',
+                change_filament: '自動換料',
+                default_device: '設成預設裝置'
             },
             window: {
-                label: 'Window',
-                minimize: 'Minimize',
-                fullscreen: 'Fullscreen'
+                label: '視窗',
+                minimize: '最小化',
+                fullscreen: '全螢幕'
             },
             help: {
-                label: 'Help',
-                starting_guide: 'Starting Guide',
-                online_support: 'Online Support',
-                troubleshooting: 'Troubleshooting'
+                label: '說明',
+                starting_guide: '開始使用',
+                online_support: '線上支援',
+                troubleshooting: '錯誤排除'
             }
         },
         initialize: {
@@ -89,6 +80,8 @@ define(function() {
             connect: '連接',
 
             // specific caption/content
+            invalid_device_name: '機器名稱只能使用英文字母、數字、空格以及特殊字元 “-”, “_”, “’”, “\'”',
+            require_device_name: '名稱欄位為必填',
             select_language: '請選擇你想使用的語言',
             change_password: '要更改密碼嗎?',
             connect_flux: '用 USB 連接你的電腦與 FLUX',
@@ -124,7 +117,6 @@ define(function() {
                 error: 'Error',
 
                 keep_connect: {
-                    caption: '無法連接裝置',
                     content: '請確認電源已被開啟及已經由 micro-usb 連接'
                 },
 
@@ -269,7 +261,7 @@ define(function() {
                 infill: '填充',
                 support: '支撐',
                 speed: '速度',
-                custom: '自訂',
+                custom: '專家',
                 slicingEngine: '切片引擎',
                 slic3r: 'Slic3r',
                 experiment: 'Experiment',
@@ -292,7 +284,7 @@ define(function() {
                 blackMagic: '黑魔法',
                 spiral: '螺旋',
                 generalSupport: '支撐',
-                spacing: '支撐距離',
+                spacing: '支撐間隙',
                 overhang: '懸空角度',
                 zDistance: 'Z Distance',
                 support_pattern: '支撐圖樣',
@@ -310,12 +302,14 @@ define(function() {
                 config: 'Config',
                 presets: '預設',
                 name: 'Name',
-                loadPreset: '載入預設',
                 apply: '套用',
+                save: '儲存',
                 saveAsPreset: '存為預設',
                 cancel: '取消',
                 saveAndApply: '套用設定',
-                delete: '刪除'
+                delete: '刪除',
+                loadPreset: '載入預設',
+                savePreset: 'save preset'
             },
             mode: [
                 {
@@ -457,8 +451,6 @@ define(function() {
             reset: '重設',
             cancel: '取消',
             done: '確認',
-            hour: '小時',
-            minute: '分鐘',
             gram: '公克',
             pause: '暫停',
             continue: '繼續',
@@ -488,9 +480,15 @@ define(function() {
             start_engrave: '雕刻',
             start_cut: '切割',
             close_alert: '關閉',
-            get_fcode: 'Get Fcode',
+            get_fcode: '儲存<br/>工作',
             name: '名稱',
             go: 'GO',
+            title: {
+                material: 'Select proper material to have the best engraving result.',
+                object_height: 'A Raft are layers built under your part and help it stick to the base plate.',
+                shading: 'Shading enables gradient effect of laser engraving. It takes longer time.',
+                advanced: 'Custom settings for power and speed'
+            },
             print_params: {
                 object_height: {
                     text: '物體高度',
@@ -588,7 +586,8 @@ define(function() {
                 },
                 save_and_apply: '儲存並套用',
                 save_as_preset: '儲存',
-                load_preset: '載入',
+                save_as_preset_title: 'Save Preset',
+                load_preset_title: '載入',
                 apply: '套用',
                 cancel: '取消',
                 save: '儲存'
@@ -682,6 +681,20 @@ define(function() {
                 x: 'X',
                 y: 'Y',
                 z: 'Z'
+            },
+            messages: {
+                'not open': {
+                    caption: '未偵測到鏡頭畫面',
+                    message: '壓下，然後拉出掃描鏡頭，直至最底端發出固定聲為止。'
+                },
+                'no object': {
+                    caption: '未偵測到校正工具',
+                    message: '請將掃描校正工具插在中心溝槽處'
+                },
+                'no laser': {
+                    caption: '未偵測到掃描雷射',
+                    message: '請壓下，並彈出掃描雷射頭。'
+                }
             }
         },
         select_printer: {
@@ -693,11 +706,12 @@ define(function() {
             retry: '重新選擇'
         },
         device: {
-            cameraOn: '啟用鏡頭',
-            cameraOff: '關閉鏡頭',
-            browseFiles: '瀏覽檔案',
+            camera_on: '啟用鏡頭',
+            camera_off: '關閉鏡頭',
+            browse_file: '瀏覽檔案',
             pause: '暫停',
             paused: '已暫停',
+            pausing: '正在暫停',
             cancelTask: '終止任務',
             selectPrinter: '選擇成型機',
             retry: '重試',
@@ -707,56 +721,86 @@ define(function() {
             reset: '重設(kick)',
             abort: '取消工作',
             start: '開始',
+            no_task: '目前無任何工作',
+            please_wait: '請稍待...',
+            unknown_command: '指令無法在此狀態下被執行',
+            quit: '中斷連結',
+            heating: '加熱中',
+            completing: '完成中',
+            calibrating: '校正中',
+            starting: '啟動中',
+            resuming: '恢復中',
+            scanning: '掃描',
+            occupied: '裝置被佔用',
+            running: '工作中',
+            uploading: '上傳中',
+            processing: '處理中',
+            disconnectedError: '與機器連線暫時中斷\n請確認機器網路連線是否正常',
             noTask: '目前無任何工作',
             pleaseWait: '請稍待...',
             unknownCommand: '指令無法在此狀態下被執行',
-            quit: '中斷連結',
             working: '工作中',
             finishing: '完成中',
-            heating: '加熱中',
-            calibrating: '校正中',
             initiating: '啟動中',
-            starting: '啟動中',
-            resuming: '恢復中',
-            unknown: '未知狀態',
-            occupied: '裝置被佔用',
-            scanning: '掃瞄'
+            unknown: '未知狀態'
         },
         monitor: {
-            change_filament: 'CHANGE FILLAMENT',
-            browse_file: 'BROWSE FILE',
-            monitor: 'MONITOR',
-            currentTemperature: 'Current Temp',
-            nothingToPrint: 'There is nothing to print',
-            go: '開始',
-            pause: '暫停',
-            stop: 'STOP',
-            record: 'RECORD',
-            camera: 'CAMERA',
-            connecting: 'Connecting, please wait...',
-            HEAD_OFFLINE: '沒有偵測到列印工具頭',
-            TILT: '請確認磁鐵關節正確的附著',
-            WRONG_HEAD: '請更換成列印工具頭',
-            FAN_FAILURE: 'Fan failed / stucked, 請用細針戳一下',
-            SHAKE: 'Head encountered unexpected shake',
-            USER_OPERATION: 'machine operated by (other) user',
-            FILAMENT_RUNOUT: 'filament run out, please refill filament',
-            RESOURCE_BUSY: 'Machine is busy',
-            processing: 'Processing',
-            savingPreview: 'Saving preview image',
-            hour: '小時',
-            minute: '分',
-            left: '完成',
-            temperature: '溫度',
-            forceStop: '強制停止機器?',
-            upload: '上傳',
-            download: '下載',
-            fileNotDownloadable: '下載不支援此檔案格式',
-            cannotPreview: '無法預覽此檔案',
-            extensionNotSupported: '上傳檔案不支援此檔案格式',
-            fileExistContinue: 'file already exist, continue (will replace)',
-            confirmGToF: 'Uploaded GCode will be converted to FCode, continue (will replace if exist)',
-            almostDone: 'almost done'
+            change_filament                 : 'CHANGE FILLAMENT',
+            browse_file                     : 'BROWSE FILE',
+            monitor                         : 'MONITOR',
+            currentTemperature              : 'Current Temp',
+            nothingToPrint                  : 'There is nothing to print',
+            go                              : '開始',
+            start                           : '開始',
+            pause                           : '暫停',
+            stop                            : 'STOP',
+            record                          : 'RECORD',
+            camera                          : 'CAMERA',
+            connecting                      : 'Connecting, please wait...',
+            HEAD_OFFLINE                    : '沒有偵測到列印工具頭',
+            HEAD_ERROR_CALIBRATING          : '模組校正失誤\n請重新裝載模組，並確認磁鐵關節正確的附著',
+            HEAD_ERROR_FAN_FAILURE          : '風扇未轉動\n請用細針戳一下',
+            HWARDWARE_ERROR_FILAMENT_RUNOUT : '未偵測到線料\n請重新插入新的線料',
+            HWARDWARE_ERROR_0               : '未偵測到線料\n請重新插入新的線料',
+            HARDWARE_ERROR_PLATE_MISSING    : '未偵測到工作平台\n請放上工作平台金屬板',
+            HARDWARE_ERROR_ZPROBE_ERROR     : '校正失敗\n請移除噴頭上的殘料',
+            CONVERGENCE_FAILED              : '校正失敗\n請移除噴頭上的殘料',
+            HARDWARE_ERROR_HOME_FAILED      : '歸零失敗\n請排除異物後重試',
+            HEAD_ERROR_TILT                 : 'Head tilted\nPlease check ball joint rod is attached correctly',
+            HEAD_ERROR_SHAKE                : 'Head tilted\nPlease check ball joint rod is attached correctly',
+            WRONG_HEAD                      : '請更換成列印工具頭',
+            USER_OPERATION                  : 'machine operated by (other) user',
+            RESOURCE_BUSY                   : '裝置忙碌中\n如果機器沒有在進行動作， 請重新啟動機器',
+            DEVICE_ERROR                    : '裝置錯誤\n請重新啟動機器',
+            NO_RESPONSE                     : '裝置錯誤\n請重新啟動機器',
+            SUBSYSTEM_ERROR                 : '裝置錯誤\n請重新啟動機器',
+            HARDWARE_FAILURE                : '裝置錯誤\n請重新啟動機器',
+            MAINBOARD_OFFLINE               : '裝置錯誤\n請重新啟動機器',
+            HEAD_ERROR_HARDWARE_FAILURE     : '噴頭錯誤\n請重新裝載工作頭',
+            G28_FAILED                      : '歸零失敗\n請排除異物後重試',
+            processing                      : 'Processing',
+            savingPreview                   : 'Saving preview image',
+            hour                            : '小時',
+            minute                          : '分',
+            second                          : '秒',
+            left                            : '完成',
+            temperature                     : '溫度',
+            forceStop                       : '強制停止機器?',
+            upload                          : '上傳',
+            download                        : '下載',
+            fileNotDownloadable             : '下載不支援此檔案格式',
+            cannotPreview                   : '無法預覽此檔案',
+            extensionNotSupported           : '上傳檔案不支援此檔案格式',
+            fileExistContinue               : 'file already exist, continue (will replace)',
+            confirmGToF                     : 'Uploaded GCode will be converted to FCode, continue (will replace if exist)',
+            task : {
+                EXTRUDER                    : '列印工作',
+                LASER                       : '雷雕工作'
+            },
+            device : {
+                EXTRUDER                    : '列印模組',
+                LASER                       : '雷射模組'
+            }
         },
         alert: {
             caption: '錯誤',
@@ -792,7 +836,12 @@ define(function() {
             machineNotConnected: 'Machine is not connected',
             notPrinting: 'Printing is not in progress',
             nothingToPrint: 'Nothing to print (source blob missing)',
-            connectionTimeout: 'device is not responding, connection timeout'
+            connectionTimeout: 'device is not responding, connection timeout',
+            device_busy: {
+                caption: '裝置忙碌中',
+                message: '裝置正在進行另外一項工作，請稍候再試。如果裝置持續沒有回應，請將裝置重新啟動。'
+            },
+            device_is_used: '裝置正被使用中，是否要終止現在任務？'
         },
         machine_status: {
             '-2': 'Scanning',

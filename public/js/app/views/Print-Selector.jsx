@@ -10,8 +10,8 @@ define([
     'helpers/api/config',
     'app/constants/device-constants',
     'app/actions/alert-actions',
-    'app/actions/initialize-machine',
     'app/stores/alert-store',
+    'app/actions/initialize-machine',
     'app/actions/progress-actions',
     'app/constants/progress-constants',
     'app/actions/input-lightbox-actions',
@@ -28,8 +28,8 @@ define([
     config,
     DeviceConstants,
     AlertActions,
-    initializeMachine,
     AlertStore,
+    initializeMachine,
     ProgressActions,
     ProgressConstants,
     InputLightboxActions,
@@ -61,36 +61,116 @@ define([
                 discoverId: 'printer-selector-' + (this.props.uniqleId || ''),
                 printOptions: [],
                 loadFinished: false,
-                noDefaultPrinter: ('undefined' === typeof initializeMachine.defaultPrinter.get().uuid),
+                hadDefaultPrinter: ('string' === typeof initializeMachine.defaultPrinter.get().uuid),
                 discoverMethods: {}
             };
         },
 
         componentDidMount: function() {
-            if (false === this.state.noDefaultPrinter) {
-                this.selected_printer = initializeMachine.defaultPrinter.get();
-                this._returnSelectedPrinter();
+            var selectedPrinter = initializeMachine.defaultPrinter.get(),
+                self = this,
+                lang = self.props.lang,
+                _options = [],
+                refreshOption = function(options) {
+                    _options = [];
+                    window.printers = options;
+
+                    options.forEach(function(el) {
+                        _options.push({
+                            label: self._renderPrinterItem(el)
+                        });
+
+                        if (true === self.hadDefaultPrinter && el.uuid === selectedPrinter.uuid) {
+                            // update device stat
+                            initializeMachine.defaultPrinter.set({
+                                serial: el.serial,
+                                uuid: el.uuid
+                            });
+                        }
+                    });
+
+                    self.setState({
+                        printOptions: _options,
+                        loadFinished: true
+                    }, function() {
+                        self._openAlertWithnoPrinters();
+                    });
+                };
+
+            if (true === this.state.hadDefaultPrinter) {
+                this._selectPrinter(selectedPrinter);
+            }
+
+            AlertStore.onRetry(this._waitForPrinters);
+            AlertStore.onYes(this._onYes);
+            AlertStore.onCancel(this._onCancel);
+
+            self.setState({
+                discoverMethods: discover(
+                    self.state.discoverId,
+                    function(printers) {
+                        refreshOption(printers);
+                    }
+                )
+            });
+
+            self._waitForPrinters();
+        },
+
+        componentWillUnmount: function() {
+            if ('function' === typeof this.state.discoverMethods.removeListener) {
+                this.state.discoverMethods.removeListener(this.state.discoverId);
+            }
+
+            AlertStore.removeRetryListener(this._waitForPrinters);
+            AlertStore.removeYesListener(this._onYes);
+            AlertStore.removeCancelListener(this._onCancel);
+        },
+
+        _onYes: function(id) {
+            var self = this;
+
+            switch (id) {
+            case 'kick':
+                DeviceMaster.kick().done(function() {
+                    self._returnSelectedPrinter();
+                });
+                break;
+            case 'abort':
+                DeviceMaster.stop().done(function() {
+                    self._returnSelectedPrinter();
+                });
+                break;
+            }
+        },
+
+        _onCancel: function(id) {
+            switch (id) {
+            case 'no-printer':
+            case 'printer-connection-timeout':
+                this._handleClose();
+                break;
+            default:
+                break;
             }
         },
 
         _selectPrinter: function(printer, e) {
-            e.preventDefault();
-
             var self = this,
-                lang = self.props.lang.select_printer,
+                lang = self.props.lang,
                 onError = function() {
                     ProgressActions.close();
                     InputLightboxActions.open('auth-device', {
                         type         : InputLightboxConstants.TYPE_PASSWORD,
-                        caption      : lang.notification,
-                        inputHeader  : lang.please_enter_password,
-                        confirmText  : lang.submit,
+                        caption      : lang.select_printer.notification,
+                        inputHeader  : lang.select_printer.please_enter_password,
+                        confirmText  : lang.select_printer.submit,
                         onSubmit     : function(password) {
                             ProgressActions.open(ProgressConstants.NONSTOP);
 
                             self._auth(printer.uuid, password, {
                                 onError: function() {
-                                    AlertActions.showPopupError('device-auth-fail', lang.auth_failure);
+                                    AlertActions.showPopupError('device-auth-fail', lang.select_printer.auth_failure);
                                 }
                             });
                         }
@@ -102,7 +182,39 @@ define([
 
             self.selected_printer = printer;
 
-            self._auth(printer.uuid, '', opts);
+            switch (printer.st_id) {
+            // null for simulate
+            case null:
+            // null for not found default device
+            case undefined:
+            case DeviceConstants.status.IDLE:
+                // no problem
+                self._auth(printer.uuid, '', opts);
+                break;
+            case DeviceConstants.status.SCAN:
+            case DeviceConstants.status.MAINTAIN:
+                // ask kick?
+                AlertActions.showPopupYesNo('kick', lang.message.device_is_used);
+                break;
+            case DeviceConstants.status.COMPLETED:
+            case DeviceConstants.status.ABORTED:
+                // quit
+                DeviceMaster.quit().done(function() {
+                    self._returnSelectedPrinter();
+                });
+                break;
+            case DeviceConstants.status.RUNNING:
+            case DeviceConstants.status.PAUSED:
+            case DeviceConstants.status.PAUSED_FROM_STARTING:
+            case DeviceConstants.status.PAUSED_FROM_RUNNING:
+                // ask for abort
+                AlertActions.showPopupYesNo('abort', lang.message.device_is_used);
+                break;
+            default:
+                // device busy
+                AlertActions.showDeviceBusyPopup('on-select-printer');
+                break;
+            }
         },
 
         _auth: function(uuid, password, opts) {
@@ -133,7 +245,12 @@ define([
         // renders
         _renderPrinterSelection: function(lang) {
             var self = this,
-                options = self.state.printOptions,
+                printOptions = self.state.printOptions,
+                options = (0 < printOptions.length ? printOptions : [{
+                    label: (
+                        <div className="spinner-roller spinner-roller-reverse"/>
+                    )
+                }]),
                 content = (
                     <div className="device-wrapper">
                         <ListView className="printer-list" items={options}/>
@@ -144,18 +261,19 @@ define([
         },
 
         _returnSelectedPrinter: function() {
-            var self = this;
+            var self = this,
+                lang = this.props.lang;
 
             if ('00000000000000000000000000000000' === self.selected_printer.uuid) {
                 self.props.onGettingPrinter(self.selected_printer);
             }
             else {
-                DeviceMaster.selectDevice(self.selected_printer).then(function(status) {
+                DeviceMaster.selectDevice(self.selected_printer).done(function(status) {
                     if (status === DeviceConstants.CONNECTED) {
                         self.props.onGettingPrinter(self.selected_printer);
                     }
                     else if (status === DeviceConstants.TIMEOUT) {
-                        AlertActions.showPopupError('printer-selector', lang.message.connectionTimeout);
+                        AlertActions.showPopupError('printer-connection-timeout', lang.message.connectionTimeout);
                     }
                 });
             }
@@ -170,7 +288,7 @@ define([
                 statusText = status[printer.st_id] || status.UNKNOWN,
                 headText = headModule[printer.head_module] || headModule.UNKNOWN;
 
-            if (16 === printer.st_id && 'number' === typeof printer.st_prog) {
+            if (DeviceConstants.status.RUNNING === printer.st_id && 'number' === typeof printer.st_prog) {
                 statusText += ' - ' + (parseInt(printer.st_prog * 1000) * 0.1).toFixed(1) + '%';
             }
 
@@ -182,12 +300,11 @@ define([
             }
 
             return (
-                <label className="device printer-item" data-meta={meta} onClick={this._selectPrinter.bind(null, printer)}>
-                    <input type="radio" name="printer-group" value={printer.uuid}/>
+                <div className="device printer-item" data-meta={meta} onClick={this._selectPrinter.bind(null, printer)}>
                     <div className="col device-name">{printer.name}</div>
                     <div className="col module">{headText}</div>
                     <div className="col status">{statusText}</div>
-                </label>
+                </div>
             );
         },
 
@@ -198,7 +315,7 @@ define([
                 cx = React.addons.classSet,
                 wrapperClass = ['select-printer'],
                 content = self._renderPrinterSelection(lang),
-                noDefaultPrinter = self.state.noDefaultPrinter;
+                hadDefaultPrinter = self.state.hadDefaultPrinter;
 
             if ('string' === typeof self.props.className) {
                 wrapperClass.push(self.props.className);
@@ -207,47 +324,24 @@ define([
             wrapperClass = cx.apply(null, wrapperClass);
 
             return (
-                true === noDefaultPrinter ?
+                true === hadDefaultPrinter ?
+                <span/> :
                 <div className={wrapperClass}>
                     {content}
                     <div className="arrow arrow-right"/>
-                </div> :
-                <span/>
+                </div>
             );
         },
 
-        componentWillMount: function () {
-            var self = this,
-                _options = [],
-                refreshOption = function(options) {
-                    _options = [];
-
-                    options.forEach(function(el) {
-                        _options.push({
-                            label: self._renderPrinterItem(el)
-                        });
-                    });
-
-                    self.setState({
-                        printOptions: _options,
-                        loadFinished: true
-                    });
-                };
-
-
-            self.setState({
-                discoverMethods: discover(
-                    self.state.discoverId,
-                    function(printers) {
-                        refreshOption(printers);
-                    }
-                )
-            });
+        _waitForPrinters: function() {
+            setTimeout(this._openAlertWithnoPrinters, 5000);
         },
 
-        componentWillUnmount: function() {
-            if ('function' === typeof this.state.discoverMethods.removeListener) {
-                this.state.discoverMethods.removeListener(this.state.discoverId);
+        _openAlertWithnoPrinters: function() {
+            var lang = this.props.lang;
+
+            if (0 === this.state.printOptions.length && false === this.state.hadDefaultPrinter) {
+                AlertActions.showPopupRetry('no-printer', lang.device_selection.no_printers);
             }
         }
     });

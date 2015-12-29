@@ -10,6 +10,7 @@ define(function() {
             no_webgl: '無法在本台電腦開啟 WebGL, 請使用其他可以支援的電腦'
         },
         device_selection: {
+            no_printers: 'FLUX Device not detected. Please check if you and the FLUX device is under same network.',
             device_name: 'DEVICE NAME',
             module: 'MODULE',
             status: 'STATUS'
@@ -31,6 +32,8 @@ define(function() {
             install: 'INSTALL'
         },
         topmenu: {
+            version: '版本',
+            sure_to_quit: 'Sure to quit?',
             flux: {
                 label: 'Flux',
                 about: 'About FLUX studio',
@@ -40,31 +43,19 @@ define(function() {
             file: {
                 label: 'File',
                 import: 'Import',
-                recent: 'Recent',
-                execute: 'Execute',
-                save_gcode: 'Save Gcode'
+                save_gcode: 'Save Gcode',
+                save_fcode: 'Save Task'
             },
             edit: {
                 label: 'Edit',
-                copy: 'Copy',
-                cut: 'Cut',
-                paste: 'Paste',
                 duplicate: 'Duplicate',
-                scale: 'Scale',
-                rotate: 'Rotate',
                 clear: 'Clear Scene'
-            },
-            view: {
-                label: 'View',
-                standard: 'Standard',
-                preview: 'Gcode Preview'
             },
             device: {
                 label: 'Device',
-                new: 'USB Configuration',
+                new: 'Add New Device',
                 device_monitor: 'Device Monitor',
                 change_filament: 'Change Filament',
-                check_firmware_update: 'Check Firmware Update',
                 default_device: 'Default Device'
             },
             window: {
@@ -85,10 +76,12 @@ define(function() {
             start: 'START',
             skip: 'Skip',
             cancel: 'CANCEL',
-            confirm: 'Confirm',
+            confirm: 'CONFIRM',
             connect: 'Connect',
 
             // specific caption/content
+            invalid_device_name: 'The name can only contains alphabet, numbers, blanks, and special characters  “-”, “_”, “’”, “\'”.',
+            require_device_name: 'Name is required',
             select_language: 'Select Language',
             change_password: 'Change password?',
             connect_flux: 'Connect FLUX to Your Computer by USB Cable',
@@ -101,7 +94,7 @@ define(function() {
             // page specific
             set_machine_generic: {
                 printer_name: 'Name',
-                printer_name_placeholder: 'Printer\'s Name',
+                printer_name_placeholder: 'Device\'s Name',
                 password: 'Password',
                 set_station_mode: 'Set station mode',
                 password_placeholder: 'Password'
@@ -124,7 +117,6 @@ define(function() {
                 error: 'Error',
 
                 keep_connect: {
-                    caption: 'Unable to detect FLUX device',
                     content: 'Please make sure your FLUX has been powered on and attached to micro-usb cord.'
                 },
 
@@ -269,13 +261,14 @@ define(function() {
                 infill: 'Infill',
                 support: 'Support',
                 speed: 'Speed',
-                custom: 'Custom',
+                custom: 'Expert',
                 slicingEngine: 'Slicing Engine',
                 slic3r: 'Slic3r',
                 experiment: 'Experiment',
                 filament: 'Filament',
                 temperature: 'Temperature',
-                layerHeight: 'Layer Height',
+                layer_height_title: 'Layer Height',
+                layer_height: 'Layer Height',
                 firstLayerHeight: 'First Layer Height',
                 shell: 'Shell',
                 shellSurface: 'Shell Surface',
@@ -294,6 +287,7 @@ define(function() {
                 spacing: 'Spacing',
                 overhang: 'Overhang',
                 zDistance: 'Z Distance',
+                support_pattern: 'Pattern',
                 raft: 'Raft',
                 raftLayers: 'Raft Layers',
                 movement: 'Movement',
@@ -305,15 +299,17 @@ define(function() {
                 innerShell: 'Inner Shell',
                 outerShell: 'Outer Shell',
                 bridge: 'Bridge',
-                config: 'Config',
+                config: 'Custom configuration',
                 presets: 'Presets',
                 name: 'Name',
-                loadPreset: 'LOAD',
                 apply: 'APPLY',
-                saveAsPreset: 'SAVE',
+                save: 'SAVE',
+                saveAsPreset: 'Save Preset',
                 cancel: 'CANCEL',
                 saveAndApply: 'SAVE & APPLY',
-                delete: 'DELETE'
+                delete: 'DELETE',
+                loadPreset: 'Load Preset',
+                savePreset: 'Save Preset'
             },
             mode: [
                 {
@@ -455,8 +451,6 @@ define(function() {
             reset: 'Reset',
             cancel: 'CANCEL',
             done: 'DONE',
-            hour: 'hr',
-            minute: 'min',
             gram: 'g',
             pause: 'PAUSE',
             continue: 'CONTINUE',
@@ -468,7 +462,11 @@ define(function() {
             deviceTitle: 'Show device monitor',
             rendering: 'Rendering',
             finishingUp: 'Finishing up...',
-            savingFilePreview: 'Saving file preview'
+            savingFilePreview: 'Saving file preview',
+            uploading: 'Uploading to slicing engine',
+            uploaded: 'Uploaded, slicing engine is processing...',
+            importingModel: 'Importing Model',
+            wait: 'Please wait...'
         },
         laser: {
             import: 'IMPORT',
@@ -482,9 +480,15 @@ define(function() {
             start_engrave: 'Engrave',
             start_cut: 'Cut',
             close_alert: 'Close',
-            get_fcode: 'Get Fcode',
+            get_fcode: 'Save<br/>Task',
             name: 'Name',
             go: 'GO',
+            title: {
+                material: 'Select proper material to have the best engraving result.',
+                object_height: 'A Raft are layers built under your part and help it stick to the base plate.',
+                shading: 'Shading enables gradient effect of laser engraving. It takes longer time.',
+                advanced: 'Custom settings for power and speed'
+            },
             print_params: {
                 object_height: {
                     text: 'OBJECT HEIGHT',
@@ -582,7 +586,8 @@ define(function() {
                 },
                 save_and_apply: 'SAVE & APPLY',
                 save_as_preset: 'SAVE',
-                load_preset: 'LOAD',
+                save_as_preset_title: 'Save Preset',
+                load_preset_title: 'Load Preset',
                 apply: 'APPLY',
                 cancel: 'CANCEL',
                 save: 'SAVE'
@@ -676,6 +681,20 @@ define(function() {
                 x: 'X',
                 y: 'Y',
                 z: 'Z'
+            },
+            messages: {
+                'not open': {
+                    caption: 'Camera not detect',
+                    message: 'Please pull off the scanning camera, until it makes a sound at the end.'
+                },
+                'no object': {
+                    caption: 'Calibration tool not detected',
+                    message: 'Insert the calibration tool into the center slot.'
+                },
+                'no laser': {
+                    caption: 'Laser not detected',
+                    message: 'Press the laser heads to open it.'
+                }
             }
         },
         select_printer: {
@@ -687,13 +706,14 @@ define(function() {
             retry: 'Retry'
         },
         device: {
-            cameraOn: 'Open Camera',
-            cameraOff: 'Close Camera',
-            browseFiles: 'Browse Files',
+            camera_on: 'Open Camera',
+            camera_off: 'Close Camera',
+            browse_file: 'Browse Files',
             pause: 'Pause',
             paused: 'Paused',
+            pausing: 'Pausing',
             cancelTask: 'Cancel Task',
-            selectPrinter: 'Select Printer',
+            select_printer: 'Select Printer',
             retry: 'Retry',
             status: 'Status',
             busy: 'Busy',
@@ -701,56 +721,87 @@ define(function() {
             reset: 'Reset (Kick)',
             abort: 'Abort',
             start: 'Start',
+            no_task: 'There are currently no task to do',
+            please_wait: 'Please Wait...',
+            unknown_command: 'command cannot be executed in current status',
+            quit: 'Quit',
+            heating: 'Heating',
+            completing: 'Completing',
+            calibrating: 'Calibrating',
+            starting: 'Starting',
+            resuming: 'Resuming',
+            scanning: 'Scanning',
+            occupied: 'Occupied',
+            running: 'Working',
+            uploading: 'Uploading',
+            processing: 'Processing',
+            disconnectedError: 'Device disconnected\nPlease confirm if network access of device is available',
             noTask: 'There are currently no task to do',
             pleaseWait: 'Please Wait...',
             unknownCommand: 'command cannot be executed in current status',
-            quit: 'Quit',
             working: 'Working',
             finishing: 'Finishing',
-            heating: 'Heating',
-            calibrating: 'Calibrating',
             initiating: 'Initiating',
-            starting: 'Starting',
-            resuming: 'Resuming',
-            unknown: 'Unknown',
-            occupied: 'Occupied',
-            scanning: 'Scanning'
+            unknown: 'Unknown'
         },
         monitor: {
-            change_filament: 'CHANGE FILLAMENT',
-            browse_file: 'BROWSE FILE',
-            monitor: 'MONITOR',
-            currentTemperature: 'Current Temp',
-            nothingToPrint: 'There is nothing to print',
-            go: 'GO',
-            pause: 'PAUSE',
-            stop: 'STOP',
-            record: 'RECORD',
-            camera: 'CAMERA',
-            connecting: 'Connecting, please wait...',
-            HEAD_OFFLINE: 'Device head is not connected or missing',
-            TILT: 'Device head is tilted, please connect all 6 magnents',
-            WRONG_HEAD: 'Device head is unknown, please connect to a correct header',
-            FAN_FAILURE: 'Fan failed / stucked, you can spin it with a pancil',
-            SHAKE: 'Head encountered unexpected shake',
-            USER_OPERATION: 'machine operated by (other) user',
-            FILAMENT_RUNOUT: 'filament run out, please refill filament',
-            RESOURCE_BUSY: 'Machine is busy',
-            processing: 'Processing',
-            savingPreview: 'Saving preview image',
-            hour: 'hr',
-            minute: 'min',
-            left: 'left',
-            temperature: 'Temperature',
-            forceStop: 'Force stopping device?',
-            upload: 'UPLOAD',
-            download: 'DOWNLOAD',
-            fileNotDownloadable: 'this file type is not supported for download',
-            cannotPreview: 'Can not preview file',
-            extensionNotSupported: 'file extension not supported',
-            fileExistContinue: 'file already exist, continue ? (will replace)',
-            confirmGToF: 'Uploaded GCode will be converted to FCode, continue (will replace if exist)',
-            almostDone: 'almost done'
+            change_filament                 : 'CHANGE FILLAMENT',
+            browse_file                     : 'BROWSE FILE',
+            monitor                         : 'MONITOR',
+            currentTemperature              : 'Current Temp',
+            nothingToPrint                  : 'There is nothing to print',
+            go                              : 'GO',
+            start                           : 'START',
+            pause                           : 'PAUSE',
+            stop                            : 'STOP',
+            record                          : 'RECORD',
+            camera                          : 'CAMERA',
+            connecting                      : 'Connecting, please wait...',
+            HEAD_OFFLINE                    : 'Device head is not connected or missing',
+            HEAD_ERROR_CALIBRATING          : 'Unable to calibrate toolhead\nplease re-attach the toolhead',
+            HEAD_ERROR_FAN_FAILURE          : 'Fan failed / stucked\nyou can spin it with a pancil',
+            HWARDWARE_ERROR_FILAMENT_RUNOUT : 'Ran out of filament\nPlease insert new material',
+            HWARDWARE_ERROR_0               : 'Ran out of filament\nPlease insert new material',
+            HARDWARE_ERROR_PLATE_MISSING    : '未偵測到工作平台\n請放上工作平台金屬板',
+            HARDWARE_ERROR_ZPROBE_ERROR     : 'Unable to calibrate the base plate\nPlease remove left-over on the nozzle',
+            CONVERGENCE_FAILED              : 'Unable to calibrate the base plate\nPlease remove left-over on the nozzle',
+            HARDWARE_ERROR_HOME_FAILED      : 'Unable to home\nPlease remove the obstacle',
+            HEAD_ERROR_TILT                 : 'Head tilted\nPlease check ball joint rod is attached correctly',
+            HEAD_ERROR_SHAKE                : 'Head tilted\nPlease check ball joint rod is attached correctly',
+            WRONG_HEAD                      : 'Device head is unknown, please connect to a correct header',
+            USER_OPERATION                  : 'machine operated by (other) user',
+            RESOURCE_BUSY                   : 'Device busy\nIf the device is not running, please restart the device',
+            DEVICE_ERROR                    : 'Something went wrong\nPlease restart the device',
+            NO_RESPONSE                     : 'Something went wrong\nPlease restart the device',
+            SUBSYSTEM_ERROR                 : 'Something went wrong\nPlease restart the device',
+            HARDWARE_FAILURE                : 'Something went wrong\nPlease restart the device',
+            MAINBOARD_OFFLINE               : 'Something went wrong\nPlease restart the device',
+            HEAD_ERROR_HARDWARE_FAILURE     : 'Something went wrong with toolhead\nPlease re-attach the toolhead',
+            G28_FAILED                      : 'Unable to home\nPlease remove the obstacle',
+            processing                      : 'Processing',
+            savingPreview                   : 'Saving preview image',
+            hour                            : 'h',
+            minute                          : 'm',
+            second                          : 's',
+            left                            : 'left',
+            temperature                     : 'Temperature',
+            forceStop                       : 'Force stopping device?',
+            upload                          : 'UPLOAD',
+            download                        : 'DOWNLOAD',
+            fileNotDownloadable             : 'this file type is not supported for download',
+            cannotPreview                   : 'Can not preview file',
+            extensionNotSupported           : 'file extension not supported',
+            fileExistContinue               : 'file already exist, continue ? (will replace)',
+            confirmGToF                     : 'Uploaded GCode will be converted to FCode, continue (will replace if exist)',
+            task : {
+                EXTRUDER                    : 'Printing Task',
+                LASER                       : 'Engraving Task'
+            },
+            device : {
+                EXTRUDER                    : 'Printing Toolhead',
+                LASER                       : 'Laser Toolhead'
+            }
+
         },
         alert: {
             caption: 'Error',
@@ -786,7 +837,12 @@ define(function() {
             machineNotConnected: 'Machine is not connected',
             notPrinting: 'Printing is not in progress',
             nothingToPrint: 'Nothing to print (source blob missing)',
-            connectionTimeout: 'device is not responding, connection timeout'
+            connectionTimeout: 'device is not responding, connection timeout',
+            device_busy: {
+                caption: 'Device Busy',
+                message: 'The device is executing another task, try again later. If it stops working, please restart the device.'
+            },
+            device_is_used: 'The device is being used, do you want to abort current task?'
         },
         machine_status: {
             '-2': 'Scanning',

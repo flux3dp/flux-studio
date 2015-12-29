@@ -2,6 +2,7 @@
  * nwjs menu factory
  */
 define([
+    'jquery',
     'helpers/nwjs/gui',
     'helpers/i18n',
     'helpers/check-firmware',
@@ -13,6 +14,7 @@ define([
     'helpers/device-master',
     'app/constants/device-constants'
 ], function(
+    $,
     gui,
     i18n,
     checkFirmware,
@@ -40,10 +42,9 @@ define([
             ABOUT  : 0 - windowIndex,
             FILE   : 1 - windowIndex,
             EDIT   : 2 - windowIndex,
-            VIEW   : 3 - windowIndex,
-            DEVICE : 4 - windowIndex,
-            WINDOW : 5 - windowIndex,
-            HELP   : 6 - windowIndex
+            DEVICE : 3 - windowIndex,
+            WINDOW : 4 - windowIndex,
+            HELP   : 5 - windowIndex
         },
         newDevice = {
             label: lang.device.new,
@@ -76,7 +77,7 @@ define([
                 parent: parentIndex.FILE
             },
             saveGCode: {
-                label: lang.file.save_gcode,
+                label: lang.file.save_fcode,
                 enabled: false,
                 onClick: emptyFunction,
                 key: 's',
@@ -139,20 +140,6 @@ define([
                 modifiers: 'cmd+shift',
                 parent: parentIndex.EDIT
             },
-            viewStandard: {
-                label: lang.view.standard,
-                enabled: true,
-                onClick: emptyFunction,
-                type: 'checkbox',
-                checked: true,
-                parent: parentIndex.VIEW
-            },
-            viewPreview: {
-                label: lang.view.preview,
-                enabled: false,
-                onClick: emptyFunction,
-                parent: parentIndex.VIEW
-            },
             device: {
                 label: lang.device.label,
                 enabled: true,
@@ -175,19 +162,16 @@ define([
         deviceRefreshTimer,
         doDiscover,
         aboutSubItems = [{
-            label: 'Reset',
-            enable: true,
-            onClick: function() {
-                initializeMachine.reset(function() {
-                    location.reload();
-                });
-            }
-        },
-        separator,
-        {
             label: lang.flux.about,
             enabled: true,
-            onClick: emptyFunction
+            onClick: function() {
+                $.ajax({
+                    url: 'package.json',
+                    dataType: 'json'
+                }).done(function(response) {
+                    alert(lang.version + ':' + response.version);
+                });
+            }
         },
         {
             label: lang.flux.preferences,
@@ -200,8 +184,10 @@ define([
         {
             label: lang.flux.quit,
             enabled: true,
+            key: 'q',
+            modifiers: 'cmd',
             onClick: function() {
-                if (true === window.confirm('Quit?')) {
+                if (true === window.confirm(lang.sure_to_quit)) {
                     gui.App.quit();
                 }
             }
@@ -221,9 +207,7 @@ define([
         if (true === initializeMachine.hasBeenCompleted()) {
             subItems = [
                 items.import,
-                items.recent,
                 separator,
-                items.execute,
                 items.saveGCode
             ];
 
@@ -238,22 +222,9 @@ define([
             {
                 label: lang.edit.label,
                 subItems: [
-                    items.copy,
-                    items.cut,
-                    items.paste,
                     items.duplicate,
                     separator,
-                    items.scale,
-                    items.rotate,
-                    separator,
                     items.clear
-                ]
-            },
-            {
-                label: lang.view.label,
-                subItems: [
-                    items.viewStandard,
-                    items.viewPreview
                 ]
             },
             items.device,
@@ -327,17 +298,6 @@ define([
                                             }
                                         },
                                         {
-                                            label: lang.device.check_firmware_update,
-                                            enabled: true,
-                                            onClick: function() {
-                                                checkFirmware(printer).done(function(response) {
-                                                    if (true === response.needUpdate) {
-                                                        AlertActions.showFirmwareUpdate(printer, response);
-                                                    }
-                                                });
-                                            }
-                                        },
-                                        {
                                             label: lang.device.default_device,
                                             enabled: true,
                                             type: 'checkbox',
@@ -380,17 +340,26 @@ define([
                 {
                     label: lang.help.starting_guide,
                     enabled: true,
-                    onClick: emptyFunction
+                    onClick: function() {
+                        if ('undefined' !== typeof requireNode) {
+                            requireNode('nw.gui').Shell.openExternal('http://flux3dp.com/starting-guide');
+                        }
+                        else {
+                            window.open('http://flux3dp.com/starting-guide');
+                        }
+                    }
                 },
                 {
                     label: lang.help.online_support,
                     enabled: true,
-                    onClick: emptyFunction
-                },
-                {
-                    label: lang.help.troubleshooting,
-                    enabled: true,
-                    onClick: emptyFunction
+                    onClick: function() {
+                        if ('undefined' !== typeof requireNode) {
+                            requireNode('nw.gui').Shell.openExternal('http://flux3dp.com/support');
+                        }
+                        else {
+                            window.open('http://flux3dp.com/support');
+                        }
+                    }
                 }
             ]
         });

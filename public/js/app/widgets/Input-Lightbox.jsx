@@ -3,8 +3,9 @@ define([
     'helpers/i18n',
     'app/constants/input-lightbox-constants',
     'jsx!widgets/Modal',
-    'jsx!widgets/Alert'
-], function(React, i18n, Constants, Modal, Alert) {
+    'jsx!widgets/Alert',
+    'plugins/classnames/index'
+], function(React, i18n, Constants, Modal, Alert, classNames) {
     'use strict';
 
     var acceptableTypes = [
@@ -38,16 +39,37 @@ define([
                 };
             },
 
+            getInitialState: function() {
+                return {
+                    allowSubmit: false
+                };
+            },
+
             // button actions
             _onClose: function(e, reactid, from) {
                 e.preventDefault();
                 this.props.onClose.apply(null, [e, reactid, from]);
             },
 
+            _onCancel: function(e, reactid) {
+                e.preventDefault();
+                this._onClose.apply(null, [e, reactid, 'cancel']);
+            },
+
             _onSubmit: function(e, reactid) {
                 e.preventDefault();
-                this.props.onSubmit(this.refs.inputField.getDOMNode().value);
-                this._onClose.apply(null, [e, reactid, 'submit']);
+
+                var result = this.props.onSubmit(this.refs.inputField.getDOMNode().value);
+
+                if (('boolean' === typeof result && true === result) || 'undefined' === typeof result) {
+                    this._onClose.apply(null, [e, reactid, 'submit']);
+                }
+            },
+
+            _inputKeyUp: function(e) {
+                this.setState({
+                    allowSubmit: (0 < e.currentTarget.value.length)
+                });
             },
 
             _getButtons: function(lang) {
@@ -58,11 +80,15 @@ define([
                     dataAttrs: {
                         'ga-event': 'cancel'
                     },
-                    onClick: this._onClose
+                    onClick: this._onCancel
                 });
 
                 buttons.push({
                     label: this.props.confirmText || lang.alert.confirm,
+                    className: classNames({
+                        'btn-default': true,
+                        'btn-disabled': false === this.state.allowSubmit
+                    }),
                     dataAttrs: {
                         'ga-event': 'confirm'
                     },
@@ -87,7 +113,13 @@ define([
                 return (
                     <label className="control">
                         <span className="inputHeader">{this.props.inputHeader}</span>
-                        <input type={type} ref="inputField" defaultValue={this.props.defaultValue} autoFocus={true}/>
+                        <input
+                            type={type}
+                            ref="inputField"
+                            defaultValue={this.props.defaultValue}
+                            autoFocus={true}
+                            onKeyUp={this._inputKeyUp}
+                        />
                     </label>
                 );
             },

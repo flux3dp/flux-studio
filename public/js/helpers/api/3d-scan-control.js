@@ -41,10 +41,10 @@ define([
                 }
             },
             wait_for_connected_timer,
-            image_timer,
             stopGettingImage = function(callback) {
                 callback = callback || function() {};
 
+                console.log(events.onMessage, callback);
                 if ('undefined' === typeof events.onMessage) {
                     callback();
                 }
@@ -56,7 +56,6 @@ define([
                         }
                     };
                 }
-
             };
 
         ws = new Websocket({
@@ -207,19 +206,29 @@ define([
 
                 stopGettingImage(checkStarted);
 
-                return $deferred;
+                return $deferred.promise();
             },
 
-            calibrate: function(send) {
+            calibrate: function() {
                 var $deferred = $.Deferred();
 
-                if (true === send) {
-                    ws.send('calibrate');
-                }
-
                 events.onMessage = function(data) {
-                    $deferred.resolve(data);
+                    switch (data.status) {
+                    case 'continue':
+                        $deferred.notify(data);
+                        break;
+                    case 'ok':
+                        initialEvents();
+                        $deferred.resolve(data);
+                        break;
+                    case 'fail':
+                        initialEvents();
+                        $deferred.reject(data);
+                        break;
+                    }
                 };
+
+                ws.send('calibrate');
 
                 return $deferred.promise();
             },
@@ -253,7 +262,6 @@ define([
                 events.onError = function(result) {
                     d.resolve(result);
                 };
-
                 ws.send('quit');
 
                 return d.promise();
