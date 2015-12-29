@@ -81,6 +81,7 @@ define(function() {
 
             // specific caption/content
             invalid_device_name: 'The name can only contains alphabet, numbers, blanks, and special characters  “-”, “_”, “’”, “\'”.',
+            require_device_name: 'Name is required',
             select_language: 'Select Language',
             change_password: 'Change password?',
             connect_flux: 'Connect FLUX to Your Computer by USB Cable',

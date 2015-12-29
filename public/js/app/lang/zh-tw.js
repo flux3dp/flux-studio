@@ -81,6 +81,7 @@ define(function() {
 
             // specific caption/content
             invalid_device_name: '機器名稱只能使用英文字母、數字、空格以及特殊字元 “-”, “_”, “’”, “\'”',
+            require_device_name: '名稱欄位為必填',
             select_language: '請選擇你想使用的語言',
             change_password: '要更改密碼嗎?',
             connect_flux: '用 USB 連接你的電腦與 FLUX',
