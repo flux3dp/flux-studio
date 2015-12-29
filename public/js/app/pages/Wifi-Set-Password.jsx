@@ -11,7 +11,6 @@ define([
     initializeMachine,
     ButtonGroup,
     Modal,
-    Alert,
     usbConfig,
     AlertActions,
     AlertStore
