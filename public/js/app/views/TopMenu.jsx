@@ -98,9 +98,6 @@ define([
                 if (0 === this.state.deviceList.length && true === this.state.showDeviceList) {
                     AlertActions.showPopupRetry('no-printer', lang.device_selection.no_printers);
                 }
-                else if(from === 'cancel' && typeof this.state.inputLightbox === 'object') {
-                    this.state.inputLightbox.onCancel();
-                }
             },
 
             _toggleDeviceList: function(open) {
