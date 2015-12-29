@@ -938,16 +938,31 @@ define([
 
                 _onCalibrateFail: function(message, Popup) {
                     var self = this,
+                        imageSrc,
                         failMessage = self.state.lang.scan.messages[message] || {
                             caption: '',
                             message: message
                         };
+
+                    switch (message) {
+                    case 'not open':
+                        imageSrc = '/img/not-open.png';
+                        break;
+                    case 'no object':
+                        imageSrc = '/img/no-object.png';
+                        break;
+                    case 'no laser':
+                        imageSrc = '/img/no-laser.png';
+                    default:
+                        break;
+                    }
+
                     self._openBlocker(false);
                     Popup(
                         'calibrate',
                         (
                             <div>
-                                <img className="calibrate-image" src="/img/calibration-guide.jpg"/>
+                                <img className="calibrate-image" src={imageSrc}/>
                                 <p>{failMessage.message}</p>
                             </div>
                         ),
@@ -959,17 +974,15 @@ define([
                     var self = this,
                         onPass = function() {
                             var scanCtrlWebSocket = self.state.scanCtrlWebSocket,
-                                calibrateDeferred = scanCtrlWebSocket.calibrate(true),
+                                calibrateDeferred = scanCtrlWebSocket.calibrate(),
                                 done = function(data) {
                                     self._refreshCamera();
                                     self._openBlocker(false);
                                 },
                                 fail = function(data) {
+                                    self._refreshCamera();
                                     self._openBlocker(false);
-                                    AlertActions.showPopupError(
-                                        'calibrate-fail',
-                                        self.state.lang.scan.calibrate_fail
-                                    );
+                                    self._onCalibrateFail(data.message, AlertActions.showPopupRetry);
                                 };
 
                             calibrateDeferred.done(done).fail(fail);
