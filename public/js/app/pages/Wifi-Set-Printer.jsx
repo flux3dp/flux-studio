@@ -23,6 +23,7 @@ define([
             getInitialState: function() {
                 return {
                     lang                 : args.state.lang,
+                    requirePrinterName   : false,
                     validPrinterName     : true,
                     validPrinterPassword : true,
                     settingPrinter       : initializeMachine.settingPrinter.get()
@@ -74,6 +75,7 @@ define([
                 isValid = (name !== '' && false === /[^a-zA-Z0-9 ’'_-]+/g.test(name));
 
                 self.setState({
+                    requirePrinterName: (name !== ''),
                     validPrinterName: isValid
                 });
 
@@ -132,7 +134,9 @@ define([
                         'initialization': true
                     },
                     cx = React.addons.classSet,
+                    invalidPrinterNameMessage = lang.initialize.invalid_device_name,
                     printerNameClass,
+                    invalidPrinterNameClass,
                     printerPasswordClass,
                     content;
 
@@ -143,6 +147,16 @@ define([
                 printerPasswordClass = cx({
                     'error': !this.state.validPrinterPassword
                 });
+
+                invalidPrinterNameClass = cx({
+                    'error-message': true,
+                    'hide': this.state.validPrinterName
+                });
+                console.log(this.state.requirePrinterName, this.state.validPrinterPassword);
+
+                if (false === this.state.requirePrinterName) {
+                    invalidPrinterNameMessage = lang.initialize.require_device_name;
+                }
 
                 content = (
                     <div className="set-machine-generic text-center">
@@ -155,14 +169,12 @@ define([
                                 <label className="control" for="printer-name">
                                     <h4 className="input-head">{lang.initialize.set_machine_generic.printer_name}</h4>
                                     <input ref="name" id="printer-name" type="text" className={printerNameClass}
-                                        pattern="[a-zA-Z0-9 ’'_-]+"
-                                        title={lang.initialize.invalid_device_name}
-                                        required={true}
                                         autoFocus={true}
                                         autoComplete={false}
                                         defaultValue={this.state.settingPrinter.name}
                                         placeholder={lang.initialize.set_machine_generic.printer_name_placeholder}
                                     />
+                                    <span className={invalidPrinterNameClass}>{invalidPrinterNameMessage}</span>
                                 </label>
                                 <label className="control" for="printer-password">
                                     <h4 className="input-head">{lang.initialize.set_machine_generic.password}</h4>
