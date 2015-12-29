@@ -540,11 +540,9 @@ define([
             this._stopReport();
             if(this.state.currentStatus === DeviceConstants.READY) {
                 var blob = this.props.fCode;
-<<<<<<< HEAD
-                this.setState({ displayStatus: lang.device.starting });
-=======
+
                 this.setState({ currentStatus: lang.device.starting });
->>>>>>> 9d6e9b2a14fa97fd0176c65f4e46a779f3a9899f
+
                 if(blob) {
                     DeviceMaster.go(blob, function(_progress) {
                         if(_progress !== 100) {
@@ -562,18 +560,12 @@ define([
                         self._getPrintingInfo();
                     });
                 }
-                // initializing = true;
 
             }
             else {
                 DeviceMaster.resume().then(function() {
-<<<<<<< HEAD
-                    self._startReport();
-                });
-=======
                     this._startReport();
                 }.bind(this));
->>>>>>> 9d6e9b2a14fa97fd0176c65f4e46a779f3a9899f
             }
         },
 
@@ -653,7 +645,6 @@ define([
                     attr.push(subError);
                 }
 
-<<<<<<< HEAD
                 console.log(attr.join('_'));
                 errorMessage = lang.monitor[attr.join('_')];
             }
@@ -661,68 +652,6 @@ define([
             if(!messageViewed && !showingPopup && mainError !== DeviceConstants.USER_OPERATION) {
                 AlertActions.showPopupRetry(_id, errorMessage);
                 showingPopup = true;
-=======
-                if(!messageViewed && mainError !== DeviceConstants.USER_OPERATION) {
-                    AlertActions.showPopupRetry(_id, errorMessage);
-                    showingPopup = true;
-                }
-
-                currentStatus = DeviceConstants.PAUSED;
-                displayStatus = lang.device.paused;
-            }
-            else if (status === DeviceConstants.UNKNOWN_STATUS) {
-                DeviceMaster.quit();
-            }
-
-            // actions responded to status
-            if(lastError === DeviceConstants.AUTH_ERROR) {
-                clearInterval(reporter);
-            }
-            else if(lastError === DeviceConstants.UNKNOWN_ERROR) {
-                DeviceMaster.quit();
-            }
-            else if(statusId === DeviceConstants.status.COMPLETED || statusId === DeviceConstants.status.ABORTED) {
-                DeviceMaster.quit();
-                displayStatus = lang.device.ready;
-                currentStatus = DeviceConstants.READY;
-            }
-            else if(status === DeviceConstants.IDLE) {
-                displayStatus = lang.device.ready;
-                currentStatus = DeviceConstants.READY;
-            }
-            else if(status === DeviceConstants.WAITING_HEAD) {
-                displayStatus = lang.device.heating;
-                currentStatus = DeviceConstants.WAITING_HEAD;
-            }
-            else if(statusId === DeviceConstants.status.PAUSED_FROM_RUNNING) {
-                displayStatus = lang.device.paused;
-                currentStatus = DeviceConstants.PAUSED;
-                // AlertActions.showPopupRetry(_id, lang.monitor.TILT);
-            }
-            else if(status === DeviceConstants.CORRECTING) {
-                displayStatus = lang.device.calibrating;
-                currentStatus = '';
-            }
-            else if(statusId === DeviceConstants.status.COMPLETING) {
-                displayStatus = lang.device.completing;
-            }
-            else if(statusId === DeviceConstants.status.INIT || statusId === DeviceConstants.status.STARTING) {
-                displayStatus = lang.device.starting;
-                currentStatus = DeviceConstants.STARTING;
-            }
-            else if(status === DeviceConstants.RESUMING) {
-                displayStatus = lang.device.resuming;
-            }
-            else if(status === DeviceConstants.OCCUPIED) {
-                displayStatus = lang.device.occupied;
-            }
-            else if(status === DeviceConstants.SCANNING) {
-                displayStatus = lang.device.scanning;
-            }
-            else if(statusId === DeviceConstants.status.RUNNING) {
-                displayStatus = lang.device.working;
-                currentStatus = DeviceConstants.RUNNING;
->>>>>>> 9d6e9b2a14fa97fd0176c65f4e46a779f3a9899f
             }
 
             // actions responded to status
@@ -739,17 +668,8 @@ define([
                 progress = '';
             }
 
-<<<<<<< HEAD
             temperature = report.rt ? `${lang.monitor.temperature} ${report.rt} °C` : '';
             headInfo = report.module ? lang.monitor.device[report.module] : '';
-=======
-            if(report.rt) {
-                temperature = `${lang.monitor.temperature} ${report.rt} °C`;
-            }
-            else {
-                temperature = '';
-            }
->>>>>>> 9d6e9b2a14fa97fd0176c65f4e46a779f3a9899f
 
             if(!report.error) {
                 AlertActions.closePopup();
@@ -769,12 +689,7 @@ define([
                 temperature: temperature,
                 currentStatus: currentStatus,
                 displayStatus: displayStatus,
-<<<<<<< HEAD
                 progress: progress
-=======
-                progress: progress,
-                headInfo: headInfo
->>>>>>> 9d6e9b2a14fa97fd0176c65f4e46a779f3a9899f
             });
         },
 
@@ -1014,7 +929,6 @@ define([
                 <div className="controls center" onClick={this._handleDownload}>
                     <div className="btn-download btn-control"></div>
                     <div className="description">{lang.monitor.download}</div>
-<<<<<<< HEAD
                 </div>
             );
 
@@ -1022,8 +936,6 @@ define([
                 <div className="controls right" onClick={this._handleToggleCamera}>
                     <div className={cameraClass}></div>
                     <div className={cameraDescriptionClass}>{lang.monitor.camera}</div>
-=======
->>>>>>> 9d6e9b2a14fa97fd0176c65f4e46a779f3a9899f
                 </div>
             );
 

@@ -175,6 +175,7 @@ define([
 
             self.selected_printer = printer;
             DeviceMaster.selectDevice(printer);
+            console.log(printer);
 
             switch (printer.st_id) {
             case DeviceConstants.status.IDLE:
