@@ -115,7 +115,6 @@ define([
                     var self = this;
 
                     AlertStore.onRetry(self._retry);
-                    AlertStore.onCancel(self._cancelScan);
                     dndHandler.plug(document, self._importPCD);
 
                     self.setState({
@@ -131,7 +130,6 @@ define([
                 componentWillUnmount: function() {
                     var self = this;
 
-                    AlertStore.removeCancelListener(self._cancelScan);
                     AlertStore.removeRetryListener(self._retry);
                     dndHandler.unplug(document);
 
@@ -160,21 +158,6 @@ define([
                     case 'calibrate':
                         self._onCalibrate();
                         break;
-                    }
-                },
-
-                _cancelScan: function(id) {
-                    if ('scan-modeling-error' === id) {
-                        // TODO: modeling error
-                    }
-                    else if ('over-quota' === id) {
-                        // TODO: over upload quota
-                    }
-                    else if ('calibrate' === id) {
-                        // TODO: cancel calibrate
-                    }
-                    else {
-                        window.history.go(-1);
                     }
                 },
 
@@ -1150,6 +1133,7 @@ define([
                             }
                         },
                         onGettingPrinter = function(auth_printer) {
+                            console.log(auth_printer);
                             self.setState({
                                 gettingStarted: true,
                                 selectedPrinter: auth_printer,
@@ -1160,11 +1144,15 @@ define([
                             menuFactory.items.import.enabled = true;
                             self._openBlocker(true, ProgressConstants.NONSTOP);
                         },
+                        noDeviceAvailable = function() {
+                            history.go(-1);
+                        },
                         content = (
                             <PrinterSelector
                                 uniqleId="scan"
                                 className="scan-printer-selection"
                                 lang={lang}
+                                onClose={noDeviceAvailable}
                                 onGettingPrinter={onGettingPrinter}
                             />
                         ),
