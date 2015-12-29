@@ -441,6 +441,8 @@ define([
 
                 return (
                     <div className="notification-collection">
+                        {monitorPanel}
+
                         <UpdateDialog
                             open={this.state.application.open}
                             type={this.state.application.type}
@@ -493,8 +495,6 @@ define([
                             hasStop={this.state.progress.hasStop}
                             onFinished={this._handleProgressFinish}
                         />
-
-                        {monitorPanel}
                     </div>
                 );
             }
