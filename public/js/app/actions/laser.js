@@ -128,7 +128,7 @@ define([
             ExportGCodeProgressing = function(data) {
                 ProgressActions.updating(data.message, data.percentage * 100);
             },
-            sendToBitmapAPI = function(args, settings, callback) {
+            sendToBitmapAPI = function(args, settings, callback, fileMode) {
                 callback = callback || function() {};
 
                 var laserParser = bitmapWebSocket,
@@ -138,9 +138,10 @@ define([
                         });
                     },
                     onUploadFinish = function() {
-                        laserParser.getGCode({
+                        laserParser.getTaskCode({
                             onProgressing: ExportGCodeProgressing,
-                            onFinished: callback
+                            onFinished: callback,
+                            fileMode: fileMode
                         });
                     };
 
@@ -153,7 +154,7 @@ define([
                     );
                 });
             },
-            sendToSVGAPI = function(args, settings, callback) {
+            sendToSVGAPI = function(args, settings, callback, fileMode) {
                 callback = callback || function() {};
 
                 var laserParser = svgWebSocket,
@@ -170,11 +171,12 @@ define([
                             names.push(obj.name);
                         });
 
-                        laserParser.getGCode(
+                        laserParser.getTaskCode(
                             names,
                             {
                                 onProgressing: ExportGCodeProgressing,
-                                onFinished: callback
+                                onFinished: callback,
+                                fileMode: fileMode
                             }
                         );
                     };
@@ -300,7 +302,8 @@ define([
             $target_image = null, // changing when image clicked
             printer = null,
             printer_selecting = false,
-            handleLaser = function(settings, callback, progressType) {
+            handleLaser = function(settings, callback, progressType, fileMode) {
+                fileMode = fileMode || '-f';
                 progressType = progressType || ProgressConstants.NONSTOP;
 
                 var $ft_controls = $laser_platform.find('.ft-controls'),
@@ -391,10 +394,10 @@ define([
                                         if (args.length === $ft_controls.length) {
                                             // sending data
                                             if ('svg' === self.state.fileFormat) {
-                                                sendToSVGAPI(args, settings, _callback);
+                                                sendToSVGAPI(args, settings, _callback, fileMode);
                                             }
                                             else {
-                                                sendToBitmapAPI(args, settings, _callback);
+                                                sendToBitmapAPI(args, settings, _callback, fileMode);
                                             }
                                         }
                                     }
@@ -625,18 +628,19 @@ define([
                 );
             },
             sendToMachine: sendToMachine,
-            export: function(settings) {
+            exportTaskCode: function(settings, fileMode) {
                 handleLaser(
                     settings,
-                    function(blob, filemode) {
-                        var extension = ('-f' === filemode ? 'fc' : 'gcode'),
+                    function(blob, fileMode) {
+                        var extension = ('-f' === fileMode ? 'fc' : 'gcode'),
                             // split by . and get unless the last then join as string
                             fileName = self.state.images[0].name.split('.').slice(0, -1).join(''),
                             fullName = fileName + '.' + extension;
 
                         saveAs(blob, fullName);
                     },
-                    ProgressConstants.STEPPING
+                    ProgressConstants.STEPPING,
+                    fileMode || '-f'
                 );
             },
             destroySocket: function() {
