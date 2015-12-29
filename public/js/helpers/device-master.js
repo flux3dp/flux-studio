@@ -67,6 +67,8 @@ define([
             _device.name = device.name;
             _device.actions = DeviceController(uuid, {
                 onConnect: function(response) {
+                    d.notify(response);
+
                     if (response.status.toUpperCase() === DeviceConstants.CONNECTED) {
                         d.resolve(DeviceConstants.CONNECTED);
                         _devices.push(_device);
