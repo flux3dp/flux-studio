@@ -199,8 +199,10 @@ define([
             case DeviceConstants.status.COMPLETED:
             case DeviceConstants.status.ABORTED:
                 // quit
-                DeviceMaster.quit().done(function() {
-                    self._returnSelectedPrinter();
+                DeviceMaster.selectDevice(self.selected_printer).then(function() {
+                    DeviceMaster.quit().done(function() {
+                        self._returnSelectedPrinter();
+                    });
                 });
                 break;
             case DeviceConstants.status.RUNNING:
