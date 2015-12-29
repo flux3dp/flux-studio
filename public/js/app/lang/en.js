@@ -684,11 +684,11 @@ define(function() {
             messages: {
                 'not open': {
                     caption: 'Camera not detect',
-                    message: 'Please pull off the scanning camera.'
+                    message: 'Please pull off the scanning camera, until it makes a sound at the end.'
                 },
                 'no object': {
                     caption: 'Calibration tool not detected',
-                    message: ''
+                    message: 'Insert the calibration tool into the center slot.'
                 },
                 'no laser': {
                     caption: 'Laser not detected',

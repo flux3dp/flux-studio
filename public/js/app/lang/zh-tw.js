@@ -684,15 +684,15 @@ define(function() {
             messages: {
                 'not open': {
                     caption: '未偵測到鏡頭畫面',
-                    message: '請參考使用手冊，將掃描鏡頭拉出。'
+                    message: '壓下，然後拉出掃描鏡頭，直至最底端發出固定聲為止。'
                 },
                 'no object': {
                     caption: '未偵測到校正工具',
-                    message: ''
+                    message: '請將掃描校正工具插在中心溝槽處'
                 },
                 'no laser': {
                     caption: '未偵測到掃描雷射',
-                    message: '請參考使用手冊，按下雷射頭將其打開'
+                    message: '請壓下，並彈出掃描雷射頭。'
                 }
             }
         },
