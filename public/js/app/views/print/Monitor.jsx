@@ -77,6 +77,11 @@ define([
         CAMERA: 'CAMERA'
     };
 
+    var type = {
+        FILE: 'FILE',
+        FOLDER: 'FOLDER'
+    };
+
     var opts = {};
     var temp = [];
 
@@ -184,6 +189,7 @@ define([
             lang                : React.PropTypes.object,
             selectedDevice      : React.PropTypes.object,
             fCode               : React.PropTypes.object,
+            previewUrl          : React.PropTypes.string,
             onClose             : React.PropTypes.func
         },
 
@@ -193,7 +199,7 @@ define([
                 mode                : mode.PREVIEW,
                 directoryContent    : {},
                 cameraImageUrl      : '',
-                selectedFileName    : '',
+                selectedItem        : '',
                 progress            : '',
                 currentStatus       : DeviceConstants.READY,
                 displayStatus       : ''
@@ -225,15 +231,18 @@ define([
             this._addHistory();
         },
 
+        shouldComponentUpdate: function(nextProps, nextState) {
+            return JSON.stringify(this.state) !== JSON.stringify(nextState);
+        },
+
         componentWillUnmount: function() {
-            DeviceMaster.stopCamera();
+            if(this.state.mode === mode.CAMERA) {
+                DeviceMaster.stopCamera();
+                console.log('camera stopped');
+            }
             this._stopReport();
             history = [];
             messageViewed = false;
-        },
-
-        shouldComponentUpdate: function(nextProps, nextState) {
-            return JSON.stringify(this.state) !== JSON.stringify(nextState);
         },
 
         _getPrintingInfo: function() {
@@ -359,7 +368,9 @@ define([
 
         _handleYes: function(id) {
             if(id === DeviceConstants.KICK) {
-                DeviceMaster.kick();
+                DeviceMaster.kick().then(function() {
+                    this._startReport();
+                }.bind(this));
             }
             else if(id === 'uploadFile') {
                 var info    = fileToBeUpload.name.split('.'),
@@ -461,9 +472,13 @@ define([
             }
         },
 
-        _handleSelectFile: function(fileName, action) {
+        _handleSelectFile: function(fileName, action, e) {
+            e.stopPropagation();
             if(action === DeviceConstants.SELECT) {
-                this.setState({ selectedFileName: fileName});
+                this.setState({
+                    selectedItem: fileName,
+                    selectedItemType: type.FILE
+                });
             }
             else {
                 start = 0;
@@ -483,6 +498,21 @@ define([
 
                 }.bind(this));
             }
+        },
+
+        _handleHighlightFolder: function(folderName, e) {
+            e.stopPropagation();
+            this.setState({
+                selectedItem: this.state.selectedItem === folderName ? '' : folderName,
+                selectedItemType: this.state.selectedItem === folderName ? '' : type.FOLDER
+            });
+        },
+
+        _handleCancelSelectItem: function(e) {
+            this.setState({
+                selectedItem: '',
+                selectedItemType: ''
+            });
         },
 
         _handleUpload: function(e) {
@@ -510,7 +540,7 @@ define([
 
         _handleDownload: function() {
             start = 0;
-            DeviceMaster.fileInfo(pathArray.join('/'), this.state.selectedFileName).then(function(info) {
+            DeviceMaster.fileInfo(pathArray.join('/'), this.state.selectedItem).then(function(info) {
                 if(info[1] instanceof Blob) {
                     saveAs(info[1], info[0]);
                 }
@@ -522,10 +552,16 @@ define([
 
         _handleToggleCamera: function() {
             if(this.state.mode === mode.CAMERA) {
+                DeviceMaster.stopCamera().then(function() {
+                    DeviceMaster.kick();
+                });
                 this._handleBack();
                 return;
             }
-            DeviceMaster.startCamera(this._processImage);
+            DeviceMaster.readyCamera().then(function() {
+                DeviceMaster.startCamera(this._processImage);
+            }.bind(this));
+
             this._stopReport();
             this.setState({
                 waiting: true,
@@ -556,7 +592,7 @@ define([
                     });
                 }
                 else {
-                    DeviceMaster.goFromFile(pathArray, this.state.selectedFileName).then(function(result) {
+                    DeviceMaster.goFromFile(pathArray, this.state.selectedItem).then(function(result) {
                         self._getPrintingInfo();
                     });
                 }
@@ -575,6 +611,7 @@ define([
 
         _handleStop: function() {
             if(statusId < 0) {
+                this._stopReport();
                 AlertActions.showPopupYesNo('KICK', lang.monitor.forceStop);
             }
             else {
@@ -627,7 +664,7 @@ define([
                     mainError = report.error;
                 }
                 else {
-                    mainError = report.error[0];
+                    mainError = report.error[0] || '';
                     subError = report.error[1] || '';
                 }
             }
@@ -649,7 +686,7 @@ define([
                 errorMessage = lang.monitor[attr.join('_')];
             }
 
-            if(!messageViewed && !showingPopup && mainError !== DeviceConstants.USER_OPERATION) {
+            if(!messageViewed && !showingPopup && mainError !== DeviceConstants.USER_OPERATION && mainError.length > 0) {
                 AlertActions.showPopupRetry(_id, errorMessage);
                 showingPopup = true;
             }
@@ -702,8 +739,8 @@ define([
             clearTimeout(timmer);
         },
 
-        _processImage: function(image_blobs, mime_type) {
-            var blob = new Blob(image_blobs, {type: mime_type});
+        _processImage: function(imageBlobs, mimeType) {
+            var blob = new Blob(imageBlobs, {type: mimeType});
             var url = URL.createObjectURL(blob);
             this.setState({
                 cameraImageUrl: url,
@@ -789,19 +826,26 @@ define([
 
             var self = this,
                 files,
-                folders;
+                folders,
+                imgSrc,
+                fileNameClass,
+                folderNameClass;
 
             folders = content.directories.map(function(item) {
+                folderNameClass = ClassNames('name', {'selected': self.state.selectedItem === item});
                 return (
-                    <div className="folder" onDoubleClick={this._handleSelectFolder.bind(this, item)}>
-                        <div className="name">{item}</div>
+                    <div
+                        className="folder"
+                        onClick={self._handleHighlightFolder.bind(null, item)}
+                        onDoubleClick={this._handleSelectFolder.bind(this, item)}>
+                        <div className={folderNameClass}>{item}</div>
                     </div>
                 );
             }.bind(this));
 
             files = filesInfo.map(function(item) {
-                var imgSrc = URL.createObjectURL(item[1]) || 'http://placehold.it/60x60',
-                    fileNameClass = ClassNames('name', {'selected': self.state.selectedFileName === item[0]});
+                imgSrc = URL.createObjectURL(item[1]) || 'http://placehold.it/60x60';
+                fileNameClass = ClassNames('name', {'selected': self.state.selectedItem === item[0]});
 
                 return (
                     <div
@@ -820,7 +864,7 @@ define([
             });
 
             return (
-                <div className="wrapper">
+                <div className="wrapper" onClick={this._handleCancelSelectItem}>
                     {folders}
                     {files}
                 </div>
@@ -844,10 +888,6 @@ define([
         },
 
         _renderContent: function() {
-            if(this.state.mode !== mode.CAMERA) {
-                DeviceMaster.stopCamera();
-            }
-
             switch(this.state.mode) {
                 case mode.PREVIEW:
                     var divStyle = {
@@ -959,7 +999,7 @@ define([
 
             action = !!commands[this.state.currentStatus] ? commands[this.state.currentStatus]() : '';
 
-            if(!this.props.fCode && !this.state.selectedFileName) {
+            if(!this.props.fCode && !this.state.selectedItem) {
                 if(this.state.currentStatus === DeviceConstants.READY) {
                     action = '';
                 }
@@ -968,6 +1008,14 @@ define([
             leftButton = this.state.mode === mode.BROWSE_FILE ? upload : stop;
             middleButton = this.state.mode === mode.BROWSE_FILE ? download : action;
             cameraButton = currentStatus !== DeviceConstants.READY ? '' : camera;
+
+            if(this.state.mode === mode.CAMERA) {
+                leftButton = '';
+            }
+
+            if(this.state.selectedItemType !== type.FILE && this.state.mode === mode.BROWSE_FILE) {
+                middleButton = '';
+            }
 
             operation = (
                 <div className="operation">

@@ -136,6 +136,10 @@ define([
                     this._registerTutorial();
                 },
 
+                componentWillUnmount: function() {
+                    director.clear();
+                },
+
                 _registerKeyEvents: function() {
                     $(document).keydown(function(e) {
                         // delete event

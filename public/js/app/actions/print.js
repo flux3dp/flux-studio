@@ -41,14 +41,17 @@ define([
     var THREE = window.THREE || {},
         container, slicer;
 
-    var camera, scene, outlineScene, renderer;
+    var camera, scene, outlineScene;
     var orbitControl, transformControl, reactSrc, controls;
 
     var objects = [],
         referenceMeshes = [];
-    var raycaster = new THREE.Raycaster();
-    var mouse = new THREE.Vector2(),
-        circularGridHelper, mouseDown, SELECTED;
+
+    var raycaster = new THREE.Raycaster(),
+        mouse = new THREE.Vector2(),
+        renderer = new THREE.WebGLRenderer();
+
+    var circularGridHelper, mouseDown, SELECTED;
 
     var movingOffsetX, movingOffsetY, panningOffset, originalCameraPosition, originalCameraRotation,
         scaleBeforeTransformX, scaleBeforeTransformY, scaleBeforeTransformZ;
@@ -155,7 +158,7 @@ define([
         scene.add(cameraLight);
 
         // renderer
-        renderer = new THREE.WebGLRenderer();
+        // renderer = new THREE.WebGLRenderer();
         renderer.autoClear = false;
         renderer.setClearColor(0xE0E0E0, 1);
         renderer.setPixelRatio(window.devicePixelRatio);
@@ -1575,10 +1578,17 @@ define([
         });
     }
 
-    function _getCameraLook(camera) {
+    function _getCameraLook(_camera) {
         var vector = new THREE.Vector3(0, 0, -1);
-        vector.applyEuler(camera.rotation, camera.eulerOrder);
+        vector.applyEuler(_camera.rotation, _camera.eulerOrder);
         return vector;
+    }
+
+    function clear() {
+        objects = [];
+        referenceMeshes = [];
+        renderer.clear();
+        renderer.clearDepth();
     }
 
     return {
@@ -1604,6 +1614,7 @@ define([
         changePreviewLayer  : changePreviewLayer,
         executePrint        : executePrint,
         setCameraPosition   : setCameraPosition,
-        clearSelection      : clearSelection
+        clearSelection      : clearSelection,
+        clear               : clear
     };
 });
