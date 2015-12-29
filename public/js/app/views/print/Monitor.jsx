@@ -973,14 +973,7 @@ define([
                 <div className="operation">
                     {leftButton}
                     {middleButton}
-<<<<<<< HEAD
                     {cameraButton}
-=======
-                    <div className="controls right" onClick={this._handleToggleCamera}>
-                        <div className={cameraClass}></div>
-                        <div className={cameraDescriptionClass}>{lang.monitor.camera}</div>
-                    </div>
->>>>>>> 9d6e9b2a14fa97fd0176c65f4e46a779f3a9899f
                 </div>
             );
 
