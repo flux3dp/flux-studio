@@ -200,7 +200,7 @@ define([
             case DeviceConstants.status.ABORTED:
                 // quit
                 DeviceMaster.quit().done(function() {
-                    this._returnSelectedPrinter();
+                    self._returnSelectedPrinter();
                 });
                 break;
             case DeviceConstants.status.RUNNING:
