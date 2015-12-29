@@ -50,7 +50,6 @@ define([
             return {
                 uniqleId: '',
                 lang: i18n.get(),
-                showLoading: false,
                 className: '',
                 onGettingPrinter: function() {},
                 onClose: function() {}
@@ -60,7 +59,6 @@ define([
         getInitialState: function() {
             return {
                 discoverId: 'printer-selector-' + (this.props.uniqleId || ''),
-                showLoading: this.props.showLoading,
                 printOptions: [],
                 loadFinished: false,
                 hadDefaultPrinter: ('string' === typeof initializeMachine.defaultPrinter.get().uuid),
@@ -270,18 +268,9 @@ define([
                 self.props.onGettingPrinter(self.selected_printer);
             }
             else {
-                DeviceMaster.selectDevice(self.selected_printer).progress(function(response) {
-                    if (false === self.state.showLoading) {
-                        self.setState({
-                            showLoading: true
-                        });
-                    }
-                }).done(function(status) {
+                DeviceMaster.selectDevice(self.selected_printer).done(function(status) {
                     if (status === DeviceConstants.CONNECTED) {
                         self.props.onGettingPrinter(self.selected_printer);
-                        self.setState({
-                            showLoading: false
-                        });
                     }
                     else if (status === DeviceConstants.TIMEOUT) {
                         AlertActions.showPopupError('printer-connection-timeout', lang.message.connectionTimeout);
@@ -325,11 +314,7 @@ define([
                 showPassword = self.state.showPassword,
                 cx = React.addons.classSet,
                 wrapperClass = ['select-printer'],
-                content = (
-                    true === self.state.showLoading ?
-                    <div className="spinner-roller spinner-roller-reverse"/> :
-                    self._renderPrinterSelection(lang)
-                ),
+                content = self._renderPrinterSelection(lang),
                 hadDefaultPrinter = self.state.hadDefaultPrinter;
 
             if ('string' === typeof self.props.className) {
@@ -339,7 +324,7 @@ define([
             wrapperClass = cx.apply(null, wrapperClass);
 
             return (
-                true === hadDefaultPrinter && false === self.state.showLoading ?
+                true === hadDefaultPrinter ?
                 <span/> :
                 <div className={wrapperClass}>
                     {content}
