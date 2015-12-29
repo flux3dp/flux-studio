@@ -5468,25 +5468,37 @@ input.switch:checked ~ label:after {
         margin: 0 0 20px 0;
         padding: 20px;
         width: 451px; }
-    .initialization .h-form .control {
-        display: -webkit-box;
-        /* OLD - iOS 6-, Safari 3.1-6 */
-        display: -webkit-flex;
-        /* NEW - Chrome */
-        display: flex;
-        /* NEW, Spec - Opera 12.1, Firefox 20+ */
-        margin: 0 0 10px 0;
-        justify-content: space-around;
-        align-items: center; }
-        .initialization .h-form .control input {
-            height: 36px;
-            width: 250px;
-            flex: 3; }
-        .initialization .h-form .control label,
-        .initialization .h-form .control .input-head {
-            font-weight: 200;
-            flex: 1;
-            margin: 0 3px 0 0; }
+    .initialization .h-form {
+        width: 416px; }
+        .initialization .h-form .control {
+            display: -webkit-box;
+            /* OLD - iOS 6-, Safari 3.1-6 */
+            display: -webkit-flex;
+            /* NEW - Chrome */
+            display: flex;
+            /* NEW, Spec - Opera 12.1, Firefox 20+ */
+            margin: 0 0 10px 0;
+            justify-content: space-around;
+            align-items: center;
+            flex-wrap: wrap; }
+            .initialization .h-form .control .error {
+                border: 2px solid #c00; }
+            .initialization .h-form .control input {
+                height: 36px;
+                width: 250px;
+                flex: 3; }
+            .initialization .h-form .control label,
+            .initialization .h-form .control .input-head {
+                font-weight: 200;
+                flex: 1;
+                margin: 0 3px 0 0; }
+            .initialization .h-form .control .error-message {
+                color: #c00;
+                font-size: 12px;
+                line-height: 20px;
+                padding: 0 0 0 104px;
+                text-align: left;
+                width: 100%; }
 
 /**
  * Laser

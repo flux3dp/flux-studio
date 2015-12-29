@@ -10,7 +10,8 @@ define([
     'jsx!views/print/Monitor',
     'jsx!widgets/Modal',
     'app/actions/alert-actions',
-    'app/stores/alert-store'
+    'app/stores/alert-store',
+    'app/actions/global-actions'
 ], function(
     $,
     React,
@@ -23,7 +24,8 @@ define([
     Monitor,
     Modal,
     AlertActions,
-    AlertStore
+    AlertStore,
+    GlobalActions
 ) {
     'use strict';
 
@@ -97,9 +99,6 @@ define([
             _openAlertWithnoPrinters: function() {
                 if (0 === this.state.deviceList.length && true === this.state.showDeviceList) {
                     AlertActions.showPopupRetry('no-printer', lang.device_selection.no_printers);
-                }
-                else if(from === 'cancel' && typeof this.state.inputLightbox === 'object') {
-                    this.state.inputLightbox.onCancel();
                 }
             },
 

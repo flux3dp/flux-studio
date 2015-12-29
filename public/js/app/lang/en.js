@@ -32,6 +32,8 @@ define(function() {
             install: 'INSTALL'
         },
         topmenu: {
+            version: '版本',
+            sure_to_quit: 'Sure to quit?',
             flux: {
                 label: 'Flux',
                 about: 'About FLUX studio',
@@ -41,31 +43,19 @@ define(function() {
             file: {
                 label: 'File',
                 import: 'Import',
-                recent: 'Recent',
-                execute: 'Execute',
-                save_gcode: 'Save Gcode'
+                save_gcode: 'Save Gcode',
+                save_fcode: 'Save Task'
             },
             edit: {
                 label: 'Edit',
-                copy: 'Copy',
-                cut: 'Cut',
-                paste: 'Paste',
                 duplicate: 'Duplicate',
-                scale: 'Scale',
-                rotate: 'Rotate',
                 clear: 'Clear Scene'
-            },
-            view: {
-                label: 'View',
-                standard: 'Standard',
-                preview: 'Gcode Preview'
             },
             device: {
                 label: 'Device',
-                new: 'USB Configuration',
+                new: 'Add New Device',
                 device_monitor: 'Device Monitor',
                 change_filament: 'Change Filament',
-                check_firmware_update: 'Check Firmware Update',
                 default_device: 'Default Device'
             },
             window: {
@@ -91,6 +81,7 @@ define(function() {
 
             // specific caption/content
             invalid_device_name: 'The name can only contains alphabet, numbers, blanks, and special characters  “-”, “_”, “’”, “\'”.',
+            require_device_name: 'Name is required',
             select_language: 'Select Language',
             change_password: 'Change password?',
             connect_flux: 'Connect FLUX to Your Computer by USB Cable',
@@ -694,11 +685,11 @@ define(function() {
             messages: {
                 'not open': {
                     caption: 'Camera not detect',
-                    message: 'Please pull off the scanning camera.'
+                    message: 'Please pull off the scanning camera, until it makes a sound at the end.'
                 },
                 'no object': {
                     caption: 'Calibration tool not detected',
-                    message: ''
+                    message: 'Insert the calibration tool into the center slot.'
                 },
                 'no laser': {
                     caption: 'Laser not detected',

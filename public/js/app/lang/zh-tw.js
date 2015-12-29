@@ -32,52 +32,42 @@ define(function() {
             install: 'INSTALL'
         },
         topmenu: {
+            version: '版本',
+            sure_to_quit: '確定要結束 FLUX Studio?',
             flux: {
                 label: 'Flux',
-                about: 'About FLUX studio',
-                preferences: 'Preferences',
-                quit: 'Quit'
+                about: '關於 FLUX studio',
+                preferences: '偏好設定',
+                quit: '結束'
             },
             file: {
-                label: 'File',
-                import: 'import',
-                recent: 'Recent',
-                execute: 'Execute',
-                save_gcode: 'Save Gcode'
+                label: '檔案',
+                import: '匯入',
+                save_gcode: '匯出 Gcode',
+                save_fcode: '匯出工作'
             },
             edit: {
-                label: 'Edit',
-                copy: 'Copy',
-                cut: 'Cut',
-                paste: 'Paste',
-                duplicate: 'Duplicate',
-                scale: 'Scale',
-                rotate: 'Rotate',
-                clear: 'Clear Scene'
-            },
-            view: {
-                label: 'View',
-                standard: 'Standard',
-                preview: 'Gcode Preview'
+                label: '編輯',
+                duplicate: '重製',
+                clear: '清除場景'
             },
             device: {
-                label: 'Device',
-                new: 'USB Configuration',
-                device_monitor: 'Device Monitor',
-                change_filament: 'Change Filament',
-                check_firmware_update: 'Check Firmware Update',
-                default_device: 'Default Device'
+                label: '裝置',
+                new: '新增裝置',
+                device_monitor: '狀態',
+                change_filament: '自動換料',
+                default_device: '設成預設裝置'
             },
             window: {
-                label: 'Window',
-                minimize: 'Minimize',
-                fullscreen: 'Fullscreen'
+                label: '視窗',
+                minimize: '最小化',
+                fullscreen: '全螢幕'
             },
             help: {
-                label: 'Help',
-                starting_guide: 'Starting Guide',
-                online_support: 'Online Support',
-                troubleshooting: 'Troubleshooting'
+                label: '說明',
+                starting_guide: '開始使用',
+                online_support: '線上支援',
+                troubleshooting: '錯誤排除'
             }
         },
         initialize: {
@@ -91,6 +81,7 @@ define(function() {
 
             // specific caption/content
             invalid_device_name: '機器名稱只能使用英文字母、數字、空格以及特殊字元 “-”, “_”, “’”, “\'”',
+            require_device_name: '名稱欄位為必填',
             select_language: '請選擇你想使用的語言',
             change_password: '要更改密碼嗎?',
             connect_flux: '用 USB 連接你的電腦與 FLUX',
@@ -694,15 +685,15 @@ define(function() {
             messages: {
                 'not open': {
                     caption: '未偵測到鏡頭畫面',
-                    message: '請參考使用手冊，將掃描鏡頭拉出。'
+                    message: '壓下，然後拉出掃描鏡頭，直至最底端發出固定聲為止。'
                 },
                 'no object': {
                     caption: '未偵測到校正工具',
-                    message: ''
+                    message: '請將掃描校正工具插在中心溝槽處'
                 },
                 'no laser': {
                     caption: '未偵測到掃描雷射',
-                    message: '請參考使用手冊，按下雷射頭將其打開'
+                    message: '請壓下，並彈出掃描雷射頭。'
                 }
             }
         },

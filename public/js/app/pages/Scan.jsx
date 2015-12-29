@@ -115,7 +115,7 @@ define([
                     var self = this;
 
                     AlertStore.onRetry(self._retry);
-                    AlertStore.onCancel(self._cancelScan);
+                    AlertStore.onCancel(self._onCancel);
                     dndHandler.plug(document, self._importPCD);
 
                     self.setState({
@@ -131,8 +131,8 @@ define([
                 componentWillUnmount: function() {
                     var self = this;
 
-                    AlertStore.removeCancelListener(self._cancelScan);
                     AlertStore.removeRetryListener(self._retry);
+                    AlertStore.removeCancelListener(self._onCancel);
                     dndHandler.unplug(document);
 
                     if ('undefined' !== typeof self.state.scanCtrlWebSocket &&
@@ -163,18 +163,12 @@ define([
                     }
                 },
 
-                _cancelScan: function(id) {
-                    if ('scan-modeling-error' === id) {
-                        // TODO: modeling error
-                    }
-                    else if ('over-quota' === id) {
-                        // TODO: over upload quota
-                    }
-                    else if ('calibrate' === id) {
-                        // TODO: cancel calibrate
-                    }
-                    else {
-                        window.history.go(-1);
+                _onCancel: function(id) {
+                    var self = this;
+
+                    switch (id) {
+                    case 'scan-device-busy':
+                        history.back();
                     }
                 },
 
@@ -944,16 +938,31 @@ define([
 
                 _onCalibrateFail: function(message, Popup) {
                     var self = this,
+                        imageSrc,
                         failMessage = self.state.lang.scan.messages[message] || {
                             caption: '',
                             message: message
                         };
+
+                    switch (message) {
+                    case 'not open':
+                        imageSrc = '/img/not-open.png';
+                        break;
+                    case 'no object':
+                        imageSrc = '/img/no-object.png';
+                        break;
+                    case 'no laser':
+                        imageSrc = '/img/no-laser.png';
+                    default:
+                        break;
+                    }
+
                     self._openBlocker(false);
                     Popup(
                         'calibrate',
                         (
                             <div>
-                                <img className="calibrate-image" src="/img/calibration-guide.jpg"/>
+                                <img className="calibrate-image" src={imageSrc}/>
                                 <p>{failMessage.message}</p>
                             </div>
                         ),
@@ -965,17 +974,15 @@ define([
                     var self = this,
                         onPass = function() {
                             var scanCtrlWebSocket = self.state.scanCtrlWebSocket,
-                                calibrateDeferred = scanCtrlWebSocket.calibrate(true),
+                                calibrateDeferred = scanCtrlWebSocket.calibrate(),
                                 done = function(data) {
                                     self._refreshCamera();
                                     self._openBlocker(false);
                                 },
                                 fail = function(data) {
+                                    self._refreshCamera();
                                     self._openBlocker(false);
-                                    AlertActions.showPopupError(
-                                        'calibrate-fail',
-                                        self.state.lang.scan.calibrate_fail
-                                    );
+                                    self._onCalibrateFail(data.message, AlertActions.showPopupRetry);
                                 };
 
                             calibrateDeferred.done(done).fail(fail);
@@ -1160,11 +1167,15 @@ define([
                             menuFactory.items.import.enabled = true;
                             self._openBlocker(true, ProgressConstants.NONSTOP);
                         },
+                        noDeviceAvailable = function() {
+                            history.go(-1);
+                        },
                         content = (
                             <PrinterSelector
                                 uniqleId="scan"
                                 className="scan-printer-selection"
                                 lang={lang}
+                                onClose={noDeviceAvailable}
                                 onGettingPrinter={onGettingPrinter}
                             />
                         ),

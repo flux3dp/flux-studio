@@ -72,8 +72,8 @@ define([
                 lang = self.props.lang,
                 _options = [],
                 refreshOption = function(options) {
-                    window.printers = options;
                     _options = [];
+                    window.printers = options;
 
                     options.forEach(function(el) {
                         _options.push({
@@ -82,7 +82,10 @@ define([
 
                         if (true === self.hadDefaultPrinter && el.uuid === selectedPrinter.uuid) {
                             // update device stat
-                            initializeMachine.defaultPrinter.set(el);
+                            initializeMachine.defaultPrinter.set({
+                                serial: el.serial,
+                                uuid: el.uuid
+                            });
                         }
                     });
 
@@ -96,10 +99,8 @@ define([
 
             if (true === this.state.hadDefaultPrinter) {
                 this._selectPrinter(selectedPrinter);
-                this._returnSelectedPrinter();
             }
 
-            AlertStore.onCancel(this._handleClose);
             AlertStore.onRetry(this._waitForPrinters);
             AlertStore.onYes(this._onYes);
             AlertStore.onCancel(this._onCancel);
@@ -121,7 +122,6 @@ define([
                 this.state.discoverMethods.removeListener(this.state.discoverId);
             }
 
-            AlertStore.removeCancelListener(this._handleClose);
             AlertStore.removeRetryListener(this._waitForPrinters);
             AlertStore.removeYesListener(this._onYes);
             AlertStore.removeCancelListener(this._onCancel);
@@ -145,10 +145,17 @@ define([
         },
 
         _onCancel: function(id) {
-            return;
+            switch (id) {
+            case 'no-printer':
+            case 'printer-connection-timeout':
+                this._handleClose();
+                break;
+            default:
+                break;
+            }
         },
 
-        _selectPrinter: function(printer) {
+        _selectPrinter: function(printer, e) {
             var self = this,
                 lang = self.props.lang,
                 onError = function() {
@@ -174,9 +181,12 @@ define([
                 };
 
             self.selected_printer = printer;
-            DeviceMaster.selectDevice(printer);
 
             switch (printer.st_id) {
+            // null for simulate
+            case null:
+            // null for not found default device
+            case undefined:
             case DeviceConstants.status.IDLE:
                 // no problem
                 self._auth(printer.uuid, '', opts);
@@ -190,7 +200,7 @@ define([
             case DeviceConstants.status.ABORTED:
                 // quit
                 DeviceMaster.quit().done(function() {
-                    this._returnSelectedPrinter();
+                    self._returnSelectedPrinter();
                 });
                 break;
             case DeviceConstants.status.RUNNING:
@@ -202,7 +212,6 @@ define([
                 break;
             default:
                 // device busy
-                console.log('device busy');
                 AlertActions.showDeviceBusyPopup('on-select-printer');
                 break;
             }
@@ -252,18 +261,19 @@ define([
         },
 
         _returnSelectedPrinter: function() {
-            var self = this;
+            var self = this,
+                lang = this.props.lang;
 
             if ('00000000000000000000000000000000' === self.selected_printer.uuid) {
                 self.props.onGettingPrinter(self.selected_printer);
             }
             else {
-                DeviceMaster.selectDevice(self.selected_printer).then(function(status) {
+                DeviceMaster.selectDevice(self.selected_printer).done(function(status) {
                     if (status === DeviceConstants.CONNECTED) {
                         self.props.onGettingPrinter(self.selected_printer);
                     }
                     else if (status === DeviceConstants.TIMEOUT) {
-                        AlertActions.showPopupError('printer-selector', lang.message.connectionTimeout);
+                        AlertActions.showPopupError('printer-connection-timeout', lang.message.connectionTimeout);
                     }
                 });
             }
@@ -290,12 +300,11 @@ define([
             }
 
             return (
-                <label className="device printer-item" data-meta={meta} onClick={this._selectPrinter.bind(null, printer)}>
-                    <input type="radio" name="printer-group" value={printer.uuid}/>
+                <div className="device printer-item" data-meta={meta} onClick={this._selectPrinter.bind(null, printer)}>
                     <div className="col device-name">{printer.name}</div>
                     <div className="col module">{headText}</div>
                     <div className="col status">{statusText}</div>
-                </label>
+                </div>
             );
         },
 

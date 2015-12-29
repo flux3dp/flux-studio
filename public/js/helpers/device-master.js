@@ -67,6 +67,8 @@ define([
             _device.name = device.name;
             _device.actions = DeviceController(uuid, {
                 onConnect: function(response) {
+                    d.notify(response);
+
                     if (response.status.toUpperCase() === DeviceConstants.CONNECTED) {
                         d.resolve(DeviceConstants.CONNECTED);
                         _devices.push(_device);
@@ -271,23 +273,31 @@ define([
         return _device.actions.fileInfo(path, fileName);
     }
 
-    function startCamera(callback) {
+    function readyCamera() {
+        var d = $.Deferred();
         _device.scanController = ScanController(_device.uuid, {
             onReady: function() {
-                _device.cameraSource = _device.scanController.getImage(callback);
+                d.resolve('');
             },
-            onError: function() {
-
+            onError: function(error) {
+                AlertActions.showPopupError('', error);
             }
         });
+
+        return d.promise();
+    }
+
+    function startCamera(callback) {
+        _device.cameraSource = _device.scanController.getImage(callback);
     }
 
     function stopCamera() {
+        var d = $.Deferred();
         if(_device.cameraSource) {
             _device.cameraSource.stop();
-            _device.scanController.quit();
-            _device.cameraSource = null;
+            d.resolve('');
         }
+        return d.promise();
     }
 
     function maintain(type) {
@@ -445,6 +455,7 @@ define([
             this.setPassword        = setPassword;
             this.getReport          = getReport;
             this.getSelectedDevice  = getSelectedDevice;
+            this.readyCamera        = readyCamera;
             this.startCamera        = startCamera;
             this.stopCamera         = stopCamera;
             this.ls                 = ls;
