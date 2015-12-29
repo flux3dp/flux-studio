@@ -299,21 +299,22 @@ define([
                 var types = {
                     INFO: function() {
                         $.growl.notice({
-                            title: self.state.lang.alert.info,
+                            title: lang.alert.info,
                             message: message
                         });
                     },
 
                     WARNING: function() {
                         $.growl.warning({
-                            title: self.state.lang.alert.warning,
-                            message: message
+                            title: lang.alert.warning,
+                            message: message,
+                            fixed: true
                         });
                     },
 
                     ERROR: function() {
                         $.growl.error({
-                            title: self.state.lang.alert.error,
+                            title: lang.alert.error,
                             message: message,
                             fixed: true
                         });
