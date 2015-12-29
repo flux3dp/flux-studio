@@ -72,7 +72,6 @@ define([
                 lang = self.props.lang,
                 _options = [],
                 refreshOption = function(options) {
-                    window.printers = options;
                     _options = [];
 
                     options.forEach(function(el) {
@@ -175,7 +174,6 @@ define([
 
             self.selected_printer = printer;
             DeviceMaster.selectDevice(printer);
-            console.log(printer);
 
             switch (printer.st_id) {
             case DeviceConstants.status.IDLE:
