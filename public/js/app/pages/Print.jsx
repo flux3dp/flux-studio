@@ -24,6 +24,7 @@ define([
     'jsx!widgets/Tour-Guide',
     'app/actions/alert-actions',
     'app/stores/alert-store',
+    'helpers/shortcuts',
     'helpers/object-assign'
 ], function(
     $,
@@ -50,7 +51,8 @@ define([
     AppSettings,
     TourGuide,
     AlertActions,
-    AlertStore
+    AlertStore,
+    shortcuts
 ) {
 
     return function(args) {
@@ -141,18 +143,17 @@ define([
                 },
 
                 _registerKeyEvents: function() {
-                    $(document).keydown(function(e) {
-                        // delete event
-                        if(e.metaKey && e.keyCode === 8 || e.keyCode === 46 || e.keyCode === 8) {
-                            if(allowDeleteObject) {
-                                director.removeSelected();
-                            }
+                    // delete event
+                    shortcuts.on(['del'], function(e) {
+                        if(allowDeleteObject) {
+                            director.removeSelected();
                         }
+                    });
 
-                        // copy event
-                        if(e.metaKey && e.keyCode === 68) {
-                            director.duplicateSelected();
-                        }
+                    // copy event
+                    shortcuts.on(['cmd', 'd'], function(e) {
+                        e.preventDefault();
+                        director.duplicateSelected();
                     });
                 },
 
@@ -219,7 +220,6 @@ define([
                         this.setState({ leftPanelReady: true });
                     }.bind(this));
                     advancedSettings.support_material = isOn ? 1 : 0;
-                    // console.log('support on?', isOn);
                     advancedSettings.custom = advancedSettings.custom.replace(
                         `support_material = ${isOn ? 0 : 1}`,
                         `support_material = ${isOn ? 1 : 0}`);
@@ -380,7 +380,6 @@ define([
                         this.setState({ layerHeight: value });
                     }
                     else if (key === 'raft_layers') {
-                        console.log(key, value !== '0');
                         this.setState({ raftOn: value !== '0' });
                     }
                 },
