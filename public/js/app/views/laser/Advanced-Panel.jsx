@@ -149,14 +149,12 @@ define([
                 power = self.refs.power,
                 defaultMaterial;
 
-            console.log(speed.value(), power.value());
             defaultMaterial = {
                 data: {
                     laser_speed: speed.value(),
                     power: power.value() / 100 * lang.form.power.max
                 }
             };
-            console.log(defaultMaterial, lang.form.power.max);
 
             self._updateDefaultMaterial(defaultMaterial);
         },
