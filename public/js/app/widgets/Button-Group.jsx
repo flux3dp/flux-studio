@@ -38,6 +38,18 @@ define(['react'], function(React){
                             <a className={className} href={opt.href} {...attrs} onClick={opt.onClick} >{opt.label}</a>
                         );
                     }
+                    else if ('icon' === opt.type) {
+                        content = (
+                            <button
+                                title={opt.title}
+                                className={className}
+                                type="button"
+                                onClick={opt.onClick}
+                                {...attrs} >
+                                {opt.label}
+                            </button>
+                        );
+                    }
                     else {
                         content = (
                             <button

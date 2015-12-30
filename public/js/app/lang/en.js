@@ -7,7 +7,7 @@ define(function() {
             name : 'Flux Studio - en'
         },
         support: {
-            no_webgl: '無法在本台電腦開啟 WebGL, 請使用其他可以支援的電腦'
+            no_webgl: 'WebGL not supported. Please use other devices.'
         },
         device_selection: {
             no_printers: 'FLUX Device not detected. Please check if you and the FLUX device is under same network.',
@@ -32,7 +32,7 @@ define(function() {
             install: 'INSTALL'
         },
         topmenu: {
-            version: '版本',
+            version: 'Version',
             sure_to_quit: 'Sure to quit?',
             flux: {
                 label: 'Flux',
@@ -762,7 +762,7 @@ define(function() {
             HEAD_ERROR_FAN_FAILURE          : 'Fan failed / stucked\nyou can spin it with a pancil',
             HWARDWARE_ERROR_FILAMENT_RUNOUT : 'Ran out of filament\nPlease insert new material',
             HWARDWARE_ERROR_0               : 'Ran out of filament\nPlease insert new material',
-            HARDWARE_ERROR_PLATE_MISSING    : '未偵測到工作平台\n請放上工作平台金屬板',
+            HARDWARE_ERROR_PLATE_MISSING    : 'Unable to detect the base plate\nPlease put on the plate.',
             HARDWARE_ERROR_ZPROBE_ERROR     : 'Unable to calibrate the base plate\nPlease remove left-over on the nozzle',
             CONVERGENCE_FAILED              : 'Unable to calibrate the base plate\nPlease remove left-over on the nozzle',
             HARDWARE_ERROR_HOME_FAILED      : 'Unable to home\nPlease remove the obstacle',
@@ -877,15 +877,11 @@ define(function() {
             unload_filament: 'Unload Filament',
             next: 'NEXT',
             heating_nozzle: 'Heating nozzle',
-            emerging: [
-                'Loading filament',
-                'Press STOP when you see material is emerging.'
-            ],
             unloading: 'Unloading Filament',
-            stop: 'STOP',
             loaded: 'Filament Loaded',
             unloaded: 'Filament Unloaded',
-            ok: 'OK'
+            ok: 'OK',
+            auto_emerging: 'Auto Emerging'
         },
         input_machine_password: {
             require_password: '"%s" requires a password',
