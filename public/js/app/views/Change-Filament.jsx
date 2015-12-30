@@ -114,15 +114,16 @@ define([
                         DeviceMaster.quitTask().done(function() {
                             self._next(steps.COMPLETED);
                         });
-                    },
-                    deferred = DeviceMaster.maintain(type).progress(progress).done(done).fail(function(response) {
-                        if ('RESOURCE_BUSY' === response.error) {
-                            AlertActions.showDeviceBusyPopup('change-filament-device-busy');
-                        }
-                        else {
-                            AlertActions.showPopupError('change-filament-device-error', response.error);
-                        }
-                    });
+                    };
+
+                DeviceMaster.maintain(type).progress(progress).done(done).fail(function(response) {
+                    if ('RESOURCE_BUSY' === response.error) {
+                        AlertActions.showDeviceBusyPopup('change-filament-device-busy');
+                    }
+                    else {
+                        AlertActions.showPopupError('change-filament-device-error', response.error);
+                    }
+                });
             },
 
             _onClose: function(e) {
@@ -183,9 +184,16 @@ define([
             },
 
             _sectionGuide: function() {
+                var activeLang = i18n.getActiveLang(),
+                    imageSrc = (
+                        'en' === activeLang ?
+                        '/img/insert-filament-en.png' :
+                        '/img/insert-filament-zh-tw.png'
+                    );
+
                 return {
                     message: (
-                        <img className="guide-image" src="/img/change-filament-guide.png"/>
+                        <img className="guide-image" src={imageSrc}/>
                     ),
                     buttons: [{
                         label: lang.change_filament.cancel,
@@ -205,14 +213,15 @@ define([
             },
 
             _sectionHeating: function() {
-                var self = this;
+                var self = this,
+                    temperature = this.state.temperature + '°C';
 
                 return {
                     message: (
                         <div className="message-container">
-                            <p>
+                            <p className="temperature">
                                 <span>{lang.change_filament.heating_nozzle}</span>
-                                <span>({this.state.temperature})</span>
+                                <span>{temperature}</span>
                             </p>
                             <div className="spinner-roller spinner-roller-reverse"/>
                         </div>
@@ -230,15 +239,19 @@ define([
 
             _sectionEmerging: function() {
                 var self = this,
-                    emergingText = lang.change_filament.emerging.map(function(text) {
-                        return (<p>{text}</p>);
-                    });
+                    activeLang = i18n.getActiveLang(),
+                    imageSrc;
+
+                imageSrc = (
+                    'en' === activeLang ?
+                    '/img/press-to-accelerate-en.png' :
+                    '/img/press-to-accelerate-zh-tw.png'
+                );
 
                 return {
                     message: (
                         <div className="message-container">
-                            {emergingText}
-                            <div className="spinner-roller spinner-roller-reverse"/>
+                            <img className="guide-image" src={imageSrc}/>
                         </div>
                     ),
                     buttons: [{
@@ -247,6 +260,17 @@ define([
                             'ga-event': 'cancel'
                         },
                         onClick: this.props.onClose
+                    },
+                    {
+                        label: [
+                            <span className="auto-emerging">{lang.change_filament.auto_emerging}</span>,
+                            <div className="spinner-roller spinner-roller-reverse"/>
+                        ],
+                        type: 'icon',
+                        className: 'btn-icon',
+                        onClick: function(e) {
+                            e.preventDefault();
+                        }
                     }]
                 };
             },
@@ -337,7 +361,8 @@ define([
                         />
                     ),
                     className = {
-                        'modal-change-filament': true
+                        'modal-change-filament': true,
+                        'shadow-modal': true
                     };
 
                 return (

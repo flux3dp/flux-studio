@@ -868,28 +868,24 @@ define(function() {
             UNKNOWN: ''
         },
         change_filament: {
-            home_caption: 'Change Filament',
-            load_filament_caption: 'LOAD FILAMENT',
-            unload_filament_caption: 'UNLOAD FILAMENT',
-            cancel: 'CANCEL',
-            load_filament: 'Load Filament',
-            unload_filament: 'Unload Filament',
-            next: 'NEXT',
-            heating_nozzle: 'Heating nozzle',
-            emerging: [
-                'Loading filament',
-                'Press STOP when you see material is emerging.'
-            ],
-            unloading: 'Unloading Filament',
-            stop: 'STOP',
-            loaded: 'Filament Loaded',
-            unloaded: 'Filament Unloaded',
-            ok: 'OK'
+            home_caption: '更換線料',
+            load_filament_caption: '自動進料',
+            unload_filament_caption: '自動退料',
+            cancel: '取消',
+            load_filament: '自動進料',
+            unload_filament: '自動退料',
+            next: '下一步',
+            heating_nozzle: '噴頭加熱中',
+            unloading: '自動退料中',
+            loaded: '進料完成',
+            unloaded: '退料完成',
+            ok: '確定',
+            auto_emerging: '進料中'
         },
         input_machine_password: {
-            require_password: '"%s" requires a password',
-            connect: 'CONNECT',
-            password: 'Password'
+            require_password: '"%s" 需要密碼',
+            connect: '連接',
+            password: '密碼'
         },
         tutorial: {
             clickToImport: 'Click to import STL file',

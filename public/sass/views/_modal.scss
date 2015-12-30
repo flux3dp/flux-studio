@@ -290,8 +290,10 @@
 
 .modal-change-filament {
     .guide-image {
+        border: 2px solid #000;
         display: block;
         margin: 0 auto;
+        width: 100%;
     }
 
     .modal-alert {
@@ -321,6 +323,12 @@
 
         p {
             margin: 0;
+        }
+    }
+
+    .temperature {
+        span {
+            margin: 0 5px 0 0;
         }
     }
 
@@ -359,6 +367,27 @@
         .btn {
             margin: 0;
             padding: 0 10px;
+        }
+
+        .btn-icon {
+            background: #fff;
+            border: none;
+            color: #B3B3B3;
+            cursor: initial;
+            max-width: none;
+            @include flexbox();
+            justify-content: space-between;
+        }
+
+        .auto-emerging {
+            margin: 0 5px 0 0;
+        }
+
+        .spinner-roller {
+            height: 33px;
+            margin: 0;
+            padding: 0;
+            width: 33px;
         }
 
         .btn:first-child:not([class*="btn-alone"]),
