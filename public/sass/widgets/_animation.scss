@@ -82,6 +82,11 @@
 .spinner-roller-reverse {
     background: linear-gradient(to right, #DEDEDC 10%, rgba(255, 255, 255, 0) 42%);
 
+    &::before {
+        left: -1px;
+        top: -1px;
+    }
+
     &::after {
         background: #fff;
     }
