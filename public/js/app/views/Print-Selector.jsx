@@ -178,42 +178,57 @@ define([
                 },
                 opts = {
                     onError: onError
+                },
+                checkStId = function(printer) {
+                    switch (printer.st_id) {
+                    // null for simulate
+                    case null:
+                    // null for not found default device
+                    case undefined:
+                    case DeviceConstants.status.IDLE:
+                        // no problem
+                        self._auth(printer.uuid, '', opts);
+                        break;
+                    case DeviceConstants.status.SCAN:
+                    case DeviceConstants.status.MAINTAIN:
+                        // ask kick?
+                        AlertActions.showPopupYesNo('kick', lang.message.device_is_used);
+                        break;
+                    case DeviceConstants.status.COMPLETED:
+                    case DeviceConstants.status.ABORTED:
+                        // quit
+                        DeviceMaster.quit().done(function() {
+                            self._returnSelectedPrinter();
+                        });
+                        break;
+                    case DeviceConstants.status.RUNNING:
+                    case DeviceConstants.status.PAUSED:
+                    case DeviceConstants.status.PAUSED_FROM_STARTING:
+                    case DeviceConstants.status.PAUSED_FROM_RUNNING:
+                        // ask for abort
+                        AlertActions.showPopupYesNo('abort', lang.message.device_is_used);
+                        break;
+                    default:
+                        // device busy
+                        AlertActions.showDeviceBusyPopup('on-select-printer');
+                        break;
+                    }
                 };
 
             self.selected_printer = printer;
 
-            switch (printer.st_id) {
-            // null for simulate
-            case null:
-            // null for not found default device
-            case undefined:
-            case DeviceConstants.status.IDLE:
-                // no problem
-                self._auth(printer.uuid, '', opts);
-                break;
-            case DeviceConstants.status.SCAN:
-            case DeviceConstants.status.MAINTAIN:
-                // ask kick?
-                AlertActions.showPopupYesNo('kick', lang.message.device_is_used);
-                break;
-            case DeviceConstants.status.COMPLETED:
-            case DeviceConstants.status.ABORTED:
-                // quit
-                DeviceMaster.quit().done(function() {
-                    self._returnSelectedPrinter();
+            if ('00000000000000000000000000000000' === self.selected_printer.uuid) {
+                self._returnSelectedPrinter();
+            }
+            else {
+                DeviceMaster.selectDevice(self.selected_printer).done(function(status) {
+                    if (status === DeviceConstants.CONNECTED) {
+                        checkStId(printer);
+                    }
+                    else if (status === DeviceConstants.TIMEOUT) {
+                        AlertActions.showPopupError('printer-connection-timeout', lang.message.connectionTimeout);
+                    }
                 });
-                break;
-            case DeviceConstants.status.RUNNING:
-            case DeviceConstants.status.PAUSED:
-            case DeviceConstants.status.PAUSED_FROM_STARTING:
-            case DeviceConstants.status.PAUSED_FROM_RUNNING:
-                // ask for abort
-                AlertActions.showPopupYesNo('abort', lang.message.device_is_used);
-                break;
-            default:
-                // device busy
-                AlertActions.showDeviceBusyPopup('on-select-printer');
-                break;
             }
         },
 
@@ -261,23 +276,9 @@ define([
         },
 
         _returnSelectedPrinter: function() {
-            var self = this,
-                lang = this.props.lang;
+            var self = this;
 
-            if ('00000000000000000000000000000000' === self.selected_printer.uuid) {
-                self.props.onGettingPrinter(self.selected_printer);
-            }
-            else {
-                DeviceMaster.selectDevice(self.selected_printer).done(function(status) {
-                    if (status === DeviceConstants.CONNECTED) {
-                        self.props.onGettingPrinter(self.selected_printer);
-                    }
-                    else if (status === DeviceConstants.TIMEOUT) {
-                        AlertActions.showPopupError('printer-connection-timeout', lang.message.connectionTimeout);
-                    }
-                });
-            }
-
+            self.props.onGettingPrinter(self.selected_printer);
         },
 
         _renderPrinterItem: function(printer) {
