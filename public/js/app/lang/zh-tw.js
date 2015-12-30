@@ -103,10 +103,10 @@ define(function() {
             setting_completed: {
                 start: '開始使用',
                 is_ready: '“%s” 準備完成',
-                station_ready_statement: '你的 FLUX 已成為 Wi-Fi 熱點，你可以藉由無線連接 “%s” 這個熱點操作 FLUX',
+                station_ready_statement: '你的 FLUX Delta 已成為 Wi-Fi 熱點，你可以藉由無線連接 “%s” 這個熱點操作 FLUX',
                 brilliant: '太棒了!',
-                begin_journey: '你可以開始使用 FLUX 隨心所欲地進行創作囉！',
-                great: 'Let\'s Begin 開始使用 FLUX',
+                begin_journey: '你可以開始使用 FLUX Delta 隨心所欲地進行創作囉！',
+                great: 'Let\'s Begin 開始使用 FLUX Delta',
                 upload_via_usb: '你可以稍後再設定 Wi-Fi 選項, 或使用 USB 隨身碟列印。',
                 back: '回到 Wi-Fi 設定',
                 ok: '開始使用'
@@ -265,7 +265,7 @@ define(function() {
                 slicingEngine: '切片引擎',
                 slic3r: 'Slic3r',
                 experiment: 'Experiment',
-                filament: '線料',
+                filament: '料捲',
                 temperature: '溫度',
                 layer_height_title: '層高',
                 layer_height: '一般層高',
@@ -760,12 +760,13 @@ define(function() {
             HEAD_OFFLINE                    : '沒有偵測到列印工具頭',
             HEAD_ERROR_CALIBRATING          : '模組校正失誤\n請重新裝載模組，並確認磁鐵關節正確的附著',
             HEAD_ERROR_FAN_FAILURE          : '風扇未轉動\n請用細針戳一下',
-            HWARDWARE_ERROR_FILAMENT_RUNOUT : '未偵測到線料\n請重新插入新的線料',
-            HWARDWARE_ERROR_0               : '未偵測到線料\n請重新插入新的線料',
+            HWARDWARE_ERROR_FILAMENT_RUNOUT : '未偵測到料捲\n請重新插入新的料捲',
+            HWARDWARE_ERROR_0               : '未偵測到料捲\n請重新插入新的料捲',
             HARDWARE_ERROR_PLATE_MISSING    : '未偵測到工作平台\n請放上工作平台金屬板',
             HARDWARE_ERROR_ZPROBE_ERROR     : '校正失敗\n請移除噴頭上的殘料',
+            HEAD_ERROR_HEAD_RESET           : '模組傳輸線接觸不良\n請重新裝載模組，並確認傳輸線完整插入',
             CONVERGENCE_FAILED              : '校正失敗\n請移除噴頭上的殘料',
-            HARDWARE_ERROR_HOME_FAILED      : '歸零失敗\n請排除異物後重試',
+            HARDWARE_ERROR_HOME_FAILED      : '歸零失敗\n請排除異物，並重新插拔噴頭傳輸線',
             HEAD_ERROR_TILT                 : 'Head tilted\nPlease check ball joint rod is attached correctly',
             HEAD_ERROR_SHAKE                : 'Head tilted\nPlease check ball joint rod is attached correctly',
             WRONG_HEAD                      : '請更換成列印工具頭',
@@ -778,6 +779,7 @@ define(function() {
             MAINBOARD_OFFLINE               : '裝置錯誤\n請重新啟動機器',
             HEAD_ERROR_HARDWARE_FAILURE     : '噴頭錯誤\n請重新裝載工作頭',
             G28_FAILED                      : '歸零失敗\n請排除異物後重試',
+            FILAMENT_RUNOUT_0               : '未偵測到料捲\n請重新插入新的料捲',
             processing                      : 'Processing',
             savingPreview                   : 'Saving preview image',
             hour                            : '小時',
@@ -868,7 +870,7 @@ define(function() {
             UNKNOWN: ''
         },
         change_filament: {
-            home_caption: '更換線料',
+            home_caption: '更換料捲',
             load_filament_caption: '自動進料',
             unload_filament_caption: '自動退料',
             cancel: '取消',
@@ -880,7 +882,9 @@ define(function() {
             loaded: '進料完成',
             unloaded: '退料完成',
             ok: '確定',
-            auto_emerging: '進料中'
+            auto_emerging: '進料中',
+            maintain_head_type_error: '列印模組未正確安裝',
+            maintain_zombie: '請重新啟動機器'
         },
         input_machine_password: {
             require_password: '"%s" 需要密碼',
@@ -888,10 +892,14 @@ define(function() {
             password: '密碼'
         },
         tutorial: {
-            clickToImport: 'Click to import STL file',
-            selectQuality: 'Select quality preferred',
-            clickGo: 'Click GO and preview',
-            startPrint: 'Click go and start printing'
+            startWithFilament: '讓我們先填裝料捲吧',
+            startWithModel: '接下來，我們來載入3Ｄ模型囉',
+            startTour: '嗨，歡迎<br/>這是你第一次使用列印功能,<br/>你希望觀看列印功能教學嗎？',
+            clickToImport: '點擊匯入以載入 3D 模型',
+            selectQuality: '選擇列印品質',
+            clickGo: '按下開始以準備列印',
+            startPrint: '開始列印',
+            skip: '跳過教學'
         },
         slicer: {
             computing: '計算中'

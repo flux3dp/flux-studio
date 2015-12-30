@@ -102,10 +102,11 @@ define([
             });
         },
 
-        showChangeFilament: function(device) {
+        showChangeFilament: function(device, src) {
             AlertDispatcher.dispatch({
                 actionType: AlertConstants.SHOW_POPUP_CHANGE_FILAMENT,
-                device: device
+                device: device,
+                src: src || ''
             });
         },
 

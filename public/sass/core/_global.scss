@@ -537,3 +537,40 @@ input[type=range]:focus::-webkit-slider-runnable-track {
     clip-path: polygon(0 0, 100% 100%, 100% 0);
     transform: translateX(1px);
 }
+
+.tour {
+    cursor: pointer;
+    z-index: 9999;
+
+    .base {
+        background-color:rgba(255, 255, 255, 0.3);
+        border: solid 1px black;
+        height: 200px;
+        left: 744px;
+        position: relative;
+        top: 388px;
+        width: 200px;
+    }
+
+    .tour-description {
+        color: white;
+        font-size: 16px;
+        font-weight: bold;
+        position: relative;
+        text-align: center;
+        top: -70px;
+    }
+
+    .tour-text {
+        font-size: 1.8rem;
+    }
+
+    .btn-tutorial {
+        position: absolute;
+        left: 30px;
+        bottom: 30px;
+        z-index: 999999;
+        border-radius: 5px;
+    }
+
+}
