@@ -15,11 +15,9 @@ define(['helpers/is-json'], function(isJson) {
 
         var defaultCallback = function(result) {},
             defaultOptions = {
-                // hostname: location.hostname,
-                hostname: '192.168.16.202',
+                hostname: location.hostname,
                 method: '',
-                // port: window.FLUX.ghostPort,
-                port: 8888,
+                port: window.FLUX.ghostPort,
                 autoReconnect: true,
                 onMessage: defaultCallback,
                 onError: defaultCallback,
