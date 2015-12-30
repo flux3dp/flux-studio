@@ -22,10 +22,14 @@ define(['react', 'jsx!widgets/Button-Group'], function(React, ButtonGroup) {
                     ''
                 );
 
+            var html = typeof this.props.message === 'string' ?
+                        <pre className="message" dangerouslySetInnerHTML={{__html: this.props.message}}></pre> :
+                        <pre className="message">{this.props.message}</pre>
+
             return (
                 <div className="modal-alert">
                     {caption}
-                    <pre className="message">{this.props.message}</pre>
+                    {html}
                     {buttonsGroup}
                 </div>
             );

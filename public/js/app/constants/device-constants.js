@@ -3,6 +3,7 @@ define(function() {
 
     return {
         // Status
+        STARTING        : 'STARTING',
         RUNNING         : 'RUNNING',
         READY           : 'READY',
         PAUSING         : 'PAUSING',

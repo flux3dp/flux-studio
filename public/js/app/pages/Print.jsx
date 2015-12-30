@@ -73,7 +73,8 @@ define([
             selectedPrinter,
             $importBtn,
             allowDeleteObject = true,
-            tutorialMode = false,
+            tutorialMode = true,
+            showChangeFilament = false,
             nwjsMenu = menuFactory.items,
             view = React.createClass({
 
@@ -161,22 +162,42 @@ define([
                         tourGuide = [
                             {
                                 selector: '.arrowBox',
-                                text: lang.tutorial.clickToImport
+                                text: lang.tutorial.startWithFilament,
+                                r: 0,
+                                position: 'top'
+                            },
+                            {
+                                selector: '.arrowBox',
+                                text: lang.tutorial.startWithModel,
+                                r: 0,
+                                position: 'bottom'
+                            },
+                            {
+                                selector: '.arrowBox',
+                                text: lang.tutorial.clickToImport,
+                                r: 80,
+                                position: 'top'
                             },
                             {
                                 selector: '.quality-select',
-                                text: lang.tutorial.selectQuality
+                                text: lang.tutorial.selectQuality,
+                                r: 80,
+                                position: 'right'
                             },
                             {
-                                selector: '.action-buttons',
-                                text: lang.tutorial.clickGo
+                                selector: 'button.btn-go',
+                                text: lang.tutorial.clickGo,
+                                r: 80,
+                                position: 'left'
                             },
                             {
-                                selector: '.go-btn',
-                                text: lang.tutorial.startPrint
+                                selector: '.btn-go.btn-control',
+                                text: lang.tutorial.startPrint,
+                                r: 80,
+                                position: 'top'
                             }
                         ];
-                        AlertActions.showPopupYesNo('tour', 'Want a tour?');
+                        AlertActions.showPopupYesNo('tour', lang.tutorial.startTour);
                         AlertStore.onYes(this._handleTakeTutorial);
                         AlertStore.onCancel(this._handleCancelTutorial);
                     }
@@ -395,13 +416,16 @@ define([
                     if(!tutorialMode) { return; }
                     this.setState({ currentTutorialStep: this.state.currentTutorialStep + 1 }, function() {
                         if(this.state.currentTutorialStep === 1) {
+                            AlertActions.showChangeFilament(DeviceMaster.getFirstDevice(), 'TUTORIAL');
+                        }
+                        else if(this.state.currentTutorialStep === 3) {
                             var fileEntry = {};
                             fileEntry.name = 'guide-example.stl';
                             fileEntry.toURL = function() {
-                                return '/img/guide-example.stl';
+                                return '/guide-example.stl';
                             };
                             var oReq = new XMLHttpRequest();
-                            oReq.open('GET', '/img/guide-example.stl', true);
+                            oReq.open('GET', '/guide-example.stl', true);
                             oReq.responseType = 'blob';
 
                             oReq.onload = function(oEvent) {
@@ -411,8 +435,9 @@ define([
 
                             oReq.send();
                         }
-                        else if (this.state.currentTutorialStep === 3) {
+                        else if (this.state.currentTutorialStep === 5) {
                             this.setState({ tutorialOn: false });
+                            $('.btn-go').click();
                         }
                     });
                 },
@@ -545,14 +570,6 @@ define([
                     nwjsMenu.saveGCode.enabled = this.state.hasObject;
                 },
 
-                _renderTutorialOff: function() {
-                    return (
-                        <div>
-                            <a className="btn btn-default btn-tutorial" onClick={this._handleTutorialComplete}>Close Tutorial</a>
-                        </div>
-                    )
-                },
-
                 render: function() {
                     var advancedPanel           = this.state.showAdvancedSettings ? this._renderAdvancedPanel() : '',
                         importWindow            = this.state.openImportWindow ? this._renderImportWindow() : '',
@@ -562,7 +579,6 @@ define([
                         printerSelectorWindow   = this.state.openPrinterSelectorWindow ? this._renderPrinterSelectorWindow() : '',
                         waitWindow              = this.state.openWaitWindow ? this._renderWaitWindow() : '',
                         progressWindow          = this.state.progressMessage ? this._renderProgressWindow() : '';
-                        tutorialOff             = tutorialMode ? this._renderTutorialOff() : '';
 
                     this._renderNwjsMenu();
 
@@ -585,19 +601,20 @@ define([
 
                             {progressWindow}
 
+
+
                             <div id="model-displayer" className="model-displayer">
                                 <div className="import-indicator"></div>
                             </div>
                             <input className="hide" ref="importBtn" type="file" accept=".stl" onChange={this._handleImport} />
 
                             <TourGuide
+                                lang={lang}
                                 enable={this.state.tutorialOn}
                                 guides={tourGuide}
                                 step={this.state.currentTutorialStep}
                                 onNextClick={this._handleTutorialStep}
                                 onComplete={this._handleTutorialComplete} />
-
-                            {tutorialOff}
 
                         </div>
                     );

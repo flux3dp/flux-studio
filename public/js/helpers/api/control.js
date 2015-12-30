@@ -501,7 +501,12 @@ define([
                             0, // extruder id
                             220 // temperature
                         ];
-                        ws.send(args.join(' '));
+                        setTimeout(
+                            function() {
+                                ws.send(args.join(' '));
+                            },
+                            3000
+                        );
                     }
                     else if ('loading' === result.status) {
                         deferred.notify(result);

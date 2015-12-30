@@ -34,11 +34,14 @@ define([
         _instance = null,
         _password = '',
         _status = DeviceConstants.READY,
+        _selectedDevice = {},
+        _firstDevice,
         _device,
         _devices = [],
         _errors = {};
 
     function selectDevice(device, deferred) {
+        Object.assign(_selectedDevice, device);
         var d = deferred || $.Deferred(),
             uuid = device.uuid,
             goAuth = function(uuid) {
@@ -172,25 +175,6 @@ define([
             _go(blob, callbackProgress).then(function(status) {
                 d.resolve(status);
             });
-            // getReport().then(function(report) {
-            //     _status = report.st_label;
-            //     if(_status === DeviceConstants.IDLE) {
-            //         _go(blob).then(function(status) {
-            //             d.resolve(status);
-            //         });
-            //     }
-            //     else if (_status === DeviceConstants.RUNNING) {
-            //         _status = DeviceConstants.RUNNING;
-            //         d.resolve(_status);
-            //     }
-            //     else if(_status === DeviceConstants.COMPLETED || _status === DeviceConstants.ABORTED) {
-            //         _do(DeviceConstants.QUIT).then(function() {
-            //             uploadFile(blob);
-            //             _status = DeviceConstants.RUNNING;
-            //             d.resolve(_status);
-            //         });
-            //     }
-            // });
         }
 
         return d.promise();
@@ -199,7 +183,6 @@ define([
     function _go(blob, callback) {
         var d = $.Deferred();
         uploadFile(blob, null, null, callback).then(function() {
-            // _status = DeviceConstants.RUNNING;
             d.resolve(_status);
         });
         return d.promise();
@@ -304,6 +287,16 @@ define([
         return _device.actions.maintain(type);
     }
 
+    function reconnect() {
+        _devices.some(function(device, i) {
+            if(device.uuid === _selectedDevice.uuid) {
+                _devices.splice(i, 1);
+            }
+        });
+
+        return selectDevice(_selectedDevice);
+    }
+
     // set functions
 
     function setPassword(password) {
@@ -328,6 +321,10 @@ define([
         return d.promise();
     }
 
+    function getFirstDevice() {
+        return _firstDevice;
+    }
+
     // Private Functions
 
     function _do(command) {
@@ -343,7 +340,6 @@ define([
             },
 
             'PAUSE': function() {
-                console.log('pause hit');
                 _device.actions.pause().then(function() {
                     d.resolve('');
                 });
@@ -364,6 +360,12 @@ define([
 
             'KICK': function() {
                 _device.actions.reset().then(function(result) {
+                    d.resolve(result);
+                });
+            },
+
+            'QUIT_TASK': function() {
+                _device.actions.quitTask().then(function(result) {
                     d.resolve(result);
                 });
             },
@@ -462,10 +464,17 @@ define([
             this.fileInfo           = fileInfo;
             this.getPreviewInfo     = getPreviewInfo;
             this.maintain           = maintain;
+            this.reconnect          = reconnect;
+            this.getFirstDevice     = getFirstDevice;
 
             Discover(
                 'device-master',
                 function(devices) {
+                    if(devices.length > 0) {
+                        if(!_firstDevice) {
+                            _firstDevice = devices[0];
+                        }
+                    }
                     _scanDeviceError(devices);
                 }
             );

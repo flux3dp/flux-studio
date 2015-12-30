@@ -152,7 +152,8 @@ define([
                     this.setState({
                         changeFilament: {
                             open: true,
-                            device: payload.device
+                            device: payload.device,
+                            src: payload.src
                         }
                     });
                 }
@@ -436,8 +437,20 @@ define([
                 });
             },
 
+            _renderChangeFilament: function() {
+                return (
+                    <ChangeFilament
+                        open={this.state.changeFilament.open}
+                        device={this.state.changeFilament.device}
+                        src={this.state.changeFilament.src}
+                        onClose={this._hideChangeFilament}
+                    />
+                );
+            },
+
             render : function() {
-                var monitorPanel = this.state.showMonitor ? this._renderMonitorPanel() : '';
+                var monitorPanel = this.state.showMonitor ? this._renderMonitorPanel() : '',
+                    filament = this.state.changeFilament.open ? this._renderChangeFilament() : '';
 
                 return (
                     <div className="notification-collection">
@@ -465,11 +478,7 @@ define([
                             onSubmit={this._handleInputLightBoxSubmit}
                         />
 
-                        <ChangeFilament
-                            open={this.state.changeFilament.open}
-                            device={this.state.changeFilament.device}
-                            onClose={this._hideChangeFilament}
-                        />
+                        {filament}
 
                         <NotificationModal
                             lang={lang}
