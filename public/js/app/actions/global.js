@@ -10,7 +10,7 @@ define([
 
     // prevent delete (back) behavior
     var defaultKeyBehavior = function() {
-        shortcuts.on(['DEL'], function(e) {
+        shortcuts.on(['BACK'], function(e) {
             if ('BODY' === e.target.tagName) {
                 e.preventDefault();
             }
