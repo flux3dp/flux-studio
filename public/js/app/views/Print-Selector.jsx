@@ -129,19 +129,20 @@ define([
 
         _onYes: function(id) {
             var self = this;
-
-            switch (id) {
-            case 'kick':
-                DeviceMaster.kick().done(function() {
-                    self._returnSelectedPrinter();
-                });
-                break;
-            case 'abort':
-                DeviceMaster.stop().done(function() {
-                    self._returnSelectedPrinter();
-                });
-                break;
-            }
+            DeviceMaster.selectDevice(self.selected_printer).then(function() {
+                switch (id) {
+                case 'kick':
+                    DeviceMaster.kick().done(function() {
+                        self._returnSelectedPrinter();
+                    });
+                    break;
+                case 'abort':
+                    DeviceMaster.stop().done(function() {
+                        self._returnSelectedPrinter();
+                    });
+                    break;
+                }
+            });
         },
 
         _onCancel: function(id) {
