@@ -440,6 +440,7 @@ input.switch:checked ~ label:after {
         box-shadow: 0 4px 15px rgba(0,0,0,.3), 0 16px 40px rgba(0,0,0,.5);
         padding: 0;
         position: relative;
+        height: 540px;
         width: 440px;
 
         .content-wrapper {
@@ -497,6 +498,7 @@ input.switch:checked ~ label:after {
                 .right {
                     padding: 4% 0;
                 }
+                border-top: 0;
             }
         }
 
@@ -532,13 +534,15 @@ input.switch:checked ~ label:after {
             }
 
             .btn {
-                border: 2px solid #E0E0DF;
                 border-radius: 0;
-                color: #B3B3B3;
                 font-size: 15px;
                 line-height: 30px;
                 margin: 0;
                 padding: 0 10px;
+                &:hover {
+                    border: 2px solid #424242;
+                    color: #424242;
+                }
             }
         }
 
@@ -635,6 +639,7 @@ input.switch:checked ~ label:after {
             position: absolute;
             width: 200px;
             animation: upanddown 5s ease infinite alternate;
+            -webkit-animation: upanddown 5s ease infinite alternate;
 
             &:hover {
                 color: #888;

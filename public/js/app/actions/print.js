@@ -65,6 +65,7 @@ define([
         transformMode = false,
         shiftPressed = false,
         previewMode = false,
+        showStopButton = true,
         leftPanelWidth = 275,
         ddHelper = 0,
         defaultFileName = '',
@@ -229,7 +230,7 @@ define([
             openImportWindow: false
         });
 
-        ProgressActions.open(ProgressConstants.STEPPING, lang.print.importingModel, lang.print.wait, false);
+        ProgressActions.open(ProgressConstants.STEPPING, lang.print.importingModel, lang.print.wait, !showStopButton);
 
         loader.load(model_file_path, function(geometry) {
             var mesh = new THREE.Mesh(geometry, commonMaterial);
@@ -610,7 +611,7 @@ define([
             ids.push(obj.uuid);
         });
 
-        ProgressActions.open(ProgressConstants.STEPPING, lang.monitor.processing, lang.monitor.savingPreview, false);
+        ProgressActions.open(ProgressConstants.STEPPING, lang.monitor.processing, lang.monitor.savingPreview, !showStopButton);
 
         getBlobFromScene().then(function(blob) {
             reactSrc.setState({ previewUrl: URL.createObjectURL(blob) });
@@ -671,7 +672,7 @@ define([
             ProgressConstants.STEPPING,
             lang.print.rendering,
             lang.print.savingFilePreview,
-            false
+            !showStopButton
         );
 
         getBlobFromScene().then(function(blob) {
@@ -1498,10 +1499,18 @@ define([
         selectObject(null);
 
         var drawPath = function() {
+            ProgressActions.open(
+                ProgressConstants.WAITING,
+                lang.print.rendering,
+                '',
+                !showStopButton
+            );
             previewMode = true;
             slicer.getPath().then(function(result) {
                 printPath = result;
-                _drawPath();
+                _drawPath().then(function() {
+                    ProgressActions.close();
+                });
             });
         };
 
@@ -1522,7 +1531,8 @@ define([
     }
 
     function _drawPath() {
-        var color,
+        var d = $.Deferred(),
+            color,
             g, m, line,
             type;
 
@@ -1557,8 +1567,11 @@ define([
 
         reactSrc.setState({
             previewLayerCount: previewScene.children.length - 1
+        }, function() {
+            d.resolve('');
         });
         _showPath();
+        return d.promise();
     }
 
     function _showPath() {

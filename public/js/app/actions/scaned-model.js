@@ -20,7 +20,7 @@ define([
             step: 10,
             upVector: new THREE.Vector3(0, 0, 1),
             color:  0x777777,
-            opacity: 0.2,
+            opacity: 0.4,
             text: true,
             textColor: '#000000',
             textPosition: 'center'
@@ -348,7 +348,7 @@ define([
 
         material = new THREE.PointCloudMaterial({
             size: 0.5,
-            opacity: 0.3,
+            opacity: 0.6,
             transparent: true,
             vertexColors: THREE.VertexColors
         });

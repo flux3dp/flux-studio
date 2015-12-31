@@ -145,6 +145,11 @@ define([
                 enabled: true,
                 subItems: [newDevice, separator],
                 parent: parentIndex.DEVICE
+            },
+            tutorial: {
+                label: lang.help.tutorial,
+                enabled: true,
+                parent: parentIndex.HELP
             }
         },
         deviceGroup = [
@@ -349,6 +354,7 @@ define([
                         }
                     }
                 },
+                items.tutorial,
                 {
                     label: lang.help.online_support,
                     enabled: true,

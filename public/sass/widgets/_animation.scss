@@ -41,8 +41,8 @@
 .spinner-roller {
     font-size: 10px;
     text-indent: -9999em;
-    width: 11em;
-    height: 11em;
+    width: 5em;
+    height: 5em;
     border-radius: 50%;
     background: #ffffff;
     background: -webkit-linear-gradient(left, #ffffff 10%, rgba(255, 255, 255, 0) 42%);
@@ -143,11 +143,26 @@
     }
 }
 
+@-webkit-keyframes upanddown {
+    0% {
+        -webkit-transform: translateY(0);
+    }
+    50% {
+        -webkit-transform: translateY(-10px);
+    }
+    100% {
+        -webkit-transform: translateY(0);
+    }
+}
+
 @keyframes upanddown {
     0% {
         transform: translateY(0);
     }
-    100% {
+    50% {
         transform: translateY(-10px);
+    }
+    100% {
+        transform: translateY(0);
     }
 }
