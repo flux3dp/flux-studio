@@ -143,6 +143,7 @@ define([
                         </form>
                     ),
                     className = {
+                        'shadow-modal': true,
                         'modal-input-lightbox': true
                     };
 
