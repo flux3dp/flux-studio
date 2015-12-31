@@ -18,6 +18,7 @@ define([
         NOTIFY_RETRY          = 'retry',
         NOTIFY_ABORT          = 'abort',
         NOTIFY_YES            = 'yes',
+        NOTIFY_NO             = 'no',
         NOTIFY_CANCEL         = 'cancel', // including the "no", "cancel", "ok" button fired
         NOTIFY_CUSTOM         = 'custom',
         NOTIFY_ANSWER         = 'answer',
@@ -47,6 +48,10 @@ define([
 
         onYes(callback) {
             this.on(NOTIFY_YES, callback);
+        },
+        
+        onNo(callback) {
+            this.on(NOTIFY_NO, callback);
         },
 
         onCancel(callback) {
@@ -87,6 +92,10 @@ define([
 
         removeYesListener(callback) {
             this.removeListener(NOTIFY_YES, callback);
+        },
+
+        removeNoListener(callback) {
+            this.removeListener(NOTIFY_NO, callback);
         },
 
         removeCancelListener(callback) {
@@ -155,6 +164,10 @@ define([
 
                 'NOTIFY_YES': function() {
                     AlertStore.emit(NOTIFY_YES, payload.id);
+                },
+
+                'NOTIFY_NO': function() {
+                    AlertStore.emit(NOTIFY_NO, payload.id);
                 },
 
                 'NOTIFY_CANCEL': function() {
