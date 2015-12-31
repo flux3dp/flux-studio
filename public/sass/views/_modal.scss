@@ -38,6 +38,10 @@
         max-height: 100%;
         overflow: hidden;
 
+        .btn-default{
+            background: #F8F8F8;
+        }
+
         .modal-content {
             height: 80%;
 
@@ -105,6 +109,10 @@
 
         .btn {
             min-width: 50px;
+        }
+
+        .btn-default{
+            background: #F8F8F8;
         }
     }
 
@@ -238,6 +246,7 @@
         }
 
         input {
+            border: 2px solid #CCC;
             flex: 2;
             padding: 3px;
         }

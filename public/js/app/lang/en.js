@@ -56,7 +56,7 @@ define(function() {
                 new: 'Add New Device',
                 device_monitor: 'Device Monitor',
                 change_filament: 'Change Filament',
-                default_device: 'Default Device'
+                default_device: 'Set as default device'
             },
             window: {
                 label: 'Window',

@@ -56,7 +56,7 @@ define(function() {
                 new: '新增裝置',
                 device_monitor: '狀態',
                 change_filament: '自動換料',
-                default_device: '設成預設裝置'
+                default_device: '設為預設裝置'
             },
             window: {
                 label: '視窗',
