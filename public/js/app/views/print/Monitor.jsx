@@ -954,7 +954,7 @@ define([
         _renderCameraContent: function() {
             var backgroundStyle = {
                 transition: 'all 0.5s',
-                -webkit-transition: 'all 0.5s',
+                '-webkit-transition': 'all 0.5s',
                 backgroundColor: '#E0E0E0',
                 backgroundImage: 'url(' +this.state.cameraImageUrl + ')',
                 backgroundSize: 'cover',
