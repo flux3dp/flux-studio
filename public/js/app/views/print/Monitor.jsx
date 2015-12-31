@@ -952,9 +952,18 @@ define([
         },
 
         _renderCameraContent: function() {
+            var backgroundStyle = {
+                transition: 'all 0.5s',
+                -webkit-transition: 'all 0.5s',
+                backgroundColor: '#E0E0E0',
+                backgroundImage: 'url(' +this.state.cameraImageUrl + ')',
+                backgroundSize: 'cover',
+                backgroundPosition: '50% 50%',
+                width: '100%',
+                height: '100%'
+            }
             return(
-                <div className="wrapper">
-                    <img className="camera-image" src={this.state.cameraImageUrl} />
+                <div className="wrapper" style={backgroundStyle}>
                 </div>
             );
         },
