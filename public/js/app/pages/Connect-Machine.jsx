@@ -42,7 +42,9 @@ define([
                     },
                     onError: function(response) {
                         self._toggleBlocker(false);
-                        AlertActions.showPopupError('connection-fail', lang.initialize.errors.keep_connect.content);
+                        AlertActions.showPopupError('connection-fail', 
+                            lang.initialize.errors.keep_connect.content, 
+                            lang.initialize.errors.keep_connect.caption);
                     }
                 });
             },
@@ -79,7 +81,7 @@ define([
                                         {lang.initialize.next}
                                     </button>
                                     <a href="#initialize/wifi/setup-complete/with-usb" data-ga-event="skip" className="btn btn-link btn-large">
-                                        {lang.initialize.skip}
+                                        {lang.initialize.no_machine}
                                     </a>
                                 </div>
                             </div>
