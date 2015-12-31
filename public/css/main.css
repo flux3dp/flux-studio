@@ -2079,6 +2079,7 @@ th {
  */
 html,
 body {
+    background-color: #E0E0E0;
     font-family: "Helvetica Neue", "HelveticaNeue-Light", "Helvetica Neue Light", 'Open Sans', Helvetica, Arial, "Lucida Grande", sans-serif, "Microsoft JhengHei", "微軟正黑體";
     font-size: 12px;
     height: 100%;
@@ -2089,7 +2090,7 @@ body {
     overflow: hidden; }
 
 body {
-    background-color: #FAFAFA;
+    background-color: #E0E0E0;
     cursor: default;
     font-size: 16px;
     position: relative; }
@@ -2140,7 +2141,7 @@ img {
     /* NEW - Chrome */
     display: flex;
     /* NEW, Spec - Opera 12.1, Firefox 20+ */
-    background: #fff;
+    background-color: #E0E0E0;
     height: 100%;
     overflow: hidden;
     width: 100%;
@@ -2671,8 +2672,8 @@ input[type=range]:focus::-webkit-slider-runnable-track {
 .spinner-roller {
     font-size: 10px;
     text-indent: -9999em;
-    width: 11em;
-    height: 11em;
+    width: 5em;
+    height: 5em;
     border-radius: 50%;
     background: #ffffff;
     background: -webkit-linear-gradient(left, #ffffff 10%, rgba(255, 255, 255, 0) 42%);
@@ -2796,7 +2797,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
 
 .btn-default {
     background: #fff;
-    border: 2px solid #E0E0DF;
+    border: 2px solid #C0C0C0;
     color: #B3B3B3; }
     .btn-default:hover {
         border: 2px solid #424242;
@@ -3163,10 +3164,12 @@ input[type=range]:focus::-webkit-slider-runnable-track {
     .modal-window .notification {
         width: 32.2rem;
         height: 25rem;
-        background-color: #FFFFFF;
+        background-color: #F8F8F8;
         position: relative;
         max-height: 100%;
         overflow: hidden; }
+        .modal-window .notification .btn-default {
+            background: #F8F8F8; }
         .modal-window .notification .modal-content {
             height: 80%; }
             .modal-window .notification .modal-content .wrapper {
@@ -3198,7 +3201,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         /* NEW - Chrome */
         display: flex;
         /* NEW, Spec - Opera 12.1, Firefox 20+ */
-        background: #FFF;
+        background: #F8F8F8;
         flex-direction: column;
         min-height: 100px;
         overflow: auto;
@@ -3209,8 +3212,10 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         justify-content: space-between;
         width: 32.2rem; }
         .modal-window .modal-alert .caption {
-            margin: 0 0 1.6rem 0; }
+            margin: 0 0 1.6rem 0;
+            color: #626262; }
         .modal-window .modal-alert .message {
+            color: #333;
             margin: 0 0 20px 0;
             text-align: left; }
         .modal-window .modal-alert .caption,
@@ -3218,6 +3223,8 @@ input[type=range]:focus::-webkit-slider-runnable-track {
             width: 100%; }
         .modal-window .modal-alert .btn {
             min-width: 50px; }
+        .modal-window .modal-alert .btn-default {
+            background: #F8F8F8; }
     .modal-window .message {
         font-family: "Helvetica Neue", "HelveticaNeue-Light", "Helvetica Neue Light", Helvetica, Arial, "Lucida Grande", sans-serif, "Microsoft JhengHei", "微軟正黑體";
         margin: 0;
@@ -3240,16 +3247,31 @@ input[type=range]:focus::-webkit-slider-runnable-track {
 .modal-progress {
     z-index: 99999; }
     .modal-progress .modal-alert {
-        min-height: 18rem; }
+        min-height: 10rem;
+        text-align: left;
+        padding: 1.6rem 0 0 0;
+        width: 32.2rem; }
+        .modal-progress .modal-alert .caption {
+            color: #626262;
+            font-size: 15px;
+            line-height: 18px;
+            text-align: left;
+            padding: 0 1.6rem;
+            margin: 0; }
+        .modal-progress .modal-alert .message {
+            color: #333;
+            padding: 0 1.6rem;
+            margin: 0 0 20px 0; }
     .modal-progress .message p {
+        font-size: 14px;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap; }
     .modal-progress .spinner-roller {
         background: linear-gradient(to right, #DEDEDC 10%, rgba(255, 255, 255, 0) 42%);
-        height: 7em;
+        height: 5rem;
         margin: 0 auto 1.6rem auto;
-        width: 7em; }
+        width: 5rem; }
         .modal-progress .spinner-roller::after {
             background: #fff; }
     .modal-progress .progress-bar {
@@ -3301,6 +3323,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         color: #ccc;
         flex: 1; }
     .modal-input-lightbox .control input {
+        border: 2px solid #CCC;
         flex: 2;
         padding: 3px; }
 
@@ -3563,7 +3586,6 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         .top-menu .brand-logo:hover .menu {
             display: block; }
         .top-menu .brand-logo:hover .logo-icon {
-            -webkit-filter: brightness(70%);
             transform: rotate(90deg); }
         .top-menu .brand-logo:hover .func-name {
             display: none; }
@@ -3580,6 +3602,9 @@ input[type=range]:focus::-webkit-slider-runnable-track {
             transform-origin: 50% 50%;
             transition: all 0.25s;
             width: 3.2rem; }
+        .top-menu .item:hover {
+            filter: brightness(70%);
+            -webkit-filter: brightness(70%); }
         .top-menu .item p,
         .top-menu .item:last-child {
             margin: 0; }
@@ -4488,6 +4513,7 @@ input.switch:checked ~ label:after {
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3), 0 16px 40px rgba(0, 0, 0, 0.5);
     padding: 0;
     position: relative;
+    height: 540px;
     width: 440px; }
     .print-studio .advanced-panel .content-wrapper {
         height: 427px;
@@ -4524,9 +4550,11 @@ input.switch:checked ~ label:after {
         font-weight: 500;
         letter-spacing: 0.5px;
         margin-bottom: 15px; }
-    .print-studio .advanced-panel .preset-wrapper .footer .left,
-    .print-studio .advanced-panel .preset-wrapper .footer .right {
-        padding: 4% 0; }
+    .print-studio .advanced-panel .preset-wrapper .footer {
+        border-top: 0; }
+        .print-studio .advanced-panel .preset-wrapper .footer .left,
+        .print-studio .advanced-panel .preset-wrapper .footer .right {
+            padding: 4% 0; }
     .print-studio .advanced-panel .footer {
         background: #fff;
         border-top: 1px solid #DDD;
@@ -4548,13 +4576,14 @@ input.switch:checked ~ label:after {
             float: left;
             padding: 4% 0 4% 16px; }
         .print-studio .advanced-panel .footer .btn {
-            border: 2px solid #E0E0DF;
             border-radius: 0;
-            color: #B3B3B3;
             font-size: 15px;
             line-height: 30px;
             margin: 0;
             padding: 0 10px; }
+            .print-studio .advanced-panel .footer .btn:hover {
+                border: 2px solid #424242;
+                color: #424242; }
     .print-studio .advanced-panel .preset-wrapper {
         margin: 20px 20px 0 20px; }
         .print-studio .advanced-panel .preset-wrapper .preset-header {
@@ -5401,7 +5430,7 @@ input.switch:checked ~ label:after {
     color: #EEEEEE; }
 
 .initialization {
-    background: #DEDEDC;
+    background: #DEDEDE;
     color: #808080;
     position: relative; }
     .initialization .brand-image {
@@ -5438,7 +5467,7 @@ input.switch:checked ~ label:after {
     .initialization .select-wifi .modal-body {
         box-shadow: 0 0 14px 1px rgba(0, 0, 0, 0.7); }
     .initialization .select-wifi .form-wifi-password {
-        background: #DEDEDC;
+        background: #DEDEDE;
         overflow: scroll;
         width: 300px; }
         .initialization .select-wifi .form-wifi-password .notice {

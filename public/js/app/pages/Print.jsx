@@ -367,6 +367,10 @@ define([
                         openPrinterSelectorWindow: false
                     });
                     director.getFCode().then(function(fcode, previewUrl) {
+                        if(!(fcode instanceof Blob)) {
+                            AlertActions.showPopupError('', lang.print.out_of_range_message, lang.print.out_of_range);
+                            return;
+                        }
                         GlobalActions.showMonitor(selectedPrinter, fcode, previewUrl);
                         setTimeout(function() {
                             if(tutorialMode) {

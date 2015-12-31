@@ -704,7 +704,11 @@ define([
                                 }
                             }
                             else {
+                                blobExpired = true;
+                                reactSrc.setState({ hasOutOfBoundsObject: true });
                                 ProgressActions.close();
+                                AlertActions.showPopupError('', result.error);
+                                d.resolve(result, '');
                             }
                         }
                     });
@@ -1516,9 +1520,7 @@ define([
 
         if (blobExpired) {
             getFCode().then(function(blob) {
-                if (blob instanceof Blob) {
-                    drawPath();
-                }
+                drawPath();
             });
         } else {
             previewMode = true;

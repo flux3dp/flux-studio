@@ -7,7 +7,7 @@ define(function() {
             name : 'Flux Studio - zh-tw'
         },
         support: {
-            no_webgl: 'Does not seem to support WebGL'
+            no_webgl: '您的系統不支援 WebGL'
         },
         device_selection: {
             no_printers: '未偵測到 FLUX 裝置, 請檢查您與機器的網路連線是否在同個網路下',
@@ -18,18 +18,18 @@ define(function() {
         update: {
             release_note: 'Release Note:',
             firmware: {
-                caption: 'An Firmware Update to FLUX is available',
-                message_pattern_1: '"%s" is now ready for firmware update.',
-                message_pattern_2: 'FLUX Firmware %s is now available - You have %s.'
+                caption: 'FLUX 有新的韌體更新',
+                message_pattern_1: '"%s" 有新的韌體更新。',
+                message_pattern_2: 'FLUX Firmware %s 可使用 - 你的版本為 %s.'
             },
             software: {
-                caption: 'An Software Update to FLUX is available',
-                message_pattern_1: 'FLUX Studio is now ready for software update.',
-                message_pattern_2: 'FLUX Software %s is now available - You have %s.'
+                caption: 'FLUX Studio 有新的軟體更新',
+                message_pattern_1: 'FLUX Studio 有新的軟體更新。',
+                message_pattern_2: 'FLUX Software %s 可使用 - 你的版本為 %s.'
             },
-            skip: 'Skip This Version',
-            later: 'LATER',
-            install: 'INSTALL'
+            skip: '跳過此版本',
+            later: '稍候',
+            install: '下載'
         },
         topmenu: {
             version: '版本',
@@ -148,7 +148,7 @@ define(function() {
                 back: '上一步',
                 join: '加入',
                 connecting: '連線中',
-                no_selected: '請選擇 Wifi'
+                no_selected: '請選擇 Wi-Fi'
             },
             success: {
                 caption: '太棒了，連線成功!',
@@ -310,7 +310,7 @@ define(function() {
                 saveAndApply: '套用設定',
                 delete: '刪除',
                 loadPreset: '載入預設',
-                savePreset: 'save preset'
+                savePreset: '儲存預設'
             },
             mode: [
                 {
@@ -457,25 +457,27 @@ define(function() {
             continue: '繼續',
             restart: '重新開始',
             download_prompt: '請輸入檔案名稱',
-            importTitle: 'Import 3D models ( .stl )',
-            getFcodeTitle: 'Save toolhead path and config into FCode file ( *.fc )',
-            goTitle: 'Print it out',
-            deviceTitle: 'Show device monitor',
-            rendering: 'Rendering',
-            finishingUp: 'Finishing up...',
-            savingFilePreview: 'Saving file preview',
-            uploading: 'Uploading to slicer',
-            uploaded: 'Uploaded, processing model',
-            importingModel: 'Importing Model',
-            wait: 'Please wait...'
+            importTitle: '匯入 3D 模型 ( .stl )',
+            getFcodeTitle: '儲存FLUX列印工作',
+            goTitle: '準備列印',
+            deviceTitle: '顯示監控介面',
+            rendering: '切片中',
+            finishingUp: '完成中',
+            savingFilePreview: '產生預覽圖',
+            uploading: '讀取中',
+            uploaded: '已上傳，分析模型中',
+            importingModel: '匯入模型',
+            wait: '請稍候',
+            out_of_range: '超過列印範圍',
+            out_of_range_message: '請縮小物件尺寸'
         },
         laser: {
             import: '匯入',
             save: '儲存⋯',
             custom: '自訂',
-            presets: 'Presets',
+            presets: '預設預設',
             acceptable_files: 'JPG, PNG, SVG',
-            drop_files_to_import: 'Drop your file here or click "import" to upload your file',
+            drop_files_to_import: '拖曳至此以匯入圖片',
             button_advanced: '進階',
             confirm: '確認',
             start_engrave: '雕刻',
@@ -588,7 +590,7 @@ define(function() {
                 },
                 save_and_apply: '儲存並套用',
                 save_as_preset: '儲存',
-                save_as_preset_title: 'Save Preset',
+                save_as_preset_title: '儲存預設',
                 load_preset_title: '載入',
                 apply: '套用',
                 cancel: '取消',
@@ -606,45 +608,45 @@ define(function() {
             remaining_time: '剩餘時間',
             elapsed_time: '已用時間',
             do_save: '儲存 STL',
-            go: 'Go',
-            rollback: 'Back',
-            error: 'Error',
+            go: '開始',
+            rollback: '返回',
+            error: '錯誤',
             confirm: '確認',
             caution: '警告',
-            cancel: 'Cancel',
+            cancel: '取消',
             delete_mesh: '真的要刪除嗎?',
-            quality: 'QUALITY',
-            scan_again_confirm: 'Do you want to discard current scan result?',
+            quality: '品質',
+            scan_again_confirm: '是否確定要放棄目前的掃瞄結果？',
             calibrate: '校正',
             calibrate_fail: '校正失敗',
             calibration_is_running: '校正進行中',
             resolution: [{
                 id: 'best',
-                text: 'Best',
+                text: '最佳',
                 time: '~60min',
                 value: 1200
             },
             {
                 id: 'high',
-                text: 'High',
+                text: '精細',
                 time: '~40min',
                 value: 800
             },
             {
                 id: 'normal',
-                text: 'Normal',
+                text: '中等',
                 time: '~20min',
                 value: 400
             },
             {
                 id: 'low',
-                text: 'Low',
+                text: '快速',
                 time: '~10min',
                 value: 200
             },
             {
                 id: 'draft',
-                text: 'Draft',
+                text: '草稿',
                 time: '~5min',
                 value: 100
             }],
@@ -660,7 +662,7 @@ define(function() {
                 },
             ],
             manipulation: {
-                filter: 'FILTER',
+                filter: '操作',
                 position: '位置',
                 size: '尺寸',
                 rotate: '旋轉',
@@ -758,7 +760,7 @@ define(function() {
             stop                            : 'STOP',
             record                          : 'RECORD',
             camera                          : 'CAMERA',
-            connecting                      : 'Connecting, please wait...',
+            connecting                      : '連線中，請稍候',
             HEAD_OFFLINE                    : '沒有偵測到列印工具頭',
             HEAD_ERROR_CALIBRATING          : '模組校正失誤\n請重新裝載模組，並確認磁鐵關節正確的附著',
             HEAD_ERROR_FAN_FAILURE          : '風扇未轉動\n請用細針戳一下',
@@ -766,12 +768,12 @@ define(function() {
             HWARDWARE_ERROR_FILAMENT_RUNOUT : '未偵測到料捲\n請重新插入新的料捲',
             HWARDWARE_ERROR_0               : '未偵測到料捲\n請重新插入新的料捲',
             HARDWARE_ERROR_PLATE_MISSING    : '未偵測到工作平台\n請放上工作平台金屬板',
-            HARDWARE_ERROR_ZPROBE_ERROR     : '校正失敗\n請移除噴頭上的殘料',
+            HARDWARE_ERROR_ZPROBE_ERROR     : '校正失敗\n請移除列印模組噴頭上的殘料',
             HEAD_ERROR_HEAD_RESET           : '模組傳輸線接觸不良\n請重新裝載模組，並確認傳輸線完整插入',
-            CONVERGENCE_FAILED              : '校正失敗\n請移除噴頭上的殘料',
-            HARDWARE_ERROR_HOME_FAILED      : '歸零失敗\n請排除異物，並重新插拔噴頭傳輸線',
-            HEAD_ERROR_TILT                 : 'Head tilted\nPlease check ball joint rod is attached correctly',
-            HEAD_ERROR_SHAKE                : 'Head tilted\nPlease check ball joint rod is attached correctly',
+            CONVERGENCE_FAILED              : '校正失敗\n請移除列印模組噴頭上的殘料',
+            HARDWARE_ERROR_HOME_FAILED      : '歸零失敗\n請排除異物，並重新插拔模組連接線',
+            HEAD_ERROR_TILT                 : '工具頭傾斜\n請確認球型關節正確附著以繼續',
+            HEAD_ERROR_SHAKE                : '工具頭傾斜\n請確認球型關節正確附著以繼續',
             WRONG_HEAD                      : '請更換成列印工具頭',
             USER_OPERATION                  : 'machine operated by (other) user',
             RESOURCE_BUSY                   : '裝置忙碌中\n如果機器沒有在進行動作， 請重新啟動機器',
@@ -780,11 +782,11 @@ define(function() {
             SUBSYSTEM_ERROR                 : '裝置錯誤\n請重新啟動機器',
             HARDWARE_FAILURE                : '裝置錯誤\n請重新啟動機器',
             MAINBOARD_OFFLINE               : '裝置錯誤\n請重新啟動機器',
-            HEAD_ERROR_HARDWARE_FAILURE     : '噴頭錯誤\n請重新裝載工作頭',
+            HEAD_ERROR_HARDWARE_FAILURE     : '工具模組發生錯誤\n請重新裝載模組，並確認傳輸線完整插入',
             G28_FAILED                      : '歸零失敗\n請排除異物後重試',
             FILAMENT_RUNOUT_0               : '未偵測到料捲\n請重新插入新的料捲',
-            processing                      : 'Processing',
-            savingPreview                   : 'Saving preview image',
+            processing                      : '處理中',
+            savingPreview                   : '產生預覽圖',
             hour                            : '小時',
             minute                          : '分',
             second                          : '秒',
@@ -796,8 +798,8 @@ define(function() {
             fileNotDownloadable             : '下載不支援此檔案格式',
             cannotPreview                   : '無法預覽此檔案',
             extensionNotSupported           : '上傳檔案不支援此檔案格式',
-            fileExistContinue               : 'file already exist, continue (will replace)',
-            confirmGToF                     : 'Uploaded GCode will be converted to FCode, continue (will replace if exist)',
+            fileExistContinue               : '檔案已存在，是否要覆蓋？',
+            confirmGToF                     : 'GCode 上傳後會轉檔成 FCode, 是否要繼續？',
             task : {
                 EXTRUDER                    : '列印工作',
                 LASER                       : '雷雕工作'
@@ -809,7 +811,7 @@ define(function() {
         },
         alert: {
             caption: '錯誤',
-            duplicated_preset_name: '重複的Preset名稱',
+            duplicated_preset_name: '重複的預設名稱',
             info: '訊息',
             warning: '警告',
             error: '錯誤',
@@ -880,7 +882,7 @@ define(function() {
             load_filament: '自動進料',
             unload_filament: '自動退料',
             next: '下一步',
-            heating_nozzle: '噴頭加熱中',
+            heating_nozzle: '列印模組加熱中',
             unloading: '自動退料中',
             loaded: '進料完成',
             unloaded: '退料完成',
