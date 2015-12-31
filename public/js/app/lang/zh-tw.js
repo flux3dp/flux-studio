@@ -798,7 +798,7 @@ define(function() {
             second                          : '秒',
             left                            : '完成',
             temperature                     : '溫度',
-            forceStop                       : '強制停止機器?',
+            forceStop                       : '是否強制停止現在工作?',
             upload                          : '上傳',
             download                        : '下載',
             fileNotDownloadable             : '下載不支援此檔案格式',

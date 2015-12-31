@@ -3159,8 +3159,9 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         /* NEW - Chrome */
         display: flex;
         /* NEW, Spec - Opera 12.1, Firefox 20+ */
-        max-height: 100%;
-        overflow: hidden; }
+        max-height: 100%; }
+        .modal-window .modal-body ::-webkit-scrollbar {
+            display: none; }
     .modal-window .notification {
         width: 32.2rem;
         height: 25rem;
@@ -3852,7 +3853,8 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         background-color: white;
         height: 40rem;
         width: 31rem;
-        position: relative; }
+        position: relative;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3), 0 16px 40px rgba(0, 0, 0, 0.5); }
         .flux-monitor .main .title {
             height: 5rem;
             text-align: center; }
@@ -4037,7 +4039,8 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         height: 6rem;
         width: 31rem;
         position: relative;
-        margin-top: 5px; }
+        margin-top: 5px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3), 0 16px 40px rgba(0, 0, 0, 0.5); }
         .flux-monitor .sub .wrapper {
             padding: 1.5rem 1.5rem 0 1.5rem; }
             .flux-monitor .sub .wrapper .row {
