@@ -21,6 +21,7 @@ define([
             'CTRL'   : keyCodeConstants.KEY_CTRL,
             'ALT'    : keyCodeConstants.KEY_ALT,
             'DEL'    : keyCodeConstants.KEY_DEL,
+            'BACK'   : keyCodeConstants.KEY_BACK,
             'RETURN' : keyCodeConstants.KEY_RETURN,
             'TAB'    : keyCodeConstants.KEY_TAB,
             'ESC'    : keyCodeConstants.KEY_ESC,

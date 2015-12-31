@@ -7,7 +7,7 @@ define(function() {
             name : 'Flux Studio - en'
         },
         support: {
-            no_webgl: '無法在本台電腦開啟 WebGL, 請使用其他可以支援的電腦'
+            no_webgl: 'WebGL not supported. Please use other devices.'
         },
         device_selection: {
             no_printers: 'FLUX Device not detected. Please check if you and the FLUX device is under same network.',
@@ -32,7 +32,7 @@ define(function() {
             install: 'INSTALL'
         },
         topmenu: {
-            version: '版本',
+            version: 'Version',
             sure_to_quit: 'Sure to quit?',
             flux: {
                 label: 'Flux',
@@ -56,7 +56,7 @@ define(function() {
                 new: 'Add New Device',
                 device_monitor: 'Device Monitor',
                 change_filament: 'Change Filament',
-                default_device: 'Default Device'
+                default_device: 'Set as default device'
             },
             window: {
                 label: 'Window',
@@ -67,7 +67,8 @@ define(function() {
                 label: 'Help',
                 starting_guide: 'Starting Guide',
                 online_support: 'Online Support',
-                troubleshooting: 'Troubleshooting'
+                troubleshooting: 'Troubleshooting',
+                tutorial: 'Start Tutorial'
             }
         },
         initialize: {
@@ -84,8 +85,8 @@ define(function() {
             require_device_name: 'Name is required',
             select_language: 'Select Language',
             change_password: 'Change password?',
-            connect_flux: 'Connect FLUX to Your Computer by USB Cable',
-            name_your_flux: 'Name Your FLUX',
+            connect_flux: 'Connect FLUX Delta with USB Cable',
+            name_your_flux: 'Name Your FLUX Delta',
             wifi_setup: 'Wi-Fi Setup',
             select_preferred_wifi: 'Select your preferred network.',
             requires_wifi_password: 'requires a password.',
@@ -96,16 +97,16 @@ define(function() {
                 printer_name: 'Name',
                 printer_name_placeholder: 'Device\'s Name',
                 password: 'Password',
-                set_station_mode: 'Set station mode',
+                set_station_mode: 'Set as wifi station',
                 password_placeholder: 'Password'
             },
 
             setting_completed: {
                 start: 'Start',
                 is_ready: '“%s” is ready',
-                station_ready_statement: 'Your FLUX is now a Wi-Fi station, you can use your FLUX wirelessly by connect to Wi-Fi “%s”',
+                station_ready_statement: 'Your FLUX Delta is now a Wi-Fi station, you can use your FLUX wirelessly by connect to Wi-Fi “%s”',
                 brilliant: 'Brilliant!',
-                begin_journey: 'You can begin the journey with your FLUX now.',
+                begin_journey: 'You can begin the journey with your FLUX Delta now.',
                 great: 'Great!',
                 upload_via_usb: 'You can setup Wi-Fi later, or use USB drive to print.',
                 back: 'Back',
@@ -117,7 +118,7 @@ define(function() {
                 error: 'Error',
 
                 keep_connect: {
-                    content: 'Please make sure your FLUX has been powered on and attached to micro-usb cord.'
+                    content: 'Please make sure your FLUX Delta has been powered on and attached to micro-usb cord.'
                 },
 
                 wifi_connection: {
@@ -458,15 +459,17 @@ define(function() {
             download_prompt: 'please enter file name',
             importTitle: 'Import 3D models ( .stl )',
             getFcodeTitle: 'Save toolhead path and config into FCode file ( *.fc )',
-            goTitle: 'Print it out',
+            goTitle: 'Prepare to print',
             deviceTitle: 'Show device monitor',
-            rendering: 'Rendering',
+            rendering: 'Slicing',
             finishingUp: 'Finishing up...',
             savingFilePreview: 'Saving file preview',
             uploading: 'Uploading to slicing engine',
             uploaded: 'Uploaded, slicing engine is processing...',
             importingModel: 'Importing Model',
-            wait: 'Please wait...'
+            wait: 'Please wait...',
+            out_of_range: 'Out of range',
+            out_of_range_message: 'please reduce the size of the object(s)'
         },
         laser: {
             import: 'IMPORT',
@@ -483,6 +486,7 @@ define(function() {
             get_fcode: 'Save<br/>Task',
             name: 'Name',
             go: 'GO',
+            process_caption: 'Generating',
             title: {
                 material: 'Select proper material to have the best engraving result.',
                 object_height: 'A Raft are layers built under your part and help it stick to the base plate.',
@@ -663,7 +667,7 @@ define(function() {
                 size: 'SIZE',
                 rotate: 'ROTATE',
                 crop: 'Crop',
-                auto_merge: 'Auto Merge',
+                auto_merge: 'Loading filament',
                 manual_merge: 'Merge',
                 clear_noise: 'Denoise'
             },
@@ -745,7 +749,7 @@ define(function() {
             unknown: 'Unknown'
         },
         monitor: {
-            change_filament                 : 'CHANGE FILLAMENT',
+            change_filament                 : 'CHANGE FILAMENT',
             browse_file                     : 'BROWSE FILE',
             monitor                         : 'MONITOR',
             currentTemperature              : 'Current Temp',
@@ -760,12 +764,14 @@ define(function() {
             HEAD_OFFLINE                    : 'Device head is not connected or missing',
             HEAD_ERROR_CALIBRATING          : 'Unable to calibrate toolhead\nplease re-attach the toolhead',
             HEAD_ERROR_FAN_FAILURE          : 'Fan failed / stucked\nyou can spin it with a pancil',
+            HEAD_ERROR_HEAD_OFFLINE         : 'Toolhead not detected\nPlease re-attach the module cable',
             HWARDWARE_ERROR_FILAMENT_RUNOUT : 'Ran out of filament\nPlease insert new material',
             HWARDWARE_ERROR_0               : 'Ran out of filament\nPlease insert new material',
-            HARDWARE_ERROR_PLATE_MISSING    : '未偵測到工作平台\n請放上工作平台金屬板',
+            HARDWARE_ERROR_PLATE_MISSING    : 'Unable to detect the base plate\nPlease put on the plate.',
             HARDWARE_ERROR_ZPROBE_ERROR     : 'Unable to calibrate the base plate\nPlease remove left-over on the nozzle',
+            HEAD_ERROR_HEAD_RESET           : 'Toolhead bad connection\nPlease re-attach the toolhead, and ensure the toolhead is connected correctly',
             CONVERGENCE_FAILED              : 'Unable to calibrate the base plate\nPlease remove left-over on the nozzle',
-            HARDWARE_ERROR_HOME_FAILED      : 'Unable to home\nPlease remove the obstacle',
+            HARDWARE_ERROR_HOME_FAILED      : 'Unable to home to origin\nPlease remove the obstacle, and reattach the toolhead',
             HEAD_ERROR_TILT                 : 'Head tilted\nPlease check ball joint rod is attached correctly',
             HEAD_ERROR_SHAKE                : 'Head tilted\nPlease check ball joint rod is attached correctly',
             WRONG_HEAD                      : 'Device head is unknown, please connect to a correct header',
@@ -778,6 +784,7 @@ define(function() {
             MAINBOARD_OFFLINE               : 'Something went wrong\nPlease restart the device',
             HEAD_ERROR_HARDWARE_FAILURE     : 'Something went wrong with toolhead\nPlease re-attach the toolhead',
             G28_FAILED                      : 'Unable to home\nPlease remove the obstacle',
+            FILAMENT_RUNOUT_0               : 'Ran out of filament\nPlease insert new material',
             processing                      : 'Processing',
             savingPreview                   : 'Saving preview image',
             hour                            : 'h',
@@ -877,15 +884,13 @@ define(function() {
             unload_filament: 'Unload Filament',
             next: 'NEXT',
             heating_nozzle: 'Heating nozzle',
-            emerging: [
-                'Loading filament',
-                'Press STOP when you see material is emerging.'
-            ],
             unloading: 'Unloading Filament',
-            stop: 'STOP',
             loaded: 'Filament Loaded',
             unloaded: 'Filament Unloaded',
-            ok: 'OK'
+            ok: 'OK',
+            auto_emerging: 'Loading filament',
+            maintain_head_type_error: 'Toolhead not installed correctly',
+            maintain_zombie: 'Please restart the device'
         },
         input_machine_password: {
             require_password: '"%s" requires a password',
@@ -893,10 +898,14 @@ define(function() {
             password: 'Password'
         },
         tutorial: {
-            clickToImport: 'Click to import STL file',
-            selectQuality: 'Select quality preferred',
-            clickGo: 'Click GO and preview',
-            startPrint: 'Click go and start printing'
+            startWithFilament: 'Let\'s start with loading filament',
+            startWithModel: 'Next, let\'s import some 3D model',
+            startTour: 'Welcome.<br/>This is your first time printing,<br/>would you like to start printing tutorial?',
+            clickToImport: 'Click to import 3D model',
+            selectQuality: 'Select quality you preferred',
+            clickGo: 'Prepare to print',
+            startPrint: 'Click go and start printing',
+            skip: 'Skip tutorial'
         },
         slicer: {
             computing: 'Computing'

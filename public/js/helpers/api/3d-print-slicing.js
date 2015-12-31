@@ -111,12 +111,18 @@ define([
                 events.onMessage = function(result) {
                     callback(result);
                 };
+                events.onError = function(result) {
+                    callback(result)
+                };
                 ws.send('go ' + nameArray.join(' ') + ' -g');
                 lastOrder = 'go';
             },
             goF: function(nameArray, callback) {
                 events.onMessage = function(result) {
                     callback(result);
+                };
+                events.onError = function(result) {
+                    callback(result)
                 };
                 ws.send('go ' + nameArray.join(' ') + ' -f');
                 lastOrder = 'go';

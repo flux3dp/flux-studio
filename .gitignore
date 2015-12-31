@@ -5,6 +5,16 @@ node_modules
 _tools/nwjs-shell-builder
 public/lib
 
+osx-cache
+win-x86-cache
+win-x64-cache
+latest-ghost-osx.zip
+latest-ghost-win-x86.rar
+pack-win.zip
+_tools/nwjs-shell-builder/resources/*
+
+*.dmg
+
 # Thumbnail cache files
 ._*
 Thumbs.db

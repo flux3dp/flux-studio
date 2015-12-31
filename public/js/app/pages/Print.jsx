@@ -68,13 +68,51 @@ define([
                 y: 0,
                 z: 0
             },
-            tourGuide = [],
             lang = args.state.lang,
             selectedPrinter,
             $importBtn,
             allowDeleteObject = true,
             tutorialMode = false,
+            showChangeFilament = false,
             nwjsMenu = menuFactory.items,
+            tourGuide = [
+                {
+                    selector: '.arrowBox',
+                    text: lang.tutorial.startWithFilament,
+                    r: 0,
+                    position: 'top'
+                },
+                {
+                    selector: '.arrowBox',
+                    text: lang.tutorial.startWithModel,
+                    r: 0,
+                    position: 'bottom'
+                },
+                {
+                    selector: '.arrowBox',
+                    text: lang.tutorial.clickToImport,
+                    r: 80,
+                    position: 'top'
+                },
+                {
+                    selector: '.quality-select',
+                    text: lang.tutorial.selectQuality,
+                    r: 80,
+                    position: 'right'
+                },
+                {
+                    selector: 'button.btn-go',
+                    text: lang.tutorial.clickGo,
+                    r: 80,
+                    position: 'left'
+                },
+                {
+                    selector: '.btn-go.btn-control',
+                    text: lang.tutorial.startPrint,
+                    r: 80,
+                    position: 'top'
+                }
+            ];
             view = React.createClass({
 
                 getInitialState: function() {
@@ -120,6 +158,7 @@ define([
                 },
 
                 componentDidMount: function() {
+                    var self = this;
                     director.init(this);
 
                     this._handleApplyAdvancedSetting();
@@ -131,6 +170,9 @@ define([
                     nwjsMenu.import.enabled = true;
                     nwjsMenu.import.onClick = function() { $importBtn.click(); };
                     nwjsMenu.saveGCode.onClick = this._handleDownloadGCode;
+                    nwjsMenu.tutorial.onClick = function() {
+                        self._handleTakeTutorial('tour');
+                    };
 
                     this._registerKeyEvents();
                     this._registerTutorial();
@@ -158,25 +200,7 @@ define([
 
                 _registerTutorial: function() {
                     if(tutorialMode) {
-                        tourGuide = [
-                            {
-                                selector: '.arrowBox',
-                                text: lang.tutorial.clickToImport
-                            },
-                            {
-                                selector: '.quality-select',
-                                text: lang.tutorial.selectQuality
-                            },
-                            {
-                                selector: '.action-buttons',
-                                text: lang.tutorial.clickGo
-                            },
-                            {
-                                selector: '.go-btn',
-                                text: lang.tutorial.startPrint
-                            }
-                        ];
-                        AlertActions.showPopupYesNo('tour', 'Want a tour?');
+                        AlertActions.showPopupYesNo('tour', lang.tutorial.startTour);
                         AlertStore.onYes(this._handleTakeTutorial);
                         AlertStore.onCancel(this._handleCancelTutorial);
                     }
@@ -201,8 +225,11 @@ define([
                 },
 
                 _handleRaftClick: function() {
+                    this.setState({ leftPanelReady: false });
                     var isOn = !this.state.raftOn;
-                    director.setParameter('raft', isOn ? '1' : '0');
+                    director.setParameter('raft', isOn ? '1' : '0').then(function() {
+                        this.setState({ leftPanelReady: true });
+                    }.bind(this));
                     advancedSettings.raft_layers = isOn ? advancedSettings.raft : 0;
                     advancedSettings.custom = advancedSettings.custom.replace(
                         `raft_layers = ${isOn ? 0 : advancedSettings.raft}`,
@@ -216,14 +243,16 @@ define([
                     this.setState({ leftPanelReady: false });
                     var isOn = !this.state.supportOn;
                     director.setParameter('support', isOn ? '1' : '0').then(function() {
-                        this.setState({ leftPanelReady: true });
+                        this.setState({
+                            leftPanelReady: true,
+                            supportOn: isOn
+                        });
                     }.bind(this));
                     advancedSettings.support_material = isOn ? 1 : 0;
-                    // console.log('support on?', isOn);
                     advancedSettings.custom = advancedSettings.custom.replace(
                         `support_material = ${isOn ? 0 : 1}`,
                         `support_material = ${isOn ? 1 : 0}`);
-                    this.setState({ supportOn: isOn });
+                    // this.setState({ supportOn: isOn });
                     Config().write('advanced-settings', JSON.stringify(advancedSettings));
                 },
 
@@ -338,6 +367,10 @@ define([
                         openPrinterSelectorWindow: false
                     });
                     director.getFCode().then(function(fcode, previewUrl) {
+                        if(!(fcode instanceof Blob)) {
+                            AlertActions.showPopupError('', lang.print.out_of_range_message, lang.print.out_of_range);
+                            return;
+                        }
                         GlobalActions.showMonitor(selectedPrinter, fcode, previewUrl);
                         setTimeout(function() {
                             if(tutorialMode) {
@@ -395,13 +428,16 @@ define([
                     if(!tutorialMode) { return; }
                     this.setState({ currentTutorialStep: this.state.currentTutorialStep + 1 }, function() {
                         if(this.state.currentTutorialStep === 1) {
+                            AlertActions.showChangeFilament(DeviceMaster.getFirstDevice(), 'TUTORIAL');
+                        }
+                        else if(this.state.currentTutorialStep === 3) {
                             var fileEntry = {};
                             fileEntry.name = 'guide-example.stl';
                             fileEntry.toURL = function() {
-                                return '/img/guide-example.stl';
+                                return '/guide-example.stl';
                             };
                             var oReq = new XMLHttpRequest();
-                            oReq.open('GET', '/img/guide-example.stl', true);
+                            oReq.open('GET', '/guide-example.stl', true);
                             oReq.responseType = 'blob';
 
                             oReq.onload = function(oEvent) {
@@ -411,8 +447,9 @@ define([
 
                             oReq.send();
                         }
-                        else if (this.state.currentTutorialStep === 3) {
+                        else if (this.state.currentTutorialStep === 5) {
                             this.setState({ tutorialOn: false });
+                            $('.btn-go').click();
                         }
                     });
                 },
@@ -545,14 +582,6 @@ define([
                     nwjsMenu.saveGCode.enabled = this.state.hasObject;
                 },
 
-                _renderTutorialOff: function() {
-                    return (
-                        <div>
-                            <a className="btn btn-default btn-tutorial" onClick={this._handleTutorialComplete}>Close Tutorial</a>
-                        </div>
-                    )
-                },
-
                 render: function() {
                     var advancedPanel           = this.state.showAdvancedSettings ? this._renderAdvancedPanel() : '',
                         importWindow            = this.state.openImportWindow ? this._renderImportWindow() : '',
@@ -562,7 +591,6 @@ define([
                         printerSelectorWindow   = this.state.openPrinterSelectorWindow ? this._renderPrinterSelectorWindow() : '',
                         waitWindow              = this.state.openWaitWindow ? this._renderWaitWindow() : '',
                         progressWindow          = this.state.progressMessage ? this._renderProgressWindow() : '';
-                        tutorialOff             = tutorialMode ? this._renderTutorialOff() : '';
 
                     this._renderNwjsMenu();
 
@@ -585,19 +613,20 @@ define([
 
                             {progressWindow}
 
+
+
                             <div id="model-displayer" className="model-displayer">
                                 <div className="import-indicator"></div>
                             </div>
                             <input className="hide" ref="importBtn" type="file" accept=".stl" onChange={this._handleImport} />
 
                             <TourGuide
+                                lang={lang}
                                 enable={this.state.tutorialOn}
                                 guides={tourGuide}
                                 step={this.state.currentTutorialStep}
                                 onNextClick={this._handleTutorialStep}
                                 onComplete={this._handleTutorialComplete} />
-
-                            {tutorialOff}
 
                         </div>
                     );

@@ -131,6 +131,7 @@ function(React, Modal, Alert, ProgressConstants) {
                     />
                 ),
                 className = {
+                    'shadow-modal': true,
                     'modal-progress': true,
                     'modal-progress-nonstop': ProgressConstants.NONSTOP === this.props.type
                 };

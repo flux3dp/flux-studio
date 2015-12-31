@@ -425,46 +425,6 @@ input.switch:checked ~ label:after {
 /* Advanced Panel */
 .print-studio {
 
-    .tour-mask {
-        background-color:rgba(0, 0, 0, 0.3);
-        bottom: 0;
-        cursor: pointer;
-        height: 100%;
-        left: 0;
-        position: absolute;
-        right: 0;
-        top: 0;
-        width: 100%;
-        z-index: 9999;
-
-        .base {
-            background-color:rgba(255, 255, 255, 0.3);
-            border: solid 1px black;
-            height: 200px;
-            left: 744px;
-            position: relative;
-            top: 388px;
-            width: 200px;
-        }
-
-        .tour-description {
-            color: white;
-            font-size: 16px;
-            font-weight: bold;
-            position: relative;
-            text-align: center;
-            top: -70px;
-        }
-
-    }
-
-    .btn-tutorial {
-        position: absolute;
-        right: 30px;
-        top: 30px;
-        z-index: 99999;
-    }
-
     .import-indicator {
         background-color: rgba(0,0,0,0.5);
         border: 7px dashed #DDD;
@@ -480,6 +440,7 @@ input.switch:checked ~ label:after {
         box-shadow: 0 4px 15px rgba(0,0,0,.3), 0 16px 40px rgba(0,0,0,.5);
         padding: 0;
         position: relative;
+        height: 540px;
         width: 440px;
 
         .content-wrapper {
@@ -537,6 +498,7 @@ input.switch:checked ~ label:after {
                 .right {
                     padding: 4% 0;
                 }
+                border-top: 0;
             }
         }
 
@@ -572,13 +534,15 @@ input.switch:checked ~ label:after {
             }
 
             .btn {
-                border: 2px solid #E0E0DF;
                 border-radius: 0;
-                color: #B3B3B3;
                 font-size: 15px;
                 line-height: 30px;
                 margin: 0;
                 padding: 0 10px;
+                &:hover {
+                    border: 2px solid #424242;
+                    color: #424242;
+                }
             }
         }
 
@@ -675,6 +639,7 @@ input.switch:checked ~ label:after {
             position: absolute;
             width: 200px;
             animation: upanddown 5s ease infinite alternate;
+            -webkit-animation: upanddown 5s ease infinite alternate;
 
             &:hover {
                 color: #888;
