@@ -444,8 +444,9 @@ define([
                                 //Insert into root html
                                 $('.tour-overlay').append($('.tour'));
                                 $('.tour').click(function(){
-                                    _handleTutorialComplete();
-                                });
+                                    $('.print-studio').append($('.tour'));
+                                    this._handleTutorialComplete();
+                                }.bind(this));
                             };
                         }.bind(this), 1000);
 
@@ -546,7 +547,11 @@ define([
                 _handleTutorialComplete: function() {
                     tutorialMode = false;
                     Config().write('tutorial-finished', true);
+                    setTimeout(function(){
+                    $('.tour').hide();
                     this.setState({ tutorialOn: false });
+                    this.forceUpdate();
+                    }.bind(this), 200);
                 },
 
                 _handleCloseAllView: function() {
