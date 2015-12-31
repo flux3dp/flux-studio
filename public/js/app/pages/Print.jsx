@@ -100,7 +100,7 @@ define([
                 {
                     selector: '.arrowBox',
                     text: lang.tutorial.clickToImport,
-                    r: 110,
+                    r: 105,
                     position: 'top'
                 },
                 {
@@ -118,8 +118,16 @@ define([
                     position: 'left'
                 },
                 {
-                    selector: '.btn-go.btn-control',
+                    selector: '.flux-monitor .operation',
                     text: lang.tutorial.startPrint,
+                    offset_y: 25,
+                    r: 80,
+                    position: 'top'
+                },
+                {
+                    selector: '.flux-monitor .operation',
+                    text: lang.tutorial.startPrint,
+                    offset_y: 25,
                     r: 80,
                     position: 'top'
                 }
@@ -223,7 +231,6 @@ define([
 
                 _registerTutorial: function() {
                     if(tutorialMode) {
-                        console.log("called to popout")
                         AlertActions.showPopupYesNo('tour', lang.tutorial.startTour);
                         AlertStore.onYes(this._handleTakeTutorial);
                         AlertStore.onCancel(this._handleCancelTutorial);
@@ -264,6 +271,7 @@ define([
                     if(answer === 'tour') {
                         this.setState({ tutorialOn: true });
                         tutorialMode = true;
+                        console.log("start take tutorial")
                     }
                 },
 
@@ -431,7 +439,12 @@ define([
                             if(tutorialMode) {
                                 this.setState({
                                     tutorialOn: true,
-                                    currentTutorialStep: 3
+                                    currentTutorialStep: 6
+                                });
+                                //Insert into root html
+                                $('.tour-overlay').append($('.tour'));
+                                $('.tour').click(function(){
+                                    _handleTutorialComplete();
                                 });
                             };
                         }.bind(this), 1000);
@@ -526,7 +539,6 @@ define([
                         else if (this.state.currentTutorialStep === 5) {
                             this.setState({ tutorialOn: false });
                             $('.btn-go').click();
-                            Config().write('tutorial-finished', true);
                         }
                     });
                 },
