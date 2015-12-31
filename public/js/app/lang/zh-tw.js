@@ -484,6 +484,7 @@ define(function() {
             get_fcode: '儲存<br/>工作',
             name: '名稱',
             go: 'GO',
+            process_caption: '輸出中',
             title: {
                 material: 'Select proper material to have the best engraving result.',
                 object_height: 'A Raft are layers built under your part and help it stick to the base plate.',

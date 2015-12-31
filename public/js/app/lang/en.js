@@ -484,6 +484,7 @@ define(function() {
             get_fcode: 'Save<br/>Task',
             name: 'Name',
             go: 'GO',
+            process_caption: 'Generating',
             title: {
                 material: 'Select proper material to have the best engraving result.',
                 object_height: 'A Raft are layers built under your part and help it stick to the base plate.',
