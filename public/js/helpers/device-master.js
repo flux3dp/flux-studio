@@ -35,7 +35,7 @@ define([
         _password = '',
         _status = DeviceConstants.READY,
         _selectedDevice = {},
-        _firstDevice,
+        _deviceNameMap = {},
         _device,
         _devices = [],
         _errors = {};
@@ -321,8 +321,23 @@ define([
         return d.promise();
     }
 
-    function getFirstDevice() {
-        return _firstDevice;
+    function getDeviceByName(name) {
+        return _deviceNameMap[name];
+    }
+
+    function getDeviceByNameAsync(name, config) {
+        if(getDeviceByName(name)){
+            config.onSuccess(getDeviceByName(name));
+            return;
+        }
+        if(config.timeout > 0){
+            setTimeout(function(){
+                config.timeout -= 500;
+                getDeviceByNameAsync(name, config)
+            },500);
+        }else{
+            config.onTimeout();
+        }
     }
 
     // Private Functions
@@ -465,15 +480,14 @@ define([
             this.getPreviewInfo     = getPreviewInfo;
             this.maintain           = maintain;
             this.reconnect          = reconnect;
-            this.getFirstDevice     = getFirstDevice;
+            this.getDeviceByName    = getDeviceByName;
+            this.getDeviceByNameAsync = getDeviceByNameAsync;
 
             Discover(
                 'device-master',
                 function(devices) {
-                    if(devices.length > 0) {
-                        if(!_firstDevice) {
-                            _firstDevice = devices[0];
-                        }
+                    for(var i in devices){
+                        _deviceNameMap[devices[i].name] = devices[i];
                     }
                     _scanDeviceError(devices);
                 }
