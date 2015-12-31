@@ -59,7 +59,6 @@
             }
 
             .logo-icon {
-                -webkit-filter: brightness(70%);
                 transform: rotate(90deg);
             }
 
@@ -83,6 +82,11 @@
             transform-origin: 50% 50%;
             transition: all .25s;
             width: 3.2rem;
+        }
+
+        &:hover{
+            filter: brightness(70%);
+            -webkit-filter: brightness(70%);
         }
 
         p,
