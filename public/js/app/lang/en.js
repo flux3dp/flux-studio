@@ -903,7 +903,13 @@ define(function() {
             connect: 'CONNECT',
             password: 'Password'
         },
+        set_default: {
+            success: 'Successfully set %s as default',
+            error: 'Unable to set %s as default, due to network issue'
+        },
         tutorial: {
+            set_first_default_caption: 'Welcome',
+            set_first_default: 'Do you want to set "%s" as your default device?',
             startWithFilament: 'Let\'s start with loading filament',
             startWithModel: 'Next, let\'s import some 3D model',
             startTour: 'Welcome!<br/>This is your first time printing,<br/>would you like to start printing tutorial?',

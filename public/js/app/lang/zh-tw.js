@@ -10,7 +10,7 @@ define(function() {
             no_webgl: '您的系統不支援 WebGL'
         },
         device_selection: {
-            no_printers: '未偵測到 FLUX 裝置, 請檢查您與機器的網路連線是否在同個網路下',
+            no_printers: '未偵測到 FLUX Delta, 請檢查您與機器的網路連線是否在同個網路下',
             device_name: 'DEVICE NAME',
             module: 'MODULE',
             status: 'STATUS'
@@ -82,14 +82,14 @@ define(function() {
             no_machine : '目前沒有機器，跳過此步驟',
 
             // specific caption/content
-            invalid_device_name: '機器名稱只能使用英文字母、數字、空格以及特殊字元 “-”, “_”, “’”, “\'”',
+            invalid_device_name: '裝置名稱只能使用英文字母、數字、空格以及特殊字元 “-”, “_”, “’”, “\'”',
             require_device_name: '名稱欄位為必填',
             select_language: '請選擇你想使用的語言',
             change_password: {
                 caption: '密碼更改',
                 content: '要更改密碼嗎?'
             },
-            connect_flux: '用 USB 連接你的電腦與 FLUX',
+            connect_flux: '用 USB 連接你的電腦與 FLUX 裝置',
             name_your_flux: '為你的 FLUX Delta 取一個獨特的名字',
             wifi_setup: '設定無線網路',
             select_preferred_wifi: '選擇你偏好的網路',
@@ -98,9 +98,9 @@ define(function() {
 
             // page specific
             set_machine_generic: {
-                printer_name: '機器名稱*',
+                printer_name: '裝置名稱*',
                 printer_name_placeholder: '例如：霹靂五號',
-                password: '機器密碼',
+                password: '裝置密碼',
                 set_station_mode: '設定成無線基地台',
                 password_placeholder: '密碼可以保護你的 FLUX Delta'
             },
@@ -902,8 +902,14 @@ define(function() {
             connect: '連接',
             password: '密碼'
         },
+        set_default: {
+            success: '%s 已設為預設裝置',
+            error: '由於網路問題，無法將 %s 設為預設裝置'
+        },
         tutorial: {
-            startWithFilament: '讓我們先填裝料捲吧',
+            set_first_default_caption: '初次使用',
+            set_first_default: '是否要將 %s 設為預設裝置?',
+            startWithFilament: '首先，讓我們先填裝料捲',
             startWithModel: '接下來，我們來載入3Ｄ模型囉',
             startTour: '嗨，歡迎<br/>這是你第一次使用列印功能,<br/>你希望觀看列印功能教學嗎？',
             clickToImport: '點擊匯入以載入 3D 模型',
