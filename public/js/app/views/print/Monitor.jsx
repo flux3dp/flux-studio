@@ -777,7 +777,13 @@ define([
                 progress = '';
             }
 
-            temperature = report.rt ? `${lang.monitor.temperature} ${report.rt} °C` : '';
+            if(status === DeviceConstants.RUNNING) {
+                temperature = report.rt ? `${lang.monitor.temperature} ${report.rt} °C` : '';
+            }
+            else {
+                temperature = report.rt ? `${lang.monitor.temperature} ${report.rt} °C / ${report.tt} °C` : '';
+            }
+
             headInfo = report.module ? lang.monitor.device[report.module] : '';
 
             if(!report.error) {
