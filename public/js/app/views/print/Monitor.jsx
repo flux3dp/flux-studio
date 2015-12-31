@@ -46,7 +46,7 @@ define([
         lastAction,
         fileToBeUpload = {},
         statusActions,
-        statusIdActions,
+        openSource,
         errorActions,
 
         // error display
@@ -82,6 +82,11 @@ define([
         FILE: 'FILE',
         FOLDER: 'FOLDER'
     };
+
+    var source = {
+        DEVICE_LIST : 'DEVICE_LIST',
+        GO          : 'GO'
+    }
 
     var operation,
         wait,
@@ -216,9 +221,12 @@ define([
         },
 
         getInitialState: function() {
+            var _mode = this.props.selectedDevice.st_id === DeviceConstants.status.IDLE ? mode.BROWSE_FILE : mode.PREVIEW;
+            openSource = !this.props.fCode ? source.DEVICE_LIST : source.GO;
+
             return {
                 waiting             : false,
-                mode                : mode.PREVIEW,
+                mode                : _mode,
                 directoryContent    : {},
                 cameraImageUrl      : '',
                 selectedItem        : '',
@@ -244,7 +252,9 @@ define([
             previewUrl  = this.props.previewUrl;
 
             statusId = DeviceConstants.status.IDLE;
-            this._getPrintingInfo();
+            if(this.state.mode !== mode.BROWSE_FILE) {
+                this._getPrintingInfo();
+            }
         },
 
         componentDidMount: function() {
@@ -252,6 +262,11 @@ define([
             AlertStore.onCancel(this._handleCancel);
             AlertStore.onYes(this._handleYes);
             this._addHistory();
+
+            if(this.state.mode === mode.BROWSE_FILE) {
+                currentStatus = DeviceConstants.READY;
+                this._refreshDirectory();
+            }
         },
 
         shouldComponentUpdate: function(nextProps, nextState) {
@@ -261,7 +276,6 @@ define([
         componentWillUnmount: function() {
             if(this.state.mode === mode.CAMERA) {
                 DeviceMaster.stopCamera();
-                console.log('camera stopped');
             }
             this._stopReport();
             history = [];
@@ -336,7 +350,6 @@ define([
         },
 
         _refreshDirectory: function() {
-            console.log(pathArray.join('/'));
             this._retrieveList(pathArray.join('/'));
         },
 
@@ -371,7 +384,6 @@ define([
                 if(isValid) {
                     var blob = new Blob([reader.result], type);
                     DeviceMaster.uploadFile(blob, file, pathArray.join('/')).then(function(result) {
-                        console.log('upload result', result);
                         self._refreshDirectory();
                     });
                 }
@@ -479,12 +491,6 @@ define([
             }
             lastAction = history[history.length - 1];
 
-            if(this.state.mode === mode.CAMERA) {
-                DeviceMaster.stopCamera().then(function() {
-                    DeviceMaster.kick();
-                });
-            };
-
             var actions = {
 
                 'PREVIEW' : function() {
@@ -503,7 +509,13 @@ define([
 
             if(actions[lastAction.mode]) {
                 actions[lastAction.mode]();
-                this.setState({ mode: lastAction.mode });
+                this.setState({ mode: lastAction.mode }, function() {
+                    if(this.state.mode === mode.CAMERA) {
+                        DeviceMaster.stopCamera().then(function() {
+                            DeviceMaster.kick();
+                        });
+                    };
+                });
             }
         },
 
@@ -1086,6 +1098,15 @@ define([
 
                 if(statusId === DeviceConstants.status.PAUSING_FROM_RUNNING) {
                     middlebuttonOn = false;
+                }
+            }
+            else if (this.state.mode === mode.PREVIEW) {
+                if(
+                    statusId === DeviceConstants.status.IDLE ||
+                    statusId === DeviceConstants.status.COMPLETED ||
+                    statusId === DeviceConstants.status.ABORTED
+                ) {
+                    leftButtonOn = false;
                 }
             }
 

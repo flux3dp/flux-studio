@@ -17,9 +17,12 @@ define([
         });
 
         if (true === window.FLUX.debug && 'undefined' !== typeof requireNode) {
-            shortcuts.on(['ctrl', 'alt', 'd'], function(e) {
-                requireNode('nw.gui').Window.get().showDevTools();
-            });
+            shortcuts.on(['ctrl', 'alt', 'd'], function(e) { requireNode('nw.gui').Window.get().showDevTools(); });
+            shortcuts.on(['cmd', 'r'], function() { window.location.reload(); });
+            shortcuts.on(['cmd', 'c'], function() { window.document.execCommand('copy'); });
+            shortcuts.on(['cmd', 'a'], function() { window.document.execCommand('selectAll'); });
+            shortcuts.on(['cmd', 'x'], function() { window.document.execCommand('cut'); });
+            shortcuts.on(['cmd', 'v'], function() { window.document.execCommand('paste'); });
         }
     };
 

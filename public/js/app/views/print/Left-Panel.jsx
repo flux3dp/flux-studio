@@ -137,7 +137,7 @@ define([
                     },
 
                     'PREVIEW': function() {
-                        if(e.target.type === 'range' || !self.props.hasObject || self.props.hasOutOfBoundsObject) {
+                        if(e.target.type === 'range' || !self.props.hasObject) {
                             e.preventDefault();
                             return;
                         }
@@ -283,7 +283,7 @@ define([
             var _class = ClassNames('display-text', {'disable': !this.props.enable});
             return {
                 label: (
-                    <div className={_class} onClick={this._handleActions.bind(null, constants.PREVIEW, '')}>
+                    <div id="preview" className={_class} onClick={this._handleActions.bind(null, constants.PREVIEW, '')}>
                         <span>{lang.preview}</span>
                     </div>
                 ),
