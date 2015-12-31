@@ -268,14 +268,16 @@ define([
                     INFO: function() {
                         $.growl.notice({
                             title   : self.state.lang.alert.info,
-                            message : message
+                            message : message,
+                            location: 'bl'
                         });
                     },
 
                     WARNING: function() {
                         $.growl.warning({
                             title   : self.state.lang.alert.warning,
-                            message : message
+                            message : message,
+                            location: 'bl'
                         });
                     },
 
@@ -283,7 +285,8 @@ define([
                         $.growl.error({
                             title   : self.state.lang.alert.error,
                             message : message,
-                            fixed   : true
+                            fixed   : true,
+                            location: 'bl'
                         });
                     }
                 };
