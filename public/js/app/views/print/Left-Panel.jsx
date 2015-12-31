@@ -101,9 +101,6 @@ define([
 
                     this.setState({ quality: _quality[nextProps.layerHeight.toString()] || lang.quality.custom });
                 }
-                else {
-                    console.log(nextProps);
-                }
             }
         },
 

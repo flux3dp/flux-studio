@@ -9,7 +9,7 @@ define([
     'app/stores/alert-store',
     'app/constants/device-constants',
     'helpers/file-system',
-    'app/actions/global-actions',
+    'app/actions/global-actions'
 ], function(
     $,
     React,
@@ -46,8 +46,8 @@ define([
         lastAction,
         fileToBeUpload = {},
         statusActions,
+        statusIdActions,
         errorActions,
-        uploadProgress = 0,
 
         // error display
         mainError = '',
@@ -72,15 +72,36 @@ define([
         refreshTime = 3000;
 
     var mode = {
-        PREVIEW: 'PREVIEW',
-        BROWSE_FILE: 'BROWSE_FILE',
-        CAMERA: 'CAMERA'
+        PRINT       : 'PRINT',
+        PREVIEW     : 'PREVIEW',
+        BROWSE_FILE : 'BROWSE_FILE',
+        CAMERA      : 'CAMERA'
     };
 
     var type = {
         FILE: 'FILE',
         FOLDER: 'FOLDER'
     };
+
+    var operation,
+        wait,
+        go,
+        pause,
+        stop,
+        commands,
+        action,
+        cameraClass,
+        cameraDescriptionClass,
+        upload,
+        download,
+        camera,
+        leftButton,
+        middleButton,
+        cameraButton,
+
+        leftButtonOn = true,
+        middlebuttonOn = true,
+        rightButtonOn = true;
 
     var opts = {};
     var temp = [];
@@ -127,6 +148,7 @@ define([
         'WAITING_HEAD': function() {
             displayStatus = lang.device.heating;
             currentStatus = '';
+            leftButtonOn = false;
         },
 
         'CORRECTING': function() {
@@ -221,6 +243,7 @@ define([
             lang        = this.props.lang;
             previewUrl  = this.props.previewUrl;
 
+            statusId = DeviceConstants.status.IDLE;
             this._getPrintingInfo();
         },
 
@@ -299,6 +322,15 @@ define([
                     time = `${min}${lang.monitor.minute} ${sec}${lang.monitor.second}`;
                 }
             }
+            else {
+                sec = parseInt(timeInSeconds);
+                if(withSeconds) {
+                    time = `00:${sec}`;
+                }
+                else {
+                    time = `${sec}${lang.monitor.second}`;
+                }
+            }
 
             return time;
         },
@@ -355,7 +387,14 @@ define([
 
         _handleRetry: function(id) {
             if(id === _id) {
-                if(this.state.currentStatus === DeviceConstants.PAUSED) {
+                if(statusId === DeviceConstants.status.ABORTED) {
+                    DeviceMaster.quit().then(function() {
+                        this.setState({ currentStatus: DeviceConstants.READY }, function() {
+                            this._handleGo();
+                        });
+                    }.bind(this));
+                }
+                else if(this.state.currentStatus === DeviceConstants.PAUSED) {
                     DeviceMaster.resume();
                 }
             }
@@ -439,6 +478,12 @@ define([
                 temp.pop();
             }
             lastAction = history[history.length - 1];
+
+            if(this.state.mode === mode.CAMERA) {
+                DeviceMaster.stopCamera().then(function() {
+                    DeviceMaster.kick();
+                });
+            };
 
             var actions = {
 
@@ -574,10 +619,14 @@ define([
         _handleGo: function() {
             var self = this;
             this._stopReport();
+
             if(this.state.currentStatus === DeviceConstants.READY) {
                 var blob = this.props.fCode;
 
-                this.setState({ currentStatus: lang.device.starting });
+                this.setState({
+                    currentStatus: DeviceConstants.STARTING,
+                    mode: mode.PRINT
+                });
 
                 if(blob) {
                     DeviceMaster.go(blob, function(_progress) {
@@ -643,6 +692,8 @@ define([
         },
 
         _processTimeout: function() {
+            clearTimeout(timmer);
+            DeviceMaster.reconnect();
             AlertActions.showPopupError('', lang.device.disconnectedError);
             this._handleClose();
         },
@@ -653,6 +704,9 @@ define([
             subError        = '';
             status          = report.st_label;
             statusId        = report.st_id;
+            leftButtonOn    = true;
+            middlebuttonOn  = true;
+            rightButtonOn   = true;
 
             clearTimeout(timmer);
             timmer = setTimeout(this._processTimeout, timeout);
@@ -682,7 +736,6 @@ define([
                     attr.push(subError);
                 }
 
-                console.log(attr.join('_'));
                 errorMessage = lang.monitor[attr.join('_')];
             }
 
@@ -692,8 +745,15 @@ define([
             }
 
             // actions responded to status
+            status = statusId === DeviceConstants.status.ABORTED ? DeviceConstants.ABORTED : status;
             if(statusActions[status]) {
                 statusActions[status]();
+            }
+
+
+            if(statusId === DeviceConstants.status.PAUSED_FROM_RUNNING) {
+                displayStatus = lang.device.paused;
+                currentStatus = DeviceConstants.PAUSED;
             }
 
             if(report.prog && !!totalTimeInSeconds) {
@@ -737,6 +797,8 @@ define([
         _stopReport: function() {
             clearInterval(reporter);
             clearTimeout(timmer);
+            reporter = null;
+            timmer = null;
         },
 
         _processImage: function(imageBlobs, mimeType) {
@@ -816,7 +878,7 @@ define([
         },
 
         _imageError: function(src) {
-            src.target.src = 'http://localhost:8080/img/ph_s.png';
+            src.target.src = '/img/ph_s.png';
         },
 
         _renderDirectoryContent: function(content) {
@@ -890,6 +952,7 @@ define([
         _renderContent: function() {
             switch(this.state.mode) {
                 case mode.PREVIEW:
+                case mode.PRINT:
                     var divStyle = {
                             backgroundColor: '#E0E0E0',
                             backgroundImage: !previewUrl ? 'url(/img/ph_l.png)' : 'url(' + previewUrl + ')',
@@ -916,35 +979,19 @@ define([
         },
 
         _renderOperation: function() {
-            var self = this,
-                operation,
-                wait,
-                go,
-                pause,
-                stop,
-                commands,
-                action,
-                cameraClass,
-                cameraDescriptionClass,
-                upload,
-                download,
-                camera,
-                leftButton,
-                middleButton,
-                cameraButton;
 
             cameraClass = ClassNames('btn-camera btn-control', { 'on': this.state.mode === mode.CAMERA });
             cameraDescriptionClass = ClassNames('description', { 'on': this.state.mode === mode.CAMERA });
 
             go = (
-                <div className="controls center" onClick={self._handleGo}>
+                <div className="controls center" onClick={this._handleGo}>
                     <div className="btn-go btn-control"></div>
                     <div className="description">{lang.monitor.go}</div>
                 </div>
             );
 
             pause = (
-                <div className="controls center" onClick={self._handlePause}>
+                <div className="controls center" onClick={this._handlePause}>
                     <div className="btn-pause btn-control"></div>
                     <div className="description">{lang.monitor.pause}</div>
                 </div>
@@ -1009,13 +1056,42 @@ define([
             middleButton = this.state.mode === mode.BROWSE_FILE ? download : action;
             cameraButton = currentStatus !== DeviceConstants.READY ? '' : camera;
 
+            // CAMERA mode
             if(this.state.mode === mode.CAMERA) {
                 leftButton = '';
-            }
-
-            if(this.state.selectedItemType !== type.FILE && this.state.mode === mode.BROWSE_FILE) {
                 middleButton = '';
             }
+
+            // BROWSE_FILE mode
+            if(this.state.mode === mode.BROWSE_FILE) {
+                if(this.state.selectedItemType !== type.FILE && this.state.mode === mode.BROWSE_FILE) {
+                    middleButton = '';
+                }
+            }
+
+            // PRINT mode
+            if(this.state.mode === mode.PRINT) {
+                if(
+                    statusId === DeviceConstants.status.IDLE ||
+                    statusId === DeviceConstants.status.COMPLETED ||
+                    statusId === DeviceConstants.status.ABORTED
+                ) {
+                    leftButtonOn = false;
+                }
+
+                if(this.state.currentStatus === DeviceConstants.STARTING) {
+                    middlebuttonOn = false;
+                    rightButtonOn = false;
+                }
+
+                if(statusId === DeviceConstants.status.PAUSING_FROM_RUNNING) {
+                    middlebuttonOn = false;
+                }
+            }
+
+            leftButton      = leftButtonOn ? leftButton : '';
+            middleButton    = middlebuttonOn ? middleButton : '';
+            cameraButton    = rightButtonOn ? cameraButton : '';
 
             operation = (
                 <div className="operation">
@@ -1081,7 +1157,7 @@ define([
             var name            = DeviceMaster.getSelectedDevice().name,
                 content         = this._renderContent(),
                 waitIcon        = this.state.waiting ? this._renderSpinner() : '',
-                operation       = this._renderOperation(),
+                op              = this._renderOperation(),
                 navigation      = this._renderNavigation(),
                 subClass        = ClassNames('sub', { 'hide': false }),
                 printingInfo    = this.state.mode === mode.BROWSE_FILE ? '' : this._renderPrintingInfo();
@@ -1107,7 +1183,7 @@ define([
                             </div>
 
                         </div>
-                        {operation}
+                        {op}
                     </div>
                     <div className={subClass}>
                         <div className="wrapper">

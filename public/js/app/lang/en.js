@@ -84,8 +84,8 @@ define(function() {
             require_device_name: 'Name is required',
             select_language: 'Select Language',
             change_password: 'Change password?',
-            connect_flux: 'Connect FLUX to Your Computer by USB Cable',
-            name_your_flux: 'Name Your FLUX',
+            connect_flux: 'Connect FLUX Delta with USB Cable',
+            name_your_flux: 'Name Your FLUX Delta',
             wifi_setup: 'Wi-Fi Setup',
             select_preferred_wifi: 'Select your preferred network.',
             requires_wifi_password: 'requires a password.',
@@ -96,16 +96,16 @@ define(function() {
                 printer_name: 'Name',
                 printer_name_placeholder: 'Device\'s Name',
                 password: 'Password',
-                set_station_mode: 'Set station mode',
+                set_station_mode: 'Set as wifi station',
                 password_placeholder: 'Password'
             },
 
             setting_completed: {
                 start: 'Start',
                 is_ready: '“%s” is ready',
-                station_ready_statement: 'Your FLUX is now a Wi-Fi station, you can use your FLUX wirelessly by connect to Wi-Fi “%s”',
+                station_ready_statement: 'Your FLUX Delta is now a Wi-Fi station, you can use your FLUX wirelessly by connect to Wi-Fi “%s”',
                 brilliant: 'Brilliant!',
-                begin_journey: 'You can begin the journey with your FLUX now.',
+                begin_journey: 'You can begin the journey with your FLUX Delta now.',
                 great: 'Great!',
                 upload_via_usb: 'You can setup Wi-Fi later, or use USB drive to print.',
                 back: 'Back',
@@ -117,7 +117,7 @@ define(function() {
                 error: 'Error',
 
                 keep_connect: {
-                    content: 'Please make sure your FLUX has been powered on and attached to micro-usb cord.'
+                    content: 'Please make sure your FLUX Delta has been powered on and attached to micro-usb cord.'
                 },
 
                 wifi_connection: {
@@ -663,7 +663,7 @@ define(function() {
                 size: 'SIZE',
                 rotate: 'ROTATE',
                 crop: 'Crop',
-                auto_merge: 'Auto Merge',
+                auto_merge: 'Loading filament',
                 manual_merge: 'Merge',
                 clear_noise: 'Denoise'
             },
@@ -745,7 +745,7 @@ define(function() {
             unknown: 'Unknown'
         },
         monitor: {
-            change_filament                 : 'CHANGE FILLAMENT',
+            change_filament                 : 'CHANGE FILAMENT',
             browse_file                     : 'BROWSE FILE',
             monitor                         : 'MONITOR',
             currentTemperature              : 'Current Temp',
@@ -764,8 +764,9 @@ define(function() {
             HWARDWARE_ERROR_0               : 'Ran out of filament\nPlease insert new material',
             HARDWARE_ERROR_PLATE_MISSING    : 'Unable to detect the base plate\nPlease put on the plate.',
             HARDWARE_ERROR_ZPROBE_ERROR     : 'Unable to calibrate the base plate\nPlease remove left-over on the nozzle',
+            HEAD_ERROR_HEAD_RESET           : 'Toolhead bad connection\nPlease re-attach the toolhead, and ensure the toolhead is connected correctly',
             CONVERGENCE_FAILED              : 'Unable to calibrate the base plate\nPlease remove left-over on the nozzle',
-            HARDWARE_ERROR_HOME_FAILED      : 'Unable to home\nPlease remove the obstacle',
+            HARDWARE_ERROR_HOME_FAILED      : 'Unable to home to origin\nPlease remove the obstacle, and reattach the toolhead',
             HEAD_ERROR_TILT                 : 'Head tilted\nPlease check ball joint rod is attached correctly',
             HEAD_ERROR_SHAKE                : 'Head tilted\nPlease check ball joint rod is attached correctly',
             WRONG_HEAD                      : 'Device head is unknown, please connect to a correct header',
@@ -778,6 +779,7 @@ define(function() {
             MAINBOARD_OFFLINE               : 'Something went wrong\nPlease restart the device',
             HEAD_ERROR_HARDWARE_FAILURE     : 'Something went wrong with toolhead\nPlease re-attach the toolhead',
             G28_FAILED                      : 'Unable to home\nPlease remove the obstacle',
+            FILAMENT_RUNOUT_0               : 'Ran out of filament\nPlease insert new material',
             processing                      : 'Processing',
             savingPreview                   : 'Saving preview image',
             hour                            : 'h',
@@ -881,7 +883,9 @@ define(function() {
             loaded: 'Filament Loaded',
             unloaded: 'Filament Unloaded',
             ok: 'OK',
-            auto_emerging: 'Auto Emerging'
+            auto_emerging: 'Loading filament',
+            maintain_head_type_error: 'Toolhead not installed correctly',
+            maintain_zombie: 'Please restart the device'
         },
         input_machine_password: {
             require_password: '"%s" requires a password',
@@ -889,10 +893,14 @@ define(function() {
             password: 'Password'
         },
         tutorial: {
-            clickToImport: 'Click to import STL file',
-            selectQuality: 'Select quality preferred',
-            clickGo: 'Click GO and preview',
-            startPrint: 'Click go and start printing'
+            startWithFilament: 'Let\'s start with loading filament',
+            startWithModel: 'Next, let\'s import some 3D model',
+            startTour: 'Welcome.<br/>This is your first time printing,<br/>would you like to start printing tutorial?',
+            clickToImport: 'Click to import 3D model',
+            selectQuality: 'Select quality you preferred',
+            clickGo: 'Prepare to print',
+            startPrint: 'Click go and start printing',
+            skip: 'Skip tutorial'
         },
         slicer: {
             computing: 'Computing'
