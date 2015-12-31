@@ -67,7 +67,8 @@ define(function() {
                 label: 'Help',
                 starting_guide: 'Starting Guide',
                 online_support: 'Online Support',
-                troubleshooting: 'Troubleshooting'
+                troubleshooting: 'Troubleshooting',
+                tutorial: 'Start Tutorial'
             }
         },
         initialize: {
@@ -760,6 +761,7 @@ define(function() {
             HEAD_OFFLINE                    : 'Device head is not connected or missing',
             HEAD_ERROR_CALIBRATING          : 'Unable to calibrate toolhead\nplease re-attach the toolhead',
             HEAD_ERROR_FAN_FAILURE          : 'Fan failed / stucked\nyou can spin it with a pancil',
+            HEAD_ERROR_HEAD_OFFLINE         : 'Toolhead not detected\nPlease re-attach the module cable',
             HWARDWARE_ERROR_FILAMENT_RUNOUT : 'Ran out of filament\nPlease insert new material',
             HWARDWARE_ERROR_0               : 'Ran out of filament\nPlease insert new material',
             HARDWARE_ERROR_PLATE_MISSING    : 'Unable to detect the base plate\nPlease put on the plate.',

@@ -635,6 +635,7 @@ input.switch:checked ~ label:after {
             position: absolute;
             width: 200px;
             animation: upanddown 5s ease infinite alternate;
+            -webkit-animation: upanddown 5s ease infinite alternate;
 
             &:hover {
                 color: #888;

@@ -68,14 +68,51 @@ define([
                 y: 0,
                 z: 0
             },
-            tourGuide = [],
             lang = args.state.lang,
             selectedPrinter,
             $importBtn,
             allowDeleteObject = true,
-            tutorialMode = true,
+            tutorialMode = false,
             showChangeFilament = false,
             nwjsMenu = menuFactory.items,
+            tourGuide = [
+                {
+                    selector: '.arrowBox',
+                    text: lang.tutorial.startWithFilament,
+                    r: 0,
+                    position: 'top'
+                },
+                {
+                    selector: '.arrowBox',
+                    text: lang.tutorial.startWithModel,
+                    r: 0,
+                    position: 'bottom'
+                },
+                {
+                    selector: '.arrowBox',
+                    text: lang.tutorial.clickToImport,
+                    r: 80,
+                    position: 'top'
+                },
+                {
+                    selector: '.quality-select',
+                    text: lang.tutorial.selectQuality,
+                    r: 80,
+                    position: 'right'
+                },
+                {
+                    selector: 'button.btn-go',
+                    text: lang.tutorial.clickGo,
+                    r: 80,
+                    position: 'left'
+                },
+                {
+                    selector: '.btn-go.btn-control',
+                    text: lang.tutorial.startPrint,
+                    r: 80,
+                    position: 'top'
+                }
+            ];
             view = React.createClass({
 
                 getInitialState: function() {
@@ -121,6 +158,7 @@ define([
                 },
 
                 componentDidMount: function() {
+                    var self = this;
                     director.init(this);
 
                     this._handleApplyAdvancedSetting();
@@ -132,6 +170,9 @@ define([
                     nwjsMenu.import.enabled = true;
                     nwjsMenu.import.onClick = function() { $importBtn.click(); };
                     nwjsMenu.saveGCode.onClick = this._handleDownloadGCode;
+                    nwjsMenu.tutorial.onClick = function() {
+                        self._handleTakeTutorial('tour');
+                    };
 
                     this._registerKeyEvents();
                     this._registerTutorial();
@@ -159,44 +200,6 @@ define([
 
                 _registerTutorial: function() {
                     if(tutorialMode) {
-                        tourGuide = [
-                            {
-                                selector: '.arrowBox',
-                                text: lang.tutorial.startWithFilament,
-                                r: 0,
-                                position: 'top'
-                            },
-                            {
-                                selector: '.arrowBox',
-                                text: lang.tutorial.startWithModel,
-                                r: 0,
-                                position: 'bottom'
-                            },
-                            {
-                                selector: '.arrowBox',
-                                text: lang.tutorial.clickToImport,
-                                r: 80,
-                                position: 'top'
-                            },
-                            {
-                                selector: '.quality-select',
-                                text: lang.tutorial.selectQuality,
-                                r: 80,
-                                position: 'right'
-                            },
-                            {
-                                selector: 'button.btn-go',
-                                text: lang.tutorial.clickGo,
-                                r: 80,
-                                position: 'left'
-                            },
-                            {
-                                selector: '.btn-go.btn-control',
-                                text: lang.tutorial.startPrint,
-                                r: 80,
-                                position: 'top'
-                            }
-                        ];
                         AlertActions.showPopupYesNo('tour', lang.tutorial.startTour);
                         AlertStore.onYes(this._handleTakeTutorial);
                         AlertStore.onCancel(this._handleCancelTutorial);
@@ -222,8 +225,11 @@ define([
                 },
 
                 _handleRaftClick: function() {
+                    this.setState({ leftPanelReady: false });
                     var isOn = !this.state.raftOn;
-                    director.setParameter('raft', isOn ? '1' : '0');
+                    director.setParameter('raft', isOn ? '1' : '0').then(function() {
+                        this.setState({ leftPanelReady: true });
+                    }.bind(this));
                     advancedSettings.raft_layers = isOn ? advancedSettings.raft : 0;
                     advancedSettings.custom = advancedSettings.custom.replace(
                         `raft_layers = ${isOn ? 0 : advancedSettings.raft}`,
@@ -237,14 +243,16 @@ define([
                     this.setState({ leftPanelReady: false });
                     var isOn = !this.state.supportOn;
                     director.setParameter('support', isOn ? '1' : '0').then(function() {
-                        this.setState({ leftPanelReady: true });
+                        this.setState({
+                            leftPanelReady: true,
+                            supportOn: isOn
+                        });
                     }.bind(this));
                     advancedSettings.support_material = isOn ? 1 : 0;
-                    // console.log('support on?', isOn);
                     advancedSettings.custom = advancedSettings.custom.replace(
                         `support_material = ${isOn ? 0 : 1}`,
                         `support_material = ${isOn ? 1 : 0}`);
-                    this.setState({ supportOn: isOn });
+                    // this.setState({ supportOn: isOn });
                     Config().write('advanced-settings', JSON.stringify(advancedSettings));
                 },
 

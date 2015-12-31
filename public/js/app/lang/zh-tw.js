@@ -67,7 +67,8 @@ define(function() {
                 label: '說明',
                 starting_guide: '開始使用',
                 online_support: '線上支援',
-                troubleshooting: '錯誤排除'
+                troubleshooting: '錯誤排除',
+                tutorial: '列印教學'
             }
         },
         initialize: {
@@ -760,6 +761,7 @@ define(function() {
             HEAD_OFFLINE                    : '沒有偵測到列印工具頭',
             HEAD_ERROR_CALIBRATING          : '模組校正失誤\n請重新裝載模組，並確認磁鐵關節正確的附著',
             HEAD_ERROR_FAN_FAILURE          : '風扇未轉動\n請用細針戳一下',
+            HEAD_ERROR_HEAD_OFFLINE         : '工具頭離線\n請重新插入模組連接線',
             HWARDWARE_ERROR_FILAMENT_RUNOUT : '未偵測到料捲\n請重新插入新的料捲',
             HWARDWARE_ERROR_0               : '未偵測到料捲\n請重新插入新的料捲',
             HARDWARE_ERROR_PLATE_MISSING    : '未偵測到工作平台\n請放上工作平台金屬板',

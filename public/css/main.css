@@ -2748,11 +2748,21 @@ input[type=range]:focus::-webkit-slider-runnable-track {
     100% {
         opacity: 0; } }
 
+@-webkit-keyframes upanddown {
+    0% {
+        -webkit-transform: translateY(0); }
+    50% {
+        -webkit-transform: translateY(-10px); }
+    100% {
+        -webkit-transform: translateY(0); } }
+
 @keyframes upanddown {
     0% {
         transform: translateY(0); }
+    50% {
+        transform: translateY(-10px); }
     100% {
-        transform: translateY(-10px); } }
+        transform: translateY(0); } }
 
 /**
  * buttons
@@ -4617,7 +4627,8 @@ input.switch:checked ~ label:after {
         height: 50px;
         position: absolute;
         width: 200px;
-        animation: upanddown 5s ease infinite alternate; }
+        animation: upanddown 5s ease infinite alternate;
+        -webkit-animation: upanddown 5s ease infinite alternate; }
         .print-studio .importWindow .arrowBox:hover {
             color: #888; }
         .print-studio .importWindow .arrowBox .import-btn {
