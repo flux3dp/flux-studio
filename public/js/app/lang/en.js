@@ -459,15 +459,17 @@ define(function() {
             download_prompt: 'please enter file name',
             importTitle: 'Import 3D models ( .stl )',
             getFcodeTitle: 'Save toolhead path and config into FCode file ( *.fc )',
-            goTitle: 'Print it out',
+            goTitle: 'Prepare to print',
             deviceTitle: 'Show device monitor',
-            rendering: 'Rendering',
+            rendering: 'Slicing',
             finishingUp: 'Finishing up...',
             savingFilePreview: 'Saving file preview',
             uploading: 'Uploading to slicing engine',
             uploaded: 'Uploaded, slicing engine is processing...',
             importingModel: 'Importing Model',
-            wait: 'Please wait...'
+            wait: 'Please wait...',
+            out_of_range: 'Out of range',
+            out_of_range_message: 'please reduce the size of the object(s)'
         },
         laser: {
             import: 'IMPORT',
