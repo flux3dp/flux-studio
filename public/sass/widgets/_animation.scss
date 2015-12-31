@@ -6,8 +6,8 @@
     background-color: #333;
     height: 40px;
     margin: auto;
-    -webkit-animation: sk-rotateplane 1.2s infinite ease-in-out;
-    animation: sk-rotateplane 1.2s infinite ease-in-out;
+    -webkit-animation: sk-rotateplane 1s infinite ease-in-out;
+    animation: sk-rotateplane 1s infinite ease-in-out;
     width: 40px;
 }
 
@@ -48,8 +48,8 @@
     background: -webkit-linear-gradient(left, #ffffff 10%, rgba(255, 255, 255, 0) 42%);
     background: linear-gradient(to right, #ffffff 10%, rgba(255, 255, 255, 0) 42%);
     position: relative;
-    -webkit-animation: load3 1.4s infinite linear;
-    animation: load3 1.4s infinite linear;
+    -webkit-animation: load3 1s infinite linear;
+    animation: load3 1s infinite linear;
     -webkit-transform: translateZ(0);
     transform: translateZ(0);
 

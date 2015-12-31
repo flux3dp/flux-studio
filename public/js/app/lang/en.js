@@ -79,12 +79,16 @@ define(function() {
             cancel: 'CANCEL',
             confirm: 'CONFIRM',
             connect: 'Connect',
+            no_machine: 'I don\'t have a machine now',
 
             // specific caption/content
             invalid_device_name: 'The name can only contains alphabet, numbers, blanks, and special characters  “-”, “_”, “’”, “\'”.',
             require_device_name: 'Name is required',
             select_language: 'Select Language',
-            change_password: 'Change password?',
+            change_password: {
+                content: 'Are you sure to change the password?',
+                caption: 'Changing password'
+            },
             connect_flux: 'Connect FLUX Delta with USB Cable',
             name_your_flux: 'Name Your FLUX Delta',
             wifi_setup: 'Wi-Fi Setup',
@@ -94,11 +98,11 @@ define(function() {
 
             // page specific
             set_machine_generic: {
-                printer_name: 'Name',
-                printer_name_placeholder: 'Device\'s Name',
+                printer_name: 'Name*',
+                printer_name_placeholder: 'Give it an unique name',
                 password: 'Password',
                 set_station_mode: 'Set as wifi station',
-                password_placeholder: 'Password'
+                password_placeholder: 'Something secret'
             },
 
             setting_completed: {
@@ -118,11 +122,13 @@ define(function() {
                 error: 'Error',
 
                 keep_connect: {
-                    content: 'Please make sure your FLUX Delta has been powered on and attached to micro-usb cord.'
+                    caption: 'USB Device not found',
+                    content: 'Oops! Don\'t worry. We\'re here for you.\nMake sure your FLUX Delta has been powered \non, attached to micro-usb cord and the driver is installed.\n<a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/215327328">...More solutions</a>'
                 },
 
                 wifi_connection: {
-                    connecting_fail: 'Connecting Fail.'
+                    caption: 'Unable to connect',
+                    connecting_fail: 'Please make sure the Wi-Fi signal is strong and the password is correct.'
                 },
 
                 select_wifi: {
@@ -735,7 +741,7 @@ define(function() {
             starting: 'Starting',
             resuming: 'Resuming',
             scanning: 'Scanning',
-            occupied: 'Occupied',
+            occupied: 'Mantaining',
             running: 'Working',
             uploading: 'Uploading',
             processing: 'Processing',
@@ -853,7 +859,7 @@ define(function() {
         },
         machine_status: {
             '-2': 'Scanning',
-            '-1': 'Occupied',
+            '-1': 'Maintaining',
             0: 'Idle',
             1: 'Initiating',
             2: 'ST_TRANSFORM',
@@ -869,7 +875,7 @@ define(function() {
             64: 'Completed',
             66: 'Completing',
             128: 'Aborted',
-            UNKNOWN: 'UNKNOWN'
+            UNKNOWN: 'Unknown'
         },
         head_module: {
             EXTRUDER: 'Print',
@@ -897,10 +903,16 @@ define(function() {
             connect: 'CONNECT',
             password: 'Password'
         },
+        set_default: {
+            success: 'Successfully set %s as default',
+            error: 'Unable to set %s as default, due to network issue'
+        },
         tutorial: {
+            set_first_default_caption: 'Welcome',
+            set_first_default: 'Do you want to set "%s" as your default device?',
             startWithFilament: 'Let\'s start with loading filament',
             startWithModel: 'Next, let\'s import some 3D model',
-            startTour: 'Welcome.<br/>This is your first time printing,<br/>would you like to start printing tutorial?',
+            startTour: 'Welcome!<br/>This is your first time printing,<br/>would you like to start printing tutorial?',
             clickToImport: 'Click to import 3D model',
             selectQuality: 'Select quality you preferred',
             clickGo: 'Prepare to print',

@@ -883,7 +883,7 @@ define([
                     topOffset = (parseInt(position.y) - objectDialogueHeight / 2),
                     marginTop = container.offsetHeight / 2 - position.y;
 
-                var rightLimit = container.offsetWidth / 2 - leftPanelWidth - objectDialogueWidth,
+                var rightLimit = container.offsetWidth - objectDialogueWidth - leftOffset,
                     topLimit = container.offsetHeight / 2 - objectDialogueHeight / 2;
 
                 if (objectDialogueDistance > rightLimit) {

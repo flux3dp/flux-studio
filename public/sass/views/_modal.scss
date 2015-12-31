@@ -101,6 +101,7 @@
             color: #333;
             margin: 0 0 20px 0;
             text-align: left;
+            line-height: 1.4em;
         }
 
         .caption,
@@ -115,6 +116,20 @@
         .btn-default{
             background: #F8F8F8;
         }
+
+        .spinner-roller-reverse {
+
+            background: linear-gradient(to right, #DEDEDC 10%, rgba(248, 248, 248, 0) 42%);
+
+            &::before {
+                background-color: #F8F8F8;
+            } 
+
+            &::after {
+                background-color: #F8F8F8;
+            } 
+        }
+
     }
 
     .message {
@@ -243,7 +258,7 @@
         align-items: center;
 
         .inputHeader {
-            color: #ccc;
+            color: #909090;
             flex: 1;
         }
 
@@ -400,7 +415,7 @@
         }
 
         .btn-icon {
-            background: #fff;
+            background: #F8F8F8;
             border: none;
             color: #B3B3B3;
             cursor: initial;

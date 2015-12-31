@@ -24,7 +24,11 @@ define([
     'jsx!widgets/Tour-Guide',
     'app/actions/alert-actions',
     'app/stores/alert-store',
-    'helpers/object-assign'
+    'helpers/object-assign',
+    'helpers/sprintf',
+    'app/actions/initialize-machine',
+    'app/actions/progress-actions',
+    'app/constants/progress-constants'
 ], function(
     $,
     React,
@@ -50,7 +54,12 @@ define([
     AppSettings,
     TourGuide,
     AlertActions,
-    AlertStore
+    AlertStore,
+    ObjectAssign,
+    sprintf,
+    InitializeMachine,
+    ProgressActions,
+    ProgressConstants
 ) {
 
     return function(args) {
@@ -91,18 +100,20 @@ define([
                 {
                     selector: '.arrowBox',
                     text: lang.tutorial.clickToImport,
-                    r: 80,
+                    r: 110,
                     position: 'top'
                 },
                 {
                     selector: '.quality-select',
                     text: lang.tutorial.selectQuality,
-                    r: 80,
+                    offset_x: -25,
+                    r: 90,
                     position: 'right'
                 },
                 {
                     selector: 'button.btn-go',
                     text: lang.tutorial.clickGo,
+                    offset_x: 6,
                     r: 80,
                     position: 'left'
                 },
@@ -123,10 +134,13 @@ define([
                         advancedSettings.raft_layers = 4;
                         advancedSettings.support_material = 0;
                         advancedSettings.custom = AppSettings.custom;
-                        tutorialMode = true;
                     }
                     else {
                         advancedSettings = _setting;
+                    }
+
+                    if(!Config().read('tutorial-finished')){
+                        tutorialMode = true;
                     }
 
                     return ({
@@ -175,7 +189,16 @@ define([
                     };
 
                     this._registerKeyEvents();
-                    this._registerTutorial();
+                    if(Config().read("configured-printer") && tutorialMode){
+                        //First time using, with usb-configured printer..
+                        AlertActions.showPopupYesNo('set_default', sprintf(lang.tutorial.set_first_default,Config().read("configured-printer")),lang.tutorial.set_first_default_caption);
+                        AlertStore.onYes(this._handleSetFirstDefault);
+                        //Use setTimeout to avoid multiple modal display conflict
+                        this._handleDefaultCancel = function(ans){setTimeout(function(){this._registerTutorial()}.bind(this), 10)}.bind(this);
+                        AlertStore.onCancel(this._handleDefaultCancel);
+                    }else{
+                        this._registerTutorial();
+                    }
                 },
 
                 componentWillUnmount: function() {
@@ -200,10 +223,41 @@ define([
 
                 _registerTutorial: function() {
                     if(tutorialMode) {
+                        console.log("called to popout")
                         AlertActions.showPopupYesNo('tour', lang.tutorial.startTour);
                         AlertStore.onYes(this._handleTakeTutorial);
                         AlertStore.onCancel(this._handleCancelTutorial);
                     }
+                },
+
+                _handleSetFirstDefault: function(answer){
+                    Config().write('default-printer-name', Config().read('configured-printer'));
+                    ProgressActions.open(ProgressConstants.NONSTOP);
+
+                    AlertStore.removeYesListener(this._handleSetFirstDefault);
+                    AlertStore.removeCancelListener(this._handleDefaultCancel);
+
+                    DeviceMaster.getDeviceByNameAsync(
+                        Config().read('configured-printer'),
+                        {
+                            timeout: 20000,
+                            onSuccess:
+                                function(printer){
+                                    ProgressActions.close();
+                                    InitializeMachine.defaultPrinter.set({
+                                              serial: printer.serial,
+                                              uuid: printer.uuid
+                                    });
+                                    setTimeout(function(){AlertActions.showInfo(sprintf(lang.set_default.success, printer.name))}, 100);
+                                    //Start tutorial
+                                    setTimeout(function(){this._registerTutorial()}.bind(this), 100);
+                                }.bind(this),
+                            onTimeout:
+                                function(){
+                                    ProgressActions.close();
+                                    setTimeout(function(){AlertActions.showWarning(sprintf(lang.set_default.error, printer.name))}, 100);
+                                }
+                        });
                 },
 
                 _handleTakeTutorial: function(answer) {
@@ -217,6 +271,7 @@ define([
                     if(answer === 'tour') {
                         this.setState({ tutorialOn: false });
                         tutorialMode = false;
+                        Config().write('tutorial-finished', true);
                     }
                 },
 
@@ -428,7 +483,28 @@ define([
                     if(!tutorialMode) { return; }
                     this.setState({ currentTutorialStep: this.state.currentTutorialStep + 1 }, function() {
                         if(this.state.currentTutorialStep === 1) {
-                            AlertActions.showChangeFilament(DeviceMaster.getFirstDevice(), 'TUTORIAL');
+                            if(Config().read('configured-printer')){
+                                DeviceMaster.getDeviceByNameAsync(
+                                Config().read('configured-printer'),
+                                {
+                                    timeout: 20000,
+                                    onSuccess:
+                                        function(printer){
+                                            //Found ya default printer
+                                            ProgressActions.close();
+                                            setTimeout(function(){AlertActions.showChangeFilament(printer, 'TUTORIAL'); }, 100);
+                                        }.bind(this),
+                                    onTimeout:
+                                        function(){
+                                            //Unable to find configured printer...
+                                            ProgressActions.close();
+                                            setTimeout(function(){AlertActions.showWarning(sprintf(lang.set_default.error, printer.name))}, 100);
+                                        }
+                                });
+                            }else{
+                                //TODO: Find any printer 
+
+                            }
                         }
                         else if(this.state.currentTutorialStep === 3) {
                             var fileEntry = {};
@@ -450,12 +526,14 @@ define([
                         else if (this.state.currentTutorialStep === 5) {
                             this.setState({ tutorialOn: false });
                             $('.btn-go').click();
+                            Config().write('tutorial-finished', true);
                         }
                     });
                 },
 
                 _handleTutorialComplete: function() {
                     tutorialMode = false;
+                    Config().write('tutorial-finished', true);
                     this.setState({ tutorialOn: false });
                 },
 

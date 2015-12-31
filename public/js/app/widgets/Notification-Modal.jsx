@@ -31,6 +31,7 @@ define([
                 onRetry     : React.PropTypes.func,
                 onAbort     : React.PropTypes.func,
                 onYes       : React.PropTypes.func,
+                onNo       : React.PropTypes.func,
                 onCustom    : React.PropTypes.func,
                 onClose     : React.PropTypes.func
             },
@@ -45,6 +46,7 @@ define([
                     onRetry   : function() {},
                     onAbort   : function() {},
                     onYes     : function() {},
+                    onNo      : function() {},
                     onCustom  : function() {},
                     onClose   : function() {}
                 };
@@ -74,6 +76,11 @@ define([
             _onYes: function(e, reactid) {
                 this.props.onYes(e);
                 this._onClose.apply(null, [e, reactid, 'yes']);
+            },
+
+            _onNo: function(e, reactid) {
+                this.props.onNo(e);
+                this._onClose.apply(null, [e, reactid, 'no']);
             },
 
             _onRetry: function(e, reactid) {
@@ -122,10 +129,15 @@ define([
 
             _getButtons: function() {
                 var buttons = [];
-
+                var onclose_bind_with_on_no = function(){
+                    if(this._onNo){
+                        this._onNo();
+                    }
+                    this.props.onClose();
+                };
                 buttons.push({
                     label: this._getCloseButtonCaption(),
-                    onClick: this.props.onClose
+                    onClick: onclose_bind_with_on_no.bind(this)
                 });
 
                 switch (this.props.type) {

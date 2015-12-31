@@ -50,6 +50,7 @@ define([
                     checkTimes = 10,    // check network per second, 10 times in maximum.
                     checkCountdown = function(callback) {
                         if (0 === checkTimes) {
+                            console.log("Check count down timeout");
                             genericFailureHandler();
                             callback();
                         }
@@ -62,7 +63,8 @@ define([
                         });
                         AlertActions.showPopupError(
                             'wifi-authenticate-fail',
-                            lang.initialize.errors.wifi_connection.connecting_fail
+                            lang.initialize.errors.wifi_connection.connecting_fail,
+                            lang.initialize.errors.wifi_connection.caption
                         );
                     },
                     checkNetworkStatus = function() {
@@ -90,6 +92,7 @@ define([
                         checkNetworkStatus();
                     },
                     onError: function(response) {
+                        console.log("Wifi set failed");
                         genericFailureHandler();
                     }
                 });

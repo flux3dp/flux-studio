@@ -10,7 +10,7 @@ define(function() {
             no_webgl: '您的系統不支援 WebGL'
         },
         device_selection: {
-            no_printers: '未偵測到 FLUX 裝置, 請檢查您與機器的網路連線是否在同個網路下',
+            no_printers: '未偵測到 FLUX Delta, 請檢查您與機器的網路連線是否在同個網路下',
             device_name: 'DEVICE NAME',
             module: 'MODULE',
             status: 'STATUS'
@@ -79,14 +79,18 @@ define(function() {
             cancel: '取消',
             confirm: '確認',
             connect: '連接',
+            no_machine : '目前沒有機器，跳過此步驟',
 
             // specific caption/content
-            invalid_device_name: '機器名稱只能使用英文字母、數字、空格以及特殊字元 “-”, “_”, “’”, “\'”',
+            invalid_device_name: '裝置名稱只能使用英文字母、數字、空格以及特殊字元 “-”, “_”, “’”, “\'”',
             require_device_name: '名稱欄位為必填',
             select_language: '請選擇你想使用的語言',
-            change_password: '要更改密碼嗎?',
-            connect_flux: '用 USB 連接你的電腦與 FLUX',
-            name_your_flux: '給你的 FLUX 一個名字',
+            change_password: {
+                caption: '密碼更改',
+                content: '要更改密碼嗎?'
+            },
+            connect_flux: '用 USB 連接你的電腦與 FLUX 裝置',
+            name_your_flux: '為你的 FLUX Delta 取一個獨特的名字',
             wifi_setup: '設定無線網路',
             select_preferred_wifi: '選擇你偏好的網路',
             requires_wifi_password: '需要密碼',
@@ -94,11 +98,11 @@ define(function() {
 
             // page specific
             set_machine_generic: {
-                printer_name: '名稱',
-                printer_name_placeholder: '請輸入名稱',
-                password: '密碼',
+                printer_name: '裝置名稱*',
+                printer_name_placeholder: '例如：霹靂五號',
+                password: '裝置密碼',
                 set_station_mode: '設定成無線基地台',
-                password_placeholder: '請輸入密碼'
+                password_placeholder: '密碼可以保護你的 FLUX Delta'
             },
 
             setting_completed: {
@@ -115,18 +119,20 @@ define(function() {
 
             // errors
             errors: {
-                error: 'Error',
+                error: '錯誤',
 
                 keep_connect: {
-                    content: '請確認電源已被開啟及已經由 micro-usb 連接'
+                    caption: '無法透過 USB 連接',
+                    content: '別擔心！請確認電源已被開啟及使用 Micro-Usb 連接裝置，並正確安裝驅動程式。<a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/215327328">...觀看更多說明</a>'
                 },
 
                 wifi_connection: {
-                    connecting_fail: '連接失敗'
+                    caption: '無法與此 Wi-Fi 連線',
+                    connecting_fail: '請確認信號強度以及密碼正確'
                 },
 
                 select_wifi: {
-                    ap_mode_fail: '設定失敗'
+                    ap_mode_fail: '基地台模式連線設定失敗'
                 }
             }
         },
@@ -818,7 +824,7 @@ define(function() {
             retry: '重試',
             abort: '放棄',
             cancel: '取消',
-            ok: 'Ok',
+            ok: '確定',
             yes: ' 是',
             no: '否',
             stop: '停止'
@@ -896,8 +902,14 @@ define(function() {
             connect: '連接',
             password: '密碼'
         },
+        set_default: {
+            success: '%s 已設為預設裝置',
+            error: '由於網路問題，無法將 %s 設為預設裝置'
+        },
         tutorial: {
-            startWithFilament: '讓我們先填裝料捲吧',
+            set_first_default_caption: '初次使用',
+            set_first_default: '是否要將 %s 設為預設裝置?',
+            startWithFilament: '首先，讓我們先填裝料捲',
             startWithModel: '接下來，我們來載入3Ｄ模型囉',
             startTour: '嗨，歡迎<br/>這是你第一次使用列印功能,<br/>你希望觀看列印功能教學嗎？',
             clickToImport: '點擊匯入以載入 3D 模型',
