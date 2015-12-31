@@ -62,7 +62,8 @@ define([
                         });
                         AlertActions.showPopupError(
                             'wifi-authenticate-fail',
-                            lang.initialize.errors.wifi_connection.connecting_fail
+                            lang.initialize.errors.wifi_connection.connecting_fail,
+                            lang.initialize.errors.wifi_connection.caption
                         );
                     },
                     checkNetworkStatus = function() {
