@@ -46,7 +46,7 @@ define([
         advancedSetting = {
             // General
             engine                              : '',
-            temperature                         : 220,
+            temperature                         : 215,
 
             // Layers
             layer_height                        : 0.2,
@@ -62,22 +62,22 @@ define([
 
             // Support
             support_material                    : 1,
-            support_material_spacing            : 2,
-            support_material_threshold          : 55,
-            support_material_pattern            : 'rectilinear-grid',
-            support_material_contact_distance   : 0.2,
+            support_material_spacing            : 2.7,
+            support_material_threshold          : 37,
+            support_material_pattern            : 'rectilinear',
+            support_material_contact_distance   : 0.06,
             raft_layers                         : 4,
             raft                                : 4,
 
             // Speed
             travel_speed                        : 80,
             support_material_speed              : 40,
-            infill_speed                        : 50,
+            infill_speed                        : 60,
             first_layer_speed                   : 20,
             solid_infill_speed                  : 20,
-            perimeter_speed                     : 30,
-            external_perimeter_speed            : 20,
-            bridge_speed                        : 40,
+            perimeter_speed                     : 40,
+            external_perimeter_speed            : 28,
+            bridge_speed                        : 60,
 
             // Custom
             custom                              : ''
