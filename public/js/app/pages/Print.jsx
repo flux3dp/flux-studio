@@ -253,6 +253,7 @@ define([
                                 function(printer){
                                     ProgressActions.close();
                                     InitializeMachine.defaultPrinter.set({
+                                              name: printer.name, 
                                               serial: printer.serial,
                                               uuid: printer.uuid
                                     });
@@ -436,6 +437,7 @@ define([
                             return;
                         }
                         GlobalActions.showMonitor(selectedPrinter, fcode, previewUrl);
+                        //Tour popout after show monitor delay
                         setTimeout(function() {
                             if(tutorialMode) {
                                 this.setState({
