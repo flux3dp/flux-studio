@@ -83,6 +83,7 @@ define([
                         if (true === self.hadDefaultPrinter && el.uuid === selectedPrinter.uuid) {
                             // update device stat
                             initializeMachine.defaultPrinter.set({
+                                name: el.name,
                                 serial: el.serial,
                                 uuid: el.uuid
                             });
@@ -222,12 +223,19 @@ define([
                 self._returnSelectedPrinter();
             }
             else {
+                ProgressActions.open(ProgressConstants.NONSTOP);
                 DeviceMaster.selectDevice(self.selected_printer).done(function(status) {
+                    ProgressActions.close();
                     if (status === DeviceConstants.CONNECTED) {
                         checkStId(printer);
                     }
                     else if (status === DeviceConstants.TIMEOUT) {
-                        AlertActions.showPopupError('printer-connection-timeout', lang.message.connectionTimeout);
+                        //TODO: Check default printer
+                        if(self.state.hadDefaultPrinter){
+                            AlertActions.showPopupError('printer-connection-timeout', lang.message.default_not_found.message, lang.message.device_not_found.caption);
+                        }else{
+                            AlertActions.showPopupError('printer-connection-timeout', lang.message.connectionTimeout, lang.caption.connectionTimeout);
+                        }
                     }
                 });
             }
