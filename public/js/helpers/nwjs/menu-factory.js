@@ -41,13 +41,22 @@ define([
                 return undefined;
             }
 
+            function crossplatform_modifiers(modifiers){
+                if(!modifiers) return;
+                if ( 'osx' !== window.FLUX.osType ){
+                    modifiers = modifiers.replace(/cmd/g,'ctrl');
+                }
+                console.log(modifiers);
+                return modifiers;
+            }
+
             items.forEach(function(el) {
                 menuOption = {
                     label: el.label || '',
                     type: el.type || 'normal',
                     click: el.onClick || emptyFunction,
                     key: el.key || '',
-                    modifiers: el.modifiers || '',
+                    modifiers: crossplatform_modifiers(el.modifiers) || '',
                     enabled: ('boolean' === typeof el.enabled ? el.enabled : true),
                     checked: el.checked || false
                 };

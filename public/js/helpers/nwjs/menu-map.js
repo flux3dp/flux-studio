@@ -337,7 +337,7 @@ define([
                                     }
                                     deviceRefreshTimer = undefined;
                                     timeout_device_update = timeout_device_update + 15000;
-                                    consoel.log('update device menu');
+                                    console.log('update device menu');
                                     clearTimeout(deviceRefreshTimer);
                                 }, timeout_device_update);
                                 console.log(timeout_device_update);
