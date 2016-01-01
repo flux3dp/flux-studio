@@ -769,7 +769,7 @@ define(function() {
             connecting                      : 'Connecting, please wait...',
             HEAD_OFFLINE                    : 'Device head is not connected or missing',
             HEAD_ERROR_CALIBRATING          : 'Unable to calibrate toolhead\nplease re-attach the toolhead',
-            HEAD_ERROR_FAN_FAILURE          : 'Fan stucked\nTry to spin it with a pencil or stick.',
+            HEAD_ERROR_FAN_FAILURE          : 'Cooling fan not spinning\nSpin it with a pencil or thin stick.',
             HEAD_ERROR_HEAD_OFFLINE         : 'Toolhead not detected\nPlease re-attach the module cable',
             HWARDWARE_ERROR_FILAMENT_RUNOUT : 'Ran out of filament\nPlease insert new material',
             HWARDWARE_ERROR_0               : 'Ran out of filament\nPlease insert new material',
@@ -814,14 +814,13 @@ define(function() {
                 EXTRUDER                    : 'Printing Toolhead',
                 LASER                       : 'Laser Toolhead'
             }
-
         },
         alert: {
             caption: 'Error',
             duplicated_preset_name: 'Duplicated preset name',
             info: 'INFO',
             warning: 'WARNING',
-            error: 'ERROR',
+            error: 'UH-OH',
             retry: 'RETRY',
             abort: 'ABORT',
             cancel: 'CANCEL',
@@ -844,13 +843,20 @@ define(function() {
             yellow: 'YELLOW',
             transparent: 'TRANSPARENT'
         },
+        caption: {
+            connectionTimeout: 'Connection timeout'
+        },
         message: {
             connecting: 'Connecting...',
             connected: 'Connected',
             machineNotConnected: 'Machine is not connected',
             notPrinting: 'Printing is not in progress',
             nothingToPrint: 'Nothing to print (source blob missing)',
-            connectionTimeout: 'device is not responding, connection timeout',
+            connectionTimeout: 'Please check your network state and FLUX Device\'s Wi-Fi indicator.',
+            device_not_found: {
+                caption: 'Device not found',
+                message: 'Please check your FLUX\'s Wi-Fi indicator'
+            },
             device_busy: {
                 caption: 'Device Busy',
                 message: 'The device is executing another task, try again later. If it stops working, please restart the device.'
@@ -916,7 +922,7 @@ define(function() {
             clickToImport: 'Click to import 3D model',
             selectQuality: 'Select quality you preferred',
             clickGo: 'Prepare to print',
-            startPrint: 'Click go and start printing',
+            startPrint: 'Apply glue on the plate, and start to print',
             skip: 'Skip tutorial'
         },
         slicer: {

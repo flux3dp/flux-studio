@@ -843,13 +843,20 @@ define(function() {
             yellow: 'YELLOW',
             transparent: 'TRANSPARENT'
         },
+        caption: {
+            connectionTimeout: '連線逾時'
+        },
         message: {
-            connecting: 'Connecting...',
-            connected: 'Connected',
+            connecting: '連線中...',
+            connected: '已連線',
             machineNotConnected: 'Machine is not connected',
             notPrinting: 'Printing is not in progress',
             nothingToPrint: 'Nothing to print (source blob missing)',
-            connectionTimeout: 'device is not responding, connection timeout',
+            connectionTimeout: '請確認你的網路狀態和FLUX Device 的 Wi-Fi 指示燈.',
+            device_not_found: {
+                caption: '找不到裝置',
+                message: '請確認 %s 的 Wi-Fi 指示燈'
+            },
             device_busy: {
                 caption: '裝置忙碌中',
                 message: '裝置正在進行另外一項工作，請稍候再試。如果裝置持續沒有回應，請將裝置重新啟動。'
@@ -915,7 +922,7 @@ define(function() {
             clickToImport: '點擊匯入以載入 3D 模型',
             selectQuality: '選擇列印品質',
             clickGo: '按下開始以準備列印',
-            startPrint: '開始列印',
+            startPrint: '在平台上塗上口紅膠，開始列印',
             skip: '跳過教學'
         },
         slicer: {

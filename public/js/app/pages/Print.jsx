@@ -205,7 +205,8 @@ define([
                         this._handleDefaultCancel = function(ans){setTimeout(function(){this._registerTutorial()}.bind(this), 10)}.bind(this);
                         AlertStore.onCancel(this._handleDefaultCancel);
                     }else{
-                        this._registerTutorial();
+                        //Disable for no-printer-setting at the time
+                        // this._registerTutorial();
                     }
                 },
 
@@ -252,6 +253,7 @@ define([
                                 function(printer){
                                     ProgressActions.close();
                                     InitializeMachine.defaultPrinter.set({
+                                              name: printer.name, 
                                               serial: printer.serial,
                                               uuid: printer.uuid
                                     });
@@ -435,6 +437,7 @@ define([
                             return;
                         }
                         GlobalActions.showMonitor(selectedPrinter, fcode, previewUrl);
+                        //Tour popout after show monitor delay
                         setTimeout(function() {
                             if(tutorialMode) {
                                 this.setState({
