@@ -505,7 +505,7 @@ define([
                             if(!selectPrinterName) selectPrinterName = DeviceMaster.getFirstDevice();
                             if(selectPrinterName){
                                 DeviceMaster.getDeviceByNameAsync(
-                                seletPrinterName,
+                                selectPrinterName,
                                 {
                                     timeout: 20000,
                                     onSuccess:

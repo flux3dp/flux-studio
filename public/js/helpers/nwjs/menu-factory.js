@@ -147,6 +147,8 @@ define([
         });
     }
 
+    window.FLUX.refreshMenu = initialize;
+
     return {
         items: menuMap.items,
         methods: methods

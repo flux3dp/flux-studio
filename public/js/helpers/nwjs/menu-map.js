@@ -201,6 +201,7 @@ define([
 
     function bindMap() {
         menuMap = [];
+        console.log("refresh menu..")
 
         if ('win' !== window.FLUX.osType) {
             menuMap.push({
@@ -269,6 +270,7 @@ define([
                 defaultDevice = initializeMachine.defaultPrinter.get();
 
                 doDiscover = function() {
+                    var timeout_device_update = 5000;
                     discover(
                         'menu-map',
                         function(printers) {
@@ -286,7 +288,9 @@ define([
                                             onClick: function() {
                                                 DeviceMaster.selectDevice(printer).then(function(status) {
                                                     if(status === DeviceConstants.CONNECTED) {
-                                                        GlobalActions.showMonitor(printer);
+                                                        setTimeout(
+                                                            function(){GlobalActions.showMonitor(printer)},
+                                                            100);
                                                     }
                                                     else if (status === DeviceConstants.TIMEOUT) {
                                                         AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
@@ -298,7 +302,9 @@ define([
                                             label: lang.device.change_filament,
                                             enabled: true,
                                             onClick: function() {
-                                                AlertActions.showChangeFilament(printer);
+                                                setTimeout(
+                                                    function(){AlertActions.showChangeFilament(printer);},
+                                                    100);
                                             }
                                         },
                                         {
@@ -322,15 +328,19 @@ define([
                                     });
                                 }
                             });
-                            console.log("timer", deviceRefreshTimer, renew);
                             if ('undefined' === typeof deviceRefreshTimer && true === renew) {
                                 clearTimeout(deviceRefreshTimer);
                                 deviceRefreshTimer = setTimeout(function() {
-                                    console.log("update device test", deviceGroup.length);
                                     items.device.subItems = deviceGroup;
-                                    deviceRefreshTimer = null;
+                                    if('win' === window.FLUX.osType && window.FLUX.refreshMenu){
+                                        window.FLUX.refreshMenu(menuMap);
+                                    }
+                                    deviceRefreshTimer = undefined;
+                                    timeout_device_update = timeout_device_update + 15000;
+                                    consoel.log('update device menu');
                                     clearTimeout(deviceRefreshTimer);
-                                }, 5000);
+                                }, timeout_device_update);
+                                console.log(timeout_device_update);
                             }
                         }
                     );
