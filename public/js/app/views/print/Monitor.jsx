@@ -221,8 +221,11 @@ define([
         },
 
         getInitialState: function() {
-            var _mode = this.props.selectedDevice.st_id === DeviceConstants.status.IDLE ? mode.BROWSE_FILE : mode.PREVIEW;
+            var _mode = mode.PREVIEW;
             openSource = !this.props.fCode ? source.DEVICE_LIST : source.GO;
+            if(openSource === source.DEVICE_LIST && this.props.selectedDevice.st_id === DeviceConstants.status.IDLE){
+                _mode = mode.BROWSE_FILE; 
+            }
 
             return {
                 waiting             : false,

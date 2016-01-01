@@ -205,7 +205,8 @@ define([
                         this._handleDefaultCancel = function(ans){setTimeout(function(){this._registerTutorial()}.bind(this), 10)}.bind(this);
                         AlertStore.onCancel(this._handleDefaultCancel);
                     }else{
-                        this._registerTutorial();
+                        //Disable for no-printer-setting at the time
+                        // this._registerTutorial();
                     }
                 },
 

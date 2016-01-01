@@ -915,7 +915,7 @@ define(function() {
             clickToImport: '點擊匯入以載入 3D 模型',
             selectQuality: '選擇列印品質',
             clickGo: '按下開始以準備列印',
-            startPrint: '開始列印',
+            startPrint: '在平台上塗上口紅膠，開始列印',
             skip: '跳過教學'
         },
         slicer: {

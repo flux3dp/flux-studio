@@ -916,7 +916,7 @@ define(function() {
             clickToImport: 'Click to import 3D model',
             selectQuality: 'Select quality you preferred',
             clickGo: 'Prepare to print',
-            startPrint: 'Click go and start printing',
+            startPrint: 'Apply glue on the plate, and start to print',
             skip: 'Skip tutorial'
         },
         slicer: {
