@@ -49,11 +49,11 @@ define([
             temperature                         : 215,
 
             // Layers
-            layer_height                        : 0.2,
-            first_layer_height                  : 0.35,
+            layer_height                        : 0.15,
+            first_layer_height                  : 0.25,
             perimeters                          : 3,
-            top_solid_layers                    : 3,
-            bottom_solid_layers                 : 3,
+            top_solid_layers                    : 4,
+            bottom_solid_layers                 : 4,
 
             // Infill
             fill_density                        : 20,
