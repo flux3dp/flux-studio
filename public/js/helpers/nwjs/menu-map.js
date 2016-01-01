@@ -322,8 +322,8 @@ define([
                                     });
                                 }
                             });
-                            console.log("timer", deviceRefreshTimer, renew);
-                            if ('undefined' === typeof deviceRefreshTimer && true === renew) {
+                            //remove 'undefined' === typeof deviceRefreshTimer (tbc)
+                            if (true === renew) {
                                 clearTimeout(deviceRefreshTimer);
                                 deviceRefreshTimer = setTimeout(function() {
                                     console.log("update device test", deviceGroup.length);
