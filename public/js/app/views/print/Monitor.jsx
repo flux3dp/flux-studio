@@ -223,8 +223,9 @@ define([
         getInitialState: function() {
             var _mode = mode.PREVIEW;
             openSource = !this.props.fCode ? source.DEVICE_LIST : source.GO;
-            if(openSource === source.DEVICE_LIST && this.props.selectedDevice.st_id === DeviceConstants.status.IDLE){
-                _mode = mode.BROWSE_FILE; 
+            if(openSource === source.DEVICE_LIST &&
+                this.props.selectedDevice.st_id === DeviceConstants.status.IDLE){
+                    _mode = mode.BROWSE_FILE; 
             }
 
             return {
@@ -803,12 +804,22 @@ define([
                 AlertActions.closePopup();
             }
 
-            this.setState({
+            var report_info = {
                 temperature: temperature,
                 currentStatus: currentStatus,
                 displayStatus: displayStatus,
                 progress: progress
-            });
+            }
+
+            //If report returns idle state, which means nothing to preview..
+            if(openSource === source.DEVICE_LIST &&
+                report.st_id === DeviceConstants.status.IDLE &&
+                this.state.mode === mode.PREVIEW){
+                report_info['mode'] = mode.BROWSE_FILE;
+                this._refreshDirectory();
+            }
+
+            this.setState(report_info);
         },
 
         _isError: function(s) {
@@ -1168,6 +1179,10 @@ define([
         },
 
         _renderNavigation: function() {
+            console.log(pathArray);
+            if(openSource === source.DEVICE_LIST && pathArray.length == 0 && this.state.mode == mode.BROWSE_FILE){
+                return (<div className="back"></div>);
+            }
             if(history.length > 1) {
                 return (
                    <div className="back" onClick={this._handleBack}>
@@ -1176,7 +1191,7 @@ define([
                );
             }
             if(this.state.mode === mode.BROWSE_FILE) {
-                return (
+               return (
                    <div className="back" onClick={this._handleBack}>
                        <i className="fa fa-angle-left"></i>
                    </div>
