@@ -500,9 +500,12 @@ define([
                     if(!tutorialMode) { return; }
                     this.setState({ currentTutorialStep: this.state.currentTutorialStep + 1 }, function() {
                         if(this.state.currentTutorialStep === 1) {
-                            if(Config().read('configured-printer')){
+                            var selectPrinterName = Config().read('configured-printer');
+                            if(!selectPrinterName) = InitializeMachine.defaultPrinter.get().name;
+                            if(!selectPrinterName) = DeviceMaster.getFirstDevice();
+                            if(selectPrinterName){
                                 DeviceMaster.getDeviceByNameAsync(
-                                Config().read('configured-printer'),
+                                seletPrinterName,
                                 {
                                     timeout: 20000,
                                     onSuccess:
@@ -519,7 +522,7 @@ define([
                                         }
                                 });
                             }else{
-                                //TODO: Find any printer 
+                                //TODO: No printer
 
                             }
                         }
