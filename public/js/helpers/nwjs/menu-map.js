@@ -322,12 +322,13 @@ define([
                                     });
                                 }
                             });
-                            //remove 'undefined' === typeof deviceRefreshTimer (tbc)
-                            if (true === renew) {
+                            console.log("timer", deviceRefreshTimer, renew);
+                            if ('undefined' === typeof deviceRefreshTimer && true === renew) {
                                 clearTimeout(deviceRefreshTimer);
                                 deviceRefreshTimer = setTimeout(function() {
                                     console.log("update device test", deviceGroup.length);
                                     items.device.subItems = deviceGroup;
+                                    deviceRefreshTimer = null;
                                     clearTimeout(deviceRefreshTimer);
                                 }, 5000);
                             }
