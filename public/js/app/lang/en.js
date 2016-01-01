@@ -737,6 +737,8 @@ define(function() {
             quit: 'Quit',
             heating: 'Heating',
             completing: 'Completing',
+            aborted: 'Aborted',
+            completed: 'Completed',
             calibrating: 'Calibrating',
             starting: 'Starting',
             resuming: 'Resuming',
@@ -745,7 +747,10 @@ define(function() {
             running: 'Working',
             uploading: 'Uploading',
             processing: 'Processing',
-            disconnectedError: 'Device disconnected\nPlease confirm if network access of device is available',
+            disconnectedError: {
+                caption: 'Device disconnected',
+                message: 'Please confirm if network access of %s is available'
+            },
             noTask: 'There are currently no task to do',
             pleaseWait: 'Please Wait...',
             unknownCommand: 'command cannot be executed in current status',

@@ -737,6 +737,8 @@ define(function() {
             quit: '中斷連結',
             heating: '加熱中',
             completing: '完成中',
+            aborted: '已終止',
+            completed: '已完成',
             calibrating: '校正中',
             starting: '啟動中',
             resuming: '恢復中',
@@ -745,7 +747,10 @@ define(function() {
             running: '工作中',
             uploading: '上傳中',
             processing: '處理中',
-            disconnectedError: '與機器連線暫時中斷\n請確認機器網路連線是否正常',
+            disconnectedError: {
+                caption: '機器連線中斷',
+                message: '請確認 %s 的網路連線是否正常'
+            },
             noTask: '目前無任何工作',
             pleaseWait: '請稍待...',
             unknownCommand: '指令無法在此狀態下被執行',
