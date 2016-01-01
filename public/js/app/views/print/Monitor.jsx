@@ -9,7 +9,8 @@ define([
     'app/stores/alert-store',
     'app/constants/device-constants',
     'helpers/file-system',
-    'app/actions/global-actions'
+    'app/actions/global-actions',
+    'helpers/sprintf'
 ], function(
     $,
     React,
@@ -21,7 +22,8 @@ define([
     AlertStore,
     DeviceConstants,
     FileSystem,
-    GlobalActions
+    GlobalActions,
+    sprintf
 ) {
     'use strict';
 
@@ -42,7 +44,7 @@ define([
         displayStatus,
         currentStatus,
         previewUrl = '',
-        lang,
+        lang, 
         lastAction,
         fileToBeUpload = {},
         statusActions,
@@ -102,10 +104,10 @@ define([
         camera,
         leftButton,
         middleButton,
-        cameraButton,
+        rightButton,
 
         leftButtonOn = true,
-        middlebuttonOn = true,
+        middleButtonOn = true,
         rightButtonOn = true;
 
     var opts = {};
@@ -169,13 +171,17 @@ define([
         'COMPLETED': function() {
             displayStatus = lang.device.completed;
             currentStatus = '';
-            DeviceMaster.quit();
+            if(openSource == source.GO){
+                DeviceMaster.quit();
+            }
         },
 
         'ABORTED': function() {
             displayStatus = lang.device.aborted;
             currentStatus = '';
-            DeviceMaster.quit();
+            if(openSource == source.GO){
+                DeviceMaster.quit();
+            }
         },
 
         'RESUMING': function() {
@@ -278,6 +284,11 @@ define([
         },
 
         componentWillUnmount: function() {
+
+            AlertStore.removeRetryListener(this._handleRetry);
+            AlertStore.removeCancelListener(this._handleCancel);
+            AlertStore.removeYesListener(this._handleYes);
+
             if(this.state.mode === mode.CAMERA) {
                 DeviceMaster.stopCamera();
             }
@@ -412,6 +423,10 @@ define([
                 }
                 else if(this.state.currentStatus === DeviceConstants.PAUSED) {
                     DeviceMaster.resume();
+                    setTimeout(function(){
+                        messageViewed = false;
+                        showingPopup = false;
+                    }, 1200);
                 }
             }
         },
@@ -710,7 +725,10 @@ define([
         _processTimeout: function() {
             clearTimeout(timmer);
             DeviceMaster.reconnect();
-            AlertActions.showPopupError('', lang.device.disconnectedError);
+            if($('.flux-monitor')[0]){
+                //Show disconnect if FLUX Monitor exists..
+                AlertActions.showPopupError('disconnect', sprintf(lang.device.disconnectedError.message, DeviceMaster.getSelectedDevice().name), lang.device.disconnectedError.caption);
+            }
             this._handleClose();
         },
 
@@ -721,7 +739,7 @@ define([
             status          = report.st_label;
             statusId        = report.st_id;
             leftButtonOn    = true;
-            middlebuttonOn  = true;
+            middleButtonOn  = true;
             rightButtonOn   = true;
 
             clearTimeout(timmer);
@@ -743,16 +761,19 @@ define([
                 errorActions[mainError](statusId);
             }
 
+            var attr = [mainError];
+            if(subError.length > 0) {
+                attr.push(subError);
+            }
+            errorMessage = lang.monitor[attr.join('_')];
+
+            //if(errorMessage == null) errorMessage = attr.join('_');
+
             if(lastError !== mainError) {
                 messageViewed = false;
                 lastError = mainError;
-                var attr = [];
-                attr.push(mainError);
-                if(subError.length > 0) {
-                    attr.push(subError);
-                }
-
-                errorMessage = lang.monitor[attr.join('_')];
+                //The display logic should be control by showing poupup
+                console.log("Error detected", attr);
             }
 
             if(!messageViewed && !showingPopup && mainError !== DeviceConstants.USER_OPERATION && mainError.length > 0) {
@@ -761,6 +782,7 @@ define([
             }
 
             // actions responded to status
+            status = statusId === DeviceConstants.status.SCAN ? DeviceConstants.SCANNING : status;
             status = statusId === DeviceConstants.status.ABORTED ? DeviceConstants.ABORTED : status;
             if(statusActions[status]) {
                 statusActions[status]();
@@ -1024,48 +1046,67 @@ define([
             cameraClass = ClassNames('btn-camera btn-control', { 'on': this.state.mode === mode.CAMERA });
             cameraDescriptionClass = ClassNames('description', { 'on': this.state.mode === mode.CAMERA });
 
-            go = (
-                <div className="controls center" onClick={this._handleGo}>
+            go = function(className){
+                console.log(className);
+                className = "controls center " + className;
+                return (
+                <div className={className} onClick={this._handleGo}>
                     <div className="btn-go btn-control"></div>
                     <div className="description">{lang.monitor.go}</div>
                 </div>
-            );
+                );
+            }.bind(this)
 
-            pause = (
-                <div className="controls center" onClick={this._handlePause}>
+            pause = function(className){
+                className = "controls center " + className;
+                return (
+                <div className={className} onClick={this._handlePause}>
                     <div className="btn-pause btn-control"></div>
                     <div className="description">{lang.monitor.pause}</div>
                 </div>
-            );
+                );
+            }.bind(this)
 
-            stop = (
-                <div className="controls left" onClick={this._handleStop}>
+            stop = function(className){
+                className = "controls left " + className;
+                return (
+                <div className={className} onClick={this._handleStop}>
                     <div className="btn-stop btn-control"></div>
                     <div className="description">{lang.monitor.stop}</div>
                 </div>
-            );
+                );
+            }.bind(this)
 
-            upload = (
-                <div className="controls left" onClick={this._handleUpload}>
-                    <div className="btn-upload btn-control"></div>
-                    <input className="upload-control" type="file" accept=".fc, .gcode" onChange={this._handleUpload} />
-                    <div className="description">{lang.monitor.upload}</div>
-                </div>
-            );
+            upload = function(className){
+                className = "controls left " + className;
+                return (
+                    <div className={className} onClick={this._handleUpload}>
+                        <div className="btn-upload btn-control"></div>
+                        <input className="upload-control" type="file" accept=".fc, .gcode" onChange={this._handleUpload} />
+                        <div className="description">{lang.monitor.upload}</div>
+                    </div>
+                );
+            }.bind(this)
 
-            download = (
-                <div className="controls center" onClick={this._handleDownload}>
-                    <div className="btn-download btn-control"></div>
-                    <div className="description">{lang.monitor.download}</div>
-                </div>
-            );
+            download =  function(className){
+                className = "controls center " + className;
+                return (
+                    <div className={className} onClick={this._handleDownload}>
+                        <div className="btn-download btn-control"></div>
+                        <div className="description">{lang.monitor.download}</div>
+                    </div>
+                );
+            }.bind(this)
 
-            camera = (
-                <div className="controls right" onClick={this._handleToggleCamera}>
-                    <div className={cameraClass}></div>
-                    <div className={cameraDescriptionClass}>{lang.monitor.camera}</div>
-                </div>
-            );
+            camera = function(className){
+                className = "controls right " + className;
+                return (
+                    <div className={className} onClick={this._handleToggleCamera}>
+                        <div className={cameraClass}></div>
+                        <div className={cameraDescriptionClass}>{lang.monitor.camera}</div>
+                    </div>
+                );
+            }.bind(this)
 
             commands = {
                 'READY': function() {
@@ -1089,24 +1130,28 @@ define([
 
             if(!this.props.fCode && !this.state.selectedItem) {
                 if(this.state.currentStatus === DeviceConstants.READY) {
-                    action = '';
+                    middleButtonOn = false;
                 }
             }
 
             leftButton = this.state.mode === mode.BROWSE_FILE ? upload : stop;
             middleButton = this.state.mode === mode.BROWSE_FILE ? download : action;
-            cameraButton = currentStatus !== DeviceConstants.READY ? '' : camera;
+            rightButton = camera;
+
+            if(currentStatus !== DeviceConstants.READY) {
+                rightButtonOn = false;
+            }
 
             // CAMERA mode
             if(this.state.mode === mode.CAMERA) {
-                leftButton = '';
-                middleButton = '';
+                leftButtonOn = false;
+                middleButtonOn = false;
             }
 
             // BROWSE_FILE mode
             if(this.state.mode === mode.BROWSE_FILE) {
                 if(this.state.selectedItemType !== type.FILE && this.state.mode === mode.BROWSE_FILE) {
-                    middleButton = '';
+                    middleButtonOn = false;
                 }
             }
 
@@ -1121,12 +1166,17 @@ define([
                 }
 
                 if(this.state.currentStatus === DeviceConstants.STARTING) {
-                    middlebuttonOn = false;
+                    middleButtonOn = false;
                     rightButtonOn = false;
                 }
 
                 if(statusId === DeviceConstants.status.PAUSING_FROM_RUNNING) {
-                    middlebuttonOn = false;
+                    middleButtonOn = false;
+                }
+
+                if(statusId === DeviceConstants.status.MAINTAIN ||
+                    statusId === DeviceConstants.status.SCAN ) {
+                    middleButtonOn = false;
                 }
             }
             else if (this.state.mode === mode.PREVIEW) {
@@ -1137,17 +1187,30 @@ define([
                 ) {
                     leftButtonOn = false;
                 }
+
+                if(statusId === DeviceConstants.status.MAINTAIN ||
+                   statusId === DeviceConstants.status.SCAN) {
+                    middleButtonOn = false;
+                }
             }
 
-            leftButton      = leftButtonOn ? leftButton : '';
-            middleButton    = middlebuttonOn ? middleButton : '';
-            cameraButton    = rightButtonOn ? cameraButton : '';
+            console.log("ID", statusId, middleButtonOn, this.state.mode)
+
+            //leftButton      = leftButtonOn ? leftButton : '';
+            //middleButton    = middleButtonOn ? middleButton : '';
+            //rightButton    = rightButtonOn ? rightButton : '';
+
+            console.log(leftButtonOn, middleButtonOn, rightButtonOn)
+
+            if(leftButton!='') leftButton = leftButton(leftButtonOn ? '' : 'disabled');
+            if(middleButton!='') middleButton = middleButton(middleButtonOn ? '' : 'disabled');
+            if(rightButton!='') rightButton = rightButton(rightButtonOn ? '' : 'disabled');
 
             operation = (
                 <div className="operation">
                     {leftButton}
                     {middleButton}
-                    {cameraButton}
+                    {rightButton}
                 </div>
             );
 
@@ -1159,7 +1222,10 @@ define([
         _renderPrintingInfo: function() {
             var _duration   = totalTimeInSeconds === 0 ? '' : this._formatTime(totalTimeInSeconds, true),
                 _progress   = percentageDone === 0 ? '' : percentageDone + '%',
-                infoClass   = ClassNames('status-info', { 'running': statusId !== DeviceConstants.status.IDLE });
+                infoClass   = ClassNames('status-info', 
+                                        { 'running': statusId !== DeviceConstants.status.IDLE && 
+                                                     statusId !== DeviceConstants.status.MAINTAIN && 
+                                                     statusId !== DeviceConstants.status.SCAN });
 
             if(statusId === DeviceConstants.status.IDLE || statusId === DeviceConstants.status.COMPLETED) {
                 taskInfo = '';
@@ -1180,7 +1246,7 @@ define([
 
         _renderNavigation: function() {
             console.log(pathArray);
-            if(openSource === source.DEVICE_LIST && pathArray.length == 0 && this.state.mode == mode.BROWSE_FILE){
+            if(openSource === source.DEVICE_LIST && statusId == 0 && pathArray.length == 0 && this.state.mode == mode.BROWSE_FILE){
                 return (<div className="back"></div>);
             }
             if(history.length > 1) {
