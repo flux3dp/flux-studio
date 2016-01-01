@@ -493,6 +493,7 @@ define([
                 temp.pop();
             }
             filePreview = false;
+            this.state.selectedItemType = '';
             lastAction = history[history.length - 1];
 
             var actions = {
@@ -1161,9 +1162,8 @@ define([
 
             // BROWSE_FILE mode
             if(this.state.mode === mode.BROWSE_FILE) {
-                if(this.state.selectedItemType !== type.FILE && this.state.mode === mode.BROWSE_FILE) {
-                    middleButtonOn = false;
-                }
+                leftButtonOn = pathArray.length > 0;
+                middleButtonOn = this.state.selectedItemType == type.FILE;
             }
 
             // PRINT mode

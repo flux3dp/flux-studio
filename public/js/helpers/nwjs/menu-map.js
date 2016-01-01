@@ -37,7 +37,7 @@ define([
         },
         lang = i18n.get().topmenu,
         menuMap = [],
-        windowIndex = ('windows' === window.FLUX.osType ? 1 : 0),
+        windowIndex = ('win' === window.FLUX.osType ? 1 : 0),
         parentIndex = {
             ABOUT  : 0 - windowIndex,
             FILE   : 1 - windowIndex,
@@ -202,7 +202,7 @@ define([
     function bindMap() {
         menuMap = [];
 
-        if ('windows' !== window.FLUX.osType) {
+        if ('win' !== window.FLUX.osType) {
             menuMap.push({
                 label: lang.flux.label,
                 subItems: aboutSubItems
@@ -216,7 +216,7 @@ define([
                 items.saveGCode
             ];
 
-            if ('windows' === window.FLUX.osType) {
+            if ('win' === window.FLUX.osType) {
                 subItems = subItems.concat(aboutSubItems);
             }
 
