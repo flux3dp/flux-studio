@@ -272,9 +272,10 @@ define([
                     discover(
                         'menu-map',
                         function(printers) {
+                            console.log("Menu update" , printers);
                             printers.forEach(function(printer) {
                                 renew = deviceGroup.some(deviceExists(printer));
-
+                                console.log("Renew", renew)
                                 if (false === renew) {
                                     deviceGroup.push({
                                         isPrinter: true,
