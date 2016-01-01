@@ -15,7 +15,8 @@ define([
     'app/actions/progress-actions',
     'app/constants/progress-constants',
     'app/actions/input-lightbox-actions',
-    'app/constants/input-lightbox-constants'
+    'app/constants/input-lightbox-constants',
+    'helpers/sprintf'
 ], function(
     React,
     $,
@@ -33,7 +34,8 @@ define([
     ProgressActions,
     ProgressConstants,
     InputLightboxActions,
-    InputLightboxConstants
+    InputLightboxConstants,
+    sprintf
 ) {
     'use strict';
 
@@ -232,7 +234,7 @@ define([
                     else if (status === DeviceConstants.TIMEOUT) {
                         //TODO: Check default printer
                         if(self.state.hadDefaultPrinter){
-                            AlertActions.showPopupError('printer-connection-timeout', lang.message.default_not_found.message, lang.message.device_not_found.caption);
+                            AlertActions.showPopupError('printer-connection-timeout', sprintf(lang.message.device_not_found.message, "device_name") , lang.message.device_not_found.caption);
                         }else{
                             AlertActions.showPopupError('printer-connection-timeout', lang.message.connectionTimeout, lang.caption.connectionTimeout);
                         }
