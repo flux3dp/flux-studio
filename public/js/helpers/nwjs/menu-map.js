@@ -272,10 +272,8 @@ define([
                     discover(
                         'menu-map',
                         function(printers) {
-                            console.log("Menu update" , printers);
                             printers.forEach(function(printer) {
                                 renew = deviceGroup.some(deviceExists(printer));
-                                console.log("Renew", renew)
                                 if (false === renew) {
                                     deviceGroup.push({
                                         isPrinter: true,
@@ -324,10 +322,11 @@ define([
                                     });
                                 }
                             });
-
+                            console.log("timer", deviceRefreshTimer, renew);
                             if ('undefined' === typeof deviceRefreshTimer && true === renew) {
                                 clearTimeout(deviceRefreshTimer);
                                 deviceRefreshTimer = setTimeout(function() {
+                                    console.log("update device test", deviceGroup.length);
                                     items.device.subItems = deviceGroup;
                                     clearTimeout(deviceRefreshTimer);
                                 }, 5000);
