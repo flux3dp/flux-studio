@@ -34,7 +34,7 @@ define(function(require, exports, module) {
 
     // By default EventEmitters will print a warning if more than 10 listeners are
     // added to it. This is a useful default which helps finding memory leaks.
-    EventEmitter.defaultMaxListeners = 10;
+    EventEmitter.defaultMaxListeners = 2;
 
     // Obviously not all Emitters should be limited to 10. This function allows
     // that to be increased. Set to zero for unlimited.
@@ -136,6 +136,9 @@ define(function(require, exports, module) {
                         'leak detected. %d listeners added. ' +
                         'Use emitter.setMaxListeners() to increase limit.',
                         this._events[type].length);
+
+          console.log("Event type:", type);
+          console.log("Event listeners:", this._events[type]);
           if (typeof console.trace === 'function') {
             // not supported in IE 10
             console.trace();

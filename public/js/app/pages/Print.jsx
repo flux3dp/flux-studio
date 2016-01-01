@@ -501,8 +501,8 @@ define([
                     this.setState({ currentTutorialStep: this.state.currentTutorialStep + 1 }, function() {
                         if(this.state.currentTutorialStep === 1) {
                             var selectPrinterName = Config().read('configured-printer');
-                            if(!selectPrinterName) = InitializeMachine.defaultPrinter.get().name;
-                            if(!selectPrinterName) = DeviceMaster.getFirstDevice();
+                            if(!selectPrinterName) selectPrinterName = InitializeMachine.defaultPrinter.get().name;
+                            if(!selectPrinterName) selectPrinterName = DeviceMaster.getFirstDevice();
                             if(selectPrinterName){
                                 DeviceMaster.getDeviceByNameAsync(
                                 seletPrinterName,
