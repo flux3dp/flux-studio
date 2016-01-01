@@ -321,6 +321,12 @@ define([
         return d.promise();
     }
 
+    function getFirstDevice(){
+        for(var i in _deviceNameMap){
+            return i;
+        }
+    }
+
     function getDeviceByName(name) {
         return _deviceNameMap[name];
     }
@@ -482,6 +488,7 @@ define([
             this.reconnect          = reconnect;
             this.getDeviceByName    = getDeviceByName;
             this.getDeviceByNameAsync = getDeviceByNameAsync;
+            this.getFirstDevice = getFirstDevice;
 
             Discover(
                 'device-master',
