@@ -36,6 +36,7 @@ define([
         history = [],
         reporter,
         status,
+        filePreview = false,
         usbExist = false,
         showingPopup = false,
         messageViewed = false,
@@ -298,24 +299,7 @@ define([
         },
 
         _getPrintingInfo: function() {
-            DeviceMaster.getPreviewInfo().then(function(info) {
-                info = info || [];
-                info[0] = info[0] || {};
-
-                if(!this._hasFCode()) {
-                    if(info[2] instanceof Blob) {
-                        previewUrl = window.URL.createObjectURL(info[2]);
-                    }
-                }
-
-                if(info[0].TIME_COST) {
-                    totalTimeInSeconds = info[0].TIME_COST;
-                }
-
-                taskInfo = lang.monitor.task[info[0].HEAD_TYPE];
-
-                this._startReport();
-            }.bind(this));
+            DeviceMaster.getPreviewInfo().then(this._processInfo.bind(this));
         },
 
         _hasFCode: function() {
@@ -508,6 +492,7 @@ define([
                 pathArray.pop();
                 temp.pop();
             }
+            filePreview = false;
             lastAction = history[history.length - 1];
 
             var actions = {
@@ -518,11 +503,11 @@ define([
 
                 'BROWSE_FILE': function() {
                     self._retrieveList(lastAction.path.join('/'));
-                    self._stopReport();
+                    //self._stopReport();
                 },
 
                 'CAMERA': function() {
-                    self._stopReport();
+                    //self._stopReport();
                 }
             };
 
@@ -560,18 +545,21 @@ define([
                 start = 0;
                 DeviceMaster.fileInfo(pathArray.join('/'), fileName).then(function(info) {
                     if(info[1] instanceof Blob) {
+                        this._processInfo([info[2]]);
                         previewUrl = URL.createObjectURL(info[1]);
+                        pathArray.push(fileName);
+                        filePreview = true;
                         this.setState({
                             mode: mode.PREVIEW
                         }, function() {
                             this._addHistory();
-                            this._startReport();
+                            this._startReport();    
                         });
                     }
                     else {
                         AlertActions.showPopupInfo('', lang.monitor.cannotPreview);
                     }
-
+                    this.forceUpdate();
                 }.bind(this));
             }
         },
@@ -709,11 +697,12 @@ define([
 
         _startReport: function() {
             var self = this;
+            this._stopReport();
             timmer = setTimeout(this._processTimeout, timeout);
 
-            DeviceMaster.getReport().then(function(report) {
-                self._processReport(report);
-            });
+            // DeviceMaster.getReport().then(function(report) {
+            //     self._processReport(report);
+            // });
 
             reporter = setInterval(function() {
                 DeviceMaster.getReport().then(function(report) {
@@ -730,6 +719,26 @@ define([
                 AlertActions.showPopupError('disconnect', sprintf(lang.device.disconnectedError.message, DeviceMaster.getSelectedDevice().name), lang.device.disconnectedError.caption);
             }
             this._handleClose();
+        },
+
+        _processInfo: function(info){
+            console.log(info);
+            info = info || [];
+            info[0] = info[0] || {};
+
+            if(!this._hasFCode()) {
+                if(info[2] instanceof Blob) {
+                    previewUrl = window.URL.createObjectURL(info[2]);
+                }
+            }
+
+            if(info[0].TIME_COST) {
+                totalTimeInSeconds = info[0].TIME_COST;
+            }
+
+            taskInfo = lang.monitor.task[info[0].HEAD_TYPE];
+
+            this._startReport();
         },
 
         _processReport: function(report) {
@@ -836,7 +845,8 @@ define([
             //If report returns idle state, which means nothing to preview..
             if(openSource === source.DEVICE_LIST &&
                 report.st_id === DeviceConstants.status.IDLE &&
-                this.state.mode === mode.PREVIEW){
+                this.state.mode === mode.PREVIEW &&
+                filePreview !== true){
                 report_info['mode'] = mode.BROWSE_FILE;
                 this._refreshDirectory();
             }
@@ -893,7 +903,9 @@ define([
                         directoryContent: result,
                         waiting: false
                     });
+                    self.forceUpdate();
                 });
+                self.forceUpdate();
             });
         },
 
@@ -1047,7 +1059,6 @@ define([
             cameraDescriptionClass = ClassNames('description', { 'on': this.state.mode === mode.CAMERA });
 
             go = function(className){
-                console.log(className);
                 className = "controls center " + className;
                 return (
                 <div className={className} onClick={this._handleGo}>
@@ -1194,13 +1205,9 @@ define([
                 }
             }
 
-            console.log("ID", statusId, middleButtonOn, this.state.mode)
-
             //leftButton      = leftButtonOn ? leftButton : '';
             //middleButton    = middleButtonOn ? middleButton : '';
             //rightButton    = rightButtonOn ? rightButton : '';
-
-            console.log(leftButtonOn, middleButtonOn, rightButtonOn)
 
             if(leftButton!='') leftButton = leftButton(leftButtonOn ? '' : 'disabled');
             if(middleButton!='') middleButton = middleButton(middleButtonOn ? '' : 'disabled');
@@ -1223,14 +1230,20 @@ define([
             var _duration   = totalTimeInSeconds === 0 ? '' : this._formatTime(totalTimeInSeconds, true),
                 _progress   = percentageDone === 0 ? '' : percentageDone + '%',
                 infoClass   = ClassNames('status-info', 
-                                        { 'running': statusId !== DeviceConstants.status.IDLE && 
+                                        { 'running': this.state.mode == mode.BROWSE_FILE ||
+                                                     this.state.mode == mode.PREVIEW && openSource == source.GO ||
+                                                     this.state.mode == mode.PREVIEW && filePreview ||
+                                                     statusId !== DeviceConstants.status.IDLE && 
                                                      statusId !== DeviceConstants.status.MAINTAIN && 
                                                      statusId !== DeviceConstants.status.SCAN });
 
             if(statusId === DeviceConstants.status.IDLE || statusId === DeviceConstants.status.COMPLETED) {
-                taskInfo = '';
-                _duration = '';
-                _progress = '';
+                if(openSource !== source.GO && filePreview !== true ){
+                    taskInfo = _duration = _progress = '';
+                    console.log("clear info?")
+                }else{
+                    console.log(taskInfo, _duration)
+                }
             }
 
             return (
@@ -1245,7 +1258,7 @@ define([
         },
 
         _renderNavigation: function() {
-            console.log(pathArray);
+            console.log("Path array", pathArray);
             if(openSource === source.DEVICE_LIST && statusId == 0 && pathArray.length == 0 && this.state.mode == mode.BROWSE_FILE){
                 return (<div className="back"></div>);
             }
