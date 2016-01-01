@@ -110,9 +110,9 @@ define(function() {
                 is_ready: '“%s” is ready',
                 station_ready_statement: 'Your FLUX Delta is now a Wi-Fi station, you can use your FLUX wirelessly by connect to Wi-Fi “%s”',
                 brilliant: 'Brilliant!',
-                begin_journey: 'You can begin the journey with your FLUX Delta now.',
-                great: 'Great!',
-                upload_via_usb: 'You can setup Wi-Fi later, or use USB drive to print.',
+                begin_journey: 'You can now detach Micro USB Cable, and begin the journey with your FLUX Delta now.',
+                great: 'Welcome to FLUX Studio',
+                upload_via_usb: 'You can setup device Wi-Fi later. If you don\'t have Wi-Fi, check <a href="https://flux3dp.zendesk.com/hc/en-us/articles/215998327-Connection-Guide-for-Desktop-PCs">Desktop Connection Guide</a>.',
                 back: 'Back',
                 ok: 'OK'
             },
@@ -123,7 +123,7 @@ define(function() {
 
                 keep_connect: {
                     caption: 'USB Device not found',
-                    content: 'Oops! Don\'t worry. We\'re here for you.\nMake sure your FLUX Delta has been powered \non, attached to micro-usb cord and the driver is installed.\n<a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/215327328">...More solutions</a>'
+                    content: 'Oops! Don\'t worry. We\'re here for you.\nMake sure your FLUX Delta has been powered \non, attached to Micro USB Cable and the driver is installed.\n<a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/215327328">...More solutions</a>'
                 },
 
                 wifi_connection: {

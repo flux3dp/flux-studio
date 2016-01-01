@@ -110,9 +110,9 @@ define(function() {
                 is_ready: '“%s” 準備完成',
                 station_ready_statement: '你的 FLUX Delta 已成為 Wi-Fi 熱點，你可以藉由無線連接 “%s” 這個熱點操作 FLUX',
                 brilliant: '太棒了!',
-                begin_journey: '你可以開始使用 FLUX Delta 隨心所欲地進行創作囉！',
-                great: 'Let\'s Begin 開始使用 FLUX Delta',
-                upload_via_usb: '你可以稍後再設定 Wi-Fi 選項, 或使用 USB 隨身碟列印。',
+                begin_journey: '你可以拔除 Micro USB 傳輸線, 開始使用 FLUX Delta 隨心所欲地進行創作囉！',
+                great: '歡迎使用 FLUX Studio',
+                upload_via_usb: '你可以稍後再設定 Wi-Fi 選項。如果你沒有 Wi-Fi 環境，請參考<a href="https://flux3dp.zendesk.com/hc/en-us/articles/215998327-Connection-Guide-for-Desktop-PCs">PC連線指南</a>',
                 back: '回到 Wi-Fi 設定',
                 ok: '開始使用'
             },
