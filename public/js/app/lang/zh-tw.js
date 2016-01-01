@@ -112,7 +112,7 @@ define(function() {
                 brilliant: '太棒了!',
                 begin_journey: '你可以拔除 Micro USB 傳輸線, 開始使用 FLUX Delta 隨心所欲地進行創作囉！',
                 great: '歡迎使用 FLUX Studio',
-                upload_via_usb: '你可以稍後再設定 Wi-Fi 選項。如果你沒有 Wi-Fi 環境，請參考<a href="https://flux3dp.zendesk.com/hc/en-us/articles/215998327-Connection-Guide-for-Desktop-PCs">PC連線指南</a>',
+                upload_via_usb: '你可以稍後再設定 Wi-Fi 選項。<br/>如果你沒有 Wi-Fi 環境，請參考<a target="__blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/215998327-Connection-Guide-for-Desktop-PCs">PC連線指南</a>',
                 back: '回到 Wi-Fi 設定',
                 ok: '開始使用'
             },
@@ -857,10 +857,10 @@ define(function() {
             machineNotConnected: 'Machine is not connected',
             notPrinting: 'Printing is not in progress',
             nothingToPrint: 'Nothing to print (source blob missing)',
-            connectionTimeout: '請確認你的網路狀態和FLUX Device 的 Wi-Fi 指示燈.',
+            connectionTimeout: '請確認你的網路狀態和 FLUX Device 的 Wi-Fi 指示燈.',
             device_not_found: {
-                caption: '找不到裝置',
-                message: '請確認 %s 的 Wi-Fi 指示燈'
+                caption: '找不到預設裝置',
+                message: '請確認預設裝置的 Wi-Fi 指示燈，或取消設定預設裝置'
             },
             device_busy: {
                 caption: '裝置忙碌中',

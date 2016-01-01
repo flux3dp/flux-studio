@@ -112,9 +112,9 @@ define(function() {
                 brilliant: 'Brilliant!',
                 begin_journey: 'You can now detach Micro USB Cable, and begin the journey with your FLUX Delta now.',
                 great: 'Welcome to FLUX Studio',
-                upload_via_usb: 'You can setup device Wi-Fi later. If you don\'t have Wi-Fi, check <a href="https://flux3dp.zendesk.com/hc/en-us/articles/215998327-Connection-Guide-for-Desktop-PCs">Desktop Connection Guide</a>.',
+                upload_via_usb: 'You can setup device Wi-Fi later. <br/>If you don\'t have Wi-Fi, check <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/215998327-Connection-Guide-for-Desktop-PCs">Desktop Connection Guide</a>.',
                 back: 'Back',
-                ok: 'OK'
+                ok: 'START CREATING'
             },
 
             // errors
@@ -859,7 +859,7 @@ define(function() {
             nothingToPrint: 'Nothing to print (source blob missing)',
             connectionTimeout: 'Please check your network state and FLUX Device\'s Wi-Fi indicator.',
             device_not_found: {
-                caption: 'Device not found',
+                caption: 'Default device not found',
                 message: 'Please check your FLUX\'s Wi-Fi indicator'
             },
             device_busy: {
