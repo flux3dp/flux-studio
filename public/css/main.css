@@ -3982,9 +3982,14 @@ input[type=range]:focus::-webkit-slider-runnable-track {
                         color: #333; }
             .flux-monitor .main .operation .controls:hover {
                 color: #333;
-                cursor: pointer; }
+                cursor: pointer;
+                filter: brightness(80%);
+                -webkit-filter: brightness(80%); }
                 .flux-monitor .main .operation .controls:hover > div {
                     opacity: 1; }
+            .flux-monitor .main .operation .disabled {
+                pointer-events: none;
+                opacity: 0.3; }
             .flux-monitor .main .operation .left {
                 left: 2rem; }
             .flux-monitor .main .operation .center {
