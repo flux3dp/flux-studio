@@ -39,6 +39,10 @@ define([
         keydown_event = function(e) {
             var matches = [];
 
+            if (true === e.ctrlKey) {
+                keyCodeStatus.push(special_key_map.CTRL);
+            }
+
             if (true === e.metaKey) {
                 keyup_event();
                 keyCodeStatus.push(special_key_map.CMD);
