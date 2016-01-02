@@ -98,13 +98,12 @@ case 'Darwin':
     break;
 }
 
-process.env.arch = 'x86';
 switch (os.arch()) {
 case 'x64':
     process.env.arch = 'x64';
     break;
-case 'Linux':
-case 'Darwin':
+case 'ia32':
+default:
     process.env.arch = 'x86';
     break;
 }
