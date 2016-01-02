@@ -174,6 +174,7 @@ define([
 
                             self._auth(printer.uuid, password, {
                                 onError: function() {
+                                    ProgressActions.close();
                                     AlertActions.showPopupError('device-auth-fail', lang.select_printer.auth_failure);
                                 }
                             });
@@ -196,6 +197,7 @@ define([
                     case DeviceConstants.status.SCAN:
                     case DeviceConstants.status.MAINTAIN:
                         // ask kick?
+                        ProgressActions.close();
                         AlertActions.showPopupYesNo('kick', lang.message.device_is_used);
                         break;
                     case DeviceConstants.status.COMPLETED:
@@ -210,10 +212,12 @@ define([
                     case DeviceConstants.status.PAUSED_FROM_STARTING:
                     case DeviceConstants.status.PAUSED_FROM_RUNNING:
                         // ask for abort
+                        ProgressActions.close();
                         AlertActions.showPopupYesNo('abort', lang.message.device_is_used);
                         break;
                     default:
                         // device busy
+                        ProgressActions.close();
                         AlertActions.showDeviceBusyPopup('on-select-printer');
                         break;
                     }
@@ -233,6 +237,7 @@ define([
                     }
                     else if (status === DeviceConstants.TIMEOUT) {
                         //TODO: Check default printer
+                        ProgressActions.close();
                         if(self.state.hadDefaultPrinter){
                             AlertActions.showPopupError('printer-connection-timeout', sprintf(lang.message.device_not_found.message, "device_name") , lang.message.device_not_found.caption);
                         }else{
