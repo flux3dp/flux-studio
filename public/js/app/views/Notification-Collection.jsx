@@ -415,7 +415,6 @@ define([
                     };
 
                 fetchProfile().then(fetchLatestVersion).done(function(currentProfile, currentVersion) {
-                    console.log(currentProfile, currentVersion)
                     var isIgnore = -1 < ignoreVersions.indexOf(currentVersion.latest_version);
 
                     if (false === isIgnore &&
