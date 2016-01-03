@@ -293,6 +293,11 @@ define([
 
     function addMesh(mesh) {
         scene.add(mesh);
+
+        if ('undefined' !== typeof mesh.transformControl) {
+            scene.add(mesh.transformControl);
+        }
+
         render();
     }
 

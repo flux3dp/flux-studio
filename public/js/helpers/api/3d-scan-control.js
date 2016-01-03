@@ -44,7 +44,6 @@ define([
             stopGettingImage = function(callback) {
                 callback = callback || function() {};
 
-                console.log(events.onMessage, callback);
                 if ('undefined' === typeof events.onMessage) {
                     callback();
                 }
