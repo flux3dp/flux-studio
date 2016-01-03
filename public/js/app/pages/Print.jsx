@@ -28,7 +28,8 @@ define([
     'helpers/sprintf',
     'app/actions/initialize-machine',
     'app/actions/progress-actions',
-    'app/constants/progress-constants'
+    'app/constants/progress-constants',
+    'helpers/shortcuts'
 ], function(
     $,
     React,
@@ -59,7 +60,8 @@ define([
     sprintf,
     InitializeMachine,
     ProgressActions,
-    ProgressConstants
+    ProgressConstants,
+    shortcuts
 ) {
 
     return function(args) {
@@ -215,21 +217,21 @@ define([
                 },
 
                 _registerKeyEvents: function() {
-                    $(document).keydown(function(e) {
-                        // delete event
-                        if(e.metaKey && e.keyCode === 8 || e.keyCode === 46 || e.keyCode === 8) {
-                            if(allowDeleteObject) {
-                                director.removeSelected();
-                            }
-                        }
-
-                        // copy event - it will listen by top menu as well in nwjs..
-                        if(!window.FLUX.osType){
-                            if(e.metaKey && e.keyCode === 68) {
-                                director.duplicateSelected();
-                            }
+                    // delete event
+                    shortcuts.on(['del'], function(e) {
+                        if(allowDeleteObject) {
+                            director.removeSelected();
                         }
                     });
+
+                    // copy event - it will listen by top menu as well in nwjs..
+                    if ('undefined' === typeof window.requireNode) {
+                        // copy event
+                        shortcuts.on(['cmd', 'd'], function(e) {
+                            e.preventDefault();
+                            director.duplicateSelected();
+                        });
+                    }
                 },
 
                 _registerTutorial: function() {
@@ -255,7 +257,7 @@ define([
                                 function(printer){
                                     ProgressActions.close();
                                     InitializeMachine.defaultPrinter.set({
-                                              name: printer.name, 
+                                              name: printer.name,
                                               serial: printer.serial,
                                               uuid: printer.uuid
                                     });
@@ -487,7 +489,6 @@ define([
                         this.setState({ layerHeight: value });
                     }
                     else if (key === 'raft_layers') {
-                        console.log(key, value !== '0');
                         this.setState({ raftOn: value !== '0' });
                     }
                 },
