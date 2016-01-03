@@ -75,7 +75,6 @@ define([
         },
 
         render: function() {
-            console.log(this.props);
             if (false === this.props.open) {
                 return <div/>;
             }
