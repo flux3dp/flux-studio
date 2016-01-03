@@ -46,7 +46,6 @@ define([
                 if ( 'osx' !== window.FLUX.osType ){
                     modifiers = modifiers.replace(/cmd/g,'ctrl');
                 }
-                console.log(modifiers);
                 return modifiers;
             }
 

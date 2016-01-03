@@ -197,11 +197,11 @@ define([
                 }
             }
         }],
-        subItems;
+        subItems,
+        timeout_device_update = 5000;
 
     function bindMap() {
         menuMap = [];
-        console.log("refresh menu..")
 
         if ('win' !== window.FLUX.osType) {
             menuMap.push({
@@ -270,7 +270,6 @@ define([
                 defaultDevice = initializeMachine.defaultPrinter.get();
 
                 doDiscover = function() {
-                    var timeout_device_update = 5000;
                     discover(
                         'menu-map',
                         function(printers) {
@@ -289,8 +288,9 @@ define([
                                                 DeviceMaster.selectDevice(printer).then(function(status) {
                                                     if(status === DeviceConstants.CONNECTED) {
                                                         setTimeout(
-                                                            function(){GlobalActions.showMonitor(printer)},
-                                                            100);
+                                                            function(){
+                                                                GlobalActions.showMonitor(printer)
+                                                            },50);
                                                     }
                                                     else if (status === DeviceConstants.TIMEOUT) {
                                                         AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
@@ -302,9 +302,17 @@ define([
                                             label: lang.device.change_filament,
                                             enabled: true,
                                             onClick: function() {
-                                                setTimeout(
-                                                    function(){AlertActions.showChangeFilament(printer);},
-                                                    100);
+                                                DeviceMaster.selectDevice(printer).then(function(status) {
+                                                    if(status === DeviceConstants.CONNECTED) {
+                                                        setTimeout(
+                                                            function(){
+                                                                AlertActions.showChangeFilament(printer);
+                                                            },50);
+                                                    }
+                                                    else if (status === DeviceConstants.TIMEOUT) {
+                                                        AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
+                                                    }
+                                                });
                                             }
                                         },
                                         {
@@ -337,10 +345,8 @@ define([
                                     }
                                     deviceRefreshTimer = undefined;
                                     timeout_device_update = timeout_device_update + 15000;
-                                    console.log('update device menu');
                                     clearTimeout(deviceRefreshTimer);
                                 }, timeout_device_update);
-                                console.log(timeout_device_update);
                             }
                         }
                     );
