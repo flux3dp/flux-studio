@@ -191,6 +191,19 @@ define(['helpers/is-json'], function(isJson) {
                 return this;
             },
 
+            optimizeLogs: function(){
+                for(var i = 0; i < _logs.length; i++){
+                    var process_data = JSON.stringify(_logs[i][1]);
+                    if(typeof _logs[i][1] == "string"){
+                        process_data = _logs[i][1];
+                    }
+                    if(process_data.length > 100){
+                        process_data = process_data.substring(0,97) + "...";
+                    }
+                    _logs[i][1] = process_data;
+                }
+            },
+
             logs: function(){
                 for(var i = 0; i < _logs.length; i++){
                     var data = JSON.stringify(_logs[i][1]);

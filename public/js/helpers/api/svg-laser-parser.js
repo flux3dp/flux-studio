@@ -3,7 +3,7 @@
  * Ref: https://github.com/flux3dp/fluxghost/wiki/websocket-svg-laser-parser
  */
 define([
-    'helpers/websocket',
+    'helpers/websocket-debug',
     'helpers/convertToTypedArray',
     'helpers/data-history',
     'helpers/api/set-params'

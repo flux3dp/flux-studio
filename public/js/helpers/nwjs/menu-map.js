@@ -12,7 +12,9 @@ define([
     'app/actions/initialize-machine',
     'app/actions/global-actions',
     'helpers/device-master',
-    'app/constants/device-constants'
+    'app/constants/device-constants',
+    'html2canvas',
+    'plugins/file-saver/file-saver.min'
 ], function(
     $,
     gui,
@@ -24,7 +26,9 @@ define([
     initializeMachine,
     GlobalActions,
     DeviceMaster,
-    DeviceConstants
+    DeviceConstants,
+    html2canvas,
+    fileSaver
 ) {
     'use strict';
 
@@ -345,7 +349,7 @@ define([
                                     }
                                     deviceRefreshTimer = undefined;
                                     if(deviceGroup.length > 2){
-                                        timeout_device_update += 120000;
+                                        timeout_device_update += 240000;
                                     }
                                     timeout_device_update = timeout_device_update + 15000;
                                     clearTimeout(deviceRefreshTimer);
@@ -385,6 +389,33 @@ define([
                         else {
                             window.open('http://flux3dp.com/support');
                         }
+                    }
+                },
+                {
+                    label: lang.help.debug,
+                    enabled: true,
+                    onClick: function(){
+                        window.html2canvas = html2canvas;
+                        function obfuse(str){
+                            var output = [];
+                            for(var i in str){
+                                var c = {'f':'x','l':'u','u':'l','x':'f'}[str[i]];
+                                output.push(c?c:str[i]);
+                            }
+                            return output.join("");
+                        }
+                        html2canvas(window.document.body).then(function(canvas) {
+                            for(var i in window.FLUX.websockets){
+                                if("function" !== typeof window.FLUX.websockets[i]){
+                                    window.FLUX.websockets[i].optimizeLogs();
+                                }
+                            }
+                            var jpegUrl = canvas.toDataURL("image/jpeg"),
+                                report_info = {ws: window.FLUX.websockets, screenshot: jpegUrl},
+                                report_blob = new Blob([obfuse(btoa(JSON.stringify(report_info)))], {type : 'text/html'});
+
+                            saveAs(report_blob, "bugreport_"+Math.floor(Date.now() / 1000)+".txt");
+                        });
                     }
                 }
             ]
