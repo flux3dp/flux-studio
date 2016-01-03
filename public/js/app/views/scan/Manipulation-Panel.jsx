@@ -21,6 +21,7 @@ define([
                 selectedMeshes: [],
                 onCropOn: function() {},
                 onCropOff: function() {},
+                onSave: function() {},
                 onClearNoise: function() {},
                 onManualMerge: function() {},
                 onReset: function() {},
@@ -31,6 +32,10 @@ define([
 
         _onClearNoise: function(e) {
             this.props.onClearNoise(this.state.handleMesh);
+        },
+
+        _onSave: function(e) {
+            this.props.onSave(this.state.handleMesh);
         },
 
         _onCrop: function(e) {
@@ -140,6 +145,12 @@ define([
                                 <button className="btn btn-action btn-denoise" data-ga-event="denoise" onClick={this._onClearNoise}>
                                     <img src="/img/icon-denoise.png"/>
                                     {lang.scan.manipulation.clear_noise}
+                                </button>
+                            </div>
+                            <div className="control">
+                                <button className="btn btn-action btn-save-pcd" data-ga-event="save-point-cloud" onClick={this._onSave}>
+                                    <img src="/img/icon-denoise.png"/>
+                                    {lang.scan.manipulation.save_pointcloud}
                                 </button>
                             </div>
                         </label>
