@@ -194,6 +194,7 @@ define([
                         // no problem
                         self._auth(printer.uuid, '', opts);
                         break;
+                    case DeviceConstants.status.RAW:
                     case DeviceConstants.status.SCAN:
                     case DeviceConstants.status.MAINTAIN:
                         // ask kick?

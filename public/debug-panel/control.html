@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>FLUXStudio - Control</title>
+  <script src="res/jquery-2.1.4.min.js"></script>
+  <script src="res/bootstrap/js/bootstrap.min.js"></script>
+  <link href="res/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+  <meta charset="UTF-8">
+  <script src="shared.js"></script>
+  <style>
+  .fileinput-button {
+    position: relative;
+    overflow: hidden;
+  }
+  .fileinput-button input {
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin: 0;
+    opacity: 0;
+    -ms-filter: 'alpha(opacity=0)';
+    font-size: 200px;
+    direction: ltr;
+    cursor: pointer;
+  }
+
+  /* Fixes for IE < 8 */
+  @media screen\9 {
+    .fileinput-button input {
+      filter: alpha(opacity=0);
+      font-size: 100%;
+      height: 100%;
+    }
+  }
+  </style>
+  <script>
+  var ghost_port = 10000;
+  var wsserver = window.location.host + ":" + ghost_port;
+  function beginControl(uuid, name) {
+    stopDiscover()
+    $(".device_select_ui").hide();
+    $(".device_control_ui").show();
+
+    $("#device_label").
+      text(name + " (" + uuid + ")").
+      attr("data-serial", uuid);
+    connectControl();
+  }
+
+  function connectControl() {
+    if(window.control_ws) {
+      appendLog("Clean old control session", "red");
+      window.control_ws.close();
+      window.control_ws = undefined;
+    }
+    var serial = $("#device_label").attr("data-serial");
+    appendLog("Connect to " + serial);
+    var ws = new WebSocket("ws://" + wsserver + "/ws/control/" + serial);
+    window.control_ws = ws;
+
+    ws.onclose = function(v) {
+      if(self.control_ws === ws) {
+        self.control_ws = undefined;
+      }
+      ws_close_handler("Control")(v);
+    };
+
+    ws.onmessage = function(m) {
+      if(window.control_ws !== ws) { return; }
+
+      try {
+        var payload = JSON.parse(m.data);
+        if(payload.status === "connecting") {
+          appendLog("Connecting... (" + payload.stage + ")", "#444");
+        } else if(payload.status === "connected") {
+          appendLog("➜ Ready")
+          appendHtmlLog('<div>' +
+            '<img src="ready.png?" height="60px" />' +
+            '<img src="ready.png?" height="60px" />' +
+            '<img src="ready.png?" height="60px" />' + '</div>');
+
+          ws.onmessage = cb_standard;
+          send_ping();
+          send_cmd("position");
+        } else {
+          appendLog("✗ Error: "+ m.data + " 😭", "red");
+        }
+
+      } catch(err) {
+        appendLog("✗ Exception: "+ err.message + " 😭", "red");
+      }
+    };
+  }
+
+  function send_ping() {
+    if(window.control_ws) window.control_ws.send("ping");
+  }
+
+  function cb_standard(m) {
+    var payload;
+    try {
+      payload = JSON.parse(m.data);
+    } catch (e) {}
+
+    if(payload != undefined && payload.status === "ok" &&
+       payload.path != undefined && payload.directories != undefined &&
+       payload.files != undefined) {
+      // List file
+      appendLog("List " + payload.path + ":");
+
+      var path = payload.path;
+      if(path != "" && path[path.length - 1] != "/") {
+        path = path + "/";
+      }
+
+      for(var i=0;i<payload.directories.length;i++) {
+        var dirname = payload.directories[i];
+        var $row = $("<div></div>");
+        $row.append($("<span>Dir&nbsp;</span>"));
+        $row.append(
+          $("<a></a>").
+            css("cursor", "pointer").
+            attr("data-cmd", "ls " + path + dirname).
+            text("[" + path + dirname + "]"));
+        appendHtmlLog($row);
+      }
+
+      for(var i=0;i<payload.files.length;i++) {
+        var filename = payload.files[i];
+        var $row = $("<div></div>");
+        $row.append($("<span>File&nbsp;</span>"));
+        $row.append(
+          $("<a></a>").
+            css("cursor", "pointer").
+            attr("data-cmd", "select " + path + filename).
+            text("[" + path + filename + "]"));
+        appendHtmlLog($row);
+      }
+    } else if(payload != undefined && payload.status === "pong") {
+      setTimeout(send_ping, 30 * 1000);
+    } else {
+      var lines = m.data.split("\n");
+      for(var i=0;i<lines.length;i++) {
+        appendLog(lines[i]);
+      }
+    }
+  }
+
+  function cb_begin_upload(m) {
+    try {
+      var data = JSON.parse(m.data)
+
+      if(data.status === "continue") {
+        appendLog("Uploading file, do not send any commnad before you recive 'ok'");
+        var reader = new FileReader();
+        reader.onload = file_uploader;
+        reader.readAsArrayBuffer(window.upload_file)
+        window.upload_file = undefined;
+      } else {
+        appendLog(data.status + ": " + data.error, "red");
+        window.upload_file = undefined;
+      }
+    } catch(err) {
+      appendLog("✗ Exception: "+ err.message + " 😭", "red");
+    }
+    window.control_ws.onmessage = cb_standard;
+  }
+
+  function file_uploader(f) {
+    window.control_ws.send(f.target.result);
+  }
+
+  function send_cmd(cmd) {
+    if(window.control_ws) {
+      if(window.control_ws.readyState == 0) {
+        appendLog("⚠️ " + cmd, "rgb(208, 142, 40)");
+      } else if(window.control_ws.readyState == 1) {
+        window.control_ws.send(cmd);
+        appendLog("➦ " + cmd);
+      } else {
+        appendLog("⚠️ " + cmd, "rgb(208, 142, 40)");
+        window.control_ws = undefined;
+      }
+    } else {
+      appendLog("⚠️ " + cmd, "rgb(208, 142, 40)");
+    }
+  }
+
+  $(window).ready(function() {
+    $('[data-toggle="tooltip"]').tooltip();
+
+    $("[data-role=discover]").on("click", function() {
+      if(window.discover_ws) {
+        stopDiscover()
+      } else {
+        startDiscover()
+      }
+    });
+
+    $("[data-role=reset-control]").on("click", function() {
+      connectControl();
+    });
+
+    $("#controlcmd").on("keypress", function(e) {
+      if(e.keyCode == 13) {
+        var val = $(this).val();
+        send_cmd(val);
+        $(this).val("");
+        return false;
+      }
+    });
+
+    $("#log").on("click", "[data-cmd]", function() {
+      cl = $(this).attr("data-cmd").split(",")
+      for(var i=0;i<cl.length;i++) {
+        send_cmd(cl[i]);
+      }
+    });
+
+    $("[data-cmd-guide]").bind("click", function() {
+      $("#controlcmd")
+        .val($(this).attr("data-cmd-guide"))
+        .focus();
+    });
+
+    $("[data-cmd]").bind("click", function() {
+      cl = $(this).attr("data-cmd").split(",")
+      for(var i=0;i<cl.length;i++) {
+        send_cmd(cl[i]);
+      }
+    });
+
+    $(".device_control_ui").hide();
+
+    // Upload File Codes
+    $("input[name=file]").on("change", function(evt) {
+      var f = evt.target.files[0];
+
+      // Get mimetype
+      var mimetype = undefined;
+      var filename = f.name.split(".");
+      var fileext = filename[filename.length - 1].toLowerCase();
+      if(fileext == "gcode") {
+        mimetype = "text/gcode";
+      } else if (fileext == "fc") {
+        mimetype = "application/fcode";
+      } else if (fileext == "bin"){
+        mimetype = "binary/fireware";
+      } else if (fileext == "fxfw") {
+        mimetype = "binary/flux-firmware";
+      } else {
+        alert("Unknow file type");
+        return
+      }
+
+      if(window.control_ws && window.control_ws.onmessage === cb_standard) {
+        if($(this).attr("data-file-cmd") == "upload_g"){
+          var cmd = $(this).attr("data-file-cmd") + " " + mimetype + " " + f.size + " # 1";
+          control_ws.flag = "g";
+        }
+        else{
+          var cmd = $(this).attr("data-file-cmd") + " " + mimetype + " " + f.size;
+          control_ws.flag = "normal";
+        }
+
+        appendLog("Start uploading... (" + cmd + ")")
+        window.control_ws.onmessage = cb_begin_upload;
+        window.control_ws.send(cmd);
+
+        window.upload_file = f;
+        this.value = "";
+      } else {
+        appendLog("Upload not start", "blue")
+      }
+    });
+    // End Upload File Codes
+
+    // Begin UI
+    $(window).bind('hashchange', function(e) {
+      var matchs = /^#[0-9a-fA-F]+;[\w\W]+$/.exec(document.location.hash);
+      if(matchs != undefined && matchs.length == 1) {
+        var tags = matchs[0].split(";");
+        var serial = tags[0].substr(1);
+        var name = tags.slice(1).join(";");
+
+        beginControl(serial, name);
+      } else {
+        $(".device_select_ui").show();
+        $(".device_control_ui").hide();
+        startDiscover();
+      }
+    }).trigger("hashchange");;
+  });
+  </script>
+</head>
+<body>
+  <div class="container-fluid">
+    <div class="row" style="padding-top: 1em">
+      <div class="col-xs-10">
+        <strong>./fluxghost/assets/control.html</strong>
+      </div>
+      <div class="col-xs-2">
+        <a href="index.html" class="btn btn-xs btn-primary">Back to Index</a>
+      </div>
+    </div>
+  </div>
+  <hr />
+  <div class="container-fluid device_select_ui" id="devices"></div>
+  <div class="container-fluid" style="margin-bottom: 5px;">
+    <div class="col-xs-8">
+      <a class="btn btn-sm btn-success device_select_ui" data-role="discover">Start Discover</a>
+      <label id="device_label" class="device_control_ui"></label>
+    </div>
+    <div class="col-xs-4 text-right">
+      <a class="btn btn-sm btn-warning device_control_ui" data-role="reset-control">
+        <i class="glyphicon glyphicon-repeat"></i>
+        Reset Connection
+      </a>
+      <a href="#" class="btn btn-sm btn-default device_control_ui" data-role="end-control">
+        <i class="glyphicon glyphicon-th-list"></i>
+        Back to device lists
+      </a>
+    </div>
+  </div>
+  <div class="container-fluid device_control_ui">
+    <div class="col-xs-12">
+      <div class="form-control" style="height: 400px; overflow-y: scroll; border: 1px gray solid" id="log"></div>
+    </div>
+  </div>
+  <div class="container-fluid device_control_ui">
+    <div class="col-xs-12">
+      <div style="margin: 5px 0">
+        懶懶 DER
+        <span data-cmd="report" class="btn btn-xs btn-default">Report</span>
+        <span data-cmd="ls" class="btn btn-xs btn-default">List files</span>
+        <div class="btn-group btn-xs dropup">
+          <span data-cmd="task start" class="btn btn-xs btn-primary"><i class="glyphicon glyphicon-fire"></i> Start</span>
+          <span data-cmd="play info" class="btn btn-xs btn-default" data-toggle="tooltip" data-placement="top" title="Playing Info"><i class="glyphicon glyphicon-info-sign"></i></span>
+          <span data-cmd="play pause" class="btn btn-xs btn-warning" data-toggle="tooltip" data-placement="top" title="Pause"><i class="glyphicon glyphicon-pause"></i></span>
+          <span data-cmd="play resume" class="btn btn-xs btn-info" data-toggle="tooltip" data-placement="top" title="Resume"><i class="glyphicon glyphicon-play"></i></span>
+          <span data-cmd="play abort" class="btn btn-xs btn-danger" data-toggle="tooltip" data-placement="top" title="Abort"><i class="glyphicon glyphicon-eject"></i></span>
+        </div>
+        <div class="btn-group btn-xs dropup">
+          <span data-cmd="task maintain" class="btn btn-xs btn-default">Maintain</span>
+          <button type="button" class="btn btn-xs btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <span class="caret"></span>
+              <span class="sr-only">Toggle Dropdown</span>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-right">
+            <li data-cmd="maintain load_filament 0 210" style="cursor: pointer"><a>Load filament</a></li>
+            <li data-cmd="maintain unload_filament 0 210" style="cursor: pointer"><a>Unload filament</a></li>
+            <li data-cmd="maintain calibrating" style="cursor: pointer"><a>Level calibrating</a></li>
+            <li data-cmd="maintain calibrating clean" style="cursor: pointer"><a>Level calibrating (from 0)</a></li>
+            <li data-cmd="maintain zprobe" style="cursor: pointer"><a>Z-probe</a></li>
+            <li data-cmd="maintain home" style="cursor: pointer"><a>Home</a></li>
+            <li data-cmd="maintain headinfo" style="cursor: pointer"><a>Headinfo</a></li>
+          </ul>
+        </div>
+        <span data-cmd="raw" class="btn btn-xs btn-info">Raw</span>
+        <span data-cmd="G28" class="btn btn-xs btn-primary">G28</span>
+        <div class="btn-group btn-xs dropup">
+          <span data-cmd="G92 E0,G1F250E50" class="btn btn-xs btn-default">送料</span>
+          <button type="button" class="btn btn-xs btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <span class="caret"></span>
+              <span class="sr-only">Toggle Dropdown</span>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-right">
+            <li class="dropdown-header">50 系列</li>
+            <li data-cmd="G92E0,G1F6000E-500" style="cursor: pointer"><a>光輪 50 (退料)</a></li>
+            <li data-cmd="G92E0,G1F6000E500" style="cursor: pointer"><a>光輪 50 (送料)</a></li>
+            <li role="separator" class="divider"></li>
+            <li class="dropdown-header">快快der</li>
+            <li data-cmd="G92E0,G1F300E162" style="cursor: pointer"><a>公道價 x2</a></li>
+            <li data-cmd="G92E0,G1F300E81" style="cursor: pointer"><a>公道價 8.1cm</a></li>
+            <li data-cmd="G92E0,G1F300E40.5" style="cursor: pointer"><a>公道價 x0.5</a></li>
+            <li role="separator" class="divider"></li>
+            <li class="dropdown-header">普通快</li>
+            <li data-cmd="G92E0,G1F200E120" style="cursor: pointer"><a>走 40 秒</a></li>
+            <li data-cmd="G92E0,G1F200E60" style="cursor: pointer"><a>走 20 秒</a></li>
+            <li data-cmd="G92E0,G1F200E30" style="cursor: pointer"><a>走 10 秒</a></li>
+            <li role="separator" class="divider"></li>
+            <li class="dropdown-header">慢慢送</li>
+            <li data-cmd="G92E0,G1F120E40" style="cursor: pointer"><a>擠少少 x4</a></li>
+            <li data-cmd="G92E0,G1F120E20" style="cursor: pointer"><a>擠少少 x2</a></li>
+            <li data-cmd="G92E0,G1F120E10" style="cursor: pointer"><a>擠少少</a></li>
+          </ul>
+        </div>
+        <div class="btn-group btn-xs dropup">
+          <span data-cmd="-1 H:0 T:200 *15" class="btn btn-xs btn-default">Temp 200</span>
+          <button type="button" class="btn btn-xs btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <span class="caret"></span>
+              <span class="sr-only">Toggle Dropdown</span>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-right">
+            <li data-cmd="-1 H:0 T:210 *14" style="cursor: pointer"><a>Temp 210</a></li>
+            <li data-cmd="-1 H:0 T:190 *5" style="cursor: pointer"><a>Temp 190</a></li>
+          </ul>
+        </div>
+        <span data-cmd="-1 ping *33" class="btn btn-xs btn-default">Ping Head</span>
+        <span data-cmd="quit" class="btn btn-xs btn-warning">Quit</span>
+        <span data-cmd="kick" style="margin-left: 10px;" class="btn btn-xs btn-danger">Kick</span>
+        <div class="btn-group btn-xs dropup">
+          <button type="button" class="btn btn-xs btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <span>Config</span>
+              <span class="caret"></span>
+              <span class="sr-only">Toggle Dropdown</span>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-right">
+            <li class="dropdown-header">correction: A a H N</li>
+            <li data-cmd="config get correction" style="cursor: pointer"><a>GET</a></li>
+            <li data-cmd-guide="config set correction " style="cursor: pointer"><a>SET</a></li>
+            <li data-cmd="config del correction" style="cursor: pointer"><a>DEL</a></li>
+            <li role="separator" class="divider"></li>
+            <li class="dropdown-header">filament_detect: Y N</li>
+            <li data-cmd="config get filament_detect" style="cursor: pointer"><a>GET</a></li>
+            <li data-cmd-guide="config set filament_detect " style="cursor: pointer"><a>SET</a></li>
+            <li data-cmd="config del filament_detect" style="cursor: pointer"><a>DEL</a></li>
+            <li role="separator" class="divider"></li>
+            <li class="dropdown-header">head_error_level: A number</li>
+            <li data-cmd="config get head_error_level" style="cursor: pointer"><a>GET</a></li>
+            <li data-cmd-guide="config set head_error_level " style="cursor: pointer"><a>SET</a></li>
+            <li data-cmd="config del head_error_level" style="cursor: pointer"><a>DEL</a></li>
+          </ul>
+        </div>
+        <span data-cmd="position" class="btn btn-xs btn-default">Position</span>
+      </div>
+    </div>
+  </div>
+  <div class="container-fluid device_control_ui">
+    <div class="col-xs-12">
+      <div class="input-group input-group">
+        <span class="input-group-addon">
+          <i class="glyphicon glyphicon-console"></i>
+        </span>
+        <input id="controlcmd" type="text" class="form-control" autocomplete="off" />
+        <div class="input-group-btn dropup">
+          <span class="btn btn-primary fileinput-button">
+              <i class="glyphicon glyphicon-upload"></i>
+              <span>Upload</span>
+              <input type="file" class="fileinput-button" data-file-cmd="upload" name="file" />
+          </span>
+          <span type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <span class="caret"></span>
+            <span class="sr-only">Toggle Dropdown</span>
+          </span>
+          <ul class="dropdown-menu dropdown-menu-right">
+            <li class="fileinput-button"><a>
+              <i class="glyphicon glyphicon-upload"></i>
+              <span>Upload As Fcode</span>
+              <input type="file" class="fileinput-button" data-file-cmd="upload_g" name="file" />
+            </a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="container-fluid device_control_ui" style="margin-top: 10px;">
+    <div class="col-xs-12">
+      <span class="btn btn-xs btn-default fileinput-button">
+          <i class="glyphicon glyphicon-upload"></i>
+          <span>** Update Device Fireware **</span>
+          <input type="file" class="fileinput-button" data-file-cmd="update_fw" name="file" />
+      </span>
+      <span class="btn btn-xs btn-danger fileinput-button">
+          <i class="glyphicon glyphicon-upload"></i>
+          <span>** Update Mainboard Fireware **</span>
+          <input type="file" class="fileinput-button" data-file-cmd="update_mbfw" name="file" />
+      </span>
+    </div>
+  </div>
+</body>
+</html>
