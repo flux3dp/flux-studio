@@ -24,7 +24,11 @@ define([
     'jsx!widgets/Tour-Guide',
     'app/actions/alert-actions',
     'app/stores/alert-store',
-    'helpers/object-assign'
+    'helpers/object-assign',
+    'helpers/sprintf',
+    'app/actions/initialize-machine',
+    'app/actions/progress-actions',
+    'app/constants/progress-constants'
 ], function(
     $,
     React,
@@ -50,7 +54,12 @@ define([
     AppSettings,
     TourGuide,
     AlertActions,
-    AlertStore
+    AlertStore,
+    ObjectAssign,
+    sprintf,
+    InitializeMachine,
+    ProgressActions,
+    ProgressConstants
 ) {
 
     return function(args) {
@@ -68,14 +77,61 @@ define([
                 y: 0,
                 z: 0
             },
-            tourGuide = [],
             lang = args.state.lang,
             selectedPrinter,
             $importBtn,
             allowDeleteObject = true,
-            tutorialMode = true,
+            tutorialMode = false,
             showChangeFilament = false,
             nwjsMenu = menuFactory.items,
+            tourGuide = [
+                {
+                    selector: '.arrowBox',
+                    text: lang.tutorial.startWithFilament,
+                    r: 0,
+                    position: 'top'
+                },
+                {
+                    selector: '.arrowBox',
+                    text: lang.tutorial.startWithModel,
+                    r: 0,
+                    position: 'bottom'
+                },
+                {
+                    selector: '.arrowBox',
+                    text: lang.tutorial.clickToImport,
+                    r: 105,
+                    position: 'top'
+                },
+                {
+                    selector: '.quality-select',
+                    text: lang.tutorial.selectQuality,
+                    offset_x: -25,
+                    r: 90,
+                    position: 'right'
+                },
+                {
+                    selector: 'button.btn-go',
+                    text: lang.tutorial.clickGo,
+                    offset_x: 6,
+                    r: 80,
+                    position: 'left'
+                },
+                {
+                    selector: '.flux-monitor .operation',
+                    text: lang.tutorial.startPrint,
+                    offset_y: 25,
+                    r: 80,
+                    position: 'top'
+                },
+                {
+                    selector: '.flux-monitor .operation',
+                    text: lang.tutorial.startPrint,
+                    offset_y: 25,
+                    r: 80,
+                    position: 'top'
+                }
+            ];
             view = React.createClass({
 
                 getInitialState: function() {
@@ -86,10 +142,13 @@ define([
                         advancedSettings.raft_layers = 4;
                         advancedSettings.support_material = 0;
                         advancedSettings.custom = AppSettings.custom;
-                        tutorialMode = true;
                     }
                     else {
                         advancedSettings = _setting;
+                    }
+
+                    if(!Config().read('tutorial-finished')){
+                        tutorialMode = true;
                     }
 
                     return ({
@@ -121,6 +180,7 @@ define([
                 },
 
                 componentDidMount: function() {
+                    var self = this;
                     director.init(this);
 
                     this._handleApplyAdvancedSetting();
@@ -132,9 +192,22 @@ define([
                     nwjsMenu.import.enabled = true;
                     nwjsMenu.import.onClick = function() { $importBtn.click(); };
                     nwjsMenu.saveGCode.onClick = this._handleDownloadGCode;
+                    nwjsMenu.tutorial.onClick = function() {
+                        self._handleTakeTutorial('tour');
+                    };
 
                     this._registerKeyEvents();
-                    this._registerTutorial();
+                    if(Config().read("configured-printer") && tutorialMode){
+                        //First time using, with usb-configured printer..
+                        AlertActions.showPopupYesNo('set_default', sprintf(lang.tutorial.set_first_default,Config().read("configured-printer")),lang.tutorial.set_first_default_caption);
+                        AlertStore.onYes(this._handleSetFirstDefault);
+                        //Use setTimeout to avoid multiple modal display conflict
+                        this._handleDefaultCancel = function(ans){setTimeout(function(){this._registerTutorial()}.bind(this), 10)}.bind(this);
+                        AlertStore.onCancel(this._handleDefaultCancel);
+                    }else{
+                        //Disable for no-printer-setting at the time
+                        // this._registerTutorial();
+                    }
                 },
 
                 componentWillUnmount: function() {
@@ -150,63 +223,59 @@ define([
                             }
                         }
 
-                        // copy event
-                        if(e.metaKey && e.keyCode === 68) {
-                            director.duplicateSelected();
+                        // copy event - it will listen by top menu as well in nwjs..
+                        if(!window.FLUX.osType){
+                            if(e.metaKey && e.keyCode === 68) {
+                                director.duplicateSelected();
+                            }
                         }
                     });
                 },
 
                 _registerTutorial: function() {
                     if(tutorialMode) {
-                        tourGuide = [
-                            {
-                                selector: '.arrowBox',
-                                text: lang.tutorial.startWithFilament,
-                                r: 0,
-                                position: 'top'
-                            },
-                            {
-                                selector: '.arrowBox',
-                                text: lang.tutorial.startWithModel,
-                                r: 0,
-                                position: 'bottom'
-                            },
-                            {
-                                selector: '.arrowBox',
-                                text: lang.tutorial.clickToImport,
-                                r: 80,
-                                position: 'top'
-                            },
-                            {
-                                selector: '.quality-select',
-                                text: lang.tutorial.selectQuality,
-                                r: 80,
-                                position: 'right'
-                            },
-                            {
-                                selector: 'button.btn-go',
-                                text: lang.tutorial.clickGo,
-                                r: 80,
-                                position: 'left'
-                            },
-                            {
-                                selector: '.btn-go.btn-control',
-                                text: lang.tutorial.startPrint,
-                                r: 80,
-                                position: 'top'
-                            }
-                        ];
                         AlertActions.showPopupYesNo('tour', lang.tutorial.startTour);
                         AlertStore.onYes(this._handleTakeTutorial);
                         AlertStore.onCancel(this._handleCancelTutorial);
                     }
                 },
 
+                _handleSetFirstDefault: function(answer){
+                    Config().write('default-printer-name', Config().read('configured-printer'));
+                    ProgressActions.open(ProgressConstants.NONSTOP);
+
+                    AlertStore.removeYesListener(this._handleSetFirstDefault);
+                    AlertStore.removeCancelListener(this._handleDefaultCancel);
+
+                    DeviceMaster.getDeviceByNameAsync(
+                        Config().read('configured-printer'),
+                        {
+                            timeout: 20000,
+                            onSuccess:
+                                function(printer){
+                                    ProgressActions.close();
+                                    InitializeMachine.defaultPrinter.set({
+                                              name: printer.name, 
+                                              serial: printer.serial,
+                                              uuid: printer.uuid
+                                    });
+                                    setTimeout(function(){AlertActions.showInfo(sprintf(lang.set_default.success, printer.name))}, 100);
+                                    //Start tutorial
+                                    setTimeout(function(){this._registerTutorial()}.bind(this), 100);
+                                }.bind(this),
+                            onTimeout:
+                                function(){
+                                    ProgressActions.close();
+                                    setTimeout(function(){AlertActions.showWarning(sprintf(lang.set_default.error, printer.name))}, 100);
+                                }
+                        });
+                },
+
                 _handleTakeTutorial: function(answer) {
                     if(answer === 'tour') {
                         this.setState({ tutorialOn: true });
                         tutorialMode = true;
+                        console.log("start take tutorial")
                     }
                 },
 
@@ -214,6 +283,7 @@ define([
                     if(answer === 'tour') {
                         this.setState({ tutorialOn: false });
                         tutorialMode = false;
+                        Config().write('tutorial-finished', true);
                     }
                 },
 
@@ -222,8 +292,11 @@ define([
                 },
 
                 _handleRaftClick: function() {
+                    this.setState({ leftPanelReady: false });
                     var isOn = !this.state.raftOn;
-                    director.setParameter('raft', isOn ? '1' : '0');
+                    director.setParameter('raft', isOn ? '1' : '0').then(function() {
+                        this.setState({ leftPanelReady: true });
+                    }.bind(this));
                     advancedSettings.raft_layers = isOn ? advancedSettings.raft : 0;
                     advancedSettings.custom = advancedSettings.custom.replace(
                         `raft_layers = ${isOn ? 0 : advancedSettings.raft}`,
@@ -237,14 +310,16 @@ define([
                     this.setState({ leftPanelReady: false });
                     var isOn = !this.state.supportOn;
                     director.setParameter('support', isOn ? '1' : '0').then(function() {
-                        this.setState({ leftPanelReady: true });
+                        this.setState({
+                            leftPanelReady: true,
+                            supportOn: isOn
+                        });
                     }.bind(this));
                     advancedSettings.support_material = isOn ? 1 : 0;
-                    // console.log('support on?', isOn);
                     advancedSettings.custom = advancedSettings.custom.replace(
                         `support_material = ${isOn ? 0 : 1}`,
                         `support_material = ${isOn ? 1 : 0}`);
-                    this.setState({ supportOn: isOn });
+                    // this.setState({ supportOn: isOn });
                     Config().write('advanced-settings', JSON.stringify(advancedSettings));
                 },
 
@@ -359,13 +434,24 @@ define([
                         openPrinterSelectorWindow: false
                     });
                     director.getFCode().then(function(fcode, previewUrl) {
+                        if(!(fcode instanceof Blob)) {
+                            AlertActions.showPopupError('', lang.print.out_of_range_message, lang.print.out_of_range);
+                            return;
+                        }
                         GlobalActions.showMonitor(selectedPrinter, fcode, previewUrl);
+                        //Tour popout after show monitor delay
                         setTimeout(function() {
                             if(tutorialMode) {
                                 this.setState({
                                     tutorialOn: true,
-                                    currentTutorialStep: 3
+                                    currentTutorialStep: 6
                                 });
+                                //Insert into root html
+                                $('.tour-overlay').append($('.tour'));
+                                $('.tour').click(function(){
+                                    $('.print-studio').append($('.tour'));
+                                    this._handleTutorialComplete();
+                                }.bind(this));
                             };
                         }.bind(this), 1000);
 
@@ -416,7 +502,31 @@ define([
                     if(!tutorialMode) { return; }
                     this.setState({ currentTutorialStep: this.state.currentTutorialStep + 1 }, function() {
                         if(this.state.currentTutorialStep === 1) {
-                            AlertActions.showChangeFilament(DeviceMaster.getFirstDevice(), 'TUTORIAL');
+                            var selectPrinterName = Config().read('configured-printer');
+                            if(!selectPrinterName) selectPrinterName = InitializeMachine.defaultPrinter.get().name;
+                            if(!selectPrinterName) selectPrinterName = DeviceMaster.getFirstDevice();
+                            if(selectPrinterName){
+                                DeviceMaster.getDeviceByNameAsync(
+                                selectPrinterName,
+                                {
+                                    timeout: 20000,
+                                    onSuccess:
+                                        function(printer){
+                                            //Found ya default printer
+                                            ProgressActions.close();
+                                            setTimeout(function(){AlertActions.showChangeFilament(printer, 'TUTORIAL'); }, 100);
+                                        }.bind(this),
+                                    onTimeout:
+                                        function(){
+                                            //Unable to find configured printer...
+                                            ProgressActions.close();
+                                            setTimeout(function(){AlertActions.showWarning(sprintf(lang.set_default.error, printer.name))}, 100);
+                                        }
+                                });
+                            }else{
+                                //TODO: No printer
+
+                            }
                         }
                         else if(this.state.currentTutorialStep === 3) {
                             var fileEntry = {};
@@ -444,7 +554,12 @@ define([
 
                 _handleTutorialComplete: function() {
                     tutorialMode = false;
+                    Config().write('tutorial-finished', true);
+                    setTimeout(function(){
+                    $('.tour').hide();
                     this.setState({ tutorialOn: false });
+                    this.forceUpdate();
+                    }.bind(this), 200);
                 },
 
                 _handleCloseAllView: function() {

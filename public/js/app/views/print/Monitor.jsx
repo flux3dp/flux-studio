@@ -9,7 +9,8 @@ define([
     'app/stores/alert-store',
     'app/constants/device-constants',
     'helpers/file-system',
-    'app/actions/global-actions'
+    'app/actions/global-actions',
+    'helpers/sprintf'
 ], function(
     $,
     React,
@@ -21,7 +22,8 @@ define([
     AlertStore,
     DeviceConstants,
     FileSystem,
-    GlobalActions
+    GlobalActions,
+    sprintf
 ) {
     'use strict';
 
@@ -34,6 +36,7 @@ define([
         history = [],
         reporter,
         status,
+        filePreview = false,
         usbExist = false,
         showingPopup = false,
         messageViewed = false,
@@ -42,11 +45,11 @@ define([
         displayStatus,
         currentStatus,
         previewUrl = '',
-        lang,
+        lang, 
         lastAction,
         fileToBeUpload = {},
         statusActions,
-        statusIdActions,
+        openSource,
         errorActions,
 
         // error display
@@ -83,6 +86,11 @@ define([
         FOLDER: 'FOLDER'
     };
 
+    var source = {
+        DEVICE_LIST : 'DEVICE_LIST',
+        GO          : 'GO'
+    }
+
     var operation,
         wait,
         go,
@@ -97,10 +105,10 @@ define([
         camera,
         leftButton,
         middleButton,
-        cameraButton,
+        rightButton,
 
         leftButtonOn = true,
-        middlebuttonOn = true,
+        middleButtonOn = true,
         rightButtonOn = true;
 
     var opts = {};
@@ -164,13 +172,17 @@ define([
         'COMPLETED': function() {
             displayStatus = lang.device.completed;
             currentStatus = '';
-            DeviceMaster.quit();
+            if(openSource == source.GO){
+                DeviceMaster.quit();
+            }
         },
 
         'ABORTED': function() {
             displayStatus = lang.device.aborted;
             currentStatus = '';
-            DeviceMaster.quit();
+            if(openSource == source.GO){
+                DeviceMaster.quit();
+            }
         },
 
         'RESUMING': function() {
@@ -216,9 +228,17 @@ define([
         },
 
         getInitialState: function() {
+            var _mode = mode.PREVIEW;
+            openSource = !this.props.fCode ? source.DEVICE_LIST : source.GO;
+            if(openSource === source.DEVICE_LIST &&
+                this.props.selectedDevice.st_id === DeviceConstants.status.IDLE){
+                    _mode = mode.BROWSE_FILE; 
+                    this._startReport();
+            }
+
             return {
                 waiting             : false,
-                mode                : mode.PREVIEW,
+                mode                : _mode,
                 directoryContent    : {},
                 cameraImageUrl      : '',
                 selectedItem        : '',
@@ -244,7 +264,9 @@ define([
             previewUrl  = this.props.previewUrl;
 
             statusId = DeviceConstants.status.IDLE;
-            this._getPrintingInfo();
+            if(this.state.mode !== mode.BROWSE_FILE) {
+                this._getPrintingInfo();
+            }
         },
 
         componentDidMount: function() {
@@ -252,6 +274,11 @@ define([
             AlertStore.onCancel(this._handleCancel);
             AlertStore.onYes(this._handleYes);
             this._addHistory();
+
+            if(this.state.mode === mode.BROWSE_FILE) {
+                currentStatus = DeviceConstants.READY;
+                this._refreshDirectory();
+            }
         },
 
         shouldComponentUpdate: function(nextProps, nextState) {
@@ -259,9 +286,13 @@ define([
         },
 
         componentWillUnmount: function() {
+
+            AlertStore.removeRetryListener(this._handleRetry);
+            AlertStore.removeCancelListener(this._handleCancel);
+            AlertStore.removeYesListener(this._handleYes);
+
             if(this.state.mode === mode.CAMERA) {
                 DeviceMaster.stopCamera();
-                console.log('camera stopped');
             }
             this._stopReport();
             history = [];
@@ -269,24 +300,7 @@ define([
         },
 
         _getPrintingInfo: function() {
-            DeviceMaster.getPreviewInfo().then(function(info) {
-                info = info || [];
-                info[0] = info[0] || {};
-
-                if(!this._hasFCode()) {
-                    if(info[2] instanceof Blob) {
-                        previewUrl = window.URL.createObjectURL(info[2]);
-                    }
-                }
-
-                if(info[0].TIME_COST) {
-                    totalTimeInSeconds = info[0].TIME_COST;
-                }
-
-                taskInfo = lang.monitor.task[info[0].HEAD_TYPE];
-
-                this._startReport();
-            }.bind(this));
+            DeviceMaster.getPreviewInfo().then(this._processInfo.bind(this));
         },
 
         _hasFCode: function() {
@@ -336,7 +350,6 @@ define([
         },
 
         _refreshDirectory: function() {
-            console.log(pathArray.join('/'));
             this._retrieveList(pathArray.join('/'));
         },
 
@@ -371,7 +384,6 @@ define([
                 if(isValid) {
                     var blob = new Blob([reader.result], type);
                     DeviceMaster.uploadFile(blob, file, pathArray.join('/')).then(function(result) {
-                        console.log('upload result', result);
                         self._refreshDirectory();
                     });
                 }
@@ -396,6 +408,10 @@ define([
                 }
                 else if(this.state.currentStatus === DeviceConstants.PAUSED) {
                     DeviceMaster.resume();
+                    setTimeout(function(){
+                        messageViewed = false;
+                        showingPopup = false;
+                    }, 1200);
                 }
             }
         },
@@ -477,13 +493,9 @@ define([
                 pathArray.pop();
                 temp.pop();
             }
+            filePreview = false;
+            this.state.selectedItemType = '';
             lastAction = history[history.length - 1];
-
-            if(this.state.mode === mode.CAMERA) {
-                DeviceMaster.stopCamera().then(function() {
-                    DeviceMaster.kick();
-                });
-            };
 
             var actions = {
 
@@ -493,17 +505,23 @@ define([
 
                 'BROWSE_FILE': function() {
                     self._retrieveList(lastAction.path.join('/'));
-                    self._stopReport();
+                    //self._stopReport();
                 },
 
                 'CAMERA': function() {
-                    self._stopReport();
+                    //self._stopReport();
                 }
             };
 
             if(actions[lastAction.mode]) {
                 actions[lastAction.mode]();
-                this.setState({ mode: lastAction.mode });
+                this.setState({ mode: lastAction.mode }, function() {
+                    if(this.state.mode === mode.CAMERA) {
+                        DeviceMaster.stopCamera().then(function() {
+                            DeviceMaster.kick();
+                        });
+                    };
+                });
             }
         },
 
@@ -529,18 +547,21 @@ define([
                 start = 0;
                 DeviceMaster.fileInfo(pathArray.join('/'), fileName).then(function(info) {
                     if(info[1] instanceof Blob) {
+                        this._processInfo([info[2]]);
                         previewUrl = URL.createObjectURL(info[1]);
+                        pathArray.push(fileName);
+                        filePreview = true;
                         this.setState({
                             mode: mode.PREVIEW
                         }, function() {
                             this._addHistory();
-                            this._startReport();
+                            this._startReport();    
                         });
                     }
                     else {
                         AlertActions.showPopupInfo('', lang.monitor.cannotPreview);
                     }
-
+                    this.forceUpdate();
                 }.bind(this));
             }
         },
@@ -678,11 +699,12 @@ define([
 
         _startReport: function() {
             var self = this;
+            this._stopReport();
             timmer = setTimeout(this._processTimeout, timeout);
 
-            DeviceMaster.getReport().then(function(report) {
-                self._processReport(report);
-            });
+            // DeviceMaster.getReport().then(function(report) {
+            //     self._processReport(report);
+            // });
 
             reporter = setInterval(function() {
                 DeviceMaster.getReport().then(function(report) {
@@ -694,8 +716,31 @@ define([
         _processTimeout: function() {
             clearTimeout(timmer);
             DeviceMaster.reconnect();
-            AlertActions.showPopupError('', lang.device.disconnectedError);
+            if($('.flux-monitor')[0]){
+                //Show disconnect if FLUX Monitor exists..
+                AlertActions.showPopupError('disconnect', sprintf(lang.device.disconnectedError.message, DeviceMaster.getSelectedDevice().name), lang.device.disconnectedError.caption);
+            }
             this._handleClose();
+        },
+
+        _processInfo: function(info){
+            console.log(info);
+            info = info || [];
+            info[0] = info[0] || {};
+
+            if(!this._hasFCode()) {
+                if(info[2] instanceof Blob) {
+                    previewUrl = window.URL.createObjectURL(info[2]);
+                }
+            }
+
+            if(info[0].TIME_COST) {
+                totalTimeInSeconds = info[0].TIME_COST;
+            }
+
+            taskInfo = lang.monitor.task[info[0].HEAD_TYPE];
+
+            this._startReport();
         },
 
         _processReport: function(report) {
@@ -705,7 +750,7 @@ define([
             status          = report.st_label;
             statusId        = report.st_id;
             leftButtonOn    = true;
-            middlebuttonOn  = true;
+            middleButtonOn  = true;
             rightButtonOn   = true;
 
             clearTimeout(timmer);
@@ -727,16 +772,19 @@ define([
                 errorActions[mainError](statusId);
             }
 
+            var attr = [mainError];
+            if(subError.length > 0) {
+                attr.push(subError);
+            }
+            errorMessage = lang.monitor[attr.join('_')];
+
+            //if(errorMessage == null) errorMessage = attr.join('_');
+
             if(lastError !== mainError) {
                 messageViewed = false;
                 lastError = mainError;
-                var attr = [];
-                attr.push(mainError);
-                if(subError.length > 0) {
-                    attr.push(subError);
-                }
-
-                errorMessage = lang.monitor[attr.join('_')];
+                //The display logic should be control by showing poupup
+                console.log("Error detected", attr);
             }
 
             if(!messageViewed && !showingPopup && mainError !== DeviceConstants.USER_OPERATION && mainError.length > 0) {
@@ -745,6 +793,7 @@ define([
             }
 
             // actions responded to status
+            status = statusId === DeviceConstants.status.SCAN ? DeviceConstants.SCANNING : status;
             status = statusId === DeviceConstants.status.ABORTED ? DeviceConstants.ABORTED : status;
             if(statusActions[status]) {
                 statusActions[status]();
@@ -765,12 +814,21 @@ define([
                 progress = '';
             }
 
-            temperature = report.rt ? `${lang.monitor.temperature} ${report.rt} °C` : '';
+            if(status === DeviceConstants.RUNNING) {
+                temperature = report.rt ? `${lang.monitor.temperature} ${report.rt} °C` : '';
+            }
+            else {
+                temperature = report.rt ? `${lang.monitor.temperature} ${report.rt} °C / ${report.tt} °C` : '';
+            }
+
             headInfo = report.module ? lang.monitor.device[report.module] : '';
 
             if(!report.error) {
-                AlertActions.closePopup();
-                showingPopup = false;
+                //If home failed, at least show an error
+                if(statusId !== DeviceConstants.status.IDLE) {
+                    AlertActions.closePopup();
+                    showingPopup = false;
+                }
             }
 
             if(status === DeviceConstants.COMPLETED) {
@@ -779,15 +837,28 @@ define([
             }
 
             if(!report.error) {
-                AlertActions.closePopup();
+                if(statusId !== DeviceConstants.status.IDLE) {
+                    AlertActions.closePopup();
+                }
             }
 
-            this.setState({
+            var report_info = {
                 temperature: temperature,
                 currentStatus: currentStatus,
                 displayStatus: displayStatus,
                 progress: progress
-            });
+            }
+
+            //If report returns idle state, which means nothing to preview..
+            if(openSource === source.DEVICE_LIST &&
+                report.st_id === DeviceConstants.status.IDLE &&
+                this.state.mode === mode.PREVIEW &&
+                filePreview !== true){
+                report_info['mode'] = mode.BROWSE_FILE;
+                this._refreshDirectory();
+            }
+
+            this.setState(report_info);
         },
 
         _isError: function(s) {
@@ -839,7 +910,9 @@ define([
                         directoryContent: result,
                         waiting: false
                     });
+                    self.forceUpdate();
                 });
+                self.forceUpdate();
             });
         },
 
@@ -934,9 +1007,18 @@ define([
         },
 
         _renderCameraContent: function() {
+            var backgroundStyle = {
+                transition: 'all 0.5s',
+                '-webkit-transition': 'all 0.5s',
+                backgroundColor: '#E0E0E0',
+                backgroundImage: 'url(' +this.state.cameraImageUrl + ')',
+                backgroundSize: 'cover',
+                backgroundPosition: '50% 50%',
+                width: '100%',
+                height: '100%'
+            }
             return(
-                <div className="wrapper">
-                    <img className="camera-image" src={this.state.cameraImageUrl} />
+                <div className="wrapper" style={backgroundStyle}>
                 </div>
             );
         },
@@ -983,48 +1065,66 @@ define([
             cameraClass = ClassNames('btn-camera btn-control', { 'on': this.state.mode === mode.CAMERA });
             cameraDescriptionClass = ClassNames('description', { 'on': this.state.mode === mode.CAMERA });
 
-            go = (
-                <div className="controls center" onClick={this._handleGo}>
+            go = function(className){
+                className = "controls center " + className;
+                return (
+                <div className={className} onClick={this._handleGo}>
                     <div className="btn-go btn-control"></div>
                     <div className="description">{lang.monitor.go}</div>
                 </div>
-            );
+                );
+            }.bind(this)
 
-            pause = (
-                <div className="controls center" onClick={this._handlePause}>
+            pause = function(className){
+                className = "controls center " + className;
+                return (
+                <div className={className} onClick={this._handlePause}>
                     <div className="btn-pause btn-control"></div>
                     <div className="description">{lang.monitor.pause}</div>
                 </div>
-            );
+                );
+            }.bind(this)
 
-            stop = (
-                <div className="controls left" onClick={this._handleStop}>
+            stop = function(className){
+                className = "controls left " + className;
+                return (
+                <div className={className} onClick={this._handleStop}>
                     <div className="btn-stop btn-control"></div>
                     <div className="description">{lang.monitor.stop}</div>
                 </div>
-            );
+                );
+            }.bind(this)
 
-            upload = (
-                <div className="controls left" onClick={this._handleUpload}>
-                    <div className="btn-upload btn-control"></div>
-                    <input className="upload-control" type="file" accept=".fc, .gcode" onChange={this._handleUpload} />
-                    <div className="description">{lang.monitor.upload}</div>
-                </div>
-            );
+            upload = function(className){
+                className = "controls left " + className;
+                return (
+                    <div className={className} onClick={this._handleUpload}>
+                        <div className="btn-upload btn-control"></div>
+                        <input className="upload-control" type="file" accept=".fc, .gcode" onChange={this._handleUpload} />
+                        <div className="description">{lang.monitor.upload}</div>
+                    </div>
+                );
+            }.bind(this)
 
-            download = (
-                <div className="controls center" onClick={this._handleDownload}>
-                    <div className="btn-download btn-control"></div>
-                    <div className="description">{lang.monitor.download}</div>
-                </div>
-            );
+            download =  function(className){
+                className = "controls center " + className;
+                return (
+                    <div className={className} onClick={this._handleDownload}>
+                        <div className="btn-download btn-control"></div>
+                        <div className="description">{lang.monitor.download}</div>
+                    </div>
+                );
+            }.bind(this)
 
-            camera = (
-                <div className="controls right" onClick={this._handleToggleCamera}>
-                    <div className={cameraClass}></div>
-                    <div className={cameraDescriptionClass}>{lang.monitor.camera}</div>
-                </div>
-            );
+            camera = function(className){
+                className = "controls right " + className;
+                return (
+                    <div className={className} onClick={this._handleToggleCamera}>
+                        <div className={cameraClass}></div>
+                        <div className={cameraDescriptionClass}>{lang.monitor.camera}</div>
+                    </div>
+                );
+            }.bind(this)
 
             commands = {
                 'READY': function() {
@@ -1048,25 +1148,28 @@ define([
 
             if(!this.props.fCode && !this.state.selectedItem) {
                 if(this.state.currentStatus === DeviceConstants.READY) {
-                    action = '';
+                    middleButtonOn = false;
                 }
             }
 
             leftButton = this.state.mode === mode.BROWSE_FILE ? upload : stop;
             middleButton = this.state.mode === mode.BROWSE_FILE ? download : action;
-            cameraButton = currentStatus !== DeviceConstants.READY ? '' : camera;
+            rightButton = camera;
+
+            if(currentStatus !== DeviceConstants.READY) {
+                rightButtonOn = false;
+            }
 
             // CAMERA mode
             if(this.state.mode === mode.CAMERA) {
-                leftButton = '';
-                middleButton = '';
+                leftButtonOn = false;
+                middleButtonOn = false;
             }
 
             // BROWSE_FILE mode
             if(this.state.mode === mode.BROWSE_FILE) {
-                if(this.state.selectedItemType !== type.FILE && this.state.mode === mode.BROWSE_FILE) {
-                    middleButton = '';
-                }
+                leftButtonOn = pathArray.length > 0;
+                middleButtonOn = this.state.selectedItemType == type.FILE;
             }
 
             // PRINT mode
@@ -1080,24 +1183,47 @@ define([
                 }
 
                 if(this.state.currentStatus === DeviceConstants.STARTING) {
-                    middlebuttonOn = false;
+                    middleButtonOn = false;
                     rightButtonOn = false;
                 }
 
                 if(statusId === DeviceConstants.status.PAUSING_FROM_RUNNING) {
-                    middlebuttonOn = false;
+                    middleButtonOn = false;
+                }
+
+                if(statusId === DeviceConstants.status.MAINTAIN ||
+                    statusId === DeviceConstants.status.SCAN ) {
+                    middleButtonOn = false;
+                }
+            }
+            else if (this.state.mode === mode.PREVIEW) {
+                if(
+                    statusId === DeviceConstants.status.IDLE ||
+                    statusId === DeviceConstants.status.COMPLETED ||
+                    statusId === DeviceConstants.status.ABORTED
+                ) {
+                    leftButtonOn = false;
+                }
+
+                if(statusId === DeviceConstants.status.MAINTAIN ||
+                   statusId === DeviceConstants.status.SCAN) {
+                    middleButtonOn = false;
                 }
             }
 
-            leftButton      = leftButtonOn ? leftButton : '';
-            middleButton    = middlebuttonOn ? middleButton : '';
-            cameraButton    = rightButtonOn ? cameraButton : '';
+            //leftButton      = leftButtonOn ? leftButton : '';
+            //middleButton    = middleButtonOn ? middleButton : '';
+            //rightButton    = rightButtonOn ? rightButton : '';
+
+            if(leftButton!='') leftButton = leftButton(leftButtonOn ? '' : 'disabled');
+            if(middleButton!='') middleButton = middleButton(middleButtonOn ? '' : 'disabled');
+            if(rightButton!='') rightButton = rightButton(rightButtonOn ? '' : 'disabled');
 
             operation = (
                 <div className="operation">
                     {leftButton}
                     {middleButton}
-                    {cameraButton}
+                    {rightButton}
                 </div>
             );
 
@@ -1109,12 +1235,21 @@ define([
         _renderPrintingInfo: function() {
             var _duration   = totalTimeInSeconds === 0 ? '' : this._formatTime(totalTimeInSeconds, true),
                 _progress   = percentageDone === 0 ? '' : percentageDone + '%',
-                infoClass   = ClassNames('status-info', { 'running': statusId !== DeviceConstants.status.IDLE });
+                infoClass   = ClassNames('status-info', 
+                                        { 'running': this.state.mode == mode.BROWSE_FILE ||
+                                                     this.state.mode == mode.PREVIEW && openSource == source.GO ||
+                                                     this.state.mode == mode.PREVIEW && filePreview ||
+                                                     statusId !== DeviceConstants.status.IDLE && 
+                                                     statusId !== DeviceConstants.status.MAINTAIN && 
+                                                     statusId !== DeviceConstants.status.SCAN });
 
             if(statusId === DeviceConstants.status.IDLE || statusId === DeviceConstants.status.COMPLETED) {
-                taskInfo = '';
-                _duration = '';
-                _progress = '';
+                if(openSource !== source.GO && filePreview !== true ){
+                    taskInfo = _duration = _progress = '';
+                    console.log("clear info?")
+                }else{
+                    console.log(taskInfo, _duration)
+                }
             }
 
             return (
@@ -1129,6 +1264,9 @@ define([
         },
 
         _renderNavigation: function() {
+            if(openSource === source.DEVICE_LIST && statusId == 0 && pathArray.length == 0 && this.state.mode == mode.BROWSE_FILE){
+                return (<div className="back"></div>);
+            }
             if(history.length > 1) {
                 return (
                    <div className="back" onClick={this._handleBack}>
@@ -1137,7 +1275,7 @@ define([
                );
             }
             if(this.state.mode === mode.BROWSE_FILE) {
-                return (
+               return (
                    <div className="back" onClick={this._handleBack}>
                        <i className="fa fa-angle-left"></i>
                    </div>

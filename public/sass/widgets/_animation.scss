@@ -6,8 +6,8 @@
     background-color: #333;
     height: 40px;
     margin: auto;
-    -webkit-animation: sk-rotateplane 1.2s infinite ease-in-out;
-    animation: sk-rotateplane 1.2s infinite ease-in-out;
+    -webkit-animation: sk-rotateplane 1s infinite ease-in-out;
+    animation: sk-rotateplane 1s infinite ease-in-out;
     width: 40px;
 }
 
@@ -41,15 +41,15 @@
 .spinner-roller {
     font-size: 10px;
     text-indent: -9999em;
-    width: 11em;
-    height: 11em;
+    width: 5em;
+    height: 5em;
     border-radius: 50%;
     background: #ffffff;
     background: -webkit-linear-gradient(left, #ffffff 10%, rgba(255, 255, 255, 0) 42%);
     background: linear-gradient(to right, #ffffff 10%, rgba(255, 255, 255, 0) 42%);
     position: relative;
-    -webkit-animation: load3 1.4s infinite linear;
-    animation: load3 1.4s infinite linear;
+    -webkit-animation: load3 1s infinite linear;
+    animation: load3 1s infinite linear;
     -webkit-transform: translateZ(0);
     transform: translateZ(0);
 
@@ -143,11 +143,26 @@
     }
 }
 
+@-webkit-keyframes upanddown {
+    0% {
+        -webkit-transform: translateY(0);
+    }
+    50% {
+        -webkit-transform: translateY(-10px);
+    }
+    100% {
+        -webkit-transform: translateY(0);
+    }
+}
+
 @keyframes upanddown {
     0% {
         transform: translateY(0);
     }
-    100% {
+    50% {
         transform: translateY(-10px);
+    }
+    100% {
+        transform: translateY(0);
     }
 }

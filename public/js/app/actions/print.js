@@ -65,6 +65,7 @@ define([
         transformMode = false,
         shiftPressed = false,
         previewMode = false,
+        showStopButton = true,
         leftPanelWidth = 275,
         ddHelper = 0,
         defaultFileName = '',
@@ -229,7 +230,7 @@ define([
             openImportWindow: false
         });
 
-        ProgressActions.open(ProgressConstants.STEPPING, lang.print.importingModel, lang.print.wait, false);
+        ProgressActions.open(ProgressConstants.STEPPING, lang.print.importingModel, lang.print.wait, !showStopButton);
 
         loader.load(model_file_path, function(geometry) {
             var mesh = new THREE.Mesh(geometry, commonMaterial);
@@ -610,40 +611,42 @@ define([
             ids.push(obj.uuid);
         });
 
-        ProgressActions.open(ProgressConstants.STEPPING, lang.monitor.processing, lang.monitor.savingPreview, false);
+        ProgressActions.open(ProgressConstants.STEPPING, lang.monitor.processing, lang.monitor.savingPreview, !showStopButton);
 
-        getBlobFromScene().then(function(blob) {
-            reactSrc.setState({ previewUrl: URL.createObjectURL(blob) });
-            return slicer.uploadPreviewImage(blob);
-        }).then(function(response) {
-            if (response.status === 'ok') {
-                sendGCodeParameters().then(function() {
-                    slicer.goG(ids, function(result) {
-                        if (result instanceof Blob) {
-                            blobExpired = false;
-                            responseBlob = result;
-                            ProgressActions.close();
-                            d.resolve(result);
-                        }
-                        else {
-                            if (result.status !== 'error') {
-                                var serverMessage = `${result.status}: ${result.message} (${parseInt(result.percentage * 100)}%)`,
-                                    drawingMessage = `Finishing up... (100%)`,
-                                    message = result.status !== 'complete' ? serverMessage : drawingMessage;
-                                ProgressActions.updating(message, parseInt(result.percentage * 100));
+        getBlobFromScene().then(function(blob){
+            cropImageUsingCanvas(blob).then(function(blob) {
+                reactSrc.setState({ previewUrl: URL.createObjectURL(blob) });
+                return slicer.uploadPreviewImage(blob);
+            }).then(function(response) {
+                if (response.status === 'ok') {
+                    sendGCodeParameters().then(function() {
+                        slicer.goG(ids, function(result) {
+                            if (result instanceof Blob) {
+                                blobExpired = false;
+                                responseBlob = result;
+                                ProgressActions.close();
+                                d.resolve(result);
                             }
                             else {
-                                ProgressActions.close();
+                                if (result.status !== 'error') {
+                                    var serverMessage = `${result.status}: ${result.message} (${parseInt(result.percentage * 100)}%)`,
+                                        drawingMessage = `Finishing up... (100%)`,
+                                        message = result.status !== 'complete' ? serverMessage : drawingMessage;
+                                    ProgressActions.updating(message, parseInt(result.percentage * 100));
+                                }
+                                else {
+                                    ProgressActions.close();
+                                }
                             }
-                        }
+                        });
                     });
-                });
-            }
-            // error
-            else {
-                _setProgressMessage('');
-                d.resolve(result);
-            }
+                }
+                // error
+                else {
+                    _setProgressMessage('');
+                    d.resolve(result);
+                }
+            });
         });
 
         return d.promise();
@@ -671,7 +674,7 @@ define([
             ProgressConstants.STEPPING,
             lang.print.rendering,
             lang.print.savingFilePreview,
-            false
+            !showStopButton
         );
 
         getBlobFromScene().then(function(blob) {
@@ -703,7 +706,11 @@ define([
                                 }
                             }
                             else {
+                                blobExpired = true;
+                                reactSrc.setState({ hasOutOfBoundsObject: true });
                                 ProgressActions.close();
+                                AlertActions.showPopupError('', result.error);
+                                d.resolve(result, '');
                             }
                         }
                     });
@@ -878,7 +885,7 @@ define([
                     topOffset = (parseInt(position.y) - objectDialogueHeight / 2),
                     marginTop = container.offsetHeight / 2 - position.y;
 
-                var rightLimit = container.offsetWidth / 2 - leftPanelWidth - objectDialogueWidth,
+                var rightLimit = container.offsetWidth - objectDialogueWidth - leftOffset,
                     topLimit = container.offsetHeight / 2 - objectDialogueHeight / 2;
 
                 if (objectDialogueDistance > rightLimit) {
@@ -1231,6 +1238,47 @@ define([
         return d.promise();
     }
 
+
+    function cropImageUsingCanvas(data, is_image){
+        if(!is_image){
+            var newImg = document.createElement("img"),
+                url = URL.createObjectURL(blob),
+                d = $.Deferred();
+            newImg.onload = function() {
+                URL.revokeObjectURL(url);
+            };
+            cropImageUsingCanvas(newImage, true).then(function(blob) {
+                d.resolve(blob);
+            });
+            return d.promise()
+        }
+        
+        var width = 640, height = 640,
+            canvas = document.createElement("canvas"),
+            sh = image.height,
+            sw = image.width,
+            sx = 0,
+            sy = 0,
+            d = $.Deferred();
+
+        if(image.width > image.height){
+            sx = (image.width - image.height)/2;
+            sw = image.height;
+        }else if(image.width < image.height){
+            sy = (image.height - image.width)/2;
+            sh = image.width;
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        var context = canvas.getContext("2d");
+        context.drawImage(this.image, sx, sy, sw, sh, 0, 0, width, height);
+        canvas.toBlob(function(blob) {
+            d.resolve(blob);
+        });
+        return d.promise()
+    }
+
     function removeFromScene(name) {
         for (var i = scene.children.length - 1; i >= 0; i--) {
             if (scene.children[i].name === name) {
@@ -1498,18 +1546,24 @@ define([
         selectObject(null);
 
         var drawPath = function() {
+            ProgressActions.open(
+                ProgressConstants.WAITING,
+                lang.print.rendering,
+                '',
+                !showStopButton
+            );
             previewMode = true;
             slicer.getPath().then(function(result) {
                 printPath = result;
-                _drawPath();
+                _drawPath().then(function() {
+                    ProgressActions.close();
+                });
             });
         };
 
         if (blobExpired) {
             getFCode().then(function(blob) {
-                if (blob instanceof Blob) {
-                    drawPath();
-                }
+                drawPath();
             });
         } else {
             previewMode = true;
@@ -1522,7 +1576,8 @@ define([
     }
 
     function _drawPath() {
-        var color,
+        var d = $.Deferred(),
+            color,
             g, m, line,
             type;
 
@@ -1557,8 +1612,11 @@ define([
 
         reactSrc.setState({
             previewLayerCount: previewScene.children.length - 1
+        }, function() {
+            d.resolve('');
         });
         _showPath();
+        return d.promise();
     }
 
     function _showPath() {

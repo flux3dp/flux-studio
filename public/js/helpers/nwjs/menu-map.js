@@ -37,7 +37,7 @@ define([
         },
         lang = i18n.get().topmenu,
         menuMap = [],
-        windowIndex = ('windows' === window.FLUX.osType ? 1 : 0),
+        windowIndex = ('win' === window.FLUX.osType ? 1 : 0),
         parentIndex = {
             ABOUT  : 0 - windowIndex,
             FILE   : 1 - windowIndex,
@@ -145,6 +145,11 @@ define([
                 enabled: true,
                 subItems: [newDevice, separator],
                 parent: parentIndex.DEVICE
+            },
+            tutorial: {
+                label: lang.help.tutorial,
+                enabled: true,
+                parent: parentIndex.HELP
             }
         },
         deviceGroup = [
@@ -192,12 +197,13 @@ define([
                 }
             }
         }],
-        subItems;
+        subItems,
+        timeout_device_update = 5000;
 
     function bindMap() {
         menuMap = [];
 
-        if ('windows' !== window.FLUX.osType) {
+        if ('win' !== window.FLUX.osType) {
             menuMap.push({
                 label: lang.flux.label,
                 subItems: aboutSubItems
@@ -211,7 +217,7 @@ define([
                 items.saveGCode
             ];
 
-            if ('windows' === window.FLUX.osType) {
+            if ('win' === window.FLUX.osType) {
                 subItems = subItems.concat(aboutSubItems);
             }
 
@@ -269,7 +275,6 @@ define([
                         function(printers) {
                             printers.forEach(function(printer) {
                                 renew = deviceGroup.some(deviceExists(printer));
-
                                 if (false === renew) {
                                     deviceGroup.push({
                                         isPrinter: true,
@@ -282,7 +287,10 @@ define([
                                             onClick: function() {
                                                 DeviceMaster.selectDevice(printer).then(function(status) {
                                                     if(status === DeviceConstants.CONNECTED) {
-                                                        GlobalActions.showMonitor(printer);
+                                                        setTimeout(
+                                                            function(){
+                                                                GlobalActions.showMonitor(printer)
+                                                            },50);
                                                     }
                                                     else if (status === DeviceConstants.TIMEOUT) {
                                                         AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
@@ -294,7 +302,17 @@ define([
                                             label: lang.device.change_filament,
                                             enabled: true,
                                             onClick: function() {
-                                                AlertActions.showChangeFilament(printer);
+                                                DeviceMaster.selectDevice(printer).then(function(status) {
+                                                    if(status === DeviceConstants.CONNECTED) {
+                                                        setTimeout(
+                                                            function(){
+                                                                AlertActions.showChangeFilament(printer);
+                                                            },50);
+                                                    }
+                                                    else if (status === DeviceConstants.TIMEOUT) {
+                                                        AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
+                                                    }
+                                                });
                                             }
                                         },
                                         {
@@ -318,13 +336,20 @@ define([
                                     });
                                 }
                             });
-
                             if ('undefined' === typeof deviceRefreshTimer && true === renew) {
                                 clearTimeout(deviceRefreshTimer);
                                 deviceRefreshTimer = setTimeout(function() {
                                     items.device.subItems = deviceGroup;
+                                    if('win' === window.FLUX.osType && window.FLUX.refreshMenu){
+                                        window.FLUX.refreshMenu(menuMap);
+                                    }
+                                    deviceRefreshTimer = undefined;
+                                    if(deviceGroup.length > 2){
+                                        timeout_device_update += 120000;
+                                    }
+                                    timeout_device_update = timeout_device_update + 15000;
                                     clearTimeout(deviceRefreshTimer);
-                                }, 5000);
+                                }, timeout_device_update);
                             }
                         }
                     );
@@ -349,6 +374,7 @@ define([
                         }
                     }
                 },
+                items.tutorial,
                 {
                     label: lang.help.online_support,
                     enabled: true,

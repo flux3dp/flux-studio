@@ -3,6 +3,7 @@
  */
 html,
 body {
+    background-color: #E0E0E0;
     font-family: "Helvetica Neue", "HelveticaNeue-Light", "Helvetica Neue Light", 'Open Sans', Helvetica, Arial, "Lucida Grande", sans-serif, "Microsoft JhengHei", "微軟正黑體";
     font-size: 12px;
     height: 100%;
@@ -14,7 +15,7 @@ body {
 }
 
 body {
-    background-color: #FAFAFA;
+    background-color: #E0E0E0;
     cursor: default;
     font-size: 16px;
     position: relative;
@@ -69,7 +70,7 @@ img {
 
 .content {
     @include flexbox();
-    background: #fff;
+    background-color: #E0E0E0;
     height: 100%;
     overflow: hidden;
     width: 100%;

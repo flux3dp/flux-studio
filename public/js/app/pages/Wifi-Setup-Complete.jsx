@@ -55,13 +55,17 @@ define([
 
             render: function() {
                 this.props.other = this.props.other || 'with-wifi';
-
                 var wrapperClassName = {
                         'initialization': true
                     },
                     lang = this.state.lang,
-                    article = this._getArticle(lang),
-                    startText = (
+                    article = this._getArticle(lang);
+
+                function createMarkup(){
+                    return {__html: article.content};
+                }
+
+                var startText = (
                         'with-usb' === this.props.other ?
                         lang.initialize.setting_completed.ok :
                         lang.initialize.setting_completed.start
@@ -77,7 +81,7 @@ define([
                         <div className="setting-completed text-center">
                             <img className="brand-image" src="/img/menu/main_logo.svg"/>
                             <h1 className="headline">{article.caption}</h1>
-                            <p className="notice">{article.content}</p>
+                            <p className="notice" dangerouslySetInnerHTML={createMarkup()}></p>
                             <div className="btn-v-group">
                                 <button className="btn btn-action btn-large" data-ga-event="start" onClick={this._onStart}>
                                     {startText}

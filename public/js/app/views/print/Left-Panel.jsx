@@ -17,8 +17,8 @@ define([
         constants;
 
     qualityLevel = {
-        high: 0.1,
-        med: 0.2,
+        high: 0.05,
+        med: 0.15,
         low: 0.25
     };
 
@@ -137,7 +137,7 @@ define([
                     },
 
                     'PREVIEW': function() {
-                        if(e.target.type === 'range' || !self.props.hasObject || self.props.hasOutOfBoundsObject) {
+                        if(e.target.type === 'range' || !self.props.hasObject) {
                             e.preventDefault();
                             return;
                         }
@@ -179,7 +179,7 @@ define([
 
         _renderQuanlity: function() {
             var _quality = ['high', 'med', 'low'],
-                _class = ClassNames('display-text quality-select', {'disable': !this.props.enable}),
+                _class = ClassNames('display-text quality-select'),
                 qualitySelection;
 
             qualitySelection = _quality.map(function(quality) {
@@ -250,7 +250,7 @@ define([
             var _class = ClassNames({'disable': !this.props.enable});
             return {
                 label: (
-                    <div className={_class} title={lang.raftTitle} onClick={this._handleActions.bind(null, constants.RAFT_ON, '')}>
+                    <div title={lang.raftTitle} onClick={this._handleActions.bind(null, constants.RAFT_ON, '')}>
                         <div>{this.props.raftOn ? lang.raft_on : lang.raft_off}</div>
                     </div>
                 )
@@ -261,7 +261,7 @@ define([
             var _class = ClassNames({'disable': !this.props.enable});
             return {
                 label: (
-                    <div className={_class} title={lang.supportTitle} onClick={this._handleActions.bind(null, constants.SUPPORT_ON, '')}>
+                    <div title={lang.supportTitle} onClick={this._handleActions.bind(null, constants.SUPPORT_ON, '')}>
                         <div>{this.props.supportOn ? lang.support_on : lang.support_off}</div>
                     </div>
                 )
@@ -272,7 +272,7 @@ define([
             var _class = ClassNames({'disable': !this.props.enable});
             return {
                 label: (
-                    <div className={_class} title={lang.advancedTitle} onClick={this._handleActions.bind(null, constants.ADVANCED, '')}>
+                    <div title={lang.advancedTitle} onClick={this._handleActions.bind(null, constants.ADVANCED, '')}>
                         <div>{this.props.lang.print.left_panel.advanced}</div>
                     </div>
                 )
@@ -283,7 +283,7 @@ define([
             var _class = ClassNames('display-text', {'disable': !this.props.enable});
             return {
                 label: (
-                    <div className={_class} onClick={this._handleActions.bind(null, constants.PREVIEW, '')}>
+                    <div id="preview" className={_class} onClick={this._handleActions.bind(null, constants.PREVIEW, '')}>
                         <span>{lang.preview}</span>
                     </div>
                 ),

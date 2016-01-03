@@ -51,6 +51,7 @@ define([
             svgWebSocket,
             LASER_IMG_CLASS = 'img-container',
             $laser_platform,
+            lang = i18n.get(),
             PLATFORM_DIAMETER_PIXEL,
             deleteImage = function() {
                 var $img_container = $('.' + LASER_IMG_CLASS).not($target_image),
@@ -103,8 +104,7 @@ define([
                 );
             },
             sendToMachine = function(blob) {
-                var lang = i18n.get(),
-                    blobUrl = window.URL,
+                var blobUrl = window.URL,
                     fcodeReaderMethods = fcodeReader(),
                     goToMonitor = function(thumbnailBlob) {
                         DeviceMaster.selectDevice(self.state.selectedPrinter).then(function(status) {
@@ -406,7 +406,7 @@ define([
                         });
                     };
 
-                ProgressActions.open(progressType, '', 'Processing...', false);
+                ProgressActions.open(progressType, lang.laser.process_caption, 'Processing...', false);
 
                 doLaser(settings);
             };

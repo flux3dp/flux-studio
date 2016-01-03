@@ -41,6 +41,10 @@ define([
                 location.hash = '#initialize/wifi/select';
             },
 
+            _handleWifiErrorConfirm: function(e) {
+
+            },
+
             _handleSetPassword: function(e) {
                 var self = this,
                     wifi = initializeMachine.settingWifi.get(),
@@ -50,6 +54,7 @@ define([
                     checkTimes = 10,    // check network per second, 10 times in maximum.
                     checkCountdown = function(callback) {
                         if (0 === checkTimes) {
+                            console.log("Check count down timeout");
                             genericFailureHandler();
                             callback();
                         }
@@ -57,12 +62,11 @@ define([
                         checkTimes--;
                     },
                     genericFailureHandler = function() {
-                        AlertStore.onCancel(function() {
-                            location.hash = '#initialize/wifi/select';
-                        });
+                        AlertStore.onCancel(this._handleWifiErrorConfirm);
                         AlertActions.showPopupError(
                             'wifi-authenticate-fail',
-                            lang.initialize.errors.wifi_connection.connecting_fail
+                            lang.initialize.errors.wifi_connection.connecting_fail,
+                            lang.initialize.errors.wifi_connection.caption
                         );
                     },
                     checkNetworkStatus = function() {
@@ -90,6 +94,7 @@ define([
                         checkNetworkStatus();
                     },
                     onError: function(response) {
+                        console.log("Wifi set failed");
                         genericFailureHandler();
                     }
                 });

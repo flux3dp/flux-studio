@@ -88,7 +88,7 @@ var fs = requireNode('fs'),
 
 switch (osType) {
 case 'Windows_NT':
-    process.env.osType = 'windows';
+    process.env.osType = 'win';
     break;
 case 'Linux':
     process.env.osType = 'linux';
@@ -103,8 +103,7 @@ switch (os.arch()) {
 case 'x64':
     process.env.arch = 'x64';
     break;
-case 'Linux':
-case 'Darwin':
+case 'ia32':
     process.env.arch = 'x86';
     break;
 }

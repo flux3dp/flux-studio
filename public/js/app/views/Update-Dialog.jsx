@@ -75,6 +75,7 @@ define([
         },
 
         render: function() {
+            console.log(this.props);
             if (false === this.props.open) {
                 return <div/>;
             }
@@ -102,7 +103,8 @@ define([
                     </div>
                 ),
                 className = {
-                    'modal-update': true
+                    'modal-update': true,
+                    'shadow-modal': true
                 };
 
             return (

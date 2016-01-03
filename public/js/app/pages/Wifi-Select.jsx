@@ -160,7 +160,7 @@ define([
                                 ref="password"
                                 type="password"
                                 className="password-input"
-                                placeholder={lang.initialize.set_machine_generic.password_placeholder}
+                                placeholder=""
                                 defaultValue=""
                                 autoFocus={true}
                             />

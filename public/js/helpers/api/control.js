@@ -106,6 +106,9 @@ define([
                 events.onMessage = function(result) {
                     if(result instanceof Blob) {
                         data.push(result);
+                    }else if(data.length == 2){
+                        //Play info info..
+                        data.push(result);
                     }
                     switch(result.status) {
                         case 'ok':
