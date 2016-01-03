@@ -11,6 +11,7 @@ define([
     'helpers/api/3d-scan-control',
     'helpers/api/touch',
     'helpers/api/discover',
+    'app/constants/input-lightbox-constants',
     'helpers/object-assign'
 ], function(
     $,
@@ -24,7 +25,8 @@ define([
     DeviceController,
     ScanController,
     Touch,
-    Discover
+    Discover,
+    InputLightBoxConstants
 ) {
     'use strict';
 
@@ -49,6 +51,7 @@ define([
                     caption      : sprintf(lang.input_machine_password.require_password, _device.name),
                     inputHeader  : lang.input_machine_password.password,
                     confirmText  : lang.input_machine_password.connect,
+                    type: InputLightBoxConstants.TYPE_PASSWORD,
                     onSubmit     : function(password) {
                         auth(uuid, password).done(function(data) {
                             selectDevice(device, d);
