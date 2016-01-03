@@ -217,6 +217,12 @@
             width: 0;
         }
     }
+
+    &.waiting{
+        .modal-alert{
+            padding-bottom: 1.6em;
+        }
+    }
 }
 
 // progress dialog size

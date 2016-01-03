@@ -629,7 +629,7 @@ define(function() {
                 message: '你可以開始掃描了'
             },
             calibrate_fail: '校正失敗',
-            calibration_is_running: '校正進行中',
+            calibration_is_running: '掃描校正中',
             resolution: [{
                 id: 'best',
                 text: '最佳',

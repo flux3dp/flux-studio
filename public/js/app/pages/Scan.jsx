@@ -895,9 +895,9 @@ define([
                     });
                 },
 
-                _openBlocker: function(is_open, type, message, hasStop) {
+                _openBlocker: function(is_open, type, message, hasStop, caption) {
                     if (true === is_open) {
-                        ProgressActions.open(type, '', message, hasStop);
+                        ProgressActions.open(type, caption ? caption : '', message, hasStop);
                     }
                     else {
                         ProgressActions.close();
@@ -1003,7 +1003,7 @@ define([
                         }
                     });
 
-                    self._openBlocker(true, ProgressConstants.WAITING, self.state.lang.scan.calibration_is_running);
+                    self._openBlocker(true, ProgressConstants.WAITING, '', false, self.state.lang.scan.calibration_is_running);
                 },
 
                 // render sections

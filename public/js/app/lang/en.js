@@ -628,8 +628,8 @@ define(function() {
                 caption: 'Calibration Done',
                 message: 'You can scan now'
             },
-            calibrate_fail: 'Calibrate Fail',
-            calibration_is_running: 'Calibration is running',
+            calibrate_fail: 'Calibration Failed',
+            calibration_is_running: 'Calibrating for Scan',
             resolution: [{
                 id: 'best',
                 text: 'Best',
