@@ -170,8 +170,6 @@ define([
                         inputHeader  : lang.select_printer.please_enter_password,
                         confirmText  : lang.select_printer.submit,
                         onSubmit     : function(password) {
-                            ProgressActions.open(ProgressConstants.NONSTOP);
-
                             self._auth(printer.uuid, password, {
                                 onError: function() {
                                     ProgressActions.close();

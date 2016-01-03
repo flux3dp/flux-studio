@@ -724,7 +724,8 @@ define([
         },
 
         _processInfo: function(info){
-            console.log(info);
+            this._startReport();
+            if(info=='') return;
             info = info || [];
             info[0] = info[0] || {};
 
@@ -734,13 +735,16 @@ define([
                 }
             }
 
+            if(!info[0].TIME_COST) return;
             if(info[0].TIME_COST) {
                 totalTimeInSeconds = info[0].TIME_COST;
             }
 
-            taskInfo = lang.monitor.task[info[0].HEAD_TYPE];
-
-            this._startReport();
+            if(info[0].HEAD_TYPE){
+                taskInfo = lang.monitor.task[info[0].HEAD_TYPE.toUpperCase()];
+            }else{
+                taskInfo = "Unknown";
+            }
         },
 
         _processReport: function(report) {
@@ -778,7 +782,7 @@ define([
             }
             errorMessage = lang.monitor[attr.join('_')];
 
-            //if(errorMessage == null) errorMessage = attr.join('_');
+            if(errorMessage == null) errorMessage = attr.join('_');
 
             if(lastError !== mainError) {
                 messageViewed = false;

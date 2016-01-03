@@ -68,7 +68,8 @@ define(function() {
                 starting_guide: 'Starting Guide',
                 online_support: 'Online Support',
                 troubleshooting: 'Troubleshooting',
-                tutorial: 'Start Tutorial'
+                tutorial: 'Start Printing Tutorial',
+                debug: 'Bug Report'
             }
         },
         initialize: {
@@ -780,6 +781,8 @@ define(function() {
             HEAD_ERROR_CALIBRATING          : 'Unable to calibrate toolhead\nplease re-attach the toolhead',
             HEAD_ERROR_FAN_FAILURE          : 'Cooling fan not spinning\nSpin it with a pencil or thin stick.',
             HEAD_ERROR_HEAD_OFFLINE         : 'Toolhead not detected\nPlease re-attach the module cable',
+            HEAD_ERROR_TYPE_ERROR           : 'Toolhead incorrect\nPlease attach correct toolhead',
+            'HEAD_ERROR_?'                  : 'Toolhead error\nCheck if the toolhead is abnormal',
             HWARDWARE_ERROR_FILAMENT_RUNOUT : 'Ran out of filament\nPlease insert new material',
             HWARDWARE_ERROR_0               : 'Ran out of filament\nPlease insert new material',
             HARDWARE_ERROR_PLATE_MISSING    : 'Unable to detect the base plate\nPlease put on the plate.',
