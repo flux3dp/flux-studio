@@ -609,6 +609,24 @@ define([
                     });
                 },
 
+                _onSaveSinglePointCloud: function(mesh) {
+                    var self = this,
+                        fileName = (new Date()).getTime() + '.pcd';
+
+                    self.state.scanModelingWebSocket.export(
+                        mesh.name,
+                        'pcd',
+                        {
+                            onFinished: function(blob) {
+                                saveAs(blob, fileName);
+                                self._openBlocker(false);
+                            }
+                        }
+                    );
+
+                    self._openBlocker(true, ProgressConstants.NONSTOP);
+                },
+
                 _onSave: function(e) {
                     var self = this,
                         exportFile = function(outputName) {
@@ -1167,6 +1185,7 @@ define([
                             onCropOn={this._doCropOn}
                             onCropOff={this._doCropOff}
                             onClearNoise={this._doClearNoise}
+                            onSave={this._onSaveSinglePointCloud}
                             onManualMerge={this._doManualMerge}
                             object={state.selectedObject}
                             position={state.objectDialogPosition}
