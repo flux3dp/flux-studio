@@ -3,7 +3,7 @@
  * Ref: https://github.com/flux3dp/fluxghost/wiki/websocket-slicing
  */
 define([
-    'helpers/websocket',
+    'helpers/websocket-debug',
     'helpers/convertToTypedArray'
 ], function(Websocket, convertToTypedArray) {
     'use strict';
