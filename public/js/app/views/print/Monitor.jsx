@@ -233,6 +233,7 @@ define([
             if(openSource === source.DEVICE_LIST &&
                 this.props.selectedDevice.st_id === DeviceConstants.status.IDLE){
                     _mode = mode.BROWSE_FILE; 
+                    this._startReport();
             }
 
             return {
@@ -823,8 +824,11 @@ define([
             headInfo = report.module ? lang.monitor.device[report.module] : '';
 
             if(!report.error) {
-                AlertActions.closePopup();
-                showingPopup = false;
+                //If home failed, at least show an error
+                if(statusId !== DeviceConstants.status.IDLE) {
+                    AlertActions.closePopup();
+                    showingPopup = false;
+                }
             }
 
             if(status === DeviceConstants.COMPLETED) {
@@ -833,7 +837,9 @@ define([
             }
 
             if(!report.error) {
-                AlertActions.closePopup();
+                if(statusId !== DeviceConstants.status.IDLE) {
+                    AlertActions.closePopup();
+                }
             }
 
             var report_info = {
