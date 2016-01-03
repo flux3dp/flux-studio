@@ -869,6 +869,7 @@ define(function() {
             device_is_used: 'The device is being used, do you want to abort current task?'
         },
         machine_status: {
+            '-10': 'Raw mode',
             '-2': 'Scanning',
             '-1': 'Maintaining',
             0: 'Idle',

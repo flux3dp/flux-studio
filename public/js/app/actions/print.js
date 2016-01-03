@@ -613,38 +613,40 @@ define([
 
         ProgressActions.open(ProgressConstants.STEPPING, lang.monitor.processing, lang.monitor.savingPreview, !showStopButton);
 
-        getBlobFromScene().then(function(blob) {
-            reactSrc.setState({ previewUrl: URL.createObjectURL(blob) });
-            return slicer.uploadPreviewImage(blob);
-        }).then(function(response) {
-            if (response.status === 'ok') {
-                sendGCodeParameters().then(function() {
-                    slicer.goG(ids, function(result) {
-                        if (result instanceof Blob) {
-                            blobExpired = false;
-                            responseBlob = result;
-                            ProgressActions.close();
-                            d.resolve(result);
-                        }
-                        else {
-                            if (result.status !== 'error') {
-                                var serverMessage = `${result.status}: ${result.message} (${parseInt(result.percentage * 100)}%)`,
-                                    drawingMessage = `Finishing up... (100%)`,
-                                    message = result.status !== 'complete' ? serverMessage : drawingMessage;
-                                ProgressActions.updating(message, parseInt(result.percentage * 100));
+        getBlobFromScene().then(function(blob){
+            cropImageUsingCanvas(blob).then(function(blob) {
+                reactSrc.setState({ previewUrl: URL.createObjectURL(blob) });
+                return slicer.uploadPreviewImage(blob);
+            }).then(function(response) {
+                if (response.status === 'ok') {
+                    sendGCodeParameters().then(function() {
+                        slicer.goG(ids, function(result) {
+                            if (result instanceof Blob) {
+                                blobExpired = false;
+                                responseBlob = result;
+                                ProgressActions.close();
+                                d.resolve(result);
                             }
                             else {
-                                ProgressActions.close();
+                                if (result.status !== 'error') {
+                                    var serverMessage = `${result.status}: ${result.message} (${parseInt(result.percentage * 100)}%)`,
+                                        drawingMessage = `Finishing up... (100%)`,
+                                        message = result.status !== 'complete' ? serverMessage : drawingMessage;
+                                    ProgressActions.updating(message, parseInt(result.percentage * 100));
+                                }
+                                else {
+                                    ProgressActions.close();
+                                }
                             }
-                        }
+                        });
                     });
-                });
-            }
-            // error
-            else {
-                _setProgressMessage('');
-                d.resolve(result);
-            }
+                }
+                // error
+                else {
+                    _setProgressMessage('');
+                    d.resolve(result);
+                }
+            });
         });
 
         return d.promise();
@@ -1234,6 +1236,47 @@ define([
         });
 
         return d.promise();
+    }
+
+
+    function cropImageUsingCanvas(data, is_image){
+        if(!is_image){
+            var newImg = document.createElement("img"),
+                url = URL.createObjectURL(blob),
+                d = $.Deferred();
+            newImg.onload = function() {
+                URL.revokeObjectURL(url);
+            };
+            cropImageUsingCanvas(newImage, true).then(function(blob) {
+                d.resolve(blob);
+            });
+            return d.promise()
+        }
+        
+        var width = 640, height = 640,
+            canvas = document.createElement("canvas"),
+            sh = image.height,
+            sw = image.width,
+            sx = 0,
+            sy = 0,
+            d = $.Deferred();
+
+        if(image.width > image.height){
+            sx = (image.width - image.height)/2;
+            sw = image.height;
+        }else if(image.width < image.height){
+            sy = (image.height - image.width)/2;
+            sh = image.width;
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        var context = canvas.getContext("2d");
+        context.drawImage(this.image, sx, sy, sw, sh, 0, 0, width, height);
+        canvas.toBlob(function(blob) {
+            d.resolve(blob);
+        });
+        return d.promise()
     }
 
     function removeFromScene(name) {
