@@ -624,6 +624,10 @@ define(function() {
             quality: '品質',
             scan_again_confirm: '是否確定要放棄目前的掃瞄結果？',
             calibrate: '校正',
+            calibration_done: {
+                caption: '校正完成',
+                message: '你可以開始掃描了'
+            },
             calibrate_fail: '校正失敗',
             calibration_is_running: '校正進行中',
             resolution: [{

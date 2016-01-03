@@ -624,6 +624,10 @@ define(function() {
             quality: 'QUALITY',
             scan_again_confirm: 'Do you want to discard current scan result?',
             calibrate: 'Calibrate',
+            calibration_done: {
+                caption: 'Calibration Done',
+                message: 'You can scan now'
+            },
             calibrate_fail: 'Calibrate Fail',
             calibration_is_running: 'Calibration is running',
             resolution: [{

@@ -223,9 +223,11 @@ define([
                             }
                         }
 
-                        // copy event
-                        if(e.metaKey && e.keyCode === 68) {
-                            director.duplicateSelected();
+                        // copy event - it will listen by top menu as well in nwjs..
+                        if(!window.FLUX.osType){
+                            if(e.metaKey && e.keyCode === 68) {
+                                director.duplicateSelected();
+                            }
                         }
                     });
                 },

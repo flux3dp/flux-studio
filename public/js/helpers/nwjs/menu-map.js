@@ -344,6 +344,9 @@ define([
                                         window.FLUX.refreshMenu(menuMap);
                                     }
                                     deviceRefreshTimer = undefined;
+                                    if(deviceGroup.length > 2){
+                                        timeout_device_update += 120000;
+                                    }
                                     timeout_device_update = timeout_device_update + 15000;
                                     clearTimeout(deviceRefreshTimer);
                                 }, timeout_device_update);

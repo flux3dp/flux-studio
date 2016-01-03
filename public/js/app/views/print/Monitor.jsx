@@ -1264,7 +1264,6 @@ define([
         },
 
         _renderNavigation: function() {
-            console.log("Path array", pathArray);
             if(openSource === source.DEVICE_LIST && statusId == 0 && pathArray.length == 0 && this.state.mode == mode.BROWSE_FILE){
                 return (<div className="back"></div>);
             }

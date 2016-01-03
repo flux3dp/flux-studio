@@ -977,7 +977,8 @@ define([
                                 calibrateDeferred = scanCtrlWebSocket.calibrate(),
                                 done = function(data) {
                                     self._refreshCamera();
-                                    self._openBlocker(false);
+                                    self._openBlocker(false);                                    
+                                    AlertActions.showPopupInfo('calibrat-done', self.state.lang.scan.calibration_done.message, self.state.lang.scan.calibration_done.caption );
                                 },
                                 fail = function(data) {
                                     self._refreshCamera();
