@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>FLUXStudio - Touch</title>
+  <script src="res/jquery-2.1.4.min.js"></script>
+  <script src="res/bootstrap/js/bootstrap.min.js"></script>
+  <link href="res/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+  <meta charset="UTF-8">
+  <script src="shared.js"></script>
+  <script>
+  var ghost_port = 10000;
+  var wsserver = window.location.host + ":" + ghost_port;
+  function touch_without_password(uuid, name, has_password) {
+    var ws = new WebSocket("ws://" + wsserver + "/ws/touch");
+    var close_normally = false;
+
+    ws.onopen = function() {
+      appendLog("Try touch: " + name + " (" + uuid + ")");
+      ws.send(JSON.stringify({uuid: uuid}));
+    }
+    ws.onmessage = function(m) {
+      close_normally = true;
+      ws.close();
+
+      var data = JSON.parse(m.data);
+
+      if(data.has_response && !data.auth && has_password) {
+        touch_with_password(uuid, name, has_password)
+      } else {
+        log_touch_result(uuid, name, data);
+      }
+
+      ws = undefined;
+    }
+    ws.onclose = ws_close_handler("Touch");
+  }
+
+  function touch_with_password(uuid, name, has_password) {
+    var pwd = prompt("Enter password for " + name + " (" + uuid + ")");
+    if(pwd) {
+      var ws = new WebSocket("ws://" + window.location.host + "/ws/touch");
+      var close_normally = false;
+
+      ws.onopen = function() {
+        appendLog("Try touch: " + name + " (" + uuid + ")");
+        ws.send(JSON.stringify({uuid: uuid, password: pwd}));
+      }
+      ws.onmessage = function(m) {
+        close_normally = true;
+        ws.close();
+
+        var data = JSON.parse(m.data);
+        log_touch_result(uuid, name, JSON.parse(m.data));
+
+        ws = undefined;
+      }
+      ws.onclose = ws_close_handler("Touch");
+    } else {
+      appendLog("Auch with \"" + name + "\" canceled", "#a00");
+    }
+  }
+
+  function log_touch_result(uuid, name, payload) {
+    var log_text = name + " (" + uuid + ") ";
+    if(payload.has_response) {
+      log_text += (payload.reachable?" is reachable ":" is NOT reachable ");
+      log_text += (payload.auth?" and auth SUCCESS":" and auth FAILED");
+
+      appendLog(log_text, (payload.auth?"#31B404":"#0000AA"))
+    } else {
+      log_text += "NO response";
+      appendLog(log_text, "red");
+    }
+  }
+
+  $(window).ready(function() {
+    $("[data-role=discover]").on("click", function() {
+      if(window.discover_ws) {
+        window.discover_ws.close();
+        window.discover_ws = undefined;
+        $(this).removeClass("btn-warning").addClass("btn-success").text("Start Discover");
+      } else {
+        $("#devices").children().remove();
+        window.discover_ws = new DiscoverWS(addDevice, removeDevice);
+        $(this).removeClass("btn-success").addClass("btn-warning").text("Stop Discover");
+      }
+    }).trigger("click");
+
+    $("#devices").on("click", "[data-uuid]", function() {
+      var uuid = $(this).attr("data-uuid");
+      var name = $(this).attr("data-name");
+      var has_password = $(this).attr("data-password") === "true";
+      touch_without_password(uuid, name, has_password);
+    });
+  });
+  </script>
+  <style>
+  .device .details {display: none;}
+  </style>
+</head>
+<body>
+  <div class="container-fluid">
+    <div class="row" style="padding-top: 1em">
+      <div class="col-xs-10">
+        <strong>./fluxghost/assets/touch.html</strong>
+      </div>
+      <div class="col-xs-2">
+        <a href="index.html" class="btn btn-xs btn-primary">Back to Index</a>
+      </div>
+    </div>
+  </div>
+  <hr />
+  <div class="container-fluid"><div class="navbar">
+      <a href="#" class="btn btn-success" data-role="discover">Start Discover</a>
+  </div></div>
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-xs-4">
+        <div class="list-group" id="devices">
+          <a href="#" class="list-group-item">
+            <span class="glyphicon glyphicon-lock"></span>
+            My 3D Printer
+            <label class="label label-default">AAAAAAAAAAAAAAAAAAAAAAAAA</label>
+          </a>
+          <a href="#" class="list-group-item">
+            <span class="glyphicon glyphicon-lock"></span>
+            My 3D Printer
+          </a>
+        </div>
+      </div>
+      <div class="col-xs-8" id="log"></div>
+    </div>
+  </div>
+</body>
+</html>

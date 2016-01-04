@@ -12,7 +12,9 @@ define([
     'app/actions/initialize-machine',
     'app/actions/global-actions',
     'helpers/device-master',
-    'app/constants/device-constants'
+    'app/constants/device-constants',
+    'html2canvas',
+    'plugins/file-saver/file-saver.min'
 ], function(
     $,
     gui,
@@ -24,7 +26,9 @@ define([
     initializeMachine,
     GlobalActions,
     DeviceMaster,
-    DeviceConstants
+    DeviceConstants,
+    html2canvas,
+    fileSaver
 ) {
     'use strict';
 
@@ -84,30 +88,6 @@ define([
                 modifiers: 'cmd',
                 parent: parentIndex.FILE
             },
-            copy: {
-                label: lang.edit.copy,
-                enabled: false,
-                onClick: emptyFunction,
-                key: 'c',
-                modifiers: 'cmd',
-                parent: parentIndex.EDIT
-            },
-            cut: {
-                label: lang.edit.cut,
-                enabled: false,
-                onClick: emptyFunction,
-                key: 'x',
-                modifiers: 'cmd',
-                parent: parentIndex.EDIT
-            },
-            paste: {
-                label: lang.edit.paste,
-                enabled: false,
-                onClick: emptyFunction,
-                key: 'v',
-                modifiers: 'cmd',
-                parent: parentIndex.EDIT
-            },
             duplicate: {
                 label: lang.edit.duplicate,
                 enabled: false,
@@ -130,6 +110,12 @@ define([
                 onClick: emptyFunction,
                 key: 'r',
                 modifiers: 'cmd+alt',
+                parent: parentIndex.EDIT
+            },
+            reset: {
+                label: lang.edit.reset,
+                enabled: false,
+                onClick: emptyFunction,
                 parent: parentIndex.EDIT
             },
             clear: {
@@ -229,6 +215,9 @@ define([
                 label: lang.edit.label,
                 subItems: [
                     items.duplicate,
+                    items.scale,
+                    items.rotate,
+                    items.reset,
                     separator,
                     items.clear
                 ]
@@ -345,7 +334,7 @@ define([
                                     }
                                     deviceRefreshTimer = undefined;
                                     if(deviceGroup.length > 2){
-                                        timeout_device_update += 120000;
+                                        timeout_device_update += 240000;
                                     }
                                     timeout_device_update = timeout_device_update + 15000;
                                     clearTimeout(deviceRefreshTimer);
@@ -363,28 +352,55 @@ define([
             label: lang.help.label,
             subItems: [
                 {
-                    label: lang.help.starting_guide,
+                    label: lang.help.help_center,
                     enabled: true,
                     onClick: function() {
                         if ('undefined' !== typeof requireNode) {
-                            requireNode('nw.gui').Shell.openExternal('http://flux3dp.com/starting-guide');
+                            requireNode('nw.gui').Shell.openExternal('https://helpcenter.flux3dp.com/');
                         }
                         else {
-                            window.open('http://flux3dp.com/starting-guide');
+                            window.open('https://helpcenter.flux3dp.com/');
+                        }
+                    }
+                },
+                {
+                    label: lang.help.contact,
+                    enabled: true,
+                    onClick: function() {
+                        if ('undefined' !== typeof requireNode) {
+                            requireNode('nw.gui').Shell.openExternal('http://flux3dp.com/contact');
+                        }
+                        else {
+                            window.open('http://flux3dp.com/contact');
                         }
                     }
                 },
                 items.tutorial,
                 {
-                    label: lang.help.online_support,
+                    label: lang.help.debug,
                     enabled: true,
-                    onClick: function() {
-                        if ('undefined' !== typeof requireNode) {
-                            requireNode('nw.gui').Shell.openExternal('http://flux3dp.com/support');
+                    onClick: function(){
+                        window.html2canvas = html2canvas;
+                        function obfuse(str){
+                            var output = [];
+                            for(var i in str){
+                                var c = {'f':'x','l':'u','u':'l','x':'f'}[str[i]];
+                                output.push(c?c:str[i]);
+                            }
+                            return output.join("");
                         }
-                        else {
-                            window.open('http://flux3dp.com/support');
-                        }
+                        html2canvas(window.document.body).then(function(canvas) {
+                            for(var i in window.FLUX.websockets){
+                                if("function" !== typeof window.FLUX.websockets[i]){
+                                    window.FLUX.websockets[i].optimizeLogs();
+                                }
+                            }
+                            var jpegUrl = canvas.toDataURL("image/jpeg"),
+                                report_info = {ws: window.FLUX.websockets, screenshot: jpegUrl},
+                                report_blob = new Blob([obfuse(btoa(JSON.stringify(report_info)))], {type : 'text/html'});
+
+                            saveAs(report_blob, "bugreport_"+Math.floor(Date.now() / 1000)+".txt");
+                        });
                     }
                 }
             ]

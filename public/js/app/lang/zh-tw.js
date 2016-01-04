@@ -49,6 +49,9 @@ define(function() {
             edit: {
                 label: '編輯',
                 duplicate: '重製',
+                rotate: '旋轉',
+                scale: '縮放',
+                reset: '重置',
                 clear: '清除場景'
             },
             device: {
@@ -65,10 +68,11 @@ define(function() {
             },
             help: {
                 label: '說明',
-                starting_guide: '開始使用',
-                online_support: '線上支援',
+                help_center: '說明中心',
+                contact: '聯絡我們',
                 troubleshooting: '錯誤排除',
-                tutorial: '列印教學'
+                tutorial: '列印教學',
+                debug: '錯誤回報'
             }
         },
         initialize: {
@@ -780,6 +784,8 @@ define(function() {
             HEAD_ERROR_CALIBRATING          : '模組校正失誤\n請重新裝載模組，並確認磁鐵關節正確的附著',
             HEAD_ERROR_FAN_FAILURE          : '風扇未轉動\n請用細針戳一下',
             HEAD_ERROR_HEAD_OFFLINE         : '工具頭離線\n請重新插入模組連接線',
+            HEAD_ERROR_TYPE_ERROR           : '錯誤模組\n請安裝正確模組',
+            'HEAD_ERROR_?'                  : 'Toolhead error\nCheck if the toolhead is abnormal',
             HWARDWARE_ERROR_FILAMENT_RUNOUT : '未偵測到料捲\n請重新插入新的料捲',
             HWARDWARE_ERROR_0               : '未偵測到料捲\n請重新插入新的料捲',
             HARDWARE_ERROR_PLATE_MISSING    : '未偵測到工作平台\n請放上工作平台金屬板',

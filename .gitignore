@@ -15,6 +15,12 @@ _tools/nwjs-shell-builder/resources/*
 
 *.dmg
 
+public/merged.stl
+public/output.fcode
+public/output.gcode
+public/preprocess.svg
+public/preview.png
+
 # Thumbnail cache files
 ._*
 Thumbs.db

@@ -82,11 +82,10 @@ define([
             objectUrl = url.createObjectURL(blob);
 
         loader.load(objectUrl, function(geometry) {
-
             var material = new THREE.MeshPhongMaterial({
                     color: 0x333333,
-                    specular: 0x111111,
-                    shininess: 100
+                    specular: 0x888888,
+                    shininess: 1
                 }),
                 mesh = new THREE.Mesh(geometry, material),
                 wfh = new THREE.WireframeHelper( mesh, 0x0fff00 );
@@ -95,7 +94,7 @@ define([
                 wfh.material.depthTest = false;
                 wfh.material.opacity = 0.25;
                 wfh.material.transparent = true;
-                mesh.add( wfh );
+                //mesh.add( wfh );
             }
 
             material.side = THREE.DoubleSide;

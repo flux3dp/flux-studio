@@ -169,7 +169,7 @@ define([
                         layerHeight                 : 0.1,
                         raftOn                      : advancedSettings.raft_layers !== 0,
                         supportOn                   : advancedSettings.support_material === 1,
-                        mode                        : 'size',
+                        mode                        : 'scale',
                         previewLayerCount           : 0,
                         progressMessage             : '',
                         fcode                       : {},

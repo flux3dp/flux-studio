@@ -624,7 +624,8 @@ define([
             handleLaser: function(settings) {
                 handleLaser(
                     settings,
-                    sendToMachine
+                    sendToMachine,
+                    ProgressConstants.STEPPING
                 );
             },
             sendToMachine: sendToMachine,

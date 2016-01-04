@@ -68,6 +68,7 @@ define(function() {
         UNLOAD_FILAMENT : 'UNLOAD',
 
         status : {
+            RAW                     : -10,
             SCAN                    : -2,
             MAINTAIN                : -1,
             IDLE                    : 0,

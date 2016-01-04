@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>FLUXStudio - Discover</title>
+  <script src="res/jquery-2.1.4.min.js"></script>
+  <script src="res/bootstrap/js/bootstrap.min.js"></script>
+  <link href="res/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+  <meta charset="UTF-8">
+  <script src="shared.js"></script>
+  <script>
+  $(window).ready(function() {
+    window.discover_ws = new WebSocket("ws://" + window.location.host + "/ws/discover");
+    window.discover_ws.onopen = function() {
+      appendLog("Connected", "#0000aa");
+    };
+    window.discover_ws.onclose = ws_close_handler("Discover");
+    window.discover_ws.onmessage = function(m) {
+      var payload = JSON.parse(m.data);
+
+      if(payload.alive) {
+        var logtext = " + " + payload.name + " (" + payload.serial + ") VER: " + payload.version + " FROM " + payload.source + (payload.password?" with":" without") + " password" ;
+        appendLog(logtext, "#0000aa");
+      } else {
+        var logtext = " - " + payload.serial;
+        appendLog(logtext, "red");
+      }
+    }
+  });
+  </script>
+</head>
+<body>
+  <div class="container"><h1>./fluxghost/assets/discover.html</h1></div>
+  <hr />
+  <div class="container"><div class="navbar">
+    <a href="index.html" class="btn btn-primary">Back to Index</a>
+  </div></div>
+  <div class="container" id="log"></div>
+</body>
+</html>

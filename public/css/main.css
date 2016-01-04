@@ -5606,7 +5606,7 @@ input.switch:checked ~ label:after {
     font-weight: bold;
     height: 50px;
     letter-spacing: 2px;
-    top: -78px;
+    top: -94px;
     width: 200px;
     align-items: center;
     justify-content: center; }
@@ -5620,7 +5620,7 @@ input.switch:checked ~ label:after {
         content: " ";
         height: 0;
         left: 50%;
-        margin-left: -15px;
+        margin-left: -13px;
         pointer-events: none;
         position: absolute;
         top: 100%;
@@ -5759,11 +5759,10 @@ input.switch:checked ~ label:after {
     top: 0;
     background: url(/img/laser-platform.png);
     background-size: 100% 100%;
-    border: 1px solid #767676;
-    height: 520px;
+    height: 510px;
     overflow: hidden;
     position: absolute;
-    width: 520px; }
+    width: 510px; }
 
 .laser-studio .laser-object .ft-container {
     z-index: 1; }

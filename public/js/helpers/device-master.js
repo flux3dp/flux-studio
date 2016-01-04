@@ -47,6 +47,7 @@ define([
         var d = deferred || $.Deferred(),
             uuid = device.uuid,
             goAuth = function(uuid) {
+                ProgressActions.close();
                 InputLightboxActions.open('auth', {
                     caption      : sprintf(lang.input_machine_password.require_password, _device.name),
                     inputHeader  : lang.input_machine_password.password,

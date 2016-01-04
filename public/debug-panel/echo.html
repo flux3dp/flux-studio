@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>FLUXStudio - Echo</title>
+  <script src="res/jquery-2.1.4.min.js"></script>
+  <script src="res/bootstrap/js/bootstrap.min.js"></script>
+  <link href="res/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+  <meta charset="UTF-8">
+  <script src="shared.js"></script>
+  <script>
+  $(window).ready(function() {
+    window.echo_ws = new WebSocket("ws://" + window.location.host + "/ws/echo");
+    window.echo_ws.onopen = function() {
+      appendLog("Echo Connected", "#0000aa");
+    };
+    window.echo_ws.onclose = ws_close_handler("Echo");
+    window.echo_ws.onmessage = function(m) {
+      appendLog("<< " + m.data, "#0000aa");
+    }
+
+    $("#cmdline").on("keypress", function(e) {
+      if(e.keyCode==13) {
+        var val = $(this).val();
+        window.echo_ws.send(val);
+        appendLog(">> " + val);
+        $(this).val("");
+        return false;
+      }
+    });
+  });
+  </script>
+</head>
+<body>
+  <div class="container"><h1>./fluxghost/assets/echo.html</h1></div>
+  <hr />
+  <div class="container"><div class="navbar">
+    <a href="index.html" class="btn btn-primary">Back to Index</a>
+  </div></div>
+  <div class="container"><div class="navbar">
+    <input type="text" class="form-control" id="cmdline"></input>
+  </div>
+  <div class="container" id="log"></div>
+</body>
+</html>

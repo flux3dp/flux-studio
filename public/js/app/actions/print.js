@@ -732,6 +732,17 @@ define([
 
     // SET section ---
 
+    function resetObject() {
+        if(SELECTED) {
+            var s = SELECTED.scale;
+            setScale(s._x, s._y, s._z, true, true);
+            setRotation(0, 0, 0, true);
+            groundIt(SELECTED);
+            alignCenter();
+            selectObject(null);
+        }
+    }
+
     function setMousePosition(e) {
         var offx = 0,
             offy = 0;
@@ -801,6 +812,7 @@ define([
     function setMode(mode) {
         removeFromScene('TransformControl');
         transformControl.setMode(mode);
+        reactSrc.setState({ mode: mode });
         scene.add(transformControl);
         render();
     }
@@ -926,8 +938,7 @@ define([
 
         if (!$.isEmptyObject(obj)) {
 
-            MenuFactory.items.duplicate.enabled = true;
-            MenuFactory.items.duplicate.onClick = duplicateSelected;
+            _enableObjectEditMenu(true);
 
             objects.forEach(function(o) {
                 o.outlineMesh.visible = false;
@@ -953,10 +964,10 @@ define([
             }
         }
         else {
-            MenuFactory.items.duplicate.enabled = false;
             transformMode = false;
             removeFromScene('TransformControl');
             _removeAllMeshOutline();
+            _enableObjectEditMenu(false);
             reactSrc.setState({ openObjectDialogue: false });
         }
 
@@ -969,6 +980,9 @@ define([
             SELECTED.position.x -= reference.x;
             SELECTED.position.y -= reference.y;
             SELECTED.position.z -= reference.z;
+            SELECTED.outlineMesh.position.x -= reference.x;
+            SELECTED.outlineMesh.position.y -= reference.y;
+            SELECTED.outlineMesh.position.z -= reference.z;
             blobExpired = true;
 
             checkOutOfBounds(SELECTED);
@@ -977,6 +991,7 @@ define([
     }
 
     function groundIt(mesh) {
+        mesh = mesh || SELECTED;
         if (!$.isEmptyObject(mesh)) {
             var reference = getReferenceDistance(mesh);
             mesh.position.z -= reference.z;
@@ -1252,7 +1267,7 @@ define([
             });
             return d.promise()
         }
-        
+
         var width = 640, height = 640,
             canvas = document.createElement("canvas"),
             sh = image.height,
@@ -1640,6 +1655,18 @@ define([
         var vector = new THREE.Vector3(0, 0, -1);
         vector.applyEuler(_camera.rotation, _camera.eulerOrder);
         return vector;
+    }
+
+    function _enableObjectEditMenu(enabled) {
+        MenuFactory.items.duplicate.enabled = enabled;
+        MenuFactory.items.scale.enabled = enabled;
+        MenuFactory.items.rotate.enabled = enabled;
+        MenuFactory.items.reset.enabled = enabled;
+
+        MenuFactory.items.duplicate.onClick = duplicateSelected;
+        MenuFactory.items.scale.onClick = setScaleMode;
+        MenuFactory.items.rotate.onClick = setRotateMode;
+        MenuFactory.items.reset.onClick = resetObject;
     }
 
     function clear() {

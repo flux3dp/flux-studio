@@ -168,7 +168,6 @@ define([
             },
 
             _showUpdate: function(payload) {
-                console.log(payload);
                 this.setState({
                     application: {
                         open: true,
@@ -415,7 +414,6 @@ define([
                     };
 
                 fetchProfile().then(fetchLatestVersion).done(function(currentProfile, currentVersion) {
-                    console.log(currentProfile, currentVersion)
                     var isIgnore = -1 < ignoreVersions.indexOf(currentVersion.latest_version);
 
                     if (false === isIgnore &&
