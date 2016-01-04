@@ -609,7 +609,7 @@ define([
                     });
                 },
 
-                _onSavePCD: function(mesh) {
+                _onSavePCD: function() {
                     var self = this,
                         selectedMeshes = self.state.selectedMeshes,
                         fileName = (new Date()).getTime() + '.pcd';
@@ -1180,7 +1180,7 @@ define([
                             false === state.isScanStarted &&
                             false === state.showCamera ?
                         <ManipulationPanel
-                            lang = {lang}
+                            lang={lang}
                             selectedMeshes={state.selectedMeshes}
                             switchTransformMode={this._switchTransformMode}
                             onCropOn={this._doCropOn}
