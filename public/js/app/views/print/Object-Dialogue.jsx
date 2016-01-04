@@ -41,6 +41,10 @@ define([
             this.props.onFocus(false);
         },
 
+        componentWillReceiveProps: function(nextProps) {
+            this._openAccordion(nextProps.mode);
+        },
+
         componentWillUpdate: function(nextProp, nextState) {
             // if update from transform control
             if(!this._hasSameSize(nextProp.model.size, refSize)) {
@@ -170,7 +174,7 @@ define([
 
                     <label className="controls accordion">
                         <input
-                            name="size"
+                            name="scale"
                             type="checkbox"
                             className="accordion-switcher"
                             onClick={this._handleModeChange}/>

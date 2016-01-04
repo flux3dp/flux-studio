@@ -80,7 +80,7 @@ define([
             if(_o.offset()){
                 _hole.x = _o.offset().left + _o.width() / 2 + _offset_x;
                 _hole.y = _o.offset().top + _o.height() / 2 + _offset_y;
-            }else{
+            } else {
                 _hole.x = _hole.y = 0;
                 console.error("Unknown selector", this.props.guides[this.props.step].selector);
             }
