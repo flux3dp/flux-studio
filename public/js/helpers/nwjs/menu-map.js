@@ -88,30 +88,6 @@ define([
                 modifiers: 'cmd',
                 parent: parentIndex.FILE
             },
-            copy: {
-                label: lang.edit.copy,
-                enabled: false,
-                onClick: emptyFunction,
-                key: 'c',
-                modifiers: 'cmd',
-                parent: parentIndex.EDIT
-            },
-            cut: {
-                label: lang.edit.cut,
-                enabled: false,
-                onClick: emptyFunction,
-                key: 'x',
-                modifiers: 'cmd',
-                parent: parentIndex.EDIT
-            },
-            paste: {
-                label: lang.edit.paste,
-                enabled: false,
-                onClick: emptyFunction,
-                key: 'v',
-                modifiers: 'cmd',
-                parent: parentIndex.EDIT
-            },
             duplicate: {
                 label: lang.edit.duplicate,
                 enabled: false,
@@ -134,6 +110,12 @@ define([
                 onClick: emptyFunction,
                 key: 'r',
                 modifiers: 'cmd+alt',
+                parent: parentIndex.EDIT
+            },
+            reset: {
+                label: lang.edit.reset,
+                enabled: false,
+                onClick: emptyFunction,
                 parent: parentIndex.EDIT
             },
             clear: {
@@ -233,6 +215,9 @@ define([
                 label: lang.edit.label,
                 subItems: [
                     items.duplicate,
+                    items.scale,
+                    items.rotate,
+                    items.reset,
                     separator,
                     items.clear
                 ]

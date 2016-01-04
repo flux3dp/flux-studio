@@ -49,6 +49,9 @@ define(function() {
             edit: {
                 label: 'Edit',
                 duplicate: 'Duplicate',
+                rotate: 'Rotate',
+                scale: 'Scale',
+                reset: 'Reset',
                 clear: 'Clear Scene'
             },
             device: {
