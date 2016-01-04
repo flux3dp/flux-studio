@@ -609,21 +609,27 @@ define([
                     });
                 },
 
-                _onSaveSinglePointCloud: function(mesh) {
+                _onSavePCD: function(mesh) {
                     var self = this,
+                        selectedMeshes = self.state.selectedMeshes,
                         fileName = (new Date()).getTime() + '.pcd';
 
-                    self.state.scanModelingWebSocket.export(
-                        mesh.name,
-                        'pcd',
-                        {
-                            onFinished: function(blob) {
-                                saveAs(blob, fileName);
-                                self._openBlocker(false);
-                            }
-                        }
+                    self._doManualMerge(
+                        selectedMeshes,
+                        function(outputName) {
+                            self.state.scanModelingWebSocket.export(
+                                outputName,
+                                'pcd',
+                                {
+                                    onFinished: function(blob) {
+                                        saveAs(blob, fileName);
+                                        self._openBlocker(false);
+                                    }
+                                }
+                            );
+                        },
+                        false
                     );
-
                     self._openBlocker(true, ProgressConstants.NONSTOP);
                 },
 
@@ -660,12 +666,7 @@ define([
                 _onScanFinished: function(point_cloud) {
                     var self = this,
                         mesh = self._getMesh(self.state.scanTimes),
-                        // upload_name = 'scan-' + (new Date()).getTime(),
                         onUploadFinished = function() {
-                            // var mesh = self._getMesh(self.state.scanTimes);
-
-                            // mesh.name = upload_name;
-
                             // update scan times
                             self.setState({
                                 openProgressBar: false,
@@ -1185,7 +1186,7 @@ define([
                             onCropOn={this._doCropOn}
                             onCropOff={this._doCropOff}
                             onClearNoise={this._doClearNoise}
-                            onSave={this._onSaveSinglePointCloud}
+                            onSavePCD={this._onSavePCD}
                             onManualMerge={this._doManualMerge}
                             object={state.selectedObject}
                             position={state.objectDialogPosition}
