@@ -680,7 +680,7 @@ define(function() {
                 auto_merge: 'Loading filament',
                 manual_merge: 'Merge',
                 clear_noise: 'Denoise',
-                save_pointcloud: 'Save'
+                save_pointcloud: 'Export'
             },
             size: {
                 x: 'X',
