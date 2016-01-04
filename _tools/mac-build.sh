@@ -6,10 +6,10 @@ chmod -R 777 ./nwjs-shell-builder/
 
 #Unzip latest ghost
 echo "${COLOR_YELLOW}Downloading latest ghost${COLOR_RESET}"
-cp $GHOST_SRC/fluxghost-$GHOST_VERSION-osx.zip latest-ghost-osx.zip
 rm -r osx-cache
 mkdir osx-cache
-unzip latest-ghost-osx.zip -d osx-cache > .zip_log
+cp $GHOST_SRC/fluxghost-$GHOST_VERSION-osx.zip osx-cache/latest-ghost-osx.zip
+unzip osx-cache/latest-ghost-osx.zip -d osx-cache > .zip_log
 rm -r $DIR/public/lib
 mkdir $DIR/public/lib
 mv osx-cache/dist/ghost $DIR/public/lib
