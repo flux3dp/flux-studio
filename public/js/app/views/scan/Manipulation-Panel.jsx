@@ -21,7 +21,7 @@ define([
                 selectedMeshes: [],
                 onCropOn: function() {},
                 onCropOff: function() {},
-                onSave: function() {},
+                onSavePCD: function() {},
                 onClearNoise: function() {},
                 onManualMerge: function() {},
                 onReset: function() {},
@@ -30,12 +30,22 @@ define([
             };
         },
 
+        getInitialState: function() {
+            return {
+                onCropping: false,
+                handleMesh: this.props.selectedMeshes[0],
+                visible: false,
+                position: this.props.position,
+                object: this.props.object
+            };
+        },
+
         _onClearNoise: function(e) {
             this.props.onClearNoise(this.state.handleMesh);
         },
 
-        _onSave: function(e) {
-            this.props.onSave(this.state.handleMesh);
+        _onSavePCD: function(e) {
+            this.props.onSavePCD();
         },
 
         _onCrop: function(e) {
@@ -96,7 +106,7 @@ define([
                                 </button>
                             </div>
                             <div className="control">
-                                <button className="btn btn-action btn-save-pcd" data-ga-event="save-point-cloud" onClick={this._onSave}>
+                                <button className="btn btn-action btn-save-pcd" data-ga-event="save-point-cloud" onClick={this._onSavePCD}>
                                     <img src="/img/icon-export.png"/>
                                     {lang.scan.manipulation.save_pointcloud}
                                 </button>
@@ -154,7 +164,7 @@ define([
                                 </button>
                             </div>
                             <div className="control">
-                                <button className="btn btn-action btn-save-pcd" data-ga-event="save-point-cloud" onClick={this._onSave}>
+                                <button className="btn btn-action btn-save-pcd" data-ga-event="save-point-cloud" onClick={this._onSavePCD}>
                                     <img src="/img/icon-export.png"/>
                                     {lang.scan.manipulation.save_pointcloud}
                                 </button>
@@ -252,16 +262,6 @@ define([
                     {content}
                 </div>
             );
-        },
-
-        getInitialState: function() {
-            return {
-                onCropping: false,
-                handleMesh: this.props.selectedMeshes[0],
-                visible: false,
-                position: this.props.position,
-                object: this.props.object
-            };
         },
 
         _computePosition: function(position) {
