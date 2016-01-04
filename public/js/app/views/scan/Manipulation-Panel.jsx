@@ -95,6 +95,12 @@ define([
                                     {lang.scan.manipulation.manual_merge}
                                 </button>
                             </div>
+                            <div className="control">
+                                <button className="btn btn-action btn-save-pcd" data-ga-event="save-point-cloud" onClick={this._onSave}>
+                                    <img src="/img/icon-export.png"/>
+                                    {lang.scan.manipulation.save_pointcloud}
+                                </button>
+                            </div>
                         </label>
                     </label>
                 </div>
@@ -149,7 +155,7 @@ define([
                             </div>
                             <div className="control">
                                 <button className="btn btn-action btn-save-pcd" data-ga-event="save-point-cloud" onClick={this._onSave}>
-                                    <img src="/img/icon-denoise.png"/>
+                                    <img src="/img/icon-export.png"/>
                                     {lang.scan.manipulation.save_pointcloud}
                                 </button>
                             </div>
