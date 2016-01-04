@@ -683,7 +683,8 @@ define(function() {
                 crop: 'Crop',
                 auto_merge: 'Loading filament',
                 manual_merge: 'Merge',
-                clear_noise: 'Denoise'
+                clear_noise: 'Denoise',
+                save_pointcloud: 'Export'
             },
             size: {
                 x: 'X',

@@ -609,6 +609,30 @@ define([
                     });
                 },
 
+                _onSavePCD: function() {
+                    var self = this,
+                        selectedMeshes = self.state.selectedMeshes,
+                        fileName = (new Date()).getTime() + '.pcd';
+
+                    self._doManualMerge(
+                        selectedMeshes,
+                        function(outputName) {
+                            self.state.scanModelingWebSocket.export(
+                                outputName,
+                                'pcd',
+                                {
+                                    onFinished: function(blob) {
+                                        saveAs(blob, fileName);
+                                        self._openBlocker(false);
+                                    }
+                                }
+                            );
+                        },
+                        false
+                    );
+                    self._openBlocker(true, ProgressConstants.NONSTOP);
+                },
+
                 _onSave: function(e) {
                     var self = this,
                         exportFile = function(outputName) {
@@ -642,12 +666,7 @@ define([
                 _onScanFinished: function(point_cloud) {
                     var self = this,
                         mesh = self._getMesh(self.state.scanTimes),
-                        // upload_name = 'scan-' + (new Date()).getTime(),
                         onUploadFinished = function() {
-                            // var mesh = self._getMesh(self.state.scanTimes);
-
-                            // mesh.name = upload_name;
-
                             // update scan times
                             self.setState({
                                 openProgressBar: false,
@@ -1161,12 +1180,13 @@ define([
                             false === state.isScanStarted &&
                             false === state.showCamera ?
                         <ManipulationPanel
-                            lang = {lang}
+                            lang={lang}
                             selectedMeshes={state.selectedMeshes}
                             switchTransformMode={this._switchTransformMode}
                             onCropOn={this._doCropOn}
                             onCropOff={this._doCropOff}
                             onClearNoise={this._doClearNoise}
+                            onSavePCD={this._onSavePCD}
                             onManualMerge={this._doManualMerge}
                             object={state.selectedObject}
                             position={state.objectDialogPosition}

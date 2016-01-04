@@ -683,7 +683,8 @@ define(function() {
                 crop: '剪裁',
                 auto_merge: '自動合併',
                 manual_merge: '手動合併',
-                clear_noise: '去除噪點'
+                clear_noise: '去除噪點',
+                save_pointcloud: '輸出點雲'
             },
             size: {
                 x: 'X',
