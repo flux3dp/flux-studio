@@ -74,17 +74,6 @@ define([
                     },
                     onClick: self.props.onConvertClick
                 });
-
-                if (true === window.FLUX.debug) {
-                    buttons.push({
-                        label: 'Save PCD',
-                        className: 'btn-action btn-hexagon btn-save-pcd',
-                        dataAttrs: {
-                            'ga-event': 'save-as-pcd'
-                        },
-                        onClick: self.props.onSaveClick
-                    });
-                }
                 break;
             case 'CONVERTED':
                 buttons.push({
