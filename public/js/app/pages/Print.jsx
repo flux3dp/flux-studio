@@ -20,7 +20,6 @@ define([
     'app/stores/global-store',
     'app/actions/global-actions',
     'app/constants/device-constants',
-    'app/app-settings',
     'jsx!widgets/Tour-Guide',
     'app/actions/alert-actions',
     'app/stores/alert-store',
@@ -28,7 +27,8 @@ define([
     'helpers/sprintf',
     'app/actions/initialize-machine',
     'app/actions/progress-actions',
-    'app/constants/progress-constants'
+    'app/constants/progress-constants',
+    'app/default-print-settings'
 ], function(
     $,
     React,
@@ -51,7 +51,6 @@ define([
     GlobalStore,
     GlobalActions,
     DeviceConstants,
-    AppSettings,
     TourGuide,
     AlertActions,
     AlertStore,
@@ -59,7 +58,8 @@ define([
     sprintf,
     InitializeMachine,
     ProgressActions,
-    ProgressConstants
+    ProgressConstants,
+    DefaultPrintSettings
 ) {
 
     return function(args) {
@@ -141,7 +141,7 @@ define([
                         advancedSettings = {};
                         advancedSettings.raft_layers = 4;
                         advancedSettings.support_material = 0;
-                        advancedSettings.custom = AppSettings.custom;
+                        advancedSettings.custom = DefaultPrintSettings.custom;
                     }
                     else {
                         advancedSettings = _setting;
