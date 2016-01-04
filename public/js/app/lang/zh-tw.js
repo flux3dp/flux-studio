@@ -65,8 +65,8 @@ define(function() {
             },
             help: {
                 label: '說明',
-                starting_guide: '開始使用',
-                online_support: '線上支援',
+                help_center: '說明中心',
+                contact: '聯絡我們',
                 troubleshooting: '錯誤排除',
                 tutorial: '列印教學',
                 debug: '錯誤回報'

@@ -65,8 +65,8 @@ define(function() {
             },
             help: {
                 label: 'Help',
-                starting_guide: 'Starting Guide',
-                online_support: 'Online Support',
+                help_center: 'Help Center',
+                contact: 'Contact Us',
                 troubleshooting: 'Troubleshooting',
                 tutorial: 'Start Printing Tutorial',
                 debug: 'Bug Report'

@@ -4,7 +4,7 @@
  */
 define([
     'jquery',
-    'helpers/websocket',
+    'helpers/websocket-debug',
     'helpers/file-system',
     'helpers/point-cloud'
 ], function($, Websocket, fileSystem, PointCloudHelper) {

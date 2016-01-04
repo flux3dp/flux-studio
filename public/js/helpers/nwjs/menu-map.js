@@ -367,30 +367,30 @@ define([
             label: lang.help.label,
             subItems: [
                 {
-                    label: lang.help.starting_guide,
+                    label: lang.help.help_center,
                     enabled: true,
                     onClick: function() {
                         if ('undefined' !== typeof requireNode) {
-                            requireNode('nw.gui').Shell.openExternal('http://flux3dp.com/starting-guide');
+                            requireNode('nw.gui').Shell.openExternal('https://helpcenter.flux3dp.com/');
                         }
                         else {
-                            window.open('http://flux3dp.com/starting-guide');
+                            window.open('https://helpcenter.flux3dp.com/');
+                        }
+                    }
+                },
+                {
+                    label: lang.help.contact,
+                    enabled: true,
+                    onClick: function() {
+                        if ('undefined' !== typeof requireNode) {
+                            requireNode('nw.gui').Shell.openExternal('http://flux3dp.com/contact');
+                        }
+                        else {
+                            window.open('http://flux3dp.com/contact');
                         }
                     }
                 },
                 items.tutorial,
-                {
-                    label: lang.help.online_support,
-                    enabled: true,
-                    onClick: function() {
-                        if ('undefined' !== typeof requireNode) {
-                            requireNode('nw.gui').Shell.openExternal('http://flux3dp.com/support');
-                        }
-                        else {
-                            window.open('http://flux3dp.com/support');
-                        }
-                    }
-                },
                 {
                     label: lang.help.debug,
                     enabled: true,
