@@ -182,7 +182,10 @@ define([
                             ''
                         ),
                         closeSubPopup = function(e) {
-                            if ('true' === e.currentTarget.dataset.closeImagePanel) {
+                            e.cancelBubble = true;
+                            e.stopPropagation();
+
+                            if ('true' === e.target.dataset.closeImagePanel) {
                                 self.refs.setupPanel.openSubPopup(e);
                                 self._inactiveSelectImage(e);
                             }

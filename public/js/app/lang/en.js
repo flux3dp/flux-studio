@@ -49,6 +49,9 @@ define(function() {
             edit: {
                 label: 'Edit',
                 duplicate: 'Duplicate',
+                rotate: 'Rotate',
+                scale: 'Scale',
+                reset: 'Reset',
                 clear: 'Clear Scene'
             },
             device: {
@@ -65,10 +68,11 @@ define(function() {
             },
             help: {
                 label: 'Help',
-                starting_guide: 'Starting Guide',
-                online_support: 'Online Support',
+                help_center: 'Help Center',
+                contact: 'Contact Us',
                 troubleshooting: 'Troubleshooting',
-                tutorial: 'Start Tutorial'
+                tutorial: 'Start Printing Tutorial',
+                debug: 'Bug Report'
             }
         },
         initialize: {
@@ -79,12 +83,16 @@ define(function() {
             cancel: 'CANCEL',
             confirm: 'CONFIRM',
             connect: 'Connect',
+            no_machine: 'I don\'t have a machine now',
 
             // specific caption/content
             invalid_device_name: 'The name can only contains alphabet, numbers, blanks, and special characters  “-”, “_”, “’”, “\'”.',
             require_device_name: 'Name is required',
             select_language: 'Select Language',
-            change_password: 'Change password?',
+            change_password: {
+                content: 'Are you sure to change the password?',
+                caption: 'Changing password'
+            },
             connect_flux: 'Connect FLUX Delta with USB Cable',
             name_your_flux: 'Name Your FLUX Delta',
             wifi_setup: 'Wi-Fi Setup',
@@ -94,11 +102,11 @@ define(function() {
 
             // page specific
             set_machine_generic: {
-                printer_name: 'Name',
-                printer_name_placeholder: 'Device\'s Name',
+                printer_name: 'Name*',
+                printer_name_placeholder: 'Give it an unique name',
                 password: 'Password',
                 set_station_mode: 'Set as wifi station',
-                password_placeholder: 'Password'
+                password_placeholder: 'Something secret'
             },
 
             setting_completed: {
@@ -106,11 +114,11 @@ define(function() {
                 is_ready: '“%s” is ready',
                 station_ready_statement: 'Your FLUX Delta is now a Wi-Fi station, you can use your FLUX wirelessly by connect to Wi-Fi “%s”',
                 brilliant: 'Brilliant!',
-                begin_journey: 'You can begin the journey with your FLUX Delta now.',
-                great: 'Great!',
-                upload_via_usb: 'You can setup Wi-Fi later, or use USB drive to print.',
+                begin_journey: 'You can now detach Micro USB Cable, and begin the journey with your FLUX Delta now.',
+                great: 'Welcome to FLUX Studio',
+                upload_via_usb: 'You can setup device Wi-Fi later. <br/>If you don\'t have Wi-Fi, check <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/215998327-Connection-Guide-for-Desktop-PCs">Desktop Connection Guide</a>.',
                 back: 'Back',
-                ok: 'OK'
+                ok: 'START CREATING'
             },
 
             // errors
@@ -118,11 +126,13 @@ define(function() {
                 error: 'Error',
 
                 keep_connect: {
-                    content: 'Please make sure your FLUX Delta has been powered on and attached to micro-usb cord.'
+                    caption: 'USB Device not found',
+                    content: 'Oops! Don\'t worry. We\'re here for you.\nMake sure your FLUX Delta has been powered \non, attached to Micro USB Cable and the driver is installed.\n<a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/215327328">...More solutions</a>'
                 },
 
                 wifi_connection: {
-                    connecting_fail: 'Connecting Fail.'
+                    caption: 'Unable to connect',
+                    connecting_fail: 'Please make sure the Wi-Fi signal is strong and the password is correct.'
                 },
 
                 select_wifi: {
@@ -618,8 +628,12 @@ define(function() {
             quality: 'QUALITY',
             scan_again_confirm: 'Do you want to discard current scan result?',
             calibrate: 'Calibrate',
-            calibrate_fail: 'Calibrate Fail',
-            calibration_is_running: 'Calibration is running',
+            calibration_done: {
+                caption: 'Calibration Done',
+                message: 'You can scan now'
+            },
+            calibrate_fail: 'Calibration Failed',
+            calibration_is_running: 'Calibrating for Scan',
             resolution: [{
                 id: 'best',
                 text: 'Best',
@@ -669,7 +683,8 @@ define(function() {
                 crop: 'Crop',
                 auto_merge: 'Loading filament',
                 manual_merge: 'Merge',
-                clear_noise: 'Denoise'
+                clear_noise: 'Denoise',
+                save_pointcloud: 'Export'
             },
             size: {
                 x: 'X',
@@ -731,15 +746,20 @@ define(function() {
             quit: 'Quit',
             heating: 'Heating',
             completing: 'Completing',
+            aborted: 'Aborted',
+            completed: 'Completed',
             calibrating: 'Calibrating',
             starting: 'Starting',
             resuming: 'Resuming',
             scanning: 'Scanning',
-            occupied: 'Occupied',
+            occupied: 'Mantaining',
             running: 'Working',
             uploading: 'Uploading',
             processing: 'Processing',
-            disconnectedError: 'Device disconnected\nPlease confirm if network access of device is available',
+            disconnectedError: {
+                caption: 'Device disconnected',
+                message: 'Please confirm if network access of %s is available'
+            },
             noTask: 'There are currently no task to do',
             pleaseWait: 'Please Wait...',
             unknownCommand: 'command cannot be executed in current status',
@@ -754,17 +774,19 @@ define(function() {
             monitor                         : 'MONITOR',
             currentTemperature              : 'Current Temp',
             nothingToPrint                  : 'There is nothing to print',
-            go                              : 'GO',
-            start                           : 'START',
-            pause                           : 'PAUSE',
-            stop                            : 'STOP',
-            record                          : 'RECORD',
-            camera                          : 'CAMERA',
+            go                              : 'Start',
+            start                           : 'Start',
+            pause                           : 'Pause',
+            stop                            : 'Stop',
+            record                          : 'Record',
+            camera                          : 'Camera',
             connecting                      : 'Connecting, please wait...',
             HEAD_OFFLINE                    : 'Device head is not connected or missing',
             HEAD_ERROR_CALIBRATING          : 'Unable to calibrate toolhead\nplease re-attach the toolhead',
-            HEAD_ERROR_FAN_FAILURE          : 'Fan failed / stucked\nyou can spin it with a pancil',
+            HEAD_ERROR_FAN_FAILURE          : 'Cooling fan not spinning\nSpin it with a pencil or thin stick.',
             HEAD_ERROR_HEAD_OFFLINE         : 'Toolhead not detected\nPlease re-attach the module cable',
+            HEAD_ERROR_TYPE_ERROR           : 'Toolhead incorrect\nPlease attach correct toolhead',
+            'HEAD_ERROR_?'                  : 'Toolhead error\nCheck if the toolhead is abnormal',
             HWARDWARE_ERROR_FILAMENT_RUNOUT : 'Ran out of filament\nPlease insert new material',
             HWARDWARE_ERROR_0               : 'Ran out of filament\nPlease insert new material',
             HARDWARE_ERROR_PLATE_MISSING    : 'Unable to detect the base plate\nPlease put on the plate.',
@@ -792,9 +814,9 @@ define(function() {
             second                          : 's',
             left                            : 'left',
             temperature                     : 'Temperature',
-            forceStop                       : 'Force stopping device?',
-            upload                          : 'UPLOAD',
-            download                        : 'DOWNLOAD',
+            forceStop                       : 'Abort current task?',
+            upload                          : 'Upload',
+            download                        : 'Download',
             fileNotDownloadable             : 'this file type is not supported for download',
             cannotPreview                   : 'Can not preview file',
             extensionNotSupported           : 'file extension not supported',
@@ -808,14 +830,13 @@ define(function() {
                 EXTRUDER                    : 'Printing Toolhead',
                 LASER                       : 'Laser Toolhead'
             }
-
         },
         alert: {
             caption: 'Error',
             duplicated_preset_name: 'Duplicated preset name',
             info: 'INFO',
             warning: 'WARNING',
-            error: 'ERROR',
+            error: 'UH-OH',
             retry: 'RETRY',
             abort: 'ABORT',
             cancel: 'CANCEL',
@@ -838,22 +859,31 @@ define(function() {
             yellow: 'YELLOW',
             transparent: 'TRANSPARENT'
         },
+        caption: {
+            connectionTimeout: 'Connection timeout'
+        },
         message: {
             connecting: 'Connecting...',
             connected: 'Connected',
             machineNotConnected: 'Machine is not connected',
             notPrinting: 'Printing is not in progress',
             nothingToPrint: 'Nothing to print (source blob missing)',
-            connectionTimeout: 'device is not responding, connection timeout',
+            connectionTimeout: 'Please check your network state and FLUX Device\'s Wi-Fi indicator.',
+            device_not_found: {
+                caption: 'Default device not found',
+                message: 'Please check your FLUX\'s Wi-Fi indicator'
+            },
             device_busy: {
                 caption: 'Device Busy',
                 message: 'The device is executing another task, try again later. If it stops working, please restart the device.'
             },
-            device_is_used: 'The device is being used, do you want to abort current task?'
+            device_is_used: 'The device is being used, do you want to abort current task?',
+            invalidFile: 'The file is not a valid stl file'
         },
         machine_status: {
+            '-10': 'Raw mode',
             '-2': 'Scanning',
-            '-1': 'Occupied',
+            '-1': 'Maintaining',
             0: 'Idle',
             1: 'Initiating',
             2: 'ST_TRANSFORM',
@@ -869,7 +899,7 @@ define(function() {
             64: 'Completed',
             66: 'Completing',
             128: 'Aborted',
-            UNKNOWN: 'UNKNOWN'
+            UNKNOWN: 'Unknown'
         },
         head_module: {
             EXTRUDER: 'Print',
@@ -897,14 +927,20 @@ define(function() {
             connect: 'CONNECT',
             password: 'Password'
         },
+        set_default: {
+            success: 'Successfully set %s as default',
+            error: 'Unable to set %s as default, due to network issue'
+        },
         tutorial: {
+            set_first_default_caption: 'Welcome',
+            set_first_default: 'Do you want to set "%s" as your default device?',
             startWithFilament: 'Let\'s start with loading filament',
             startWithModel: 'Next, let\'s import some 3D model',
-            startTour: 'Welcome.<br/>This is your first time printing,<br/>would you like to start printing tutorial?',
+            startTour: 'Welcome!<br/>This is your first time printing,<br/>would you like to start printing tutorial?',
             clickToImport: 'Click to import 3D model',
             selectQuality: 'Select quality you preferred',
             clickGo: 'Prepare to print',
-            startPrint: 'Click go and start printing',
+            startPrint: 'Apply glue on the plate, and start to print',
             skip: 'Skip tutorial'
         },
         slicer: {

@@ -10,7 +10,7 @@ define(function() {
             no_webgl: '您的系統不支援 WebGL'
         },
         device_selection: {
-            no_printers: '未偵測到 FLUX 裝置, 請檢查您與機器的網路連線是否在同個網路下',
+            no_printers: '未偵測到 FLUX Delta, 請檢查您與機器的網路連線是否在同個網路下',
             device_name: 'DEVICE NAME',
             module: 'MODULE',
             status: 'STATUS'
@@ -49,6 +49,9 @@ define(function() {
             edit: {
                 label: '編輯',
                 duplicate: '重製',
+                rotate: '旋轉',
+                scale: '縮放',
+                reset: '重置',
                 clear: '清除場景'
             },
             device: {
@@ -65,10 +68,11 @@ define(function() {
             },
             help: {
                 label: '說明',
-                starting_guide: '開始使用',
-                online_support: '線上支援',
+                help_center: '說明中心',
+                contact: '聯絡我們',
                 troubleshooting: '錯誤排除',
-                tutorial: '列印教學'
+                tutorial: '列印教學',
+                debug: '錯誤回報'
             }
         },
         initialize: {
@@ -79,14 +83,18 @@ define(function() {
             cancel: '取消',
             confirm: '確認',
             connect: '連接',
+            no_machine : '目前沒有機器，跳過此步驟',
 
             // specific caption/content
-            invalid_device_name: '機器名稱只能使用英文字母、數字、空格以及特殊字元 “-”, “_”, “’”, “\'”',
+            invalid_device_name: '裝置名稱只能使用英文字母、數字、空格以及特殊字元 “-”, “_”, “’”, “\'”',
             require_device_name: '名稱欄位為必填',
             select_language: '請選擇你想使用的語言',
-            change_password: '要更改密碼嗎?',
-            connect_flux: '用 USB 連接你的電腦與 FLUX',
-            name_your_flux: '給你的 FLUX 一個名字',
+            change_password: {
+                caption: '密碼更改',
+                content: '要更改密碼嗎?'
+            },
+            connect_flux: '用 USB 連接你的電腦與 FLUX 裝置',
+            name_your_flux: '為你的 FLUX Delta 取一個獨特的名字',
             wifi_setup: '設定無線網路',
             select_preferred_wifi: '選擇你偏好的網路',
             requires_wifi_password: '需要密碼',
@@ -94,11 +102,11 @@ define(function() {
 
             // page specific
             set_machine_generic: {
-                printer_name: '名稱',
-                printer_name_placeholder: '請輸入名稱',
-                password: '密碼',
+                printer_name: '裝置名稱*',
+                printer_name_placeholder: '例如：霹靂五號',
+                password: '裝置密碼',
                 set_station_mode: '設定成無線基地台',
-                password_placeholder: '請輸入密碼'
+                password_placeholder: '密碼可以保護你的 FLUX Delta'
             },
 
             setting_completed: {
@@ -106,27 +114,29 @@ define(function() {
                 is_ready: '“%s” 準備完成',
                 station_ready_statement: '你的 FLUX Delta 已成為 Wi-Fi 熱點，你可以藉由無線連接 “%s” 這個熱點操作 FLUX',
                 brilliant: '太棒了!',
-                begin_journey: '你可以開始使用 FLUX Delta 隨心所欲地進行創作囉！',
-                great: 'Let\'s Begin 開始使用 FLUX Delta',
-                upload_via_usb: '你可以稍後再設定 Wi-Fi 選項, 或使用 USB 隨身碟列印。',
+                begin_journey: '你可以拔除 Micro USB 傳輸線, 開始使用 FLUX Delta 隨心所欲地進行創作囉！',
+                great: '歡迎使用 FLUX Studio',
+                upload_via_usb: '你可以稍後再設定 Wi-Fi 選項。<br/>如果你沒有 Wi-Fi 環境，請參考<a target="__blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/215998327-Connection-Guide-for-Desktop-PCs">PC連線指南</a>',
                 back: '回到 Wi-Fi 設定',
                 ok: '開始使用'
             },
 
             // errors
             errors: {
-                error: 'Error',
+                error: '錯誤',
 
                 keep_connect: {
-                    content: '請確認電源已被開啟及已經由 micro-usb 連接'
+                    caption: '無法透過 USB 連接',
+                    content: '別擔心！請確認電源已被開啟及使用 Micro-Usb 連接裝置，並正確安裝驅動程式。<a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/215327328">...觀看更多說明</a>'
                 },
 
                 wifi_connection: {
-                    connecting_fail: '連接失敗'
+                    caption: '無法與此 Wi-Fi 連線',
+                    connecting_fail: '請確認信號強度以及密碼正確'
                 },
 
                 select_wifi: {
-                    ap_mode_fail: '設定失敗'
+                    ap_mode_fail: '基地台模式連線設定失敗'
                 }
             }
         },
@@ -300,9 +310,9 @@ define(function() {
                 innerShell: '外殼內圈',
                 outerShell: '外殼外圈',
                 bridge: '架橋',
-                config: 'Config',
+                config: '設定',
                 presets: '預設',
-                name: 'Name',
+                name: '名稱',
                 apply: '套用',
                 save: '儲存',
                 saveAsPreset: '存為預設',
@@ -618,8 +628,12 @@ define(function() {
             quality: '品質',
             scan_again_confirm: '是否確定要放棄目前的掃瞄結果？',
             calibrate: '校正',
+            calibration_done: {
+                caption: '校正完成',
+                message: '你可以開始掃描了'
+            },
             calibrate_fail: '校正失敗',
-            calibration_is_running: '校正進行中',
+            calibration_is_running: '掃描校正中',
             resolution: [{
                 id: 'best',
                 text: '最佳',
@@ -669,7 +683,8 @@ define(function() {
                 crop: '剪裁',
                 auto_merge: '自動合併',
                 manual_merge: '手動合併',
-                clear_noise: '去除噪點'
+                clear_noise: '去除噪點',
+                save_pointcloud: '輸出點雲'
             },
             size: {
                 x: 'X',
@@ -731,6 +746,8 @@ define(function() {
             quit: '中斷連結',
             heating: '加熱中',
             completing: '完成中',
+            aborted: '已終止',
+            completed: '已完成',
             calibrating: '校正中',
             starting: '啟動中',
             resuming: '恢復中',
@@ -739,7 +756,10 @@ define(function() {
             running: '工作中',
             uploading: '上傳中',
             processing: '處理中',
-            disconnectedError: '與機器連線暫時中斷\n請確認機器網路連線是否正常',
+            disconnectedError: {
+                caption: '機器連線中斷',
+                message: '請確認 %s 的網路連線是否正常'
+            },
             noTask: '目前無任何工作',
             pleaseWait: '請稍待...',
             unknownCommand: '指令無法在此狀態下被執行',
@@ -765,6 +785,8 @@ define(function() {
             HEAD_ERROR_CALIBRATING          : '模組校正失誤\n請重新裝載模組，並確認磁鐵關節正確的附著',
             HEAD_ERROR_FAN_FAILURE          : '風扇未轉動\n請用細針戳一下',
             HEAD_ERROR_HEAD_OFFLINE         : '工具頭離線\n請重新插入模組連接線',
+            HEAD_ERROR_TYPE_ERROR           : '錯誤模組\n請安裝正確模組',
+            'HEAD_ERROR_?'                  : 'Toolhead error\nCheck if the toolhead is abnormal',
             HWARDWARE_ERROR_FILAMENT_RUNOUT : '未偵測到料捲\n請重新插入新的料捲',
             HWARDWARE_ERROR_0               : '未偵測到料捲\n請重新插入新的料捲',
             HARDWARE_ERROR_PLATE_MISSING    : '未偵測到工作平台\n請放上工作平台金屬板',
@@ -792,7 +814,7 @@ define(function() {
             second                          : '秒',
             left                            : '完成',
             temperature                     : '溫度',
-            forceStop                       : '強制停止機器?',
+            forceStop                       : '是否強制停止現在工作?',
             upload                          : '上傳',
             download                        : '下載',
             fileNotDownloadable             : '下載不支援此檔案格式',
@@ -818,7 +840,7 @@ define(function() {
             retry: '重試',
             abort: '放棄',
             cancel: '取消',
-            ok: 'Ok',
+            ok: '確定',
             yes: ' 是',
             no: '否',
             stop: '停止'
@@ -837,37 +859,46 @@ define(function() {
             yellow: 'YELLOW',
             transparent: 'TRANSPARENT'
         },
+        caption: {
+            connectionTimeout: '連線逾時'
+        },
         message: {
-            connecting: 'Connecting...',
-            connected: 'Connected',
+            connecting: '連線中...',
+            connected: '已連線',
             machineNotConnected: 'Machine is not connected',
             notPrinting: 'Printing is not in progress',
             nothingToPrint: 'Nothing to print (source blob missing)',
-            connectionTimeout: 'device is not responding, connection timeout',
+            connectionTimeout: '請確認你的網路狀態和 FLUX Device 的 Wi-Fi 指示燈.',
+            device_not_found: {
+                caption: '找不到預設裝置',
+                message: '請確認預設裝置的 Wi-Fi 指示燈，或取消設定預設裝置'
+            },
             device_busy: {
                 caption: '裝置忙碌中',
                 message: '裝置正在進行另外一項工作，請稍候再試。如果裝置持續沒有回應，請將裝置重新啟動。'
             },
-            device_is_used: '裝置正被使用中，是否要終止現在任務？'
+            device_is_used: '裝置正被使用中，是否要終止現在任務？',
+            invalidFile: '檔案不是正確的 STL 格式'
         },
         machine_status: {
-            '-2': 'Scanning',
-            '-1': 'Occupied',
-            0: 'Idle',
-            1: 'Initiating',
+            '-10': 'Raw Mode',
+            '-2': '掃描中',
+            '-1': '維護中',
+            0: '待命中',
+            1: '初始化',
             2: 'ST_TRANSFORM',
             4: 'Starting',
-            6: 'Resuming',
-            16: 'Working',
-            18: 'Resuming',
-            32: 'Paused',
-            36: 'Paused',
-            38: 'Pausing',
-            48: 'Paused',
-            50: 'Pausing',
-            64: 'Completed',
-            66: 'Completing',
-            128: 'Aborted',
+            6: '回復中',
+            16: '工作中',
+            18: '回復中',
+            32: '已暫停',
+            36: '已暫停',
+            38: '暫停中',
+            48: '已暫停',
+            50: '暫停中',
+            64: '已完成',
+            66: '完成中',
+            128: '已中斷',
             UNKNOWN: 'UNKNOWN'
         },
         head_module: {
@@ -896,14 +927,20 @@ define(function() {
             connect: '連接',
             password: '密碼'
         },
+        set_default: {
+            success: '%s 已設為預設裝置',
+            error: '由於網路問題，無法將 %s 設為預設裝置'
+        },
         tutorial: {
-            startWithFilament: '讓我們先填裝料捲吧',
+            set_first_default_caption: '初次使用',
+            set_first_default: '是否要將 %s 設為預設裝置?',
+            startWithFilament: '首先，讓我們先填裝料捲',
             startWithModel: '接下來，我們來載入3Ｄ模型囉',
             startTour: '嗨，歡迎<br/>這是你第一次使用列印功能,<br/>你希望觀看列印功能教學嗎？',
             clickToImport: '點擊匯入以載入 3D 模型',
             selectQuality: '選擇列印品質',
             clickGo: '按下開始以準備列印',
-            startPrint: '開始列印',
+            startPrint: '在平台上塗上口紅膠，開始列印',
             skip: '跳過教學'
         },
         slicer: {

@@ -1,6 +1,15 @@
 define(['helpers/is-json'], function(isJson) {
     'use strict';
 
+    var websockets = [];
+    websockets.list = function() {
+        for(var i = 0; i < websockets.length; i++){
+            console.log(i, websockets[i].url);
+        }
+    };
+
+    window.FLUX.websockets = websockets;
+
     // options:
     //      hostname      - host name (Default: localhost)
     //      port          - what protocol uses (Default: 8000)
@@ -12,6 +21,7 @@ define(['helpers/is-json'], function(isJson) {
     //      onClose       - fired on connection closed
     //      onOpen        - fired on connection connecting
     return function(options) {
+        var _logs = [];
 
         var defaultCallback = function(result) {},
             defaultOptions = {
@@ -45,9 +55,11 @@ define(['helpers/is-json'], function(isJson) {
 
                 _ws.onmessage = function(result) {
                     var data = (true === isJson(result.data) ? JSON.parse(result.data) : result.data);
+                    _logs.push(['recv', data]);
 
                     if ('string' === typeof data) {
                         data = result.data.replace(/NaN(,)/g, 'null$1');
+                        data = data.replace(/\r?\n|\r/g);
                     }
 
                     data = (true === isJson(data) ? JSON.parse(data) : data);
@@ -95,12 +107,16 @@ define(['helpers/is-json'], function(isJson) {
 
         setInterval(function() {
             if (null !== ws && readyState.OPEN === ws.readyState) {
+                _logs.push(['sent','ping']);
                 ws.send('ping');
             }
         }, 60000);
 
-        return {
+        var wsobj = {
             readyState: readyState,
+            options: socketOptions,
+            _logs: _logs,
+            url: '/ws/' + options.method,
 
             send: function(data) {
                 var self = this;
@@ -111,10 +127,12 @@ define(['helpers/is-json'], function(isJson) {
 
                 if (null === ws || readyState.OPEN !== ws.readyState) {
                     ws.onopen = function() {
+                        _logs.push(['sent',data]);
                         ws.send(data);
                     };
                 }
                 else {
+                    _logs.push(['sent',data]);
                     ws.send(data);
                 }
 
@@ -172,7 +190,42 @@ define(['helpers/is-json'], function(isJson) {
                 socketOptions.onFatal = callback;
 
                 return this;
+            },
+
+            optimizeLogs: function(){
+                for(var i = 0; i < _logs.length; i++){
+                    var process_data = JSON.stringify(_logs[i][1]);
+                    if(typeof _logs[i][1] == "string"){
+                        process_data = _logs[i][1];
+                    }
+                    if(process_data.length > 100){
+                        process_data = process_data.substring(0,97) + "...";
+                    }
+                    _logs[i][1] = process_data;
+                }
+            },
+
+            logs: function(){
+                for(var i = 0; i < _logs.length; i++){
+                    var data = JSON.stringify(_logs[i][1]);
+                    var additional_data = null;
+                    if(typeof _logs[i][1] == "string"){
+                        data = _logs[i][1];
+                        if(data.length > 100){
+                            additional_data = {str: data};
+                            data = data.substring(0,20) + "...";
+                        }
+                    }
+                    if(data && data.length > 100) data = _logs[i][1];
+                    if(additional_data){
+                        console.log(_logs[i][0], data, additional_data);
+                    }else{
+                        console.log(_logs[i][0], data);
+                    }
+                }
             }
         };
+        websockets.push(wsobj);
+        return wsobj;
     };
 });

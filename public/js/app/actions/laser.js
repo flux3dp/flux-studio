@@ -72,6 +72,7 @@ define([
                     if (0 === $img_container.length) {
                         $target_image = null;
                         state.hasImage = false;
+                        state.images = [];
 
                         menuFactory.items.execute.enabled = false;
                         menuFactory.items.saveGCode.enabled = false;
@@ -232,13 +233,48 @@ define([
                 return range > limit;
             },
             sleep,
+            resetPosition = function() {
+                var $img_container = $('.' + LASER_IMG_CLASS),
+                    platform_pos = $laser_platform.box(true),
+                    rollback = true,
+                    $controlPoints,
+                    el_position;
+
+                $img_container.each(function(i, el) {
+                    var $el = $(el),
+                        data = $el.data('freetrans');
+
+                    el_position = $el.box();
+
+                    $controlPoints = $el.parent().find('.ft-scaler');
+                    $controlPoints.each(function(k, el) {
+                        var elPosition = $(el).box(true);
+
+                        rollback = (
+                            false === outOfRange(elPosition.center) ?
+                            false :
+                            rollback
+                        );
+                    });
+
+
+                    if (true === rollback) {
+                        $el.addClass('bounce').parent().find('.ft-controls').addClass('bounce');
+
+                        $el.freetrans({
+                            x: ((platform_pos.width - el_position.width) / 2) - data.originalSize.width * (1 - data.scalex),
+                            y: ((platform_pos.height - el_position.height) / 2) - data.originalSize.height * (1 - data.scaley)
+                        });
+
+                        $el.one('transitionend', function() {
+                            $el.removeClass('bounce').parent().find('.ft-controls').removeClass('bounce');
+                        });
+                    }
+                });
+            },
             refreshObjectParams = function(e, $el) {
                 var el_position, el_offset_position,
-                    last_x, last_y,
-                    $controlPoints,
-                    platform_pos = $laser_platform.box(true),
-                    position, size, angle, threshold,
-                    rollback = true;
+                    position, size, angle, threshold;
 
                 if (null !== $el) {
                     el_position = $el.box();
@@ -257,36 +293,6 @@ define([
 
                     if ('move' !== e.freetransEventType) {
                         refreshImage($el, threshold);
-                    }
-
-                    $controlPoints = $el.parent().find('.ft-scaler');
-                    $controlPoints.each(function(k, el) {
-                        var elPosition = $(el).box(true);
-
-                        rollback = (
-                            false === outOfRange(elPosition.center) ?
-                            false :
-                            rollback
-                        );
-                    });
-
-                    clearTimeout(sleep);
-
-                    if (true === rollback) {
-                        sleep = setTimeout(function() {
-                            var data = $el.data('freetrans');
-
-                            $target_image.addClass('bounce').parent().find('.ft-controls').addClass('bounce');
-
-                            $target_image.freetrans({
-                                x: ((platform_pos.width - el_position.width) / 2) - data.originalSize.width * (1 - data.scalex),
-                                y: ((platform_pos.height - el_position.height) / 2) - data.originalSize.height * (1 - data.scaley)
-                            });
-
-                            $target_image.one('transitionend', function() {
-                                $target_image.removeClass('bounce').parent().find('.ft-controls').removeClass('bounce');
-                            });
-                        }, 300);
                     }
 
                     self.setState({
@@ -311,19 +317,13 @@ define([
                         callback.apply(null, arguments);
                         ProgressActions.close();
                     },
-                    getPoint = function($el, position) {
+                    getPoint = function($el) {
                         var containerOffset = $laser_platform.offset(),
                             offset = $el.offset(),
                             width = $el.width(),
                             height = $el.height(),
-                            // default as bottom-right
-                            pointX = offset.left - containerOffset.left,
-                            pointY = offset.top - containerOffset.top;
-
-                        if ('top-left' === position) {
-                            pointX = pointX + width;
-                            pointY = pointY + height;
-                        }
+                            pointX = offset.left - containerOffset.left + (width / 2),
+                            pointY = offset.top - containerOffset.top + (height / 2);
 
                         return {
                             x: pointX,
@@ -336,8 +336,8 @@ define([
                         $ft_controls.each(function(k, el) {
                             var $el = $(el),
                                 image = new Image(),
-                                top_left = getPoint($el.find('.ft-scaler-top.ft-scaler-left'), 'top-left'),
-                                bottom_right = getPoint($el.find('.ft-scaler-bottom.ft-scaler-right'), 'bottom-right'),
+                                top_left = getPoint($el.find('.ft-scaler-top.ft-scaler-left')),
+                                bottom_right = getPoint($el.find('.ft-scaler-bottom.ft-scaler-right')),
                                 $img = $el.parents('.ft-container').find('img'),
                                 box = $img.box(),
                                 isShading = self.refs.setupPanel.isShading(),
@@ -354,8 +354,7 @@ define([
                                 },
                                 grayscaleOpts = {
                                     is_svg: ('svg' === self.state.fileFormat),
-                                    is_shading: isShading,
-                                    threshold: $img.data('threshold') || 128
+                                    threshold: 255
                                 },
                                 src = $img.data('base'),
                                 previewImageSize;
@@ -497,21 +496,6 @@ define([
                             $img.addClass('image-active');
                         }
 
-                        menuFactory.items.copy.enabled = true;
-                        menuFactory.items.copy.onClick = function() {
-                            menuFactory.items.paste.enabled = true;
-                            menuFactory.items.paste.onClick = clone;
-                        };
-                        menuFactory.items.cut.enabled = true;
-                        menuFactory.items.cut.onClick = function() {
-                            deleteImage();
-
-                            menuFactory.items.paste.enabled = true;
-                            menuFactory.items.paste.onClick = function() {
-                                clone();
-                                menuFactory.items.paste.enabled = false;
-                            };
-                        };
                         menuFactory.items.duplicate.enabled = true;
                         menuFactory.items.duplicate.onClick = clone;
                     });
@@ -555,6 +539,7 @@ define([
                         },
                         onComplete: function(result) {
                             file.url = result.canvas.toDataURL('svg' === file.extension ? 'image/svg+xml' : 'image/png');
+
                             self.state.images.push(file);
                             self.setState({
                                 images: self.state.images
@@ -569,19 +554,17 @@ define([
             parserSocket.upload(name, file, opts);
         }
 
-        function inactiveAllImage() {
-            $('.image-active').removeClass('image-active');
-            menuFactory.items.copy.enabled = false;
-            menuFactory.items.cut.enabled = false;
+        function inactiveAllImage($exclude) {
+            $('.image-active').not($exclude).removeClass('image-active');
             menuFactory.items.duplicate.enabled = false;
 
             if (0 === $('.image-active').length) {
                 $target_image = null;
-            }
 
-            self.setState({
-                selectedImage: false
-            });
+                self.setState({
+                    selectedImage: false
+                });
+            }
         }
 
         function refreshImagePanelPos() {
@@ -620,11 +603,14 @@ define([
             refreshImagePanelPos();
         });
 
+        setInterval(resetPosition, 100);
+
         return {
             handleLaser: function(settings) {
                 handleLaser(
                     settings,
-                    sendToMachine
+                    sendToMachine,
+                    ProgressConstants.STEPPING
                 );
             },
             sendToMachine: sendToMachine,
@@ -704,6 +690,7 @@ define([
                 }
             },
             onFileReadEnd: function(e, files) {
+                ProgressActions.close();
                 self.setState({
                     step: 'start',
                     hasImage: 0 < files.length,

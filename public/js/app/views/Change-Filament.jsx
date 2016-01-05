@@ -52,7 +52,7 @@ define([
             getInitialState: function() {
                 return {
                     type: this.props.src === 'TUTORIAL' ? DeviceConstants.LOAD_FILAMENT : '',
-                    currentStep: this.props.src === 'TUTORIAL' ? steps.GUIDE : STEPS.HOME,
+                    currentStep: this.props.src === 'TUTORIAL' ? steps.GUIDE : steps.HOME,
                     temperature: 20
                 };
             },
@@ -100,6 +100,8 @@ define([
                     nextStep = (self.state.type === DeviceConstants.LOAD_FILAMENT ? steps.EMERGING : steps.UNLOADING),
                     progress = function(response) {
                         switch (response.nav) {
+                        case 'WAITTING':
+                        case 'WAITING':
                         case 'LOADING':
                             self._next(steps.EMERGING);
                             break;

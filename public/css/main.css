@@ -2646,8 +2646,8 @@ input[type=range]:focus::-webkit-slider-runnable-track {
     background-color: #333;
     height: 40px;
     margin: auto;
-    -webkit-animation: sk-rotateplane 1.2s infinite ease-in-out;
-    animation: sk-rotateplane 1.2s infinite ease-in-out;
+    -webkit-animation: sk-rotateplane 1s infinite ease-in-out;
+    animation: sk-rotateplane 1s infinite ease-in-out;
     width: 40px; }
 
 @-webkit-keyframes sk-rotateplane {
@@ -2679,8 +2679,8 @@ input[type=range]:focus::-webkit-slider-runnable-track {
     background: -webkit-linear-gradient(left, #ffffff 10%, rgba(255, 255, 255, 0) 42%);
     background: linear-gradient(to right, #ffffff 10%, rgba(255, 255, 255, 0) 42%);
     position: relative;
-    -webkit-animation: load3 1.4s infinite linear;
-    animation: load3 1.4s infinite linear;
+    -webkit-animation: load3 1s infinite linear;
+    animation: load3 1s infinite linear;
     -webkit-transform: translateZ(0);
     transform: translateZ(0); }
     .spinner-roller:before {
@@ -3159,8 +3159,9 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         /* NEW - Chrome */
         display: flex;
         /* NEW, Spec - Opera 12.1, Firefox 20+ */
-        max-height: 100%;
-        overflow: hidden; }
+        max-height: 100%; }
+        .modal-window .modal-body ::-webkit-scrollbar {
+            display: none; }
     .modal-window .notification {
         width: 32.2rem;
         height: 25rem;
@@ -3217,7 +3218,8 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         .modal-window .modal-alert .message {
             color: #333;
             margin: 0 0 20px 0;
-            text-align: left; }
+            text-align: left;
+            line-height: 1.4em; }
         .modal-window .modal-alert .caption,
         .modal-window .modal-alert .message {
             width: 100%; }
@@ -3225,6 +3227,12 @@ input[type=range]:focus::-webkit-slider-runnable-track {
             min-width: 50px; }
         .modal-window .modal-alert .btn-default {
             background: #F8F8F8; }
+        .modal-window .modal-alert .spinner-roller-reverse {
+            background: linear-gradient(to right, #DEDEDC 10%, rgba(248, 248, 248, 0) 42%); }
+            .modal-window .modal-alert .spinner-roller-reverse::before {
+                background-color: #F8F8F8; }
+            .modal-window .modal-alert .spinner-roller-reverse::after {
+                background-color: #F8F8F8; }
     .modal-window .message {
         font-family: "Helvetica Neue", "HelveticaNeue-Light", "Helvetica Neue Light", Helvetica, Arial, "Lucida Grande", sans-serif, "Microsoft JhengHei", "微軟正黑體";
         margin: 0;
@@ -3285,16 +3293,18 @@ input[type=range]:focus::-webkit-slider-runnable-track {
             height: 100%;
             transition: width 0.3s ease;
             width: 0; }
+    .modal-progress.waiting .modal-alert {
+        padding-bottom: 1.6em; }
 
 .modal-progress-nonstop .spinner-roller {
-    height: 13rem;
+    height: 4rem;
     margin: auto;
-    width: 13rem; }
+    width: 4rem; }
 
 .modal-progress-nonstop .modal-alert {
-    height: 20rem;
-    min-height: 20rem;
-    width: 20rem; }
+    height: 8rem;
+    min-height: 8rem;
+    width: 8rem; }
 
 .modal-input-lightbox .modal-alert {
     min-height: 18rem;
@@ -3320,7 +3330,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
     justify-content: space-between;
     align-items: center; }
     .modal-input-lightbox .control .inputHeader {
-        color: #ccc;
+        color: #909090;
         flex: 1; }
     .modal-input-lightbox .control input {
         border: 2px solid #CCC;
@@ -3434,7 +3444,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         margin: 0;
         padding: 0 10px; }
     .modal-change-filament .button-group .btn-icon {
-        background: #fff;
+        background: #F8F8F8;
         border: none;
         color: #B3B3B3;
         cursor: initial;
@@ -3846,7 +3856,8 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         background-color: white;
         height: 40rem;
         width: 31rem;
-        position: relative; }
+        position: relative;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3), 0 16px 40px rgba(0, 0, 0, 0.5); }
         .flux-monitor .main .title {
             height: 5rem;
             text-align: center; }
@@ -3956,7 +3967,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
                         font-size: 1.2em;
                         color: #FFF; }
                 .flux-monitor .main .body .device-content .status-info.running {
-                    background-color: #AAA; }
+                    background-color: rgba(0, 0, 0, 0.25); }
             .flux-monitor .main .body .close {
                 right: 20px; }
         .flux-monitor .main .operation {
@@ -3974,9 +3985,14 @@ input[type=range]:focus::-webkit-slider-runnable-track {
                         color: #333; }
             .flux-monitor .main .operation .controls:hover {
                 color: #333;
-                cursor: pointer; }
+                cursor: pointer;
+                filter: brightness(80%);
+                -webkit-filter: brightness(80%); }
                 .flux-monitor .main .operation .controls:hover > div {
                     opacity: 1; }
+            .flux-monitor .main .operation .disabled {
+                pointer-events: none;
+                opacity: 0.3; }
             .flux-monitor .main .operation .left {
                 left: 2rem; }
             .flux-monitor .main .operation .center {
@@ -4031,7 +4047,8 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         height: 6rem;
         width: 31rem;
         position: relative;
-        margin-top: 5px; }
+        margin-top: 5px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3), 0 16px 40px rgba(0, 0, 0, 0.5); }
         .flux-monitor .sub .wrapper {
             padding: 1.5rem 1.5rem 0 1.5rem; }
             .flux-monitor .sub .wrapper .row {
@@ -4550,6 +4567,9 @@ input.switch:checked ~ label:after {
         font-weight: 500;
         letter-spacing: 0.5px;
         margin-bottom: 15px; }
+        .print-studio .advanced-panel .title .load-preset {
+            float: right;
+            cursor: pointer; }
     .print-studio .advanced-panel .preset-wrapper .footer {
         border-top: 0; }
         .print-studio .advanced-panel .preset-wrapper .footer .left,
@@ -5590,7 +5610,7 @@ input.switch:checked ~ label:after {
     font-weight: bold;
     height: 50px;
     letter-spacing: 2px;
-    top: -78px;
+    top: -94px;
     width: 200px;
     align-items: center;
     justify-content: center; }
@@ -5604,7 +5624,7 @@ input.switch:checked ~ label:after {
         content: " ";
         height: 0;
         left: 50%;
-        margin-left: -15px;
+        margin-left: -13px;
         pointer-events: none;
         position: absolute;
         top: 100%;
@@ -5625,6 +5645,11 @@ input.switch:checked ~ label:after {
     width: auto;
     z-index: 1;
     align-self: center; }
+    .laser-studio .operating-panel .material-name {
+        max-width: 310px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap; }
     .laser-studio .operating-panel .custom-presets-wrapper {
         background: #FFF;
         overflow: scroll;
@@ -5743,11 +5768,10 @@ input.switch:checked ~ label:after {
     top: 0;
     background: url(/img/laser-platform.png);
     background-size: 100% 100%;
-    border: 1px solid #767676;
-    height: 520px;
+    height: 510px;
     overflow: hidden;
     position: absolute;
-    width: 520px; }
+    width: 510px; }
 
 .laser-studio .laser-object .ft-container {
     z-index: 1; }
@@ -5872,8 +5896,8 @@ input.switch:checked ~ label:after {
     align-items: center;
     justify-content: space-around; }
     .laser-studio .control [type="range"] {
-        flex: 1 auto;
-        margin: 0 10px 0 0; }
+        margin: 0 10px 0 0;
+        flex: 1 auto; }
     .laser-studio .control .value-text {
         width: 120px; }
     .laser-studio .control .label {
@@ -5998,7 +6022,8 @@ input.switch:checked ~ label:after {
             align-items: center; }
             .scan-studio .manipulation-panel .btn img {
                 height: 32px;
-                margin: 0 11px 0 0; }
+                margin: 0 11px 0 0;
+                width: 38px; }
         .scan-studio .manipulation-panel .btn-pressed {
             background: #000; }
         .scan-studio .manipulation-panel .accordion-body {

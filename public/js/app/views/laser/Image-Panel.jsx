@@ -53,7 +53,7 @@ define([
         _onTransform: function(e) {
             var type = e.currentTarget.dataset.type,
                 newParams = {
-                    angle: parseFloat(this.refs.objectAngle.getDOMNode().value, 10),
+                    angle: this.refs.objectAngle.value(),
                     position: {
                         x: this.refs.objectPosX.value(),
                         y: this.refs.objectPosY.value()
@@ -102,7 +102,7 @@ define([
         },
 
         _renderThreshold: function(lang, props, state) {
-            var thresholdValue = (state.threshold || lang.laser.object_params.threshold.default),
+            var thresholdValue = (state.threshold || props.threshold || lang.laser.object_params.threshold.default),
                 thresholdDisplay = round(thresholdValue / lang.laser.advanced.form.power.max * 100, 0);
 
             return (
@@ -116,7 +116,7 @@ define([
                     <label className="accordion-body">
                         <div className="control">
                             <input type="range" min="0" max="255" step="1" ref="threshold"
-                                defaultValue={props.thresholdValue} value={props.thresholdValue}
+                                defaultValue={thresholdValue} value={thresholdValue}
                                 onChange={this._onThresholdChanged}/>
                         </div>
                     </label>
@@ -152,8 +152,8 @@ define([
                                 <div className="control">
                                     <span className="text-center header">X</span>
                                     <UnitInput
-                                        min={-170}
-                                        max={170}
+                                        min={-85}
+                                        max={85}
                                         dataAttrs={{ type: 'x' }}
                                         ref="objectPosX"
                                         defaultValue={props.position.x}
@@ -163,8 +163,8 @@ define([
                                 <div className="control">
                                     <span className="text-center header">Y</span>
                                     <UnitInput
-                                        min={-170}
-                                        max={170}
+                                        min={-85}
+                                        max={85}
                                         dataAttrs={{ type: 'y' }}
                                         ref="objectPosY"
                                         defaultValue={props.position.y}
@@ -213,9 +213,17 @@ define([
                             </p>
                             <label className="accordion-body">
                                 <div className="control">
-                                    <input type="number" className="input-fullsize" min="0" max="360" ref="objectAngle" data-type="angle"
-                                        defaultValue={props.angle} value={props.angle}
-                                        onChange={this._onTransform}/>
+                                    <UnitInput
+                                        className={{'input-fullsize': true}}
+                                        min={0}
+                                        max={360}
+                                        defaultUnitType="angle"
+                                        defaultUnit="°"
+                                        dataAttrs={{ type: 'angle' }}
+                                        ref="objectAngle"
+                                        defaultValue={props.angle}
+                                        getValue={this._onTransform}
+                                    />
                                 </div>
                             </label>
                         </label>

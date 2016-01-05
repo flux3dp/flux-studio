@@ -20,11 +20,16 @@ define([
     'app/stores/global-store',
     'app/actions/global-actions',
     'app/constants/device-constants',
-    'app/app-settings',
     'jsx!widgets/Tour-Guide',
     'app/actions/alert-actions',
     'app/stores/alert-store',
-    'helpers/object-assign'
+    'helpers/object-assign',
+    'helpers/sprintf',
+    'app/actions/initialize-machine',
+    'app/actions/progress-actions',
+    'app/constants/progress-constants',
+    'helpers/shortcuts',
+    'app/default-print-settings'
 ], function(
     $,
     React,
@@ -47,10 +52,16 @@ define([
     GlobalStore,
     GlobalActions,
     DeviceConstants,
-    AppSettings,
     TourGuide,
     AlertActions,
-    AlertStore
+    AlertStore,
+    ObjectAssign,
+    sprintf,
+    InitializeMachine,
+    ProgressActions,
+    ProgressConstants,
+    shortcuts,
+    DefaultPrintSettings
 ) {
 
     return function(args) {
@@ -91,24 +102,34 @@ define([
                 {
                     selector: '.arrowBox',
                     text: lang.tutorial.clickToImport,
-                    r: 80,
+                    r: 105,
                     position: 'top'
                 },
                 {
                     selector: '.quality-select',
                     text: lang.tutorial.selectQuality,
-                    r: 80,
+                    offset_x: -25,
+                    r: 90,
                     position: 'right'
                 },
                 {
                     selector: 'button.btn-go',
                     text: lang.tutorial.clickGo,
+                    offset_x: 6,
                     r: 80,
                     position: 'left'
                 },
                 {
-                    selector: '.btn-go.btn-control',
+                    selector: '.flux-monitor .operation',
                     text: lang.tutorial.startPrint,
+                    offset_y: 25,
+                    r: 80,
+                    position: 'top'
+                },
+                {
+                    selector: '.flux-monitor .operation',
+                    text: lang.tutorial.startPrint,
+                    offset_y: 25,
                     r: 80,
                     position: 'top'
                 }
@@ -122,11 +143,14 @@ define([
                         advancedSettings = {};
                         advancedSettings.raft_layers = 4;
                         advancedSettings.support_material = 0;
-                        advancedSettings.custom = AppSettings.custom;
-                        tutorialMode = true;
+                        advancedSettings.custom = DefaultPrintSettings.custom;
                     }
                     else {
                         advancedSettings = _setting;
+                    }
+
+                    if(!Config().read('tutorial-finished')){
+                        tutorialMode = true;
                     }
 
                     return ({
@@ -145,7 +169,7 @@ define([
                         layerHeight                 : 0.1,
                         raftOn                      : advancedSettings.raft_layers !== 0,
                         supportOn                   : advancedSettings.support_material === 1,
-                        mode                        : 'size',
+                        mode                        : 'scale',
                         previewLayerCount           : 0,
                         progressMessage             : '',
                         fcode                       : {},
@@ -175,7 +199,17 @@ define([
                     };
 
                     this._registerKeyEvents();
-                    this._registerTutorial();
+                    if(Config().read("configured-printer") && tutorialMode){
+                        //First time using, with usb-configured printer..
+                        AlertActions.showPopupYesNo('set_default', sprintf(lang.tutorial.set_first_default,Config().read("configured-printer")),lang.tutorial.set_first_default_caption);
+                        AlertStore.onYes(this._handleSetFirstDefault);
+                        //Use setTimeout to avoid multiple modal display conflict
+                        this._handleDefaultCancel = function(ans){setTimeout(function(){this._registerTutorial()}.bind(this), 10)}.bind(this);
+                        AlertStore.onCancel(this._handleDefaultCancel);
+                    }else{
+                        //Disable for no-printer-setting at the time
+                        // this._registerTutorial();
+                    }
                 },
 
                 componentWillUnmount: function() {
@@ -183,19 +217,21 @@ define([
                 },
 
                 _registerKeyEvents: function() {
-                    $(document).keydown(function(e) {
-                        // delete event
-                        if(e.metaKey && e.keyCode === 8 || e.keyCode === 46 || e.keyCode === 8) {
-                            if(allowDeleteObject) {
-                                director.removeSelected();
-                            }
-                        }
-
-                        // copy event
-                        if(e.metaKey && e.keyCode === 68) {
-                            director.duplicateSelected();
+                    // delete event
+                    shortcuts.on(['del'], function(e) {
+                        if(allowDeleteObject) {
+                            director.removeSelected();
                         }
                     });
+
+                    // copy event - it will listen by top menu as well in nwjs..
+                    if ('undefined' === typeof window.requireNode) {
+                        // copy event
+                        shortcuts.on(['cmd', 'd'], function(e) {
+                            e.preventDefault();
+                            director.duplicateSelected();
+                        });
+                    }
                 },
 
                 _registerTutorial: function() {
@@ -206,10 +242,42 @@ define([
                     }
                 },
 
+                _handleSetFirstDefault: function(answer){
+                    Config().write('default-printer-name', Config().read('configured-printer'));
+                    ProgressActions.open(ProgressConstants.NONSTOP);
+
+                    AlertStore.removeYesListener(this._handleSetFirstDefault);
+                    AlertStore.removeCancelListener(this._handleDefaultCancel);
+
+                    DeviceMaster.getDeviceByNameAsync(
+                        Config().read('configured-printer'),
+                        {
+                            timeout: 20000,
+                            onSuccess:
+                                function(printer){
+                                    ProgressActions.close();
+                                    InitializeMachine.defaultPrinter.set({
+                                              name: printer.name,
+                                              serial: printer.serial,
+                                              uuid: printer.uuid
+                                    });
+                                    setTimeout(function(){AlertActions.showInfo(sprintf(lang.set_default.success, printer.name))}, 100);
+                                    //Start tutorial
+                                    setTimeout(function(){this._registerTutorial()}.bind(this), 100);
+                                }.bind(this),
+                            onTimeout:
+                                function(){
+                                    ProgressActions.close();
+                                    setTimeout(function(){AlertActions.showWarning(sprintf(lang.set_default.error, printer.name))}, 100);
+                                }
+                        });
+                },
+
                 _handleTakeTutorial: function(answer) {
                     if(answer === 'tour') {
                         this.setState({ tutorialOn: true });
                         tutorialMode = true;
+                        console.log("start take tutorial")
                     }
                 },
 
@@ -217,6 +285,7 @@ define([
                     if(answer === 'tour') {
                         this.setState({ tutorialOn: false });
                         tutorialMode = false;
+                        Config().write('tutorial-finished', true);
                     }
                 },
 
@@ -372,12 +441,19 @@ define([
                             return;
                         }
                         GlobalActions.showMonitor(selectedPrinter, fcode, previewUrl);
+                        //Tour popout after show monitor delay
                         setTimeout(function() {
                             if(tutorialMode) {
                                 this.setState({
                                     tutorialOn: true,
-                                    currentTutorialStep: 3
+                                    currentTutorialStep: 6
                                 });
+                                //Insert into root html
+                                $('.tour-overlay').append($('.tour'));
+                                $('.tour').click(function(){
+                                    $('.print-studio').append($('.tour'));
+                                    this._handleTutorialComplete();
+                                }.bind(this));
                             };
                         }.bind(this), 1000);
 
@@ -413,7 +489,6 @@ define([
                         this.setState({ layerHeight: value });
                     }
                     else if (key === 'raft_layers') {
-                        console.log(key, value !== '0');
                         this.setState({ raftOn: value !== '0' });
                     }
                 },
@@ -428,7 +503,31 @@ define([
                     if(!tutorialMode) { return; }
                     this.setState({ currentTutorialStep: this.state.currentTutorialStep + 1 }, function() {
                         if(this.state.currentTutorialStep === 1) {
-                            AlertActions.showChangeFilament(DeviceMaster.getFirstDevice(), 'TUTORIAL');
+                            var selectPrinterName = Config().read('configured-printer');
+                            if(!selectPrinterName) selectPrinterName = InitializeMachine.defaultPrinter.get().name;
+                            if(!selectPrinterName) selectPrinterName = DeviceMaster.getFirstDevice();
+                            if(selectPrinterName){
+                                DeviceMaster.getDeviceByNameAsync(
+                                selectPrinterName,
+                                {
+                                    timeout: 20000,
+                                    onSuccess:
+                                        function(printer){
+                                            //Found ya default printer
+                                            ProgressActions.close();
+                                            setTimeout(function(){AlertActions.showChangeFilament(printer, 'TUTORIAL'); }, 100);
+                                        }.bind(this),
+                                    onTimeout:
+                                        function(){
+                                            //Unable to find configured printer...
+                                            ProgressActions.close();
+                                            setTimeout(function(){AlertActions.showWarning(sprintf(lang.set_default.error, printer.name))}, 100);
+                                        }
+                                });
+                            }else{
+                                //TODO: No printer
+
+                            }
                         }
                         else if(this.state.currentTutorialStep === 3) {
                             var fileEntry = {};
@@ -456,6 +555,8 @@ define([
 
                 _handleTutorialComplete: function() {
                     tutorialMode = false;
+                    Config().write('tutorial-finished', true);
+                    $('.tour').hide();
                     this.setState({ tutorialOn: false });
                 },
 
@@ -494,8 +595,9 @@ define([
                 },
 
                 _renderImportWindow: function() {
+                    var importWindowClass = ClassNames('importWindow', {'hide': !this.state.openImportWindow});
                     return (
-                        <div className="importWindow">
+                        <div className={importWindowClass}>
                             <div className="arrowBox" onClick={this._handleCloseAllView}>
                                 <div title={lang.print.importTitle} className="file-importer">
                                     <div className="import-btn">{lang.print.import}</div>
@@ -584,7 +686,7 @@ define([
 
                 render: function() {
                     var advancedPanel           = this.state.showAdvancedSettings ? this._renderAdvancedPanel() : '',
-                        importWindow            = this.state.openImportWindow ? this._renderImportWindow() : '',
+                        importWindow            = this._renderImportWindow(),
                         leftPanel               = this._renderLeftPanel(),
                         rightPanel              = this._renderRightPanel(),
                         objectDialogue          = this.state.openObjectDialogue ? this._renderObjectDialogue() : '',

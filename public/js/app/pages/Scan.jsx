@@ -22,8 +22,10 @@ define([
     'helpers/round',
     'helpers/dnd-handler',
     'helpers/nwjs/menu-factory',
+    'helpers/observe',
     // non-return
     'helpers/array-findindex',
+    'helpers/object-assign',
     'plugins/file-saver/file-saver.min'
 ], function(
     $,
@@ -48,7 +50,8 @@ define([
     shortcuts,
     round,
     dndHandler,
-    menuFactory
+    menuFactory,
+    observe
 ) {
     'use strict';
 
@@ -65,13 +68,8 @@ define([
                         gettingStarted: false,  // selecting machine
                         scanTimes: 0,   // how many scan executed
                         selectedPrinter: undefined, // which machine selected
-                        confirm: {
-                            show: false,
-                            caption: '',
-                            message: '',
-                            onOK: function() {},
-                            onCancel: function() {}
-                        },
+                        deleting_mesh: undefined,
+                        history: [],
                         openAlert: false,
                         openProgressBar: false,
                         blocker: false,
@@ -112,9 +110,76 @@ define([
                 },
 
                 componentDidMount: function() {
-                    var self = this;
+                    var self = this,
+                        object,
+                        objectObserve = function(mesh, arrayIndex) {
+                            var disableLogging = ['transformMethods', 'choose', 'display'],
+                                pushToHistory = function(mesh, arrayIndex) {
+                                    mesh.type = 'update';
+                                    mesh.arrayIndex = arrayIndex;
+                                    self.state.history.push(mesh);
+                                    self.setState({
+                                        history: self.state.history
+                                    });
+                                };
+
+                            (function(arrayIndex) {
+                                Object.observe(mesh, function(changes) {
+                                    for (var i in changes) {
+                                        if (true === changes.hasOwnProperty(i) &&
+                                            'name' === changes[i].name
+                                        ) {
+                                            object = Object.assign({}, changes[i].object);
+                                            object.oldBlob = self.state.scanModelingWebSocket.History.findByName(changes[i].oldValue)[0].data;
+                                            pushToHistory(object, arrayIndex);
+                                        }
+                                    }
+                                });
+                            })(arrayIndex);
+                        },
+                        objectGroupObserve = function(meshes, arrayIndex) {
+                            meshes.forEach(function(mesh, i) {
+                                objectObserve(mesh, arrayIndex);
+                            });
+                        };
+
+                    Array.observe(this.state.meshes, function(changes) {
+                        changes.forEach(function(change, i) {
+                            // add new entry
+                            if (0 < change.addedCount) {
+                                object = Object.assign({}, change.object[change.index]);
+                                object.type = 'add';
+                                object.arrayIndex = change.index;
+                                self.state.history.push(object);
+                                self.setState({
+                                    history: self.state.history
+                                });
+                                objectGroupObserve(change.object, change.index);
+                            }
+                            // remove an entry
+                            else if (0 < change.removed.length) {
+                                change.removed.forEach(function(object) {
+                                    if (true !== object.forceDelete) {
+                                        object = Object.assign({}, object);
+                                        object.type = 'remove';
+                                        object.arrayIndex = change.index;
+                                        self.state.history.push(object);
+                                    }
+                                });
+
+                                self.setState({
+                                    history: self.state.history
+                                });
+                            }
+                        });
+                    });
+
+                    shortcuts.on(['ctrl', 'z'], function(e) {
+                        self._undo();
+                    });
 
                     AlertStore.onRetry(self._retry);
+                    AlertStore.onYes(self._onYes);
                     AlertStore.onCancel(self._onCancel);
                     dndHandler.plug(document, self._importPCD);
 
@@ -132,6 +197,7 @@ define([
                     var self = this;
 
                     AlertStore.removeRetryListener(self._retry);
+                    AlertStore.removeYesListener(self._onYes);
                     AlertStore.removeCancelListener(self._onCancel);
                     dndHandler.unplug(document);
 
@@ -150,6 +216,49 @@ define([
                 },
 
                 // ui events
+                _undo: function() {
+                    var self = this,
+                        currentMesh,
+                        actionMap = {
+                            add: function(mesh) {
+                                // delete
+                                currentMesh = self._getMesh(mesh.index);
+                                currentMesh.forceDelete = true;
+                                self._onDeleteMesh(mesh.arrayIndex, mesh);
+                            },
+                            update: function(mesh) {
+                                var fileReader = new FileReader(),
+                                    typedArray;
+
+                                currentMesh = self._getMesh(mesh.index);
+
+                                fileReader.onload = function() {
+                                    typedArray = new Float32Array(this.result);
+                                    currentMesh.model = scanedModel.updateMesh(currentMesh.model, typedArray);
+                                };
+
+                                fileReader.readAsArrayBuffer(mesh.oldBlob);
+                            },
+                            remove: function(mesh) {
+                                // add
+                                scanedModel.add(mesh.model);
+                                self.state.meshes.push(mesh);
+                                self.state.scanControlImageMethods.stop();
+
+                                self.setState({
+                                    showCamera: false,
+                                    meshes: self.state.meshes
+                                });
+                            }
+                        },
+                        lastAction = self.state.history.pop() || {},
+                        undoAction = actionMap[lastAction.type];
+
+                    if ('undefined' !== typeof undoAction && false === this.state.isScanStarted) {
+                        undoAction(lastAction);
+                    }
+                },
+
                 _retry: function(id) {
                     var self = this;
 
@@ -159,6 +268,16 @@ define([
                         break;
                     case 'calibrate':
                         self._onCalibrate();
+                        break;
+                    }
+                },
+
+                _onYes: function(id) {
+                    var self = this;
+
+                    switch (id) {
+                    case 'deleting-mesh':
+                        self._onDeleteMesh(self.state.deleting_mesh.index, self.state.deleting_mesh.object);
                         break;
                     }
                 },
@@ -343,6 +462,7 @@ define([
 
                 _newMesh: function(args) {
                     args = args || {};
+
                     return {
                         model: args.model || undefined,
                         transformMethods: {
@@ -380,6 +500,7 @@ define([
                         model = scanedModel.appendModel(views);
 
                         meshes.push(self._newMesh({
+                            name: 'scan-' + (new Date()).getTime(),
                             model: model,
                             index: self.state.scanTimes
                         }));
@@ -488,6 +609,30 @@ define([
                     });
                 },
 
+                _onSavePCD: function() {
+                    var self = this,
+                        selectedMeshes = self.state.selectedMeshes,
+                        fileName = (new Date()).getTime() + '.pcd';
+
+                    self._doManualMerge(
+                        selectedMeshes,
+                        function(outputName) {
+                            self.state.scanModelingWebSocket.export(
+                                outputName,
+                                'pcd',
+                                {
+                                    onFinished: function(blob) {
+                                        saveAs(blob, fileName);
+                                        self._openBlocker(false);
+                                    }
+                                }
+                            );
+                        },
+                        false
+                    );
+                    self._openBlocker(true, ProgressConstants.NONSTOP);
+                },
+
                 _onSave: function(e) {
                     var self = this,
                         exportFile = function(outputName) {
@@ -520,12 +665,8 @@ define([
 
                 _onScanFinished: function(point_cloud) {
                     var self = this,
-                        upload_name = 'scan-' + (new Date()).getTime(),
+                        mesh = self._getMesh(self.state.scanTimes),
                         onUploadFinished = function() {
-                            var mesh = self._getMesh(self.state.scanTimes);
-
-                            mesh.name = upload_name;
-
                             // update scan times
                             self.setState({
                                 openProgressBar: false,
@@ -535,7 +676,7 @@ define([
                         };
 
                     self.state.scanModelingWebSocket.upload(
-                        upload_name,
+                        mesh.name,
                         point_cloud,
                         {
                             onFinished: onUploadFinished
@@ -881,23 +1022,10 @@ define([
                     }
                 },
 
-                _openConfirm: function(open, opts) {
-                    opts = opts || {};
+                _openBlocker: function(is_open, type, message, hasStop, caption) {
 
-                    this.setState({
-                        confirm: {
-                            show: open,
-                            caption: opts.caption || '',
-                            message: opts.message || '',
-                            onOK: opts.onOK || function() {},
-                            onCancel: opts.onCancel || function() {}
-                        }
-                    });
-                },
-
-                _openBlocker: function(is_open, type, message, hasStop) {
                     if (true === is_open) {
-                        ProgressActions.open(type, '', message, hasStop);
+                        ProgressActions.open(type, caption ? caption : '', message, hasStop);
                     }
                     else {
                         ProgressActions.close();
@@ -978,6 +1106,7 @@ define([
                                 done = function(data) {
                                     self._refreshCamera();
                                     self._openBlocker(false);
+                                    AlertActions.showPopupInfo('calibrat-done', self.state.lang.scan.calibration_done.message, self.state.lang.scan.calibration_done.caption );
                                 },
                                 fail = function(data) {
                                     self._refreshCamera();
@@ -1002,7 +1131,24 @@ define([
                         }
                     });
 
-                    self._openBlocker(true, ProgressConstants.WAITING, self.state.lang.scan.calibration_is_running);
+                    self._openBlocker(true, ProgressConstants.WAITING, '', false, self.state.lang.scan.calibration_is_running);
+                },
+
+                _onDeleteMesh: function(index, mesh) {
+                    var self = this,
+                        meshes = self.state.meshes;
+
+                    scanedModel.remove(mesh.model);
+                    meshes.splice(index, 1);
+
+                    self.setState({
+                        meshes: meshes,
+                        selectedMeshes: (0 === meshes.length ? [] : self.state.selectedMeshes)
+                    });
+
+                    if (0 === meshes.length) {
+                        self._refreshCamera();
+                    }
                 },
 
                 // render sections
@@ -1034,12 +1180,13 @@ define([
                             false === state.isScanStarted &&
                             false === state.showCamera ?
                         <ManipulationPanel
-                            lang = {lang}
+                            lang={lang}
                             selectedMeshes={state.selectedMeshes}
                             switchTransformMode={this._switchTransformMode}
                             onCropOn={this._doCropOn}
                             onCropOff={this._doCropOff}
                             onClearNoise={this._doClearNoise}
+                            onSavePCD={this._onSavePCD}
                             onManualMerge={this._doManualMerge}
                             object={state.selectedObject}
                             position={state.objectDialogPosition}
@@ -1221,40 +1368,6 @@ define([
                     );
                 },
 
-                _renderConfirm: function(lang) {
-                    var self = this,
-                        onOK = function(e) {
-                            (self.state.confirm.onOK || function() {})();
-                            self._openConfirm(false);
-                        },
-                        onCancel = function(e) {
-                            (self.state.confirm.onCancel || function() {})();
-                            self._openConfirm(false);
-                        },
-                        buttons = [{
-                            label: lang.scan.confirm,
-                            onClick: onOK
-                        },
-                        {
-                            label: lang.scan.cancel,
-                            onClick: onCancel
-                        }],
-                        content = (
-                            <Alert
-                                lang={lang}
-                                caption={self.state.confirm.caption}
-                                message={self.state.confirm.message}
-                                buttons={buttons}
-                            />
-                        );
-
-                    return (
-                        true === self.state.confirm.show ?
-                        <Modal content={content} disabledEscapeOnBackground={true}/> :
-                        ''
-                    );
-                },
-
                 _renderMeshThumbnail: function(lang) {
                     var self = this,
                         thumbnails = [],
@@ -1319,29 +1432,15 @@ define([
                                 });
                             },
                             onDeleteMesh = function(e) {
-                                var deleteMesh = function() {
-                                    scanedModel.remove(mesh.model);
-                                    meshes.splice(i, 1);
 
-                                    self.setState({
-                                        meshes: meshes,
-                                        scanTimes: (0 === meshes.length ? 0 : self.state.scanTimes),
-                                        selectedMeshes: (0 === meshes.length ? [] : self.state.selectedMeshes)
-                                    });
-
-                                    if (0 === meshes.length) {
-                                        self._refreshCamera();
+                                self.setState({
+                                    deleting_mesh: {
+                                        object: mesh,
+                                        index: i
                                     }
-                                };
-
-                                self._openConfirm(
-                                    true,
-                                    {
-                                        caption: lang.scan.caution,
-                                        message: lang.scan.delete_mesh,
-                                        onOK: deleteMesh
-                                    }
-                                );
+                                }, function() {
+                                    AlertActions.showPopupYesNo('deleting-mesh', lang.scan.delete_mesh, lang.scan.caution);
+                                });
                             };
 
                         itemClass = {
@@ -1372,7 +1471,6 @@ define([
                         lang = state.lang,
                         progressBar = this._renderProgressBar(lang),
                         alert = this._renderAlert(lang),
-                        confirm = this._renderConfirm(lang),
                         cx = React.addons.classSet,
                         actionButtons = this._renderActionButtons(lang),
                         scanStage = this._renderStageSection(lang),
@@ -1390,7 +1488,6 @@ define([
                             {actionButtons}
                             {progressBar}
                             {alert}
-                            {confirm}
                         </div>
                     );
                 }

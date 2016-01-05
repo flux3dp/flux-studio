@@ -32,7 +32,7 @@ define([
 
             // save skip version and close
             config().write(key, ignoreList);
-            this._handleClose();
+            this._onClose();
         },
 
         _onClose: function() {
@@ -102,7 +102,8 @@ define([
                     </div>
                 ),
                 className = {
-                    'modal-update': true
+                    'modal-update': true,
+                    'shadow-modal': true
                 };
 
             return (

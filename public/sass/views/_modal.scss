@@ -27,7 +27,9 @@
     .modal-body {
         @include flexbox();
         max-height: 100%;
-        overflow: hidden;
+        ::-webkit-scrollbar { 
+            display: none; 
+        }
     }
 
     .notification {
@@ -101,6 +103,7 @@
             color: #333;
             margin: 0 0 20px 0;
             text-align: left;
+            line-height: 1.4em;
         }
 
         .caption,
@@ -115,6 +118,20 @@
         .btn-default{
             background: #F8F8F8;
         }
+
+        .spinner-roller-reverse {
+
+            background: linear-gradient(to right, #DEDEDC 10%, rgba(248, 248, 248, 0) 42%);
+
+            &::before {
+                background-color: #F8F8F8;
+            } 
+
+            &::after {
+                background-color: #F8F8F8;
+            } 
+        }
+
     }
 
     .message {
@@ -200,20 +217,26 @@
             width: 0;
         }
     }
+
+    &.waiting{
+        .modal-alert{
+            padding-bottom: 1.6em;
+        }
+    }
 }
 
 // progress dialog size
 .modal-progress-nonstop {
     .spinner-roller {
-        height: 13rem;
+        height: 4rem;
         margin: auto;
-        width: 13rem;
+        width: 4rem;
     }
 
     .modal-alert {
-        height: 20rem;
-        min-height: 20rem;
-        width: 20rem;
+        height: 8rem;
+        min-height: 8rem;
+        width: 8rem;
     }
 }
 
@@ -243,7 +266,7 @@
         align-items: center;
 
         .inputHeader {
-            color: #ccc;
+            color: #909090;
             flex: 1;
         }
 
@@ -400,7 +423,7 @@
         }
 
         .btn-icon {
-            background: #fff;
+            background: #F8F8F8;
             border: none;
             color: #B3B3B3;
             cursor: initial;

@@ -173,8 +173,9 @@ define([
                         open: true,
                         device: payload.device,
                         type: payload.type,
-                        latestVersion: payload.updateInfo.latest_version,
-                        releaseNote: payload.updateInfo.changelog,
+                        currentVersion: payload.updateInfo.currentVersion,
+                        latestVersion: payload.updateInfo.latestVersion,
+                        releaseNote: payload.updateInfo.releaseNote,
                         onInstall: payload.onInstall
                     }
                 });
@@ -216,6 +217,9 @@ define([
                 });
 
                 if ('' === from && 'function' === typeof this.state.inputLightbox) {
+                    this.state.inputLightbox.onClose();
+                }
+                else if(from === 'cancel') {
                     this.state.inputLightbox.onClose();
                 }
             },
@@ -268,14 +272,16 @@ define([
                     INFO: function() {
                         $.growl.notice({
                             title   : self.state.lang.alert.info,
-                            message : message
+                            message : message,
+                            location: 'bl'
                         });
                     },
 
                     WARNING: function() {
                         $.growl.warning({
                             title   : self.state.lang.alert.warning,
-                            message : message
+                            message : message,
+                            location: 'bl'
                         });
                     },
 
@@ -283,7 +289,8 @@ define([
                         $.growl.error({
                             title   : self.state.lang.alert.error,
                             message : message,
-                            fixed   : true
+                            fixed   : true,
+                            location: 'bl'
                         });
                     }
                 };
@@ -394,7 +401,7 @@ define([
 
                         return deferred;
                     },
-                    fetchLatestVersion = function(currentProflie) {
+                    fetchLatestVersion = function(currentProfile) {
                         var deferred = $.Deferred();
 
                         data.os = (window.FLUX.osType || '') + '-' + (window.FLUX.arch || '');
@@ -403,24 +410,24 @@ define([
                             url: 'http://software.flux3dp.com/check-update/',
                             data: data
                         }).then(function(response) {
-                            deferred.resolve(currentProflie, response);
+                            deferred.resolve(currentProfile, response);
                         });
 
                         return deferred;
                     };
 
-                fetchProfile().then(fetchLatestVersion).done(function(currentProflie, currentVersion) {
+                fetchProfile().then(fetchLatestVersion).done(function(currentProfile, currentVersion) {
                     var isIgnore = -1 < ignoreVersions.indexOf(currentVersion.latest_version);
 
                     if (false === isIgnore &&
                         null !== currentVersion.latest_version &&
-                        currentVersion.latest_version !== currentProflie.version
+                        currentVersion.latest_version !== currentProfile.version
                     ) {
                         self._showUpdate({
                             type: 'software',
                             device: {},
                             updateInfo: {
-                                currentVersion: currentProflie.version,
+                                currentVersion: currentProfile.version,
                                 latestVersion: currentVersion.latest_version,
                                 releaseNote: currentVersion.changelog,
                             },
@@ -460,7 +467,7 @@ define([
                             open={this.state.application.open}
                             type={this.state.application.type}
                             device={this.state.application.device}
-                            currentVersion={this.state.application.device.version}
+                            currentVersion={this.state.application.currentVersion}
                             latestVersion={this.state.application.latestVersion}
                             releaseNote={this.state.application.releaseNote}
                             onClose={this._handleUpdateClose}

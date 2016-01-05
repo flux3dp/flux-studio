@@ -15,7 +15,8 @@ define([
     'app/actions/progress-actions',
     'app/constants/progress-constants',
     'app/actions/input-lightbox-actions',
-    'app/constants/input-lightbox-constants'
+    'app/constants/input-lightbox-constants',
+    'helpers/sprintf'
 ], function(
     React,
     $,
@@ -33,7 +34,8 @@ define([
     ProgressActions,
     ProgressConstants,
     InputLightboxActions,
-    InputLightboxConstants
+    InputLightboxConstants,
+    sprintf
 ) {
     'use strict';
 
@@ -83,6 +85,7 @@ define([
                         if (true === self.hadDefaultPrinter && el.uuid === selectedPrinter.uuid) {
                             // update device stat
                             initializeMachine.defaultPrinter.set({
+                                name: el.name,
                                 serial: el.serial,
                                 uuid: el.uuid
                             });
@@ -167,10 +170,9 @@ define([
                         inputHeader  : lang.select_printer.please_enter_password,
                         confirmText  : lang.select_printer.submit,
                         onSubmit     : function(password) {
-                            ProgressActions.open(ProgressConstants.NONSTOP);
-
                             self._auth(printer.uuid, password, {
                                 onError: function() {
+                                    ProgressActions.close();
                                     AlertActions.showPopupError('device-auth-fail', lang.select_printer.auth_failure);
                                 }
                             });
@@ -190,9 +192,11 @@ define([
                         // no problem
                         self._auth(printer.uuid, '', opts);
                         break;
+                    case DeviceConstants.status.RAW:
                     case DeviceConstants.status.SCAN:
                     case DeviceConstants.status.MAINTAIN:
                         // ask kick?
+                        ProgressActions.close();
                         AlertActions.showPopupYesNo('kick', lang.message.device_is_used);
                         break;
                     case DeviceConstants.status.COMPLETED:
@@ -207,10 +211,12 @@ define([
                     case DeviceConstants.status.PAUSED_FROM_STARTING:
                     case DeviceConstants.status.PAUSED_FROM_RUNNING:
                         // ask for abort
+                        ProgressActions.close();
                         AlertActions.showPopupYesNo('abort', lang.message.device_is_used);
                         break;
                     default:
                         // device busy
+                        ProgressActions.close();
                         AlertActions.showDeviceBusyPopup('on-select-printer');
                         break;
                     }
@@ -222,12 +228,20 @@ define([
                 self._returnSelectedPrinter();
             }
             else {
+                ProgressActions.open(ProgressConstants.NONSTOP);
                 DeviceMaster.selectDevice(self.selected_printer).done(function(status) {
+                    ProgressActions.close();
                     if (status === DeviceConstants.CONNECTED) {
                         checkStId(printer);
                     }
                     else if (status === DeviceConstants.TIMEOUT) {
-                        AlertActions.showPopupError('printer-connection-timeout', lang.message.connectionTimeout);
+                        //TODO: Check default printer
+                        ProgressActions.close();
+                        if(self.state.hadDefaultPrinter){
+                            AlertActions.showPopupError('printer-connection-timeout', sprintf(lang.message.device_not_found.message, "device_name") , lang.message.device_not_found.caption);
+                        }else{
+                            AlertActions.showPopupError('printer-connection-timeout', lang.message.connectionTimeout, lang.caption.connectionTimeout);
+                        }
                     }
                 });
             }

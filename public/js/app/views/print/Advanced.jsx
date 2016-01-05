@@ -9,6 +9,7 @@ define([
     'app/actions/input-lightbox-actions',
     'plugins/classnames/index',
     'helpers/api/config',
+    'app/default-print-settings',
     'helpers/object-assign'
 ], function(
     $,
@@ -20,7 +21,8 @@ define([
     Modal,
     InputLightboxActions,
     ClassNames,
-    Config
+    Config,
+    DefaultPrintSettings
 ) {
     'use strict';
 
@@ -46,14 +48,14 @@ define([
         advancedSetting = {
             // General
             engine                              : '',
-            temperature                         : 220,
+            temperature                         : 215,
 
             // Layers
-            layer_height                        : 0.2,
-            first_layer_height                  : 0.35,
+            layer_height                        : 0.15,
+            first_layer_height                  : 0.25,
             perimeters                          : 3,
-            top_solid_layers                    : 3,
-            bottom_solid_layers                 : 3,
+            top_solid_layers                    : 4,
+            bottom_solid_layers                 : 4,
 
             // Infill
             fill_density                        : 20,
@@ -62,22 +64,22 @@ define([
 
             // Support
             support_material                    : 1,
-            support_material_spacing            : 2,
-            support_material_threshold          : 55,
-            support_material_pattern            : 'rectilinear-grid',
-            support_material_contact_distance   : 0.2,
+            support_material_spacing            : 2.7,
+            support_material_threshold          : 37,
+            support_material_pattern            : 'rectilinear',
+            support_material_contact_distance   : 0.06,
             raft_layers                         : 4,
             raft                                : 4,
 
             // Speed
             travel_speed                        : 80,
             support_material_speed              : 40,
-            infill_speed                        : 50,
+            infill_speed                        : 60,
             first_layer_speed                   : 20,
             solid_infill_speed                  : 20,
-            perimeter_speed                     : 30,
-            external_perimeter_speed            : 20,
-            bridge_speed                        : 40,
+            perimeter_speed                     : 40,
+            external_perimeter_speed            : 28,
+            bridge_speed                        : 60,
 
             // Custom
             custom                              : ''
@@ -263,7 +265,7 @@ define([
             this.setState({ selectedPreset: name });
         },
 
-        _handleLoadPreset: function() {
+        _handleListPreset: function() {
             var self = this;
             this.setState({ mode: mode.load });
             this._getPresets(function(settings) {
@@ -283,8 +285,7 @@ define([
                 inputHeader : lang.name,
                 confirmText : lang.save,
                 onSubmit    : this._handleSavePreset,
-                onClose     : this._handleBackToSetting,
-                onCancel    : this._handleBackToSetting
+                onClose     : this._handleBackToSetting
             });
         },
 
@@ -296,7 +297,6 @@ define([
         },
 
         _handleControlValueChange: function(id, value) {
-            // console.log(id, value);
             if(typeof(value) === 'boolean') {
                 advancedSetting[id] = value ? 1 : 0;
             }
@@ -355,6 +355,10 @@ define([
         _handleCloseAdvancedSetting: function(e) {
             e.preventDefault();
             this.props.onClose();
+        },
+
+        _handleLoadPreset: function() {
+            this.setState({ custom: DefaultPrintSettings.custom });
         },
 
         _renderTabs: function() {
@@ -510,7 +514,7 @@ define([
                         <DropdownControl
                             id="fill_pattern"
                             label={lang.pattern}
-                            options={[lang.rectilinear, lang.line, lang.rectilinear, lang.honeycomb]}
+                            options={[lang.rectilinear, lang.line, lang.honeycomb]}
                             default={advancedSetting.fill_pattern}
                             onChange={this._handleControlValueChange} />
 
@@ -708,7 +712,10 @@ define([
                 <div className="content-wrapper">
 
                     <div className="section">
-                        <div className="title">{lang.config}</div>
+                        <div className="title">{lang.config}
+                            <div className="load-preset" onClick={this._handleLoadPreset}>{lang.loadPreset}</div>
+                        </div>
+
                         <div className="controls">
                             <div className="label pull-left"></div>
                             <div className="control">
@@ -764,7 +771,7 @@ define([
             switch(this.state.mode) {
 
                 case mode.setup:
-                    buttons[0] = (<button className="btn btn-default" data-ga-event="load-preset" title={lang.loadPreset} onClick={this._handleLoadPreset}><i className="fa fa-folder-open-o"></i></button>);
+                    buttons[0] = (<button className="btn btn-default" data-ga-event="load-preset" title={lang.loadPreset} onClick={this._handleListPreset}><i className="fa fa-folder-open-o"></i></button>);
                     buttons[1] = (<button className="btn btn-default" data-ga-event="cancel-preset" onClick={this._handleCloseAdvancedSetting}>{lang.cancel}</button>);
                     buttons[2] = (<button className="btn btn-default" data-ga-event="save-preset" title={lang.savePreset} onClick={this._handleOpenSaveAsPreset}><i className="fa fa-floppy-o"></i></button>);
                     buttons[3] = (<button className="btn btn-default" data-ga-event="apply-preset" onClick={this._handleApply.bind(null, false)}>{lang.apply}</button>);
@@ -773,7 +780,7 @@ define([
                 case mode.load:
                     buttons[0] = (<button className="btn btn-default" data-ga-event="delete-preset" onClick={this._handleDeletePreset}>{lang.delete}</button>);
                     buttons[2] = '';
-                    buttons[1] = (<button className="btn btn-default" data-ga-event="back-to-preset-setting" onClick={this._handleBackToSetting}>{lang.cancel}</button>);                    
+                    buttons[1] = (<button className="btn btn-default" data-ga-event="back-to-preset-setting" onClick={this._handleBackToSetting}>{lang.cancel}</button>);
                     buttons[3] = (<button className="btn btn-default" data-ga-event="apply-preset" onClick={this._handleApplyPreset}>{lang.apply}</button>);
                     break;
 

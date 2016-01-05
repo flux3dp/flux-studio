@@ -19,7 +19,6 @@ define([
                 defaultValue : args.defaultValue,
                 confirmText  : args.confirmText,
                 onClose      : args.onClose,
-                onCancel     : args.onCancel,
                 onSubmit     : args.onSubmit
             }, id);
         }

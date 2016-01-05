@@ -83,12 +83,13 @@ define([
             },
 
             componentDidMount: function() {
-                AlertStore.onCancel(this._toggleDeviceList.bind(null, false));
+                this._toggleDeviceListBind = this._toggleDeviceList.bind(null, false);
+                AlertStore.onCancel(this._toggleDeviceListBind);
                 AlertStore.onRetry(this._waitForPrinters);
             },
 
             componentWillUnmount: function() {
-                AlertStore.removeCancelListener(this._toggleDeviceList.bind(null, false));
+                AlertStore.removeCancelListener(this._toggleDeviceListBind);
                 AlertStore.removeRetryListener(this._waitForPrinters);
             },
 

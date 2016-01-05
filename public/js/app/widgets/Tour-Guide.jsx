@@ -63,6 +63,8 @@ define([
             }
 
             var _o = $(this.props.guides[this.props.step].selector),
+                _offset_x = this.props.guides[this.props.step].offset_x,
+                _offset_y = this.props.guides[this.props.step].offset_y,
                 _guide = this.props.guides[this.props.step],
                 _r = _guide.r,
                 _text = {},
@@ -70,33 +72,37 @@ define([
                 _position,
                 content = '';
 
+            if(!_offset_x) _offset_x = 0;
+            if(!_offset_y) _offset_y = 0;
+
             _text.content = _guide.text;
+
+            if(_o.offset()){
+                _hole.x = _o.offset().left + _o.width() / 2 + _offset_x;
+                _hole.y = _o.offset().top + _o.height() / 2 + _offset_y;
+            } else {
+                _hole.x = _hole.y = 0;
+                console.error("Unknown selector", this.props.guides[this.props.step].selector);
+            }
+
 
             var positions = {
                 'top': function() {
-                    _hole.x = _o.offset().left + _o.width() / 2;
-                    _hole.y = _o.offset().top + _o.height() / 2;
                     _text.x = _hole.x;
                     _text.y = _hole.y - 100;
                     _position = 'middle';
                 },
                 'bottom': function() {
-                    _hole.x = _o.offset().left + _o.width() / 2;
-                    _hole.y = _o.offset().top + _o.height() / 2;
                     _text.x = _hole.x;
                     _text.y = _hole.y + _r + 50;
                     _position = 'middle';
                 },
                 'left': function() {
-                    _hole.x = _o.offset().left + _o.width() / 2;
-                    _hole.y = _o.offset().top + _o.height() / 2;
                     _text.x = _hole.x - _r / 2 - 50;
                     _text.y = _hole.y;
                     _position = 'end';
                 },
                 'right': function() {
-                    _hole.x = _o.offset().left + _o.width() / 2;
-                    _hole.y = _o.offset().top + _o.height() / 2;
                     _text.x = _hole.x + _r / 2 + 50;
                     _text.y = _hole.y;
                     _position = 'start';

@@ -11,6 +11,7 @@ define([
     'helpers/api/3d-scan-control',
     'helpers/api/touch',
     'helpers/api/discover',
+    'app/constants/input-lightbox-constants',
     'helpers/object-assign'
 ], function(
     $,
@@ -24,7 +25,8 @@ define([
     DeviceController,
     ScanController,
     Touch,
-    Discover
+    Discover,
+    InputLightBoxConstants
 ) {
     'use strict';
 
@@ -35,7 +37,7 @@ define([
         _password = '',
         _status = DeviceConstants.READY,
         _selectedDevice = {},
-        _firstDevice,
+        _deviceNameMap = {},
         _device,
         _devices = [],
         _errors = {};
@@ -45,10 +47,12 @@ define([
         var d = deferred || $.Deferred(),
             uuid = device.uuid,
             goAuth = function(uuid) {
+                ProgressActions.close();
                 InputLightboxActions.open('auth', {
                     caption      : sprintf(lang.input_machine_password.require_password, _device.name),
                     inputHeader  : lang.input_machine_password.password,
                     confirmText  : lang.input_machine_password.connect,
+                    type: InputLightBoxConstants.TYPE_PASSWORD,
                     onSubmit     : function(password) {
                         auth(uuid, password).done(function(data) {
                             selectDevice(device, d);
@@ -321,8 +325,29 @@ define([
         return d.promise();
     }
 
-    function getFirstDevice() {
-        return _firstDevice;
+    function getFirstDevice(){
+        for(var i in _deviceNameMap){
+            return i;
+        }
+    }
+
+    function getDeviceByName(name) {
+        return _deviceNameMap[name];
+    }
+
+    function getDeviceByNameAsync(name, config) {
+        if(getDeviceByName(name)){
+            config.onSuccess(getDeviceByName(name));
+            return;
+        }
+        if(config.timeout > 0){
+            setTimeout(function(){
+                config.timeout -= 500;
+                getDeviceByNameAsync(name, config)
+            },500);
+        }else{
+            config.onTimeout();
+        }
     }
 
     // Private Functions
@@ -465,15 +490,15 @@ define([
             this.getPreviewInfo     = getPreviewInfo;
             this.maintain           = maintain;
             this.reconnect          = reconnect;
-            this.getFirstDevice     = getFirstDevice;
+            this.getDeviceByName    = getDeviceByName;
+            this.getDeviceByNameAsync = getDeviceByNameAsync;
+            this.getFirstDevice = getFirstDevice;
 
             Discover(
                 'device-master',
                 function(devices) {
-                    if(devices.length > 0) {
-                        if(!_firstDevice) {
-                            _firstDevice = devices[0];
-                        }
+                    for(var i in devices){
+                        _deviceNameMap[devices[i].name] = devices[i];
                     }
                     _scanDeviceError(devices);
                 }

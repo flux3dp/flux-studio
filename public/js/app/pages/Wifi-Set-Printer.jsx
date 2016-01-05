@@ -4,14 +4,16 @@ define([
     'helpers/api/usb-config',
     'jsx!widgets/Modal',
     'app/actions/alert-actions',
-    'app/stores/alert-store'
+    'app/stores/alert-store',
+    'helpers/api/config'
 ], function(
     React,
     initializeMachine,
     usbConfig,
     Modal,
     AlertActions,
-    AlertStore
+    AlertStore,
+    Config
 ) {
     'use strict';
 
@@ -66,13 +68,20 @@ define([
                                 else {
                                     goNext();
                                 }
+                                Config().write("configured-printer", name);
                             }
                         });
+                        AlertStore.removeYesListener(startSetting);
+                        AlertStore.removeNoListener(cancelSetting);
+                    },
+                    cancelSetting = function(){
+                        AlertStore.removeYesListener(startSetting);
+                        AlertStore.removeNoListener(cancelSetting);
                     },
                     setMachine,
                     isValid;
 
-                isValid = (name !== '' && false === /[^a-zA-Z0-9 ’'_-]+/g.test(name));
+                isValid = (name !== '' && false === /[^\u4e00-\u9fa5a-zA-Z0-9 ’'_-]+/g.test(name));
 
                 self.setState({
                     requirePrinterName: (name !== ''),
@@ -82,11 +91,12 @@ define([
                 if (true === isValid) {
 
                     if (true === self.state.settingPrinter.password && '' !== password) {
-                        AlertStore.onCustom(startSetting);
-                        AlertActions.showPopupCustom(
+                        AlertStore.onYes(startSetting);
+                        AlertStore.onNo(cancelSetting);
+                        AlertActions.showPopupYesNo(
                             'change-password',
-                            lang.initialize.errors.keep_connect.content,
-                            lang.initialize.confirm
+                            lang.initialize.change_password.content,
+                            lang.initialize.change_password.confirm
                         );
                     }
                     else {

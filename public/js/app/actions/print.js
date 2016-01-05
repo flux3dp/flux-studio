@@ -233,13 +233,30 @@ define([
         ProgressActions.open(ProgressConstants.STEPPING, lang.print.importingModel, lang.print.wait, !showStopButton);
 
         loader.load(model_file_path, function(geometry) {
+            if(geometry.vertices) {
+                if(geometry.vertices.length === 0) {
+                    ProgressActions.close();
+                    reactSrc.setState({
+                        openImportWindow: true,
+                        openObjectDialogue: false
+                    });
+                    AlertActions.showPopupError('', lang.message.invalidFile);
+                    return;
+                }
+            }
             var mesh = new THREE.Mesh(geometry, commonMaterial);
             mesh.up = new THREE.Vector3(0, 0, 1);
 
             ProgressActions.updating(lang.print.uploading, 40);
             uploadStl(mesh.uuid, file).then(function(result) {
                 if (result.status !== 'ok') {
-                    AlertActions.showPopupError('', result.status);
+                    ProgressActions.close();
+                    reactSrc.setState({
+                        openImportWindow: true,
+                        openObjectDialogue: false
+                    });
+                    AlertActions.showPopupError('', result.error);
+                    return;
                 }
                 callback();
                 ProgressActions.close();
@@ -568,7 +585,6 @@ define([
                 }
             }
         }
-        console.log(v);
         return v;
     }
 
@@ -613,38 +629,40 @@ define([
 
         ProgressActions.open(ProgressConstants.STEPPING, lang.monitor.processing, lang.monitor.savingPreview, !showStopButton);
 
-        getBlobFromScene().then(function(blob) {
-            reactSrc.setState({ previewUrl: URL.createObjectURL(blob) });
-            return slicer.uploadPreviewImage(blob);
-        }).then(function(response) {
-            if (response.status === 'ok') {
-                sendGCodeParameters().then(function() {
-                    slicer.goG(ids, function(result) {
-                        if (result instanceof Blob) {
-                            blobExpired = false;
-                            responseBlob = result;
-                            ProgressActions.close();
-                            d.resolve(result);
-                        }
-                        else {
-                            if (result.status !== 'error') {
-                                var serverMessage = `${result.status}: ${result.message} (${parseInt(result.percentage * 100)}%)`,
-                                    drawingMessage = `Finishing up... (100%)`,
-                                    message = result.status !== 'complete' ? serverMessage : drawingMessage;
-                                ProgressActions.updating(message, parseInt(result.percentage * 100));
+        getBlobFromScene().then(function(blob){
+            cropImageUsingCanvas(blob).then(function(blob) {
+                reactSrc.setState({ previewUrl: URL.createObjectURL(blob) });
+                return slicer.uploadPreviewImage(blob);
+            }).then(function(response) {
+                if (response.status === 'ok') {
+                    sendGCodeParameters().then(function() {
+                        slicer.goG(ids, function(result) {
+                            if (result instanceof Blob) {
+                                blobExpired = false;
+                                responseBlob = result;
+                                ProgressActions.close();
+                                d.resolve(result);
                             }
                             else {
-                                ProgressActions.close();
+                                if (result.status !== 'error') {
+                                    var serverMessage = `${result.status}: ${result.message} (${parseInt(result.percentage * 100)}%)`,
+                                        drawingMessage = `Finishing up... (100%)`,
+                                        message = result.status !== 'complete' ? serverMessage : drawingMessage;
+                                    ProgressActions.updating(message, parseInt(result.percentage * 100));
+                                }
+                                else {
+                                    ProgressActions.close();
+                                }
                             }
-                        }
+                        });
                     });
-                });
-            }
-            // error
-            else {
-                _setProgressMessage('');
-                d.resolve(result);
-            }
+                }
+                // error
+                else {
+                    _setProgressMessage('');
+                    d.resolve(result);
+                }
+            });
         });
 
         return d.promise();
@@ -724,11 +742,40 @@ define([
         return d.promise();
     }
 
+    function getSlicingReport() {
+        var reporter,
+            processor,
+            reportTimmer = 1000; // 1 sec
+
+        processor = function(report) {
+            console.log(report);
+            if(report.status === 'complete') {
+                clearInterval(reporter);
+            }
+        };
+
+        reporter = setInterval(function() {
+            slicer.reportSlicing(processor);
+        }, reportTimmer);
+
+    }
+
     function getModelCount() {
         return objects.length;
     }
 
     // SET section ---
+
+    function resetObject() {
+        if(SELECTED) {
+            var s = SELECTED.scale;
+            setScale(s._x, s._y, s._z, true, true);
+            setRotation(0, 0, 0, true);
+            groundIt(SELECTED);
+            alignCenter();
+            selectObject(null);
+        }
+    }
 
     function setMousePosition(e) {
         var offx = 0,
@@ -799,6 +846,7 @@ define([
     function setMode(mode) {
         removeFromScene('TransformControl');
         transformControl.setMode(mode);
+        reactSrc.setState({ mode: mode });
         scene.add(transformControl);
         render();
     }
@@ -883,7 +931,7 @@ define([
                     topOffset = (parseInt(position.y) - objectDialogueHeight / 2),
                     marginTop = container.offsetHeight / 2 - position.y;
 
-                var rightLimit = container.offsetWidth / 2 - leftPanelWidth - objectDialogueWidth,
+                var rightLimit = container.offsetWidth - objectDialogueWidth - leftOffset,
                     topLimit = container.offsetHeight / 2 - objectDialogueHeight / 2;
 
                 if (objectDialogueDistance > rightLimit) {
@@ -924,8 +972,7 @@ define([
 
         if (!$.isEmptyObject(obj)) {
 
-            MenuFactory.items.duplicate.enabled = true;
-            MenuFactory.items.duplicate.onClick = duplicateSelected;
+            _enableObjectEditMenu(true);
 
             objects.forEach(function(o) {
                 o.outlineMesh.visible = false;
@@ -951,10 +998,10 @@ define([
             }
         }
         else {
-            MenuFactory.items.duplicate.enabled = false;
             transformMode = false;
             removeFromScene('TransformControl');
             _removeAllMeshOutline();
+            _enableObjectEditMenu(false);
             reactSrc.setState({ openObjectDialogue: false });
         }
 
@@ -967,6 +1014,9 @@ define([
             SELECTED.position.x -= reference.x;
             SELECTED.position.y -= reference.y;
             SELECTED.position.z -= reference.z;
+            SELECTED.outlineMesh.position.x -= reference.x;
+            SELECTED.outlineMesh.position.y -= reference.y;
+            SELECTED.outlineMesh.position.z -= reference.z;
             blobExpired = true;
 
             checkOutOfBounds(SELECTED);
@@ -975,6 +1025,7 @@ define([
     }
 
     function groundIt(mesh) {
+        mesh = mesh || SELECTED;
         if (!$.isEmptyObject(mesh)) {
             var reference = getReferenceDistance(mesh);
             mesh.position.z -= reference.z;
@@ -1044,6 +1095,7 @@ define([
                     mesh.rotation.x = SELECTED.rotation.x;
                     mesh.rotation.y = SELECTED.rotation.y;
                     mesh.rotation.z = SELECTED.rotation.z;
+                    mesh.rotation.order = 'ZYX';
 
                     mesh.name = 'custom';
                     mesh.plane_boundary = planeBoundary(mesh);
@@ -1051,6 +1103,9 @@ define([
                     addSizeProperty(mesh);
                     groundIt(mesh);
                     createOutline(mesh);
+
+                    selectObject(null);
+                    selectObject(mesh);
 
                     scene.add(mesh);
                     outlineScene.add(mesh.outlineMesh);
@@ -1234,6 +1289,47 @@ define([
         });
 
         return d.promise();
+    }
+
+
+    function cropImageUsingCanvas(data, is_image){
+        if(!is_image){
+            var newImg = document.createElement("img"),
+                url = URL.createObjectURL(blob),
+                d = $.Deferred();
+            newImg.onload = function() {
+                URL.revokeObjectURL(url);
+            };
+            cropImageUsingCanvas(newImage, true).then(function(blob) {
+                d.resolve(blob);
+            });
+            return d.promise()
+        }
+
+        var width = 640, height = 640,
+            canvas = document.createElement("canvas"),
+            sh = image.height,
+            sw = image.width,
+            sx = 0,
+            sy = 0,
+            d = $.Deferred();
+
+        if(image.width > image.height){
+            sx = (image.width - image.height)/2;
+            sw = image.height;
+        }else if(image.width < image.height){
+            sy = (image.height - image.width)/2;
+            sh = image.width;
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        var context = canvas.getContext("2d");
+        context.drawImage(this.image, sx, sy, sw, sh, 0, 0, width, height);
+        canvas.toBlob(function(blob) {
+            d.resolve(blob);
+        });
+        return d.promise()
     }
 
     function removeFromScene(name) {
@@ -1519,8 +1615,15 @@ define([
         };
 
         if (blobExpired) {
-            getFCode().then(function(blob) {
-                drawPath();
+            getFCode().then(function(response) {
+                if(response.status) {
+                    if(response.status === 'error') {
+                        _closePreview();
+                    }
+                }
+                else {
+                    drawPath();
+                }
             });
         } else {
             previewMode = true;
@@ -1530,6 +1633,10 @@ define([
                 _showPath();
             }
         }
+    }
+
+    function _closePreview() {
+        $('#preview').parents('label').find('input').prop('checked',false);
     }
 
     function _drawPath() {
@@ -1597,6 +1704,18 @@ define([
         var vector = new THREE.Vector3(0, 0, -1);
         vector.applyEuler(_camera.rotation, _camera.eulerOrder);
         return vector;
+    }
+
+    function _enableObjectEditMenu(enabled) {
+        MenuFactory.items.duplicate.enabled = enabled;
+        MenuFactory.items.scale.enabled = enabled;
+        MenuFactory.items.rotate.enabled = enabled;
+        MenuFactory.items.reset.enabled = enabled;
+
+        MenuFactory.items.duplicate.onClick = duplicateSelected;
+        MenuFactory.items.scale.onClick = setScaleMode;
+        MenuFactory.items.rotate.onClick = setRotateMode;
+        MenuFactory.items.reset.onClick = resetObject;
     }
 
     function clear() {

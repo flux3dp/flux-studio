@@ -19,6 +19,7 @@ define([
                 isOpen       : React.PropTypes.bool,
                 lang         : React.PropTypes.object,
                 type         : React.PropTypes.oneOf(acceptableTypes),
+                maxLength    : React.PropTypes.number,
                 inputHeader  : React.PropTypes.string,
                 defaultValue : React.PropTypes.string,
                 confirmText  : React.PropTypes.string,
@@ -31,6 +32,7 @@ define([
                     isOpen       : true,
                     lang         : i18n.get(),
                     type         : Constants.TYPE_TEXT,
+                    maxLength    : 255,
                     inputHeader  : '',
                     defaultValue : '',
                     confirmText  : '',
@@ -119,6 +121,7 @@ define([
                             defaultValue={this.props.defaultValue}
                             autoFocus={true}
                             onKeyUp={this._inputKeyUp}
+                            maxLength={this.props.maxLength}
                         />
                     </label>
                 );

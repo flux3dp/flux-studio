@@ -21,7 +21,7 @@
         font-weight: bold;
         height: 50px;
         letter-spacing: 2px;
-        top: -78px;
+        top: -94px;
         width: 200px;
         align-items: center;
         justify-content: center;
@@ -38,7 +38,7 @@
             content: " ";
             height: 0;
             left: 50%;
-            margin-left: -15px;
+            margin-left: -13px;
             pointer-events: none;
             position: absolute;
             top: 100%;
@@ -62,6 +62,13 @@
         width: auto;
         z-index: 1;
         align-self: center;
+
+        .material-name {
+            max-width: 310px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
 
         .custom-presets-wrapper {
             background: #FFF;
@@ -214,11 +221,10 @@
         @include absolute-center();
         background: url(/img/laser-platform.png);
         background-size: 100% 100%;
-        border: 1px solid #767676;
-        height: 520px;
+        height: 510px;
         overflow: hidden;
         position: absolute;
-        width: 520px;
+        width: 510px;
     }
 
     .laser-object {
@@ -373,8 +379,8 @@
         justify-content: space-around;
 
         [type="range"] {
-            flex: 1 auto;
             margin: 0 10px 0 0;
+            flex: 1 auto;
         }
 
         .value-text {
