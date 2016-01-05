@@ -233,14 +233,16 @@ define([
         ProgressActions.open(ProgressConstants.STEPPING, lang.print.importingModel, lang.print.wait, !showStopButton);
 
         loader.load(model_file_path, function(geometry) {
-            if(geometry.vertices.length === 0) {
-                ProgressActions.close();
-                reactSrc.setState({
-                    openImportWindow: true,
-                    openObjectDialogue: false
-                });
-                AlertActions.showPopupError('', lang.message.invalidFile);
-                return;
+            if(geometry.vertices) {
+                if(geometry.vertices.length === 0) {
+                    ProgressActions.close();
+                    reactSrc.setState({
+                        openImportWindow: true,
+                        openObjectDialogue: false
+                    });
+                    AlertActions.showPopupError('', lang.message.invalidFile);
+                    return;
+                }
             }
             var mesh = new THREE.Mesh(geometry, commonMaterial);
             mesh.up = new THREE.Vector3(0, 0, 1);
