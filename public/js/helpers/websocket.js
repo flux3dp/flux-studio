@@ -59,6 +59,7 @@ define(['helpers/is-json'], function(isJson) {
 
                     if ('string' === typeof data) {
                         data = result.data.replace(/NaN(,)/g, 'null$1');
+                        data = data.replace(/\r?\n|\r/g);
                     }
 
                     data = (true === isJson(data) ? JSON.parse(data) : data);

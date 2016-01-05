@@ -41,10 +41,6 @@ define([
                 location.hash = '#initialize/wifi/select';
             },
 
-            _handleWifiErrorConfirm: function(e) {
-
-            },
-
             _handleSetPassword: function(e) {
                 var self = this,
                     wifi = initializeMachine.settingWifi.get(),
@@ -62,7 +58,6 @@ define([
                         checkTimes--;
                     },
                     genericFailureHandler = function() {
-                        AlertStore.onCancel(this._handleWifiErrorConfirm);
                         AlertActions.showPopupError(
                             'wifi-authenticate-fail',
                             lang.initialize.errors.wifi_connection.connecting_fail,

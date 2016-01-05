@@ -32,7 +32,7 @@ define([
 
             // save skip version and close
             config().write(key, ignoreList);
-            this._handleClose();
+            this._onClose();
         },
 
         _onClose: function() {

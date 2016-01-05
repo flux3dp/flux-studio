@@ -233,13 +233,30 @@ define([
         ProgressActions.open(ProgressConstants.STEPPING, lang.print.importingModel, lang.print.wait, !showStopButton);
 
         loader.load(model_file_path, function(geometry) {
+            if(geometry.vertices) {
+                if(geometry.vertices.length === 0) {
+                    ProgressActions.close();
+                    reactSrc.setState({
+                        openImportWindow: true,
+                        openObjectDialogue: false
+                    });
+                    AlertActions.showPopupError('', lang.message.invalidFile);
+                    return;
+                }
+            }
             var mesh = new THREE.Mesh(geometry, commonMaterial);
             mesh.up = new THREE.Vector3(0, 0, 1);
 
             ProgressActions.updating(lang.print.uploading, 40);
             uploadStl(mesh.uuid, file).then(function(result) {
                 if (result.status !== 'ok') {
-                    AlertActions.showPopupError('', result.status);
+                    ProgressActions.close();
+                    reactSrc.setState({
+                        openImportWindow: true,
+                        openObjectDialogue: false
+                    });
+                    AlertActions.showPopupError('', result.error);
+                    return;
                 }
                 callback();
                 ProgressActions.close();
@@ -568,7 +585,6 @@ define([
                 }
             }
         }
-        console.log(v);
         return v;
     }
 
@@ -724,6 +740,24 @@ define([
         });
 
         return d.promise();
+    }
+
+    function getSlicingReport() {
+        var reporter,
+            processor,
+            reportTimmer = 1000; // 1 sec
+
+        processor = function(report) {
+            console.log(report);
+            if(report.status === 'complete') {
+                clearInterval(reporter);
+            }
+        };
+
+        reporter = setInterval(function() {
+            slicer.reportSlicing(processor);
+        }, reportTimmer);
+
     }
 
     function getModelCount() {
@@ -1581,8 +1615,15 @@ define([
         };
 
         if (blobExpired) {
-            getFCode().then(function(blob) {
-                drawPath();
+            getFCode().then(function(response) {
+                if(response.status) {
+                    if(response.status === 'error') {
+                        _closePreview();
+                    }
+                }
+                else {
+                    drawPath();
+                }
             });
         } else {
             previewMode = true;
@@ -1592,6 +1633,10 @@ define([
                 _showPath();
             }
         }
+    }
+
+    function _closePreview() {
+        $('#preview').parents('label').find('input').prop('checked',false);
     }
 
     function _drawPath() {

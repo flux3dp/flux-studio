@@ -371,7 +371,7 @@ define([
 
             return {
                 label: (
-                    <div title={lang.laser.title.material}>
+                    <div className="material-name" title={lang.laser.title.material}>
                         <span className="caption">{lang.laser.advanced.form.object_options.text}</span>
                         <span>{defaultMaterial.label}</span>
                     </div>

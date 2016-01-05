@@ -4,8 +4,9 @@
  */
 define([
     'helpers/websocket',
-    'helpers/convertToTypedArray'
-], function(Websocket, convertToTypedArray) {
+    'helpers/convertToTypedArray',
+    'helpers/is-json'
+], function(Websocket, convertToTypedArray, isJSON) {
     'use strict';
 
     return function(opts) {
@@ -81,10 +82,15 @@ define([
 
                 }.bind(this);
 
+                events.onError = function(result) {
+                    d.resolve(result);
+                }
+
                 ws.send('upload ' + name + ' ' + file.size);
                 lastOrder = 'upload';
                 return d.promise();
             },
+
             set: function(name, positionX, positionY, positionZ, rotationX, rotationY, rotationZ, scaleX, scaleY, scaleZ) {
                 var d = $.Deferred();
                 events.onMessage = function(result) {
@@ -96,6 +102,7 @@ define([
 
                 return d.promise();
             },
+
             delete: function(name, callback) {
                 events.onMessage = function(result) {
                     callback(result);
@@ -106,27 +113,55 @@ define([
                 ws.send('delete ' + name);
                 lastOrder = 'delete';
             },
+
             // go does not use deferred because multiple response and instant update
             goG: function(nameArray, callback) {
                 events.onMessage = function(result) {
                     callback(result);
                 };
                 events.onError = function(result) {
-                    callback(result)
+                    callback(result);
                 };
                 ws.send('go ' + nameArray.join(' ') + ' -g');
                 lastOrder = 'go';
             },
+
             goF: function(nameArray, callback) {
                 events.onMessage = function(result) {
                     callback(result);
                 };
                 events.onError = function(result) {
-                    callback(result)
+                    callback(result);
                 };
                 ws.send('go ' + nameArray.join(' ') + ' -f');
                 lastOrder = 'go';
             },
+
+            beginSlicing: function(nameArray, type) {
+                type = type || 'f';
+                var d = $.Deferred();
+                events.onMessage = function(result) {
+                    d.resolve(result);
+                };
+                events.onError = function(result) {
+                    d.resolve(result);
+                };
+                ws.send(`begin_slicing ${nameArray.join(' ')} -${type}`);
+                lastOrder = 'begin_slicing';
+                return d.promise();
+            },
+
+            reportSlicing: function(callback) {
+                events.onMessage = function(result) {
+                    callback(result);
+                };
+                events.onError = function(result) {
+                    callback(result);
+                };
+                ws.send(`report_slicing`);
+                lastOrder = 'report_slicing';
+            },
+
             setParameter: function(name, value) {
                 var d = $.Deferred(),
                     errors = [];
@@ -149,6 +184,7 @@ define([
 
                 return d.promise();
             },
+
             status: function() {
                 var d = $.Deferred();
                 events.onMessage = function(result) {
@@ -160,6 +196,7 @@ define([
 
                 return d.promise();
             },
+
             getPath: function() {
                 var d = $.Deferred();
                 events.onMessage = function(result) {
@@ -171,6 +208,7 @@ define([
 
                 return d.promise();
             },
+
             uploadPreviewImage: function(file) {
                 var d = $.Deferred();
                 events.onMessage = function(result) {
@@ -193,6 +231,7 @@ define([
 
                 return d.promise();
             },
+
             duplicate: function(oldName, newName) {
                 var d = $.Deferred();
 
@@ -212,6 +251,7 @@ define([
 
                 return d.promise();
             },
+
             stop: function() {
                 var d = $.Deferred();
 

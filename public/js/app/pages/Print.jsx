@@ -556,11 +556,8 @@ define([
                 _handleTutorialComplete: function() {
                     tutorialMode = false;
                     Config().write('tutorial-finished', true);
-                    setTimeout(function(){
                     $('.tour').hide();
                     this.setState({ tutorialOn: false });
-                    this.forceUpdate();
-                    }.bind(this), 200);
                 },
 
                 _handleCloseAllView: function() {
@@ -598,8 +595,9 @@ define([
                 },
 
                 _renderImportWindow: function() {
+                    var importWindowClass = ClassNames('importWindow', {'hide': !this.state.openImportWindow});
                     return (
-                        <div className="importWindow">
+                        <div className={importWindowClass}>
                             <div className="arrowBox" onClick={this._handleCloseAllView}>
                                 <div title={lang.print.importTitle} className="file-importer">
                                     <div className="import-btn">{lang.print.import}</div>
@@ -688,7 +686,7 @@ define([
 
                 render: function() {
                     var advancedPanel           = this.state.showAdvancedSettings ? this._renderAdvancedPanel() : '',
-                        importWindow            = this.state.openImportWindow ? this._renderImportWindow() : '',
+                        importWindow            = this._renderImportWindow(),
                         leftPanel               = this._renderLeftPanel(),
                         rightPanel              = this._renderRightPanel(),
                         objectDialogue          = this.state.openObjectDialogue ? this._renderObjectDialogue() : '',

@@ -20,9 +20,7 @@ var fs = requireNode('fs'),
                 '--slic3r',
                 '',
                 '--port',
-                port,
-                '--assets',
-                cwd + '/lib/ghost/assets'
+                port
             ],
             ghostCmd = '';
 
