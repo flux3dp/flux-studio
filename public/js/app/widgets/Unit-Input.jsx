@@ -2,8 +2,9 @@ define([
     'react',
     'helpers/unit-converter',
     'app/constants/keycode-constants',
-    'helpers/round'
-], function(React, unitConverter, keyCodeConstants, round) {
+    'helpers/round',
+    'plugins/classnames/index'
+], function(React, unitConverter, keyCodeConstants, round, ClassNames) {
     'use strict';
 
     return React.createClass({
@@ -11,6 +12,7 @@ define([
 
         getDefaultProps: function() {
             return {
+                className: {},
                 defaultValue: '',
                 defaultUnit: unitConverter.defaultUnit,
                 defaultUnitType: unitConverter.defaultUnitType,
@@ -178,7 +180,10 @@ define([
                 props = self.props,
                 state = self.state,
                 displayValue = state.defaultValue + props.defaultUnit,
-                attrs = {};
+                attrs = {},
+                className = props.className;
+
+            className['ui ui-control-unit-input'] = true;
 
             for (var key in props.dataAttrs) {
                 if (false === attrs.hasOwnProperty(key)) {
@@ -190,7 +195,7 @@ define([
                 <input
                     ref="unitInput"
                     type="text"
-                    className="ui ui-control-unit-input"
+                    className={ClassNames(className)}
                     defaultValue={displayValue}
                     onBlur={this._onBlur}
                     onKeyUp={this._onKeyUp}
