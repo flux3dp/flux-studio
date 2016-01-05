@@ -24,3 +24,15 @@ public/preview.png
 # Thumbnail cache files
 ._*
 Thumbs.db
+
+# temporary/log files
+output.fcode
+output.gcode
+output.stl
+preprocess.svg
+preview.png
+public/_preview.png
+public/npm-debug.log
+public/output.fc
+public/output.ini
+public/output.stl
