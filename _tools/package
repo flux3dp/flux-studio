@@ -14,7 +14,7 @@ TXT_RESET="\e[0m"
 $DIR/_tools/nwjs-shell-builder/nwjs-build.sh --clean
 rm -r $DIR/public/lib
 mkdir -p $DIR/public/lib
-cd $DIR
+cd $DIR/_tools
 
 while true; do
     read -p "==> Build for which OS? (Windows[W], OSX[O], Linux[L]) "
@@ -32,7 +32,6 @@ while true; do
             mv $DIR/_tools/slic3r-mswin-x86-1-2-9a-stable.zip $DIR/public/lib/slic3r-x86.zip
 
             unzip $DIR/public/lib/fluxghost-win-latest-x86.zip -d $DIR/public/lib/
-            mv $DIR/public/lib/fluxghost-win-latest/assets $DIR/public/lib/assets
             mv $DIR/public/lib/fluxghost-win-latest/ghost $DIR/public/lib/ghost
             rm -r $DIR/public/lib/fluxghost-win-latest $DIR/public/lib/fluxghost-win-latest-x86.zip
 
@@ -61,7 +60,6 @@ while true; do
             mv $DIR/_tools/slic3r-mswin-x64-1-2-9a-stable.zip $DIR/public/lib/slic3r-x64.zip
 
             unzip $DIR/public/lib/fluxghost-win-latest-x64.zip -d $DIR/public/lib/
-            mv $DIR/public/lib/fluxghost-win-latest/assets $DIR/public/lib/assets
             mv $DIR/public/lib/fluxghost-win-latest/ghost $DIR/public/lib/ghost
             rm -r $DIR/public/lib/fluxghost-win-latest $DIR/public/lib/fluxghost-win-latest-x64.zip
 
@@ -70,7 +68,7 @@ while true; do
             printf "\n";
             printf "${TXT_INFO} Packing for Windows x64 ${TXT_RESET}";
             printf "\n";
-            # # dl latest ghost and sli3er (for x64)
+            # dl latest ghost and sli3er (for x64)
             $DIR/_tools/nwjs-shell-builder/nwjs-build.sh --src=$DIR/public --name="$PACKAGE_NAME" --win-icon=$DIR/public/icon.png --version="1.0.0" --nw=0.12.3 --target="3" --build
             mv $DIR/_tools/nwjs-shell-builder/TMP/output/FLUX_Studio-$(date +%Y%m%d)-win-x64.zip $DIR/_tools/nwjs-shell-builder/TMP/output/fstudio-$(date +%Y%m%d)-win-x64.zip
 
@@ -89,7 +87,6 @@ while true; do
             mv $DIR/_tools/slic3r.zip $DIR/public/lib/slic3r.zip
 
             unzip $DIR/public/lib/fluxghost-osx-latest.zip -d $DIR/public/lib/
-            mv $DIR/public/lib/fluxghost-osx-latest/assets $DIR/public/lib/assets
             mv $DIR/public/lib/fluxghost-osx-latest/ghost $DIR/public/lib/ghost
             rm -r $DIR/public/lib/fluxghost-osx-latest $DIR/public/lib/fluxghost-osx-latest.zip
 
@@ -130,7 +127,6 @@ while true; do
             mv $DIR/_tools/slic3r-linux-x86_64-1-2-9-stable.tar.gz $DIR/public/lib/slic3r-linux-latest.tar.gz
 
             unzip $DIR/public/lib/slic3r-linux-latest.tar.gz -d $DIR/public/lib/
-            mv $DIR/public/lib/fluxghost-linux-latest/assets $DIR/public/lib/assets
             mv $DIR/public/lib/fluxghost-linux-latest/ghost $DIR/public/lib/ghost
             rm -r $DIR/public/lib/fluxghost-linux-latest $DIR/public/lib/fluxghost-linux-latest.zip
 
