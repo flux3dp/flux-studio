@@ -1061,6 +1061,7 @@ define([
                     mesh.rotation.x = SELECTED.rotation.x;
                     mesh.rotation.y = SELECTED.rotation.y;
                     mesh.rotation.z = SELECTED.rotation.z;
+                    mesh.rotation.order = 'ZYX';
 
                     mesh.name = 'custom';
                     mesh.plane_boundary = planeBoundary(mesh);
@@ -1068,6 +1069,9 @@ define([
                     addSizeProperty(mesh);
                     groundIt(mesh);
                     createOutline(mesh);
+
+                    selectObject(null);
+                    selectObject(mesh);
 
                     scene.add(mesh);
                     outlineScene.add(mesh.outlineMesh);
