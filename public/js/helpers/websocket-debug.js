@@ -10,6 +10,7 @@ define(['helpers/is-json'], function(isJson) {
 
     window.FLUX.websockets = websockets;
 
+
     // options:
     //      hostname      - host name (Default: localhost)
     //      port          - what protocol uses (Default: 8000)
