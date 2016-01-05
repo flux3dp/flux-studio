@@ -30,6 +30,10 @@ define([
 
         // Public methods
         value: function(val) {
+            if (false === this.isMounted()) {
+                return 0;
+            }
+
             if ('number' === typeof val) {
                 val = this.props.handleNumberFormat(val);
                 this.refs.unitInput.getDOMNode().value = val + this.props.defaultUnit;
@@ -181,7 +185,7 @@ define([
                 state = self.state,
                 displayValue = state.defaultValue + props.defaultUnit,
                 attrs = {},
-                className = props.className;
+                className = props.className || {};
 
             className['ui ui-control-unit-input'] = true;
 
