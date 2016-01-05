@@ -312,19 +312,13 @@ define([
                         callback.apply(null, arguments);
                         ProgressActions.close();
                     },
-                    getPoint = function($el, position) {
+                    getPoint = function($el) {
                         var containerOffset = $laser_platform.offset(),
                             offset = $el.offset(),
                             width = $el.width(),
                             height = $el.height(),
-                            // default as bottom-right
-                            pointX = offset.left - containerOffset.left,
-                            pointY = offset.top - containerOffset.top;
-
-                        if ('top-left' === position) {
-                            pointX = pointX + width;
-                            pointY = pointY + height;
-                        }
+                            pointX = offset.left - containerOffset.left + (width / 2),
+                            pointY = offset.top - containerOffset.top + (height / 2);
 
                         return {
                             x: pointX,
@@ -337,8 +331,8 @@ define([
                         $ft_controls.each(function(k, el) {
                             var $el = $(el),
                                 image = new Image(),
-                                top_left = getPoint($el.find('.ft-scaler-top.ft-scaler-left'), 'top-left'),
-                                bottom_right = getPoint($el.find('.ft-scaler-bottom.ft-scaler-right'), 'bottom-right'),
+                                top_left = getPoint($el.find('.ft-scaler-top.ft-scaler-left')),
+                                bottom_right = getPoint($el.find('.ft-scaler-bottom.ft-scaler-right')),
                                 $img = $el.parents('.ft-container').find('img'),
                                 box = $img.box(),
                                 isShading = self.refs.setupPanel.isShading(),
