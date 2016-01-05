@@ -28,12 +28,13 @@ while true; do
             # dl latest sli3er
             wget $DOWNLOAD_SOURCE/slic3r/windows/slic3r-mswin-x86-1-2-9a-stable.zip
 
-            mv $DIR/_tools/fluxghost-win-latest-x86.zip $DIR/public/lib/fluxghost-windows-latest-x86.zip
+            mv $DIR/_tools/fluxghost-win-latest-x86.zip $DIR/public/lib/fluxghost-win-latest-x86.zip
             mv $DIR/_tools/slic3r-mswin-x86-1-2-9a-stable.zip $DIR/public/lib/slic3r-x86.zip
 
             unzip $DIR/public/lib/fluxghost-win-latest-x86.zip -d $DIR/public/lib/
-            mv $DIR/public/lib/fluxghost-win-latest/ghost $DIR/public/lib/ghost
-            rm -r $DIR/public/lib/fluxghost-win-latest $DIR/public/lib/fluxghost-win-latest-x86.zip
+            unzip $DIR/public/lib/slic3r-x86.zip -d $DIR/public/lib/
+            mv $DIR/public/lib/fluxghost-win-latest-x86/ghost $DIR/public/lib/ghost
+            rm -r $DIR/public/lib/slic3r-x86.zip $DIR/public/lib/fluxghost-win-latest-x86 $DIR/public/lib/fluxghost-win-latest-x86.zip
 
             find /var/www/web-panel/public/lib/ -name "__MACOSX" | xargs rm -r
 
@@ -56,12 +57,13 @@ while true; do
             # dl latest sli3er
             wget $DOWNLOAD_SOURCE/slic3r/windows/slic3r-mswin-x64-1-2-9a-stable.zip
 
-            mv $DIR/_tools/fluxghost-win-latest-x64.zip $DIR/public/lib/fluxghost-windows-latest-x64.zip
+            mv $DIR/_tools/fluxghost-win-latest-x64.zip $DIR/public/lib/fluxghost-win-latest-x64.zip
             mv $DIR/_tools/slic3r-mswin-x64-1-2-9a-stable.zip $DIR/public/lib/slic3r-x64.zip
 
             unzip $DIR/public/lib/fluxghost-win-latest-x64.zip -d $DIR/public/lib/
-            mv $DIR/public/lib/fluxghost-win-latest/ghost $DIR/public/lib/ghost
-            rm -r $DIR/public/lib/fluxghost-win-latest $DIR/public/lib/fluxghost-win-latest-x64.zip
+            unzip $DIR/public/lib/slic3r-x64.zip -d $DIR/public/lib/
+            mv $DIR/public/lib/fluxghost-win-latest-x64/ghost $DIR/public/lib/ghost
+            rm -r $DIR/public/lib/slic3r-x64.zip $DIR/public/lib/fluxghost-win-latest-x64 $DIR/public/lib/fluxghost-win-latest-x64.zip
 
             find /var/www/web-panel/public/lib/ -name "__MACOSX" | xargs rm -r
 
@@ -110,7 +112,6 @@ while true; do
             ln -s /Applications $DIR/_tools/nwjs-shell-builder/TMP/output/FLUX\ Studio/Applications
 
             hdiutil create -size 400m -srcfolder $DIR/_tools/nwjs-shell-builder/TMP/output/FLUX\ Studio/ $DIR/_tools/nwjs-shell-builder/TMP/output/FLUX\ Studio/fstudio-$(date +%Y%m%d)-osx.dmg
-            open $DIR/_tools/nwjs-shell-builder/TMP/output/FLUX\ Studio/
 
             break;;
 
@@ -144,5 +145,6 @@ while true; do
     esac
 done
 
-printf "${TXT_INFO} Done ${TXT_RESET}"
+printf "\n${TXT_INFO} Done ${TXT_RESET}\n"
+open $DIR/_tools/nwjs-shell-builder/TMP/output/
 exit 0;
