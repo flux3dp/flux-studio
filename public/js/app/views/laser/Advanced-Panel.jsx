@@ -232,7 +232,7 @@ define([
                             />
                             <UnitInput
                                 ref="speed"
-                                className="value-text"
+                                className={{ 'value-text': true }}
                                 step={0.1}
                                 min={lang.form.laser_speed.min}
                                 max={lang.form.laser_speed.max}
@@ -261,7 +261,7 @@ define([
                             />
                             <UnitInput
                                 ref="power"
-                                className="value-text"
+                                className={{ 'value-text': true }}
                                 min={0}
                                 max={100}
                                 step={1}
