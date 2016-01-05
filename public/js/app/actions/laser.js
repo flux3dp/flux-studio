@@ -355,8 +355,7 @@ define([
                                 },
                                 grayscaleOpts = {
                                     is_svg: ('svg' === self.state.fileFormat),
-                                    is_shading: isShading,
-                                    threshold: $img.data('threshold') || 128
+                                    threshold: 255
                                 },
                                 src = $img.data('base'),
                                 previewImageSize;
