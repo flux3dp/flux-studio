@@ -152,8 +152,8 @@ define([
                                 <div className="control">
                                     <span className="text-center header">X</span>
                                     <UnitInput
-                                        min={-170}
-                                        max={170}
+                                        min={-85}
+                                        max={85}
                                         dataAttrs={{ type: 'x' }}
                                         ref="objectPosX"
                                         defaultValue={props.position.x}
@@ -163,8 +163,8 @@ define([
                                 <div className="control">
                                     <span className="text-center header">Y</span>
                                     <UnitInput
-                                        min={-170}
-                                        max={170}
+                                        min={-85}
+                                        max={85}
                                         dataAttrs={{ type: 'y' }}
                                         ref="objectPosY"
                                         defaultValue={props.position.y}
