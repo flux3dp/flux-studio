@@ -490,6 +490,11 @@ input.switch:checked ~ label:after {
             font-weight: 500;
             letter-spacing: 0.5px;
             margin-bottom: 15px;
+
+            .load-preset {
+                float: right;
+                cursor: pointer;
+            }
         }
 
         .preset-wrapper {
