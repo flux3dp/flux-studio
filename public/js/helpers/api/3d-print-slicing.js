@@ -16,7 +16,6 @@ define([
         var ws = new Websocket({
                 method: '3dprint-slicing',
                 onMessage: function(data) {
-                    // console.log('message',data);
                     events.onMessage(data);
                     lastMessage = data;
                 },
