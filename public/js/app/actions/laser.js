@@ -72,6 +72,7 @@ define([
                     if (0 === $img_container.length) {
                         $target_image = null;
                         state.hasImage = false;
+                        state.images = [];
 
                         menuFactory.items.execute.enabled = false;
                         menuFactory.items.saveGCode.enabled = false;
@@ -540,6 +541,7 @@ define([
                         },
                         onComplete: function(result) {
                             file.url = result.canvas.toDataURL('svg' === file.extension ? 'image/svg+xml' : 'image/png');
+
                             self.state.images.push(file);
                             self.setState({
                                 images: self.state.images
