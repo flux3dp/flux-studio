@@ -1,14 +1,14 @@
-var websockets = [];
-websockets.list = function(){
-    for(var i = 0; i < websockets.length; i++){
-        console.log(i, websockets[i].url);
-    }
-}
-
-window.FLUX.websockets = websockets;
-
 define(['helpers/is-json'], function(isJson) {
     'use strict';
+
+    var websockets = [];
+    websockets.list = function() {
+        for(var i = 0; i < websockets.length; i++){
+            console.log(i, websockets[i].url);
+        }
+    };
+
+    window.FLUX.websockets = websockets;
 
     // options:
     //      hostname      - host name (Default: localhost)

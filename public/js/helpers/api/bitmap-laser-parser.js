@@ -4,7 +4,7 @@
  */
 define([
     'jquery',
-    'helpers/websocket-debug',
+    'helpers/websocket',
     'helpers/convertToTypedArray',
     'helpers/is-json',
     'helpers/data-history',

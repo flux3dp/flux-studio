@@ -3,7 +3,7 @@
  * Ref: https://github.com/flux3dp/fluxghost/wiki/websocket-usb-config
  */
 define([
-    'helpers/websocket-debug'
+    'helpers/websocket'
 ], function(Websocket) {
     'use strict';
 

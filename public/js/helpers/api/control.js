@@ -4,7 +4,7 @@
  */
 define([
     'jquery',
-    'helpers/websocket-debug',
+    'helpers/websocket',
     'helpers/convertToTypedArray',
     'app/constants/device-constants'
 ], function($, Websocket, convertToTypedArray, DeviceConstants) {
