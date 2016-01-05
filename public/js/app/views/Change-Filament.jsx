@@ -100,6 +100,8 @@ define([
                     nextStep = (self.state.type === DeviceConstants.LOAD_FILAMENT ? steps.EMERGING : steps.UNLOADING),
                     progress = function(response) {
                         switch (response.nav) {
+                        case 'WAITTING':
+                        case 'WAITING':
                         case 'LOADING':
                             self._next(steps.EMERGING);
                             break;
