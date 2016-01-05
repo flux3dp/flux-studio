@@ -45,7 +45,7 @@ define([
         displayStatus,
         currentStatus,
         previewUrl = '',
-        lang, 
+        lang,
         lastAction,
         fileToBeUpload = {},
         statusActions,
@@ -232,7 +232,7 @@ define([
             openSource = !this.props.fCode ? source.DEVICE_LIST : source.GO;
             if(openSource === source.DEVICE_LIST &&
                 this.props.selectedDevice.st_id === DeviceConstants.status.IDLE){
-                    _mode = mode.BROWSE_FILE; 
+                    _mode = mode.BROWSE_FILE;
                     this._startReport();
             }
 
@@ -362,6 +362,7 @@ define([
         },
 
         _doFileUpload: function(file) {
+            this._stopReport();
             var self = this,
                 reader = new FileReader();
 
@@ -384,6 +385,7 @@ define([
                 if(isValid) {
                     var blob = new Blob([reader.result], type);
                     DeviceMaster.uploadFile(blob, file, pathArray.join('/')).then(function(result) {
+                        self._startReport();
                         self._refreshDirectory();
                     });
                 }
@@ -549,13 +551,12 @@ define([
                     if(info[1] instanceof Blob) {
                         this._processInfo([info[2]]);
                         previewUrl = URL.createObjectURL(info[1]);
-                        pathArray.push(fileName);
                         filePreview = true;
                         this.setState({
                             mode: mode.PREVIEW
                         }, function() {
                             this._addHistory();
-                            this._startReport();    
+                            this._startReport();
                         });
                     }
                     else {
@@ -1239,12 +1240,12 @@ define([
         _renderPrintingInfo: function() {
             var _duration   = totalTimeInSeconds === 0 ? '' : this._formatTime(totalTimeInSeconds, true),
                 _progress   = percentageDone === 0 ? '' : percentageDone + '%',
-                infoClass   = ClassNames('status-info', 
+                infoClass   = ClassNames('status-info',
                                         { 'running': this.state.mode == mode.BROWSE_FILE ||
                                                      this.state.mode == mode.PREVIEW && openSource == source.GO ||
                                                      this.state.mode == mode.PREVIEW && filePreview ||
-                                                     statusId !== DeviceConstants.status.IDLE && 
-                                                     statusId !== DeviceConstants.status.MAINTAIN && 
+                                                     statusId !== DeviceConstants.status.IDLE &&
+                                                     statusId !== DeviceConstants.status.MAINTAIN &&
                                                      statusId !== DeviceConstants.status.SCAN });
 
             if(statusId === DeviceConstants.status.IDLE || statusId === DeviceConstants.status.COMPLETED) {

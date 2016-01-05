@@ -219,6 +219,9 @@ define([
                 if ('' === from && 'function' === typeof this.state.inputLightbox) {
                     this.state.inputLightbox.onClose();
                 }
+                else if(from === 'cancel') {
+                    this.state.inputLightbox.onClose();
+                }
             },
 
             _handleInputLightBoxSubmit: function(value) {
