@@ -293,10 +293,7 @@ define([
                                             onClick: function() {
                                                 DeviceMaster.selectDevice(printer).then(function(status) {
                                                     if(status === DeviceConstants.CONNECTED) {
-                                                        setTimeout(
-                                                            function(){
-                                                                AlertActions.showChangeFilament(printer);
-                                                            },50);
+                                                        AlertActions.showChangeFilament(printer);
                                                     }
                                                     else if (status === DeviceConstants.TIMEOUT) {
                                                         AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
@@ -325,17 +322,20 @@ define([
                                     });
                                 }
                             });
-                            if ('undefined' === typeof deviceRefreshTimer && true === renew) {
+                            if ('undefined' === typeof deviceRefreshTimer && false === renew) {
                                 clearTimeout(deviceRefreshTimer);
                                 deviceRefreshTimer = setTimeout(function() {
                                     items.device.subItems = deviceGroup;
-                                    if('win' === window.FLUX.osType && window.FLUX.refreshMenu){
+                                    if ('win' === window.FLUX.osType && window.FLUX.refreshMenu){
                                         window.FLUX.refreshMenu(menuMap);
                                     }
+
                                     deviceRefreshTimer = undefined;
-                                    if(deviceGroup.length > 2){
+
+                                    if (deviceGroup.length > 2) {
                                         timeout_device_update += 240000;
                                     }
+
                                     timeout_device_update = timeout_device_update + 15000;
                                     clearTimeout(deviceRefreshTimer);
                                 }, timeout_device_update);
