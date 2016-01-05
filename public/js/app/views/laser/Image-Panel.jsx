@@ -53,7 +53,7 @@ define([
         _onTransform: function(e) {
             var type = e.currentTarget.dataset.type,
                 newParams = {
-                    angle: parseFloat(this.refs.objectAngle.getDOMNode().value, 10),
+                    angle: this.refs.objectAngle.value(),
                     position: {
                         x: this.refs.objectPosX.value(),
                         y: this.refs.objectPosY.value()
@@ -213,9 +213,17 @@ define([
                             </p>
                             <label className="accordion-body">
                                 <div className="control">
-                                    <input type="number" className="input-fullsize" min="0" max="360" ref="objectAngle" data-type="angle"
-                                        defaultValue={props.angle} value={props.angle}
-                                        onChange={this._onTransform}/>
+                                    <UnitInput
+                                        className={{'input-fullsize': true}}
+                                        min={0}
+                                        max={360}
+                                        defaultUnitType="angle"
+                                        defaultUnit="°"
+                                        dataAttrs={{ type: 'angle' }}
+                                        ref="objectAngle"
+                                        defaultValue={props.angle}
+                                        getValue={this._onTransform}
+                                    />
                                 </div>
                             </label>
                         </label>
