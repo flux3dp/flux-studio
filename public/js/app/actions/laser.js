@@ -497,21 +497,6 @@ define([
                             $img.addClass('image-active');
                         }
 
-                        menuFactory.items.copy.enabled = true;
-                        menuFactory.items.copy.onClick = function() {
-                            menuFactory.items.paste.enabled = true;
-                            menuFactory.items.paste.onClick = clone;
-                        };
-                        menuFactory.items.cut.enabled = true;
-                        menuFactory.items.cut.onClick = function() {
-                            deleteImage();
-
-                            menuFactory.items.paste.enabled = true;
-                            menuFactory.items.paste.onClick = function() {
-                                clone();
-                                menuFactory.items.paste.enabled = false;
-                            };
-                        };
                         menuFactory.items.duplicate.enabled = true;
                         menuFactory.items.duplicate.onClick = clone;
                     });
@@ -571,8 +556,6 @@ define([
 
         function inactiveAllImage() {
             $('.image-active').removeClass('image-active');
-            menuFactory.items.copy.enabled = false;
-            menuFactory.items.cut.enabled = false;
             menuFactory.items.duplicate.enabled = false;
 
             if (0 === $('.image-active').length) {
@@ -705,6 +688,7 @@ define([
                 }
             },
             onFileReadEnd: function(e, files) {
+                ProgressActions.close();
                 self.setState({
                     step: 'start',
                     hasImage: 0 < files.length,
