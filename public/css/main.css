@@ -5645,6 +5645,11 @@ input.switch:checked ~ label:after {
     width: auto;
     z-index: 1;
     align-self: center; }
+    .laser-studio .operating-panel .material-name {
+        max-width: 310px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap; }
     .laser-studio .operating-panel .custom-presets-wrapper {
         background: #FFF;
         overflow: scroll;
@@ -5891,8 +5896,8 @@ input.switch:checked ~ label:after {
     align-items: center;
     justify-content: space-around; }
     .laser-studio .control [type="range"] {
-        flex: 1 auto;
-        margin: 0 10px 0 0; }
+        margin: 0 10px 0 0;
+        flex: 1 auto; }
     .laser-studio .control .value-text {
         width: 120px; }
     .laser-studio .control .label {
