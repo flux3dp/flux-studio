@@ -877,7 +877,8 @@ define(function() {
                 caption: 'Device Busy',
                 message: 'The device is executing another task, try again later. If it stops working, please restart the device.'
             },
-            device_is_used: 'The device is being used, do you want to abort current task?'
+            device_is_used: 'The device is being used, do you want to abort current task?',
+            invalidFile: 'The file is not a valid stl file'
         },
         machine_status: {
             '-10': 'Raw mode',
