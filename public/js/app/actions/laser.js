@@ -233,13 +233,48 @@ define([
                 return range > limit;
             },
             sleep,
+            resetPosition = function() {
+                var $img_container = $('.' + LASER_IMG_CLASS),
+                    platform_pos = $laser_platform.box(true),
+                    rollback = true,
+                    $controlPoints,
+                    el_position;
+
+                $img_container.each(function(i, el) {
+                    var $el = $(el),
+                        data = $el.data('freetrans');
+
+                    el_position = $el.box();
+
+                    $controlPoints = $el.parent().find('.ft-scaler');
+                    $controlPoints.each(function(k, el) {
+                        var elPosition = $(el).box(true);
+
+                        rollback = (
+                            false === outOfRange(elPosition.center) ?
+                            false :
+                            rollback
+                        );
+                    });
+
+
+                    if (true === rollback) {
+                        $el.addClass('bounce').parent().find('.ft-controls').addClass('bounce');
+
+                        $el.freetrans({
+                            x: ((platform_pos.width - el_position.width) / 2) - data.originalSize.width * (1 - data.scalex),
+                            y: ((platform_pos.height - el_position.height) / 2) - data.originalSize.height * (1 - data.scaley)
+                        });
+
+                        $el.one('transitionend', function() {
+                            $el.removeClass('bounce').parent().find('.ft-controls').removeClass('bounce');
+                        });
+                    }
+                });
+            },
             refreshObjectParams = function(e, $el) {
                 var el_position, el_offset_position,
-                    last_x, last_y,
-                    $controlPoints,
-                    platform_pos = $laser_platform.box(true),
-                    position, size, angle, threshold,
-                    rollback = true;
+                    position, size, angle, threshold;
 
                 if (null !== $el) {
                     el_position = $el.box();
@@ -258,36 +293,6 @@ define([
 
                     if ('move' !== e.freetransEventType) {
                         refreshImage($el, threshold);
-                    }
-
-                    $controlPoints = $el.parent().find('.ft-scaler');
-                    $controlPoints.each(function(k, el) {
-                        var elPosition = $(el).box(true);
-
-                        rollback = (
-                            false === outOfRange(elPosition.center) ?
-                            false :
-                            rollback
-                        );
-                    });
-
-                    clearTimeout(sleep);
-
-                    if (true === rollback) {
-                        sleep = setTimeout(function() {
-                            var data = $el.data('freetrans');
-
-                            $target_image.addClass('bounce').parent().find('.ft-controls').addClass('bounce');
-
-                            $target_image.freetrans({
-                                x: ((platform_pos.width - el_position.width) / 2) - data.originalSize.width * (1 - data.scalex),
-                                y: ((platform_pos.height - el_position.height) / 2) - data.originalSize.height * (1 - data.scaley)
-                            });
-
-                            $target_image.one('transitionend', function() {
-                                $target_image.removeClass('bounce').parent().find('.ft-controls').removeClass('bounce');
-                            });
-                        }, 300);
                     }
 
                     self.setState({
@@ -549,17 +554,17 @@ define([
             parserSocket.upload(name, file, opts);
         }
 
-        function inactiveAllImage() {
-            $('.image-active').removeClass('image-active');
+        function inactiveAllImage($exclude) {
+            $('.image-active').not($exclude).removeClass('image-active');
             menuFactory.items.duplicate.enabled = false;
 
             if (0 === $('.image-active').length) {
                 $target_image = null;
-            }
 
-            self.setState({
-                selectedImage: false
-            });
+                self.setState({
+                    selectedImage: false
+                });
+            }
         }
 
         function refreshImagePanelPos() {
@@ -597,6 +602,8 @@ define([
         window.addEventListener('resize', function(e) {
             refreshImagePanelPos();
         });
+
+        setInterval(resetPosition, 100);
 
         return {
             handleLaser: function(settings) {
