@@ -116,7 +116,7 @@ define([
                     <label className="accordion-body">
                         <div className="control">
                             <input type="range" min="0" max="255" step="1" ref="threshold"
-                                defaultValue={props.thresholdValue} value={props.thresholdValue}
+                                defaultValue={thresholdValue} value={thresholdValue}
                                 onChange={this._onThresholdChanged}/>
                         </div>
                     </label>
