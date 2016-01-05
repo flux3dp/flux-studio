@@ -552,6 +552,7 @@ define([
                         this._processInfo([info[2]]);
                         previewUrl = URL.createObjectURL(info[1]);
                         filePreview = true;
+                        pathArray.push(fileName);
                         this.setState({
                             mode: mode.PREVIEW
                         }, function() {
@@ -663,7 +664,7 @@ define([
                     });
                 }
                 else {
-                    DeviceMaster.goFromFile(pathArray, this.state.selectedItem).then(function(result) {
+                    DeviceMaster.goFromFile(pathArray, '').then(function(result) {
                         self._getPrintingInfo();
                     });
                 }
