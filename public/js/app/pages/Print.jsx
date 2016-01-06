@@ -406,7 +406,6 @@ define([
 
                 _handleDownloadGCode: function() {
                     if(director.getModelCount() !== 0) {
-                        this.setState({ openWaitWindow: true });
                         director.downloadGCode().then(() => {
                             this.setState({ openWaitWindow: false });
                         });
@@ -415,7 +414,6 @@ define([
 
                 _handleDownloadFCode: function() {
                     if(director.getModelCount() !== 0) {
-                        this.setState({ openWaitWindow: true });
                         director.downloadFCode().then(() => {
                             this.setState({ openWaitWindow: false });
                         });
