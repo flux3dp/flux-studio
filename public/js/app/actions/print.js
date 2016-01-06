@@ -1601,7 +1601,7 @@ define([
         var drawPath = function() {
             ProgressActions.open(
                 ProgressConstants.WAITING,
-                lang.print.rendering,
+                lang.print.drawingPreview,
                 '',
                 !showStopButton
             );

@@ -479,7 +479,8 @@ define(function() {
             importingModel: 'Importing Model',
             wait: 'Please wait...',
             out_of_range: 'Out of range',
-            out_of_range_message: 'please reduce the size of the object(s)'
+            out_of_range_message: 'please reduce the size of the object(s)',
+            drawingPreview: 'Drawing preview path, please wait'
         },
         laser: {
             import: 'IMPORT',

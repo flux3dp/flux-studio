@@ -1073,7 +1073,7 @@ define([
         },
 
         _renderOperation: function() {
-
+            var className;
             cameraClass = ClassNames('btn-camera btn-control', { 'on': this.state.mode === mode.CAMERA });
             cameraDescriptionClass = ClassNames('description', { 'on': this.state.mode === mode.CAMERA });
 
