@@ -499,6 +499,12 @@ define([
             this.state.selectedItemType = '';
             lastAction = history[history.length - 1];
 
+            if(this.state.mode === mode.CAMERA) {
+                DeviceMaster.stopCamera().then(function() {
+                    DeviceMaster.kick();
+                });
+            }
+
             var actions = {
 
                 'PREVIEW' : function() {
@@ -620,9 +626,6 @@ define([
 
         _handleToggleCamera: function() {
             if(this.state.mode === mode.CAMERA) {
-                DeviceMaster.stopCamera().then(function() {
-                    DeviceMaster.kick();
-                });
                 this._handleBack();
                 return;
             }
