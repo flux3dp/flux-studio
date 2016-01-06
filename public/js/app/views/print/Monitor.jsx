@@ -89,7 +89,7 @@ define([
     var source = {
         DEVICE_LIST : 'DEVICE_LIST',
         GO          : 'GO'
-    }
+    };
 
     var operation,
         wait,
@@ -172,7 +172,7 @@ define([
         'COMPLETED': function() {
             displayStatus = lang.device.completed;
             currentStatus = '';
-            if(openSource == source.GO){
+            if(openSource === source.GO) {
                 DeviceMaster.quit();
             }
         },
@@ -180,7 +180,7 @@ define([
         'ABORTED': function() {
             displayStatus = lang.device.aborted;
             currentStatus = '';
-            if(openSource == source.GO){
+            if(openSource === source.GO) {
                 DeviceMaster.quit();
             }
         },
@@ -707,10 +707,6 @@ define([
             this._stopReport();
             timmer = setTimeout(this._processTimeout, timeout);
 
-            // DeviceMaster.getReport().then(function(report) {
-            //     self._processReport(report);
-            // });
-
             reporter = setInterval(function() {
                 DeviceMaster.getReport().then(function(report) {
                     self._processReport(report);
@@ -730,7 +726,9 @@ define([
 
         _processInfo: function(info){
             this._startReport();
-            if(info=='') return;
+            if(info === '') {
+                return;
+            }
             info = info || [];
             info[0] = info[0] || {};
 
@@ -740,15 +738,19 @@ define([
                 }
             }
 
-            if(!info[0].TIME_COST) return;
+            if(!info[0].TIME_COST) {
+                return;
+            }
+
             if(info[0].TIME_COST) {
                 totalTimeInSeconds = info[0].TIME_COST;
             }
 
-            if(info[0].HEAD_TYPE){
+            if(info[0].HEAD_TYPE) {
                 taskInfo = lang.monitor.task[info[0].HEAD_TYPE.toUpperCase()];
-            }else{
-                taskInfo = "Unknown";
+            }
+            else {
+                taskInfo = 'Unknown';
             }
         },
 
@@ -787,13 +789,14 @@ define([
             }
             errorMessage = lang.monitor[attr.join('_')];
 
-            if(errorMessage == null) errorMessage = attr.join('_');
+            if(errorMessage === null) {
+                errorMessage = attr.join('_');
+            }
 
             if(lastError !== mainError) {
                 messageViewed = false;
                 lastError = mainError;
-                //The display logic should be control by showing poupup
-                console.log("Error detected", attr);
+                AlertActions.showPopupError('', mainError);
             }
 
             if(!messageViewed && !showingPopup && mainError !== DeviceConstants.USER_OPERATION && mainError.length > 0) {
@@ -856,7 +859,7 @@ define([
                 currentStatus: currentStatus,
                 displayStatus: displayStatus,
                 progress: progress
-            }
+            };
 
             //If report returns idle state, which means nothing to preview..
             if(openSource === source.DEVICE_LIST &&
@@ -1025,7 +1028,7 @@ define([
                 backgroundPosition: '50% 50%',
                 width: '100%',
                 height: '100%'
-            }
+            };
             return(
                 <div className="wrapper" style={backgroundStyle}>
                 </div>
@@ -1074,38 +1077,38 @@ define([
             cameraClass = ClassNames('btn-camera btn-control', { 'on': this.state.mode === mode.CAMERA });
             cameraDescriptionClass = ClassNames('description', { 'on': this.state.mode === mode.CAMERA });
 
-            go = function(className){
-                className = "controls center " + className;
+            go = function(enable) {
+                className = ClassNames('controls center', {'disabled': !enable});
                 return (
                 <div className={className} onClick={this._handleGo}>
                     <div className="btn-go btn-control"></div>
                     <div className="description">{lang.monitor.go}</div>
                 </div>
                 );
-            }.bind(this)
+            }.bind(this);
 
-            pause = function(className){
-                className = "controls center " + className;
+            pause = function(enable) {
+                className = ClassNames('controls center', {'disabled': !enable});
                 return (
                 <div className={className} onClick={this._handlePause}>
                     <div className="btn-pause btn-control"></div>
                     <div className="description">{lang.monitor.pause}</div>
                 </div>
                 );
-            }.bind(this)
+            }.bind(this);
 
-            stop = function(className){
-                className = "controls left " + className;
+            stop = function(enable) {
+                className = ClassNames('controls left', {'disabled': !enable});
                 return (
                 <div className={className} onClick={this._handleStop}>
                     <div className="btn-stop btn-control"></div>
                     <div className="description">{lang.monitor.stop}</div>
                 </div>
                 );
-            }.bind(this)
+            }.bind(this);
 
-            upload = function(className){
-                className = "controls left " + className;
+            upload = function(enable) {
+                className = ClassNames('controls left', {'disabled': !enable});
                 return (
                     <div className={className} onClick={this._handleUpload}>
                         <div className="btn-upload btn-control"></div>
@@ -1113,27 +1116,27 @@ define([
                         <div className="description">{lang.monitor.upload}</div>
                     </div>
                 );
-            }.bind(this)
+            }.bind(this);
 
-            download =  function(className){
-                className = "controls center " + className;
+            download =  function(enable) {
+                className = ClassNames('controls center', {'disabled': !enable});
                 return (
                     <div className={className} onClick={this._handleDownload}>
                         <div className="btn-download btn-control"></div>
                         <div className="description">{lang.monitor.download}</div>
                     </div>
                 );
-            }.bind(this)
+            }.bind(this);
 
-            camera = function(className){
-                className = "controls right " + className;
+            camera = function(enable) {
+                className = ClassNames('controls right', {'disabled': !enable});
                 return (
                     <div className={className} onClick={this._handleToggleCamera}>
                         <div className={cameraClass}></div>
                         <div className={cameraDescriptionClass}>{lang.monitor.camera}</div>
                     </div>
                 );
-            }.bind(this)
+            }.bind(this);
 
             commands = {
                 'READY': function() {
@@ -1161,10 +1164,6 @@ define([
                 }
             }
 
-            leftButton = this.state.mode === mode.BROWSE_FILE ? upload : stop;
-            middleButton = this.state.mode === mode.BROWSE_FILE ? download : action;
-            rightButton = camera;
-
             if(currentStatus !== DeviceConstants.READY) {
                 rightButtonOn = false;
             }
@@ -1178,7 +1177,7 @@ define([
             // BROWSE_FILE mode
             if(this.state.mode === mode.BROWSE_FILE) {
                 leftButtonOn = pathArray.length > 0;
-                middleButtonOn = this.state.selectedItemType == type.FILE;
+                middleButtonOn = this.state.selectedItemType === type.FILE;
             }
 
             // PRINT mode
@@ -1215,18 +1214,27 @@ define([
                 }
 
                 if(statusId === DeviceConstants.status.MAINTAIN ||
-                   statusId === DeviceConstants.status.SCAN) {
+                   statusId === DeviceConstants.status.SCAN
+                ) {
                     middleButtonOn = false;
                 }
             }
 
-            //leftButton      = leftButtonOn ? leftButton : '';
-            //middleButton    = middleButtonOn ? middleButton : '';
-            //rightButton    = rightButtonOn ? rightButton : '';
+            leftButton = this.state.mode === mode.BROWSE_FILE ? upload : stop;
+            middleButton = this.state.mode === mode.BROWSE_FILE ? download : action;
+            rightButton = camera;
 
-            if(leftButton!='') leftButton = leftButton(leftButtonOn ? '' : 'disabled');
-            if(middleButton!='') middleButton = middleButton(middleButtonOn ? '' : 'disabled');
-            if(rightButton!='') rightButton = rightButton(rightButtonOn ? '' : 'disabled');
+            if(leftButton !== '') {
+                leftButton = leftButton(leftButtonOn);
+            }
+
+            if(middleButton !== '') {
+                middleButton = middleButton(middleButtonOn);
+            }
+
+            if(rightButton !== '') {
+                rightButton = rightButton(rightButtonOn);
+            }
 
             operation = (
                 <div className="operation">
@@ -1244,20 +1252,22 @@ define([
         _renderPrintingInfo: function() {
             var _duration   = totalTimeInSeconds === 0 ? '' : this._formatTime(totalTimeInSeconds, true),
                 _progress   = percentageDone === 0 ? '' : percentageDone + '%',
-                infoClass   = ClassNames('status-info',
-                                        { 'running': this.state.mode == mode.BROWSE_FILE ||
-                                                     this.state.mode == mode.PREVIEW && openSource == source.GO ||
-                                                     this.state.mode == mode.PREVIEW && filePreview ||
-                                                     statusId !== DeviceConstants.status.IDLE &&
-                                                     statusId !== DeviceConstants.status.MAINTAIN &&
-                                                     statusId !== DeviceConstants.status.SCAN });
+                infoClass   = ClassNames(
+                    'status-info',
+                    {
+                        'running':
+                            this.state.mode === mode.BROWSE_FILE ||
+                            this.state.mode === mode.PREVIEW && openSource === source.GO ||
+                            this.state.mode === mode.PREVIEW && filePreview ||
+                            statusId !== DeviceConstants.status.IDLE &&
+                            statusId !== DeviceConstants.status.MAINTAIN &&
+                            statusId !== DeviceConstants.status.SCAN
+                    }
+                );
 
             if(statusId === DeviceConstants.status.IDLE || statusId === DeviceConstants.status.COMPLETED) {
-                if(openSource !== source.GO && filePreview !== true ){
+                if(openSource !== source.GO && filePreview !== true) {
                     taskInfo = _duration = _progress = '';
-                    console.log("clear info?")
-                }else{
-                    console.log(taskInfo, _duration)
                 }
             }
 
@@ -1273,7 +1283,12 @@ define([
         },
 
         _renderNavigation: function() {
-            if(openSource === source.DEVICE_LIST && statusId == 0 && pathArray.length == 0 && this.state.mode == mode.BROWSE_FILE){
+            if(
+                openSource === source.DEVICE_LIST &&
+                statusId === 0 &&
+                pathArray.length === 0 &&
+                this.state.mode === mode.BROWSE_FILE
+            ) {
                 return (<div className="back"></div>);
             }
             if(history.length > 1) {
