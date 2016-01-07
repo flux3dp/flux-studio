@@ -379,26 +379,6 @@ define([
                         <Modal className={className} content={content} disabledEscapeOnBackground={false}/>
                     </div>
                 );
-
-                // var section = this._sectionFactory(),
-                //     content = (
-                //         <Alert
-                //             lang={lang}
-                //             caption={this._makeCaption(section.caption)}
-                //             message={section.message}
-                //             buttons={section.buttons}
-                //         />
-                //     ),
-                //     className = {
-                //         'modal-change-filament': true,
-                //         'shadow-modal': true
-                //     };
-                //
-                // return (
-                //     <div className="always-top" ref="modal">
-                //         <Modal className={className} content={content} disabledEscapeOnBackground={false}/>
-                //     </div>
-                // );
             }
 
         });

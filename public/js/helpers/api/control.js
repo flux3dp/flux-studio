@@ -526,7 +526,43 @@ define([
                 ws.send(args.join(' '));
 
                 return deferred.promise();
-            }
+            },
+
+            /**
+             * update firmware
+             * @param {File} file - file
+             */
+            fwUpdate: function(file) {
+                var deferred = $.Deferred(),
+                    mimeType = 'binary/flux-firmware',
+                    blob = new Blob([file], { type: mimeType }),
+                    args = [
+                        'update_fw',
+                        'binary/flux-firmware',  // mimeType
+                        blob.size
+                    ];
+
+                events.onMessage = function(result) {
+                    if ('ok' === result.status) {
+                        deferred.resolve(result);
+                    }
+                    else if ('continue' === result.status) {
+                        deferred.notify(result);
+                        ws.send(blob);
+                    }
+                    else {
+                        deferred.reject(result);
+                    }
+                };
+
+                events.onError = function(result) {
+                    deferred.reject(result);
+                };
+
+                ws.send(args.join(' '));
+
+                return deferred.promise();
+            },
         };
     };
 });

@@ -20,7 +20,15 @@ define(function() {
             firmware: {
                 caption: 'FLUX 有新的韌體更新',
                 message_pattern_1: '"%s" 有新的韌體更新。',
-                message_pattern_2: 'FLUX Firmware %s 可使用 - 你的版本為 %s.'
+                message_pattern_2: 'FLUX Firmware %s 可使用 - 你的版本為 %s.',
+                latest_firmware: {
+                    caption: '韌體更新',
+                    message: '韌體已經是最新版本'
+                },
+                confirm: '確認更新',
+                upload_file: '請上傳檔案',
+                update_success: '更新成功',
+                update_fail: '更新失敗'
             },
             software: {
                 caption: 'FLUX Studio 有新的軟體更新',
@@ -59,7 +67,8 @@ define(function() {
                 new: '新增裝置',
                 device_monitor: '狀態',
                 change_filament: '自動換料',
-                default_device: '設為預設裝置'
+                default_device: '設為預設裝置',
+                check_firmware_update: '韌體更新'
             },
             window: {
                 label: '視窗',
