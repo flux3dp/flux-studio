@@ -20,7 +20,15 @@ define(function() {
             firmware: {
                 caption: 'An Firmware Update to FLUX is available',
                 message_pattern_1: '"%s" is now ready for firmware update.',
-                message_pattern_2: 'FLUX Firmware %s is now available - You have %s.'
+                message_pattern_2: 'FLUX Firmware %s is now available - You have %s.',
+                latest_firmware: {
+                    caption: 'Firmware Update',
+                    message: 'You have the latest firmware'
+                },
+                confirm: 'CONFIRM',
+                upload_file: 'Upload file',
+                update_success: 'Update Success',
+                update_fail: 'Update Fail'
             },
             software: {
                 caption: 'An Software Update to FLUX is available',
@@ -59,7 +67,8 @@ define(function() {
                 new: 'Add New Device',
                 device_monitor: 'Device Monitor',
                 change_filament: 'Change Filament',
-                default_device: 'Set as default device'
+                default_device: 'Set as default device',
+                check_firmware_update: 'Check Firmware Update'
             },
             window: {
                 label: 'Window',
