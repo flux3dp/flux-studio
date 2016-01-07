@@ -389,19 +389,7 @@ define([
 
                 _handleImport: function(e) {
                     var files = e.target.files;
-                    for (var i = 0; i < files.length; i++) {
-                        (function(file) {
-                            FileSystem.writeFile(
-                                file,
-                                {
-                                    onComplete: function(evt, fileEntry) {
-                                        director.appendModel(fileEntry, file);
-                                    }
-                                }
-                            );
-                        })(files.item(i));
-                    }
-                    e.target.value = null;
+                    director.appendModels(files, 0, () => {});
                 },
 
                 _handleDownloadGCode: function() {
@@ -599,7 +587,7 @@ define([
                             <div className="arrowBox" onClick={this._handleCloseAllView}>
                                 <div title={lang.print.importTitle} className="file-importer">
                                     <div className="import-btn">{lang.print.import}</div>
-                                    <input type="file" accept=".stl" onChange={this._handleImport} />
+                                    <input type="file" accept=".stl" onChange={this._handleImport} multiple />
                                 </div>
                             </div>
                         </div>
