@@ -113,8 +113,7 @@ define([
                     var self = this,
                         object,
                         objectObserve = function(mesh, arrayIndex) {
-                            var disableLogging = ['transformMethods', 'choose', 'display'],
-                                pushToHistory = function(mesh, arrayIndex) {
+                            var pushToHistory = function(mesh, arrayIndex) {
                                     mesh.type = 'update';
                                     mesh.arrayIndex = arrayIndex;
                                     self.state.history.push(mesh);
@@ -123,19 +122,24 @@ define([
                                     });
                                 };
 
-                            (function(arrayIndex) {
-                                Object.observe(mesh, function(changes) {
-                                    for (var i in changes) {
-                                        if (true === changes.hasOwnProperty(i) &&
-                                            'name' === changes[i].name
-                                        ) {
-                                            object = Object.assign({}, changes[i].object);
-                                            object.oldBlob = self.state.scanModelingWebSocket.History.findByName(changes[i].oldValue)[0].data;
-                                            pushToHistory(object, arrayIndex);
+                                (function(mesh, arrayIndex) {
+                                    Object.observe(mesh, function(changes) {
+                                        for (var i in changes) {
+                                            if (true === changes.hasOwnProperty(i) &&
+                                                'name' === changes[i].name &&
+                                                true !== changes[i].object.isUndo
+                                            ) {
+                                                object = Object.assign({}, changes[i].object);
+                                                object.oldBlob = self.state.scanModelingWebSocket.History.findByName(changes[i].oldValue)[0].data;
+                                                object.isUndo = false;
+                                                // old name
+                                                object.name = changes[i].oldValue;
+                                                pushToHistory(object, arrayIndex);
+                                            }
                                         }
-                                    }
-                                });
-                            })(arrayIndex);
+                                    });
+                                })(mesh, arrayIndex);
+
                         },
                         objectGroupObserve = function(meshes, arrayIndex) {
                             meshes.forEach(function(mesh, i) {
@@ -148,22 +152,34 @@ define([
                             // add new entry
                             if (0 < change.addedCount) {
                                 object = Object.assign({}, change.object[change.index]);
-                                object.type = 'add';
-                                object.arrayIndex = change.index;
-                                self.state.history.push(object);
-                                self.setState({
-                                    history: self.state.history
-                                });
+
+                                if (true !== change.object[change.index].isUndo) {
+                                    object.type = 'add';
+                                    object.arrayIndex = change.index;
+                                    self.state.history.push(object);
+                                    self.setState({
+                                        history: self.state.history
+                                    });
+                                }
+                                else {
+                                    change.object[change.index].isUndo = false;
+                                }
+
+                                // each new mesh needs to be observe
                                 objectGroupObserve(change.object, change.index);
                             }
+
                             // remove an entry
-                            else if (0 < change.removed.length) {
+                            if (0 < change.removed.length) {
                                 change.removed.forEach(function(object) {
-                                    if (true !== object.forceDelete) {
+                                    if (true !== object.isUndo) {
                                         object = Object.assign({}, object);
                                         object.type = 'remove';
                                         object.arrayIndex = change.index;
                                         self.state.history.push(object);
+                                    }
+                                    else {
+                                        object.isUndo = false;
                                     }
                                 });
 
@@ -221,20 +237,45 @@ define([
                         currentMesh,
                         actionMap = {
                             add: function(mesh) {
-                                // delete
-                                currentMesh = self._getMesh(mesh.index);
-                                currentMesh.forceDelete = true;
-                                self._onDeleteMesh(mesh.arrayIndex, mesh);
+                                // ask for delete
+                                mesh.isUndo = true;
+                                self._onDeletingMesh(mesh, mesh.arrayIndex);
                             },
                             update: function(mesh) {
                                 var fileReader = new FileReader(),
+                                    meshes = self.state.meshes,
+                                    newMesh = {},
                                     typedArray;
 
-                                currentMesh = self._getMesh(mesh.index);
-
                                 fileReader.onload = function() {
+
+                                    // remove current
+                                    currentMesh = self._getMesh(mesh.index);
+                                    currentMesh.isUndo = true;
+                                    currentMesh.transformMethods.hide();
+                                    self._onDeleteMesh(mesh.arrayIndex, currentMesh);
+
+                                    // add old
                                     typedArray = new Float32Array(this.result);
-                                    currentMesh.model = scanedModel.updateMesh(currentMesh.model, typedArray);
+
+                                    // update point cloud
+                                    mesh.model = scanedModel.updateMesh(mesh.model, typedArray);
+
+                                    newMesh = self._newMesh({
+                                        model: mesh.model,
+                                        name: mesh.name,
+                                        index: mesh.index
+                                    });
+
+                                    scanedModel.add(mesh.model);
+                                    newMesh.isUndo = true;
+                                    meshes.splice(mesh.arrayIndex, 0, newMesh);
+                                    self.state.scanControlImageMethods.stop();
+
+                                    self.setState({
+                                        showCamera: false,
+                                        meshes: meshes
+                                    });
                                 };
 
                                 fileReader.readAsArrayBuffer(mesh.oldBlob);
@@ -288,6 +329,10 @@ define([
                     switch (id) {
                     case 'scan-device-busy':
                         history.back();
+                        break;
+                    case 'deleting-mesh':
+                        self._revertDeletingMeshToHistory();
+                        break;
                     }
                 },
 
@@ -1134,6 +1179,32 @@ define([
                     self._openBlocker(true, ProgressConstants.WAITING, '', false, self.state.lang.scan.calibration_is_running);
                 },
 
+                _onDeletingMesh: function(mesh, arrayIndex) {
+                    var self = this,
+                        lang = self.state.lang;
+
+                    self.setState({
+                        deleting_mesh: {
+                            object: mesh,
+                            index: arrayIndex
+                        }
+                    }, function() {
+                        AlertActions.showPopupYesNo('deleting-mesh', lang.scan.delete_mesh, lang.scan.caution);
+                    });
+                },
+
+                _revertDeletingMeshToHistory: function() {
+                    var self = this,
+                        mesh = self.state.deleting_mesh.object,
+                        newMesh = self._newMesh(mesh);
+
+                    newMesh.type = mesh.type;
+                    self.state.history.push(newMesh);
+                    self.setState({
+                        history: self.state.history
+                    });
+                },
+
                 _onDeleteMesh: function(index, mesh) {
                     var self = this,
                         meshes = self.state.meshes;
@@ -1430,17 +1501,6 @@ define([
 
                                     scanedModel.render();
                                 });
-                            },
-                            onDeleteMesh = function(e) {
-
-                                self.setState({
-                                    deleting_mesh: {
-                                        object: mesh,
-                                        index: i
-                                    }
-                                }, function() {
-                                    AlertActions.showPopupYesNo('deleting-mesh', lang.scan.delete_mesh, lang.scan.caution);
-                                });
                             };
 
                         itemClass = {
@@ -1453,7 +1513,7 @@ define([
                             label: (
                                 <div className={cx(itemClass)}>
                                     <div className="mesh-thumbnail-no" data-index={mesh.index} onClick={onChooseMesh}>{mesh.index}</div>
-                                    <div className="mesh-thumbnail-close fa fa-times" onClick={onDeleteMesh}></div>
+                                    <div className="mesh-thumbnail-close fa fa-times" onClick={self._onDeletingMesh.bind(self, mesh, i)}></div>
                                 </div>
                             )
                         }
