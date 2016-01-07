@@ -13,6 +13,10 @@ define([
     'app/actions/global-actions',
     'helpers/device-master',
     'app/constants/device-constants',
+    'app/actions/input-lightbox-actions',
+    'app/constants/input-lightbox-constants',
+    'app/actions/progress-actions',
+    'app/constants/progress-constants',
     'html2canvas',
     'plugins/file-saver/file-saver.min'
 ], function(
@@ -27,6 +31,10 @@ define([
     GlobalActions,
     DeviceMaster,
     DeviceConstants,
+    InputLightboxActions,
+    InputLightboxConstants,
+    ProgressActions,
+    ProgressConstants,
     html2canvas,
     fileSaver
 ) {
@@ -276,10 +284,7 @@ define([
                                             onClick: function() {
                                                 DeviceMaster.selectDevice(printer).then(function(status) {
                                                     if(status === DeviceConstants.CONNECTED) {
-                                                        setTimeout(
-                                                            function(){
-                                                                GlobalActions.showMonitor(printer)
-                                                            },50);
+                                                        GlobalActions.showMonitor(printer);
                                                     }
                                                     else if (status === DeviceConstants.TIMEOUT) {
                                                         AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
@@ -306,7 +311,6 @@ define([
                                             enabled: true,
                                             type: 'checkbox',
                                             onClick: function() {
-                                                console.log(this.checked, printer);
                                                 if (false === this.checked) {
                                                     initializeMachine.defaultPrinter.clear();
                                                 }
@@ -318,11 +322,78 @@ define([
                                             },
                                             parent: parentIndex.DEVICE,
                                             checked: (defaultDevice.uuid === printer.uuid)
+                                        },
+                                        {
+                                            label: lang.device.check_firmware_update,
+                                            enabled: true,
+                                            onClick: function() {
+                                                checkFirmware(printer).done(function(response) {
+                                                    var lang = i18n.get(),
+                                                        onSubmit = function(files, e) {
+                                                            var file = files.item(0),
+                                                                onFinishUpdate = function(isSuccess) {
+                                                                    ProgressActions.close();
+
+                                                                    if (true === isSuccess) {
+                                                                        AlertActions.showPopupInfo(
+                                                                            'firmware-update-success',
+                                                                            lang.update.firmware.update_success
+                                                                        );
+                                                                    }
+                                                                    else {
+                                                                        AlertActions.showPopupError(
+                                                                            'firmware-update-fail',
+                                                                            lang.update.firmware.update_fail
+                                                                        );
+                                                                    }
+                                                                };
+
+                                                            ProgressActions.open(ProgressConstants.NONSTOP);
+                                                            DeviceMaster.selectDevice(printer).then(function(status) {
+                                                                if (status === DeviceConstants.CONNECTED) {
+                                                                    DeviceMaster.updateFirmware(file).
+                                                                        done(onFinishUpdate.bind(null, true)).
+                                                                        fail(onFinishUpdate.bind(null, false));
+                                                                }
+                                                                else if (status === DeviceConstants.TIMEOUT) {
+                                                                    AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
+                                                                }
+                                                            });
+                                                        },
+                                                        onInstall = function() {
+                                                            InputLightboxActions.open(
+                                                                'upload-firmware',
+                                                                {
+                                                                    type: InputLightboxConstants.TYPE_FILE,
+                                                                    inputHeader: lang.update.firmware.upload_file,
+                                                                    onSubmit: onSubmit,
+                                                                    confirmText: lang.update.firmware.confirm
+                                                                }
+                                                            );
+                                                        };
+
+                                                    if (true === response.needUpdate) {
+                                                        AlertActions.showUpdate(
+                                                            printer,
+                                                            'firmware',
+                                                            response,
+                                                            onInstall
+                                                        );
+                                                    }
+                                                    else {
+                                                        AlertActions.showPopupInfo(
+                                                            'latest-firmware',
+                                                            lang.update.firmware.latest_firmware.message,
+                                                            lang.update.firmware.latest_firmware.caption
+                                                        );
+                                                    }
+                                                });
+                                            }
                                         }]
                                     });
                                 }
                             });
-                            if ('undefined' === typeof deviceRefreshTimer && false === renew) {
+                            if ('undefined' === typeof deviceRefreshTimer && true === renew) {
                                 clearTimeout(deviceRefreshTimer);
                                 deviceRefreshTimer = setTimeout(function() {
                                     items.device.subItems = deviceGroup;
@@ -383,7 +454,7 @@ define([
                         window.html2canvas = html2canvas;
                         function obfuse(str){
                             var output = [];
-                            for(var i in str){
+                            for (var i in str) {
                                 var c = {'f':'x','l':'u','u':'l','x':'f'}[str[i]];
                                 output.push(c?c:str[i]);
                             }
