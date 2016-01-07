@@ -479,7 +479,8 @@ define(function() {
             importingModel: '匯入模型',
             wait: '請稍候',
             out_of_range: '超過列印範圍',
-            out_of_range_message: '請縮小物件尺寸'
+            out_of_range_message: '請縮小物件尺寸',
+            drawingPreview: '繪製預覽路徑，請稍候'
         },
         laser: {
             import: '匯入',

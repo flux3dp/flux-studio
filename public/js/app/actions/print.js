@@ -1251,7 +1251,8 @@ define([
         if(objects.length > 0) {
             if (!blobExpired) {
                 d.resolve(saveAs(responseBlob, fileName));
-            } else {
+            }
+            else {
                 getFCode().then(function(blob) {
                     if (blob instanceof Blob) {
                         _setProgressMessage('');
@@ -1601,7 +1602,7 @@ define([
         var drawPath = function() {
             ProgressActions.open(
                 ProgressConstants.WAITING,
-                lang.print.rendering,
+                lang.print.drawingPreview,
                 '',
                 !showStopButton
             );
@@ -1728,6 +1729,7 @@ define([
     return {
         init                : init,
         appendModel         : appendModel,
+        appendModels        : appendModels,
         setRotation         : setRotation,
         setScale            : setScale,
         alignCenter         : alignCenter,
