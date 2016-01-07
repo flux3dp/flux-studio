@@ -191,7 +191,9 @@ define([
                     });
 
                     shortcuts.on(['ctrl', 'z'], function(e) {
-                        self._undo();
+                        if (false === self.state.isScanStarted) {
+                            self._undo();
+                        }
                     });
 
                     AlertStore.onRetry(self._retry);
@@ -237,9 +239,24 @@ define([
                         currentMesh,
                         actionMap = {
                             add: function(mesh) {
+                                var revertTimes = mesh.associted || 0;
+
+                                currentMesh = self._getMesh(mesh.index);
+                                currentMesh.isUndo = true;
+
                                 // ask for delete
-                                mesh.isUndo = true;
-                                self._onDeletingMesh(mesh, mesh.arrayIndex);
+                                if (0 === revertTimes) {
+                                    self._onDeletingMesh(currentMesh, mesh.arrayIndex);
+                                }
+                                else {
+                                    self._onDeleteMesh(mesh.arrayIndex, currentMesh);
+
+                                    // delete associted mesh
+                                    for (var i = 0; i < revertTimes; i++) {
+                                        currentMesh = self.state.history.pop();
+                                        actionMap.remove(currentMesh);
+                                    }
+                                }
                             },
                             update: function(mesh) {
                                 var fileReader = new FileReader(),
@@ -282,8 +299,11 @@ define([
                             },
                             remove: function(mesh) {
                                 // add
+                                mesh.model.material.opacity = 0.3;
+                                mesh.choose = false;
+                                mesh.isUndo = true;
                                 scanedModel.add(mesh.model);
-                                self.state.meshes.push(mesh);
+                                self.state.meshes.splice(mesh.arrayIndex, 0, mesh);
                                 self.state.scanControlImageMethods.stop();
 
                                 self.setState({
@@ -516,7 +536,8 @@ define([
                         name: args.name || '',
                         index: args.index,
                         choose: false,
-                        display: true
+                        display: true,
+                        associted: 0
                     };
                 },
 
@@ -948,6 +969,7 @@ define([
                     var self = this,
                         meshes = this.state.meshes,
                         selectedMeshes = (true === selectedMeshes instanceof Array ? selectedMeshes : this.state.selectedMeshes),
+                        lengthSelectedMeshes = selectedMeshes.length,
                         outputName = '';
 
                     this._doApplyTransform(function(response) {
@@ -967,6 +989,7 @@ define([
                                     onUpdate = function(response) {
                                         mesh = self._getMesh(self.state.scanTimes);
                                         mesh.name = outputName;
+                                        mesh.associted = lengthSelectedMeshes;
                                     };
 
                                 deferred.done(onUpdate);
