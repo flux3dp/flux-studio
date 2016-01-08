@@ -396,8 +396,9 @@ define([
                                 }
                             }
                             var jpegUrl = canvas.toDataURL("image/jpeg"),
-                                report_info = {ws: window.FLUX.websockets, screenshot: jpegUrl},
-                                report_blob = new Blob([obfuse(btoa(JSON.stringify(report_info)))], {type : 'text/html'});
+                                report_info = JSON.stringify({ws: window.FLUX.websockets, screenshot: jpegUrl}, null, 2);
+                            if(!window.FLUX.debug) report_info = obfuse(btoa(report_info));
+                            var report_blob = new Blob([report_info], {type : 'text/html'});
 
                             saveAs(report_blob, "bugreport_"+Math.floor(Date.now() / 1000)+".txt");
                         });

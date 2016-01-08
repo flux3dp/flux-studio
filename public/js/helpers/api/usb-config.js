@@ -3,8 +3,9 @@
  * Ref: https://github.com/flux3dp/fluxghost/wiki/websocket-usb-config
  */
 define([
-    'helpers/websocket'
-], function(Websocket) {
+    'helpers/websocket',
+    'helpers/api/config'
+], function(Websocket, Config) {
     'use strict';
 
     var ws;
@@ -277,6 +278,7 @@ define([
                 var args = [
                     'set network',
                     JSON.stringify({
+                        ssid: Config().read('configured-pritner'),
                         wifi_mode: 'host',
                         method: 'dhcp'
                     })

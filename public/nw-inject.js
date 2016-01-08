@@ -3,6 +3,9 @@ window.requireNode = window.require || function() {};
 
 var fs = requireNode('fs'),
     os = requireNode('os'),
+    path = require('path'),
+    nwPath = process.execPath,
+    nwDir = path.dirname(nwPath),
     osType = os.type(),
     spawn = requireNode('child_process').spawn,
     exec = requireNode('child_process').exec,
@@ -27,7 +30,13 @@ var fs = requireNode('fs'),
         if ('Windows_NT' === osType) {
             // TODO: has to assign env root for slic3r
             args[slic3rPathIndex] = cwd + '/lib/Slic3r/slic3r-console.exe';
-            ghostCmd = cwd + '/lib/ghost/ghost.exe';
+            fs.stat(nwPath+"/ghost/ghost.exe", function(err, stat){
+                if(err == null){
+                    ghostCmd = nwPath + '/ghost/ghost.exe';
+                }else{
+                    ghostCmd = cwd + '/lib/ghost/ghost.exe';
+                }
+            });
         }
         else if ('Linux' === osType) {
             args[slic3rPathIndex] = cwd + '/lib/Slic3r/bin/slic3r';
@@ -117,5 +126,9 @@ currentWindow.on('close', function() {
     });
     this.close(true);
 });
+
+
+//crashdump for windows
+gui.App.setCrashDumpDir(nwPath);
 
 delete window.require;
