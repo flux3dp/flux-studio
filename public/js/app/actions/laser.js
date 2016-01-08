@@ -257,8 +257,7 @@ define([
                         );
                     });
 
-
-                    if (true === rollback) {
+                    if (true === rollback && 'undefined' !== typeof data) {
                         $el.addClass('bounce').parent().find('.ft-controls').addClass('bounce');
 
                         $el.freetrans({
@@ -266,7 +265,8 @@ define([
                             y: ((platform_pos.height - el_position.height) / 2) - data.originalSize.height * (1 - data.scaley)
                         });
 
-                        $el.one('transitionend', function() {
+                        // set fallback for older version of chrome
+                        $el.one('transitionend webkitTransitionend', function() {
                             $el.removeClass('bounce').parent().find('.ft-controls').removeClass('bounce');
                         });
                     }
@@ -603,7 +603,7 @@ define([
             refreshImagePanelPos();
         });
 
-        setInterval(resetPosition, 100);
+        setInterval(resetPosition, 200);
 
         return {
             handleLaser: function(settings) {
