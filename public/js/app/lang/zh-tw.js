@@ -95,7 +95,7 @@ define(function() {
             no_machine : '目前沒有機器，跳過此步驟',
 
             // specific caption/content
-            invalid_device_name: '裝置名稱只能使用英文字母、數字、空格以及特殊字元 “-”, “_”, “’”, “\'”',
+            invalid_device_name: '裝置名稱只能使用中文字，英文字母、數字、空格以及特殊字元  “(”, “)”, “-”, “_”, “’”, “\'”',
             require_device_name: '名稱欄位為必填',
             select_language: '請選擇你想使用的語言',
             change_password: {
