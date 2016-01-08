@@ -272,6 +272,8 @@ define([
                         function(printers) {
                             printers.forEach(function(printer) {
                                 renew = deviceGroup.some(deviceExists(printer));
+
+                                // if it's a new device by discover then append to list
                                 if (false === renew) {
                                     deviceGroup.push({
                                         isPrinter: true,
@@ -305,23 +307,6 @@ define([
                                                     }
                                                 });
                                             }
-                                        },
-                                        {
-                                            label: lang.device.default_device,
-                                            enabled: true,
-                                            type: 'checkbox',
-                                            onClick: function() {
-                                                if (false === this.checked) {
-                                                    initializeMachine.defaultPrinter.clear();
-                                                }
-                                                else {
-                                                    initializeMachine.defaultPrinter.set(printer);
-                                                }
-
-                                                defaultDeviceChange(this, printer);
-                                            },
-                                            parent: parentIndex.DEVICE,
-                                            checked: (defaultDevice.uuid === printer.uuid)
                                         },
                                         {
                                             label: lang.device.check_firmware_update,
@@ -389,15 +374,33 @@ define([
                                                     }
                                                 });
                                             }
+                                        },
+                                        {
+                                            label: lang.device.default_device,
+                                            enabled: true,
+                                            type: 'checkbox',
+                                            onClick: function() {
+                                                if (false === this.checked) {
+                                                    initializeMachine.defaultPrinter.clear();
+                                                }
+                                                else {
+                                                    initializeMachine.defaultPrinter.set(printer);
+                                                }
+
+                                                defaultDeviceChange(this, printer);
+                                            },
+                                            parent: parentIndex.DEVICE,
+                                            checked: (defaultDevice.uuid === printer.uuid)
                                         }]
                                     });
                                 }
                             });
+
                             if ('undefined' === typeof deviceRefreshTimer && true === renew) {
                                 clearTimeout(deviceRefreshTimer);
                                 deviceRefreshTimer = setTimeout(function() {
                                     items.device.subItems = deviceGroup;
-                                    if ('win' === window.FLUX.osType && window.FLUX.refreshMenu){
+                                    if ('win' === window.FLUX.osType && window.FLUX.refreshMenu) {
                                         window.FLUX.refreshMenu(menuMap);
                                     }
 
