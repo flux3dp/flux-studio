@@ -271,12 +271,13 @@ define([
                 };
             },
 
-            setAPMode: function(opts) {
+            setAPMode: function(ssid, opts) {
                 opts = reorganizeOptions(opts);
 
                 var args = [
                     'set network',
                     JSON.stringify({
+                        ssid: ssid,
                         wifi_mode: 'host',
                         method: 'dhcp'
                     })
