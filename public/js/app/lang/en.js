@@ -927,7 +927,7 @@ define(function() {
             loaded: 'Filament Loaded',
             unloaded: 'Filament Unloaded',
             ok: 'OK',
-            auto_emerging: 'Loading filament',
+            auto_emerging: 'Please insert filament',
             maintain_head_type_error: 'Toolhead not installed correctly',
             maintain_zombie: 'Please restart the device'
         },

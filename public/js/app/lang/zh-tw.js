@@ -927,7 +927,7 @@ define(function() {
             loaded: '進料完成',
             unloaded: '退料完成',
             ok: '確定',
-            auto_emerging: '進料中',
+            auto_emerging: '請插入線料',
             maintain_head_type_error: '列印模組未正確安裝',
             maintain_zombie: '請重新啟動機器'
         },
