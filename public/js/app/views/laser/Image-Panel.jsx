@@ -62,7 +62,7 @@ define([
                         width: this.refs.objectSizeW.value(),
                         height: this.refs.objectSizeH.value()
                     },
-                    sizeLock: !this.state.sizeLock
+                    sizeLock: this.state.sizeLock
                 },
                 ratio;
 
