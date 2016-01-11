@@ -32,6 +32,20 @@ define([
                 }
             },
 
+            componentDidMount: function() {
+                AlertStore.onCancel(this._onCancel);
+            },
+
+            componentWillUnmount: function() {
+                AlertStore.removeCancelListener(this._onCancel);
+            },
+
+            _onCancel: function(id) {
+                var usb = usbConfig();
+                usb.close();
+                location.hash = 'initialize/wifi/connect-machine';
+            },
+
             _handleSetPrinter: function(e) {
                 e.preventDefault();
 
@@ -81,7 +95,7 @@ define([
                     setMachine,
                     isValid;
 
-                isValid = (name !== '' && false === /[^\u4e00-\u9fa5a-zA-Z0-9 ’'_-]+/g.test(name));
+                isValid = (name !== '' && false === /[^()\u4e00-\u9fa5a-zA-Z0-9 ’'_-]+/g.test(name));
 
                 self.setState({
                     requirePrinterName: (name !== ''),
@@ -162,7 +176,6 @@ define([
                     'error-message': true,
                     'hide': this.state.validPrinterName
                 });
-                console.log(this.state.requirePrinterName, this.state.validPrinterPassword);
 
                 if (false === this.state.requirePrinterName) {
                     invalidPrinterNameMessage = lang.initialize.require_device_name;
@@ -180,7 +193,7 @@ define([
                                     <h4 className="input-head">{lang.initialize.set_machine_generic.printer_name}</h4>
                                     <input ref="name" id="printer-name" type="text" className={printerNameClass}
                                         autoFocus={true}
-                                        autoComplete={false}
+                                        autoComplete="off"
                                         defaultValue={this.state.settingPrinter.name}
                                         placeholder={lang.initialize.set_machine_generic.printer_name_placeholder}
                                     />

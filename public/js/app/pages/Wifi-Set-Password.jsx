@@ -31,7 +31,22 @@ define([
                 };
             },
 
+            componentDidMount: function() {
+                this._handleSetPassword();
+                AlertStore.onCancel(this._onCancel);
+            },
+
+            componentWillUnmount: function() {
+                AlertStore.removeCancelListener(this._onCancel);
+            },
+
             // UI events
+            _onCancel: function(id) {
+                var usb = usbConfig();
+                usb.close();
+                location.hash = 'initialize/wifi/connect-machine';
+            },
+
             _onCancelConnection: function(e) {
                 var wifi = initializeMachine.settingWifi.get();
 
@@ -47,15 +62,15 @@ define([
                     usb = usbConfig(),
                     lang = self.state.lang,
                     password = wifi.plain_password,
-                    checkTimes = 10,    // check network per second, 10 times in maximum.
-                    checkCountdown = function(callback) {
-                        if (0 === checkTimes) {
-                            console.log("Check count down timeout");
+                    diffTime = 60000,    // check network within 60 secs
+                    startTime = (new Date()).getTime(),
+                    checkCountdown = function(response) {
+                        if (diffTime <= (new Date()).getTime() - startTime) {
                             genericFailureHandler();
-                            callback();
+                            return false;
                         }
 
-                        checkTimes--;
+                        return true;
                     },
                     genericFailureHandler = function() {
                         AlertActions.showPopupError(
@@ -65,23 +80,21 @@ define([
                         );
                     },
                     checkNetworkStatus = function() {
-                        var methods = usb.getMachineNetwork({
-                                onSuccess: function(response) {
-                                    response.ipaddr = response.ipaddr || [];
-                                    response.ssid = response.ssid || '';
+                        var tryAgain = function(response) {
+                            if (true === checkCountdown(response)) {
+                                usb.getMachineNetwork(deferred);
+                            }
+                        },
+                        deferred;
 
-                                    if (0 < response.ipaddr.length && '' !== response.ssid) {
-                                        methods.stop();
-                                        location.hash = '#initialize/wifi/setup-complete';
-                                    }
-                                    else {
-                                        checkCountdown(methods.stop);
-                                    }
-                                },
-                                onError: function(response) {
-                                    checkCountdown(methods.stop);
-                                }
-                            });
+                        // NOTICE: Wait for 2 sec due to the device may not refresh its IP.
+                        setTimeout(function() {
+                            deferred = usb.getMachineNetwork(deferred).fail(tryAgain).
+                                progress(tryAgain).
+                                done(function() {
+                                    location.hash = '#initialize/wifi/setup-complete';
+                                });
+                        }, 2000);
                     };
 
                 usb.setWifiNetwork(wifi, password, {
@@ -89,7 +102,6 @@ define([
                         checkNetworkStatus();
                     },
                     onError: function(response) {
-                        console.log("Wifi set failed");
                         genericFailureHandler();
                     }
                 });
@@ -112,11 +124,7 @@ define([
                 return (
                     <Modal className={wrapperClassName} content={content}/>
                 );
-            },
-
-            componentDidMount: function() {
-                this._handleSetPassword();
-            },
+            }
         });
 
         return Page;
