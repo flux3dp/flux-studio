@@ -32,6 +32,20 @@ define([
                 }
             },
 
+            componentDidMount: function() {
+                AlertStore.onCancel(this._onCancel);
+            },
+
+            componentWillUnmount: function() {
+                AlertStore.removeCancelListener(this._onCancel);
+            },
+
+            _onCancel: function(id) {
+                var usb = usbConfig();
+                usb.close();
+                location.hash = 'initialize/wifi/connect-machine';
+            },
+
             _handleSetPrinter: function(e) {
                 e.preventDefault();
 
