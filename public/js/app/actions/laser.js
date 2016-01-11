@@ -273,20 +273,20 @@ define([
                 });
             },
             refreshObjectParams = function(e, $el) {
-                var el_position, el_offset_position,
-                    position, size, angle, threshold;
+                var el_position, el_offset_position, position, size, angle, threshold, data;
 
                 if (null !== $el) {
                     el_position = $el.box();
                     el_offset_position = $el.box(true);
+                    data = $el.data('freetrans');
 
                     position = {
                         x: convertToRealCoordinate(el_position.center.x, 'x'),
                         y: convertToRealCoordinate(el_position.center.y, 'y')
                     };
                     size = {
-                        width: round(el_position.width / PLATFORM_DIAMETER_PIXEL * DIAMETER, -2),
-                        height: round(el_position.height / PLATFORM_DIAMETER_PIXEL * DIAMETER, -2)
+                        width: round($el.width() * data.scalex / PLATFORM_DIAMETER_PIXEL * DIAMETER, -2),
+                        height: round($el.height() * data.scaley / PLATFORM_DIAMETER_PIXEL * DIAMETER, -2)
                     };
                     angle = elementAngle($el[0]);
                     threshold = $el.data('threshold') || 128;
