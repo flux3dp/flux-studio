@@ -451,6 +451,18 @@ define([
                 },
                 items.tutorial,
                 {
+                    label: lang.help.forum,
+                    enabled: true,
+                    onClick: function() {
+                        if ('undefined' !== typeof requireNode) {
+                            requireNode('nw.gui').Shell.openExternal('http://forum.flux3dp.com');
+                        }
+                        else {
+                            window.open('http://forum.flux3dp.com');
+                        }
+                    }
+                },
+                {
                     label: lang.help.debug,
                     enabled: true,
                     onClick: function(){

@@ -81,7 +81,8 @@ define(function() {
                 contact: 'Contact Us',
                 troubleshooting: 'Troubleshooting',
                 tutorial: 'Start Printing Tutorial',
-                debug: 'Bug Report'
+                debug: 'Bug Report',
+                forum: 'Community Forum'
             }
         },
         initialize: {
