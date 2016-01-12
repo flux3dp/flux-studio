@@ -4,8 +4,9 @@
  */
 define([
     'jquery',
-    'helpers/websocket'
-], function($, Websocket) {
+    'helpers/websocket',
+    'helpers/api/config'
+], function($, Websocket, Config) {
     'use strict';
 
     var ws;

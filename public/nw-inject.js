@@ -3,6 +3,9 @@ window.requireNode = window.require || function() {};
 
 var fs = requireNode('fs'),
     os = requireNode('os'),
+    path = requireNode('path'),
+    nwPath = process.execPath,
+    nwDir = path.dirname(nwPath),
     osType = os.type(),
     spawn = requireNode('child_process').spawn,
     exec = requireNode('child_process').exec,
@@ -14,7 +17,7 @@ var fs = requireNode('fs'),
     currentWindow = gui.Window.get(),
     ghost,
     appWindow,
-    executeGhost = function(port) {
+    executeGhost = function(port, seperate_package) {
         var slic3rPathIndex = 1,
             args = [
                 '--slic3r',
@@ -27,15 +30,18 @@ var fs = requireNode('fs'),
         if ('Windows_NT' === osType) {
             // TODO: has to assign env root for slic3r
             args[slic3rPathIndex] = cwd + '/lib/Slic3r/slic3r-console.exe';
-            ghostCmd = cwd + '/lib/ghost/ghost.exe';
+            ghostCmd = cwd + '/lib/ghost/ghost.exe' ;
+            if(seperate_package) ghostCmd = nwPath + '/ghost/ghost.exe';
         }
         else if ('Linux' === osType) {
             args[slic3rPathIndex] = cwd + '/lib/Slic3r/bin/slic3r';
             ghostCmd = cwd + '/lib/ghost/ghost';
+            if(seperate_package) ghostCmd = nwPath + '/ghost/ghost';
         }
         else {
             args[slic3rPathIndex] = cwd + '/lib/Slic3r.app/Contents/MacOS/slic3r';
             ghostCmd = cwd + '/lib/ghost/ghost';
+            if(seperate_package) ghostCmd = nwPath + '/ghost/ghost';
         }
 
         fs.chmodSync(ghostCmd, 0777);
@@ -73,7 +79,14 @@ var fs = requireNode('fs'),
     },
     findPort = function(result) {
         if (true === result) {
-            executeGhost(currentPort);
+            var seperate_package_path = ('Windows_NT' === osType) ? nwPath+"/ghost/ghost.exe" : nwPath+"/ghost/ghost";
+            fs.stat(seperate_package_path, function(err, stat){
+                if(err == null){
+                    executeGhost(currentPort, true);
+                }else{
+                    executeGhost(currentPort);
+                }
+            });
         }
         else if (currentPort < maxPort) {
             currentPort++;
@@ -117,5 +130,9 @@ currentWindow.on('close', function() {
     });
     this.close(true);
 });
+
+
+//crashdump for windows
+gui.App.setCrashDumpDir(nwPath);
 
 delete window.require;
