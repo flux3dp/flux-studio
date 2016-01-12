@@ -85,6 +85,7 @@ define([
                         percentage : 0,
                         type       : '',
                         hasStop    : undefined,
+                        onStop     : function() {},
                         onFinished : function() {}
                     },
                     // input lightbox
@@ -126,7 +127,8 @@ define([
 
                 ProgressStore.onOpened(this._handleProgress).
                     onUpdating(this._handleProgress).
-                    onClosed(this._handleProgressFinish);
+                    onClosed(this._handleProgressFinish).
+                    onStop(this._handleProgressStop);
                 InputLightboxStore.onInputLightBoxOpened(this._handleInputLightBoxOpen);
 
                 GlobalStore.onShowMonitor(this._handleOpenMonitor);
@@ -141,7 +143,8 @@ define([
                 // progress
                 ProgressStore.removeOpenedListener(this._handleProgress).
                     removeUpdatingListener(this._handleProgress).
-                    removeClosedListener(this._handleProgressFinish);
+                    removeClosedListener(this._handleProgressFinish).
+                    removeStopListener(this._handleProgressStop);
 
                 // input lightbox
                 InputLightboxStore.removeOpenedListener(this._handleInputLightBoxOpen);
@@ -247,6 +250,7 @@ define([
                         percentage: payload.percentage || 0,
                         type: payload.type || self.state.progress.type || ProgressConstants.WAITING,
                         hasStop: hasStop,
+                        onStop: payload.onStop || self.state.progress.onStop || function() {},
                         onFinished: payload.onFinished || self.state.progress.onFinished || function() {}
                     }
                 });
@@ -261,6 +265,17 @@ define([
                     progress: {
                         open: false,
                         onFinished: self.state.progress.onFinished
+                    }
+                });
+            },
+
+            _handleProgressStop: function(payload) {
+                GlobalActions.cancelPreview();
+                this.state.progress.onStop();
+                this.setState({
+                    progress: {
+                        open: false,
+                        onFinished: this.state.progress.onStop
                     }
                 });
             },
@@ -341,12 +356,12 @@ define([
 
             },
 
-            _handleOpenMonitor: function(selectedDevice, fcode, previewUrl) {
+            _handleOpenMonitor: function(payload, selectedDevice, fcode, previewUrl) {
                 this.setState({
-                    fcode: fcode,
+                    fcode: payload.fcode,
                     showMonitor: true,
-                    selectedDevice: selectedDevice,
-                    previewUrl: previewUrl
+                    selectedDevice: payload.printer,
+                    previewUrl: payload.previewUrl
                 });
             },
 
@@ -509,6 +524,7 @@ define([
                             type={this.state.progress.type}
                             percentage={this.state.progress.percentage}
                             hasStop={this.state.progress.hasStop}
+                            onStop={this._handleProgressStop}
                             onFinished={this._handleProgressFinish}
                         />
                     </div>

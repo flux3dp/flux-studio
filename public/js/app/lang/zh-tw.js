@@ -480,7 +480,8 @@ define(function() {
             wait: '請稍候',
             out_of_range: '超過列印範圍',
             out_of_range_message: '請縮小物件尺寸',
-            drawingPreview: '繪製預覽路徑，請稍候'
+            drawingPreview: '繪製預覽路徑，請稍候',
+            gettingSlicingReport: '正在取得最新切片狀態'
         },
         laser: {
             import: '匯入',
@@ -879,7 +880,8 @@ define(function() {
                 message: '裝置正在進行另外一項工作，請稍候再試。如果裝置持續沒有回應，請將裝置重新啟動。'
             },
             device_is_used: '裝置正被使用中，是否要終止現在任務？',
-            invalidFile: '檔案不是正確的 STL 格式'
+            invalidFile: '檔案不是正確的 STL 格式',
+            failGeneratingPreview: '無法儲存預覽圖'
         },
         machine_status: {
             '-10': 'Raw Mode',

@@ -19,7 +19,7 @@ define([
                 },
                 componentDidMount: function() {
                     $('#next').addClass('btn-confirm');
-                    setTimeout(() => { this._handleConfigured() }, 2000);
+                    setTimeout(function() { this._handleConfigured() }, 2000);
                 },
                 _handleNext: function() {
                     location.href = '#studio/settings/setting-configured-flux';
