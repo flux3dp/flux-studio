@@ -8,10 +8,13 @@ define([
     'helpers/file-system',
     'app/actions/alert-actions',
     'app/actions/progress-actions',
+    'app/stores/progress-store',
     'app/constants/device-constants',
     'app/constants/progress-constants',
     'helpers/i18n',
     'helpers/nwjs/menu-factory',
+    'app/actions/global-actions',
+    'app/stores/global-store',
     // non-return value
     'threeOrbitControls',
     'threeTrackballControls',
@@ -31,10 +34,13 @@ define([
     FileSystem,
     AlertActions,
     ProgressActions,
+    ProgressStore,
     DeviceConstants,
     ProgressConstants,
     I18n,
-    MenuFactory
+    MenuFactory,
+    GlobalActions,
+    GlobalStore
 ) {
     'use strict';
 
@@ -42,7 +48,7 @@ define([
         container, slicer;
 
     var camera, scene, outlineScene;
-    var orbitControl, transformControl, reactSrc, controls;
+    var orbitControl, transformControl, reactSrc;
 
     var objects = [],
         referenceMeshes = [];
@@ -61,16 +67,16 @@ define([
         previewScene,
         previewColors = [],
         previewUrl = '',
-        blobExpired = true,
+        blobExpired = false,
         transformMode = false,
         shiftPressed = false,
         previewMode = false,
         showStopButton = true,
-        leftPanelWidth = 275,
         ddHelper = 0,
         defaultFileName = '',
         cameraLight,
-        outOfBoundCount = 0,
+        slicingReport = {},
+        slicingStatus = {},
         lang = I18n.get();
 
     var s = {
@@ -97,6 +103,11 @@ define([
         specular: 0x888888,
         shininess: 1
     });
+
+    var slicingType = {
+        F: 'f',
+        G: 'g'
+    };
 
     // var advancedParameters = ['layerHeight', 'infill', 'travelingSpeed', 'extrudingSpeed', 'temperature', 'advancedSettings'];
 
@@ -200,6 +211,8 @@ define([
         slicer = printSlicing();
 
         registerDropToImport();
+        registerSlicingProgress();
+        registerCancelPreview();
     }
 
     function _handleStop() {
@@ -230,7 +243,12 @@ define([
             openImportWindow: false
         });
 
-        ProgressActions.open(ProgressConstants.STEPPING, lang.print.importingModel, lang.print.wait, !showStopButton);
+        ProgressActions.open(
+            ProgressConstants.STEPPING,
+            lang.print.importingModel,
+            lang.print.wait,
+            !showStopButton
+        );
 
         loader.load(model_file_path, function(geometry) {
             if(geometry.vertices) {
@@ -258,8 +276,11 @@ define([
                     AlertActions.showPopupError('', result.error);
                     return;
                 }
-                callback();
+
+                slicingStatus.inProgress = true;
+                startSlicing(slicingType.F);
                 ProgressActions.close();
+                callback();
             });
 
             geometry.center();
@@ -343,6 +364,89 @@ define([
         }
     }
 
+    function startSlicing(type) {
+        slicingStatus.inProgress = true;
+        slicingStatus.isComplete = false;
+
+        if(objects.length === 0 || !blobExpired) { return; }
+        var ids = [];
+        objects.forEach(function(obj) {
+            ids.push(obj.uuid);
+        });
+
+        slicingStatus.canInterrupt = false;
+        sendGCodeParameters().then(function() {
+            stopSlicing().then(function() {
+                slicer.beginSlicing(ids, slicingType.F).then(function() {
+                    slicingStatus.canInterrupt = true;
+                    getSlicingReport(function(report) {
+                        console.log('report slicing');
+                        slicingReport.report = report;
+                    });
+                });
+            });
+        });
+    }
+
+    function registerSlicingProgress() {
+        Object.observe(slicingReport, function(change) {
+            console.log(change[0].object.report);
+
+            if(slicingStatus.needToCloseWait) {
+                ProgressActions.close();
+                slicingStatus.needToCloseWait = false;
+            }
+
+            var report = change[0].object.report,
+                progress = `${lang.slicer[report.status]} - ${'\n' + parseInt(report.percentage * 100)}% - ${report.message}`,
+                complete = lang.print.finishingUp,
+                show = slicingStatus.showProgress;
+
+            if(show) {
+                ProgressActions.open(
+                    ProgressConstants.STEPPING,
+                    lang.print.rendering,
+                    lang.print.savingFilePreview,
+                    showStopButton
+                );
+                show = true;
+            }
+
+            if(report.status === 'error') {
+                blobExpired = true;
+                reactSrc.setState({ hasOutOfBoundsObject: true });
+                if(show) {
+                    ProgressActions.close();
+                }
+                AlertActions.showPopupError('', result.error);
+            }
+            else if(report.status === 'warning') {
+                AlertActions.showWarning(report.message);
+            }
+            else if(report.status !== 'complete') {
+                if(show) {
+                    ProgressActions.updating(progress, parseInt(report.percentage * 100));
+                }
+            }
+            else {
+
+                if(show) {
+                    ProgressActions.updating(complete, 100);
+                }
+                slicer.getSlicingResult().then(function(r) {
+                    if(show) {
+                        ProgressActions.close();
+                    }
+
+                    blobExpired = false;
+                    responseBlob = r;
+                    _handleSliceComplete();
+
+                });
+            }
+        });
+    }
+
     function registerDropToImport() {
         if(window.FileReader) {
             var zone = document.querySelector('.studio-container.print-studio');
@@ -351,6 +455,10 @@ define([
             zone.addEventListener('dragleave', onDragLeave);
             zone.addEventListener('drop', onDropFile);
         }
+    }
+
+    function registerCancelPreview() {
+        GlobalStore.onCancelPreview(_handleCancelPreview);
     }
 
     function onDropFile(e) {
@@ -454,6 +562,11 @@ define([
 
         if (transformMode) {
             selectObject(transformControl.object);
+        }
+
+        if(blobExpired) {
+            slicingStatus.showProgress = false;
+            startSlicing(slicingType.F);
         }
 
         render();
@@ -627,7 +740,12 @@ define([
             ids.push(obj.uuid);
         });
 
-        ProgressActions.open(ProgressConstants.STEPPING, lang.monitor.processing, lang.monitor.savingPreview, !showStopButton);
+        ProgressActions.open(
+            ProgressConstants.STEPPING,
+            lang.monitor.processing,
+            lang.monitor.savingPreview,
+            !showStopButton
+        );
 
         getBlobFromScene().then(function(blob){
             cropImageUsingCanvas(blob).then(function(blob) {
@@ -668,9 +786,19 @@ define([
         return d.promise();
     }
 
+    function uploadPreviewImage(blob) {
+        if(slicingStatus.canInterrupt) {
+            return slicer.uploadPreviewImage(blob);
+        }
+        else {
+            setTimeout(function() {
+                uploadPreviewImage(blob);
+            }, 1000);
+        }
+    }
+
     function getFCode() {
         var d = $.Deferred();
-        var ids = [];
 
         if(objects.length === 0) {
             d.resolve('');
@@ -682,80 +810,51 @@ define([
             return d.promise();
         }
 
-        objects.forEach(function(obj) {
-            ids.push(obj.uuid);
-        });
-
-        ProgressActions.open(
-            ProgressConstants.STEPPING,
-            lang.print.rendering,
-            lang.print.savingFilePreview,
-            !showStopButton
-        );
-
+        _showWait(lang.print.gettingSlicingReport, !showStopButton);
+        slicingStatus.showProgress = true;
+        slicingStatus.pauseReport = true;
         getBlobFromScene().then(function(blob) {
             previewUrl = URL.createObjectURL(blob);
-            return slicer.uploadPreviewImage(blob);
-        }).then(function(response) {
-            if (response.status === 'ok') {
-                sendGCodeParameters().then(function() {
-                    slicer.goF(ids, function(result) {
-                        if (result instanceof Blob) {
-                            blobExpired = false;
-                            responseBlob = result;
-                            ProgressActions.close();
-                            d.resolve(result, previewUrl);
-                        }
-                        else {
-                            if (result.status !== 'error') {
-                                var progress = `${lang.slicer[result.status]} - ${'\n' + parseInt(result.percentage * 100)}% - ${result.message}`,
-                                    complete = lang.print.finishingUp;
+            return uploadPreviewImage(blob);
 
-                                if(result.status === 'warning') {
-                                    AlertActions.showWarning(result.message);
-                                }
-                                else if(result.status !== 'complete') {
-                                    ProgressActions.updating(progress, parseInt(result.percentage * 100));
-                                }
-                                else {
-                                    ProgressActions.updating(complete, 100);
-                                }
-                            }
-                            else {
-                                blobExpired = true;
-                                reactSrc.setState({ hasOutOfBoundsObject: true });
-                                ProgressActions.close();
-                                AlertActions.showPopupError('', result.error);
-                                d.resolve(result, '');
-                            }
-                        }
-                    });
-                });
-            }
+        }).then(function(response) {
+            slicingStatus.pauseReport = false;
+            var observer = function(change) {
+                if(change[0].object.isComplete) {
+                    Object.unobserve(slicingStatus, observer);
+                    d.resolve(responseBlob, previewUrl);
+                }
+            };
+            Object.observe(slicingStatus, observer);
+
             // error
-            else {
-                _setProgressMessage('');
-                d.resolve(result);
+            if (response.status !== 'ok') {
+                ProgressActions.close();
+                d.resolve(response);
             }
         });
 
         return d.promise();
     }
 
-    function getSlicingReport() {
-        var reporter,
-            processor,
+    function getSlicingReport(callback) {
+        var processor,
             reportTimmer = 1000; // 1 sec
 
         processor = function(report) {
-            console.log(report);
             if(report.status === 'complete') {
-                clearInterval(reporter);
+                clearInterval(slicingStatus.reporter);
+                callback(report);
+            }
+            else if(report.status !== 'ok') {
+                callback(report);
             }
         };
 
-        reporter = setInterval(function() {
-            slicer.reportSlicing(processor);
+        slicingStatus.reporter = setInterval(function() {
+            if(!slicingStatus.pauseReport) {
+                slicer.reportSlicing(processor);
+            }
         }, reportTimmer);
 
     }
@@ -823,16 +922,24 @@ define([
     }
 
     function setSize(x, y, z, isLocked) {
+        isLocked = isLocked || true;
         var sx = Math.round(x / SELECTED.size.originalX * 1000) / 1000,
             sy = Math.round(y / SELECTED.size.originalY * 1000) / 1000,
             sz = Math.round(z / SELECTED.size.originalZ * 1000) / 1000,
             _center = true;
+
+        if(sx + sy + sz === 0) {
+            return;
+        }
 
         setScale(sx, sy, sz, isLocked, _center);
 
         SELECTED.size.x = x;
         SELECTED.size.y = y;
         SELECTED.size.z = z;
+
+        slicingStatus.showProgress = false;
+        startSlicing(slicingType.F);
     }
 
     function setRotateMode() {
@@ -862,7 +969,7 @@ define([
 
     function setParameter(name, value) {
         blobExpired = true;
-        return slicer.setParameter(name, value)
+        return slicer.setParameter(name, value);
     }
 
     function setRotation(x, y, z, needRender, src) {
@@ -889,6 +996,9 @@ define([
             checkOutOfBounds(src);
             render();
         }
+
+        slicingStatus.showProgress = false;
+        startSlicing(slicingType.F);
     }
 
     function setImportWindowPosition() {
@@ -1004,7 +1114,6 @@ define([
             _enableObjectEditMenu(false);
             reactSrc.setState({ openObjectDialogue: false });
         }
-
         render();
     }
 
@@ -1119,22 +1228,6 @@ define([
             });
         }
     }
-
-    function addPoint(x, y, z, r) {
-        var geometry = new THREE.SphereGeometry(r || 5, 32, 32);
-        var material = new THREE.MeshBasicMaterial({
-            color: 0xffff00,
-            transparent: true,
-            opacity: 0.3
-        });
-        var sphere = new THREE.Mesh(geometry, material);
-        sphere.position.x = x;
-        sphere.position.y = y;
-        sphere.position.z = z;
-        scene.add(sphere);
-    }
-
-
 
     function planeBoundary(sourceMesh) {
         // ref: http://www.csie.ntnu.edu.tw/~u91029/ConvexHull.html#4
@@ -1275,7 +1368,6 @@ define([
             d = $.Deferred(),
             ol = _getCameraLook(camera);
 
-        // camera.position.set(originalCameraPosition.x, originalCameraPosition.y, originalCameraPosition.z);
         camera.position.set(0, -215, 60);
         camera.rotation.set(originalCameraRotation.x, originalCameraRotation.y, originalCameraRotation.z, originalCameraRotation.order);
         camera.lookAt(new THREE.Vector3(0,300,0));
@@ -1295,7 +1387,7 @@ define([
 
     function cropImageUsingCanvas(data, is_image){
         if(!is_image){
-            var newImg = document.createElement("img"),
+            var newImg = document.createElement('img'),
                 url = URL.createObjectURL(blob),
                 d = $.Deferred();
             newImg.onload = function() {
@@ -1304,11 +1396,11 @@ define([
             cropImageUsingCanvas(newImage, true).then(function(blob) {
                 d.resolve(blob);
             });
-            return d.promise()
+            return d.promise();
         }
 
         var width = 640, height = 640,
-            canvas = document.createElement("canvas"),
+            canvas = document.createElement('canvas'),
             sh = image.height,
             sw = image.width,
             sx = 0,
@@ -1325,12 +1417,12 @@ define([
 
         canvas.width = width;
         canvas.height = height;
-        var context = canvas.getContext("2d");
+        var context = canvas.getContext('2d');
         context.drawImage(this.image, sx, sy, sw, sh, 0, 0, width, height);
         canvas.toBlob(function(blob) {
             d.resolve(blob);
         });
-        return d.promise()
+        return d.promise();
     }
 
     function removeFromScene(name) {
@@ -1485,7 +1577,7 @@ define([
         });
     }
 
-    function toScreenPosition(obj, camera) {
+    function toScreenPosition(obj, cam) {
         if (!$.isEmptyObject(obj)) {
             var vector = new THREE.Vector3();
 
@@ -1495,7 +1587,7 @@ define([
 
             obj.updateMatrixWorld();
             vector.setFromMatrixPosition(obj.matrixWorld);
-            vector.project(camera);
+            vector.project(cam);
 
             vector.x = (vector.x * widthHalf) + widthHalf;
             vector.y = -(vector.y * heightHalf) + heightHalf;
@@ -1535,29 +1627,46 @@ define([
         }
     }
 
+    function stopSlicing() {
+        var d = $.Deferred();
+        slicingStatus.inProgress = false;
+        clearInterval(slicingStatus.reporter);
+
+        if(slicingStatus.inProgress) {
+            slicer.stopSlicing().then(function() {
+                d.resolve('');
+            });
+        }
+        else {
+            d.resolve('');
+
+        }
+        return d.promise();
+    }
+
     // Private Functions ---
 
     // sync parameters with server
-    function _syncObjectParameter(objects, index, callback) {
+    function _syncObjectParameter(o, index, callback) {
         index = index || 0;
-        if (index < objects.length) {
+        if (index < o.length) {
             slicer.set(
-                objects[index].uuid,
-                objects[index].position.x,
-                objects[index].position.y,
-                objects[index].position.z,
-                objects[index].rotation.x,
-                objects[index].rotation.y,
-                objects[index].rotation.z,
-                objects[index].scale.x,
-                objects[index].scale.y,
-                objects[index].scale.z
+                o[index].uuid,
+                o[index].position.x,
+                o[index].position.y,
+                o[index].position.z,
+                o[index].rotation.x,
+                o[index].rotation.y,
+                o[index].rotation.z,
+                o[index].scale.x,
+                o[index].scale.y,
+                o[index].scale.z
             ).then(function(result) {
                 if (result.status === 'error') {
-                    index = objects.length;
+                    index = o.length;
                 }
-                if (index < objects.length) {
-                    _syncObjectParameter(objects, index + 1, callback);
+                if (index < o.length) {
+                    _syncObjectParameter(o, index + 1, callback);
                 }
             });
         } else {
@@ -1596,48 +1705,77 @@ define([
         _setProgressMessage('');
     }
 
-    function _showPreview() {
-        selectObject(null);
-
-        var drawPath = function() {
-            ProgressActions.open(
-                ProgressConstants.WAITING,
-                lang.print.drawingPreview,
-                '',
-                !showStopButton
-            );
-            previewMode = true;
+    function _handleSliceComplete() {
+        if(previewMode) {
+            _showWait(lang.print.drawingPreview, !showStopButton);
             slicer.getPath().then(function(result) {
                 printPath = result;
                 _drawPath().then(function() {
                     ProgressActions.close();
+                    slicingStatus.showProgress = false;
                 });
             });
-        };
+        }
+        slicingStatus.inProgress = false;
+        slicingStatus.isComplete = true;
+    }
 
-        if (blobExpired) {
-            getFCode().then(function(response) {
-                if(response.status) {
-                    if(response.status === 'error') {
-                        _closePreview();
-                    }
-                }
-                else {
-                    drawPath();
-                }
-            });
-        } else {
-            previewMode = true;
-            if (previewScene.children.length <= 1) {
-                drawPath();
-            } else {
-                _showPath();
+    function _handleCancelPreview() {
+        console.log('preview cancel');
+        previewMode = false;
+        slicingStatus.showProgress = false;
+        _closePreview();
+    }
+
+    function _showPreview() {
+        selectObject(null);
+        previewMode = true;
+
+        if(blobExpired) {
+            slicingStatus.showProgress = true;
+            slicingStatus.needToCloseWait = true;
+            _showWait(lang.print.gettingSlicingReport, !showStopButton);
+        }
+        else {
+            _showWait(lang.print.drawingPreview, !showStopButton);
+            if(!printPath) {
+                slicer.getPath().then(function(result) {
+                    printPath = result;
+                    _drawPath().then(function() {
+                        _closeWait();
+                    });
+                });
+            }
+            else {
+                _drawPath().then(function() {
+                    _closeWait();
+                });
             }
         }
     }
 
+    function _showWait(message, stopButton, onCloseFunction) {
+        onCloseFunction = onCloseFunction || function() {};
+        ProgressActions.close();
+        ProgressActions.open(
+            ProgressConstants.WAITING,
+            message,
+            '',
+            stopButton
+        );
+    }
+
+    function _closeWait() {
+        console.log('closing wait');
+        ProgressActions.close();
+    }
+
     function _closePreview() {
         $('#preview').parents('label').find('input').prop('checked',false);
+        previewMode = false;
+        reactSrc.setState({ previewMode: false }, function() {
+            togglePreview(false);
+        });
     }
 
     function _drawPath() {

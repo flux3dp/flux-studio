@@ -69,7 +69,7 @@ define([
                     if(deviceController)
                     {
                         var p = deviceController.getStatus();
-                        p.then((result) => {
+                        p.then(function(result) {
                             result = result || {};
                             this.setState({ status: this._translateStatus(result.location) });
                         });
@@ -105,7 +105,7 @@ define([
                         }
 
                         if(p) {
-                            p.then((result) => {
+                            p.then(function(result) {
                                 if(result.status === 'error') {
                                     this.setState({
                                         errorMessage: this._translateStatus(result.error),

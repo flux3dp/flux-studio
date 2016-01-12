@@ -15,13 +15,19 @@ define([
 
         closeMonitor: function() {
             Dispatcher.dispatch({
-                actionType: GlobalConstants.SHOW_MONITOR
+                actionType: GlobalConstants.CLOSE_MONITOR
             });
         },
 
         closeAllView: function() {
             Dispatcher.dispatch({
                 actionType: GlobalConstants.CLOSE_ALL_VIEW
+            });
+        },
+
+        cancelPreview: function() {
+            Dispatcher.dispatch({
+                actionType: GlobalConstants.CANCEL_PREVIEW
             });
         }
 

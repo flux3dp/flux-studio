@@ -42,7 +42,7 @@ define([
 
                     case 'general':
                         childView = 'Setting-General';
-                        this.setState({ displayFooter: false });
+                        this.setState({ displayFooter: true });
                         break;
 
                     default:
@@ -62,6 +62,10 @@ define([
                     };
                     Display(view, args, $('.tab-container')[0]);
                 });
+            },
+
+            _handleDone: function() {
+                location.hash = '#studio/print';
             },
 
             render : function() {
@@ -105,8 +109,8 @@ define([
                 footer =
                     <footer className="sticky-bottom">
                         <div className="actions">
-                            <a className="btn btn-cancel">{lang.settings.cancel}</a>
-                            <a className="btn btn-done">{lang.settings.done}</a>
+                            {/*<a className="btn btn-cancel">{lang.settings.cancel}</a>*/}
+                            <a className="btn btn-done" onClick={this._handleDone}>{lang.settings.done}</a>
                         </div>
                     </footer>
 
