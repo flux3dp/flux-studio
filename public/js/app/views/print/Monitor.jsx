@@ -10,7 +10,8 @@ define([
     'app/constants/device-constants',
     'helpers/file-system',
     'app/actions/global-actions',
-    'helpers/sprintf'
+    'helpers/sprintf',
+    'helpers/round'
 ], function(
     $,
     React,
@@ -23,7 +24,8 @@ define([
     DeviceConstants,
     FileSystem,
     GlobalActions,
-    sprintf
+    sprintf,
+    round
 ) {
     'use strict';
 
@@ -826,6 +828,8 @@ define([
                 progress = '';
             }
 
+            report.rt = round(report.rt, -1) || 0;
+
             if(status === DeviceConstants.RUNNING) {
                 temperature = report.rt ? `${lang.monitor.temperature} ${report.rt} °C` : '';
             }
@@ -1338,12 +1342,10 @@ define([
                         </div>
                         <div className="body">
                             <div className="device-content" onScroll={this._handleScroll}>
-                                {/*<div className="close"></div>*/}
                                 {content}
                                 {waitIcon}
                                 {printingInfo}
                             </div>
-
                         </div>
                         {op}
                     </div>
@@ -1362,15 +1364,6 @@ define([
                                 <div className="time-left right">{this.state.progress}</div>
                             </div>
                         </div>
-                        {
-                            /*
-                            <div className="actions center">
-                                <a className="btn filament">{lang.monitor.change_filament}</a>
-                                <a className="btn file" onClick={this._handleBrowseFile}>{lang.monitor.browse_file}</a>
-                                <a className="btn monitor" onClick={this._handleToggleCamera}>{lang.monitor.monitor}</a>
-                            </div>
-                            */
-                        }
                     </div>
                 </div>
             );
