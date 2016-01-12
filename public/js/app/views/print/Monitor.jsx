@@ -767,6 +767,7 @@ define([
             middleButtonOn  = true;
             rightButtonOn   = true;
 
+            clearTimeout(timmer);
             timmer = setTimeout(this._processTimeout, timeoutLength);
             // rootMode = statusId === DeviceConstants.status.IDLE ? DeviceConstants.IDLE : DeviceConstants.RUNNING;
 
@@ -835,10 +836,10 @@ define([
             }
 
             if(status === DeviceConstants.RUNNING) {
-                temperature = report.rt ? `${lang.monitor.temperature} ${report.rt} °C` : '';
+                temperature = report.rt ? `${lang.monitor.temperature} ${parseInt(report.rt * 10) / 10} °C` : '';
             }
             else {
-                temperature = report.rt ? `${lang.monitor.temperature} ${report.rt} °C / ${report.tt} °C` : '';
+                temperature = report.rt ? `${lang.monitor.temperature} ${parseInt(report.rt * 10) / 10} °C / ${report.tt} °C` : '';
             }
 
             headInfo = report.module ? lang.monitor.device[report.module] : '';
