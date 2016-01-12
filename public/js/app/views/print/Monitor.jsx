@@ -801,7 +801,13 @@ define([
                 AlertActions.showPopupError('', mainError);
             }
 
-            if(!messageViewed && !showingPopup && mainError !== DeviceConstants.USER_OPERATION && mainError.length > 0) {
+            if(
+                !messageViewed &&
+                !showingPopup &&
+                mainError !== DeviceConstants.USER_OPERATION &&
+                mainError.length > 0 &&
+                errorMessage.length > 0
+            ) {
                 AlertActions.showPopupRetry(_id, errorMessage);
                 showingPopup = true;
             }
