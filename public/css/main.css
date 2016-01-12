@@ -2145,7 +2145,7 @@ img {
     height: 100%;
     overflow: hidden;
     width: 100%;
-    position: relative; }
+    position: fixed; }
 
 .horizontal-menu .menu-item {
     float: left;
