@@ -376,13 +376,13 @@ define([
 
         slicingStatus.canInterrupt = false;
         sendGCodeParameters().then(function() {
-            stopSlicing().then(function() {
-                slicer.beginSlicing(ids, slicingType.F).then(function() {
-                    slicingStatus.canInterrupt = true;
-                    getSlicingReport(function(report) {
-                        console.log('report slicing');
-                        slicingReport.report = report;
-                    });
+            return stopSlicing();
+        }).then(function() {
+            slicer.beginSlicing(ids, slicingType.F).then(function() {
+                slicingStatus.canInterrupt = true;
+                getSlicingReport(function(report) {
+                    console.log('report slicing');
+                    slicingReport.report = report;
                 });
             });
         });
@@ -806,7 +806,10 @@ define([
         }
 
         if(!blobExpired) {
-            d.resolve(responseBlob, previewUrl);
+            getBlobFromScene().then(function(blob) {
+                previewUrl = URL.createObjectURL(blob);
+                d.resolve(responseBlob, previewUrl);
+            });
             return d.promise();
         }
 
