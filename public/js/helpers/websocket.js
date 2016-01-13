@@ -58,7 +58,7 @@ define(['helpers/is-json'], function(isJson) {
                     _logs.push(['recv', data]);
 
                     if ('string' === typeof data) {
-                        data = result.data.replace(/NaN(,)/g, 'null$1');
+                        data = JSON.parse(data.replace(/\bNaN\b/g, 'null'));
                         data = data.replace(/\r?\n|\r/g);
                     }
 
@@ -76,9 +76,8 @@ define(['helpers/is-json'], function(isJson) {
                         // it's a heartbeat response. ignore it.
                     }
                     else {
-                        if(typeof data === 'string') {
-                            data = JSON.parse(data.replace(/\bNaN\b/g, 'null'));
-                        }
+                        // unexpected response
+                        console.log(data);
                         options.onMessage(data);
                     }
                 };
