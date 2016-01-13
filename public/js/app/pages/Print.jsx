@@ -165,6 +165,7 @@ define([
                         hasObject                   : false,
                         tutorialOn                  : false,
                         leftPanelReady              : true,
+                        previewMode                 : false,
                         currentTutorialStep         : 0,
                         layerHeight                 : 0.1,
                         raftOn                      : advancedSettings.raft_layers !== 0,
@@ -199,16 +200,17 @@ define([
                     };
 
                     this._registerKeyEvents();
-                    if(Config().read("configured-printer") && tutorialMode){
+                    if(Config().read('configured-printer') && tutorialMode){
                         //First time using, with usb-configured printer..
-                        AlertActions.showPopupYesNo('set_default', sprintf(lang.tutorial.set_first_default,Config().read("configured-printer")),lang.tutorial.set_first_default_caption);
+                        AlertActions.showPopupYesNo('set_default', sprintf(lang.tutorial.set_first_default,Config().read('configured-printer')),lang.tutorial.set_first_default_caption);
                         AlertStore.onYes(this._handleSetFirstDefault);
                         //Use setTimeout to avoid multiple modal display conflict
-                        this._handleDefaultCancel = function(ans){setTimeout(function(){this._registerTutorial()}.bind(this), 10)}.bind(this);
+                        this._handleDefaultCancel = function(ans) {
+                            setTimeout(function() {
+                                this._registerTutorial();
+                            }.bind(this), 10);
+                        }.bind(this);
                         AlertStore.onCancel(this._handleDefaultCancel);
-                    }else{
-                        //Disable for no-printer-setting at the time
-                        // this._registerTutorial();
                     }
                 },
 
@@ -383,18 +385,14 @@ define([
                     return director.setAdvanceParameter(setting);
                 },
 
-                _handleTogglePrintPause: function(printPaused) {
-                    console.log(printPaused ? 'print paused' : 'continue printing');
-                },
-
                 _handleImport: function(e) {
                     var files = e.target.files;
-                    director.appendModels(files, 0, () => {});
+                    director.appendModels(files, 0, function() {});
                 },
 
                 _handleDownloadGCode: function() {
                     if(director.getModelCount() !== 0) {
-                        director.downloadGCode().then(() => {
+                        director.downloadGCode().then(function() {
                             this.setState({ openWaitWindow: false });
                         });
                     }
@@ -402,14 +400,14 @@ define([
 
                 _handleDownloadFCode: function() {
                     if(director.getModelCount() !== 0) {
-                        director.downloadFCode().then(() => {
-                            this.setState({ openWaitWindow: false });
-                        });
+                        director.downloadFCode();
                     }
                 },
 
                 _handlePreview: function(isOn) {
-                    director.togglePreview(isOn);
+                    this.setState({ previewMode: isOn }, function() {
+                        director.togglePreview(isOn);
+                    });
                 },
 
                 _handlePrinterSelectorWindowClose: function() {
@@ -421,6 +419,7 @@ define([
                     this.setState({
                         openPrinterSelectorWindow: false
                     });
+
                     director.getFCode().then(function(fcode, previewUrl) {
                         if(!(fcode instanceof Blob)) {
                             AlertActions.showPopupError('', lang.print.out_of_range_message, lang.print.out_of_range);
@@ -444,6 +443,7 @@ define([
                         }.bind(this), 1000);
 
                     }.bind(this));
+
                 },
 
                 _handlePreviewLayerChange: function(targetLayer) {
@@ -601,6 +601,7 @@ define([
                             enable                      = {this.state.leftPanelReady}
                             hasObject                   = {this.state.hasObject}
                             hasOutOfBoundsObject        = {this.state.hasOutOfBoundsObject}
+                            previewMode                 = {this.state.previewMode}
                             previewLayerCount           = {this.state.previewLayerCount}
                             raftOn                      = {this.state.raftOn}
                             supportOn                   = {this.state.supportOn}

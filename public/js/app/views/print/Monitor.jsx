@@ -62,7 +62,7 @@ define([
         headInfo = '',
         taskInfo = '',
 
-        timeout = 20000,
+        timeoutLength = 20000,
         timmer,
 
         // for monitor temperature, time...
@@ -302,7 +302,10 @@ define([
         },
 
         _getPrintingInfo: function() {
-            DeviceMaster.getPreviewInfo().then(this._processInfo.bind(this));
+            DeviceMaster.getReport().then(function(report) {
+                this._processReport(report);
+                DeviceMaster.getPreviewInfo().then(this._processInfo.bind(this));
+            }.bind(this));
         },
 
         _hasFCode: function() {
@@ -707,7 +710,7 @@ define([
         _startReport: function() {
             var self = this;
             this._stopReport();
-            timmer = setTimeout(this._processTimeout, timeout);
+            timmer = setTimeout(this._processTimeout, timeoutLength);
 
             reporter = setInterval(function() {
                 DeviceMaster.getReport().then(function(report) {
@@ -766,8 +769,7 @@ define([
             middleButtonOn  = true;
             rightButtonOn   = true;
 
-            clearTimeout(timmer);
-            timmer = setTimeout(this._processTimeout, timeout);
+            timmer = setTimeout(this._processTimeout, timeoutLength);
             // rootMode = statusId === DeviceConstants.status.IDLE ? DeviceConstants.IDLE : DeviceConstants.RUNNING;
 
             // jug down errors as main and sub error for later use

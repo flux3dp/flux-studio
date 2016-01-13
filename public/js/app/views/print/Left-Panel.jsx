@@ -102,6 +102,10 @@ define([
                     this.setState({ quality: _quality[nextProps.layerHeight.toString()] || lang.quality.custom });
                 }
             }
+
+            if(nextProps.previewMode !== this.state.previewOn) {
+                this.setState({ previewOn: nextProps.previewMode });
+            }
         },
 
         _closePopup: function() {
@@ -142,10 +146,9 @@ define([
                             return;
                         }
                         if(self.props.hasObject) {
-                            // var src = self.refs.preview.getDOMNode();
-                            // $(src).prop('checked', !self.state.previewOn);
-                            self.setState({ previewOn: !self.state.previewOn });
-                            self.props.onPreviewClick(!self.state.previewOn);
+                            self.setState({ previewOn: !self.state.previewOn }, function() {
+                                self.props.onPreviewClick(self.state.previewOn);
+                            });
                         }
                     },
                 };
