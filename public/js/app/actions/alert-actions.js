@@ -94,7 +94,7 @@ define([
 
         showUpdate: function(device, type, updateInfo, onInstall) {
             AlertDispatcher.dispatch({
-                actionType: AlertConstants.SHOW_POPUP_FIRMWARE_UPDATE,
+                actionType: AlertConstants.SHOW_POPUP_UPDATE,
                 device: device,
                 type: type,
                 updateInfo: updateInfo,

@@ -41,11 +41,15 @@ define([
                 return undefined;
             }
 
-            function crossplatform_modifiers(modifiers){
-                if(!modifiers) return;
-                if ( 'osx' !== window.FLUX.osType ){
-                    modifiers = modifiers.replace(/cmd/g,'ctrl');
+            function crossplatform_modifiers(modifiers) {
+                if (!modifiers) {
+                    return modifiers;
                 }
+
+                if ('osx' !== window.FLUX.osType) {
+                    modifiers = modifiers.replace(/cmd/g, 'ctrl', '');
+                }
+
                 return modifiers;
             }
 

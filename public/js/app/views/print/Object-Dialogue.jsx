@@ -101,6 +101,10 @@ define([
 
             if(this.state.scaleLocked) {
                 _ratio = value / _size[axis];
+                if(_ratio === 0) {
+                    this.setState({ size: this.state.size });
+                    return;
+                }
 
                 if(_size.x * _ratio > _maxLength || _size.y * _ratio > _maxLength || _size.z * _ratio > _maxLength) {
                     axis = this._getLargestPropertyValue(_size);

@@ -36,17 +36,12 @@ define([
         },
 
         _onClose: function() {
-            this._handleClose();
             this.props.onClose();
         },
 
         _onInstall: function() {
             this.props.onInstall();
-            this._handleClose();
-        },
-
-        _handleClose: function() {
-            React.unmountComponentAtNode(this.refs.modal.getDOMNode().parentNode);
+            this._onClose();
         },
 
         _getButtons: function(lang) {

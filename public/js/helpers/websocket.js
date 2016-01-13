@@ -127,12 +127,12 @@ define(['helpers/is-json'], function(isJson) {
 
                 if (null === ws || readyState.OPEN !== ws.readyState) {
                     ws.onopen = function() {
-                        _logs.push(['sent',data]);
+                        _logs.push(['sent',data,typeof data]);
                         ws.send(data);
                     };
                 }
                 else {
-                    _logs.push(['sent',data]);
+                    _logs.push(['sent',data,typeof data]);
                     ws.send(data);
                 }
 

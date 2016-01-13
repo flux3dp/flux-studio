@@ -3,6 +3,10 @@ window.requireNode = window.require || function() {};
 
 var fs = requireNode('fs'),
     os = requireNode('os'),
+    path = requireNode('path'),
+    nwPath = process.execPath,
+    nwDir = path.dirname(nwPath),
+    dirParts = nwDir.split(path.sep),
     osType = os.type(),
     spawn = requireNode('child_process').spawn,
     exec = requireNode('child_process').exec,
@@ -14,7 +18,7 @@ var fs = requireNode('fs'),
     currentWindow = gui.Window.get(),
     ghost,
     appWindow,
-    executeGhost = function(port) {
+    executeGhost = function(port, libPath) {
         var slic3rPathIndex = 1,
             args = [
                 '--slic3r',
@@ -26,19 +30,18 @@ var fs = requireNode('fs'),
 
         if ('Windows_NT' === osType) {
             // TODO: has to assign env root for slic3r
-            args[slic3rPathIndex] = cwd + '/lib/Slic3r/slic3r-console.exe';
-            ghostCmd = cwd + '/lib/ghost/ghost.exe';
+            args[slic3rPathIndex] = libPath + '/lib/Slic3r/slic3r-console.exe';
+            ghostCmd = libPath + '/lib/ghost/ghost.exe' ;
         }
         else if ('Linux' === osType) {
-            args[slic3rPathIndex] = cwd + '/lib/Slic3r/bin/slic3r';
-            ghostCmd = cwd + '/lib/ghost/ghost';
+            args[slic3rPathIndex] = libPath + '/lib/Slic3r/bin/slic3r';
+            ghostCmd = libPath + '/lib/ghost/ghost';
         }
         else {
-            args[slic3rPathIndex] = cwd + '/lib/Slic3r.app/Contents/MacOS/slic3r';
-            ghostCmd = cwd + '/lib/ghost/ghost';
+            args[slic3rPathIndex] = libPath + '/lib/Slic3r.app/Contents/MacOS/slic3r';
+            ghostCmd = libPath + '/lib/ghost/ghost';
         }
 
-        fs.chmodSync(ghostCmd, 0777);
         ghost = spawn(ghostCmd, args);
 
         ghost.stdout.on('data', function(data) {
@@ -73,7 +76,34 @@ var fs = requireNode('fs'),
     },
     findPort = function(result) {
         if (true === result) {
-            executeGhost(currentPort);
+            var seperate_package_path,
+                contentPos,
+                appRoot;
+
+            switch (osType) {
+            case 'Windows_NT':
+                appRoot = dirParts.join(path.sep);
+                seperate_package_path = appRoot + '/lib/ghost/ghost.exe';
+                break;
+            case 'Linux':
+                break;
+            case 'Darwin':
+                contentPos = dirParts.indexOf('Contents');
+                appRoot = dirParts.slice(0, contentPos + 1).join(path.sep);
+                seperate_package_path = appRoot + '/lib/ghost/ghost';
+                break;
+            }
+
+            fs.chmodSync(seperate_package_path, 0777);
+            fs.stat(seperate_package_path, function(err, stat) {
+
+                if (null === err) {
+                    executeGhost(currentPort, appRoot);
+                }
+                else {
+                    executeGhost(currentPort, cwd);
+                }
+            });
         }
         else if (currentPort < maxPort) {
             currentPort++;
@@ -117,5 +147,9 @@ currentWindow.on('close', function() {
     });
     this.close(true);
 });
+
+
+//crashdump for windows
+gui.App.setCrashDumpDir(nwPath);
 
 delete window.require;

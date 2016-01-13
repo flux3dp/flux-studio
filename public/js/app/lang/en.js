@@ -20,7 +20,15 @@ define(function() {
             firmware: {
                 caption: 'An Firmware Update to FLUX is available',
                 message_pattern_1: '"%s" is now ready for firmware update.',
-                message_pattern_2: 'FLUX Firmware %s is now available - You have %s.'
+                message_pattern_2: 'FLUX Firmware %s is now available - You have %s.',
+                latest_firmware: {
+                    caption: 'Firmware Update',
+                    message: 'You have the latest firmware'
+                },
+                confirm: 'CONFIRM',
+                upload_file: 'Upload file',
+                update_success: 'Update Success',
+                update_fail: 'Update Fail'
             },
             software: {
                 caption: 'An Software Update to FLUX is available',
@@ -59,7 +67,8 @@ define(function() {
                 new: 'Add New Device',
                 device_monitor: 'Device Monitor',
                 change_filament: 'Change Filament',
-                default_device: 'Set as default device'
+                default_device: 'Set as default device',
+                check_firmware_update: 'Check Firmware Update'
             },
             window: {
                 label: 'Window',
@@ -72,7 +81,8 @@ define(function() {
                 contact: 'Contact Us',
                 troubleshooting: 'Troubleshooting',
                 tutorial: 'Start Printing Tutorial',
-                debug: 'Bug Report'
+                debug: 'Bug Report',
+                forum: 'Community Forum'
             }
         },
         initialize: {
@@ -86,7 +96,7 @@ define(function() {
             no_machine: 'I don\'t have a machine now',
 
             // specific caption/content
-            invalid_device_name: 'The name can only contains alphabet, numbers, blanks, and special characters  “-”, “_”, “’”, “\'”.',
+            invalid_device_name: 'The name can only contains chinese, alphabet, numbers, blanks, and special characters  “(”, “)”, “-”, “_”, “’”, “\'”.',
             require_device_name: 'Name is required',
             select_language: 'Select Language',
             change_password: {
@@ -479,7 +489,9 @@ define(function() {
             importingModel: 'Importing Model',
             wait: 'Please wait...',
             out_of_range: 'Out of range',
-            out_of_range_message: 'please reduce the size of the object(s)'
+            out_of_range_message: 'please reduce the size of the object(s)',
+            drawingPreview: 'Drawing preview path, please wait',
+            gettingSlicingReport: 'Getting slicing status'
         },
         laser: {
             import: 'IMPORT',
@@ -787,12 +799,12 @@ define(function() {
             HEAD_ERROR_HEAD_OFFLINE         : 'Toolhead not detected\nPlease re-attach the module cable',
             HEAD_ERROR_TYPE_ERROR           : 'Toolhead incorrect\nPlease attach correct toolhead',
             'HEAD_ERROR_?'                  : 'Toolhead error\nCheck if the toolhead is abnormal',
-            HWARDWARE_ERROR_FILAMENT_RUNOUT : 'Ran out of filament\nPlease insert new material',
-            HWARDWARE_ERROR_0               : 'Ran out of filament\nPlease insert new material',
+            HARDWARE_ERROR_FILAMENT_RUNOUT : 'Ran out of filament\nPlease insert new material',
+            HARDWARE_ERROR_0               : 'Ran out of filament\nPlease insert new material',
             HARDWARE_ERROR_PLATE_MISSING    : 'Unable to detect the base plate\nPlease put on the plate.',
             HARDWARE_ERROR_ZPROBE_ERROR     : 'Unable to calibrate the base plate\nPlease remove left-over on the nozzle',
             HEAD_ERROR_HEAD_RESET           : 'Toolhead bad connection\nPlease re-attach the toolhead, and ensure the toolhead is connected correctly',
-            CONVERGENCE_FAILED              : 'Unable to calibrate the base plate\nPlease remove left-over on the nozzle',
+            HARDWARE_ERROR_CONVERGENCE_FAILED : 'Unable to calibrate the base plate\nPlease remove left-over on the nozzle',
             HARDWARE_ERROR_HOME_FAILED      : 'Unable to home to origin\nPlease remove the obstacle, and reattach the toolhead',
             HEAD_ERROR_TILT                 : 'Head tilted\nPlease check ball joint rod is attached correctly',
             HEAD_ERROR_SHAKE                : 'Head tilted\nPlease check ball joint rod is attached correctly',
@@ -878,7 +890,8 @@ define(function() {
                 message: 'The device is executing another task, try again later. If it stops working, please restart the device.'
             },
             device_is_used: 'The device is being used, do you want to abort current task?',
-            invalidFile: 'The file is not a valid stl file'
+            invalidFile: 'The file is not a valid stl file',
+            failGeneratingPreview: 'Fail to generate preview'
         },
         machine_status: {
             '-10': 'Raw mode',
@@ -918,7 +931,7 @@ define(function() {
             loaded: 'Filament Loaded',
             unloaded: 'Filament Unloaded',
             ok: 'OK',
-            auto_emerging: 'Loading filament',
+            auto_emerging: 'Please insert filament',
             maintain_head_type_error: 'Toolhead not installed correctly',
             maintain_zombie: 'Please restart the device'
         },

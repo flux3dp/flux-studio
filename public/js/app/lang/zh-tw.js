@@ -20,7 +20,15 @@ define(function() {
             firmware: {
                 caption: 'FLUX 有新的韌體更新',
                 message_pattern_1: '"%s" 有新的韌體更新。',
-                message_pattern_2: 'FLUX Firmware %s 可使用 - 你的版本為 %s.'
+                message_pattern_2: 'FLUX Firmware %s 可使用 - 你的版本為 %s.',
+                latest_firmware: {
+                    caption: '韌體更新',
+                    message: '韌體已經是最新版本'
+                },
+                confirm: '確認更新',
+                upload_file: '請上傳檔案',
+                update_success: '更新成功',
+                update_fail: '更新失敗'
             },
             software: {
                 caption: 'FLUX Studio 有新的軟體更新',
@@ -59,7 +67,8 @@ define(function() {
                 new: '新增裝置',
                 device_monitor: '狀態',
                 change_filament: '自動換料',
-                default_device: '設為預設裝置'
+                default_device: '設為預設裝置',
+                check_firmware_update: '韌體更新'
             },
             window: {
                 label: '視窗',
@@ -72,7 +81,8 @@ define(function() {
                 contact: '聯絡我們',
                 troubleshooting: '錯誤排除',
                 tutorial: '列印教學',
-                debug: '錯誤回報'
+                debug: '錯誤回報',
+                forum: '社群論壇'
             }
         },
         initialize: {
@@ -86,7 +96,7 @@ define(function() {
             no_machine : '目前沒有機器，跳過此步驟',
 
             // specific caption/content
-            invalid_device_name: '裝置名稱只能使用英文字母、數字、空格以及特殊字元 “-”, “_”, “’”, “\'”',
+            invalid_device_name: '裝置名稱只能使用中文字，英文字母、數字、空格以及特殊字元  “(”, “)”, “-”, “_”, “’”, “\'”',
             require_device_name: '名稱欄位為必填',
             select_language: '請選擇你想使用的語言',
             change_password: {
@@ -479,7 +489,9 @@ define(function() {
             importingModel: '匯入模型',
             wait: '請稍候',
             out_of_range: '超過列印範圍',
-            out_of_range_message: '請縮小物件尺寸'
+            out_of_range_message: '請縮小物件尺寸',
+            drawingPreview: '繪製預覽路徑，請稍候',
+            gettingSlicingReport: '正在取得最新切片狀態'
         },
         laser: {
             import: '匯入',
@@ -787,12 +799,12 @@ define(function() {
             HEAD_ERROR_HEAD_OFFLINE         : '工具頭離線\n請重新插入模組連接線',
             HEAD_ERROR_TYPE_ERROR           : '錯誤模組\n請安裝正確模組',
             'HEAD_ERROR_?'                  : 'Toolhead error\nCheck if the toolhead is abnormal',
-            HWARDWARE_ERROR_FILAMENT_RUNOUT : '未偵測到料捲\n請重新插入新的料捲',
-            HWARDWARE_ERROR_0               : '未偵測到料捲\n請重新插入新的料捲',
+            HARDWARE_ERROR_FILAMENT_RUNOUT : '未偵測到料捲\n請重新插入新的料捲',
+            HARDWARE_ERROR_0               : '未偵測到料捲\n請重新插入新的料捲',
             HARDWARE_ERROR_PLATE_MISSING    : '未偵測到工作平台\n請放上工作平台金屬板',
             HARDWARE_ERROR_ZPROBE_ERROR     : '校正失敗\n請移除列印模組噴頭上的殘料',
             HEAD_ERROR_HEAD_RESET           : '模組傳輸線接觸不良\n請重新裝載模組，並確認傳輸線完整插入',
-            CONVERGENCE_FAILED              : '校正失敗\n請移除列印模組噴頭上的殘料',
+            HARDWARE_ERROR_CONVERGENCE_FAILED : '校正失敗\n請移除列印模組噴頭上的殘料',
             HARDWARE_ERROR_HOME_FAILED      : '歸零失敗\n請排除異物，並重新插拔模組連接線',
             HEAD_ERROR_TILT                 : '工具頭傾斜\n請確認球型關節正確附著以繼續',
             HEAD_ERROR_SHAKE                : '工具頭傾斜\n請確認球型關節正確附著以繼續',
@@ -878,7 +890,8 @@ define(function() {
                 message: '裝置正在進行另外一項工作，請稍候再試。如果裝置持續沒有回應，請將裝置重新啟動。'
             },
             device_is_used: '裝置正被使用中，是否要終止現在任務？',
-            invalidFile: '檔案不是正確的 STL 格式'
+            invalidFile: '檔案不是正確的 STL 格式',
+            failGeneratingPreview: '無法儲存預覽圖'
         },
         machine_status: {
             '-10': 'Raw Mode',
@@ -918,7 +931,7 @@ define(function() {
             loaded: '進料完成',
             unloaded: '退料完成',
             ok: '確定',
-            auto_emerging: '進料中',
+            auto_emerging: '請插入線料',
             maintain_head_type_error: '列印模組未正確安裝',
             maintain_zombie: '請重新啟動機器'
         },

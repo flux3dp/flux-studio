@@ -3,8 +3,10 @@
  * Ref: https://github.com/flux3dp/fluxghost/wiki/websocket-usb-config
  */
 define([
-    'helpers/websocket'
-], function(Websocket) {
+    'jquery',
+    'helpers/websocket',
+    'helpers/api/config'
+], function($, Websocket, Config) {
     'use strict';
 
     var ws;
@@ -201,33 +203,31 @@ define([
                 ws.send(args.join(' '));
             },
 
-            getMachineNetwork: function(opts) {
-                opts = reorganizeOptions(opts);
+            getMachineNetwork: function(deferred) {
+                var $deferred = deferred || $.Deferred();
+
+                events.onMessage = function(response) {
+                    response.ipaddr = response.ipaddr || [];
+                    response.ssid = response.ssid || '';
+
+                    if ('ok' === response.status &&
+                        0 < response.ipaddr.length &&
+                        '' !== response.ssid
+                    ) {
+                        $deferred.resolve({ action: 'GOOD' });
+                    }
+                    else {
+                        $deferred.notify({ action: 'TRY_AGAIN' });
+                    }
+                };
+
+                ws.send('get network');
 
                 ws.onError(function(data) {
-                    sendCommand();
-                    opts.onError(data);
+                    $deferred.notify({ action: 'ERROR' });
                 });
 
-                var sendCommand = function() {
-                    ws.send('get network');
-                };
-
-                events.onMessage = function(data) {
-                    if ('ok' === data.status) {
-                        opts.onSuccess(data);
-                    }
-
-                    sendCommand();
-                };
-
-                sendCommand();
-
-                return {
-                    stop: function() {
-                        sendCommand = function() {};
-                    }
-                };
+                return $deferred;
             },
 
             setMachine: function(opts) {
@@ -271,12 +271,13 @@ define([
                 };
             },
 
-            setAPMode: function(opts) {
+            setAPMode: function(ssid, opts) {
                 opts = reorganizeOptions(opts);
 
                 var args = [
                     'set network',
                     JSON.stringify({
+                        ssid: ssid,
                         wifi_mode: 'host',
                         method: 'dhcp'
                     })
@@ -316,7 +317,9 @@ define([
 
             close: function() {
                 ws.close();
-                ws = null;
+                ws = new Websocket({
+                    method: 'usb-config'
+                });
             }
         };
     };

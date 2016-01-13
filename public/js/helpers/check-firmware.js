@@ -18,6 +18,6 @@ define(['jquery', 'helpers/api/config'], function($, config) {
             deferred.resolve(response);
         });
 
-        return deferred;
+        return deferred.promise();
     };
 });

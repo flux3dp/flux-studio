@@ -257,8 +257,7 @@ define([
                         );
                     });
 
-
-                    if (true === rollback) {
+                    if (true === rollback && 'undefined' !== typeof data) {
                         $el.addClass('bounce').parent().find('.ft-controls').addClass('bounce');
 
                         $el.freetrans({
@@ -266,27 +265,28 @@ define([
                             y: ((platform_pos.height - el_position.height) / 2) - data.originalSize.height * (1 - data.scaley)
                         });
 
-                        $el.one('transitionend', function() {
+                        // set fallback for older version of chrome
+                        $el.one('transitionend webkitTransitionend', function() {
                             $el.removeClass('bounce').parent().find('.ft-controls').removeClass('bounce');
                         });
                     }
                 });
             },
             refreshObjectParams = function(e, $el) {
-                var el_position, el_offset_position,
-                    position, size, angle, threshold;
+                var el_position, el_offset_position, position, size, angle, threshold, data;
 
                 if (null !== $el) {
                     el_position = $el.box();
                     el_offset_position = $el.box(true);
+                    data = $el.data('freetrans');
 
                     position = {
                         x: convertToRealCoordinate(el_position.center.x, 'x'),
                         y: convertToRealCoordinate(el_position.center.y, 'y')
                     };
                     size = {
-                        width: round(el_position.width / PLATFORM_DIAMETER_PIXEL * DIAMETER, -2),
-                        height: round(el_position.height / PLATFORM_DIAMETER_PIXEL * DIAMETER, -2)
+                        width: round($el.width() * data.scalex / PLATFORM_DIAMETER_PIXEL * DIAMETER, -2),
+                        height: round($el.height() * data.scaley / PLATFORM_DIAMETER_PIXEL * DIAMETER, -2)
                     };
                     angle = elementAngle($el[0]);
                     threshold = $el.data('threshold') || 128;
@@ -603,7 +603,7 @@ define([
             refreshImagePanelPos();
         });
 
-        setInterval(resetPosition, 100);
+        setInterval(resetPosition, 200);
 
         return {
             handleLaser: function(settings) {

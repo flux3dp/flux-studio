@@ -13,6 +13,10 @@ define([
     'app/actions/global-actions',
     'helpers/device-master',
     'app/constants/device-constants',
+    'app/actions/input-lightbox-actions',
+    'app/constants/input-lightbox-constants',
+    'app/actions/progress-actions',
+    'app/constants/progress-constants',
     'html2canvas',
     'plugins/file-saver/file-saver.min'
 ], function(
@@ -27,6 +31,10 @@ define([
     GlobalActions,
     DeviceMaster,
     DeviceConstants,
+    InputLightboxActions,
+    InputLightboxConstants,
+    ProgressActions,
+    ProgressConstants,
     html2canvas,
     fileSaver
 ) {
@@ -264,6 +272,8 @@ define([
                         function(printers) {
                             printers.forEach(function(printer) {
                                 renew = deviceGroup.some(deviceExists(printer));
+
+                                // if it's a new device by discover then append to list
                                 if (false === renew) {
                                     deviceGroup.push({
                                         isPrinter: true,
@@ -276,10 +286,7 @@ define([
                                             onClick: function() {
                                                 DeviceMaster.selectDevice(printer).then(function(status) {
                                                     if(status === DeviceConstants.CONNECTED) {
-                                                        setTimeout(
-                                                            function(){
-                                                                GlobalActions.showMonitor(printer)
-                                                            },50);
+                                                        GlobalActions.showMonitor(printer);
                                                     }
                                                     else if (status === DeviceConstants.TIMEOUT) {
                                                         AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
@@ -302,11 +309,77 @@ define([
                                             }
                                         },
                                         {
+                                            label: lang.device.check_firmware_update,
+                                            enabled: true,
+                                            onClick: function() {
+                                                checkFirmware(printer).done(function(response) {
+                                                    var lang = i18n.get(),
+                                                        onSubmit = function(files, e) {
+                                                            var file = files.item(0),
+                                                                onFinishUpdate = function(isSuccess) {
+                                                                    ProgressActions.close();
+
+                                                                    if (true === isSuccess) {
+                                                                        AlertActions.showPopupInfo(
+                                                                            'firmware-update-success',
+                                                                            lang.update.firmware.update_success
+                                                                        );
+                                                                    }
+                                                                    else {
+                                                                        AlertActions.showPopupError(
+                                                                            'firmware-update-fail',
+                                                                            lang.update.firmware.update_fail
+                                                                        );
+                                                                    }
+                                                                };
+
+                                                            ProgressActions.open(ProgressConstants.NONSTOP);
+                                                            DeviceMaster.selectDevice(printer).then(function(status) {
+                                                                if (status === DeviceConstants.CONNECTED) {
+                                                                    DeviceMaster.updateFirmware(file).
+                                                                        done(onFinishUpdate.bind(null, true)).
+                                                                        fail(onFinishUpdate.bind(null, false));
+                                                                }
+                                                                else if (status === DeviceConstants.TIMEOUT) {
+                                                                    AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
+                                                                }
+                                                            });
+                                                        },
+                                                        onInstall = function() {
+                                                            InputLightboxActions.open(
+                                                                'upload-firmware',
+                                                                {
+                                                                    type: InputLightboxConstants.TYPE_FILE,
+                                                                    inputHeader: lang.update.firmware.upload_file,
+                                                                    onSubmit: onSubmit,
+                                                                    confirmText: lang.update.firmware.confirm
+                                                                }
+                                                            );
+                                                        };
+
+                                                    if (true === response.needUpdate) {
+                                                        AlertActions.showUpdate(
+                                                            printer,
+                                                            'firmware',
+                                                            response,
+                                                            onInstall
+                                                        );
+                                                    }
+                                                    else {
+                                                        AlertActions.showPopupInfo(
+                                                            'latest-firmware',
+                                                            lang.update.firmware.latest_firmware.message,
+                                                            lang.update.firmware.latest_firmware.caption
+                                                        );
+                                                    }
+                                                });
+                                            }
+                                        },
+                                        {
                                             label: lang.device.default_device,
                                             enabled: true,
                                             type: 'checkbox',
                                             onClick: function() {
-                                                console.log(this.checked, printer);
                                                 if (false === this.checked) {
                                                     initializeMachine.defaultPrinter.clear();
                                                 }
@@ -322,11 +395,12 @@ define([
                                     });
                                 }
                             });
-                            if ('undefined' === typeof deviceRefreshTimer && false === renew) {
+
+                            if ('undefined' === typeof deviceRefreshTimer && true === renew) {
                                 clearTimeout(deviceRefreshTimer);
                                 deviceRefreshTimer = setTimeout(function() {
                                     items.device.subItems = deviceGroup;
-                                    if ('win' === window.FLUX.osType && window.FLUX.refreshMenu){
+                                    if ('win' === window.FLUX.osType && window.FLUX.refreshMenu) {
                                         window.FLUX.refreshMenu(menuMap);
                                     }
 
@@ -377,13 +451,25 @@ define([
                 },
                 items.tutorial,
                 {
+                    label: lang.help.forum,
+                    enabled: true,
+                    onClick: function() {
+                        if ('undefined' !== typeof requireNode) {
+                            requireNode('nw.gui').Shell.openExternal('http://forum.flux3dp.com');
+                        }
+                        else {
+                            window.open('http://forum.flux3dp.com');
+                        }
+                    }
+                },
+                {
                     label: lang.help.debug,
                     enabled: true,
                     onClick: function(){
                         window.html2canvas = html2canvas;
                         function obfuse(str){
                             var output = [];
-                            for(var i in str){
+                            for (var i in str) {
                                 var c = {'f':'x','l':'u','u':'l','x':'f'}[str[i]];
                                 output.push(c?c:str[i]);
                             }
@@ -396,8 +482,9 @@ define([
                                 }
                             }
                             var jpegUrl = canvas.toDataURL("image/jpeg"),
-                                report_info = {ws: window.FLUX.websockets, screenshot: jpegUrl},
-                                report_blob = new Blob([obfuse(btoa(JSON.stringify(report_info)))], {type : 'text/html'});
+                                report_info = JSON.stringify({ws: window.FLUX.websockets, screenshot: jpegUrl}, null, 2);
+                            if(!window.FLUX.debug) report_info = obfuse(btoa(report_info));
+                            var report_blob = new Blob([report_info], {type : 'text/html'});
 
                             saveAs(report_blob, "bugreport_"+Math.floor(Date.now() / 1000)+".txt");
                         });

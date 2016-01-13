@@ -11,7 +11,8 @@ define([
     var acceptableTypes = [
             Constants.TYPE_TEXT,
             Constants.TYPE_NUMBER,
-            Constants.TYPE_PASSWORD
+            Constants.TYPE_PASSWORD,
+            Constants.TYPE_FILE
         ],
         View = React.createClass({
 
@@ -61,7 +62,17 @@ define([
             _onSubmit: function(e, reactid) {
                 e.preventDefault();
 
-                var result = this.props.onSubmit(this.refs.inputField.getDOMNode().value);
+                var returnValue,
+                    result;
+
+                if (Constants.TYPE_FILE === this.props.type) {
+                    returnValue = this.refs.inputField.getDOMNode().files;
+                }
+                else {
+                    returnValue = this.refs.inputField.getDOMNode().value;
+                }
+
+                result = this.props.onSubmit(returnValue, e);
 
                 if (('boolean' === typeof result && true === result) || 'undefined' === typeof result) {
                     this._onClose.apply(null, [e, reactid, 'submit']);
@@ -70,7 +81,10 @@ define([
 
             _inputKeyUp: function(e) {
                 this.setState({
-                    allowSubmit: (0 < e.currentTarget.value.length)
+                    allowSubmit: (
+                        0 < e.currentTarget.value.length ||
+                        0 < e.currentTarget.files.length
+                    )
                 });
             },
 
@@ -104,9 +118,10 @@ define([
                 var typeMap = {},
                     type = 'text';
 
-                typeMap[Constants.TYPE_TEXT] = 'text';
-                typeMap[Constants.TYPE_NUMBER] = 'number';
+                typeMap[Constants.TYPE_TEXT]     = 'text';
+                typeMap[Constants.TYPE_NUMBER]   = 'number';
                 typeMap[Constants.TYPE_PASSWORD] = 'password';
+                typeMap[Constants.TYPE_FILE]     = 'file';
 
                 if ('string' === typeof typeMap[this.props.type]) {
                     type = typeMap[this.props.type];
@@ -121,6 +136,7 @@ define([
                             defaultValue={this.props.defaultValue}
                             autoFocus={true}
                             onKeyUp={this._inputKeyUp}
+                            onChange={this._inputKeyUp}
                             maxLength={this.props.maxLength}
                         />
                     </label>
