@@ -90,7 +90,7 @@ define([
                 events.onError = function(result) {
                     d.resolve(result);
                 };
-                lastOrder = 'ls';
+                lastOrder = 'file ls';
                 ws.send(lastOrder + ' ' + path);
 
                 return d.promise();
@@ -106,7 +106,8 @@ define([
                 events.onMessage = function(result) {
                     if(result instanceof Blob) {
                         data.push(result);
-                    }else if(data.length == 2){
+                    }
+                    else if(data.length === 2) {
                         //Play info info..
                         data.push(result);
                     }
@@ -365,8 +366,8 @@ define([
                     d.resolve(result);
                 };
 
-                ws.send('start');
-                lastOrder = 'start';
+                ws.send('play start');
+                lastOrder = 'play start';
 
                 return d.promise();
             },
@@ -474,7 +475,12 @@ define([
                     d.resolve(result);
                 };
 
-                ws.send(`select ${path.join('/')}/${fileName}`);
+                if(fileName === '') {
+                    ws.send(`select ${path.join('/')}`);
+                }
+                else {
+                    ws.send(`select ${path.join('/')}/${fileName}`);
+                }
 
                 return d.promise();
             },
