@@ -23,6 +23,7 @@ function(React, Modal, Alert, ProgressConstants) {
             message    : React.PropTypes.string,
             percentage : React.PropTypes.number,
             hasStop    : React.PropTypes.object,
+            onStop     : React.PropTypes.func,
             onFinished : React.PropTypes.func
         },
 
@@ -35,6 +36,7 @@ function(React, Modal, Alert, ProgressConstants) {
                 type       : ProgressConstants.WAITING,
                 percentage : 0,
                 hasStop    : true,
+                onStop     : function() {},
                 onFinished : function() {}
             };
         },
@@ -50,7 +52,7 @@ function(React, Modal, Alert, ProgressConstants) {
                     dataAttrs: {
                         'ga-event': 'stop'
                     },
-                    onClick: this.props.onFinished
+                    onClick: this.props.onStop
                 });
                 break;
             case ProgressConstants.NONSTOP:

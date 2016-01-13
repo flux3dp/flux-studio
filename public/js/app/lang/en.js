@@ -490,7 +490,8 @@ define(function() {
             wait: 'Please wait...',
             out_of_range: 'Out of range',
             out_of_range_message: 'please reduce the size of the object(s)',
-            drawingPreview: 'Drawing preview path, please wait'
+            drawingPreview: 'Drawing preview path, please wait',
+            gettingSlicingReport: 'Getting slicing status'
         },
         laser: {
             import: 'IMPORT',
@@ -889,7 +890,8 @@ define(function() {
                 message: 'The device is executing another task, try again later. If it stops working, please restart the device.'
             },
             device_is_used: 'The device is being used, do you want to abort current task?',
-            invalidFile: 'The file is not a valid stl file'
+            invalidFile: 'The file is not a valid stl file',
+            failGeneratingPreview: 'Fail to generate preview'
         },
         machine_status: {
             '-10': 'Raw mode',
