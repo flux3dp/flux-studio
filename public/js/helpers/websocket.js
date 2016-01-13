@@ -58,7 +58,7 @@ define(['helpers/is-json'], function(isJson) {
                     _logs.push(['recv', data]);
 
                     if ('string' === typeof data) {
-                        data = JSON.parse(data.replace(/\bNaN\b/g, 'null'));
+                        data = data.replace(/\bNaN\b/g, 'null');
                         data = data.replace(/\r?\n|\r/g);
                     }
 
