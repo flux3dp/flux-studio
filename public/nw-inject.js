@@ -38,9 +38,11 @@ var fs = requireNode('fs'),
             ghostCmd = libPath + '/lib/ghost/ghost';
         }
         else {
-            args[slic3rPathIndex] = libPath + '/lib/Slic3r.app/Contents/MacOS/slic3r';
+            args[slic3rPathIndex] = libPath + '/lib/Slic3r';
             ghostCmd = libPath + '/lib/ghost/ghost';
         }
+
+        fs.chmodSync(args[slic3rPathIndex], 0777);
 
         ghost = spawn(ghostCmd, args);
 
