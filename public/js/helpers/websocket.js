@@ -76,8 +76,6 @@ define(['helpers/is-json'], function(isJson) {
                         // it's a heartbeat response. ignore it.
                     }
                     else {
-                        // unexpected response
-                        console.log(data);
                         options.onMessage(data);
                     }
                 };
