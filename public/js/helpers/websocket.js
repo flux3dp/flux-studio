@@ -76,6 +76,9 @@ define(['helpers/is-json'], function(isJson) {
                         // it's a heartbeat response. ignore it.
                     }
                     else {
+                        if(typeof data === 'string') {
+                            data = JSON.parse(data.replace(/\bNaN\b/g, 'null'));
+                        }
                         options.onMessage(data);
                     }
                 };
