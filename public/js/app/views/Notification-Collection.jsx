@@ -171,12 +171,18 @@ define([
             },
 
             _showUpdate: function(payload) {
+                var currentVersion = (
+                    'software' === payload.type ?
+                    payload.updateInfo.currentVersion :
+                    payload.device.version
+                );
+
                 this.setState({
                     application: {
                         open: true,
                         device: payload.device,
                         type: payload.type,
-                        currentVersion: payload.updateInfo.currentVersion,
+                        currentVersion: currentVersion,
                         latestVersion: payload.updateInfo.latestVersion,
                         releaseNote: payload.updateInfo.releaseNote,
                         onInstall: payload.onInstall
