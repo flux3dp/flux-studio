@@ -133,6 +133,7 @@ define([
 
                 GlobalStore.onShowMonitor(this._handleOpenMonitor);
                 GlobalStore.onCloseAllView(this._handleCloseAllView);
+                GlobalStore.onSliceComplete(this._handleSliceReport);
 
                 this._checkSoftwareUpdate();
             },
@@ -376,6 +377,10 @@ define([
                 $('.dialog-opener').prop('checked','');
             },
 
+            _handleSliceReport: function(data) {
+                this.setState({ slicingStatus: data.report });
+            },
+
             _renderMonitorPanel: function() {
                 var content = (
                     <Monitor
@@ -383,6 +388,7 @@ define([
                         selectedDevice = {this.state.selectedDevice}
                         fCode          = {this.state.fcode}
                         previewUrl     = {this.state.previewUrl}
+                        slicingStatus  = {this.state.slicingStatus}
                         onClose        = {this._handleMonitorClose} />
                 );
                 return (

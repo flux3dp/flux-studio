@@ -29,6 +29,10 @@ define([
             this.on(GlobalConstants.CANCEL_PREVIEW, callback);
         },
 
+        onSliceComplete(callback) {
+            this.on(GlobalConstants.SLICE_COMPLETE, callback);
+        },
+
         removeShowMoniotorListener(callback) {
             this.removeListener(GlobalConstants.SHOW_MONITOR, callback);
         },
@@ -43,6 +47,10 @@ define([
 
         removeCancelPreviewListener(callback) {
             this.removeListener(GlobalConstants.CANCEL_PREVIEW, callback);
+        },
+
+        removeSliceComplete(callback) {
+            this.removeListener(GlobalConstants.SLICE_COMPLETE, callback);
         },
 
         dispatcherIndex: Dispatcher.register(function(payload) {

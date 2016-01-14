@@ -158,6 +158,9 @@ define([
                         if(progress.length > 0) {
                             callback(progress.pop());
                         }
+                        else {
+                            callback(null);
+                        }
                     }
                     else {
                         progress.push(result);
