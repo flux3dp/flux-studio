@@ -148,7 +148,7 @@ define([
                 (function(menuItem) {
                     observe(menuItem, function(changes) {
                         menuMap.all = menuMap.refresh();
-                        methods.updateMenu(menuMap.all[menuItem.parent], menuItem.parent);
+                        initialize(menuMap.all);
                     });
                 })(menuMap.items[key]);
             }
