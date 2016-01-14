@@ -152,14 +152,50 @@ define([
             },
 
             reportSlicing: function(callback) {
+                var progress = [];
                 events.onMessage = function(result) {
-                    callback(result);
+                    if(result.status === 'ok') {
+                        if(progress.length > 0) {
+                            callback(progress.pop());
+                        }
+                    }
+                    else {
+                        progress.push(result);
+                    }
                 };
                 events.onError = function(result) {
                     callback(result);
                 };
                 ws.send(`report_slicing`);
                 lastOrder = 'report_slicing';
+            },
+
+            getSlicingResult: function() {
+                var d = $.Deferred();
+                events.onMessage = function(result) {
+                    if(result instanceof Blob) {
+                        d.resolve(result);
+                    }
+                };
+                events.onError = function(result) {
+                    d.resolve(result);
+                };
+                ws.send(`get_result`);
+                lastOrder = 'get_result';
+                return d.promise();
+            },
+
+            stopSlicing: function() {
+                var d = $.Deferred();
+                events.onMessage = function(result) {
+                    d.resolve(result);
+                };
+                events.onError = function(result) {
+                    d.resolve(result);
+                };
+                ws.send(`end_slicing`);
+                lastOrder = 'end_slicing';
+                return d.promise();
             },
 
             setParameter: function(name, value) {

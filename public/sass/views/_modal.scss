@@ -27,8 +27,8 @@
     .modal-body {
         @include flexbox();
         max-height: 100%;
-        ::-webkit-scrollbar { 
-            display: none; 
+        ::-webkit-scrollbar {
+            display: none;
         }
     }
 
@@ -125,11 +125,11 @@
 
             &::before {
                 background-color: #F8F8F8;
-            } 
+            }
 
             &::after {
                 background-color: #F8F8F8;
-            } 
+            }
         }
 
     }
@@ -461,5 +461,11 @@
 .shadow-modal {
     .modal-body {
         box-shadow: 0 4px 15px rgba(0, 0, 0, .3), 0 16px 40px rgba(0, 0, 0, .5);
+    }
+}
+
+.modal-progress.modal-window {
+    .button-group button.btn-default {
+        margin-bottom: 15px;
     }
 }

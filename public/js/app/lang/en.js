@@ -490,7 +490,8 @@ define(function() {
             wait: 'Please wait...',
             out_of_range: 'Out of range',
             out_of_range_message: 'please reduce the size of the object(s)',
-            drawingPreview: 'Drawing preview path, please wait'
+            drawingPreview: 'Drawing preview path, please wait',
+            gettingSlicingReport: 'Getting slicing status'
         },
         laser: {
             import: 'IMPORT',
@@ -798,12 +799,12 @@ define(function() {
             HEAD_ERROR_HEAD_OFFLINE         : 'Toolhead not detected\nPlease re-attach the module cable',
             HEAD_ERROR_TYPE_ERROR           : 'Toolhead incorrect\nPlease attach correct toolhead',
             'HEAD_ERROR_?'                  : 'Toolhead error\nCheck if the toolhead is abnormal',
-            HWARDWARE_ERROR_FILAMENT_RUNOUT : 'Ran out of filament\nPlease insert new material',
-            HWARDWARE_ERROR_0               : 'Ran out of filament\nPlease insert new material',
+            HARDWARE_ERROR_FILAMENT_RUNOUT : 'Ran out of filament\nPlease insert new material',
+            HARDWARE_ERROR_0               : 'Ran out of filament\nPlease insert new material',
             HARDWARE_ERROR_PLATE_MISSING    : 'Unable to detect the base plate\nPlease put on the plate.',
             HARDWARE_ERROR_ZPROBE_ERROR     : 'Unable to calibrate the base plate\nPlease remove left-over on the nozzle',
             HEAD_ERROR_HEAD_RESET           : 'Toolhead bad connection\nPlease re-attach the toolhead, and ensure the toolhead is connected correctly',
-            CONVERGENCE_FAILED              : 'Unable to calibrate the base plate\nPlease remove left-over on the nozzle',
+            HARDWARE_ERROR_CONVERGENCE_FAILED : 'Unable to calibrate the base plate\nPlease remove left-over on the nozzle',
             HARDWARE_ERROR_HOME_FAILED      : 'Unable to home to origin\nPlease remove the obstacle, and reattach the toolhead',
             HEAD_ERROR_TILT                 : 'Head tilted\nPlease check ball joint rod is attached correctly',
             HEAD_ERROR_SHAKE                : 'Head tilted\nPlease check ball joint rod is attached correctly',
@@ -889,7 +890,8 @@ define(function() {
                 message: 'The device is executing another task, try again later. If it stops working, please restart the device.'
             },
             device_is_used: 'The device is being used, do you want to abort current task?',
-            invalidFile: 'The file is not a valid stl file'
+            invalidFile: 'The file is not a valid stl file',
+            failGeneratingPreview: 'Fail to generate preview'
         },
         machine_status: {
             '-10': 'Raw mode',

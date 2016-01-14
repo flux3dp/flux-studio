@@ -10,7 +10,8 @@ define([
     'app/constants/device-constants',
     'helpers/file-system',
     'app/actions/global-actions',
-    'helpers/sprintf'
+    'helpers/sprintf',
+    'helpers/round'
 ], function(
     $,
     React,
@@ -23,7 +24,8 @@ define([
     DeviceConstants,
     FileSystem,
     GlobalActions,
-    sprintf
+    sprintf,
+    round
 ) {
     'use strict';
 
@@ -60,7 +62,7 @@ define([
         headInfo = '',
         taskInfo = '',
 
-        timeout = 20000,
+        timeoutLength = 20000,
         timmer,
 
         // for monitor temperature, time...
@@ -106,6 +108,7 @@ define([
         leftButton,
         middleButton,
         rightButton,
+        deviceStatus,
 
         leftButtonOn = true,
         middleButtonOn = true,
@@ -262,11 +265,7 @@ define([
             pathArray   = [];
             lang        = this.props.lang;
             previewUrl  = this.props.previewUrl;
-
-            statusId = DeviceConstants.status.IDLE;
-            if(this.state.mode !== mode.BROWSE_FILE) {
-                this._getPrintingInfo();
-            }
+            statusId    = DeviceConstants.status.IDLE;
         },
 
         componentDidMount: function() {
@@ -275,10 +274,16 @@ define([
             AlertStore.onYes(this._handleYes);
             this._addHistory();
 
-            if(this.state.mode === mode.BROWSE_FILE) {
-                currentStatus = DeviceConstants.READY;
-                this._refreshDirectory();
-            }
+            DeviceMaster.getReport().then(function(report) {
+                this._processReport(report);
+                if(this.state.mode === mode.BROWSE_FILE) {
+                    currentStatus = DeviceConstants.READY;
+                    this._refreshDirectory();
+                }
+                else {
+                    this._getPrintingInfo();
+                }
+            }.bind(this));
         },
 
         shouldComponentUpdate: function(nextProps, nextState) {
@@ -300,7 +305,10 @@ define([
         },
 
         _getPrintingInfo: function() {
-            DeviceMaster.getPreviewInfo().then(this._processInfo.bind(this));
+            DeviceMaster.getReport().then(function(report) {
+                this._processReport(report);
+                DeviceMaster.getPreviewInfo().then(this._processInfo.bind(this));
+            }.bind(this));
         },
 
         _hasFCode: function() {
@@ -446,6 +454,7 @@ define([
         },
 
         _handleBrowseFile: function() {
+            this._stopReport();
             DeviceMaster.stopCamera();
             filesInfo = [];
             pathArray = [];
@@ -461,7 +470,6 @@ define([
             }, function() {
                 this._addHistory();
             });
-            this._stopReport();
         },
 
         _handleSelectFolder: function(pathName) {
@@ -560,10 +568,13 @@ define([
                         filePreview = true;
                         pathArray.push(fileName);
                         this.setState({
-                            mode: mode.PREVIEW
+                            mode: mode.PREVIEW,
+                            currentStatus: deviceStatus.st_id === DeviceConstants.status.COMPLETED ? DeviceConstants.READY : this.state.currentStatus
                         }, function() {
+                            DeviceMaster.getReport().then(function(report) {
+                                this._processReport(report);
+                            }.bind(this));
                             this._addHistory();
-                            this._startReport();
                         });
                     }
                     else {
@@ -667,9 +678,26 @@ define([
                     });
                 }
                 else {
-                    DeviceMaster.goFromFile(pathArray, '').then(function(result) {
-                        self._getPrintingInfo();
-                    });
+                    var executeGo = function() {
+                        DeviceMaster.goFromFile(pathArray, '').then(function(result) {
+                            self._getPrintingInfo();
+                        });
+                    };
+
+                    if(
+                        deviceStatus.st_id === DeviceConstants.status.COMPLETED ||
+                        deviceStatus.st_id === DeviceConstants.status.ABORTED
+                    ) {
+                        DeviceMaster.quit().then(function() {
+                            setTimeout(function() {
+                                executeGo();
+                            }, 1000);
+                        });
+                    }
+                    else {
+                        executeGo();
+                    }
+
                 }
 
             }
@@ -705,7 +733,7 @@ define([
         _startReport: function() {
             var self = this;
             this._stopReport();
-            timmer = setTimeout(this._processTimeout, timeout);
+            timmer = setTimeout(this._processTimeout, timeoutLength);
 
             reporter = setInterval(function() {
                 DeviceMaster.getReport().then(function(report) {
@@ -763,9 +791,10 @@ define([
             leftButtonOn    = true;
             middleButtonOn  = true;
             rightButtonOn   = true;
+            deviceStatus    = report;
 
             clearTimeout(timmer);
-            timmer = setTimeout(this._processTimeout, timeout);
+            timmer = setTimeout(this._processTimeout, timeoutLength);
             // rootMode = statusId === DeviceConstants.status.IDLE ? DeviceConstants.IDLE : DeviceConstants.RUNNING;
 
             // jug down errors as main and sub error for later use
@@ -789,17 +818,26 @@ define([
             }
             errorMessage = lang.monitor[attr.join('_')];
 
-            if(errorMessage === null) {
+            if(errorMessage === null || errorMessage === '' || typeof errorMessage === 'undefined') {
                 errorMessage = attr.join('_');
             }
 
             if(lastError !== mainError) {
                 messageViewed = false;
                 lastError = mainError;
-                AlertActions.showPopupError('', mainError);
+                if(mainError.length > 0) {
+                    console.log('showing error', mainError);
+                    AlertActions.showPopupError('', mainError);
+                }
             }
 
-            if(!messageViewed && !showingPopup && mainError !== DeviceConstants.USER_OPERATION && mainError.length > 0) {
+            if(
+                !messageViewed &&
+                !showingPopup &&
+                mainError !== DeviceConstants.USER_OPERATION &&
+                mainError.length > 0 &&
+                errorMessage.length > 0
+            ) {
                 AlertActions.showPopupRetry(_id, errorMessage);
                 showingPopup = true;
             }
@@ -810,7 +848,6 @@ define([
             if(statusActions[status]) {
                 statusActions[status]();
             }
-
 
             if(statusId === DeviceConstants.status.PAUSED_FROM_RUNNING) {
                 displayStatus = lang.device.paused;
@@ -824,13 +861,16 @@ define([
             }
             else {
                 progress = '';
+                percentageDone = 0;
             }
 
+            report.rt = round(report.rt, -1) || 0;
+
             if(status === DeviceConstants.RUNNING) {
-                temperature = report.rt ? `${lang.monitor.temperature} ${report.rt} °C` : '';
+                temperature = report.rt ? `${lang.monitor.temperature} ${parseInt(report.rt * 10) / 10} °C` : '';
             }
             else {
-                temperature = report.rt ? `${lang.monitor.temperature} ${report.rt} °C / ${report.tt} °C` : '';
+                temperature = report.rt ? `${lang.monitor.temperature} ${parseInt(report.rt * 10) / 10} °C / ${report.tt} °C` : '';
             }
 
             headInfo = report.module ? lang.monitor.device[report.module] : '';
@@ -843,7 +883,7 @@ define([
                 }
             }
 
-            if(status === DeviceConstants.COMPLETED) {
+            if(this._isAbortedOrCompleted()) {
                 temperature = '';
                 progress = '';
             }
@@ -852,6 +892,10 @@ define([
                 if(statusId !== DeviceConstants.status.IDLE) {
                     AlertActions.closePopup();
                 }
+            }
+
+            if(this._isAbortedOrCompleted() && pathArray.length > 0) {
+                currentStatus = DeviceConstants.READY;
             }
 
             var report_info = {
@@ -875,6 +919,13 @@ define([
 
         _isError: function(s) {
             return operationStatus.indexOf(s) < 0;
+        },
+
+        _isAbortedOrCompleted: function() {
+            return (
+                statusId === DeviceConstants.status.ABORTED ||
+                statusId === DeviceConstants.status.COMPLETED
+            );
         },
 
         _stopReport: function() {
@@ -1265,9 +1316,11 @@ define([
                     }
                 );
 
-            if(statusId === DeviceConstants.status.IDLE || statusId === DeviceConstants.status.COMPLETED) {
+            if(statusId === DeviceConstants.status.IDLE || this._isAbortedOrCompleted()) {
                 if(openSource !== source.GO && filePreview !== true) {
-                    taskInfo = _duration = _progress = '';
+                    taskInfo = '';
+                    _duration = '';
+                    _progress = '';
                 }
             }
 
@@ -1338,12 +1391,10 @@ define([
                         </div>
                         <div className="body">
                             <div className="device-content" onScroll={this._handleScroll}>
-                                {/*<div className="close"></div>*/}
                                 {content}
                                 {waitIcon}
                                 {printingInfo}
                             </div>
-
                         </div>
                         {op}
                     </div>
@@ -1362,15 +1413,6 @@ define([
                                 <div className="time-left right">{this.state.progress}</div>
                             </div>
                         </div>
-                        {
-                            /*
-                            <div className="actions center">
-                                <a className="btn filament">{lang.monitor.change_filament}</a>
-                                <a className="btn file" onClick={this._handleBrowseFile}>{lang.monitor.browse_file}</a>
-                                <a className="btn monitor" onClick={this._handleToggleCamera}>{lang.monitor.monitor}</a>
-                            </div>
-                            */
-                        }
                     </div>
                 </div>
             );

@@ -10,6 +10,7 @@ define(function() {
         // events
         OPEN_EVENT   : 'OPEN',
         UPDATE_EVENT : 'UPDATE',
+        STOP_EVENT   : 'STOP',
         FINISH_EVENT : 'FINISH'
     };
 });

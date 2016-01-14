@@ -2145,7 +2145,7 @@ img {
     height: 100%;
     overflow: hidden;
     width: 100%;
-    position: relative; }
+    position: fixed; }
 
 .horizontal-menu .menu-item {
     float: left;
@@ -3475,6 +3475,9 @@ input[type=range]:focus::-webkit-slider-runnable-track {
 
 .shadow-modal .modal-body {
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3), 0 16px 40px rgba(0, 0, 0, 0.5); }
+
+.modal-progress.modal-window .button-group button.btn-default {
+    margin-bottom: 15px; }
 
 /**
  * the view of printer selector

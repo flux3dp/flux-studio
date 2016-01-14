@@ -11,11 +11,11 @@ define([
     // prevent delete (back) behavior
     var defaultKeyBehavior = function() {
         shortcuts.on(['BACK'], function(e) {
-            if ('INPUT' !== e.target.tagName) {
+            if ('INPUT' !== e.target.tagName && 'TEXTAREA' !== e.target.tagName) {
                 e.preventDefault();
             }
         });
-            
+
         shortcuts.on(['cmd', 'r'], function() { window.location.reload(); });
         shortcuts.on(['ctrl', 'r'], function() { window.location.reload(); });
         shortcuts.on(['cmd', 'c'], function() { window.document.execCommand('copy'); });
