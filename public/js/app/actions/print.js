@@ -376,13 +376,13 @@ define([
 
         slicingStatus.canInterrupt = false;
         sendGCodeParameters().then(function() {
-            stopSlicing().then(function() {
-                slicer.beginSlicing(ids, slicingType.F).then(function() {
-                    slicingStatus.canInterrupt = true;
-                    getSlicingReport(function(report) {
-                        console.log('report slicing');
-                        slicingReport.report = report;
-                    });
+            return stopSlicing();
+        }).then(function() {
+            slicer.beginSlicing(ids, slicingType.F).then(function() {
+                slicingStatus.canInterrupt = true;
+                getSlicingReport(function(report) {
+                    console.log('report slicing');
+                    slicingReport.report = report;
                 });
             });
         });
@@ -391,7 +391,7 @@ define([
     function registerSlicingProgress() {
         Object.observe(slicingReport, function(change) {
             console.log(change[0].object.report);
-
+            slicingStatus.inProgress = true;
             if(slicingStatus.needToCloseWait) {
                 ProgressActions.close();
                 slicingStatus.needToCloseWait = false;
@@ -806,7 +806,10 @@ define([
         }
 
         if(!blobExpired) {
-            d.resolve(responseBlob, previewUrl);
+            getBlobFromScene().then(function(blob) {
+                previewUrl = URL.createObjectURL(blob);
+                d.resolve(responseBlob, previewUrl);
+            });
             return d.promise();
         }
 
@@ -959,7 +962,11 @@ define([
     }
 
     function setAdvanceParameter(settings) {
+        slicingStatus.pauseReport = true;
         slicer.setParameter('advancedSettings', settings.custom).then(function(result, errors) {
+            slicingStatus.showProgress = false;
+            slicingStatus.pauseReport = false;
+            startSlicing(slicingType.F);
             if(errors.length > 0) {
                 AlertActions.showPopupError(_id, errors.join('\n'));
             }
@@ -968,8 +975,16 @@ define([
     }
 
     function setParameter(name, value) {
+        slicingStatus.pauseReport = true;
+        var d = $.Deferred();
         blobExpired = true;
-        return slicer.setParameter(name, value);
+        slicer.setParameter(name, value).then(function() {
+            slicingStatus.showProgress = false;
+            slicingStatus.pauseReport = false;
+            startSlicing(slicingType.F);
+            d.resolve('');
+        });
+        return d.promise();
     }
 
     function setRotation(x, y, z, needRender, src) {
@@ -1629,11 +1644,10 @@ define([
 
     function stopSlicing() {
         var d = $.Deferred();
-        slicingStatus.inProgress = false;
         clearInterval(slicingStatus.reporter);
-
         if(slicingStatus.inProgress) {
             slicer.stopSlicing().then(function() {
+                slicingStatus.inProgress = false;
                 d.resolve('');
             });
         }

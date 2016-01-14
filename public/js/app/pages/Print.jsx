@@ -291,10 +291,6 @@ define([
                     }
                 },
 
-                _handleSpeedChange: function(speed) {
-                    director.setParameter('printSpeed', speed);
-                },
-
                 _handleRaftClick: function() {
                     this.setState({ leftPanelReady: false });
                     var isOn = !this.state.raftOn;
@@ -323,7 +319,6 @@ define([
                     advancedSettings.custom = advancedSettings.custom.replace(
                         `support_material = ${isOn ? 0 : 1}`,
                         `support_material = ${isOn ? 1 : 0}`);
-                    // this.setState({ supportOn: isOn });
                     Config().write('advanced-settings', JSON.stringify(advancedSettings));
                 },
 
@@ -490,8 +485,12 @@ define([
                     this.setState({ currentTutorialStep: this.state.currentTutorialStep + 1 }, function() {
                         if(this.state.currentTutorialStep === 1) {
                             var selectPrinterName = Config().read('configured-printer');
-                            if(!selectPrinterName) selectPrinterName = InitializeMachine.defaultPrinter.get().name;
-                            if(!selectPrinterName) selectPrinterName = DeviceMaster.getFirstDevice();
+                            if(!selectPrinterName) {
+                                selectPrinterName = InitializeMachine.defaultPrinter.get().name;
+                            }
+                            if(!selectPrinterName) {
+                                selectPrinterName = DeviceMaster.getFirstDevice();
+                            }
                             if(selectPrinterName){
                                 DeviceMaster.getDeviceByNameAsync(
                                 selectPrinterName,
@@ -507,10 +506,13 @@ define([
                                         function(){
                                             //Unable to find configured printer...
                                             ProgressActions.close();
-                                            setTimeout(function(){AlertActions.showWarning(sprintf(lang.set_default.error, printer.name))}, 100);
+                                            setTimeout(function() {
+                                                AlertActions.showWarning(sprintf(lang.set_default.error, printer.name)
+                                            )}, 100);
                                         }
                                 });
-                            }else{
+                            }
+                            else{
                                 //TODO: No printer
 
                             }

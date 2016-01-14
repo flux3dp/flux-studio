@@ -97,17 +97,14 @@ while true; do
             # dl latest ghost
             wget $DOWNLOAD_SOURCE/ghost/osx/fluxghost-osx-latest.zip
             # dl latest sli3er
-            wget $DOWNLOAD_SOURCE/slic3r/osx/slic3r.zip
+            wget $DOWNLOAD_SOURCE/slic3r/osx/slic3r
 
             mv $DIR/_tools/fluxghost-osx-latest.zip $DIR/lib/fluxghost-osx-latest.zip
-            mv $DIR/_tools/slic3r.zip $DIR/lib/slic3r.zip
+            mv $DIR/_tools/slic3r $DIR/lib/slic3r
 
             unzip $DIR/lib/fluxghost-osx-latest.zip -d $DIR/lib/
             mv $DIR/lib/fluxghost-osx-latest/ghost $DIR/lib/ghost
             rm -r $DIR/lib/fluxghost-osx-latest $DIR/lib/fluxghost-osx-latest.zip
-
-            unzip $DIR/lib/slic3r.zip -d $DIR/lib/
-            rm $DIR/lib/slic3r.zip
 
             find /var/www/web-panel/lib/ -name "__MACOSX" | xargs rm -r
 
