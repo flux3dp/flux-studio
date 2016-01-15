@@ -27,7 +27,7 @@ define(function() {
                 },
                 confirm: '確認更新',
                 upload_file: '請上傳檔案',
-                update_success: '更新成功',
+                update_success: '韌體更新上傳成功',
                 update_fail: '更新失敗'
             },
             software: {
