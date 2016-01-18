@@ -37,7 +37,8 @@ define(function() {
             },
             skip: 'Skip This Version',
             later: 'LATER',
-            install: 'INSTALL'
+            install: 'INSTALL',
+            upload: 'UPLOAD'
         },
         topmenu: {
             version: 'Version',
