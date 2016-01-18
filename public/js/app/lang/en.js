@@ -881,7 +881,8 @@ define(function() {
             },
             device_is_used: 'The device is being used, do you want to abort current task?',
             invalidFile: 'The file is not a valid stl file',
-            failGeneratingPreview: 'Fail to generate preview'
+            failGeneratingPreview: 'Fail to generate preview',
+            slicingFailed: 'slic3r is unable to slice this model'
         },
         machine_status: {
             '-10': 'Raw mode',

@@ -235,6 +235,10 @@ define([
     }
 
     function appendModel(fileEntry, file, callback) {
+        if(file.size === 0) {
+            AlertActions.showPopupError('', lang.message.invalidFile);
+            return;
+        }
         var loader = new THREE.STLLoader();
         var model_file_path = fileEntry.toURL();
         callback = callback || function() {};
@@ -298,7 +302,16 @@ define([
                 );
 
             // alert for auto scalling
-            if (scale !== 1) {
+            if(scale === Infinity) {
+                reactSrc.setState({
+                    openImportWindow: true,
+                    openObjectDialogue: false
+                }, function() {
+                    AlertActions.showPopupError('', lang.message.slicingFailed);
+                });
+                return;
+            }
+            else if (scale !== 1) {
                 console.log('this model has been scaled for better printing ratio');
             }
 
@@ -442,7 +455,7 @@ define([
                 if(show) {
                     ProgressActions.close();
                 }
-                AlertActions.showPopupError('', result.error);
+                AlertActions.showPopupError('', report.error);
             }
             else if(report.status === 'warning') {
                 AlertActions.showWarning(report.message);
