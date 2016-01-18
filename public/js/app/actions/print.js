@@ -683,7 +683,6 @@ define([
                 SELECTED.rotation.enteredZ = updateDegreeWithStep(radianToDegree(SELECTED.rotation.z));
                 updateObjectSize(SELECTED);
                 groundIt(SELECTED);
-                doSlicing();
                 break;
             case 'objectChange':
                 updateObjectSize(e.target.object);
@@ -994,7 +993,6 @@ define([
         SELECTED.size.z = z;
 
         slicingStatus.showProgress = false;
-        doSlicing();
     }
 
     function setRotateMode() {
@@ -1065,7 +1063,6 @@ define([
         }
 
         slicingStatus.showProgress = false;
-        doSlicing();
     }
 
     function setImportWindowPosition() {
