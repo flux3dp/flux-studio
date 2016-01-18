@@ -177,7 +177,7 @@ define([
                         objectDialogueStyle         : {},
                         camera                      : {},
                         rotation                    : {},
-                        scale                       : {},
+                        scale                       : _scale,
                         printerControllerStatus     : ''
                     });
                 },
@@ -353,8 +353,10 @@ define([
                     director.setScale(scale.x, scale.y, scale.z, scale.locked, true);
                 },
 
-                _handleToggleScaleLock: function(isLocked) {
+                _handleToggleScaleLock: function(size, isLocked) {
                     _scale.locked = isLocked;
+                    this.setState({ scale: _scale });
+                    director.setTransformedSize(size.x, size.y, size.z, isLocked);
                 },
 
                 _handleResize: function(size, isLocked) {
@@ -382,7 +384,9 @@ define([
 
                 _handleImport: function(e) {
                     var files = e.target.files;
-                    director.appendModels(files, 0, function() {});
+                    director.appendModels(files, 0, function() {
+                        e.target = null;
+                    }.bind(this));
                 },
 
                 _handleDownloadGCode: function() {
@@ -589,7 +593,7 @@ define([
                             <div className="arrowBox" onClick={this._handleCloseAllView}>
                                 <div title={lang.print.importTitle} className="file-importer">
                                     <div className="import-btn">{lang.print.import}</div>
-                                    <input type="file" accept=".stl" onChange={this._handleImport} multiple />
+                                    <input ref="import" type="file" accept=".stl" onChange={this._handleImport} multiple />
                                 </div>
                             </div>
                         </div>
