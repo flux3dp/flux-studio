@@ -10,6 +10,8 @@
     "gulp-mocha": "~2.2.0",
     "requirejs": "~2.1.22",
     "mocha": "~2.3.4",
-    "mocha-jsdom": "~1.0.0"
+    "mocha-jsdom": "~1.0.0",
+    "jsdom-global": "~1.6.1",
+    "jsdom": "~7.2.2"
   }
 }
