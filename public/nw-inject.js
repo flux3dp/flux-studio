@@ -42,6 +42,7 @@ var fs = requireNode('fs'),
             ghostCmd = libPath + '/lib/ghost/ghost';
         }
 
+        fs.chmodSync(ghostCmd, 0777);
         fs.chmodSync(args[slic3rPathIndex], 0777);
 
         ghost = spawn(ghostCmd, args);
@@ -91,14 +92,13 @@ var fs = requireNode('fs'),
                 break;
             case 'Darwin':
                 contentPos = dirParts.indexOf('Contents');
+                contentPos = (-1 < contentPos ? contentPos : dirParts.length);
                 appRoot = dirParts.slice(0, contentPos + 1).join(path.sep);
                 seperate_package_path = appRoot + '/lib/ghost/ghost';
                 break;
             }
 
-            fs.chmodSync(seperate_package_path, 0777);
             fs.stat(seperate_package_path, function(err, stat) {
-
                 if (null === err) {
                     executeGhost(currentPort, appRoot);
                 }
