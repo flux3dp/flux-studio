@@ -8,14 +8,15 @@ define([
     'use strict';
 
     return {
-        open: function(type, caption, message, hasStop, onFinished) {
+        open: function(type, caption, message, hasStop, onFinished, onOpened) {
             ProgressDispatcher.dispatch({
                 actionType: ProgressConstants.OPEN_EVENT,
                 type: type,
                 caption: caption,
                 message: message,
                 hasStop: hasStop,
-                onFinished: onFinished
+                onFinished: onFinished,
+                onOpened: onOpened
             });
         },
 

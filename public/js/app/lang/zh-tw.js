@@ -892,7 +892,8 @@ define(function() {
             },
             device_is_used: '裝置正被使用中，是否要終止現在任務？',
             invalidFile: '檔案不是正確的 STL 格式',
-            failGeneratingPreview: '無法儲存預覽圖'
+            failGeneratingPreview: '無法儲存預覽圖',
+            slicingFailed: 'slic3r 無法型成可列印的 model'
         },
         machine_status: {
             '-10': 'Raw Mode',

@@ -29,6 +29,12 @@ define([
             Dispatcher.dispatch({
                 actionType: GlobalConstants.CANCEL_PREVIEW
             });
+        },
+
+        sliceComplete: function(report) {
+            Dispatcher.dispatch({
+                actionType: GlobalConstants.SLICE_COMPLETE, report
+            });
         }
 
     };

@@ -291,7 +291,6 @@ define([
         },
 
         componentWillUnmount: function() {
-
             AlertStore.removeRetryListener(this._handleRetry);
             AlertStore.removeCancelListener(this._handleCancel);
             AlertStore.removeYesListener(this._handleYes);
@@ -302,6 +301,8 @@ define([
             this._stopReport();
             history = [];
             messageViewed = false;
+            totalTimeInSeconds = '';
+            taskInfo = '';
         },
 
         _getPrintingInfo: function() {
@@ -315,7 +316,8 @@ define([
             return this.props.fCode instanceof Blob;
         },
 
-        _formatTime(timeInSeconds, withSeconds) {
+        _formatTime: function(timeInSeconds, withSeconds) {
+            if(timeInSeconds === '') { return ''; }
             var hour = 0,
                 min = 0,
                 sec = 0,
@@ -1315,6 +1317,10 @@ define([
                             statusId !== DeviceConstants.status.SCAN
                     }
                 );
+
+            if(_duration === '') {
+                _duration = this._formatTime(this.props.slicingStatus.time, true);
+            }
 
             if(statusId === DeviceConstants.status.IDLE || this._isAbortedOrCompleted()) {
                 if(openSource !== source.GO && filePreview !== true) {
