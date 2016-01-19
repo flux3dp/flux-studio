@@ -5,7 +5,13 @@
   "dependencies": {},
   "devDependencies": {
     "gulp": "~3.8.8",
-    "gulp-sass": "~2.0.1",
-    "gulp-webserver": "~0.9.1"
+    "gulp-sass": "~3.4.2",
+    "gulp-webserver": "~0.9.1",
+    "gulp-mocha": "~2.2.0",
+    "requirejs": "~2.1.22",
+    "mocha": "~2.3.4",
+    "mocha-jsdom": "~1.0.0",
+    "jsdom-global": "~1.6.1",
+    "jsdom": "~7.2.2"
   }
 }
