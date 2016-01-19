@@ -91,7 +91,17 @@ define([
                         break;
                     case DeviceConstants.AUTH_ERROR:
                     case DeviceConstants.AUTH_FAILED:
-                        goAuth(_device.uuid);
+                        if (true === device.password) {
+                            goAuth(_device.uuid);
+                        }
+                        else {
+                            ProgressActions.close();
+                            AlertActions.showPopupInfo(
+                                'auth-error-with-diff-computer',
+                                lang.message.no_password.content,
+                                lang.message.no_password.caption
+                            );
+                        }
                         break;
                     }
                 }
