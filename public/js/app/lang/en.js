@@ -893,7 +893,11 @@ define(function() {
             device_is_used: 'The device is being used, do you want to abort current task?',
             invalidFile: 'The file is not a valid stl file',
             failGeneratingPreview: 'Fail to generate preview',
-            slicingFailed: 'slic3r is unable to slice this model'
+            slicingFailed: 'slic3r is unable to slice this model',
+            no_password: {
+                content: 'Setup machine password via USB to enable connection for this computer',
+                caption: 'Password not set'
+            }
         },
         machine_status: {
             '-10': 'Raw mode',
