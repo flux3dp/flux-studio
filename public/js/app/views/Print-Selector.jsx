@@ -164,20 +164,26 @@ define([
                 lang = self.props.lang,
                 onError = function() {
                     ProgressActions.close();
-                    InputLightboxActions.open('auth-device', {
-                        type         : InputLightboxConstants.TYPE_PASSWORD,
-                        caption      : lang.select_printer.notification,
-                        inputHeader  : lang.select_printer.please_enter_password,
-                        confirmText  : lang.select_printer.submit,
-                        onSubmit     : function(password) {
-                            self._auth(printer.uuid, password, {
-                                onError: function() {
-                                    ProgressActions.close();
-                                    AlertActions.showPopupError('device-auth-fail', lang.select_printer.auth_failure);
-                                }
-                            });
-                        }
-                    });
+
+                    if (true === printer.password) {
+                        InputLightboxActions.open('auth-device', {
+                            type         : InputLightboxConstants.TYPE_PASSWORD,
+                            caption      : lang.select_printer.notification,
+                            inputHeader  : lang.select_printer.please_enter_password,
+                            confirmText  : lang.select_printer.submit,
+                            onSubmit     : function(password) {
+                                self._auth(printer.uuid, password, {
+                                    onError: function() {
+                                        ProgressActions.close();
+                                        AlertActions.showPopupError('device-auth-fail', lang.select_printer.auth_failure);
+                                    }
+                                });
+                            }
+                        });
+                    }
+                    else {
+                        AlertActions.showPopupInfo('device-auth-fail', lang.message.no_password.content, lang.message.no_password.caption);
+                    }
                 },
                 opts = {
                     onError: onError
@@ -235,11 +241,16 @@ define([
                         checkStId(printer);
                     }
                     else if (status === DeviceConstants.TIMEOUT) {
-                        //TODO: Check default printer
+                        // TODO: Check default printer
                         ProgressActions.close();
-                        if(self.state.hadDefaultPrinter){
-                            AlertActions.showPopupError('printer-connection-timeout', sprintf(lang.message.device_not_found.message, "device_name") , lang.message.device_not_found.caption);
-                        }else{
+                        if (self.state.hadDefaultPrinter) {
+                            AlertActions.showPopupError(
+                                'printer-connection-timeout',
+                                sprintf(lang.message.device_not_found.message, self.selected_printer.name),
+                                lang.message.device_not_found.caption
+                            );
+                        }
+                        else{
                             AlertActions.showPopupError('printer-connection-timeout', lang.message.connectionTimeout, lang.caption.connectionTimeout);
                         }
                     }
