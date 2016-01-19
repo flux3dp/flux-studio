@@ -1013,27 +1013,37 @@ define([
 
     function setAdvanceParameter(settings) {
         slicingStatus.pauseReport = true;
-        slicer.setParameter('advancedSettings', settings.custom).then(function(result, errors) {
-            slicingStatus.showProgress = false;
-            slicingStatus.pauseReport = false;
-            doSlicing();
-            if(errors.length > 0) {
-                AlertActions.showPopupError(_id, errors.join('\n'));
+
+        var t = setInterval(function() {
+            if(slicingStatus.canInterrupt) {
+                slicer.setParameter('advancedSettings', settings.custom).then(function(result, errors) {
+                    slicingStatus.showProgress = false;
+                    slicingStatus.pauseReport = false;
+                    doSlicing();
+                    if(errors.length > 0) {
+                        AlertActions.showPopupError(_id, errors.join('\n'));
+                    }
+                });
+                blobExpired = true;
+                slicingStatus.pauseReport = false;
+                clearInterval(t);
             }
-        });
-        blobExpired = true;
+        }, 500);
     }
 
     function setParameter(name, value) {
         slicingStatus.pauseReport = true;
         var d = $.Deferred();
         blobExpired = true;
-        slicer.setParameter(name, value).then(function() {
-            slicingStatus.showProgress = false;
-            slicingStatus.pauseReport = false;
-            doSlicing();
-            d.resolve('');
-        });
+        var t = setInterval(function() {
+            slicer.setParameter(name, value).then(function() {
+                slicingStatus.showProgress = false;
+                slicingStatus.pauseReport = false;
+                doSlicing();
+                d.resolve('');
+            });
+            clearInterval(t);
+        }, 500);
         return d.promise();
     }
 
