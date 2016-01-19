@@ -20,41 +20,41 @@ while true; do
     read -p "==> Build for which OS? (Windows[W], OSX[O], Linux[L]) "
     case $REPLY in
         [Ww] )
-            # printf "\n";
-            # printf "${TXT_INFO} Download Resources for Windows x86 ${TXT_RESET}";
-            # printf "\n";
-            # # dl latest ghost
-            # wget $DOWNLOAD_SOURCE/ghost/windows/fluxghost-win-latest-x86.zip
-            # # dl latest sli3er
-            # wget $DOWNLOAD_SOURCE/slic3r/windows/slic3r-mswin-x86-1-2-9a-stable.zip
+            printf "\n";
+            printf "${TXT_INFO} Download Resources for Windows x86 ${TXT_RESET}";
+            printf "\n";
+            # dl latest ghost
+            wget $DOWNLOAD_SOURCE/ghost/windows/fluxghost-win-latest-x86.zip
+            # dl latest sli3er
+            wget $DOWNLOAD_SOURCE/slic3r/windows/slic3r-mswin-x86-1-2-9a-stable.zip
 
-            # mv $DIR/_tools/fluxghost-win-latest-x86.zip $DIR/lib/fluxghost-win-latest-x86.zip
-            # mv $DIR/_tools/slic3r-mswin-x86-1-2-9a-stable.zip $DIR/lib/slic3r-x86.zip
+            mv $DIR/_tools/fluxghost-win-latest-x86.zip $DIR/lib/fluxghost-win-latest-x86.zip
+            mv $DIR/_tools/slic3r-mswin-x86-1-2-9a-stable.zip $DIR/lib/slic3r-x86.zip
 
-            # unzip $DIR/lib/fluxghost-win-latest-x86.zip -d $DIR/lib/
-            # unzip $DIR/lib/slic3r-x86.zip -d $DIR/lib/
-            # mv $DIR/lib/fluxghost-win-latest-x86/ghost $DIR/lib/ghost
-            # rm -r $DIR/lib/slic3r-x86.zip $DIR/lib/fluxghost-win-latest-x86 $DIR/lib/fluxghost-win-latest-x86.zip
+            unzip $DIR/lib/fluxghost-win-latest-x86.zip -d $DIR/lib/
+            unzip $DIR/lib/slic3r-x86.zip -d $DIR/lib/
+            mv $DIR/lib/fluxghost-win-latest-x86/ghost $DIR/lib/ghost
+            rm -r $DIR/lib/slic3r-x86.zip $DIR/lib/fluxghost-win-latest-x86 $DIR/lib/fluxghost-win-latest-x86.zip
 
-            # find /var/www/web-panel/lib/ -name "__MACOSX" | xargs rm -r
+            find /var/www/web-panel/lib/ -name "__MACOSX" | xargs rm -r
 
-            # printf "\n";
-            # printf "${TXT_INFO} Packing for Windows x86 ${TXT_RESET}";
-            # printf "\n";
-            # # dl latest ghost and sli3er (for x86)
-            # $DIR/_tools/nwjs-shell-builder/nwjs-build.sh --src=$DIR/public --name="$PACKAGE_NAME" --win-icon=$DIR/public/icon.png --version="1.0.0" --nw=0.12.3 --target="2" --build
-            # mkdir -p $DIR/_tools/nwjs-shell-builder/TMP/output/fstudio-$(date +%Y%m%d)-win-x86/lib
-            # unzip $DIR/_tools/nwjs-shell-builder/TMP/output/FLUX_Studio-$(date +%Y%m%d)-win-ia32.zip -d $DIR/_tools/nwjs-shell-builder/TMP/output/fstudio-$(date +%Y%m%d)-win-x86
-            # $DIR/_tools/nwjs-shell-builder/TMP/output/FLUX_Studio-$(date +%Y%m%d)-win-ia32.zip
-            # mv -f $DIR/lib $DIR/_tools/nwjs-shell-builder/TMP/output/fstudio-$(date +%Y%m%d)-win-x86/
-            # cp $DIR/_tools/platform-script/windows-firewall.bat $DIR/_tools/nwjs-shell-builder/TMP/output/fstudio-$(date +%Y%m%d)-win-x86/
-            # cd $DIR/_tools/nwjs-shell-builder/TMP/output/
-            # zip -r -X ./fstudio-$(date +%Y%m%d)-win-x86.zip ./fstudio-$(date +%Y%m%d)-win-x86
-            # cd $DIR/_tools
+            printf "\n";
+            printf "${TXT_INFO} Packing for Windows x86 ${TXT_RESET}";
+            printf "\n";
+            # dl latest ghost and sli3er (for x86)
+            $DIR/_tools/nwjs-shell-builder/nwjs-build.sh --src=$DIR/public --name="$PACKAGE_NAME" --win-icon=$DIR/public/icon.png --version="1.0.0" --nw=0.12.3 --target="2" --build
+            mkdir -p $DIR/_tools/nwjs-shell-builder/TMP/output/fstudio-$(date +%Y%m%d)-win-x86/lib
+            unzip $DIR/_tools/nwjs-shell-builder/TMP/output/FLUX_Studio-$(date +%Y%m%d)-win-ia32.zip -d $DIR/_tools/nwjs-shell-builder/TMP/output/fstudio-$(date +%Y%m%d)-win-x86
+            $DIR/_tools/nwjs-shell-builder/TMP/output/FLUX_Studio-$(date +%Y%m%d)-win-ia32.zip
+            mv -f $DIR/lib $DIR/_tools/nwjs-shell-builder/TMP/output/fstudio-$(date +%Y%m%d)-win-x86/
+            cp $DIR/_tools/platform-script/windows-firewall.bat $DIR/_tools/nwjs-shell-builder/TMP/output/fstudio-$(date +%Y%m%d)-win-x86/
+            cd $DIR/_tools/nwjs-shell-builder/TMP/output/
+            zip -r -X ./fstudio-$(date +%Y%m%d)-win-x86.zip ./fstudio-$(date +%Y%m%d)-win-x86
+            cd $DIR/_tools
 
-            # # clear
-            # rm -r $DIR/lib
-            # mkdir -p $DIR/lib
+            # clear
+            rm -r $DIR/lib
+            mkdir -p $DIR/lib
 
             # build x64 for windows
             printf "\n";
@@ -105,7 +105,7 @@ while true; do
             mv $DIR/_tools/slic3r $DIR/lib/slic3r
 
             unzip $DIR/lib/fluxghost-osx-latest.zip -d $DIR/lib/
-            mv $DIR/lib/fluxghost-osx-latest/ghost $DIR/lib/ghost
+            mv $DIR/lib/fluxghost-osx-latest/flux_api $DIR/lib/flux_api
             rm -r $DIR/lib/fluxghost-osx-latest $DIR/lib/fluxghost-osx-latest.zip
 
             find /var/www/web-panel/lib/ -name "__MACOSX" | xargs rm -r
@@ -126,7 +126,7 @@ while true; do
             mv $DIR/_tools/nwjs-shell-builder/TMP/output/FLUX\ Studio/FLUX_Studio.app $DIR/_tools/nwjs-shell-builder/TMP/output/FLUX\ Studio/FLUX\ Studio.app
             ln -s /Applications $DIR/_tools/nwjs-shell-builder/TMP/output/FLUX\ Studio/Applications
 
-            hdiutil create -size 400m -srcfolder $DIR/_tools/nwjs-shell-builder/TMP/output/FLUX\ Studio/ $DIR/_tools/nwjs-shell-builder/TMP/output/FLUX\ Studio/fstudio-$(date +%Y%m%d)-osx.dmg
+            hdiutil create -size 500m -srcfolder $DIR/_tools/nwjs-shell-builder/TMP/output/FLUX\ Studio/ $DIR/_tools/nwjs-shell-builder/TMP/output/FLUX\ Studio/fstudio-$(date +%Y%m%d)-osx.dmg
             rm $DIR/_tools/nwjs-shell-builder/TMP/output/FLUX\ Studio/Applications
 
             break;;
