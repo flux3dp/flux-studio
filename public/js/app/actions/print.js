@@ -75,7 +75,9 @@ define([
         ddHelper = 0,
         defaultFileName = '',
         cameraLight,
-        transformAxisChanged = '',
+        slicingTimmer,
+        slicingWaitTime = 500,
+        stlTimmer,
         slicingReport = {},
         slicingStatus = {},
         lang = I18n.get();
@@ -210,14 +212,11 @@ define([
 
         // init print controller
         slicer = printSlicing();
+        slicingStatus.canInterrupt = true;
 
         registerDropToImport();
         registerSlicingProgress();
         registerCancelPreview();
-    }
-
-    function _handleStop() {
-        console.log('stopped');
     }
 
     function uploadStl(name, file) {
@@ -236,6 +235,10 @@ define([
     }
 
     function appendModel(fileEntry, file, callback) {
+        if(file.size === 0) {
+            AlertActions.showPopupError('', lang.message.invalidFile);
+            return;
+        }
         var loader = new THREE.STLLoader();
         var model_file_path = fileEntry.toURL();
         callback = callback || function() {};
@@ -267,7 +270,9 @@ define([
             mesh.up = new THREE.Vector3(0, 0, 1);
 
             ProgressActions.updating(lang.print.uploading, 40);
+            slicingStatus.pauseReport = true;
             uploadStl(mesh.uuid, file).then(function(result) {
+                slicingStatus.pauseReport = false;
                 if (result.status !== 'ok') {
                     ProgressActions.close();
                     reactSrc.setState({
@@ -277,9 +282,10 @@ define([
                     AlertActions.showPopupError('', result.error);
                     return;
                 }
-
                 slicingStatus.inProgress = true;
-                startSlicing(slicingType.F);
+                if(slicingStatus.canInterrupt) {
+                    startSlicing(slicingType.F);
+                }
                 ProgressActions.close();
                 callback();
             });
@@ -296,7 +302,16 @@ define([
                 );
 
             // alert for auto scalling
-            if (scale !== 1) {
+            if(scale === Infinity) {
+                reactSrc.setState({
+                    openImportWindow: true,
+                    openObjectDialogue: false
+                }, function() {
+                    AlertActions.showPopupError('', lang.message.slicingFailed);
+                });
+                return;
+            }
+            else if (scale !== 1) {
                 console.log('this model has been scaled for better printing ratio');
             }
 
@@ -343,6 +358,7 @@ define([
     }
 
     function appendModels(files, index, callback) {
+        slicingStatus.canInterrupt = false;
         if(files.item(index).name.split('.').pop().toLowerCase() === 'stl') {
             FileSystem.writeFile(
                 files.item(index),
@@ -353,6 +369,8 @@ define([
                                 appendModels(files, index + 1, callback);
                             }
                             else {
+                                slicingStatus.canInterrupt = true;
+                                startSlicing(slicingType.F);
                                 callback();
                             }
                         });
@@ -368,6 +386,9 @@ define([
     function startSlicing(type) {
         slicingStatus.inProgress = true;
         slicingStatus.isComplete = false;
+        slicingStatus.canInterrupt = false;
+        slicingStatus.pauseReport = true;
+        blobExpired = true;
 
         if(objects.length === 0 || !blobExpired) { return; }
         var ids = [];
@@ -375,23 +396,36 @@ define([
             ids.push(obj.uuid);
         });
 
-        slicingStatus.canInterrupt = false;
         sendGCodeParameters().then(function() {
             return stopSlicing();
         }).then(function() {
+            return getBlobFromScene();
+        }).then(function(blob) {
+            previewUrl = URL.createObjectURL(blob);
+            return slicer.uploadPreviewImage(blob);
+        }).then(function() {
             slicer.beginSlicing(ids, slicingType.F).then(function() {
                 slicingStatus.canInterrupt = true;
+                slicingStatus.pauseReport = false;
                 getSlicingReport(function(report) {
-                    console.log('report slicing');
                     slicingReport.report = report;
                 });
             });
         });
     }
 
+    function doSlicing() {
+        clearInterval(slicingTimmer);
+        slicingTimmer = setInterval(function() {
+            if(slicingStatus.canInterrupt) {
+                startSlicing(slicingType.F);
+                clearInterval(slicingTimmer);
+            }
+        }, slicingWaitTime);
+    }
+
     function registerSlicingProgress() {
         Object.observe(slicingReport, function(change) {
-            console.log(change[0].object.report);
             slicingStatus.inProgress = true;
             if(slicingStatus.needToCloseWait) {
                 ProgressActions.close();
@@ -402,6 +436,9 @@ define([
                 progress = `${lang.slicer[report.status]} - ${'\n' + parseInt(report.percentage * 100)}% - ${report.message}`,
                 complete = lang.print.finishingUp,
                 show = slicingStatus.showProgress;
+
+            slicingStatus.lastProgress = progress;
+            slicingStatus.lastReport = report;
 
             if(show) {
                 ProgressActions.open(
@@ -414,27 +451,36 @@ define([
             }
 
             if(report.status === 'error') {
-                blobExpired = true;
+
                 reactSrc.setState({ hasOutOfBoundsObject: true });
                 if(show) {
                     ProgressActions.close();
                 }
-                AlertActions.showPopupError('', result.error);
+                if(report.error === 'gcode area too big') {
+                    AlertActions.showPopupError('', '<b>' + lang.message.gcodeAreaTooBigCaption + '</b><br/>' + lang.message.gcodeAreaTooBigMessage);
+                }
+                else {
+                    AlertActions.showPopupError('', report.error);
+                }
             }
             else if(report.status === 'warning') {
                 AlertActions.showWarning(report.message);
             }
             else if(report.status !== 'complete') {
                 if(show) {
-                    ProgressActions.updating(progress, parseInt(report.percentage * 100));
+                    if(report.percentage) {
+                        ProgressActions.updating(progress, parseInt(report.percentage * 100));
+                    }
                 }
             }
             else {
-
+                GlobalActions.sliceComplete(report);
                 if(show) {
                     ProgressActions.updating(complete, 100);
                 }
+                slicingStatus.canInterrupt = false;
                 slicer.getSlicingResult().then(function(r) {
+                    slicingStatus.canInterrupt = true;
                     if(show) {
                         ProgressActions.close();
                     }
@@ -503,7 +549,6 @@ define([
         e.preventDefault();
         if(previewMode) { return; }
         setMousePosition(e);
-        mouseDown = true;
 
         if (previewMode) {
             return;
@@ -551,6 +596,26 @@ define([
         render();
     }
 
+    function toggleTransformControl(hide) {
+        if(!$.isEmptyObject(SELECTED)) {
+            if(hide) {
+                removeFromScene('TransformControl');
+                SELECTED.outlineMesh.visible = false;
+                render();
+            }
+            else {
+                transformControl.attach(SELECTED);
+                SELECTED.outlineMesh.visible = true;
+                if(reactSrc.state.mode === 'rotate') {
+                    setRotateMode();
+                }
+                else {
+                    setScaleMode();
+                }
+            }
+        }
+    }
+
     function onMouseUp(e) {
         e.preventDefault();
         reactSrc.setState({
@@ -559,17 +624,11 @@ define([
         orbitControl.enabled = true;
         mouseDown = false;
         container.style.cursor = 'auto';
-        transformAxisChanged = '';
         checkOutOfBounds(SELECTED);
-        groundIt(SELECTED);
-
-        if (transformMode) {
-            selectObject(transformControl.object);
-        }
 
         if(blobExpired) {
             slicingStatus.showProgress = false;
-            startSlicing(slicingType.F);
+            doSlicing();
         }
 
         render();
@@ -628,6 +687,7 @@ define([
                 SELECTED.rotation.enteredY = updateDegreeWithStep(radianToDegree(SELECTED.rotation.y));
                 SELECTED.rotation.enteredZ = updateDegreeWithStep(radianToDegree(SELECTED.rotation.z));
                 updateObjectSize(SELECTED);
+                groundIt(SELECTED);
                 break;
             case 'objectChange':
                 updateObjectSize(e.target.object);
@@ -789,17 +849,6 @@ define([
         return d.promise();
     }
 
-    function uploadPreviewImage(blob) {
-        if(slicingStatus.canInterrupt) {
-            return slicer.uploadPreviewImage(blob);
-        }
-        else {
-            setTimeout(function() {
-                uploadPreviewImage(blob);
-            }, 1000);
-        }
-    }
-
     function getFCode() {
         var d = $.Deferred();
 
@@ -809,22 +858,13 @@ define([
         }
 
         if(!blobExpired) {
-            getBlobFromScene().then(function(blob) {
-                previewUrl = URL.createObjectURL(blob);
-                d.resolve(responseBlob, previewUrl);
-            });
+            d.resolve(responseBlob, previewUrl);
             return d.promise();
         }
 
-        _showWait(lang.print.gettingSlicingReport, !showStopButton);
-        slicingStatus.showProgress = true;
-        slicingStatus.pauseReport = true;
-        getBlobFromScene().then(function(blob) {
-            previewUrl = URL.createObjectURL(blob);
-            return uploadPreviewImage(blob);
-
-        }).then(function(response) {
-            slicingStatus.pauseReport = false;
+        if(!slicingStatus.isComplete) {
+            _showWait(lang.print.gettingSlicingReport, !showStopButton);
+            slicingStatus.showProgress = true;
             var observer = function(change) {
                 if(change[0].object.isComplete) {
                     Object.unobserve(slicingStatus, observer);
@@ -832,13 +872,10 @@ define([
                 }
             };
             Object.observe(slicingStatus, observer);
-
-            // error
-            if (response.status !== 'ok') {
-                ProgressActions.close();
-                d.resolve(response);
-            }
-        });
+        }
+        else {
+            d.resolve(responseBlob, previewUrl);
+        }
 
         return d.promise();
     }
@@ -848,6 +885,8 @@ define([
             reportTimmer = 1000; // 1 sec
 
         processor = function(report) {
+            slicingStatus.canInterrupt = true;
+            slicingStatus.pauseReport = false;
             if(report.status === 'complete') {
                 clearInterval(slicingStatus.reporter);
                 callback(report);
@@ -859,7 +898,20 @@ define([
 
         slicingStatus.reporter = setInterval(function() {
             if(!slicingStatus.pauseReport) {
-                slicer.reportSlicing(processor);
+                slicingStatus.canInterrupt = false;
+                slicingStatus.pauseReport = true;
+                slicer.reportSlicing(function(report) {
+                    slicingStatus.canInterrupt = true;
+                    slicingStatus.pauseReport = false;
+                    if(!report) { return; }
+                    if(report.status === 'complete') {
+                        clearInterval(slicingStatus.reporter);
+                        callback(report);
+                    }
+                    else if(report.status !== 'ok') {
+                        callback(report);
+                    }
+                });
             }
         }, reportTimmer);
 
@@ -945,7 +997,6 @@ define([
         SELECTED.size.z = z;
 
         slicingStatus.showProgress = false;
-        startSlicing(slicingType.F);
     }
 
     function setRotateMode() {
@@ -966,27 +1017,39 @@ define([
 
     function setAdvanceParameter(settings) {
         slicingStatus.pauseReport = true;
-        slicer.setParameter('advancedSettings', settings.custom).then(function(result, errors) {
-            slicingStatus.showProgress = false;
-            slicingStatus.pauseReport = false;
-            startSlicing(slicingType.F);
-            if(errors.length > 0) {
-                AlertActions.showPopupError(_id, errors.join('\n'));
+
+        var t = setInterval(function() {
+            if(slicingStatus.canInterrupt) {
+                slicer.setParameter('advancedSettings', settings.custom).then(function(result, errors) {
+                    slicingStatus.showProgress = false;
+                    slicingStatus.pauseReport = false;
+                    doSlicing();
+                    if(errors.length > 0) {
+                        AlertActions.showPopupError(_id, errors.join('\n'));
+                    }
+                });
+                blobExpired = true;
+                slicingStatus.pauseReport = false;
+                clearInterval(t);
             }
-        });
-        blobExpired = true;
+        }, 500);
     }
 
     function setParameter(name, value) {
         slicingStatus.pauseReport = true;
         var d = $.Deferred();
         blobExpired = true;
-        slicer.setParameter(name, value).then(function() {
-            slicingStatus.showProgress = false;
-            slicingStatus.pauseReport = false;
-            startSlicing(slicingType.F);
-            d.resolve('');
-        });
+        var t = setInterval(function() {
+            if(slicingStatus.canInterrupt) {
+                slicer.setParameter(name, value).then(function() {
+                    slicingStatus.showProgress = false;
+                    slicingStatus.pauseReport = false;
+                    doSlicing();
+                    d.resolve('');
+                });
+                clearInterval(t);
+            }
+        }, 500);
         return d.promise();
     }
 
@@ -1016,7 +1079,6 @@ define([
         }
 
         slicingStatus.showProgress = false;
-        startSlicing(slicingType.F);
     }
 
     function setImportWindowPosition() {
@@ -1174,7 +1236,9 @@ define([
 
     function removeSelected() {
         if (SELECTED && Object.keys(SELECTED).length > 0) {
-            var index;
+            var index,
+                uuid = SELECTED.uuid;
+
             scene.remove(SELECTED.outlineMesh);
             scene.remove(SELECTED);
             outlineScene.remove(SELECTED.outlineMesh);
@@ -1183,19 +1247,11 @@ define([
                 objects.splice(index, 1);
             }
 
-            //  model in backend
-            slicer.delete(SELECTED.uuid, function(result) {
-                if(result.status.toUpperCase() === DeviceConstants.ERROR) {
-                    AlertActions.showPopupError('slicer', result.error);
-                }
-            });
-
             transformControl.detach(SELECTED);
             selectObject(null);
-            render();
 
             setDefaultFileName();
-
+            render();
             if(objects.length === 0) {
                 reactSrc.setState({
                     openImportWindow: true,
@@ -1204,6 +1260,22 @@ define([
                     setImportWindowPosition();
                 });
             }
+
+            //  delete model in backend
+            /*
+            var t = setInterval(function() {
+                if(slicingStatus.canInterrupt) {
+                    clearInterval(t);
+                    slicingStatus.canInterrupt = false;
+                    slicer.delete(uuid, function(result) {
+                        slicingStatus.canInterrupt = true;
+                        if(result.status.toUpperCase() === DeviceConstants.ERROR) {
+                            AlertActions.showPopupError('slicer', result.error);
+                        }
+                    });
+                }
+            }, 500);
+            */
         }
     }
 
@@ -1386,12 +1458,16 @@ define([
             d = $.Deferred(),
             ol = _getCameraLook(camera);
 
-        camera.position.set(0, -180, 60);
+        camera.position.set(0, -215, 60);
         camera.rotation.set(originalCameraRotation.x, originalCameraRotation.y, originalCameraRotation.z, originalCameraRotation.order);
-        camera.lookAt(new THREE.Vector3(0,300,0));
+        camera.lookAt(new THREE.Vector3(0,380,0));
         render();
 
+        // var s = SELECTED;
+        toggleTransformControl(true);
         renderer.domElement.toBlob(function(blob) {
+            toggleTransformControl(false);
+            previewUrl = URL.createObjectURL(blob)
             camera.position.set(ccp.x, ccp.y, ccp.z);
             camera.rotation.set(ccr.x, ccr.y, ccr.z, ccr.order);
             camera.lookAt(ol);
@@ -1538,15 +1614,9 @@ define([
             obj.size.enteredX = boundingBox.box.size().x;
             obj.size.enteredY = boundingBox.box.size().y;
             obj.size.enteredZ = boundingBox.box.size().z;
-
             obj.size.originalX = boundingBox.box.size().x;
             obj.size.originalY = boundingBox.box.size().y;
             obj.size.originalZ = boundingBox.box.size().z;
-
-            obj.size.transformedSize = {};
-            obj.size.transformedSize.x = boundingBox.box.size().x;
-            obj.size.transformedSize.y = boundingBox.box.size().y;
-            obj.size.transformedSize.z = boundingBox.box.size().z;
         }
     }
 
@@ -1578,49 +1648,13 @@ define([
 
     function updateObjectSize(src) {
         var boundingBox = new THREE.BoundingBoxHelper(src),
-            size,
-            ratio;
+            size;
 
         boundingBox.update();
         size = boundingBox.box.size();
         src.size.x = size.x;
         src.size.y = size.y;
         src.size.z = size.z;
-
-        if(mouseDown && !transformAxisChanged) {
-            if(src.size.enteredX !== src.size.x) {
-                transformAxisChanged = 'x';
-            }
-            if(src.size.enteredY !== src.size.y) {
-                transformAxisChanged = 'y';
-            }
-            if(src.size.enteredZ !== src.size.z) {
-                transformAxisChanged = 'z';
-            }
-
-        }
-
-        if(reactSrc.state.scale.locked) {
-            var originalValue   = SELECTED.size.transformedSize[transformAxisChanged],// src.size[`entered${axisChanged.toUpperCase()}`],
-                newValue        = src.size[transformAxisChanged];
-
-            if(!newValue) { return; }
-
-            ratio = newValue / originalValue;
-            if(!ratio) {
-                console.log(newValue, originalValue);
-            }
-
-            Object.keys(SELECTED.size).forEach(function(property) {
-                if(property.length === 1) {
-                    if(property !== transformAxisChanged) {
-                        src.size[property] = SELECTED.size.transformedSize[property] * ratio;
-                    }
-                }
-            });
-
-        }
-
         src.size.enteredX = src.size.x;
         src.size.enteredY = src.size.y;
         src.size.enteredZ = src.size.z;
@@ -1635,8 +1669,6 @@ define([
         reactSrc.setState({
             modelSelected: src
         });
-
-        setSize(src.size.x, src.size.y, src.size.z, reactSrc.state.scale.locked);
     }
 
     function toScreenPosition(obj, cam) {
@@ -1777,12 +1809,13 @@ define([
                 });
             });
         }
-        slicingStatus.inProgress = false;
-        slicingStatus.isComplete = true;
+        slicingStatus.inProgress    = false;
+        slicingStatus.isComplete    = true;
+        slicingStatus.lastProgress  = null;
+        slicingStatus.lastReport    = null;
     }
 
     function _handleCancelPreview() {
-        console.log('preview cancel');
         previewMode = false;
         slicingStatus.showProgress = false;
         _closePreview();
@@ -1795,7 +1828,21 @@ define([
         if(blobExpired) {
             slicingStatus.showProgress = true;
             slicingStatus.needToCloseWait = true;
-            _showWait(lang.print.gettingSlicingReport, !showStopButton);
+            if(slicingStatus.lastProgress && slicingStatus.lastReport) {
+                ProgressActions.open(
+                    ProgressConstants.STEPPING,
+                    lang.print.rendering,
+                    lang.print.savingFilePreview,
+                    showStopButton,
+                    function() {},
+                    function() {
+                        ProgressActions.updating(slicingStatus.lastProgress, parseInt(slicingStatus.lastReport.percentage * 100));
+                    }
+                );
+            }
+            else {
+                _showWait(lang.print.gettingSlicingReport, !showStopButton);
+            }
         }
         else {
             _showWait(lang.print.drawingPreview, !showStopButton);
@@ -1827,7 +1874,6 @@ define([
     }
 
     function _closeWait() {
-        console.log('closing wait');
         ProgressActions.close();
     }
 
@@ -1925,15 +1971,6 @@ define([
         renderer.clearDepth();
     }
 
-    function setTransformedSize(x, y, z, locked) {
-        if(locked) {
-            SELECTED.size.transformedSize.x = x;
-            SELECTED.size.transformedSize.y = y;
-            SELECTED.size.transformedSize.z = z;
-            console.log(SELECTED.size.transformedSize);
-        }
-    }
-
     return {
         init                : init,
         appendModel         : appendModel,
@@ -1959,7 +1996,6 @@ define([
         executePrint        : executePrint,
         setCameraPosition   : setCameraPosition,
         clearSelection      : clearSelection,
-        clear               : clear,
-        setTransformedSize  : setTransformedSize
+        clear               : clear
     };
 });
