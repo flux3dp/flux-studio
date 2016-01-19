@@ -897,7 +897,9 @@ define(function() {
             no_password: {
                 content: 'Setup machine password via USB to enable connection for this computer',
                 caption: 'Password not set'
-            }
+            },
+            gCodeAreaTooBigCaption: 'Toolpath out of range',
+            gCodeAreaTooBigMessage: 'Please reduce the size of the object(s), or try to turn off raft, brim or skirt'
         },
         machine_status: {
             '-10': 'Raw mode',
