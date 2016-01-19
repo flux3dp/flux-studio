@@ -254,6 +254,10 @@ define([
                         onStop: payload.onStop || self.state.progress.onStop || function() {},
                         onFinished: payload.onFinished || self.state.progress.onFinished || function() {}
                     }
+                }, function() {
+                    if(typeof payload.onOpened === 'function') {
+                        payload.onOpened();
+                    }
                 });
             },
 

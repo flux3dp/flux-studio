@@ -359,7 +359,6 @@ define([
 
     function appendModels(files, index, callback) {
         slicingStatus.canInterrupt = false;
-        slicingStatus.last = 'append models';
         if(files.item(index).name.split('.').pop().toLowerCase() === 'stl') {
             FileSystem.writeFile(
                 files.item(index),
@@ -389,7 +388,6 @@ define([
         slicingStatus.isComplete = false;
         slicingStatus.canInterrupt = false;
         slicingStatus.pauseReport = true;
-        slicingStatus.last = 'start slicing';
         blobExpired = true;
 
         if(objects.length === 0 || !blobExpired) { return; }
@@ -439,6 +437,9 @@ define([
                 complete = lang.print.finishingUp,
                 show = slicingStatus.showProgress;
 
+            slicingStatus.lastProgress = progress;
+            slicingStatus.lastReport = report;
+
             if(show) {
                 ProgressActions.open(
                     ProgressConstants.STEPPING,
@@ -473,7 +474,6 @@ define([
                     ProgressActions.updating(complete, 100);
                 }
                 slicingStatus.canInterrupt = false;
-                slicingStatus.last = 'register';
                 slicer.getSlicingResult().then(function(r) {
                     slicingStatus.canInterrupt = true;
                     if(show) {
@@ -895,7 +895,6 @@ define([
             if(!slicingStatus.pauseReport) {
                 slicingStatus.canInterrupt = false;
                 slicingStatus.pauseReport = true;
-                slicingStatus.last = 'getslicingreport';
                 slicer.reportSlicing(function(report) {
                     slicingStatus.canInterrupt = true;
                     slicingStatus.pauseReport = false;
@@ -1036,13 +1035,15 @@ define([
         var d = $.Deferred();
         blobExpired = true;
         var t = setInterval(function() {
-            slicer.setParameter(name, value).then(function() {
-                slicingStatus.showProgress = false;
-                slicingStatus.pauseReport = false;
-                doSlicing();
-                d.resolve('');
-            });
-            clearInterval(t);
+            if(slicingStatus.canInterrupt) {
+                slicer.setParameter(name, value).then(function() {
+                    slicingStatus.showProgress = false;
+                    slicingStatus.pauseReport = false;
+                    doSlicing();
+                    d.resolve('');
+                });
+                clearInterval(t);
+            }
         }, 500);
         return d.promise();
     }
@@ -1803,8 +1804,10 @@ define([
                 });
             });
         }
-        slicingStatus.inProgress = false;
-        slicingStatus.isComplete = true;
+        slicingStatus.inProgress    = false;
+        slicingStatus.isComplete    = true;
+        slicingStatus.lastProgress  = null;
+        slicingStatus.lastReport    = null;
     }
 
     function _handleCancelPreview() {
@@ -1820,7 +1823,21 @@ define([
         if(blobExpired) {
             slicingStatus.showProgress = true;
             slicingStatus.needToCloseWait = true;
-            _showWait(lang.print.gettingSlicingReport, !showStopButton);
+            if(slicingStatus.lastProgress && slicingStatus.lastReport) {
+                ProgressActions.open(
+                    ProgressConstants.STEPPING,
+                    lang.print.rendering,
+                    lang.print.savingFilePreview,
+                    showStopButton,
+                    function() {},
+                    function() {
+                        ProgressActions.updating(slicingStatus.lastProgress, parseInt(slicingStatus.lastReport.percentage * 100));
+                    }
+                );
+            }
+            else {
+                _showWait(lang.print.gettingSlicingReport, !showStopButton);
+            }
         }
         else {
             _showWait(lang.print.drawingPreview, !showStopButton);
