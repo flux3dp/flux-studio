@@ -1442,7 +1442,7 @@ define([
             d = $.Deferred(),
             ol = _getCameraLook(camera);
 
-        camera.position.set(0, -215, 60);
+        camera.position.set(0, -180, 60);
         camera.rotation.set(originalCameraRotation.x, originalCameraRotation.y, originalCameraRotation.z, originalCameraRotation.order);
         camera.lookAt(new THREE.Vector3(0,380,0));
         render();
