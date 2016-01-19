@@ -78,6 +78,7 @@ define([
         slicingTimmer,
         slicingWaitTime = 500,
         stlTimmer,
+        transformAxisChanged = '',
         slicingReport = {},
         slicingStatus = {},
         lang = I18n.get();
@@ -544,6 +545,7 @@ define([
         e.preventDefault();
         if(previewMode) { return; }
         setMousePosition(e);
+        mouseDown = true;
 
         if (previewMode) {
             return;
@@ -619,6 +621,7 @@ define([
         orbitControl.enabled = true;
         mouseDown = false;
         container.style.cursor = 'auto';
+        transformAxisChanged = '';
         checkOutOfBounds(SELECTED);
 
         if(blobExpired) {
@@ -1598,9 +1601,15 @@ define([
             obj.size.enteredX = boundingBox.box.size().x;
             obj.size.enteredY = boundingBox.box.size().y;
             obj.size.enteredZ = boundingBox.box.size().z;
+
             obj.size.originalX = boundingBox.box.size().x;
             obj.size.originalY = boundingBox.box.size().y;
             obj.size.originalZ = boundingBox.box.size().z;
+
+            obj.size.transformedSize = {};
+            obj.size.transformedSize.x = boundingBox.box.size().x;
+            obj.size.transformedSize.y = boundingBox.box.size().y;
+            obj.size.transformedSize.z = boundingBox.box.size().z;
         }
     }
 
@@ -1632,13 +1641,49 @@ define([
 
     function updateObjectSize(src) {
         var boundingBox = new THREE.BoundingBoxHelper(src),
-            size;
+            size,
+            ratio;
 
         boundingBox.update();
         size = boundingBox.box.size();
         src.size.x = size.x;
         src.size.y = size.y;
         src.size.z = size.z;
+
+        if(mouseDown && !transformAxisChanged) {
+            if(src.size.enteredX !== src.size.x) {
+                transformAxisChanged = 'x';
+            }
+            if(src.size.enteredY !== src.size.y) {
+                transformAxisChanged = 'y';
+            }
+            if(src.size.enteredZ !== src.size.z) {
+                transformAxisChanged = 'z';
+            }
+
+        }
+
+        if(reactSrc.state.scale.locked) {
+            var originalValue   = SELECTED.size.transformedSize[transformAxisChanged],// src.size[`entered${axisChanged.toUpperCase()}`],
+                newValue        = src.size[transformAxisChanged];
+
+            if(!newValue) { return; }
+
+            ratio = newValue / originalValue;
+            if(!ratio) {
+                console.log(newValue, originalValue);
+            }
+
+            Object.keys(SELECTED.size).forEach(function(property) {
+                if(property.length === 1) {
+                    if(property !== transformAxisChanged) {
+                        src.size[property] = SELECTED.size.transformedSize[property] * ratio;
+                    }
+                }
+            });
+
+        }
+
         src.size.enteredX = src.size.x;
         src.size.enteredY = src.size.y;
         src.size.enteredZ = src.size.z;
@@ -1653,6 +1698,8 @@ define([
         reactSrc.setState({
             modelSelected: src
         });
+
+        setSize(src.size.x, src.size.y, src.size.z, reactSrc.state.scale.locked);
     }
 
     function toScreenPosition(obj, cam) {
@@ -1955,6 +2002,15 @@ define([
         renderer.clearDepth();
     }
 
+    function setTransformedSize(x, y, z, locked) {
+        if(locked) {
+            SELECTED.size.transformedSize.x = x;
+            SELECTED.size.transformedSize.y = y;
+            SELECTED.size.transformedSize.z = z;
+            console.log(SELECTED.size.transformedSize);
+        }
+    }
+
     return {
         init                : init,
         appendModel         : appendModel,
@@ -1980,6 +2036,7 @@ define([
         executePrint        : executePrint,
         setCameraPosition   : setCameraPosition,
         clearSelection      : clearSelection,
-        clear               : clear
+        clear               : clear,
+        setTransformedSize  : setTransformedSize
     };
 });
