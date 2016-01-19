@@ -16,7 +16,7 @@ define(function() {
             status: 'STATUS'
         },
         update: {
-            release_note: 'Release Note:',
+            release_note: '版本訊息:',
             firmware: {
                 caption: 'FLUX 有新的韌體更新',
                 message_pattern_1: '"%s" 有新的韌體更新。',
@@ -27,7 +27,7 @@ define(function() {
                 },
                 confirm: '確認更新',
                 upload_file: '請上傳檔案',
-                update_success: '更新成功',
+                update_success: '韌體更新上傳成功',
                 update_fail: '更新失敗'
             },
             software: {
@@ -37,7 +37,8 @@ define(function() {
             },
             skip: '跳過此版本',
             later: '稍候',
-            install: '下載'
+            install: '下載',
+            upload: '上傳'
         },
         topmenu: {
             version: '版本',

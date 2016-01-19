@@ -27,7 +27,7 @@ define(function() {
                 },
                 confirm: 'CONFIRM',
                 upload_file: 'Upload file',
-                update_success: 'Update Success',
+                update_success: 'Firmware update successfully uploaded',
                 update_fail: 'Update Fail'
             },
             software: {
@@ -37,7 +37,8 @@ define(function() {
             },
             skip: 'Skip This Version',
             later: 'LATER',
-            install: 'INSTALL'
+            install: 'INSTALL',
+            upload: 'UPLOAD'
         },
         topmenu: {
             version: 'Version',

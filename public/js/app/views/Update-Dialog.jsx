@@ -53,7 +53,10 @@ define([
                 onClick: this._onClose
             },
             {
-                label: lang.update.install,
+                label: ('software' === this.props.type ?
+                    lang.update.install :
+                    lang.update.upload
+                ),
                 dataAttrs: {
                     'ga-event': 'install-new-' + this.props.type.toLowerCase()
                 },
