@@ -706,11 +706,16 @@ define([
                 SELECTED.rotation.enteredX = updateDegreeWithStep(radianToDegree(SELECTED.rotation.x));
                 SELECTED.rotation.enteredY = updateDegreeWithStep(radianToDegree(SELECTED.rotation.y));
                 SELECTED.rotation.enteredZ = updateDegreeWithStep(radianToDegree(SELECTED.rotation.z));
-                updateObjectSize(SELECTED);
+                if(reactSrc.state.mode === 'scale') {
+                    updateObjectSize(e.target.object);
+                }
                 groundIt(SELECTED);
                 break;
             case 'objectChange':
-                updateObjectSize(e.target.object);
+                syncObjectOutline(SELECTED);
+                if(reactSrc.state.mode === 'scale') {
+                    updateObjectSize(e.target.object);
+                }
                 break;
         }
     }
