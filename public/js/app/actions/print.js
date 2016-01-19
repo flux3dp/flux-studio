@@ -385,11 +385,12 @@ define([
     }
 
     function startSlicing(type) {
-        slicingStatus.inProgress = true;
-        slicingStatus.isComplete = false;
-        slicingStatus.canInterrupt = false;
-        slicingStatus.pauseReport = true;
-        blobExpired = true;
+        slicingStatus.inProgress            = true;
+        slicingStatus.isComplete            = false;
+        slicingStatus.canInterrupt          = false;
+        slicingStatus.pauseReport           = true;
+        slicingStatus.hasError              = false;
+        blobExpired                         = true;
 
         if(objects.length === 0 || !blobExpired) { return; }
         var ids = [];
@@ -427,7 +428,9 @@ define([
 
     function registerSlicingProgress() {
         Object.observe(slicingReport, function(change) {
+
             slicingStatus.inProgress = true;
+
             if(slicingStatus.needToCloseWait) {
                 ProgressActions.close();
                 slicingStatus.needToCloseWait = false;
@@ -439,7 +442,9 @@ define([
                 show = slicingStatus.showProgress;
 
             slicingStatus.lastProgress = progress;
-            slicingStatus.lastReport = report;
+            if(!slicingStatus.hasError) {
+                slicingStatus.lastReport = report;
+            }
 
             if(show) {
                 ProgressActions.open(
@@ -452,12 +457,29 @@ define([
             }
 
             if(report.status === 'error') {
-
-                reactSrc.setState({ hasOutOfBoundsObject: true });
-                if(show) {
-                    ProgressActions.close();
+                clearInterval(slicingStatus.reporter);
+                if(report.error === 'gcode area too big') {
+                    slicingStatus.lastReport.error = lang.message.gCodeAreaTooBigMessage;
+                    slicingStatus.lastReport.caption = lang.message.gCodeAreaTooBigCaption;
                 }
-                AlertActions.showPopupError('', report.error);
+                else {
+                    slicingStatus.lastReport.caption = lang.alert.error;
+                }
+
+                if(show || previewMode) {
+                    ProgressActions.close();
+                    _closePreview();
+
+                    AlertActions.showPopupError(
+                        '',
+                        slicingStatus.lastReport.error,
+                        slicingStatus.lastReport.caption);
+                }
+                else {
+                    slicingStatus.hasError = true;
+                }
+                slicingStatus.lastProgress = '';
+                reactSrc.setState({ hasOutOfBoundsObject: true });
             }
             else if(report.status === 'warning') {
                 AlertActions.showWarning(report.message);
@@ -1853,6 +1875,15 @@ define([
     }
 
     function _showPreview() {
+        if(slicingStatus.hasError) {
+            AlertActions.showPopupError(
+                '',
+                slicingStatus.lastReport.error,
+                slicingStatus.lastReport.caption);
+            setTimeout(function() { _handleCancelPreview(); }, 500);
+            return;
+        }
+
         selectObject(null);
         previewMode = true;
 
@@ -1909,10 +1940,10 @@ define([
     }
 
     function _closePreview() {
-        $('#preview').parents('label').find('input').prop('checked',false);
         previewMode = false;
         reactSrc.setState({ previewMode: false }, function() {
             togglePreview(false);
+            $('#preview').parents('label').find('input').prop('checked',false);
         });
     }
 
