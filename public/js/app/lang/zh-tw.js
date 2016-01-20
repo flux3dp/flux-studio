@@ -893,7 +893,13 @@ define(function() {
             device_is_used: '裝置正被使用中，是否要終止現在任務？',
             invalidFile: '檔案不是正確的 STL 格式',
             failGeneratingPreview: '無法儲存預覽圖',
-            slicingFailed: 'slic3r 無法型成可列印的 model'
+            slicingFailed: 'slic3r 無法型成可列印的 model',
+            no_password: {
+                content: '請用 USB 設定機器密碼，以提供此台電腦連線',
+                caption: '未設定密碼'
+            },
+            gCodeAreaTooBigCaption: '工作路徑超過列印範圍',
+            gCodeAreaTooBigMessage: '請縮小物體尺寸、關閉底座、Brim或是Skirt'
         },
         machine_status: {
             '-10': 'Raw Mode',

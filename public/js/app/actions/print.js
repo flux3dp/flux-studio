@@ -332,6 +332,7 @@ define([
             mesh.rotation.enteredY = 0;
             mesh.rotation.enteredZ = 0;
             mesh.position.isOutOfBounds = false;
+            mesh.scale.locked = true;
             /* end customized property */
 
             if (mesh.geometry.type !== 'Geometry') {
@@ -385,11 +386,12 @@ define([
     }
 
     function startSlicing(type) {
-        slicingStatus.inProgress = true;
-        slicingStatus.isComplete = false;
-        slicingStatus.canInterrupt = false;
-        slicingStatus.pauseReport = true;
-        blobExpired = true;
+        slicingStatus.inProgress            = true;
+        slicingStatus.isComplete            = false;
+        slicingStatus.canInterrupt          = false;
+        slicingStatus.pauseReport           = true;
+        slicingStatus.hasError              = false;
+        blobExpired                         = true;
 
         if(objects.length === 0 || !blobExpired) { return; }
         var ids = [];
@@ -427,7 +429,9 @@ define([
 
     function registerSlicingProgress() {
         Object.observe(slicingReport, function(change) {
+
             slicingStatus.inProgress = true;
+
             if(slicingStatus.needToCloseWait) {
                 ProgressActions.close();
                 slicingStatus.needToCloseWait = false;
@@ -439,7 +443,9 @@ define([
                 show = slicingStatus.showProgress;
 
             slicingStatus.lastProgress = progress;
-            slicingStatus.lastReport = report;
+            if(!slicingStatus.hasError) {
+                slicingStatus.lastReport = report;
+            }
 
             if(show) {
                 ProgressActions.open(
@@ -452,12 +458,29 @@ define([
             }
 
             if(report.status === 'error') {
-
-                reactSrc.setState({ hasOutOfBoundsObject: true });
-                if(show) {
-                    ProgressActions.close();
+                clearInterval(slicingStatus.reporter);
+                if(report.error === 'gcode area too big') {
+                    slicingStatus.lastReport.error = lang.message.gCodeAreaTooBigMessage;
+                    slicingStatus.lastReport.caption = lang.message.gCodeAreaTooBigCaption;
                 }
-                AlertActions.showPopupError('', report.error);
+                else {
+                    slicingStatus.lastReport.caption = lang.alert.error;
+                }
+
+                if(show || previewMode) {
+                    ProgressActions.close();
+                    _closePreview();
+
+                    AlertActions.showPopupError(
+                        '',
+                        slicingStatus.lastReport.error,
+                        slicingStatus.lastReport.caption);
+                }
+                else {
+                    slicingStatus.hasError = true;
+                }
+                slicingStatus.lastProgress = '';
+                reactSrc.setState({ hasOutOfBoundsObject: true });
             }
             else if(report.status === 'warning') {
                 AlertActions.showWarning(report.message);
@@ -684,11 +707,18 @@ define([
                 SELECTED.rotation.enteredX = updateDegreeWithStep(radianToDegree(SELECTED.rotation.x));
                 SELECTED.rotation.enteredY = updateDegreeWithStep(radianToDegree(SELECTED.rotation.y));
                 SELECTED.rotation.enteredZ = updateDegreeWithStep(radianToDegree(SELECTED.rotation.z));
-                updateObjectSize(SELECTED);
+                if(reactSrc.state.mode === 'scale') {
+                    updateObjectSize(e.target.object);
+                }
                 groundIt(SELECTED);
                 break;
             case 'objectChange':
-                updateObjectSize(e.target.object);
+                if(reactSrc.state.mode === 'scale') {
+                    updateObjectSize(e.target.object);
+                }
+                else {
+                    updateObjectRotation(e.target.object);
+                }
                 break;
         }
     }
@@ -1024,7 +1054,9 @@ define([
                 slicer.setParameter('advancedSettings', settings.custom).then(function(result, errors) {
                     slicingStatus.showProgress = false;
                     slicingStatus.pauseReport = false;
-                    doSlicing();
+                    if(objects.length > 0) {
+                        doSlicing();
+                    }
                     if(errors.length > 0) {
                         AlertActions.showPopupError(_id, errors.join('\n'));
                     }
@@ -1046,7 +1078,9 @@ define([
                 slicer.setParameter(name, value).then(function() {
                     slicingStatus.showProgress = false;
                     slicingStatus.pauseReport = false;
-                    doSlicing();
+                    if(objects.length > 0) {
+                        doSlicing();
+                    }
                     d.resolve('');
                 });
                 clearInterval(t);
@@ -1585,7 +1619,6 @@ define([
         if (!$.isEmptyObject(SELECTED)) {
             updateFromScene('TransformControl');
         }
-        // renderer.render(previewMode ? previewScene : scene, camera);
         renderer.clear();
         renderer.render( outlineScene, camera );
 
@@ -1640,54 +1673,35 @@ define([
     }
 
     function updateObjectSize(src) {
-        var boundingBox = new THREE.BoundingBoxHelper(src),
-            size,
-            ratio;
+        src.size.enteredX = src.scale.x * src.size.originalX;
+        src.size.enteredY = src.scale.y * src.size.originalY;
+        src.size.enteredZ = src.scale.z * src.size.originalZ;
 
-        boundingBox.update();
-        size = boundingBox.box.size();
-        src.size.x = size.x;
-        src.size.y = size.y;
-        src.size.z = size.z;
+        src.size.x = src.scale.x * src.size.originalX;
+        src.size.y = src.scale.y * src.size.originalY;
+        src.size.z = src.scale.z * src.size.originalZ;
 
-        if(mouseDown && !transformAxisChanged) {
-            if(src.size.enteredX !== src.size.x) {
-                transformAxisChanged = 'x';
-            }
-            if(src.size.enteredY !== src.size.y) {
-                transformAxisChanged = 'y';
-            }
-            if(src.size.enteredZ !== src.size.z) {
-                transformAxisChanged = 'z';
-            }
+        syncObjectOutline(src);
 
-        }
+        reactSrc.setState({
+            modelSelected: src
+        });
 
-        if(reactSrc.state.scale.locked) {
-            var originalValue   = SELECTED.size.transformedSize[transformAxisChanged],// src.size[`entered${axisChanged.toUpperCase()}`],
-                newValue        = src.size[transformAxisChanged];
+    }
 
-            if(!newValue) { return; }
-
-            ratio = newValue / originalValue;
-            if(!ratio) {
-                console.log(newValue, originalValue);
-            }
-
-            Object.keys(SELECTED.size).forEach(function(property) {
-                if(property.length === 1) {
-                    if(property !== transformAxisChanged) {
-                        src.size[property] = SELECTED.size.transformedSize[property] * ratio;
-                    }
+    function getLargestPropertyValue(obj) {
+        var v = 0;
+        for (var property in obj) {
+            if (obj.hasOwnProperty(property)) {
+                if (obj[property] > v) {
+                    v = obj[property];
                 }
-            });
-
+            }
         }
+        return v;
+    }
 
-        src.size.enteredX = src.size.x;
-        src.size.enteredY = src.size.y;
-        src.size.enteredZ = src.size.z;
-
+    function updateObjectRotation(src) {
         src.rotation.enteredX = updateDegreeWithStep(radianToDegree(src.rotation.x));
         src.rotation.enteredY = updateDegreeWithStep(radianToDegree(src.rotation.y));
         src.rotation.enteredZ = updateDegreeWithStep(radianToDegree(src.rotation.z));
@@ -1698,8 +1712,6 @@ define([
         reactSrc.setState({
             modelSelected: src
         });
-
-        setSize(src.size.x, src.size.y, src.size.z, reactSrc.state.scale.locked);
     }
 
     function toScreenPosition(obj, cam) {
@@ -1853,6 +1865,15 @@ define([
     }
 
     function _showPreview() {
+        if(slicingStatus.hasError) {
+            AlertActions.showPopupError(
+                '',
+                slicingStatus.lastReport.error,
+                slicingStatus.lastReport.caption);
+            setTimeout(function() { _handleCancelPreview(); }, 500);
+            return;
+        }
+
         selectObject(null);
         previewMode = true;
 
@@ -1909,10 +1930,10 @@ define([
     }
 
     function _closePreview() {
-        $('#preview').parents('label').find('input').prop('checked',false);
         previewMode = false;
         reactSrc.setState({ previewMode: false }, function() {
             togglePreview(false);
+            $('#preview').parents('label').find('input').prop('checked',false);
         });
     }
 
@@ -2002,12 +2023,9 @@ define([
         renderer.clearDepth();
     }
 
-    function setTransformedSize(x, y, z, locked) {
-        if(locked) {
-            SELECTED.size.transformedSize.x = x;
-            SELECTED.size.transformedSize.y = y;
-            SELECTED.size.transformedSize.z = z;
-            console.log(SELECTED.size.transformedSize);
+    function toggleScaleLock(locked) {
+        if(SELECTED) {
+            SELECTED.scale.locked = locked;
         }
     }
 
@@ -2037,6 +2055,6 @@ define([
         setCameraPosition   : setCameraPosition,
         clearSelection      : clearSelection,
         clear               : clear,
-        setTransformedSize  : setTransformedSize
+        toggleScaleLock     : toggleScaleLock
     };
 });

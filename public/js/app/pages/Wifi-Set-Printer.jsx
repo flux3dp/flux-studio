@@ -88,7 +88,7 @@ define([
                         AlertStore.removeYesListener(startSetting);
                         AlertStore.removeNoListener(cancelSetting);
                     },
-                    cancelSetting = function(){
+                    cancelSetting = function() {
                         AlertStore.removeYesListener(startSetting);
                         AlertStore.removeNoListener(cancelSetting);
                     },

@@ -167,7 +167,7 @@ define([
                     }
                 };
                 events.onError = function(result) {
-                    callback(result);
+                    progress.push(result);
                 };
                 ws.send(`report_slicing`);
                 lastOrder = 'report_slicing';
