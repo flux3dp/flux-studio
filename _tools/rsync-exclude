@@ -2,7 +2,8 @@
 sass
 .DS_*
 ghost
-lib
+./lib
+public/lib/
 README.md
 _tools
 node_modules
