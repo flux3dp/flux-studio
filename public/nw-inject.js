@@ -31,17 +31,18 @@ var fs = requireNode('fs'),
         if ('Windows_NT' === osType) {
             // TODO: has to assign env root for slic3r
             args[slic3rPathIndex] = libPath + '/lib/Slic3r/slic3r-console.exe';
-            ghostCmd = libPath + '/lib/ghost/ghost.exe' ;
+            ghostCmd = libPath + '/lib/flux_api/flux_api.exe' ;
         }
         else if ('Linux' === osType) {
             args[slic3rPathIndex] = libPath + '/lib/Slic3r/bin/slic3r';
-            ghostCmd = libPath + '/lib/ghost/ghost';
+            ghostCmd = libPath + '/lib/flux_api/flux_api';
         }
         else {
             args[slic3rPathIndex] = libPath + '/lib/Slic3r';
-            ghostCmd = libPath + '/lib/ghost/ghost';
+            ghostCmd = libPath + '/lib/flux_api/flux_api';
         }
 
+        fs.chmodSync(ghostCmd, 0777);
         fs.chmodSync(args[slic3rPathIndex], 0777);
 
         ghost = spawn(ghostCmd, args);
@@ -85,20 +86,19 @@ var fs = requireNode('fs'),
             switch (osType) {
             case 'Windows_NT':
                 appRoot = dirParts.join(path.sep);
-                seperate_package_path = appRoot + '/lib/ghost/ghost.exe';
+                seperate_package_path = appRoot + '/lib/flux_api/flux_api.exe';
                 break;
             case 'Linux':
                 break;
             case 'Darwin':
                 contentPos = dirParts.indexOf('Contents');
+                contentPos = (-1 < contentPos ? contentPos : dirParts.length);
                 appRoot = dirParts.slice(0, contentPos + 1).join(path.sep);
-                seperate_package_path = appRoot + '/lib/ghost/ghost';
+                seperate_package_path = appRoot + '/lib/flux_api/flux_api';
                 break;
             }
 
-            fs.chmodSync(seperate_package_path, 0777);
             fs.stat(seperate_package_path, function(err, stat) {
-
                 if (null === err) {
                     executeGhost(currentPort, appRoot);
                 }
@@ -144,7 +144,7 @@ probe(currentPort, findPort);
 currentWindow.on('close', function() {
     // Pretend to be closed already
     this.hide();
-    exec('pkill -f ghost', function(error, stdout, stderr) {
+    exec('pkill -f flux_api', function(error, stdout, stderr) {
         console.log(error, stdout, stderr);
     });
     this.close(true);

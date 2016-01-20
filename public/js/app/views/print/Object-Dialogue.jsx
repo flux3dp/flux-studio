@@ -138,9 +138,9 @@ define([
             }
         },
 
-        _handleToggleScaleLock: function(e) {
+        _handleToggleScaleLock: function() {
+            this.props.onScaleLock(_size, !this.state.scaleLocked);
             this.setState({ scaleLocked: !this.state.scaleLocked });
-            this.props.onScaleLock(!this.state.scaleLocked);
         },
 
         _handleRotationChange: function(e, value) {

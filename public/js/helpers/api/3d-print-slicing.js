@@ -158,13 +158,16 @@ define([
                         if(progress.length > 0) {
                             callback(progress.pop());
                         }
+                        else {
+                            callback(null);
+                        }
                     }
                     else {
                         progress.push(result);
                     }
                 };
                 events.onError = function(result) {
-                    callback(result);
+                    progress.push(result);
                 };
                 ws.send(`report_slicing`);
                 lastOrder = 'report_slicing';

@@ -27,7 +27,7 @@ define(function() {
                 },
                 confirm: 'CONFIRM',
                 upload_file: 'Upload file',
-                update_success: 'Update Success',
+                update_success: 'Firmware update successfully uploaded',
                 update_fail: 'Update Fail'
             },
             software: {
@@ -37,7 +37,8 @@ define(function() {
             },
             skip: 'Skip This Version',
             later: 'LATER',
-            install: 'INSTALL'
+            install: 'INSTALL',
+            upload: 'UPLOAD'
         },
         topmenu: {
             version: 'Version',
@@ -891,7 +892,14 @@ define(function() {
             },
             device_is_used: 'The device is being used, do you want to abort current task?',
             invalidFile: 'The file is not a valid stl file',
-            failGeneratingPreview: 'Fail to generate preview'
+            failGeneratingPreview: 'Fail to generate preview',
+            slicingFailed: 'slic3r is unable to slice this model',
+            no_password: {
+                content: 'Setup machine password via USB to enable connection for this computer',
+                caption: 'Password not set'
+            },
+            gCodeAreaTooBigCaption: 'Toolpath out of range',
+            gCodeAreaTooBigMessage: 'Please reduce the size of the object(s), or try to turn off raft, brim or skirt'
         },
         machine_status: {
             '-10': 'Raw mode',

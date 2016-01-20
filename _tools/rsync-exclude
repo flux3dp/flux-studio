@@ -2,4 +2,14 @@
 sass
 .DS_*
 ghost
-lib
+./lib
+public/lib/
+README.md
+_tools
+node_modules
+output.fcode
+output.gcode
+output.stl
+preprocess.svg
+preview.png
+spec

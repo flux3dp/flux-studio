@@ -238,7 +238,8 @@ select {
  *    `input` and others.
  */
 button,
-html input[type="button"], input[type="reset"],
+html input[type="button"],
+input[type="reset"],
 input[type="submit"] {
     -webkit-appearance: button;
     /* 2 */
@@ -413,8 +414,8 @@ th {
     left: -1.85714286em; }
 
 .fa-border {
-    padding: 0.2em 0.25em 0.15em;
-    border: solid 0.08em #eee;
+    padding: .2em .25em .15em;
+    border: solid .08em #eee;
     border-radius: .1em; }
 
 .pull-right {
@@ -2072,7 +2073,7 @@ th {
     font-style: normal;
     font-weight: 300;
     src: local("Open Sans"), local("OpenSans"), url(/fonts/open-sans-latin.woff2) format("woff2");
-    unicode-range: U0-0FF, U131, U152-153, U2C 6, U2DA, U2DC, U2000-206F, U2074, U20AC, U2212, U2215, UE0FF, UEFFD, UF000; }
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215, U+E0FF, U+EFFD, U+F000; }
 
 /**
  * global customize styles
@@ -2784,8 +2785,8 @@ input[type=range]:focus::-webkit-slider-runnable-track {
     position: relative;
     text-align: center;
     text-decoration: none;
-    -webkit-transition: opacity 0.1s ease, background-color 0.1s ease, color 0.1s ease, box-shadow 0.1s ease, background 0.1s ease;
-    transition: opacity 0.1s ease, background-color 0.1s ease, color 0.1s ease, box-shadow 0.1s ease, background 0.1s ease;
+    -webkit-transition: opacity .1s ease,background-color .1s ease,color .1s ease,box-shadow .1s ease,background .1s ease;
+    transition: opacity .1s ease,background-color .1s ease,color .1s ease,box-shadow .1s ease,background .1s ease;
     -webkit-user-select: none;
     user-select: none;
     -webkit-tap-highlight-color: transparent; }
@@ -3066,8 +3067,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         text-overflow: ellipsis;
         white-space: nowrap;
         word-break: break-all; }
-        .ui-dialog-menu .dialog-label:hover .btn,
-        .ui-dialog-menu .dialog-label:hover {
+        .ui-dialog-menu .dialog-label:hover .btn, .ui-dialog-menu .dialog-label:hover {
             background: #B3B3B3;
             color: #E0E0DF; }
         .ui-dialog-menu .dialog-label .btn {
@@ -3247,7 +3247,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
             font-size: 1.3rem;
             height: 2.8rem;
             line-height: calc(2.8rem - 4px);
-            margin: 0 0.6rem 0 0;
+            margin: 0 .6rem 0 0;
             max-width: 13rem; }
             .modal-window .btn-h-group .btn:last-child {
                 margin: 0; }
@@ -3291,7 +3291,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
             content: "";
             display: block;
             height: 100%;
-            transition: width 0.3s ease;
+            transition: width .3s ease;
             width: 0; }
     .modal-progress.waiting .modal-alert {
         padding-bottom: 1.6em; }
@@ -3566,7 +3566,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         .top-menu .brand-logo .menu {
             float: left; }
         .top-menu .brand-logo .logo-icon {
-            transition: all 0.25s;
+            transition: all .25s;
             width: 49px; }
         .top-menu .brand-logo .func-name {
             color: #B3B3B3;
@@ -3578,7 +3578,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
             background: #fff;
             display: none;
             left: 5.05rem;
-            padding: 0.65rem 2.6rem;
+            padding: .65rem 2.6rem;
             position: relative;
             top: 27px; }
             .top-menu .brand-logo .menu .arrow-top-left-flat {
@@ -3613,13 +3613,12 @@ input[type=range]:focus::-webkit-slider-runnable-track {
             height: 3.2rem;
             margin: 0 auto;
             transform-origin: 50% 50%;
-            transition: all 0.25s;
+            transition: all .25s;
             width: 3.2rem; }
         .top-menu .item:hover {
             filter: brightness(70%);
             -webkit-filter: brightness(70%); }
-        .top-menu .item p,
-        .top-menu .item:last-child {
+        .top-menu .item p, .top-menu .item:last-child {
             margin: 0; }
     .top-menu .device {
         cursor: pointer;
@@ -3641,7 +3640,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
                 margin: 0 0 7px 0;
                 transform: rotate(60deg);
                 transform-origin: 50% 50%;
-                transition: all 0.25s;
+                transition: all .25s;
                 width: 3.6rem; }
             .top-menu .device .device-icon:hover img {
                 transform: rotate(240deg); }
@@ -3716,8 +3715,8 @@ input[type=range]:focus::-webkit-slider-runnable-track {
     height: 0;
     overflow: hidden;
     transform: scaleY(0);
-    -webkit-transition: all 0.3s ease;
-    transition: all 0.3s ease;
+    -webkit-transition: all .3s ease;
+    transition: all .3s ease;
     -webkit-transform-origin: 0 0;
     transform-origin: 0 0; }
 
@@ -4763,7 +4762,7 @@ input.switch:checked ~ label:after {
     /* NEW, Spec - Opera 12.1, Firefox 20+ */
     font-size: 20px;
     position: absolute;
-    transition: all 0.1s ease;
+    transition: all .1s ease;
     width: 280px;
     z-index: 1; }
     .print-studio .object-dialogue .accordion-body {
@@ -4913,7 +4912,7 @@ input.switch:checked ~ label:after {
     position: absolute;
     right: 31px;
     top: 0;
-    transition: all 0.3s ease-in 0s;
+    transition: all .3s ease-in 0s;
     width: 20px; }
 
 .onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-inner {
@@ -4935,7 +4934,7 @@ input.switch:checked ~ label:after {
     width: 800px;
     height: 600px;
     background-color: #FFF;
-    box-shadow: 0px 0px 12px 0px rgba(255, 255, 255, 0.8); }
+    box-shadow: 0px 0px 12px 0px rgba(128, 128, 128, 0.8); }
 
 .settings header {
     height: 47px;
@@ -5701,7 +5700,7 @@ input.switch:checked ~ label:after {
                 line-height: 26px;
                 min-width: 66px; }
     .laser-studio .operating-panel .caption {
-        padding: 0 0.3em 0 0; }
+        padding: 0 .3em 0 0; }
     .laser-studio .operating-panel .popup-selection {
         display: -webkit-box;
         /* OLD - iOS 6-, Safari 3.1-6 */
@@ -5790,7 +5789,7 @@ input.switch:checked ~ label:after {
     visibility: hidden; }
 
 .laser-studio .laser-object .bounce {
-    transition: all 0.3s ease; }
+    transition: all .3s ease; }
 
 .laser-studio .laser-object .image-active {
     background: rgba(255, 255, 255, 0.6); }
@@ -5824,7 +5823,7 @@ input.switch:checked ~ label:after {
     display: flex;
     /* NEW, Spec - Opera 12.1, Firefox 20+ */
     font-size: 20px;
-    transition: all 0.1s ease;
+    transition: all .1s ease;
     z-index: 1;
     will-change: top,left,transform; }
     .laser-studio .object-position .accordion-body {
@@ -6005,7 +6004,7 @@ input.switch:checked ~ label:after {
         font-size: 20px;
         margin: 0;
         position: absolute;
-        transition: all 0.1s ease;
+        transition: all .1s ease;
         width: 270px;
         z-index: 1; }
         .scan-studio .manipulation-panel .wrapper,
@@ -6151,15 +6150,14 @@ input.switch:checked ~ label:after {
         position: static;
         z-index: 1; }
         .scan-studio .setup-panel .caption {
-            padding: 0 0.3em 0 0;
+            padding: 0 .3em 0 0;
             text-transform: uppercase; }
         .scan-studio .setup-panel .btn-calibrate {
             background: transparent;
             border: none;
             font-size: inherit;
             margin: 0; }
-            .scan-studio .setup-panel .btn-calibrate:active,
-            .scan-studio .setup-panel .btn-calibrate:hover {
+            .scan-studio .setup-panel .btn-calibrate:active, .scan-studio .setup-panel .btn-calibrate:hover {
                 box-shadow: none;
                 color: inherit; }
     .scan-studio .scan-progress {

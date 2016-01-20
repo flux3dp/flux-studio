@@ -5,7 +5,7 @@ define(function() {
     var body = document.querySelector('body'),
         tracker = document.createElement('script');
 
-    if (false === window.FLUX.debug) {
+    if (false === window.FLUX.debug && true === window.FLUX.onLine) {
         tracker.setAttribute('src', 'https://d2zah9y47r7bi2.cloudfront.net/releases/current/tracker.js');
         tracker.setAttribute('async', true);
         body.appendChild(tracker);
