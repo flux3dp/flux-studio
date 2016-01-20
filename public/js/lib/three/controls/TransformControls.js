@@ -859,9 +859,18 @@
 
 				if ( scope.space == "local" ) {
 
+					// locked is added from print.js to determine if the scaling is locked
 					if ( scope.axis == "XYZ" || scope.object.scale.locked) {
 
-						scale = 1 + ( ( point.y ) / sensitivity );
+						if(scope.axis === 'XYZ') {
+
+							scale = 1 + ( ( point.y ) / sensitivity );
+
+						} else {
+
+							scale = 1 + ( ( point[scope.axis.toLowerCase()] ) / sensitivity );
+
+						}
 
 						scope.object.scale.x = oldScale.x * scale;
 						scope.object.scale.y = oldScale.y * scale;
