@@ -279,7 +279,6 @@ define([
                     if(answer === 'tour') {
                         this.setState({ tutorialOn: true });
                         tutorialMode = true;
-                        console.log("start take tutorial")
                     }
                 },
 
@@ -360,7 +359,7 @@ define([
                 _handleToggleScaleLock: function(size, isLocked) {
                     _scale.locked = isLocked;
                     this.setState({ scale: _scale });
-                    director.setTransformedSize(size.x, size.y, size.z, isLocked);
+                    director.toggleScaleLock(isLocked);
                 },
 
                 _handleResize: function(size, isLocked) {

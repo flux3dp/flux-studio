@@ -332,6 +332,7 @@ define([
             mesh.rotation.enteredY = 0;
             mesh.rotation.enteredZ = 0;
             mesh.position.isOutOfBounds = false;
+            mesh.scale.locked = true;
             /* end customized property */
 
             if (mesh.geometry.type !== 'Geometry') {
@@ -1618,7 +1619,6 @@ define([
         if (!$.isEmptyObject(SELECTED)) {
             updateFromScene('TransformControl');
         }
-        // renderer.render(previewMode ? previewScene : scene, camera);
         renderer.clear();
         renderer.render( outlineScene, camera );
 
@@ -1673,56 +1673,13 @@ define([
     }
 
     function updateObjectSize(src) {
-        var boundingBox = new THREE.BoundingBoxHelper(src),
-            size,
-            ratio;
+        src.size.enteredX = src.scale.x * src.size.originalX;
+        src.size.enteredY = src.scale.y * src.size.originalY;
+        src.size.enteredZ = src.scale.z * src.size.originalZ;
 
-        boundingBox.update();
-        size = boundingBox.box.size();
-        src.size.x = size.x;
-        src.size.y = size.y;
-        src.size.z = size.z;
-
-        if(mouseDown && !transformAxisChanged) {
-            if(src.size.enteredX !== src.size.x) {
-                transformAxisChanged = 'x';
-            }
-            if(src.size.enteredY !== src.size.y) {
-                transformAxisChanged = 'y';
-            }
-            if(src.size.enteredZ !== src.size.z) {
-                transformAxisChanged = 'z';
-            }
-        }
-
-        if(reactSrc.state.scale.locked) {
-            var originalValue   = SELECTED.size.transformedSize[transformAxisChanged],// src.size[`entered${axisChanged.toUpperCase()}`],
-                newValue        = src.size[transformAxisChanged];
-
-            if(!newValue) { return; }
-
-            ratio = newValue / originalValue;
-
-            if(transformAxisChanged === 'x') {
-                src.size.y = SELECTED.size.transformedSize.y * ratio;
-                src.size.z = SELECTED.size.transformedSize.z * ratio;
-                render();
-            }
-            else if(transformAxisChanged === 'y') {
-                src.size.x = SELECTED.size.transformedSize.x * ratio;
-                src.size.z = SELECTED.size.transformedSize.z * ratio;
-                render();
-            }
-            else {
-                src.size.x = SELECTED.size.transformedSize.x * ratio;
-                src.size.y = SELECTED.size.transformedSize.y * ratio;
-                render();
-            }
-        }
-
-        src.size.enteredX = src.size.x;
-        src.size.enteredY = src.size.y;
-        src.size.enteredZ = src.size.z;
+        src.size.x = src.scale.x * src.size.originalX;
+        src.size.y = src.scale.y * src.size.originalY;
+        src.size.z = src.scale.z * src.size.originalZ;
 
         syncObjectOutline(src);
 
@@ -1730,7 +1687,6 @@ define([
             modelSelected: src
         });
 
-        setSize(src.size.x, src.size.y, src.size.z, reactSrc.state.scale.locked);
     }
 
     function getLargestPropertyValue(obj) {
@@ -2067,12 +2023,9 @@ define([
         renderer.clearDepth();
     }
 
-    function setTransformedSize(x, y, z, locked) {
-        if(locked) {
-            SELECTED.size.transformedSize.x = x;
-            SELECTED.size.transformedSize.y = y;
-            SELECTED.size.transformedSize.z = z;
-            console.log(SELECTED.size.transformedSize);
+    function toggleScaleLock(locked) {
+        if(SELECTED) {
+            SELECTED.scale.locked = locked;
         }
     }
 
@@ -2102,6 +2055,6 @@ define([
         setCameraPosition   : setCameraPosition,
         clearSelection      : clearSelection,
         clear               : clear,
-        setTransformedSize  : setTransformedSize
+        toggleScaleLock     : toggleScaleLock
     };
 });

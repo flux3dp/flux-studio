@@ -859,7 +859,7 @@
 
 				if ( scope.space == "local" ) {
 
-					if ( scope.axis == "XYZ") {
+					if ( scope.axis == "XYZ" || scope.object.scale.locked) {
 
 						scale = 1 + ( ( point.y ) / sensitivity );
 
@@ -871,11 +871,26 @@
 
 						point.applyMatrix4( tempMatrix.getInverse( worldRotationMatrix ) );
 
-						if ( scope.axis == "X" ) scope.object.scale.x = oldScale.x * ( 1 + point.x / sensitivity );
-						if ( scope.axis == "Y" ) scope.object.scale.y = oldScale.y * ( 1 + point.y / sensitivity );
-						if ( scope.axis == "Z" ) scope.object.scale.z = oldScale.z * ( 1 + point.z / 50 );
+						if ( scope.axis === "X" ) {
+
+							scale = ( 1 + point.x / sensitivity );
+							scope.object.scale.x = oldScale.x * scale;
+						}
+
+						if ( scope.axis === "Y" ) {
+							scale = ( 1 + point.y / sensitivity );
+							scope.object.scale.y = oldScale.y * scale;
+						}
+
+						if ( scope.axis === "Z" ) {
+							scale = ( 1 + point.z / sensitivity );
+							scope.object.scale.z = oldScale.z * scale;
+						}
 
 					}
+
+					scope.object.scale.value = scale;
+					scope.object.oldScale = oldScale;
 
 				}
 
