@@ -33,7 +33,7 @@ while true; do
 
             unzip $DIR/lib/fluxghost-win-latest-x86.zip -d $DIR/lib/
             unzip $DIR/lib/slic3r-x86.zip -d $DIR/lib/
-            mv $DIR/lib/fluxghost-win-latest-x86/ghost $DIR/lib/ghost
+            mv $DIR/lib/fluxghost-win-latest-x86/flux_api $DIR/lib/flux_api
             rm -r $DIR/lib/slic3r-x86.zip $DIR/lib/fluxghost-win-latest-x86 $DIR/lib/fluxghost-win-latest-x86.zip
 
             find /var/www/web-panel/lib/ -name "__MACOSX" | xargs rm -r
@@ -70,7 +70,7 @@ while true; do
 
             unzip $DIR/lib/fluxghost-win-latest-x64.zip -d $DIR/lib/
             unzip $DIR/lib/slic3r-x64.zip -d $DIR/lib/
-            mv $DIR/lib/fluxghost-win-latest-x64/ghost $DIR/lib/ghost
+            mv $DIR/lib/fluxghost-win-latest-x64/flux_api $DIR/lib/flux_api
             rm -r $DIR/lib/slic3r-x64.zip $DIR/lib/fluxghost-win-latest-x64 $DIR/lib/fluxghost-win-latest-x64.zip
 
             find /var/www/web-panel/lib/ -name "__MACOSX" | xargs rm -r
