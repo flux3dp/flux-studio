@@ -295,14 +295,15 @@ define([
                     this.setState({ leftPanelReady: false });
                     var isOn = !this.state.raftOn;
                     director.setParameter('raft', isOn ? '1' : '0').then(function() {
-                        this.setState({ leftPanelReady: true });
+                        this.setState({
+                            leftPanelReady: true,
+                            raftOn: isOn
+                        });
                     }.bind(this));
                     advancedSettings.raft_layers = isOn ? advancedSettings.raft : 0;
                     advancedSettings.custom = advancedSettings.custom.replace(
                         `raft_layers = ${isOn ? 0 : advancedSettings.raft}`,
                         `raft_layers = ${isOn ? advancedSettings.raft : 0}`);
-
-                    this.setState({ raftOn: isOn });
                     Config().write('advanced-settings', JSON.stringify(advancedSettings));
                 },
 
@@ -323,7 +324,10 @@ define([
                 },
 
                 _handleToggleAdvancedSettingPanel: function() {
-                    this.setState({ showAdvancedSettings: !this.state.showAdvancedSettings });
+                    this.setState({ showAdvancedSettings: !this.state.showAdvancedSettings }, function() {
+                        allowDeleteObject = !this.state.showAdvancedSettings;
+                    });
+
                 },
 
                 _handleGoClick: function() {
@@ -369,6 +373,7 @@ define([
 
                 _handleCloseAdvancedSetting: function() {
                     this.setState({ showAdvancedSettings: false });
+                    allowDeleteObject = true;
                 },
 
                 _handleApplyAdvancedSetting: function(setting) {

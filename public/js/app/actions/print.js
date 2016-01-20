@@ -712,9 +712,11 @@ define([
                 groundIt(SELECTED);
                 break;
             case 'objectChange':
-                syncObjectOutline(SELECTED);
                 if(reactSrc.state.mode === 'scale') {
                     updateObjectSize(e.target.object);
+                }
+                else {
+                    updateObjectRotation(e.target.object);
                 }
                 break;
         }
@@ -1051,7 +1053,9 @@ define([
                 slicer.setParameter('advancedSettings', settings.custom).then(function(result, errors) {
                     slicingStatus.showProgress = false;
                     slicingStatus.pauseReport = false;
-                    doSlicing();
+                    if(objects.length > 0) {
+                        doSlicing();
+                    }
                     if(errors.length > 0) {
                         AlertActions.showPopupError(_id, errors.join('\n'));
                     }
@@ -1073,7 +1077,9 @@ define([
                 slicer.setParameter(name, value).then(function() {
                     slicingStatus.showProgress = false;
                     slicingStatus.pauseReport = false;
-                    doSlicing();
+                    if(objects.length > 0) {
+                        doSlicing();
+                    }
                     d.resolve('');
                 });
                 clearInterval(t);
@@ -1687,7 +1693,6 @@ define([
             if(src.size.enteredZ !== src.size.z) {
                 transformAxisChanged = 'z';
             }
-
         }
 
         if(reactSrc.state.scale.locked) {
@@ -1697,24 +1702,50 @@ define([
             if(!newValue) { return; }
 
             ratio = newValue / originalValue;
-            if(!ratio) {
-                console.log(newValue, originalValue);
+
+            if(transformAxisChanged === 'x') {
+                src.size.y = SELECTED.size.transformedSize.y * ratio;
+                src.size.z = SELECTED.size.transformedSize.z * ratio;
+                render();
             }
-
-            Object.keys(SELECTED.size).forEach(function(property) {
-                if(property.length === 1) {
-                    if(property !== transformAxisChanged) {
-                        src.size[property] = SELECTED.size.transformedSize[property] * ratio;
-                    }
-                }
-            });
-
+            else if(transformAxisChanged === 'y') {
+                src.size.x = SELECTED.size.transformedSize.x * ratio;
+                src.size.z = SELECTED.size.transformedSize.z * ratio;
+                render();
+            }
+            else {
+                src.size.x = SELECTED.size.transformedSize.x * ratio;
+                src.size.y = SELECTED.size.transformedSize.y * ratio;
+                render();
+            }
         }
 
         src.size.enteredX = src.size.x;
         src.size.enteredY = src.size.y;
         src.size.enteredZ = src.size.z;
 
+        syncObjectOutline(src);
+
+        reactSrc.setState({
+            modelSelected: src
+        });
+
+        setSize(src.size.x, src.size.y, src.size.z, reactSrc.state.scale.locked);
+    }
+
+    function getLargestPropertyValue(obj) {
+        var v = 0;
+        for (var property in obj) {
+            if (obj.hasOwnProperty(property)) {
+                if (obj[property] > v) {
+                    v = obj[property];
+                }
+            }
+        }
+        return v;
+    }
+
+    function updateObjectRotation(src) {
         src.rotation.enteredX = updateDegreeWithStep(radianToDegree(src.rotation.x));
         src.rotation.enteredY = updateDegreeWithStep(radianToDegree(src.rotation.y));
         src.rotation.enteredZ = updateDegreeWithStep(radianToDegree(src.rotation.z));
@@ -1725,8 +1756,6 @@ define([
         reactSrc.setState({
             modelSelected: src
         });
-
-        setSize(src.size.x, src.size.y, src.size.z, reactSrc.state.scale.locked);
     }
 
     function toScreenPosition(obj, cam) {
