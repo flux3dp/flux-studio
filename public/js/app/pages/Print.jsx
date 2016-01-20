@@ -383,9 +383,9 @@ define([
                 },
 
                 _handleImport: function(e) {
-                    var files = e.target.files;
-                    director.appendModels(files, 0, function() {
-                        e.target = null;
+                    var t = e.target;
+                    director.appendModels(t.files, 0, function() {
+                        t.value = null;
                     }.bind(this));
                 },
 
