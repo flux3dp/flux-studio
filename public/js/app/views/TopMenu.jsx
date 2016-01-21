@@ -57,6 +57,13 @@ define([
                     className: genericClassName,
                     label: lang.menu.scan,
                     imgSrc: '/img/menu/icon_scan.svg'
+                },
+                {
+                    name: 'holder',
+                    displayName: 'HOLDER',
+                    className: genericClassName,
+                    label: lang.menu.holder,
+                    imgSrc: '/img/menu/icon_laser.svg'
                 }
             ];
 
