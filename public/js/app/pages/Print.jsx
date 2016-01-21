@@ -19,6 +19,7 @@ define([
     'helpers/device-master',
     'app/stores/global-store',
     'app/actions/global-actions',
+    'app/constants/global-constants',
     'app/constants/device-constants',
     'jsx!widgets/Tour-Guide',
     'app/actions/alert-actions',
@@ -51,6 +52,7 @@ define([
     DeviceMaster,
     GlobalStore,
     GlobalActions,
+    GlobalConstants,
     DeviceConstants,
     TourGuide,
     AlertActions,
@@ -428,7 +430,7 @@ define([
                             AlertActions.showPopupError('', lang.print.out_of_range_message, lang.print.out_of_range);
                             return;
                         }
-                        GlobalActions.showMonitor(selectedPrinter, fcode, previewUrl);
+                        GlobalActions.showMonitor(selectedPrinter, fcode, previewUrl, GlobalConstants.PRINT);
                         //Tour popout after show monitor delay
                         setTimeout(function() {
                             if(tutorialMode) {
