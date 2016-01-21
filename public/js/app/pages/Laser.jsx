@@ -6,6 +6,7 @@ define([
     'app/actions/progress-actions',
     'jsx!widgets/Select',
     'jsx!views/laser/Setup-Panel',
+    'jsx!views/holder/Setup-Panel',
     'jsx!views/laser/Image-Panel',
     'jsx!widgets/File-Uploader',
     'jsx!widgets/Modal',
@@ -20,7 +21,8 @@ define([
     AlertActions,
     ProgressActions,
     SelectView,
-    SetupPanel,
+    LaserSetupPanel,
+    HolderSetupPanel,
     ImagePanel,
     FileUploader,
     Modal,
@@ -34,7 +36,13 @@ define([
     return function(args) {
         args = args || {};
 
-        var view = React.createClass({
+        var storageDefaultKey = storageDefaultKey = args.props.page.toLowerCase() + '-defaults',
+            view = React.createClass({
+                getDefaultProps: function() {
+                    return {
+                        page: ''
+                    };
+                },
 
                 getInitialState: function() {
                     return {
@@ -101,10 +109,15 @@ define([
                 _onDropUpload: function(e) {
                     e.preventDefault();
 
-                    var uploadedFiles = e.originalEvent.dataTransfer.files,
+                    var self = this,
+                        uploadedFiles = e.originalEvent.dataTransfer.files,
                         checkFiles = function(files) {
                             var allowedfiles = [],
-                                checker = /^image\/\w+$/,
+                                checker = (
+                                    'laser' === self.props.page ?
+                                    /^image\/\w+$/ :
+                                    /^image\svg$/
+                                ),
                                 file;
 
                             for (var i = 0; i < files.length; i++) {
@@ -138,15 +151,27 @@ define([
                 // Private events
                 _fetchFormalSettings: function() {
                     var self = this,
-                        defaultSettings = config().read('laser-defaults'),
-                        max = args.state.lang.laser.advanced.form.power.max;
+                        defaultSettings = config().read(storageDefaultKey),
+                        max = args.state.lang.laser.advanced.form.power.max,
+                        data;
 
-                    return {
-                        object_height: defaultSettings.objectHeight,
-                        laser_speed: defaultSettings.material.data.laser_speed,
-                        power: defaultSettings.material.data.power / max,
-                        shading: (true === self.refs.setupPanel.isShading() ? 1 : 0)
-                    };
+                    if ('laser' === self.props.page) {
+                        data = {
+                            object_height: defaultSettings.objectHeight,
+                            laser_speed: defaultSettings.material.data.laser_speed,
+                            power: defaultSettings.material.data.power / max,
+                            shading: (true === self.refs.setupPanel.isShading() ? 1 : 0)
+                        };
+                    }
+                    else {
+                        data = {
+                            lift_height: defaultSettings.liftHeight || 0.1,
+                            draw_height: defaultSettings.drawHeight || 0.1,
+                            speed: defaultSettings.speed || 0.1
+                        };
+                    }
+
+                    return data;
                 },
 
                 _inactiveSelectImage: function(e) {
@@ -190,24 +215,60 @@ define([
                                 self._inactiveSelectImage(e);
                             }
                         },
+                        paramPanel,
                         setupPanelDefaults;
 
-                    config().read('laser-defaults', {
+                    config().read(storageDefaultKey, {
                         onFinished: function(response) {
                             setupPanelDefaults = response || {};
 
-                            if ('undefined' === typeof setupPanelDefaults.material) {
-                                setupPanelDefaults.material = lang.laser.advanced.form.object_options.options[0];
+                            if ('laser' === self.props.page) {
+                                if ('undefined' === typeof setupPanelDefaults.material) {
+                                    setupPanelDefaults.material = lang.laser.advanced.form.object_options.options[0];
+                                }
+
+                                setupPanelDefaults.objectHeight = setupPanelDefaults.objectHeight || 0;
+                                setupPanelDefaults.isShading = (
+                                    'boolean' === typeof setupPanelDefaults.isShading ?
+                                    setupPanelDefaults.isShading :
+                                    true
+                                );
+                            }
+                            // holder
+                            else {
+                                setupPanelDefaults = {
+                                    liftHeight: response.liftHeight || 0.1,
+                                    drawHeight: response.drawHeight || 0.1,
+                                    speed: response.speed || 0.1
+                                }
                             }
 
-                            setupPanelDefaults.objectHeight = setupPanelDefaults.objectHeight || 0;
-                            setupPanelDefaults.isShading = ('boolean' === typeof setupPanelDefaults.isShading ? setupPanelDefaults.isShading : true);
-
                             if ('' === response) {
-                                config().write('laser-defaults', setupPanelDefaults);
+                                config().write(storageDefaultKey, setupPanelDefaults);
                             }
                         }
                     });
+
+                    paramPanel = (
+                        'laser' === this.props.page ?
+                        <LaserSetupPanel
+                            lang={lang}
+                            page={this.props.page}
+                            className="operating-panel"
+                            imageFormat={this.state.fileFormat}
+                            defaults={setupPanelDefaults}
+                            ref="setupPanel"
+                            onShadingChanged={this._onShadingChanged}
+                        /> :
+                        <HolderSetupPanel
+                            lang={lang}
+                            page={this.props.page}
+                            className="operating-panel"
+                            imageFormat={this.state.fileFormat}
+                            defaults={setupPanelDefaults}
+                            ref="setupPanel"
+                        />
+                    );
 
                     return (
                         <div ref="laserStage" className="laser-stage">
@@ -215,14 +276,7 @@ define([
                                 <div ref="laserObject" data-close-image-panel="true" className="laser-object border-circle" onClick={closeSubPopup}/>
                                 {imagePanel}
                             </section>
-                            <SetupPanel
-                                lang={lang}
-                                className="operating-panel"
-                                imageFormat={this.state.fileFormat}
-                                defaults={setupPanelDefaults}
-                                ref="setupPanel"
-                                onShadingChanged={this._onShadingChanged}
-                            />
+                            {paramPanel}
                         </div>
                     );
                 },
@@ -260,6 +314,7 @@ define([
                 _renderFileUploader: function(lang) {
                     var self = this,
                         uploadStyle = false === self.state.hasImage ? 'file-importer absolute-center' : 'hide',
+                        accept = ('laser' === self.props.page ? 'image/*' : 'image/svg'),
                         onError = function(msg) {
                             ProgressActions.close();
                             AlertActions.showPopupError('laser-upload-error', msg);
@@ -270,7 +325,7 @@ define([
                             <lable>{lang.laser.import}</lable>
                             <FileUploader
                                 ref="fileUploader"
-                                accept="image/*"
+                                accept={accept}
                                 multiple={true}
                                 onReadFileStarted={this.state.laserEvents.onReadFileStarted}
                                 onReadingFile={this.state.laserEvents.onFileReading}
