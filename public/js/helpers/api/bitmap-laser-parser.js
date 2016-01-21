@@ -160,6 +160,7 @@ define([
                         'go',
                         opts.fileMode || '-f'
                     ],
+                    duration,
                     total_length = 0,
                     blob;
 
@@ -170,13 +171,14 @@ define([
                     }
                     else if ('complete' === data.status) {
                         total_length = data.length;
+                        duration = data.time;
                     }
                     else if (true === data instanceof Blob) {
                         blobs.push(data);
                         blob = new Blob(blobs);
 
                         if (total_length === blob.size) {
-                            opts.onFinished(blob, args[1]);
+                            opts.onFinished(blob, args[1], duration);
                         }
                     }
 
