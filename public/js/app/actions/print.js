@@ -76,7 +76,7 @@ define([
         defaultFileName = '',
         cameraLight,
         slicingTimmer,
-        slicingWaitTime = 500,
+        slicingWaitTime = 3000,
         stlTimmer,
         transformAxisChanged = '',
         slicingReport = {},
@@ -214,6 +214,7 @@ define([
         // init print controller
         slicer = printSlicing();
         slicingStatus.canInterrupt = true;
+        slicingStatus.inProgress = false;
 
         registerDropToImport();
         registerSlicingProgress();
@@ -283,7 +284,6 @@ define([
                     AlertActions.showPopupError('', result.error);
                     return;
                 }
-                slicingStatus.inProgress = true;
                 if(slicingStatus.canInterrupt) {
                     startSlicing(slicingType.F);
                 }
@@ -387,7 +387,6 @@ define([
 
     function startSlicing(type) {
         slicingStatus.inProgress            = true;
-        slicingStatus.isComplete            = false;
         slicingStatus.canInterrupt          = false;
         slicingStatus.pauseReport           = true;
         slicingStatus.hasError              = false;
@@ -399,7 +398,12 @@ define([
             ids.push(obj.uuid);
         });
 
-        sendGCodeParameters().then(function() {
+        if(previewMode) {
+            _clearPath();
+            _showPreview();
+        }
+
+        syncObjectParameter().then(function() {
             return stopSlicing();
         }).then(function() {
             return getBlobFromScene();
@@ -418,13 +422,26 @@ define([
     }
 
     function doSlicing() {
-        clearInterval(slicingTimmer);
-        slicingTimmer = setInterval(function() {
-            if(slicingStatus.canInterrupt) {
-                startSlicing(slicingType.F);
-                clearInterval(slicingTimmer);
-            }
-        }, slicingWaitTime);
+        _clearPath();
+        if(slicingStatus.inProgress) {
+            clearTimeout(slicingTimmer);
+            slicingTimmer = setTimeout(function() {
+                var t = setInterval(function() {
+                    if(slicingStatus.canInterrupt) {
+                        clearInterval(t);
+                        startSlicing(slicingType.F);
+                    }
+                }, 500);
+            }, slicingWaitTime)
+        }
+        else {
+            slicingTimmer = setInterval(function() {
+                if(slicingStatus.canInterrupt) {
+                    clearInterval(slicingTimmer);
+                    startSlicing(slicingType.F);
+                }
+            }, 500);
+        }
     }
 
     function registerSlicingProgress() {
@@ -844,7 +861,7 @@ define([
                 return slicer.uploadPreviewImage(blob);
             }).then(function(response) {
                 if (response.status === 'ok') {
-                    sendGCodeParameters().then(function() {
+                    syncObjectParameter().then(function() {
                         slicer.goG(ids, function(result) {
                             if (result instanceof Blob) {
                                 blobExpired = false;
@@ -893,7 +910,7 @@ define([
             return d.promise();
         }
 
-        if(!slicingStatus.isComplete) {
+        if(slicingStatus.inProgress) {
             _showWait(lang.print.gettingSlicingReport, !showStopButton);
             slicingStatus.showProgress = true;
             var observer = function(change) {
@@ -1405,11 +1422,12 @@ define([
         }
     }
 
-    function sendGCodeParameters() {
+    function syncObjectParameter() {
         var d = $.Deferred();
         _syncObjectParameter(objects, 0, function() {
             d.resolve('');
         });
+
         return d.promise();
     }
 
@@ -1844,7 +1862,9 @@ define([
     function _handleSliceComplete() {
         if(previewMode) {
             _showWait(lang.print.drawingPreview, !showStopButton);
+            slicingStatus.canInterrupt = false;
             slicer.getPath().then(function(result) {
+                slicingStatus.canInterrupt = true;
                 printPath = result;
                 _drawPath().then(function() {
                     ProgressActions.close();
@@ -1853,7 +1873,6 @@ define([
             });
         }
         slicingStatus.inProgress    = false;
-        slicingStatus.isComplete    = true;
         slicingStatus.lastProgress  = null;
         slicingStatus.lastReport    = null;
     }
@@ -1899,7 +1918,9 @@ define([
         else {
             _showWait(lang.print.drawingPreview, !showStopButton);
             if(!printPath) {
+                slicingStatus.canInterrupt = false;
                 slicer.getPath().then(function(result) {
+                    slicingStatus.canInterrupt = true;
                     printPath = result;
                     _drawPath().then(function() {
                         _closeWait();
@@ -1977,13 +1998,15 @@ define([
         }, function() {
             d.resolve('');
         });
-        _showPath();
+        render();
+        _setProgressMessage('');
         return d.promise();
     }
 
-    function _showPath() {
+    function _clearPath() {
+        printPath = [];
+        previewScene.children.splice(1, previewScene.children.length - 1);
         render();
-        _setProgressMessage('');
     }
 
     function _setProgressMessage(message) {
@@ -2038,7 +2061,6 @@ define([
         alignCenter         : alignCenter,
         removeSelected      : removeSelected,
         duplicateSelected   : duplicateSelected,
-        sendGCodeParameters : sendGCodeParameters,
         setSize             : setSize,
         downloadGCode       : downloadGCode,
         downloadFCode       : downloadFCode,
