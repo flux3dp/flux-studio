@@ -35,7 +35,7 @@ function(React, $, Backbone, display, config, appSettings, detectWebgl) {
                     ],
                     // go to studio
                     [
-                        /^studio\/?(print|laser|scan|usb|settings|device)\/?(.*)?/,
+                        /^studio\/?(print|laser|scan|usb|settings|device|holder)\/?(.*)?/,
                         'studio',
                         this.studio
                     ],
@@ -119,7 +119,8 @@ function(React, $, Backbone, display, config, appSettings, detectWebgl) {
                 map = {
                     'print': this.print,
                     'settings': this.settings,
-                    'laser': this.laser,
+                    'laser': this.laser.bind(null, page),
+                    'holder': this.laser.bind(null, page),
                     'scan': this.scan,
                     'usb': this.usb,
                     'device': this.device
@@ -185,10 +186,13 @@ function(React, $, Backbone, display, config, appSettings, detectWebgl) {
             });
         },
 
-        laser: function(step) {
+        laser: function(page, step) {
             require(['jsx!pages/Laser'], function(view) {
                 var args = {
-                    step: step
+                    step: step,
+                    props: {
+                        page: page
+                    }
                 };
                 _display(view, args);
             });
