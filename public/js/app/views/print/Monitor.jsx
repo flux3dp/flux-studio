@@ -11,7 +11,8 @@ define([
     'helpers/file-system',
     'app/actions/global-actions',
     'helpers/sprintf',
-    'helpers/round'
+    'helpers/round',
+    'helpers/duration-formatter'
 ], function(
     $,
     React,
@@ -25,7 +26,8 @@ define([
     FileSystem,
     GlobalActions,
     sprintf,
-    round
+    round,
+    formatDuration
 ) {
     'use strict';
 
@@ -858,7 +860,7 @@ define([
 
             if(report.prog && !!totalTimeInSeconds) {
                 percentageDone = parseInt(report.prog * 100);
-                timeLeft = this._formatTime(totalTimeInSeconds * (1 - report.prog));
+                timeLeft = formatDuration(totalTimeInSeconds * (1 - report.prog));
                 progress = `${percentageDone}%, ${timeLeft} ${lang.monitor.left}`;
             }
             else {
@@ -1318,7 +1320,7 @@ define([
                     }
                 );
 
-            if(_duration === '') {
+            if(_duration === '' && !!this.props.slicingStatus) {
                 _duration = this._formatTime(this.props.slicingStatus.time, true);
             }
 
