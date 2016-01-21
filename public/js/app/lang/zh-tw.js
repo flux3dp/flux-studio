@@ -214,7 +214,8 @@ define(function() {
             scan: '掃描',
             usb: 'USB',
             device: '裝置',
-            setting: '設定'
+            setting: '設定',
+            holder: '筆架'
         },
         settings: {
             caption: '設定',
@@ -493,6 +494,18 @@ define(function() {
             out_of_range_message: '請縮小物件尺寸',
             drawingPreview: '繪製預覽路徑，請稍候',
             gettingSlicingReport: '正在取得最新切片狀態'
+        },
+        holder: {
+            pen_up: '移動高度',
+            pen_down: '繪製高度',
+            speed: '速度',
+            pen_up_title: '筆不會碰到繪製表面的 Z 軸距離',
+            pen_down_title: '筆會碰到繪製表面的 Z 軸距離, 必須比移動高度低',
+            speed_title: '握架模組移動的速度',
+            units: {
+                mms: 'mm/s',
+                mm: 'mm'
+            }
         },
         laser: {
             import: '匯入',
