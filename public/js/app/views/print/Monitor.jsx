@@ -1319,6 +1319,7 @@ define([
                 );
 
             if(_duration === '') {
+                this.props.slicingStatus = this.props.slicingStatus || { time: 0 };
                 _duration = this._formatTime(this.props.slicingStatus.time, true);
             }
 
