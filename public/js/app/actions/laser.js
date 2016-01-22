@@ -96,7 +96,8 @@ define([
                         grayscale: {
                             is_rgba: true,
                             is_shading: self.refs.setupPanel.isShading(),
-                            threshold: parseInt(threshold, 10)
+                            threshold: parseInt(threshold, 10),
+                            is_svg: ('svg' === self.state.fileFormat)
                         },
                         onComplete: function(result) {
                             $img.attr('src', result.canvas.toDataURL('image/png'));
@@ -536,7 +537,8 @@ define([
                         grayscale: {
                             is_rgba: true,
                             is_shading: self.refs.setupPanel.isShading(),
-                            threshold: 128
+                            threshold: 128,
+                            is_svg: ('svg' === self.state.fileFormat)
                         },
                         onComplete: function(result) {
                             file.url = result.canvas.toDataURL('svg' === file.extension ? 'image/svg+xml' : 'image/png');
