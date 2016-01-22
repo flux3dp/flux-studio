@@ -167,7 +167,7 @@ define([
                         data = {
                             lift_height: defaultSettings.liftHeight || 0.1,
                             draw_height: defaultSettings.drawHeight || 0.1,
-                            speed: defaultSettings.speed || 0.1
+                            speed: defaultSettings.speed || 20
                         };
                     }
 
@@ -239,7 +239,7 @@ define([
                                 setupPanelDefaults = {
                                     liftHeight: response.liftHeight || 0.1,
                                     drawHeight: response.drawHeight || 0.1,
-                                    speed: response.speed || 0.1
+                                    speed: response.speed || 20
                                 }
                             }
 
