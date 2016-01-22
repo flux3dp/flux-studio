@@ -85,7 +85,7 @@ define([
 
         // Lifecycle
         _renderLiftHeight: function(lang) {
-            var max = Math.min(150, this.state.defaults.drawHeight);
+            var min = Math.max(0.1, this.state.defaults.drawHeight);
 
             return {
                 label: (
@@ -102,8 +102,8 @@ define([
                             defaultUnit="mm"
                             defaultValue={this.state.defaults.liftHeight}
                             getValue={this._updateDefaults}
-                            min={0.1}
-                            max={max}
+                            min={min}
+                            max={150}
                         />
                     </div>
                 )
@@ -111,7 +111,7 @@ define([
         },
 
         _renderDrawHeight: function(lang) {
-            var min = Math.max(0.1, this.state.defaults.liftHeight);
+            var max = Math.min(150, this.state.defaults.liftHeight);
 
             return {
                 label: (
@@ -128,8 +128,8 @@ define([
                             defaultUnit="mm"
                             defaultValue={this.state.defaults.drawHeight}
                             getValue={this._updateDefaults}
-                            min={min}
-                            max={150}
+                            min={0.1}
+                            max={max}
                         />
                     </div>
                 )
@@ -154,7 +154,7 @@ define([
                             defaultValue={this.state.defaults.speed}
                             getValue={this._updateDefaults}
                             min={0.1}
-                            max={20}
+                            max={150}
                         />
                     </div>
                 )
