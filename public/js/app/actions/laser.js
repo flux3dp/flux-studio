@@ -314,6 +314,7 @@ define([
 
                 var $ft_controls = $laser_platform.find('.ft-controls'),
                     _callback = function() {
+                        GlobalActions.sliceComplete({ time: arguments[2] });
                         callback.apply(null, arguments);
                         ProgressActions.close();
                     },
@@ -661,7 +662,9 @@ define([
                 }
 
                 if ('svg' === currentFileFormat) {
-                    svgWebSocket = svgWebSocket || svgLaserParser();
+                    svgWebSocket = svgWebSocket || svgLaserParser({
+                        isLaser: 'laser' === self.props.page
+                    });
                 }
                 else {
                     bitmapWebSocket = bitmapWebSocket || bitmapLaserParser();
