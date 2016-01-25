@@ -321,12 +321,18 @@ define([
                     console.log(error);
                 };
 
+                fileName = fileName.replace(/ /g, '_');
                 var ext = fileName.split('.');
                 if(ext[ext.length - 1] === 'fc') {
+
                     ws.send(`upload application/fcode ${blob.size} ${uploadPath}/${fileName}`);
                 }
                 else if(ext[ext.length - 1] === 'gcode') {
-                    ws.send(`upload text/gcode ${blob.size} ${uploadPath}/${fileName} 1`);
+                    fileName = fileName.split('.');
+                    fileName.splice(fileName.length - 2, 1);
+                    fileName.push('fc');
+                    fileName = fileName.join('.');
+                    ws.send(`upload text/gcode ${blob.size} ${uploadPath}/${fileName}`);
                 }
 
                 return d.promise();
