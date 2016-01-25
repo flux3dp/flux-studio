@@ -28,12 +28,12 @@ gulp.task('webserver', function() {
 
 gulp.task('dev', ['sass:watch', 'webserver']);
 
-gulp.task('test', function() {
+gulp.task('unit-test', function() {
     return gulp.
-        src('./_test/**/*.js', { read: false }).
+        src('./_test/unit/**/*.js', { read: false }).
         pipe(mocha({
             require: [
-                process.cwd() + '/_test/bootstrap.js'
+                process.cwd() + '/_test/unit/bootstrap.js'
             ]
         })).
         once('error', function() {
