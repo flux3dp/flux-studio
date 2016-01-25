@@ -49,7 +49,7 @@ define([
             this.removeListener(GlobalConstants.CANCEL_PREVIEW, callback);
         },
 
-        removeSliceComplete(callback) {
+        removeSliceCompleteListener(callback) {
             this.removeListener(GlobalConstants.SLICE_COMPLETE, callback);
         },
 

@@ -483,6 +483,7 @@ define(function() {
             goTitle: 'Prepare to print',
             deviceTitle: 'Show device monitor',
             rendering: 'Slicing',
+            reRendering: 'Re-Slicing',
             finishingUp: 'Finishing up...',
             savingFilePreview: 'Saving file preview',
             uploading: 'Uploading to slicing engine',

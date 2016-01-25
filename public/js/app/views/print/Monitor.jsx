@@ -835,7 +835,7 @@ define([
                 lastError = mainError;
                 if(mainError.length > 0) {
                     console.log('showing error', mainError);
-                    AlertActions.showPopupError('', mainError);
+                    AlertActions.showPopupError('', mainError + '<br/>' + subError);
                 }
             }
 
