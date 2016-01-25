@@ -426,6 +426,9 @@ define([
                     });
 
                     director.getFCode().then(function(fcode, previewUrl) {
+                        if(director.getSlicingStatus().inProgress) {
+                            return;
+                        }
                         if(!(fcode instanceof Blob)) {
                             AlertActions.showPopupError('', lang.print.out_of_range_message, lang.print.out_of_range);
                             return;
