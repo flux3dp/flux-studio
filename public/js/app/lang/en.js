@@ -495,7 +495,7 @@ define(function() {
             drawingPreview: 'Drawing preview path, please wait',
             gettingSlicingReport: 'Getting slicing status'
         },
-        holder: {
+        draw: {
             pen_up: 'Moving Height',
             pen_down: 'Drawing Height',
             speed: 'Speed',

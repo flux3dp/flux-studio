@@ -69,7 +69,7 @@ define([
                     defaults: opts
                 };
 
-            config().write('holder-defaults', opts);
+            config().write('draw-defaults', opts);
 
             self.setState(state);
         },
@@ -89,10 +89,10 @@ define([
 
             return {
                 label: (
-                    <div title={lang.holder.pen_up_title}>
-                        <span className="caption">{lang.holder.pen_up}</span>
+                    <div title={lang.draw.pen_up_title}>
+                        <span className="caption">{lang.draw.pen_up}</span>
                         <span>{this.state.defaults.liftHeight}</span>
-                        <span>{lang.holder.units.mm}</span>
+                        <span>{lang.draw.units.mm}</span>
                     </div>
                 ),
                 content: (
@@ -115,10 +115,10 @@ define([
 
             return {
                 label: (
-                    <div title={lang.holder.pen_down_title}>
-                        <span className="caption">{lang.holder.pen_down}</span>
+                    <div title={lang.draw.pen_down_title}>
+                        <span className="caption">{lang.draw.pen_down}</span>
                         <span>{this.state.defaults.drawHeight}</span>
-                        <span>{lang.holder.units.mm}</span>
+                        <span>{lang.draw.units.mm}</span>
                     </div>
                 ),
                 content: (
@@ -139,10 +139,10 @@ define([
         _renderSpeed: function(lang) {
             return {
                 label: (
-                    <div title={lang.holder.speed_title}>
-                        <span className="caption">{lang.holder.speed}</span>
+                    <div title={lang.draw.speed_title}>
+                        <span className="caption">{lang.draw.speed}</span>
                         <span>{this.state.defaults.speed}</span>
-                        <span>{lang.holder.units.mms}</span>
+                        <span>{lang.draw.units.mms}</span>
                     </div>
                 ),
                 content: (

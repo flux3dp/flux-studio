@@ -495,7 +495,7 @@ define(function() {
             drawingPreview: '繪製預覽路徑，請稍候',
             gettingSlicingReport: '正在取得最新切片狀態'
         },
-        holder: {
+        draw: {
             pen_up: '移動高度',
             pen_down: '繪製高度',
             speed: '速度',
