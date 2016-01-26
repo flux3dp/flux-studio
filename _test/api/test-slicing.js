@@ -7,7 +7,7 @@ var ws = require("nodejs-websocket"),
 
 console.log('#####\tTEST SLICING');
 
-conn = ws.connect('ws://127.0.0.1:8000/ws/3dprint-slicing', function() {
+conn = ws.connect('ws://127.0.0.1:10000/ws/3dprint-slicing', function() {
     var methods = [upload],
         result = Q(1);
 
