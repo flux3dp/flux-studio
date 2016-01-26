@@ -85,7 +85,7 @@ define([
                     // TODO: shouldn't do replace
                     response.error = response.error.replace(/^.*\:\s+(\w+)$/g, '$1');
 
-                    switch (response.error) {
+                    switch (response.error.toUpperCase()) {
                     case DeviceConstants.TIMEOUT:
                         d.resolve(DeviceConstants.TIMEOUT);
                         break;
@@ -102,6 +102,9 @@ define([
                                 lang.message.no_password.caption
                             );
                         }
+                        break;
+                    case DeviceConstants.MONITOR_TOO_OLD:
+                        d.reject(DeviceConstants.MONITOR_TOO_OLD);
                         break;
                     }
                 }
