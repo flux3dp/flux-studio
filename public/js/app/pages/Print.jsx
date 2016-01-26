@@ -214,10 +214,16 @@ define([
                         }.bind(this);
                         AlertStore.onCancel(this._handleDefaultCancel);
                     }
+
+                    GlobalStore.onCancelPreview(this._handleCancelPreview);
                 },
 
                 componentWillUnmount: function() {
                     director.clear();
+
+                    AlertStore.removeYesListener(this._handleSetFirstDefault);
+                    AlertStore.removeCancelListener(this._handleDefaultCancel);
+                    GlobalStore.removeCancelPreviewListener(this._handleCancelPreview);
                 },
 
                 _registerKeyEvents: function() {
@@ -567,6 +573,10 @@ define([
 
                 _handleObjectDialogueFocus: function(isFocused) {
                     allowDeleteObject = !isFocused;
+                },
+
+                _handleCancelPreview: function() {
+                    director.cancelPreview();
                 },
 
                 _renderAdvancedPanel: function() {

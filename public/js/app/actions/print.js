@@ -14,7 +14,6 @@ define([
     'helpers/i18n',
     'helpers/nwjs/menu-factory',
     'app/actions/global-actions',
-    'app/stores/global-store',
     // non-return value
     'threeOrbitControls',
     'threeTrackballControls',
@@ -39,8 +38,7 @@ define([
     ProgressConstants,
     I18n,
     MenuFactory,
-    GlobalActions,
-    GlobalStore
+    GlobalActions
 ) {
     'use strict';
 
@@ -220,7 +218,6 @@ define([
 
         registerDropToImport();
         registerSlicingProgress();
-        registerCancelPreview();
     }
 
     function uploadStl(name, file) {
@@ -562,10 +559,6 @@ define([
             zone.addEventListener('dragleave', onDragLeave);
             zone.addEventListener('drop', onDropFile);
         }
-    }
-
-    function registerCancelPreview() {
-        GlobalStore.onCancelPreview(_handleCancelPreview);
     }
 
     function onDropFile(e) {
@@ -1917,8 +1910,7 @@ define([
         slicingStatus.lastReport    = null;
     }
 
-    function _handleCancelPreview() {
-        previewMode = false;
+    function cancelPreview() {
         slicingStatus.showProgress = false;
         _closePreview();
     }
@@ -1929,7 +1921,7 @@ define([
                 '',
                 slicingStatus.lastReport.error,
                 slicingStatus.lastReport.caption);
-            setTimeout(function() { _handleCancelPreview(); }, 500);
+            setTimeout(function() { cancelPreview(); }, 500);
             return;
         }
 
@@ -1951,7 +1943,7 @@ define([
         }
         else {
             _showWait(lang.print.drawingPreview, !showStopButton);
-            if(!printPath) {
+            if(!printPath || printPath.length === 0) {
                 slicingStatus.canInterrupt = false;
                 slicer.getPath().then(function(result) {
                     slicingStatus.canInterrupt = true;
@@ -2116,6 +2108,7 @@ define([
         clearSelection      : clearSelection,
         clear               : clear,
         toggleScaleLock     : toggleScaleLock,
-        getSlicingStatus    : getSlicingStatus
+        getSlicingStatus    : getSlicingStatus,
+        cancelPreview       : cancelPreview
     };
 });
