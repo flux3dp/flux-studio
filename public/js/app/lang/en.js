@@ -215,7 +215,7 @@ define(function() {
             usb: 'USB',
             device: 'Device',
             setting: 'SETTING',
-            holder: 'HOLDER'
+            draw: 'DRAW'
         },
         settings: {
             caption: 'Settings',

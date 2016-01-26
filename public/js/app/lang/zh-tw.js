@@ -215,7 +215,7 @@ define(function() {
             usb: 'USB',
             device: '裝置',
             setting: '設定',
-            holder: '筆架'
+            draw: '繪製'
         },
         settings: {
             caption: '設定',

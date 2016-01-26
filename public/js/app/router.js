@@ -35,7 +35,7 @@ function(React, $, Backbone, display, config, appSettings, detectWebgl) {
                     ],
                     // go to studio
                     [
-                        /^studio\/?(print|laser|scan|usb|settings|device|holder)\/?(.*)?/,
+                        /^studio\/?(print|laser|scan|usb|settings|device|draw)\/?(.*)?/,
                         'studio',
                         this.studio
                     ],
@@ -120,7 +120,7 @@ function(React, $, Backbone, display, config, appSettings, detectWebgl) {
                     'print': this.print,
                     'settings': this.settings,
                     'laser': this.laser.bind(null, page),
-                    'holder': this.laser.bind(null, page),
+                    'draw': this.laser.bind(null, page),
                     'scan': this.scan,
                     'usb': this.usb,
                     'device': this.device

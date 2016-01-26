@@ -59,11 +59,11 @@ define([
                     imgSrc: '/img/menu/icon_scan.svg'
                 },
                 {
-                    name: 'holder',
-                    displayName: 'HOLDER',
+                    name: 'draw',
+                    displayName: 'DRAW',
                     className: genericClassName,
-                    label: lang.menu.holder,
-                    imgSrc: '/img/menu/icon_laser.svg'
+                    label: lang.menu.draw,
+                    imgSrc: '/img/menu/icon-draw.svg'
                 }
             ];
 
