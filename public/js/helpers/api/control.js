@@ -517,7 +517,7 @@ define([
                             3000
                         );
                     }
-                    else if ('loading' === result.status) {
+                    else if (-1 < ['loading', 'unloading'].indexOf(result.status.toLowerCase())) {
                         deferred.notify(result);
                     }
                     else {
