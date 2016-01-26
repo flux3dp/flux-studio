@@ -10,7 +10,9 @@ var ws = require("nodejs-websocket"),
     getTaskCode,
     conn;
 
-conn = ws.connect('ws://127.0.0.1:8000/ws/svg-laser-parser', function() {
+console.log('#####\tTEST SVG LASER PARSER');
+
+conn = ws.connect('ws://127.0.0.1:10000/ws/svg-laser-parser', function() {
     var methods = [upload, getSVG],
         result = Q(1);
 
