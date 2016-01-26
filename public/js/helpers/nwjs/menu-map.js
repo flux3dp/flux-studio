@@ -18,7 +18,8 @@ define([
     'app/actions/progress-actions',
     'app/constants/progress-constants',
     'html2canvas',
-    'plugins/file-saver/file-saver.min'
+    'plugins/file-saver/file-saver.min',
+    'helpers/check-device-status'
 ], function(
     $,
     gui,
@@ -36,7 +37,8 @@ define([
     ProgressActions,
     ProgressConstants,
     html2canvas,
-    fileSaver
+    fileSaver,
+    checkDeviceStatus
 ) {
     'use strict';
 
@@ -285,12 +287,22 @@ define([
                                             enabled: true,
                                             onClick: function() {
                                                 DeviceMaster.selectDevice(printer).then(function(status) {
-                                                    if(status === DeviceConstants.CONNECTED) {
-                                                        GlobalActions.showMonitor(printer);
+                                                    if (status === DeviceConstants.CONNECTED) {
+                                                        checkDeviceStatus(printer).done(function(status) {
+                                                            switch (status) {
+                                                            case 'ok':
+                                                                GlobalActions.showMonitor(printer);
+                                                                break;
+                                                            }
+                                                        });
                                                     }
                                                     else if (status === DeviceConstants.TIMEOUT) {
                                                         AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
                                                     }
+                                                }).
+                                                fail(function(status) {
+                                                    ProgressActions.close();
+                                                    AlertActions.showPopupError('fatal-occurred', status);
                                                 });
                                             }
                                         },
