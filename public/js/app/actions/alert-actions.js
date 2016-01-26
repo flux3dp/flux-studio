@@ -19,9 +19,9 @@ define([
             });
         },
 
-        showWarning: function(message) {
+        showWarning: function(message, onClickCallback) {
             AlertDispatcher.dispatch({
-                actionType: AlertConstants.SHOW_WARNING, message
+                actionType: AlertConstants.SHOW_WARNING, message, onClickCallback
             });
         },
 
