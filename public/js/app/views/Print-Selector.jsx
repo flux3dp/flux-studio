@@ -16,7 +16,8 @@ define([
     'app/constants/progress-constants',
     'app/actions/input-lightbox-actions',
     'app/constants/input-lightbox-constants',
-    'helpers/sprintf'
+    'helpers/sprintf',
+    'helpers/check-device-status'
 ], function(
     React,
     $,
@@ -35,7 +36,8 @@ define([
     ProgressConstants,
     InputLightboxActions,
     InputLightboxConstants,
-    sprintf
+    sprintf,
+    checkDeviceStatus
 ) {
     'use strict';
 
@@ -105,7 +107,6 @@ define([
             }
 
             AlertStore.onRetry(this._waitForPrinters);
-            AlertStore.onYes(this._onYes);
             AlertStore.onCancel(this._onCancel);
 
             self.setState({
@@ -126,26 +127,7 @@ define([
             }
 
             AlertStore.removeRetryListener(this._waitForPrinters);
-            AlertStore.removeYesListener(this._onYes);
             AlertStore.removeCancelListener(this._onCancel);
-        },
-
-        _onYes: function(id) {
-            var self = this;
-            DeviceMaster.selectDevice(self.selected_printer).then(function() {
-                switch (id) {
-                case 'kick':
-                    DeviceMaster.kick().done(function() {
-                        self._returnSelectedPrinter();
-                    });
-                    break;
-                case 'abort':
-                    DeviceMaster.stop().done(function() {
-                        self._returnSelectedPrinter();
-                    });
-                    break;
-                }
-            });
         },
 
         _onCancel: function(id) {
@@ -187,45 +169,6 @@ define([
                 },
                 opts = {
                     onError: onError
-                },
-                checkStId = function(printer) {
-                    switch (printer.st_id) {
-                    // null for simulate
-                    case null:
-                    // null for not found default device
-                    case undefined:
-                    case DeviceConstants.status.IDLE:
-                        // no problem
-                        self._auth(printer.uuid, '', opts);
-                        break;
-                    case DeviceConstants.status.RAW:
-                    case DeviceConstants.status.SCAN:
-                    case DeviceConstants.status.MAINTAIN:
-                        // ask kick?
-                        ProgressActions.close();
-                        AlertActions.showPopupYesNo('kick', lang.message.device_is_used);
-                        break;
-                    case DeviceConstants.status.COMPLETED:
-                    case DeviceConstants.status.ABORTED:
-                        // quit
-                        DeviceMaster.quit().done(function() {
-                            self._returnSelectedPrinter();
-                        });
-                        break;
-                    case DeviceConstants.status.RUNNING:
-                    case DeviceConstants.status.PAUSED:
-                    case DeviceConstants.status.PAUSED_FROM_STARTING:
-                    case DeviceConstants.status.PAUSED_FROM_RUNNING:
-                        // ask for abort
-                        ProgressActions.close();
-                        AlertActions.showPopupYesNo('abort', lang.message.device_is_used);
-                        break;
-                    default:
-                        // device busy
-                        ProgressActions.close();
-                        AlertActions.showDeviceBusyPopup('on-select-printer');
-                        break;
-                    }
                 };
 
             self.selected_printer = printer;
@@ -237,8 +180,18 @@ define([
                 ProgressActions.open(ProgressConstants.NONSTOP);
                 DeviceMaster.selectDevice(self.selected_printer).done(function(status) {
                     ProgressActions.close();
+
                     if (status === DeviceConstants.CONNECTED) {
-                        checkStId(printer);
+                        checkDeviceStatus(printer).done(function(status) {
+                            switch (status) {
+                            case 'ok':
+                                self._returnSelectedPrinter();
+                                break;
+                            case 'auth':
+                                self._auth(printer.uuid, '', opts);
+                                break;
+                            }
+                        });
                     }
                     else if (status === DeviceConstants.TIMEOUT) {
                         // TODO: Check default printer
@@ -254,6 +207,10 @@ define([
                             AlertActions.showPopupError('printer-connection-timeout', lang.message.connectionTimeout, lang.caption.connectionTimeout);
                         }
                     }
+                }).
+                fail(function(status) {
+                    ProgressActions.close();
+                    AlertActions.showPopupError('fatal-occurred', status);
                 });
             }
         },
