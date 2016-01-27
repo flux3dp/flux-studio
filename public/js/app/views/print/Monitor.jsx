@@ -919,7 +919,6 @@ define([
                 this.state.mode === mode.PREVIEW &&
                 filePreview !== true){
                 report_info['mode'] = mode.BROWSE_FILE;
-                this._refreshDirectory();
             }
 
             this.setState(report_info);
@@ -971,6 +970,10 @@ define([
                     }
                 }
                 currentLevelFiles = result.files;
+                self.setState({
+                    directoryContent: result,
+                    waiting: false
+                });
                 self._retrieveFileInfo(path).then(function(info) {
                     filesInfo = filesInfo.concat(info);
                     if(path === '' && !usbExist) {
@@ -1338,11 +1341,14 @@ define([
 
                 if(taskInfo === '' && openSource) {
                     var f = {
-                        'PRINT' : function() {
+                        'PRINT': function() {
                             return lang.monitor.task.EXTRUDER;
                         },
-                        'LASER' : function() {
+                        'LASER': function() {
                             return lang.monitor.task.LASER;
+                        },
+                        'DEVICE_LIST': function() {
+                            return '';
                         }
                     };
 
