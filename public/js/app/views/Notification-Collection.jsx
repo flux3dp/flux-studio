@@ -68,6 +68,7 @@ define([
                     showMonitor           : false,
                     fcode                 : {},
                     previewUrl            : '',
+                    monitorOpener         : null,
 
                     // general popup
                     showNotificationModal : false,
@@ -367,12 +368,13 @@ define([
 
             },
 
-            _handleOpenMonitor: function(payload, selectedDevice, fcode, previewUrl) {
+            _handleOpenMonitor: function(payload) {
                 this.setState({
                     fcode: payload.fcode,
                     showMonitor: true,
                     selectedDevice: payload.printer,
-                    previewUrl: payload.previewUrl
+                    previewUrl: payload.previewUrl,
+                    monitorOpener: payload.opener
                 });
             },
 
@@ -399,6 +401,7 @@ define([
                         fCode          = {this.state.fcode}
                         previewUrl     = {this.state.previewUrl}
                         slicingStatus  = {this.state.slicingStatus}
+                        opener         = {this.state.monitorOpener}
                         onClose        = {this._handleMonitorClose} />
                 );
                 return (

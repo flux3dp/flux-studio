@@ -7,9 +7,9 @@ define([
 ) {
     return {
 
-        showMonitor: function(printer, fcode, previewUrl) {
+        showMonitor: function(printer, fcode, previewUrl, opener) {
             Dispatcher.dispatch({
-                actionType: GlobalConstants.SHOW_MONITOR, printer, fcode, previewUrl
+                actionType: GlobalConstants.SHOW_MONITOR, printer, fcode, previewUrl, opener
             });
         },
 

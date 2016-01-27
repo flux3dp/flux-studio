@@ -13,6 +13,7 @@ define([
     'helpers/nwjs/menu-factory',
     'app/actions/alert-actions',
     'app/actions/global-actions',
+    'app/constants/global-constants',
     'helpers/device-master',
     'app/constants/device-constants',
     'app/actions/progress-actions',
@@ -35,6 +36,7 @@ define([
     menuFactory,
     AlertActions,
     GlobalActions,
+    GlobalConstants,
     DeviceMaster,
     DeviceConstants,
     ProgressActions,
@@ -110,7 +112,7 @@ define([
                     goToMonitor = function(thumbnailBlob) {
                         DeviceMaster.selectDevice(self.state.selectedPrinter).then(function(status) {
                             if(status === DeviceConstants.CONNECTED) {
-                                GlobalActions.showMonitor(self.state.selectedPrinter, blob, blobUrl.createObjectURL(thumbnailBlob));
+                                GlobalActions.showMonitor(self.state.selectedPrinter, blob, blobUrl.createObjectURL(thumbnailBlob), GlobalConstants.LASER);
                             }
                             else if (status === DeviceConstants.TIMEOUT) {
                                 AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);

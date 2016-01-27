@@ -10,6 +10,7 @@ define([
     'app/constants/device-constants',
     'helpers/file-system',
     'app/actions/global-actions',
+    'app/constants/global-constants',
     'helpers/sprintf',
     'helpers/round',
     'helpers/duration-formatter'
@@ -25,6 +26,7 @@ define([
     DeviceConstants,
     FileSystem,
     GlobalActions,
+    GlobalConstants,
     sprintf,
     round,
     formatDuration
@@ -177,7 +179,7 @@ define([
         'COMPLETED': function() {
             displayStatus = lang.device.completed;
             currentStatus = '';
-            if(openSource === source.GO) {
+            if(openSource === GlobalConstants.PRINT) {
                 DeviceMaster.quit();
             }
         },
@@ -185,7 +187,7 @@ define([
         'ABORTED': function() {
             displayStatus = lang.device.aborted;
             currentStatus = '';
-            if(openSource === source.GO) {
+            if(openSource === GlobalConstants.PRINT) {
                 DeviceMaster.quit();
             }
         },
@@ -228,14 +230,16 @@ define([
             lang                : React.PropTypes.object,
             selectedDevice      : React.PropTypes.object,
             fCode               : React.PropTypes.object,
+            slicingStatus       : React.PropTypes.object,
             previewUrl          : React.PropTypes.string,
+            opener              : React.PropTypes.string,
             onClose             : React.PropTypes.func
         },
 
         getInitialState: function() {
             var _mode = mode.PREVIEW;
-            openSource = !this.props.fCode ? source.DEVICE_LIST : source.GO;
-            if(openSource === source.DEVICE_LIST &&
+            openSource = this.props.opener || GlobalConstants.DEVICE_LIST;
+            if(openSource === GlobalConstants.DEVICE_LIST &&
                 this.props.selectedDevice.st_id === DeviceConstants.status.IDLE){
                     _mode = mode.BROWSE_FILE;
                     this._startReport();
@@ -910,7 +914,7 @@ define([
             };
 
             //If report returns idle state, which means nothing to preview..
-            if(openSource === source.DEVICE_LIST &&
+            if(openSource === GlobalConstants.DEVICE_LIST &&
                 report.st_id === DeviceConstants.status.IDLE &&
                 this.state.mode === mode.PREVIEW &&
                 filePreview !== true){
@@ -1312,7 +1316,7 @@ define([
                     {
                         'running':
                             this.state.mode === mode.BROWSE_FILE ||
-                            this.state.mode === mode.PREVIEW && openSource === source.GO ||
+                            this.state.mode === mode.PREVIEW && openSource === GlobalConstants.PRINT ||
                             this.state.mode === mode.PREVIEW && filePreview ||
                             statusId !== DeviceConstants.status.IDLE &&
                             statusId !== DeviceConstants.status.MAINTAIN &&
@@ -1326,10 +1330,25 @@ define([
             }
 
             if(statusId === DeviceConstants.status.IDLE || this._isAbortedOrCompleted()) {
-                if(openSource !== source.GO && filePreview !== true) {
+                if(openSource !== GlobalConstants.PRINT && filePreview !== true) {
                     taskInfo = '';
                     _duration = '';
                     _progress = '';
+                }
+
+                if(taskInfo === '' && openSource) {
+                    var f = {
+                        'PRINT' : function() {
+                            return lang.monitor.task.EXTRUDER;
+                        },
+                        'LASER' : function() {
+                            return lang.monitor.task.LASER;
+                        }
+                    };
+
+                    if(!f[opener]) {
+                        taskInfo = f[openSource]();
+                    }
                 }
             }
 
@@ -1346,7 +1365,7 @@ define([
 
         _renderNavigation: function() {
             if(
-                openSource === source.DEVICE_LIST &&
+                openSource === GlobalConstants.DEVICE_LIST &&
                 statusId === 0 &&
                 pathArray.length === 0 &&
                 this.state.mode === mode.BROWSE_FILE
