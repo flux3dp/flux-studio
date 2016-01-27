@@ -98,7 +98,8 @@ define([
                         grayscale: {
                             is_rgba: true,
                             is_shading: self.refs.setupPanel.isShading(),
-                            threshold: parseInt(threshold, 10)
+                            threshold: parseInt(threshold, 10),
+                            is_svg: ('svg' === self.state.fileFormat)
                         },
                         onComplete: function(result) {
                             $img.attr('src', result.canvas.toDataURL('image/png'));
@@ -316,6 +317,7 @@ define([
 
                 var $ft_controls = $laser_platform.find('.ft-controls'),
                     _callback = function() {
+                        GlobalActions.sliceComplete({ time: arguments[2] });
                         callback.apply(null, arguments);
                         ProgressActions.close();
                     },
@@ -537,7 +539,8 @@ define([
                         grayscale: {
                             is_rgba: true,
                             is_shading: self.refs.setupPanel.isShading(),
-                            threshold: 128
+                            threshold: 128,
+                            is_svg: ('svg' === self.state.fileFormat)
                         },
                         onComplete: function(result) {
                             file.url = result.canvas.toDataURL('svg' === file.extension ? 'image/svg+xml' : 'image/png');
@@ -663,7 +666,9 @@ define([
                 }
 
                 if ('svg' === currentFileFormat) {
-                    svgWebSocket = svgWebSocket || svgLaserParser();
+                    svgWebSocket = svgWebSocket || svgLaserParser({
+                        isLaser: 'laser' === self.props.page
+                    });
                 }
                 else {
                     bitmapWebSocket = bitmapWebSocket || bitmapLaserParser();
