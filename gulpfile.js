@@ -3,6 +3,8 @@
 var gulp = require('gulp'),
     sass = require('gulp-sass'),
     webserver = require('gulp-webserver'),
+    exec = require('gulp-exec'),
+    fs = require('fs'),
     mocha = require('gulp-mocha');
 
 gulp.task('sass', function () {
@@ -28,12 +30,12 @@ gulp.task('webserver', function() {
 
 gulp.task('dev', ['sass:watch', 'webserver']);
 
-gulp.task('test', function() {
+gulp.task('unit-test', function() {
     return gulp.
-        src('./_test/**/*.js', { read: false }).
+        src('./_test/unit/**/*.js', { read: false }).
         pipe(mocha({
             require: [
-                process.cwd() + '/_test/bootstrap.js'
+                process.cwd() + '/_test/unit/bootstrap.js'
             ]
         })).
         once('error', function() {
@@ -42,4 +44,11 @@ gulp.task('test', function() {
         once('end', function() {
             process.exit(); // good
         });
+});
+
+gulp.task('api-test', function() {
+    return gulp.
+        src('./_test/api/**/*.js').
+        pipe(exec('node <%= file.path %>')).
+        pipe(exec.reporter());
 });
