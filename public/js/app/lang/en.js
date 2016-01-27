@@ -793,7 +793,8 @@ define(function() {
             working: 'Working',
             finishing: 'Finishing',
             initiating: 'Initiating',
-            unknown: 'Unknown'
+            unknown: 'Unknown',
+            pausedFromError: 'paused from error'
         },
         monitor: {
             change_filament                     : 'CHANGE FILAMENT',

@@ -793,7 +793,8 @@ define(function() {
             working: '工作中',
             finishing: '完成中',
             initiating: '啟動中',
-            unknown: '未知狀態'
+            unknown: '未知狀態',
+            pausedFromError: '發生錯誤暫停'
         },
         monitor: {
             change_filament                     : 'CHANGE FILLAMENT',
