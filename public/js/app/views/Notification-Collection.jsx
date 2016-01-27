@@ -135,6 +135,7 @@ define([
                 GlobalStore.onShowMonitor(this._handleOpenMonitor);
                 GlobalStore.onCloseAllView(this._handleCloseAllView);
                 GlobalStore.onSliceComplete(this._handleSliceReport);
+                GlobalStore.onCloseMonitor(this._handlecloseMonitor);
 
                 this._checkSoftwareUpdate();
             },
@@ -150,6 +151,11 @@ define([
 
                 // input lightbox
                 InputLightboxStore.removeOpenedListener(this._handleInputLightBoxOpen);
+
+                GlobalStore.removeShowMoniotorListener();
+                GlobalStore.removeCloseMonitorListener();
+                GlobalStore.removeCloseAllViewListener();
+                GlobalStore.removeSliceCompleteListener();
             },
 
             _showChangeFilament: function(payload) {
@@ -375,6 +381,12 @@ define([
                     selectedDevice: payload.printer,
                     previewUrl: payload.previewUrl,
                     monitorOpener: payload.opener
+                });
+            },
+
+            _handlecloseMonitor: function() {
+                this.setState({
+                    showMonitor: false
                 });
             },
 

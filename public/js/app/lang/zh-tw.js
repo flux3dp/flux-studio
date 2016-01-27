@@ -484,6 +484,7 @@ define(function() {
             goTitle: '準備列印',
             deviceTitle: '顯示監控介面',
             rendering: '切片中',
+            reRendering: '重新切片中',
             finishingUp: '完成中',
             savingFilePreview: '產生預覽圖',
             uploading: '讀取中',
