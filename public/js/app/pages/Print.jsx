@@ -486,6 +486,15 @@ define([
                     director.setParameter('layer_height', layerHeight);
                     advancedSettings.layer_height = layerHeight;
                     this.setState({ layerHeight: layerHeight });
+                    // update custom property
+                    var _settings = advancedSettings.custom.split('\n');
+                    for(var i = 0; i < _settings.length; i++) {
+                        if(_settings[i].substring(0, 12) === 'layer_height') {
+                            _settings[i] = 'layer_height = ' + layerHeight;
+                        }
+                    }
+                    advancedSettings.custom = _settings.join('\n');
+                    Config().write('advanced-settings', JSON.stringify(advancedSettings));
                 },
 
                 _handleTutorialStep: function() {

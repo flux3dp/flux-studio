@@ -7,7 +7,7 @@ define([
     'helpers/api/config',
     'helpers/array-findindex',
     'helpers/object-assign'
-], function(Websocket, config) {
+], function(Websocket) {
     'use strict';
 
     var ws = ws || new Websocket({
@@ -50,29 +50,13 @@ define([
                 printers.splice(existing_key, 1);
             }
 
-            updateTime = (new Date()).getTime();
-
             // set a sleep
-            if (SLEEP < updateTime - (lastUpdateTime || 0)) {
+            clearTimeout(timer);
+            timer = setTimeout(function() {
                 sendFoundPrinter();
-                lastUpdateTime = updateTime;
-                clearTimeout(timer);
-                timer = null;
-            }
-            else {
-                timer = timer || setTimeout(function() {
-                    sendFoundPrinter();
-                    lastUpdateTime = updateTime;
-                    clearTimeout(timer);
-                    timer = null;
-                }, SLEEP);
-            }
-
-            sendFoundPrinter();
+            }, BUFFER);
         },
-        SLEEP = 3000,
-        lastUpdateTime,
-        updateTime,
+        BUFFER = 100,
         timer;
 
     ws.onMessage(onMessage);
@@ -102,11 +86,11 @@ define([
 
         return {
             connection: ws,
-            removeListener: function(id) {
-                var index = idList.indexOf(id);
+            removeListener: function(_id) {
+                var _index = idList.indexOf(_id);
 
-                idList = idList.splice(index, 1);
-                dispatchers = dispatchers.splice(index, 1);
+                idList = idList.splice(_index, 1);
+                dispatchers = dispatchers.splice(_index, 1);
             },
             sendAggressive: function() {
                 ws.send('aggressive');
