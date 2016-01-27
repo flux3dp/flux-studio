@@ -94,7 +94,7 @@ define([
             if(nextProps.layerHeight !== layerHeight) {
                 var _quality = {
                     '0.1': lang.quality.high,
-                    '0.2': lang.quality.med,
+                    '0.15': lang.quality.med,
                     '0.25': lang.quality.low
                 };
                 if(nextProps.layerHeight) {
