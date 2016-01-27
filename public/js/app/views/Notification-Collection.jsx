@@ -298,13 +298,13 @@ define([
                 });
             },
 
-            _handleNotification: function(type, message) {
+            _handleNotification: function(type, message, onClickCallback) {
                 var self = this;
 
                 var types = {
                     INFO: function() {
                         $.growl.notice({
-                            title   : self.state.lang.alert.info,
+                            title   : lang.alert.info,
                             message : message,
                             location: 'bl'
                         });
@@ -312,7 +312,7 @@ define([
 
                     WARNING: function() {
                         $.growl.warning({
-                            title   : self.state.lang.alert.warning,
+                            title   : lang.alert.warning,
                             message : message,
                             location: 'bl'
                         });
@@ -320,7 +320,7 @@ define([
 
                     ERROR: function() {
                         $.growl.error({
-                            title   : self.state.lang.alert.error,
+                            title   : lang.alert.error,
                             message : message,
                             fixed   : true,
                             location: 'bl'
@@ -329,6 +329,11 @@ define([
                 };
 
                 types[type]();
+                setTimeout(function() {
+                    $('.growl').on('click', function() {
+                        onClickCallback();
+                    });
+                }, 500);
             },
 
             _handlePopup: function(type, id, caption, message, customText) {
@@ -390,12 +395,6 @@ define([
                 });
             },
 
-            _handleMonitorClose: function() {
-                this.setState({
-                    showMonitor: false
-                });
-            },
-
             _handleCloseAllView: function() {
                 $('.device > .menu').removeClass('show');
                 $('.dialog-opener').prop('checked','');
@@ -414,7 +413,7 @@ define([
                         previewUrl     = {this.state.previewUrl}
                         slicingStatus  = {this.state.slicingStatus}
                         opener         = {this.state.monitorOpener}
-                        onClose        = {this._handleMonitorClose} />
+                        onClose        = {this._handlecloseMonitor} />
                 );
                 return (
                     <Modal

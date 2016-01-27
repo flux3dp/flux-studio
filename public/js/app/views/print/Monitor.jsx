@@ -814,29 +814,17 @@ define([
                     mainError = report.error[0] || '';
                     subError = report.error[1] || '';
                 }
+
+                if(lastError !== mainError) {
+                    messageViewed = false;
+                    lastError = mainError;
+                }
+
+                errorMessage = lang.monitor[report.error.join('_')];
             }
 
             if(errorActions[mainError]) {
                 errorActions[mainError](statusId);
-            }
-
-            var attr = [mainError];
-            if(subError.length > 0) {
-                attr.push(subError);
-            }
-            errorMessage = lang.monitor[attr.join('_')];
-
-            if(errorMessage === null || errorMessage === '' || typeof errorMessage === 'undefined') {
-                errorMessage = attr.join('_');
-            }
-
-            if(lastError !== mainError) {
-                messageViewed = false;
-                lastError = mainError;
-                if(mainError.length > 0) {
-                    console.log('showing error', mainError);
-                    AlertActions.showPopupError('', mainError + '<br/>' + subError);
-                }
             }
 
             if(
