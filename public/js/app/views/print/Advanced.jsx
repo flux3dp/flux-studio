@@ -247,6 +247,9 @@ define([
 
         _handleNavigate: function(selectedTab, e) {
             e.preventDefault();
+            if(this.state.selectedTab === tab.Custom) {
+                this._processCustomInput();
+            }
             this.setState({
                 selectedTab: selectedTab
             });
