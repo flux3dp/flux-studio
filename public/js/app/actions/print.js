@@ -216,7 +216,7 @@ define([
         slicingStatus.canInterrupt = true;
         slicingStatus.inProgress = false;
 
-        registerDropToImport();
+        registerDragToImport();
         registerSlicingProgress();
     }
 
@@ -236,6 +236,7 @@ define([
     }
 
     function appendModel(fileEntry, file, callback) {
+        unregisterDragToImport();
         if(file.size === 0) {
             AlertActions.showPopupError('', lang.message.invalidFile);
             return;
@@ -551,7 +552,7 @@ define([
         });
     }
 
-    function registerDropToImport() {
+    function registerDragToImport() {
         if(window.FileReader) {
             var zone = document.querySelector('.studio-container.print-studio');
             zone.addEventListener('dragenter', onDragEnter);
@@ -561,13 +562,21 @@ define([
         }
     }
 
+    function unregisterDragToImport() {
+        var zone = document.querySelector('.studio-container.print-studio');
+        zone.removeEventListener('dragenter', onDragEnter);
+        zone.removeEventListener('dragover', onDragEnter);
+        zone.removeEventListener('dragleave', onDragLeave);
+        zone.removeEventListener('drop', onDropFile);
+    }
+
     function onDropFile(e) {
         e.preventDefault();
+        $('.import-indicator').hide();
         if(previewMode) { return; }
         var files = e.dataTransfer.files;
         if(files.length > 0) {
             appendModels(files, 0, function() {
-                $('.import-indicator').hide();
                 e.target.value = null;
             });
         }
@@ -1339,6 +1348,7 @@ define([
             setDefaultFileName();
             render();
             if(objects.length === 0) {
+                registerDragToImport();
                 reactSrc.setState({
                     openImportWindow: true,
                     hasObject: false
