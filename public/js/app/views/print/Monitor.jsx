@@ -322,49 +322,6 @@ define([
             return this.props.fCode instanceof Blob;
         },
 
-        _formatTime: function(timeInSeconds, withSeconds) {
-            if(timeInSeconds === '') { return ''; }
-            var hour = 0,
-                min = 0,
-                sec = 0,
-                time = '';
-
-            if(timeInSeconds > 3600) {
-                hour = parseInt(timeInSeconds / 3600);
-                min = parseInt((timeInSeconds % 3600) / 60);
-                sec = parseInt((timeInSeconds % 3600 % 60));
-
-                if(withSeconds) {
-                    time = `${hour}:${min}:${sec}`;
-                }
-                else {
-                    time = `${hour}${lang.monitor.hour} ${min}${lang.monitor.minute}`;
-                }
-            }
-            else if(timeInSeconds > 60) {
-                min = parseInt(timeInSeconds / 60);
-                sec = parseInt(timeInSeconds % 60);
-
-                if(withSeconds) {
-                    time = `${min}:${sec}`;
-                }
-                else {
-                    time = `${min}${lang.monitor.minute} ${sec}${lang.monitor.second}`;
-                }
-            }
-            else {
-                sec = parseInt(timeInSeconds);
-                if(withSeconds) {
-                    time = `00:${sec}`;
-                }
-                else {
-                    time = `${sec}${lang.monitor.second}`;
-                }
-            }
-
-            return time;
-        },
-
         _refreshDirectory: function() {
             this._retrieveList(pathArray.join('/'));
         },
@@ -1300,7 +1257,7 @@ define([
         },
 
         _renderPrintingInfo: function() {
-            var _duration   = totalTimeInSeconds === 0 ? '' : this._formatTime(totalTimeInSeconds, true),
+            var _duration   = totalTimeInSeconds === 0 ? '' : formatDuration(totalTimeInSeconds),
                 _progress   = percentageDone === 0 ? '' : percentageDone + '%',
                 infoClass   = ClassNames(
                     'status-info',
@@ -1317,7 +1274,7 @@ define([
 
             if(_duration === '' && this.props.slicingStatus) {
                 var time = this.props.slicingStatus.time || 0;
-                _duration = this._formatTime(time, true);
+                _duration = formatDuration(time);
             }
 
             if(statusId === DeviceConstants.status.IDLE || this._isAbortedOrCompleted()) {
