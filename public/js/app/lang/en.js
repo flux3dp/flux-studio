@@ -214,7 +214,8 @@ define(function() {
             scan: 'SCAN',
             usb: 'USB',
             device: 'Device',
-            setting: 'SETTING'
+            setting: 'SETTING',
+            draw: 'DRAW'
         },
         settings: {
             caption: 'Settings',
@@ -494,6 +495,18 @@ define(function() {
             out_of_range_message: 'please reduce the size of the object(s)',
             drawingPreview: 'Drawing preview path, please wait',
             gettingSlicingReport: 'Getting slicing status'
+        },
+        draw: {
+            pen_up: 'Moving Height',
+            pen_down: 'Drawing Height',
+            speed: 'Speed',
+            pen_up_title: 'The height that your pen won\'t contact drawing surface',
+            pen_down_title: 'The height that your pen will contact drawing surface, must be lower than moving height',
+            speed_title: 'The drawing speed',
+            units: {
+                mms: 'mm/s',
+                mm: 'mm'
+            }
         },
         laser: {
             import: 'IMPORT',

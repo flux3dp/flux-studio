@@ -80,6 +80,7 @@ define([
 
             var el = this.refs.unitInput.getDOMNode(),
                 value = el.value.replace(/\s+/g, ''),
+                value = el.value.replace('/s', 's'),
                 isNegative = /^-.*/.test(value),
                 values,
                 tempValue;

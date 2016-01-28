@@ -53,11 +53,20 @@ define(function() {
             }
             else {
                 // 3 is alpha
-                if (0 < data[i + 3]) {
-                    binary.push(0);
+                if (false === opts.is_rgba) {
+                    if (0 < data[i + 3]) {
+                        binary.push(BLACK);
+                    }
+                    else {
+                        binary.push(WHITE);
+                    }
                 }
                 else {
-                    binary.push(255);
+                    for (var j = 0; j < 3; j++) {
+                        binary.push(0 < data[i + j] ? WHITE : BLACK);
+                    }
+
+                    binary.push(0 < data[i + 3] ? WHITE : BLACK);
                 }
             }
         }

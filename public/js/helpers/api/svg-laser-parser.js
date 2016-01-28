@@ -15,9 +15,15 @@ define([
 
     return function(opts) {
         opts = opts || {};
+        opts.isLaser = ('boolean' === typeof opts.isLaser ? opts.isLaser : true);
 
-        var ws = new Websocket({
-                method: 'svg-laser-parser',
+        var apiMethod = (
+                true === opts.isLaser ?
+                'svg-laser-parser' :
+                'pen-svg-parser'
+            ),
+            ws = new Websocket({
+                method: apiMethod,
                 onMessage: function(data) {
 
                     events.onMessage(data);
@@ -314,6 +320,7 @@ define([
                         opts.fileMode || '-f'
                     ],
                     blobs = [],
+                    duration,
                     total_length = 0,
                     blob;
 
@@ -324,13 +331,14 @@ define([
                     }
                     else if ('complete' === data.status) {
                         total_length = data.length;
+                        duration = data.time;
                     }
                     else if (true === data instanceof Blob) {
                         blobs.push(data);
                         blob = new Blob(blobs);
 
                         if (total_length === blob.size) {
-                            opts.onFinished(blob, args[2]);
+                            opts.onFinished(blob, args[2], duration);
                         }
                     }
 

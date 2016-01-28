@@ -12,6 +12,9 @@
     "mocha": "~2.3.4",
     "mocha-jsdom": "~1.0.0",
     "jsdom-global": "~1.6.1",
-    "jsdom": "~7.2.2"
+    "jsdom": "~7.2.2",
+    "nodejs-websocket": "~1.5.0",
+    "q": "~1.4.1",
+    "gulp-exec": "~2.1.2"
   }
 }
