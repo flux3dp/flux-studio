@@ -111,7 +111,7 @@ define([
                 },
 
                 'SHOW_WARNING': function() {
-                    AlertStore.emit(NOTIFY_EVENT, AlertConstants.WARNING, payload.message, payload.onClickCallback);
+                    AlertStore.emit(NOTIFY_EVENT, AlertConstants.WARNING, payload.message, payload.onClickCallback, payload.fixed);
                 },
 
                 'SHOW_ERROR': function() {
