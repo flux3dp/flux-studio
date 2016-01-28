@@ -202,16 +202,10 @@ define([
                     };
 
                     this._registerKeyEvents();
-                    if(Config().read('configured-printer') && tutorialMode){
+                    if(Config().read('configured-printer') && tutorialMode) {
                         //First time using, with usb-configured printer..
                         AlertActions.showPopupYesNo('set_default', sprintf(lang.tutorial.set_first_default,Config().read('configured-printer')),lang.tutorial.set_first_default_caption);
                         AlertStore.onYes(this._handleSetFirstDefault);
-                        //Use setTimeout to avoid multiple modal display conflict
-                        this._handleDefaultCancel = function(ans) {
-                            setTimeout(function() {
-                                this._registerTutorial();
-                            }.bind(this), 10);
-                        }.bind(this);
                         AlertStore.onCancel(this._handleDefaultCancel);
                     }
 
@@ -582,6 +576,13 @@ define([
 
                 _handleObjectDialogueFocus: function(isFocused) {
                     allowDeleteObject = !isFocused;
+                },
+
+                _handleDefaultCancel: function(ans) {
+                    //Use setTimeout to avoid multiple modal display conflict
+                    setTimeout(function() {
+                        this._registerTutorial();
+                    }, 10);
                 },
 
                 _handleCancelPreview: function() {
