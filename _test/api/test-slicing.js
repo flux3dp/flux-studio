@@ -1,52 +1,21 @@
 var ws = require("nodejs-websocket"),
     fs = require('fs'),
     Q = require('q'),
+    bootstrap = require(process.cwd() + '/_test/api/bootstrap'),
     uploadName = 'test',
-    upload,
+    testCases = [],
     conn;
 
-console.log('#####\tTEST SLICING');
-
-conn = ws.connect('ws://127.0.0.1:10000/ws/3dprint-slicing', function() {
-    var methods = [upload],
-        result = Q(1);
-
-    methods.forEach(function(f, index) {
-        result = result.then(f);
-
-        if (index + 1 === methods.length) {
-            result.done(function() {
-                process.exit();
-            });
-        }
-    });
-
-    conn.on('error', function(data) {
-        console.log('error', data);
-        process.exit(1);
-    });
-});
-
-upload = function() {
-    var deferred = Q.defer(),
-        file;
-
-    console.log('###\tUPLOAD STL FILE');
-
-    (function() {
+testCases.push(new bootstrap.TestCase('upload stl file').
+    onStarting(function(deferred, conn) {
         fs.readFile(process.cwd() + '/_test/api/assets/guide-example.stl', function(err, data) {
             file = data;
             deferred.notify({ status: 'starting' });
         });
 
         return deferred.promise;
-    }()).then(null, function() {
-        // fail
-        console.log('fail', arguments);
-        process.exit(1);
-    }, function(response) {
-        console.log(JSON.stringify(response));
-
+    }).
+    onProgress(function(response, deferred, conn) {
         // progress
         switch (response.status) {
         case 'starting':
@@ -55,20 +24,151 @@ upload = function() {
         case 'continue':
             conn.sendBinary(file);
             break;
+        case 'ok':
+            deferred.resolve(response);
+            break;
         case 'fatal':
-            process.exit(1);
+        case 'error':
+        default:
+            bootstrap.err(response);
+            break;
+        }
+    })
+);
+
+testCases.push(new bootstrap.TestCase('duplicate stl file').
+    onStarting(function(deferred, conn) {
+        conn.sendText(['duplicate', uploadName, 'test1'].join(' '));
+
+        return deferred.promise;
+    }).
+    onProgress(function(response, deferred, conn) {
+        // progress
+        switch (response.status) {
+        case 'ok':
+            deferred.resolve(response);
+            break;
+        case 'fatal':
+        case 'error':
+        default:
+            bootstrap.err(response);
+            break;
+        }
+    })
+);
+
+testCases.push(new bootstrap.TestCase('set stl file').
+    onStarting(function(deferred, conn) {
+        conn.sendText([
+            'set',
+            uploadName,
+            // position (x, y, z)
+            0, 0, 47.981412844073475,
+            // rotation (x, y, z)
+            0, 0, 0,
+            // scale (x, y, z)
+            3.1483866030745835, 3.1483866030745835, 3.1483866030745835
+        ].join(' '));
+
+        return deferred.promise;
+    }).
+    onProgress(function(response, deferred, conn) {
+        // progress
+        switch (response.status) {
+        case 'ok':
+            deferred.resolve(response);
+            break;
+        case 'fatal':
+        case 'error':
+        default:
+            bootstrap.err(response);
+            break;
+        }
+    })
+);
+
+testCases.push(new bootstrap.TestCase('delete existing stl file').
+    onStarting(function(deferred, conn) {
+        conn.sendText([
+            'delete',
+            'test1'
+        ].join(' '));
+
+        return deferred.promise;
+    }).
+    onProgress(function(response, deferred, conn) {
+        // progress
+        switch (response.status) {
+        case 'ok':
+            deferred.resolve(response);
+            break;
+        case 'fatal':
+        case 'error':
+        default:
+            bootstrap.err(response);
+            break;
+        }
+    })
+);
+
+testCases.push(new bootstrap.TestCase('upload preview').
+    onStarting(function(deferred, conn) {
+        fs.readFile(process.cwd() + '/_test/api/assets/guide-example-preview.png', function(err, data) {
+            file = data;
+            deferred.notify({ status: 'starting' });
+        });
+
+        return deferred.promise;
+    }).
+    onProgress(function(response, deferred, conn) {
+        // progress
+        switch (response.status) {
+        case 'starting':
+            conn.sendText([
+                'upload_image',
+                file.length
+            ].join(' '));
+            break;
+        case 'continue':
+            conn.sendBinary(file);
             break;
         case 'ok':
             deferred.resolve(response);
             break;
+        case 'fatal':
+        case 'error':
+        default:
+            bootstrap.err(response);
+            break;
         }
-    });
+    })
+);
 
-    conn.on('text', function(data) {
-        var json = JSON.parse(data);
+testCases.push(new bootstrap.TestCase('slice existing stl').
+    onStarting(function(deferred, conn) {
+        conn.sendText([
+            'begin_slicing',
+            uploadName,
+            'f'
+        ].join(' '));
 
-        deferred.notify(json);
-    });
+        return deferred.promise;
+    }).
+    onProgress(function(response, deferred, conn) {
+        // progress
+        switch (response.status) {
+        case 'ok':
+            deferred.resolve(response);
+            break;
+        case 'error':
+            deferred.resolve(response);
+            break;
+        case 'fatal':
+        default:
+            bootstrap.err(response);
+            break;
+        }
+    })
+);
 
-    return deferred.promise;
-};
+bootstrap.executeTest('slicing', '3dprint-slicing', testCases);
