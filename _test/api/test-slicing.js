@@ -12,8 +12,6 @@ testCases.push(new bootstrap.TestCase('upload stl file').
             file = data;
             deferred.notify({ status: 'starting' });
         });
-
-        return deferred.promise;
     }).
     onProgress(function(response, deferred, conn) {
         // progress
@@ -39,8 +37,6 @@ testCases.push(new bootstrap.TestCase('upload stl file').
 testCases.push(new bootstrap.TestCase('duplicate stl file').
     onStarting(function(deferred, conn) {
         conn.sendText(['duplicate', uploadName, 'test1'].join(' '));
-
-        return deferred.promise;
     }).
     onProgress(function(response, deferred, conn) {
         // progress
@@ -70,7 +66,6 @@ testCases.push(new bootstrap.TestCase('set stl file').
             3.1483866030745835, 3.1483866030745835, 3.1483866030745835
         ].join(' '));
 
-        return deferred.promise;
     }).
     onProgress(function(response, deferred, conn) {
         // progress
@@ -93,8 +88,6 @@ testCases.push(new bootstrap.TestCase('delete existing stl file').
             'delete',
             'test1'
         ].join(' '));
-
-        return deferred.promise;
     }).
     onProgress(function(response, deferred, conn) {
         // progress
@@ -117,8 +110,6 @@ testCases.push(new bootstrap.TestCase('upload preview').
             file = data;
             deferred.notify({ status: 'starting' });
         });
-
-        return deferred.promise;
     }).
     onProgress(function(response, deferred, conn) {
         // progress
@@ -151,8 +142,6 @@ testCases.push(new bootstrap.TestCase('slice existing stl').
             uploadName,
             'f'
         ].join(' '));
-
-        return deferred.promise;
     }).
     onProgress(function(response, deferred, conn) {
         // progress
