@@ -107,7 +107,6 @@ testCases.push(new bootstrap.TestCase('compute svg file', 60000).
         // progress
         switch (response.status) {
         case 'continue':
-            console.log(svgFile.length + bitmapFile.length);
             conn.sendBinary(svgFile);
             conn.sendBinary(bitmapFile);
             break;
@@ -156,6 +155,27 @@ testCases.push(new bootstrap.TestCase('set params', 60000).
 testCases.push(new bootstrap.TestCase('get gcode', 60000).
     onStarting(function(deferred, conn) {
         conn.sendText(['go', uploadName, '-g'].join(' '));
+    }).
+    onProgress(function(response, deferred, conn) {
+        // progress
+        switch (response.status) {
+        case 'computing':
+            // ignore
+            break;
+        case 'complete':
+            deferred.resolve(response);
+            break;
+        case 'fatal':
+        default:
+            bootstrap.err(response);
+            break;
+        }
+    })
+);
+
+testCases.push(new bootstrap.TestCase('get fcode', 60000).
+    onStarting(function(deferred, conn) {
+        conn.sendText(['go', uploadName, '-f'].join(' '));
     }).
     onProgress(function(response, deferred, conn) {
         // progress
