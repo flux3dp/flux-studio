@@ -1,5 +1,4 @@
 var fs = require('fs'),
-    Q = require('q'),
     bootstrap = require(process.cwd() + '/_test/api/bootstrap'),
     testCases = [],
     params = [

@@ -1,6 +1,4 @@
-var ws = require("nodejs-websocket"),
-    fs = require('fs'),
-    Q = require('q'),
+var fs = require('fs'),
     bootstrap = require(process.cwd() + '/_test/api/bootstrap'),
     uploadName = 'test',
     testCases = [],
