@@ -98,7 +98,7 @@ define([
                         <p className="caption">
                             {lang.scan.manipulation.filter}
                         </p>
-                        <label className="accordion-body">
+                        <div className="accordion-body">
                             <div className="control">
                                 <button className="btn btn-action btn-merge" data-ga-event="manual-merge" onClick={this._onManualMerge}>
                                     <img src="/img/icon-merge.png"/>
@@ -111,7 +111,7 @@ define([
                                     {lang.scan.manipulation.save_pointcloud}
                                 </button>
                             </div>
-                        </label>
+                        </div>
                     </label>
                 </div>
             );
@@ -150,7 +150,7 @@ define([
                         <p className="caption">
                             {lang.scan.manipulation.filter}
                         </p>
-                        <label className="accordion-body">
+                        <div className="accordion-body">
                             <div className="control">
                                 <button className={cx(cropClass)} data-ga-event="crop" onClick={this._onCrop}>
                                     <img src="/img/icon-crop.png"/>
@@ -169,7 +169,7 @@ define([
                                     {lang.scan.manipulation.save_pointcloud}
                                 </button>
                             </div>
-                        </label>
+                        </div>
                     </label>
                     <label className="controls accordion" onClick={this.props.switchTransformMode.bind(this, 'translate')}>
                         <input name="maniplulation" type="radio" className="accordion-switcher"/>
