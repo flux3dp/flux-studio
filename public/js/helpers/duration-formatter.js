@@ -4,12 +4,14 @@ define([
     i18n
 ) {
     'use strict';
-    
+
     var lang = i18n.get(),
         oneHour = 3600,
         oneMinute = 60;
 
     return function(lengthInSecond) {
+
+        lengthInSecond = lengthInSecond || 0;
 
         if(lengthInSecond >= oneHour) {
 
@@ -27,6 +29,9 @@ define([
 
         } else {
 
+            if(!lengthInSecond) {
+                return '';
+            }
             return `${lengthInSecond} ${lang.monitor.second}`;
 
         }
