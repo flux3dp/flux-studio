@@ -52,10 +52,10 @@ testCases.push(new bootstrap.TestCase('upload bitmap file', 60000).
             size.height,
             // position (top left)
             -50,
-            -50,
+            50,
             // position (bottom right)
             50,
-            50,
+            -50,
             // rotation
             0,
             // threshold
