@@ -49,6 +49,7 @@ define([
 
         var self = this,    // react component
             DIAMETER = 170,    // 170mm
+            ACCEPTABLE_MIN_SIZE = 1, // width * height > 1
             bitmapWebSocket,
             svgWebSocket,
             LASER_IMG_CLASS = 'img-container',
@@ -512,7 +513,7 @@ define([
             return $img;
         }
 
-        function handleUploadImage(file, parserSocket) {
+        function handleUploadImage(file, parserSocket, isEnd, deferred) {
             var name = 'image-' + (new Date()).getTime(),
                 opts = {},
                 onUploadFinished = function(data) {
@@ -532,26 +533,37 @@ define([
                         size.height = size.height * ratio;
                     }
 
-                    imageData(blob, {
-                        width: size.width,
-                        height: size.height,
-                        type: file.type,
-                        grayscale: {
-                            is_rgba: true,
-                            is_shading: self.refs.setupPanel.isShading(),
-                            threshold: 128,
-                            is_svg: ('svg' === self.state.fileFormat)
-                        },
-                        onComplete: function(result) {
-                            file.url = result.canvas.toDataURL('svg' === file.extension ? 'image/svg+xml' : 'image/png');
+                    if (ACCEPTABLE_MIN_SIZE < size.width * size.height) {
+                        file.tooSmall = false;
 
-                            self.state.images.push(file);
-                            self.setState({
-                                images: self.state.images
-                            });
-                            setupImage(file, size, objectUrl, name);
-                        }
-                    });
+                        imageData(blob, {
+                            width: size.width,
+                            height: size.height,
+                            type: file.type,
+                            grayscale: {
+                                is_rgba: true,
+                                is_shading: self.refs.setupPanel.isShading(),
+                                threshold: 128,
+                                is_svg: ('svg' === self.state.fileFormat)
+                            },
+                            onComplete: function(result) {
+                                file.url = result.canvas.toDataURL('svg' === file.extension ? 'image/svg+xml' : 'image/png');
+
+                                self.state.images.push(file);
+                                self.setState({
+                                    images: self.state.images
+                                });
+                                setupImage(file, size, objectUrl, name);
+                            }
+                        });
+                    }
+                    else {
+                        file.tooSmall = true;
+                    }
+
+                    if (true === isEnd) {
+                        deferred.resolve();
+                    }
                 };
 
             opts.onFinished = onUploadFinished;
@@ -674,7 +686,7 @@ define([
                     bitmapWebSocket = bitmapWebSocket || bitmapLaserParser();
                 }
             },
-            onFileReading: function(file) {
+            onFileReading: function(file, isEnd, deferred) {
                 var name = 'image-' + (new Date()).getTime(),
                     parserSocket;
 
@@ -693,15 +705,30 @@ define([
                 }
 
                 if ('undefined' !== typeof parserSocket) {
-                    handleUploadImage(file, parserSocket);
+                    handleUploadImage(file, parserSocket, isEnd, deferred);
                 }
             },
             onFileReadEnd: function(e, files) {
+                var tooSmallList = files.filter(function(file) {
+                        return true === file.tooSmall;
+                    }),
+                    invalidName,
+                    operationMode = ('svg' === self.state.fileFormat ? 'cut' : 'engrave');
+
                 ProgressActions.close();
+
+                if (0 < tooSmallList.length) {
+                    invalidName = tooSmallList.map(function(image) {
+                        return image.name;
+                    }).join('\n');
+                    AlertActions.showPopupError('has-too-small-image', invalidName + '\n' +  lang.message.image_is_too_small);
+                    operationMode = undefined;
+                }
+
                 self.setState({
-                    step: 'start',
-                    hasImage: 0 < files.length,
-                    mode: ('svg' === self.state.fileFormat ? 'cut' : 'engrave')
+                    step: (0 < tooSmallList.length ? self.state.step : 'start'),
+                    hasImage: 0 < (files.length - tooSmallList.length),
+                    mode: operationMode
                 });
 
                 menuFactory.items.execute.enabled = true;
