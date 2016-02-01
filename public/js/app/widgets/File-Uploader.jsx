@@ -1,7 +1,10 @@
 define([
+    'jquery',
     'react'
-], function(React) {
+], function($, React) {
     'use strict';
+
+    var deferred = $.Deferred();
 
     return React.createClass({
         getDefaultProps: function() {
@@ -31,13 +34,14 @@ define([
                 thisFile = files.item(0),
                 blobUrl = window.URL,
                 fileReader,
+                uploadFiles = [],
                 blob,
                 readFile = function() {
                     fileReader = new FileReader();
 
                     fileReader.onloadend = function(e) {
                         blob = new Blob([fileReader.result], { type: thisFile.type });
-                        self.props.onReadingFile({
+                        uploadFiles.push({
                             data: fileReader.result,
                             blob: blob,
                             url: blobUrl.createObjectURL(blob),
@@ -52,14 +56,16 @@ define([
                         fileIndex++;
                         thisFile = files.item(fileIndex);
 
+                        deferred.notify({
+                            status: 'reading',
+                            file: uploadFiles.slice(-1)[0],
+                            isEnd: (fileIndex === files.length)
+                        });
+
                         // finished
                         if (fileIndex === files.length) {
-                            self.props.onReadEnd(e, files);
+                            deferred = $.Deferred();
                             currentTarget.value = '';
-                        }
-                        // move forward
-                        else {
-                            readFile();
                         }
                     };
 
@@ -87,6 +93,15 @@ define([
                 };
 
             self.props.onReadFileStarted(e);
+            deferred.
+                progress(function(data) {
+                    self.props.onReadingFile(data.file, data.isEnd, deferred);
+
+                    if (false === data.isEnd) {
+                        readFile();
+                    }
+                }).
+                done(self.props.onReadEnd.bind(null, e, uploadFiles));
 
             if (false === checkType(files)) {
                 self.props.onError('Image only');
