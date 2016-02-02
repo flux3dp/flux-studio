@@ -133,7 +133,7 @@ testCases.push(new bootstrap.TestCase('upload preview').
     })
 );
 
-testCases.push(new bootstrap.TestCase('slice existing stl').
+testCases.push(new bootstrap.TestCase('slice existing stl', 60000).
     onStarting(function(deferred, conn) {
         conn.sendText([
             'begin_slicing',

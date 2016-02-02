@@ -44,8 +44,6 @@ exports.executeTest = function(name, apiMethod, testCases) {
 };
 
 exports.TestCase = function(describe, timeout) {
-    timeout = timeout || 1000;
-
     var self = this,
         deferred = Q.defer(),
         buffer = new Buffer(0),
@@ -54,6 +52,8 @@ exports.TestCase = function(describe, timeout) {
         _onProgress = function() {};
 
     deferred.time = describe + '-' + (new Date()).getTime();
+
+    self.timeout = timeout || 1000;
 
     self.onProgress = function(cb) {
         _onProgress = ('function' === typeof cb ? cb : _onProgress);
@@ -115,7 +115,7 @@ exports.TestCase = function(describe, timeout) {
 
         setTimeout(function() {
             exports.err(describe + ' Timeout', 9999);
-        }, timeout);
+        }, self.timeout);
 
         return deferred.promise;
     };

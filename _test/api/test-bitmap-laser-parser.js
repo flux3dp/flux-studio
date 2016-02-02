@@ -116,6 +116,7 @@ testCases.push(new bootstrap.TestCase('get gcode', 60000).
     onProgress(function(response, deferred, conn) {
         // progress
         switch (response.status) {
+        case 'progressing':
         case 'computing':
             // ignore
             break;
@@ -137,6 +138,7 @@ testCases.push(new bootstrap.TestCase('get fcode', 60000).
     onProgress(function(response, deferred, conn) {
         // progress
         switch (response.status) {
+        case 'progressing':
         case 'computing':
             // ignore
             break;
