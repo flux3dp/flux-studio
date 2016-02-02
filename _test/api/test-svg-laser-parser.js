@@ -5,7 +5,8 @@ var fs = require('fs'),
     params = [
         { name: 'object_height', value: 10 },
         { name:'laser_speed', value: 20 },
-        { name:'power', value: 1 }
+        { name:'power', value: 1 },
+        { name:'shading', value: 1 }
     ],
     width,
     height,
@@ -76,7 +77,7 @@ testCases.push(new bootstrap.TestCase('compute svg file', 60000).
             bitmapFile = [];
 
             for (var i = 0; i < thumbnailImageCapacity; i++) {
-                bitmapFile[i] = 255;
+                bitmapFile[i] = 0;
             }
 
             bitmapFile = new Buffer(bitmapFile);
@@ -89,10 +90,10 @@ testCases.push(new bootstrap.TestCase('compute svg file', 60000).
                 100,
                 // position (top left)
                 -50,
-                -50,
+                50,
                 // position (bottom right)
                 50,
-                50,
+                -50,
                 // rotation
                 0,
                 svgFile.length,
