@@ -73,15 +73,11 @@ testCases.push(new bootstrap.TestCase('get path from fcode').
         conn.sendText('get_path');
     }).
     onProgress(function(response, deferred, conn) {
-        // progress
-        switch (response.status) {
-        case 'complete':
+        if (response instanceof Array) {
             deferred.resolve(response);
-            break;
-        case 'fatal':
-        default:
+        }
+        else {
             bootstrap.err(response);
-            break;
         }
     })
 );
