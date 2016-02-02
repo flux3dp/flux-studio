@@ -2,8 +2,6 @@ var ws = require("nodejs-websocket"),
     assert = require('assert'),
     Q = require('q');
 
-ws.setMaxBufferLength(4096);
-
 exports.executeTest = function(name, apiMethod, testCases) {
     var conn;
     console.log('#####\tTEST ' + name.toUpperCase());
