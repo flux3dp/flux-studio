@@ -914,7 +914,8 @@ define(function() {
                 caption: 'Password not set'
             },
             gCodeAreaTooBigCaption: 'Toolpath out of range',
-            gCodeAreaTooBigMessage: 'Please reduce the size of the object(s), or try to turn off raft, brim or skirt'
+            gCodeAreaTooBigMessage: 'Please reduce the size of the object(s), or try to turn off raft, brim or skirt',
+            image_is_too_small: 'The file contains unsupported information'
         },
         machine_status: {
             '-10': 'Raw mode',

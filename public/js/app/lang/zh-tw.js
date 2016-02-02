@@ -914,7 +914,8 @@ define(function() {
                 caption: '未設定密碼'
             },
             gCodeAreaTooBigCaption: '工作路徑超過列印範圍',
-            gCodeAreaTooBigMessage: '請縮小物體尺寸、關閉底座、Brim或是Skirt'
+            gCodeAreaTooBigMessage: '請縮小物體尺寸、關閉底座、Brim或是Skirt',
+            image_is_too_small: '圖檔內容有誤'
         },
         machine_status: {
             '-10': 'Raw Mode',

@@ -356,6 +356,12 @@ define([
                     }
                 },
 
+                _onReadingPCD: function(file, isEnd, deferred) {
+                    if (true === isEnd) {
+                        deferred.resolve();
+                    }
+                },
+
                 _importPCD: function(e, files) {
                     var self = this,
                         lang = self.state.lang,
@@ -364,6 +370,7 @@ define([
                         meshes = self.state.meshes,
                         allowedfiles = [],
                         uploadFiles,
+                        convertedfiles = [],
                         file,
                         blob,
                         scanTimes,
@@ -376,15 +383,13 @@ define([
                                 checker = /.*[.]pcd$/,
                                 file;
 
-                            for (var i = 0; i < files.length; i++) {
-                                file = files.item(i);
-
+                            files.forEach(function(file) {
                                 file.isPCD = checker.test(file.name);
 
                                 if (true === file.isPCD) {
                                     allowedfiles.push(file);
                                 }
-                            }
+                            });
 
                             return allowedfiles;
                         },
@@ -402,7 +407,11 @@ define([
                         uploadFiles = files;
                     }
 
-                    allowedfiles = checkFiles(uploadFiles);
+                    for (var i = 0; i < uploadFiles.length; i++) {
+                        convertedfiles.push(uploadFiles[i] || uploadFiles.item(i));
+                    }
+
+                    allowedfiles = checkFiles(convertedfiles);
 
                     uploadQuota = self.MAX_MESHES - meshes.length - allowedfiles.length;
 
@@ -417,7 +426,7 @@ define([
                         doImport = function() {
                             file = allowedfiles.pop();
                             fileName = (new Date).getTime();
-                            blob = new Blob([file]);
+                            blob = file.blob || new Blob([file]);
                             scanTimes = self.state.scanTimes + 1;
 
                             self.state.scanModelingWebSocket.import(fileName, 'pcd', blob, blob.size).done(function(pointCloud) {
@@ -1564,6 +1573,7 @@ define([
                             <FileUploader
                                 ref="fileUploader"
                                 className={{ hide: true }}
+                                onReadingFile={this._onReadingPCD}
                                 onReadEnd={this._importPCD}
                             />
                             {selectPrinter}
