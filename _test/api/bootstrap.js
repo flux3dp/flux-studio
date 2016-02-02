@@ -131,6 +131,6 @@ exports.err = function(response, code) {
     code = code || 0;
     response = ('string' === typeof response ? response : JSON.stringify(response));
 
-    console.error(new Error(response.toString()), code);
+    console.error(new Error(response), code);
     process.exit(1);
 };
