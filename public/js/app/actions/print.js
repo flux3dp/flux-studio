@@ -78,6 +78,7 @@ define([
         slicingTimmer,
         slicingWaitTime = 3000,
         stlTimmer,
+        changeRenderThrottle,
         transformAxisChanged = '',
         slicingReport = {},
         slicingStatus = {},
@@ -189,10 +190,10 @@ define([
         orbitControl.addEventListener('change', updateOrbitControl);
 
         transformControl = new THREE.TransformControls(camera, renderer.domElement);
-        transformControl.addEventListener('change', render);
-        transformControl.addEventListener('mouseDown', onTransform);
-        transformControl.addEventListener('mouseUp', onTransform);
-        transformControl.addEventListener('objectChange', onTransform);
+        transformControl.addEventListener('change', onTransformChange);
+        transformControl.addEventListener('mouseDown', onObjectTransform);
+        transformControl.addEventListener('mouseUp', onObjectTransform);
+        transformControl.addEventListener('objectChange', onObjectTransform);
 
         window.addEventListener('resize', onWindowResize, false);
         window.addEventListener('keydown', onKeyPress, false);
@@ -646,8 +647,6 @@ define([
                 }
             }
         }
-
-        render();
     }
 
     function toggleTransformControl(hide) {
@@ -723,7 +722,14 @@ define([
         }
     }
 
-    function onTransform(e) {
+    function onTransformChange() {
+        clearTimeout(changeRenderThrottle);
+        changeRenderThrottle = setTimeout(function() {
+            render();
+        }, 100);
+    }
+
+    function onObjectTransform(e) {
         if(previewMode) { return; }
         switch (e.type) {
             case 'mouseDown':
@@ -2032,7 +2038,6 @@ define([
     function _clearPath() {
         printPath = [];
         previewScene.children.splice(1, previewScene.children.length - 1);
-        render();
     }
 
     function _setProgressMessage(message) {
