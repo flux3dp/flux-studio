@@ -1,60 +1,23 @@
-var ws = require("nodejs-websocket"),
-    fs = require('fs'),
+var fs = require('fs'),
     Q = require('q'),
     bootstrap = require(process.cwd() + '/_test/api/bootstrap'),
-    uploadName = 'test',
     testCases = [],
     params = [
         { name: 'object_height', value: 10 },
         { name:'laser_speed', value: 20 },
-        { name:'power', value: 1 }
+        { name:'power', value: 1 },
+        { name:'shading', value: 1 }
     ],
-    width,
-    height,
-    svgFile,
     bitmapFile,
     conn;
 
-testCases.push(new bootstrap.TestCase('upload svg file').
+testCases.push(new bootstrap.TestCase('clear uploaded bitmap file', 60000).
     onStarting(function(deferred, conn) {
-        fs.readFile(process.cwd() + '/_test/api/assets/circle-test.svg', function(err, data) {
-            svgFile = data;
-            deferred.notify({ status: 'starting' });
-        });
+        conn.sendText('clear_imgs');
     }).
     onProgress(function(response, deferred, conn) {
         // progress
         switch (response.status) {
-        case 'starting':
-            conn.sendText(['upload', uploadName, svgFile.length].join(' '));
-            break;
-        case 'continue':
-            conn.sendBinary(svgFile);
-            break;
-        case 'fatal':
-            console.error(new Error(JSON.stringify(response)));
-            break;
-        case 'ok':
-            deferred.resolve(response);
-            break;
-        }
-    })
-);
-
-testCases.push(new bootstrap.TestCase('get post-processing svg file').
-    onStarting(function(deferred, conn) {
-        conn.sendText(['get', uploadName].join(' '));
-    }).
-    onProgress(function(response, deferred, conn) {
-        // progress
-        switch (response.status) {
-        case 'continue':
-            width = response.width;
-            height = response.height;
-            break;
-        case 'progressing':
-            // ignore
-            break;
         case 'ok':
             deferred.resolve(response);
             break;
@@ -66,51 +29,46 @@ testCases.push(new bootstrap.TestCase('get post-processing svg file').
     })
 );
 
-testCases.push(new bootstrap.TestCase('compute svg file', 60000).
+testCases.push(new bootstrap.TestCase('upload bitmap file', 60000).
     onStarting(function(deferred, conn) {
-        fs.readFile(process.cwd() + '/_test/api/assets/circle-test.svg', function(err, data) {
-            var size = {
-                    width: 640,
-                    height: 640
-                },
-                thumbnailImageCapacity = size.width * size.height;
+        var size = {
+                width: 640,
+                height: 640
+            },
+            thumbnailImageCapacity = size.width * size.height;
 
-            bitmapFile = [];
+        bitmapFile = [];
 
-            for (var i = 0; i < thumbnailImageCapacity; i++) {
-                bitmapFile[i] = 255;
-            }
+        for (var i = 0; i < thumbnailImageCapacity; i++) {
+            bitmapFile[i] = 255;
+        }
 
-            bitmapFile = new Buffer(bitmapFile);
+        bitmapFile = new Buffer(bitmapFile);
 
-            conn.sendText([
-                'compute',
-                uploadName,
-                // size in real world
-                100,
-                100,
-                // position (top left)
-                -50,
-                -50,
-                // position (bottom right)
-                50,
-                50,
-                // rotation
-                0,
-                svgFile.length,
-                size.width,
-                size.height
-            ].join(' '));
-        });
+        conn.sendText([
+            'upload',
+            // size in px
+            size.width,
+            size.height,
+            // position (top left)
+            -50,
+            50,
+            // position (bottom right)
+            50,
+            -50,
+            // rotation
+            0,
+            // threshold
+            128
+        ].join(' '));
     }).
     onProgress(function(response, deferred, conn) {
         // progress
         switch (response.status) {
         case 'continue':
-            conn.sendBinary(svgFile);
             conn.sendBinary(bitmapFile);
             break;
-        case 'ok':
+        case 'accept':
             deferred.resolve(response);
             break;
         case 'fatal':
@@ -154,7 +112,7 @@ testCases.push(new bootstrap.TestCase('set params', 60000).
 
 testCases.push(new bootstrap.TestCase('get gcode', 60000).
     onStarting(function(deferred, conn) {
-        conn.sendText(['go', uploadName, '-g'].join(' '));
+        conn.sendText(['go', '-g'].join(' '));
     }).
     onProgress(function(response, deferred, conn) {
         // progress
@@ -175,7 +133,7 @@ testCases.push(new bootstrap.TestCase('get gcode', 60000).
 
 testCases.push(new bootstrap.TestCase('get fcode', 60000).
     onStarting(function(deferred, conn) {
-        conn.sendText(['go', uploadName, '-f'].join(' '));
+        conn.sendText(['go', '-f'].join(' '));
     }).
     onProgress(function(response, deferred, conn) {
         // progress
@@ -194,4 +152,4 @@ testCases.push(new bootstrap.TestCase('get fcode', 60000).
     })
 );
 
-bootstrap.executeTest('svg laser parser', 'svg-laser-parser', testCases);
+bootstrap.executeTest('bitmap laser parser', 'bitmap-laser-parser', testCases);
