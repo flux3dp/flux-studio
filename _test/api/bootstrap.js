@@ -113,10 +113,6 @@ exports.TestCase = function(describe, timeout) {
             });
         });
 
-        setTimeout(function() {
-            exports.err(describe + ' Timeout', 9999);
-        }, self.timeout);
-
         return deferred.promise;
     };
 };
