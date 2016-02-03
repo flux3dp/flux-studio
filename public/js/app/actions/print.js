@@ -385,12 +385,12 @@ define([
     }
 
     function startSlicing(type) {
-        slicingStatus.inProgress            = true;
-        slicingStatus.canInterrupt          = false;
-        slicingStatus.pauseReport           = true;
-        slicingStatus.hasError              = false;
-        blobExpired                         = true;
-        willReslice                         = false;
+        slicingStatus.inProgress    = true;
+        slicingStatus.canInterrupt  = false;
+        slicingStatus.pauseReport   = true;
+        slicingStatus.hasError      = false;
+        blobExpired                 = true;
+        willReslice                 = false;
 
         if(objects.length === 0 || !blobExpired) { return; }
         var ids = [];
@@ -896,7 +896,10 @@ define([
                                     var serverMessage = `${result.status}: ${result.message} (${parseInt(result.percentage * 100)}%)`,
                                         drawingMessage = `Finishing up... (100%)`,
                                         message = result.status !== 'complete' ? serverMessage : drawingMessage;
-                                    ProgressActions.updating(message, parseInt(result.percentage * 100));
+                                    if(!willReslice) {
+                                        ProgressActions.updating(message, parseInt(result.percentage * 100));
+                                    }
+
                                 }
                                 else {
                                     ProgressActions.close();
