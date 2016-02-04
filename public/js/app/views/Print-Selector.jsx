@@ -210,7 +210,13 @@ define([
                 }).
                 fail(function(status) {
                     ProgressActions.close();
-                    AlertActions.showPopupError('fatal-occurred', status);
+
+                    if (status === DeviceConstants.MONITOR_TOO_OLD) {
+                        AlertActions.showPopupError('fatal-occurred', lang.message.monitor_too_old.content, lang.message.monitor_too_old.caption);
+                    }
+                    else {
+                        AlertActions.showPopupError('fatal-occurred', status);
+                    }
                 });
             }
         },
