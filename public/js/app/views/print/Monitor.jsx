@@ -1001,7 +1001,13 @@ define([
                     currentDirectoryContent.files[index][0],
                     opts
                 ).then(function(r) {
-                    filesArray.push(r);
+                    if(r.error) {
+                        filesArray.push(currentDirectoryContent.files[index]);
+                    }
+                    else {
+                        filesArray.push(r);
+                    }
+
                     socketStatus.ready = true;
                     if(socketStatus.cancel) {
                         callback(filesArray);
