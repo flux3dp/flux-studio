@@ -533,9 +533,7 @@ define([
                 slicingStatus.canInterrupt = false;
                 slicer.getSlicingResult().then(function(r) {
                     slicingStatus.canInterrupt = true;
-                    if(show) {
-                        ProgressActions.close();
-                    }
+                    ProgressActions.close();
                     setTimeout(function() {
                         if(needToShowMonitor) {
                             reactSrc._handleDeviceSelected();
