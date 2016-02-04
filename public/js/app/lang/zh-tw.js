@@ -915,7 +915,11 @@ define(function() {
             },
             gCodeAreaTooBigCaption: '工作路徑超過列印範圍',
             gCodeAreaTooBigMessage: '請縮小物體尺寸、關閉底座、Brim或是Skirt',
-            image_is_too_small: '圖檔內容有誤'
+            image_is_too_small: '圖檔內容有誤',
+            monitor_too_old: {
+                caption: '韌體需要更新',
+                content: '請至官網安裝最新韌體 <a target="_blank" href="http://helpcenter.flux3dp.com/hc/zh-tw/articles/216251077">瞭解更多</a>'
+            }
         },
         machine_status: {
             '-10': 'Raw Mode',
