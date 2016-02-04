@@ -310,6 +310,7 @@ define([
                 }.bind(this), 200);
             }
             else {
+                totalTimeInSeconds = parseInt(this.props.slicingStatus.time);
                 this._startReport();
             }
         },
