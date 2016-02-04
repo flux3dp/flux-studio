@@ -91,6 +91,7 @@ define([
 
                 componentWillUnmount: function () {
                     this.state.laserEvents.destroySocket();
+                    this.state.laserEvents.destroy();
                     dndHandler.unplug(document);
                 },
 

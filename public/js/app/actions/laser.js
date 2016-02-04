@@ -311,6 +311,7 @@ define([
             },
             $target_image = null, // changing when image clicked
             printer = null,
+            resetPosTimer = null,
             printer_selecting = false,
             handleLaser = function(settings, callback, progressType, fileMode) {
                 fileMode = fileMode || '-f';
@@ -620,7 +621,7 @@ define([
             refreshImagePanelPos();
         });
 
-        setInterval(resetPosition, 200);
+        resetPosTimer = setInterval(resetPosition, 200);
 
         return {
             handleLaser: function(settings) {
@@ -791,6 +792,9 @@ define([
             refreshImage: refreshImage,
             getCurrentImages: function() {
                 return $('.' + LASER_IMG_CLASS);
+            },
+            destroy: function() {
+                clearInterval(resetPosTimer);
             }
         };
     };
