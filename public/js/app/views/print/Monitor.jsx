@@ -860,7 +860,7 @@ define([
 
             headInfo = report.module ? lang.monitor.device[report.module] : '';
 
-            if(!report.error) {
+            if(!report.error || report.error.length === 0) {
                 //If home failed, at least show an error
                 if(statusId !== DeviceConstants.status.IDLE) {
                     AlertActions.closePopup();
