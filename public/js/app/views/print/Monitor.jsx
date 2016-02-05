@@ -1424,6 +1424,10 @@ define([
                 }
             }
 
+            if(!_duration && ! _progress) {
+                infoClass = 'status-info';
+            }
+
             return (
                 <div className={infoClass}>
                     <div className="verticle-align">
