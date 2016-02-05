@@ -533,12 +533,12 @@ define([
                 slicingStatus.canInterrupt = false;
                 slicer.getSlicingResult().then(function(r) {
                     slicingStatus.canInterrupt = true;
-                    ProgressActions.close();
                     setTimeout(function() {
                         if(needToShowMonitor) {
                             reactSrc._handleDeviceSelected();
                             needToShowMonitor = false;
                         }
+                        ProgressActions.close();
                     }, 1000);
 
                     blobExpired = false;
