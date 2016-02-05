@@ -210,13 +210,13 @@ define([
 
                 events.onError = function(result) {
                     errors.push(result.error);
-                }
+                };
 
                 if(name === 'advancedSettings' && value !== '') {
                     ws.send(`advanced_setting ${value}`);
                 }
                 else {
-                    ws.send(`set_params ${name} ${value}`);
+                    ws.send(`advanced_setting ${name} = ${value}`);
                 }
 
                 lastOrder = 'set_params';
