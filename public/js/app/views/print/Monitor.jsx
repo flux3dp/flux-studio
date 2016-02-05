@@ -105,6 +105,7 @@ define([
         go,
         pause,
         stop,
+        preparing,
         commands,
         action,
         cameraClass,
@@ -139,7 +140,7 @@ define([
 
         'INIT': function() {
             displayStatus = lang.device.starting;
-            currentStatus = '';
+            currentStatus = DeviceConstants.STARTING;
         },
 
         'STARTING': function() {
@@ -165,13 +166,13 @@ define([
 
         'WAITING_HEAD': function() {
             displayStatus = lang.device.heating;
-            currentStatus = '';
+            currentStatus = DeviceConstants.HEATING;
             leftButtonOn = false;
         },
 
         'CORRECTING': function() {
             displayStatus = lang.device.calibrating;
-            currentStatus = '';
+            currentStatus = DeviceConstants.CALIBRATING;
         },
 
         'COMPLETING': function() {
@@ -1247,6 +1248,16 @@ define([
                 );
             }.bind(this);
 
+            preparing = function(enable) {
+                className = ClassNames('controls center', {'disabled': true});
+                return (
+                <div className={className}>
+                    <div className="btn-pause btn-control"></div>
+                    <div className="description">{lang.monitor.pause}</div>
+                </div>
+                );
+            }.bind(this);
+
             commands = {
                 'READY': function() {
                     return go;
@@ -1257,12 +1268,20 @@ define([
                 },
 
                 'STARTING': function() {
-                    return pause;
+                    return preparing;
                 },
 
                 'PAUSED': function() {
                     return go;
                 },
+
+                'HEATING': function() {
+                    return preparing;
+                },
+
+                'CALIBRATING': function() {
+                    return preparing;
+                }
             };
 
             action = !!commands[this.state.currentStatus] ? commands[this.state.currentStatus]() : '';

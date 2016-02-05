@@ -41,7 +41,8 @@ define(function() {
         OCCUPIED        : 'OCCUPIED',
         SCANNING        : 'SCANNING',
         CALIBRATING     : 'CALIBRATING',
-        MONITOR_TOO_OLD : 'FLUXMONITOR_VERSION_IS_TOO_OLD',
+        HEATING         : 'HEATING',
+        MONITOR_TOO_OLD : 'FLUXMONITOR VERSION IS TOO OLD',
 
         // folder
         NOT_EXIST       : 'NOT_EXIST',
