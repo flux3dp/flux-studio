@@ -17,7 +17,7 @@ define([
         constants;
 
     qualityLevel = {
-        high: 0.05,
+        high: 0.10,
         med: 0.15,
         low: 0.25
     };

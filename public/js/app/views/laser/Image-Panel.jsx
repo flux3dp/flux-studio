@@ -183,7 +183,7 @@ define([
                                 <div className="control">
                                     <span className="text-center header">{lang.laser.object_params.size.unit.width}</span>
                                     <UnitInput
-                                        min={10}
+                                        min={1}
                                         max={170}
                                         dataAttrs={{ type: 'width' }}
                                         ref="objectSizeW"
@@ -194,7 +194,7 @@ define([
                                 <div className="control">
                                     <span className="text-center header">{lang.laser.object_params.size.unit.height}</span>
                                     <UnitInput
-                                        min={10}
+                                        min={1}
                                         max={170}
                                         dataAttrs={{ type: 'height' }}
                                         ref="objectSizeH"

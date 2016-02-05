@@ -19,6 +19,7 @@ define([
     'helpers/device-master',
     'app/stores/global-store',
     'app/actions/global-actions',
+    'app/constants/global-constants',
     'app/constants/device-constants',
     'jsx!widgets/Tour-Guide',
     'app/actions/alert-actions',
@@ -51,6 +52,7 @@ define([
     DeviceMaster,
     GlobalStore,
     GlobalActions,
+    GlobalConstants,
     DeviceConstants,
     TourGuide,
     AlertActions,
@@ -200,22 +202,22 @@ define([
                     };
 
                     this._registerKeyEvents();
-                    if(Config().read('configured-printer') && tutorialMode){
+                    if(Config().read('configured-printer') && tutorialMode) {
                         //First time using, with usb-configured printer..
                         AlertActions.showPopupYesNo('set_default', sprintf(lang.tutorial.set_first_default,Config().read('configured-printer')),lang.tutorial.set_first_default_caption);
                         AlertStore.onYes(this._handleSetFirstDefault);
-                        //Use setTimeout to avoid multiple modal display conflict
-                        this._handleDefaultCancel = function(ans) {
-                            setTimeout(function() {
-                                this._registerTutorial();
-                            }.bind(this), 10);
-                        }.bind(this);
                         AlertStore.onCancel(this._handleDefaultCancel);
                     }
+
+                    GlobalStore.onCancelPreview(this._handleCancelPreview);
                 },
 
                 componentWillUnmount: function() {
                     director.clear();
+
+                    AlertStore.removeYesListener(this._handleSetFirstDefault);
+                    AlertStore.removeCancelListener(this._handleDefaultCancel);
+                    GlobalStore.removeCancelPreviewListener(this._handleCancelPreview);
                 },
 
                 _registerKeyEvents: function() {
@@ -424,11 +426,14 @@ define([
                     });
 
                     director.getFCode().then(function(fcode, previewUrl) {
+                        if(director.getSlicingStatus().inProgress) {
+                            return;
+                        }
                         if(!(fcode instanceof Blob)) {
                             AlertActions.showPopupError('', lang.print.out_of_range_message, lang.print.out_of_range);
                             return;
                         }
-                        GlobalActions.showMonitor(selectedPrinter, fcode, previewUrl);
+                        GlobalActions.showMonitor(selectedPrinter, fcode, previewUrl, GlobalConstants.PRINT);
                         //Tour popout after show monitor delay
                         setTimeout(function() {
                             if(tutorialMode) {
@@ -571,6 +576,17 @@ define([
 
                 _handleObjectDialogueFocus: function(isFocused) {
                     allowDeleteObject = !isFocused;
+                },
+
+                _handleDefaultCancel: function(ans) {
+                    //Use setTimeout to avoid multiple modal display conflict
+                    setTimeout(function() {
+                        this._registerTutorial();
+                    }, 10);
+                },
+
+                _handleCancelPreview: function() {
+                    director.cancelPreview();
                 },
 
                 _renderAdvancedPanel: function() {

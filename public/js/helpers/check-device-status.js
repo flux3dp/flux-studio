@@ -25,6 +25,9 @@ define([
     return function(printer) {
         var deferred = $.Deferred(),
             onYes = function(id) {
+                var timer,
+                    _deferred = $.Deferred();
+
                 DeviceMaster.selectDevice(printer).then(function() {
                     switch (id) {
                     case 'kick':
@@ -34,7 +37,24 @@ define([
                         break;
                     case 'abort':
                         DeviceMaster.stop().done(function() {
-                            deferred.resolve('ok');
+                            timer = setInterval(function() {
+                                DeviceMaster.getReport().done(function(report) {
+                                    _deferred.notify(report);
+                                });
+                            }, 100);
+
+                            _deferred.progress(function(report) {
+                                if (report.st_id === DeviceConstants.status.ABORTED) {
+                                    setTimeout(function() {
+                                        DeviceMaster.quit().done(function() {
+                                            deferred.resolve('ok');
+                                            _deferred.resolve('ok');
+                                        });
+                                    }, 500);
+
+                                    clearInterval(timer);
+                                }
+                            });
                         });
                         break;
                     }

@@ -68,6 +68,7 @@ define([
                     showMonitor           : false,
                     fcode                 : {},
                     previewUrl            : '',
+                    monitorOpener         : null,
 
                     // general popup
                     showNotificationModal : false,
@@ -134,6 +135,7 @@ define([
                 GlobalStore.onShowMonitor(this._handleOpenMonitor);
                 GlobalStore.onCloseAllView(this._handleCloseAllView);
                 GlobalStore.onSliceComplete(this._handleSliceReport);
+                GlobalStore.onCloseMonitor(this._handlecloseMonitor);
 
                 this._checkSoftwareUpdate();
             },
@@ -149,6 +151,11 @@ define([
 
                 // input lightbox
                 InputLightboxStore.removeOpenedListener(this._handleInputLightBoxOpen);
+
+                GlobalStore.removeShowMoniotorListener();
+                GlobalStore.removeCloseMonitorListener();
+                GlobalStore.removeCloseAllViewListener();
+                GlobalStore.removeSliceCompleteListener();
             },
 
             _showChangeFilament: function(payload) {
@@ -291,13 +298,13 @@ define([
                 });
             },
 
-            _handleNotification: function(type, message) {
+            _handleNotification: function(type, message, onClickCallback) {
                 var self = this;
 
                 var types = {
                     INFO: function() {
                         $.growl.notice({
-                            title   : self.state.lang.alert.info,
+                            title   : lang.alert.info,
                             message : message,
                             location: 'bl'
                         });
@@ -305,7 +312,7 @@ define([
 
                     WARNING: function() {
                         $.growl.warning({
-                            title   : self.state.lang.alert.warning,
+                            title   : lang.alert.warning,
                             message : message,
                             location: 'bl'
                         });
@@ -313,7 +320,7 @@ define([
 
                     ERROR: function() {
                         $.growl.error({
-                            title   : self.state.lang.alert.error,
+                            title   : lang.alert.error,
                             message : message,
                             fixed   : true,
                             location: 'bl'
@@ -322,6 +329,11 @@ define([
                 };
 
                 types[type]();
+                setTimeout(function() {
+                    $('.growl').on('click', function() {
+                        onClickCallback();
+                    });
+                }, 500);
             },
 
             _handlePopup: function(type, id, caption, message, customText) {
@@ -367,16 +379,17 @@ define([
 
             },
 
-            _handleOpenMonitor: function(payload, selectedDevice, fcode, previewUrl) {
+            _handleOpenMonitor: function(payload) {
                 this.setState({
                     fcode: payload.fcode,
                     showMonitor: true,
                     selectedDevice: payload.printer,
-                    previewUrl: payload.previewUrl
+                    previewUrl: payload.previewUrl,
+                    monitorOpener: payload.opener
                 });
             },
 
-            _handleMonitorClose: function() {
+            _handlecloseMonitor: function() {
                 this.setState({
                     showMonitor: false
                 });
@@ -399,7 +412,8 @@ define([
                         fCode          = {this.state.fcode}
                         previewUrl     = {this.state.previewUrl}
                         slicingStatus  = {this.state.slicingStatus}
-                        onClose        = {this._handleMonitorClose} />
+                        opener         = {this.state.monitorOpener}
+                        onClose        = {this._handlecloseMonitor} />
                 );
                 return (
                     <Modal
