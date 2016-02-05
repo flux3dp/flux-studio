@@ -51,6 +51,7 @@ while true; do
             cd $DIR/_tools/nwjs-shell-builder/TMP/output/
             zip -r -X ./fstudio-$(date +%Y%m%d)-win-x86.zip ./fstudio-$(date +%Y%m%d)-win-x86
             cd $DIR/_tools
+            cp ./fstudio-$(date +%Y%m%d)-win-x86.zip /var/www/latest-version/fstudio-$(date +%Y%m%d)-win-x86.zip
 
             # clear
             rm -r $DIR/lib
@@ -89,7 +90,7 @@ while true; do
             cd $DIR/_tools/nwjs-shell-builder/TMP/output/
             zip -r -X ./fstudio-$(date +%Y%m%d)-win-x64.zip ./fstudio-$(date +%Y%m%d)-win-x64
             cd $DIR/_tools
-
+            cp ./fstudio-$(date +%Y%m%d)-win-x64.zip /var/www/latest-version/fstudio-$(date +%Y%m%d)-win-x64.zip
             break;;
 
         [Oo] )
@@ -124,11 +125,15 @@ while true; do
             printf "${TXT_INFO} Packing a dmg ${TXT_RESET}"
             printf "\n";
             mv $DIR/_tools/nwjs-shell-builder/TMP/output/FLUX\ Studio/FLUX_Studio.app $DIR/_tools/nwjs-shell-builder/TMP/output/FLUX\ Studio/FLUX\ Studio.app
-            ln -s /Applications $DIR/_tools/nwjs-shell-builder/TMP/output/FLUX\ Studio/Applications
-
-            hdiutil create -size 500m -srcfolder $DIR/_tools/nwjs-shell-builder/TMP/output/FLUX\ Studio/ $DIR/_tools/nwjs-shell-builder/TMP/output/FLUX\ Studio/fstudio-$(date +%Y%m%d)-osx.dmg
-            rm $DIR/_tools/nwjs-shell-builder/TMP/output/FLUX\ Studio/Applications
-
+            # Mac OSX
+            if [[ "$OSTYPE" == "darwin"* ]]; then
+                  ln -s /Applications $DIR/_tools/nwjs-shell-builder/TMP/output/FLUX\ Studio/Applications
+                  hdiutil create -size 500m -srcfolder $DIR/_tools/nwjs-shell-builder/TMP/output/FLUX\ Studio/ $DIR/_tools/nwjs-shell-builder/TMP/output/FLUX\ Studio/fstudio-$(date +%Y%m%d)-osx.dmg
+                  rm $DIR/_tools/nwjs-shell-builder/TMP/output/FLUX\ Studio/Applications
+            else
+                  zip -r -X ~/fstudio-$(date +%Y%m%d)-osx.zip $DIR/_tools/nwjs-shell-builder/TMP/output/FLUX\ Studio/FLUX\ Studio.app
+                  cp ~/fstudio-$(date +%Y%m%d)-osx.zip /var/www/latest-version/osx
+            fi
             break;;
 
         [Ll] )
