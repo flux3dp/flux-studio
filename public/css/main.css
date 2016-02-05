@@ -3882,8 +3882,10 @@ input[type=range]:focus::-webkit-slider-runnable-track {
             .flux-monitor .main .title .back:hover {
                 color: #333; }
             .flux-monitor .main .title .close {
-                right: 12px;
-                top: 9px; }
+                width: 28px;
+                height: 28px;
+                right: 20px;
+                top: 12px; }
         .flux-monitor .main .body {
             height: 70%; }
             .flux-monitor .main .body .device-content {
