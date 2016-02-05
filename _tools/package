@@ -11,13 +11,18 @@ TXT_WARNING="\e[93m"
 TXT_ERROR="\e[31m"
 TXT_RESET="\e[0m"
 
+#arg
+REPLY=$1
+
 $DIR/_tools/nwjs-shell-builder/nwjs-build.sh --clean
 rm -r $DIR/lib
 mkdir -p $DIR/lib
 cd $DIR/_tools
 
 while true; do
-    read -p "==> Build for which OS? (Windows[W], OSX[O], Linux[L]) "
+    if test -z "$REPLY"; then
+    	read -p "==> Build for which OS? (Windows[W], OSX[O], Linux[L]) "
+    fi
     case $REPLY in
         [Ww] )
             printf "\n";
@@ -50,8 +55,8 @@ while true; do
             cp $DIR/_tools/platform-script/windows-firewall.bat $DIR/_tools/nwjs-shell-builder/TMP/output/fstudio-$(date +%Y%m%d)-win-x86/
             cd $DIR/_tools/nwjs-shell-builder/TMP/output/
             zip -r -X ./fstudio-$(date +%Y%m%d)-win-x86.zip ./fstudio-$(date +%Y%m%d)-win-x86
-            cd $DIR/_tools
-            cp ./fstudio-$(date +%Y%m%d)-win-x86.zip /var/www/latest-version/fstudio-$(date +%Y%m%d)-win-x86.zip
+            cp ./fstudio-$(date +%Y%m%d)-win-x86.zip /var/www/latest-release/app/fstudio-$(date +%Y%m%d)-win-x86.zip
+	    cd $DIR/_tools
 
             # clear
             rm -r $DIR/lib
@@ -89,8 +94,8 @@ while true; do
             cp $DIR/_tools/platform-script/windows-firewall.bat $DIR/_tools/nwjs-shell-builder/TMP/output/fstudio-$(date +%Y%m%d)-win-x64/
             cd $DIR/_tools/nwjs-shell-builder/TMP/output/
             zip -r -X ./fstudio-$(date +%Y%m%d)-win-x64.zip ./fstudio-$(date +%Y%m%d)-win-x64
+            cp ./fstudio-$(date +%Y%m%d)-win-x64.zip /var/www/latest-release/app/fstudio-$(date +%Y%m%d)-win-x64.zip
             cd $DIR/_tools
-            cp ./fstudio-$(date +%Y%m%d)-win-x64.zip /var/www/latest-version/fstudio-$(date +%Y%m%d)-win-x64.zip
             break;;
 
         [Oo] )
@@ -132,7 +137,7 @@ while true; do
                   rm $DIR/_tools/nwjs-shell-builder/TMP/output/FLUX\ Studio/Applications
             else
                   zip -r -X ~/fstudio-$(date +%Y%m%d)-osx.zip $DIR/_tools/nwjs-shell-builder/TMP/output/FLUX\ Studio/FLUX\ Studio.app
-                  cp ~/fstudio-$(date +%Y%m%d)-osx.zip /var/www/latest-version/osx
+                  cp ~/fstudio-$(date +%Y%m%d)-osx.zip /var/www/latest-release/app/fstudio-$(date +%Y%m%d)-osx.zip
             fi
             break;;
 
