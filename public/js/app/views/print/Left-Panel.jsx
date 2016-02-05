@@ -98,7 +98,7 @@ define([
                     '0.25': lang.quality.low
                 };
                 if(nextProps.layerHeight) {
-
+                    layerHeight = nextProps.layerHeight;
                     this.setState({ quality: _quality[nextProps.layerHeight.toString()] || lang.quality.custom });
                 }
             }
