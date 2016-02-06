@@ -917,8 +917,8 @@ define(function() {
             gCodeAreaTooBigMessage: 'Please reduce the size of the object(s), or try to turn off raft, brim or skirt',
             image_is_too_small: 'The file contains unsupported information',
             monitor_too_old: {
-                caption: 'Firmware outdated',
-                content: 'Please install the latest firmware. <a target="_blank" href="http://helpcenter.flux3dp.com/hc/zh-tw/articles/216251077">瞭解更多</a>'
+                caption: 'Firmware Outdated',
+                content: 'Please install the latest firmware. <a target="_blank" href="http://helpcenter.flux3dp.com/hc/zh-tw/articles/216251077"> More</a>'
             }
         },
         machine_status: {
