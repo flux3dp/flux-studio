@@ -14,7 +14,7 @@
         "min_width": 1000,
         "min_height": 600,
         "js-flags": "--max-old-space-size 1900",
-        "toolbar": false
+        "toolbar": true
     },
     "webkit": {
         "plugin": true
