@@ -557,7 +557,7 @@ define([
                 DeviceMaster.fileInfo(pathArray.join('/'), fileName).then(function(info) {
                     if(info[1] instanceof Blob) {
                         this._processInfo([info[2]]);
-                        previewUrl = URL.createObjectURL(info[1]);
+                        previewUrl = info[1].size === 0 ? '/img/ph_l.png' : URL.createObjectURL(info[1]);
                         filePreview = true;
                         pathArray.push(fileName);
                         this.setState({
@@ -883,6 +883,10 @@ define([
             if(this._isAbortedOrCompleted() && pathArray.length > 0) {
                 currentStatus = DeviceConstants.READY;
             }
+            else {
+                currentStatus = status;
+            }
+
 
             var report_info = {
                 temperature: temperature,
@@ -1275,6 +1279,10 @@ define([
                     return go;
                 },
 
+                'ABORTED': function() {
+                    return go;
+                },
+
                 'HEATING': function() {
                     return preparing;
                 },
@@ -1333,12 +1341,18 @@ define([
                 }
             }
             else if (this.state.mode === mode.PREVIEW) {
+
                 if(
                     statusId === DeviceConstants.status.IDLE ||
                     statusId === DeviceConstants.status.COMPLETED ||
                     statusId === DeviceConstants.status.ABORTED
                 ) {
                     leftButtonOn = false;
+                    middleButtonOn = false;
+                }
+
+                if(statusId === DeviceConstants.status.PAUSED_FROM_RUNNING) {
+                    leftButtonOn = true;
                 }
 
                 if(statusId === DeviceConstants.status.MAINTAIN ||
