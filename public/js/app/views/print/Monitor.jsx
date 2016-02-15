@@ -557,7 +557,7 @@ define([
                 DeviceMaster.fileInfo(pathArray.join('/'), fileName).then(function(info) {
                     if(info[1] instanceof Blob) {
                         this._processInfo([info[2]]);
-                        previewUrl = URL.createObjectURL(info[1]);
+                        previewUrl = info[1].size === 0 ? '/img/ph_l.png' : URL.createObjectURL(info[1]);
                         filePreview = true;
                         pathArray.push(fileName);
                         this.setState({
