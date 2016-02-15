@@ -1084,6 +1084,13 @@ define([
         SELECTED.size.z = z;
 
         slicingStatus.showProgress = false;
+
+        var t = setInterval(function() {
+            if(slicingStatus.canInterrupt) {
+                doSlicing();
+                clearInterval(t);
+            }
+        }, 500);
     }
 
     function setRotateMode() {
