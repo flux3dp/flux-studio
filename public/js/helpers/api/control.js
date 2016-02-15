@@ -329,7 +329,7 @@ define([
                 }
                 else if(ext[ext.length - 1] === 'gcode') {
                     fileName = fileName.split('.');
-                    fileName.splice(fileName.length - 2, 1);
+                    fileName.pop();
                     fileName.push('fc');
                     fileName = fileName.join('.');
                     ws.send(`upload text/gcode ${blob.size} ${uploadPath}/${fileName}`);
