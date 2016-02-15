@@ -883,7 +883,8 @@ define([
             if(this._isAbortedOrCompleted() && pathArray.length > 0) {
                 currentStatus = DeviceConstants.READY;
             }
-            else {
+
+            if(currentStatus === '') {
                 currentStatus = status;
             }
 
@@ -1348,7 +1349,6 @@ define([
                     statusId === DeviceConstants.status.ABORTED
                 ) {
                     leftButtonOn = false;
-                    middleButtonOn = false;
                 }
 
                 if(statusId === DeviceConstants.status.PAUSED_FROM_RUNNING) {
