@@ -814,6 +814,7 @@ define(function() {
             HEAD_ERROR_FAN_FAILURE              : 'Cooling fan not spinning\nSpin it with a pencil or thin stick.',
             HEAD_ERROR_HEAD_OFFLINE             : 'Toolhead not detected\nPlease re-attach the module cable',
             HEAD_ERROR_TYPE_ERROR               : 'Toolhead incorrect\nPlease attach correct toolhead',
+            HEAD_ERROR_INTLK_TRIG               : 'Laser toolhead tilted\nPlease ensure the rods are connected correctly, then continue',
             'HEAD_ERROR_?'                      : 'Toolhead error\nCheck if the toolhead is abnormal',
             HARDWARE_ERROR_FILAMENT_RUNOUT      : 'Ran out of filament\nPlease insert new material',
             HARDWARE_ERROR_0                    : 'Ran out of filament\nPlease insert new material',

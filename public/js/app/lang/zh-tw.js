@@ -814,6 +814,7 @@ define(function() {
             HEAD_ERROR_FAN_FAILURE              : '風扇未轉動\n請用細針戳一下',
             HEAD_ERROR_HEAD_OFFLINE             : '工具頭離線\n請重新插入模組連接線',
             HEAD_ERROR_TYPE_ERROR               : '錯誤模組\n請安裝正確模組',
+            HEAD_ERROR_INTLK_TRIG               : '雷射工具頭傾\n請確認金屬棒正確連結，再繼續',
             'HEAD_ERROR_?'                      : 'Toolhead error\nCheck if the toolhead is abnormal',
             HARDWARE_ERROR_FILAMENT_RUNOUT      : '未偵測到料捲\n請重新插入新的料捲',
             HARDWARE_ERROR_0                    : '未偵測到料捲\n請重新插入新的料捲',
