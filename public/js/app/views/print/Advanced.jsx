@@ -508,7 +508,7 @@ define([
                 <div className="content-wrapper">
 
                     <div className="section">
-                        <div className="title">Infill</div>
+                        <div className="title">{lang.infill}</div>
 
                         <SliderControl
                             id="fill_density"
