@@ -353,7 +353,7 @@ define([
         slicingStatus.canInterrupt = false;
         if(files.item(index).name.split('.').pop().toLowerCase() === 'stl') {
             var reader  = new FileReader();
-            reader.addEventListener("load", function () {
+            reader.addEventListener('load', function () {
                 appendModel(reader.result, files.item(index), function() {
                     if(files.length > index + 1) {
                         appendModels(files, index + 1, callback);
@@ -424,6 +424,7 @@ define([
                 var t = setInterval(function() {
                     if(slicingStatus.canInterrupt) {
                         clearInterval(t);
+                        slicingStatus.isComplete = false;
                         startSlicing(slicingType.F);
                     }
                 }, 500);
@@ -433,6 +434,7 @@ define([
             slicingTimmer = setInterval(function() {
                 if(slicingStatus.canInterrupt) {
                     clearInterval(slicingTimmer);
+                    slicingStatus.isComplete = false;
                     startSlicing(slicingType.F);
                 }
             }, 500);
@@ -1144,6 +1146,8 @@ define([
 
     function setRotation(x, y, z, needRender, src) {
         src = src || SELECTED;
+        syncObjectOutline(src);
+
         var _x = parseInt(x) || 0,
             _y = parseInt(y) || 0,
             _z = parseInt(z) || 0;
@@ -1800,6 +1804,7 @@ define([
         outlineMesh.position.set(mesh.position.x, mesh.position.y, mesh.position.z);
         outlineMesh.scale.set(mesh.scale.x, mesh.scale.y, mesh.scale.z);
         outlineMesh.rotation.set(mesh.rotation.x, mesh.rotation.y, mesh.rotation.z);
+        outlineMesh.up = new THREE.Vector3(0, 0, 1);
         mesh.outlineMesh = outlineMesh;
         outlineScene.add(outlineMesh);
 
@@ -1896,6 +1901,7 @@ define([
 
     function _handleSliceComplete() {
         if(previewMode) {
+            slicingStatus.isComplete = true;
             _showWait(lang.print.drawingPreview, !showStopButton);
             slicingStatus.canInterrupt = false;
             slicer.getPath().then(function(result) {
@@ -1906,6 +1912,9 @@ define([
                     slicingStatus.showProgress = false;
                 });
             });
+        }
+        else {
+            slicingStatus.isComplete = true;
         }
 
         slicingStatus.inProgress    = false;
@@ -1942,7 +1951,10 @@ define([
             else {
                 progress = lang.print.gettingSlicingReport;
             }
-            _showWait(progress, !showStopButton);
+
+            if(!slicingStatus.isComplete) {
+                _showWait(progress, !showStopButton);
+            }
         }
         else {
             _showWait(lang.print.drawingPreview, !showStopButton);

@@ -85,7 +85,6 @@ define([
             defaultRaftLayer = 4,
             allowDeleteObject = true,
             tutorialMode = false,
-            showChangeFilament = false,
             nwjsMenu = menuFactory.items,
             tourGuide = [
                 {
@@ -273,7 +272,7 @@ define([
                                               uuid: printer.uuid
                                     });
                                     setTimeout(function() {
-                                        AlertActions.showInfo(sprintf(lang.set_default.success, printer.name))
+                                        AlertActions.showInfo(sprintf(lang.set_default.success, printer.name));
                                     }, 100);
                                     //Start tutorial
                                     setTimeout(function() {
