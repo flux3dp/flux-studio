@@ -10,7 +10,6 @@ define([
     'jsx!views/print/Right-Panel',
     'jsx!views/print/Monitor',
     'jsx!views/print/Object-Dialogue',
-    'helpers/file-system',
     'helpers/api/control',
     'jsx!widgets/Modal',
     'helpers/api/config',
@@ -19,6 +18,7 @@ define([
     'helpers/device-master',
     'app/stores/global-store',
     'app/actions/global-actions',
+    'app/constants/global-constants',
     'app/constants/device-constants',
     'jsx!widgets/Tour-Guide',
     'app/actions/alert-actions',
@@ -42,7 +42,6 @@ define([
     RightPanel,
     Monitor,
     ObjectDialogue,
-    FileSystem,
     PrinterController,
     Modal,
     Config,
@@ -51,6 +50,7 @@ define([
     DeviceMaster,
     GlobalStore,
     GlobalActions,
+    GlobalConstants,
     DeviceConstants,
     TourGuide,
     AlertActions,
@@ -82,9 +82,9 @@ define([
             lang = args.state.lang,
             selectedPrinter,
             $importBtn,
+            defaultRaftLayer = 4,
             allowDeleteObject = true,
             tutorialMode = false,
-            showChangeFilament = false,
             nwjsMenu = menuFactory.items,
             tourGuide = [
                 {
@@ -137,11 +137,12 @@ define([
             view = React.createClass({
 
                 getInitialState: function() {
-                    var _setting = Config().read('advanced-settings');
+                    var _setting = Config().read('advanced-settings'),
+                        _raftLayers;
 
                     if(!_setting) {
                         advancedSettings = {};
-                        advancedSettings.raft_layers = 4;
+                        advancedSettings.raft_layers = defaultRaftLayer;
                         advancedSettings.support_material = 0;
                         advancedSettings.custom = DefaultPrintSettings.custom;
                     }
@@ -149,9 +150,15 @@ define([
                         advancedSettings = _setting;
                     }
 
-                    if(!Config().read('tutorial-finished')){
+                    if(!advancedSettings.raft_layers || advancedSettings.raft_layers === '0') {
+                        advancedSettings.raft_layers = defaultRaftLayer;
+                    }
+
+                    if(!Config().read('tutorial-finished')) {
                         tutorialMode = true;
                     }
+
+                    _raftLayers = parseInt(this._getValueFromAdvancedCustomSettings('raft_layers'));
 
                     return ({
                         showAdvancedSettings        : false,
@@ -168,7 +175,8 @@ define([
                         previewMode                 : false,
                         currentTutorialStep         : 0,
                         layerHeight                 : 0.1,
-                        raftOn                      : advancedSettings.raft_layers !== 0,
+                        raftLayers                  : _raftLayers,
+                        raftOn                      : advancedSettings.custom.raft_layers !== 0,
                         supportOn                   : advancedSettings.support_material === 1,
                         mode                        : 'scale',
                         previewLayerCount           : 0,
@@ -200,22 +208,22 @@ define([
                     };
 
                     this._registerKeyEvents();
-                    if(Config().read('configured-printer') && tutorialMode){
+                    if(Config().read('configured-printer') && tutorialMode) {
                         //First time using, with usb-configured printer..
                         AlertActions.showPopupYesNo('set_default', sprintf(lang.tutorial.set_first_default,Config().read('configured-printer')),lang.tutorial.set_first_default_caption);
                         AlertStore.onYes(this._handleSetFirstDefault);
-                        //Use setTimeout to avoid multiple modal display conflict
-                        this._handleDefaultCancel = function(ans) {
-                            setTimeout(function() {
-                                this._registerTutorial();
-                            }.bind(this), 10);
-                        }.bind(this);
                         AlertStore.onCancel(this._handleDefaultCancel);
                     }
+
+                    GlobalStore.onCancelPreview(this._handleCancelPreview);
                 },
 
                 componentWillUnmount: function() {
                     director.clear();
+
+                    AlertStore.removeYesListener(this._handleSetFirstDefault);
+                    AlertStore.removeCancelListener(this._handleDefaultCancel);
+                    GlobalStore.removeCancelPreviewListener(this._handleCancelPreview);
                 },
 
                 _registerKeyEvents: function() {
@@ -263,14 +271,20 @@ define([
                                               serial: printer.serial,
                                               uuid: printer.uuid
                                     });
-                                    setTimeout(function(){AlertActions.showInfo(sprintf(lang.set_default.success, printer.name))}, 100);
+                                    setTimeout(function() {
+                                        AlertActions.showInfo(sprintf(lang.set_default.success, printer.name));
+                                    }, 100);
                                     //Start tutorial
-                                    setTimeout(function(){this._registerTutorial()}.bind(this), 100);
+                                    setTimeout(function() {
+                                        this._registerTutorial();
+                                    }.bind(this), 100);
                                 }.bind(this),
                             onTimeout:
                                 function(){
                                     ProgressActions.close();
-                                    setTimeout(function(){AlertActions.showWarning(sprintf(lang.set_default.error, printer.name))}, 100);
+                                    setTimeout(function() {
+                                        AlertActions.showWarning(sprintf(lang.set_default.error, printer.name));
+                                    }, 100);
                                 }
                         });
                 },
@@ -292,24 +306,33 @@ define([
 
                 _handleRaftClick: function() {
                     this.setState({ leftPanelReady: false });
-                    var isOn = !this.state.raftOn;
-                    director.setParameter('raft', isOn ? '1' : '0').then(function() {
+                    var isOn = !this.state.raftOn,
+                        _raftLayers = isOn ? advancedSettings.raft_layers : 0;
+
+                    if(!isOn) {
+                        advancedSettings.raft_layers = this.state.raftLayers || advancedSettings.raft_layers;
+                    }
+
+                    var currentRaftLayers = isOn ? advancedSettings.raft_layers : 0;
+                    var oldValue = this._getLineFromAdvancedCustomSetting('raft_layers');
+                    var newValue = `raft_layers = ${currentRaftLayers}`;
+
+                    advancedSettings.custom = advancedSettings.custom.replace(oldValue, newValue);
+                    Config().write('advanced-settings', JSON.stringify(advancedSettings));
+
+                    director.setParameter('raft_layers', _raftLayers).then(function() {
                         this.setState({
                             leftPanelReady: true,
+                            raftLayers: currentRaftLayers,
                             raftOn: isOn
                         });
                     }.bind(this));
-                    advancedSettings.raft_layers = isOn ? advancedSettings.raft : 0;
-                    advancedSettings.custom = advancedSettings.custom.replace(
-                        `raft_layers = ${isOn ? 0 : advancedSettings.raft}`,
-                        `raft_layers = ${isOn ? advancedSettings.raft : 0}`);
-                    Config().write('advanced-settings', JSON.stringify(advancedSettings));
                 },
 
                 _handleSupportClick: function() {
                     this.setState({ leftPanelReady: false });
                     var isOn = !this.state.supportOn;
-                    director.setParameter('support', isOn ? '1' : '0').then(function() {
+                    director.setParameter('support_material', isOn ? '1' : '0').then(function() {
                         this.setState({
                             leftPanelReady: true,
                             supportOn: isOn
@@ -326,7 +349,6 @@ define([
                     this.setState({ showAdvancedSettings: !this.state.showAdvancedSettings }, function() {
                         allowDeleteObject = !this.state.showAdvancedSettings;
                     });
-
                 },
 
                 _handleGoClick: function() {
@@ -376,14 +398,22 @@ define([
                 },
 
                 _handleApplyAdvancedSetting: function(setting) {
-                    setting = setting || advancedSettings;
-                    Config().write('advanced-settings', JSON.stringify(setting));
                     Object.assign(advancedSettings, setting);
+                    // remove old properties
+                    delete advancedSettings.raft;
+                    delete advancedSettings.raft_on;
+                    Config().write('advanced-settings', JSON.stringify(advancedSettings));
+                    var _raftLayers = parseInt(this._getValueFromAdvancedCustomSettings('raft_layers'));
+                    if(_raftLayers !== 0) {
+                        advancedSettings.raft_layers = _raftLayers;
+                    }
                     this.setState({
-                        supportOn: setting.support_material === 1,
-                        layerHeight: setting.layer_height
+                        supportOn: advancedSettings.support_material === 1,
+                        layerHeight: advancedSettings.layer_height,
+                        raftLayers: _raftLayers,
+                        raftOn: _raftLayers !== 0
                     });
-                    return director.setAdvanceParameter(setting);
+                    return director.setAdvanceParameter(advancedSettings);
                 },
 
                 _handleImport: function(e) {
@@ -424,11 +454,14 @@ define([
                     });
 
                     director.getFCode().then(function(fcode, previewUrl) {
+                        if(director.getSlicingStatus().inProgress) {
+                            return;
+                        }
                         if(!(fcode instanceof Blob)) {
                             AlertActions.showPopupError('', lang.print.out_of_range_message, lang.print.out_of_range);
                             return;
                         }
-                        GlobalActions.showMonitor(selectedPrinter, fcode, previewUrl);
+                        GlobalActions.showMonitor(selectedPrinter, fcode, previewUrl, GlobalConstants.PRINT);
                         //Tour popout after show monitor delay
                         setTimeout(function() {
                             if(tutorialMode) {
@@ -474,12 +507,16 @@ define([
                 },
 
                 _handleAdvancedValueChange: function(key, value) {
-                    if(key === 'layer_height') {
-                        this.setState({ layerHeight: value });
-                    }
-                    else if (key === 'raft_layers') {
-                        this.setState({ raftOn: value !== '0' });
-                    }
+                    // if(key === 'layer_height') {
+                    //     this.setState({ layerHeight: value });
+                    // }
+                    // else if (key === 'raft_layers') {
+                    //     // if(value !== '0') {
+                    //     //     advancedSettings.raft_layers = value;
+                    //     // }
+                    //     this.setState({ raftOn: value });
+                    // }
+                    // console.log('raft layer is', advancedSettings.raft_layers);
                 },
 
                 _handleQualitySelected: function(layerHeight) {
@@ -573,11 +610,33 @@ define([
                     allowDeleteObject = !isFocused;
                 },
 
+                _handleDefaultCancel: function(ans) {
+                    //Use setTimeout to avoid multiple modal display conflict
+                    setTimeout(function() {
+                        this._registerTutorial();
+                    }, 10);
+                },
+
+                _handleCancelPreview: function() {
+                    director.cancelPreview();
+                },
+
+                _getLineFromAdvancedCustomSetting(key) {
+                    var start = advancedSettings.custom.indexOf(key);
+                    var end = advancedSettings.custom.indexOf('\n', start);
+                    return advancedSettings.custom.substring(start, end);
+                },
+
+                _getValueFromAdvancedCustomSettings(key) {
+                    return this._getLineFromAdvancedCustomSetting(key).split('=')[1].replace(/ /g, '');
+                },
+
                 _renderAdvancedPanel: function() {
                     return (
                         <AdvancedPanel
                             lang            = {lang}
                             setting         = {advancedSettings}
+                            raftLayers      = {this.state.raftLayers}
                             onValueChange   = {this._handleAdvancedValueChange}
                             onClose         = {this._handleCloseAdvancedSetting}
                             onApply         = {this._handleApplyAdvancedSetting} />

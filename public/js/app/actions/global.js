@@ -11,8 +11,34 @@ define([
     // prevent delete (back) behavior
     var defaultKeyBehavior = function() {
         shortcuts.on(['BACK'], function(e) {
-            if ('INPUT' !== e.target.tagName && 'TEXTAREA' !== e.target.tagName) {
-                e.preventDefault();
+            // always prevent default, and implement delete function our own.
+            e.preventDefault();
+
+            var value,
+                selectionStart,
+                samePosition,
+                deleteStart,
+                deleteCount;
+
+            // if ('INPUT' !== e.target.tagName && 'TEXTAREA' !== e.target.tagName) {
+            if ('INPUT' === e.target.tagName || 'TEXTAREA' === e.target.tagName) {
+                selectionStart = e.target.selectionStart;
+                value = e.target.value.split('');
+                samePosition = e.target.selectionEnd === selectionStart;
+                deleteCount = (
+                    true === samePosition ? // same position
+                    1 :
+                    e.target.selectionEnd - selectionStart
+                );
+                deleteStart = (
+                    true === samePosition ? // same position
+                    selectionStart - 1 :
+                    selectionStart
+                );
+
+                value.splice(deleteStart, deleteCount);
+                e.target.value = value.join('');
+                e.target.setSelectionRange(selectionStart - 1, selectionStart - 1);
             }
         });
 

@@ -49,7 +49,7 @@ define([
         onYes(callback) {
             this.on(NOTIFY_YES, callback);
         },
-        
+
         onNo(callback) {
             this.on(NOTIFY_NO, callback);
         },
@@ -111,7 +111,7 @@ define([
                 },
 
                 'SHOW_WARNING': function() {
-                    AlertStore.emit(NOTIFY_EVENT, AlertConstants.WARNING, payload.message);
+                    AlertStore.emit(NOTIFY_EVENT, AlertConstants.WARNING, payload.message, payload.onClickCallback);
                 },
 
                 'SHOW_ERROR': function() {

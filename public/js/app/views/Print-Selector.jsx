@@ -278,14 +278,14 @@ define([
 
             try {
                 meta = JSON.stringify(printer);
-            }
+            } 
             catch (ex) {
                 console.log(ex, printer);
             }
 
             return (
                 <div className="device printer-item" data-meta={meta} onClick={this._selectPrinter.bind(null, printer)}>
-                    <div className="col device-name">{printer.name}</div>
+                    <div className="col device-name">{printer.name}*</div> 
                     <div className="col module">{headText}</div>
                     <div className="col status">{statusText}</div>
                 </div>

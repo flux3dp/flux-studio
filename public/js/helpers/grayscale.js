@@ -15,15 +15,16 @@ define(function() {
             WHITE = 255,
             BLACK = 0,
             grayscale,
+            i, j,
             red, green, blue, alpha;
 
-        for (var i = 0; i < data.length; i += 4) {
+        for (i = 0; i < data.length; i += 4) {
             if (false === opts.is_svg) {
                 // http://yolijn.com/convert-rgba-to-rgb
                 alpha = data[i + 3] / 255;
-                red = (1 - alpha) * data[i] + alpha * data[i];
-                green = (1 - alpha) * data[i + 1] + alpha * data[i + 1];
-                blue = (1 - alpha) * data[i + 2] + alpha * data[i + 2];
+                red = (1 - alpha) * WHITE + alpha * data[i];
+                green = (1 - alpha) * WHITE + alpha * data[i + 1];
+                blue = (1 - alpha) * WHITE + alpha * data[i + 2];
                 // refers to http://en.wikipedia.org/wiki/Grayscale
                 grayscale = parseInt(red * 0.299 + green * 0.587 + blue * 0.114, 10);
 
@@ -44,7 +45,7 @@ define(function() {
 
                 }
                 else {
-                    for (var j = 0; j < 3; j++) {
+                    for (j = 0; j < 3; j++) {
                         binary.push(grayscale);
                     }
 
@@ -53,11 +54,20 @@ define(function() {
             }
             else {
                 // 3 is alpha
-                if (0 < data[i + 3]) {
-                    binary.push(0);
+                if (false === opts.is_rgba) {
+                    if (0 < data[i + 3]) {
+                        binary.push(BLACK);
+                    }
+                    else {
+                        binary.push(WHITE);
+                    }
                 }
                 else {
-                    binary.push(255);
+                    for (j = 0; j < 3; j++) {
+                        binary.push(0 < data[i + j] ? WHITE : BLACK);
+                    }
+
+                    binary.push(0 < data[i + 3] ? WHITE : BLACK);
                 }
             }
         }

@@ -57,6 +57,13 @@ define([
                     className: genericClassName,
                     label: lang.menu.scan,
                     imgSrc: '/img/menu/icon_scan.svg'
+                },
+                {
+                    name: 'draw',
+                    displayName: 'DRAW',
+                    className: genericClassName,
+                    label: lang.menu.draw,
+                    imgSrc: '/img/menu/icon-draw.svg'
                 }
             ];
 
@@ -142,7 +149,7 @@ define([
 
             _handleSelectDevice: function(device, e) {
                 e.preventDefault();
-
+                
                 DeviceMaster.selectDevice(device).then(function(status) {
                     if (status === DeviceConstants.CONNECTED) {
                         GlobalActions.showMonitor(device);
@@ -150,6 +157,10 @@ define([
                     else if (status === DeviceConstants.TIMEOUT) {
                         AlertActions.showPopupError(_id, lang.message.connectionTimeout);
                     }
+                }).
+                fail(function(status) {
+                    ProgressActions.close();
+                    AlertActions.showPopupError('fatal-occurred', status);
                 });
 
                 this._toggleDeviceList(false);

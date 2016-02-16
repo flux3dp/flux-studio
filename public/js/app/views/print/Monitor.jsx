@@ -8,10 +8,11 @@ define([
     'app/actions/alert-actions',
     'app/stores/alert-store',
     'app/constants/device-constants',
-    'helpers/file-system',
     'app/actions/global-actions',
+    'app/constants/global-constants',
     'helpers/sprintf',
-    'helpers/round'
+    'helpers/round',
+    'helpers/duration-formatter'
 ], function(
     $,
     React,
@@ -22,10 +23,11 @@ define([
     AlertActions,
     AlertStore,
     DeviceConstants,
-    FileSystem,
     GlobalActions,
+    GlobalConstants,
     sprintf,
-    round
+    round,
+    formatDuration
 ) {
     'use strict';
 
@@ -61,6 +63,9 @@ define([
         errorMessage = '',
         headInfo = '',
         taskInfo = '',
+
+        currentDirectoryContent,
+        socketStatus = {},
 
         timeoutLength = 20000,
         timmer,
@@ -98,6 +103,7 @@ define([
         go,
         pause,
         stop,
+        preparing,
         commands,
         action,
         cameraClass,
@@ -132,7 +138,7 @@ define([
 
         'INIT': function() {
             displayStatus = lang.device.starting;
-            currentStatus = '';
+            currentStatus = DeviceConstants.STARTING;
         },
 
         'STARTING': function() {
@@ -158,13 +164,13 @@ define([
 
         'WAITING_HEAD': function() {
             displayStatus = lang.device.heating;
-            currentStatus = '';
+            currentStatus = DeviceConstants.HEATING;
             leftButtonOn = false;
         },
 
         'CORRECTING': function() {
             displayStatus = lang.device.calibrating;
-            currentStatus = '';
+            currentStatus = DeviceConstants.CALIBRATING;
         },
 
         'COMPLETING': function() {
@@ -175,7 +181,7 @@ define([
         'COMPLETED': function() {
             displayStatus = lang.device.completed;
             currentStatus = '';
-            if(openSource === source.GO) {
+            if(openSource === GlobalConstants.PRINT) {
                 DeviceMaster.quit();
             }
         },
@@ -183,7 +189,7 @@ define([
         'ABORTED': function() {
             displayStatus = lang.device.aborted;
             currentStatus = '';
-            if(openSource === source.GO) {
+            if(openSource === GlobalConstants.PRINT) {
                 DeviceMaster.quit();
             }
         },
@@ -226,17 +232,18 @@ define([
             lang                : React.PropTypes.object,
             selectedDevice      : React.PropTypes.object,
             fCode               : React.PropTypes.object,
+            slicingStatus       : React.PropTypes.object,
             previewUrl          : React.PropTypes.string,
+            opener              : React.PropTypes.string,
             onClose             : React.PropTypes.func
         },
 
         getInitialState: function() {
             var _mode = mode.PREVIEW;
-            openSource = !this.props.fCode ? source.DEVICE_LIST : source.GO;
-            if(openSource === source.DEVICE_LIST &&
+            openSource = this.props.opener || GlobalConstants.DEVICE_LIST;
+            if(openSource === GlobalConstants.DEVICE_LIST &&
                 this.props.selectedDevice.st_id === DeviceConstants.status.IDLE){
                     _mode = mode.BROWSE_FILE;
-                    this._startReport();
             }
 
             return {
@@ -266,6 +273,9 @@ define([
             lang        = this.props.lang;
             previewUrl  = this.props.previewUrl;
             statusId    = DeviceConstants.status.IDLE;
+
+            socketStatus.ready = true;
+            socketStatus.cancel = false;
         },
 
         componentDidMount: function() {
@@ -274,16 +284,34 @@ define([
             AlertStore.onYes(this._handleYes);
             this._addHistory();
 
+            socketStatus.ready = false;
             DeviceMaster.getReport().then(function(report) {
                 this._processReport(report);
                 if(this.state.mode === mode.BROWSE_FILE) {
                     currentStatus = DeviceConstants.READY;
                     this._refreshDirectory();
                 }
-                else {
-                    this._getPrintingInfo();
-                }
+                return this._checkUSBFolderExistance();
+            }.bind(this)).then(function(exist) {
+                usbExist = exist;
+                socketStatus.reader = true;
             }.bind(this));
+
+            if(openSource === GlobalConstants.DEVICE_LIST) {
+                socketStatus.ready = false;
+                var t = setInterval(function() {
+                    clearInterval(t);
+                    DeviceMaster.getPreviewInfo().then(function(info) {
+                        this._startReport();
+                        socketStatus.ready = true;
+                        this._processInfo(info);
+                    }.bind(this));
+                }.bind(this), 200);
+            }
+            else {
+                totalTimeInSeconds = parseInt(this.props.slicingStatus.time);
+                this._startReport();
+            }
         },
 
         shouldComponentUpdate: function(nextProps, nextState) {
@@ -305,62 +333,12 @@ define([
             taskInfo = '';
         },
 
-        _getPrintingInfo: function() {
-            DeviceMaster.getReport().then(function(report) {
-                this._processReport(report);
-                DeviceMaster.getPreviewInfo().then(this._processInfo.bind(this));
-            }.bind(this));
-        },
-
         _hasFCode: function() {
             return this.props.fCode instanceof Blob;
         },
 
-        _formatTime: function(timeInSeconds, withSeconds) {
-            if(timeInSeconds === '') { return ''; }
-            var hour = 0,
-                min = 0,
-                sec = 0,
-                time = '';
-
-            if(timeInSeconds > 3600) {
-                hour = parseInt(timeInSeconds / 3600);
-                min = parseInt((timeInSeconds % 3600) / 60);
-                sec = parseInt((timeInSeconds % 3600 % 60));
-
-                if(withSeconds) {
-                    time = `${hour}:${min}:${sec}`;
-                }
-                else {
-                    time = `${hour}${lang.monitor.hour} ${min}${lang.monitor.minute}`;
-                }
-            }
-            else if(timeInSeconds > 60) {
-                min = parseInt(timeInSeconds / 60);
-                sec = parseInt(timeInSeconds % 60);
-
-                if(withSeconds) {
-                    time = `${min}:${sec}`;
-                }
-                else {
-                    time = `${min}${lang.monitor.minute} ${sec}${lang.monitor.second}`;
-                }
-            }
-            else {
-                sec = parseInt(timeInSeconds);
-                if(withSeconds) {
-                    time = `00:${sec}`;
-                }
-                else {
-                    time = `${sec}${lang.monitor.second}`;
-                }
-            }
-
-            return time;
-        },
-
         _refreshDirectory: function() {
-            this._retrieveList(pathArray.join('/'));
+            this._retrieveFolderContent(pathArray.join('/'));
         },
 
         _existFileInDirectory: function(path, fileName) {
@@ -435,7 +413,9 @@ define([
 
         _handleYes: function(id) {
             if(id === DeviceConstants.KICK) {
+                socketStatus.ready = false;
                 DeviceMaster.kick().then(function() {
+                    socketStatus.reader = true;
                     this._startReport();
                 }.bind(this));
             }
@@ -455,35 +435,39 @@ define([
             }
         },
 
-        _handleBrowseFile: function() {
+        _handleBrowseFolder: function() {
             this._stopReport();
             DeviceMaster.stopCamera();
             filesInfo = [];
             pathArray = [];
 
-            DeviceMaster.ls('USB').then(function(result) {
-                usbExist = result.status === 'ok';
-                this._retrieveList('');
+            this._retrieveFolderContent('').then(function() {
+                this._startReport();
+                this.setState({
+                    mode: mode.BROWSE_FILE
+                }, function() {
+                    this._addHistory();
+                });
             }.bind(this));
-
-            this.setState({
-                mode: mode.BROWSE_FILE,
-                waiting: true
-            }, function() {
-                this._addHistory();
-            });
         },
 
         _handleSelectFolder: function(pathName) {
-            var dir = this.state.directoryContent.directories;
+            var dir = this.state.currentDirectoryFolders;
             // if it's a directory
             if(dir.some(function(d) {
                 return d === pathName;
             })) {
                 pathArray.push(pathName);
                 start = 0;
-                this._retrieveList(pathArray.join('/'));
-                this.setState({ waiting: true });
+                socketStatus.cancel = false;
+                var t = setInterval(function() {
+                    if(socketStatus.ready) {
+                        this._retrieveFolderContent(pathArray.join('/'));
+                        clearInterval(t);
+                    }
+                }.bind(this), 100);
+
+                // this.setState({ waiting: true });
                 this._addHistory();
             }
         },
@@ -495,7 +479,13 @@ define([
                 return;
             }
             pathArray.pop();
-            this._retrieveList(pathArray.join('/'));
+            socketStatus.cancel = true;
+            var t = setInterval(function() {
+                if(socketStatus.ready) {
+                    this._retrieveFolderContent(pathArray.join('/'));
+                    clearInterval(t);
+                }
+            }, 100);
         },
 
         _handleBack: function() {
@@ -510,8 +500,11 @@ define([
             lastAction = history[history.length - 1];
 
             if(this.state.mode === mode.CAMERA) {
+                socketStatus.ready = false;
                 DeviceMaster.stopCamera().then(function() {
-                    DeviceMaster.kick();
+                    return DeviceMaster.kick();
+                }).then(function() {
+                    socketStatus.ready = true;
                 });
             }
 
@@ -522,24 +515,21 @@ define([
                 },
 
                 'BROWSE_FILE': function() {
-                    self._retrieveList(lastAction.path.join('/'));
-                    //self._stopReport();
+                    var t = setInterval(function() {
+                        if(socketStatus.ready) {
+                            self._retrieveFolderContent(lastAction.path.join('/'));
+                            clearInterval(t);
+                        }
+                    }.bind(this), 100);
                 },
 
                 'CAMERA': function() {
-                    //self._stopReport();
                 }
             };
 
             if(actions[lastAction.mode]) {
                 actions[lastAction.mode]();
-                this.setState({ mode: lastAction.mode }, function() {
-                    if(this.state.mode === mode.CAMERA) {
-                        DeviceMaster.stopCamera().then(function() {
-                            DeviceMaster.kick();
-                        });
-                    };
-                });
+                this.setState({ mode: lastAction.mode });
             }
         },
 
@@ -547,8 +537,7 @@ define([
             if(this.state.mode === mode.BROWSE_FILE) {
                 var onNeedData = e.target.scrollHeight === e.target.offsetHeight + e.target.scrollTop;
                 if(onNeedData) {
-                    start = start + scrollSize;
-                    this._retrieveList(history[history.length-1].path.join('/'));
+                    this._renderFolderFilesWithPreview();
                 }
             }
         },
@@ -566,14 +555,16 @@ define([
                 DeviceMaster.fileInfo(pathArray.join('/'), fileName).then(function(info) {
                     if(info[1] instanceof Blob) {
                         this._processInfo([info[2]]);
-                        previewUrl = URL.createObjectURL(info[1]);
+                        previewUrl = info[1].size === 0 ? '/img/ph_l.png' : URL.createObjectURL(info[1]);
                         filePreview = true;
                         pathArray.push(fileName);
                         this.setState({
                             mode: mode.PREVIEW,
                             currentStatus: deviceStatus.st_id === DeviceConstants.status.COMPLETED ? DeviceConstants.READY : this.state.currentStatus
                         }, function() {
+                            socketStatus.ready = false;
                             DeviceMaster.getReport().then(function(report) {
+                                socketStatus.ready = true;
                                 this._processReport(report);
                             }.bind(this));
                             this._addHistory();
@@ -676,13 +667,13 @@ define([
                             self.setState({ displayStatus: `${lang.device.processing}`});
                         }
                     }).then(function() {
-                        self._getPrintingInfo();
+                        self._startReport();
                     });
                 }
                 else {
                     var executeGo = function() {
                         DeviceMaster.goFromFile(pathArray, '').then(function(result) {
-                            self._getPrintingInfo();
+                            self._startReport();
                         });
                     };
 
@@ -738,7 +729,9 @@ define([
             timmer = setTimeout(this._processTimeout, timeoutLength);
 
             reporter = setInterval(function() {
+                socketStatus.ready = false;
                 DeviceMaster.getReport().then(function(report) {
+                    socketStatus.ready = true;
                     self._processReport(report);
                 });
             }, refreshTime);
@@ -754,7 +747,7 @@ define([
             this._handleClose();
         },
 
-        _processInfo: function(info){
+        _processInfo: function(info) {
             this._startReport();
             if(info === '') {
                 return;
@@ -782,6 +775,7 @@ define([
             else {
                 taskInfo = 'Unknown';
             }
+            this.forceUpdate();
         },
 
         _processReport: function(report) {
@@ -808,29 +802,17 @@ define([
                     mainError = report.error[0] || '';
                     subError = report.error[1] || '';
                 }
+
+                if(lastError !== mainError) {
+                    messageViewed = false;
+                    lastError = mainError;
+                }
+
+                errorMessage = lang.monitor[report.error.join('_')] || report.error.join(' ');
             }
 
             if(errorActions[mainError]) {
                 errorActions[mainError](statusId);
-            }
-
-            var attr = [mainError];
-            if(subError.length > 0) {
-                attr.push(subError);
-            }
-            errorMessage = lang.monitor[attr.join('_')];
-
-            if(errorMessage === null || errorMessage === '' || typeof errorMessage === 'undefined') {
-                errorMessage = attr.join('_');
-            }
-
-            if(lastError !== mainError) {
-                messageViewed = false;
-                lastError = mainError;
-                if(mainError.length > 0) {
-                    console.log('showing error', mainError);
-                    AlertActions.showPopupError('', mainError);
-                }
             }
 
             if(
@@ -858,7 +840,7 @@ define([
 
             if(report.prog && !!totalTimeInSeconds) {
                 percentageDone = parseInt(report.prog * 100);
-                timeLeft = this._formatTime(totalTimeInSeconds * (1 - report.prog));
+                timeLeft = formatDuration(totalTimeInSeconds * (1 - report.prog));
                 progress = `${percentageDone}%, ${timeLeft} ${lang.monitor.left}`;
             }
             else {
@@ -877,7 +859,7 @@ define([
 
             headInfo = report.module ? lang.monitor.device[report.module] : '';
 
-            if(!report.error) {
+            if(!report.error || report.error.length === 0) {
                 //If home failed, at least show an error
                 if(statusId !== DeviceConstants.status.IDLE) {
                     AlertActions.closePopup();
@@ -900,6 +882,11 @@ define([
                 currentStatus = DeviceConstants.READY;
             }
 
+            if(currentStatus === '') {
+                currentStatus = status;
+            }
+
+
             var report_info = {
                 temperature: temperature,
                 currentStatus: currentStatus,
@@ -908,12 +895,11 @@ define([
             };
 
             //If report returns idle state, which means nothing to preview..
-            if(openSource === source.DEVICE_LIST &&
+            if(openSource === GlobalConstants.DEVICE_LIST &&
                 report.st_id === DeviceConstants.status.IDLE &&
                 this.state.mode === mode.PREVIEW &&
                 filePreview !== true){
                 report_info['mode'] = mode.BROWSE_FILE;
-                this._refreshDirectory();
             }
 
             this.setState(report_info);
@@ -946,84 +932,116 @@ define([
             });
         },
 
-        _retrieveList: function(path) {
-            var self = this;
+        _retrieveFolderContent: function(path) {
+            var self = this,
+                d = $.Deferred();
 
-            if(start === 0) {
-                filesInfo = [];
-            }
-
+            socketStatus.cancel = false;
+            socketStatus.ready = false;
             DeviceMaster.ls(path).then(function(result) {
+                socketStatus.ready = true;
                 if(result.error) {
                     if(result.error !== DeviceConstants.NOT_EXIST) {
                         AlertActions.showPopupError(result.error);
                         result.directories = [];
-                        self.setState({
-                            directoryContent: result,
-                            waiting: false
-                        });
                     }
                 }
-                currentLevelFiles = result.files;
-                self._retrieveFileInfo(path).then(function(info) {
-                    filesInfo = filesInfo.concat(info);
-                    if(path === '' && !usbExist) {
-                        var i = result.directories.indexOf('USB');
-                        result.directories.splice(i, 1);
+                currentDirectoryContent = result;
+                start = 0;
+
+                if(!usbExist && pathArray.length === 0) {
+                    var i = currentDirectoryContent.directories.indexOf('USB');
+                    if(i >= 0) {
+                        currentDirectoryContent.directories.splice(i, 1);
                     }
-                    self.setState({
-                        directoryContent: result,
-                        waiting: false
-                    });
-                    self.forceUpdate();
+                }
+                currentDirectoryContent.files = currentDirectoryContent.files.map(function(file) {
+                    var a = [];
+                    a.push(file);
+                    return a;
                 });
-                self.forceUpdate();
-            });
-        },
-
-        _retrieveFileInfo: function(path) {
-            var d = $.Deferred();
-            var returnArray = [];
-
-            currentLevelFiles = currentLevelFiles || [];
-            if(currentLevelFiles.length === 0) {
-                d.resolve(returnArray);
-                return d.promise();
-            }
-            var end = (start + scrollSize);
-            end = end < currentLevelFiles.length ? end : currentLevelFiles.length - 1;
-
-            this._iterateFileInfo(path, start, end, returnArray, function(result) {
-                d.resolve(result);
+                self.setState({
+                    currentDirectoryFolders: currentDirectoryContent.directories,
+                    currentDirectoryFiles: currentDirectoryContent.files,
+                    wait: false
+                }, function() {
+                    self._renderFolderFilesWithPreview();
+                    d.resolve('');
+                });
             });
             return d.promise();
         },
 
-        _iterateFileInfo: function(path, startIndex, endIndex, returnArray, callback) {
-            var self = this;
+        _renderFolderFilesWithPreview: function() {
+            this._stopReport();
+            if(currentDirectoryContent.files.length === 0) {
+                this._startReport();
+                return;
+            }
 
-            if(startIndex <= endIndex) {
-                DeviceMaster.fileInfo(path, currentLevelFiles[startIndex], opts).then(function(r) {
-                    if(!r.error) {
-                        returnArray.push(r);
+            var end = start + scrollSize;
+            if(end > currentDirectoryContent.files.length) {
+                end = currentDirectoryContent.files.length;
+            }
+
+            this._retrieveFileInfo(start, end, function(filesArray) {
+                var files = currentDirectoryContent.files;
+
+                Array.prototype.splice.apply(files, [start, filesArray.length].concat(filesArray));
+                this.setState({ currentDirectoryFiles: files }, function() {
+                    this.forceUpdate();
+                    start = start + scrollSize;
+                }.bind(this));
+                socketStatus.ready = true;
+                this._startReport();
+            }.bind(this));
+        },
+
+        _retrieveFileInfo: function(index, end, callback, filesArray) {
+            filesArray = filesArray || [];
+            if(index < end) {
+                socketStatus.ready = false;
+                DeviceMaster.fileInfo(
+                    currentDirectoryContent.path,
+                    currentDirectoryContent.files[index][0],
+                    opts
+                ).then(function(r) {
+                    if(r.error) {
+                        filesArray.push(currentDirectoryContent.files[index]);
                     }
-                    return self._iterateFileInfo(path, startIndex + 1, endIndex, returnArray, callback);
-                });
+                    else {
+                        filesArray.push(r);
+                    }
+
+                    socketStatus.ready = true;
+                    if(socketStatus.cancel) {
+                        callback(filesArray);
+                    }
+                    else {
+                        this._retrieveFileInfo(index + 1, end, callback, filesArray);
+                    }
+
+                }.bind(this));
             }
             else {
-                callback(returnArray);
+                callback(filesArray);
             }
         },
 
-        _imageError: function(src) {
-            src.target.src = '/img/ph_s.png';
+        _checkUSBFolderExistance: function() {
+            var d = $.Deferred();
+            var t = setInterval(function() {
+                if(socketStatus.ready) {
+                    clearInterval(t);
+                    DeviceMaster.ls('USB').then(function(result) {
+                        d.resolve(result.status === 'ok');
+                    });
+                }
+            }, 200);
+            return d.promise();
         },
 
-        _renderDirectoryContent: function(content) {
-            if(!content.directories) {
-                return '';
-            }
-
+        _displayFolderContent: function() {
             var self = this,
                 files,
                 folders,
@@ -1031,37 +1049,44 @@ define([
                 fileNameClass,
                 folderNameClass;
 
-            folders = content.directories.map(function(item) {
-                folderNameClass = ClassNames('name', {'selected': self.state.selectedItem === item});
-                return (
-                    <div
-                        className="folder"
-                        onClick={self._handleHighlightFolder.bind(null, item)}
-                        onDoubleClick={this._handleSelectFolder.bind(this, item)}>
-                        <div className={folderNameClass}>{item}</div>
-                    </div>
-                );
-            }.bind(this));
-
-            files = filesInfo.map(function(item) {
-                imgSrc = URL.createObjectURL(item[1]) || 'http://placehold.it/60x60';
-                fileNameClass = ClassNames('name', {'selected': self.state.selectedItem === item[0]});
-
-                return (
-                    <div
-                        title={item[0]}
-                        className="file"
-                        onClick={self._handleSelectFile.bind(null, item[0], DeviceConstants.SELECT)}
-                        onDoubleClick={self._handleSelectFile.bind(null, item[0], DeviceConstants.PREVIEW)}>
-                        <div className="image-wrapper">
-                            <img src={imgSrc} onError={self._imageError.bind(this)}/>
+            if(this.state.currentDirectoryFolders) {
+                folders = this.state.currentDirectoryFolders.map(function(item) {
+                    folderNameClass = ClassNames('name', {'selected': self.state.selectedItem === item});
+                    return (
+                        <div
+                            className="folder"
+                            onClick={self._handleHighlightFolder.bind(null, item)}
+                            onDoubleClick={this._handleSelectFolder.bind(this, item)}>
+                            <div className={folderNameClass}>{item}</div>
                         </div>
-                        <div className={fileNameClass}>
-                            {item[0].length > fileNameLength ? item[0].substring(0, fileNameLength) + '...' : item[0]}
+                    );
+                }.bind(this));
+            }
+
+            if(this.state.currentDirectoryFiles) {
+                files = this.state.currentDirectoryFiles.map(function(item, i) {
+                    if(!item[0]) {
+                        item = [currentDirectoryContent.files[i]];
+                    }
+                    imgSrc = URL.createObjectURL(item[1]) || '/img/ph_s.png';
+                    fileNameClass = ClassNames('name', {'selected': self.state.selectedItem === item[0]});
+
+                    return (
+                        <div
+                            title={item[0]}
+                            className="file"
+                            onClick={self._handleSelectFile.bind(null, item[0], DeviceConstants.SELECT)}
+                            onDoubleClick={self._handleSelectFile.bind(null, item[0], DeviceConstants.PREVIEW)}>
+                            <div className="image-wrapper">
+                                <img src={imgSrc} onError={self._imageError.bind(this)}/>
+                            </div>
+                            <div className={fileNameClass}>
+                                {item[0].length > fileNameLength ? item[0].substring(0, fileNameLength) + '...' : item[0]}
+                            </div>
                         </div>
-                    </div>
-                );
-            });
+                    );
+                });
+            }
 
             return (
                 <div className="wrapper" onClick={this._handleCancelSelectItem}>
@@ -1069,6 +1094,10 @@ define([
                     {files}
                 </div>
             );
+        },
+
+        _imageError: function(src) {
+            src.target.src = '/img/ph_s.png';
         },
 
         _renderCameraContent: function() {
@@ -1112,7 +1141,38 @@ define([
                     break;
 
                 case mode.BROWSE_FILE:
-                    return this._renderDirectoryContent(this.state.directoryContent);
+                    // console.log(this.state.directoryContent);
+                    return this._processFolderContent();
+                    break;
+
+                case mode.CAMERA:
+                    return this._renderCameraContent();
+                    break;
+
+                default:
+                    return '';
+                    break;
+            }
+        },
+
+        _renderFolderContent: function() {
+            // console.log('rendering folder content');
+            switch(this.state.mode) {
+                case mode.PREVIEW:
+                case mode.PRINT:
+                    var divStyle = {
+                            backgroundColor: '#E0E0E0',
+                            backgroundImage: !previewUrl ? 'url(/img/ph_l.png)' : 'url(' + previewUrl + ')',
+                            backgroundSize: 'cover',
+                            backgroundPosition: '50% 50%',
+                            width: '100%',
+                            height: '100%'
+                        };
+                    return (<div style={divStyle} />);
+                    break;
+
+                case mode.BROWSE_FILE:
+                    return this._displayFolderContent();
                     break;
 
                 case mode.CAMERA:
@@ -1191,6 +1251,16 @@ define([
                 );
             }.bind(this);
 
+            preparing = function(enable) {
+                className = ClassNames('controls center', {'disabled': true});
+                return (
+                <div className={className}>
+                    <div className="btn-pause btn-control"></div>
+                    <div className="description">{lang.monitor.pause}</div>
+                </div>
+                );
+            }.bind(this);
+
             commands = {
                 'READY': function() {
                     return go;
@@ -1201,12 +1271,24 @@ define([
                 },
 
                 'STARTING': function() {
-                    return pause;
+                    return preparing;
                 },
 
                 'PAUSED': function() {
                     return go;
                 },
+
+                'ABORTED': function() {
+                    return go;
+                },
+
+                'HEATING': function() {
+                    return preparing;
+                },
+
+                'CALIBRATING': function() {
+                    return preparing;
+                }
             };
 
             action = !!commands[this.state.currentStatus] ? commands[this.state.currentStatus]() : '';
@@ -1258,12 +1340,17 @@ define([
                 }
             }
             else if (this.state.mode === mode.PREVIEW) {
+
                 if(
                     statusId === DeviceConstants.status.IDLE ||
                     statusId === DeviceConstants.status.COMPLETED ||
                     statusId === DeviceConstants.status.ABORTED
                 ) {
                     leftButtonOn = false;
+                }
+
+                if(statusId === DeviceConstants.status.PAUSED_FROM_RUNNING) {
+                    leftButtonOn = true;
                 }
 
                 if(statusId === DeviceConstants.status.MAINTAIN ||
@@ -1303,14 +1390,14 @@ define([
         },
 
         _renderPrintingInfo: function() {
-            var _duration   = totalTimeInSeconds === 0 ? '' : this._formatTime(totalTimeInSeconds, true),
+            var _duration   = totalTimeInSeconds === 0 ? '' : formatDuration(totalTimeInSeconds),
                 _progress   = percentageDone === 0 ? '' : percentageDone + '%',
                 infoClass   = ClassNames(
                     'status-info',
                     {
                         'running':
                             this.state.mode === mode.BROWSE_FILE ||
-                            this.state.mode === mode.PREVIEW && openSource === source.GO ||
+                            this.state.mode === mode.PREVIEW && openSource === GlobalConstants.PRINT ||
                             this.state.mode === mode.PREVIEW && filePreview ||
                             statusId !== DeviceConstants.status.IDLE &&
                             statusId !== DeviceConstants.status.MAINTAIN &&
@@ -1318,17 +1405,39 @@ define([
                     }
                 );
 
-            if(_duration === '') {
-                this.props.slicingStatus = this.props.slicingStatus || { time: 0 };
-                _duration = this._formatTime(this.props.slicingStatus.time, true);
+            if(_duration === '' && this.props.slicingStatus) {
+                var time = this.props.slicingStatus.time || 0;
+                _duration = formatDuration(time);
             }
 
             if(statusId === DeviceConstants.status.IDLE || this._isAbortedOrCompleted()) {
-                if(openSource !== source.GO && filePreview !== true) {
+                if(openSource !== GlobalConstants.PRINT && filePreview !== true) {
                     taskInfo = '';
                     _duration = '';
                     _progress = '';
                 }
+
+                if(taskInfo === '' && openSource) {
+                    var f = {
+                        'PRINT': function() {
+                            return lang.monitor.task.EXTRUDER;
+                        },
+                        'LASER': function() {
+                            return lang.monitor.task.LASER;
+                        },
+                        'DEVICE_LIST': function() {
+                            return '';
+                        }
+                    };
+
+                    if(!f[opener]) {
+                        taskInfo = f[openSource]();
+                    }
+                }
+            }
+
+            if(!_duration && ! _progress) {
+                infoClass = 'status-info';
             }
 
             return (
@@ -1344,7 +1453,7 @@ define([
 
         _renderNavigation: function() {
             if(
-                openSource === source.DEVICE_LIST &&
+                openSource === GlobalConstants.DEVICE_LIST &&
                 statusId === 0 &&
                 pathArray.length === 0 &&
                 this.state.mode === mode.BROWSE_FILE
@@ -1367,7 +1476,7 @@ define([
             }
             else {
                 return (
-                    <div className="back" onClick={this._handleBrowseFile}>
+                    <div className="back" onClick={this._handleBrowseFolder}>
                         <img src="../../img/folder.svg" />
                     </div>
                 );
@@ -1375,9 +1484,9 @@ define([
         },
 
         render: function() {
-
             var name            = DeviceMaster.getSelectedDevice().name,
-                content         = this._renderContent(),
+                // content         = this._renderContent(),
+                content         = this._renderFolderContent(),
                 waitIcon        = this.state.waiting ? this._renderSpinner() : '',
                 op              = this._renderOperation(),
                 navigation      = this._renderNavigation(),

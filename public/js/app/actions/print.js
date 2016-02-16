@@ -1,11 +1,9 @@
 define([
     'jquery',
-    'helpers/file-system',
     'helpers/display',
     'helpers/websocket',
     'helpers/api/3d-print-slicing',
     'helpers/api/control',
-    'helpers/file-system',
     'app/actions/alert-actions',
     'app/actions/progress-actions',
     'app/stores/progress-store',
@@ -14,7 +12,6 @@ define([
     'helpers/i18n',
     'helpers/nwjs/menu-factory',
     'app/actions/global-actions',
-    'app/stores/global-store',
     // non-return value
     'threeOrbitControls',
     'threeTrackballControls',
@@ -26,12 +23,10 @@ define([
     'helpers/object-assign'
 ], function(
     $,
-    fileSystem,
     display,
     websocket,
     printSlicing,
     printerController,
-    FileSystem,
     AlertActions,
     ProgressActions,
     ProgressStore,
@@ -39,8 +34,7 @@ define([
     ProgressConstants,
     I18n,
     MenuFactory,
-    GlobalActions,
-    GlobalStore
+    GlobalActions
 ) {
     'use strict';
 
@@ -72,12 +66,15 @@ define([
         shiftPressed = false,
         previewMode = false,
         showStopButton = true,
+        willReslice = false,
+        needToShowMonitor = false,
         ddHelper = 0,
         defaultFileName = '',
         cameraLight,
         slicingTimmer,
-        slicingWaitTime = 500,
+        slicingWaitTime = 3000,
         stlTimmer,
+        changeRenderThrottle,
         transformAxisChanged = '',
         slicingReport = {},
         slicingStatus = {},
@@ -189,10 +186,10 @@ define([
         orbitControl.addEventListener('change', updateOrbitControl);
 
         transformControl = new THREE.TransformControls(camera, renderer.domElement);
-        transformControl.addEventListener('change', render);
-        transformControl.addEventListener('mouseDown', onTransform);
-        transformControl.addEventListener('mouseUp', onTransform);
-        transformControl.addEventListener('objectChange', onTransform);
+        transformControl.addEventListener('change', onTransformChange);
+        transformControl.addEventListener('mouseDown', onObjectTransform);
+        transformControl.addEventListener('mouseUp', onObjectTransform);
+        transformControl.addEventListener('objectChange', onObjectTransform);
 
         window.addEventListener('resize', onWindowResize, false);
         window.addEventListener('keydown', onKeyPress, false);
@@ -214,34 +211,29 @@ define([
         // init print controller
         slicer = printSlicing();
         slicingStatus.canInterrupt = true;
+        slicingStatus.inProgress = false;
 
         registerDropToImport();
         registerSlicingProgress();
-        registerCancelPreview();
     }
 
     function uploadStl(name, file) {
         // pass to slicer
         var d = $.Deferred();
-        var reader = new FileReader();
-
-        reader.onload = function() {
-            slicer.upload(name, file, displayProgress).then(function(result) {
-                ProgressActions.updating('finishing up', 100);
-                d.resolve(result);
-            });
-        };
-        reader.readAsArrayBuffer(file);
+        slicer.upload(name, file, displayProgress).then(function(result) {
+            ProgressActions.updating('finishing up', 100);
+            d.resolve(result);
+        });
         return d.promise();
     }
 
-    function appendModel(fileEntry, file, callback) {
+    function appendModel(fileUrl, file, callback) {
         if(file.size === 0) {
             AlertActions.showPopupError('', lang.message.invalidFile);
             return;
         }
         var loader = new THREE.STLLoader();
-        var model_file_path = fileEntry.toURL();
+        var model_file_path = fileUrl;
         callback = callback || function() {};
 
         reactSrc.setState({
@@ -270,7 +262,6 @@ define([
             var mesh = new THREE.Mesh(geometry, commonMaterial);
             mesh.up = new THREE.Vector3(0, 0, 1);
 
-            ProgressActions.updating(lang.print.uploading, 40);
             slicingStatus.pauseReport = true;
             uploadStl(mesh.uuid, file).then(function(result) {
                 slicingStatus.pauseReport = false;
@@ -283,7 +274,6 @@ define([
                     AlertActions.showPopupError('', result.error);
                     return;
                 }
-                slicingStatus.inProgress = true;
                 if(slicingStatus.canInterrupt) {
                     startSlicing(slicingType.F);
                 }
@@ -339,7 +329,7 @@ define([
                 mesh.geometry = new THREE.Geometry().fromBufferGeometry(mesh.geometry);
             }
             mesh.name = 'custom';
-            mesh.fileName = fileEntry.name;
+            mesh.fileName = file.name;
             mesh.plane_boundary = planeBoundary(mesh);
 
             addSizeProperty(mesh);
@@ -362,23 +352,21 @@ define([
     function appendModels(files, index, callback) {
         slicingStatus.canInterrupt = false;
         if(files.item(index).name.split('.').pop().toLowerCase() === 'stl') {
-            FileSystem.writeFile(
-                files.item(index),
-                {
-                    onComplete: function(e, fileEntry) {
-                        appendModel(fileEntry, files.item(index), function() {
-                            if(files.length > index + 1) {
-                                appendModels(files, index + 1, callback);
-                            }
-                            else {
-                                slicingStatus.canInterrupt = true;
-                                startSlicing(slicingType.F);
-                                callback();
-                            }
-                        });
+            var reader  = new FileReader();
+            reader.addEventListener('load', function () {
+                appendModel(reader.result, files.item(index), function() {
+                    if(files.length > index + 1) {
+                        appendModels(files, index + 1, callback);
                     }
-                }
-            );
+                    else {
+                        slicingStatus.canInterrupt = true;
+                        startSlicing(slicingType.F);
+                        callback();
+                    }
+                });
+            }, false);
+
+            reader.readAsDataURL(files.item(index));
         }
         else {
             callback();
@@ -386,12 +374,12 @@ define([
     }
 
     function startSlicing(type) {
-        slicingStatus.inProgress            = true;
-        slicingStatus.isComplete            = false;
-        slicingStatus.canInterrupt          = false;
-        slicingStatus.pauseReport           = true;
-        slicingStatus.hasError              = false;
-        blobExpired                         = true;
+        slicingStatus.inProgress    = true;
+        slicingStatus.canInterrupt  = false;
+        slicingStatus.pauseReport   = true;
+        slicingStatus.hasError      = false;
+        blobExpired                 = true;
+        willReslice                 = false;
 
         if(objects.length === 0 || !blobExpired) { return; }
         var ids = [];
@@ -399,9 +387,16 @@ define([
             ids.push(obj.uuid);
         });
 
-        sendGCodeParameters().then(function() {
+        if(previewMode) {
+            _clearPath();
+            _showPreview();
+        }
+
+        syncObjectParameter().then(function() {
             return stopSlicing();
         }).then(function() {
+            // set again because stop slicing set inProgress to false
+            slicingStatus.inProgress = true;
             return getBlobFromScene();
         }).then(function(blob) {
             previewUrl = URL.createObjectURL(blob);
@@ -411,6 +406,7 @@ define([
                 slicingStatus.canInterrupt = true;
                 slicingStatus.pauseReport = false;
                 getSlicingReport(function(report) {
+                    slicingStatus.lastReport = report;
                     slicingReport.report = report;
                 });
             });
@@ -418,13 +414,31 @@ define([
     }
 
     function doSlicing() {
-        clearInterval(slicingTimmer);
-        slicingTimmer = setInterval(function() {
-            if(slicingStatus.canInterrupt) {
-                startSlicing(slicingType.F);
-                clearInterval(slicingTimmer);
-            }
-        }, slicingWaitTime);
+        _clearPath();
+        blobExpired = true;
+        willReslice = true;
+
+        if(slicingStatus.inProgress) {
+            clearTimeout(slicingTimmer);
+            slicingTimmer = setTimeout(function() {
+                var t = setInterval(function() {
+                    if(slicingStatus.canInterrupt) {
+                        clearInterval(t);
+                        slicingStatus.isComplete = false;
+                        startSlicing(slicingType.F);
+                    }
+                }, 500);
+            }, slicingWaitTime);
+        }
+        else {
+            slicingTimmer = setInterval(function() {
+                if(slicingStatus.canInterrupt) {
+                    clearInterval(slicingTimmer);
+                    slicingStatus.isComplete = false;
+                    startSlicing(slicingType.F);
+                }
+            }, 500);
+        }
     }
 
     function registerSlicingProgress() {
@@ -440,11 +454,18 @@ define([
             var report = change[0].object.report,
                 progress = `${lang.slicer[report.status]} - ${'\n' + parseInt(report.percentage * 100)}% - ${report.message}`,
                 complete = lang.print.finishingUp,
-                show = slicingStatus.showProgress;
+                show = slicingStatus.showProgress,
+                monitorOn = $('.flux-monitor').length > 0;
 
             slicingStatus.lastProgress = progress;
             if(!slicingStatus.hasError) {
                 slicingStatus.lastReport = report;
+            }
+
+            if(monitorOn) {
+                console.log('closing monitor');
+                GlobalActions.closeMonitor();
+                needToShowMonitor = true;
             }
 
             if(show) {
@@ -487,6 +508,9 @@ define([
             }
             else if(report.status !== 'complete') {
                 if(show) {
+                    if(willReslice) {
+                        ProgressActions.updating(lang.print.reRendering, 0);
+                    }
                     if(report.percentage) {
                         ProgressActions.updating(progress, parseInt(report.percentage * 100));
                     }
@@ -500,9 +524,13 @@ define([
                 slicingStatus.canInterrupt = false;
                 slicer.getSlicingResult().then(function(r) {
                     slicingStatus.canInterrupt = true;
-                    if(show) {
+                    setTimeout(function() {
+                        if(needToShowMonitor) {
+                            reactSrc._handleDeviceSelected();
+                            needToShowMonitor = false;
+                        }
                         ProgressActions.close();
-                    }
+                    }, 1000);
 
                     blobExpired = false;
                     responseBlob = r;
@@ -521,10 +549,6 @@ define([
             zone.addEventListener('dragleave', onDragLeave);
             zone.addEventListener('drop', onDropFile);
         }
-    }
-
-    function registerCancelPreview() {
-        GlobalStore.onCancelPreview(_handleCancelPreview);
     }
 
     function onDropFile(e) {
@@ -612,8 +636,6 @@ define([
                 }
             }
         }
-
-        render();
     }
 
     function toggleTransformControl(hide) {
@@ -647,11 +669,10 @@ define([
         transformAxisChanged = '';
         checkOutOfBounds(SELECTED);
 
-        if(blobExpired) {
+        if(blobExpired && objects.length > 0) {
             slicingStatus.showProgress = false;
             doSlicing();
         }
-
         render();
     }
 
@@ -690,7 +711,14 @@ define([
         }
     }
 
-    function onTransform(e) {
+    function onTransformChange() {
+        clearTimeout(changeRenderThrottle);
+        changeRenderThrottle = setTimeout(function() {
+            render();
+        }, 100);
+    }
+
+    function onObjectTransform(e) {
         if(previewMode) { return; }
         switch (e.type) {
             case 'mouseDown':
@@ -844,7 +872,7 @@ define([
                 return slicer.uploadPreviewImage(blob);
             }).then(function(response) {
                 if (response.status === 'ok') {
-                    sendGCodeParameters().then(function() {
+                    syncObjectParameter().then(function() {
                         slicer.goG(ids, function(result) {
                             if (result instanceof Blob) {
                                 blobExpired = false;
@@ -857,7 +885,10 @@ define([
                                     var serverMessage = `${result.status}: ${result.message} (${parseInt(result.percentage * 100)}%)`,
                                         drawingMessage = `Finishing up... (100%)`,
                                         message = result.status !== 'complete' ? serverMessage : drawingMessage;
-                                    ProgressActions.updating(message, parseInt(result.percentage * 100));
+                                    if(!willReslice) {
+                                        ProgressActions.updating(message, parseInt(result.percentage * 100));
+                                    }
+
                                 }
                                 else {
                                     ProgressActions.close();
@@ -893,19 +924,34 @@ define([
             return d.promise();
         }
 
-        if(!slicingStatus.isComplete) {
-            _showWait(lang.print.gettingSlicingReport, !showStopButton);
-            slicingStatus.showProgress = true;
-            var observer = function(change) {
-                if(change[0].object.isComplete) {
-                    Object.unobserve(slicingStatus, observer);
-                    d.resolve(responseBlob, previewUrl);
+        var execute = function() {
+            if(slicingStatus.inProgress) {
+                _showWait(lang.print.gettingSlicingReport, !showStopButton);
+                slicingStatus.showProgress = true;
+                var observer = function(change) {
+                    if(!change[0].object.inProgress) {
+                        Object.unobserve(slicingStatus, observer);
+                        d.resolve(responseBlob, previewUrl);
+                    }
+                };
+                Object.observe(slicingStatus, observer);
+            }
+            else {
+                d.resolve(responseBlob, previewUrl);
+            }
+        };
+
+        if(willReslice) {
+            var t = setInterval(function() {
+                if(slicingStatus.inProgress) {
+                    willReslice = false;
+                    execute();
+                    clearInterval(t);
                 }
-            };
-            Object.observe(slicingStatus, observer);
+            }, 500);
         }
         else {
-            d.resolve(responseBlob, previewUrl);
+            execute();
         }
 
         return d.promise();
@@ -934,6 +980,7 @@ define([
                 slicer.reportSlicing(function(report) {
                     slicingStatus.canInterrupt = true;
                     slicingStatus.pauseReport = false;
+                    slicingStatus.lastReport = report;
                     if(!report) { return; }
                     if(report.status === 'complete') {
                         clearInterval(slicingStatus.reporter);
@@ -1028,6 +1075,13 @@ define([
         SELECTED.size.z = z;
 
         slicingStatus.showProgress = false;
+
+        var t = setInterval(function() {
+            if(slicingStatus.canInterrupt) {
+                doSlicing();
+                clearInterval(t);
+            }
+        }, 500);
     }
 
     function setRotateMode() {
@@ -1092,6 +1146,8 @@ define([
 
     function setRotation(x, y, z, needRender, src) {
         src = src || SELECTED;
+        syncObjectOutline(src);
+
         var _x = parseInt(x) || 0,
             _y = parseInt(y) || 0,
             _z = parseInt(z) || 0;
@@ -1405,11 +1461,12 @@ define([
         }
     }
 
-    function sendGCodeParameters() {
+    function syncObjectParameter() {
         var d = $.Deferred();
         _syncObjectParameter(objects, 0, function() {
             d.resolve('');
         });
+
         return d.promise();
     }
 
@@ -1747,6 +1804,7 @@ define([
         outlineMesh.position.set(mesh.position.x, mesh.position.y, mesh.position.z);
         outlineMesh.scale.set(mesh.scale.x, mesh.scale.y, mesh.scale.z);
         outlineMesh.rotation.set(mesh.rotation.x, mesh.rotation.y, mesh.rotation.z);
+        outlineMesh.up = new THREE.Vector3(0, 0, 1);
         mesh.outlineMesh = outlineMesh;
         outlineScene.add(outlineMesh);
 
@@ -1843,8 +1901,11 @@ define([
 
     function _handleSliceComplete() {
         if(previewMode) {
+            slicingStatus.isComplete = true;
             _showWait(lang.print.drawingPreview, !showStopButton);
+            slicingStatus.canInterrupt = false;
             slicer.getPath().then(function(result) {
+                slicingStatus.canInterrupt = true;
                 printPath = result;
                 _drawPath().then(function() {
                     ProgressActions.close();
@@ -1852,14 +1913,16 @@ define([
                 });
             });
         }
+        else {
+            slicingStatus.isComplete = true;
+        }
+
         slicingStatus.inProgress    = false;
-        slicingStatus.isComplete    = true;
         slicingStatus.lastProgress  = null;
         slicingStatus.lastReport    = null;
     }
 
-    function _handleCancelPreview() {
-        previewMode = false;
+    function cancelPreview() {
         slicingStatus.showProgress = false;
         _closePreview();
     }
@@ -1870,7 +1933,7 @@ define([
                 '',
                 slicingStatus.lastReport.error,
                 slicingStatus.lastReport.caption);
-            setTimeout(function() { _handleCancelPreview(); }, 500);
+            setTimeout(function() { cancelPreview(); }, 500);
             return;
         }
 
@@ -1878,28 +1941,27 @@ define([
         previewMode = true;
 
         if(blobExpired) {
+            var progress;
             slicingStatus.showProgress = true;
             slicingStatus.needToCloseWait = true;
-            if(slicingStatus.lastProgress && slicingStatus.lastReport) {
-                ProgressActions.open(
-                    ProgressConstants.STEPPING,
-                    lang.print.rendering,
-                    lang.print.savingFilePreview,
-                    showStopButton,
-                    function() {},
-                    function() {
-                        ProgressActions.updating(slicingStatus.lastProgress, parseInt(slicingStatus.lastReport.percentage * 100));
-                    }
-                );
+
+            if(willReslice) {
+                progress = lang.print.reRendering;
             }
             else {
-                _showWait(lang.print.gettingSlicingReport, !showStopButton);
+                progress = lang.print.gettingSlicingReport;
+            }
+
+            if(!slicingStatus.isComplete) {
+                _showWait(progress, !showStopButton);
             }
         }
         else {
             _showWait(lang.print.drawingPreview, !showStopButton);
-            if(!printPath) {
+            if(!printPath || printPath.length === 0) {
+                slicingStatus.canInterrupt = false;
                 slicer.getPath().then(function(result) {
+                    slicingStatus.canInterrupt = true;
                     printPath = result;
                     _drawPath().then(function() {
                         _closeWait();
@@ -1977,13 +2039,14 @@ define([
         }, function() {
             d.resolve('');
         });
-        _showPath();
+        render();
+        _setProgressMessage('');
         return d.promise();
     }
 
-    function _showPath() {
-        render();
-        _setProgressMessage('');
+    function _clearPath() {
+        printPath = [];
+        previewScene.children.splice(1, previewScene.children.length - 1);
     }
 
     function _setProgressMessage(message) {
@@ -2029,6 +2092,10 @@ define([
         }
     }
 
+    function getSlicingStatus() {
+        return slicingStatus;
+    }
+
     return {
         init                : init,
         appendModel         : appendModel,
@@ -2038,7 +2105,6 @@ define([
         alignCenter         : alignCenter,
         removeSelected      : removeSelected,
         duplicateSelected   : duplicateSelected,
-        sendGCodeParameters : sendGCodeParameters,
         setSize             : setSize,
         downloadGCode       : downloadGCode,
         downloadFCode       : downloadFCode,
@@ -2055,6 +2121,8 @@ define([
         setCameraPosition   : setCameraPosition,
         clearSelection      : clearSelection,
         clear               : clear,
-        toggleScaleLock     : toggleScaleLock
+        toggleScaleLock     : toggleScaleLock,
+        getSlicingStatus    : getSlicingStatus,
+        cancelPreview       : cancelPreview
     };
 });

@@ -3882,8 +3882,10 @@ input[type=range]:focus::-webkit-slider-runnable-track {
             .flux-monitor .main .title .back:hover {
                 color: #333; }
             .flux-monitor .main .title .close {
-                right: 12px;
-                top: 9px; }
+                width: 28px;
+                height: 28px;
+                right: 20px;
+                top: 12px; }
         .flux-monitor .main .body {
             height: 70%; }
             .flux-monitor .main .body .device-content {
@@ -3969,7 +3971,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
                         font-size: 1.2em;
                         color: #FFF; }
                 .flux-monitor .main .body .device-content .status-info.running {
-                    background-color: rgba(0, 0, 0, 0.25); }
+                    background-color: rgba(0, 0, 0, 0.5); }
             .flux-monitor .main .body .close {
                 right: 20px; }
         .flux-monitor .main .operation {

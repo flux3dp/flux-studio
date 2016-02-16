@@ -165,6 +165,13 @@ define([
             this.props.onFocus(true);
         },
 
+        _rotationKeyUp: function(e) {
+            // fire on backspace
+            if(e.keyCode === 8 && e.target.value !== '') {
+                this.props.onRotate(e);
+            }
+        },
+
         render: function() {
             var lang            = this.props.lang,
                 dialogueClass   = ClassNames('object-dialogue', {'through': this.props.isTransforming}),
@@ -241,6 +248,7 @@ define([
                                     type="text"
                                     onFocus={this._inputFocused}
                                     onChange={this.props.onRotate.bind(this)}
+                                    onKeyUp={this._rotationKeyUp}
                                     onBlur={this.props.onRotate.bind(this)}
                                     value={rotation.enteredX} />
                             </div>
@@ -252,6 +260,7 @@ define([
                                     type="text"
                                     onFocus={this._inputFocused}
                                     onChange={this.props.onRotate.bind(this)}
+                                    onKeyUp={this._rotationKeyUp}
                                     onBlur={this.props.onRotate.bind(this)}
                                     value={rotation.enteredY} />
                             </div>
@@ -263,6 +272,7 @@ define([
                                     type="text"
                                     onFocus={this._inputFocused}
                                     onChange={this.props.onRotate.bind(this)}
+                                    onKeyUp={this._rotationKeyUp}
                                     onBlur={this.props.onRotate.bind(this)}
                                     value={rotation.enteredZ} />
                             </div>

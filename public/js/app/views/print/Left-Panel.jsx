@@ -17,7 +17,7 @@ define([
         constants;
 
     qualityLevel = {
-        high: 0.05,
+        high: 0.10,
         med: 0.15,
         low: 0.25
     };
@@ -98,7 +98,7 @@ define([
                     '0.25': lang.quality.low
                 };
                 if(nextProps.layerHeight) {
-
+                    layerHeight = nextProps.layerHeight;
                     this.setState({ quality: _quality[nextProps.layerHeight.toString()] || lang.quality.custom });
                 }
             }

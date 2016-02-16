@@ -11,6 +11,8 @@ define([
     'helpers/api/3d-scan-control',
     'helpers/api/touch',
     'helpers/api/discover',
+    'helpers/api/config',
+    'app/actions/global-actions',
     'app/constants/input-lightbox-constants',
     'helpers/object-assign'
 ], function(
@@ -26,6 +28,8 @@ define([
     ScanController,
     Touch,
     Discover,
+    Config,
+    GlobalActions,
     InputLightBoxConstants
 ) {
     'use strict';
@@ -33,6 +37,8 @@ define([
     var lang = i18n.get(),
         thisProgress,
         lastProgress,
+        defaultPrinter,
+        defaultPrinterWarningShowed = false,
         _instance = null,
         _password = '',
         _status = DeviceConstants.READY,
@@ -84,7 +90,6 @@ define([
                 onError: function(response) {
                     // TODO: shouldn't do replace
                     response.error = response.error.replace(/^.*\:\s+(\w+)$/g, '$1');
-
                     switch (response.error.toUpperCase()) {
                     case DeviceConstants.TIMEOUT:
                         d.resolve(DeviceConstants.TIMEOUT);
@@ -104,7 +109,9 @@ define([
                         }
                         break;
                     case DeviceConstants.MONITOR_TOO_OLD:
-                        d.reject(DeviceConstants.MONITOR_TOO_OLD);
+                        AlertActions.showPopupError('fatal-occurred', 
+                                                    lang.message.monitor_too_old.content, 
+                                                    lang.message.monitor_too_old.caption);
                         break;
                     }
                 }
@@ -339,7 +346,7 @@ define([
     }
 
     function getFirstDevice(){
-        for(var i in _deviceNameMap){
+        for(var i in _deviceNameMap) {
             return i;
         }
     }
@@ -356,7 +363,7 @@ define([
         if(config.timeout > 0){
             setTimeout(function(){
                 config.timeout -= 500;
-                getDeviceByNameAsync(name, config)
+                getDeviceByNameAsync(name, config);
             },500);
         }else{
             config.onTimeout();
@@ -460,7 +467,7 @@ define([
             if(typeof(_errors[device.serial]) === 'string')  {
                 if(_errors[device.serial] !== device.error_label && device.error_label) {
                     if(window.debug) {
-                        AlertActions.showError(device.name + ': ' + device.error_label)
+                        AlertActions.showError(device.name + ': ' + device.error_label);
                         _errors[device.serial] = device.error_label;
                     }
                 }
@@ -470,6 +477,24 @@ define([
             }
             else {
                 _errors[device.serial] = '';
+            }
+            if(defaultPrinter) {
+                if(defaultPrinter.serial === device.serial) {
+                    if(device.st_id === DeviceConstants.status.PAUSED_FROM_RUNNING) {
+                        if(!defaultPrinterWarningShowed) {
+                            var message = `${device.name} ${lang.device.pausedFromError}`;
+                            AlertActions.showWarning(message, function() {
+                                selectDevice(defaultPrinter).then(function() {
+                                    GlobalActions.showMonitor(defaultPrinter);
+                                });
+                            });
+                            defaultPrinterWarningShowed = true;
+                        }
+                    }
+                    else {
+                        defaultPrinterWarningShowed = false;
+                    }
+                }
             }
         });
     }
@@ -515,7 +540,7 @@ define([
             Discover(
                 'device-master',
                 function(devices) {
-                    for(var i in devices){
+                    for(var i in devices) {
                         _deviceNameMap[devices[i].name] = devices[i];
                     }
                     _scanDeviceError(devices);
@@ -528,6 +553,7 @@ define([
         if(_instance === null) {
             _instance = new DeviceSingleton();
         }
+        defaultPrinter = Config().read('default-printer');
         return _instance;
     };
 
