@@ -1146,6 +1146,8 @@ define([
 
     function setRotation(x, y, z, needRender, src) {
         src = src || SELECTED;
+        syncObjectOutline(src);
+
         var _x = parseInt(x) || 0,
             _y = parseInt(y) || 0,
             _z = parseInt(z) || 0;
@@ -1802,6 +1804,7 @@ define([
         outlineMesh.position.set(mesh.position.x, mesh.position.y, mesh.position.z);
         outlineMesh.scale.set(mesh.scale.x, mesh.scale.y, mesh.scale.z);
         outlineMesh.rotation.set(mesh.rotation.x, mesh.rotation.y, mesh.rotation.z);
+        outlineMesh.up = new THREE.Vector3(0, 0, 1);
         mesh.outlineMesh = outlineMesh;
         outlineScene.add(outlineMesh);
 
