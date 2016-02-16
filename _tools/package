@@ -56,7 +56,7 @@ while true; do
             cd $DIR/_tools/nwjs-shell-builder/TMP/output/
             zip -r -X ./fstudio-$(date +%Y%m%d)-win-x86.zip ./fstudio-$(date +%Y%m%d)-win-x86
             cp ./fstudio-$(date +%Y%m%d)-win-x86.zip /var/www/latest-release/app/fstudio-$(date +%Y%m%d)-win-x86.zip
-	    cd $DIR/_tools
+            cd $DIR/_tools
 
             # clear
             rm -r $DIR/lib
