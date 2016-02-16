@@ -5,7 +5,7 @@ ghost
 ./lib
 public/lib/
 README.md
-_tools
+_tools/nwjs-shell-builder
 node_modules
 output.fcode
 output.gcode

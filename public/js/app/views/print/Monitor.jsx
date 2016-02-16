@@ -8,7 +8,6 @@ define([
     'app/actions/alert-actions',
     'app/stores/alert-store',
     'app/constants/device-constants',
-    'helpers/file-system',
     'app/actions/global-actions',
     'app/constants/global-constants',
     'helpers/sprintf',
@@ -24,7 +23,6 @@ define([
     AlertActions,
     AlertStore,
     DeviceConstants,
-    FileSystem,
     GlobalActions,
     GlobalConstants,
     sprintf,
@@ -105,6 +103,7 @@ define([
         go,
         pause,
         stop,
+        preparing,
         commands,
         action,
         cameraClass,
@@ -139,7 +138,7 @@ define([
 
         'INIT': function() {
             displayStatus = lang.device.starting;
-            currentStatus = '';
+            currentStatus = DeviceConstants.STARTING;
         },
 
         'STARTING': function() {
@@ -165,13 +164,13 @@ define([
 
         'WAITING_HEAD': function() {
             displayStatus = lang.device.heating;
-            currentStatus = '';
+            currentStatus = DeviceConstants.HEATING;
             leftButtonOn = false;
         },
 
         'CORRECTING': function() {
             displayStatus = lang.device.calibrating;
-            currentStatus = '';
+            currentStatus = DeviceConstants.CALIBRATING;
         },
 
         'COMPLETING': function() {
@@ -556,7 +555,7 @@ define([
                 DeviceMaster.fileInfo(pathArray.join('/'), fileName).then(function(info) {
                     if(info[1] instanceof Blob) {
                         this._processInfo([info[2]]);
-                        previewUrl = URL.createObjectURL(info[1]);
+                        previewUrl = info[1].size === 0 ? '/img/ph_l.png' : URL.createObjectURL(info[1]);
                         filePreview = true;
                         pathArray.push(fileName);
                         this.setState({
@@ -882,6 +881,11 @@ define([
             if(this._isAbortedOrCompleted() && pathArray.length > 0) {
                 currentStatus = DeviceConstants.READY;
             }
+
+            if(currentStatus === '') {
+                currentStatus = status;
+            }
+
 
             var report_info = {
                 temperature: temperature,
@@ -1247,6 +1251,16 @@ define([
                 );
             }.bind(this);
 
+            preparing = function(enable) {
+                className = ClassNames('controls center', {'disabled': true});
+                return (
+                <div className={className}>
+                    <div className="btn-pause btn-control"></div>
+                    <div className="description">{lang.monitor.pause}</div>
+                </div>
+                );
+            }.bind(this);
+
             commands = {
                 'READY': function() {
                     return go;
@@ -1257,12 +1271,24 @@ define([
                 },
 
                 'STARTING': function() {
-                    return pause;
+                    return preparing;
                 },
 
                 'PAUSED': function() {
                     return go;
                 },
+
+                'ABORTED': function() {
+                    return go;
+                },
+
+                'HEATING': function() {
+                    return preparing;
+                },
+
+                'CALIBRATING': function() {
+                    return preparing;
+                }
             };
 
             action = !!commands[this.state.currentStatus] ? commands[this.state.currentStatus]() : '';
@@ -1314,12 +1340,17 @@ define([
                 }
             }
             else if (this.state.mode === mode.PREVIEW) {
+
                 if(
                     statusId === DeviceConstants.status.IDLE ||
                     statusId === DeviceConstants.status.COMPLETED ||
                     statusId === DeviceConstants.status.ABORTED
                 ) {
                     leftButtonOn = false;
+                }
+
+                if(statusId === DeviceConstants.status.PAUSED_FROM_RUNNING) {
+                    leftButtonOn = true;
                 }
 
                 if(statusId === DeviceConstants.status.MAINTAIN ||
@@ -1403,6 +1434,10 @@ define([
                         taskInfo = f[openSource]();
                     }
                 }
+            }
+
+            if(!_duration && ! _progress) {
+                infoClass = 'status-info';
             }
 
             return (

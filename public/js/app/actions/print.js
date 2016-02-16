@@ -1,11 +1,9 @@
 define([
     'jquery',
-    'helpers/file-system',
     'helpers/display',
     'helpers/websocket',
     'helpers/api/3d-print-slicing',
     'helpers/api/control',
-    'helpers/file-system',
     'app/actions/alert-actions',
     'app/actions/progress-actions',
     'app/stores/progress-store',
@@ -25,12 +23,10 @@ define([
     'helpers/object-assign'
 ], function(
     $,
-    fileSystem,
     display,
     websocket,
     printSlicing,
     printerController,
-    FileSystem,
     AlertActions,
     ProgressActions,
     ProgressStore,
@@ -224,25 +220,20 @@ define([
     function uploadStl(name, file) {
         // pass to slicer
         var d = $.Deferred();
-        var reader = new FileReader();
-
-        reader.onload = function() {
-            slicer.upload(name, file, displayProgress).then(function(result) {
-                ProgressActions.updating('finishing up', 100);
-                d.resolve(result);
-            });
-        };
-        reader.readAsArrayBuffer(file);
+        slicer.upload(name, file, displayProgress).then(function(result) {
+            ProgressActions.updating('finishing up', 100);
+            d.resolve(result);
+        });
         return d.promise();
     }
 
-    function appendModel(fileEntry, file, callback) {
+    function appendModel(fileUrl, file, callback) {
         if(file.size === 0) {
             AlertActions.showPopupError('', lang.message.invalidFile);
             return;
         }
         var loader = new THREE.STLLoader();
-        var model_file_path = fileEntry.toURL();
+        var model_file_path = fileUrl;
         callback = callback || function() {};
 
         reactSrc.setState({
@@ -338,7 +329,7 @@ define([
                 mesh.geometry = new THREE.Geometry().fromBufferGeometry(mesh.geometry);
             }
             mesh.name = 'custom';
-            mesh.fileName = fileEntry.name;
+            mesh.fileName = file.name;
             mesh.plane_boundary = planeBoundary(mesh);
 
             addSizeProperty(mesh);
@@ -361,23 +352,21 @@ define([
     function appendModels(files, index, callback) {
         slicingStatus.canInterrupt = false;
         if(files.item(index).name.split('.').pop().toLowerCase() === 'stl') {
-            FileSystem.writeFile(
-                files.item(index),
-                {
-                    onComplete: function(e, fileEntry) {
-                        appendModel(fileEntry, files.item(index), function() {
-                            if(files.length > index + 1) {
-                                appendModels(files, index + 1, callback);
-                            }
-                            else {
-                                slicingStatus.canInterrupt = true;
-                                startSlicing(slicingType.F);
-                                callback();
-                            }
-                        });
+            var reader  = new FileReader();
+            reader.addEventListener('load', function () {
+                appendModel(reader.result, files.item(index), function() {
+                    if(files.length > index + 1) {
+                        appendModels(files, index + 1, callback);
                     }
-                }
-            );
+                    else {
+                        slicingStatus.canInterrupt = true;
+                        startSlicing(slicingType.F);
+                        callback();
+                    }
+                });
+            }, false);
+
+            reader.readAsDataURL(files.item(index));
         }
         else {
             callback();
@@ -435,6 +424,7 @@ define([
                 var t = setInterval(function() {
                     if(slicingStatus.canInterrupt) {
                         clearInterval(t);
+                        slicingStatus.isComplete = false;
                         startSlicing(slicingType.F);
                     }
                 }, 500);
@@ -444,6 +434,7 @@ define([
             slicingTimmer = setInterval(function() {
                 if(slicingStatus.canInterrupt) {
                     clearInterval(slicingTimmer);
+                    slicingStatus.isComplete = false;
                     startSlicing(slicingType.F);
                 }
             }, 500);
@@ -533,12 +524,12 @@ define([
                 slicingStatus.canInterrupt = false;
                 slicer.getSlicingResult().then(function(r) {
                     slicingStatus.canInterrupt = true;
-                    ProgressActions.close();
                     setTimeout(function() {
                         if(needToShowMonitor) {
                             reactSrc._handleDeviceSelected();
                             needToShowMonitor = false;
                         }
+                        ProgressActions.close();
                     }, 1000);
 
                     blobExpired = false;
@@ -1084,6 +1075,13 @@ define([
         SELECTED.size.z = z;
 
         slicingStatus.showProgress = false;
+
+        var t = setInterval(function() {
+            if(slicingStatus.canInterrupt) {
+                doSlicing();
+                clearInterval(t);
+            }
+        }, 500);
     }
 
     function setRotateMode() {
@@ -1148,6 +1146,8 @@ define([
 
     function setRotation(x, y, z, needRender, src) {
         src = src || SELECTED;
+        syncObjectOutline(src);
+
         var _x = parseInt(x) || 0,
             _y = parseInt(y) || 0,
             _z = parseInt(z) || 0;
@@ -1804,6 +1804,7 @@ define([
         outlineMesh.position.set(mesh.position.x, mesh.position.y, mesh.position.z);
         outlineMesh.scale.set(mesh.scale.x, mesh.scale.y, mesh.scale.z);
         outlineMesh.rotation.set(mesh.rotation.x, mesh.rotation.y, mesh.rotation.z);
+        outlineMesh.up = new THREE.Vector3(0, 0, 1);
         mesh.outlineMesh = outlineMesh;
         outlineScene.add(outlineMesh);
 
@@ -1900,6 +1901,7 @@ define([
 
     function _handleSliceComplete() {
         if(previewMode) {
+            slicingStatus.isComplete = true;
             _showWait(lang.print.drawingPreview, !showStopButton);
             slicingStatus.canInterrupt = false;
             slicer.getPath().then(function(result) {
@@ -1910,6 +1912,9 @@ define([
                     slicingStatus.showProgress = false;
                 });
             });
+        }
+        else {
+            slicingStatus.isComplete = true;
         }
 
         slicingStatus.inProgress    = false;
@@ -1946,7 +1951,10 @@ define([
             else {
                 progress = lang.print.gettingSlicingReport;
             }
-            _showWait(progress, !showStopButton);
+
+            if(!slicingStatus.isComplete) {
+                _showWait(progress, !showStopButton);
+            }
         }
         else {
             _showWait(lang.print.drawingPreview, !showStopButton);
