@@ -353,7 +353,7 @@ define([
         slicingStatus.canInterrupt = false;
         if(files.item(index).name.split('.').pop().toLowerCase() === 'stl') {
             var reader  = new FileReader();
-            reader.addEventListener("load", function () {
+            reader.addEventListener('load', function () {
                 appendModel(reader.result, files.item(index), function() {
                     if(files.length > index + 1) {
                         appendModels(files, index + 1, callback);
@@ -424,6 +424,7 @@ define([
                 var t = setInterval(function() {
                     if(slicingStatus.canInterrupt) {
                         clearInterval(t);
+                        slicingStatus.isComplete = false;
                         startSlicing(slicingType.F);
                     }
                 }, 500);
@@ -433,6 +434,7 @@ define([
             slicingTimmer = setInterval(function() {
                 if(slicingStatus.canInterrupt) {
                     clearInterval(slicingTimmer);
+                    slicingStatus.isComplete = false;
                     startSlicing(slicingType.F);
                 }
             }, 500);
@@ -1896,6 +1898,7 @@ define([
 
     function _handleSliceComplete() {
         if(previewMode) {
+            slicingStatus.isComplete = true;
             _showWait(lang.print.drawingPreview, !showStopButton);
             slicingStatus.canInterrupt = false;
             slicer.getPath().then(function(result) {
@@ -1906,6 +1909,9 @@ define([
                     slicingStatus.showProgress = false;
                 });
             });
+        }
+        else {
+            slicingStatus.isComplete = true;
         }
 
         slicingStatus.inProgress    = false;
@@ -1942,7 +1948,10 @@ define([
             else {
                 progress = lang.print.gettingSlicingReport;
             }
-            _showWait(progress, !showStopButton);
+
+            if(!slicingStatus.isComplete) {
+                _showWait(progress, !showStopButton);
+            }
         }
         else {
             _showWait(lang.print.drawingPreview, !showStopButton);
