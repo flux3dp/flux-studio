@@ -298,28 +298,31 @@ define([
                 });
             },
 
-            _handleNotification: function(type, message, onClickCallback) {
-                var self = this;
+            _handleNotification: function(type, message, onClickCallback, fixed) {
+                var growl;
+                fixed = fixed || false;
 
                 var types = {
                     INFO: function() {
-                        $.growl.notice({
+                        grown = $.growl.notice({
                             title   : lang.alert.info,
                             message : message,
+                            fixed   : fixed,
                             location: 'bl'
                         });
                     },
 
                     WARNING: function() {
-                        $.growl.warning({
+                        growl = $.growl.warning({
                             title   : lang.alert.warning,
                             message : message,
+                            fixed   : fixed,
                             location: 'bl'
                         });
                     },
 
                     ERROR: function() {
-                        $.growl.error({
+                        growl = $.growl.error({
                             title   : lang.alert.error,
                             message : message,
                             fixed   : true,
@@ -331,7 +334,7 @@ define([
                 types[type]();
                 setTimeout(function() {
                     $('.growl').on('click', function() {
-                        onClickCallback();
+                        onClickCallback(growl);
                     });
                 }, 500);
             },

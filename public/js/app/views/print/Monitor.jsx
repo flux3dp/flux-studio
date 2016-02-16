@@ -310,6 +310,7 @@ define([
             }
             else {
                 totalTimeInSeconds = parseInt(this.props.slicingStatus.time);
+
                 this._startReport();
             }
         },
@@ -986,6 +987,7 @@ define([
 
             this._retrieveFileInfo(start, end, function(filesArray) {
                 var files = currentDirectoryContent.files;
+<<<<<<< HEAD
 
                 Array.prototype.splice.apply(files, [start, filesArray.length].concat(filesArray));
                 this.setState({ currentDirectoryFiles: files }, function() {
@@ -1013,6 +1015,29 @@ define([
                         filesArray.push(r);
                     }
 
+=======
+
+                Array.prototype.splice.apply(files, [start, filesArray.length].concat(filesArray));
+                this.setState({ currentDirectoryFiles: files }, function() {
+                    this.forceUpdate();
+                    start = start + scrollSize;
+                }.bind(this));
+                socketStatus.ready = true;
+                this._startReport();
+            }.bind(this));
+        },
+
+        _retrieveFileInfo: function(index, end, callback, filesArray) {
+            filesArray = filesArray || [];
+            if(index < end) {
+                socketStatus.ready = false;
+                DeviceMaster.fileInfo(
+                    currentDirectoryContent.path,
+                    currentDirectoryContent.files[index][0],
+                    opts
+                ).then(function(r) {
+                    filesArray.push(r);
+>>>>>>> feature/s25_150
                     socketStatus.ready = true;
                     if(socketStatus.cancel) {
                         callback(filesArray);

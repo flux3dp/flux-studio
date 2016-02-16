@@ -483,11 +483,12 @@ define([
                     if(device.st_id === DeviceConstants.status.PAUSED_FROM_RUNNING) {
                         if(!defaultPrinterWarningShowed) {
                             var message = `${device.name} ${lang.device.pausedFromError}`;
-                            AlertActions.showWarning(message, function() {
+                            AlertActions.showWarning(message, function(growl) {
+                                growl.remove(function() {});
                                 selectDevice(defaultPrinter).then(function() {
                                     GlobalActions.showMonitor(defaultPrinter);
                                 });
-                            });
+                            }, true);
                             defaultPrinterWarningShowed = true;
                         }
                     }
