@@ -1,11 +1,9 @@
 define([
     'jquery',
-    'helpers/file-system',
     'helpers/display',
     'helpers/websocket',
     'helpers/api/3d-print-slicing',
     'helpers/api/control',
-    'helpers/file-system',
     'app/actions/alert-actions',
     'app/actions/progress-actions',
     'app/stores/progress-store',
@@ -25,12 +23,10 @@ define([
     'helpers/object-assign'
 ], function(
     $,
-    fileSystem,
     display,
     websocket,
     printSlicing,
     printerController,
-    FileSystem,
     AlertActions,
     ProgressActions,
     ProgressStore,
@@ -224,25 +220,20 @@ define([
     function uploadStl(name, file) {
         // pass to slicer
         var d = $.Deferred();
-        var reader = new FileReader();
-
-        reader.onload = function() {
-            slicer.upload(name, file, displayProgress).then(function(result) {
-                ProgressActions.updating('finishing up', 100);
-                d.resolve(result);
-            });
-        };
-        reader.readAsArrayBuffer(file);
+        slicer.upload(name, file, displayProgress).then(function(result) {
+            ProgressActions.updating('finishing up', 100);
+            d.resolve(result);
+        });
         return d.promise();
     }
 
-    function appendModel(fileEntry, file, callback) {
+    function appendModel(fileUrl, file, callback) {
         if(file.size === 0) {
             AlertActions.showPopupError('', lang.message.invalidFile);
             return;
         }
         var loader = new THREE.STLLoader();
-        var model_file_path = fileEntry.toURL();
+        var model_file_path = fileUrl;
         callback = callback || function() {};
 
         reactSrc.setState({
@@ -338,7 +329,7 @@ define([
                 mesh.geometry = new THREE.Geometry().fromBufferGeometry(mesh.geometry);
             }
             mesh.name = 'custom';
-            mesh.fileName = fileEntry.name;
+            mesh.fileName = file.name;
             mesh.plane_boundary = planeBoundary(mesh);
 
             addSizeProperty(mesh);
@@ -361,23 +352,21 @@ define([
     function appendModels(files, index, callback) {
         slicingStatus.canInterrupt = false;
         if(files.item(index).name.split('.').pop().toLowerCase() === 'stl') {
-            FileSystem.writeFile(
-                files.item(index),
-                {
-                    onComplete: function(e, fileEntry) {
-                        appendModel(fileEntry, files.item(index), function() {
-                            if(files.length > index + 1) {
-                                appendModels(files, index + 1, callback);
-                            }
-                            else {
-                                slicingStatus.canInterrupt = true;
-                                startSlicing(slicingType.F);
-                                callback();
-                            }
-                        });
+            var reader  = new FileReader();
+            reader.addEventListener("load", function () {
+                appendModel(reader.result, files.item(index), function() {
+                    if(files.length > index + 1) {
+                        appendModels(files, index + 1, callback);
                     }
-                }
-            );
+                    else {
+                        slicingStatus.canInterrupt = true;
+                        startSlicing(slicingType.F);
+                        callback();
+                    }
+                });
+            }, false);
+
+            reader.readAsDataURL(files.item(index));
         }
         else {
             callback();
