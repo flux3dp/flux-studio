@@ -220,7 +220,8 @@ define([
 
                 componentWillUnmount: function() {
                     director.clear();
-
+                    director.willUnmount();
+                    
                     AlertStore.removeYesListener(this._handleSetFirstDefault);
                     AlertStore.removeCancelListener(this._handleDefaultCancel);
                     GlobalStore.removeCancelPreviewListener(this._handleCancelPreview);

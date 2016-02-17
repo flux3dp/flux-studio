@@ -209,12 +209,16 @@ define([
         setImportWindowPosition();
 
         // init print controller
-        slicer = printSlicing();
         slicingStatus.canInterrupt = true;
         slicingStatus.inProgress = false;
 
+        if(!slicer) {
+            slicer = printSlicing();
+            registerSlicingProgress();
+        }
+
         registerDropToImport();
-        registerSlicingProgress();
+
     }
 
     function uploadStl(name, file) {
@@ -463,7 +467,6 @@ define([
             }
 
             if(monitorOn) {
-                console.log('closing monitor');
                 GlobalActions.closeMonitor();
                 needToShowMonitor = true;
             }
@@ -522,7 +525,6 @@ define([
                     ProgressActions.updating(complete, 100);
                 }
                 slicingStatus.canInterrupt = false;
-                console.log('get slicing result');
                 slicer.getSlicingResult().then(function(r) {
                     slicingStatus.canInterrupt = true;
                     setTimeout(function() {
@@ -540,6 +542,10 @@ define([
                 });
             }
         });
+    }
+
+    function willUnmount() {
+        Object.unobserve(slicingReport, function() {});
     }
 
     function registerDropToImport() {
@@ -2118,6 +2124,7 @@ define([
         clear               : clear,
         toggleScaleLock     : toggleScaleLock,
         getSlicingStatus    : getSlicingStatus,
-        cancelPreview       : cancelPreview
+        cancelPreview       : cancelPreview,
+        willUnmount         : willUnmount
     };
 });
