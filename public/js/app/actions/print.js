@@ -209,12 +209,16 @@ define([
         setImportWindowPosition();
 
         // init print controller
-        slicer = printSlicing();
         slicingStatus.canInterrupt = true;
         slicingStatus.inProgress = false;
 
+        if(!slicer) {
+            slicer = printSlicing();
+            registerSlicingProgress();
+        }
+
         registerDropToImport();
-        registerSlicingProgress();
+
     }
 
     function uploadStl(name, file) {
@@ -431,9 +435,9 @@ define([
             }, slicingWaitTime);
         }
         else {
-            slicingTimmer = setInterval(function() {
+            var t = setInterval(function() {
                 if(slicingStatus.canInterrupt) {
-                    clearInterval(slicingTimmer);
+                    clearInterval(t);
                     slicingStatus.isComplete = false;
                     startSlicing(slicingType.F);
                 }
@@ -463,7 +467,6 @@ define([
             }
 
             if(monitorOn) {
-                console.log('closing monitor');
                 GlobalActions.closeMonitor();
                 needToShowMonitor = true;
             }
@@ -539,6 +542,10 @@ define([
                 });
             }
         });
+    }
+
+    function willUnmount() {
+        Object.unobserve(slicingReport, function() {});
     }
 
     function registerDropToImport() {
@@ -944,9 +951,9 @@ define([
         if(willReslice) {
             var t = setInterval(function() {
                 if(slicingStatus.inProgress) {
+                    clearInterval(t);
                     willReslice = false;
                     execute();
-                    clearInterval(t);
                 }
             }, 500);
         }
@@ -1075,13 +1082,7 @@ define([
         SELECTED.size.z = z;
 
         slicingStatus.showProgress = false;
-
-        var t = setInterval(function() {
-            if(slicingStatus.canInterrupt) {
-                doSlicing();
-                clearInterval(t);
-            }
-        }, 500);
+        doSlicing();
     }
 
     function setRotateMode() {
@@ -1105,6 +1106,7 @@ define([
 
         var t = setInterval(function() {
             if(slicingStatus.canInterrupt) {
+                clearInterval(t);
                 slicer.setParameter('advancedSettings', settings.custom).then(function(result, errors) {
                     slicingStatus.showProgress = false;
                     slicingStatus.pauseReport = false;
@@ -1117,7 +1119,6 @@ define([
                 });
                 blobExpired = true;
                 slicingStatus.pauseReport = false;
-                clearInterval(t);
             }
         }, 500);
     }
@@ -1129,6 +1130,7 @@ define([
 
         var t = setInterval(function() {
             if(slicingStatus.canInterrupt) {
+                clearInterval(t);
                 slicer.setParameter(name, value).then(function() {
                     slicingStatus.showProgress = false;
                     slicingStatus.pauseReport = false;
@@ -1137,7 +1139,6 @@ define([
                     }
                     d.resolve('');
                 });
-                clearInterval(t);
             }
         }, 500);
 
@@ -1363,7 +1364,6 @@ define([
 
             slicer.duplicate(SELECTED.uuid, mesh.uuid).then(function(result) {
                 if(result.status.toUpperCase() === DeviceConstants.OK) {
-
                     Object.assign(mesh.scale, SELECTED.scale);
                     mesh.rotation.enteredX = SELECTED.rotation.enteredX;
                     mesh.rotation.enteredY = SELECTED.rotation.enteredY;
@@ -1388,6 +1388,7 @@ define([
                     objects.push(mesh);
 
                     render();
+                    doSlicing();
                 }
                 else {
                     AlertActions.showPopupError('duplicateError', result.error);
@@ -2123,6 +2124,7 @@ define([
         clear               : clear,
         toggleScaleLock     : toggleScaleLock,
         getSlicingStatus    : getSlicingStatus,
-        cancelPreview       : cancelPreview
+        cancelPreview       : cancelPreview,
+        willUnmount         : willUnmount
     };
 });
