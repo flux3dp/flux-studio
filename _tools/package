@@ -55,7 +55,6 @@ while true; do
             cp $DIR/_tools/platform-script/windows-firewall.bat $DIR/_tools/nwjs-shell-builder/TMP/output/fstudio-$(date +%Y%m%d)-win-x86/
             cd $DIR/_tools/nwjs-shell-builder/TMP/output/
             zip -r -X ./fstudio-$(date +%Y%m%d)-win-x86.zip ./fstudio-$(date +%Y%m%d)-win-x86
-            cp ./fstudio-$(date +%Y%m%d)-win-x86.zip /var/www/latest-release/app/fstudio-$(date +%Y%m%d)-win-x86.zip
             cd $DIR/_tools
 
             # clear
@@ -94,7 +93,6 @@ while true; do
             cp $DIR/_tools/platform-script/windows-firewall.bat $DIR/_tools/nwjs-shell-builder/TMP/output/fstudio-$(date +%Y%m%d)-win-x64/
             cd $DIR/_tools/nwjs-shell-builder/TMP/output/
             zip -r -X ./fstudio-$(date +%Y%m%d)-win-x64.zip ./fstudio-$(date +%Y%m%d)-win-x64
-            cp ./fstudio-$(date +%Y%m%d)-win-x64.zip /var/www/latest-release/app/fstudio-$(date +%Y%m%d)-win-x64.zip
             cd $DIR/_tools
             break;;
 
