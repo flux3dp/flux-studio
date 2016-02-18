@@ -72,7 +72,9 @@ define([
                         }
                     });
 
-                    AlertStore.onCancel(this._onCancel);
+                    if(this.props.src !== 'TUTORIAL') {
+                        AlertStore.onCancel(this._onCancel);
+                    }
                 }
             },
 

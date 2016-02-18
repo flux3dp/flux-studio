@@ -154,9 +154,10 @@ define([
                         advancedSettings.raft_layers = defaultRaftLayer;
                     }
 
-                    if(!Config().read('tutorial-finished')) {
+                    if(!Config().read('tutorial-finished') || Config().read('tutorial-finished') !== 'true') {
                         tutorialMode = true;
                     }
+
 
                     _raftLayers = parseInt(this._getValueFromAdvancedCustomSettings('raft_layers'));
 
@@ -208,7 +209,7 @@ define([
                     };
 
                     this._registerKeyEvents();
-                    if(Config().read('configured-printer') && tutorialMode) {
+                    if(tutorialMode) {
                         //First time using, with usb-configured printer..
                         AlertActions.showPopupYesNo('set_default', sprintf(lang.tutorial.set_first_default,Config().read('configured-printer')),lang.tutorial.set_first_default_caption);
                         AlertStore.onYes(this._handleSetFirstDefault);
@@ -221,7 +222,7 @@ define([
                 componentWillUnmount: function() {
                     director.clear();
                     director.willUnmount();
-                    
+
                     AlertStore.removeYesListener(this._handleSetFirstDefault);
                     AlertStore.removeCancelListener(this._handleDefaultCancel);
                     GlobalStore.removeCancelPreviewListener(this._handleCancelPreview);
@@ -249,7 +250,6 @@ define([
                     if(tutorialMode) {
                         AlertActions.showPopupYesNo('tour', lang.tutorial.startTour);
                         AlertStore.onYes(this._handleTakeTutorial);
-                        AlertStore.onCancel(this._handleCancelTutorial);
                     }
                 },
 
@@ -539,13 +539,11 @@ define([
                     if(!tutorialMode) { return; }
                     this.setState({ currentTutorialStep: this.state.currentTutorialStep + 1 }, function() {
                         if(this.state.currentTutorialStep === 1) {
-                            var selectPrinterName = Config().read('configured-printer');
-                            if(!selectPrinterName) {
-                                selectPrinterName = InitializeMachine.defaultPrinter.get().name;
-                            }
-                            if(!selectPrinterName) {
-                                selectPrinterName = DeviceMaster.getFirstDevice();
-                            }
+                            var selectPrinterName =
+                                    Config().read('configured-printer') ||
+                                    InitializeMachine.defaultPrinter.get().name ||
+                                    DeviceMaster.getFirstDevice();
+
                             if(selectPrinterName){
                                 DeviceMaster.getDeviceByNameAsync(
                                 selectPrinterName,
@@ -584,10 +582,13 @@ define([
 
                             oReq.onload = function(oEvent) {
                                 var blob = oReq.response;
-                                director.appendModel(fileEntry, blob);
+                                var url = URL.createObjectURL(blob);
+                                blob.name = 'guide-example.stl';
+                                director.appendModel(url, blob);
                             };
 
                             oReq.send();
+                            AlertStore.removeCancelListener(this._handleDefaultCancel);
                         }
                         else if (this.state.currentTutorialStep === 5) {
                             this.setState({ tutorialOn: false });
@@ -613,9 +614,21 @@ define([
 
                 _handleDefaultCancel: function(ans) {
                     //Use setTimeout to avoid multiple modal display conflict
+                    if(ans === 'set_default') {
+                        AlertStore.removeYesListener(this._handleSetFirstDefault);
+                    }
+                    if(ans === 'tour') {
+                        this.setState({ tutorialOn: false });
+                        tutorialMode = false;
+                        Config().write('tutorial-finished', true);
+                    }
+                    if(ans === 'change-filament-device-busy') {
+                        this.setState({ tutorialOn: false });
+                        tutorialMode = false;
+                    }
                     setTimeout(function() {
                         this._registerTutorial();
-                    }, 10);
+                    }.bind(this), 10);
                 },
 
                 _handleCancelPreview: function() {
