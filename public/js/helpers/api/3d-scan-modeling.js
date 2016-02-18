@@ -24,8 +24,7 @@ define([
             splitBinary = function(blob, callback) {
                 callback = callback || function() {};
 
-                var fileReader,
-                    chunk,
+                var chunk,
                     CHUNK_PKG_SIZE = 4096,
                     onLoaded = function(e) {
                         callback(this.result);
@@ -34,12 +33,7 @@ define([
                 // split up to pieces
                 for (var i = 0; i < blob.size; i += CHUNK_PKG_SIZE) {
                     chunk = blob.slice(i, i + CHUNK_PKG_SIZE);
-
-                    fileReader = new FileReader();
-
-                    fileReader.onloadend = onLoaded;
-
-                    fileReader.readAsArrayBuffer(chunk);
+                    callback(chunk);
                 }
             };
 
