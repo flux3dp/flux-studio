@@ -10,15 +10,14 @@ define([
 ], function($, Websocket, PointCloudHelper, history) {
     'use strict';
 
-    var ws;
-
     return function(opts) {
         opts = opts || {};
         opts.onError = opts.onError || function() {};
         opts.onFatal = opts.onFatal || function() {};
         opts.onClose = opts.onClose || function() {};
 
-        var events = {
+        var ws,
+            events = {
                 onMessage: function() {}
             },
             History = history(),
@@ -44,7 +43,7 @@ define([
                 }
             };
 
-        ws = ws || new Websocket({
+        ws = new Websocket({
             method: '3d-scan-modeling',
             onMessage: function(data) {
 
@@ -58,6 +57,7 @@ define([
             connection: ws,
             History: History,
             upload: function(name, point_cloud, opts) {
+                opts.onStarting = opts.onStarting || function() {};
                 opts.onFinished = opts.onFinished || function() {};
 
                 var order_name = 'upload',
@@ -67,16 +67,19 @@ define([
                         point_cloud.left.size / 24,
                         point_cloud.right.size / 24 || 0
                     ],
-                    chunk,
-                    fileReader,
-                    CHUNK_PKG_SIZE = 4096;
+                    chunks = [];
+
+                // split up to pieces
+                splitBinary(point_cloud.total, function(result) {
+                    chunks.push(result);
+                });
 
                 events.onMessage = function(data) {
                     switch (data.status) {
                     case 'continue':
                         // split up to pieces
-                        splitBinary(point_cloud.total, function(result) {
-                            ws.send(result);
+                        chunks.forEach(function(chunk) {
+                            ws.send(chunk);
                         });
 
                         break;
@@ -87,6 +90,8 @@ define([
                     }
 
                 };
+
+                opts.onStarting();
 
                 ws.send(args.join(' '));
             },
