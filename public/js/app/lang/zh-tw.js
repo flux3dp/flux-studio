@@ -35,6 +35,20 @@ define(function() {
                 message_pattern_1: 'FLUX Studio 有新的軟體更新。',
                 message_pattern_2: 'FLUX Software %s 可使用 - 你的版本為 %s.'
             },
+            toolhead: {
+                caption: 'An Toolhead Firmware Update to FLUX is available',
+                message_pattern_1: '"%s" is now ready for toolhead firmware update.',
+                message_pattern_2: 'FLUX Toolhead Firmware %s is now available.',
+                latest_firmware: {
+                    caption: 'Firmware Update',
+                    message: 'You have the latest firmware'
+                },
+                confirm: 'CONFIRM',
+                upload_file: 'Upload file',
+                update_success: 'Toolhead Firmware update successfully uploaded',
+                update_fail: 'Update Fail'
+            },
+            network_unreachable: '請確認網路連線',
             skip: '跳過此版本',
             later: '稍候',
             install: '下載',
@@ -69,7 +83,8 @@ define(function() {
                 device_monitor: '狀態',
                 change_filament: '自動換料',
                 default_device: '設為預設裝置',
-                check_firmware_update: '韌體更新'
+                check_firmware_update: '韌體更新',
+                update_toolhead: '更新工具模組韌體'
             },
             window: {
                 label: '視窗',
