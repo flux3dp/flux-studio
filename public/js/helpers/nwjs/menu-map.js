@@ -194,7 +194,86 @@ define([
             }
         }],
         subItems,
-        timeout_device_update = 5000;
+        timeout_device_update = 5000,
+        executeFirmwareUpdate = function(printer, type) {
+            var lang = i18n.get();
+
+            console.log(printer);
+            checkFirmware(printer, type).done(function(response) {
+                var doUpdate = (
+                        'firmware' === type ?
+                        DeviceMaster.updateFirmware :
+                        DeviceMaster.updateToolhead
+                    ),
+                    onSubmit = function(files, e) {
+                        var file = files.item(0),
+                            onFinishUpdate = function(isSuccess) {
+                                ProgressActions.close();
+
+                                if (true === isSuccess) {
+                                    AlertActions.showPopupInfo(
+                                        'firmware-update-success',
+                                        lang.update.firmware.update_success
+                                    );
+                                }
+                                else {
+                                    AlertActions.showPopupError(
+                                        'firmware-update-fail',
+                                        lang.update.firmware.update_fail
+                                    );
+                                }
+                            };
+
+                        ProgressActions.open(ProgressConstants.NONSTOP);
+                        DeviceMaster.selectDevice(printer).then(function(status) {
+                            if (status === DeviceConstants.CONNECTED) {
+                                doUpdate(file).
+                                    always(function() {
+                                        DeviceMaster.quitTask();
+                                    }).
+                                    done(onFinishUpdate.bind(null, true)).
+                                    fail(onFinishUpdate.bind(null, false));
+                            }
+                            else if (status === DeviceConstants.TIMEOUT) {
+                                AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
+                            }
+                        });
+                    },
+                    onInstall = function() {
+                        InputLightboxActions.open(
+                            'upload-firmware',
+                            {
+                                type: InputLightboxConstants.TYPE_FILE,
+                                inputHeader: lang.update.firmware.upload_file,
+                                onSubmit: onSubmit,
+                                confirmText: lang.update.firmware.confirm
+                            }
+                        );
+                    };
+
+                if (true === response.needUpdate) {
+                    AlertActions.showUpdate(
+                        printer,
+                        type,
+                        response,
+                        onInstall
+                    );
+                }
+                else {
+                    AlertActions.showPopupInfo(
+                        'latest-firmware',
+                        lang.update.firmware.latest_firmware.message,
+                        lang.update.firmware.latest_firmware.caption
+                    );
+                }
+            }).
+            fail(function() {
+                AlertActions.showPopupInfo(
+                    'latest-firmware',
+                    lang.update.network_unreachable
+                );
+            });
+        };
 
     function bindMap() {
         menuMap = [];
@@ -324,67 +403,14 @@ define([
                                             label: lang.device.check_firmware_update,
                                             enabled: true,
                                             onClick: function() {
-                                                checkFirmware(printer).done(function(response) {
-                                                    var lang = i18n.get(),
-                                                        onSubmit = function(files, e) {
-                                                            var file = files.item(0),
-                                                                onFinishUpdate = function(isSuccess) {
-                                                                    ProgressActions.close();
-
-                                                                    if (true === isSuccess) {
-                                                                        AlertActions.showPopupInfo(
-                                                                            'firmware-update-success',
-                                                                            lang.update.firmware.update_success
-                                                                        );
-                                                                    }
-                                                                    else {
-                                                                        AlertActions.showPopupError(
-                                                                            'firmware-update-fail',
-                                                                            lang.update.firmware.update_fail
-                                                                        );
-                                                                    }
-                                                                };
-
-                                                            ProgressActions.open(ProgressConstants.NONSTOP);
-                                                            DeviceMaster.selectDevice(printer).then(function(status) {
-                                                                if (status === DeviceConstants.CONNECTED) {
-                                                                    DeviceMaster.updateFirmware(file).
-                                                                        done(onFinishUpdate.bind(null, true)).
-                                                                        fail(onFinishUpdate.bind(null, false));
-                                                                }
-                                                                else if (status === DeviceConstants.TIMEOUT) {
-                                                                    AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
-                                                                }
-                                                            });
-                                                        },
-                                                        onInstall = function() {
-                                                            InputLightboxActions.open(
-                                                                'upload-firmware',
-                                                                {
-                                                                    type: InputLightboxConstants.TYPE_FILE,
-                                                                    inputHeader: lang.update.firmware.upload_file,
-                                                                    onSubmit: onSubmit,
-                                                                    confirmText: lang.update.firmware.confirm
-                                                                }
-                                                            );
-                                                        };
-
-                                                    if (true === response.needUpdate) {
-                                                        AlertActions.showUpdate(
-                                                            printer,
-                                                            'firmware',
-                                                            response,
-                                                            onInstall
-                                                        );
-                                                    }
-                                                    else {
-                                                        AlertActions.showPopupInfo(
-                                                            'latest-firmware',
-                                                            lang.update.firmware.latest_firmware.message,
-                                                            lang.update.firmware.latest_firmware.caption
-                                                        );
-                                                    }
-                                                });
+                                                executeFirmwareUpdate(printer, 'firmware');
+                                            }
+                                        },
+                                        {
+                                            label: lang.device.update_toolhead,
+                                            enabled: true,
+                                            onClick: function() {
+                                                executeFirmwareUpdate(printer, 'toolhead');
                                             }
                                         },
                                         {
