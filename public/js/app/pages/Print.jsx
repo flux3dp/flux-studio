@@ -210,8 +210,12 @@ define([
 
                     this._registerKeyEvents();
                     if(tutorialMode) {
-                        //First time using, with usb-configured printer..
-                        AlertActions.showPopupYesNo('set_default', sprintf(lang.tutorial.set_first_default,Config().read('configured-printer')),lang.tutorial.set_first_default_caption);
+                        var configuredPrinter = Config().read('configured-printer');
+                        // if no configured printer, no tutorial & don't set default printer
+                        if(configuredPrinter !== '') {
+                            AlertActions.showPopupYesNo('set_default', sprintf(lang.tutorial.set_first_default,Config().read('configured-printer')),lang.tutorial.set_first_default_caption);
+                            tutorialMode = false;
+                        }
                         AlertStore.onYes(this._handleSetFirstDefault);
                         AlertStore.onCancel(this._handleDefaultCancel);
                     }
