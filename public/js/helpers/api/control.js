@@ -575,6 +575,49 @@ define([
 
                 return deferred.promise();
             },
+
+            /**
+             * update toolhead firmware
+             * @param {File} file - file
+             */
+            toolheadUpdate: function(file) {
+                var deferred = $.Deferred(),
+                    mimeType = 'binary/flux-firmware',
+                    blob = new Blob([file], { type: mimeType }),
+                    args = [
+                        'update_hbfw',
+                        'binary',
+                        blob.size
+                    ];
+
+                events.onMessage = function(result) {
+                    switch (result.status) {
+                    case 'ok':
+                        deferred.resolve(result);
+                        break;
+                    case 'uploading':
+                        deferred.notify(result);
+                        break;
+                    case 'continue':
+                        deferred.notify(result);
+                        ws.send(blob);
+                        break;
+                    case 'update_hbfw':
+                        deferred.notify(result);
+                        break;
+                    default:
+                        deferred.reject(result);
+                    }
+                };
+
+                events.onError = function(result) {
+                    deferred.reject(result);
+                };
+
+                ws.send(args.join(' '));
+
+                return deferred.promise();
+            }
         };
     };
 });
