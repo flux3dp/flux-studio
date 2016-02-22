@@ -851,6 +851,7 @@ define(function() {
             extensionNotSupported               : 'file extension not supported',
             fileExistContinue                   : 'file already exist, continue ? (will replace)',
             confirmGToF                         : 'Uploaded GCode will be converted to FCode, continue (will replace if exist)',
+            confirmFileDelete                   : 'Are you sure you want to delete this file?',
             task : {
                 EXTRUDER                        : 'Printing Task',
                 LASER                           : 'Engraving Task'

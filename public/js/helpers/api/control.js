@@ -490,6 +490,21 @@ define([
 
                 return d.promise();
             },
+            deleteFile: function(fileNameWithPath) {
+                var d = $.Deferred();
+
+                events.onMessage = function(result) {
+                    d.resolve(result);
+                };
+
+                events.onError = function(result) {
+                    d.resolve(result);
+                };
+
+                ws.send(`file rmfile ${fileNameWithPath}`);
+
+                return d.promise();
+            },
 
             /**
              * maintain mode

@@ -109,8 +109,8 @@ define([
                         }
                         break;
                     case DeviceConstants.MONITOR_TOO_OLD:
-                        AlertActions.showPopupError('fatal-occurred', 
-                                                    lang.message.monitor_too_old.content, 
+                        AlertActions.showPopupError('fatal-occurred',
+                                                    lang.message.monitor_too_old.content,
                                                     lang.message.monitor_too_old.caption);
                         break;
                     }
@@ -278,6 +278,11 @@ define([
 
     function fileInfo(path, fileName) {
         return _device.actions.fileInfo(path, fileName);
+    }
+
+    function deleteFile(path, fileName) {
+        var fileNameWithPath = `${path.join('/')}/${fileName}`;
+        return _device.actions.deleteFile(fileNameWithPath);
     }
 
     function readyCamera() {
@@ -530,6 +535,7 @@ define([
             this.stopCamera           = stopCamera;
             this.ls                   = ls;
             this.fileInfo             = fileInfo;
+            this.deleteFile           = deleteFile;
             this.getPreviewInfo       = getPreviewInfo;
             this.maintain             = maintain;
             this.reconnect            = reconnect;

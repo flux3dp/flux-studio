@@ -12,7 +12,8 @@ define([
     'app/constants/global-constants',
     'helpers/sprintf',
     'helpers/round',
-    'helpers/duration-formatter'
+    'helpers/duration-formatter',
+    'helpers/shortcuts',
 ], function(
     $,
     React,
@@ -27,7 +28,8 @@ define([
     GlobalConstants,
     sprintf,
     round,
-    formatDuration
+    formatDuration,
+    shortcuts
 ) {
     'use strict';
 
@@ -295,24 +297,33 @@ define([
             }.bind(this)).then(function(exist) {
                 usbExist = exist;
                 socketStatus.reader = true;
+
+                if(openSource === GlobalConstants.DEVICE_LIST) {
+                    socketStatus.ready = false;
+                    var t = setInterval(function() {
+                        clearInterval(t);
+                        DeviceMaster.getPreviewInfo().then(function(info) {
+                            this._startReport();
+                            socketStatus.ready = true;
+                            this._processInfo(info);
+                        }.bind(this));
+                    }.bind(this), 200);
+                }
+                else {
+                    totalTimeInSeconds = parseInt(this.props.slicingStatus.time);
+
+                    this._startReport();
+                }
             }.bind(this));
 
-            if(openSource === GlobalConstants.DEVICE_LIST) {
-                socketStatus.ready = false;
-                var t = setInterval(function() {
-                    clearInterval(t);
-                    DeviceMaster.getPreviewInfo().then(function(info) {
-                        this._startReport();
-                        socketStatus.ready = true;
-                        this._processInfo(info);
-                    }.bind(this));
-                }.bind(this), 200);
-            }
-            else {
-                totalTimeInSeconds = parseInt(this.props.slicingStatus.time);
-
-                this._startReport();
-            }
+            // listening to key
+            shortcuts.on(['DEL'], function(e) {
+                e.preventDefault();
+                if(this.state.selectedItem) {
+                    this._stopReport();
+                    AlertActions.showPopupYesNo('DELETE_FILE', lang.monitor.confirmFileDelete);
+                }
+            }.bind(this));
         },
 
         shouldComponentUpdate: function(nextProps, nextState) {
@@ -384,6 +395,13 @@ define([
             };
         },
 
+        _clearSelectedItem: function() {
+            this.setState({
+                selectedItem: '',
+                selectedItemType: ''
+            });
+        },
+
         _handleClose: function() {
             this.props.onClose();
         },
@@ -410,9 +428,11 @@ define([
         _handleCancel: function(id) {
             messageViewed = true;
             showingPopup = false;
+            this._startReport();
         },
 
         _handleYes: function(id) {
+            console.log(id);
             if(id === DeviceConstants.KICK) {
                 socketStatus.ready = false;
                 DeviceMaster.kick().then(function() {
@@ -420,19 +440,23 @@ define([
                     this._startReport();
                 }.bind(this));
             }
-            else if(id === 'uploadFile') {
+            else if(id === 'UPLOAD_FILE') {
                 var info    = fileToBeUpload.name.split('.'),
                     ext     = info[info.length - 1];
 
                 if(ext === 'gcode') {
-                    AlertActions.showPopupYesNo('confirmGToF', lang.monitor.confirmGToF);
+                    AlertActions.showPopupYesNo('CONFIRM_G_TO_F', lang.monitor.confirmGToF);
                 }
                 else {
                     this._doFileUpload(fileToBeUpload);
                 }
             }
-            else if(id === 'confirmGToF') {
+            else if(id === 'CONFIRM_G_TO_F') {
                 this._doFileUpload(fileToBeUpload);
+            }
+            else if(id === 'DELETE_FILE') {
+                console.log('delete pressed!', pathArray.join('/') + '/' + this.state.selectedItem);
+                this._handleDeleteFile(pathArray, this.state.selectedItem);
             }
         },
 
@@ -453,6 +477,7 @@ define([
         },
 
         _handleSelectFolder: function(pathName) {
+            this._clearSelectedItem();
             var dir = this.state.currentDirectoryFolders;
             // if it's a directory
             if(dir.some(function(d) {
@@ -489,6 +514,13 @@ define([
             }, 100);
         },
 
+        _handleDeleteFile: function(pathToFile, fileName) {
+            var a = 'no';
+            DeviceMaster.deleteFile(pathToFile, fileName).then(function(response) {
+                this._removeFileFromUI(fileName);
+            }.bind(this));
+        },
+
         _handleBack: function() {
             var self = this;
             if(history.length > 1) {
@@ -508,6 +540,8 @@ define([
                     socketStatus.ready = true;
                 });
             }
+
+            this._clearSelectedItem();
 
             var actions = {
 
@@ -599,14 +633,16 @@ define([
                 fileToBeUpload = e.target.files[0];
                 this._existFileInDirectory(pathArray, fileToBeUpload.name).then(function(exist) {
                     if(exist) {
-                        AlertActions.showPopupYesNo('uploadFile', lang.monitor.fileExistContinue);
+                        this._stopReport();
+                        AlertActions.showPopupYesNo('UPLOAD_FILE', lang.monitor.fileExistContinue);
                     }
                     else {
                         var info = fileToBeUpload.name.split('.'),
                             ext  = info[info.length - 1];
 
                         if(ext === 'gcode') {
-                            AlertActions.showPopupYesNo('confirmGToF', lang.monitor.confirmGToF);
+                            this._stopReport();
+                            AlertActions.showPopupYesNo('CONFIRM_G_TO_F', lang.monitor.confirmGToF);
                         }
                         else {
                             this._doFileUpload(fileToBeUpload);
@@ -795,7 +831,7 @@ define([
             // rootMode = statusId === DeviceConstants.status.IDLE ? DeviceConstants.IDLE : DeviceConstants.RUNNING;
 
             // jug down errors as main and sub error for later use
-            if(report.error) {
+            if(report.error && report.error.length > 0) {
                 if(typeof(report.error) === 'string') {
                     mainError = report.error;
                 }
@@ -931,6 +967,19 @@ define([
                 cameraImageUrl: url,
                 waiting: false
             });
+        },
+
+        _removeFileFromUI: function(fileName) {
+            var files = this.state.currentDirectoryFiles,
+                r = [];
+
+            for(var i = 0; i < files.length; i++) {
+                if(files[i][0] !== fileName) {
+                    r.push(files[i]);
+                }
+            }
+            console.log(r);
+            this.setState({ currentDirectoryFiles: r });
         },
 
         _retrieveFolderContent: function(path) {

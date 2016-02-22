@@ -851,6 +851,7 @@ define(function() {
             extensionNotSupported               : '上傳檔案不支援此檔案格式',
             fileExistContinue                   : '檔案已存在，是否要覆蓋？',
             confirmGToF                         : 'GCode 上傳後會轉檔成 FCode, 是否要繼續？',
+            confirmFileDelete                   : '是否確定要刪除這個檔案？',
             task : {
                 EXTRUDER                        : '列印工作',
                 LASER                           : '雷雕工作'
