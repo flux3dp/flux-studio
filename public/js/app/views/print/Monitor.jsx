@@ -583,29 +583,36 @@ define([
             }
             else {
                 start = 0;
-                DeviceMaster.fileInfo(pathArray.join('/'), fileName).then(function(info) {
-                    if(info[1] instanceof Blob) {
-                        this._processInfo([info[2]]);
-                        previewUrl = info[1].size === 0 ? '/img/ph_l.png' : URL.createObjectURL(info[1]);
-                        filePreview = true;
-                        pathArray.push(fileName);
-                        this.setState({
-                            mode: mode.PREVIEW,
-                            currentStatus: deviceStatus.st_id === DeviceConstants.status.COMPLETED ? DeviceConstants.READY : this.state.currentStatus
-                        }, function() {
-                            socketStatus.ready = false;
-                            DeviceMaster.getReport().then(function(report) {
-                                socketStatus.ready = true;
-                                this._processReport(report);
-                            }.bind(this));
-                            this._addHistory();
-                        });
+                socketStatus.cancel = true;
+                var t = setInterval(function() {
+                    if(socketStatus.ready) {
+                        clearInterval(t);
+                        DeviceMaster.fileInfo(pathArray.join('/'), fileName).then(function(info) {
+                            if(info[1] instanceof Blob) {
+                                this._processInfo([info[2]]);
+                                previewUrl = info[1].size === 0 ? '/img/ph_l.png' : URL.createObjectURL(info[1]);
+                                filePreview = true;
+                                pathArray.push(fileName);
+                                this.setState({
+                                    mode: mode.PREVIEW,
+                                    currentStatus: deviceStatus.st_id === DeviceConstants.status.COMPLETED ? DeviceConstants.READY : this.state.currentStatus
+                                }, function() {
+                                    socketStatus.cancel = false;
+                                    socketStatus.ready = false;
+                                    DeviceMaster.getReport().then(function(report) {
+                                        socketStatus.ready = true;
+                                        this._processReport(report);
+                                    }.bind(this));
+                                    this._addHistory();
+                                });
+                            }
+                            else {
+                                AlertActions.showPopupInfo('', lang.monitor.cannotPreview);
+                            }
+                            this.forceUpdate();
+                        }.bind(this));
                     }
-                    else {
-                        AlertActions.showPopupInfo('', lang.monitor.cannotPreview);
-                    }
-                    this.forceUpdate();
-                }.bind(this));
+                }.bind(this), 200);
             }
         },
 
@@ -660,7 +667,6 @@ define([
                 if(socketStatus.ready) {
                     clearInterval(t);
                     DeviceMaster.downloadFile(pathArray, self.state.selectedItem, downloadProgressDisplay).then(function(file) {
-                        console.log(file);
                         saveAs(file[1], self.state.selectedItem);
                         self.setState({ displayStatus: displayStatus });
                     });
@@ -671,7 +677,6 @@ define([
                 self.setState({
                     displayStatus: `${lang.monitor.processing} ${parseInt((p.size - p.left) / p.size * 100)}%`
                 });
-                console.log(p);
             };
         },
 
@@ -776,6 +781,9 @@ define([
             timmer = setTimeout(this._processTimeout, timeoutLength);
 
             reporter = setInterval(function() {
+                if(self.state.mode === mode.BROWSE_FILE) {
+                    return;
+                }
                 socketStatus.ready = false;
                 DeviceMaster.getReport().then(function(report) {
                     socketStatus.ready = true;
