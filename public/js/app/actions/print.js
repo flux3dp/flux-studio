@@ -901,7 +901,6 @@ define([
                                     if(!willReslice) {
                                         ProgressActions.updating(message, parseInt(result.percentage * 100));
                                     }
-
                                 }
                                 else {
                                     ProgressActions.close();
@@ -988,6 +987,9 @@ define([
 
         slicingStatus.reporter = setInterval(function() {
             if(!slicingStatus.pauseReport) {
+                if(willReslice) {
+                    return;
+                }
                 slicingStatus.canInterrupt = false;
                 slicingStatus.pauseReport = true;
                 slicer.reportSlicing(function(report) {
