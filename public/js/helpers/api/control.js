@@ -505,6 +505,31 @@ define([
 
                 return d.promise();
             },
+            downloadFile: function(fileNameWithPath, callbackProgress) {
+                var d = $.Deferred(),
+                    file = [];
+
+                events.onMessage = function(result) {
+                    if(result.status === 'continue') {
+                        callbackProgress(result);
+                    }
+                    else {
+                        file.push(result);
+                    }
+
+                    if(result instanceof Blob) {
+                        d.resolve(file);
+                    }
+                };
+
+                events.onError = function(result) {
+                    d.resolve(result);
+                };
+
+                ws.send(`file download ${fileNameWithPath}`);
+
+                return d.promise();
+            },
 
             /**
              * maintain mode

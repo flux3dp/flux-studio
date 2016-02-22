@@ -288,6 +288,7 @@ define([
 
             socketStatus.ready = false;
             DeviceMaster.getReport().then(function(report) {
+                socketStatus.ready = true;
                 this._processReport(report);
                 if(this.state.mode === mode.BROWSE_FILE) {
                     currentStatus = DeviceConstants.READY;
@@ -300,14 +301,13 @@ define([
 
                 if(openSource === GlobalConstants.DEVICE_LIST) {
                     socketStatus.ready = false;
-                    var t = setInterval(function() {
-                        clearInterval(t);
-                        DeviceMaster.getPreviewInfo().then(function(info) {
+                    DeviceMaster.getPreviewInfo().then(function(info) {
+                        if(this.state.mode !== mode.BROWSE_FILE) {
                             this._startReport();
-                            socketStatus.ready = true;
-                            this._processInfo(info);
-                        }.bind(this));
-                    }.bind(this), 200);
+                        }
+                        socketStatus.ready = true;
+                        this._processInfo(info);
+                    }.bind(this));
                 }
                 else {
                     totalTimeInSeconds = parseInt(this.props.slicingStatus.time);
@@ -385,7 +385,6 @@ define([
                 if(isValid) {
                     var blob = new Blob([reader.result], type);
                     DeviceMaster.uploadFile(blob, file, pathArray.join('/')).then(function(result) {
-                        self._startReport();
                         self._refreshDirectory();
                     });
                 }
@@ -467,7 +466,6 @@ define([
             pathArray = [];
 
             this._retrieveFolderContent('').then(function() {
-                this._startReport();
                 this.setState({
                     mode: mode.BROWSE_FILE
                 }, function() {
@@ -493,7 +491,6 @@ define([
                     }
                 }.bind(this), 100);
 
-                // this.setState({ waiting: true });
                 this._addHistory();
             }
         },
@@ -501,7 +498,6 @@ define([
         _handleBrowseUpLevel: function() {
             if(pathArray.length === 0) {
                 this.setState({ mode: mode.PREVIEW });
-                this._startReport();
                 return;
             }
             pathArray.pop();
@@ -654,15 +650,29 @@ define([
         },
 
         _handleDownload: function() {
+            var self = this,
+                displayStatus = '';
+
             start = 0;
-            DeviceMaster.fileInfo(pathArray.join('/'), this.state.selectedItem).then(function(info) {
-                if(info[1] instanceof Blob) {
-                    saveAs(info[1], info[0]);
+            displayStatus = this.state.displayStatus;
+            this._stopReport();
+            var t = setInterval(function() {
+                if(socketStatus.ready) {
+                    clearInterval(t);
+                    DeviceMaster.downloadFile(pathArray, self.state.selectedItem, downloadProgressDisplay).then(function(file) {
+                        console.log(file);
+                        saveAs(file[1], self.state.selectedItem);
+                        self.setState({ displayStatus: displayStatus });
+                    });
                 }
-                else {
-                    AlertActions.showPopupInfo('', lang.monitor.fileNotDownloadable);
-                }
-            }.bind(this));
+            }, 200);
+
+            var downloadProgressDisplay = function(p) {
+                self.setState({
+                    displayStatus: `${lang.monitor.processing} ${parseInt((p.size - p.left) / p.size * 100)}%`
+                });
+                console.log(p);
+            };
         },
 
         _handleToggleCamera: function() {
@@ -785,7 +795,6 @@ define([
         },
 
         _processInfo: function(info) {
-            this._startReport();
             if(info === '') {
                 return;
             }
@@ -1025,7 +1034,6 @@ define([
         _renderFolderFilesWithPreview: function() {
             this._stopReport();
             if(currentDirectoryContent.files.length === 0) {
-                this._startReport();
                 return;
             }
 
@@ -1043,7 +1051,6 @@ define([
                     start = start + scrollSize;
                 }.bind(this));
                 socketStatus.ready = true;
-                this._startReport();
             }.bind(this));
         },
 
@@ -1191,7 +1198,6 @@ define([
                     break;
 
                 case mode.BROWSE_FILE:
-                    // console.log(this.state.directoryContent);
                     return this._processFolderContent();
                     break;
 
@@ -1206,7 +1212,6 @@ define([
         },
 
         _renderFolderContent: function() {
-            // console.log('rendering folder content');
             switch(this.state.mode) {
                 case mode.PREVIEW:
                 case mode.PRINT:

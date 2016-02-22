@@ -285,6 +285,11 @@ define([
         return _device.actions.deleteFile(fileNameWithPath);
     }
 
+    function downloadFile(path, fileName, callbackProgress) {
+        var fileNameWithPath = `${path.join('/')}/${fileName}`;
+        return _device.actions.downloadFile(fileNameWithPath, callbackProgress);
+    }
+
     function readyCamera() {
         var d = $.Deferred();
         _device.scanController = ScanController(_device.uuid, {
@@ -517,32 +522,33 @@ define([
 
     DeviceSingleton.prototype = {
         init: function() {
-            this.selectDevice         = selectDevice;
-            this.uploadFile           = uploadFile;
-            this.go                   = go;
-            this.goFromFile           = goFromFile;
-            this.resume               = resume;
-            this.pause                = pause;
-            this.stop                 = stop;
-            this.quit                 = quit;
-            this.quitTask             = quitTask;
-            this.kick                 = kick;
-            this.setPassword          = setPassword;
-            this.getReport            = getReport;
-            this.getSelectedDevice    = getSelectedDevice;
-            this.readyCamera          = readyCamera;
-            this.startCamera          = startCamera;
-            this.stopCamera           = stopCamera;
-            this.ls                   = ls;
-            this.fileInfo             = fileInfo;
-            this.deleteFile           = deleteFile;
-            this.getPreviewInfo       = getPreviewInfo;
-            this.maintain             = maintain;
-            this.reconnect            = reconnect;
-            this.getDeviceByName      = getDeviceByName;
-            this.getDeviceByNameAsync = getDeviceByNameAsync;
-            this.getFirstDevice       = getFirstDevice;
-            this.updateFirmware       = updateFirmware;
+            this.selectDevice           = selectDevice;
+            this.uploadFile             = uploadFile;
+            this.go                     = go;
+            this.goFromFile             = goFromFile;
+            this.resume                 = resume;
+            this.pause                  = pause;
+            this.stop                   = stop;
+            this.quit                   = quit;
+            this.quitTask               = quitTask;
+            this.kick                   = kick;
+            this.setPassword            = setPassword;
+            this.getReport              = getReport;
+            this.getSelectedDevice      = getSelectedDevice;
+            this.readyCamera            = readyCamera;
+            this.startCamera            = startCamera;
+            this.stopCamera             = stopCamera;
+            this.ls                     = ls;
+            this.fileInfo               = fileInfo;
+            this.deleteFile             = deleteFile;
+            this.downloadFile           = downloadFile;
+            this.getPreviewInfo         = getPreviewInfo;
+            this.maintain               = maintain;
+            this.reconnect              = reconnect;
+            this.getDeviceByName        = getDeviceByName;
+            this.getDeviceByNameAsync   = getDeviceByNameAsync;
+            this.getFirstDevice         = getFirstDevice;
+            this.updateFirmware         = updateFirmware;
 
             Discover(
                 'device-master',
