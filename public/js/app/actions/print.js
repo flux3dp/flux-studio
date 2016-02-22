@@ -531,7 +531,6 @@ define([
                             reactSrc._handleDeviceSelected();
                             needToShowMonitor = false;
                         }
-                        ProgressActions.close();
                     }, 1000);
 
                     blobExpired = false;
