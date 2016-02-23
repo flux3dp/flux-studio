@@ -585,15 +585,25 @@ define([
                     mimeType = 'binary/flux-firmware',
                     blob = new Blob([file], { type: mimeType }),
                     args = [
+                        'task',
+                        'maintain'
+                    ],
+                    updateArgs = [
+                        'maintain',
                         'update_hbfw',
-                        'binary',
+                        'binary/fireware',
                         blob.size
                     ];
 
                 events.onMessage = function(result) {
                     switch (result.status) {
                     case 'ok':
-                        deferred.resolve(result);
+                        if ('maintain' === result.task) {
+                            ws.send(updateArgs.join(' '));
+                        }
+                        else {
+                            deferred.resolve(result);
+                        }
                         break;
                     case 'uploading':
                         deferred.notify(result);
