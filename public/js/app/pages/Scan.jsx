@@ -748,16 +748,21 @@ define([
                                 isScanStarted: false,
                                 hasMultiScan: false
                             });
+                            ProgressActions.close();
                         };
 
                     self.state.scanModelingWebSocket.upload(
                         mesh.name,
                         point_cloud,
                         {
+                            onStarting: function() {
+                                ProgressActions.open(
+                                    ProgressConstants.NONSTOP
+                                );
+                            },
                             onFinished: onUploadFinished
                         }
                     );
-
                 },
 
                 _handleCheck: function(callback) {
