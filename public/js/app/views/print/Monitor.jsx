@@ -497,7 +497,6 @@ define([
                 temp.pop();
             }
             filePreview = false;
-            this.state.selectedItemType = '';
             lastAction = history[history.length - 1];
 
             if(this.state.mode === mode.CAMERA) {
