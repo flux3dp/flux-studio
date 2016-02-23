@@ -88,6 +88,7 @@ define([
                     }
                 },
                 onError: function(response) {
+                    ProgressActions.close();
                     // TODO: shouldn't do replace
                     response.error = response.error.replace(/^.*\:\s+(\w+)$/g, '$1');
                     switch (response.error.toUpperCase()) {
@@ -100,7 +101,6 @@ define([
                             goAuth(_device.uuid);
                         }
                         else {
-                            ProgressActions.close();
                             AlertActions.showPopupInfo(
                                 'auth-error-with-diff-computer',
                                 lang.message.no_password.content,
