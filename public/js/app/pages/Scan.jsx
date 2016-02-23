@@ -1325,7 +1325,7 @@ define([
                         <section ref="operatingSection" className="operating-section">
                             {meshThumbnails}
                             <div id="model-displayer" className="model-displayer">
-                                <img ref="camera_image" src="" className={camera_image_class} onClick={closeSubPopup}/>
+                                <img ref="camera_image" src="" className={camera_image_class} onClick={closeSubPopup} draggable="false"/>
                             </div>
                             {settingPanel}
                             {manipulationPanel}

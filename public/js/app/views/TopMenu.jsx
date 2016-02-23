@@ -149,7 +149,7 @@ define([
 
             _handleSelectDevice: function(device, e) {
                 e.preventDefault();
-                
+
                 DeviceMaster.selectDevice(device).then(function(status) {
                     if (status === DeviceConstants.CONNECTED) {
                         GlobalActions.showMonitor(device);
@@ -194,7 +194,7 @@ define([
                         <li className={itemClass} key={'menu' + i}
                             data-display-name={opt.displayName}
                             onClick={this._handleNavigation.bind(null, opt.name)}>
-                            <img src={opt.imgSrc} />
+                            <img src={opt.imgSrc} draggable="false"/>
                             {label}
                         </li>
                     );
@@ -259,7 +259,7 @@ define([
                 return (
                     <div className={ClassNames(topClass)}>
                         <div className="brand-logo">
-                            <img className="logo-icon" src="/img/menu/main_logo.svg"/>
+                            <img className="logo-icon" src="/img/menu/main_logo.svg" draggable="false"/>
                             <span className="func-name">{currentWorkingFunction.displayName}</span>
                             <div className="menu">
                                 <div className="arrow arrow-left arrow-top-left-flat"/>
@@ -271,7 +271,7 @@ define([
 
                         <div title={lang.print.deviceTitle} className="device" onClick={this._handleShowDeviceList}>
                             <p className="device-icon">
-                                <img src="/img/btn-device.svg"/>
+                                <img src="/img/btn-device.svg" draggable="false"/>
                                 <span>{lang.menu.device}</span>
                             </p>
                             <div className={menuClass}>
