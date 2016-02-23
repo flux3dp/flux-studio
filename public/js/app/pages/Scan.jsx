@@ -1557,7 +1557,7 @@ define([
                     });
 
                     return (
-                        0 < meshes.length ?
+                        0 < meshes.length && false === self.state.hasConvert ?
                         <List className="mesh-thumbnail" items={thumbnails}/> :
                         ''
                     );
