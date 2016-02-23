@@ -20,12 +20,12 @@ define(function() {
             firmware: {
                 caption: 'An Firmware Update to FLUX is available',
                 message_pattern_1: '"%s" is now ready for firmware update.',
-                message_pattern_2: 'FLUX Firmware %s is now available - You have %s.',
+                message_pattern_2: 'FLUX Firmware v%s is now available - You have v%s.',
                 latest_firmware: {
                     caption: 'Firmware Update',
                     message: 'You have the latest firmware'
                 },
-                confirm: 'CONFIRM',
+                confirm: 'UPLOAD',
                 upload_file: 'Upload file',
                 update_success: 'Firmware update successfully uploaded',
                 update_fail: 'Update Fail'
@@ -33,7 +33,7 @@ define(function() {
             software: {
                 caption: 'An Software Update to FLUX is available',
                 message_pattern_1: 'FLUX Studio is now ready for software update.',
-                message_pattern_2: 'FLUX Software %s is now available - You have %s.'
+                message_pattern_2: 'FLUX Software v%s is now available - You have v%s.'
             },
             toolhead: {
                 caption: 'An Toolhead Firmware Update to FLUX is available',
@@ -43,7 +43,7 @@ define(function() {
                     caption: 'Firmware Update',
                     message: 'You have the latest firmware'
                 },
-                confirm: 'CONFIRM',
+                confirm: 'UPLOAD',
                 upload_file: 'Upload file',
                 update_success: 'Toolhead Firmware update successfully uploaded',
                 update_fail: 'Update Fail'
@@ -866,6 +866,7 @@ define(function() {
             extensionNotSupported               : 'file extension not supported',
             fileExistContinue                   : 'file already exist, continue ? (will replace)',
             confirmGToF                         : 'Uploaded GCode will be converted to FCode, continue (will replace if exist)',
+            updatePrintPresetSetting            : 'FLUX STUDIO has new printing preset, do you want to update? (will overwrite current parameters)',
             task : {
                 EXTRUDER                        : 'Printing Task',
                 LASER                           : 'Engraving Task'

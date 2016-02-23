@@ -20,12 +20,12 @@ define(function() {
             firmware: {
                 caption: 'FLUX 有新的韌體更新',
                 message_pattern_1: '"%s" 有新的韌體更新。',
-                message_pattern_2: 'FLUX Firmware %s 可使用 - 你的版本為 %s.',
+                message_pattern_2: 'FLUX Firmware v%s 可使用 - 你的版本為 v%s.',
                 latest_firmware: {
                     caption: '韌體更新',
                     message: '韌體已經是最新版本'
                 },
-                confirm: '確認更新',
+                confirm: '上傳',
                 upload_file: '請上傳檔案',
                 update_success: '韌體更新上傳成功',
                 update_fail: '更新失敗'
@@ -33,20 +33,20 @@ define(function() {
             software: {
                 caption: 'FLUX Studio 有新的軟體更新',
                 message_pattern_1: 'FLUX Studio 有新的軟體更新。',
-                message_pattern_2: 'FLUX Software %s 可使用 - 你的版本為 %s.'
+                message_pattern_2: 'FLUX Software v%s 可使用 - 你的版本為 v%s.'
             },
             toolhead: {
-                caption: 'An Toolhead Firmware Update to FLUX is available',
-                message_pattern_1: '"%s" is now ready for toolhead firmware update.',
-                message_pattern_2: 'FLUX Toolhead Firmware %s is now available.',
+                caption: 'FLUX 有新的韌體更新',
+                message_pattern_1: '"%s" 有新的韌體更新。',
+                message_pattern_2: 'FLUX Toolhead Firmware v%s 可使用',
                 latest_firmware: {
-                    caption: 'Firmware Update',
-                    message: 'You have the latest firmware'
+                    caption: '韌體更新',
+                    message: '韌體已經是最新版本'
                 },
-                confirm: 'CONFIRM',
-                upload_file: 'Upload file',
-                update_success: 'Toolhead Firmware update successfully uploaded',
-                update_fail: 'Update Fail'
+                confirm: '上傳',
+                upload_file: '請上傳檔案',
+                update_success: '韌體更新上傳成功',
+                update_fail: '更新失敗'
             },
             network_unreachable: '請確認網路連線',
             skip: '跳過此版本',
@@ -866,6 +866,7 @@ define(function() {
             extensionNotSupported               : '上傳檔案不支援此檔案格式',
             fileExistContinue                   : '檔案已存在，是否要覆蓋？',
             confirmGToF                         : 'GCode 上傳後會轉檔成 FCode, 是否要繼續？',
+            updatePrintPresetSetting            : 'FLUX STUDIO 有新的預設列印參數。\n是否要更新？（會刪除目前參數）',
             task : {
                 EXTRUDER                        : '列印工作',
                 LASER                           : '雷雕工作'
