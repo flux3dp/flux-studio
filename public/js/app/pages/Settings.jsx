@@ -66,6 +66,7 @@ define([
 
             _handleDone: function() {
                 location.hash = '#studio/print';
+                window.location.reload();
             },
 
             render : function() {
