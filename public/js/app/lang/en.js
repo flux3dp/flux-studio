@@ -920,7 +920,7 @@ define(function() {
             image_is_too_small: 'The file contains unsupported information',
             monitor_too_old: {
                 caption: 'Firmware Outdated',
-                content: 'Please install the latest firmware. <a target="_blank" href="http://helpcenter.flux3dp.com/hc/zh-tw/articles/216251077"> More</a>'
+                content: 'Please install the latest firmware with <a target="_blank" href="http://helpcenter.flux3dp.com/hc/en-us/articles/216251077">this guide</a>.'
             }
         },
         machine_status: {
