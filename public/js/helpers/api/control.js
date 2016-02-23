@@ -555,14 +555,18 @@ define([
                     ];
 
                 events.onMessage = function(result) {
-                    if ('ok' === result.status) {
+                    switch (result.status) {
+                    case 'ok':
                         deferred.resolve(result);
-                    }
-                    else if ('continue' === result.status) {
+                        break;
+                    case 'continue':
                         deferred.notify(result);
                         ws.send(blob);
-                    }
-                    else {
+                        break;
+                    case 'uploading':
+                        // ignore
+                        break;
+                    default:
                         deferred.reject(result);
                     }
                 };
