@@ -109,9 +109,11 @@ define([
                         }
                         break;
                     case DeviceConstants.MONITOR_TOO_OLD:
-                        AlertActions.showPopupError('fatal-occurred', 
-                                                    lang.message.monitor_too_old.content, 
-                                                    lang.message.monitor_too_old.caption);
+                        AlertActions.showPopupError(
+                            'fatal-occurred',
+                            lang.message.monitor_too_old.content,
+                            lang.message.monitor_too_old.caption
+                        );
                         break;
                     }
                 }
