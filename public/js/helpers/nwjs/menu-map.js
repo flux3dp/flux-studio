@@ -346,16 +346,9 @@ define([
                                                                 };
 
                                                             ProgressActions.open(ProgressConstants.NONSTOP);
-                                                            DeviceMaster.selectDevice(printer).then(function(status) {
-                                                                if (status === DeviceConstants.CONNECTED) {
-                                                                    DeviceMaster.updateFirmware(file).
-                                                                        done(onFinishUpdate.bind(null, true)).
-                                                                        fail(onFinishUpdate.bind(null, false));
-                                                                }
-                                                                else if (status === DeviceConstants.TIMEOUT) {
-                                                                    AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
-                                                                }
-                                                            });
+                                                            DeviceMaster.updateFirmware(file).
+                                                                done(onFinishUpdate.bind(null, true)).
+                                                                fail(onFinishUpdate.bind(null, false));
                                                         },
                                                         onInstall = function() {
                                                             InputLightboxActions.open(
@@ -370,12 +363,20 @@ define([
                                                         };
 
                                                     if (true === response.needUpdate) {
-                                                        AlertActions.showUpdate(
-                                                            printer,
-                                                            'firmware',
-                                                            response,
-                                                            onInstall
-                                                        );
+                                                        DeviceMaster.selectDevice(printer).then(function(status) {
+
+                                                            if (status === DeviceConstants.CONNECTED) {
+                                                                AlertActions.showUpdate(
+                                                                    printer,
+                                                                    'firmware',
+                                                                    response,
+                                                                    onInstall
+                                                                );
+                                                            }
+                                                            else if (status === DeviceConstants.TIMEOUT) {
+                                                                AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
+                                                            }
+                                                        });
                                                     }
                                                     else {
                                                         AlertActions.showPopupInfo(
