@@ -137,8 +137,12 @@ define([
             view = React.createClass({
 
                 getInitialState: function() {
-                    var _setting = Config().read('advanced-settings'),
+                    var _setting            = Config().read('advanced-settings'),
+                        tutorialFinished    = Config().read('tutorial-finished'),
+                        configuredPrinter   = Config().read('configured-printer'),
                         _raftLayers;
+
+                    this._checkDefaultPrintSettingsVersion();
 
                     if(!_setting) {
                         advancedSettings = {};
@@ -154,7 +158,7 @@ define([
                         advancedSettings.raft_layers = defaultRaftLayer;
                     }
 
-                    if(!Config().read('tutorial-finished')) {
+                    if(tutorialFinished !== 'true' && configuredPrinter !== '') {
                         tutorialMode = true;
                     }
 
@@ -204,25 +208,24 @@ define([
                     nwjsMenu.import.onClick = function() { $importBtn.click(); };
                     nwjsMenu.saveGCode.onClick = this._handleDownloadGCode;
                     nwjsMenu.tutorial.onClick = function() {
-                        self._handleTakeTutorial('tour');
+                        self._handleYes('tour');
                     };
 
                     this._registerKeyEvents();
-                    if(Config().read('configured-printer') && tutorialMode) {
-                        //First time using, with usb-configured printer..
+                    if(tutorialMode) {
                         AlertActions.showPopupYesNo('set_default', sprintf(lang.tutorial.set_first_default,Config().read('configured-printer')),lang.tutorial.set_first_default_caption);
-                        AlertStore.onYes(this._handleSetFirstDefault);
-                        AlertStore.onCancel(this._handleDefaultCancel);
                     }
 
+                    AlertStore.onYes(this._handleYes);
+                    AlertStore.onCancel(this._handleDefaultCancel);
                     GlobalStore.onCancelPreview(this._handleCancelPreview);
                 },
 
                 componentWillUnmount: function() {
                     director.clear();
                     director.willUnmount();
-                    
-                    AlertStore.removeYesListener(this._handleSetFirstDefault);
+
+                    AlertStore.removeYesListener(this._handleYes);
                     AlertStore.removeCancelListener(this._handleDefaultCancel);
                     GlobalStore.removeCancelPreviewListener(this._handleCancelPreview);
                 },
@@ -248,52 +251,53 @@ define([
                 _registerTutorial: function() {
                     if(tutorialMode) {
                         AlertActions.showPopupYesNo('tour', lang.tutorial.startTour);
-                        AlertStore.onYes(this._handleTakeTutorial);
-                        AlertStore.onCancel(this._handleCancelTutorial);
                     }
                 },
 
-                _handleSetFirstDefault: function(answer){
-                    Config().write('default-printer-name', Config().read('configured-printer'));
-                    ProgressActions.open(ProgressConstants.NONSTOP);
-
-                    AlertStore.removeYesListener(this._handleSetFirstDefault);
-                    AlertStore.removeCancelListener(this._handleDefaultCancel);
-
-                    DeviceMaster.getDeviceByNameAsync(
-                        Config().read('configured-printer'),
-                        {
-                            timeout: 20000,
-                            onSuccess:
-                                function(printer){
-                                    ProgressActions.close();
-                                    InitializeMachine.defaultPrinter.set({
-                                              name: printer.name,
-                                              serial: printer.serial,
-                                              uuid: printer.uuid
-                                    });
-                                    setTimeout(function() {
-                                        AlertActions.showInfo(sprintf(lang.set_default.success, printer.name));
-                                    }, 100);
-                                    //Start tutorial
-                                    setTimeout(function() {
-                                        this._registerTutorial();
-                                    }.bind(this), 100);
-                                }.bind(this),
-                            onTimeout:
-                                function(){
-                                    ProgressActions.close();
-                                    setTimeout(function() {
-                                        AlertActions.showWarning(sprintf(lang.set_default.error, printer.name));
-                                    }, 100);
-                                }
-                        });
-                },
-
-                _handleTakeTutorial: function(answer) {
+                _handleYes: function(answer) {
+                    console.log(answer);
                     if(answer === 'tour') {
                         this.setState({ tutorialOn: true });
                         tutorialMode = true;
+                    }
+                    else if(answer === 'set_default') {
+                        Config().write('default-printer-name', Config().read('configured-printer'));
+                        ProgressActions.open(ProgressConstants.NONSTOP);
+
+                        DeviceMaster.getDeviceByNameAsync(
+                            Config().read('configured-printer'),
+                            {
+                                timeout: 20000,
+                                onSuccess:
+                                    function(printer){
+                                        ProgressActions.close();
+                                        InitializeMachine.defaultPrinter.set({
+                                                  name: printer.name,
+                                                  serial: printer.serial,
+                                                  uuid: printer.uuid
+                                        });
+                                        setTimeout(function() {
+                                            AlertActions.showInfo(sprintf(lang.set_default.success, printer.name));
+                                        }, 100);
+                                        //Start tutorial
+                                        setTimeout(function() {
+                                            this._registerTutorial();
+                                        }.bind(this), 100);
+                                    }.bind(this),
+                                onTimeout:
+                                    function() {
+                                        ProgressActions.close();
+                                        setTimeout(function() {
+                                            AlertActions.showWarning(sprintf(lang.set_default.error, printer.name));
+                                        }, 100);
+                                    }
+                            }
+                        );
+                    }
+                    else if(answer === 'print-setting-version') {
+                        advancedSettings.custom = DefaultPrintSettings.custom;
+                        Config().write('advanced-settings', JSON.stringify(advancedSettings));
+                        Config().write('print-setting-version', GlobalConstants.DEFAULT_PRINT_SETTING_VERSION);
                     }
                 },
 
@@ -539,13 +543,11 @@ define([
                     if(!tutorialMode) { return; }
                     this.setState({ currentTutorialStep: this.state.currentTutorialStep + 1 }, function() {
                         if(this.state.currentTutorialStep === 1) {
-                            var selectPrinterName = Config().read('configured-printer');
-                            if(!selectPrinterName) {
-                                selectPrinterName = InitializeMachine.defaultPrinter.get().name;
-                            }
-                            if(!selectPrinterName) {
-                                selectPrinterName = DeviceMaster.getFirstDevice();
-                            }
+                            var selectPrinterName =
+                                    Config().read('configured-printer') ||
+                                    InitializeMachine.defaultPrinter.get().name ||
+                                    DeviceMaster.getFirstDevice();
+
                             if(selectPrinterName){
                                 DeviceMaster.getDeviceByNameAsync(
                                 selectPrinterName,
@@ -584,10 +586,13 @@ define([
 
                             oReq.onload = function(oEvent) {
                                 var blob = oReq.response;
-                                director.appendModel(fileEntry, blob);
+                                var url = URL.createObjectURL(blob);
+                                blob.name = 'guide-example.stl';
+                                director.appendModel(url, blob);
                             };
 
                             oReq.send();
+                            AlertStore.removeCancelListener(this._handleDefaultCancel);
                         }
                         else if (this.state.currentTutorialStep === 5) {
                             this.setState({ tutorialOn: false });
@@ -612,24 +617,47 @@ define([
                 },
 
                 _handleDefaultCancel: function(ans) {
+                    console.log(ans);
                     //Use setTimeout to avoid multiple modal display conflict
+                    if(ans === 'set_default') {
+                        AlertStore.removeYesListener(this._onYes);
+                    }
+                    else if(ans === 'tour') {
+                        this.setState({ tutorialOn: false });
+                        tutorialMode = false;
+                        Config().write('tutorial-finished', true);
+                    }
+                    else if(ans === 'change-filament-device-busy') {
+                        this.setState({ tutorialOn: false });
+                        tutorialMode = false;
+                    }
+                    else if (ans === 'print-setting-version') {
+                        Config().write('print-setting-version', GlobalConstants.DEFAULT_PRINT_SETTING_VERSION);
+                    }
                     setTimeout(function() {
                         this._registerTutorial();
-                    }, 10);
+                    }.bind(this), 10);
                 },
 
                 _handleCancelPreview: function() {
                     director.cancelPreview();
                 },
 
-                _getLineFromAdvancedCustomSetting(key) {
+                _getLineFromAdvancedCustomSetting: function(key) {
                     var start = advancedSettings.custom.indexOf(key);
                     var end = advancedSettings.custom.indexOf('\n', start);
                     return advancedSettings.custom.substring(start, end);
                 },
 
-                _getValueFromAdvancedCustomSettings(key) {
+                _getValueFromAdvancedCustomSettings: function(key) {
                     return this._getLineFromAdvancedCustomSetting(key).split('=')[1].replace(/ /g, '');
+                },
+
+                _checkDefaultPrintSettingsVersion: function() {
+                    var version = Config().read('print-setting-version');
+                    if(!version || version !== GlobalConstants.DEFAULT_PRINT_SETTING_VERSION) {
+                        AlertActions.showPopupYesNo('print-setting-version', lang.monitor.updatePrintPresetSetting);
+                    }
                 },
 
                 _renderAdvancedPanel: function() {
