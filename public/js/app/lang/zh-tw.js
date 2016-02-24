@@ -921,8 +921,7 @@ define(function() {
             },
             device_busy: {
                 caption: '裝置忙碌中',
-                message: '裝置正在進行另外一項
-                工作，請稍候再試。如果裝置持續沒有回應，請將裝置重新啟動。'
+                message: '裝置正在進行另外一項工作，請稍候再試。如果裝置持續沒有回應，請將裝置重新啟動。'
             },
             device_is_used: '裝置正被使用中，是否要終止現在任務？',
             invalidFile: '檔案不是正確的 STL 格式',
