@@ -386,6 +386,10 @@ define([
         return _device.actions.fwUpdate(file);
     }
 
+    function updateToolhead(file) {
+        return _device.actions.toolheadUpdate(file);
+    }
+
     // Private Functions
 
     function _do(command) {
@@ -551,6 +555,7 @@ define([
             this.getDeviceByNameAsync   = getDeviceByNameAsync;
             this.getFirstDevice         = getFirstDevice;
             this.updateFirmware         = updateFirmware;
+            this.updateToolhead         = updateToolhead;
 
             Discover(
                 'device-master',

@@ -194,7 +194,82 @@ define([
             }
         }],
         subItems,
-        timeout_device_update = 5000;
+        timeout_device_update = 5000,
+        executeFirmwareUpdate = function(printer, type) {
+            var lang = i18n.get();
+
+            checkFirmware(printer, type).done(function(response) {
+                var doUpdate = (
+                        'firmware' === type ?
+                        DeviceMaster.updateFirmware :
+                        DeviceMaster.updateToolhead
+                    ),
+                    onSubmit = function(files, e) {
+                        var file = files.item(0),
+                            onFinishUpdate = function(isSuccess) {
+                                ProgressActions.close();
+
+                                if (true === isSuccess) {
+                                    AlertActions.showPopupInfo(
+                                        'firmware-update-success',
+                                        lang.update.firmware.update_success
+                                    );
+                                }
+                                else {
+                                    AlertActions.showPopupError(
+                                        'firmware-update-fail',
+                                        lang.update.firmware.update_fail
+                                    );
+                                }
+                            };
+
+                        ProgressActions.open(ProgressConstants.NONSTOP);
+                        DeviceMaster.updateFirmware(file).
+                            done(onFinishUpdate.bind(null, true)).
+                            fail(onFinishUpdate.bind(null, false));
+                    },
+                    onInstall = function() {
+                        InputLightboxActions.open(
+                            'upload-firmware',
+                            {
+                                type: InputLightboxConstants.TYPE_FILE,
+                                inputHeader: lang.update.firmware.upload_file,
+                                onSubmit: onSubmit,
+                                confirmText: lang.update.firmware.confirm
+                            }
+                        );
+                    };
+
+                if (true === response.needUpdate) {
+                    DeviceMaster.selectDevice(printer).then(function(status) {
+                        if (status === DeviceConstants.CONNECTED) {
+                            AlertActions.showUpdate(
+                                printer,
+                                type,
+                                response,
+                                onInstall
+                            );
+                        }
+                        else if (status === DeviceConstants.TIMEOUT) {
+                            AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
+                        }
+                    });
+                }
+                else {
+                    AlertActions.showPopupInfo(
+                        'latest-firmware',
+                        lang.update.firmware.latest_firmware.message,
+                        lang.update.firmware.latest_firmware.caption
+                    );
+                }
+            }).
+            fail(function() {
+                AlertActions.showPopupInfo(
+                    'latest-firmware',
+                    lang.update.network_unreachable
+                );
+            });
+        };
 
     function bindMap() {
         menuMap = [];
@@ -324,68 +399,14 @@ define([
                                             label: lang.device.check_firmware_update,
                                             enabled: true,
                                             onClick: function() {
-                                                checkFirmware(printer).done(function(response) {
-                                                    var lang = i18n.get(),
-                                                        onSubmit = function(files, e) {
-                                                            var file = files.item(0),
-                                                                onFinishUpdate = function(isSuccess) {
-                                                                    ProgressActions.close();
-
-                                                                    if (true === isSuccess) {
-                                                                        AlertActions.showPopupInfo(
-                                                                            'firmware-update-success',
-                                                                            lang.update.firmware.update_success
-                                                                        );
-                                                                    }
-                                                                    else {
-                                                                        AlertActions.showPopupError(
-                                                                            'firmware-update-fail',
-                                                                            lang.update.firmware.update_fail
-                                                                        );
-                                                                    }
-                                                                };
-
-                                                            ProgressActions.open(ProgressConstants.NONSTOP);
-                                                            DeviceMaster.updateFirmware(file).
-                                                                done(onFinishUpdate.bind(null, true)).
-                                                                fail(onFinishUpdate.bind(null, false));
-                                                        },
-                                                        onInstall = function() {
-                                                            InputLightboxActions.open(
-                                                                'upload-firmware',
-                                                                {
-                                                                    type: InputLightboxConstants.TYPE_FILE,
-                                                                    inputHeader: lang.update.firmware.upload_file,
-                                                                    onSubmit: onSubmit,
-                                                                    confirmText: lang.update.firmware.confirm
-                                                                }
-                                                            );
-                                                        };
-
-                                                    if (true === response.needUpdate) {
-                                                        DeviceMaster.selectDevice(printer).then(function(status) {
-
-                                                            if (status === DeviceConstants.CONNECTED) {
-                                                                AlertActions.showUpdate(
-                                                                    printer,
-                                                                    'firmware',
-                                                                    response,
-                                                                    onInstall
-                                                                );
-                                                            }
-                                                            else if (status === DeviceConstants.TIMEOUT) {
-                                                                AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
-                                                            }
-                                                        });
-                                                    }
-                                                    else {
-                                                        AlertActions.showPopupInfo(
-                                                            'latest-firmware',
-                                                            lang.update.firmware.latest_firmware.message,
-                                                            lang.update.firmware.latest_firmware.caption
-                                                        );
-                                                    }
-                                                });
+                                                executeFirmwareUpdate(printer, 'firmware');
+                                            }
+                                        },
+                                        {
+                                            label: lang.device.update_toolhead,
+                                            enabled: true,
+                                            onClick: function() {
+                                                executeFirmwareUpdate(printer, 'toolhead');
                                             }
                                         },
                                         {
@@ -481,23 +502,35 @@ define([
                     onClick: function(){
                         window.html2canvas = html2canvas;
                         function obfuse(str){
-                            var output = [];
+                            var output = [],
+                                c;
+
                             for (var i in str) {
-                                var c = {'f':'x','l':'u','u':'l','x':'f'}[str[i]];
+                                c = {'f':'x','l':'u','u':'l','x':'f'}[str[i]];
                                 output.push(c?c:str[i]);
                             }
+
                             return output.join("");
                         }
                         html2canvas(window.document.body).then(function(canvas) {
+                            var report_blob,
+                                jpegUrl,
+                                report_info;
+
                             for(var i in window.FLUX.websockets){
                                 if("function" !== typeof window.FLUX.websockets[i]){
                                     window.FLUX.websockets[i].optimizeLogs();
                                 }
                             }
-                            var jpegUrl = canvas.toDataURL("image/jpeg"),
-                                report_info = JSON.stringify({ws: window.FLUX.websockets, screenshot: jpegUrl}, null, 2);
-                            if(!window.FLUX.debug) report_info = obfuse(btoa(report_info));
-                            var report_blob = new Blob([report_info], {type : 'text/html'});
+
+                            jpegUrl = canvas.toDataURL("image/jpeg");
+                            report_info = JSON.stringify({ws: window.FLUX.websockets, screenshot: jpegUrl}, null, 2);
+
+                            if (!window.FLUX.debug) {
+                                report_info = obfuse(btoa(report_info));
+                            }
+
+                            report_blob = new Blob([report_info], {type : 'text/html'});
 
                             saveAs(report_blob, "bugreport_"+Math.floor(Date.now() / 1000)+".txt");
                         });

@@ -20,12 +20,12 @@ define(function() {
             firmware: {
                 caption: 'An Firmware Update to FLUX is available',
                 message_pattern_1: '"%s" is now ready for firmware update.',
-                message_pattern_2: 'FLUX Firmware %s is now available - You have %s.',
+                message_pattern_2: 'FLUX Firmware v%s is now available - You have v%s.',
                 latest_firmware: {
                     caption: 'Firmware Update',
                     message: 'You have the latest firmware'
                 },
-                confirm: 'CONFIRM',
+                confirm: 'UPLOAD',
                 upload_file: 'Upload file',
                 update_success: 'Firmware update successfully uploaded',
                 update_fail: 'Update Fail'
@@ -33,8 +33,22 @@ define(function() {
             software: {
                 caption: 'An Software Update to FLUX is available',
                 message_pattern_1: 'FLUX Studio is now ready for software update.',
-                message_pattern_2: 'FLUX Software %s is now available - You have %s.'
+                message_pattern_2: 'FLUX Software v%s is now available - You have v%s.'
             },
+            toolhead: {
+                caption: 'An Toolhead Firmware Update to FLUX is available',
+                message_pattern_1: '"%s" is now ready for toolhead firmware update.',
+                message_pattern_2: 'FLUX Toolhead Firmware %s is now available.',
+                latest_firmware: {
+                    caption: 'Firmware Update',
+                    message: 'You have the latest firmware'
+                },
+                confirm: 'UPLOAD',
+                upload_file: 'Upload file',
+                update_success: 'Toolhead Firmware update successfully uploaded',
+                update_fail: 'Update Fail'
+            },
+            network_unreachable: 'Network is unreachable',
             skip: 'Skip This Version',
             later: 'LATER',
             install: 'INSTALL',
@@ -69,7 +83,8 @@ define(function() {
                 device_monitor: 'Device Monitor',
                 change_filament: 'Change Filament',
                 default_device: 'Set as default device',
-                check_firmware_update: 'Check Firmware Update'
+                check_firmware_update: 'Check Firmware Update',
+                update_toolhead: 'Update toolhead'
             },
             window: {
                 label: 'Window',
