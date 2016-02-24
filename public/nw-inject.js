@@ -38,7 +38,7 @@ var fs = requireNode('fs'),
             ghostCmd = libPath + '/lib/flux_api/flux_api';
         }
         else {
-            args[slic3rPathIndex] = libPath + '/lib/Slic3r';
+            args[slic3rPathIndex] = libPath + '/lib/slic3r';
             ghostCmd = libPath + '/lib/flux_api/flux_api';
         }
 

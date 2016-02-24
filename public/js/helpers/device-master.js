@@ -88,6 +88,7 @@ define([
                     }
                 },
                 onError: function(response) {
+                    ProgressActions.close();
                     // TODO: shouldn't do replace
                     response.error = response.error.replace(/^.*\:\s+(\w+)$/g, '$1');
                     switch (response.error.toUpperCase()) {
@@ -100,7 +101,6 @@ define([
                             goAuth(_device.uuid);
                         }
                         else {
-                            ProgressActions.close();
                             AlertActions.showPopupInfo(
                                 'auth-error-with-diff-computer',
                                 lang.message.no_password.content,
@@ -109,9 +109,11 @@ define([
                         }
                         break;
                     case DeviceConstants.MONITOR_TOO_OLD:
-                        AlertActions.showPopupError('fatal-occurred', 
-                                                    lang.message.monitor_too_old.content, 
-                                                    lang.message.monitor_too_old.caption);
+                        AlertActions.showPopupError(
+                            'fatal-occurred',
+                            lang.message.monitor_too_old.content,
+                            lang.message.monitor_too_old.caption
+                        );
                         break;
                     }
                 }
@@ -483,11 +485,12 @@ define([
                     if(device.st_id === DeviceConstants.status.PAUSED_FROM_RUNNING) {
                         if(!defaultPrinterWarningShowed) {
                             var message = `${device.name} ${lang.device.pausedFromError}`;
-                            AlertActions.showWarning(message, function() {
+                            AlertActions.showWarning(message, function(growl) {
+                                growl.remove(function() {});
                                 selectDevice(defaultPrinter).then(function() {
                                     GlobalActions.showMonitor(defaultPrinter);
                                 });
-                            });
+                            }, true);
                             defaultPrinterWarningShowed = true;
                         }
                     }

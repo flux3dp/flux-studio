@@ -920,7 +920,7 @@ define(function() {
             image_is_too_small: '圖檔內容有誤',
             monitor_too_old: {
                 caption: '韌體需要更新',
-                content: '請至官網安裝最新韌體 <a target="_blank" href="http://helpcenter.flux3dp.com/hc/zh-tw/articles/216251077">瞭解更多</a>'
+                content: '請按照<a target="_blank" href="http://helpcenter.flux3dp.com/hc/zh-tw/articles/216251077">此說明</a>安裝最新韌體版本'
             }
         },
         machine_status: {
