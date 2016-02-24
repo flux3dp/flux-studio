@@ -852,6 +852,7 @@ define(function() {
             fileExistContinue                   : '檔案已存在，是否要覆蓋？',
             confirmGToF                         : 'GCode 上傳後會轉檔成 FCode, 是否要繼續？',
             updatePrintPresetSetting            : 'FLUX STUDIO 有新的預設列印參數。\n是否要更新？（會刪除目前參數）',
+            confirmFileDelete                   : '是否確定要刪除這個檔案？',
             task : {
                 EXTRUDER                        : '列印工作',
                 LASER                           : '雷雕工作'
@@ -905,7 +906,8 @@ define(function() {
             },
             device_busy: {
                 caption: '裝置忙碌中',
-                message: '裝置正在進行另外一項工作，請稍候再試。如果裝置持續沒有回應，請將裝置重新啟動。'
+                message: '裝置正在進行另外一項
+                工作，請稍候再試。如果裝置持續沒有回應，請將裝置重新啟動。'
             },
             device_is_used: '裝置正被使用中，是否要終止現在任務？',
             invalidFile: '檔案不是正確的 STL 格式',

@@ -852,6 +852,7 @@ define(function() {
             fileExistContinue                   : 'file already exist, continue ? (will replace)',
             confirmGToF                         : 'Uploaded GCode will be converted to FCode, continue (will replace if exist)',
             updatePrintPresetSetting            : 'FLUX STUDIO has new printing preset, do you want to update? (will overwrite current parameters)',
+            confirmFileDelete                   : 'Are you sure you want to delete this file?',
             task : {
                 EXTRUDER                        : 'Printing Task',
                 LASER                           : 'Engraving Task'
