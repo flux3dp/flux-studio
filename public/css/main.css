@@ -3220,6 +3220,8 @@ input[type=range]:focus::-webkit-slider-runnable-track {
             margin: 0 0 20px 0;
             text-align: left;
             line-height: 1.4em; }
+            .modal-window .modal-alert .message a {
+                font-size: 1em; }
         .modal-window .modal-alert .caption,
         .modal-window .modal-alert .message {
             width: 100%; }
