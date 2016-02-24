@@ -162,6 +162,7 @@ define([
                         tutorialMode = true;
                     }
 
+
                     _raftLayers = parseInt(this._getValueFromAdvancedCustomSettings('raft_layers'));
 
                     return ({
@@ -213,6 +214,7 @@ define([
 
                     this._registerKeyEvents();
                     if(tutorialMode) {
+                        //First time using, with usb-configured printer..
                         AlertActions.showPopupYesNo('set_default', sprintf(lang.tutorial.set_first_default,Config().read('configured-printer')),lang.tutorial.set_first_default_caption);
                     }
 
@@ -634,6 +636,7 @@ define([
                     else if (ans === 'print-setting-version') {
                         Config().write('print-setting-version', GlobalConstants.DEFAULT_PRINT_SETTING_VERSION);
                     }
+
                     setTimeout(function() {
                         this._registerTutorial();
                     }.bind(this), 10);
