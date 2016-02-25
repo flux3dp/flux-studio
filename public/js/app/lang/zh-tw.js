@@ -921,7 +921,8 @@ define(function() {
             monitor_too_old: {
                 caption: '韌體需要更新',
                 content: '請按照<a target="_blank" href="http://helpcenter.flux3dp.com/hc/zh-tw/articles/216251077">此說明</a>安裝最新韌體版本'
-            }
+            },
+            cant_establish_connection: 'Can not establish connection to FLUX api'
         },
         machine_status: {
             '-10': 'Raw Mode',
