@@ -26,7 +26,24 @@ var fs = requireNode('fs'),
                 '--port',
                 port
             ],
-            ghostCmd = '';
+            ghostCmd = '',
+            writeLog = function(message, mode) {
+                var callback = function(err) {
+                    if (err) {
+                        console.log('cant save log');
+                    }
+                };
+
+                if ('w' === mode) {
+                    fs.writeFile('message.log', message, 'utf8', callback);
+                }
+                else {
+                    fs.appendFile('message.log', message, 'utf8', callback);
+                }
+            };
+
+        // empty message.log
+        writeLog('', 'w');
 
         if ('Windows_NT' === osType) {
             // TODO: has to assign env root for slic3r
@@ -48,15 +65,24 @@ var fs = requireNode('fs'),
         ghost = spawn(ghostCmd, args);
 
         ghost.stdout.on('data', function(data) {
-            console.log('stdout: ' + data);
+            console.log('stdout: ' + data.toString());
+            writeLog(data.toString());
         });
 
         ghost.stderr.on('data', function(data) {
-            console.log('stderr: ' + data);
+            console.log('stderr: ' + data.toString());
+            writeLog(data.toString());
+        });
+
+        ghost.on('error', function(err) {
+            if (err) {
+                writeLog(err.message);
+            }
         });
 
         ghost.on('exit', function (code) {
             console.log('child process exited with code ' + code);
+            writeLog('FLUX API is closed (' + code + ')');
         });
 
         process.env.ghostPort = port;
