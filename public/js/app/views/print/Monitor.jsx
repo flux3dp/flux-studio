@@ -310,7 +310,7 @@ define([
                     }.bind(this));
                 }
                 else {
-                    totalTimeInSeconds = parseInt(this.props.slicingStatus.time);
+                    totalTimeInSeconds = parseInt(this.props.slicingStatus.time || this.props.slicingStatus.metadata.TIME_COST);
 
                     this._startReport();
                 }
@@ -1468,7 +1468,7 @@ define([
                 );
 
             if(_duration === '' && this.props.slicingStatus) {
-                var time = this.props.slicingStatus.time || 0;
+                var time = this.props.slicingStatus.time || this.props.slicingStatus.metadata.TIME_COST || 0;
                 _duration = formatDuration(time);
             }
 

@@ -41,6 +41,7 @@ define([
             lang                        : React.PropTypes.object,
             enable                      : React.PropTypes.bool,
             previewMode                 : React.PropTypes.bool,
+            previewModeOnly             : React.PropTypes.bool,
             hasObject                   : React.PropTypes.bool,
             hasOutOfBoundsObject        : React.PropTypes.bool,
             previewLayerCount           : React.PropTypes.number,
@@ -118,6 +119,9 @@ define([
         },
 
         _handleActions: function(source, arg, e) {
+            if(this.props.previewModeOnly === true) {
+                return;
+            }
             var self = this,
                 actions = {
                     'QUALITY': function() {
@@ -182,7 +186,7 @@ define([
 
         _renderQuanlity: function() {
             var _quality = ['high', 'med', 'low'],
-                _class = ClassNames('display-text quality-select'),
+                _class = ClassNames('display-text quality-select', {'disable': this.props.previewModeOnly}),
                 qualitySelection;
 
             qualitySelection = _quality.map(function(quality) {
@@ -203,8 +207,9 @@ define([
                     <ul>
                         {qualitySelection}
                     </ul>
-                )
-            }
+                ),
+                disable: this.props.previewModeOnly
+            };
         },
 
         _renderMaterialPallet: function() {
@@ -253,10 +258,11 @@ define([
             var _class = ClassNames({'disable': !this.props.enable});
             return {
                 label: (
-                    <div title={lang.raftTitle} onClick={this._handleActions.bind(null, constants.RAFT_ON, '')}>
+                    <div className={_class} title={lang.raftTitle} onClick={this._handleActions.bind(null, constants.RAFT_ON, '')}>
                         <div>{this.props.raftOn ? lang.raft_on : lang.raft_off}</div>
                     </div>
-                )
+                ),
+                disable: this.props.previewModeOnly
             };
         },
 
@@ -264,21 +270,23 @@ define([
             var _class = ClassNames({'disable': !this.props.enable});
             return {
                 label: (
-                    <div title={lang.supportTitle} onClick={this._handleActions.bind(null, constants.SUPPORT_ON, '')}>
+                    <div className={_class} title={lang.supportTitle} onClick={this._handleActions.bind(null, constants.SUPPORT_ON, '')}>
                         <div>{this.props.supportOn ? lang.support_on : lang.support_off}</div>
                     </div>
-                )
+                ),
+                disable: this.props.previewModeOnly
             };
         },
 
         _renderAdvanced: function() {
-            var _class = ClassNames({'disable': !this.props.enable});
+            var _class = ClassNames({'disable': !this.props.enable || this.props.previewModeOnly});
             return {
                 label: (
-                    <div title={lang.advancedTitle} onClick={this._handleActions.bind(null, constants.ADVANCED, '')}>
+                    <div className={_class} title={lang.advancedTitle} onClick={this._handleActions.bind(null, constants.ADVANCED, '')}>
                         <div>{this.props.lang.print.left_panel.advanced}</div>
                     </div>
-                )
+                ),
+                disable: this.props.previewModeOnly
             };
         },
 
@@ -297,7 +305,8 @@ define([
                             {this.state.previewCurrentLayer}
                         </div>
                     </div>
-                )
+                ),
+                disable: this.props.previewModeOnly
             };
         },
 
@@ -307,7 +316,7 @@ define([
                 support     = this._renderSupport(),
                 advanced    = this._renderAdvanced(),
                 preview     = this._renderPreview(),
-                mask        = this.props.enable ? '' : (<div className="mask"></div>),
+                mask        = this.props.enable || this.props.previewModeOnly ? '' : (<div className="mask"></div>),
                 items = [
                     quality,
                     raft,

@@ -178,6 +178,7 @@ define([
                         tutorialOn                  : false,
                         leftPanelReady              : true,
                         previewMode                 : false,
+                        previewModeOnly             : false,
                         currentTutorialStep         : 0,
                         layerHeight                 : 0.1,
                         raftLayers                  : _raftLayers,
@@ -712,6 +713,7 @@ define([
                             hasObject                   = {this.state.hasObject}
                             hasOutOfBoundsObject        = {this.state.hasOutOfBoundsObject}
                             previewMode                 = {this.state.previewMode}
+                            previewModeOnly             = {this.state.previewModeOnly}
                             previewLayerCount           = {this.state.previewLayerCount}
                             raftOn                      = {this.state.raftOn}
                             supportOn                   = {this.state.supportOn}
