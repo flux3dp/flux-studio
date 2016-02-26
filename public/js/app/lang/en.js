@@ -939,7 +939,8 @@ define(function() {
                 caption: 'Firmware Outdated',
                 content: 'Please install the latest firmware with <a target="_blank" href="http://helpcenter.flux3dp.com/hc/en-us/articles/216251077">this guide</a>.'
             },
-            fcodeForLaser: 'This is a fcode for laser'
+            fcodeForLaser: 'This is a fcode for laser',
+            confirmFCodeImport: 'Importing fcode will remove all objects on the scene, are you sure?'
         },
         machine_status: {
             '-10': 'Raw mode',

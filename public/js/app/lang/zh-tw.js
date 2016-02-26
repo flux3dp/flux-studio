@@ -939,7 +939,8 @@ define(function() {
                 caption: '韌體需要更新',
                 content: '請按照<a target="_blank" href="http://helpcenter.flux3dp.com/hc/zh-tw/articles/216251077">此說明</a>安裝最新韌體版本'
             },
-            fcodeForLaser: '檔案為雷射工作'
+            fcodeForLaser: '檔案為雷射工作',
+            confirmFCodeImport: '載入.fc檔案將清除目前所有場景，繼續？'
         },
         machine_status: {
             '-10': 'Raw Mode',
