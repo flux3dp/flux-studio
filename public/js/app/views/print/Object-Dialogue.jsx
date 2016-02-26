@@ -199,6 +199,7 @@ define([
                                 <span className="text-center header">X</span>
                                     <UnitInput
                                         max={210}
+                                        min={0.05}
                                         defaultValue={_size.x}
                                         dataAttrs={{id: 'x'}}
                                         getValue={this._handleResize}
@@ -209,6 +210,7 @@ define([
                                 <span className="text-center header">Y</span>
                                     <UnitInput
                                         max={210}
+                                        min={0..05}
                                         defaultValue={_size.y}
                                         dataAttrs={{id: 'y'}}
                                         getValue={this._handleResize}
@@ -219,6 +221,7 @@ define([
                                 <span className="text-center header">Z</span>
                                     <UnitInput
                                         max={210}
+                                        min={0.05}
                                         defaultValue={_size.z}
                                         dataAttrs={{id: 'z'}}
                                         getValue={this._handleResize}
