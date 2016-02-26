@@ -210,7 +210,7 @@ define([
                                 <span className="text-center header">Y</span>
                                     <UnitInput
                                         max={210}
-                                        min={0..05}
+                                        min={0.05}
                                         defaultValue={_size.y}
                                         dataAttrs={{id: 'y'}}
                                         getValue={this._handleResize}
