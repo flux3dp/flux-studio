@@ -399,12 +399,32 @@ define([
     }
 
     function appendPreviewPath(file, index, callback) {
-        var reader = new FileReader();
+        var metadata,
+            reader = new FileReader();
+
         reader.addEventListener('load', function() {
             fcodeConsole.upload(reader.result, file.size, function() {
-                fcodeConsole.getPath().then(processPath);
+                fcodeConsole.getMetadata(processMetadata);
             });
         });
+
+        var processMetadata = function(m) {
+            metadata = m;
+            if(m.metadata.HEAD_TYPE !== 'LASER') {
+                fcodeConsole.getPath().then(processPath);
+            }
+            else {
+                ProgressActions.close();
+                importFromFCode = false;
+                previewMode = false;
+                reactSrc.setState({
+                    openImportWindow: true,
+                    previewMode: false,
+                    hasObject: false
+                });
+                AlertActions.showPopupWarning('', lang.message.fcodeForLaser, lang.message.notValidFCodeForPrint);
+            }
+        };
 
         var processPath = function(path) {
             previewMode = true;
@@ -417,16 +437,10 @@ define([
             previewUrl = URL.createObjectURL(blob);
             blobExpired = false;
             responseBlob = new Blob([reader.result]);
-            fcodeConsole.getMetadata(processMetadata);
-        };
-
-        var processMetadata = function(metadata) {
             GlobalActions.sliceComplete(metadata);
         };
 
         reader.readAsArrayBuffer(file);
-
-        // console.log(files);
     }
 
     function startSlicing(type) {
