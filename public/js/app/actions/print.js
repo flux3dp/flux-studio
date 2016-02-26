@@ -547,15 +547,11 @@ define([
                 if(show || previewMode) {
                     ProgressActions.close();
                     _closePreview();
-
-                    AlertActions.showPopupError(
-                        '',
-                        slicingStatus.lastReport.error,
-                        slicingStatus.lastReport.caption);
                 }
                 else {
                     slicingStatus.hasError = true;
                 }
+                AlertActions.showPopupError('', slicingStatus.lastReport.error, slicingStatus.lastReport.caption);
                 slicingStatus.lastProgress = '';
                 reactSrc.setState({ hasOutOfBoundsObject: true });
             }
@@ -1039,20 +1035,7 @@ define([
     }
 
     function getSlicingReport(callback) {
-        var processor,
-            reportTimmer = 1000; // 1 sec
-
-        processor = function(report) {
-            slicingStatus.canInterrupt = true;
-            slicingStatus.pauseReport = false;
-            if(report.status === 'complete') {
-                clearInterval(slicingStatus.reporter);
-                callback(report);
-            }
-            else if(report.status !== 'ok') {
-                callback(report);
-            }
-        };
+        var reportTimmer = 1000; // 1 sec
 
         slicingStatus.reporter = setInterval(function() {
             if(!slicingStatus.pauseReport) {
