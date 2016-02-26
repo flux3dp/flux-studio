@@ -35,6 +35,12 @@ define([
             Dispatcher.dispatch({
                 actionType: GlobalConstants.SLICE_COMPLETE, report
             });
+        },
+
+        monitorClosed: function() {
+            Dispatcher.dispatch({
+                actionType: GlobalConstants.MONITOR_CLOSED
+            });
         }
 
     };

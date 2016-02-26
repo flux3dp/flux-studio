@@ -33,6 +33,10 @@ define([
             this.on(GlobalConstants.SLICE_COMPLETE, callback);
         },
 
+        onMonitorClosed(callback) {
+            this.on(GlobalConstants.MONITOR_CLOSED, callback);
+        },
+
         removeShowMoniotorListener(callback) {
             this.removeListener(GlobalConstants.SHOW_MONITOR, callback);
         },
@@ -51,6 +55,10 @@ define([
 
         removeSliceCompleteListener(callback) {
             this.removeListener(GlobalConstants.SLICE_COMPLETE, callback);
+        },
+
+        removeMonitorClosedListener(callback) {
+            this.removeListener(GlobalConstants.MONITOR_CLOSED, callback);
         },
 
         dispatcherIndex: Dispatcher.register(function(payload) {

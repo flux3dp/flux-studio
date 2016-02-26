@@ -107,7 +107,13 @@ define([
             },
 
             getPath: function(onFinished) {
-                // TODO: to be implemented
+                var d = $.Deferred();
+                events.onMessage = function(result) {
+                    d.resolve(result);
+                };
+
+                ws.send('get_path');
+                return d.promise();
             }
         }
     };

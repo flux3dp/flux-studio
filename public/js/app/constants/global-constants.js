@@ -5,6 +5,7 @@ define([], function(){
         CLOSE_ALL_VIEW                  : 'CLOSE_ALL_VIEW',
         CANCEL_PREVIEW                  : 'CANCEL_PREVIEW',
         SLICE_COMPLETE                  : 'SLICE_COMPLETE',
+        MONITOR_CLOSED                  : 'MONITOR_CLOSED',
 
         // Monitor Open source
         PRINT                           : 'PRINT',
