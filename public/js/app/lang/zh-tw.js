@@ -937,7 +937,9 @@ define(function() {
             monitor_too_old: {
                 caption: '韌體需要更新',
                 content: '請按照<a target="_blank" href="http://helpcenter.flux3dp.com/hc/zh-tw/articles/216251077">此說明</a>安裝最新韌體版本'
-            }
+            },
+            fcodeForLaser: 'This .fc file is for laser',
+            notValidFCodeForPrint: 'Not a valid FCode'
         },
         machine_status: {
             '-10': 'Raw Mode',
