@@ -4721,6 +4721,9 @@ input.switch:checked ~ label:after {
         position: absolute; }
     .print-studio .leftPanel .dialog-label .disable {
         color: #C0C0C0; }
+    .print-studio .leftPanel .dialog-label.disable:hover {
+        background: none;
+        color: #C0C0C0; }
 
 .print-studio .rightPanel {
     height: 100%;
