@@ -938,8 +938,7 @@ define(function() {
                 caption: 'Firmware Outdated',
                 content: 'Please install the latest firmware with <a target="_blank" href="http://helpcenter.flux3dp.com/hc/en-us/articles/216251077">this guide</a>.'
             },
-            fcodeForLaser: 'This .fc file is for laser',
-            notValidFCodeForPrint: 'Not a valid FCode'
+            fcodeForLaser: 'This is a fcode for laser'
         },
         machine_status: {
             '-10': 'Raw mode',

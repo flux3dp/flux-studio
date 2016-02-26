@@ -422,7 +422,7 @@ define([
                     previewMode: false,
                     hasObject: false
                 });
-                AlertActions.showPopupWarning('', lang.message.fcodeForLaser, lang.message.notValidFCodeForPrint);
+                AlertActions.showPopupInfo('', lang.message.fcodeForLaser);
             }
         };
 
