@@ -7,6 +7,7 @@ define([
     'app/actions/alert-actions',
     'app/actions/progress-actions',
     'app/stores/progress-store',
+    'app/constants/global-constants',
     'app/constants/device-constants',
     'app/constants/progress-constants',
     'helpers/i18n',
@@ -30,6 +31,7 @@ define([
     AlertActions,
     ProgressActions,
     ProgressStore,
+    GlobalConstants,
     DeviceConstants,
     ProgressConstants,
     I18n,
@@ -79,6 +81,7 @@ define([
         transformAxisChanged = '',
         slicingReport = {},
         slicingStatus = {},
+        importedFCode = {},
         lang = I18n.get();
 
     var s = {
@@ -356,7 +359,6 @@ define([
     function appendModels(files, index, callback) {
         slicingStatus.canInterrupt = false;
         var ext = files.item(index).name.split('.').pop().toLowerCase();
-        console.log(ext);
         if(ext === 'stl') {
             var reader  = new FileReader();
             reader.addEventListener('load', function () {
@@ -375,21 +377,13 @@ define([
             reader.readAsDataURL(files.item(index));
         }
         else if (ext === 'fc') {
-            fcodeConsole = fcodeReader();
-            importFromFCode = true;
-            previewMode = true;
-            _showWait(lang.print.drawingPreview, !showStopButton);
-
-            reactSrc.setState({
-                openImportWindow: false,
-                previewMode: true,
-                hasObject: true
-            });
-
-            appendPreviewPath(files.item(index), function() {
-                ProgressActions.close();
-                callback();
-            });
+            importedFCode = files.item(0);
+            if(objects.length === 0) {
+                doFCodeImport();
+            }
+            else {
+                AlertActions.showPopupYesNo(GlobalConstants.IMPORT_FCODE, lang.message.confirmFCodeImport);
+            }
         }
         else {
             callback();
@@ -1889,6 +1883,30 @@ define([
         return d.promise();
     }
 
+    function doFCodeImport() {
+        fcodeConsole = fcodeReader();
+        importFromFCode = true;
+        previewMode = true;
+        objects.length = 0;
+        outlineScene.children.length = 0;
+        _clearScene(scene);
+        selectObject(null);
+        render();
+        _showWait(lang.print.drawingPreview, !showStopButton);
+
+        reactSrc.setState({
+            openImportWindow: false,
+            previewMode: true,
+            hasObject: true,
+            openObjectDialogue: false
+        });
+
+        appendPreviewPath(importedFCode, function() {
+            ProgressActions.close();
+            callback();
+        });
+    }
+
     // Private Functions ---
 
     // sync parameters with server
@@ -2161,6 +2179,14 @@ define([
         MenuFactory.items.reset.onClick = resetObject;
     }
 
+    function _clearScene(scene) {
+        for(var i = scene.children.length - 1; i >= 0; i--) {
+            if(scene.children[i].name === 'custom') {
+                scene.children.splice(i, 1);
+            }
+        }
+    }
+
     function clear() {
         objects = [];
         referenceMeshes = [];
@@ -2205,6 +2231,7 @@ define([
         toggleScaleLock     : toggleScaleLock,
         getSlicingStatus    : getSlicingStatus,
         cancelPreview       : cancelPreview,
+        doFCodeImport       : doFCodeImport,
         willUnmount         : willUnmount
     };
 });

@@ -7,6 +7,7 @@ define([], function(){
         SLICE_COMPLETE                  : 'SLICE_COMPLETE',
         MONITOR_CLOSED                  : 'MONITOR_CLOSED',
         EXIT_PREVIEW                    : 'EXIT_PREVIEW',
+        IMPORT_FCODE                    : 'IMPORT_FCODE',
 
         // Monitor Open source
         PRINT                           : 'PRINT',

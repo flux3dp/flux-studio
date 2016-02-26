@@ -306,6 +306,9 @@ define([
                     else if(answer === GlobalConstants.EXIT_PREVIEW) {
                         director.cancelPreview();
                     }
+                    else if(answer === GlobalConstants.IMPORT_FCODE) {
+                        director.doFCodeImport();
+                    }
                 },
 
                 _handleCancelTutorial: function(answer) {
