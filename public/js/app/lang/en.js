@@ -468,7 +468,8 @@ define(function() {
                 raftTitle: 'A Raft are layers built under your part and help it stick to the base plate',
                 supportTitle: 'A Support is a generated structure to support overhanging part of your object, to prevent filament dropping',
                 previewTitle: 'Preview the actual path of toolhead during printing task',
-                advancedTitle: 'Detail 3d printing parameters, you may acheive better result than default by adjusting them'
+                advancedTitle: 'Detail 3d printing parameters, you may acheive better result than default by adjusting them',
+                confirmExitFcodeMode: 'Exiting preview mode will unload the fcode, are you sure?'
             },
             right_panel: {
                 get: 'Get',
