@@ -79,6 +79,7 @@ define([
         transformAxisChanged = '',
         slicingReport = {},
         slicingStatus = {},
+        objectBeforeTransform = {},
         lang = I18n.get();
 
     var s = {
@@ -790,6 +791,8 @@ define([
         if(previewMode) { return; }
         switch (e.type) {
             case 'mouseDown':
+                objectBeforeTransform = {};
+                Object.assign(objectBeforeTransform, SELECTED);
                 transformMode = true;
                 reactSrc.setState({
                     isTransforming: true
@@ -804,7 +807,14 @@ define([
                 SELECTED.rotation.enteredY = updateDegreeWithStep(radianToDegree(SELECTED.rotation.y));
                 SELECTED.rotation.enteredZ = updateDegreeWithStep(radianToDegree(SELECTED.rotation.z));
                 if(reactSrc.state.mode === 'scale') {
-                    updateObjectSize(e.target.object);
+                    // check for inverse transform
+                    if(SELECTED.size.x <= 0 || SELECTED.size.y <= 0 || SELECTED.size.z <= 0) {
+                        setSize(objectBeforeTransform.size.x, objectBeforeTransform.size.y, objectBeforeTransform.z, false);
+                        updateObjectSize(objectBeforeTransform);
+                    }
+                    else {
+                        updateObjectSize(e.target.object);
+                    }
                 }
                 groundIt(SELECTED);
                 break;
