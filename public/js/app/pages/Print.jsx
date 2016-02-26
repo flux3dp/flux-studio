@@ -222,6 +222,7 @@ define([
                     AlertStore.onYes(this._handleYes);
                     AlertStore.onCancel(this._handleDefaultCancel);
                     GlobalStore.onCancelPreview(this._handleCancelPreview);
+                    GlobalStore.onMonitorClosed(this._handleMonitorClosed);
                 },
 
                 componentWillUnmount: function() {
@@ -231,6 +232,7 @@ define([
                     AlertStore.removeYesListener(this._handleYes);
                     AlertStore.removeCancelListener(this._handleDefaultCancel);
                     GlobalStore.removeCancelPreviewListener(this._handleCancelPreview);
+                    GlobalStore.removeMonitorClosedListener(this._handleMonitorClosed);
                 },
 
                 _registerKeyEvents: function() {
@@ -258,7 +260,6 @@ define([
                 },
 
                 _handleYes: function(answer) {
-                    console.log(answer);
                     if(answer === 'tour') {
                         this.setState({ tutorialOn: true });
                         tutorialMode = true;
@@ -360,6 +361,7 @@ define([
                 },
 
                 _handleGoClick: function() {
+                    AlertStore.removeCancelListener(this._handleDefaultCancel);
                     this.setState({
                         openPrinterSelectorWindow: true
                     });
@@ -455,6 +457,10 @@ define([
                     this.setState({ openPrinterSelectorWindow: false });
                 },
 
+                _handlePrinterSelectorUnmount: function() {
+                    AlertStore.onCancel(this._handleDefaultCancel);
+                },
+
                 _handleDeviceSelected: function(printer) {
                     selectedPrinter = printer;
                     this.setState({
@@ -469,6 +475,7 @@ define([
                             AlertActions.showPopupError('', lang.print.out_of_range_message, lang.print.out_of_range);
                             return;
                         }
+                        AlertStore.removeCancelListener(this._handleDefaultCancel);
                         GlobalActions.showMonitor(selectedPrinter, fcode, previewUrl, GlobalConstants.PRINT);
                         //Tour popout after show monitor delay
                         setTimeout(function() {
@@ -498,10 +505,8 @@ define([
                     director.setCameraPosition(position, rotation);
                 },
 
-                _handleMonitorClose: function() {
-                    this.setState({
-                        showMonitor: false
-                    });
+                _handleMonitorClosed: function() {
+                    AlertStore.onCancel(this._handleDefaultCancel);
                 },
 
                 _handleModeChange: function(mode) {
@@ -620,7 +625,6 @@ define([
                 },
 
                 _handleDefaultCancel: function(ans) {
-                    console.log(ans);
                     //Use setTimeout to avoid multiple modal display conflict
                     if(ans === 'set_default') {
                         AlertStore.removeYesListener(this._onYes);
@@ -682,6 +686,7 @@ define([
                             uniqleId="print"
                             lang={lang}
                             onClose={this._handlePrinterSelectorWindowClose}
+                            onUnmount={this._handlePrinterSelectorUnmount}
                             onGettingPrinter={this._handleDeviceSelected} />
                     );
                     return (

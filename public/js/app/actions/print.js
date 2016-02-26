@@ -421,7 +421,6 @@ define([
         };
 
         var processMetadata = function(metadata) {
-            console.log(metadata);
             GlobalActions.sliceComplete(metadata);
         };
 

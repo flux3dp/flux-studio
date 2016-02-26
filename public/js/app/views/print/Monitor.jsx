@@ -343,6 +343,8 @@ define([
             messageViewed = false;
             totalTimeInSeconds = '';
             taskInfo = '';
+
+            GlobalActions.monitorClosed();
         },
 
         _hasFCode: function() {
@@ -431,7 +433,6 @@ define([
         },
 
         _handleYes: function(id) {
-            console.log(id);
             if(id === DeviceConstants.KICK) {
                 socketStatus.ready = false;
                 DeviceMaster.kick().then(function() {
@@ -454,7 +455,6 @@ define([
                 this._doFileUpload(fileToBeUpload);
             }
             else if(id === 'DELETE_FILE') {
-                console.log('delete pressed!', pathArray.join('/') + '/' + this.state.selectedItem);
                 this._handleDeleteFile(pathArray, this.state.selectedItem);
             }
         },
@@ -994,7 +994,6 @@ define([
                     r.push(files[i]);
                 }
             }
-            console.log(r);
             this.setState({ currentDirectoryFiles: r });
         },
 
