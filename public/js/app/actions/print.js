@@ -218,10 +218,6 @@ define([
             registerSlicingProgress();
         }
 
-        if(!fcodeConsole) {
-            fcodeConsole = fcodeReader();
-        }
-
         registerDropToImport();
     }
 
@@ -360,6 +356,7 @@ define([
     function appendModels(files, index, callback) {
         slicingStatus.canInterrupt = false;
         var ext = files.item(index).name.split('.').pop().toLowerCase();
+        console.log(ext);
         if(ext === 'stl') {
             var reader  = new FileReader();
             reader.addEventListener('load', function () {
@@ -378,6 +375,7 @@ define([
             reader.readAsDataURL(files.item(index));
         }
         else if (ext === 'fc') {
+            fcodeConsole = fcodeReader();
             importFromFCode = true;
             previewMode = true;
             _showWait(lang.print.drawingPreview, !showStopButton);
@@ -417,11 +415,7 @@ define([
                 ProgressActions.close();
                 importFromFCode = false;
                 previewMode = false;
-                reactSrc.setState({
-                    openImportWindow: true,
-                    previewMode: false,
-                    hasObject: false
-                });
+                _exitImportFromFCodeMode();
                 AlertActions.showPopupInfo('', lang.message.fcodeForLaser);
             }
         };
@@ -1982,6 +1976,24 @@ define([
     function cancelPreview() {
         slicingStatus.showProgress = false;
         _closePreview();
+
+        if(importFromFCode) {
+            _exitImportFromFCodeMode();
+        }
+    }
+
+    function _exitImportFromFCodeMode() {
+        importFromFCode = false;
+        previewMode = false;
+        reactSrc.setState({
+            openImportWindow: objects.length === 0,
+            previewMode: false,
+            hasObject: false,
+            previewModeOnly: false,
+            leftPanelReady: true
+        });
+        _clearPath();
+        render();
     }
 
     function _showPreview() {

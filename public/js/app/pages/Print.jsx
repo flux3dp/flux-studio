@@ -303,6 +303,9 @@ define([
                         Config().write('advanced-settings', JSON.stringify(advancedSettings));
                         Config().write('print-setting-version', GlobalConstants.DEFAULT_PRINT_SETTING_VERSION);
                     }
+                    else if(answer === GlobalConstants.EXIT_PREVIEW) {
+                        director.cancelPreview();
+                    }
                 },
 
                 _handleCancelTutorial: function(answer) {

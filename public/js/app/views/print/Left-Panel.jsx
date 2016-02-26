@@ -5,8 +5,10 @@ define([
     'plugins/classnames/index',
     'helpers/device-master',
     'helpers/api/config',
-    'jsx!widgets/Dialog-Menu'
-], function($, React, printController, ClassNames, DeviceMaster, Config, DialogMenu) {
+    'jsx!widgets/Dialog-Menu',
+    'app/constants/global-constants',
+    'app/actions/alert-actions'
+], function($, React, printController, ClassNames, DeviceMaster, Config, DialogMenu, GlobalConstants, AlertActions) {
     'use strict';
 
     var lang,
@@ -119,7 +121,12 @@ define([
         },
 
         _handleActions: function(source, arg, e) {
+            e.preventDefault();
             if(this.props.previewModeOnly === true) {
+                if(source === 'PREVIEW') {
+                    $('#preview').parents('label').find('input').prop('checked',true);
+                    AlertActions.showPopupYesNo(GlobalConstants.EXIT_PREVIEW, lang.confirmExitFcodeMode);
+                }
                 return;
             }
             var self = this,
@@ -291,7 +298,7 @@ define([
         },
 
         _renderPreview: function() {
-            var _class = ClassNames('display-text', {'disable': !this.props.enable});
+            var _class = ClassNames('display-text', {'disable': !this.props.enable && !this.props.previewModeOnly});
             return {
                 label: (
                     <div id="preview" className={_class} onClick={this._handleActions.bind(null, constants.PREVIEW, '')}>
@@ -305,8 +312,7 @@ define([
                             {this.state.previewCurrentLayer}
                         </div>
                     </div>
-                ),
-                disable: this.props.previewModeOnly
+                )
             };
         },
 
