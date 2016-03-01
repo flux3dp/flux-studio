@@ -207,7 +207,7 @@ define([
 
                     nwjsMenu.import.enabled = true;
                     nwjsMenu.import.onClick = function() { $importBtn.click(); };
-                    nwjsMenu.saveGCode.onClick = this._handleDownloadGCode;
+                    nwjsMenu.saveTask.onClick = this._handleDownloadFCode;
                     nwjsMenu.tutorial.onClick = function() {
                         self._handleYes('tour');
                     };
@@ -778,7 +778,7 @@ define([
                 },
 
                 _renderNwjsMenu: function() {
-                    nwjsMenu.saveGCode.enabled = this.state.hasObject;
+                    nwjsMenu.saveTask.enabled = this.state.hasObject;
                 },
 
                 render: function() {
