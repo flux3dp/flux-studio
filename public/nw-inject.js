@@ -40,6 +40,10 @@ var fs = requireNode('fs'),
                 else {
                     fs.appendFile('message.log', message, 'utf8', callback);
                 }
+            },
+            recordOutput = function(data) {
+                console.log(data.toString());
+                writeLog(data.toString());
             };
 
         // empty message.log
@@ -59,20 +63,18 @@ var fs = requireNode('fs'),
             ghostCmd = libPath + '/lib/flux_api/flux_api';
         }
 
-        fs.chmodSync(ghostCmd, 0777);
-        fs.chmodSync(args[slic3rPathIndex], 0777);
+        try {
+            fs.chmodSync(ghostCmd, 0777);
+            fs.chmodSync(args[slic3rPathIndex], 0777);
+        }
+        catch (ex) {
+            console.log(ex);
+            writeLog(ex.message);
+        }
 
         ghost = spawn(ghostCmd, args);
-
-        ghost.stdout.on('data', function(data) {
-            console.log('stdout: ' + data.toString());
-            writeLog(data.toString());
-        });
-
-        ghost.stderr.on('data', function(data) {
-            console.log('stderr: ' + data.toString());
-            writeLog(data.toString());
-        });
+        ghost.stdout.on('data', recordOutput);
+        ghost.stderr.on('data', recordOutput);
 
         ghost.on('error', function(err) {
             if (err) {
