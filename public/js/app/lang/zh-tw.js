@@ -937,7 +937,8 @@ define(function() {
             monitor_too_old: {
                 caption: '韌體需要更新',
                 content: '請按照<a target="_blank" href="http://helpcenter.flux3dp.com/hc/zh-tw/articles/216251077">此說明</a>安裝最新韌體版本'
-            }
+            },
+            cant_establish_connection: '無法啟動 FLUX API，請使用 說明 > 錯誤回報 輸出偵錯訊息，並<a href="https://flux3dp.zendesk.com/hc/zh-tw/requests/new" target="_blank">聯繫 FLUX 客服</a>'
         },
         machine_status: {
             '-10': 'Raw Mode',

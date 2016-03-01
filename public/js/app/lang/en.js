@@ -937,7 +937,8 @@ define(function() {
             monitor_too_old: {
                 caption: 'Firmware Outdated',
                 content: 'Please install the latest firmware with <a target="_blank" href="http://helpcenter.flux3dp.com/hc/en-us/articles/216251077">this guide</a>.'
-            }
+            },
+            cant_establish_connection: 'Unable to initiate FLUX API, kindly use Help > Bug Report to export debug message and <a href="https://flux3dp.zendesk.com/hc/en-us/requests/new" target="_blank">contact FLUX support.</a>'
         },
         machine_status: {
             '-10': 'Raw mode',

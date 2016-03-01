@@ -40,7 +40,7 @@ function(React, $, Backbone, display, config, appSettings, detectWebgl) {
                         this.studio
                     ],
                     // flux home
-                    [/^$/, 'home', this.home],
+                    [/^$/, 'home', this.home]
                 ];
 
             routes.forEach(function(route) {
@@ -202,7 +202,6 @@ function(React, $, Backbone, display, config, appSettings, detectWebgl) {
             // TODO: handle 404
             alert('404');
         }
-
     });
 
 });

@@ -19,7 +19,8 @@ define([
     'app/constants/progress-constants',
     'html2canvas',
     'plugins/file-saver/file-saver.min',
-    'helpers/check-device-status'
+    'helpers/check-device-status',
+    'helpers/ghost-log-reader'
 ], function(
     $,
     gui,
@@ -38,7 +39,8 @@ define([
     ProgressConstants,
     html2canvas,
     fileSaver,
-    checkDeviceStatus
+    checkDeviceStatus,
+    ghostLogReader
 ) {
     'use strict';
 
@@ -499,7 +501,7 @@ define([
                 {
                     label: lang.help.debug,
                     enabled: true,
-                    onClick: function(){
+                    onClick: function() {
                         window.html2canvas = html2canvas;
                         function obfuse(str){
                             var output = [],
@@ -510,29 +512,28 @@ define([
                                 output.push(c?c:str[i]);
                             }
 
-                            return output.join("");
+                            return output.join('');
                         }
+
                         html2canvas(window.document.body).then(function(canvas) {
-                            var report_blob,
-                                jpegUrl,
-                                report_info;
+                            var jpegUrl = canvas.toDataURL("image/jpeg"),
+                                report_info = JSON.stringify({ ws: window.FLUX.websockets, screenshot: jpegUrl }, null, 2),
+                                report_blob;
 
                             for(var i in window.FLUX.websockets){
-                                if("function" !== typeof window.FLUX.websockets[i]){
+                                if ("function" !== typeof window.FLUX.websockets[i]){
                                     window.FLUX.websockets[i].optimizeLogs();
                                 }
                             }
-
-                            jpegUrl = canvas.toDataURL("image/jpeg");
-                            report_info = JSON.stringify({ws: window.FLUX.websockets, screenshot: jpegUrl}, null, 2);
 
                             if (!window.FLUX.debug) {
                                 report_info = obfuse(btoa(report_info));
                             }
 
-                            report_blob = new Blob([report_info], {type : 'text/html'});
-
-                            saveAs(report_blob, "bugreport_"+Math.floor(Date.now() / 1000)+".txt");
+                            ghostLogReader().done(function(log) {
+                                report_blob = new Blob([log, report_info], { type : 'text/html' });
+                                saveAs(report_blob, 'bugreport_' + Math.floor(Date.now() / 1000) + '.txt');
+                            });
                         });
                     }
                 }

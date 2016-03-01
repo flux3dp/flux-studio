@@ -1,4 +1,14 @@
-define(['helpers/is-json'], function(isJson) {
+define([
+    'helpers/is-json',
+    'helpers/i18n',
+    'app/actions/alert-actions',
+    'app/actions/progress-actions'
+], function(
+    isJson,
+    i18n,
+    AlertActions,
+    ProgressActions
+) {
     'use strict';
 
     var websockets = [];
@@ -21,7 +31,8 @@ define(['helpers/is-json'], function(isJson) {
     //      onClose       - fired on connection closed
     //      onOpen        - fired on connection connecting
     return function(options) {
-        var _logs = [];
+        var _logs = [],
+            lang = i18n.get();
 
         var defaultCallback = function(result) {},
             defaultOptions = {
@@ -81,7 +92,14 @@ define(['helpers/is-json'], function(isJson) {
                 };
 
                 _ws.onclose = function(result) {
+                    ProgressActions.close();
                     options.onClose(result);
+
+                    // The connection was closed abnormally without sending or receving data
+                    // ref: http://tools.ietf.org/html/rfc6455#section-7.4.1
+                    if (1006 === result.code) {
+                        AlertActions.showPopupError('abnormally-close', lang.message.cant_establish_connection);
+                    }
 
                     if (true === options.autoReconnect) {
                         received_data = [];

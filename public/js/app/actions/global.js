@@ -20,7 +20,6 @@ define([
                 deleteStart,
                 deleteCount;
 
-            // if ('INPUT' !== e.target.tagName && 'TEXTAREA' !== e.target.tagName) {
             if ('INPUT' === e.target.tagName || 'TEXTAREA' === e.target.tagName) {
                 selectionStart = e.target.selectionStart;
                 value = e.target.value.split('');
