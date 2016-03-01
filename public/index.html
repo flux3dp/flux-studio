@@ -60,7 +60,7 @@
                     getStarted(env.ghostPort);
                 }
                 else {
-                    if (5000 <= (new Date()).getTime() - window.FLUX.timestamp) {
+                    if (30000 <= (new Date()).getTime() - window.FLUX.timestamp) {
                         getStarted(env.ghostPort);
                         clearInterval(timer);
                     }
