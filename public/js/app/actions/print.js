@@ -1587,7 +1587,7 @@ define([
             else {
                 getFCode().then(function(blob) {
                     if (blob instanceof Blob) {
-                        _setProgressMessage('');
+                        ProgressActions.close();
                         d.resolve(saveAs(blob, fileName));
                     }
                 });

@@ -90,7 +90,7 @@ define([
                 onClick: emptyFunction,
                 parent: parentIndex.FILE
             },
-            saveGCode: {
+            saveTask: {
                 label: lang.file.save_fcode,
                 enabled: false,
                 onClick: emptyFunction,
@@ -285,7 +285,7 @@ define([
             subItems = [
                 items.import,
                 separator,
-                items.saveGCode
+                items.saveTask
             ];
 
             if ('win' === window.FLUX.osType) {
