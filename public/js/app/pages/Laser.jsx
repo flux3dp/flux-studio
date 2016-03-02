@@ -83,8 +83,8 @@ define([
                         self._onRunLaser();
                     };
 
-                    self.state.laserEvents.menuFactory.items.saveGCode.enabled = false;
-                    self.state.laserEvents.menuFactory.items.saveGCode.onClick = function() {
+                    self.state.laserEvents.menuFactory.items.saveTask.enabled = false;
+                    self.state.laserEvents.menuFactory.items.saveTask.onClick = function() {
                         self._onExport('-g');
                     };
                 },

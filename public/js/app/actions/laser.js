@@ -78,7 +78,7 @@ define([
                         state.images = [];
 
                         menuFactory.items.execute.enabled = false;
-                        menuFactory.items.saveGCode.enabled = false;
+                        menuFactory.items.saveTask.enabled = false;
                         self.state.fileFormat = undefined;
                     }
                     else {
@@ -733,7 +733,7 @@ define([
                 });
 
                 menuFactory.items.execute.enabled = true;
-                menuFactory.items.saveGCode.enabled = true;
+                menuFactory.items.saveTask.enabled = true;
             },
             thresholdChanged: function(threshold) {
                 var $el = $('.image-active:eq(0)');
