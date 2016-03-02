@@ -12,7 +12,8 @@ define([
     'app/constants/global-constants',
     'helpers/sprintf',
     'helpers/round',
-    'helpers/duration-formatter'
+    'helpers/duration-formatter',
+    'helpers/shortcuts',
 ], function(
     $,
     React,
@@ -27,7 +28,8 @@ define([
     GlobalConstants,
     sprintf,
     round,
-    formatDuration
+    formatDuration,
+    shortcuts
 ) {
     'use strict';
 
@@ -286,6 +288,7 @@ define([
 
             socketStatus.ready = false;
             DeviceMaster.getReport().then(function(report) {
+                socketStatus.ready = true;
                 this._processReport(report);
                 if(this.state.mode === mode.BROWSE_FILE) {
                     currentStatus = DeviceConstants.READY;
@@ -295,24 +298,32 @@ define([
             }.bind(this)).then(function(exist) {
                 usbExist = exist;
                 socketStatus.reader = true;
-            }.bind(this));
 
-            if(openSource === GlobalConstants.DEVICE_LIST) {
-                socketStatus.ready = false;
-                var t = setInterval(function() {
-                    clearInterval(t);
+                if(openSource === GlobalConstants.DEVICE_LIST) {
+                    socketStatus.ready = false;
                     DeviceMaster.getPreviewInfo().then(function(info) {
-                        this._startReport();
+                        if(this.state.mode !== mode.BROWSE_FILE) {
+                            this._startReport();
+                        }
                         socketStatus.ready = true;
                         this._processInfo(info);
                     }.bind(this));
-                }.bind(this), 200);
-            }
-            else {
-                totalTimeInSeconds = parseInt(this.props.slicingStatus.time);
+                }
+                else {
+                    totalTimeInSeconds = parseInt(this.props.slicingStatus.time);
 
-                this._startReport();
-            }
+                    this._startReport();
+                }
+            }.bind(this));
+
+            // listening to key
+            shortcuts.on(['DEL'], function(e) {
+                e.preventDefault();
+                if(this.state.selectedItem) {
+                    this._stopReport();
+                    AlertActions.showPopupYesNo('DELETE_FILE', lang.monitor.confirmFileDelete);
+                }
+            }.bind(this));
         },
 
         shouldComponentUpdate: function(nextProps, nextState) {
@@ -374,7 +385,6 @@ define([
                 if(isValid) {
                     var blob = new Blob([reader.result], type);
                     DeviceMaster.uploadFile(blob, file, pathArray.join('/')).then(function(result) {
-                        self._startReport();
                         self._refreshDirectory();
                     });
                 }
@@ -382,6 +392,13 @@ define([
                     AlertActions.showPopupInfo('', lang.monitor.extensionNotSupported);
                 }
             };
+        },
+
+        _clearSelectedItem: function() {
+            this.setState({
+                selectedItem: '',
+                selectedItemType: ''
+            });
         },
 
         _handleClose: function() {
@@ -410,9 +427,11 @@ define([
         _handleCancel: function(id) {
             messageViewed = true;
             showingPopup = false;
+            this._startReport();
         },
 
         _handleYes: function(id) {
+            console.log(id);
             if(id === DeviceConstants.KICK) {
                 socketStatus.ready = false;
                 DeviceMaster.kick().then(function() {
@@ -420,19 +439,23 @@ define([
                     this._startReport();
                 }.bind(this));
             }
-            else if(id === 'uploadFile') {
+            else if(id === 'UPLOAD_FILE') {
                 var info    = fileToBeUpload.name.split('.'),
                     ext     = info[info.length - 1];
 
                 if(ext === 'gcode') {
-                    AlertActions.showPopupYesNo('confirmGToF', lang.monitor.confirmGToF);
+                    AlertActions.showPopupYesNo('CONFIRM_G_TO_F', lang.monitor.confirmGToF);
                 }
                 else {
                     this._doFileUpload(fileToBeUpload);
                 }
             }
-            else if(id === 'confirmGToF') {
+            else if(id === 'CONFIRM_G_TO_F') {
                 this._doFileUpload(fileToBeUpload);
+            }
+            else if(id === 'DELETE_FILE') {
+                console.log('delete pressed!', pathArray.join('/') + '/' + this.state.selectedItem);
+                this._handleDeleteFile(pathArray, this.state.selectedItem);
             }
         },
 
@@ -443,7 +466,6 @@ define([
             pathArray = [];
 
             this._retrieveFolderContent('').then(function() {
-                this._startReport();
                 this.setState({
                     mode: mode.BROWSE_FILE
                 }, function() {
@@ -453,6 +475,7 @@ define([
         },
 
         _handleSelectFolder: function(pathName) {
+            this._clearSelectedItem();
             var dir = this.state.currentDirectoryFolders;
             // if it's a directory
             if(dir.some(function(d) {
@@ -468,7 +491,6 @@ define([
                     }
                 }.bind(this), 100);
 
-                // this.setState({ waiting: true });
                 this._addHistory();
             }
         },
@@ -476,7 +498,6 @@ define([
         _handleBrowseUpLevel: function() {
             if(pathArray.length === 0) {
                 this.setState({ mode: mode.PREVIEW });
-                this._startReport();
                 return;
             }
             pathArray.pop();
@@ -487,6 +508,13 @@ define([
                     clearInterval(t);
                 }
             }, 100);
+        },
+
+        _handleDeleteFile: function(pathToFile, fileName) {
+            var a = 'no';
+            DeviceMaster.deleteFile(pathToFile, fileName).then(function(response) {
+                this._removeFileFromUI(fileName);
+            }.bind(this));
         },
 
         _handleBack: function() {
@@ -507,6 +535,8 @@ define([
                     socketStatus.ready = true;
                 });
             }
+
+            this._clearSelectedItem();
 
             var actions = {
 
@@ -552,29 +582,36 @@ define([
             }
             else {
                 start = 0;
-                DeviceMaster.fileInfo(pathArray.join('/'), fileName).then(function(info) {
-                    if(info[1] instanceof Blob) {
-                        this._processInfo([info[2]]);
-                        previewUrl = info[1].size === 0 ? '/img/ph_l.png' : URL.createObjectURL(info[1]);
-                        filePreview = true;
-                        pathArray.push(fileName);
-                        this.setState({
-                            mode: mode.PREVIEW,
-                            currentStatus: deviceStatus.st_id === DeviceConstants.status.COMPLETED ? DeviceConstants.READY : this.state.currentStatus
-                        }, function() {
-                            socketStatus.ready = false;
-                            DeviceMaster.getReport().then(function(report) {
-                                socketStatus.ready = true;
-                                this._processReport(report);
-                            }.bind(this));
-                            this._addHistory();
-                        });
+                socketStatus.cancel = true;
+                var t = setInterval(function() {
+                    if(socketStatus.ready) {
+                        clearInterval(t);
+                        DeviceMaster.fileInfo(pathArray.join('/'), fileName).then(function(info) {
+                            if(info[1] instanceof Blob) {
+                                this._processInfo([info[2]]);
+                                previewUrl = info[1].size === 0 ? '/img/ph_l.png' : URL.createObjectURL(info[1]);
+                                filePreview = true;
+                                pathArray.push(fileName);
+                                this.setState({
+                                    mode: mode.PREVIEW,
+                                    currentStatus: deviceStatus.st_id === DeviceConstants.status.COMPLETED ? DeviceConstants.READY : this.state.currentStatus
+                                }, function() {
+                                    socketStatus.cancel = false;
+                                    socketStatus.ready = false;
+                                    DeviceMaster.getReport().then(function(report) {
+                                        socketStatus.ready = true;
+                                        this._processReport(report);
+                                    }.bind(this));
+                                    this._addHistory();
+                                });
+                            }
+                            else {
+                                AlertActions.showPopupInfo('', lang.monitor.cannotPreview);
+                            }
+                            this.forceUpdate();
+                        }.bind(this));
                     }
-                    else {
-                        AlertActions.showPopupInfo('', lang.monitor.cannotPreview);
-                    }
-                    this.forceUpdate();
-                }.bind(this));
+                }.bind(this), 200);
             }
         },
 
@@ -598,14 +635,16 @@ define([
                 fileToBeUpload = e.target.files[0];
                 this._existFileInDirectory(pathArray, fileToBeUpload.name).then(function(exist) {
                     if(exist) {
-                        AlertActions.showPopupYesNo('uploadFile', lang.monitor.fileExistContinue);
+                        this._stopReport();
+                        AlertActions.showPopupYesNo('UPLOAD_FILE', lang.monitor.fileExistContinue);
                     }
                     else {
                         var info = fileToBeUpload.name.split('.'),
                             ext  = info[info.length - 1];
 
                         if(ext === 'gcode') {
-                            AlertActions.showPopupYesNo('confirmGToF', lang.monitor.confirmGToF);
+                            this._stopReport();
+                            AlertActions.showPopupYesNo('CONFIRM_G_TO_F', lang.monitor.confirmGToF);
                         }
                         else {
                             this._doFileUpload(fileToBeUpload);
@@ -617,15 +656,27 @@ define([
         },
 
         _handleDownload: function() {
+            var self = this,
+                displayStatus = '';
+
             start = 0;
-            DeviceMaster.fileInfo(pathArray.join('/'), this.state.selectedItem).then(function(info) {
-                if(info[1] instanceof Blob) {
-                    saveAs(info[1], info[0]);
+            displayStatus = this.state.displayStatus;
+            this._stopReport();
+            var t = setInterval(function() {
+                if(socketStatus.ready) {
+                    clearInterval(t);
+                    DeviceMaster.downloadFile(pathArray, self.state.selectedItem, downloadProgressDisplay).then(function(file) {
+                        saveAs(file[1], self.state.selectedItem);
+                        self.setState({ displayStatus: displayStatus });
+                    });
                 }
-                else {
-                    AlertActions.showPopupInfo('', lang.monitor.fileNotDownloadable);
-                }
-            }.bind(this));
+            }, 200);
+
+            var downloadProgressDisplay = function(p) {
+                self.setState({
+                    displayStatus: `${lang.monitor.processing} ${parseInt((p.size - p.left) / p.size * 100)}%`
+                });
+            };
         },
 
         _handleToggleCamera: function() {
@@ -729,6 +780,9 @@ define([
             timmer = setTimeout(this._processTimeout, timeoutLength);
 
             reporter = setInterval(function() {
+                if(self.state.mode === mode.BROWSE_FILE) {
+                    return;
+                }
                 socketStatus.ready = false;
                 DeviceMaster.getReport().then(function(report) {
                     socketStatus.ready = true;
@@ -748,7 +802,6 @@ define([
         },
 
         _processInfo: function(info) {
-            this._startReport();
             if(info === '') {
                 return;
             }
@@ -794,7 +847,7 @@ define([
             // rootMode = statusId === DeviceConstants.status.IDLE ? DeviceConstants.IDLE : DeviceConstants.RUNNING;
 
             // jug down errors as main and sub error for later use
-            if(report.error) {
+            if(report.error && report.error.length > 0) {
                 if(typeof(report.error) === 'string') {
                     mainError = report.error;
                 }
@@ -932,6 +985,19 @@ define([
             });
         },
 
+        _removeFileFromUI: function(fileName) {
+            var files = this.state.currentDirectoryFiles,
+                r = [];
+
+            for(var i = 0; i < files.length; i++) {
+                if(files[i][0] !== fileName) {
+                    r.push(files[i]);
+                }
+            }
+            console.log(r);
+            this.setState({ currentDirectoryFiles: r });
+        },
+
         _retrieveFolderContent: function(path) {
             var self = this,
                 d = $.Deferred();
@@ -975,7 +1041,6 @@ define([
         _renderFolderFilesWithPreview: function() {
             this._stopReport();
             if(currentDirectoryContent.files.length === 0) {
-                this._startReport();
                 return;
             }
 
@@ -993,7 +1058,6 @@ define([
                     start = start + scrollSize;
                 }.bind(this));
                 socketStatus.ready = true;
-                this._startReport();
             }.bind(this));
         },
 
@@ -1141,7 +1205,6 @@ define([
                     break;
 
                 case mode.BROWSE_FILE:
-                    // console.log(this.state.directoryContent);
                     return this._processFolderContent();
                     break;
 
@@ -1156,7 +1219,6 @@ define([
         },
 
         _renderFolderContent: function() {
-            // console.log('rendering folder content');
             switch(this.state.mode) {
                 case mode.PREVIEW:
                 case mode.PRINT:

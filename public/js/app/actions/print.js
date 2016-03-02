@@ -217,7 +217,7 @@ define([
             registerSlicingProgress();
         }
 
-        registerDropToImport();
+        registerDragToImport();
     }
 
     function uploadStl(name, file) {
@@ -531,7 +531,6 @@ define([
                             reactSrc._handleDeviceSelected();
                             needToShowMonitor = false;
                         }
-                        ProgressActions.close();
                     }, 1000);
 
                     blobExpired = false;
@@ -547,7 +546,7 @@ define([
         Object.unobserve(slicingReport, function() {});
     }
 
-    function registerDropToImport() {
+    function registerDragToImport() {
         if(window.FileReader) {
             var zone = document.querySelector('.studio-container.print-studio');
             zone.addEventListener('dragenter', onDragEnter);
@@ -902,7 +901,6 @@ define([
                                     if(!willReslice) {
                                         ProgressActions.updating(message, parseInt(result.percentage * 100));
                                     }
-
                                 }
                                 else {
                                     ProgressActions.close();
@@ -989,6 +987,9 @@ define([
 
         slicingStatus.reporter = setInterval(function() {
             if(!slicingStatus.pauseReport) {
+                if(willReslice) {
+                    return;
+                }
                 slicingStatus.canInterrupt = false;
                 slicingStatus.pauseReport = true;
                 slicer.reportSlicing(function(report) {
@@ -1525,7 +1526,7 @@ define([
             else {
                 getFCode().then(function(blob) {
                     if (blob instanceof Blob) {
-                        _setProgressMessage('');
+                        ProgressActions.close();
                         d.resolve(saveAs(blob, fileName));
                     }
                 });

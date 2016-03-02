@@ -32,7 +32,7 @@ define([
             if(!lengthInSecond) {
                 return '';
             }
-            return `${lengthInSecond} ${lang.monitor.second}`;
+            return `${parseInt(lengthInSecond)} ${lang.monitor.second}`;
 
         }
 

@@ -17,7 +17,7 @@ define([
         constants;
 
     qualityLevel = {
-        high: 0.10,
+        high: 0.05,
         med: 0.15,
         low: 0.25
     };
@@ -93,7 +93,7 @@ define([
 
             if(nextProps.layerHeight !== layerHeight) {
                 var _quality = {
-                    '0.1': lang.quality.high,
+                    '0.05': lang.quality.high,
                     '0.15': lang.quality.med,
                     '0.25': lang.quality.low
                 };

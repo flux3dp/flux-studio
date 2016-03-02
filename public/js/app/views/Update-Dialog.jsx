@@ -13,7 +13,7 @@ define([
         getDefaultProps: function() {
             return {
                 open: false,
-                type: 'software',
+                type: 'software',   // software|firmware|toolhead
                 device: {},
                 currentVersion: '',
                 latestVersion: '',
@@ -84,6 +84,13 @@ define([
                 message1 = sprintf(lang.update[this.props.type].message_pattern_1, this.props.device.name),
                 message2 = sprintf(lang.update[this.props.type].message_pattern_2, this.props.latestVersion, this.props.currentVersion),
                 buttons = this._getButtons(lang),
+                skipButton = (
+                    'software' === this.props.type ?
+                    <button className="btn btn-link" data-ga-event={'skip-' + this.props.type.toLowerCase() + '-update'} onClick={this._onSkip}>
+                        {lang.update.skip}
+                    </button> :
+                    ''
+                ),
                 content = (
                     <div className="update-wrapper">
                         <h2 className="caption">{caption}</h2>
@@ -94,7 +101,7 @@ define([
                         <h4 className="release-note-caption">{lang.update.release_note}</h4>
                         <div className="release-note-content" dangerouslySetInnerHTML={this._getReleaseNote()}/>
                         <div className="action-button">
-                            <button className="btn btn-link" data-ga-event={'skip-' + this.props.type.toLowerCase() + '-update'} onClick={this._onSkip}>{lang.update.skip}</button>
+                            {skipButton}
                             <ButtonGroup buttons={buttons}/>
                         </div>
                     </div>
