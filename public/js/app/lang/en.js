@@ -835,7 +835,7 @@ define(function() {
             HARDWARE_ERROR_0                    : 'Ran out of filament\nPlease insert new material',
             HARDWARE_ERROR_PLATE_MISSING        : 'Unable to detect the base plate\nPlease put on the plate.',
             HARDWARE_ERROR_ZPROBE_ERROR         : 'Unable to calibrate the base plate\nPlease remove left-over on the nozzle',
-            HEAD_ERROR_HEAD_RESET               : 'Toolhead bad connection\nPlease re-attach the toolhead, and ensure the toolhead is connected correctly',
+            HEAD_ERROR_RESET                    : 'Toolhead bad connection\nPlease re-attach the toolhead, and ensure the toolhead is connected correctly',
             HARDWARE_ERROR_CONVERGENCE_FAILED   : 'Unable to calibrate the base plate\nPlease remove left-over on the nozzle',
             HARDWARE_ERROR_HOME_FAILED          : 'Unable to home to origin\nPlease remove the obstacle, and reattach the toolhead',
             HEAD_ERROR_TILT                     : 'Head tilted\nPlease check ball joint rod is attached correctly',
