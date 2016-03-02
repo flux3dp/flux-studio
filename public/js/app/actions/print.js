@@ -217,7 +217,7 @@ define([
             registerSlicingProgress();
         }
 
-        registerDropToImport();
+        registerDragToImport();
     }
 
     function uploadStl(name, file) {
@@ -546,7 +546,7 @@ define([
         Object.unobserve(slicingReport, function() {});
     }
 
-    function registerDropToImport() {
+    function registerDragToImport() {
         if(window.FileReader) {
             var zone = document.querySelector('.studio-container.print-studio');
             zone.addEventListener('dragenter', onDragEnter);
