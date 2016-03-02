@@ -3,10 +3,11 @@ define([
     'helpers/display',
     'helpers/websocket',
     'helpers/api/3d-print-slicing',
-    'helpers/api/control',
+    'helpers/api/fcode-reader',
     'app/actions/alert-actions',
     'app/actions/progress-actions',
     'app/stores/progress-store',
+    'app/constants/global-constants',
     'app/constants/device-constants',
     'app/constants/progress-constants',
     'helpers/i18n',
@@ -26,10 +27,11 @@ define([
     display,
     websocket,
     printSlicing,
-    printerController,
+    fcodeReader,
     AlertActions,
     ProgressActions,
     ProgressStore,
+    GlobalConstants,
     DeviceConstants,
     ProgressConstants,
     I18n,
@@ -39,7 +41,7 @@ define([
     'use strict';
 
     var THREE = window.THREE || {},
-        container, slicer;
+        container, slicer, fcodeConsole;
 
     var camera, scene, outlineScene;
     var orbitControl, transformControl, reactSrc;
@@ -67,6 +69,7 @@ define([
         previewMode = false,
         showStopButton = true,
         willReslice = false,
+        importFromFCode = false,
         needToShowMonitor = false,
         ddHelper = 0,
         defaultFileName = '',
@@ -78,6 +81,7 @@ define([
         transformAxisChanged = '',
         slicingReport = {},
         slicingStatus = {},
+        importedFCode = {},
         lang = I18n.get();
 
     var s = {
@@ -354,7 +358,8 @@ define([
 
     function appendModels(files, index, callback) {
         slicingStatus.canInterrupt = false;
-        if(files.item(index).name.split('.').pop().toLowerCase() === 'stl') {
+        var ext = files.item(index).name.split('.').pop().toLowerCase();
+        if(ext === 'stl') {
             var reader  = new FileReader();
             reader.addEventListener('load', function () {
                 appendModel(reader.result, files.item(index), function() {
@@ -371,9 +376,59 @@ define([
 
             reader.readAsDataURL(files.item(index));
         }
+        else if (ext === 'fc') {
+            importedFCode = files.item(0);
+            if(objects.length === 0) {
+                doFCodeImport();
+            }
+            else {
+                AlertActions.showPopupYesNo(GlobalConstants.IMPORT_FCODE, lang.message.confirmFCodeImport);
+            }
+        }
         else {
             callback();
         }
+    }
+
+    function appendPreviewPath(file, index, callback) {
+        var metadata,
+            reader = new FileReader();
+
+        reader.addEventListener('load', function() {
+            fcodeConsole.upload(reader.result, file.size, function() {
+                fcodeConsole.getMetadata(processMetadata);
+            });
+        });
+
+        var processMetadata = function(m) {
+            metadata = m;
+            if(m.metadata.HEAD_TYPE !== 'LASER') {
+                fcodeConsole.getPath().then(processPath);
+            }
+            else {
+                ProgressActions.close();
+                importFromFCode = false;
+                previewMode = false;
+                _exitImportFromFCodeMode();
+                AlertActions.showPopupInfo('', lang.message.fcodeForLaser);
+            }
+        };
+
+        var processPath = function(path) {
+            previewMode = true;
+            printPath = path;
+            _drawPathFromFCode();
+            fcodeConsole.getThumbnail(processPreview);
+        };
+
+        var processPreview = function(blob) {
+            previewUrl = URL.createObjectURL(blob);
+            blobExpired = false;
+            responseBlob = new Blob([reader.result]);
+            GlobalActions.sliceComplete(metadata);
+        };
+
+        reader.readAsArrayBuffer(file);
     }
 
     function startSlicing(type) {
@@ -543,6 +598,8 @@ define([
     }
 
     function willUnmount() {
+        previewMode = false;
+        importFromFCode = false;
         Object.unobserve(slicingReport, function() {});
     }
 
@@ -923,7 +980,11 @@ define([
     function getFCode() {
         var d = $.Deferred();
 
-        if(objects.length === 0) {
+        if(importFromFCode) {
+            d.resolve(responseBlob, previewUrl);
+            return d.promise();
+        }
+        else if(objects.length === 0) {
             d.resolve('');
             return d.promise();
         }
@@ -1638,32 +1699,6 @@ define([
         render();
     }
 
-    function executePrint(serial) {
-        var d = $.Deferred();
-        selectObject(null);
-        if(objects.length === 0) {
-            d.resolve('');
-            return d.promise();
-        }
-        var go = function(blob) {
-            var control_methods = printerController(serial);
-            control_methods.upload(blob.size, blob);
-            d.resolve(blob);
-        };
-
-        if (!blobExpired) {
-            go(responseBlob);
-        }
-        else {
-            getFCode().then(function(result) {
-                if (result instanceof Blob) {
-                    go(result);
-                }
-            });
-        }
-        return d.promise();
-    }
-
     function updateOrbitControl() {
         setObjectDialoguePosition();
         render();
@@ -1848,6 +1883,30 @@ define([
         return d.promise();
     }
 
+    function doFCodeImport() {
+        fcodeConsole = fcodeReader();
+        importFromFCode = true;
+        previewMode = true;
+        objects.length = 0;
+        outlineScene.children.length = 0;
+        _clearScene(scene);
+        selectObject(null);
+        render();
+        _showWait(lang.print.drawingPreview, !showStopButton);
+
+        reactSrc.setState({
+            openImportWindow: false,
+            previewMode: true,
+            hasObject: true,
+            openObjectDialogue: false
+        });
+
+        appendPreviewPath(importedFCode, function() {
+            ProgressActions.close();
+            callback();
+        });
+    }
+
     // Private Functions ---
 
     // sync parameters with server
@@ -1935,6 +1994,24 @@ define([
     function cancelPreview() {
         slicingStatus.showProgress = false;
         _closePreview();
+
+        if(importFromFCode) {
+            _exitImportFromFCodeMode();
+        }
+    }
+
+    function _exitImportFromFCodeMode() {
+        importFromFCode = false;
+        previewMode = false;
+        reactSrc.setState({
+            openImportWindow: objects.length === 0,
+            previewMode: false,
+            hasObject: false,
+            previewModeOnly: false,
+            leftPanelReady: true
+        });
+        _clearPath();
+        render();
     }
 
     function _showPreview() {
@@ -2043,7 +2120,6 @@ define([
             line.name = 'line';
             previewScene.add(line);
         }
-
         reactSrc.setState({
             previewLayerCount: previewScene.children.length - 1
         }, function() {
@@ -2052,6 +2128,20 @@ define([
         render();
         _setProgressMessage('');
         return d.promise();
+    }
+
+    function _drawPathFromFCode() {
+        _drawPath().then(function() {
+            $('#preview').parents('label').find('input').prop('checked', true);
+            _closeWait();
+            reactSrc.setState({
+                leftPanelReady: false,
+                previewModeOnly: true
+            }, function() {
+                // remove disable class for hover effect
+                $('#preview').parent().removeClass('disable');
+            });
+        });
     }
 
     function _clearPath() {
@@ -2087,6 +2177,14 @@ define([
         MenuFactory.items.scale.onClick = setScaleMode;
         MenuFactory.items.rotate.onClick = setRotateMode;
         MenuFactory.items.reset.onClick = resetObject;
+    }
+
+    function _clearScene(scene) {
+        for(var i = scene.children.length - 1; i >= 0; i--) {
+            if(scene.children[i].name === 'custom') {
+                scene.children.splice(i, 1);
+            }
+        }
     }
 
     function clear() {
@@ -2127,13 +2225,13 @@ define([
         getModelCount       : getModelCount,
         togglePreview       : togglePreview,
         changePreviewLayer  : changePreviewLayer,
-        executePrint        : executePrint,
         setCameraPosition   : setCameraPosition,
         clearSelection      : clearSelection,
         clear               : clear,
         toggleScaleLock     : toggleScaleLock,
         getSlicingStatus    : getSlicingStatus,
         cancelPreview       : cancelPreview,
+        doFCodeImport       : doFCodeImport,
         willUnmount         : willUnmount
     };
 });

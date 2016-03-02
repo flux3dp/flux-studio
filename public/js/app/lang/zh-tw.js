@@ -468,7 +468,8 @@ define(function() {
                 raftTitle: 'A Raft are layers built under your part and help it stick to the base plate',
                 supportTitle: 'A Support is a generated structure to support overhanging part of your object, to prevent filament dropping',
                 previewTitle: 'Preview the actual path of toolhead during printing task',
-                advancedTitle: 'Detail 3d printing parameters, you may acheive better result than default by adjusting them'
+                advancedTitle: 'Detail 3d printing parameters, you may acheive better result than default by adjusting them',
+                confirmExitFcodeMode: '離開預覽模式將會移除fcode，繼續？'
             },
             right_panel: {
                 get: 'Get',
@@ -938,7 +939,9 @@ define(function() {
                 caption: '韌體需要更新',
                 content: '請按照<a target="_blank" href="http://helpcenter.flux3dp.com/hc/zh-tw/articles/216251077">此說明</a>安裝最新韌體版本'
             },
-            cant_establish_connection: '無法啟動 FLUX API，請使用 說明 > 錯誤回報 輸出偵錯訊息，並<a href="https://flux3dp.zendesk.com/hc/zh-tw/requests/new" target="_blank">聯繫 FLUX 客服</a>'
+            cant_establish_connection: '無法啟動 FLUX API，請使用 說明 > 錯誤回報 輸出偵錯訊息，並<a href="https://flux3dp.zendesk.com/hc/zh-tw/requests/new" target="_blank">聯繫 FLUX 客服</a>',
+            fcodeForLaser: '檔案為雷射工作',
+            confirmFCodeImport: '載入.fc檔案將清除目前所有場景，繼續？'
         },
         machine_status: {
             '-10': 'Raw Mode',
