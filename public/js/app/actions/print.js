@@ -82,6 +82,7 @@ define([
         slicingReport = {},
         slicingStatus = {},
         importedFCode = {},
+        objectBeforeTransform = {},
         lang = I18n.get();
 
     var s = {
@@ -548,15 +549,11 @@ define([
                 if(show || previewMode) {
                     ProgressActions.close();
                     _closePreview();
-
-                    AlertActions.showPopupError(
-                        '',
-                        slicingStatus.lastReport.error,
-                        slicingStatus.lastReport.caption);
                 }
                 else {
                     slicingStatus.hasError = true;
                 }
+                AlertActions.showPopupError('', slicingStatus.lastReport.error, slicingStatus.lastReport.caption);
                 slicingStatus.lastProgress = '';
                 reactSrc.setState({ hasOutOfBoundsObject: true });
             }
@@ -792,6 +789,8 @@ define([
         if(previewMode) { return; }
         switch (e.type) {
             case 'mouseDown':
+                objectBeforeTransform = {};
+                Object.assign(objectBeforeTransform, SELECTED);
                 transformMode = true;
                 reactSrc.setState({
                     isTransforming: true
@@ -806,7 +805,14 @@ define([
                 SELECTED.rotation.enteredY = updateDegreeWithStep(radianToDegree(SELECTED.rotation.y));
                 SELECTED.rotation.enteredZ = updateDegreeWithStep(radianToDegree(SELECTED.rotation.z));
                 if(reactSrc.state.mode === 'scale') {
-                    updateObjectSize(e.target.object);
+                    // check for inverse transform
+                    if(SELECTED.size.x <= 0 || SELECTED.size.y <= 0 || SELECTED.size.z <= 0) {
+                        setSize(objectBeforeTransform.size.x, objectBeforeTransform.size.y, objectBeforeTransform.z, false);
+                        updateObjectSize(objectBeforeTransform);
+                    }
+                    else {
+                        updateObjectSize(e.target.object);
+                    }
                 }
                 groundIt(SELECTED);
                 break;
@@ -1031,20 +1037,7 @@ define([
     }
 
     function getSlicingReport(callback) {
-        var processor,
-            reportTimmer = 1000; // 1 sec
-
-        processor = function(report) {
-            slicingStatus.canInterrupt = true;
-            slicingStatus.pauseReport = false;
-            if(report.status === 'complete') {
-                clearInterval(slicingStatus.reporter);
-                callback(report);
-            }
-            else if(report.status !== 'ok') {
-                callback(report);
-            }
-        };
+        var reportTimmer = 1000; // 1 sec
 
         slicingStatus.reporter = setInterval(function() {
             if(!slicingStatus.pauseReport) {
