@@ -1977,6 +1977,7 @@ define([
         }
         else {
             slicingStatus.isComplete = true;
+            ProgressActions.close();
         }
 
         slicingStatus.inProgress    = false;
