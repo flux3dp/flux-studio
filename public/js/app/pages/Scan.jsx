@@ -59,8 +59,8 @@ define([
         args = args || {};
 
         var View = React.createClass({
-                progressRemainingTime: 1200, // 20 minutes
                 MAX_MESHES: 5,
+                AVERAGE_STEP_TIME: 2,    // 2s each step
 
                 getInitialState: function() {
                     return {
@@ -76,8 +76,7 @@ define([
                         hasConvert: false,  // point cloud into stl
                         hasMultiScan: false,    // ready to multi scan
                         progressPercentage: 0,
-                        progressRemainingTime: this.progressRemainingTime,    // 20 minutes
-                        progressElapsedTime: 0,
+                        progressRemainingTime: 0,
                         printerIsReady: false,
                         isScanStarted: false,   // scan getting started
                         showCamera: true,
@@ -553,22 +552,31 @@ define([
                 _onRendering: function(views, chunk_length, mesh) {
                     var self = this,
                         scan_speed = self._getScanSpeed(),
-                        progressRemainingTime = self.progressRemainingTime / scan_speed * (scan_speed - chunk_length),
-                        progressElapsedTime = parseInt(((new Date()).getTime() - self.state.scanStartTime) / 1000, 10),
+                        left_step = (scan_speed - chunk_length),
+                        progressRemainingTime,
                         progressPercentage,
+                        elapsedTime = ((new Date()).getTime() - self.state.scanStartTime) / 1000,
                         meshes = self.state.meshes,
                         mesh = mesh || self._getMesh(self.state.scanTimes),
-                        model, transformMethods;
+                        model,
+                        transformMethods;
+
+                    if (5 > chunk_length) {
+                        progressRemainingTime = self.AVERAGE_STEP_TIME * left_step;
+                    }
+                    else {
+                        progressRemainingTime = parseInt((elapsedTime / chunk_length), 10) * left_step;
+                    }
 
                     progressPercentage = Math.min(
-                    round(chunk_length / scan_speed * 100, -2),
+                        round(chunk_length / scan_speed * 100, -2),
                         100
                     );
 
                     self.setState({
+                        currentSteps: chunk_length,
                         progressPercentage: progressPercentage,
-                        progressRemainingTime: progressRemainingTime,
-                        progressElapsedTime: progressElapsedTime
+                        progressRemainingTime: progressRemainingTime
                     });
 
                     if ('undefined' === typeof mesh) {
@@ -583,8 +591,7 @@ define([
                         self.setState({
                             meshes: meshes,
                             progressPercentage: progressPercentage,
-                            progressRemainingTime: progressRemainingTime,
-                            progressElapsedTime: progressElapsedTime
+                            progressRemainingTime: progressRemainingTime
                         });
                     }
                     else {
@@ -816,11 +823,18 @@ define([
                                 self.state.scanCtrlWebSocket.scan(scan_speed, opts);
                             }
                         },
+                        meshes = self.state.meshes,
                         stage;
 
                     self.state.scanControlImageMethods.stop();
 
+                    meshes.forEach(function(mesh) {
+                        mesh.choose = false;
+                        mesh.transformMethods.hide();
+                    });
+
                     self.setState({
+                        progressRemainingTime: self.AVERAGE_STEP_TIME * self._getScanSpeed(),
                         scanStartTime: (new Date()).getTime(),
                         scanTimes: self.state.scanTimes + 1,
                         isScanStarted: true,
@@ -1376,7 +1390,7 @@ define([
                             lang={lang}
                             percentage={this.state.progressPercentage}
                             remainingTime={this.state.progressRemainingTime}
-                            elapsedTime={this.state.progressElapsedTime}
+                            currentSteps={this.state.currentSteps}
                             onStop={this._onScanStop}
                         /> :
                         ''
