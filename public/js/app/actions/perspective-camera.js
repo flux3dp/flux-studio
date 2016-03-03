@@ -1,5 +1,6 @@
 define([
     'jquery',
+    'helpers/three/threex.domevents',
     'threeOrbitControls'
 ], function ($) {
     'use strict';
@@ -27,20 +28,29 @@ define([
 
         scene = new THREE.Scene();
 
-        var geometry = new THREE.BoxGeometry(200, 200, 200);
-        // var material = new THREE.MeshBasicMaterial({
-        //     color: 0xAAAAAA,
-        //     wireframe: false
-        // });
-        var front = new THREE.MeshBasicMaterial({ map: THREE.ImageUtils.loadTexture('img/pc-front.png') }),
-            back = new THREE.MeshBasicMaterial({ map: THREE.ImageUtils.loadTexture('img/pc-back.png') }),
-            left = new THREE.MeshBasicMaterial({ map: THREE.ImageUtils.loadTexture('img/pc-left.png') }),
-            right = new THREE.MeshBasicMaterial({ map: THREE.ImageUtils.loadTexture('img/pc-right.png') }),
-            top = new THREE.MeshBasicMaterial({ map: THREE.ImageUtils.loadTexture('img/pc-top.png') }),
-            bottom = new THREE.MeshBasicMaterial({ map: THREE.ImageUtils.loadTexture('img/pc-bottom.png') }),
-            meshFaceMaterial = new THREE.MeshFaceMaterial([right, left, back, front, top, bottom]);
+        var geometry = new THREE.BoxGeometry(200, 200, 200),
+            material = {},
+            meshFaceMaterial,
+            domEvents,
+            cube;
 
-        var cube = new THREE.Mesh(geometry, meshFaceMaterial);
+        material.front      = new THREE.MeshBasicMaterial({ map: THREE.ImageUtils.loadTexture('img/pc-front.png') });
+        material.back       = new THREE.MeshBasicMaterial({ map: THREE.ImageUtils.loadTexture('img/pc-back.png') });
+        material.left       = new THREE.MeshBasicMaterial({ map: THREE.ImageUtils.loadTexture('img/pc-left.png') });
+        material.right      = new THREE.MeshBasicMaterial({ map: THREE.ImageUtils.loadTexture('img/pc-right.png') });
+        material.bottom     = new THREE.MeshBasicMaterial({ map: THREE.ImageUtils.loadTexture('img/pc-bottom.png') });
+        material.top        = new THREE.MeshBasicMaterial({ map: THREE.ImageUtils.loadTexture('img/pc-top.png') });
+        material.hover      = [
+            new THREE.MeshBasicMaterial({ map: THREE.ImageUtils.loadTexture('img/pc-right-hover.png') }),
+            new THREE.MeshBasicMaterial({ map: THREE.ImageUtils.loadTexture('img/pc-left-hover.png') }),
+            new THREE.MeshBasicMaterial({ map: THREE.ImageUtils.loadTexture('img/pc-back-hover.png') }),
+            new THREE.MeshBasicMaterial({ map: THREE.ImageUtils.loadTexture('img/pc-front-hover.png') }),
+            new THREE.MeshBasicMaterial({ map: THREE.ImageUtils.loadTexture('img/pc-top-hover.png') }),
+            new THREE.MeshBasicMaterial({ map: THREE.ImageUtils.loadTexture('img/pc-bottom-hover.png') })
+        ];
+        meshFaceMaterial    = new THREE.MeshFaceMaterial([material.right, material.left, material.back, material.front, material.top, material.bottom]);
+
+        cube = new THREE.Mesh(geometry, meshFaceMaterial);
         scene.add(cube);
 
         THREE.DefaultLoadingManager.onLoad = function () {
@@ -64,6 +74,8 @@ define([
         renderer.sortObjects = false;
         container.appendChild(renderer.domElement);
 
+        domEvents = new THREEx.DomEvents(camera, renderer.domElement);
+
         orbitControl = new THREE.OrbitControls(camera, renderer.domElement);
         orbitControl.maxPolarAngle = Math.PI / 4 * 3;
         orbitControl.maxDistance = 300;
@@ -71,6 +83,22 @@ define([
         orbitControl.noZoom = true;
         orbitControl.noPan = true;
         orbitControl.addEventListener('change', updateMainOrbitControl);
+
+        var resetMeshMaterial = function() {
+            cube.material.materials = [material.right, material.left, material.back, material.front, material.top, material.bottom];
+        };
+
+        domEvents.addEventListener(cube, 'mousemove', function(event) {
+            var faceIndex = event.intersect.face.materialIndex;
+            resetMeshMaterial();
+            cube.material.materials[faceIndex] = material.hover[faceIndex];
+            render();
+        });
+
+        domEvents.addEventListener(cube, 'mouseout', function() {
+            resetMeshMaterial();
+            render();
+        });
 
         render();
     }
