@@ -56,6 +56,7 @@ define([
                 lang: i18n.get(),
                 className: '',
                 onGettingPrinter: function() {},
+                onUnmount: function() {},
                 onClose: function() {}
             };
         },
@@ -286,7 +287,7 @@ define([
 
             return (
                 <div className="device printer-item" data-meta={meta} onClick={this._selectPrinter.bind(null, printer)}>
-                    <div className="col device-name">{printer.name}*</div>
+                    <div className="col device-name">{printer.name}</div>
                     <div className="col module">{headText}</div>
                     <div className="col status">{statusText}</div>
                 </div>
