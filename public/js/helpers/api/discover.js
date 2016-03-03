@@ -34,9 +34,12 @@ define([
                     data = JSON.parse(data);
                 }
 
+                data.isNew = true;
                 printers.push(data);
             }
             else {
+                printers[existing_key].isNew = false;
+
                 // if existing. update attributes
                 for (var key in data) {
                     if (true === data.hasOwnProperty(key)) {
