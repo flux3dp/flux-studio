@@ -226,7 +226,7 @@ define([
                             };
 
                         ProgressActions.open(ProgressConstants.NONSTOP);
-                        DeviceMaster.updateFirmware(file).
+                        doUpdate(file).
                             done(onFinishUpdate.bind(null, true)).
                             fail(onFinishUpdate.bind(null, false));
                     },
