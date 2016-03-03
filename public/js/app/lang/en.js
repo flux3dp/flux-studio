@@ -675,6 +675,7 @@ define(function() {
                 caption: 'Calibration Done',
                 message: 'You can scan now'
             },
+            estimating: 'estimating...',
             calibrate_fail: 'Calibration Failed',
             calibration_is_running: 'Calibrating for Scan',
             resolution: [{
