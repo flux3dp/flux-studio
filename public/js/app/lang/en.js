@@ -67,7 +67,8 @@ define(function() {
                 label: 'File',
                 import: 'Import',
                 save_gcode: 'Save Gcode',
-                save_fcode: 'Save Task'
+                save_fcode: 'Save Task',
+                save_scene: 'Save Scene'
             },
             edit: {
                 label: 'Edit',

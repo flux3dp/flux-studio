@@ -67,7 +67,8 @@ define(function() {
                 label: '檔案',
                 import: '匯入',
                 save_gcode: '匯出 Gcode',
-                save_fcode: '匯出工作'
+                save_fcode: '匯出工作',
+                save_scene: '匯出場景'
             },
             edit: {
                 label: '編輯',
