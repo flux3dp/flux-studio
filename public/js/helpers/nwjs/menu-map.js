@@ -100,6 +100,12 @@ define([
                 modifiers: 'cmd',
                 parent: parentIndex.FILE
             },
+            saveScene: {
+                abel: lang.file.save_scene,
+                enabled: false,
+                onClick: emptyFunction,
+                parent: parentIndex.FILE
+            },
             duplicate: {
                 label: lang.edit.duplicate,
                 enabled: false,

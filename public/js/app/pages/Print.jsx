@@ -29,6 +29,7 @@ define([
     'app/actions/progress-actions',
     'app/constants/progress-constants',
     'helpers/shortcuts',
+    'helpers/packer',
     'app/default-print-settings'
 ], function(
     $,
@@ -61,6 +62,7 @@ define([
     ProgressActions,
     ProgressConstants,
     shortcuts,
+    packer,
     DefaultPrintSettings
 ) {
 
@@ -209,6 +211,7 @@ define([
                     nwjsMenu.import.enabled = true;
                     nwjsMenu.import.onClick = function() { $importBtn.click(); };
                     nwjsMenu.saveTask.onClick = this._handleDownloadFCode;
+                    // nwjsMenu.saveScene.onClick = director.downloadScene();
                     nwjsMenu.tutorial.onClick = function() {
                         self._handleYes('tour');
                     };
@@ -241,6 +244,10 @@ define([
                         if(allowDeleteObject) {
                             director.removeSelected();
                         }
+                    });
+
+                    shortcuts.on(['ALT'], function(e) {
+                        director.downloadScene();
                     });
 
                     // copy event - it will listen by top menu as well in nwjs..
@@ -308,6 +315,9 @@ define([
                     }
                     else if(answer === GlobalConstants.IMPORT_FCODE) {
                         director.doFCodeImport();
+                    }
+                    else if(answer === GlobalConstants.IMPORT_SCENE) {
+                        director.loadScene();
                     }
                 },
 
@@ -792,6 +802,7 @@ define([
 
                 _renderNwjsMenu: function() {
                     nwjsMenu.saveTask.enabled = this.state.hasObject;
+                    nwjsMenu.saveScene.enabled = this.state.hasObject;
                 },
 
                 render: function() {

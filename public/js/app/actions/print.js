@@ -10,6 +10,7 @@ define([
     'app/constants/global-constants',
     'app/constants/device-constants',
     'app/constants/progress-constants',
+    'helpers/packer',
     'helpers/i18n',
     'helpers/nwjs/menu-factory',
     'app/actions/global-actions',
@@ -34,6 +35,7 @@ define([
     GlobalConstants,
     DeviceConstants,
     ProgressConstants,
+    Packer,
     I18n,
     MenuFactory,
     GlobalActions
@@ -82,6 +84,7 @@ define([
         slicingReport = {},
         slicingStatus = {},
         importedFCode = {},
+        importedScene = {},
         objectBeforeTransform = {},
         lang = I18n.get();
 
@@ -114,6 +117,8 @@ define([
         F: 'f',
         G: 'g'
     };
+
+    var models = [];
 
     // var advancedParameters = ['layerHeight', 'infill', 'travelingSpeed', 'extrudingSpeed', 'temperature', 'advancedSettings'];
 
@@ -337,6 +342,7 @@ define([
                 mesh.geometry = new THREE.Geometry().fromBufferGeometry(mesh.geometry);
             }
             mesh.name = 'custom';
+            mesh.file = file;
             mesh.fileName = file.name;
             mesh.plane_boundary = planeBoundary(mesh);
 
@@ -358,37 +364,63 @@ define([
     }
 
     function appendModels(files, index, callback) {
-        slicingStatus.canInterrupt = false;
-        var ext = files.item(index).name.split('.').pop().toLowerCase();
-        if(ext === 'stl') {
-            var reader  = new FileReader();
-            reader.addEventListener('load', function () {
-                appendModel(reader.result, files.item(index), function() {
-                    if(files.length > index + 1) {
-                        appendModels(files, index + 1, callback);
+        var t = setInterval(function() {
+            if(slicingStatus.canInterrupt) {
+                clearInterval(t);
+                var file = files.item ? files.item(index) : files[index];
+                models.push(file);
+                slicingStatus.canInterrupt = false;
+                var ext = file.name.split('.').pop().toLowerCase();
+                if(ext === 'stl') {
+                    var reader  = new FileReader();
+                    reader.addEventListener('load', function () {
+                        appendModel(reader.result, file, function() {
+                            slicingStatus.canInterrupt = true;
+                            if(files.length > index + 1) {
+                                appendModels(files, index + 1, callback);
+                            }
+                            else {
+                                slicingStatus.canInterrupt = true;
+                                startSlicing(slicingType.F);
+                                callback();
+                            }
+                        });
+                    }, false);
+
+                    reader.readAsDataURL(file);
+                }
+                else if (ext === 'fc') {
+                    slicingStatus.canInterrupt = true;
+                    importedFCode = files.item(0);
+                    if(objects.length === 0) {
+                        doFCodeImport();
                     }
                     else {
-                        slicingStatus.canInterrupt = true;
-                        startSlicing(slicingType.F);
-                        callback();
+                        AlertActions.showPopupYesNo(
+                            GlobalConstants.IMPORT_FCODE,
+                            lang.message.confirmFCodeImport);
                     }
-                });
-            }, false);
+                }
+                else if (ext === 'fsc') {
+                    slicingStatus.canInterrupt = true;
+                    importedScene = files.item(0);
+                    if(objects.length === 0) {
+                        _handleLoadScene(importedScene);
+                    }
+                    else {
+                        AlertActions.showPopupYesNo(
+                            GlobalConstants.IMPORT_SCENE,
+                            lang.message.confirmSceneImport
+                        );
+                    }
 
-            reader.readAsDataURL(files.item(index));
-        }
-        else if (ext === 'fc') {
-            importedFCode = files.item(0);
-            if(objects.length === 0) {
-                doFCodeImport();
+                }
+                else {
+                    slicingStatus.canInterrupt = true;
+                    callback();
+                }
             }
-            else {
-                AlertActions.showPopupYesNo(GlobalConstants.IMPORT_FCODE, lang.message.confirmFCodeImport);
-            }
-        }
-        else {
-            callback();
-        }
+        });
     }
 
     function appendPreviewPath(file, index, callback) {
@@ -403,7 +435,7 @@ define([
 
         var processMetadata = function(m) {
             metadata = m;
-            if(m.metadata.HEAD_TYPE !== 'LASER') {
+            if(m.metadata.HEAD_TYPE !== 'LASER' || true) {
                 fcodeConsole.getPath().then(processPath);
             }
             else {
@@ -625,6 +657,7 @@ define([
         var files = e.dataTransfer.files;
         if(files.length > 0) {
             appendModels(files, 0, function() {
+                console.log('clearing');
                 e.target.value = null;
             });
         }
@@ -1089,10 +1122,11 @@ define([
         mouse.y = -((e.offsetY - offy) / container.offsetHeight) * 2 + 1;
     }
 
-    function setScale(x, y, z, isLocked, center) {
-        var originalScaleX = SELECTED.scale._x;
-        var originalScaleY = SELECTED.scale._y;
-        var originalScaleZ = SELECTED.scale._z;
+    function setScale(x, y, z, isLocked, center, src) {
+        src = src || SELECTED
+        var originalScaleX = src.scale._x;
+        var originalScaleY = src.scale._y;
+        var originalScaleZ = src.scale._z;
         if (x === '' || x <= 0) {
             x = scaleBeforeTransformX;
         }
@@ -1102,46 +1136,47 @@ define([
         if (z === '' || z <= 0) {
             z = scaleBeforeTransformZ;
         }
-        SELECTED.scale.enteredX = x;
-        SELECTED.scale.enteredY = y;
-        SELECTED.scale.enteredZ = z;
-        SELECTED.scale.set(
+        src.scale.enteredX = x;
+        src.scale.enteredY = y;
+        src.scale.enteredZ = z;
+        src.scale.set(
             (originalScaleX * x) || scaleBeforeTransformX, (originalScaleY * y) || scaleBeforeTransformY, (originalScaleZ * z) || scaleBeforeTransformZ
         );
-        SELECTED.outlineMesh.scale.set(
+        src.outlineMesh.scale.set(
             (originalScaleX * x) || scaleBeforeTransformX, (originalScaleY * y) || scaleBeforeTransformY, (originalScaleZ * z) || scaleBeforeTransformZ
         );
-        SELECTED.scale.locked = isLocked;
-        SELECTED.plane_boundary = planeBoundary(SELECTED);
+        src.scale.locked = isLocked;
+        src.plane_boundary = planeBoundary(src);
 
         reactSrc.setState({
-            modelSelected: SELECTED.uuid ? SELECTED : null
+            modelSelected: src.uuid ? src : null
         });
 
         if (center) {
-            SELECTED.plane_boundary = planeBoundary(SELECTED);
-            groundIt(SELECTED);
-            checkOutOfBounds(SELECTED);
+            src.plane_boundary = planeBoundary(src);
+            groundIt(src);
+            checkOutOfBounds(src);
             render();
         }
     }
 
-    function setSize(x, y, z, isLocked) {
+    function setSize(x, y, z, isLocked, src) {
+        src = src || SELECTED
         isLocked = isLocked || true;
-        var sx = Math.round(x / SELECTED.size.originalX * 1000) / 1000,
-            sy = Math.round(y / SELECTED.size.originalY * 1000) / 1000,
-            sz = Math.round(z / SELECTED.size.originalZ * 1000) / 1000,
+        var sx = Math.round(x / src.size.originalX * 1000) / 1000,
+            sy = Math.round(y / src.size.originalY * 1000) / 1000,
+            sz = Math.round(z / src.size.originalZ * 1000) / 1000,
             _center = true;
 
         if(sx + sy + sz === 0) {
             return;
         }
 
-        setScale(sx, sy, sz, isLocked, _center);
+        setScale(sx, sy, sz, isLocked, _center, src);
 
-        SELECTED.size.x = x;
-        SELECTED.size.y = y;
-        SELECTED.size.z = z;
+        src.size.x = x;
+        src.size.y = y;
+        src.size.z = z;
 
         slicingStatus.showProgress = false;
         doSlicing();
@@ -1169,7 +1204,9 @@ define([
         var t = setInterval(function() {
             if(slicingStatus.canInterrupt) {
                 clearInterval(t);
+                slicingStatus.canInterrupt = false;
                 slicer.setParameter('advancedSettings', settings.custom).then(function(result, errors) {
+                    slicingStatus.canInterrupt = true;
                     slicingStatus.showProgress = false;
                     slicingStatus.pauseReport = false;
                     if(objects.length > 0) {
@@ -1880,8 +1917,7 @@ define([
         fcodeConsole = fcodeReader();
         importFromFCode = true;
         previewMode = true;
-        objects.length = 0;
-        outlineScene.children.length = 0;
+
         _clearScene(scene);
         selectObject(null);
         render();
@@ -1898,6 +1934,76 @@ define([
             ProgressActions.close();
             callback();
         });
+    }
+
+    function downloadScene() {
+        var packer = require('helpers/packer'),
+            parameter;
+
+        if(objects.length > 0) {
+            objects.forEach(function(model) {
+                parameter = {};
+                parameter.size = model.size;
+                parameter.rotation = model.rotation;
+                parameter.position = model.position;
+                parameter.scale = model.scale;
+                packer.addInfo(parameter);
+                packer.addFile(model.file);
+            });
+        }
+        var sceneFile = packer.pack();
+        // var url = URL.createObjectURL(sceneFile);
+        // console.log(url);
+        // location.href = url;
+        saveAs(sceneFile, parseInt(Math.random() * 100) + '.fsc');
+        console.log('downloading scene');
+    }
+
+    function loadScene() {
+        _clearScene(scene);
+        _handleLoadScene(importedScene);
+    }
+
+    function _handleLoadScene(sceneFile) {
+        var packer = require('helpers/packer');
+
+        packer.unpack(sceneFile).then(function(_sceneFile) {
+            var files = _sceneFile[0];
+
+            sceneFile = _sceneFile;
+
+            appendModels(files, 0, function() {
+                updateObject();
+            });
+        });
+
+        var updateObject = function() {
+            sceneFile.shift();
+            objects.forEach(function(obj, i) {
+                var ref = sceneFile[i];
+
+                obj.position.x = ref.position.x;
+                obj.position.y = ref.position.y;
+                obj.outlineMesh.position.x = ref.position.x;
+                obj.outlineMesh.position.y = ref.position.y;
+
+                setRotation(
+                    parseInt(ref.rotation.enteredX),
+                    parseInt(ref.rotation.enteredY),
+                    parseInt(ref.rotation.enteredZ), true, obj);
+
+                setSize(
+                    ref.size.x,
+                    ref.size.y,
+                    ref.size.z, true, obj
+                );
+
+                selectObject(null);
+                render();
+
+            });
+        };
+
     }
 
     // Private Functions ---
@@ -2174,6 +2280,8 @@ define([
     }
 
     function _clearScene(scene) {
+        objects.length = 0;
+        outlineScene.children.length = 0;
         for(var i = scene.children.length - 1; i >= 0; i--) {
             if(scene.children[i].name === 'custom') {
                 scene.children.splice(i, 1);
@@ -2226,6 +2334,8 @@ define([
         getSlicingStatus    : getSlicingStatus,
         cancelPreview       : cancelPreview,
         doFCodeImport       : doFCodeImport,
-        willUnmount         : willUnmount
+        willUnmount         : willUnmount,
+        downloadScene       : downloadScene,
+        loadScene           : loadScene
     };
 });
