@@ -66,7 +66,7 @@ define([
                 discoverId: 'printer-selector-' + (this.props.uniqleId || ''),
                 printOptions: [],
                 loadFinished: false,
-                hadDefaultPrinter: ('string' === typeof initializeMachine.defaultPrinter.get().uuid),
+                hadDefaultPrinter: true === initializeMachine.defaultPrinter.isExisting(),
                 discoverMethods: {}
             };
         },
