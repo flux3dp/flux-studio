@@ -212,7 +212,19 @@ define([
                 },
 
                 componentWillUnmount: function() {
-                    var self = this;
+                    var self = this,
+                        closeConnection = function() {
+                            if ('undefined' !== typeof self.state.scanCtrlWebSocket) {
+                                self.state.scanCtrlWebSocket.connection.close(false);
+                            }
+                        },
+                        stopGettingImage = function() {
+                            if ('undefined' !== typeof self.state.scanControlImageMethods) {
+                                self.state.scanControlImageMethods.stop(function() {
+                                    closeConnection();
+                                });
+                            }
+                        };
 
                     AlertStore.removeRetryListener(self._retry);
                     AlertStore.removeYesListener(self._onYes);
@@ -222,11 +234,7 @@ define([
                     if ('undefined' !== typeof self.state.scanCtrlWebSocket &&
                         'undefined' !== typeof self.state.scanModelingWebSocket
                     ) {
-                        if ('undefined' !== typeof self.state.scanControlImageMethods) {
-                            self.state.scanControlImageMethods.stop(function() {
-                               self.state.scanCtrlWebSocket.connection.close(false);
-                            });
-                        }
+                        stopGettingImage();
                         self.state.scanModelingWebSocket.connection.close(false);
                     }
 
