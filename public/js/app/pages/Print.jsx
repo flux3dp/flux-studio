@@ -665,7 +665,7 @@ define([
                 _handleDefaultCancel: function(ans) {
                     //Use setTimeout to avoid multiple modal display conflict
                     if(ans === 'set_default') {
-                        AlertStore.removeYesListener(this._onYes);
+                        AlertStore.removeYesListener(this._handleYes);
                     }
                     else if(ans === 'tour') {
                         this.setState({ tutorialOn: false });
