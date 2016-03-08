@@ -435,7 +435,7 @@ define([
 
         var processMetadata = function(m) {
             metadata = m;
-            if(m.metadata.HEAD_TYPE !== 'LASER' || true) {
+            if(m.metadata.HEAD_TYPE !== 'LASER') {
                 fcodeConsole.getPath().then(processPath);
             }
             else {
@@ -2212,12 +2212,15 @@ define([
 
             // TODO: with no gradient, but 2x more points
             for (var point = 1; point < printPath[layer].length; point++) {
-                color[point] = previewColors[printPath[layer][point].t];
-                g.vertices.push(new THREE.Vector3(
-                    printPath[layer][point].p[0],
-                    printPath[layer][point].p[1],
-                    printPath[layer][point].p[2]
-                ));
+                color[color.length - 1] = previewColors[printPath[layer][point].t];
+                for (var _ = 0; _ < 2; _++) {
+                    color.push(previewColors[printPath[layer][point].t]);
+                    g.vertices.push(new THREE.Vector3(
+                        printPath[layer][point].p[0],
+                        printPath[layer][point].p[1],
+                        printPath[layer][point].p[2]
+                    ));
+                }
             }
 
             g.colors = color;
