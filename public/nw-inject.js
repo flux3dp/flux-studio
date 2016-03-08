@@ -1,7 +1,8 @@
 // avoid name conflict
-window.requireNode = window.require || function() {};
+global.requireNode = nw.require || function() {};
 
-var fs = requireNode('fs'),
+var process = nw.process,
+    fs = requireNode('fs'),
     os = requireNode('os'),
     path = requireNode('path'),
     nwPath = process.execPath,
@@ -14,8 +15,6 @@ var fs = requireNode('fs'),
     net = requireNode('net'),
     currentPort = 10000,
     maxPort = 65535,
-    gui = requireNode('nw.gui'),
-    currentWindow = gui.Window.get(),
     ghost,
     appWindow,
     executeGhost = function(port, libPath) {
@@ -169,17 +168,11 @@ default:
 // find port
 probe(currentPort, findPort);
 
-currentWindow.on('close', function() {
-    // Pretend to be closed already
-    this.hide();
+nw.Window.get().on('close', function() {
     exec('pkill -f flux_api', function(error, stdout, stderr) {
         console.log(error, stdout, stderr);
     });
-    this.close(true);
+    nw.App.quit();
 });
-
-
-//crashdump for windows
-gui.App.setCrashDumpDir(nwPath);
 
 delete window.require;
