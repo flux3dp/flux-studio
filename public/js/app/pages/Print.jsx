@@ -30,7 +30,9 @@ define([
     'app/constants/progress-constants',
     'helpers/shortcuts',
     'helpers/packer',
-    'app/default-print-settings'
+    'app/default-print-settings',
+    'app/actions/input-lightbox-actions',
+    'app/constants/input-lightbox-constants',
 ], function(
     $,
     React,
@@ -63,7 +65,9 @@ define([
     ProgressConstants,
     shortcuts,
     packer,
-    DefaultPrintSettings
+    DefaultPrintSettings,
+    InputLightboxActions,
+    InputLightboxConstants
 ) {
 
     return function(args) {
@@ -211,7 +215,7 @@ define([
                     nwjsMenu.import.enabled = true;
                     nwjsMenu.import.onClick = function() { $importBtn.click(); };
                     nwjsMenu.saveTask.onClick = this._handleDownloadFCode;
-                    // nwjsMenu.saveScene.onClick = director.downloadScene();
+                    nwjsMenu.saveScene.onClick = this._handleDownloadScene;
                     nwjsMenu.tutorial.onClick = function() {
                         self._handleYes('tour');
                     };
@@ -247,8 +251,8 @@ define([
                     });
 
                     shortcuts.on(['ALT'], function(e) {
-                        director.downloadScene();
-                    });
+                        this._handleDownloadScene();
+                    }.bind(this));
 
                     // copy event - it will listen by top menu as well in nwjs..
                     if ('undefined' === typeof window.requireNode) {
@@ -461,6 +465,24 @@ define([
                     if(director.getModelCount() !== 0) {
                         director.downloadFCode();
                     }
+                },
+
+                _handleDownloadScene: function() {
+                    allowDeleteObject = false;
+                    InputLightboxActions.open(GlobalConstants.IMPORT_SCENE, {
+                        type        : InputLightboxConstants.TEXT_INPUT,
+                        caption     : lang.print.download_prompt,
+                        // caption      : lang.select_printer.notification,
+                        // inputHeader     : lang.print.download_prompt,
+                        confirmText : lang.select_printer.submit,
+                        onSubmit    : function(fileName) {
+                            director.downloadScene(fileName);
+                        },
+                        onClose     : function() {
+                            allowDeleteObject = true;
+                            console.log('closed');
+                        }
+                    });
                 },
 
                 _handlePreview: function(isOn) {

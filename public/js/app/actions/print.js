@@ -1936,7 +1936,8 @@ define([
         });
     }
 
-    function downloadScene() {
+    function downloadScene(fileName) {
+        if(objects.length === 0) { return; }
         var packer = require('helpers/packer'),
             parameter;
 
@@ -1955,7 +1956,7 @@ define([
         // var url = URL.createObjectURL(sceneFile);
         // console.log(url);
         // location.href = url;
-        saveAs(sceneFile, parseInt(Math.random() * 100) + '.fsc');
+        saveAs(sceneFile, fileName + '.fsc');
         console.log('downloading scene');
     }
 
