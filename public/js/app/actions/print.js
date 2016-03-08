@@ -2203,22 +2203,15 @@ define([
 
         for (var layer = 0; layer < printPath.length; layer++) {
             g = new THREE.Geometry();
-            color = [previewColors[printPath[layer][0].t]];
-            g.vertices.push(new THREE.Vector3(
-                printPath[layer][0].p[0],
-                printPath[layer][0].p[1],
-                printPath[layer][0].p[2]
-            ));
+            color = []
 
-            // TODO: with no gradient, but 2x more points
             for (var point = 1; point < printPath[layer].length; point++) {
-                color[color.length - 1] = previewColors[printPath[layer][point].t];
-                for (var _ = 0; _ < 2; _++) {
+                for (var tmp = 1; tmp >= 0; tmp--) {
                     color.push(previewColors[printPath[layer][point].t]);
                     g.vertices.push(new THREE.Vector3(
-                        printPath[layer][point].p[0],
-                        printPath[layer][point].p[1],
-                        printPath[layer][point].p[2]
+                        printPath[layer][point - tmp].p[0],
+                        printPath[layer][point - tmp].p[1],
+                        printPath[layer][point - tmp].p[2]
                     ));
                 }
             }
