@@ -101,7 +101,7 @@ define([
                 parent: parentIndex.FILE
             },
             saveScene: {
-                abel: lang.file.save_scene,
+                label: lang.file.save_scene,
                 enabled: false,
                 onClick: emptyFunction,
                 parent: parentIndex.FILE
@@ -293,7 +293,8 @@ define([
             subItems = [
                 items.import,
                 separator,
-                items.saveTask
+                items.saveTask,
+                items.saveScene
             ];
 
             if ('win' === window.FLUX.osType) {
