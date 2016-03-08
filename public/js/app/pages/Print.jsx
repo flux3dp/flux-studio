@@ -250,10 +250,6 @@ define([
                         }
                     });
 
-                    shortcuts.on(['ALT'], function(e) {
-                        this._handleDownloadScene();
-                    }.bind(this));
-
                     // copy event - it will listen by top menu as well in nwjs..
                     if ('undefined' === typeof window.requireNode) {
                         // copy event
