@@ -80,10 +80,11 @@ define([
             },
 
             _inputKeyUp: function(e) {
+                var targetFiles = e.currentTarget.files || {};
                 this.setState({
                     allowSubmit: (
                         0 < e.currentTarget.value.length ||
-                        0 < e.currentTarget.files.length
+                        0 < (targetFiles.length || 0)
                     )
                 });
             },
