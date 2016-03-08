@@ -28,12 +28,21 @@ function(
         },
 
         toggleSubPopup: function(disable, e) {
-            if(disable === true) { return; }
             var $wrapper = $(this.refs.uiDialogMenu.getDOMNode()),
-                $me = $(e.currentTarget).find('.dialog-opener'),
+                $me,
+                $popupOpen;
+
+            if (1 === arguments.length) {
+                e = disable;
+                disable = false;
+            }
+
+            if (disable === false) {
+                $me = $(e.currentTarget).find('.dialog-opener');
                 $popupOpen = $wrapper.find('.dialog-opener:checked').not($me);
 
-            $popupOpen.removeAttr('checked');
+                $popupOpen.removeAttr('checked');
+            }
         },
 
         _renderItem: function() {

@@ -11,7 +11,9 @@ define([
 ) {
     'use strict';
 
-    var websockets = [];
+    var websockets = [],
+        hadConnected = false;
+
     websockets.list = function() {
         for(var i = 0; i < websockets.length; i++){
             console.log(i, websockets[i].url);
@@ -89,6 +91,8 @@ define([
                     else {
                         options.onMessage(data);
                     }
+
+                    hadConnected = true;
                 };
 
                 _ws.onclose = function(result) {
@@ -97,7 +101,10 @@ define([
 
                     // The connection was closed abnormally without sending or receving data
                     // ref: http://tools.ietf.org/html/rfc6455#section-7.4.1
-                    if (1006 === result.code) {
+                    if (1006 === result.code &&
+                        60000 <= (new Date()).getTime() - window.FLUX.timestamp &&
+                        false === hadConnected
+                    ) {
                         AlertActions.showPopupError('abnormally-close', lang.message.cant_establish_connection);
                     }
 

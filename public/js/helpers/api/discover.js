@@ -4,10 +4,10 @@
  */
 define([
     'helpers/websocket',
-    'helpers/api/config',
+    'app/actions/initialize-machine',
     'helpers/array-findindex',
     'helpers/object-assign'
-], function(Websocket) {
+], function(Websocket, initializeMachine) {
     'use strict';
 
     var ws = ws || new Websocket({
@@ -36,6 +36,7 @@ define([
 
                 data.isNew = true;
                 printers.push(data);
+                existing_key = printers.length - 1;
             }
             else {
                 printers[existing_key].isNew = false;
@@ -46,6 +47,13 @@ define([
                         printers[existing_key][key] = data[key];
                     }
                 }
+            }
+
+            // update default device info
+            if (true === initializeMachine.defaultPrinter.isExisting() &&
+                data.uuid === initializeMachine.defaultPrinter.get().uuid
+            ) {
+                initializeMachine.defaultPrinter.set(printers[existing_key]);
             }
 
             if (false === data.alive && -1 < existing_key) {
