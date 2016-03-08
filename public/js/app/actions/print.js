@@ -2206,7 +2206,7 @@ define([
             color = []
 
             for (var point = 1; point < printPath[layer].length; point++) {
-                for (var tmp = 1; tmp >= 0; tmp--) {
+                for (var tmp = 0; tmp >= 0; tmp--) {
                     color.push(previewColors[printPath[layer][point].t]);
                     g.vertices.push(new THREE.Vector3(
                         printPath[layer][point - tmp].p[0],
