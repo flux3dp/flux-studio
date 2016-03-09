@@ -468,7 +468,8 @@ define(function() {
                 raftTitle: 'A Raft are layers built under your part and help it stick to the base plate',
                 supportTitle: 'A Support is a generated structure to support overhanging part of your object, to prevent filament dropping',
                 previewTitle: 'Preview the actual path of toolhead during printing task',
-                advancedTitle: 'Detail 3d printing parameters, you may acheive better result than default by adjusting them'
+                advancedTitle: 'Detail 3d printing parameters, you may acheive better result than default by adjusting them',
+                confirmExitFcodeMode: 'Exiting preview mode will unload the fcode, are you sure?'
             },
             right_panel: {
                 get: 'Get',
@@ -938,7 +939,9 @@ define(function() {
                 caption: 'Firmware Outdated',
                 content: 'Please install the latest firmware with <a target="_blank" href="http://helpcenter.flux3dp.com/hc/en-us/articles/216251077">this guide</a>.'
             },
-            cant_establish_connection: 'Unable to initiate FLUX API, kindly use Help > Bug Report to export debug message and <a href="https://flux3dp.zendesk.com/hc/en-us/requests/new" target="_blank">contact FLUX support.</a>'
+            cant_establish_connection: 'Unable to initiate FLUX API, kindly use Help > Bug Report to export debug message and <a href="https://flux3dp.zendesk.com/hc/en-us/requests/new" target="_blank">contact FLUX support.</a>',
+            fcodeForLaser: 'This is a fcode for laser',
+            confirmFCodeImport: 'Importing fcode will remove all objects on the scene, are you sure?'
         },
         machine_status: {
             '-10': 'Raw mode',

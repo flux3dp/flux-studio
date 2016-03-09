@@ -690,6 +690,10 @@ input.switch:checked ~ label:after {
         .dialog-label .disable {
             color: #C0C0C0;
         }
+        .dialog-label.disable:hover {
+            background: none;
+            color: #C0C0C0;
+        }
     }
     .rightPanel {
         height: 100%;

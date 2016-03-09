@@ -27,12 +27,22 @@ function(
             };
         },
 
-        toggleSubPopup: function(e) {
+        toggleSubPopup: function(disable, e) {
             var $wrapper = $(this.refs.uiDialogMenu.getDOMNode()),
-                $me = $(e.currentTarget).find('.dialog-opener'),
+                $me,
+                $popupOpen;
+
+            if (1 === arguments.length) {
+                e = disable;
+                disable = false;
+            }
+
+            if (disable === false) {
+                $me = $(e.currentTarget).find('.dialog-opener');
                 $popupOpen = $wrapper.find('.dialog-opener:checked').not($me);
 
-            $popupOpen.removeAttr('checked');
+                $popupOpen.removeAttr('checked');
+            }
         },
 
         _renderItem: function() {
@@ -60,8 +70,13 @@ function(
                     disablePopup = true;
                 }
 
+                if(opt.disable === true) {
+                    disablePopup = true;
+                }
+
                 itemLabelClassName = {
-                    'dialog-label': true
+                    'dialog-label': true,
+                    'disable': opt.disable === true
                 };
 
                 itemLabelClassName = Object.assign(itemLabelClassName, opt.labelClass);
@@ -69,7 +84,7 @@ function(
                 if (opt.label) {
                     listItems.push({
                         label: (
-                            <label className="ui-dialog-menu-item" onClick={self.toggleSubPopup}>
+                            <label className="ui-dialog-menu-item" onClick={self.toggleSubPopup.bind(null, opt.disable)}>
                                 <input
                                     name="dialog-opener"
                                     className="dialog-opener"

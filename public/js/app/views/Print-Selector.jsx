@@ -56,6 +56,7 @@ define([
                 lang: i18n.get(),
                 className: '',
                 onGettingPrinter: function() {},
+                onUnmount: function() {},
                 onClose: function() {}
             };
         },
@@ -65,7 +66,7 @@ define([
                 discoverId: 'printer-selector-' + (this.props.uniqleId || ''),
                 printOptions: [],
                 loadFinished: false,
-                hadDefaultPrinter: ('string' === typeof initializeMachine.defaultPrinter.get().uuid),
+                hadDefaultPrinter: true === initializeMachine.defaultPrinter.isExisting(),
                 discoverMethods: {}
             };
         },
@@ -128,6 +129,7 @@ define([
 
             AlertStore.removeRetryListener(this._waitForPrinters);
             AlertStore.removeCancelListener(this._onCancel);
+            this.props.onUnmount();
         },
 
         _onCancel: function(id) {
@@ -278,14 +280,14 @@ define([
 
             try {
                 meta = JSON.stringify(printer);
-            } 
+            }
             catch (ex) {
                 console.log(ex, printer);
             }
 
             return (
                 <div className="device printer-item" data-meta={meta} onClick={this._selectPrinter.bind(null, printer)}>
-                    <div className="col device-name">{printer.name}*</div> 
+                    <div className="col device-name">{printer.name}</div>
                     <div className="col module">{headText}</div>
                     <div className="col status">{statusText}</div>
                 </div>

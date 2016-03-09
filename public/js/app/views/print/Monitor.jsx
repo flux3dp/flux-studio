@@ -310,7 +310,7 @@ define([
                     }.bind(this));
                 }
                 else {
-                    totalTimeInSeconds = parseInt(this.props.slicingStatus.time);
+                    totalTimeInSeconds = parseInt(this.props.slicingStatus.time || this.props.slicingStatus.metadata.TIME_COST);
 
                     this._startReport();
                 }
@@ -343,6 +343,8 @@ define([
             messageViewed = false;
             totalTimeInSeconds = '';
             taskInfo = '';
+
+            GlobalActions.monitorClosed();
         },
 
         _hasFCode: function() {
@@ -355,6 +357,7 @@ define([
 
         _existFileInDirectory: function(path, fileName) {
             var d = $.Deferred();
+            fileName = fileName.replace('.gcode', '.fc');
             DeviceMaster.fileInfo(path, fileName).then(function(result) {
                 d.resolve(result.error !== DeviceConstants.NOT_EXIST);
             });
@@ -431,7 +434,6 @@ define([
         },
 
         _handleYes: function(id) {
-            console.log(id);
             if(id === DeviceConstants.KICK) {
                 socketStatus.ready = false;
                 DeviceMaster.kick().then(function() {
@@ -444,7 +446,9 @@ define([
                     ext     = info[info.length - 1];
 
                 if(ext === 'gcode') {
-                    AlertActions.showPopupYesNo('CONFIRM_G_TO_F', lang.monitor.confirmGToF);
+                    setTimeout(function() {
+                        AlertActions.showPopupYesNo('CONFIRM_G_TO_F', lang.monitor.confirmGToF);
+                    }, 1000);
                 }
                 else {
                     this._doFileUpload(fileToBeUpload);
@@ -454,7 +458,6 @@ define([
                 this._doFileUpload(fileToBeUpload);
             }
             else if(id === 'DELETE_FILE') {
-                console.log('delete pressed!', pathArray.join('/') + '/' + this.state.selectedItem);
                 this._handleDeleteFile(pathArray, this.state.selectedItem);
             }
         },
@@ -994,7 +997,6 @@ define([
                     r.push(files[i]);
                 }
             }
-            console.log(r);
             this.setState({ currentDirectoryFiles: r });
         },
 
@@ -1064,28 +1066,33 @@ define([
         _retrieveFileInfo: function(index, end, callback, filesArray) {
             filesArray = filesArray || [];
             if(index < end) {
-                socketStatus.ready = false;
-                DeviceMaster.fileInfo(
-                    currentDirectoryContent.path,
-                    currentDirectoryContent.files[index][0],
-                    opts
-                ).then(function(r) {
-                    if(r.error) {
-                        filesArray.push(currentDirectoryContent.files[index]);
-                    }
-                    else {
-                        filesArray.push(r);
-                    }
+                var t = setInterval(function() {
+                    if(socketStatus.ready) {
+                        clearInterval(t);
+                        socketStatus.ready = false;
+                        DeviceMaster.fileInfo(
+                            currentDirectoryContent.path,
+                            currentDirectoryContent.files[index][0],
+                            opts
+                        ).then(function(r) {
+                            if(r.error) {
+                                filesArray.push(currentDirectoryContent.files[index]);
+                            }
+                            else {
+                                filesArray.push(r);
+                            }
 
-                    socketStatus.ready = true;
-                    if(socketStatus.cancel) {
-                        callback(filesArray);
-                    }
-                    else {
-                        this._retrieveFileInfo(index + 1, end, callback, filesArray);
-                    }
+                            socketStatus.ready = true;
+                            if(socketStatus.cancel) {
+                                callback(filesArray);
+                            }
+                            else {
+                                this._retrieveFileInfo(index + 1, end, callback, filesArray);
+                            }
 
-                }.bind(this));
+                        }.bind(this));
+                    }
+                }.bind(this), 200);
             }
             else {
                 callback(filesArray);
@@ -1468,7 +1475,7 @@ define([
                 );
 
             if(_duration === '' && this.props.slicingStatus) {
-                var time = this.props.slicingStatus.time || 0;
+                var time = this.props.slicingStatus.time || this.props.slicingStatus.metadata.TIME_COST || 0;
                 _duration = formatDuration(time);
             }
 
