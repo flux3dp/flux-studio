@@ -4,12 +4,13 @@ define([
     'use strict';
 
     return React.createClass({
+            ESTIMATED_STEP: 10,
 
             propTypes: {
                 lang: React.PropTypes.object,
                 percentage: React.PropTypes.number,
                 remainingTime: React.PropTypes.number,
-                elapsedTime: React.PropTypes.number,
+                currentSteps: React.PropTypes.number,
                 onStop: React.PropTypes.func
             },
 
@@ -18,7 +19,7 @@ define([
                     lang: {},
                     percentage: 0,
                     remainingTime: 0,
-                    elapsedTime: 0,
+                    currentSteps: 0,
                     onStop: function() {}
                 };
             },
@@ -57,13 +58,23 @@ define([
 
             _renderProgress: function() {
                 var self = this,
-                    lang = self.props.lang;
+                    lang = self.props.lang,
+                    estimatedTime = (
+                        self.ESTIMATED_STEP < self.props.currentSteps ?
+                        self._formatSecondToTime(self.props.remainingTime) :
+                        lang.scan.estimating
+                    ),
+                    textRemainingTime = (
+                        self.ESTIMATED_STEP < self.props.currentSteps ?
+                        lang.scan.remaining_time :
+                        ''
+                    );
 
                 return (
                     <div className="progress-status">
                         <span className="progress-text">{self.props.percentage}%,</span>
-                        <span className="progress-text">{self._formatSecondToTime(self.props.remainingTime)}</span>
-                        <span className="progress-text">{lang.scan.remaining_time}</span>
+                        <span className="progress-text">{estimatedTime}</span>
+                        <span className="progress-text">{textRemainingTime}</span>
                         <button className="btn btn-hexagon btn-stop-scan" data-ga-event="stop-scan" onClick={this._onStop}>{lang.scan.stop_scan}</button>
                     </div>
                 );
