@@ -864,7 +864,10 @@ define([
                     lastError = mainError;
                 }
 
-                errorMessage = lang.monitor[report.error.join('_')] || report.error.join(' ');
+                // this condition can be removed when assembla #45 is fixed
+                if(typeof report.error !== 'string' && report.error !== 'UNKNOWN_ERROR') {
+                    errorMessage = lang.monitor[report.error.join('_')] || report.error.join(' ');
+                }
             }
 
             if(errorActions[mainError]) {

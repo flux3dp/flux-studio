@@ -129,7 +129,9 @@ define([
 
             AlertStore.removeRetryListener(this._waitForPrinters);
             AlertStore.removeCancelListener(this._onCancel);
-            this.props.onUnmount();
+            if(this.props.onUnmount) {
+                this.props.onUnmount();
+            }
         },
 
         _onCancel: function(id) {
