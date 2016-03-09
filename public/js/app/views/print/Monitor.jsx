@@ -1474,6 +1474,9 @@ define([
                             statusId !== DeviceConstants.status.IDLE &&
                             statusId !== DeviceConstants.status.MAINTAIN &&
                             statusId !== DeviceConstants.status.SCAN
+                    },
+                    {
+                        'hide': this.state.mode === 'CAMERA'
                     }
                 );
 
