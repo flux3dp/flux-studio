@@ -29,7 +29,10 @@ define([
     'app/actions/progress-actions',
     'app/constants/progress-constants',
     'helpers/shortcuts',
-    'app/default-print-settings'
+    'helpers/packer',
+    'app/default-print-settings',
+    'app/actions/input-lightbox-actions',
+    'app/constants/input-lightbox-constants',
 ], function(
     $,
     React,
@@ -61,7 +64,10 @@ define([
     ProgressActions,
     ProgressConstants,
     shortcuts,
-    DefaultPrintSettings
+    packer,
+    DefaultPrintSettings,
+    InputLightboxActions,
+    InputLightboxConstants
 ) {
 
     return function(args) {
@@ -209,6 +215,7 @@ define([
                     nwjsMenu.import.enabled = true;
                     nwjsMenu.import.onClick = function() { $importBtn.click(); };
                     nwjsMenu.saveTask.onClick = this._handleDownloadFCode;
+                    nwjsMenu.saveScene.onClick = this._handleDownloadScene;
                     nwjsMenu.tutorial.onClick = function() {
                         self._handleYes('tour');
                     };
@@ -308,6 +315,9 @@ define([
                     }
                     else if(answer === GlobalConstants.IMPORT_FCODE) {
                         director.doFCodeImport();
+                    }
+                    else if(answer === GlobalConstants.IMPORT_SCENE) {
+                        director.loadScene();
                     }
                 },
 
@@ -451,6 +461,24 @@ define([
                     if(director.getModelCount() !== 0) {
                         director.downloadFCode();
                     }
+                },
+
+                _handleDownloadScene: function() {
+                    allowDeleteObject = false;
+                    InputLightboxActions.open(GlobalConstants.IMPORT_SCENE, {
+                        type        : InputLightboxConstants.TEXT_INPUT,
+                        caption     : lang.print.download_prompt,
+                        // caption      : lang.select_printer.notification,
+                        // inputHeader     : lang.print.download_prompt,
+                        confirmText : lang.select_printer.submit,
+                        onSubmit    : function(fileName) {
+                            director.downloadScene(fileName);
+                        },
+                        onClose     : function() {
+                            allowDeleteObject = true;
+                            console.log('closed');
+                        }
+                    });
                 },
 
                 _handlePreview: function(isOn) {
@@ -792,6 +820,7 @@ define([
 
                 _renderNwjsMenu: function() {
                     nwjsMenu.saveTask.enabled = this.state.hasObject;
+                    nwjsMenu.saveScene.enabled = this.state.hasObject;
                 },
 
                 render: function() {

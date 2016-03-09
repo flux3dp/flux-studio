@@ -76,6 +76,12 @@ define([
                 modifiers: 'cmd',
                 parent: parentIndex.FILE
             },
+            saveScene: {
+                label: lang.file.save_scene,
+                enabled: false,
+                onClick: emptyFunction,
+                parent: parentIndex.FILE
+            },
             duplicate: {
                 label: lang.edit.duplicate,
                 enabled: false,
@@ -179,7 +185,8 @@ define([
             subItems = [
                 items.import,
                 separator,
-                items.saveTask
+                items.saveTask,
+                items.saveScene
             ];
 
             if ('win' === window.FLUX.osType) {
