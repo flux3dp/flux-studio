@@ -570,18 +570,16 @@ define([
                 };
 
             opts.onFinished = onUploadFinished;
-            opts.onError = function(file, data) {
-                var message = lang.laser.svg_fail_messages[data.message] || lang.laser.svg_fail_messages.SVG_BROKEN,
-                    popupAction = (
-                        'error' === data.status ?
-                        AlertActions.showPopupError :
-                        AlertActions.showPopupWarning
+            opts.onError = function(file, warning_collection) {
+                var message = file.name + ':<br>' + warning_collection.map(function(message) {
+                    return sprintf(
+                        lang.laser.svg_fail_messages[message] || lang.laser.svg_fail_messages.SVG_BROKEN,
+                        file.name
                     );
-
-                message = sprintf(message, file.name);
+                }).join(',');
 
                 ProgressActions.close();
-                popupAction('svg-parse-fail', message);
+                AlertActions.showPopupWarning('svg-parse-fail', message);
             };
 
             parserSocket.upload(name, file, opts);
