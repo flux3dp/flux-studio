@@ -3219,7 +3219,10 @@ input[type=range]:focus::-webkit-slider-runnable-track {
             color: #333;
             margin: 0 0 20px 0;
             text-align: left;
-            line-height: 1.4em; }
+            line-height: 1.4em;
+            word-wrap: break-word;
+            word-break: break-all;
+            white-space: pre-wrap; }
             .modal-window .modal-alert .message a {
                 font-size: 1em; }
         .modal-window .modal-alert .caption,
