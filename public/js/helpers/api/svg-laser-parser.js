@@ -6,8 +6,9 @@ define([
     'helpers/websocket',
     'helpers/convertToTypedArray',
     'helpers/data-history',
-    'helpers/api/set-params'
-], function(Websocket, convertToTypedArray, history, setParams) {
+    'helpers/api/set-params',
+    'app/actions/alert-actions'
+], function(Websocket, convertToTypedArray, history, setParams, AlertActions) {
     'use strict';
 
     // Because the preview image size is 640x640
@@ -29,7 +30,11 @@ define([
                     events.onMessage(data);
 
                 },
-                onError: opts.onError,
+                onError: function(data) {
+
+                    events.onError(data);
+
+                },
                 onFatal: opts.onFatal
             }),
             uploaded_svg = [],
@@ -96,8 +101,10 @@ define([
                         order_name,
                         name,
                         file.size
-                    ],
-                    onFinished = opts.onFinished || function() {};
+                    ];
+
+                opts.onFinished = opts.onFinished || function() {};
+                opts.onError = opts.onError || function() {};
 
                 events.onMessage = function(data) {
 
@@ -106,11 +113,18 @@ define([
                         ws.send(file.data);
                         break;
                     case 'ok':
-
                         get(name, opts);
+                        break;
+                    case 'warning':
+                        opts.onError(file, data);
                         break;
                     }
 
+                };
+
+                events.onError = function(data) {
+                    data.message = data.error;
+                    opts.onError(file, data);
                 };
 
                 ws.send(args.join(' '));
@@ -152,12 +166,18 @@ define([
                                     object.opts.onFinished(blob, size);
                                     goNextUpload = true;
                                     clearInterval(timer);
+                                },
+                                onError = function(file, data) {
+                                    object.opts.onError(file, data);
+                                    goNextUpload = true;
+                                    clearInterval(timer);
                                 };
 
                             goNextUpload = false;
 
                             upload(object.name, object.file, {
-                                onFinished: onFinished
+                                onFinished: onFinished,
+                                onError: onError
                             });
                         }
 
@@ -176,10 +196,12 @@ define([
              * @param {Json}   file - the file data that convert by File-Uploader
              * @param {Json}   opts - options
              *      {Function}   onFinished - fire on upload finish
+             *      {Function}   onError    - fire on parsing fail
              */
             upload: function(name, file, opts) {
                 opts = opts || {};
                 opts.onFinished = opts.onFinished || function() {};
+                opts.onError = opts.onError || function() {};
 
                 // NOTICE: it's very tricky for modified this array.
                 // it will fire observe function then get what you changed (and where you changed)
