@@ -5,6 +5,7 @@ define([
     'helpers/api/fcode-reader',
     'helpers/convertToTypedArray',
     'helpers/element-angle',
+    'helpers/sprintf',
     'helpers/api/control',
     'helpers/shortcuts',
     'helpers/image-data',
@@ -28,6 +29,7 @@ define([
     fcodeReader,
     convertToTypedArray,
     elementAngle,
+    sprintf,
     control,
     shortcuts,
     imageData,
@@ -568,6 +570,19 @@ define([
                 };
 
             opts.onFinished = onUploadFinished;
+            opts.onError = function(file, data) {
+                var message = lang.laser.svg_fail_messages[data.message] || lang.laser.svg_fail_messages.SVG_BROKEN,
+                    popupAction = (
+                        'error' === data.status ?
+                        AlertActions.showPopupError :
+                        AlertActions.showPopupWarning
+                    );
+
+                message = sprintf(message, file.name);
+
+                ProgressActions.close();
+                popupAction('svg-parse-fail', message);
+            };
 
             parserSocket.upload(name, file, opts);
         }
