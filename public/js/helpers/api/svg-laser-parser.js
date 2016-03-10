@@ -101,7 +101,14 @@ define([
                         order_name,
                         name,
                         file.size
-                    ];
+                    ],
+                    warning_collection = [],
+                    showMessages = function() {
+                        if (0 < warning_collection.length) {
+                            opts.onError(file, warning_collection);
+                            warning_collection = [];
+                        }
+                    };
 
                 opts.onFinished = opts.onFinished || function() {};
                 opts.onError = opts.onError || function() {};
@@ -114,17 +121,19 @@ define([
                         break;
                     case 'ok':
                         get(name, opts);
+
+                        showMessages();
                         break;
                     case 'warning':
-                        opts.onError(file, data);
+                        warning_collection.push(data.message);
+
                         break;
                     }
 
                 };
 
                 events.onError = function(data) {
-                    data.message = data.error;
-                    opts.onError(file, data);
+                    showMessages();
                 };
 
                 ws.send(args.join(' '));
