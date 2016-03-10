@@ -542,10 +542,10 @@ define(function() {
             go: 'GO',
             process_caption: '輸出中',
             svg_fail_messages: {
-                'TEXT_TAG': '%s 不支援標籤 &lt;text&gt;',
-                'EMPTY': '%s 內容為空',
-                'FAIL_PARSING': '%s 解析錯誤',
-                'SVG_BROKEN': '%s 檔案損壞'
+                'TEXT_TAG': '不支援標籤 &lt;text&gt;',
+                'EMPTY': '內容為空',
+                'FAIL_PARSING': '解析錯誤',
+                'SVG_BROKEN': '檔案損壞'
             },
             title: {
                 material: 'Select proper material to have the best engraving result.',

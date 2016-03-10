@@ -543,9 +543,9 @@ define(function() {
             process_caption: 'Generating',
             svg_fail_messages: {
                 'TEXT_TAG': 'Tag &lt;text&gt; is not supported',
-                'EMPTY': '%s is an empty file',
-                'FAIL_PARSING': '%s is parsing fail',
-                'SVG_BROKEN': '%s was broken'
+                'EMPTY': 'is an empty file',
+                'FAIL_PARSING': 'is parsing fail',
+                'SVG_BROKEN': 'was broken'
             },
             title: {
                 material: 'Select proper material to have the best engraving result.',
