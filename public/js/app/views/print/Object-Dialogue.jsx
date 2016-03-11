@@ -7,7 +7,9 @@ define([
 
     var refSize,
         lastModifiedAxis,
+        throttle,
         _size,
+        rotation = {},
         _ratio = 1,
         _maxLength = 210;
 
@@ -35,6 +37,16 @@ define([
             });
         },
 
+        componentWillMount: function() {
+            rotation.x = this.props.model.rotation.x;
+            rotation.y = this.props.model.rotation.y;
+            rotation.z = this.props.model.rotation.z;
+
+            rotation.enteredX = this.props.model.rotation.enteredX;
+            rotation.enteredY = this.props.model.rotation.enteredY;
+            rotation.enteredZ = this.props.model.rotation.enteredZ;
+        },
+
         componentDidMount: function() {
             this._openAccordion(this.props.mode);
             refSize = this.props.model.size.clone();
@@ -43,6 +55,13 @@ define([
 
         componentWillReceiveProps: function(nextProps) {
             this._openAccordion(nextProps.mode);
+            rotation.x = this.props.model.rotation.x;
+            rotation.y = this.props.model.rotation.y;
+            rotation.z = this.props.model.rotation.z;
+
+            rotation.enteredX = this.props.model.rotation.enteredX;
+            rotation.enteredY = this.props.model.rotation.enteredY;
+            rotation.enteredZ = this.props.model.rotation.enteredZ;
         },
 
         componentWillUpdate: function(nextProp, nextState) {
@@ -143,8 +162,25 @@ define([
             this.setState({ scaleLocked: !this.state.scaleLocked });
         },
 
-        _handleRotationChange: function(e, value) {
-            console.log(e, value);
+        _handleRotationChange: function(e) {
+            if(e.type === 'blur') {
+                rotation['entered' + e.target.id.toUpperCase()] = parseInt(e.target.value) || 0;
+                this.forceUpdate();
+                return;
+            }
+
+            if(e.keyCode === 13) {
+                rotation.enteredX = rotation.enteredX || 0;
+                rotation.enteredY = rotation.enteredY || 0;
+                rotation.enteredZ = rotation.enteredZ || 0;
+                console.log('sending rotation', rotation);
+                this.props.onRotate(rotation);
+            }
+            else {
+                rotation['entered' + e.target.id.toUpperCase()] = parseInt(e.target.value) || '';
+                this.forceUpdate();
+            }
+
         },
 
         _handleModeChange: function(e) {
@@ -166,17 +202,25 @@ define([
         },
 
         _rotationKeyUp: function(e) {
-            // fire on backspace
-            if(e.keyCode === 8 && e.target.value !== '') {
-                this.props.onRotate(e);
+            if(e.keyCode === 13) {
+                console.log('entered');
+            }
+
+            if(e.keyCode === 8 && e.target.value === '') {
+                clearTimeout(throttle);
+                throttle = setTimeout(function() {
+                    rotation.enteredX = parseInt($('#x').val()) || 0;
+                    rotation.enteredY = parseInt($('#y').val()) || 0;
+                    rotation.enteredZ = parseInt($('#z').val()) || 0;
+                    this.props.onRotate(rotation);
+                }.bind(this), 500);
             }
         },
 
         render: function() {
             var lang            = this.props.lang,
                 dialogueClass   = ClassNames('object-dialogue', {'through': this.props.isTransforming}),
-                lockClass       = ClassNames('lock', { 'unlock': !this.state.scaleLocked }),
-                rotation        = this.props.model.rotation;
+                lockClass       = ClassNames('lock', { 'unlock': !this.state.scaleLocked });
 
             return (
                 <div className={dialogueClass} style={this.props.style}>
@@ -250,9 +294,9 @@ define([
                                     id="x"
                                     type="text"
                                     onFocus={this._inputFocused}
-                                    onChange={this.props.onRotate.bind(this)}
-                                    onKeyUp={this._rotationKeyUp}
-                                    onBlur={this.props.onRotate.bind(this)}
+                                    onChange={this._handleRotationChange.bind(this)}
+                                    onKeyUp={this._handleRotationChange.bind(this)}
+                                    onBlur={this._handleRotationChange.bind(this)}
                                     value={rotation.enteredX} />
                             </div>
 
@@ -262,9 +306,9 @@ define([
                                     id="y"
                                     type="text"
                                     onFocus={this._inputFocused}
-                                    onChange={this.props.onRotate.bind(this)}
-                                    onKeyUp={this._rotationKeyUp}
-                                    onBlur={this.props.onRotate.bind(this)}
+                                    onChange={this._handleRotationChange.bind(this)}
+                                    onKeyUp={this._handleRotationChange.bind(this)}
+                                    onBlur={this._handleRotationChange.bind(this)}
                                     value={rotation.enteredY} />
                             </div>
 
@@ -274,9 +318,9 @@ define([
                                     id="z"
                                     type="text"
                                     onFocus={this._inputFocused}
-                                    onChange={this.props.onRotate.bind(this)}
-                                    onKeyUp={this._rotationKeyUp}
-                                    onBlur={this.props.onRotate.bind(this)}
+                                    onChange={this._handleRotationChange.bind(this)}
+                                    onKeyUp={this._handleRotationChange.bind(this)}
+                                    onBlur={this._handleRotationChange.bind(this)}
                                     value={rotation.enteredZ} />
                             </div>
 
