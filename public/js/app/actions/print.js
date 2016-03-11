@@ -14,6 +14,7 @@ define([
     'helpers/i18n',
     'helpers/nwjs/menu-factory',
     'app/actions/global-actions',
+    'helpers/sprintf',
     // non-return value
     'threeOrbitControls',
     'threeTrackballControls',
@@ -38,7 +39,8 @@ define([
     Packer,
     I18n,
     MenuFactory,
-    GlobalActions
+    GlobalActions,
+    Sprintf
 ) {
     'use strict';
 
@@ -429,7 +431,14 @@ define([
             reader = new FileReader();
 
         reader.addEventListener('load', function() {
-            fcodeConsole.upload(reader.result, file.size, function() {
+            fcodeConsole.upload(reader.result, file.size, function(result) {
+                // if there's a result
+                if(!!result) {
+                    if(!!result.error) {
+                        AlertActions.showPopupError('fcode-error', Sprintf(lang.message.brokenFcode, file.name));
+                        cancelPreview();
+                    }
+                }
                 fcodeConsole.getMetadata(processMetadata);
             });
         });
