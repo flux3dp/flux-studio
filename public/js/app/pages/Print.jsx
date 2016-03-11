@@ -250,6 +250,10 @@ define([
                         }
                     });
 
+                    shortcuts.on(['cmd', 'z'], function(e) {
+                        director.undo();
+                    });
+
                     // copy event - it will listen by top menu as well in nwjs..
                     if ('undefined' === typeof window.requireNode) {
                         // copy event
@@ -384,10 +388,9 @@ define([
                     director.clearSelection();
                 },
 
-                _handleRotationChange: function(src) {
-                    var axis = src.target.id;
-                    _rotation[axis] = src.type === 'blur' && !$.isNumeric(src.target.value) ? 0 : src.target.value;
-                    director.setRotation(_rotation.x, _rotation.y, _rotation.z, true);
+                _handleRotationChange: function(rotation) {
+                    director.addHistory();
+                    director.setRotation(rotation.enteredX, rotation.enteredY, rotation.enteredZ, true);
                 },
 
                 _handleResetRotation: function() {
@@ -411,7 +414,8 @@ define([
                 },
 
                 _handleResize: function(size, isLocked) {
-                    director.setSize(size.x, size.y, size.z, isLocked);
+                    director.addHistory();
+                    director.setSize(size, isLocked);
                 },
 
                 _handleResetScale: function() {
