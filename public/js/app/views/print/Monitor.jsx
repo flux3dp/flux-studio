@@ -591,26 +591,27 @@ define([
                         clearInterval(t);
                         DeviceMaster.fileInfo(pathArray.join('/'), fileName).then(function(info) {
                             if(info[1] instanceof Blob) {
-                                this._processInfo([info[2]]);
                                 previewUrl = info[1].size === 0 ? '/img/ph_l.png' : URL.createObjectURL(info[1]);
-                                filePreview = true;
-                                pathArray.push(fileName);
-                                this.setState({
-                                    mode: mode.PREVIEW,
-                                    currentStatus: deviceStatus.st_id === DeviceConstants.status.COMPLETED ? DeviceConstants.READY : this.state.currentStatus
-                                }, function() {
-                                    socketStatus.cancel = false;
-                                    socketStatus.ready = false;
-                                    DeviceMaster.getReport().then(function(report) {
-                                        socketStatus.ready = true;
-                                        this._processReport(report);
-                                    }.bind(this));
-                                    this._addHistory();
-                                });
                             }
                             else {
-                                AlertActions.showPopupInfo('', lang.monitor.cannotPreview);
+                                previewUrl = '/img/ph_l.png';
                             }
+                            this._processInfo([info[2]]);
+                            previewUrl = '/img/ph_l.png';
+                            filePreview = true;
+                            pathArray.push(fileName);
+                            this.setState({
+                                mode: mode.PREVIEW,
+                                currentStatus: deviceStatus.st_id === DeviceConstants.status.COMPLETED ? DeviceConstants.READY : this.state.currentStatus
+                            }, function() {
+                                socketStatus.cancel = false;
+                                socketStatus.ready = false;
+                                DeviceMaster.getReport().then(function(report) {
+                                    socketStatus.ready = true;
+                                    this._processReport(report);
+                                }.bind(this));
+                                this._addHistory();
+                            });
                             this.forceUpdate();
                         }.bind(this));
                     }
@@ -1021,6 +1022,7 @@ define([
                 start = 0;
 
                 if(!usbExist && pathArray.length === 0) {
+                    console.log(currentDirectoryContent);
                     var i = currentDirectoryContent.directories.indexOf('USB');
                     if(i >= 0) {
                         currentDirectoryContent.directories.splice(i, 1);
