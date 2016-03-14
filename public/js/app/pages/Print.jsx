@@ -775,6 +775,7 @@ define([
                         <RightPanel
                             lang                    = {lang}
                             camera                  = {this.state.camera}
+                            updateCamera            = {this.state.updateCamera}
                             hasObject               = {this.state.hasObject}
                             hasOutOfBoundsObject    = {this.state.hasOutOfBoundsObject}
                             onGoClick               = {this._handleGoClick}

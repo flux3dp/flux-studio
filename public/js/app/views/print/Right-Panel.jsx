@@ -31,7 +31,9 @@ define([
         },
 
         componentWillReceiveProps: function(nextProps) {
-            PerspectiveCamera.setCameraPosition(nextProps.camera);
+            if(nextProps.updateCamera === true) {
+                PerspectiveCamera.setCameraPosition(nextProps.camera);
+            }
         },
 
         _handleTest: function() {

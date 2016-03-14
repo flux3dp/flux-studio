@@ -229,6 +229,10 @@ define([
         }
 
         registerDragToImport();
+        reactSrc.setState({
+            camera: camera,
+            updateCamera: true
+        });
     }
 
     function uploadStl(name, file) {
@@ -700,7 +704,8 @@ define([
         }
 
         reactSrc.setState({
-            isTransforming: true
+            isTransforming: true,
+            updateCamera: false
         });
 
         raycaster.setFromCamera(mouse, camera);
@@ -766,7 +771,8 @@ define([
     function onMouseUp(e) {
         e.preventDefault();
         reactSrc.setState({
-            isTransforming: false
+            isTransforming: false,
+            updateCamera: false
         });
         orbitControl.enabled = true;
         mouseDown = false;
@@ -1672,11 +1678,11 @@ define([
         // var s = SELECTED;
         toggleTransformControl(true);
         renderer.domElement.toBlob(function(blob) {
-            toggleTransformControl(false);
             previewUrl = URL.createObjectURL(blob)
             camera.position.set(ccp.x, ccp.y, ccp.z);
             camera.rotation.set(ccr.x, ccr.y, ccr.z, ccr.order);
             camera.lookAt(ol);
+            toggleTransformControl(false);
             render();
             d.resolve(blob);
         });
@@ -1761,7 +1767,8 @@ define([
         render();
         setImportWindowPosition();
         reactSrc.setState({
-            camera: camera
+            camera: camera,
+            updateCamera: true
         });
         panningOffset = camera.position.clone().sub(camera.position.raw);
 

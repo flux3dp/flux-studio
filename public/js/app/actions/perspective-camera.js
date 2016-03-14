@@ -9,8 +9,8 @@ define([
         container,
         reactSrc;
 
-    var controllerWidth = 175,
-        controllerHeight = 100;
+    var controllerWidth = 165,
+        controllerHeight = 150;
 
     var camera, scene, renderer;
     var orbitControl,
@@ -20,7 +20,7 @@ define([
         reactSrc = src;
         container = document.getElementById('cameraViewController');
 
-        camera = new THREE.PerspectiveCamera(60, controllerWidth / controllerHeight, 1, 30000);
+        camera = new THREE.PerspectiveCamera(65, controllerWidth / controllerHeight, 1, 30000);
         camera.position.set(0, -300, 110);
         camera.up = new THREE.Vector3(0, 0, 1);
         defaultDistance = camera.position.length();
@@ -109,6 +109,7 @@ define([
                 r = refCamera.rotation;
 
             offsetRatio = Math.sqrt(Math.pow(p.x, 2) + Math.pow(p.y, 2) + Math.pow(p.z, 2)) / defaultDistance;
+            offsetRatio *= 1.1;
             camera.position.set(p.x / offsetRatio, p.y / offsetRatio, p.z / offsetRatio);
             camera.rotation.set(r.x, r.y, r.z);
 
@@ -150,7 +151,6 @@ define([
             c.position.z * offsetRatio
         );
         reactSrc._updateCamera(c);
-        render();
     }
 
     function render() {
