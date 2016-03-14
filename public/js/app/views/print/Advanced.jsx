@@ -69,6 +69,8 @@ define([
             support_material_threshold          : 37,
             support_material_pattern            : 'rectilinear',
             support_material_contact_distance   : 0.06,
+            brim_width                          : 0,
+            skirts                              : 2,
 
             // Speed
             travel_speed                        : 80,
@@ -314,7 +316,11 @@ define([
 
         _handleControlValueChange: function(id, value) {
             if(typeof(value) === 'boolean') {
-                advancedSetting[id] = value ? 1 : 0;
+                var onValue = 1;
+                if(id === 'skirts') {
+                    onValue = 2;
+                }
+                advancedSetting[id] = value ? onValue : 0;
             }
             else {
                 if(id === 'raft_layers') {
@@ -610,6 +616,22 @@ define([
                             max={6}
                             step={1}
                             default={raftLayers}
+                            onChange={this._handleControlValueChange} />
+
+                        <SliderControl
+                            id="brim_width"
+                            key="brim_width"
+                            label={lang.brim}
+                            min={0}
+                            max={10}
+                            step={1}
+                            default={advancedSetting.brim_width}
+                            onChange={this._handleControlValueChange} />
+
+                        <SwitchControl
+                            id="skirts"
+                            label={lang.skirts}
+                            default={advancedSetting.skirts > 0}
                             onChange={this._handleControlValueChange} />
 
                     </div>
