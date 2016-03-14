@@ -67,7 +67,8 @@ define(function() {
                 label: 'File',
                 import: 'Import',
                 save_gcode: 'Save Gcode',
-                save_fcode: 'Save Task'
+                save_fcode: 'Save Task',
+                save_scene: 'Save Scene'
             },
             edit: {
                 label: 'Edit',
@@ -675,6 +676,7 @@ define(function() {
                 caption: 'Calibration Done',
                 message: 'You can scan now'
             },
+            estimating: 'estimating...',
             calibrate_fail: 'Calibration Failed',
             calibration_is_running: 'Calibrating for Scan',
             resolution: [{
@@ -941,7 +943,8 @@ define(function() {
             },
             cant_establish_connection: 'Unable to initiate FLUX API, kindly use Help > Bug Report to export debug message and <a href="https://flux3dp.zendesk.com/hc/en-us/requests/new" target="_blank">contact FLUX support.</a>',
             fcodeForLaser: 'This is a fcode for laser',
-            confirmFCodeImport: 'Importing fcode will remove all objects on the scene, are you sure?'
+            confirmFCodeImport: 'Importing fcode will remove all objects on the scene, are you sure?',
+            confirmSceneImport: 'Importing .fsc will remove all objects on the scene, are you sure?'
         },
         machine_status: {
             '-10': 'Raw mode',

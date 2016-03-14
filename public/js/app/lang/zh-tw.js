@@ -67,7 +67,8 @@ define(function() {
                 label: '檔案',
                 import: '匯入',
                 save_gcode: '匯出 Gcode',
-                save_fcode: '匯出工作'
+                save_fcode: '匯出工作',
+                save_scene: '匯出場景'
             },
             edit: {
                 label: '編輯',
@@ -675,6 +676,7 @@ define(function() {
                 caption: '校正完成',
                 message: '你可以開始掃描了'
             },
+            estimating: '估計中...',
             calibrate_fail: '校正失敗',
             calibration_is_running: '掃描校正中',
             resolution: [{
@@ -941,7 +943,8 @@ define(function() {
             },
             cant_establish_connection: '無法啟動 FLUX API，請使用 說明 > 錯誤回報 輸出偵錯訊息，並<a href="https://flux3dp.zendesk.com/hc/zh-tw/requests/new" target="_blank">聯繫 FLUX 客服</a>',
             fcodeForLaser: '檔案為雷射工作',
-            confirmFCodeImport: '載入.fc檔案將清除目前所有場景，繼續？'
+            confirmFCodeImport: '載入.fc檔案將清除目前所有場景，繼續？',
+            confirmSceneImport: '載入.fsc檔案將清除目前所有場景，繼續？'
         },
         machine_status: {
             '-10': 'Raw Mode',
