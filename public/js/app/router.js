@@ -53,7 +53,7 @@ function(React, $, Backbone, display, config, appSettings, detectWebgl) {
         home: function(name) {
             this.appendSideBar(false);
 
-            require(['jsx!pages/Home', 'app/app-settings'], function(view, settings) {
+            requirejs(['jsx!pages/Home', 'app/app-settings'], function(view, settings) {
                 var args = {
                     props: {
                         supported_langs: settings.i18n.supported_langs
@@ -80,7 +80,7 @@ function(React, $, Backbone, display, config, appSettings, detectWebgl) {
 
             this.appendSideBar(false);
 
-            require(['jsx!pages/' + view_name], function(view) {
+            requirejs(['jsx!pages/' + view_name], function(view) {
                 _display(
                     view,
                     {
@@ -93,14 +93,14 @@ function(React, $, Backbone, display, config, appSettings, detectWebgl) {
         },
 
         appendNotificationCollection: function() {
-            require(['jsx!views/Notification-Collection'], function(view) {
+            requirejs(['jsx!views/Notification-Collection'], function(view) {
                 display(view, {}, $('.notification')[0]);
             });
         },
 
         appendSideBar: function(show) {
             show = ('boolean' === typeof show ? show : true);
-            require(['jsx!views/TopMenu'], function(view) {
+            requirejs(['jsx!views/TopMenu'], function(view) {
                 display(view, {
                     props: {
                         show: show
@@ -142,7 +142,7 @@ function(React, $, Backbone, display, config, appSettings, detectWebgl) {
         },
 
         scan: function(step) {
-            require(['jsx!pages/Scan'], function(view) {
+            requirejs(['jsx!pages/Scan'], function(view) {
                 var args = {
                     step: step
                 };
@@ -151,19 +151,19 @@ function(React, $, Backbone, display, config, appSettings, detectWebgl) {
         },
 
         print: function() {
-            require(['jsx!pages/Print'], function(view) {
+            requirejs(['jsx!pages/Print'], function(view) {
                 _display(view);
             });
         },
 
         usb: function() {
-            require(['jsx!pages/usb'], function(view) {
+            requirejs(['jsx!pages/usb'], function(view) {
                 _display(view);
             });
         },
 
         device: function(child, requests) {
-            require(['jsx!pages/Device'], function(view) {
+            requirejs(['jsx!pages/Device'], function(view) {
                 var args = {
                     child: child,
                     requests: requests
@@ -173,7 +173,7 @@ function(React, $, Backbone, display, config, appSettings, detectWebgl) {
         },
 
         settings: function(child, requests) {
-            require(['jsx!pages/Settings', 'app/app-settings'], function(view, settings) {
+            requirejs(['jsx!pages/Settings', 'app/app-settings'], function(view, settings) {
                 child = (child || 'general').toLowerCase();
 
                 var childView,
@@ -187,7 +187,7 @@ function(React, $, Backbone, display, config, appSettings, detectWebgl) {
         },
 
         laser: function(page, step) {
-            require(['jsx!pages/Laser'], function(view) {
+            requirejs(['jsx!pages/Laser'], function(view) {
                 var args = {
                     step: step,
                     props: {
