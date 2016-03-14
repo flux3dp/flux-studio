@@ -329,6 +329,8 @@ define(function() {
                 support_pattern: '支撐圖樣',
                 raft: '底座',
                 raftLayers: '底座層數',
+                brim: '底部延伸圈數',
+                skirts: '邊界預覽',
                 movement: '移動速度',
                 structure: '結構速度',
                 traveling: '移動',
