@@ -37,7 +37,8 @@
             timestamp: (new Date()).getTime(),
             onLine: navigator.onLine,
             os: ('undefined' === typeof requireNode ? undefined : os),
-            ghostPort: location.port || 8000
+            ghostPort: location.port || 8000,
+            isNW: ('undefined' !== typeof nw)
         };
 
         // it's not node-webkit
