@@ -228,7 +228,7 @@ define([
         NWjsWindow.menu = mainmenu;
     }
 
-    if ('undefined' !== typeof requireNode) {
+    if (true === window.FLUX.isNW) {
         initialize(menuMap.all);
 
         observe(menuMap.items, function(changes) {
@@ -237,7 +237,7 @@ define([
         });
     }
 
-    if ('undefined' !== typeof requireNode) {
+    if (true === window.FLUX.isNW) {
         createDevice = function(printer) {
             defaultDevice = initializeMachine.defaultPrinter.get();
 

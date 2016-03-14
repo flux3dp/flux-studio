@@ -158,9 +158,7 @@ define([
             key: 'q',
             modifiers: 'cmd',
             onClick: function() {
-                if (true === window.confirm(lang.sure_to_quit)) {
-                    gui.App.quit();
-                }
+                nw.Window.get().close();
             }
         }],
         subItems;
@@ -232,8 +230,8 @@ define([
                     label: lang.help.help_center,
                     enabled: true,
                     onClick: function() {
-                        if ('undefined' !== typeof requireNode) {
-                            requireNode('nw.gui').Shell.openExternal('https://helpcenter.flux3dp.com/');
+                        if (true === window.FLUX.isNW) {
+                            nw.Shell.openExternal('https://helpcenter.flux3dp.com/');
                         }
                         else {
                             window.open('https://helpcenter.flux3dp.com/');
@@ -244,8 +242,8 @@ define([
                     label: lang.help.contact,
                     enabled: true,
                     onClick: function() {
-                        if ('undefined' !== typeof requireNode) {
-                            requireNode('nw.gui').Shell.openExternal('http://flux3dp.com/contact');
+                        if (true === window.FLUX.isNW) {
+                            nw.Shell.openExternal('http://flux3dp.com/contact');
                         }
                         else {
                             window.open('http://flux3dp.com/contact');
@@ -257,8 +255,8 @@ define([
                     label: lang.help.forum,
                     enabled: true,
                     onClick: function() {
-                        if ('undefined' !== typeof requireNode) {
-                            requireNode('nw.gui').Shell.openExternal('http://forum.flux3dp.com');
+                        if (true === window.FLUX.isNW) {
+                            nw.Shell.openExternal('http://forum.flux3dp.com');
                         }
                         else {
                             window.open('http://forum.flux3dp.com');

@@ -21,10 +21,7 @@ define(function() {
             }),
             Window: emptyFunction({
                 get: emptyFunction
-            }),
-            App: {
-                quit: emptyFunction
-            }
+            })
         },
         gui;
 
