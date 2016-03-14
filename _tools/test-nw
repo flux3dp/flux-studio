@@ -21,6 +21,9 @@ else
     sudo npm install nw-builder -g
 fi
 
+sudo nw install 0.13.0-rc2
+sudo nw use 0.13.0-rc2
+
 if [ -d $CWD/$NWJS_PACKAGE ]; then
     # Already download
     printf "${TXT_INFO} nwjs sdk downloaded ${TXT_RESET}\n";
