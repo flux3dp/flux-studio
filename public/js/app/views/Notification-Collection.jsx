@@ -480,8 +480,8 @@ define([
                                 releaseNote: currentVersion.changelog,
                             },
                             onInstall: function() {
-                                if ('undefined' !== typeof requireNode) {
-                                    requireNode('nw.gui').Shell.openExternal('https://flux3dp.com/downloads/');
+                                if (true === window.FLUX.isNW) {
+                                    nw.Shell.openExternal('https://flux3dp.com/downloads/');
                                 }
                                 else {
                                     window.open('https://flux3dp.com/downloads/');
