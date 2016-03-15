@@ -109,7 +109,7 @@ define([
                 var existing_key = printers.findIndex(findIndex.bind(null, printer));
 
                 if (-1 === existing_key) {
-                    return printer;
+                    return null;
                 }
                 else {
                     return printers[existing_key];
