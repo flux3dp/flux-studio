@@ -89,7 +89,6 @@ define([
         propTypes: {
             lang            : React.PropTypes.object,
             setting         : React.PropTypes.object,
-            onValueChange   : React.PropTypes.func,
             onClose         : React.PropTypes.func,
             onApply         : React.PropTypes.funcs
         },
