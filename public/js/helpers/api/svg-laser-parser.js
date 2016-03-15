@@ -133,6 +133,7 @@ define([
                 };
 
                 events.onError = function(data) {
+                    warning_collection.push(data.error);
                     showMessages();
                 };
 
