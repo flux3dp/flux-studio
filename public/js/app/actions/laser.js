@@ -741,7 +741,7 @@ define([
 
                 self.setState({
                     step: (0 < tooSmallList.length ? self.state.step : 'start'),
-                    hasImage: 0 < (files.length - tooSmallList.length),
+                    hasImage: 0 < (self.state.images.length + files.length - tooSmallList.length),
                     mode: operationMode
                 });
 
