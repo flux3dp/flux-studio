@@ -118,7 +118,7 @@ define([
                     });
                 };
 
-            checkDeviceStatus(printer).done(function(status) {
+            checkDeviceStatus(currentPrinter).done(function(status) {
                 switch (status) {
                 case 'ok':
                     updateFirmware();
@@ -297,7 +297,7 @@ define([
                             };
 
                         DeviceMaster.selectDevice(currentPrinter).then(function(status) {
-                            checkDeviceStatus(printer).done(function(status) {
+                            checkDeviceStatus(currentPrinter).done(function(status) {
                                 switch (status) {
                                 case 'ok':
                                     showPopup(status);
