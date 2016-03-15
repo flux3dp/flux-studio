@@ -543,6 +543,9 @@ define(function() {
             process_caption: '輸出中',
             svg_fail_messages: {
                 'TEXT_TAG': '不支援標籤 &lt;text&gt;',
+                'DEFS_TAG': '不支援標籤 &lt;defs&gt;',
+                'CLIP_TAG': '不支援標籤 &lt;clip&gt;',
+                'FILTER_TAG': '不支援標籤 &lt;filter&gt;',
                 'EMPTY': '內容為空',
                 'FAIL_PARSING': '解析錯誤',
                 'SVG_BROKEN': '檔案損壞'
