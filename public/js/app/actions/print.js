@@ -1482,6 +1482,7 @@ define([
             setDefaultFileName();
             render();
             if(objects.length === 0) {
+                clearTimeout(slicingTimmer);
                 registerDragToImport();
                 reactSrc.setState({
                     openImportWindow: true,
