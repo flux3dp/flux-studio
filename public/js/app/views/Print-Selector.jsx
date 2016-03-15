@@ -74,11 +74,11 @@ define([
         componentDidMount: function() {
             var selectedPrinter = initializeMachine.defaultPrinter.get(),
                 self = this,
+                currentPrinter,
                 lang = self.props.lang,
                 _options = [],
                 refreshOption = function(options) {
                     _options = [];
-                    window.printers = options;
 
                     options.forEach(function(el) {
                         _options.push({
@@ -103,12 +103,8 @@ define([
                     });
                 };
 
-            if (true === this.state.hadDefaultPrinter) {
-                this._selectPrinter(selectedPrinter);
-            }
-
-            AlertStore.onRetry(this._waitForPrinters);
-            AlertStore.onCancel(this._onCancel);
+            AlertStore.onRetry(self._waitForPrinters);
+            AlertStore.onCancel(self._onCancel);
 
             self.setState({
                 discoverMethods: discover(
@@ -117,6 +113,29 @@ define([
                         refreshOption(printers);
                     }
                 )
+            }, function() {
+                var timer,
+                    tryTimes = 20,
+                    selectDefaultDevice = function() {
+                        if (true === self.state.hadDefaultPrinter) {
+                            if (null !== currentPrinter) {
+                                self._selectPrinter(selectedPrinter);
+                                clearInterval(timer);
+                            }
+                            else {
+                                tryTimes--;
+                            }
+                        }
+
+                        if (0 > tryTimes) {
+                            AlertActions.showPopupError('device-not-found', lang.message.device_not_found.message, lang.message.device_not_found.caption);
+                            clearInterval(timer);
+                        }
+                    };
+
+                currentPrinter = self.state.discoverMethods.getLatestPrinter(selectedPrinter);
+
+                timer = setInterval(selectDefaultDevice, 100);
             });
 
             self._waitForPrinters();
