@@ -877,7 +877,7 @@ define([
                         progressPercentage: 100 // total complete
                     });
 
-                    if ('function' === typeof this.state.scanMethods.stop) {
+                    if ('undefined' !== typeof this.state.scanMethods) {
                         this.state.scanMethods.stop(this._onScanFinished);
                     }
                 },
