@@ -877,7 +877,9 @@ define([
                         progressPercentage: 100 // total complete
                     });
 
-                    this.state.scanMethods.stop(this._onScanFinished);
+                    if ('function' === typeof this.state.scanMethods.stop) {
+                        this.state.scanMethods.stop(this._onScanFinished);
+                    }
                 },
 
                 _doClearNoise: function(mesh) {
