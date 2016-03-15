@@ -64,6 +64,7 @@ define([
 
                         // finished
                         if (fileIndex === files.length) {
+                            deferred.resolve();
                             deferred = $.Deferred();
                             currentTarget.value = '';
                         }
