@@ -576,7 +576,7 @@ define([
                         lang.laser.svg_fail_messages[message] || lang.laser.svg_fail_messages.SVG_BROKEN,
                         file.name
                     );
-                }).join(',');
+                }).join('. ');
 
                 ProgressActions.close();
                 AlertActions.showPopupWarning('svg-parse-fail', message);
