@@ -14,6 +14,7 @@ define([
     'helpers/i18n',
     'helpers/nwjs/menu-factory',
     'app/actions/global-actions',
+    'helpers/sprintf',
     // non-return value
     'threeOrbitControls',
     'threeTrackballControls',
@@ -38,7 +39,8 @@ define([
     Packer,
     I18n,
     MenuFactory,
-    GlobalActions
+    GlobalActions,
+    Sprintf
 ) {
     'use strict';
 
@@ -86,6 +88,7 @@ define([
         importedFCode = {},
         importedScene = {},
         objectBeforeTransform = {},
+        history = [],
         lang = I18n.get();
 
     var s = {
@@ -428,7 +431,14 @@ define([
             reader = new FileReader();
 
         reader.addEventListener('load', function() {
-            fcodeConsole.upload(reader.result, file.size, function() {
+            fcodeConsole.upload(reader.result, file.size, function(result) {
+                // if there's a result
+                if(!!result) {
+                    if(!!result.error) {
+                        AlertActions.showPopupError('fcode-error', Sprintf(lang.message.brokenFcode, file.name));
+                        cancelPreview();
+                    }
+                }
                 fcodeConsole.getMetadata(processMetadata);
             });
         });
@@ -736,6 +746,10 @@ define([
                 }
             }
         }
+
+        if(SELECTED.uuid) {
+            addHistory();
+        }
     }
 
     function toggleTransformControl(hide) {
@@ -840,11 +854,22 @@ define([
                 if(reactSrc.state.mode === 'scale') {
                     // check for inverse transform
                     if(SELECTED.size.x <= 0 || SELECTED.size.y <= 0 || SELECTED.size.z <= 0) {
-                        setSize(objectBeforeTransform.size.x, objectBeforeTransform.size.y, objectBeforeTransform.z, false);
+                        setSize(objectBeforeTransform.size, false);
                         updateObjectSize(objectBeforeTransform);
                     }
                     else {
-                        updateObjectSize(e.target.object);
+                        var s = e.target.object.size;
+                        s.x = _round(s.x);
+                        s.y = _round(s.y);
+                        s.z = _round(s.z);
+                        s.enteredX = _round(s.enteredX);
+                        s.enteredY = _round(s.enteredY);
+                        s.enteredZ = _round(s.enteredZ);
+                        syncObjectOutline(e.target.object);
+
+                        reactSrc.setState({
+                            modelSelected: e.target.object
+                        });
                     }
                 }
                 groundIt(SELECTED);
@@ -1160,26 +1185,37 @@ define([
         }
     }
 
-    function setSize(x, y, z, isLocked, src) {
-        src = src || SELECTED
-        isLocked = isLocked || true;
-        var sx = Math.round(x / src.size.originalX * 1000) / 1000,
-            sy = Math.round(y / src.size.originalY * 1000) / 1000,
-            sz = Math.round(z / src.size.originalZ * 1000) / 1000,
-            _center = true;
+    function setSize(size, isLocked, src) {
+        // if(!mouseDown) {
+        //     addHistory();
+        // }
 
-        if(sx + sy + sz === 0) {
-            return;
+        var o = { size: {} };
+        Object.assign(o.size, size);
+
+        src = src || SELECTED;
+        var objectChanged = _objectChanged(src, o);
+        if(objectChanged) {
+            isLocked = isLocked || true;
+            var sx = Math.round(size.x / src.size.originalX * 1000) / 1000,
+                sy = Math.round(size.y / src.size.originalY * 1000) / 1000,
+                sz = Math.round(size.z / src.size.originalZ * 1000) / 1000,
+                _center = true;
+
+            if(sx + sy + sz === 0) {
+                return;
+            }
+
+            setScale(sx, sy, sz, isLocked, _center, src);
+
+            src.size.x = size.x;
+            src.size.y = size.y;
+            src.size.z = size.z;
+
+            slicingStatus.showProgress = false;
+
+            doSlicing();
         }
-
-        setScale(sx, sy, sz, isLocked, _center, src);
-
-        src.size.x = x;
-        src.size.y = y;
-        src.size.z = z;
-
-        slicingStatus.showProgress = false;
-        doSlicing();
     }
 
     function setRotateMode() {
@@ -1993,11 +2029,7 @@ define([
                     parseInt(ref.rotation.enteredY),
                     parseInt(ref.rotation.enteredZ), true, obj);
 
-                setSize(
-                    ref.size.x,
-                    ref.size.y,
-                    ref.size.z, true, obj
-                );
+                setSize(ref.size, true, obj);
 
                 selectObject(null);
                 render();
@@ -2098,6 +2130,31 @@ define([
 
         if(importFromFCode) {
             _exitImportFromFCodeMode();
+        }
+    }
+
+    function addHistory() {
+        if(SELECTED) {
+            var entry = { size: {}, rotation: {}, position: {}, scale: {} };
+            entry.uuid = SELECTED.uuid;
+            Object.assign(entry.position, SELECTED.position);
+            Object.assign(entry.size, SELECTED.size);
+            Object.assign(entry.rotation, SELECTED.rotation);
+            Object.assign(entry.scale, SELECTED.scale);
+            history.push(entry);
+        }
+    }
+
+    function undo() {
+        if(history.length > 0) {
+            var entry = history.pop();
+            objects.forEach(function(model) {
+                if(model.uuid === entry.uuid) {
+                    _setObject(entry, model);
+                    setObjectDialoguePosition(model);
+                    selectObject(model);
+                }
+            });
         }
     }
 
@@ -2206,7 +2263,7 @@ define([
             color = []
 
             for (var point = 1; point < printPath[layer].length; point++) {
-                for (var tmp = 0; tmp >= 0; tmp--) {
+                for (var tmp = 1; tmp >= 0; tmp--) {
                     color.push(previewColors[printPath[layer][point].t]);
                     g.vertices.push(new THREE.Vector3(
                         printPath[layer][point - tmp].p[0],
@@ -2280,6 +2337,22 @@ define([
         MenuFactory.items.reset.onClick = resetObject;
     }
 
+    function _setObject(ref, target) {
+        target.position.x = ref.position.x;
+        target.position.y = ref.position.y;
+        target.outlineMesh.position.x = ref.position.x;
+        target.outlineMesh.position.y = ref.position.y;
+
+        setRotation(
+            parseInt(ref.rotation.enteredX),
+            parseInt(ref.rotation.enteredY),
+            parseInt(ref.rotation.enteredZ), true, target);
+
+        setSize(ref.size, true, target);
+
+        render();
+    }
+
     function _clearScene(scene) {
         objects.length = 0;
         outlineScene.children.length = 0;
@@ -2288,6 +2361,32 @@ define([
                 scene.children.splice(i, 1);
             }
         }
+    }
+
+    function _objectChanged(ref, src) {
+        if(!ref.size) { ref.size = {} };
+        if(!ref.rotation) { ref.rotation = {} }
+
+        var sizeChanged = (
+            ref.size.x !== src.size.x ||
+            ref.size.y !== src.size.y ||
+            ref.size.z !== src.size.z
+        )
+
+        var rotationChanged = (
+            ref.rotation.enteredX !== ref.rotation.enteredX ||
+            ref.rotation.enteredY !== ref.rotation.enteredY ||
+            ref.rotation.enteredZ !== ref.rotation.enteredZ
+        )
+
+        // var rotationChanged = {
+        // }
+
+        return sizeChanged;
+    }
+
+    function _round(float) {
+        return parseFloat((Math.round(float * 100) / 100).toFixed(2));
     }
 
     function clear() {
@@ -2337,6 +2436,8 @@ define([
         doFCodeImport       : doFCodeImport,
         willUnmount         : willUnmount,
         downloadScene       : downloadScene,
-        loadScene           : loadScene
+        loadScene           : loadScene,
+        undo                : undo,
+        addHistory          : addHistory
     };
 });

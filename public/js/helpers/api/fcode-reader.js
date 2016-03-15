@@ -19,15 +19,20 @@ define([
         var ws = new Websocket({
                 method: 'fcode-reader',
                 onMessage: function(data) {
-
                     events.onMessage(data);
 
                 },
-                onError: opts.onError,
-                onFatal: opts.onFatal
+                onError: function(response) {
+                    events.onError(response);
+                },
+                onFatal: function(response) {
+                    events.onFatal(response);
+                }
             }),
             events = {
-                onMessage: function() {}
+                onMessage: function() {},
+                onError: opts.onError,
+                onFatal: opts.onFatal
             };
 
         return {
@@ -40,7 +45,7 @@ define([
              * @param {Int}         size       - binary data with array buffer type
              * @param {Function}    onFinished - fired when process finished
              */
-            upload: function(data, size, onFinished) {
+            upload: function(data, size, onFinished, opts) {
                 var args = [
                     'upload',
                     size
@@ -55,6 +60,14 @@ define([
                         onFinished();
                     }
 
+                };
+
+                events.onError = function(response) {
+                    onFinished(response);
+                };
+
+                events.onFatal = function(response) {
+                    onFinished(response);
                 };
 
                 ws.send(args.join(' '));

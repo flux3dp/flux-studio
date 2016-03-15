@@ -250,6 +250,10 @@ define([
                         }
                     });
 
+                    shortcuts.on(['cmd', 'z'], function(e) {
+                        director.undo();
+                    });
+
                     // copy event - it will listen by top menu as well in nwjs..
                     if ('undefined' === typeof window.requireNode) {
                         // copy event
@@ -384,10 +388,9 @@ define([
                     director.clearSelection();
                 },
 
-                _handleRotationChange: function(src) {
-                    var axis = src.target.id;
-                    _rotation[axis] = src.type === 'blur' && !$.isNumeric(src.target.value) ? 0 : src.target.value;
-                    director.setRotation(_rotation.x, _rotation.y, _rotation.z, true);
+                _handleRotationChange: function(rotation) {
+                    director.addHistory();
+                    director.setRotation(rotation.enteredX, rotation.enteredY, rotation.enteredZ, true);
                 },
 
                 _handleResetRotation: function() {
@@ -411,7 +414,8 @@ define([
                 },
 
                 _handleResize: function(size, isLocked) {
-                    director.setSize(size.x, size.y, size.z, isLocked);
+                    director.addHistory();
+                    director.setSize(size, isLocked);
                 },
 
                 _handleResetScale: function() {
@@ -468,15 +472,12 @@ define([
                     InputLightboxActions.open(GlobalConstants.IMPORT_SCENE, {
                         type        : InputLightboxConstants.TEXT_INPUT,
                         caption     : lang.print.download_prompt,
-                        // caption      : lang.select_printer.notification,
-                        // inputHeader     : lang.print.download_prompt,
                         confirmText : lang.select_printer.submit,
                         onSubmit    : function(fileName) {
                             director.downloadScene(fileName);
                         },
                         onClose     : function() {
                             allowDeleteObject = true;
-                            console.log('closed');
                         }
                     });
                 },
@@ -551,19 +552,6 @@ define([
                     else {
                         director.setScaleMode();
                     }
-                },
-
-                _handleAdvancedValueChange: function(key, value) {
-                    // if(key === 'layer_height') {
-                    //     this.setState({ layerHeight: value });
-                    // }
-                    // else if (key === 'raft_layers') {
-                    //     // if(value !== '0') {
-                    //     //     advancedSettings.raft_layers = value;
-                    //     // }
-                    //     this.setState({ raftOn: value });
-                    // }
-                    // console.log('raft layer is', advancedSettings.raft_layers);
                 },
 
                 _handleQualitySelected: function(layerHeight) {
@@ -708,7 +696,6 @@ define([
                             lang            = {lang}
                             setting         = {advancedSettings}
                             raftLayers      = {this.state.raftLayers}
-                            onValueChange   = {this._handleAdvancedValueChange}
                             onClose         = {this._handleCloseAdvancedSetting}
                             onApply         = {this._handleApplyAdvancedSetting} />
                     );
