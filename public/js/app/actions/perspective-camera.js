@@ -19,14 +19,19 @@ define([
     function init(src) {
         reactSrc = src;
         container = document.getElementById('cameraViewController');
+        scene = new THREE.Scene();
 
-        camera = new THREE.PerspectiveCamera(65, controllerWidth / controllerHeight, 1, 30000);
-        camera.position.set(0, -300, 110);
+        var aspect = controllerWidth / controllerHeight,
+            d = 200;
+        
+        camera = new THREE.OrthographicCamera(-d * aspect, d * aspect, d, -d, 1, 1000);
+        camera.position.set( 0, -300, 110 );
         camera.up = new THREE.Vector3(0, 0, 1);
+		camera.rotation.y = - Math.PI / 4;
+		camera.rotation.x = Math.atan( - 1 / Math.sqrt( 2 ) );
+
         defaultDistance = camera.position.length();
         offsetRatio = Math.sqrt(Math.pow(camera.position.x, 2) + Math.pow(camera.position.y, 2) + Math.pow(camera.position.z, 2)) / defaultDistance;
-
-        scene = new THREE.Scene();
 
         var geometry = new THREE.BoxGeometry(200, 200, 200),
             material = {},
