@@ -1,0 +1,48 @@
+#!/bin/bash
+# please install nodejs and npm first
+
+DIR="$( cd "../$( dirname "$0" )" && pwd)"
+CWD=$DIR/_tools
+NWJS_PACKAGE="nwjs-sdk-v0.13.0-rc2-osx-x64"
+# colors
+TXT_NORMAL="\e[1m"
+TXT_INFO="\e[32m"
+TXT_WARNING="\e[93m"
+TXT_ERROR="\e[31m"
+TXT_RESET="\e[0m"
+
+pkill -f FLUX
+
+# install nwbuilder
+if which nwbuild > /dev/null; then
+    printf "${TXT_INFO} nw-builder installed ${TXT_RESET}\n";
+else
+    printf "${TXT_INFO} nw-builder installing... ${TXT_RESET}\n";
+    sudo npm install nw-builder -g
+fi
+
+sudo nw install 0.13.0-rc2
+sudo nw use 0.13.0-rc2
+
+if [ -d $CWD/$NWJS_PACKAGE ]; then
+    # Already download
+    printf "${TXT_INFO} nwjs sdk downloaded ${TXT_RESET}\n";
+else
+    # dl nw 0.13.0-rc2
+    printf "${TXT_INFO} nwjs sdk downloading... ${TXT_RESET}\n";
+    curl -O http://dl.nwjs.io/v0.13.0-rc2/$NWJS_PACKAGE.zip
+    unzip $NWJS_PACKAGE.zip
+    rm $NWJS_PACKAGE.zip
+fi
+
+# build
+sudo nwbuild -v 0.13.0-rc2 -p osx64 $DIR/public
+
+if [ -d "$DIR/public/lib" ]; then
+    cp -R "$CWD/build/FLUX Studio/osx64/FLUX Studio.app/Contents/Resources/app.nw" "$CWD/nwjs-sdk-v0.13.0-rc2-osx-x64/nwjs.app/Contents/Resources/"
+    cp -R "$DIR/public/lib" "$CWD/nwjs-sdk-v0.13.0-rc2-osx-x64/nwjs.app/Contents/"
+    open -n "$CWD/nwjs-sdk-v0.13.0-rc2-osx-x64/nwjs.app"
+else
+    printf "${TXT_ERROR} lib was lost ${TXT_RESET}\n";
+fi
+

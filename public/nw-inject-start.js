@@ -1,7 +1,8 @@
 // avoid name conflict
-window.requireNode = window.require || function() {};
+window.requireNode = nw.require || function() {};
 
-var fs = requireNode('fs'),
+var process = nw.process,
+    fs = requireNode('fs'),
     os = requireNode('os'),
     path = requireNode('path'),
     nwPath = process.execPath,
@@ -14,11 +15,11 @@ var fs = requireNode('fs'),
     net = requireNode('net'),
     currentPort = 10000,
     maxPort = 65535,
-    gui = requireNode('nw.gui'),
-    currentWindow = gui.Window.get(),
     ghost,
+    ghostExecuted = false,
     appWindow,
     executeGhost = function(port, libPath) {
+        console.log(port, libPath);
         var slic3rPathIndex = 1,
             args = [
                 '--slic3r',
@@ -72,9 +73,13 @@ var fs = requireNode('fs'),
             writeLog(ex.message);
         }
 
-        ghost = spawn(ghostCmd, args);
-        ghost.stdout.on('data', recordOutput);
-        ghost.stderr.on('data', recordOutput);
+        if (false === ghostExecuted) {
+            ghost = spawn(ghostCmd, args);
+            ghost.stdout.on('data', recordOutput);
+            ghost.stderr.on('data', recordOutput);
+
+            ghostExecuted = true;
+        }
 
         ghost.on('error', function(err) {
             if (err) {
@@ -168,18 +173,5 @@ default:
 
 // find port
 probe(currentPort, findPort);
-
-currentWindow.on('close', function() {
-    // Pretend to be closed already
-    this.hide();
-    exec('pkill -f flux_api', function(error, stdout, stderr) {
-        console.log(error, stdout, stderr);
-    });
-    this.close(true);
-});
-
-
-//crashdump for windows
-gui.App.setCrashDumpDir(nwPath);
 
 delete window.require;

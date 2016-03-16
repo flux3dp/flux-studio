@@ -48,8 +48,8 @@ define([
         shortcuts.on(['cmd', 'x'], function() { window.document.execCommand('cut'); });
         shortcuts.on(['cmd', 'v'], function() { window.document.execCommand('paste'); });
 
-        if (true === window.FLUX.debug && 'undefined' !== typeof requireNode) {
-            shortcuts.on(['ctrl', 'alt', 'd'], function(e) { requireNode('nw.gui').Window.get().showDevTools(); });
+        if (true === window.FLUX.debug && true === window.FLUX.isNW) {
+            shortcuts.on(['ctrl', 'alt', 'd'], function(e) { nw.Window.get().showDevTools(); });
             shortcuts.on(['ctrl', 'alt', 'shift', 'd'], function() { window.location.href="/debug-panel/index.html" });
         }
     };
@@ -70,6 +70,10 @@ define([
 
         window.GA('send', 'event', 'button', 'click', $self.data('ga-event'));
     });
+
+    if (true === window.FLUX.isNW) {
+        requirejs(['helpers/nwjs/nw-events']);
+    }
 
     return function(callback) {
         var $body = $('body'),

@@ -60,6 +60,9 @@ CFBundleIdentifier="com.${PKG_NAME}"
 # Handle libudev on linux
 LIBUDEV_HANDLER=false
 
+# is sdk flavor
+SDK_FLAVOR=""
+
 # --------------------------------------------------------------------
 # Guess you should not need to edit bellow this comment block
 # Unless you really want/need to
@@ -426,17 +429,19 @@ build() {
         mkdir -p ${WORKING_DIR}/${TMP}/${ARR_OS[$i]}/latest-git;
         mkdir -p ${LOCAL_NW_ARCHIVES_PATH};
         NOTE 'WORKING';
+        printf "${SDK_FLAVOR}\n"
         printf "Bulding ${TXT_BOLD}${TXT_YELLO}${PKG_NAME}${TXT_RESET} for ${TXT_BOLD}${TXT_YELLO}${ARR_OS[$i]}${TXT_RESET}\n"
-        for DL_FILE in ${LOCAL_NW_ARCHIVES_PATH}/*-v${NW_VERSION}-${ARR_OS[$i]}.${ARR_DL_EXT[$i]}; do
+        for DL_FILE in ${LOCAL_NW_ARCHIVES_PATH}/*-${SDK_FLAVOR}v${NW_VERSION}-${ARR_OS[$i]}.${ARR_DL_EXT[$i]}; do
+            printf "${DL_FILE}\n"
             if [[ -f "${DL_FILE}" || ${LOCAL_NW_ARCHIVES_MODE} = "TRUE" || ${LOCAL_NW_ARCHIVES_MODE} = "true" || ${LOCAL_NW_ARCHIVES_MODE} = "1" ]]; then
                 NOTE 'NOTE';
                 printf "File ${TXT_YELLO}nwjs-${NW_VERSION}-${ARR_OS[$i]}.${ARR_DL_EXT[$i]}${TXT_RESET} is in the download cache\n- no need to re-download\n"
-                cp ${LOCAL_NW_ARCHIVES_PATH}/*-v${NW_VERSION}-${ARR_OS[$i]}.${ARR_DL_EXT[$i]} ${WORKING_DIR}/${TMP};
+                cp ${LOCAL_NW_ARCHIVES_PATH}/*-${SDK_FLAVOR}v${NW_VERSION}-${ARR_OS[$i]}.${ARR_DL_EXT[$i]} ${WORKING_DIR}/${TMP};
             else
-                wget -O ${LOCAL_NW_ARCHIVES_PATH}/nwjs-v${NW_VERSION}-${ARR_OS[$i]}.${ARR_DL_EXT[$i]} ${DL_URL}/v${NW_VERSION}/node-webkit-v${NW_VERSION}-${ARR_OS[$i]}.${ARR_DL_EXT[$i]} || wget -O ${LOCAL_NW_ARCHIVES_PATH}/nwjs-v${NW_VERSION}-${ARR_OS[$i]}.${ARR_DL_EXT[$i]} ${DL_URL}/v${NW_VERSION}/nwjs-v${NW_VERSION}-${ARR_OS[$i]}.${ARR_DL_EXT[$i]};
+                wget -O ${LOCAL_NW_ARCHIVES_PATH}/nwjs-${SDK_FLAVOR}v${NW_VERSION}-${ARR_OS[$i]}.${ARR_DL_EXT[$i]} ${DL_URL}/v${NW_VERSION}/node-webkit-v${NW_VERSION}-${ARR_OS[$i]}.${ARR_DL_EXT[$i]} || wget -O ${LOCAL_NW_ARCHIVES_PATH}/nwjs-${SDK_FLAVOR}v${NW_VERSION}-${ARR_OS[$i]}.${ARR_DL_EXT[$i]} ${DL_URL}/v${NW_VERSION}/nwjs-${SDK_FLAVOR}v${NW_VERSION}-${ARR_OS[$i]}.${ARR_DL_EXT[$i]};
             fi
             extractme "${ARR_EXTRACT_COMMAND[$i]}" "${DL_FILE}" "${WORKING_DIR}/${TMP}/${ARR_OS[$i]}";
-            mv ${WORKING_DIR}/${TMP}/${ARR_OS[$i]}/*-v${NW_VERSION}-${ARR_OS[$i]} ${WORKING_DIR}/${TMP}/${ARR_OS[$i]}/nwjs;
+            mv ${WORKING_DIR}/${TMP}/${ARR_OS[$i]}/*-${SDK_FLAVOR}v${NW_VERSION}-${ARR_OS[$i]} ${WORKING_DIR}/${TMP}/${ARR_OS[$i]}/nwjs;
 
             if [[ `split_string "${ARR_OS[$i]}" "-"` = "osx" ]]; then
                 cp -r ${PKG_SRC} ${WORKING_DIR}/${TMP}/${ARR_OS[$i]}/latest-git/${PKG_NAME}.nw;
@@ -508,6 +513,10 @@ while true; do
         ;;
     --libudev )
         LIBUDEV_HANDLER=true
+        shift
+        ;;
+    --sdk )
+        SDK_FLAVOR="sdk-"
         shift
         ;;
     --build )

@@ -8,18 +8,7 @@ define(function() {
     var emptyFunction = function(object) {
             return object || {};
         },
-        gui;
-
-    try {
-        gui = (window.requireNode || emptyFunction)('nw.gui');
-    }
-    catch (e) {
-        // TODO: do something?
-    }
-
-    // fake gui object
-    if ('object' !== typeof gui) {
-        gui = {
+        mockGUI = {
             Menu: emptyFunction(function() {
                 return {
                     append: emptyFunction
@@ -32,12 +21,11 @@ define(function() {
             }),
             Window: emptyFunction({
                 get: emptyFunction
-            }),
-            App: {
-                quit: emptyFunction
-            }
-        };
-    }
+            })
+        },
+        gui;
+
+    gui = (true === window.FLUX.isNW ? nw : mockGUI);
 
     return gui;
 });
