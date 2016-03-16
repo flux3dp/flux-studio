@@ -29,7 +29,10 @@ define([
     'app/actions/progress-actions',
     'app/constants/progress-constants',
     'helpers/shortcuts',
-    'app/default-print-settings'
+    'helpers/packer',
+    'app/default-print-settings',
+    'app/actions/input-lightbox-actions',
+    'app/constants/input-lightbox-constants',
 ], function(
     $,
     React,
@@ -61,7 +64,10 @@ define([
     ProgressActions,
     ProgressConstants,
     shortcuts,
-    DefaultPrintSettings
+    packer,
+    DefaultPrintSettings,
+    InputLightboxActions,
+    InputLightboxConstants
 ) {
 
     return function(args) {
@@ -209,6 +215,7 @@ define([
                     nwjsMenu.import.enabled = true;
                     nwjsMenu.import.onClick = function() { $importBtn.click(); };
                     nwjsMenu.saveTask.onClick = this._handleDownloadFCode;
+                    nwjsMenu.saveScene.onClick = this._handleDownloadScene;
                     nwjsMenu.tutorial.onClick = function() {
                         self._handleYes('tour');
                     };
@@ -241,6 +248,10 @@ define([
                         if(allowDeleteObject) {
                             director.removeSelected();
                         }
+                    });
+
+                    shortcuts.on(['cmd', 'z'], function(e) {
+                        director.undo();
                     });
 
                     // copy event - it will listen by top menu as well in nwjs..
@@ -309,6 +320,9 @@ define([
                     else if(answer === GlobalConstants.IMPORT_FCODE) {
                         director.doFCodeImport();
                     }
+                    else if(answer === GlobalConstants.IMPORT_SCENE) {
+                        director.loadScene();
+                    }
                 },
 
                 _handleCancelTutorial: function(answer) {
@@ -374,10 +388,9 @@ define([
                     director.clearSelection();
                 },
 
-                _handleRotationChange: function(src) {
-                    var axis = src.target.id;
-                    _rotation[axis] = src.type === 'blur' && !$.isNumeric(src.target.value) ? 0 : src.target.value;
-                    director.setRotation(_rotation.x, _rotation.y, _rotation.z, true);
+                _handleRotationChange: function(rotation) {
+                    director.addHistory();
+                    director.setRotation(rotation.enteredX, rotation.enteredY, rotation.enteredZ, true);
                 },
 
                 _handleResetRotation: function() {
@@ -401,7 +414,8 @@ define([
                 },
 
                 _handleResize: function(size, isLocked) {
-                    director.setSize(size.x, size.y, size.z, isLocked);
+                    director.addHistory();
+                    director.setSize(size, isLocked);
                 },
 
                 _handleResetScale: function() {
@@ -451,6 +465,21 @@ define([
                     if(director.getModelCount() !== 0) {
                         director.downloadFCode();
                     }
+                },
+
+                _handleDownloadScene: function() {
+                    allowDeleteObject = false;
+                    InputLightboxActions.open(GlobalConstants.IMPORT_SCENE, {
+                        type        : InputLightboxConstants.TEXT_INPUT,
+                        caption     : lang.print.download_prompt,
+                        confirmText : lang.select_printer.submit,
+                        onSubmit    : function(fileName) {
+                            director.downloadScene(fileName);
+                        },
+                        onClose     : function() {
+                            allowDeleteObject = true;
+                        }
+                    });
                 },
 
                 _handlePreview: function(isOn) {
@@ -523,19 +552,6 @@ define([
                     else {
                         director.setScaleMode();
                     }
-                },
-
-                _handleAdvancedValueChange: function(key, value) {
-                    // if(key === 'layer_height') {
-                    //     this.setState({ layerHeight: value });
-                    // }
-                    // else if (key === 'raft_layers') {
-                    //     // if(value !== '0') {
-                    //     //     advancedSettings.raft_layers = value;
-                    //     // }
-                    //     this.setState({ raftOn: value });
-                    // }
-                    // console.log('raft layer is', advancedSettings.raft_layers);
                 },
 
                 _handleQualitySelected: function(layerHeight) {
@@ -680,7 +696,6 @@ define([
                             lang            = {lang}
                             setting         = {advancedSettings}
                             raftLayers      = {this.state.raftLayers}
-                            onValueChange   = {this._handleAdvancedValueChange}
                             onClose         = {this._handleCloseAdvancedSetting}
                             onApply         = {this._handleApplyAdvancedSetting} />
                     );
@@ -792,6 +807,7 @@ define([
 
                 _renderNwjsMenu: function() {
                     nwjsMenu.saveTask.enabled = this.state.hasObject;
+                    nwjsMenu.saveScene.enabled = this.state.hasObject;
                 },
 
                 render: function() {

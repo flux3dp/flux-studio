@@ -104,6 +104,9 @@
             margin: 0 0 20px 0;
             text-align: left;
             line-height: 1.4em;
+            word-wrap: break-word;
+            word-break: break-all;
+            white-space: pre-wrap;
 
             a {
                 font-size: 1em;

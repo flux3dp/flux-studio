@@ -5,6 +5,7 @@ define([
     'helpers/api/fcode-reader',
     'helpers/convertToTypedArray',
     'helpers/element-angle',
+    'helpers/sprintf',
     'helpers/api/control',
     'helpers/shortcuts',
     'helpers/image-data',
@@ -28,6 +29,7 @@ define([
     fcodeReader,
     convertToTypedArray,
     elementAngle,
+    sprintf,
     control,
     shortcuts,
     imageData,
@@ -568,6 +570,17 @@ define([
                 };
 
             opts.onFinished = onUploadFinished;
+            opts.onError = function(file, warning_collection) {
+                var message = file.name + ':<br>' + warning_collection.map(function(message) {
+                    return sprintf(
+                        lang.laser.svg_fail_messages[message] || lang.laser.svg_fail_messages.SVG_BROKEN,
+                        file.name
+                    );
+                }).join('. ');
+
+                ProgressActions.close();
+                AlertActions.showPopupWarning('svg-parse-fail', message);
+            };
 
             parserSocket.upload(name, file, opts);
         }
@@ -728,7 +741,7 @@ define([
 
                 self.setState({
                     step: (0 < tooSmallList.length ? self.state.step : 'start'),
-                    hasImage: 0 < (files.length - tooSmallList.length),
+                    hasImage: 0 < (self.state.images.length + files.length - tooSmallList.length),
                     mode: operationMode
                 });
 

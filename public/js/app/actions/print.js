@@ -10,9 +10,11 @@ define([
     'app/constants/global-constants',
     'app/constants/device-constants',
     'app/constants/progress-constants',
+    'helpers/packer',
     'helpers/i18n',
     'helpers/nwjs/menu-factory',
     'app/actions/global-actions',
+    'helpers/sprintf',
     // non-return value
     'threeOrbitControls',
     'threeTrackballControls',
@@ -34,9 +36,11 @@ define([
     GlobalConstants,
     DeviceConstants,
     ProgressConstants,
+    Packer,
     I18n,
     MenuFactory,
-    GlobalActions
+    GlobalActions,
+    Sprintf
 ) {
     'use strict';
 
@@ -82,7 +86,9 @@ define([
         slicingReport = {},
         slicingStatus = {},
         importedFCode = {},
+        importedScene = {},
         objectBeforeTransform = {},
+        history = [],
         lang = I18n.get();
 
     var s = {
@@ -114,6 +120,8 @@ define([
         F: 'f',
         G: 'g'
     };
+
+    var models = [];
 
     // var advancedParameters = ['layerHeight', 'infill', 'travelingSpeed', 'extrudingSpeed', 'temperature', 'advancedSettings'];
 
@@ -337,6 +345,7 @@ define([
                 mesh.geometry = new THREE.Geometry().fromBufferGeometry(mesh.geometry);
             }
             mesh.name = 'custom';
+            mesh.file = file;
             mesh.fileName = file.name;
             mesh.plane_boundary = planeBoundary(mesh);
 
@@ -358,37 +367,63 @@ define([
     }
 
     function appendModels(files, index, callback) {
-        slicingStatus.canInterrupt = false;
-        var ext = files.item(index).name.split('.').pop().toLowerCase();
-        if(ext === 'stl') {
-            var reader  = new FileReader();
-            reader.addEventListener('load', function () {
-                appendModel(reader.result, files.item(index), function() {
-                    if(files.length > index + 1) {
-                        appendModels(files, index + 1, callback);
+        var t = setInterval(function() {
+            if(slicingStatus.canInterrupt) {
+                clearInterval(t);
+                var file = files.item ? files.item(index) : files[index];
+                models.push(file);
+                slicingStatus.canInterrupt = false;
+                var ext = file.name.split('.').pop().toLowerCase();
+                if(ext === 'stl') {
+                    var reader  = new FileReader();
+                    reader.addEventListener('load', function () {
+                        appendModel(reader.result, file, function() {
+                            slicingStatus.canInterrupt = true;
+                            if(files.length > index + 1) {
+                                appendModels(files, index + 1, callback);
+                            }
+                            else {
+                                slicingStatus.canInterrupt = true;
+                                startSlicing(slicingType.F);
+                                callback();
+                            }
+                        });
+                    }, false);
+
+                    reader.readAsDataURL(file);
+                }
+                else if (ext === 'fc') {
+                    slicingStatus.canInterrupt = true;
+                    importedFCode = files.item(0);
+                    if(objects.length === 0) {
+                        doFCodeImport();
                     }
                     else {
-                        slicingStatus.canInterrupt = true;
-                        startSlicing(slicingType.F);
-                        callback();
+                        AlertActions.showPopupYesNo(
+                            GlobalConstants.IMPORT_FCODE,
+                            lang.message.confirmFCodeImport);
                     }
-                });
-            }, false);
+                }
+                else if (ext === 'fsc') {
+                    slicingStatus.canInterrupt = true;
+                    importedScene = files.item(0);
+                    if(objects.length === 0) {
+                        _handleLoadScene(importedScene);
+                    }
+                    else {
+                        AlertActions.showPopupYesNo(
+                            GlobalConstants.IMPORT_SCENE,
+                            lang.message.confirmSceneImport
+                        );
+                    }
 
-            reader.readAsDataURL(files.item(index));
-        }
-        else if (ext === 'fc') {
-            importedFCode = files.item(0);
-            if(objects.length === 0) {
-                doFCodeImport();
+                }
+                else {
+                    slicingStatus.canInterrupt = true;
+                    callback();
+                }
             }
-            else {
-                AlertActions.showPopupYesNo(GlobalConstants.IMPORT_FCODE, lang.message.confirmFCodeImport);
-            }
-        }
-        else {
-            callback();
-        }
+        });
     }
 
     function appendPreviewPath(file, index, callback) {
@@ -396,7 +431,14 @@ define([
             reader = new FileReader();
 
         reader.addEventListener('load', function() {
-            fcodeConsole.upload(reader.result, file.size, function() {
+            fcodeConsole.upload(reader.result, file.size, function(result) {
+                // if there's a result
+                if(!!result) {
+                    if(!!result.error) {
+                        AlertActions.showPopupError('fcode-error', Sprintf(lang.message.brokenFcode, file.name));
+                        cancelPreview();
+                    }
+                }
                 fcodeConsole.getMetadata(processMetadata);
             });
         });
@@ -625,6 +667,7 @@ define([
         var files = e.dataTransfer.files;
         if(files.length > 0) {
             appendModels(files, 0, function() {
+                console.log('clearing');
                 e.target.value = null;
             });
         }
@@ -702,6 +745,10 @@ define([
                     scaleBeforeTransformZ = SELECTED.scale.z;
                 }
             }
+        }
+
+        if(SELECTED.uuid) {
+            addHistory();
         }
     }
 
@@ -807,11 +854,22 @@ define([
                 if(reactSrc.state.mode === 'scale') {
                     // check for inverse transform
                     if(SELECTED.size.x <= 0 || SELECTED.size.y <= 0 || SELECTED.size.z <= 0) {
-                        setSize(objectBeforeTransform.size.x, objectBeforeTransform.size.y, objectBeforeTransform.z, false);
+                        setSize(objectBeforeTransform.size, false);
                         updateObjectSize(objectBeforeTransform);
                     }
                     else {
-                        updateObjectSize(e.target.object);
+                        var s = e.target.object.size;
+                        s.x = _round(s.x);
+                        s.y = _round(s.y);
+                        s.z = _round(s.z);
+                        s.enteredX = _round(s.enteredX);
+                        s.enteredY = _round(s.enteredY);
+                        s.enteredZ = _round(s.enteredZ);
+                        syncObjectOutline(e.target.object);
+
+                        reactSrc.setState({
+                            modelSelected: e.target.object
+                        });
                     }
                 }
                 groundIt(SELECTED);
@@ -1089,10 +1147,11 @@ define([
         mouse.y = -((e.offsetY - offy) / container.offsetHeight) * 2 + 1;
     }
 
-    function setScale(x, y, z, isLocked, center) {
-        var originalScaleX = SELECTED.scale._x;
-        var originalScaleY = SELECTED.scale._y;
-        var originalScaleZ = SELECTED.scale._z;
+    function setScale(x, y, z, isLocked, center, src) {
+        src = src || SELECTED
+        var originalScaleX = src.scale._x;
+        var originalScaleY = src.scale._y;
+        var originalScaleZ = src.scale._z;
         if (x === '' || x <= 0) {
             x = scaleBeforeTransformX;
         }
@@ -1102,49 +1161,61 @@ define([
         if (z === '' || z <= 0) {
             z = scaleBeforeTransformZ;
         }
-        SELECTED.scale.enteredX = x;
-        SELECTED.scale.enteredY = y;
-        SELECTED.scale.enteredZ = z;
-        SELECTED.scale.set(
+        src.scale.enteredX = x;
+        src.scale.enteredY = y;
+        src.scale.enteredZ = z;
+        src.scale.set(
             (originalScaleX * x) || scaleBeforeTransformX, (originalScaleY * y) || scaleBeforeTransformY, (originalScaleZ * z) || scaleBeforeTransformZ
         );
-        SELECTED.outlineMesh.scale.set(
+        src.outlineMesh.scale.set(
             (originalScaleX * x) || scaleBeforeTransformX, (originalScaleY * y) || scaleBeforeTransformY, (originalScaleZ * z) || scaleBeforeTransformZ
         );
-        SELECTED.scale.locked = isLocked;
-        SELECTED.plane_boundary = planeBoundary(SELECTED);
+        src.scale.locked = isLocked;
+        src.plane_boundary = planeBoundary(src);
 
         reactSrc.setState({
-            modelSelected: SELECTED.uuid ? SELECTED : null
+            modelSelected: src.uuid ? src : null
         });
 
         if (center) {
-            SELECTED.plane_boundary = planeBoundary(SELECTED);
-            groundIt(SELECTED);
-            checkOutOfBounds(SELECTED);
+            src.plane_boundary = planeBoundary(src);
+            groundIt(src);
+            checkOutOfBounds(src);
             render();
         }
     }
 
-    function setSize(x, y, z, isLocked) {
-        isLocked = isLocked || true;
-        var sx = Math.round(x / SELECTED.size.originalX * 1000) / 1000,
-            sy = Math.round(y / SELECTED.size.originalY * 1000) / 1000,
-            sz = Math.round(z / SELECTED.size.originalZ * 1000) / 1000,
-            _center = true;
+    function setSize(size, isLocked, src) {
+        // if(!mouseDown) {
+        //     addHistory();
+        // }
 
-        if(sx + sy + sz === 0) {
-            return;
+        var o = { size: {} };
+        Object.assign(o.size, size);
+
+        src = src || SELECTED;
+        var objectChanged = _objectChanged(src, o);
+        if(objectChanged) {
+            isLocked = isLocked || true;
+            var sx = Math.round(size.x / src.size.originalX * 1000) / 1000,
+                sy = Math.round(size.y / src.size.originalY * 1000) / 1000,
+                sz = Math.round(size.z / src.size.originalZ * 1000) / 1000,
+                _center = true;
+
+            if(sx + sy + sz === 0) {
+                return;
+            }
+
+            setScale(sx, sy, sz, isLocked, _center, src);
+
+            src.size.x = size.x;
+            src.size.y = size.y;
+            src.size.z = size.z;
+
+            slicingStatus.showProgress = false;
+
+            doSlicing();
         }
-
-        setScale(sx, sy, sz, isLocked, _center);
-
-        SELECTED.size.x = x;
-        SELECTED.size.y = y;
-        SELECTED.size.z = z;
-
-        slicingStatus.showProgress = false;
-        doSlicing();
     }
 
     function setRotateMode() {
@@ -1169,7 +1240,9 @@ define([
         var t = setInterval(function() {
             if(slicingStatus.canInterrupt) {
                 clearInterval(t);
+                slicingStatus.canInterrupt = false;
                 slicer.setParameter('advancedSettings', settings.custom).then(function(result, errors) {
+                    slicingStatus.canInterrupt = true;
                     slicingStatus.showProgress = false;
                     slicingStatus.pauseReport = false;
                     if(objects.length > 0) {
@@ -1409,6 +1482,7 @@ define([
             setDefaultFileName();
             render();
             if(objects.length === 0) {
+                clearTimeout(slicingTimmer);
                 registerDragToImport();
                 reactSrc.setState({
                     openImportWindow: true,
@@ -1880,8 +1954,7 @@ define([
         fcodeConsole = fcodeReader();
         importFromFCode = true;
         previewMode = true;
-        objects.length = 0;
-        outlineScene.children.length = 0;
+
         _clearScene(scene);
         selectObject(null);
         render();
@@ -1898,6 +1971,73 @@ define([
             ProgressActions.close();
             callback();
         });
+    }
+
+    function downloadScene(fileName) {
+        if(objects.length === 0) { return; }
+        var packer = require('helpers/packer'),
+            parameter;
+
+        if(objects.length > 0) {
+            objects.forEach(function(model) {
+                parameter = {};
+                parameter.size = model.size;
+                parameter.rotation = model.rotation;
+                parameter.position = model.position;
+                parameter.scale = model.scale;
+                packer.addInfo(parameter);
+                packer.addFile(model.file);
+            });
+        }
+        var sceneFile = packer.pack();
+        // var url = URL.createObjectURL(sceneFile);
+        // console.log(url);
+        // location.href = url;
+        saveAs(sceneFile, fileName + '.fsc');
+        console.log('downloading scene');
+    }
+
+    function loadScene() {
+        _clearScene(scene);
+        _handleLoadScene(importedScene);
+    }
+
+    function _handleLoadScene(sceneFile) {
+        var packer = require('helpers/packer');
+
+        packer.unpack(sceneFile).then(function(_sceneFile) {
+            var files = _sceneFile[0];
+
+            sceneFile = _sceneFile;
+
+            appendModels(files, 0, function() {
+                updateObject();
+            });
+        });
+
+        var updateObject = function() {
+            sceneFile.shift();
+            objects.forEach(function(obj, i) {
+                var ref = sceneFile[i];
+
+                obj.position.x = ref.position.x;
+                obj.position.y = ref.position.y;
+                obj.outlineMesh.position.x = ref.position.x;
+                obj.outlineMesh.position.y = ref.position.y;
+
+                setRotation(
+                    parseInt(ref.rotation.enteredX),
+                    parseInt(ref.rotation.enteredY),
+                    parseInt(ref.rotation.enteredZ), true, obj);
+
+                setSize(ref.size, true, obj);
+
+                selectObject(null);
+                render();
+
+            });
+        };
+
     }
 
     // Private Functions ---
@@ -1991,6 +2131,31 @@ define([
 
         if(importFromFCode) {
             _exitImportFromFCodeMode();
+        }
+    }
+
+    function addHistory() {
+        if(SELECTED) {
+            var entry = { size: {}, rotation: {}, position: {}, scale: {} };
+            entry.uuid = SELECTED.uuid;
+            Object.assign(entry.position, SELECTED.position);
+            Object.assign(entry.size, SELECTED.size);
+            Object.assign(entry.rotation, SELECTED.rotation);
+            Object.assign(entry.scale, SELECTED.scale);
+            history.push(entry);
+        }
+    }
+
+    function undo() {
+        if(history.length > 0) {
+            var entry = history.pop();
+            objects.forEach(function(model) {
+                if(model.uuid === entry.uuid) {
+                    _setObject(entry, model);
+                    setObjectDialoguePosition(model);
+                    selectObject(model);
+                }
+            });
         }
     }
 
@@ -2096,17 +2261,17 @@ define([
 
         for (var layer = 0; layer < printPath.length; layer++) {
             g = new THREE.Geometry();
-            color = [];
+            color = []
 
-            // with no gradient, but 2x more points
-            for (var point = 0; point < printPath[layer].length; point++) {
-                type = !!printPath[layer][point + 1] ? printPath[layer][point + 1].t : printPath[layer][point].t;
-                color[point] = previewColors[type];
-                g.vertices.push(new THREE.Vector3(
-                    printPath[layer][point].p[0],
-                    printPath[layer][point].p[1],
-                    printPath[layer][point].p[2]
-                ));
+            for (var point = 1; point < printPath[layer].length; point++) {
+                for (var tmp = 1; tmp >= 0; tmp--) {
+                    color.push(previewColors[printPath[layer][point].t]);
+                    g.vertices.push(new THREE.Vector3(
+                        printPath[layer][point - tmp].p[0],
+                        printPath[layer][point - tmp].p[1],
+                        printPath[layer][point - tmp].p[2]
+                    ));
+                }
             }
 
             g.colors = color;
@@ -2173,12 +2338,56 @@ define([
         MenuFactory.items.reset.onClick = resetObject;
     }
 
+    function _setObject(ref, target) {
+        target.position.x = ref.position.x;
+        target.position.y = ref.position.y;
+        target.outlineMesh.position.x = ref.position.x;
+        target.outlineMesh.position.y = ref.position.y;
+
+        setRotation(
+            parseInt(ref.rotation.enteredX),
+            parseInt(ref.rotation.enteredY),
+            parseInt(ref.rotation.enteredZ), true, target);
+
+        setSize(ref.size, true, target);
+
+        render();
+    }
+
     function _clearScene(scene) {
+        objects.length = 0;
+        outlineScene.children.length = 0;
         for(var i = scene.children.length - 1; i >= 0; i--) {
             if(scene.children[i].name === 'custom') {
                 scene.children.splice(i, 1);
             }
         }
+    }
+
+    function _objectChanged(ref, src) {
+        if(!ref.size) { ref.size = {} };
+        if(!ref.rotation) { ref.rotation = {} }
+
+        var sizeChanged = (
+            ref.size.x !== src.size.x ||
+            ref.size.y !== src.size.y ||
+            ref.size.z !== src.size.z
+        )
+
+        var rotationChanged = (
+            ref.rotation.enteredX !== ref.rotation.enteredX ||
+            ref.rotation.enteredY !== ref.rotation.enteredY ||
+            ref.rotation.enteredZ !== ref.rotation.enteredZ
+        )
+
+        // var rotationChanged = {
+        // }
+
+        return sizeChanged;
+    }
+
+    function _round(float) {
+        return parseFloat((Math.round(float * 100) / 100).toFixed(2));
     }
 
     function clear() {
@@ -2226,6 +2435,10 @@ define([
         getSlicingStatus    : getSlicingStatus,
         cancelPreview       : cancelPreview,
         doFCodeImport       : doFCodeImport,
-        willUnmount         : willUnmount
+        willUnmount         : willUnmount,
+        downloadScene       : downloadScene,
+        loadScene           : loadScene,
+        undo                : undo,
+        addHistory          : addHistory
     };
 });

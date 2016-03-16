@@ -8,6 +8,7 @@ define([], function(){
         MONITOR_CLOSED                  : 'MONITOR_CLOSED',
         EXIT_PREVIEW                    : 'EXIT_PREVIEW',
         IMPORT_FCODE                    : 'IMPORT_FCODE',
+        IMPORT_SCENE                    : 'IMPORT_SCENE',
 
         // Monitor Open source
         PRINT                           : 'PRINT',

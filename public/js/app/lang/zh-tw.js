@@ -67,7 +67,8 @@ define(function() {
                 label: '檔案',
                 import: '匯入',
                 save_gcode: '匯出 Gcode',
-                save_fcode: '匯出工作'
+                save_fcode: '匯出工作',
+                save_scene: '匯出場景'
             },
             edit: {
                 label: '編輯',
@@ -540,6 +541,15 @@ define(function() {
             name: '名稱',
             go: 'GO',
             process_caption: '輸出中',
+            svg_fail_messages: {
+                'TEXT_TAG': '不支援標籤 &lt;text&gt;',
+                'DEFS_TAG': '不支援標籤 &lt;defs&gt;',
+                'CLIP_TAG': '不支援標籤 &lt;clip&gt;',
+                'FILTER_TAG': '不支援標籤 &lt;filter&gt;',
+                'EMPTY': '內容為空',
+                'FAIL_PARSING': '解析錯誤',
+                'SVG_BROKEN': '檔案損壞'
+            },
             title: {
                 material: 'Select proper material to have the best engraving result.',
                 object_height: 'A Raft are layers built under your part and help it stick to the base plate.',
@@ -675,6 +685,7 @@ define(function() {
                 caption: '校正完成',
                 message: '你可以開始掃描了'
             },
+            estimating: '估計中...',
             calibrate_fail: '校正失敗',
             calibration_is_running: '掃描校正中',
             resolution: [{
@@ -941,7 +952,9 @@ define(function() {
             },
             cant_establish_connection: '無法啟動 FLUX API，請使用 說明 > 錯誤回報 輸出偵錯訊息，並<a href="https://flux3dp.zendesk.com/hc/zh-tw/requests/new" target="_blank">聯繫 FLUX 客服</a>',
             fcodeForLaser: '檔案為雷射工作',
-            confirmFCodeImport: '載入.fc檔案將清除目前所有場景，繼續？'
+            confirmFCodeImport: '載入.fc檔案將清除目前所有場景，繼續？',
+            confirmSceneImport: '載入.fsc檔案將清除目前所有場景，繼續？',
+            brokenFcode: '無法開啟 %s'
         },
         machine_status: {
             '-10': 'Raw Mode',

@@ -76,6 +76,12 @@ define([
                 modifiers: 'cmd',
                 parent: parentIndex.FILE
             },
+            saveScene: {
+                label: lang.file.save_scene,
+                enabled: false,
+                onClick: emptyFunction,
+                parent: parentIndex.FILE
+            },
             duplicate: {
                 label: lang.edit.duplicate,
                 enabled: false,
@@ -179,7 +185,8 @@ define([
             subItems = [
                 items.import,
                 separator,
-                items.saveTask
+                items.saveTask,
+                items.saveScene
             ];
 
             if ('win' === window.FLUX.osType) {
@@ -284,8 +291,20 @@ define([
 
                         html2canvas(window.document.body).then(function(canvas) {
                             var jpegUrl = canvas.toDataURL("image/jpeg"),
-                                report_info = JSON.stringify({ ws: window.FLUX.websockets, screenshot: jpegUrl }, null, 2),
+                                report_info = {
+                                    ws: window.FLUX.websockets,
+                                    screenshot: jpegUrl,
+                                    localStorage: {}
+                                },
                                 report_blob;
+
+                            for (var key in localStorage) {
+                                if (false === key.startsWith('lang')) {
+                                    report_info.localStorage[key] = localStorage[key];
+                                }
+                            }
+
+                            report_info = JSON.stringify(report_info, null, 2);
 
                             for(var i in window.FLUX.websockets){
                                 if ("function" !== typeof window.FLUX.websockets[i]){

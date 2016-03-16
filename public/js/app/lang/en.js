@@ -67,7 +67,8 @@ define(function() {
                 label: 'File',
                 import: 'Import',
                 save_gcode: 'Save Gcode',
-                save_fcode: 'Save Task'
+                save_fcode: 'Save Task',
+                save_scene: 'Save Scene'
             },
             edit: {
                 label: 'Edit',
@@ -540,6 +541,15 @@ define(function() {
             name: 'Name',
             go: 'GO',
             process_caption: 'Generating',
+            svg_fail_messages: {
+                'TEXT_TAG': 'Tag &lt;text&gt; is not supported',
+                'DEFS_TAG': 'Tag &lt;defs&gt; is not supported',
+                'CLIP_TAG': 'Tag &lt;clip&gt; is not supported',
+                'FILTER_TAG': 'Tag &lt;filter&gt; is not supported',
+                'EMPTY': 'is an empty file',
+                'FAIL_PARSING': 'is parsing fail',
+                'SVG_BROKEN': 'was broken'
+            },
             title: {
                 material: 'Select proper material to have the best engraving result.',
                 object_height: 'A Raft are layers built under your part and help it stick to the base plate.',
@@ -675,6 +685,7 @@ define(function() {
                 caption: 'Calibration Done',
                 message: 'You can scan now'
             },
+            estimating: 'estimating...',
             calibrate_fail: 'Calibration Failed',
             calibration_is_running: 'Calibrating for Scan',
             resolution: [{
@@ -941,7 +952,9 @@ define(function() {
             },
             cant_establish_connection: 'Unable to initiate FLUX API, kindly use Help > Bug Report to export debug message and <a href="https://flux3dp.zendesk.com/hc/en-us/requests/new" target="_blank">contact FLUX support.</a>',
             fcodeForLaser: 'This is a fcode for laser',
-            confirmFCodeImport: 'Importing fcode will remove all objects on the scene, are you sure?'
+            confirmFCodeImport: 'Importing fcode will remove all objects on the scene, are you sure?',
+            confirmSceneImport: 'Importing .fsc will remove all objects on the scene, are you sure?',
+            brokenFcode: 'unable to open %s'
         },
         machine_status: {
             '-10': 'Raw mode',
