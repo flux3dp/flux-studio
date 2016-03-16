@@ -94,7 +94,6 @@ define([
                 wfh.material.depthTest = false;
                 wfh.material.opacity = 0.25;
                 wfh.material.transparent = true;
-                //mesh.add( wfh );
             }
 
             material.side = THREE.DoubleSide;

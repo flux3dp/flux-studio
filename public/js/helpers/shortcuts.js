@@ -39,20 +39,22 @@ define([
         keydown_event = function(e) {
             var matches = [];
 
+            keyup_event();
+
+            if (false === isMetaKey(e.keyCode)) {
+                keyCodeStatus.push(e.keyCode);
+            }
+
             if (true === e.ctrlKey) {
                 keyCodeStatus.push(special_key_map.CTRL);
             }
 
-            if (true === e.metaKey) {
-                keyup_event();
-                keyCodeStatus.push(special_key_map.CMD);
-
-                if (false === isMetaKey(e.keyCode)) {
-                    keyCodeStatus.push(e.keyCode);
-                }
+            if (true === e.altKey) {
+                keyCodeStatus.push(special_key_map.ALT);
             }
-            else {
-                keyCodeStatus.push(e.keyCode);
+
+            if (true === e.metaKey) {
+                keyCodeStatus.push(special_key_map.CMD);
             }
 
             keyCodeStatus = keyCodeStatus.unique().sort();

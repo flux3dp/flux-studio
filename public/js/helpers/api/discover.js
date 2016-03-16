@@ -21,12 +21,11 @@ define([
                 dispatcher.sender(printers);
             });
         },
-        findIndex,
+        findIndex = function(base, target) {
+            return base.uuid === target.uuid;
+        },
         onMessage = function(data) {
-            findIndex = function(el) {
-                return el.uuid === data.uuid;
-            };
-            var existing_key = printers.findIndex(findIndex);
+            var existing_key = printers.findIndex(findIndex.bind(null, data));
 
             if (-1 === existing_key) {
                 if (typeof data === 'string') {
@@ -105,6 +104,16 @@ define([
             },
             sendAggressive: function() {
                 ws.send('aggressive');
+            },
+            getLatestPrinter: function(printer) {
+                var existing_key = printers.findIndex(findIndex.bind(null, printer));
+
+                if (-1 === existing_key) {
+                    return null;
+                }
+                else {
+                    return printers[existing_key];
+                }
             }
         };
     };

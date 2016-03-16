@@ -347,6 +347,8 @@ define([
                     case 'deleting-mesh':
                         self._onDeleteMesh(self.state.deleting_mesh.index, self.state.deleting_mesh.object);
                         break;
+                    case 'kick':
+                        self._onScanStop();
                     }
                 },
 
@@ -871,10 +873,13 @@ define([
                         openProgressBar: false,
                         hasMultiScan: false,
                         isScanStarted: false,
+                        showCamera: false,
                         progressPercentage: 100 // total complete
                     });
 
-                    this.state.scanMethods.stop(this._onScanFinished);
+                    if ('undefined' !== typeof this.state.scanMethods) {
+                        this.state.scanMethods.stop(this._onScanFinished);
+                    }
                 },
 
                 _doClearNoise: function(mesh) {
