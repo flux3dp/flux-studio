@@ -329,6 +329,8 @@ define(function() {
                 support_pattern: 'Pattern',
                 raft: 'Raft',
                 raftLayers: 'Raft Layers',
+                brim: 'Brim Width',
+                skirts: 'Skirts',
                 movement: 'Movement',
                 structure: 'Structure',
                 traveling: 'Traveling',
