@@ -844,6 +844,9 @@ define([
             case 'mouseDown':
                 objectBeforeTransform = {};
                 Object.assign(objectBeforeTransform, SELECTED);
+                objectBeforeTransform.size = SELECTED.size.clone();
+                objectBeforeTransform.scale = SELECTED.scale.clone();
+                objectBeforeTransform.rotation = SELECTED.rotation.clone();
                 transformMode = true;
                 reactSrc.setState({
                     isTransforming: true
