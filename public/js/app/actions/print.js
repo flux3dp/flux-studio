@@ -356,6 +356,7 @@ define([
             mesh.fileName = file.name;
             mesh.plane_boundary = planeBoundary(mesh);
 
+            autoArrange(mesh);
             addSizeProperty(mesh);
             groundIt(mesh);
             selectObject(mesh);
@@ -690,7 +691,6 @@ define([
         var files = e.dataTransfer.files;
         if(files.length > 0) {
             appendModels(files, 0, function() {
-                console.log('clearing');
                 e.target.value = null;
             });
         }
@@ -1547,6 +1547,7 @@ define([
                     mesh.name = 'custom';
                     mesh.plane_boundary = planeBoundary(mesh);
 
+                    autoArrange(mesh);
                     addSizeProperty(mesh);
                     groundIt(mesh);
                     createOutline(mesh);
@@ -1631,6 +1632,128 @@ define([
                 hasOutOfBoundsObject: hasOutOfBoundsObject
             });
         }
+    }
+
+    function checkCollisionWithAny(src, callback) {
+        var _objects,
+            collided = false,
+            sourceBox;
+
+        _objects = objects.filter(function(o) {
+            return o.uuid !== src.uuid;
+        });
+
+        sourceBox = new THREE.BoundingBoxHelper(src, s.colorSelected);
+        sourceBox.update();
+        sourceBox.box.intersectsBox = function ( box ) {
+
+		// using 6 splitting planes to rule out intersections.
+
+    		if ( box.max.x < this.min.x || box.min.x > this.max.x ||
+				 box.max.y < this.min.y || box.min.y > this.max.y ||
+				 box.max.z < this.min.z || box.min.z > this.max.z ) {
+
+    			return false;
+    		}
+    		return true;
+    	};
+
+        for(var i = 0; i < _objects.length; i++) {
+            if(!collided) {
+                var box = new THREE.BoundingBoxHelper(_objects[i], s.colorSelected);
+                box.update();
+                if(sourceBox.box.intersectsBox(box.box)) {
+                    collided = true;
+                    callback(box);
+                }
+            }
+        }
+
+        if(!collided) {
+            callback(null);
+        }
+    }
+
+    function autoArrange(model) {
+        var level = 1,
+            spacing = 2,
+            inserted = false,
+            target = new THREE.BoundingBoxHelper(model),
+            mover,
+            arithmetic,
+            spacingX,
+            spacingY,
+            originalPosition,
+            _model;
+
+        originalPosition = model.position.clone();
+
+        spacingX = function(size) {
+            return level * (size.x + spacing);
+        };
+
+        spacingY = function(size) {
+            return level * (size.y + spacing);
+        };
+
+        arithmetic = {
+            '1': function(size) {
+                model.position.x = spacingX(size);
+                model.position.y = originalPosition.y;
+            },
+            '2': function(size) {
+                model.position.x = spacingX(size);
+                model.position.y = -spacingY(size);
+            },
+            '3': function(size) {
+                model.position.x = originalPosition.x;
+                model.position.y = -spacingY(size);
+            },
+            '4': function(size) {
+                model.position.x = -spacingX(size);
+                model.position.y = -spacingY(size);
+            },
+            '5': function(size) {
+                model.position.x = -spacingX(size);
+                model.position.y = originalPosition.y;
+            },
+            '6': function(size) {
+                model.position.x = -spacingX(size);
+                model.position.y = spacingY(size);
+            },
+            '7': function(size) {
+                model.position.x = originalPosition.x;
+                model.position.y = spacingY(size);
+            },
+            '8': function(size) {
+                model.position.x = spacingX(size);
+                model.position.y = spacingY(size);
+            }
+        };
+
+        target.update();
+        mover = function(ref, method) {
+            var size = ref.box.size();
+            arithmetic[method.toString()](size);
+            checkCollisionWithAny(model, function(collideObject) {
+                if(collideObject !== null) {
+                    if(method === Object.keys(arithmetic).length) {
+                        level++;
+                        method = 0;
+                    }
+                    mover(ref, method + 1);
+                }
+            });
+        };
+
+        checkCollisionWithAny(model, function(collideObject) {
+            if(collideObject !== null) {
+                var ref = new THREE.BoundingBoxHelper(collideObject, s.colorSelected);
+                ref.update();
+                mover(ref, 1);
+            }
+        });
+
     }
 
     function syncObjectParameter() {
@@ -2311,7 +2434,7 @@ define([
 
         for (var layer = 0; layer < printPath.length; layer++) {
             g = new THREE.Geometry();
-            color = []
+            color = [];
 
             for (var point = 1; point < printPath[layer].length; point++) {
                 for (var tmp = 1; tmp >= 0; tmp--) {
@@ -2415,25 +2538,22 @@ define([
     }
 
     function _objectChanged(ref, src) {
-        if(!ref.size) { ref.size = {} };
-        if(!ref.rotation) { ref.rotation = {} }
+        if(!ref.size) { ref.size = {}; }
+        if(!ref.rotation) { ref.rotation = {}; }
 
         var sizeChanged = (
             ref.size.x !== src.size.x ||
             ref.size.y !== src.size.y ||
             ref.size.z !== src.size.z
-        )
+        );
 
         var rotationChanged = (
             ref.rotation.enteredX !== ref.rotation.enteredX ||
             ref.rotation.enteredY !== ref.rotation.enteredY ||
             ref.rotation.enteredZ !== ref.rotation.enteredZ
-        )
+        );
 
-        // var rotationChanged = {
-        // }
-
-        return sizeChanged;
+        return sizeChanged || rotationChanged;
     }
 
     function _round(float) {
