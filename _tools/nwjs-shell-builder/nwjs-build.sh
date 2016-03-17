@@ -429,7 +429,6 @@ build() {
         mkdir -p ${WORKING_DIR}/${TMP}/${ARR_OS[$i]}/latest-git;
         mkdir -p ${LOCAL_NW_ARCHIVES_PATH};
         NOTE 'WORKING';
-        printf "${SDK_FLAVOR}\n"
         printf "Bulding ${TXT_BOLD}${TXT_YELLO}${PKG_NAME}${TXT_RESET} for ${TXT_BOLD}${TXT_YELLO}${ARR_OS[$i]}${TXT_RESET}\n"
         for DL_FILE in ${LOCAL_NW_ARCHIVES_PATH}/*-${SDK_FLAVOR}v${NW_VERSION}-${ARR_OS[$i]}.${ARR_DL_EXT[$i]}; do
             printf "${DL_FILE}\n"
