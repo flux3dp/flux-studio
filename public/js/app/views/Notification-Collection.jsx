@@ -469,7 +469,7 @@ define([
 
                     if (false === isIgnore &&
                         null !== currentVersion.latest_version &&
-                        currentVersion.latest_version !== currentProfile.version
+                        currentVersion.latest_version > currentProfile.version
                     ) {
                         self._showUpdate({
                             type: 'software',
