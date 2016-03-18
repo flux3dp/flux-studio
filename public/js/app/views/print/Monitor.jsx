@@ -1022,7 +1022,6 @@ define([
                 start = 0;
 
                 if(!usbExist && pathArray.length === 0) {
-                    console.log(currentDirectoryContent);
                     var i = currentDirectoryContent.directories.indexOf('USB');
                     if(i >= 0) {
                         currentDirectoryContent.directories.splice(i, 1);
