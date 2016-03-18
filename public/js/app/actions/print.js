@@ -441,6 +441,7 @@ define([
                 // if there's a result
                 if(!!result) {
                     if(!!result.error) {
+                        console.log('error');
                         AlertActions.showPopupError('fcode-error', Sprintf(lang.message.brokenFcode, file.name));
                         cancelPreview();
                     }
@@ -471,10 +472,13 @@ define([
         };
 
         var processPreview = function(blob) {
-            previewUrl = URL.createObjectURL(blob);
-            blobExpired = false;
-            responseBlob = new Blob([reader.result]);
-            GlobalActions.sliceComplete(metadata);
+            if(blob instanceof Blob) {
+                previewUrl = URL.createObjectURL(blob);
+                blobExpired = false;
+                responseBlob = new Blob([reader.result]);
+                GlobalActions.sliceComplete(metadata);
+            }
+
         };
 
         reader.readAsArrayBuffer(file);
