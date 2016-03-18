@@ -15,6 +15,7 @@ define([
     'helpers/nwjs/menu-factory',
     'app/actions/global-actions',
     'helpers/sprintf',
+    'helpers/packer',
     // non-return value
     'threeOrbitControls',
     'threeTrackballControls',
@@ -40,7 +41,8 @@ define([
     I18n,
     MenuFactory,
     GlobalActions,
-    Sprintf
+    Sprintf,
+    packer
 ) {
     'use strict';
 
@@ -1985,8 +1987,9 @@ define([
 
     function downloadScene(fileName) {
         if(objects.length === 0) { return; }
-        var packer = require('helpers/packer'),
-            parameter;
+
+        var parameter;
+        packer.clear();
 
         if(objects.length > 0) {
             objects.forEach(function(model) {
@@ -2004,7 +2007,6 @@ define([
         // console.log(url);
         // location.href = url;
         saveAs(sceneFile, fileName + '.fsc');
-        console.log('downloading scene');
     }
 
     function loadScene() {
