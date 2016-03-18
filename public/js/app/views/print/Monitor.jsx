@@ -335,9 +335,7 @@ define([
             AlertStore.removeCancelListener(this._handleCancel);
             AlertStore.removeYesListener(this._handleYes);
 
-            if(this.state.mode === mode.CAMERA) {
-                DeviceMaster.stopCamera();
-            }
+            this._stopCamera();
             this._stopReport();
             history = [];
             messageViewed = false;
@@ -349,6 +347,17 @@ define([
 
         _hasFCode: function() {
             return this.props.fCode instanceof Blob;
+        },
+
+        _stopCamera: function() {
+            if(this.state.mode === mode.CAMERA) {
+                socketStatus.ready = false;
+                DeviceMaster.stopCamera().then(function() {
+                    return DeviceMaster.kick();
+                }).then(function() {
+                    socketStatus.ready = true;
+                });
+            }
         },
 
         _refreshDirectory: function() {
@@ -530,15 +539,7 @@ define([
             filePreview = false;
             lastAction = history[history.length - 1];
 
-            if(this.state.mode === mode.CAMERA) {
-                socketStatus.ready = false;
-                DeviceMaster.stopCamera().then(function() {
-                    return DeviceMaster.kick();
-                }).then(function() {
-                    socketStatus.ready = true;
-                });
-            }
-
+            this._stopCamera();
             this._clearSelectedItem();
 
             var actions = {
@@ -1022,7 +1023,6 @@ define([
                 start = 0;
 
                 if(!usbExist && pathArray.length === 0) {
-                    console.log(currentDirectoryContent);
                     var i = currentDirectoryContent.directories.indexOf('USB');
                     if(i >= 0) {
                         currentDirectoryContent.directories.splice(i, 1);
