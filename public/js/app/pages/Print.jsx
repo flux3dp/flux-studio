@@ -466,9 +466,7 @@ define([
                 },
 
                 _handleDownloadFCode: function() {
-                    if(director.getModelCount() !== 0) {
-                        director.downloadFCode();
-                    }
+                    director.downloadFCode();
                 },
 
                 _handleDownloadScene: function() {
