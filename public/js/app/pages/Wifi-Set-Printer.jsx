@@ -41,9 +41,11 @@ define([
             },
 
             _onCancel: function(id) {
-                var usb = usbConfig();
-                usb.close();
-                location.hash = 'initialize/wifi/connect-machine';
+                if ('#initialize/wifi/set-printer' === location.hash) {
+                    var usb = usbConfig();
+                    usb.close();
+                    location.hash = 'initialize/wifi/connect-machine';
+                }
             },
 
             _handleSetPrinter: function(e) {
