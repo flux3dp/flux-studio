@@ -7,10 +7,10 @@ define(function() {
             name : 'Flux Studio - en'
         },
         support: {
-            no_webgl: 'WebGL not supported. Please use other devices.'
+            no_webgl: 'WebGL is not supported. Please use other devices.'
         },
         device_selection: {
-            no_printers: 'FLUX Device not detected. Please check if you and the FLUX device is under same network.',
+            no_printers: 'FLUX Delta not found. Please check if your PC and FLUX Delta are under the same network.',
             device_name: 'DEVICE NAME',
             module: 'MODULE',
             status: 'STATUS'
@@ -18,12 +18,12 @@ define(function() {
         update: {
             release_note: 'Release Note:',
             firmware: {
-                caption: 'An Firmware Update to FLUX is available',
+                caption: 'A Firmware Update to FLUX Delta is available',
                 message_pattern_1: '"%s" is now ready for firmware update.',
                 message_pattern_2: 'FLUX Firmware v%s is now available - You have v%s.',
                 latest_firmware: {
-                    caption: 'Firmware Update',
-                    message: 'You have the latest firmware'
+                    caption: 'Delta Firmware Update',
+                    message: 'You have the latest Delta firmware'
                 },
                 confirm: 'UPLOAD',
                 upload_file: 'Upload file',
@@ -31,17 +31,17 @@ define(function() {
                 update_fail: 'Update Fail'
             },
             software: {
-                caption: 'An Software Update to FLUX is available',
+                caption: 'A Software Update to FLUX Studio is available',
                 message_pattern_1: 'FLUX Studio is now ready for software update.',
                 message_pattern_2: 'FLUX Software v%s is now available - You have v%s.'
             },
             toolhead: {
-                caption: 'An Toolhead Firmware Update to FLUX is available',
+                caption: 'A Firmware Update to FLUX Toolhead is available',
                 message_pattern_1: '"%s" is now ready for toolhead firmware update.',
                 message_pattern_2: 'FLUX Toolhead Firmware %s is now available.',
                 latest_firmware: {
-                    caption: 'Firmware Update',
-                    message: 'You have the latest firmware'
+                    caption: 'Toolhead Firmware Update',
+                    message: 'You have the latest toolhead firmware'
                 },
                 confirm: 'UPLOAD',
                 upload_file: 'Upload file',
@@ -56,18 +56,18 @@ define(function() {
         },
         topmenu: {
             version: 'Version',
-            sure_to_quit: 'Sure to quit?',
+            sure_to_quit: 'Are you sure you want to quit?',
             flux: {
-                label: 'Flux',
-                about: 'About FLUX studio',
+                label: 'FLUX',
+                about: 'About',
                 preferences: 'Preferences',
                 quit: 'Quit'
             },
             file: {
                 label: 'File',
                 import: 'Import',
-                save_gcode: 'Save Gcode',
-                save_fcode: 'Save Task',
+                save_gcode: 'Export Gcode',
+                save_fcode: 'Export FLUX Task',
                 save_scene: 'Save Scene'
             },
             edit: {
@@ -82,10 +82,10 @@ define(function() {
                 label: 'Device',
                 new: 'Add New Device',
                 device_monitor: 'Device Monitor',
-                change_filament: 'Change Filament',
-                default_device: 'Set as default device',
-                check_firmware_update: 'Check Firmware Update',
-                update_toolhead: 'Update toolhead'
+                change_filament: 'Change Filaments',
+                default_device: 'Set as Default Device',
+                check_firmware_update: 'Update Delta Firmware',
+                update_toolhead: 'Update Toolhead Firmware'
             },
             window: {
                 label: 'Window',
@@ -117,10 +117,10 @@ define(function() {
             require_device_name: 'Name is required',
             select_language: 'Select Language',
             change_password: {
-                content: 'Are you sure to change the password?',
+                content: 'Are you sure about changing the password?',
                 caption: 'Changing password'
             },
-            connect_flux: 'Connect FLUX Delta with USB Cable',
+            connect_flux: 'Connect FLUX Delta with the USB Cable',
             name_your_flux: 'Name Your FLUX Delta',
             wifi_setup: 'Wi-Fi Setup',
             select_preferred_wifi: 'Select your preferred network.',
@@ -130,9 +130,9 @@ define(function() {
             // page specific
             set_machine_generic: {
                 printer_name: 'Name*',
-                printer_name_placeholder: 'Give it an unique name',
+                printer_name_placeholder: 'Give your Delta an unique name',
                 password: 'Password',
-                set_station_mode: 'Set as wifi station',
+                set_station_mode: 'Set as a Wi-Fi station',
                 password_placeholder: 'Something secret'
             },
 
@@ -203,7 +203,7 @@ define(function() {
                 printer_name_placeholder: '設定名稱',
                 password: '密碼',
                 password_placeholder: '設定密碼',
-                notice: '設定密碼，可以確保你的 FLUX 只有知道密碼的人可以操作',
+                notice: '設定密碼，可以確保你的 FLUX Delta 只有知道密碼的人可以操作',
                 next: '下一步'
             },
             setup_complete: {
@@ -212,13 +212,13 @@ define(function() {
                 start: 'Start Using FLUX'
             },
             configuring_flux: {
-                caption: 'We\'re configuring your FLUX as a wifi station',
-                description: 'so you can control your FLUX through wifi network',
+                caption: 'We\'re configuring your FLUX Detla as a wifi station',
+                description: 'so you can control your FLUX Detla through wifi network',
                 next: 'next',
                 footer: 'I want to swtich back to wifi connection'
             },
             configured_flux: {
-                caption: 'Your FLUX is now a wifi station',
+                caption: 'Your FLUX Detla is now a wifi station',
                 description: 'you can start using it after few simple setting',
                 next: 'next',
                 footer: 'I want to swtich back to wifi connection'
@@ -338,7 +338,7 @@ define(function() {
                 innerShell: 'Inner Shell',
                 outerShell: 'Outer Shell',
                 bridge: 'Bridge',
-                config: 'Custom configuration',
+                config: 'Expert Settings',
                 presets: 'Presets',
                 name: 'Name',
                 apply: 'APPLY',
@@ -598,7 +598,7 @@ define(function() {
                                 value: 'wood',
                                 label: 'WOOD',
                                 data: {
-                                    laser_speed: 5,
+                                    laser_speed: 3,
                                     power: 255
                                 }
                             },
@@ -606,7 +606,7 @@ define(function() {
                                 value: 'leather',
                                 label: 'LEATHER',
                                 data: {
-                                    laser_speed: 50,
+                                    laser_speed: 5,
                                     power: 255
                                 }
                             },
@@ -614,16 +614,16 @@ define(function() {
                                 value: 'paper',
                                 label: 'PAPER',
                                 data: {
-                                    laser_speed: 10,
-                                    power: 25
+                                    laser_speed: 2,
+                                    power: 255
                                 }
                             },
                             {
                                 value: 'cork',
                                 label: 'CORK',
                                 data: {
-                                    laser_speed: 15,
-                                    power: 200
+                                    laser_speed: 5,
+                                    power: 255
                                 }
                             },
                             {
@@ -683,11 +683,11 @@ define(function() {
             calibrate: 'Calibrate',
             calibration_done: {
                 caption: 'Calibration Done',
-                message: 'You can scan now'
+                message: 'You are able to scan now'
             },
-            estimating: 'estimating...',
+            estimating: 'Estimating the time...',
             calibrate_fail: 'Calibration Failed',
-            calibration_is_running: 'Calibrating for Scan',
+            calibration_is_running: 'Calibrating for Scanning',
             resolution: [{
                 id: 'best',
                 text: 'Best',
@@ -765,7 +765,7 @@ define(function() {
                     message: 'Insert the calibration tool into the center slot.'
                 },
                 'no laser': {
-                    caption: 'Laser not detected',
+                    caption: 'Scanning laser not detected',
                     message: 'Press the laser heads to open it.'
                 }
             }
@@ -836,32 +836,32 @@ define(function() {
             record                              : 'Record',
             camera                              : 'Camera',
             connecting                          : 'Connecting, please wait...',
-            HEAD_OFFLINE                        : 'Device head is not connected or missing',
+            HEAD_OFFLINE                        : 'Toolhead not connected or missing',
             HEAD_ERROR_CALIBRATING              : 'Unable to calibrate toolhead\nplease re-attach the toolhead',
-            HEAD_ERROR_FAN_FAILURE              : 'Cooling fan not spinning\nSpin it with a pencil or thin stick.',
-            HEAD_ERROR_HEAD_OFFLINE             : 'Toolhead not detected\nPlease re-attach the module cable',
-            HEAD_ERROR_TYPE_ERROR               : 'Toolhead incorrect\nPlease attach correct toolhead',
-            HEAD_ERROR_INTLK_TRIG               : 'Laser toolhead tilted\nPlease ensure the rods are connected correctly, then continue',
+            HEAD_ERROR_FAN_FAILURE              : 'Cooling fan failed\nKindly spin the fan with a pencil or thin stick.',
+            HEAD_ERROR_HEAD_OFFLINE             : 'Toolhead not detected\nPlease re-attach the module cable <a href="https://flux3dp.zendesk.com/hc/en-us/articles/218183157">More Info</a>',
+            HEAD_ERROR_TYPE_ERROR               : 'Toolhead incorrect\nPlease attach the correct toolhead',
+            HEAD_ERROR_INTLK_TRIG               : 'Engraving toolhead tilt detected\nPlease ensure the rods are connected correctly. <a href="https://flux3dp.zendesk.com/hc/en-us/articles/217085937">More Info</a>',
             'HEAD_ERROR_?'                      : 'Toolhead error\nCheck if the toolhead is abnormal',
-            HARDWARE_ERROR_FILAMENT_RUNOUT      : 'Ran out of filament\nPlease insert new material',
-            HARDWARE_ERROR_0                    : 'Ran out of filament\nPlease insert new material',
+            HARDWARE_ERROR_FILAMENT_RUNOUT      : 'Ran out of the filament\nPlease insert new material <a href="https://flux3dp.zendesk.com/hc/en-us/articles/218183177">More Info</a>',
+            HARDWARE_ERROR_0                    : 'Ran out of the filament\nPlease insert new material <a href="https://flux3dp.zendesk.com/hc/en-us/articles/218183177">More Info</a>',
             HARDWARE_ERROR_PLATE_MISSING        : 'Unable to detect the base plate\nPlease put on the plate.',
             HARDWARE_ERROR_ZPROBE_ERROR         : 'Unable to calibrate the base plate\nPlease remove left-over on the nozzle',
-            HEAD_ERROR_RESET                    : 'Toolhead bad connection\nPlease re-attach the toolhead, and ensure the toolhead is connected correctly',
+            HEAD_ERROR_RESET                    : 'Toolhead bad connection\nPlease re-attach the toolhead, and ensure the toolhead is connected correctly <a href="https://flux3dp.zendesk.com/hc/en-us/articles/218183167">More Info</a>',
             HARDWARE_ERROR_CONVERGENCE_FAILED   : 'Unable to calibrate the base plate\nPlease remove left-over on the nozzle',
             HARDWARE_ERROR_HOME_FAILED          : 'Unable to home to origin\nPlease remove the obstacle, and reattach the toolhead',
-            HEAD_ERROR_TILT                     : 'Head tilted\nPlease check ball joint rod is attached correctly',
-            HEAD_ERROR_SHAKE                    : 'Head tilted\nPlease check ball joint rod is attached correctly',
-            WRONG_HEAD                          : 'Device head is unknown, please connect to a correct header',
-            USER_OPERATION                      : 'machine operated by (other) user',
-            RESOURCE_BUSY                       : 'Device busy\nIf the device is not running, please restart the device',
+            HEAD_ERROR_TILT                     : 'Toolhead tilt detected\nPlease check ball joint rod is attached correctly',
+            HEAD_ERROR_SHAKE                    : 'Toolhead tilt detected\nPlease check ball joint rod is attached correctly',
+            WRONG_HEAD                          : 'Device head is unknown, please connect to a correct toolhead',
+            USER_OPERATION                      : 'Machine is being operated by (other) user',
+            RESOURCE_BUSY                       : 'Device is busy\nIf the device is not running, please restart the device',
             DEVICE_ERROR                        : 'Something went wrong\nPlease restart the device',
             NO_RESPONSE                         : 'Something went wrong\nPlease restart the device',
             SUBSYSTEM_ERROR                     : 'Something went wrong\nPlease restart the device',
             HARDWARE_FAILURE                    : 'Something went wrong\nPlease restart the device',
             MAINBOARD_OFFLINE                   : 'Something went wrong\nPlease restart the device',
             HEAD_ERROR_HARDWARE_FAILURE         : 'Something went wrong with toolhead\nPlease re-attach the toolhead',
-            G28_FAILED                          : 'Unable to home\nPlease remove the obstacle',
+            G28_FAILED                          : 'Unable to calibrate origin\nPlease remove the obstacle',
             FILAMENT_RUNOUT_0                   : 'Ran out of filament\nPlease insert new material',
             processing                          : 'Processing',
             savingPreview                       : 'Saving preview image',
@@ -886,7 +886,7 @@ define(function() {
             },
             device : {
                 EXTRUDER                        : 'Printing Toolhead',
-                LASER                           : 'Laser Toolhead'
+                LASER                           : 'Engraving Toolhead'
             }
         },
         alert: {
@@ -926,10 +926,10 @@ define(function() {
             machineNotConnected: 'Machine is not connected',
             notPrinting: 'Printing is not in progress',
             nothingToPrint: 'Nothing to print (source blob missing)',
-            connectionTimeout: 'Please check your network state and FLUX Device\'s Wi-Fi indicator.',
+            connectionTimeout: 'Please check your network state and your Delta\'s Wi-Fi indicator.',
             device_not_found: {
-                caption: 'Default device not found',
-                message: 'Please check your FLUX\'s Wi-Fi indicator'
+                caption: 'Default Device not found',
+                message: 'Please check your Delta\'s Wi-Fi indicator'
             },
             device_busy: {
                 caption: 'Device Busy',
@@ -950,7 +950,7 @@ define(function() {
                 caption: 'Firmware Outdated',
                 content: 'Please install the latest firmware with <a target="_blank" href="http://helpcenter.flux3dp.com/hc/en-us/articles/216251077">this guide</a>.'
             },
-            cant_establish_connection: 'Unable to initiate FLUX API, kindly use Help > Bug Report to export debug message and <a href="https://flux3dp.zendesk.com/hc/en-us/requests/new" target="_blank">contact FLUX support.</a>',
+            cant_establish_connection: 'Unable to initiate FLUX Studio API, kindly use Help > Bug Report to export debug message and <a href="https://flux3dp.zendesk.com/hc/en-us/requests/new" target="_blank">contact FLUX support.</a>',
             fcodeForLaser: 'This is a fcode for laser',
             confirmFCodeImport: 'Importing fcode will remove all objects on the scene, are you sure?',
             confirmSceneImport: 'Importing .fsc will remove all objects on the scene, are you sure?',
@@ -1013,11 +1013,11 @@ define(function() {
             startWithFilament: 'Let\'s start with loading filament',
             startWithModel: 'Next, let\'s import some 3D model',
             startTour: 'Welcome!<br/>This is your first time printing,<br/>would you like to start printing tutorial?',
-            clickToImport: 'Click to import 3D model',
+            clickToImport: 'Click here to import example 3D model',
             selectQuality: 'Select quality you preferred',
             clickGo: 'Prepare to print',
-            startPrint: 'Apply glue on the plate, and start to print',
-            skip: 'Skip tutorial'
+            startPrint: 'Apply glue on the plate with no-grid, wait till it\' dry, then you are ready to print',
+            skip: 'Skip Tutorial'
         },
         slicer: {
             computing: 'Computing'
