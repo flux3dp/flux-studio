@@ -132,7 +132,7 @@ define([
 
             // Private methods
             _onCancel: function(id) {
-                if ('#initialize/wifi/set-printer' === location.hash) {
+                if ('#initialize/wifi/select' === location.hash) {
                     var usb = usbConfig();
                     usb.close();
                     location.hash = 'initialize/wifi/connect-machine';
