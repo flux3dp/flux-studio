@@ -10,7 +10,7 @@ define(function() {
             no_webgl: '您的系統不支援 WebGL，建議您使用其他電腦開啟 FLUX Studio'
         },
         device_selection: {
-            no_printers: '未偵測到 FLUX Delta, 請檢查您與機器的網路連線是否在同個網路下',
+            no_printers: '無法透過 Wi-Fi 偵測到 FLUX Delta，請檢查您與機器的網路連線是否在同個網路下 <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/215394548">暸解更多</a>',
             device_name: 'DEVICE NAME',
             module: 'MODULE',
             status: 'STATUS'

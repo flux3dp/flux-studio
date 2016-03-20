@@ -10,7 +10,7 @@ define(function() {
             no_webgl: 'WebGL is not supported. Please use other devices.'
         },
         device_selection: {
-            no_printers: 'FLUX Delta not found. Please check if your PC and FLUX Delta are under the same network.',
+            no_printers: 'Cannot detect FLUX Delta through Wi-Fi. Please check if your PC and FLUX Delta are under the same network. <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/215394548">More Info</a>',
             device_name: 'DEVICE NAME',
             module: 'MODULE',
             status: 'STATUS'
@@ -154,7 +154,7 @@ define(function() {
 
                 keep_connect: {
                     caption: 'USB Device not found',
-                    content: 'Oops! Don\'t worry. We\'re here for you.\nMake sure your FLUX Delta has been powered \non, attached to Micro USB Cable and the driver is installed.\n<a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/215327328">...More solutions</a>'
+                    content: 'Oops! Don\'t worry. We\'re here for you.\nMake sure your FLUX Delta has been powered \non, attached to Micro USB Cable and the driver is installed.\n<a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/215327328">More Info</a>'
                 },
 
                 wifi_connection: {
@@ -849,7 +849,7 @@ define(function() {
             HARDWARE_ERROR_ZPROBE_ERROR         : 'Unable to calibrate the base plate\nPlease remove left-over on the nozzle',
             HEAD_ERROR_RESET                    : 'Toolhead bad connection\nPlease re-attach the toolhead, and ensure the toolhead is connected correctly <a href="https://flux3dp.zendesk.com/hc/en-us/articles/218183167">More Info</a>',
             HARDWARE_ERROR_CONVERGENCE_FAILED   : 'Unable to calibrate the base plate\nPlease remove left-over on the nozzle',
-            HARDWARE_ERROR_HOME_FAILED          : 'Unable to home to origin\nPlease remove the obstacle, and reattach the toolhead',
+            HARDWARE_ERROR_HOME_FAILED          : 'Unable to calibrate origin\nPlease remove the obstacle, and reattach the toolhead',
             HEAD_ERROR_TILT                     : 'Toolhead tilt detected\nPlease check ball joint rod is attached correctly',
             HEAD_ERROR_SHAKE                    : 'Toolhead tilt detected\nPlease check ball joint rod is attached correctly',
             WRONG_HEAD                          : 'Device head is unknown, please connect to a correct toolhead',
@@ -860,11 +860,11 @@ define(function() {
             SUBSYSTEM_ERROR                     : 'Something went wrong\nPlease restart the device',
             HARDWARE_FAILURE                    : 'Something went wrong\nPlease restart the device',
             MAINBOARD_OFFLINE                   : 'Something went wrong\nPlease restart the device',
-            HEAD_ERROR_HARDWARE_FAILURE         : 'Something went wrong with toolhead\nPlease re-attach the toolhead',
+            HEAD_ERROR_HARDWARE_FAILURE         : 'Something went wrong with toolhead\nPlease re-attach the module cable',
             G28_FAILED                          : 'Unable to calibrate origin\nPlease remove the obstacle',
             FILAMENT_RUNOUT_0                   : 'Ran out of filament\nPlease insert new material',
             processing                          : 'Processing',
-            savingPreview                       : 'Saving preview image',
+            savingPreview                       : 'Generating thumbnails',
             hour                                : 'h',
             minute                              : 'm',
             second                              : 's',
