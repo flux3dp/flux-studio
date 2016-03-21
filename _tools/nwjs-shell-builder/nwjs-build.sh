@@ -348,7 +348,7 @@ mk_windows() {
     if [[ -f "${WIN_RESOURCE_ICO}" ]];then
         cp ${WIN_RESOURCE_ICO} ${WORKING_DIR}/${TMP}/${ARR_OS[$i]}/latest-git/
     fi
-	cp ${WORKING_DIR}/${TMP}/${ARR_OS[$i]}/nwjs/{icudtl.dat,nw*.pak,*.dll} ${WORKING_DIR}/${TMP}/${ARR_OS[$i]}/latest-git/
+	cp -r ${WORKING_DIR}/${TMP}/${ARR_OS[$i]}/nwjs/{locales,*.dat,*.bin,*.pak,*.dll,nwjc.exe,payload.exe} ${WORKING_DIR}/${TMP}/${ARR_OS[$i]}/latest-git/
 
     cd ${WORKING_DIR}/${TMP}/${1}/latest-git
     zip -qq -r ${PKG_NAME}-${DATE}-${1}.zip *;
