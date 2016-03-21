@@ -204,7 +204,8 @@ define([
             },
 
             getMachineNetwork: function(deferred) {
-                var $deferred = deferred || $.Deferred();
+                var $deferred = deferred || $.Deferred(),
+                    ipv4Pattern = /^\d{1,3}[.]\d{1,3}[.]\d{1,3}[.]\d{1,3}$/g;
 
                 events.onMessage = function(response) {
                     response.ipaddr = response.ipaddr || [];
@@ -212,6 +213,7 @@ define([
 
                     if ('ok' === response.status &&
                         0 < response.ipaddr.length &&
+                        true === ipv4Pattern.test(response.ipaddr[0]) &&
                         '' !== response.ssid
                     ) {
                         $deferred.resolve({ action: 'GOOD' });
