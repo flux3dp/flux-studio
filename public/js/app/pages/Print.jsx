@@ -733,7 +733,7 @@ define([
                             <div className="arrowBox" onClick={this._handleCloseAllView}>
                                 <div title={lang.print.importTitle} className="file-importer">
                                     <div className="import-btn">{lang.print.import}</div>
-                                    <input ref="import" type="file" accept=".stl,.fc" onChange={this._handleImport} multiple />
+                                    <input ref="import" type="file" accept=".stl,.fc,.gcode" onChange={this._handleImport} multiple />
                                 </div>
                             </div>
                         </div>
