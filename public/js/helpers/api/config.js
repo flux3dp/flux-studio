@@ -5,7 +5,7 @@
 define([
     'helpers/websocket',
     'helpers/local-storage'
-], function(Websocket, localStorage) {
+], function(Websocket, _localStorage) {
     'use strict';
 
     return function() {
@@ -21,13 +21,13 @@ define([
             write: function(key, value, opts) {
                 opts = stardardOptions(opts);
 
-                localStorage.set(key, value);
+                _localStorage.set(key, value);
                 opts.onFinished();
 
                 return this;
             },
             read: function(key, opts) {
-                var value = localStorage.get(key);
+                var value = _localStorage.get(key);
 
                 opts = stardardOptions(opts);
 
