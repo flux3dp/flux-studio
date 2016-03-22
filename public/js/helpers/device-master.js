@@ -393,7 +393,7 @@ define([
     }
 
     function headinfo() {
-        return _device.actions.headinfo().then(function() {
+        return _device.actions.headinfo().always(function(response) {
             _device.actions.quitTask();
         });
     }
