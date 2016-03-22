@@ -76,7 +76,7 @@ define([
     setInterval(function() {
         pokeIP = config().read('poke-ip-addr');
 
-        if ('string' === typeof pokeIP) {
+        if ('string' === typeof pokeIP && '' !== pokeIP) {
             ws.send(JSON.stringify({ "cmd" : "poke", "ipaddr": pokeIP }));
         }
     }, 3000);
