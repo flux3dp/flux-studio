@@ -4,6 +4,7 @@ define([
     'jsx!widgets/Button-Group',
     'jsx!widgets/Modal',
     'helpers/api/usb-config',
+    'helpers/api/config',
     'app/actions/alert-actions',
     'app/stores/alert-store'
 ], function(
@@ -12,6 +13,7 @@ define([
     ButtonGroup,
     Modal,
     usbConfig,
+    config,
     AlertActions,
     AlertStore
 ) {
@@ -93,7 +95,8 @@ define([
                         setTimeout(function() {
                             deferred = usb.getMachineNetwork(deferred).fail(tryAgain).
                                 progress(tryAgain).
-                                done(function() {
+                                done(function(response) {
+                                    config().write('poke-ip-addr', response.ipaddr[0]);
                                     location.hash = '#initialize/wifi/setup-complete';
                                 });
                         }, 2000);
