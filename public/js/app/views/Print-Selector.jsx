@@ -219,7 +219,6 @@ define([
                     else if (status === DeviceConstants.TIMEOUT) {
                         // TODO: Check default printer
                         ProgressActions.close();
-                        console.log('1');
                         if (self.state.hadDefaultPrinter) {
                             AlertActions.showPopupError(
                                 'printer-connection-timeout',
@@ -234,7 +233,6 @@ define([
                 }).
                 fail(function(status) {
                     ProgressActions.close();
-                    console.log('2');
                     AlertActions.showPopupError('fatal-occurred', status);
                 });
             }
