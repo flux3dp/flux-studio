@@ -3,14 +3,15 @@ define(function() {
 
     return {
         // progress dialog types
-        WAITING      : 'WAITING',
-        STEPPING     : 'STEPPING',
-        NONSTOP      : 'NONSTOP',
+        WAITING                 : 'WAITING',
+        STEPPING                : 'STEPPING',
+        NONSTOP                 : 'NONSTOP',
+        NONSTOP_WITH_MESSAGE    : 'NONSTOP_WITH_MESSAGE',
 
         // events
-        OPEN_EVENT   : 'OPEN',
-        UPDATE_EVENT : 'UPDATE',
-        STOP_EVENT   : 'STOP',
-        FINISH_EVENT : 'FINISH'
+        OPEN_EVENT              : 'OPEN',
+        UPDATE_EVENT            : 'UPDATE',
+        STOP_EVENT              : 'STOP',
+        FINISH_EVENT            : 'FINISH'
     };
 });
