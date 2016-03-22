@@ -1144,7 +1144,7 @@ define([
                     if(!item[0]) {
                         item = [currentDirectoryContent.files[i]];
                     }
-                    imgSrc = URL.createObjectURL(item[1]) || '/img/ph_s.png';
+                    imgSrc = item[1] ? URL.createObjectURL(item[1]) : '/img/ph_s.png';
                     fileNameClass = ClassNames('name', {'selected': self.state.selectedItem === item[0]});
 
                     return (

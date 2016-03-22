@@ -96,7 +96,10 @@ define([
                             onFinished(blob);
                         }
                     }
+                };
 
+                events.onError = function(response) {
+                    onFinished(response);
                 };
 
                 ws.send('get_img');

@@ -15,6 +15,7 @@ define([
     'helpers/nwjs/menu-factory',
     'app/actions/global-actions',
     'helpers/sprintf',
+    'helpers/packer',
     // non-return value
     'threeOrbitControls',
     'threeTrackballControls',
@@ -40,7 +41,8 @@ define([
     I18n,
     MenuFactory,
     GlobalActions,
-    Sprintf
+    Sprintf,
+    packer
 ) {
     'use strict';
 
@@ -439,6 +441,7 @@ define([
                 // if there's a result
                 if(!!result) {
                     if(!!result.error) {
+                        console.log('error');
                         AlertActions.showPopupError('fcode-error', Sprintf(lang.message.brokenFcode, file.name));
                         cancelPreview();
                     }
@@ -469,10 +472,13 @@ define([
         };
 
         var processPreview = function(blob) {
-            previewUrl = URL.createObjectURL(blob);
-            blobExpired = false;
-            responseBlob = new Blob([reader.result]);
-            GlobalActions.sliceComplete(metadata);
+            if(blob instanceof Blob) {
+                previewUrl = URL.createObjectURL(blob);
+                blobExpired = false;
+                responseBlob = new Blob([reader.result]);
+                GlobalActions.sliceComplete(metadata);
+            }
+
         };
 
         reader.readAsArrayBuffer(file);
@@ -844,6 +850,9 @@ define([
             case 'mouseDown':
                 objectBeforeTransform = {};
                 Object.assign(objectBeforeTransform, SELECTED);
+                objectBeforeTransform.size = SELECTED.size.clone();
+                objectBeforeTransform.scale = SELECTED.scale.clone();
+                objectBeforeTransform.rotation = SELECTED.rotation.clone();
                 transformMode = true;
                 reactSrc.setState({
                     isTransforming: true
@@ -1982,8 +1991,9 @@ define([
 
     function downloadScene(fileName) {
         if(objects.length === 0) { return; }
-        var packer = require('helpers/packer'),
-            parameter;
+
+        var parameter;
+        packer.clear();
 
         if(objects.length > 0) {
             objects.forEach(function(model) {
@@ -2001,7 +2011,6 @@ define([
         // console.log(url);
         // location.href = url;
         saveAs(sceneFile, fileName + '.fsc');
-        console.log('downloading scene');
     }
 
     function loadScene() {

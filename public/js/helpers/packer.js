@@ -13,7 +13,6 @@ define(['jquery'],function($) {
     }
 
     function addInfo(information) {
-        console.log(information);
         info.push(information);
     }
 
@@ -23,7 +22,7 @@ define(['jquery'],function($) {
 
         totalSize = files.reduce(function(p, c) {
             return p.size + c.size;
-        });
+        }, {size: 0});
 
         files.forEach(function(i) {
             fileInfo.push({size: i.size, name: i.name});
@@ -35,8 +34,8 @@ define(['jquery'],function($) {
         var infoIndex = _pad(totalSize, reserveLength);
         files.unshift(infoIndex);
 
-        console.log('packed', files);
-        return new Blob(files);
+        var b = new Blob(files, {type : 'application/scene'});
+        return b;
     }
 
     function unpack(source) {
@@ -57,7 +56,6 @@ define(['jquery'],function($) {
 
             _info.shift();
             _info.unshift(_files);
-            console.log('unpacked', _info);
             d.resolve(_info);
         });
 
@@ -91,6 +89,11 @@ define(['jquery'],function($) {
         return d.promise();
     }
 
+    function clear() {
+        files.length = 0;
+        info.length = 0;
+    }
+
     function _pad(num, size) {
         var s = num + '';
         while (s.length < size) {
@@ -103,6 +106,7 @@ define(['jquery'],function($) {
         addFile     : addFile,
         addInfo     : addInfo,
         pack        : pack,
-        unpack      : unpack
+        unpack      : unpack,
+        clear       : clear
     };
 });
