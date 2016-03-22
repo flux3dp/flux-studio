@@ -216,7 +216,8 @@ define([
                         true === ipv4Pattern.test(response.ipaddr[0]) &&
                         '' !== response.ssid
                     ) {
-                        $deferred.resolve({ action: 'GOOD' });
+                        response.action = 'GOOD';
+                        $deferred.resolve(response);
                     }
                     else {
                         $deferred.notify({ action: 'TRY_AGAIN' });

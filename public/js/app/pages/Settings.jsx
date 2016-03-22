@@ -110,7 +110,6 @@ define([
                 footer =
                     <footer className="sticky-bottom">
                         <div className="actions">
-                            {/*<a className="btn btn-cancel">{lang.settings.cancel}</a>*/}
                             <a className="btn btn-done" onClick={this._handleDone}>{lang.settings.done}</a>
                         </div>
                     </footer>
