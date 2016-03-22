@@ -693,7 +693,11 @@ define([
                                 'maintain',
                                 'headinfo'
                             ];
-                            ws.send(updateArgs.join(' '));
+
+                            // MAGIC delay for 1sec
+                            setTimeout(function() {
+                                ws.send(args.join(' '));
+                            }, 1000);
                         }
                         else {
                             deferred.resolve(result);
