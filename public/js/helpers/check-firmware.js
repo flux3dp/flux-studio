@@ -10,11 +10,17 @@ define(['jquery', 'helpers/api/config'], function($, config) {
      * @return Promise
      */
     return function(printer, type) {
+        console.log(printer);
         var deferred = $.Deferred(),
             typeMap = {
                 firmware: 'pi',
                 toolhead: 'toolhead'
-            };
+            },
+            versionKeyMap = {
+                firmware: 'version',
+                toolhead: 'toolhead_version'
+            },
+            versionKey = versionKeyMap[type] || '';
 
         type = typeMap[type] || 'pi';
 
@@ -24,7 +30,8 @@ define(['jquery', 'helpers/api/config'], function($, config) {
             }).then(function(response) {
                 response.needUpdate = (
                     null !== response.latest_version &&
-                    printer.version !== response.latest_version
+                    'string' === typeof printer[versionKey] &&
+                    printer[versionKey] !== response.latest_version
                 );
                 response.latestVersion = response.latest_version;
 
