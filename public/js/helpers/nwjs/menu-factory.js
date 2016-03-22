@@ -405,12 +405,16 @@ define([
                     enabled: true,
                     type: 'checkbox',
                     onClick: function() {
-                        var _currentPrinters = menuMap.all[3].subItems,
+                        var _currentPrinters = menuMap.all[menuMap.parentIndex.DEVICE].subItems,
                             targetPrinter;
 
                         _currentPrinters.forEach(function(_printer, i) {
-                            if (1 < i && printer.uuid === _currentPrinters[i].uuid) {
-                                targetPrinter = _currentPrinters[i];
+                            if (1 < i) {
+                                _currentPrinters[i].subItems[4].checked = false;
+
+                                if (printer.uuid === _currentPrinters[i].uuid) {
+                                    targetPrinter = _currentPrinters[i];
+                                }
                             }
                         });
 
@@ -439,7 +443,7 @@ define([
             });
 
             return _printers;
-        }
+        };
 
         doDiscover = function() {
             var _printers = [],

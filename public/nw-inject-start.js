@@ -19,7 +19,6 @@ var process = nw.process,
     ghostExecuted = false,
     appWindow,
     executeGhost = function(port, libPath) {
-        console.log(port, libPath);
         var slic3rPathIndex = 1,
             args = [
                 '--slic3r',
