@@ -97,13 +97,16 @@
     margin: 0 0 20px 0;
 }
 
-.settings .general select {
-    width: 240px;
-    height: 32px;
-    overflow: hidden;;
-    border: 1px solid #ccc;
-    background-color: #FFFFFF;
-    padding-left: 10px;
+.settings .general {
+    input[type="text"],
+    select {
+        width: 240px;
+        height: 32px;
+        overflow: hidden;;
+        border: 1px solid #ccc;
+        background-color: #FFFFFF;
+        padding-left: 10px;
+    }
 }
 
 .settings footer {
