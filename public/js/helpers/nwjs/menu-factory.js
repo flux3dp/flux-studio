@@ -17,7 +17,8 @@ define([
     'app/actions/progress-actions',
     'app/constants/progress-constants',
     'app/actions/input-lightbox-actions',
-    'app/constants/input-lightbox-constants'
+    'app/constants/input-lightbox-constants',
+    'helpers/api/touch'
 ], function(
     gui,
     menuMap,
@@ -34,7 +35,8 @@ define([
     ProgressActions,
     ProgressConstants,
     InputLightboxActions,
-    InputLightboxConstants
+    InputLightboxConstants,
+    touch
 ) {
     'use strict';
 
@@ -116,13 +118,47 @@ define([
                             lang.update.network_unreachable
                         );
                     });
+                },
+                checkStatus = function() {
+                    checkDeviceStatus(currentPrinter).done(function(status) {
+                        switch (status) {
+                        case 'ok':
+                            updateFirmware();
+                            break;
+                        case 'auth':
+                            var opts = {
+                                onSuccess: function() {
+                                    updateFirmware();
+                                },
+                                onError: function() {
+                                    InputLightboxActions.open('auth-device', {
+                                        type         : InputLightboxConstants.TYPE_PASSWORD,
+                                        caption      : lang.select_printer.notification,
+                                        inputHeader  : lang.select_printer.please_enter_password,
+                                        confirmText  : lang.select_printer.submit,
+                                        onSubmit     : function(password) {
+                                            _auth(printer.uuid, password, {
+                                                onError: function() {
+                                                    AlertActions.showPopupError('device-auth-fail', lang.select_printer.auth_failure);
+                                                }
+                                            });
+                                        }
+                                    });
+                                }
+                            };
+                            _auth(currentPrinter.uuid, '', opts);
+                            break;
+                        }
+                    });
+
                 };
 
-            checkDeviceStatus(currentPrinter).done(function(status) {
-                switch (status) {
-                case 'ok':
-                    updateFirmware();
-                    break;
+            DeviceMaster.selectDevice(printer).then(function(status) {
+                if (status === DeviceConstants.CONNECTED) {
+                    checkStatus();
+                }
+                else if (status === DeviceConstants.TIMEOUT) {
+                    AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
                 }
             });
         },
@@ -138,7 +174,27 @@ define([
         createDevice,
         createDeviceList,
         doDiscover,
-        discoverMethods;
+        discoverMethods,
+        _auth = function(uuid, password, opts) {
+            ProgressActions.open(ProgressConstants.NONSTOP);
+            opts = opts || {};
+            opts.onError = opts.onError || function() {};
+            opts.onSuccess = opts.onSuccess || function() {};
+
+            var self = this,
+                _opts = {
+                    onSuccess: function(data) {
+                        ProgressActions.close();
+                        opts.onSuccess();
+                    },
+                    onFail: function(data) {
+                        ProgressActions.close();
+                        opts.onError();
+                    }
+                };
+
+            touch(_opts).send(uuid, password);
+        };
 
     MenuItem = gui.MenuItem;
     NWjsWindow = gui.Window.get();
@@ -287,23 +343,46 @@ define([
                     enabled: true,
                     onClick: function() {
                         var currentPrinter = discoverMethods.getLatestPrinter(printer),
-                            showPopup = function(status) {
-                                if (status === DeviceConstants.CONNECTED) {
-                                    AlertActions.showChangeFilament(currentPrinter);
-                                }
-                                else if (status === DeviceConstants.TIMEOUT) {
-                                    AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
-                                }
+                            showPopup = function() {
+                                checkDeviceStatus(currentPrinter).done(function(status) {
+                                    switch (status) {
+                                    case 'ok':
+                                        AlertActions.showChangeFilament(currentPrinter);
+                                        break;
+                                    case 'auth':
+                                        var opts = {
+                                            onSuccess: function() {
+                                                AlertActions.showChangeFilament(currentPrinter);
+                                            },
+                                            onError: function() {
+                                                InputLightboxActions.open('auth-device', {
+                                                    type         : InputLightboxConstants.TYPE_PASSWORD,
+                                                    caption      : lang.select_printer.notification,
+                                                    inputHeader  : lang.select_printer.please_enter_password,
+                                                    confirmText  : lang.select_printer.submit,
+                                                    onSubmit     : function(password) {
+                                                        _auth(printer.uuid, password, {
+                                                            onError: function() {
+                                                                AlertActions.showPopupError('device-auth-fail', lang.select_printer.auth_failure);
+                                                            }
+                                                        });
+                                                    }
+                                                });
+                                            }
+                                        };
+                                        _auth(currentPrinter.uuid, '', opts);
+                                        break;
+                                    }
+                                });
                             };
 
                         DeviceMaster.selectDevice(currentPrinter).then(function(status) {
-                            checkDeviceStatus(currentPrinter).done(function(status) {
-                                switch (status) {
-                                case 'ok':
-                                    showPopup(status);
-                                    break;
-                                }
-                            });
+                            if (status === DeviceConstants.CONNECTED) {
+                                showPopup();
+                            }
+                            else if (status === DeviceConstants.TIMEOUT) {
+                                AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
+                            }
                         });
                     }
                 },
