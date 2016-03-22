@@ -671,6 +671,50 @@ define([
                 ws.send(args.join(' '));
 
                 return deferred.promise();
+            },
+
+            /**
+             * fetch toolhead info
+             *
+             * @return Promise
+             */
+            headinfo: function() {
+                var deferred = $.Deferred(),
+                    args = [
+                        'task',
+                        'maintain'
+                    ];
+
+                events.onMessage = function(result) {
+                    switch (result.status) {
+                    case 'ok':
+                        if ('maintain' === result.task) {
+                            args = [
+                                'maintain',
+                                'headinfo'
+                            ];
+
+                            // MAGIC delay for 1sec
+                            setTimeout(function() {
+                                ws.send(args.join(' '));
+                            }, 1000);
+                        }
+                        else {
+                            deferred.resolve(result);
+                        }
+                        break;
+                    default:
+                        deferred.reject(result);
+                    }
+                };
+
+                events.onError = function(result) {
+                    deferred.reject(result);
+                };
+
+                ws.send(args.join(' '));
+
+                return deferred.promise();
             }
         };
     };

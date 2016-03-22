@@ -392,6 +392,12 @@ define([
         });
     }
 
+    function headinfo() {
+        return _device.actions.headinfo().always(function(response) {
+            _device.actions.quitTask();
+        });
+    }
+
     // Private Functions
 
     function _do(command) {
@@ -558,6 +564,7 @@ define([
             this.getFirstDevice         = getFirstDevice;
             this.updateFirmware         = updateFirmware;
             this.updateToolhead         = updateToolhead;
+            this.headinfo               = headinfo;
 
             Discover(
                 'device-master',
