@@ -46,7 +46,23 @@ define([
         executeFirmwareUpdate = function(printer, type) {
             var currentPrinter = discoverMethods.getLatestPrinter(printer),
                 lang = i18n.get(),
+                checkToolheadFirmware = function() {
+                    var $deferred = $.Deferred();
+
+                    if ('toolhead' === type) {
+                        DeviceMaster.headinfo().done(function(response) {
+                            currentPrinter.toolhead_version = response.version;
+                            $deferred.resolve({ status: 'ok' });
+                        });
+                    }
+                    else {
+                        $deferred.resolve({ status: 'ok' });
+                    }
+
+                    return $deferred;
+                },
                 updateFirmware = function() {
+                    console.log(currentPrinter);
                     checkFirmware(currentPrinter, type).done(function(response) {
                         var doUpdate = (
                                 'firmware' === type ?
@@ -90,19 +106,12 @@ define([
                             };
 
                         if (true === response.needUpdate) {
-                            DeviceMaster.selectDevice(printer).then(function(status) {
-                                if (status === DeviceConstants.CONNECTED) {
-                                    AlertActions.showUpdate(
-                                        printer,
-                                        type,
-                                        response,
-                                        onInstall
-                                    );
-                                }
-                                else if (status === DeviceConstants.TIMEOUT) {
-                                    AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
-                                }
-                            });
+                            AlertActions.showUpdate(
+                                printer,
+                                type,
+                                response,
+                                onInstall
+                            );
                         }
                         else {
                             AlertActions.showPopupInfo(
@@ -123,7 +132,9 @@ define([
                     checkDeviceStatus(currentPrinter).done(function(status) {
                         switch (status) {
                         case 'ok':
-                            updateFirmware();
+                            checkToolheadFirmware().done(function() {
+                                updateFirmware();
+                            });
                             break;
                         case 'auth':
                             var opts = {
