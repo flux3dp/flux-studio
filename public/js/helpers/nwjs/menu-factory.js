@@ -51,8 +51,13 @@ define([
 
                     if ('toolhead' === type) {
                         DeviceMaster.headinfo().done(function(response) {
-                            currentPrinter.toolhead_version = response.version;
-                            $deferred.resolve({ status: 'ok' });
+                            if ('undefined' === typeof response.version) {
+                                $deferred.reject();
+                            }
+                            else {
+                                currentPrinter.toolhead_version = response.version || undefined;
+                                $deferred.resolve({ status: 'ok' });
+                            }
                         });
                     }
                     else {
@@ -62,7 +67,6 @@ define([
                     return $deferred;
                 },
                 updateFirmware = function() {
-                    console.log(currentPrinter);
                     checkFirmware(currentPrinter, type).done(function(response) {
                         var doUpdate = (
                                 'firmware' === type ?
@@ -129,17 +133,23 @@ define([
                     });
                 },
                 checkStatus = function() {
+                    var goCheckStatus = function() {
+                        checkToolheadFirmware().done(function() {
+                            updateFirmware();
+                        }).fail(function() {
+                            AlertActions.showPopupError('toolhead-offline', lang.monitor.HEAD_OFFLINE);
+                        });
+                    };
+
                     checkDeviceStatus(currentPrinter).done(function(status) {
                         switch (status) {
                         case 'ok':
-                            checkToolheadFirmware().done(function() {
-                                updateFirmware();
-                            });
+                            goCheckStatus();
                             break;
                         case 'auth':
                             var opts = {
                                 onSuccess: function() {
-                                    updateFirmware();
+                                    goCheckStatus();
                                 },
                                 onError: function() {
                                     InputLightboxActions.open('auth-device', {
