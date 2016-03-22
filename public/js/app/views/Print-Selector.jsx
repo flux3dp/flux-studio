@@ -200,7 +200,7 @@ define([
                 self._returnSelectedPrinter();
             }
             else {
-                ProgressActions.open(ProgressConstants.NONSTOP);
+                ProgressActions.open(ProgressConstants.NONSTOP_WITH_MESSAGE, lang.initialize.connecting);
                 DeviceMaster.selectDevice(self.selected_printer).done(function(status) {
                     ProgressActions.close();
 
@@ -219,6 +219,7 @@ define([
                     else if (status === DeviceConstants.TIMEOUT) {
                         // TODO: Check default printer
                         ProgressActions.close();
+                        console.log('1');
                         if (self.state.hadDefaultPrinter) {
                             AlertActions.showPopupError(
                                 'printer-connection-timeout',
@@ -233,13 +234,15 @@ define([
                 }).
                 fail(function(status) {
                     ProgressActions.close();
+                    console.log('2');
                     AlertActions.showPopupError('fatal-occurred', status);
                 });
             }
         },
 
         _auth: function(uuid, password, opts) {
-            ProgressActions.open(ProgressConstants.NONSTOP);
+            var lang = this.props.lang;
+            ProgressActions.open(ProgressConstants.NONSTOP_WITH_MESSAGE, lang.initialize.connecting);
             opts = opts || {};
             opts.onError = opts.onError || function() {};
 

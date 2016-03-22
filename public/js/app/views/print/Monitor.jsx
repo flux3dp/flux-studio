@@ -1475,7 +1475,8 @@ define([
                             this.state.mode === mode.PREVIEW && filePreview ||
                             statusId !== DeviceConstants.status.IDLE &&
                             statusId !== DeviceConstants.status.MAINTAIN &&
-                            statusId !== DeviceConstants.status.SCAN
+                            statusId !== DeviceConstants.status.SCAN ||
+                            _duration !== ''
                     },
                     {
                         'hide': this.state.mode === 'CAMERA'
