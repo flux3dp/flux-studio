@@ -14,6 +14,6 @@ define([], function(){
         PRINT                           : 'PRINT',
         LASER                           : 'LASER',
         DEVICE_LIST                     : 'DEVICE_LIST',
-        DEFAULT_PRINT_SETTING_VERSION   : '0.24'
+        DEFAULT_PRINT_SETTING_VERSION   : '0.29'
     };
 });

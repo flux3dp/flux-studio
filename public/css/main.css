@@ -2891,7 +2891,8 @@ input[type=range]:focus::-webkit-slider-runnable-track {
     .controls .label {
         color: #B3B3B3;
         font-size: 13px;
-        line-height: 40px; }
+        line-height: 40px;
+        width: 100px; }
     .controls .control {
         line-height: 40px;
         position: relative; }
@@ -3310,6 +3311,17 @@ input[type=range]:focus::-webkit-slider-runnable-track {
     height: 8rem;
     min-height: 8rem;
     width: 8rem; }
+
+.modal-progress-nonstop-with-message .spinner-roller {
+    height: 4rem;
+    margin: auto;
+    width: 4rem; }
+
+.modal-progress-nonstop-with-message .modal-alert {
+    min-height: 8rem;
+    width: 100%; }
+    .modal-progress-nonstop-with-message .modal-alert .caption {
+        padding-bottom: 1rem; }
 
 .modal-input-lightbox .modal-alert {
     min-height: 18rem;
@@ -5012,6 +5024,7 @@ input.switch:checked ~ label:after {
 .settings .general .row-fluid {
     margin: 0 0 20px 0; }
 
+.settings .general input[type="text"],
 .settings .general select {
     width: 240px;
     height: 32px;

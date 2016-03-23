@@ -132,9 +132,11 @@ define([
 
             // Private methods
             _onCancel: function(id) {
-                var usb = usbConfig();
-                usb.close();
-                location.hash = 'initialize/wifi/connect-machine';
+                if ('#initialize/wifi/select' === location.hash) {
+                    var usb = usbConfig();
+                    usb.close();
+                    location.hash = 'initialize/wifi/connect-machine';
+                }
             },
 
             _afterStopWifiScanning: function(args) {

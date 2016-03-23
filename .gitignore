@@ -2,7 +2,8 @@
 .DS_Store
 Desktop.ini
 node_modules
-_tools/nwjs-shell-builder
+_tools/nwjs*
+_tools/build
 public/lib
 
 osx-cache

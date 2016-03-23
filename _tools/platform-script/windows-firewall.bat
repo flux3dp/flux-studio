@@ -12,3 +12,13 @@ if not ERRORLEVEL 1 (
     echo Rule %RULE_NAME% does not exist. Creating...
     netsh advfirewall firewall add rule name=%RULE_NAME% dir=in action=allow protocol=UDP localport=%PORT%
 )
+
+netsh advfirewall firewall show rule name=FLUX_API >nul
+
+if not ERRORLEVEL 1 (
+    rem Rule %RULE_NAME% already exists.
+    echo Hey, you already got a out rule by that name, you cannot put another one in!
+) else (
+    echo Rule %RULE_NAME% does not exist. Creating...
+    netsh advfirewall firewall add rule name=FLUX_API dir=in action=allow protocol=UDP program="%cd%\lib\flux_api\flux_api.exe"
+)

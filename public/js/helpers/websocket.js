@@ -38,7 +38,7 @@ define([
 
         var defaultCallback = function(result) {},
             defaultOptions = {
-                hostname: location.hostname,
+                hostname: (true === window.FLUX.isNW ? 'localhost' : location.hostname),
                 method: '',
                 port: window.FLUX.ghostPort,
                 autoReconnect: true,

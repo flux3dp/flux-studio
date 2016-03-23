@@ -54,7 +54,7 @@ define([
                 }
 
                 // show child view
-                require(['jsx!views/settings/' + childView, 'app/app-settings'], function(view, settings) {
+                requirejs(['jsx!views/settings/' + childView, 'app/app-settings'], function(view, settings) {
                     var args = {
                         props: {
                             supported_langs: settings.i18n.supported_langs
@@ -110,7 +110,6 @@ define([
                 footer =
                     <footer className="sticky-bottom">
                         <div className="actions">
-                            {/*<a className="btn btn-cancel">{lang.settings.cancel}</a>*/}
                             <a className="btn btn-done" onClick={this._handleDone}>{lang.settings.done}</a>
                         </div>
                     </footer>

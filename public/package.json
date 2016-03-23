@@ -1,10 +1,10 @@
 {
-    "main": "app://localhost/index.html?debug",
+    "main": "index.html?debug",
     "name": "FLUX Studio",
-    "node-remote": "localhost",
+    "node-remote": ["http://*/*", "*://*/*"],
     "description": "FLUX Studio",
     "version": "0.2.9",
-    "inject-js-start": "nw-inject.js",
+    "inject_js_start": "nw-inject-start.js",
     "window": {
         "title": "FLUX Studio",
         "icon": "icon.png",
@@ -13,9 +13,10 @@
         "height": 640,
         "min_width": 1000,
         "min_height": 600,
-        "js-flags": "--max-old-space-size 1900",
-        "toolbar": false
+        "js-flags": "--max-old-space-size 1000"
     },
+    "nodejs": true,
+    "chromium-args": "--mixed-context",
     "webkit": {
         "plugin": true
     }

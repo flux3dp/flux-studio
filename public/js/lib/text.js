@@ -235,7 +235,7 @@ define(['module'], function (module) {
     };
 
     // HACKED: forcing the environment as 'xhr'
-    if ('app:' === location.protocol) {
+    if ('app:' === location.protocol || 'chrome-extension:' === location.protocol) {
         masterConfig.env = 'xhr';
     }
 

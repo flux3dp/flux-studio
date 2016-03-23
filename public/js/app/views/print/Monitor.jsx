@@ -1144,7 +1144,7 @@ define([
                     if(!item[0]) {
                         item = [currentDirectoryContent.files[i]];
                     }
-                    imgSrc = URL.createObjectURL(item[1]) || '/img/ph_s.png';
+                    imgSrc = item[1] ? URL.createObjectURL(item[1]) : '/img/ph_s.png';
                     fileNameClass = ClassNames('name', {'selected': self.state.selectedItem === item[0]});
 
                     return (
@@ -1475,7 +1475,8 @@ define([
                             this.state.mode === mode.PREVIEW && filePreview ||
                             statusId !== DeviceConstants.status.IDLE &&
                             statusId !== DeviceConstants.status.MAINTAIN &&
-                            statusId !== DeviceConstants.status.SCAN
+                            statusId !== DeviceConstants.status.SCAN ||
+                            _duration !== ''
                     },
                     {
                         'hide': this.state.mode === 'CAMERA'

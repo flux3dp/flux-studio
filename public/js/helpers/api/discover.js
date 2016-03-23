@@ -5,9 +5,10 @@
 define([
     'helpers/websocket',
     'app/actions/initialize-machine',
+    'helpers/api/config',
     'helpers/array-findindex',
     'helpers/object-assign'
-], function(Websocket, initializeMachine) {
+], function(Websocket, initializeMachine, config) {
     'use strict';
 
     var ws = ws || new Websocket({
@@ -67,9 +68,18 @@ define([
             }, BUFFER);
         },
         BUFFER = 100,
+        pokeIP,
         timer;
 
     ws.onMessage(onMessage);
+
+    setInterval(function() {
+        pokeIP = config().read('poke-ip-addr');
+
+        if ('string' === typeof pokeIP && '' !== pokeIP) {
+            ws.send(JSON.stringify({ "cmd" : "poke", "ipaddr": pokeIP }));
+        }
+    }, 3000);
 
     return function(id, getPrinters) {
         getPrinters = getPrinters || function() {};

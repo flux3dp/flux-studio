@@ -83,6 +83,7 @@ function(React, Modal, Alert, ProgressConstants) {
                 );
                 break;
             case ProgressConstants.NONSTOP:
+            case ProgressConstants.NONSTOP_WITH_MESSAGE:
                 message = progressIcon;
                 break;
             }
@@ -99,6 +100,7 @@ function(React, Modal, Alert, ProgressConstants) {
             switch (this.props.type) {
             case ProgressConstants.WAITING:
             case ProgressConstants.NONSTOP:
+            case ProgressConstants.NONSTOP_WITH_MESSAGE:
                 icon = (
                     <div className="spinner-roller spinner-roller-reverse"/>
                 );
@@ -136,7 +138,8 @@ function(React, Modal, Alert, ProgressConstants) {
                     'shadow-modal': true,
                     'waiting': ProgressConstants.WAITING === this.props.type,
                     'modal-progress': true,
-                    'modal-progress-nonstop': ProgressConstants.NONSTOP === this.props.type
+                    'modal-progress-nonstop': ProgressConstants.NONSTOP === this.props.type,
+                    'modal-progress-nonstop-with-message': ProgressConstants.NONSTOP_WITH_MESSAGE === this.props.type
                 };
 
             return (

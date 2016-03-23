@@ -46,6 +46,26 @@ define([
         executeFirmwareUpdate = function(printer, type) {
             var currentPrinter = discoverMethods.getLatestPrinter(printer),
                 lang = i18n.get(),
+                checkToolheadFirmware = function() {
+                    var $deferred = $.Deferred();
+
+                    if ('toolhead' === type) {
+                        DeviceMaster.headinfo().done(function(response) {
+                            if ('undefined' === typeof response.version) {
+                                $deferred.reject();
+                            }
+                            else {
+                                currentPrinter.toolhead_version = response.version || undefined;
+                                $deferred.resolve({ status: 'ok' });
+                            }
+                        });
+                    }
+                    else {
+                        $deferred.resolve({ status: 'ok' });
+                    }
+
+                    return $deferred;
+                },
                 updateFirmware = function() {
                     checkFirmware(currentPrinter, type).done(function(response) {
                         var doUpdate = (
@@ -90,19 +110,12 @@ define([
                             };
 
                         if (true === response.needUpdate) {
-                            DeviceMaster.selectDevice(printer).then(function(status) {
-                                if (status === DeviceConstants.CONNECTED) {
-                                    AlertActions.showUpdate(
-                                        printer,
-                                        type,
-                                        response,
-                                        onInstall
-                                    );
-                                }
-                                else if (status === DeviceConstants.TIMEOUT) {
-                                    AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
-                                }
-                            });
+                            AlertActions.showUpdate(
+                                printer,
+                                type,
+                                response,
+                                onInstall
+                            );
                         }
                         else {
                             AlertActions.showPopupInfo(
@@ -120,15 +133,23 @@ define([
                     });
                 },
                 checkStatus = function() {
+                    var goCheckStatus = function() {
+                        checkToolheadFirmware().done(function() {
+                            updateFirmware();
+                        }).fail(function() {
+                            AlertActions.showPopupError('toolhead-offline', lang.monitor.HEAD_OFFLINE);
+                        });
+                    };
+
                     checkDeviceStatus(currentPrinter).done(function(status) {
                         switch (status) {
                         case 'ok':
-                            updateFirmware();
+                            goCheckStatus();
                             break;
                         case 'auth':
                             var opts = {
                                 onSuccess: function() {
-                                    updateFirmware();
+                                    goCheckStatus();
                                 },
                                 onError: function() {
                                     InputLightboxActions.open('auth-device', {
@@ -295,7 +316,7 @@ define([
         NWjsWindow.menu = mainmenu;
     }
 
-    if ('undefined' !== typeof requireNode) {
+    if (true === window.FLUX.isNW) {
         initialize(menuMap.all);
 
         observe(menuMap.items, function(changes) {
@@ -304,7 +325,7 @@ define([
         });
     }
 
-    if ('undefined' !== typeof requireNode) {
+    if (true === window.FLUX.isNW) {
         createDevice = function(printer) {
             defaultDevice = initializeMachine.defaultPrinter.get();
 
@@ -405,12 +426,16 @@ define([
                     enabled: true,
                     type: 'checkbox',
                     onClick: function() {
-                        var _currentPrinters = menuMap.all[3].subItems,
+                        var _currentPrinters = menuMap.all[menuMap.parentIndex.DEVICE].subItems,
                             targetPrinter;
 
                         _currentPrinters.forEach(function(_printer, i) {
-                            if (1 < i && printer.uuid === _currentPrinters[i].uuid) {
-                                targetPrinter = _currentPrinters[i];
+                            if (1 < i) {
+                                _currentPrinters[i].subItems[4].checked = false;
+
+                                if (printer.uuid === _currentPrinters[i].uuid) {
+                                    targetPrinter = _currentPrinters[i];
+                                }
                             }
                         });
 
@@ -439,7 +464,7 @@ define([
             });
 
             return _printers;
-        }
+        };
 
         doDiscover = function() {
             var _printers = [],
