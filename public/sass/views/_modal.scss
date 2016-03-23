@@ -247,6 +247,23 @@
     }
 }
 
+.modal-progress-nonstop-with-message {
+    .spinner-roller {
+        height: 4rem;
+        margin: auto;
+        width: 4rem;
+    }
+
+    .modal-alert {
+        min-height: 8rem;
+        width: 100%;
+
+        .caption {
+            padding-bottom: 1rem;
+        }
+    }
+}
+
 .modal-input-lightbox {
     .modal-alert {
         min-height: 18rem;
