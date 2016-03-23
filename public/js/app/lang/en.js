@@ -240,7 +240,7 @@ define(function() {
                 flux_cloud: 'FLUX Could',
                 printer: 'Printer'
             },
-            ip: 'IP',
+            ip: 'Device IP',
             wrong_ip_format: 'Wrong IP',
             language: 'Language',
             notifications: 'Notifications',

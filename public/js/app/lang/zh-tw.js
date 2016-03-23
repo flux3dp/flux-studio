@@ -240,7 +240,7 @@ define(function() {
                 flux_cloud: 'FLUX Could',
                 printer: '成型機'
             },
-            ip: 'IP',
+            ip: '裝置 IP',
             wrong_ip_format: 'IP格式錯誤',
             language: '語言',
             notifications: '通知',
