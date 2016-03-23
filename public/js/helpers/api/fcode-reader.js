@@ -45,7 +45,7 @@ define([
              * @param {Int}         size       - binary data with array buffer type
              * @param {Function}    onFinished - fired when process finished
              */
-            upload: function(data, size, onFinished, opts) {
+            upload: function(data, size, onFinished, gcode) {
                 var args = [
                     'upload',
                     size
@@ -69,6 +69,8 @@ define([
                 events.onFatal = function(response) {
                     onFinished(response);
                 };
+
+                args.push(gcode ? '-g' : '-f');
 
                 ws.send(args.join(' '));
             },
@@ -102,6 +104,7 @@ define([
                     onFinished(response);
                 };
 
+
                 ws.send('get_img');
             },
 
@@ -129,6 +132,25 @@ define([
                 };
 
                 ws.send('get_path');
+                return d.promise();
+            },
+
+            getFCode: function() {
+                var d = $.Deferred(),
+                    totalLength = 0;
+
+                events.onMessage = function(response) {
+                    if (response.status === 'complete') {
+                        totalLength = response.length;
+                    }
+                    else if (response instanceof Blob) {
+                        if (totalLength === response.size) {
+                            d.resolve(response);
+                        }
+                    }
+                };
+
+                ws.send('get_fcode');
                 return d.promise();
             }
         }
