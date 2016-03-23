@@ -36,7 +36,7 @@ define([
     var _id = 'MONITOR',
         pathArray,
         start,
-        scrollSize = 10,
+        scrollSize = 1,
         currentLevelFiles = [],
         filesInfo = [],
         history = [],
@@ -297,23 +297,26 @@ define([
                 return this._checkUSBFolderExistance();
             }.bind(this)).then(function(exist) {
                 usbExist = exist;
-                socketStatus.reader = true;
 
-                if(openSource === GlobalConstants.DEVICE_LIST) {
-                    socketStatus.ready = false;
-                    DeviceMaster.getPreviewInfo().then(function(info) {
-                        if(this.state.mode !== mode.BROWSE_FILE) {
+                var t = setInterval(function() {
+                    if(socketStatus.ready) {
+                        clearInterval(t);
+                        if(openSource === GlobalConstants.DEVICE_LIST) {
+                            socketStatus.ready = false;
+                            DeviceMaster.getPreviewInfo().then(function(info) {
+                                if(this.state.mode !== mode.BROWSE_FILE) {
+                                    this._startReport();
+                                }
+                                socketStatus.ready = true;
+                                this._processInfo(info);
+                            }.bind(this));
+                        }
+                        else {
+                            totalTimeInSeconds = parseInt(this.props.slicingStatus.time || this.props.slicingStatus.metadata.TIME_COST);
                             this._startReport();
                         }
-                        socketStatus.ready = true;
-                        this._processInfo(info);
-                    }.bind(this));
-                }
-                else {
-                    totalTimeInSeconds = parseInt(this.props.slicingStatus.time || this.props.slicingStatus.metadata.TIME_COST);
-
-                    this._startReport();
-                }
+                    }
+                }.bind(this), 200);
             }.bind(this));
 
             // listening to key
@@ -335,9 +338,7 @@ define([
             AlertStore.removeCancelListener(this._handleCancel);
             AlertStore.removeYesListener(this._handleYes);
 
-            if(this.state.mode === mode.CAMERA) {
-                DeviceMaster.stopCamera();
-            }
+            this._stopCamera();
             this._stopReport();
             history = [];
             messageViewed = false;
@@ -349,6 +350,17 @@ define([
 
         _hasFCode: function() {
             return this.props.fCode instanceof Blob;
+        },
+
+        _stopCamera: function() {
+            if(this.state.mode === mode.CAMERA) {
+                socketStatus.ready = false;
+                DeviceMaster.stopCamera().then(function() {
+                    return DeviceMaster.kick();
+                }).then(function() {
+                    socketStatus.ready = true;
+                });
+            }
         },
 
         _refreshDirectory: function() {
@@ -437,7 +449,7 @@ define([
             if(id === DeviceConstants.KICK) {
                 socketStatus.ready = false;
                 DeviceMaster.kick().then(function() {
-                    socketStatus.reader = true;
+                    socketStatus.ready = true;
                     this._startReport();
                 }.bind(this));
             }
@@ -468,13 +480,20 @@ define([
             filesInfo = [];
             pathArray = [];
 
-            this._retrieveFolderContent('').then(function() {
-                this.setState({
-                    mode: mode.BROWSE_FILE
-                }, function() {
-                    this._addHistory();
-                });
-            }.bind(this));
+            var t = setInterval(function() {
+                if(socketStatus.ready) {
+                    clearInterval(t);
+                    socketStatus.ready = false;
+                    this._retrieveFolderContent('').then(function() {
+                        socketStatus.ready = true;
+                        this.setState({
+                            mode: mode.BROWSE_FILE
+                        }, function() {
+                            this._addHistory();
+                        });
+                    }.bind(this));
+                }
+            }.bind(this), 200);
         },
 
         _handleSelectFolder: function(pathName) {
@@ -514,10 +533,16 @@ define([
         },
 
         _handleDeleteFile: function(pathToFile, fileName) {
-            var a = 'no';
-            DeviceMaster.deleteFile(pathToFile, fileName).then(function(response) {
-                this._removeFileFromUI(fileName);
-            }.bind(this));
+            var t = setInterval(function() {
+                if(socketStatus.ready) {
+                    clearInterval(t);
+                    socketStatus.ready = false;
+                    DeviceMaster.deleteFile(pathToFile, fileName).then(function(response) {
+                        socketStatus.ready = true;
+                        this._removeFileFromUI(fileName);
+                    }.bind(this));
+                }
+            }.bind(this), 200);
         },
 
         _handleBack: function() {
@@ -530,15 +555,7 @@ define([
             filePreview = false;
             lastAction = history[history.length - 1];
 
-            if(this.state.mode === mode.CAMERA) {
-                socketStatus.ready = false;
-                DeviceMaster.stopCamera().then(function() {
-                    return DeviceMaster.kick();
-                }).then(function() {
-                    socketStatus.ready = true;
-                });
-            }
-
+            this._stopCamera();
             this._clearSelectedItem();
 
             var actions = {
@@ -563,15 +580,6 @@ define([
             if(actions[lastAction.mode]) {
                 actions[lastAction.mode]();
                 this.setState({ mode: lastAction.mode });
-            }
-        },
-
-        _handleScroll: function(e) {
-            if(this.state.mode === mode.BROWSE_FILE) {
-                var onNeedData = e.target.scrollHeight === e.target.offsetHeight + e.target.scrollTop;
-                if(onNeedData) {
-                    this._renderFolderFilesWithPreview();
-                }
             }
         },
 
@@ -635,26 +643,32 @@ define([
         },
 
         _handleUpload: function(e) {
+            socketStatus.cancel = true;
             if(e.target.files.length > 0) {
                 fileToBeUpload = e.target.files[0];
-                this._existFileInDirectory(pathArray, fileToBeUpload.name).then(function(exist) {
-                    if(exist) {
-                        this._stopReport();
-                        AlertActions.showPopupYesNo('UPLOAD_FILE', lang.monitor.fileExistContinue);
-                    }
-                    else {
-                        var info = fileToBeUpload.name.split('.'),
-                            ext  = info[info.length - 1];
+                var t = setInterval(function() {
+                    if(socketStatus.ready) {
+                        clearInterval(t);
+                        this._existFileInDirectory(pathArray, fileToBeUpload.name.replace(/ /g, '_')).then(function(exist) {
+                            if(exist) {
+                                this._stopReport();
+                                AlertActions.showPopupYesNo('UPLOAD_FILE', lang.monitor.fileExistContinue);
+                            }
+                            else {
+                                var info = fileToBeUpload.name.split('.'),
+                                    ext  = info[info.length - 1];
 
-                        if(ext === 'gcode') {
-                            this._stopReport();
-                            AlertActions.showPopupYesNo('CONFIRM_G_TO_F', lang.monitor.confirmGToF);
-                        }
-                        else {
-                            this._doFileUpload(fileToBeUpload);
-                        }
+                                if(ext === 'gcode') {
+                                    this._stopReport();
+                                    AlertActions.showPopupYesNo('CONFIRM_G_TO_F', lang.monitor.confirmGToF);
+                                }
+                                else {
+                                    this._doFileUpload(fileToBeUpload);
+                                }
+                            }
+                        }.bind(this));
                     }
-                }.bind(this));
+                }.bind(this), 200);
                 e.target.value = null;
             }
         },
@@ -663,15 +677,16 @@ define([
             var self = this,
                 displayStatus = '';
 
-            start = 0;
             displayStatus = this.state.displayStatus;
             this._stopReport();
+            socketStatus.cancel = true;
             var t = setInterval(function() {
                 if(socketStatus.ready) {
                     clearInterval(t);
                     DeviceMaster.downloadFile(pathArray, self.state.selectedItem, downloadProgressDisplay).then(function(file) {
                         saveAs(file[1], self.state.selectedItem);
                         self.setState({ displayStatus: displayStatus });
+                        self._renderFolderFilesWithPreview();
                     });
                 }
             }, 200);
@@ -993,6 +1008,7 @@ define([
         },
 
         _removeFileFromUI: function(fileName) {
+            socketStatus.cancel = true;
             var files = this.state.currentDirectoryFiles,
                 r = [];
 
@@ -1001,7 +1017,12 @@ define([
                     r.push(files[i]);
                 }
             }
-            this.setState({ currentDirectoryFiles: r });
+            currentDirectoryContent.files = r;
+
+            this.setState({ currentDirectoryFiles: r }, function() {
+                socketStatus.cancel = false;
+                start--; // restart a previous preview render due to delete and skipped
+            });
         },
 
         _retrieveFolderContent: function(path) {
@@ -1022,7 +1043,6 @@ define([
                 start = 0;
 
                 if(!usbExist && pathArray.length === 0) {
-                    console.log(currentDirectoryContent);
                     var i = currentDirectoryContent.directories.indexOf('USB');
                     if(i >= 0) {
                         currentDirectoryContent.directories.splice(i, 1);
@@ -1046,16 +1066,18 @@ define([
         },
 
         _renderFolderFilesWithPreview: function() {
+            if(start > currentDirectoryContent.files.length) {
+                return;
+            }
             this._stopReport();
             if(currentDirectoryContent.files.length === 0) {
                 return;
             }
-
             var end = start + scrollSize;
             if(end > currentDirectoryContent.files.length) {
                 end = currentDirectoryContent.files.length;
             }
-
+            if(socketStatus.cancel) { return; }
             this._retrieveFileInfo(start, end, function(filesArray) {
                 var files = currentDirectoryContent.files;
 
@@ -1065,6 +1087,9 @@ define([
                     start = start + scrollSize;
                 }.bind(this));
                 socketStatus.ready = true;
+                if(end < currentDirectoryContent.files.length) {
+                    this._renderFolderFilesWithPreview();
+                }
             }.bind(this));
         },
 
@@ -1072,7 +1097,12 @@ define([
             filesArray = filesArray || [];
             if(index < end) {
                 var t = setInterval(function() {
-                    if(socketStatus.ready) {
+                    if(socketStatus.cancel) {
+                        clearInterval(t);
+                        socketStatus.ready = true;
+                        socketStatus.cancel = false;
+                    }
+                    else if(socketStatus.ready) {
                         clearInterval(t);
                         socketStatus.ready = false;
                         DeviceMaster.fileInfo(
@@ -1109,7 +1139,9 @@ define([
             var t = setInterval(function() {
                 if(socketStatus.ready) {
                     clearInterval(t);
+                    socketStatus.ready = false;
                     DeviceMaster.ls('USB').then(function(result) {
+                        socketStatus.ready = true;
                         d.resolve(result.status === 'ok');
                     });
                 }
@@ -1584,7 +1616,7 @@ define([
                             </div>
                         </div>
                         <div className="body">
-                            <div className="device-content" onScroll={this._handleScroll}>
+                            <div className="device-content">
                                 {content}
                                 {waitIcon}
                                 {printingInfo}
