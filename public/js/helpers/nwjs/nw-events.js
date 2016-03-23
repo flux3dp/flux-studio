@@ -7,6 +7,8 @@ define(['helpers/i18n'], function(i18n) {
             lang = i18n.get(),
             exec = requireNode('child_process').exec;
 
+        win.title = 'FLUX Studio';
+
         win.on('close', function() {
             if (true === window.confirm(lang.topmenu.sure_to_quit)) {
                 exec('pkill -f flux_api', function(error, stdout, stderr) {
