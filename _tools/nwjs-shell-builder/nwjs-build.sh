@@ -363,7 +363,7 @@ mk_osx() {
 
 	# check if it is nwjs or node-webkit
 	if [[ -d "${WORKING_DIR}/${TMP}/${ARR_OS[$i]}/nwjs/nwjs.app" ]]; then
-		CFBundleExecutable=$(upper_case_word ${PKG_NAME} | sed 's/_/ /g')
+		CFBundleExecutable="nwjs"
 	else
 		CFBundleExecutable="node-webkit"
 	fi
@@ -386,7 +386,7 @@ cat << gisto_plist_helper >> ${WORKING_DIR}/${TMP}/${ARR_OS[$i]}/latest-git/${PK
 	<key>CFBundleDocumentTypes</key>
 	<array/>
 	<key>CFBundleExecutable</key>
-	<string>$(upper_case_word ${PKG_NAME} | sed 's/_/ /g')</string>
+	<string>${CFBundleExecutable}</string>
 	<key>CFBundleIconFile</key>
     <string>$(echo "${OSX_RESOURCE_ICNS}" | rev | cut -d"/" -f1 | rev)</string>
 	<key>CFBundleIdentifier</key>
