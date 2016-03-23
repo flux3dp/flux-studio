@@ -694,10 +694,10 @@ define([
                                 'headinfo'
                             ];
 
-                            // MAGIC delay for 1sec
+                            // MAGIC delay for 5sec
                             setTimeout(function() {
                                 ws.send(args.join(' '));
-                            }, 1000);
+                            }, 5000);
                         }
                         else {
                             deferred.resolve(result);
