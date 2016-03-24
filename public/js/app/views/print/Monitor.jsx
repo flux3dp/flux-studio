@@ -191,7 +191,11 @@ define([
         'ABORTED': function() {
             displayStatus = lang.device.aborted;
             currentStatus = '';
-            if(openSource === GlobalConstants.PRINT) {
+            if(
+                openSource === GlobalConstants.PRINT ||
+                openSource === GlobalConstants.LASER ||
+                openSource === GlobalConstants.DRAW
+            ) {
                 DeviceMaster.quit();
             }
         },
@@ -882,7 +886,8 @@ define([
 
                 // this condition can be removed when assembla #45 is fixed
                 if(typeof report.error !== 'string' && report.error !== 'UNKNOWN_ERROR') {
-                    errorMessage = lang.monitor[report.error.join('_')] || report.error.join(' ');
+                    var err = report.error.splice(0, 2).join('_');
+                    errorMessage = lang.monitor[err] || err;
                 }
             }
 
@@ -933,14 +938,6 @@ define([
             }
 
             headInfo = report.module ? lang.monitor.device[report.module] : '';
-
-            if(!report.error || report.error.length === 0) {
-                //If home failed, at least show an error
-                if(statusId !== DeviceConstants.status.IDLE) {
-                    AlertActions.closePopup();
-                    showingPopup = false;
-                }
-            }
 
             if(this._isAbortedOrCompleted()) {
                 temperature = '';
@@ -1104,6 +1101,7 @@ define([
                     }
                     else if(socketStatus.ready) {
                         clearInterval(t);
+                        if(currentDirectoryContent.files.length === 0) { return; }
                         socketStatus.ready = false;
                         DeviceMaster.fileInfo(
                             currentDirectoryContent.path,
@@ -1502,13 +1500,14 @@ define([
                     'status-info',
                     {
                         'running':
-                            this.state.mode === mode.BROWSE_FILE ||
-                            this.state.mode === mode.PREVIEW && openSource === GlobalConstants.PRINT ||
-                            this.state.mode === mode.PREVIEW && filePreview ||
-                            statusId !== DeviceConstants.status.IDLE &&
-                            statusId !== DeviceConstants.status.MAINTAIN &&
-                            statusId !== DeviceConstants.status.SCAN ||
-                            _duration !== ''
+                            (
+                                this.state.mode === mode.PREVIEW ||
+                                !!_duration
+                            ) && (
+                                statusId !== DeviceConstants.status.SCAN &&
+                                statusId !== DeviceConstants.status.MAINTAIN &&
+                                statusId !== DeviceConstants.status.SCAN
+                            )
                     },
                     {
                         'hide': this.state.mode === 'CAMERA'
@@ -1535,6 +1534,9 @@ define([
                         'LASER': function() {
                             return lang.monitor.task.LASER;
                         },
+                        'DRAW': function() {
+                            return lang.monitor.task.DRAW;
+                        },
                         'DEVICE_LIST': function() {
                             return '';
                         }
@@ -1544,10 +1546,6 @@ define([
                         taskInfo = f[openSource]();
                     }
                 }
-            }
-
-            if(!_duration && ! _progress) {
-                infoClass = 'status-info';
             }
 
             return (
