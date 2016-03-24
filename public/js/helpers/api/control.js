@@ -21,13 +21,14 @@ define([
             ws = new Websocket({
                 method: 'control/' + uuid,
                 onMessage: function(data) {
-                    clearTimeout(timmer);
                     switch (data.status) {
                     case 'connecting':
                         opts.onConnect(data);
+                        clearTimeout(timmer);
                         timmer = setTimeout(isTimeout, timeout);
                         break;
                     case 'connected':
+                        clearTimeout(timmer);
                         opts.onConnect(data);
                         break;
                     default:
