@@ -884,13 +884,15 @@ define(function() {
             confirmGToF                         : 'Uploaded GCode will be converted to FCode, continue (will replace if exist)',
             updatePrintPresetSetting            : 'FLUX STUDIO has new printing preset, do you want to update?\n(will overwrite current parameters)',
             confirmFileDelete                   : 'Are you sure you want to delete this file?',
-            task : {
+            task: {
                 EXTRUDER                        : 'Printing Task',
-                LASER                           : 'Engraving Task'
+                LASER                           : 'Engraving Task',
+                DRAW                            : 'Drawing Task'
             },
-            device : {
+            device: {
                 EXTRUDER                        : 'Printing Toolhead',
-                LASER                           : 'Engraving Toolhead'
+                LASER                           : 'Engraving Toolhead',
+                DRAW                            : 'Drawing Toolhead'
             }
         },
         alert: {
