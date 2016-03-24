@@ -69,6 +69,7 @@ define([
                         scanTimes: 0,   // how many scan executed
                         selectedPrinter: undefined, // which machine selected
                         deleting_mesh: undefined,
+                        cameraImageSrc: '/img/menu/main_logo.svg',
                         history: [],
                         openAlert: false,
                         openProgressBar: false,
@@ -477,36 +478,24 @@ define([
                 },
 
                 _refreshCamera: function() {
-                    var self = this;
+                    var self = this,
+                        ctrlControl = self.state.scanCtrlWebSocket,
+                        imageMethods = ctrlControl.getImage();
+
+                    imageMethods.progress(function(response) {
+                        if ('ok' === response.status) {
+                            imageMethods.notify({
+                                status: ctrlControl.imageCommand.IMAGE
+                            });
+
+                            self.setState({
+                                cameraImageSrc: response.url
+                            });
+                        }
+                    });
 
                     self.setState({
-                        scanControlImageMethods: self.state.scanCtrlWebSocket.getImage(
-                            function(image_blobs, mime_type) {
-                                var blob = new Blob(image_blobs, {type: mime_type}),
-                                    url = (window.URL || window.webkitURL),
-                                    objectUrl = url.createObjectURL(blob),
-                                    img;
-
-                                if (false === self.state.showCamera) {
-                                    self.setState({
-                                        showCamera: true
-                                    });
-                                }
-
-                                if (true === self.isMounted()) {
-                                    img = self.refs.camera_image.getDOMNode();
-
-                                    img.onload = function() {
-                                        // release the object URL once the image has loaded
-                                        url.revokeObjectURL(objectUrl);
-                                        blob = null;
-                                    };
-
-                                    // trigger the image to load
-                                    img.src = objectUrl;
-                                }
-                            }
-                        )
+                        scanControlImageMethods: imageMethods
                     }, function() {
                         self.setState({
                             printerIsReady: true
@@ -836,7 +825,7 @@ define([
                         meshes = self.state.meshes,
                         stage;
 
-                    self.state.scanControlImageMethods.stop();
+                    self.state.scanCtrlWebSocket.stopGettingImage();
 
                     meshes.forEach(function(mesh) {
                         mesh.choose = false;
@@ -1341,6 +1330,9 @@ define([
                         meshThumbnails = this._renderMeshThumbnail(lang),
                         closeSubPopup = function(e) {
                             self.refs.setupPanel.openSubPopup(e);
+                        },
+                        camera_inline_style = {
+                            'background-image': 'url(' + self.state.cameraImageSrc + ')'
                         };
 
                     camera_image_class = cx({
@@ -1352,7 +1344,7 @@ define([
                         <section ref="operatingSection" className="operating-section">
                             {meshThumbnails}
                             <div id="model-displayer" className="model-displayer">
-                                <img ref="camera_image" src="" className={camera_image_class} onClick={closeSubPopup} draggable="false"/>
+                                <div style={camera_inline_style} className={camera_image_class} onClick={closeSubPopup}/>
                             </div>
                             {settingPanel}
                             {manipulationPanel}
