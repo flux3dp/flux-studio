@@ -1099,14 +1099,12 @@ define([
                 var observer = function(change) {
                     if(!change[0].object.inProgress) {
                         Object.unobserve(slicingStatus, observer);
-                        console.log('1');
                         d.resolve(responseBlob, previewUrl);
                     }
                 };
                 Object.observe(slicingStatus, observer);
             }
             else {
-                console.log('3');
                 d.resolve(responseBlob, previewUrl);
             }
         };
