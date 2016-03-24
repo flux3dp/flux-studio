@@ -116,7 +116,8 @@ define([
                     goToMonitor = function(thumbnailBlob) {
                         DeviceMaster.selectDevice(self.state.selectedPrinter).then(function(status) {
                             if(status === DeviceConstants.CONNECTED) {
-                                GlobalActions.showMonitor(self.state.selectedPrinter, blob, blobUrl.createObjectURL(thumbnailBlob), GlobalConstants.LASER);
+                                var source = self.props.page === 'draw' ? GlobalConstants.DRAW : GlobalConstants.LASER;
+                                GlobalActions.showMonitor(self.state.selectedPrinter, blob, blobUrl.createObjectURL(thumbnailBlob), source);
                             }
                             else if (status === DeviceConstants.TIMEOUT) {
                                 AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
