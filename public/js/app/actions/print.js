@@ -1088,10 +1088,7 @@ define([
         }
 
         if(!blobExpired) {
-            getBlobFromScene().then(function(blob) {
-                previewUrl = URL.createObjectURL(blob);
-                d.resolve(responseBlob, previewUrl);
-            });
+            d.resolve(responseBlob, previewUrl);
             return d.promise();
         }
 
@@ -1102,12 +1099,14 @@ define([
                 var observer = function(change) {
                     if(!change[0].object.inProgress) {
                         Object.unobserve(slicingStatus, observer);
+                        console.log('1');
                         d.resolve(responseBlob, previewUrl);
                     }
                 };
                 Object.observe(slicingStatus, observer);
             }
             else {
+                console.log('3');
                 d.resolve(responseBlob, previewUrl);
             }
         };
@@ -1724,7 +1723,7 @@ define([
         // var s = SELECTED;
         toggleTransformControl(true);
         renderer.domElement.toBlob(function(blob) {
-            previewUrl = URL.createObjectURL(blob)
+            previewUrl = URL.createObjectURL(blob);
             camera.position.set(ccp.x, ccp.y, ccp.z);
             camera.rotation.set(ccr.x, ccr.y, ccr.z, ccr.order);
             camera.lookAt(ol);
