@@ -18,11 +18,18 @@ define([
         var ws,
             errorHandler = function(data) {
                 isReady = true;
+                clearTimeout(connectingTimer);
                 opts.onError(data);
             },
             isReady = false,
             events = {
                 onMessage: function() {}
+            },
+            genericSender = function(command) {
+                return checkDeviceIsReady().then(function() {
+                    ws.send(command);
+                    isReady = false;
+                });
             },
             checkDeviceIsReady = function() {
                 var $deferred = $.Deferred(),
@@ -40,23 +47,24 @@ define([
                             $deferred.reject(timeoutResponse);
                             clearInterval(readyTimer);
                         }
-                    });
+                    }, 0);
 
                 return $deferred.promise();
             },
             imageCommand = {
-                IMAGE: 'image', // start getting image
-                STOP: 'stop'   // stop getting image
+                IMAGE : 'image', // start getting image
+                STOP  : 'stop'   // stop getting image
+            },
+            scanCommand = {
+                RESOLUTION : 'resolution', // set resolution
+                SCAN       : 'scan', // scan getting start
+                FINISH     : 'finish'   // scan finish
             },
             timeoutResponse = { status: 'error', message: 'TIMEOUT' },
             TIMEOUT = 10000,
             $imageDeferred = $.Deferred(),
             $scanDeferred = $.Deferred(),
             connectingTimer,
-            genericSender = function(command) {
-                ws.send(command);
-                isReady = false;
-            },
             stopGettingImage = function() {
                 return $imageDeferred.notify({ status: imageCommand.STOP });
             };
@@ -64,7 +72,6 @@ define([
         ws = new Websocket({
             method: '3d-scan-control/' + uuid,
             onMessage: function(data) {
-
                 switch (data.status) {
                 case 'connecting':
                     clearTimeout(connectingTimer);
@@ -89,51 +96,28 @@ define([
                     events.onMessage(data);
                 }
             },
-            onError: errorHandler,
-            onClose: errorHandler
+            onError: errorHandler
         });
 
         return {
             connection: ws,
-            imageCommand: imageCommand,
             getImage: function() {
                 $imageDeferred = $.Deferred();
 
                 var goFetch = function() {
-                        genericSender('image');
+                        return genericSender('image');
                     },
                     url = (window.URL || window.webkitURL),
-                    blob,
+                    blob = null,
                     objectUrl,
                     imageLength = 0,
                     mimeType = '',
                     imageBlobs = [];
 
-                events.onMessage = function(data) {
-                    switch (data.status) {
-                    case 'binary':
-                        mimeType = data.mime;
-                        break;
-                    case 'ok':
-                        blob = new Blob(imageBlobs, { type: mimeType });
-                        objectUrl = url.createObjectURL(blob);
-                        mimeType = '';
-                        imageBlobs = [];
-
-                        $imageDeferred.notify({
-                            status: 'ok',
-                            url: objectUrl
-                        });
-
-                        break;
-                    default:
-                        if (data instanceof Blob) {
-                            imageBlobs.push(data);
-                        }
-                        else {
-                            // TODO: unexception data
-                        }
-                    }
+                $imageDeferred.getImage = function() {
+                    $imageDeferred.notify({
+                        status: imageCommand.IMAGE
+                    });
                 };
 
                 $imageDeferred.progress(function(response) {
@@ -142,13 +126,41 @@ define([
                         setTimeout(goFetch, 200);
                         break;
                     case imageCommand.STOP:
-                        $imageDeferred.resolve({ status: 'stop' });
+                        $imageDeferred.resolve({ status: imageCommand.STOP });
                         break;
                     }
                 });
 
-                checkDeviceIsReady().done(function() {
-                    goFetch();
+                goFetch().done(function() {
+                    events.onMessage = function(data) {
+                        switch (data.status) {
+                        case 'binary':
+                            url.revokeObjectURL(objectUrl);
+                            blob = null;
+                            mimeType = data.mime;
+                            break;
+                        case 'ok':
+                            blob = new Blob(imageBlobs, { type: mimeType });
+
+                            objectUrl = url.createObjectURL(blob);
+                            mimeType = '';
+                            imageBlobs = [];
+
+                            $imageDeferred.notify({
+                                status: 'ok',
+                                url: objectUrl
+                            });
+
+                            break;
+                        default:
+                            if (data instanceof Blob) {
+                                imageBlobs.push(data);
+                            }
+                            else {
+                                // TODO: unexception data
+                            }
+                        }
+                    }
                 }).fail(function(response) {
                     $imageDeferred.reject(response);
                 });
@@ -158,29 +170,30 @@ define([
 
             stopGettingImage: stopGettingImage,
 
-            scan: function(resolution, opts) {
+            scan: function(resolution, onRendering) {
                 $scanDeferred = $.Deferred();
 
-                opts = opts || {};
-                opts.onRendering = opts.onRendering || function() {};
-                opts.onFinished = opts.onFinished || function() {};
+                onRendering = onRendering || function() {};
 
                 var pointCloud = new PointCloudHelper(),
                     next_left = 0,
                     next_right = 0,
-                    _opts = {
-                        onProgress: opts.onRendering
+                    opts = {
+                        onProgress: onRendering
                     },
                     command = '',
+                    runScan = function() {
+                        command = scanCommand.SCAN;
+                        genericSender(command);
+                    },
                     handleResolutionResponse = function(data) {
                         if ('ok' === data.status) {
-                            command = 'send';
-                            genericSender(command);
+                            runScan();
                         }
                     },
                     handleScanResponse = function(data) {
                         if (data instanceof Blob) {
-                            pointCloud.push(data, next_left, next_right, _opts);
+                            pointCloud.push(data, next_left, next_right, opts);
                         }
                         else if ('chunk' === data.status) {
                             next_left = parseInt(data.left, 10) * 24;
@@ -190,10 +203,14 @@ define([
                             resolution--;
 
                             if (0 === parseInt(resolution, 10)) {
-                                opts.onFinished(pointCloud.get());
+                                $scanDeferred.notify({
+                                    status: scanCommand.FINISH
+                                });
                             }
                             else {
-                                runScan();
+                                $scanDeferred.notify({
+                                    status: scanCommand.SCAN
+                                });
                             }
                         }
                         else {
@@ -201,47 +218,61 @@ define([
                         }
                     };
 
-                events.onMessage = function(data) {
-                    switch (command) {
-                    case 'resolution':
-                        handleResolutionResponse(data);
+                $scanDeferred.progress(function(response) {
+                    switch (response.status) {
+                    case scanCommand.SCAN:
+                        runScan();
                         break;
-                    case 'scan':
-                        handleScanResponse(data);
+                    case scanCommand.FINISH:
+                        $scanDeferred.resolve({
+                            status: scanCommand.FINISH,
+                            pointCloud: pointCloud.get()
+                        });
                         break;
                     }
-                };
+                });
 
-                stopGettingImage();
+                stopGettingImage().done(function() {
+                    command = scanCommand.RESOLUTION;
+                    genericSender([command, resolution].join(' ')).done(function() {
+                        events.onMessage = function(data) {
+                            switch (command) {
+                            case scanCommand.RESOLUTION:
+                                handleResolutionResponse(data);
+                                break;
+                            case scanCommand.SCAN:
+                                handleScanResponse(data);
+                                break;
+                            }
+                        };
+                    }).fail(function(response) {
+                        $scanDeferred.reject(response);
+                    });
 
-                checkDeviceIsReady().done(function() {
-                    command = 'resolution';
-                    genericSender([command, resolution].join(' '));
-                }).fail(function(response) {
-                    $scanDeferred.reject(response);
                 });
 
                 return $scanDeferred;
-                return {
-                    stop: function(callback) {
-                        callback = callback || function() {};
-                        callback(pointCloud.get());
-                    }
-                };
+            },
+
+            stopScan: function() {
+                return $scanDeferred.notify({
+                    status: scanCommand.FINISH
+                });
             },
 
             check: function() {
                 var $deferred = $.Deferred(),
                     checkStarted = function() {
-                        events.onMessage = function(data) {
-
-                            $deferred.resolve(data);
-                        };
-
-                        ws.send('scan_check');
+                        genericSender('scan_check').done(function() {
+                            events.onMessage = function(data) {
+                                $deferred.resolve(data);
+                            };
+                        });
                     };
 
-                stopGettingImage(checkStarted);
+                stopGettingImage().done(function() {
+                    checkDeviceIsReady().done(checkStarted);
+                });
 
                 return $deferred.promise();
             },
@@ -249,53 +280,66 @@ define([
             calibrate: function() {
                 var $deferred = $.Deferred();
 
-                events.onMessage = function(data) {
-                    switch (data.status) {
-                    case 'continue':
-                        $deferred.notify(data);
-                        break;
-                    case 'ok':
-                        $deferred.resolve(data);
-                        break;
-                    case 'fail':
-                        $deferred.reject(data);
-                        break;
-                    }
-                };
+                stopGettingImage();
 
-                ws.send('calibrate');
+                checkDeviceIsReady().done(function() {
+                    events.onMessage = function(data) {
+                        switch (data.status) {
+                        case 'continue':
+                            $deferred.notify(data);
+                            break;
+                        case 'ok':
+                            $deferred.resolve(data);
+                            break;
+                        case 'fail':
+                            $deferred.reject(data);
+                            break;
+                        }
+                    };
+
+                    genericSender('calibrate');
+                });
 
                 return $deferred.promise();
             },
 
             retry: function(callback) {
-                events.onMessage = function(data) {
-                    callback(data);
-                };
 
-                ws.send('retry');
+                checkDeviceIsReady().done(function() {
+                    events.onMessage = function(data) {
+                        callback(data);
+                    };
+
+                    genericSender('retry');
+                });
             },
 
             takeControl: function(callback) {
-                events.onMessage = function(data) {
-                    callback(data);
-                };
+                checkDeviceIsReady().done(function() {
+                    events.onMessage = function(data) {
+                        callback(data);
+                    };
 
-                ws.send('take_control');
+                    genericSender('take_control');
+                });
             },
 
             quit: function(opts) {
-                var d = $.Deferred();
-                events.onMessage = function(result) {
-                    d.resolve(result);
-                };
+                var $deferred = $.Deferred();
 
-                events.onError = function(result) {
-                    d.resolve(result);
-                };
-                ws.send('quit');
+                checkDeviceIsReady().done(function() {
+                    events.onMessage = function(result) {
+                        $deferred.resolve(result);
+                    };
 
-                return d.promise();
+                    events.onError = function(result) {
+                        $deferred.resolve(result);
+                    };
+
+                    genericSender('quit');
+                });
+
+                return $deferred.promise();
             }
         };
     };
