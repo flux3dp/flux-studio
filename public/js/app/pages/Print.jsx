@@ -229,7 +229,7 @@ define([
 
                     AlertStore.onYes(this._handleYes);
                     AlertStore.onCancel(this._handleDefaultCancel);
-                    listeningToCancel = true
+                    listeningToCancel = true;
                     GlobalStore.onCancelPreview(this._handleCancelPreview);
                     GlobalStore.onMonitorClosed(this._handleMonitorClosed);
                 },
