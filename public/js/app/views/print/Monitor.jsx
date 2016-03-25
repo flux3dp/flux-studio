@@ -886,7 +886,8 @@ define([
 
                 // this condition can be removed when assembla #45 is fixed
                 if(typeof report.error !== 'string' && report.error !== 'UNKNOWN_ERROR') {
-                    var err = report.error.splice(0, 2).join('_');
+                    var err = report.error.slice(0);
+                    var err = err.splice(0, 2).join('_');
                     errorMessage = lang.monitor[err] || err;
                 }
             }
@@ -944,9 +945,10 @@ define([
                 progress = '';
             }
 
-            if(!report.error) {
+            if(report.error.length === 0) {
                 if(statusId !== DeviceConstants.status.IDLE) {
                     AlertActions.closePopup();
+                    showingPopup = false;
                 }
             }
 
