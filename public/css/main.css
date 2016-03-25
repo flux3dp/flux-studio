@@ -6015,7 +6015,8 @@ input.switch:checked ~ label:after {
             background-size: contain;
             height: 100%;
             width: 100%;
-            transition: background-image .3s ease; }
+            transition: background-image .3s ease;
+            will-change: background-image; }
     .scan-studio .scan-printer-selection {
         overflow: hidden;
         position: relative;
