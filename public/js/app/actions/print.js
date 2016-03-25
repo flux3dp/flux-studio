@@ -263,13 +263,6 @@ define([
             openImportWindow: false
         });
 
-        ProgressActions.open(
-            ProgressConstants.STEPPING,
-            lang.print.importingModel,
-            lang.print.wait,
-            !showStopButton
-        );
-
         loader.load(model_file_path, function(geometry) {
             if(geometry.vertices) {
                 if(geometry.vertices.length === 0) {
@@ -375,6 +368,13 @@ define([
     }
 
     function appendModels(files, index, callback) {
+        ProgressActions.open(
+            ProgressConstants.STEPPING,
+            lang.print.importingModel,
+            lang.print.wait,
+            !showStopButton
+        );
+
         var t = setInterval(function() {
             if(slicingStatus.canInterrupt) {
                 clearInterval(t);
@@ -738,11 +738,11 @@ define([
 
         raycaster.setFromCamera(mouse, camera);
         var intersects = raycaster.intersectObjects(objects);
-        var location = getReferenceIntersectLocation(e);
 
         if (intersects.length > 0) {
 
             var target = intersects[0].object;
+            var location = getReferenceIntersectLocation(e);
             selectObject(target);
 
             orbitControl.enabled = false;
@@ -818,10 +818,11 @@ define([
     function onMouseMove(e) {
         e.preventDefault();
         setMousePosition(e);
-
-        var location = getReferenceIntersectLocation(e);
-        if (SELECTED && mouseDown) {
+        SELECTED = SELECTED || {};
+        // if SELECTED and mouse down
+        if (Object.keys(SELECTED).length > 0 && mouseDown) {
             if (!transformMode) {
+                var location = getReferenceIntersectLocation(e);
                 if (SELECTED.position && location) {
                     SELECTED.position.x = location.x - movingOffsetX;
                     SELECTED.position.y = location.y - movingOffsetY;
