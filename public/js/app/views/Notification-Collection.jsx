@@ -121,6 +121,7 @@ define([
 
             componentDidMount: function() {
                 AlertStore.onNotify(this._handleNotification);
+                AlertStore.onCloseNotify(this._handleCloseNotification);
                 AlertStore.onPopup(this._handlePopup);
                 AlertStore.onClosePopup(this._handleClosePopup);
                 AlertStore.onUpdate(this._showUpdate);
@@ -143,6 +144,8 @@ define([
             componentWillUnmount: function() {
                 AlertStore.removeNotifyListener(this._handleNotification);
                 AlertStore.removePopupListener(this._handlePopup);
+                AlertStore.removeClosePopupListener(this._handleClosePopup);
+                AlertStore.removeNotifyListener(this._handleNotification);
                 // progress
                 ProgressStore.removeOpenedListener(this._handleProgress).
                     removeUpdatingListener(this._handleProgress).
@@ -337,6 +340,10 @@ define([
                         onClickCallback(growl);
                     });
                 }, 500);
+            },
+
+            _handleCloseNotification: function() {
+                $('#growls').remove();
             },
 
             _handlePopup: function(type, id, caption, message, customText) {
