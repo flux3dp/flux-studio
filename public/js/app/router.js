@@ -35,7 +35,7 @@ function(React, $, Backbone, display, config, appSettings, detectWebgl) {
                     ],
                     // go to studio
                     [
-                        /^studio\/?(print|laser|scan|usb|settings|device|draw)\/?(.*)?/,
+                        /^studio\/?(print|laser|scan|usb|settings|draw)\/?(.*)?/,
                         'studio',
                         this.studio
                     ],
@@ -159,16 +159,6 @@ function(React, $, Backbone, display, config, appSettings, detectWebgl) {
         usb: function() {
             requirejs(['jsx!pages/usb'], function(view) {
                 _display(view);
-            });
-        },
-
-        device: function(child, requests) {
-            requirejs(['jsx!pages/Device'], function(view) {
-                var args = {
-                    child: child,
-                    requests: requests
-                };
-                _display(view, args);
             });
         },
 
