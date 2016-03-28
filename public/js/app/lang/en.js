@@ -891,7 +891,8 @@ define(function() {
             device : {
                 EXTRUDER                        : 'Printing Toolhead',
                 LASER                           : 'Engraving Toolhead'
-            }
+            },
+            cant_get_toolhead_version           : 'Unable to get latest version infomation'
         },
         alert: {
             caption: 'Error',

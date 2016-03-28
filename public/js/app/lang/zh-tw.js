@@ -891,7 +891,8 @@ define(function() {
             device : {
                 EXTRUDER                        : '列印模組',
                 LASER                           : '雕刻模組'
-            }
+            },
+            cant_get_toolhead_version           : '無法取得最新版本資訊'
         },
         alert: {
             caption: '錯誤',
