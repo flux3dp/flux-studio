@@ -250,7 +250,12 @@ define([
                     enabled: true,
                     onClick: function() {
                         if (true === window.FLUX.isNW) {
-                            nw.Shell.openExternal('http://flux3dp.com/contact');
+                            if(i18n.getActiveLang() === 'zh-tw') {
+                                nw.Shell.openExternal('http://flux3dp.zendesk.com/hc/zh-tw/requests/new');
+                            }
+                            else {
+                                nw.Shell.openExternal('http://flux3dp.zendesk.com/hc/en-us/requests/new');
+                            }
                         }
                         else {
                             window.open('http://flux3dp.com/contact');
