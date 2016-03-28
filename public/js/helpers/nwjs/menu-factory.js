@@ -49,13 +49,16 @@ define([
                 checkToolheadFirmware = function() {
                     var $deferred = $.Deferred();
 
+                    ProgressActions.open(ProgressConstants.NONSTOP);
+
                     if ('toolhead' === type) {
                         DeviceMaster.headinfo().done(function(response) {
+                            currentPrinter.toolhead_version = response.version || '';
+
                             if ('undefined' === typeof response.version) {
                                 $deferred.reject();
                             }
                             else {
-                                currentPrinter.toolhead_version = response.version || undefined;
                                 $deferred.resolve({ status: 'ok' });
                             }
                         });
@@ -134,10 +137,11 @@ define([
                 },
                 checkStatus = function() {
                     var goCheckStatus = function() {
-                        checkToolheadFirmware().done(function() {
+                        checkToolheadFirmware().always(function() {
+                            ProgressActions.close();
                             updateFirmware();
                         }).fail(function() {
-                            AlertActions.showPopupError('toolhead-offline', lang.monitor.HEAD_OFFLINE);
+                            AlertActions.showPopupError('toolhead-offline', lang.monitor.cant_get_toolhead_version);
                         });
                     };
 
