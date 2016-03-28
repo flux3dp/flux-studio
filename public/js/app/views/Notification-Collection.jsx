@@ -505,7 +505,12 @@ define([
 
             render : function() {
                 var monitorPanel = this.state.showMonitor ? this._renderMonitorPanel() : '',
-                    filament = this.state.changeFilament.open ? this._renderChangeFilament() : '';
+                    filament = this.state.changeFilament.open ? this._renderChangeFilament() : '',
+                    latestVersion = (
+                        'toolhead' === this.state.application.type ?
+                        this.state.application.latestVersion :
+                        this.state.application.toolhead_version
+                    );
 
                 return (
                     <div className="notification-collection">
@@ -516,7 +521,7 @@ define([
                             type={this.state.application.type}
                             device={this.state.application.device}
                             currentVersion={this.state.application.currentVersion}
-                            latestVersion={this.state.application.latestVersion}
+                            latestVersion={latestVersion}
                             releaseNote={this.state.application.releaseNote}
                             onClose={this._handleUpdateClose}
                             onInstall={this._handleUpdateInstall}
