@@ -1404,6 +1404,10 @@ define([
                                 self._openBlocker(false);
                                 AlertActions.showPopupError('scan-modeling-error', data.error);
                             }
+                            onFatal: function(data) {
+                                self._openBlocker(false);
+                                AlertActions.showPopupError('scan-fatal-error', data.error);
+                            }
                         },
                         onGettingPrinter = function(auth_printer) {
                             self.setState({
