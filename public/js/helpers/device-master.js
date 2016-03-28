@@ -307,16 +307,18 @@ define([
     }
 
     function startCamera(callback) {
-        _device.cameraSource = _device.scanController.getImage(callback);
+        _device.cameraSource = _device.scanController.getImage();
+
+        _device.cameraSource.progress(function(response) {
+            if ('ok' === response.status) {
+                _device.cameraSource.getImage();
+                callback(response);
+            }
+        });
     }
 
     function stopCamera() {
-        var d = $.Deferred();
-        if(_device.cameraSource) {
-            _device.cameraSource.stop();
-            d.resolve('');
-        }
-        return d.promise();
+        return _device.scanController.stopGettingImage();
     }
 
     function maintain(type) {
