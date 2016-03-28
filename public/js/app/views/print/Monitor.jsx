@@ -998,11 +998,9 @@ define([
             timmer = null;
         },
 
-        _processImage: function(imageBlobs, mimeType) {
-            var blob = new Blob(imageBlobs, {type: mimeType});
-            var url = URL.createObjectURL(blob);
+        _processImage: function(response) {
             this.setState({
-                cameraImageUrl: url,
+                cameraImageUrl: response.url,
                 waiting: false
             });
         },
