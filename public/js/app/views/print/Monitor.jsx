@@ -1231,35 +1231,6 @@ define([
             );
         },
 
-        _renderContent: function() {
-            switch(this.state.mode) {
-                case mode.PREVIEW:
-                case mode.PRINT:
-                    var divStyle = {
-                            backgroundColor: '#E0E0E0',
-                            backgroundImage: !previewUrl ? 'url(/img/ph_l.png)' : 'url(' + previewUrl + ')',
-                            backgroundSize: 'cover',
-                            backgroundPosition: '50% 50%',
-                            width: '100%',
-                            height: '100%'
-                        };
-                    return (<div style={divStyle} />);
-                    break;
-
-                case mode.BROWSE_FILE:
-                    return this._processFolderContent();
-                    break;
-
-                case mode.CAMERA:
-                    return this._renderCameraContent();
-                    break;
-
-                default:
-                    return '';
-                    break;
-            }
-        },
-
         _renderFolderContent: function() {
             switch(this.state.mode) {
                 case mode.PREVIEW:
@@ -1593,7 +1564,6 @@ define([
 
         render: function() {
             var name            = DeviceMaster.getSelectedDevice().name,
-                // content         = this._renderContent(),
                 content         = this._renderFolderContent(),
                 waitIcon        = this.state.waiting ? this._renderSpinner() : '',
                 op              = this._renderOperation(),
