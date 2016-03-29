@@ -523,12 +523,22 @@ define([
                                         message = `${lang.device.pausedFromError}`;
                                     }
 
-                                    AlertActions.showWarning(message, function(growl) {
-                                        growl.remove(function() {});
-                                        selectDevice(defaultPrinter).then(function() {
-                                            GlobalActions.showMonitor(defaultPrinter);
-                                        });
-                                    }, true);
+                                    if(device.st_id === DeviceConstants.status.COMPLETED) {
+                                        AlertActions.showInfo(message, function(growl) {
+                                            growl.remove(function() {});
+                                            selectDevice(defaultPrinter).then(function() {
+                                                GlobalActions.showMonitor(defaultPrinter);
+                                            });
+                                        }, true);
+                                    }
+                                    else {
+                                        AlertActions.showWarning(message, function(growl) {
+                                            growl.remove(function() {});
+                                            selectDevice(defaultPrinter).then(function() {
+                                                GlobalActions.showMonitor(defaultPrinter);
+                                            });
+                                        }, true);
+                                    }
 
                                     var notification = new Notification(device.name, {
                                         icon: '/img/icon-home-s.png',
