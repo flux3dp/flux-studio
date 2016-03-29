@@ -112,11 +112,11 @@ define([
             },
             sendToMachine = function(blob) {
                 var blobUrl = window.URL,
+                    source = self.props.page === 'draw' ? GlobalConstants.DRAW : GlobalConstants.LASER,
                     fcodeReaderMethods = fcodeReader(),
                     goToMonitor = function(thumbnailBlob) {
                         DeviceMaster.selectDevice(self.state.selectedPrinter).then(function(status) {
-                            if(status === DeviceConstants.CONNECTED) {
-                                var source = self.props.page === 'draw' ? GlobalConstants.DRAW : GlobalConstants.LASER;
+                            if (status === DeviceConstants.CONNECTED) {
                                 GlobalActions.showMonitor(self.state.selectedPrinter, blob, blobUrl.createObjectURL(thumbnailBlob), source);
                             }
                             else if (status === DeviceConstants.TIMEOUT) {
