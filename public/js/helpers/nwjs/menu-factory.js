@@ -181,6 +181,8 @@ define([
                 };
 
             DeviceMaster.selectDevice(printer).then(function(status) {
+                var lang = i18n.get();
+
                 if (status === DeviceConstants.CONNECTED) {
                     checkStatus();
                 }
@@ -346,6 +348,8 @@ define([
                     enabled: true,
                     onClick: function() {
                         DeviceMaster.selectDevice(printer).then(function(status) {
+                            var lang = i18n.get();
+
                             if (status === DeviceConstants.CONNECTED) {
                                 checkDeviceStatus(printer).done(function(status) {
                                     switch (status) {
@@ -405,6 +409,8 @@ define([
                             };
 
                         DeviceMaster.selectDevice(currentPrinter).then(function(status) {
+                            var lang = i18n.get();
+
                             if (status === DeviceConstants.CONNECTED) {
                                 showPopup();
                             }
