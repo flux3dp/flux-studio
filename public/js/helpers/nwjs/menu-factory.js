@@ -347,15 +347,17 @@ define([
                     label: lang.device.device_monitor,
                     enabled: true,
                     onClick: function() {
-                        DeviceMaster.selectDevice(printer).then(function(status) {
-                            var lang = i18n.get();
+                        var currentPrinter = discoverMethods.getLatestPrinter(printer),
+                            lang = i18n.get();
+
+                        DeviceMaster.selectDevice(currentPrinter).then(function(status) {
 
                             if (status === DeviceConstants.CONNECTED) {
-                                checkDeviceStatus(printer).done(function(status) {
+                                checkDeviceStatus(currentPrinter).done(function(status) {
                                     switch (status) {
                                     case 'ok':
                                     case 'auth':
-                                        GlobalActions.showMonitor(printer, '', '', GlobalConstants.DEVICE_LIST);
+                                        GlobalActions.showMonitor(currentPrinter, '', '', GlobalConstants.DEVICE_LIST);
                                         break;
                                     }
                                 });
