@@ -122,6 +122,9 @@ define([
                 case AlertConstants.ERROR:
                     caption = lang.ok;
                     break;
+                case AlertConstants.CUSTOM_CANCEL:
+                    caption = lang.close;
+                    break;
                 }
 
                 return caption;

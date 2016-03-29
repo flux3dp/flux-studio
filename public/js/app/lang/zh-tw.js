@@ -905,6 +905,7 @@ define(function() {
             retry: '重試',
             abort: '放棄',
             cancel: '取消',
+            close: '關閉',
             ok: '確定',
             yes: ' 是',
             no: '否',
@@ -957,7 +958,9 @@ define(function() {
                 caption: '韌體需要更新',
                 content: '請按照<a target="_blank" href="http://helpcenter.flux3dp.com/hc/zh-tw/articles/216251077">此說明</a>安裝最新韌體版本'
             },
-            cant_establish_connection: '無法啟動 FLUX API，請使用 說明 > 錯誤回報 輸出偵錯訊息，並<a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/requests/new" target="_blank">聯繫 FLUX 客服</a>',
+            cant_establish_connection: '無法啟動 FLUX Studio API，並<a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/requests/new" target="_blank">聯繫 FLUX 客服</a>',
+            application_occurs_error: '程式發生錯誤',
+            error_log: '錯誤訊息',
             fcodeForLaser: '檔案為雕刻工作',
             confirmFCodeImport: '載入.fc檔案將清除目前所有場景，繼續？',
             confirmSceneImport: '載入.fsc檔案將清除目前所有場景，繼續？',
