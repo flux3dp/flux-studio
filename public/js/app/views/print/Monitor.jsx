@@ -863,6 +863,7 @@ define([
 
             clearTimeout(timmer);
             timmer = setTimeout(this._processTimeout, timeoutLength);
+            report.error = report.error || [];
             // rootMode = statusId === DeviceConstants.status.IDLE ? DeviceConstants.IDLE : DeviceConstants.RUNNING;
 
             // jug down errors as main and sub error for later use

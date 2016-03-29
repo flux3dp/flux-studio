@@ -229,7 +229,7 @@ define([
 
                     AlertStore.onYes(this._handleYes);
                     AlertStore.onCancel(this._handleDefaultCancel);
-                    listeningToCancel = true
+                    listeningToCancel = true;
                     GlobalStore.onCancelPreview(this._handleCancelPreview);
                     GlobalStore.onMonitorClosed(this._handleMonitorClosed);
                 },
@@ -515,7 +515,6 @@ define([
                         }
                         AlertStore.removeCancelListener(this._handleDefaultCancel);
                         removeCancelListener = false;
-                        console.log('show monitor');
                         GlobalActions.showMonitor(selectedPrinter, fcode, previewUrl, GlobalConstants.PRINT);
                         //Tour popout after show monitor delay
                         setTimeout(function() {

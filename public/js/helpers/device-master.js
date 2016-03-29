@@ -504,16 +504,40 @@ define([
             }
             if(defaultPrinter) {
                 if(defaultPrinter.serial === device.serial) {
-                    if(device.st_id === DeviceConstants.status.PAUSED_FROM_RUNNING) {
+                    if(
+                        device.st_id === DeviceConstants.status.PAUSED_FROM_RUNNING ||
+                        device.st_id === DeviceConstants.status.COMPLETED ||
+                        device.st_id === DeviceConstants.status.ABORTED
+                    ) {
                         if(!defaultPrinterWarningShowed) {
-                            var message = `${device.name} ${lang.device.pausedFromError}`;
-                            AlertActions.showWarning(message, function(growl) {
-                                growl.remove(function() {});
-                                selectDevice(defaultPrinter).then(function() {
-                                    GlobalActions.showMonitor(defaultPrinter);
-                                });
-                            }, true);
-                            defaultPrinterWarningShowed = true;
+                            Notification.requestPermission((permission) => {
+                                if(permission === 'granted') {
+                                    var message = '';
+                                    if(device.st_id === DeviceConstants.status.COMPLETED) {
+                                        message = `${lang.device.completed}`;
+                                    }
+                                    else if(device.st_id === DeviceConstants.status.ABORTED) {
+                                        message = `${lang.device.aborted}`;
+                                    }
+                                    else {
+                                        message = `${lang.device.pausedFromError}`;
+                                    }
+
+                                    AlertActions.showWarning(message, function(growl) {
+                                        growl.remove(function() {});
+                                        selectDevice(defaultPrinter).then(function() {
+                                            GlobalActions.showMonitor(defaultPrinter);
+                                        });
+                                    }, true);
+
+                                    var notification = new Notification(device.name, {
+                                        icon: '/img/icon-home-s.png',
+                                        body: message
+                                    });
+
+                                    defaultPrinterWarningShowed = true;
+                                }
+                            });
                         }
                     }
                     else {
