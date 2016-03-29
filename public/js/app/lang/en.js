@@ -905,6 +905,7 @@ define(function() {
             retry: 'RETRY',
             abort: 'ABORT',
             cancel: 'CANCEL',
+            close: 'CLOSE',
             ok: 'OK',
             yes: 'YES',
             no: 'NO',
@@ -957,7 +958,9 @@ define(function() {
                 caption: 'Firmware Outdated',
                 content: 'Please install the latest firmware with <a target="_blank" href="http://helpcenter.flux3dp.com/hc/en-us/articles/216251077">this guide</a>.'
             },
-            cant_establish_connection: 'Unable to initiate FLUX Studio API, kindly use Help > Bug Report to export debug message and <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/requests/new" target="_blank">contact FLUX support.</a>',
+            cant_establish_connection: 'Unable to connect FLUX Studio API. Please <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/requests/new" target="_blank">contact FLUX support.</a>',
+            application_occurs_error: 'Program Error',
+            error_log: 'Error Log',
             fcodeForLaser: 'This is a fcode for laser',
             confirmFCodeImport: 'Importing fcode will remove all objects on the scene, are you sure?',
             confirmSceneImport: 'Importing .fsc will remove all objects on the scene, are you sure?',
