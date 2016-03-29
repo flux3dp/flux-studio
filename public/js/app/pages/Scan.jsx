@@ -862,7 +862,9 @@ define([
                         self.setState(self.getInitialState());
                         scanedModel.clear();
                         self.state.scanControlImageMethods.stop(function() {
-                           self.state.scanCtrlWebSocket.connection.close(false);
+                            if ('undefined' !== typeof self.state.scanCtrlWebSocket.connection) {
+                                self.state.scanCtrlWebSocket.connection.close(false);
+                            }
                         });
                     });
                     AlertActions.showPopupYesNo('scan-again', self.state.lang.scan.scan_again_confirm);
