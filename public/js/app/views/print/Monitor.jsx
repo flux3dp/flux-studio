@@ -867,10 +867,11 @@ define([
 
             clearTimeout(timmer);
             timmer = setTimeout(this._processTimeout, timeoutLength);
+            report.error = report.error || [];
             // rootMode = statusId === DeviceConstants.status.IDLE ? DeviceConstants.IDLE : DeviceConstants.RUNNING;
 
             // jug down errors as main and sub error for later use
-            if(report.error && report.error.length > 0) {
+            if(report.error.length > 0) {
                 if(typeof(report.error) === 'string') {
                     mainError = report.error;
                 }
