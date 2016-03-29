@@ -956,9 +956,11 @@ define(function() {
             },
             cant_establish_connection: '無法啟動 FLUX API，請使用 說明 > 錯誤回報 輸出偵錯訊息，並<a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/requests/new" target="_blank">聯繫 FLUX 客服</a>',
             fcodeForLaser: '檔案為雕刻工作',
+            fcodeForPen: '檔案為繪圖工作',
             confirmFCodeImport: '載入.fc檔案將清除目前所有場景，繼續？',
             confirmSceneImport: '載入.fsc檔案將清除目前所有場景，繼續？',
-            brokenFcode: '無法開啟 %s'
+            brokenFcode: '無法開啟 %s',
+            slicingFatalError: '切片時發生錯誤，請上傳模型檔案給 FLUX 客服'
         },
         machine_status: {
             '-10': 'Raw Mode',
