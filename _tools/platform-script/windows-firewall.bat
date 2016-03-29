@@ -1,7 +1,7 @@
 set PORT=1901
 set RULE_NAME="FLUX Discover Port %PORT%"
 
-icacls "%cd%\lib" /grant Everyone:(OI)(CI)f
+icacls "%cd%\FLUX\lib" /grant Everyone:(OI)(CI)f
 
 netsh advfirewall firewall show rule name=%RULE_NAME% >nul
 
