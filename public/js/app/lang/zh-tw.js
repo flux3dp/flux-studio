@@ -884,13 +884,15 @@ define(function() {
             confirmGToF                         : 'GCode 上傳後會自動轉檔成 FCode，是否要繼續？',
             updatePrintPresetSetting            : 'FLUX STUDIO 有新的預設列印參數。\n是否要更新？（會刪除目前參數）',
             confirmFileDelete                   : '是否確定要刪除這個檔案？',
-            task : {
+            task: {
                 EXTRUDER                        : '列印工作',
-                LASER                           : '雕刻工作'
+                LASER                           : '雕刻工作',
+                DRAW                            : '繪製工作'
             },
-            device : {
+            device: {
                 EXTRUDER                        : '列印模組',
-                LASER                           : '雕刻模組'
+                LASER                           : '雕刻模組',
+                DRAW                            : '繪製模組'
             }
         },
         alert: {

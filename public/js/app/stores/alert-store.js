@@ -12,6 +12,7 @@ define([
 
     var NOTIFY_EVENT          = 'notify',
         POPUP_EVENT           = 'popup',
+        CLOSE_NOTIFICATION    = 'closeNotification',
         CLOSE_POPUP           = 'closePopup',
         UPDATE_EVENT          = 'update',
         CHANGE_FILAMENT_EVENT = 'change_filament',
@@ -70,6 +71,10 @@ define([
             this.on(NOTIFY_ANSWER, callback);
         },
 
+        onCloseNotify(callback) {
+            this.on(CLOSE_NOTIFICATION, callback);
+        },
+
         onClosePopup(callback) {
             this.on(CLOSE_POPUP, callback);
         },
@@ -80,6 +85,14 @@ define([
 
         removePopupListener(callback) {
             this.removeListener(POPUP_EVENT, callback);
+        },
+
+        removeCloseNotifyListener(callback) {
+            this.removeListener(CLOSE_NOTIFICATION, callback);
+        },
+
+        removeClosePopupListener(callback) {
+            this.removeListener(CLOSE_POPUP, callback);
         },
 
         removeRetryListener(callback) {
@@ -184,6 +197,10 @@ define([
 
                 'SHOW_POPUP_UPDATE': function() {
                     AlertStore.emit(UPDATE_EVENT, payload);
+                },
+
+                'CLOSE_NOTIFICATION': function() {
+                    AlertStore.emit(CLOSE_NOTIFICATION);
                 },
 
                 'CLOSE_POPUP': function() {

@@ -1088,10 +1088,7 @@ define([
         }
 
         if(!blobExpired) {
-            getBlobFromScene().then(function(blob) {
-                previewUrl = URL.createObjectURL(blob);
-                d.resolve(responseBlob, previewUrl);
-            });
+            d.resolve(responseBlob, previewUrl);
             return d.promise();
         }
 
@@ -1847,7 +1844,7 @@ define([
         // var s = SELECTED;
         toggleTransformControl(true);
         renderer.domElement.toBlob(function(blob) {
-            previewUrl = URL.createObjectURL(blob)
+            previewUrl = URL.createObjectURL(blob);
             camera.position.set(ccp.x, ccp.y, ccp.z);
             camera.rotation.set(ccr.x, ccr.y, ccr.z, ccr.order);
             camera.lookAt(ol);

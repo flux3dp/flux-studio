@@ -517,7 +517,10 @@ define([
                         }
                     }
                     else {
-                        defaultPrinterWarningShowed = false;
+                        if($('#growls').length > 0) {
+                            AlertActions.closeNotification();
+                            defaultPrinterWarningShowed = false;
+                        }
                     }
                 }
             }

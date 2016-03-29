@@ -102,6 +102,7 @@ define([
             componentWillUnmount: function() {
                 AlertStore.removeCancelListener(this._toggleDeviceListBind);
                 AlertStore.removeRetryListener(this._waitForPrinters);
+                GlobalStore.removeMonitorClosedListener(this._handleMonitorClosed);
             },
 
             _waitForPrinters: function() {

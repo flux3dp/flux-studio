@@ -13,6 +13,7 @@ define([], function(){
         // Monitor Open source
         PRINT                           : 'PRINT',
         LASER                           : 'LASER',
+        DRAW                            : 'DRAW',
         DEVICE_LIST                     : 'DEVICE_LIST',
         DEFAULT_PRINT_SETTING_VERSION   : '0.29'
     };
