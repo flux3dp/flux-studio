@@ -862,7 +862,7 @@ define([
                         self.setState(self.getInitialState());
                         scanedModel.clear();
                         self.state.scanControlImageMethods.stop(function() {
-                            if ('undefined' !== typeof self.state.scanCtrlWebSocket.connection) {
+                            if ('undefined' !== typeof self.state.scanCtrlWebSocket) {
                                 self.state.scanCtrlWebSocket.connection.close(false);
                             }
                         });
