@@ -13,6 +13,7 @@ define([
     'app/actions/initialize-machine',
     'helpers/check-device-status',
     'app/actions/global-actions',
+    'app/constants/global-constants',
     'app/actions/alert-actions',
     'app/actions/progress-actions',
     'app/constants/progress-constants',
@@ -31,6 +32,7 @@ define([
     initializeMachine,
     checkDeviceStatus,
     GlobalActions,
+    GlobalConstants,
     AlertActions,
     ProgressActions,
     ProgressConstants,
@@ -348,7 +350,8 @@ define([
                                 checkDeviceStatus(printer).done(function(status) {
                                     switch (status) {
                                     case 'ok':
-                                        GlobalActions.showMonitor(printer);
+                                    case 'auth':
+                                        GlobalActions.showMonitor(printer, '', '', GlobalConstants.DEVICE_LIST);
                                         break;
                                     }
                                 });
