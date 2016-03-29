@@ -526,9 +526,13 @@ define([
             previewUrl = URL.createObjectURL(blob);
             return slicer.uploadPreviewImage(blob);
         }).then(function() {
-            slicer.beginSlicing(ids, slicingType.F).then(function() {
+            slicer.beginSlicing(ids, slicingType.F).then(function(response) {
                 slicingStatus.canInterrupt = true;
                 slicingStatus.pauseReport = false;
+                if(response.status === 'fatal') {
+                    AlertActions.showPopupError('slicingFatalError', lang.message.slicingFatalError);
+                    return;
+                }
                 getSlicingReport(function(report) {
                     slicingStatus.lastReport = report;
                     slicingReport.report = report;
