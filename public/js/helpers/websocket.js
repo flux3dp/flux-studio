@@ -237,34 +237,48 @@ define([
                 return this;
             },
 
-            optimizeLogs: function(){
-                for(var i = 0; i < _logs.length; i++){
-                    var process_data = JSON.stringify(_logs[i][1]);
-                    if(typeof _logs[i][1] == "string"){
+            optimizeLogs: function() {
+                var process_data;
+
+                for (var i = 0; i < _logs.length; i++){
+                    process_data = JSON.stringify(_logs[i][1]);
+
+                    if (typeof _logs[i][1] === "string"){
                         process_data = _logs[i][1];
                     }
-                    if(process_data.length > 100){
+
+                    if (process_data.length > 100){
                         process_data = process_data.substring(0,97) + "...";
                     }
+
                     _logs[i][1] = process_data;
                 }
             },
 
             logs: function(){
-                for(var i = 0; i < _logs.length; i++){
-                    var data = JSON.stringify(_logs[i][1]);
-                    var additional_data = null;
-                    if(typeof _logs[i][1] == "string"){
+                var data,
+                    additional_data = null;
+
+                for (var i = 0; i < _logs.length; i++){
+                    data = JSON.stringify(_logs[i][1]);
+                    additional_data = null;
+
+                    if (typeof _logs[i][1] === "string"){
                         data = _logs[i][1];
-                        if(data.length > 100){
+                        if (data.length > 100){
                             additional_data = {str: data};
                             data = data.substring(0,20) + "...";
                         }
                     }
-                    if(data && data.length > 100) data = _logs[i][1];
-                    if(additional_data){
+
+                    if (data && data.length > 100) {
+                        data = _logs[i][1];
+                    }
+
+                    if (additional_data){
                         console.log(_logs[i][0], data, additional_data);
-                    }else{
+                    }
+                    else {
                         console.log(_logs[i][0], data);
                     }
                 }

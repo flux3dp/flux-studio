@@ -6009,9 +6009,14 @@ input.switch:checked ~ label:after {
         width: 100%;
         z-index: 0; }
         .scan-studio .model-displayer .camera-image {
+            background-position: center center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+            background-size: contain;
             height: 100%;
             width: 100%;
-            object-fit: contain; }
+            transition: background-image .3s ease;
+            will-change: background-image; }
     .scan-studio .scan-printer-selection {
         overflow: hidden;
         position: relative;

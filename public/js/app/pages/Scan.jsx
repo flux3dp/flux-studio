@@ -3,7 +3,6 @@ define([
     'react',
     'jsx!widgets/List',
     'jsx!widgets/Modal',
-    'jsx!widgets/Alert',
     'app/actions/scaned-model',
     'helpers/api/3d-scan-control',
     'helpers/api/3d-scan-modeling',
@@ -32,7 +31,6 @@ define([
     React,
     List,
     Modal,
-    Alert,
     scanedModel,
     scanControl,
     scanModeling,
@@ -69,8 +67,8 @@ define([
                         scanTimes: 0,   // how many scan executed
                         selectedPrinter: undefined, // which machine selected
                         deleting_mesh: undefined,
+                        cameraImageSrc: undefined,
                         history: [],
-                        openAlert: false,
                         openProgressBar: false,
                         blocker: false,
                         hasConvert: false,  // point cloud into stl
@@ -104,7 +102,7 @@ define([
                             size: {},
                             rotate: {},
                         },
-                        stage: undefined // three stage (scene, camera, renderer)
+                        stage: undefined // three stages (scene, camera, renderer)
                     };
                 },
 
@@ -212,15 +210,10 @@ define([
 
                 componentWillUnmount: function() {
                     var self = this,
-                        closeConnection = function() {
-                            if ('undefined' !== typeof self.state.scanCtrlWebSocket) {
-                                self.state.scanCtrlWebSocket.connection.close(false);
-                            }
-                        },
                         stopGettingImage = function() {
-                            if ('undefined' !== typeof self.state.scanControlImageMethods) {
-                                self.state.scanControlImageMethods.stop(function() {
-                                    closeConnection();
+                            if ('undefined' !== typeof self.state.scanCtrlWebSocket) {
+                                self.state.scanCtrlWebSocket.stopGettingImage().done(function() {
+                                    self.state.scanCtrlWebSocket.connection.close(false);
                                 });
                             }
                         };
@@ -230,12 +223,11 @@ define([
                     AlertStore.removeCancelListener(self._onCancel);
                     dndHandler.unplug(document);
 
-                    if ('undefined' !== typeof self.state.scanCtrlWebSocket &&
-                        'undefined' !== typeof self.state.scanModelingWebSocket
-                    ) {
-                        stopGettingImage();
+                    if ('undefined' !== typeof self.state.scanModelingWebSocket) {
                         self.state.scanModelingWebSocket.connection.close(false);
                     }
+
+                    stopGettingImage();
 
                     scanedModel.destroy();
                 },
@@ -294,7 +286,7 @@ define([
                                     scanedModel.add(mesh.model);
                                     newMesh.isUndo = true;
                                     meshes.splice(mesh.arrayIndex, 0, newMesh);
-                                    self.state.scanControlImageMethods.stop();
+                                    self.state.scanCtrlWebSocket.stopGettingImage();
 
                                     self.setState({
                                         showCamera: false,
@@ -311,7 +303,7 @@ define([
                                 mesh.isUndo = true;
                                 scanedModel.add(mesh.model);
                                 self.state.meshes.splice(mesh.arrayIndex, 0, mesh);
-                                self.state.scanControlImageMethods.stop();
+                                self.state.scanCtrlWebSocket.stopGettingImage();
 
                                 self.setState({
                                     showCamera: false,
@@ -347,8 +339,12 @@ define([
                     case 'deleting-mesh':
                         self._onDeleteMesh(self.state.deleting_mesh.index, self.state.deleting_mesh.object);
                         break;
-                    case 'kick':
-                        self._onScanStop();
+                    case 'scan-again':
+                        self.setState(self.getInitialState());
+                        scanedModel.clear();
+                        self.state.scanCtrlWebSocket.stopGettingImage().done(function() {
+                           self.state.scanCtrlWebSocket.connection.close(false);
+                        });
                     }
                 },
 
@@ -439,7 +435,7 @@ define([
                             scanTimes = self.state.scanTimes + 1;
 
                             self.state.scanModelingWebSocket.import(fileName, 'pcd', blob, blob.size).done(function(pointCloud) {
-                                self.state.scanControlImageMethods.stop();
+                                self.state.scanCtrlWebSocket.stopGettingImage();
 
                                 fileReader = new FileReader();
 
@@ -477,43 +473,25 @@ define([
                 },
 
                 _refreshCamera: function() {
-                    var self = this;
+                    var self = this,
+                        ctrlControl = self.state.scanCtrlWebSocket,
+                        imageMethods = ctrlControl.getImage();
+
+                    imageMethods.progress(function(response) {
+                        if ('ok' === response.status) {
+                            imageMethods.getImage();
+
+                            self.setState({
+                                cameraImageSrc: response.url
+                            });
+                        }
+                    });
 
                     self.setState({
-                        scanControlImageMethods: self.state.scanCtrlWebSocket.getImage(
-                            function(image_blobs, mime_type) {
-                                var blob = new Blob(image_blobs, {type: mime_type}),
-                                    url = (window.URL || window.webkitURL),
-                                    objectUrl = url.createObjectURL(blob),
-                                    img;
-
-                                if (false === self.state.showCamera) {
-                                    self.setState({
-                                        showCamera: true
-                                    });
-                                }
-
-                                if (true === self.isMounted()) {
-                                    img = self.refs.camera_image.getDOMNode();
-
-                                    img.onload = function() {
-                                        // release the object URL once the image has loaded
-                                        url.revokeObjectURL(objectUrl);
-                                        blob = null;
-                                    };
-
-                                    // trigger the image to load
-                                    img.src = objectUrl;
-                                }
-                            }
-                        )
-                    }, function() {
-                        self.setState({
-                            printerIsReady: true
-                        });
-
-                        self._openBlocker(false);
+                        printerIsReady: true
                     });
+
+                    self._openBlocker(false);
                 },
 
                 _getMesh: function(index) {
@@ -693,7 +671,7 @@ define([
                         selectedMeshes: meshes
                     }, function() {
                         // merge each mesh
-                        this._doManualMerge(meshes, callback, false);
+                        self._doManualMerge(meshes, callback, false);
 
                         self.setState({
                             selectedMeshes: []
@@ -763,7 +741,8 @@ define([
                             self.setState({
                                 openProgressBar: false,
                                 isScanStarted: false,
-                                hasMultiScan: false
+                                hasMultiScan: false,
+                                cameraImageSrc: undefined
                             });
                             ProgressActions.close();
                         };
@@ -782,10 +761,8 @@ define([
                     );
                 },
 
-                _handleCheck: function(callback) {
-                    callback = callback || function() {};
-
-                    this.state.scanCtrlWebSocket.check().done(callback);
+                _handleCheck: function() {
+                    return this.state.scanCtrlWebSocket.check();
                 },
 
                 _handleScan: function(e) {
@@ -803,7 +780,7 @@ define([
                                 openProgressBar(onScan);
                             };
 
-                            self._handleCheck(function(data) {
+                            self._handleCheck().done(function(data) {
                                 switch (data.message) {
                                 case 'good':
                                 case 'no object':
@@ -818,25 +795,15 @@ define([
                             });
                         },
                         onScan = function() {
-                            var opts = {
-                                    onRendering: self._onRendering,
-                                    onFinished: self._onScanFinished
-                                },
-                                scan_speed = self._getScanSpeed();
+                            var scanResolution = self._getScanSpeed(),
+                                scanMethods = self.state.scanCtrlWebSocket.scan(scanResolution, self._onRendering);
 
-                            if ('undefined' === typeof self.state.scanMethods) {
-                                self.setState({
-                                    scanMethods: self.state.scanCtrlWebSocket.scan(scan_speed, opts)
-                                });
-                            }
-                            else {
-                                self.state.scanCtrlWebSocket.scan(scan_speed, opts);
-                            }
+                            scanMethods.done(function(response) {
+                                self._onScanFinished(response.pointCloud);
+                            });
                         },
                         meshes = self.state.meshes,
                         stage;
-
-                    self.state.scanControlImageMethods.stop();
 
                     meshes.forEach(function(mesh) {
                         mesh.choose = false;
@@ -849,7 +816,9 @@ define([
                         scanTimes: self.state.scanTimes + 1,
                         isScanStarted: true,
                         showCamera: false,
-                        stage: stage
+                        stage: stage,
+                        currentSteps: 0,
+                        progressPercentage: 0
                     });
 
                     checkLenOpened();
@@ -878,7 +847,7 @@ define([
                         hasMultiScan: false,
                         isScanStarted: false,
                         showCamera: false,
-                        progressPercentage: 100 // total complete
+                        progressPercentage: 100 // total complete,
                     });
 
                     if (true === self.state.isScanStarted &&
@@ -895,7 +864,6 @@ define([
                                 self.state.scanCtrlWebSocket.connection.close(false);
                             }
                         });
-                    }
                 },
 
                 _doClearNoise: function(mesh) {
@@ -1029,8 +997,9 @@ define([
                         lengthSelectedMeshes = selectedMeshes.length,
                         outputName = '';
 
-                    this._doApplyTransform(function(response) {
+                    self._doApplyTransform(function(response) {
                         var onMergeFinished = function(data) {
+                                console.log(data, isEnd(), currentIndex);
                                 if (false === isEnd()) {
                                     currentIndex++;
                                     doingMerge();
@@ -1040,6 +1009,7 @@ define([
                                 }
                             },
                             afterMerge = callback || function(outputName) {
+                                console.log(outputName);
                                 var mesh,
                                     updatedMeshes = [],
                                     deferred = $.Deferred(),
@@ -1165,12 +1135,11 @@ define([
                     var self = this,
                         mesh = self._getMesh(self.state.scanTimes);
 
-                    self.state.scanMethods.stop();
+                    self.state.scanCtrlWebSocket.stopScan();
                     // TODO: restore to the status before scan
 
                     self.setState({
                         openProgressBar: false,
-                        scanTimes: (0 === self.state.scanTimes ? 0 : self.state.scanTimes),
                         isScanStarted: false
                     });
                 },
@@ -1185,7 +1154,7 @@ define([
                         this._refreshCamera();
                     }
                     else {
-                        this.state.scanControlImageMethods.stop();
+                        this.state.scanCtrlWebSocket.stopGettingImage();
                     }
                 },
 
@@ -1242,7 +1211,7 @@ define([
                             calibrateDeferred.done(done).fail(fail);
                         };
 
-                    self._handleCheck(function(data) {
+                    self._handleCheck().done(function(data) {
                         switch (data.message) {
                         case 'good':
                             onPass();
@@ -1357,6 +1326,10 @@ define([
                         meshThumbnails = this._renderMeshThumbnail(lang),
                         closeSubPopup = function(e) {
                             self.refs.setupPanel.openSubPopup(e);
+                        },
+                        cameraImage = (self.state.cameraImageSrc || '/img/menu/main_logo.svg'),
+                        camera_inline_style = {
+                            'background-image': 'url(' + cameraImage + ')'
                         };
 
                     camera_image_class = cx({
@@ -1368,7 +1341,7 @@ define([
                         <section ref="operatingSection" className="operating-section">
                             {meshThumbnails}
                             <div id="model-displayer" className="model-displayer">
-                                <img ref="camera_image" src="" className={camera_image_class} onClick={closeSubPopup} draggable="false"/>
+                                <div style={camera_inline_style} className={camera_image_class} onClick={closeSubPopup}/>
                             </div>
                             {settingPanel}
                             {manipulationPanel}
@@ -1430,6 +1403,8 @@ define([
                     var self = this,
                         ctrlOpts = {
                             onError: function(data) {
+                                data.info = data.info || '';
+
                                 if (-1 < data.info.toUpperCase().indexOf('ZOMBIE')) {
                                     self.state.scanCtrlWebSocket.takeControl(function(response) {
                                         self._openBlocker(false);
@@ -1452,6 +1427,10 @@ define([
                             onError: function(data) {
                                 self._openBlocker(false);
                                 AlertActions.showPopupError('scan-modeling-error', data.error);
+                            }
+                            onFatal: function(data) {
+                                self._openBlocker(false);
+                                AlertActions.showPopupError('scan-fatal-error', data.error);
                             }
                         },
                         onGettingPrinter = function(auth_printer) {
@@ -1484,37 +1463,6 @@ define([
                     return (
                         false === self.state.gettingStarted ?
                         <Modal content={content} className={className} disabledEscapeOnBackground={true}/> :
-                        ''
-                    );
-                },
-
-                _renderAlert: function(lang) {
-                    var self = this,
-                        onClose = function(e) {
-                            (self.state.error.onClose || function() {})();
-                            self.setState({
-                                openAlert: false
-                            });
-                        },
-                        buttons = [{
-                            label: lang.scan.confirm,
-                            dataAttrs: {
-                                'ga-event': 'confirm'
-                            },
-                            onClick: onClose
-                        }],
-                        content = (
-                            <Alert
-                                lang={lang}
-                                caption={self.state.error.caption}
-                                message={self.state.error.message}
-                                buttons={buttons}
-                            />
-                        );
-
-                    return (
-                        true === self.state.openAlert ?
-                        <Modal content={content} disabledEscapeOnBackground={true}/> :
                         ''
                     );
                 },
@@ -1610,7 +1558,6 @@ define([
                     var state = this.state,
                         lang = state.lang,
                         progressBar = this._renderProgressBar(lang),
-                        alert = this._renderAlert(lang),
                         cx = React.addons.classSet,
                         actionButtons = this._renderActionButtons(lang),
                         scanStage = this._renderStageSection(lang),

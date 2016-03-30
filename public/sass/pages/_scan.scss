@@ -106,9 +106,14 @@
         z-index: 0;
 
         .camera-image {
+            background-position: center center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+            background-size: contain;
             height: 100%;
             width: 100%;
-            object-fit: contain;
+            transition: background-image .3s ease;
+            will-change: background-image;
         }
     }
 

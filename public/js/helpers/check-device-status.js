@@ -59,9 +59,9 @@ define([
                         break;
                     }
                 });
-            };
 
-        AlertStore.onYes(onYes);
+                AlertStore.removeYesListener(onYes);
+            };
 
         deferred.always(function() {
             AlertStore.removeYesListener(onYes);
@@ -82,6 +82,7 @@ define([
             // ask kick?
             ProgressActions.close();
             AlertActions.showPopupYesNo('kick', lang.message.device_is_used);
+            AlertStore.onYes(onYes);
             break;
         case DeviceConstants.status.COMPLETED:
         case DeviceConstants.status.ABORTED:
@@ -97,6 +98,7 @@ define([
             // ask for abort
             ProgressActions.close();
             AlertActions.showPopupYesNo('abort', lang.message.device_is_used);
+            AlertStore.onYes(onYes);
             break;
         default:
             // device busy
