@@ -112,6 +112,14 @@ define([
                 onClick: emptyFunction,
                 parent: parentIndex.EDIT
             },
+            undo: {
+                label: lang.edit.undo,
+                enabled: false,
+                key: 'Z',
+                modifiers: 'cmd',
+                onClick: emptyFunction,
+                parent: parentIndex.EDIT
+            },
             clear: {
                 label: lang.edit.clear,
                 enabled: false,
@@ -198,6 +206,8 @@ define([
             {
                 label: lang.edit.label,
                 subItems: [
+                    items.undo,
+                    separator,
                     items.duplicate,
                     items.scale,
                     items.rotate,
