@@ -1576,7 +1576,7 @@ define([
         // sort the index of each point in stl
         var stl_index = [];
         var boundary = [];
-        if (sourceMesh.geometry.type == 'Geometry') {
+        if (sourceMesh.geometry.type === 'Geometry') {
             // define Cross product function on 2d plane
             var cross = (function cross(p0, p1, p2) {
                 return ((p1.x - p0.x) * (p2.y - p0.y)) - ((p1.y - p0.y) * (p2.x - p0.x));
@@ -1591,7 +1591,7 @@ define([
                 }
                 return sourceMesh.geometry.vertices[a].y - sourceMesh.geometry.vertices[b].y;
             });
-            console.log(stl_index);
+            // console.log(stl_index);
 
             // find boundary
 
@@ -2180,9 +2180,7 @@ define([
 
         previewMode = true;
 
-        _clearScene(scene);
-        selectObject(null);
-        render();
+        clearScene();
         _showWait(lang.print.drawingPreview, !showStopButton);
 
         reactSrc.setState({
@@ -2223,7 +2221,7 @@ define([
     }
 
     function loadScene() {
-        _clearScene(scene);
+        clearScene();
         _handleLoadScene(importedScene);
     }
 
@@ -2382,6 +2380,19 @@ define([
                 }
             });
         }
+    }
+
+    function clearScene() {
+        objects.length = 0;
+        outlineScene.children.length = 0;
+        for(var i = scene.children.length - 1; i >= 0; i--) {
+            if(scene.children[i].name === 'custom') {
+                scene.children.splice(i, 1);
+            }
+        }
+        _exitImportFromFCodeMode();
+        selectObject(null);
+        render();
     }
 
     function _exitImportFromFCodeMode() {
@@ -2580,16 +2591,6 @@ define([
         render();
     }
 
-    function _clearScene(scene) {
-        objects.length = 0;
-        outlineScene.children.length = 0;
-        for(var i = scene.children.length - 1; i >= 0; i--) {
-            if(scene.children[i].name === 'custom') {
-                scene.children.splice(i, 1);
-            }
-        }
-    }
-
     function _objectChanged(ref, src) {
         if(!ref.size) { ref.size = {}; }
         if(!ref.rotation) { ref.rotation = {}; }
@@ -2662,6 +2663,7 @@ define([
         downloadScene       : downloadScene,
         loadScene           : loadScene,
         undo                : undo,
-        addHistory          : addHistory
+        addHistory          : addHistory,
+        clearScene          : clearScene
     };
 });

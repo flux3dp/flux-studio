@@ -217,6 +217,7 @@ define([
                     nwjsMenu.import.onClick = function() { $importBtn.click(); };
                     nwjsMenu.saveTask.onClick = this._handleDownloadFCode;
                     nwjsMenu.saveScene.onClick = this._handleDownloadScene;
+                    nwjsMenu.clear.onClick = this._handleClearScene;
                     nwjsMenu.tutorial.onClick = function() {
                         self._handleYes('tour');
                     };
@@ -682,6 +683,10 @@ define([
                     director.cancelPreview();
                 },
 
+                _handleClearScene: function() {
+                    director.clearScene();
+                },
+
                 _getLineFromAdvancedCustomSetting: function(key) {
                     var start = advancedSettings.custom.indexOf(key);
                     var end = advancedSettings.custom.indexOf('\n', start);
@@ -818,6 +823,7 @@ define([
                 _renderNwjsMenu: function() {
                     nwjsMenu.saveTask.enabled = this.state.hasObject;
                     nwjsMenu.saveScene.enabled = this.state.hasObject;
+                    nwjsMenu.clear.enabled = this.state.hasObject;
                 },
 
                 render: function() {
