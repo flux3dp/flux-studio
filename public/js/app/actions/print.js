@@ -263,13 +263,6 @@ define([
             openImportWindow: false
         });
 
-        ProgressActions.open(
-            ProgressConstants.STEPPING,
-            lang.print.importingModel,
-            lang.print.wait,
-            !showStopButton
-        );
-
         loader.load(model_file_path, function(geometry) {
             if(geometry.vertices) {
                 if(geometry.vertices.length === 0) {
@@ -348,9 +341,6 @@ define([
             mesh.scale.locked = true;
             /* end customized property */
 
-            if (mesh.geometry.type !== 'Geometry') {
-                mesh.geometry = new THREE.Geometry().fromBufferGeometry(mesh.geometry);
-            }
             mesh.name = 'custom';
             mesh.file = file;
             mesh.fileName = file.name;
@@ -375,6 +365,13 @@ define([
     }
 
     function appendModels(files, index, callback) {
+        ProgressActions.open(
+            ProgressConstants.STEPPING,
+            lang.print.importingModel,
+            lang.print.wait,
+            !showStopButton
+        );
+
         var t = setInterval(function() {
             if(slicingStatus.canInterrupt) {
                 clearInterval(t);
@@ -742,11 +739,11 @@ define([
 
         raycaster.setFromCamera(mouse, camera);
         var intersects = raycaster.intersectObjects(objects);
-        var location = getReferenceIntersectLocation(e);
 
         if (intersects.length > 0) {
 
             var target = intersects[0].object;
+            var location = getReferenceIntersectLocation(e);
             selectObject(target);
 
             orbitControl.enabled = false;
@@ -822,10 +819,11 @@ define([
     function onMouseMove(e) {
         e.preventDefault();
         setMousePosition(e);
-
-        var location = getReferenceIntersectLocation(e);
-        if (SELECTED && mouseDown) {
+        SELECTED = SELECTED || {};
+        // if SELECTED and mouse down
+        if (Object.keys(SELECTED).length > 0 && mouseDown) {
             if (!transformMode) {
+                var location = getReferenceIntersectLocation(e);
                 if (SELECTED.position && location) {
                     SELECTED.position.x = location.x - movingOffsetX;
                     SELECTED.position.y = location.y - movingOffsetY;
@@ -1574,51 +1572,105 @@ define([
         // ref: http://www.csie.ntnu.edu.tw/~u91029/ConvexHull.html#4
         // Andrew's Monotone Chain
 
-        // define Cross product function on 2d plane
-        var cross = (function cross(p0, p1, p2) {
-            return ((p1.x - p0.x) * (p2.y - p0.y)) - ((p1.y - p0.y) * (p2.x - p0.x));
-        });
 
         // sort the index of each point in stl
         var stl_index = [];
-        for (var i = 0; i < sourceMesh.geometry.vertices.length; i += 1) {
-          stl_index.push(i);
-        }
-        stl_index.sort(function(a, b) {
-            if (sourceMesh.geometry.vertices[a].y === sourceMesh.geometry.vertices[b].y) {
-                return sourceMesh.geometry.vertices[a].x - sourceMesh.geometry.vertices[b].x;
-            }
-            return sourceMesh.geometry.vertices[a].y - sourceMesh.geometry.vertices[b].y;
-        });
-
-        // find boundary
         var boundary = [];
+        if (sourceMesh.geometry.type == 'Geometry') {
+            // define Cross product function on 2d plane
+            var cross = (function cross(p0, p1, p2) {
+                return ((p1.x - p0.x) * (p2.y - p0.y)) - ((p1.y - p0.y) * (p2.x - p0.x));
+            });
 
-        // compute upper hull
-        for (var i = 0; i < stl_index.length; i += 1) {
-          while( boundary.length >= 2 && cross(sourceMesh.geometry.vertices[boundary[boundary.length - 2]], sourceMesh.geometry.vertices[boundary[boundary.length - 1]], sourceMesh.geometry.vertices[stl_index[i]]) <= 0){
-            boundary.pop();
-          }
-            boundary.push(stl_index[i]);
-        }
-        // compute lower hull
-        var t = boundary.length + 1;
-        for (var i = stl_index.length - 2 ; i >= 0; i -= 1) {
-            while( boundary.length >= t && cross(sourceMesh.geometry.vertices[boundary[boundary.length - 2]], sourceMesh.geometry.vertices[boundary[boundary.length - 1]], sourceMesh.geometry.vertices[stl_index[i]]) <= 0){
-                boundary.pop();
+            for (var i = 0; i < sourceMesh.geometry.vertices.length; i += 1) {
+              stl_index.push(i);
             }
-            boundary.push(stl_index[i]);
-        }
-        // delete redundant point(i.e., starting point)
-        boundary.pop();
+            stl_index.sort(function(a, b) {
+                if (sourceMesh.geometry.vertices[a].y === sourceMesh.geometry.vertices[b].y) {
+                    return sourceMesh.geometry.vertices[a].x - sourceMesh.geometry.vertices[b].x;
+                }
+                return sourceMesh.geometry.vertices[a].y - sourceMesh.geometry.vertices[b].y;
+            });
+            console.log(stl_index);
 
+            // find boundary
+
+            // compute upper hull
+            for (var i = 0; i < stl_index.length; i += 1) {
+              while( boundary.length >= 2 && cross(sourceMesh.geometry.vertices[boundary[boundary.length - 2]], sourceMesh.geometry.vertices[boundary[boundary.length - 1]], sourceMesh.geometry.vertices[stl_index[i]]) <= 0){
+                boundary.pop();
+              }
+                boundary.push(stl_index[i]);
+            }
+            // compute lower hull
+            var t = boundary.length + 1;
+            for (var i = stl_index.length - 2 ; i >= 0; i -= 1) {
+                while( boundary.length >= t && cross(sourceMesh.geometry.vertices[boundary[boundary.length - 2]], sourceMesh.geometry.vertices[boundary[boundary.length - 1]], sourceMesh.geometry.vertices[stl_index[i]]) <= 0){
+                    boundary.pop();
+                }
+                boundary.push(stl_index[i]);
+            }
+            // delete redundant point(i.e., starting point)
+            boundary.pop();
+        }
+        else{
+            // define Cross product function on 2d plane for buffergeometry
+            var cross = (function cross(sm, p0, p1, p2) {
+
+                return ((sm.geometry.attributes.position.array[p1 * 3 + 0] - sm.geometry.attributes.position.array[p0 * 3 + 0]) *
+                        (sm.geometry.attributes.position.array[p2 * 3 + 1] - sm.geometry.attributes.position.array[p0 * 3 + 1])) -
+                       ((sm.geometry.attributes.position.array[p1 * 3 + 1] - sm.geometry.attributes.position.array[p0 * 3 + 1]) *
+                        (sm.geometry.attributes.position.array[p2 * 3 + 0] - sm.geometry.attributes.position.array[p0 * 3 + 0]))
+            });
+
+            for (var i = 0; i < sourceMesh.geometry.attributes.position.length / sourceMesh.geometry.attributes.position.itemSize; i += 1) {
+              stl_index.push(i);
+            }
+
+            stl_index.sort(function(a, b) {
+                if (sourceMesh.geometry.attributes.position.array[a * 3 + 1] === sourceMesh.geometry.attributes.position.array[b * 3 + 1]) {
+                    return sourceMesh.geometry.attributes.position.array[a * 3 + 0] - sourceMesh.geometry.attributes.position.array[b * 3 + 0];
+                }
+                return sourceMesh.geometry.attributes.position.array[a * 3 + 1] - sourceMesh.geometry.attributes.position.array[b * 3 + 1];
+            });
+
+            // find boundary
+
+            // compute upper hull
+            for (var i = 0; i < stl_index.length; i += 1) {
+              while( boundary.length >= 2 && cross(sourceMesh, boundary[boundary.length - 2], boundary[boundary.length - 1], stl_index[i]) <= 0){
+                boundary.pop();
+              }
+                boundary.push(stl_index[i]);
+            }
+            // compute lower hull
+            var t = boundary.length + 1;
+            for (var i = stl_index.length - 2 ; i >= 0; i -= 1) {
+                while( boundary.length >= t && cross(sourceMesh, boundary[boundary.length - 2], boundary[boundary.length - 1], stl_index[i]) <= 0){
+                    boundary.pop();
+                }
+                boundary.push(stl_index[i]);
+            }
+            // delete redundant point(i.e., starting point)
+            boundary.pop();
+        };
         return boundary;
     }
 
     function checkOutOfBounds(sourceMesh) {
+
         if (!$.isEmptyObject(sourceMesh)) {
+            var vector = new THREE.Vector3();
             sourceMesh.position.isOutOfBounds = sourceMesh.plane_boundary.some(function(v) {
-                var vector = sourceMesh.geometry.vertices[v].clone();
+                if (sourceMesh.geometry.type == 'Geometry') {
+                    vector = sourceMesh.geometry.vertices[v].clone();
+                }
+                else{
+                    vector.x = sourceMesh.geometry.attributes.position.array[v * 3 + 0];
+                    vector.y = sourceMesh.geometry.attributes.position.array[v * 3 + 1];
+                    vector.z = sourceMesh.geometry.attributes.position.array[v * 3 + 2];
+                }
+
                 vector.applyMatrix4(sourceMesh.matrixWorld);
                 return Math.sqrt(Math.pow(vector.x, 2) + Math.pow(vector.y, 2)) > s.radius;
             });
