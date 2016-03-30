@@ -461,16 +461,18 @@ define([
 
         var processMetadata = function(m) {
             metadata = m;
-            if(m.metadata.HEAD_TYPE !== 'LASER') {
+            var fcodeType = m.metadata.HEAD_TYPE
+            if(fcodeType === 'EXTRUDER') {
                 fcodeConsole.getPath().then(processPath);
             }
             else {
+                var message = fcodeType === 'LASER' ? lang.message.fcodeForLaser : lang.message.fcodeForPen
                 ProgressActions.close();
                 importFromFCode = false;
                 importFromGCode = false;
                 previewMode = false;
                 _exitImportFromFCodeMode();
-                AlertActions.showPopupInfo('', lang.message.fcodeForLaser);
+                AlertActions.showPopupInfo('', message);
             }
         };
 

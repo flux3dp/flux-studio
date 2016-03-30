@@ -963,6 +963,7 @@ define(function() {
             application_occurs_error: 'Program Error',
             error_log: 'Error Log',
             fcodeForLaser: 'This is a fcode for laser',
+            fcodeForPen: 'This is a fcode for pen',
             confirmFCodeImport: 'Importing fcode will remove all objects on the scene, are you sure?',
             confirmSceneImport: 'Importing .fsc will remove all objects on the scene, are you sure?',
             brokenFcode: 'unable to open %s',

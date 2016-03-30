@@ -963,6 +963,7 @@ define(function() {
             application_occurs_error: '程式發生錯誤',
             error_log: '錯誤訊息',
             fcodeForLaser: '檔案為雕刻工作',
+            fcodeForPen: '檔案為繪圖工作',
             confirmFCodeImport: '載入.fc檔案將清除目前所有場景，繼續？',
             confirmSceneImport: '載入.fsc檔案將清除目前所有場景，繼續？',
             brokenFcode: '無法開啟 %s',
