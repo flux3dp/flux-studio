@@ -2,12 +2,16 @@ define([
     'helpers/is-json',
     'helpers/i18n',
     'app/actions/alert-actions',
-    'app/actions/progress-actions'
+    'app/stores/alert-store',
+    'app/actions/progress-actions',
+    'helpers/output-error'
 ], function(
     isJson,
     i18n,
     AlertActions,
-    ProgressActions
+    AlertStore,
+    ProgressActions,
+    outputError
 ) {
     'use strict';
 
@@ -99,13 +103,29 @@ define([
                     ProgressActions.close();
                     options.onClose(result);
 
+                    var abnormallyId = 'abnormally-close',
+                        message = '',
+                        outputLog = function() {
+                            console.log('outputLog');
+                            outputError();
+                            AlertStore.removeYesListener(outputLog);
+                        };
+
                     // The connection was closed abnormally without sending or receving data
                     // ref: http://tools.ietf.org/html/rfc6455#section-7.4.1
                     if (1006 === result.code &&
-                        60000 <= (new Date()).getTime() - window.FLUX.timestamp &&
-                        false === hadConnected
+                        60000 <= (new Date()).getTime() - window.FLUX.timestamp
                     ) {
-                        AlertActions.showPopupError('abnormally-close', lang.message.cant_establish_connection);
+                        if (false === hadConnected) {
+                            message = lang.message.cant_establish_connection;
+                        }
+                        else {
+                            message = lang.message.application_occurs_error;
+                            _logs.push('**abnormal disconnection**');
+                        }
+
+                        AlertActions.showPopupCustom(abnormallyId, message, lang.message.error_log);
+                        AlertStore.onYes(outputLog);
                     }
 
                     if (true === options.autoReconnect) {

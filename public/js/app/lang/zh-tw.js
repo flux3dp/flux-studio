@@ -884,14 +884,17 @@ define(function() {
             confirmGToF                         : 'GCode 上傳後會自動轉檔成 FCode，是否要繼續？',
             updatePrintPresetSetting            : 'FLUX STUDIO 有新的預設列印參數。\n是否要更新？（會刪除目前參數）',
             confirmFileDelete                   : '是否確定要刪除這個檔案？',
-            task : {
+            task: {
                 EXTRUDER                        : '列印工作',
-                LASER                           : '雕刻工作'
+                LASER                           : '雕刻工作',
+                DRAW                            : '繪製工作'
             },
-            device : {
+            device: {
                 EXTRUDER                        : '列印模組',
-                LASER                           : '雕刻模組'
-            }
+                LASER                           : '雕刻模組',
+                DRAW                            : '繪製模組'
+            },
+            cant_get_toolhead_version           : '無法取得最新版本資訊'
         },
         alert: {
             caption: '錯誤',
@@ -902,6 +905,7 @@ define(function() {
             retry: '重試',
             abort: '放棄',
             cancel: '取消',
+            close: '關閉',
             ok: '確定',
             yes: ' 是',
             no: '否',
@@ -954,11 +958,14 @@ define(function() {
                 caption: '韌體需要更新',
                 content: '請按照<a target="_blank" href="http://helpcenter.flux3dp.com/hc/zh-tw/articles/216251077">此說明</a>安裝最新韌體版本'
             },
-            cant_establish_connection: '無法啟動 FLUX API，請使用 說明 > 錯誤回報 輸出偵錯訊息，並<a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/requests/new" target="_blank">聯繫 FLUX 客服</a>',
+            cant_establish_connection: '無法啟動 FLUX Studio API，並<a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/requests/new" target="_blank">聯繫 FLUX 客服</a>',
+            application_occurs_error: '程式發生錯誤',
+            error_log: '錯誤訊息',
             fcodeForLaser: '檔案為雕刻工作',
             confirmFCodeImport: '載入.fc檔案將清除目前所有場景，繼續？',
             confirmSceneImport: '載入.fsc檔案將清除目前所有場景，繼續？',
-            brokenFcode: '無法開啟 %s'
+            brokenFcode: '無法開啟 %s',
+            slicingFatalError: '切片時發生錯誤，請上傳模型檔案給 FLUX 客服'
         },
         machine_status: {
             '-10': 'Raw Mode',

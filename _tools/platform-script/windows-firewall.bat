@@ -1,7 +1,7 @@
 set PORT=1901
 set RULE_NAME="FLUX Discover Port %PORT%"
 
-icacls "%cd%\lib" /grant Everyone:(OI)(CI)f
+icacls "%cd%\FLUX\lib" /grant Everyone:(OI)(CI)f
 
 netsh advfirewall firewall show rule name=%RULE_NAME% >nul
 
@@ -20,5 +20,5 @@ if not ERRORLEVEL 1 (
     echo Hey, you already got a out rule by that name, you cannot put another one in!
 ) else (
     echo Rule %RULE_NAME% does not exist. Creating...
-    netsh advfirewall firewall add rule name=FLUX_API dir=in action=allow protocol=UDP program="%cd%\lib\flux_api\flux_api.exe"
+    netsh advfirewall firewall add rule name=FLUX_API dir=in action=allow protocol=ANY program="%cd%\FLUX\lib\flux_api\flux_api.exe"
 )

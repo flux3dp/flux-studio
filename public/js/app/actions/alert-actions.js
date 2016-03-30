@@ -146,6 +146,12 @@ define([
             });
         },
 
+        closeNotification: function() {
+            AlertDispatcher.dispatch({
+                actionType: AlertConstants.CLOSE_NOTIFICATION
+            });
+        },
+
         closePopup: function() {
             AlertDispatcher.dispatch({
                 actionType: AlertConstants.CLOSE_POPUP

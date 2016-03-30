@@ -88,6 +88,7 @@ define([
             lang = args.state.lang,
             selectedPrinter,
             $importBtn,
+            listeningToCancel = false,
             defaultRaftLayer = 4,
             allowDeleteObject = true,
             tutorialMode = false,
@@ -228,6 +229,7 @@ define([
 
                     AlertStore.onYes(this._handleYes);
                     AlertStore.onCancel(this._handleDefaultCancel);
+                    listeningToCancel = true
                     GlobalStore.onCancelPreview(this._handleCancelPreview);
                     GlobalStore.onMonitorClosed(this._handleMonitorClosed);
                 },
@@ -238,6 +240,7 @@ define([
 
                     AlertStore.removeYesListener(this._handleYes);
                     AlertStore.removeCancelListener(this._handleDefaultCancel);
+                    removeCancelListener = false;
                     GlobalStore.removeCancelPreviewListener(this._handleCancelPreview);
                     GlobalStore.removeMonitorClosedListener(this._handleMonitorClosed);
                 },
@@ -382,6 +385,7 @@ define([
 
                 _handleGoClick: function() {
                     AlertStore.removeCancelListener(this._handleDefaultCancel);
+                    listeningToCancel = false;
                     this.setState({
                         openPrinterSelectorWindow: true
                     });
@@ -462,9 +466,7 @@ define([
                 },
 
                 _handleDownloadFCode: function() {
-                    if(director.getModelCount() !== 0) {
-                        director.downloadFCode();
-                    }
+                    director.downloadFCode();
                 },
 
                 _handleDownloadScene: function() {
@@ -494,6 +496,7 @@ define([
 
                 _handlePrinterSelectorUnmount: function() {
                     AlertStore.onCancel(this._handleDefaultCancel);
+                    listeningToCancel = true;
                 },
 
                 _handleDeviceSelected: function(printer) {
@@ -511,6 +514,8 @@ define([
                             return;
                         }
                         AlertStore.removeCancelListener(this._handleDefaultCancel);
+                        removeCancelListener = false;
+                        console.log('show monitor');
                         GlobalActions.showMonitor(selectedPrinter, fcode, previewUrl, GlobalConstants.PRINT);
                         //Tour popout after show monitor delay
                         setTimeout(function() {
@@ -541,7 +546,10 @@ define([
                 },
 
                 _handleMonitorClosed: function() {
-                    AlertStore.onCancel(this._handleDefaultCancel);
+                    if(!listeningToCancel) {
+                        AlertStore.removeCancelListener(this._handleDefaultCancel);
+                        listeningToCancel = true;
+                    }
                 },
 
                 _handleModeChange: function(mode) {
@@ -623,6 +631,7 @@ define([
 
                             oReq.send();
                             AlertStore.removeCancelListener(this._handleDefaultCancel);
+                            removeCancelListener = false;
                         }
                         else if (this.state.currentTutorialStep === 5) {
                             this.setState({ tutorialOn: false });
@@ -724,7 +733,7 @@ define([
                             <div className="arrowBox" onClick={this._handleCloseAllView}>
                                 <div title={lang.print.importTitle} className="file-importer">
                                     <div className="import-btn">{lang.print.import}</div>
-                                    <input ref="import" type="file" accept=".stl,.fc" onChange={this._handleImport} multiple />
+                                    <input ref="import" type="file" accept=".stl,.fc,.gcode" onChange={this._handleImport} multiple />
                                 </div>
                             </div>
                         </div>

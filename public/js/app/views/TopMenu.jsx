@@ -11,7 +11,8 @@ define([
     'jsx!widgets/Modal',
     'app/actions/alert-actions',
     'app/stores/alert-store',
-    'app/actions/global-actions'
+    'app/actions/global-actions',
+    'app/stores/global-store'
 ], function(
     $,
     React,
@@ -25,7 +26,8 @@ define([
     Modal,
     AlertActions,
     AlertStore,
-    GlobalActions
+    GlobalActions,
+    GlobalStore
 ) {
     'use strict';
 
@@ -91,13 +93,16 @@ define([
 
             componentDidMount: function() {
                 this._toggleDeviceListBind = this._toggleDeviceList.bind(null, false);
+
                 AlertStore.onCancel(this._toggleDeviceListBind);
                 AlertStore.onRetry(this._waitForPrinters);
+                GlobalStore.onMonitorClosed(this._handleMonitorClosed);
             },
 
             componentWillUnmount: function() {
                 AlertStore.removeCancelListener(this._toggleDeviceListBind);
                 AlertStore.removeRetryListener(this._waitForPrinters);
+                GlobalStore.removeMonitorClosedListener(this._handleMonitorClosed);
             },
 
             _waitForPrinters: function() {
@@ -149,7 +154,7 @@ define([
 
             _handleSelectDevice: function(device, e) {
                 e.preventDefault();
-
+                AlertStore.removeCancelListener(this._toggleDeviceListBind);
                 DeviceMaster.selectDevice(device).then(function(status) {
                     if (status === DeviceConstants.CONNECTED) {
                         GlobalActions.showMonitor(device);
@@ -170,6 +175,10 @@ define([
                 this.setState({
                     showMonitor: false
                 });
+            },
+
+            _handleMonitorClosed: function() {
+                AlertStore.onCancel(this._toggleDeviceListBind);
             },
 
             _renderStudioFunctions: function() {

@@ -862,14 +862,18 @@ define([
                         self.setState(self.getInitialState());
                         scanedModel.clear();
                         self.state.scanControlImageMethods.stop(function() {
-                           self.state.scanCtrlWebSocket.connection.close(false);
+                            if ('undefined' !== typeof self.state.scanCtrlWebSocket) {
+                                self.state.scanCtrlWebSocket.connection.close(false);
+                            }
                         });
                     });
                     AlertActions.showPopupYesNo('scan-again', self.state.lang.scan.scan_again_confirm);
                 },
 
                 _onScanStop: function(e) {
-                    this.setState({
+                    var self = this;
+
+                    self.setState({
                         openProgressBar: false,
                         hasMultiScan: false,
                         isScanStarted: false,
@@ -877,8 +881,20 @@ define([
                         progressPercentage: 100 // total complete
                     });
 
-                    if ('undefined' !== typeof this.state.scanMethods) {
-                        this.state.scanMethods.stop(this._onScanFinished);
+                    if (true === self.state.isScanStarted &&
+                        0 < self.state.meshes.length &&
+                        'undefined' !== typeof self.state.scanMethods
+                    ) {
+                        self.state.scanMethods.stop(self._onScanFinished);
+                    }
+                    else {
+                        self.setState(self.getInitialState());
+                        scanedModel.clear();
+                        self.state.scanControlImageMethods.stop(function() {
+                            if ('undefined' !== typeof self.state.scanCtrlWebSocket) {
+                                self.state.scanCtrlWebSocket.connection.close(false);
+                            }
+                        });
                     }
                 },
 

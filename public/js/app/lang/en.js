@@ -884,14 +884,17 @@ define(function() {
             confirmGToF                         : 'Uploaded GCode will be converted to FCode, continue (will replace if exist)',
             updatePrintPresetSetting            : 'FLUX STUDIO has new printing preset, do you want to update?\n(will overwrite current parameters)',
             confirmFileDelete                   : 'Are you sure you want to delete this file?',
-            task : {
+            task: {
                 EXTRUDER                        : 'Printing Task',
-                LASER                           : 'Engraving Task'
+                LASER                           : 'Engraving Task',
+                DRAW                            : 'Drawing Task'
             },
-            device : {
+            device: {
                 EXTRUDER                        : 'Printing Toolhead',
-                LASER                           : 'Engraving Toolhead'
-            }
+                LASER                           : 'Engraving Toolhead',
+                DRAW                            : 'Drawing Toolhead'
+            },
+            cant_get_toolhead_version           : 'Unable to get latest version infomation'
         },
         alert: {
             caption: 'Error',
@@ -902,6 +905,7 @@ define(function() {
             retry: 'RETRY',
             abort: 'ABORT',
             cancel: 'CANCEL',
+            close: 'CLOSE',
             ok: 'OK',
             yes: 'YES',
             no: 'NO',
@@ -954,11 +958,14 @@ define(function() {
                 caption: 'Firmware Outdated',
                 content: 'Please install the latest firmware with <a target="_blank" href="http://helpcenter.flux3dp.com/hc/en-us/articles/216251077">this guide</a>.'
             },
-            cant_establish_connection: 'Unable to initiate FLUX Studio API, kindly use Help > Bug Report to export debug message and <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/requests/new" target="_blank">contact FLUX support.</a>',
+            cant_establish_connection: 'Unable to connect FLUX Studio API. Please <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/requests/new" target="_blank">contact FLUX support.</a>',
+            application_occurs_error: 'Program Error',
+            error_log: 'Error Log',
             fcodeForLaser: 'This is a fcode for laser',
             confirmFCodeImport: 'Importing fcode will remove all objects on the scene, are you sure?',
             confirmSceneImport: 'Importing .fsc will remove all objects on the scene, are you sure?',
-            brokenFcode: 'unable to open %s'
+            brokenFcode: 'unable to open %s',
+            slicingFatalError: 'Error encountered during slicing. Kindly report stl file to customer support.'
         },
         machine_status: {
             '-10': 'Raw mode',

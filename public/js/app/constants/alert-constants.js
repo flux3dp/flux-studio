@@ -28,6 +28,7 @@ define(function(){
         NOTIFY_CANCEL              : 'NOTIFY_CANCEL',
         NOTIFY_CUSTOM              : 'NOTIFY_CUSTOM',
         QUESTION                   : 'QUESTION',
+        CLOSE_NOTIFICATION         : 'CLOSE_NOTIFICATION',
         CLOSE_POPUP                : 'CLOSE_POPUP',
         SHOW_POPUP_CHANGE_FILAMENT : 'SHOW_POPUP_CHANGE_FILAMENT'
     };

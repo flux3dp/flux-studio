@@ -13,6 +13,7 @@ define([
     'app/actions/initialize-machine',
     'helpers/check-device-status',
     'app/actions/global-actions',
+    'app/constants/global-constants',
     'app/actions/alert-actions',
     'app/actions/progress-actions',
     'app/constants/progress-constants',
@@ -31,6 +32,7 @@ define([
     initializeMachine,
     checkDeviceStatus,
     GlobalActions,
+    GlobalConstants,
     AlertActions,
     ProgressActions,
     ProgressConstants,
@@ -49,13 +51,16 @@ define([
                 checkToolheadFirmware = function() {
                     var $deferred = $.Deferred();
 
+                    ProgressActions.open(ProgressConstants.NONSTOP);
+
                     if ('toolhead' === type) {
                         DeviceMaster.headinfo().done(function(response) {
+                            currentPrinter.toolhead_version = response.version || '';
+
                             if ('undefined' === typeof response.version) {
                                 $deferred.reject();
                             }
                             else {
-                                currentPrinter.toolhead_version = response.version || undefined;
                                 $deferred.resolve({ status: 'ok' });
                             }
                         });
@@ -134,10 +139,11 @@ define([
                 },
                 checkStatus = function() {
                     var goCheckStatus = function() {
-                        checkToolheadFirmware().done(function() {
+                        checkToolheadFirmware().always(function() {
+                            ProgressActions.close();
                             updateFirmware();
                         }).fail(function() {
-                            AlertActions.showPopupError('toolhead-offline', lang.monitor.HEAD_OFFLINE);
+                            AlertActions.showPopupError('toolhead-offline', lang.monitor.cant_get_toolhead_version);
                         });
                     };
 
@@ -175,6 +181,8 @@ define([
                 };
 
             DeviceMaster.selectDevice(printer).then(function(status) {
+                var lang = i18n.get();
+
                 if (status === DeviceConstants.CONNECTED) {
                     checkStatus();
                 }
@@ -339,15 +347,13 @@ define([
                     label: lang.device.device_monitor,
                     enabled: true,
                     onClick: function() {
-                        DeviceMaster.selectDevice(printer).then(function(status) {
+                        var currentPrinter = discoverMethods.getLatestPrinter(printer),
+                            lang = i18n.get();
+
+                        DeviceMaster.selectDevice(currentPrinter).then(function(status) {
+
                             if (status === DeviceConstants.CONNECTED) {
-                                checkDeviceStatus(printer).done(function(status) {
-                                    switch (status) {
-                                    case 'ok':
-                                        GlobalActions.showMonitor(printer);
-                                        break;
-                                    }
-                                });
+                                GlobalActions.showMonitor(currentPrinter, '', '', GlobalConstants.DEVICE_LIST);
                             }
                             else if (status === DeviceConstants.TIMEOUT) {
                                 AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
@@ -398,6 +404,8 @@ define([
                             };
 
                         DeviceMaster.selectDevice(currentPrinter).then(function(status) {
+                            var lang = i18n.get();
+
                             if (status === DeviceConstants.CONNECTED) {
                                 showPopup();
                             }
