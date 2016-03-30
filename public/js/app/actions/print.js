@@ -480,17 +480,24 @@ define([
             previewMode = true;
             printPath = path;
             _drawPathFromFCode();
-            fcodeConsole.getThumbnail(processPreview);
-        };
 
-        var processPreview = function(blob) {
-            if(blob instanceof Blob) {
-                previewUrl = URL.createObjectURL(blob);
-                blobExpired = false;
-                responseBlob = new Blob([reader.result]);
-                GlobalActions.sliceComplete(metadata);
-            }
+            // update the preview image
+            getBlobFromScene().then((blob) => {
+                if(blob instanceof Blob) {
+                    previewUrl = URL.createObjectURL(blob);
+                    var d = fcodeConsole.changeImage(blob);
 
+                    d.then(() => {
+                        blobExpired = false;
+                        responseBlob = new Blob([reader.result]);
+                        GlobalActions.sliceComplete(metadata);
+                    });
+
+                    d.catch((error) => {
+                        console.log('error from change image', error);
+                    });
+                }
+            });
         };
 
         reader.readAsArrayBuffer(file);
@@ -1082,7 +1089,7 @@ define([
         }
         else if(importFromGCode) {
             fcodeConsole.getFCode().then(function(blob) {
-                d.resolve(blob);
+                d.resolve(blob, previewUrl);
             });
             return d.promise();
         }
