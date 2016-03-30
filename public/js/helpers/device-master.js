@@ -45,6 +45,7 @@ define([
         _selectedDevice = {},
         _deviceNameMap = {},
         _device,
+        nwConsole,
         _devices = [],
         _errors = {};
 
@@ -359,7 +360,7 @@ define([
         return d.promise();
     }
 
-    function getFirstDevice(){
+    function getFirstDevice() {
         for(var i in _deviceNameMap) {
             return i;
         }
@@ -464,6 +465,24 @@ define([
         return d.promise();
     }
 
+    function updateNWProgress(deviceStatus) {
+        if(FLUX.isNW) {
+            if(!nwConsole) {
+                nwConsole = nw.Window.get();
+            }
+            var stId = deviceStatus.st_id;
+            if(stId !== 0 && stId !== 64 && stId !== 128) {
+                if(deviceStatus.st_prog) {
+                    nwConsole.setProgressBar(-1);
+                    nwConsole.setProgressBar(deviceStatus.st_prog);
+                }
+            }
+            else {
+                nwConsole.setProgressBar(-1);
+            }
+        }
+    }
+
     function _isPrinting() {
         return _status === DeviceConstants.RUNNING;
     }
@@ -506,6 +525,7 @@ define([
             }
             if(defaultPrinter) {
                 if(defaultPrinter.serial === device.serial) {
+                    updateNWProgress(device);
                     if(device.st_id === DeviceConstants.status.PAUSED_FROM_RUNNING) {
                         if(!defaultPrinterWarningShowed) {
                             var message = `${device.name} ${lang.device.pausedFromError}`;
