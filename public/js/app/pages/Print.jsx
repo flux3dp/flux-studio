@@ -516,7 +516,6 @@ define([
                         }
                         AlertStore.removeCancelListener(this._handleDefaultCancel);
                         removeCancelListener = false;
-                        console.log('show monitor');
                         GlobalActions.showMonitor(selectedPrinter, fcode, previewUrl, GlobalConstants.PRINT);
                         //Tour popout after show monitor delay
                         setTimeout(function() {

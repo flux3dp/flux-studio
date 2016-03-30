@@ -307,7 +307,7 @@ define([
 
                 var types = {
                     INFO: function() {
-                        grown = $.growl.notice({
+                        growl = $.growl.notice({
                             title   : lang.alert.info,
                             message : message,
                             fixed   : fixed,
