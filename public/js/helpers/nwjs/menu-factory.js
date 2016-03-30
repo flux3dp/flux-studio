@@ -353,14 +353,7 @@ define([
                         DeviceMaster.selectDevice(currentPrinter).then(function(status) {
 
                             if (status === DeviceConstants.CONNECTED) {
-                                checkDeviceStatus(currentPrinter).done(function(status) {
-                                    switch (status) {
-                                    case 'ok':
-                                    case 'auth':
-                                        GlobalActions.showMonitor(currentPrinter, '', '', GlobalConstants.DEVICE_LIST);
-                                        break;
-                                    }
-                                });
+                                GlobalActions.showMonitor(currentPrinter, '', '', GlobalConstants.DEVICE_LIST);
                             }
                             else if (status === DeviceConstants.TIMEOUT) {
                                 AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
