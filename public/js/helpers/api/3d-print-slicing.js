@@ -146,6 +146,9 @@ define([
                 events.onError = function(result) {
                     d.resolve(result);
                 };
+                events.onFatal = function(result) {
+                    d.resolve(result);
+                }
                 ws.send(`begin_slicing ${nameArray.join(' ')} -${type}`);
                 lastOrder = 'begin_slicing';
                 return d.promise();

@@ -238,8 +238,8 @@ define([
                             // holder
                             else {
                                 setupPanelDefaults = {
-                                    liftHeight: response.liftHeight || 0.1,
-                                    drawHeight: response.drawHeight || 0.1,
+                                    liftHeight: response.liftHeight || 55,
+                                    drawHeight: response.drawHeight || 50,
                                     speed: response.speed || 20
                                 }
                             }
