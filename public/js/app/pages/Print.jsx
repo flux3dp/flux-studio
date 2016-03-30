@@ -204,7 +204,6 @@ define([
                 },
 
                 componentDidMount: function() {
-                    var self = this;
                     director.init(this);
 
                     this._handleApplyAdvancedSetting();
@@ -214,12 +213,14 @@ define([
                     $importBtn = this.refs.importBtn.getDOMNode();
 
                     nwjsMenu.import.enabled = true;
-                    nwjsMenu.import.onClick = function() { $importBtn.click(); };
+                    nwjsMenu.import.onClick = () => { $importBtn.click(); };
+                    nwjsMenu.undo.onClick = () => { director.undo(); }
+                    nwjsMenu.duplicate.onClick = () => { director.duplicateSelected(); }
                     nwjsMenu.saveTask.onClick = this._handleDownloadFCode;
                     nwjsMenu.saveScene.onClick = this._handleDownloadScene;
                     nwjsMenu.clear.onClick = this._handleClearScene;
-                    nwjsMenu.tutorial.onClick = function() {
-                        self._handleYes('tour');
+                    nwjsMenu.tutorial.onClick = () => {
+                        this._handleYes('tour');
                     };
 
                     this._registerKeyEvents();
@@ -820,6 +821,7 @@ define([
                 },
 
                 _renderNwjsMenu: function() {
+                    nwjsMenu.undo.enabled = this.state.hasObject;
                     nwjsMenu.saveTask.enabled = this.state.hasObject;
                     nwjsMenu.saveScene.enabled = this.state.hasObject;
                     nwjsMenu.clear.enabled = this.state.hasObject;

@@ -76,7 +76,8 @@ define(function() {
                 rotate: '旋轉',
                 scale: '縮放',
                 reset: '重置',
-                clear: '清除場景'
+                clear: '清除場景',
+                undo: '復原'
             },
             device: {
                 label: '裝置',

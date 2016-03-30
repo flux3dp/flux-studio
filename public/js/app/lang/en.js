@@ -76,7 +76,8 @@ define(function() {
                 rotate: 'Rotate',
                 scale: 'Scale',
                 reset: 'Reset',
-                clear: 'Clear Scene'
+                clear: 'Clear Scene',
+                undo: 'Undo'
             },
             device: {
                 label: 'Device',
