@@ -829,11 +829,7 @@ define([
                     AlertStore.onYes(function(id) {
                         self.setState(self.getInitialState());
                         scanedModel.clear();
-                        self.state.scanControlImageMethods.stop(function() {
-                            if ('undefined' !== typeof self.state.scanCtrlWebSocket) {
-                                self.state.scanCtrlWebSocket.connection.close(false);
-                            }
-                        });
+                        self.state.scanCtrlWebSocket.stopGettingImage();
                     });
                     AlertActions.showPopupYesNo('scan-again', self.state.lang.scan.scan_again_confirm);
                 },
@@ -849,16 +845,14 @@ define([
                         progressPercentage: 100 // total complete,
                     });
 
-                    if (true === self.state.isScanStarted &&
-                        0 < self.state.meshes.length &&
-                        'undefined' !== typeof self.state.scanControlImageMethods
-                    ) {
-                        self.state.scanControlImageMethods.stopScan();
+                    if ('undefined' !== typeof self.state.scanCtrlWebSocket) {
+                        self.state.scanCtrlWebSocket.stopScan();
                     }
-                    else {
+
+                    // on scanning or had point cloud
+                    if (true === self.state.isScanStarted && 0 === self.state.meshes.length) {
                         self.setState(self.getInitialState());
                         scanedModel.clear();
-                        self.state.scanControlImageMethods.stopScan();
 
                         if ('undefined' !== typeof self.state.scanCtrlWebSocket) {
                             self.state.scanCtrlWebSocket.connection.close(false);
