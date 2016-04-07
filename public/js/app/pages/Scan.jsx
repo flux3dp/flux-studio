@@ -79,7 +79,6 @@ define([
                         isScanStarted: false,   // scan getting started
                         showCamera: true,
                         scanStartTime: undefined,   // when the scan started
-                        scanMethods: undefined,
                         scanCtrlWebSocket: undefined,
                         scanModelingWebSocket: undefined,
                         meshes: [],
@@ -852,18 +851,19 @@ define([
 
                     if (true === self.state.isScanStarted &&
                         0 < self.state.meshes.length &&
-                        'undefined' !== typeof self.state.scanMethods
+                        'undefined' !== typeof self.state.scanControlImageMethods
                     ) {
-                        self.state.scanMethods.stop(self._onScanFinished);
+                        self.state.scanControlImageMethods.stopScan();
                     }
                     else {
                         self.setState(self.getInitialState());
                         scanedModel.clear();
-                        self.state.scanControlImageMethods.stop(function() {
-                            if ('undefined' !== typeof self.state.scanCtrlWebSocket) {
-                                self.state.scanCtrlWebSocket.connection.close(false);
-                            }
-                        });
+                        self.state.scanControlImageMethods.stopScan();
+
+                        if ('undefined' !== typeof self.state.scanCtrlWebSocket) {
+                            self.state.scanCtrlWebSocket.connection.close(false);
+                        }
+                    }
                 },
 
                 _doClearNoise: function(mesh) {
@@ -1427,7 +1427,7 @@ define([
                             onError: function(data) {
                                 self._openBlocker(false);
                                 AlertActions.showPopupError('scan-modeling-error', data.error);
-                            }
+                            },
                             onFatal: function(data) {
                                 self._openBlocker(false);
                                 AlertActions.showPopupError('scan-fatal-error', data.error);
