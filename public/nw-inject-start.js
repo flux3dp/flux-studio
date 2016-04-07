@@ -121,7 +121,6 @@ var process = nw.process,
                 seperate_package_path = appRoot + '/lib/flux_api/flux_api.exe';
                 break;
             case 'Linux':
-                break;
             case 'Darwin':
                 contentPos = dirParts.indexOf('Contents');
                 contentPos = (-1 < contentPos ? contentPos : dirParts.length);
