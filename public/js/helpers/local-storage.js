@@ -70,6 +70,18 @@ define(function() {
             localStorage.clear();
 
             return this;
+        },
+
+        /**
+         * key is existing
+         *
+         * @param {string} key - key name
+         *
+         * @return bool
+         */
+        isExisting : function(key) {
+            return ('string' === typeof localStorage.getItem(key) ? true : false);
         }
+
     };
 });
