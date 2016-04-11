@@ -79,7 +79,6 @@ define([
                         isScanStarted: false,   // scan getting started
                         showCamera: true,
                         scanStartTime: undefined,   // when the scan started
-                        scanMethods: undefined,
                         scanCtrlWebSocket: undefined,
                         scanModelingWebSocket: undefined,
                         meshes: [],
@@ -830,11 +829,7 @@ define([
                     AlertStore.onYes(function(id) {
                         self.setState(self.getInitialState());
                         scanedModel.clear();
-                        self.state.scanControlImageMethods.stop(function() {
-                            if ('undefined' !== typeof self.state.scanCtrlWebSocket) {
-                                self.state.scanCtrlWebSocket.connection.close(false);
-                            }
-                        });
+                        self.state.scanCtrlWebSocket.stopGettingImage();
                     });
                     AlertActions.showPopupYesNo('scan-again', self.state.lang.scan.scan_again_confirm);
                 },
@@ -850,20 +845,19 @@ define([
                         progressPercentage: 100 // total complete,
                     });
 
-                    if (true === self.state.isScanStarted &&
-                        0 < self.state.meshes.length &&
-                        'undefined' !== typeof self.state.scanMethods
-                    ) {
-                        self.state.scanMethods.stop(self._onScanFinished);
+                    if ('undefined' !== typeof self.state.scanCtrlWebSocket) {
+                        self.state.scanCtrlWebSocket.stopScan();
                     }
-                    else {
+
+                    // on scanning or had point cloud
+                    if (true === self.state.isScanStarted && 0 === self.state.meshes.length) {
                         self.setState(self.getInitialState());
                         scanedModel.clear();
-                        self.state.scanControlImageMethods.stop(function() {
-                            if ('undefined' !== typeof self.state.scanCtrlWebSocket) {
-                                self.state.scanCtrlWebSocket.connection.close(false);
-                            }
-                        });
+
+                        if ('undefined' !== typeof self.state.scanCtrlWebSocket) {
+                            self.state.scanCtrlWebSocket.connection.close(false);
+                        }
+                    }
                 },
 
                 _doClearNoise: function(mesh) {
@@ -1427,7 +1421,7 @@ define([
                             onError: function(data) {
                                 self._openBlocker(false);
                                 AlertActions.showPopupError('scan-modeling-error', data.error);
-                            }
+                            },
                             onFatal: function(data) {
                                 self._openBlocker(false);
                                 AlertActions.showPopupError('scan-fatal-error', data.error);

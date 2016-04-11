@@ -121,7 +121,7 @@ define([
                         }
                         else {
                             message = lang.message.application_occurs_error;
-                            _logs.push('**abnormal disconnection**');
+                            websockets.push('**abnormal disconnection**');
                         }
 
                         AlertActions.showPopupCustom(abnormallyId, message, lang.message.error_log);
