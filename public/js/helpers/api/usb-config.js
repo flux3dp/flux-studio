@@ -34,8 +34,6 @@ define([
                 method: 'usb-config',
                 autoReconnect: false
             });
-
-            ws.send(rsaKey());
         }
 
         ws.onMessage(function(data) {
@@ -102,17 +100,28 @@ define([
             connect: function(port, opts) {
                 opts = reorganizeOptions(opts);
 
-                var args = [
-                    'connect',
-                    port
-                ];
+                var currentCommand = 'key',
+                    args = [
+                        currentCommand,
+                        rsaKey()
+                    ];
 
                 ws.onError(opts.onError);
 
                 events.onMessage = function(data) {
                     if ('ok' === data.status) {
-                        data.port = port;
-                        opts.onSuccess(data);
+                        if ('key' === currentCommand) {
+                            currentCommand = 'connect';
+                            args = [
+                                currentCommand,
+                                port
+                            ];
+                            ws.send(args.join(' '));
+                        }
+                        else {
+                            data.port = port;
+                            opts.onSuccess(data);
+                        }
                     }
                 };
 
