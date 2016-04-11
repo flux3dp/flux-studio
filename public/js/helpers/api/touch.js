@@ -4,12 +4,10 @@
  */
 define([
     'helpers/websocket',
-    'helpers/local-storage',
-    // non-return
-    'lib/jsencrypt'
+    'helpers/rsa-key'
 ], function(
     Websocket,
-    localStorage
+    rsaKey
 ) {
     'use strict';
 
@@ -45,11 +43,7 @@ define([
             send: function(uuid, password) {
                 password = password || '';
 
-                var rsaCipher = new JSEncrypt({ default_key_size: 1024 }),
-                    rsaKey = localStorage.get('flux-rsa-key') || rsaCipher.getPrivateKey(),
-                    args = JSON.stringify({ uuid: uuid, password: password, key: rsaKey });
-
-                localStorage.set('flux-rsa-key', rsaKey);
+                var args = JSON.stringify({ uuid: uuid, password: password, key: rsaKey() });
 
                 ws.send(args);
             }

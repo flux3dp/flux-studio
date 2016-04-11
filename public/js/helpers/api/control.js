@@ -6,8 +6,9 @@ define([
     'jquery',
     'helpers/websocket',
     'helpers/convertToTypedArray',
-    'app/constants/device-constants'
-], function($, Websocket, convertToTypedArray, DeviceConstants) {
+    'app/constants/device-constants',
+    'helpers/rsa-key'
+], function($, Websocket, convertToTypedArray, DeviceConstants, rsaKey) {
     'use strict';
 
     return function(uuid, opts) {
@@ -72,6 +73,8 @@ define([
                 };
                 opts.onError(error);
             };
+
+        ws.send(rsaKey());
 
         return {
             connection: ws,

@@ -5,8 +5,9 @@
 define([
     'jquery',
     'helpers/websocket',
-    'helpers/api/config'
-], function($, Websocket, Config) {
+    'helpers/api/config',
+    'helpers/rsa-key'
+], function($, Websocket, Config, rsaKey) {
     'use strict';
 
     var ws;
@@ -45,6 +46,8 @@ define([
         ws.onError(globalOpts.onError);
         ws.onFatal(globalOpts.onFatal);
         ws.onClose(globalOpts.onClose);
+
+        ws.send(rsaKey());
 
         return {
             connection: ws,
