@@ -34,6 +34,8 @@ define([
                 method: 'usb-config',
                 autoReconnect: false
             });
+
+            ws.send(rsaKey());
         }
 
         ws.onMessage(function(data) {
@@ -46,8 +48,6 @@ define([
         ws.onError(globalOpts.onError);
         ws.onFatal(globalOpts.onFatal);
         ws.onClose(globalOpts.onClose);
-
-        ws.send(rsaKey());
 
         return {
             connection: ws,
