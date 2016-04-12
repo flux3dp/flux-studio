@@ -357,6 +357,14 @@ define([
                     case 'deleting-mesh':
                         self._revertDeletingMeshToHistory();
                         break;
+                    case 'calibrate':
+                        self._refreshCamera();
+
+                        self.setState({
+                            isScanStarted: false
+                        });
+
+                        break;
                     }
                 },
 
