@@ -487,7 +487,8 @@ define([
                     });
 
                     self.setState({
-                        printerIsReady: true
+                        printerIsReady: true,
+                        showCamera: true
                     });
 
                     self._openBlocker(false);
