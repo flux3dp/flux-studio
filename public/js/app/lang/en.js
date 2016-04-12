@@ -546,6 +546,8 @@ define(function() {
             name: 'Name',
             go: 'GO',
             process_caption: 'Generating',
+            laser_accepted_images: 'Image only',
+            draw_accepted_images: '僅支援圖片',
             svg_fail_messages: {
                 'TEXT_TAG': 'Tag &lt;text&gt; is not supported',
                 'DEFS_TAG': 'Tag &lt;defs&gt; is not supported',
