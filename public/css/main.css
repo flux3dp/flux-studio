@@ -6184,7 +6184,9 @@ input.switch:checked ~ label:after {
             background: transparent;
             border: none;
             font-size: inherit;
-            margin: 0; }
+            margin: 0;
+            text-align: left;
+            width: 100%; }
             .scan-studio .setup-panel .btn-calibrate:active, .scan-studio .setup-panel .btn-calibrate:hover {
                 box-shadow: none;
                 color: inherit; }
