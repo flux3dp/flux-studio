@@ -29,14 +29,14 @@ define([
         },
         lang = i18n.get().topmenu,
         menuMap = [],
-        windowIndex = ('win' === window.FLUX.osType ? 1 : 0),
+        menuIndexOffset = ('osx' === window.FLUX.osType ? 0 : 1),
         parentIndex = {
-            ABOUT  : 0 - windowIndex,
-            FILE   : 1 - windowIndex,
-            EDIT   : 2 - windowIndex,
-            DEVICE : 3 - windowIndex,
-            WINDOW : 4 - windowIndex,
-            HELP   : 5 - windowIndex
+            ABOUT  : 0 - menuIndexOffset,
+            FILE   : 1 - menuIndexOffset,
+            EDIT   : 2 - menuIndexOffset,
+            DEVICE : 3 - menuIndexOffset,
+            WINDOW : 4 - menuIndexOffset,
+            HELP   : 5 - menuIndexOffset
         },
         newDevice = {
             label: lang.device.new,
@@ -180,7 +180,7 @@ define([
     function bindMap() {
         menuMap = [];
 
-        if ('win' !== window.FLUX.osType) {
+        if (1 !== menuIndexOffset) {
             menuMap.push({
                 label: lang.flux.label,
                 subItems: aboutSubItems
@@ -195,7 +195,7 @@ define([
                 items.saveScene
             ];
 
-            if ('win' === window.FLUX.osType) {
+            if (1 === menuIndexOffset) {
                 subItems = subItems.concat(aboutSubItems);
             }
 
