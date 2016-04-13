@@ -14,6 +14,7 @@ define([
                 accept: '',
                 multiple: true,
                 className: {},
+                typeErrorMessage: '',
                 // events
                 onReadFileStarted: function() {},
                 onReadingFile: function() {},
@@ -105,7 +106,7 @@ define([
                 done(self.props.onReadEnd.bind(null, e, uploadFiles));
 
             if (false === checkType(files)) {
-                self.props.onError('Image only');
+                self.props.onError(self.props.typeErrorMessage || 'File(s) are not accepted');
             }
             else {
                 readFile();

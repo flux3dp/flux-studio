@@ -76,7 +76,8 @@ define(function() {
                 rotate: '旋轉',
                 scale: '縮放',
                 reset: '重置',
-                clear: '清除場景'
+                clear: '清除場景',
+                undo: '復原'
             },
             device: {
                 label: '裝置',
@@ -545,6 +546,8 @@ define(function() {
             name: '名稱',
             go: 'GO',
             process_caption: '輸出中',
+            laser_accepted_images: '只支援圖片',
+            draw_accepted_images: '繪製僅支援 SVG 檔案格式',
             svg_fail_messages: {
                 'TEXT_TAG': '不支援標籤 &lt;text&gt;',
                 'DEFS_TAG': '不支援標籤 &lt;defs&gt;',
@@ -962,6 +965,7 @@ define(function() {
             application_occurs_error: '程式發生錯誤',
             error_log: '錯誤訊息',
             fcodeForLaser: '檔案為雕刻工作',
+            fcodeForPen: '檔案為繪圖工作',
             confirmFCodeImport: '載入.fc檔案將清除目前所有場景，繼續？',
             confirmSceneImport: '載入.fsc檔案將清除目前所有場景，繼續？',
             brokenFcode: '無法開啟 %s',

@@ -103,7 +103,6 @@ define([
                     });
                 };
 
-            AlertStore.onRetry(self._waitForPrinters);
             AlertStore.onCancel(self._onCancel);
 
             self.setState({
@@ -146,7 +145,6 @@ define([
                 this.state.discoverMethods.removeListener(this.state.discoverId);
             }
 
-            AlertStore.removeRetryListener(this._waitForPrinters);
             AlertStore.removeCancelListener(this._onCancel);
             if(this.props.onUnmount) {
                 this.props.onUnmount();
@@ -346,10 +344,14 @@ define([
         },
 
         _openAlertWithnoPrinters: function() {
-            var lang = this.props.lang;
+            var self = this,
+                lang = self.props.lang;
 
-            if (0 === this.state.printOptions.length && false === this.state.hadDefaultPrinter) {
+            AlertStore.removeRetryListener(self._waitForPrinters);
+
+            if (0 === self.state.printOptions.length && false === self.state.hadDefaultPrinter) {
                 AlertActions.showPopupRetry('no-printer', lang.device_selection.no_printers);
+                AlertStore.onRetry(self._waitForPrinters);
             }
         }
     });

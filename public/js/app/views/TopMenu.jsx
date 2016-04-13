@@ -96,13 +96,13 @@ define([
 
                 AlertStore.onCancel(this._toggleDeviceListBind);
                 AlertStore.onRetry(this._waitForPrinters);
-                GlobalStore.onMonitorClosed(this._handleMonitorClosed);
+                GlobalStore.onMonitorClosed(this._toggleDeviceListBind);
             },
 
             componentWillUnmount: function() {
                 AlertStore.removeCancelListener(this._toggleDeviceListBind);
                 AlertStore.removeRetryListener(this._waitForPrinters);
-                GlobalStore.removeMonitorClosedListener(this._handleMonitorClosed);
+                GlobalStore.removeMonitorClosedListener(this._toggleDeviceListBind);
             },
 
             _waitForPrinters: function() {
@@ -175,10 +175,6 @@ define([
                 this.setState({
                     showMonitor: false
                 });
-            },
-
-            _handleMonitorClosed: function() {
-                AlertStore.onCancel(this._toggleDeviceListBind);
             },
 
             _renderStudioFunctions: function() {

@@ -6009,9 +6009,13 @@ input.switch:checked ~ label:after {
         width: 100%;
         z-index: 0; }
         .scan-studio .model-displayer .camera-image {
+            background-position: center center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+            background-size: contain;
             height: 100%;
             width: 100%;
-            object-fit: contain; }
+            will-change: background-image; }
     .scan-studio .scan-printer-selection {
         overflow: hidden;
         position: relative;
@@ -6179,7 +6183,9 @@ input.switch:checked ~ label:after {
             background: transparent;
             border: none;
             font-size: inherit;
-            margin: 0; }
+            margin: 0;
+            text-align: left;
+            width: 100%; }
             .scan-studio .setup-panel .btn-calibrate:active, .scan-studio .setup-panel .btn-calibrate:hover {
                 box-shadow: none;
                 color: inherit; }

@@ -10,7 +10,6 @@ define(['jquery', 'helpers/api/config'], function($, config) {
      * @return Promise
      */
     return function(printer, type) {
-        console.log(printer);
         var deferred = $.Deferred(),
             typeMap = {
                 firmware: 'pi',
@@ -27,7 +26,7 @@ define(['jquery', 'helpers/api/config'], function($, config) {
         if (true === navigator.onLine) {
             $.ajax({
                 url: 'http://software.flux3dp.com/check-update/?os=' + type
-            }).then(function(response) {
+            }).done(function(response) {
                 response.needUpdate = (
                     null !== response.latest_version &&
                     'string' === typeof printer[versionKey] &&
@@ -36,10 +35,17 @@ define(['jquery', 'helpers/api/config'], function($, config) {
                 response.latestVersion = response.latest_version;
 
                 deferred.resolve(response);
+            }).
+            fail(function() {
+                deferred.reject({
+                    needUpdate: true
+                });
             });
         }
         else {
-            deferred.reject();
+            deferred.reject({
+                needUpdate: true
+            });
         }
 
         return deferred.promise();

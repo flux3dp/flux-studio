@@ -68,14 +68,21 @@ define([
                         self.ESTIMATED_STEP < self.props.currentSteps ?
                         lang.scan.remaining_time :
                         ''
-                    );
+                    ),
+                    cx = React.addons.classSet,
+                    stopButtonClasses = cx({
+                        'btn': true,
+                        'btn-hexagon': true,
+                        'btn-stop-scan': true,
+                        'btn-disabled': (0 === self.props.percentage),
+                    });
 
                 return (
                     <div className="progress-status">
                         <span className="progress-text">{self.props.percentage}%,</span>
                         <span className="progress-text">{estimatedTime}</span>
                         <span className="progress-text">{textRemainingTime}</span>
-                        <button className="btn btn-hexagon btn-stop-scan" data-ga-event="stop-scan" onClick={this._onStop}>{lang.scan.stop_scan}</button>
+                        <button className={stopButtonClasses} data-ga-event="stop-scan" onClick={this._onStop}>{lang.scan.stop_scan}</button>
                     </div>
                 );
             },

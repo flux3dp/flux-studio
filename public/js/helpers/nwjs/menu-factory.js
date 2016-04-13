@@ -72,68 +72,82 @@ define([
                     return $deferred;
                 },
                 updateFirmware = function() {
-                    checkFirmware(currentPrinter, type).done(function(response) {
-                        var doUpdate = (
-                                'firmware' === type ?
-                                DeviceMaster.updateFirmware :
-                                DeviceMaster.updateToolhead
-                            ),
-                            onSubmit = function(files, e) {
-                                var file = files.item(0),
-                                    onFinishUpdate = function(isSuccess) {
-                                        ProgressActions.close();
+                    var doUpdate = (
+                            'firmware' === type ?
+                            DeviceMaster.updateFirmware :
+                            DeviceMaster.updateToolhead
+                        ),
+                        onInstall = function() {
+                            InputLightboxActions.open(
+                                'upload-firmware',
+                                {
+                                    type: InputLightboxConstants.TYPE_FILE,
+                                    inputHeader: lang.update.firmware.upload_file,
+                                    onSubmit: onSubmit,
+                                    confirmText: lang.update.firmware.confirm
+                                }
+                            );
+                        },
+                        onSubmit = function(files, e) {
+                            var file = files.item(0),
+                                onFinishUpdate = function(isSuccess) {
+                                    ProgressActions.close();
 
-                                        if (true === isSuccess) {
-                                            AlertActions.showPopupInfo(
-                                                'firmware-update-success',
-                                                lang.update.firmware.update_success
-                                            );
-                                        }
-                                        else {
-                                            AlertActions.showPopupError(
-                                                'firmware-update-fail',
-                                                lang.update.firmware.update_fail
-                                            );
-                                        }
-                                    };
-
-                                ProgressActions.open(ProgressConstants.NONSTOP);
-                                doUpdate(file).
-                                    done(onFinishUpdate.bind(null, true)).
-                                    fail(onFinishUpdate.bind(null, false));
-                            },
-                            onInstall = function() {
-                                InputLightboxActions.open(
-                                    'upload-firmware',
-                                    {
-                                        type: InputLightboxConstants.TYPE_FILE,
-                                        inputHeader: lang.update.firmware.upload_file,
-                                        onSubmit: onSubmit,
-                                        confirmText: lang.update.firmware.confirm
+                                    if (true === isSuccess) {
+                                        AlertActions.showPopupInfo(
+                                            'firmware-update-success',
+                                            lang.update.firmware.update_success
+                                        );
                                     }
-                                );
-                            };
+                                    else {
+                                        AlertActions.showPopupError(
+                                            'firmware-update-fail',
+                                            lang.update.firmware.update_fail
+                                        );
+                                    }
+                                };
 
-                        if (true === response.needUpdate) {
+                            ProgressActions.open(ProgressConstants.NONSTOP);
+                            doUpdate(file).
+                                done(onFinishUpdate.bind(null, true)).
+                                fail(onFinishUpdate.bind(null, false));
+                        },
+                        showUpdate = function(response) {
                             AlertActions.showUpdate(
                                 printer,
                                 type,
-                                response,
+                                response || {},
                                 onInstall
                             );
+                        };
+
+                    checkFirmware(currentPrinter, type).done(function(response) {
+                        var latestVersion = currentPrinter.version,
+                            caption = lang.update.firmware.latest_firmware.caption,
+                            message = lang.update.firmware.latest_firmware.message;
+
+                        if ('toolhead' === type) {
+                            latestVersion = currentPrinter.toolhead_version;
+                            caption = lang.update.toolhead.latest_firmware.caption;
+                            message = lang.update.toolhead.latest_firmware.message;
+                        }
+
+                        if (true === response.needUpdate) {
+                            showUpdate(response);
                         }
                         else {
                             AlertActions.showPopupInfo(
                                 'latest-firmware',
-                                lang.update.firmware.latest_firmware.message,
-                                lang.update.firmware.latest_firmware.caption
+                                message + ' (v' + latestVersion + ')',
+                                caption
                             );
                         }
                     }).
-                    fail(function() {
+                    fail(function(response) {
+                        showUpdate(response);
                         AlertActions.showPopupInfo(
                             'latest-firmware',
-                            lang.update.network_unreachable
+                            lang.monitor.cant_get_toolhead_version
                         );
                     });
                 },

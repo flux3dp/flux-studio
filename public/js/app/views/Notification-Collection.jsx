@@ -307,7 +307,7 @@ define([
 
                 var types = {
                     INFO: function() {
-                        grown = $.growl.notice({
+                        growl = $.growl.notice({
                             title   : lang.alert.info,
                             message : message,
                             fixed   : fixed,
@@ -515,8 +515,8 @@ define([
                     filament = this.state.changeFilament.open ? this._renderChangeFilament() : '',
                     latestVersion = (
                         'toolhead' === this.state.application.type ?
-                        this.state.application.latestVersion :
-                        this.state.application.toolhead_version
+                        this.state.application.toolhead_version :
+                        this.state.application.latestVersion
                     );
 
                 return (

@@ -300,10 +300,10 @@ make_bins() {
 }
 
 mk_linux() {
-cat ${WORKING_DIR}/${TMP}/${ARR_OS[$i]}/nwjs/nw ${WORKING_DIR}/${TMP}/${ARR_OS[$i]}/latest-git/${PKG_NAME}.nw > ${WORKING_DIR}/${TMP}/${ARR_OS[$i]}/latest-git/${PKG_NAME}
+cat ${WORKING_DIR}/${TMP}/${ARR_OS[$i]}/nwjs/nw ${WORKING_DIR}/${TMP}/${ARR_OS[$i]}/latest-git/${PKG_NAME}.nw > ${WORKING_DIR}/${TMP}/${ARR_OS[$i]}/latest-git/${PKG_NAME} && chmod +x ${WORKING_DIR}/${TMP}/${ARR_OS[$i]}/latest-git/${PKG_NAME}
         rm ${WORKING_DIR}/${TMP}/${ARR_OS[$i]}/latest-git/${PKG_NAME}.nw
         chmod +x ${WORKING_DIR}/${TMP}/${ARR_OS[$i]}/latest-git/${PKG_NAME}
-        cp ${WORKING_DIR}/${TMP}/${ARR_OS[$i]}/nwjs/{icudtl.dat,nw*.pak} ${WORKING_DIR}/${TMP}/${ARR_OS[$i]}/latest-git/
+        cp -r ${WORKING_DIR}/${TMP}/${ARR_OS[$i]}/nwjs/{chromedriver,icudtl.dat,lib,locales,nacl_helper,nacl_helper_bootstrap,nacl_irt_x86_64.nexe,*.bin,*.pak,nwjc,payload,pnacl} ${WORKING_DIR}/${TMP}/${ARR_OS[$i]}/latest-git/
         cd ${WORKING_DIR}/${TMP}/${1}/latest-git
 
         if [[ ${LIBUDEV_HANDLER} = "true" ]];then

@@ -54,6 +54,11 @@ define([
                 opts.onStarting = opts.onStarting || function() {};
                 opts.onFinished = opts.onFinished || function() {};
 
+                if (24 > point_cloud.left.size + point_cloud.right.size) {
+                    opts.onFinished(false);
+                    return;
+                }
+
                 var order_name = 'upload',
                     args = [
                         order_name,
@@ -79,7 +84,7 @@ define([
                         break;
                     case 'ok':
                         History.push(name, point_cloud.total);
-                        opts.onFinished();
+                        opts.onFinished(true);
                         break;
                     }
 

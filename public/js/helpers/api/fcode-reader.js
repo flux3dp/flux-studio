@@ -152,7 +152,36 @@ define([
 
                 ws.send('get_fcode');
                 return d.promise();
+            },
+
+            changeImage: function(data, size) {
+
+                return new Promise((resolve, reject) => {
+
+                    events.onMessage = (response) => {
+                        switch(response.status) {
+                            case 'ok':
+                                resolve('');
+                                break;
+                            case 'continue':
+                                ws.send(data);
+                                break;
+                            default: break;
+                        }
+                    };
+
+                    events.onError = (response) => {
+                        reject(response);
+                    };
+
+                    events.onFatal = (response) => {
+                        reject(response);
+                    };
+
+                    ws.send(`change_img ${data.size}`);
+
+                });
             }
-        }
+        };
     };
 });

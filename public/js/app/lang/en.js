@@ -76,7 +76,8 @@ define(function() {
                 rotate: 'Rotate',
                 scale: 'Scale',
                 reset: 'Reset',
-                clear: 'Clear Scene'
+                clear: 'Clear Scene',
+                undo: 'Undo'
             },
             device: {
                 label: 'Device',
@@ -545,6 +546,8 @@ define(function() {
             name: 'Name',
             go: 'GO',
             process_caption: 'Generating',
+            laser_accepted_images: 'Image only',
+            draw_accepted_images: '僅支援圖片',
             svg_fail_messages: {
                 'TEXT_TAG': 'Tag &lt;text&gt; is not supported',
                 'DEFS_TAG': 'Tag &lt;defs&gt; is not supported',
@@ -962,6 +965,7 @@ define(function() {
             application_occurs_error: 'Program Error',
             error_log: 'Error Log',
             fcodeForLaser: 'This is a fcode for laser',
+            fcodeForPen: 'This is a fcode for pen',
             confirmFCodeImport: 'Importing fcode will remove all objects on the scene, are you sure?',
             confirmSceneImport: 'Importing .fsc will remove all objects on the scene, are you sure?',
             brokenFcode: 'unable to open %s',

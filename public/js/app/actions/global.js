@@ -18,12 +18,16 @@ define([
                 selectionStart,
                 samePosition,
                 deleteStart,
-                deleteCount;
+                deleteCount,
+                me = e.target,
+                acceptedInput = ['TEXT', 'NUMBER', 'PASSWORD', 'TEL', 'URL', 'SEARCH', 'EMAIL'];
 
-            if ('INPUT' === e.target.tagName || 'TEXTAREA' === e.target.tagName) {
-                selectionStart = e.target.selectionStart;
-                value = e.target.value.split('');
-                samePosition = e.target.selectionEnd === selectionStart;
+            if (('INPUT' === me.tagName && -1 < acceptedInput.indexOf(me.type.toUpperCase()) || 'TEXTAREA' === me.tagName) &&
+                'undefined' !== typeof me.selectionStart
+            ) {
+                selectionStart = me.selectionStart;
+                value = me.value.split('');
+                samePosition = me.selectionEnd === selectionStart;
                 deleteCount = (
                     true === samePosition ? // same position
                     1 :
@@ -49,8 +53,12 @@ define([
         shortcuts.on(['cmd', 'v'], function() { window.document.execCommand('paste'); });
 
         if (true === window.FLUX.debug && true === window.FLUX.isNW) {
-            shortcuts.on(['ctrl', 'alt', 'd'], function(e) { nw.Window.get().showDevTools(); });
-            shortcuts.on(['ctrl', 'alt', 'shift', 'd'], function() { window.location.href="/debug-panel/index.html" });
+            shortcuts.on(['ctrl', 'alt', 'd'], function(e) {
+                nw.Window.get().showDevTools();
+            });
+            shortcuts.on(['ctrl', 'alt', 'shift', 'd'], function() {
+                window.location.href = "/debug-panel/index.html";
+            });
         }
     };
 

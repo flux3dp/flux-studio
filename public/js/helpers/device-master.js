@@ -45,6 +45,7 @@ define([
         _selectedDevice = {},
         _deviceNameMap = {},
         _device,
+        nwConsole,
         _devices = [],
         _errors = {};
 
@@ -307,16 +308,18 @@ define([
     }
 
     function startCamera(callback) {
-        _device.cameraSource = _device.scanController.getImage(callback);
+        _device.cameraSource = _device.scanController.getImage();
+
+        _device.cameraSource.progress(function(response) {
+            if ('ok' === response.status) {
+                _device.cameraSource.getImage();
+                callback(response);
+            }
+        });
     }
 
     function stopCamera() {
-        var d = $.Deferred();
-        if(_device.cameraSource) {
-            _device.cameraSource.stop();
-            d.resolve('');
-        }
-        return d.promise();
+        return _device.scanController.stopGettingImage();
     }
 
     function maintain(type) {
@@ -357,7 +360,7 @@ define([
         return d.promise();
     }
 
-    function getFirstDevice(){
+    function getFirstDevice() {
         for(var i in _deviceNameMap) {
             return i;
         }
@@ -462,6 +465,24 @@ define([
         return d.promise();
     }
 
+    function updateNWProgress(deviceStatus) {
+        if(FLUX.isNW) {
+            if(!nwConsole) {
+                nwConsole = nw.Window.get();
+            }
+            var stId = deviceStatus.st_id;
+            if(stId !== 0 && stId !== 64 && stId !== 128) {
+                if(deviceStatus.st_prog) {
+                    nwConsole.setProgressBar(-1);
+                    nwConsole.setProgressBar(deviceStatus.st_prog);
+                }
+            }
+            else {
+                nwConsole.setProgressBar(-1);
+            }
+        }
+    }
+
     function _isPrinting() {
         return _status === DeviceConstants.RUNNING;
     }
@@ -504,16 +525,50 @@ define([
             }
             if(defaultPrinter) {
                 if(defaultPrinter.serial === device.serial) {
-                    if(device.st_id === DeviceConstants.status.PAUSED_FROM_RUNNING) {
+                    if(
+                        device.st_id === DeviceConstants.status.PAUSED_FROM_RUNNING ||
+                        device.st_id === DeviceConstants.status.COMPLETED ||
+                        device.st_id === DeviceConstants.status.ABORTED
+                    ) {
                         if(!defaultPrinterWarningShowed) {
-                            var message = `${device.name} ${lang.device.pausedFromError}`;
-                            AlertActions.showWarning(message, function(growl) {
-                                growl.remove(function() {});
-                                selectDevice(defaultPrinter).then(function() {
-                                    GlobalActions.showMonitor(defaultPrinter);
-                                });
-                            }, true);
-                            defaultPrinterWarningShowed = true;
+                            Notification.requestPermission((permission) => {
+                                if(permission === 'granted') {
+                                    var message = '';
+                                    if(device.st_id === DeviceConstants.status.COMPLETED) {
+                                        message = `${lang.device.completed}`;
+                                    }
+                                    else if(device.st_id === DeviceConstants.status.ABORTED) {
+                                        message = `${lang.device.aborted}`;
+                                    }
+                                    else {
+                                        message = `${lang.device.pausedFromError}`;
+                                    }
+
+                                    if(device.st_id === DeviceConstants.status.COMPLETED) {
+                                        AlertActions.showInfo(message, function(growl) {
+                                            growl.remove(function() {});
+                                            selectDevice(defaultPrinter).then(function() {
+                                                GlobalActions.showMonitor(defaultPrinter);
+                                            });
+                                        }, true);
+                                    }
+                                    else {
+                                        AlertActions.showWarning(message, function(growl) {
+                                            growl.remove(function() {});
+                                            selectDevice(defaultPrinter).then(function() {
+                                                GlobalActions.showMonitor(defaultPrinter);
+                                            });
+                                        }, true);
+                                    }
+
+                                    var notification = new Notification(device.name, {
+                                        icon: '/img/icon-home-s.png',
+                                        body: message
+                                    });
+
+                                    defaultPrinterWarningShowed = true;
+                                }
+                            });
                         }
                     }
                     else {
