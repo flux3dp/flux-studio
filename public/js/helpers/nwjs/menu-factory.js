@@ -122,14 +122,24 @@ define([
                         };
 
                     checkFirmware(currentPrinter, type).done(function(response) {
+                        var latestVersion = currentPrinter.version,
+                            caption = lang.update.firmware.latest_firmware.caption,
+                            message = lang.update.firmware.latest_firmware.message;
+
+                        if ('toolhead' === type) {
+                            latestVersion = currentPrinter.toolhead_version;
+                            caption = lang.update.toolhead.latest_firmware.caption;
+                            message = lang.update.toolhead.latest_firmware.message;
+                        }
+
                         if (true === response.needUpdate) {
                             showUpdate(response);
                         }
                         else {
                             AlertActions.showPopupInfo(
                                 'latest-firmware',
-                                lang.update.firmware.latest_firmware.message,
-                                lang.update.firmware.latest_firmware.caption
+                                message + ' (v' + latestVersion + ')',
+                                caption
                             );
                         }
                     }).
