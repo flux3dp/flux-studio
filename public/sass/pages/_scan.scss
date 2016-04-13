@@ -112,7 +112,6 @@
             background-size: contain;
             height: 100%;
             width: 100%;
-            transition: background-image .3s ease;
             will-change: background-image;
         }
     }
@@ -315,6 +314,8 @@
             border: none;
             font-size: inherit;
             margin: 0;
+            text-align: left;
+            width: 100%;
 
             &:active,
             &:hover {

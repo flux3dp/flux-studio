@@ -546,6 +546,8 @@ define(function() {
             name: '名稱',
             go: 'GO',
             process_caption: '輸出中',
+            laser_accepted_images: '只支援圖片',
+            draw_accepted_images: '繪製僅支援 SVG 檔案格式',
             svg_fail_messages: {
                 'TEXT_TAG': '不支援標籤 &lt;text&gt;',
                 'DEFS_TAG': '不支援標籤 &lt;defs&gt;',

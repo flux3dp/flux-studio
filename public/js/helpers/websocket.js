@@ -106,9 +106,8 @@ define([
                     var abnormallyId = 'abnormally-close',
                         message = '',
                         outputLog = function() {
-                            console.log('outputLog');
                             outputError();
-                            AlertStore.removeYesListener(outputLog);
+                            AlertStore.removeCustomListener(outputLog);
                         };
 
                     // The connection was closed abnormally without sending or receving data
@@ -121,11 +120,10 @@ define([
                         }
                         else {
                             message = lang.message.application_occurs_error;
-                            websockets.push('**abnormal disconnection**');
                         }
 
                         AlertActions.showPopupCustom(abnormallyId, message, lang.message.error_log);
-                        AlertStore.onYes(outputLog);
+                        AlertStore.onCustom(outputLog);
                     }
 
                     if (true === options.autoReconnect) {

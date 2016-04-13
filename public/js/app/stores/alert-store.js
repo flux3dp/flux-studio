@@ -115,6 +115,10 @@ define([
             this.removeListener(NOTIFY_CANCEL, callback);
         },
 
+        removeCustomListener(callback) {
+            this.removeListener(NOTIFY_CUSTOM, callback);
+        },
+
         dispatcherIndex: Dispatcher.register(function(payload) {
             var actionType = payload.actionType,
                 action = {

@@ -111,28 +111,7 @@ define([
                     e.preventDefault();
 
                     var self = this,
-                        uploadedFiles = e.originalEvent.dataTransfer.files,
-                        checkFiles = function(files) {
-                            var allowedfiles = [],
-                                checker = (
-                                    'laser' === self.props.page ?
-                                    /^image\/\w+$/ :
-                                    /^image\svg$/
-                                ),
-                                file;
-
-                            for (var i = 0; i < files.length; i++) {
-                                file = files.item(i);
-
-                                file.isImage = checker.test(file.type);
-
-                                if (true === file.isPCD) {
-                                    allowedfiles.push(file);
-                                }
-                            }
-
-                            return allowedfiles;
-                        };
+                        uploadedFiles = e.originalEvent.dataTransfer.files;
 
                     e.target.files = uploadedFiles;
                     this.refs.fileUploader.readFiles(e, uploadedFiles);
@@ -319,7 +298,13 @@ define([
                         onError = function(msg) {
                             ProgressActions.close();
                             AlertActions.showPopupError('laser-upload-error', msg);
-                        };
+                        },
+                        lang = args.state.lang,
+                        typeErrorMessage = (
+                            'laser' === self.props.page ?
+                            lang.laser.laser_accepted_images :
+                            lang.laser.draw_accepted_images
+                        );
 
                     return (
                         <div className={uploadStyle}>
@@ -327,6 +312,7 @@ define([
                             <FileUploader
                                 ref="fileUploader"
                                 accept={accept}
+                                typeErrorMessage={typeErrorMessage}
                                 multiple={true}
                                 onReadFileStarted={this.state.laserEvents.onReadFileStarted}
                                 onReadingFile={this.state.laserEvents.onFileReading}

@@ -357,6 +357,14 @@ define([
                     case 'deleting-mesh':
                         self._revertDeletingMeshToHistory();
                         break;
+                    case 'calibrate':
+                        self._refreshCamera();
+
+                        self.setState({
+                            isScanStarted: false
+                        });
+
+                        break;
                     }
                 },
 
@@ -487,7 +495,8 @@ define([
                     });
 
                     self.setState({
-                        printerIsReady: true
+                        printerIsReady: true,
+                        showCamera: true
                     });
 
                     self._openBlocker(false);
