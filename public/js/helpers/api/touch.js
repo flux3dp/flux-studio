@@ -2,7 +2,13 @@
  * API touch
  * Ref: https://github.com/flux3dp/fluxghost/wiki/websocket-touch
  */
-define(['helpers/websocket'], function(Websocket) {
+define([
+    'helpers/websocket',
+    'helpers/rsa-key'
+], function(
+    Websocket,
+    rsaKey
+) {
     'use strict';
 
     return function(opts) {
@@ -37,7 +43,7 @@ define(['helpers/websocket'], function(Websocket) {
             send: function(uuid, password) {
                 password = password || '';
 
-                var args = JSON.stringify({ uuid: uuid, password: password });
+                var args = JSON.stringify({ uuid: uuid, password: password, key: rsaKey() });
 
                 ws.send(args);
             }
