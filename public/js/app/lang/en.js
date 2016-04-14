@@ -288,7 +288,9 @@ define(function() {
             },
             connect_printer: {
                 title: 'Connect with your printer'
-            }
+            },
+            notification_on: 'On',
+            notification_off: 'Off'
         },
         print: {
             import: 'IMPORT',
