@@ -12,6 +12,7 @@ define([
         args = args || {};
 
         var options = [],
+            notificationOptions = [],
             View = React.createClass({
                 _checkIPFormat: function(e) {
                     var me = e.currentTarget,
@@ -61,9 +62,10 @@ define([
                                 </div>
 
                                 <div className="span8">
-                                    <select className="font3">
+                                    {/*<select className="font3">
                                         <option>None</option>
-                                    </select>
+                                    </select>*/}
+                                    <SelectView id="select-notification" className="font3" options={notificationOptions} />
                                 </div>
 
                             </div>
@@ -82,7 +84,7 @@ define([
 
                             </div>
                         </div>
-                    )
+                    );
                 },
 
                 getInitialState: function() {
@@ -98,6 +100,19 @@ define([
                 selected: lang_code === i18n.getActiveLang()
             });
         }
+
+        notificationOptions = [
+            {
+                value: 0,
+                label: args.state.lang.settings.notification_off,
+                selected: config().read('notification') === '0'
+            },
+            {
+                value: 1,
+                label: args.state.lang.settings.notification_on,
+                selected: config().read('notification') === '1'
+            }
+        ];
 
         return View;
     };
