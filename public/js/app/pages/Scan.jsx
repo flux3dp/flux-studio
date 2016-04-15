@@ -804,10 +804,22 @@ define([
                         },
                         onScan = function() {
                             var scanResolution = self._getScanSpeed(),
-                                scanMethods = self.state.scanCtrlWebSocket.scan(scanResolution, self._onRendering);
+                                scanMethods = self.state.scanCtrlWebSocket.scan(scanResolution, self._onRendering),
+                                opts = {
+                                    onError: function(data) {
+                                        console.log('error', data);
+                                    },
+                                    onReady: function() {
+                                        self._handleScan(e);
+                                    }
+                                };
 
                             scanMethods.done(function(response) {
                                 self._onScanFinished(response.pointCloud);
+                            }).fail(function(response) {
+                                self.setState({
+                                    scanCtrlWebSocket: scanControl(self.state.selectedPrinter.uuid, opts)
+                                });
                             });
                         },
                         meshes = self.state.meshes,
@@ -1002,7 +1014,6 @@ define([
 
                     self._doApplyTransform(function(response) {
                         var onMergeFinished = function(data) {
-                                console.log(data, isEnd(), currentIndex);
                                 if (false === isEnd()) {
                                     currentIndex++;
                                     doingMerge();
@@ -1012,7 +1023,6 @@ define([
                                 }
                             },
                             afterMerge = callback || function(outputName) {
-                                console.log(outputName);
                                 var mesh,
                                     updatedMeshes = [],
                                     deferred = $.Deferred(),
@@ -1330,13 +1340,10 @@ define([
                         closeSubPopup = function(e) {
                             self.refs.setupPanel.openSubPopup(e);
                         },
-                        cameraImage = (self.state.cameraImageSrc || '/img/menu/main_logo.svg'),
-                        camera_inline_style = {
-                            'background-image': 'url(' + cameraImage + ')'
-                        };
+                        cameraImage = (self.state.cameraImageSrc || '/img/menu/main_logo.svg');
 
                     camera_image_class = cx({
-                        'camera-image' : true,
+                        'camera-image' : true === this.state.showCamera,
                         'hide' : false === this.state.showCamera
                     });
 
@@ -1344,7 +1351,7 @@ define([
                         <section ref="operatingSection" className="operating-section">
                             {meshThumbnails}
                             <div id="model-displayer" className="model-displayer">
-                                <div style={camera_inline_style} className={camera_image_class} onClick={closeSubPopup}/>
+                                <img src={cameraImage} className={camera_image_class} onClick={closeSubPopup}/>
                             </div>
                             {settingPanel}
                             {manipulationPanel}
