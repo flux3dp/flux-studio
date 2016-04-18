@@ -14,7 +14,8 @@ define([
     'helpers/api/config',
     'app/actions/global-actions',
     'app/constants/input-lightbox-constants',
-    'helpers/object-assign'
+    'helpers/object-assign',
+    'helpers/array-findIndex'
 ], function(
     $,
     i18n,
@@ -401,6 +402,11 @@ define([
         });
     }
 
+    function closeConnection() {
+        _device.actions.connection.close();
+        _removeConnection(_device.uuid);
+    }
+
     // Private Functions
 
     function _do(command) {
@@ -493,12 +499,22 @@ define([
         });
     }
 
-    function _switchDevice(uuid) {
-        for(var i = 0; i < _devices.length; i++) {
-            if(_devices[i].uuid === uuid) {
-                return _devices[i];
-            }
+    function _removeConnection(uuid) {
+        var index = _devices.findIndex(function(d) {
+            return d.uuid === uuid;
+        });
+
+        if (-1 < index) {
+            _devices.splice(index, 1);
         }
+    }
+
+    function _switchDevice(uuid) {
+        var index = _devices.findIndex(function(d) {
+            return d.uuid === uuid;
+        });
+
+        return _devices[index];
     }
 
     function _watch() {
@@ -623,6 +639,7 @@ define([
             this.updateFirmware         = updateFirmware;
             this.updateToolhead         = updateToolhead;
             this.headinfo               = headinfo;
+            this.closeConnection        = closeConnection;
 
             Discover(
                 'device-master',
