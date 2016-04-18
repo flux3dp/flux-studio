@@ -64,8 +64,16 @@ define([
                         auth(uuid, password).done(function(data) {
                             selectDevice(device, d);
                         }).
-                        fail(function(data) {
+                        fail(function(response) {
+                            var message = (
+                                false === response.reachable ?
+                                lang.select_printer.unable_to_connect :
+                                lang.select_printer.auth_failure
+                            );
+
                             goAuth(uuid);
+
+                            AlertActions.showPopupError('device-auth-fail', message);
                         });
                     }
                 });
