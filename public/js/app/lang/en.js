@@ -1011,7 +1011,8 @@ define(function() {
             ok: 'OK',
             auto_emerging: 'Please insert filament',
             maintain_head_type_error: 'Toolhead not installed correctly',
-            maintain_zombie: 'Please restart the device'
+            maintain_zombie: 'Please restart the device',
+            toolhead_no_response: '#117 Module no response <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/218347477">More</a>'
         },
         input_machine_password: {
             require_password: '"%s" requires a password',
