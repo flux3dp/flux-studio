@@ -53,7 +53,7 @@ define([
                 return {
                     type: this.props.src === 'TUTORIAL' ? DeviceConstants.LOAD_FILAMENT : '',
                     currentStep: this.props.src === 'TUTORIAL' ? steps.GUIDE : steps.HOME,
-                    temperature: 20
+                    temperature: '-'
                 };
             },
 
