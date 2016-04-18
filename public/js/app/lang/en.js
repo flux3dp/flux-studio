@@ -783,7 +783,8 @@ define(function() {
             submit: 'SUBMIT',
             please_enter_password: 'password',
             auth_failure: 'Authentication fail',
-            retry: 'Retry'
+            retry: 'Retry',
+            unable_to_connect: 'Unable to connect machine through UDP'
         },
         device: {
             camera_on: 'Open Camera',
