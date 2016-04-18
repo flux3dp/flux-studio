@@ -542,6 +542,7 @@ define([
             maintain: function(type) {
                 var deferred = $.Deferred(),
                     typeMap = {},
+                    timeout,
                     args = [
                         'task',
                         'maintain'
@@ -552,6 +553,14 @@ define([
                 typeMap[DeviceConstants.UNLOAD_FILAMENT] = 'unload_filament';
 
                 events.onMessage = function(result) {
+                    clearTimeout(timeout);
+                    timeout = setTimeout(function() {
+                        deferred.reject({
+                            status: 'error',
+                            error: 'TIMEOUT'
+                        });
+                    }, 30000); // magic timeout duration
+
                     if ('ok' === result.status && 'begining' === currentTask) {
                         currentTask = typeMap[type];
                         args = [
@@ -576,6 +585,7 @@ define([
                 };
 
                 events.onError = function(result) {
+                    clearTimeout(timeout);
                     deferred.reject(result);
                 };
 
