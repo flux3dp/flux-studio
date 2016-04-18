@@ -6,34 +6,45 @@ define([
     'helpers/i18n',
     'html2canvas',
     'plugins/file-saver/file-saver.min',
-    'helpers/ghost-log-reader'
+    'helpers/ghost-log-reader',
+    'helpers/logger'
 ], function(
     $,
     i18n,
     html2canvas,
     fileSaver,
-    ghostLogReader
+    ghostLogReader,
+    Logger
 ) {
     'use strict';
 
-    window.html2canvas = html2canvas;
     function obfuse(str){
         var output = [],
             c;
 
         for (var i in str) {
-            c = {'f':'x','l':'u','u':'l','x':'f'}[str[i]];
-            output.push(c?c:str[i]);
+            if (true === str.hasProperty(i)) {
+                c = {'f':'x','l':'u','u':'l','x':'f'}[str[i]];
+                output.push(c?c:str[i]);
+            }
         }
 
         return output.join('');
+    }
+
+    function optimizeLogs() {
+        var wsLog = new Logger('websocket'),
+            _logs = wsLog.get();
+
+        wsLog = null;
+        return _logs;
     }
 
     return function() {
         html2canvas(window.document.body).then(function(canvas) {
             var jpegUrl = canvas.toDataURL("image/jpeg"),
                 report_info = {
-                    ws: window.FLUX.websockets,
+                    ws: optimizeLogs(),
                     screenshot: jpegUrl,
                     localStorage: {}
                 },
@@ -46,12 +57,6 @@ define([
             }
 
             report_info = JSON.stringify(report_info, null, 2);
-
-            for(var i in window.FLUX.websockets){
-                if ("function" !== typeof window.FLUX.websockets[i]){
-                    window.FLUX.websockets[i].optimizeLogs();
-                }
-            }
 
             if (!window.FLUX.debug) {
                 report_info = obfuse(btoa(report_info));
