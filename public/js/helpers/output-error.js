@@ -32,23 +32,20 @@ define([
         return output.join('');
     }
 
-    function optimizeLogs() {
-        var wsLog = new Logger('websocket'),
-            _logs = wsLog.get();
-
-        wsLog = null;
-        return _logs;
-    }
-
     return function() {
         html2canvas(window.document.body).then(function(canvas) {
             var jpegUrl = canvas.toDataURL("image/jpeg"),
+                _logger = new Logger('websocket'),
+                allLog = _logger.getAll(),
                 report_info = {
-                    ws: optimizeLogs(),
+                    ws: allLog.websocket || '',
                     screenshot: jpegUrl,
-                    localStorage: {}
+                    localStorage: {},
+                    general: allLog.generic || '',
                 },
                 report_blob;
+
+            allLog = null;
 
             for (var key in localStorage) {
                 if (false === key.startsWith('lang')) {
