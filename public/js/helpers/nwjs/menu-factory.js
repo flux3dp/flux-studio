@@ -403,8 +403,13 @@ define([
                                                     confirmText  : lang.select_printer.submit,
                                                     onSubmit     : function(password) {
                                                         _auth(printer.uuid, password, {
-                                                            onError: function() {
-                                                                AlertActions.showPopupError('device-auth-fail', lang.select_printer.auth_failure);
+                                                            onError: function(response) {
+                                                                var message = (
+                                                                    false === response.reachable ?
+                                                                    lang.select_printer.unable_to_connect :
+                                                                    lang.select_printer.auth_failure
+                                                                );
+                                                                AlertActions.showPopupError('device-auth-fail', message);
                                                             }
                                                         });
                                                     }
