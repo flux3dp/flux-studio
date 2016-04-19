@@ -5,9 +5,8 @@ define([
     'react',
     'jquery',
     'helpers/i18n',
-    'helpers/observe',
-    'helpers/api/config'
-], function(React, $, i18n, Observe, Config) {
+    'helpers/observe'
+], function(React, $, i18n, Observe) {
     'use strict';
 
     var views = [];
@@ -35,10 +34,6 @@ define([
 
         $('body').off('change').on('change', '#select-lang', function(e) {
             args.state.lang = i18n.setActiveLang(e.currentTarget.value).get();
-        });
-
-        $('body').off('change').on('change', '#select-notification', function(e) {
-            Config().write('notification', e.currentTarget.value);
         });
     };
 });
