@@ -833,13 +833,15 @@ define([
                 },
 
                 _onScanAgain: function(e) {
-                    var self = this;
+                    var self = this,
+                        onYes = function(id) {
+                            self.state.scanCtrlWebSocket.stopGettingImage();
+                            self.setState(self.getInitialState());
+                            scanedModel.clear();
+                            AlertStore.removeYesListener(onYes);
+                        };
 
-                    AlertStore.onYes(function(id) {
-                        self.state.scanCtrlWebSocket.stopGettingImage();
-                        self.setState(self.getInitialState());
-                        scanedModel.clear();
-                    });
+                    AlertStore.onYes(onYes);
                     AlertActions.showPopupYesNo('scan-again', self.state.lang.scan.scan_again_confirm);
                 },
 
