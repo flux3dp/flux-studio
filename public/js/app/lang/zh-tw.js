@@ -288,7 +288,9 @@ define(function() {
             },
             connect_printer: {
                 title: '選擇連接成型機'
-            }
+            },
+            notification_on: '開啟',
+            notification_off: '關閉'
         },
         print: {
             import: '匯入',
