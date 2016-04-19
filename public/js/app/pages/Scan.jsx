@@ -836,9 +836,9 @@ define([
                     var self = this;
 
                     AlertStore.onYes(function(id) {
+                        self.state.scanCtrlWebSocket.stopGettingImage();
                         self.setState(self.getInitialState());
                         scanedModel.clear();
-                        self.state.scanCtrlWebSocket.stopGettingImage();
                     });
                     AlertActions.showPopupYesNo('scan-again', self.state.lang.scan.scan_again_confirm);
                 },
