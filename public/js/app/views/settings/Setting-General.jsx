@@ -32,6 +32,10 @@ define([
 
                 },
 
+                _switchNotification: function(e) {
+                    config().write('notification', e.currentTarget.value);
+                },
+
                 render : function() {
                     var lang = args.state.lang,
                         pokeIP = config().read('poke-ip-addr');
@@ -62,10 +66,7 @@ define([
                                 </div>
 
                                 <div className="span8">
-                                    {/*<select className="font3">
-                                        <option>None</option>
-                                    </select>*/}
-                                    <SelectView id="select-notification" className="font3" options={notificationOptions} />
+                                    <SelectView className="font3" options={notificationOptions} onChange={this._switchNotification}/>
                                 </div>
 
                             </div>
