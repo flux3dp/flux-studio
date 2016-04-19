@@ -4,27 +4,21 @@ define([
     'app/actions/alert-actions',
     'app/stores/alert-store',
     'app/actions/progress-actions',
-    'helpers/output-error'
+    'helpers/output-error',
+    'helpers/logger'
 ], function(
     isJson,
     i18n,
     AlertActions,
     AlertStore,
     ProgressActions,
-    outputError
+    outputError,
+    Logger
 ) {
     'use strict';
 
-    var websockets = [],
-        hadConnected = false;
-
-    websockets.list = function() {
-        for(var i = 0; i < websockets.length; i++){
-            console.log(i, websockets[i].url);
-        }
-    };
-
-    window.FLUX.websockets = websockets;
+    var hadConnected = false,
+        WsLogger = new Logger('websocket');
 
     // options:
     //      hostname      - host name (Default: localhost)
@@ -37,10 +31,8 @@ define([
     //      onClose       - fired on connection closed
     //      onOpen        - fired on connection connecting
     return function(options) {
-        var _logs = [],
-            lang = i18n.get();
-
-        var defaultCallback = function(result) {},
+        var lang = i18n.get(),
+            defaultCallback = function(result) {},
             defaultOptions = {
                 hostname: (true === window.FLUX.isNW ? 'localhost' : location.hostname),
                 method: '',
@@ -67,12 +59,12 @@ define([
                     _ws = new WebSocket(url);
 
                 _ws.onopen = function(e) {
-                    options.onOpen(e);
+                    socketOptions.onOpen(e);
                 };
 
                 _ws.onmessage = function(result) {
                     var data = (true === isJson(result.data) ? JSON.parse(result.data) : result.data);
-                    _logs.push(['recv', data]);
+                    wsLog.log.push([WsLogger.getTimeLabel(), 'recv', result.data].join(' '));
 
                     if ('string' === typeof data) {
                         data = data.replace(/\bNaN\b/g, 'null');
@@ -122,6 +114,7 @@ define([
                             message = lang.message.application_occurs_error;
                         }
 
+                        wsLog.log.push([WsLogger.getTimeLabel(), '**abnormal disconnection**'].join(' '));
                         AlertActions.showPopupCustom(abnormallyId, message, lang.message.error_log);
                         AlertStore.onCustom(outputLog);
                     }
@@ -150,139 +143,98 @@ define([
 
         setInterval(function() {
             if (null !== ws && readyState.OPEN === ws.readyState) {
-                _logs.push(['sent','ping']);
+                wsLog.log.push(['sent', 'ping'].join(' '));
                 ws.send('ping');
             }
         }, 60000);
 
-        var wsobj = {
-            readyState: readyState,
-            options: socketOptions,
-            _logs: _logs,
-            url: '/ws/' + options.method,
-
-            send: function(data) {
-                var self = this;
-
-                if (null === ws) {
-                    ws = createWebSocket(socketOptions);
-                }
-
-                if (null === ws || readyState.OPEN !== ws.readyState) {
-                    ws.onopen = function() {
-                        _logs.push(['sent',data,typeof data]);
-                        ws.send(data);
-                    };
-                }
-                else {
-                    _logs.push(['sent',data,typeof data]);
-                    ws.send(data);
-                }
-
-                return this;
+        var wsLog = {
+                url: '/ws/' + options.method,
+                log: []
             },
+            wsobj = {
+                readyState: readyState,
+                options: socketOptions,
+                url: '/ws/' + options.method,
 
-            fetchData: function() {
-                return received_data;
-            },
+                send: function(data) {
+                    var self = this;
 
-            fetchLastResponse: function() {
-                return this.fetchData()[received_data.length - 1];
-            },
-
-            getReadyState: function() {
-                return ws.readyState;
-            },
-
-            close: function(reconnect) {
-                if ('boolean' === typeof reconnect) {
-                    socketOptions.autoReconnect = reconnect;
-                }
-
-                if (null !== ws) {
-                    ws.close();
-                }
-            },
-
-            // events
-            onOpen: function(callback) {
-                socketOptions.onOpen = callback;
-
-                return this;
-            },
-
-            onMessage: function(callback) {
-                socketOptions.onMessage = callback;
-
-                return this;
-            },
-
-            onClose: function(callback) {
-                socketOptions.onclose = callback;
-
-                return this;
-            },
-
-            onError: function(callback) {
-                socketOptions.onError = callback;
-
-                return this;
-            },
-
-            onFatal: function(callback) {
-                socketOptions.onFatal = callback;
-
-                return this;
-            },
-
-            optimizeLogs: function() {
-                var process_data;
-
-                for (var i = 0; i < _logs.length; i++){
-                    process_data = JSON.stringify(_logs[i][1]);
-
-                    if (typeof _logs[i][1] === "string"){
-                        process_data = _logs[i][1];
+                    if (null === ws) {
+                        ws = createWebSocket(socketOptions);
                     }
 
-                    if (process_data.length > 100){
-                        process_data = process_data.substring(0,97) + "...";
-                    }
-
-                    _logs[i][1] = process_data;
-                }
-            },
-
-            logs: function(){
-                var data,
-                    additional_data = null;
-
-                for (var i = 0; i < _logs.length; i++){
-                    data = JSON.stringify(_logs[i][1]);
-                    additional_data = null;
-
-                    if (typeof _logs[i][1] === "string"){
-                        data = _logs[i][1];
-                        if (data.length > 100){
-                            additional_data = {str: data};
-                            data = data.substring(0,20) + "...";
-                        }
-                    }
-
-                    if (data && data.length > 100) {
-                        data = _logs[i][1];
-                    }
-
-                    if (additional_data){
-                        console.log(_logs[i][0], data, additional_data);
+                    if (null === ws || readyState.OPEN !== ws.readyState) {
+                        ws.onopen = function(e) {
+                            wsLog.log.push([WsLogger.getTimeLabel(), 'sent', data, typeof data].join(' '));
+                            socketOptions.onOpen(e);
+                            ws.send(data);
+                        };
                     }
                     else {
-                        console.log(_logs[i][0], data);
+                        wsLog.log.push([WsLogger.getTimeLabel(), 'sent', data, typeof data].join(' '));
+                        ws.send(data);
                     }
+
+                    return this;
+                },
+
+                fetchData: function() {
+                    return received_data;
+                },
+
+                fetchLastResponse: function() {
+                    return this.fetchData()[received_data.length - 1];
+                },
+
+                getReadyState: function() {
+                    return ws.readyState;
+                },
+
+                close: function(reconnect) {
+                    if ('boolean' === typeof reconnect) {
+                        socketOptions.autoReconnect = reconnect;
+                    }
+
+                    if (null !== ws) {
+                        ws.close();
+                    }
+                },
+
+                // events
+                onOpen: function(callback) {
+                    socketOptions.onOpen = callback;
+
+                    return this;
+                },
+
+                onMessage: function(callback) {
+                    socketOptions.onMessage = callback;
+
+                    return this;
+                },
+
+                onClose: function(callback) {
+                    socketOptions.onclose = callback;
+
+                    return this;
+                },
+
+                onError: function(callback) {
+                    socketOptions.onError = callback;
+
+                    return this;
+                },
+
+                onFatal: function(callback) {
+                    socketOptions.onFatal = callback;
+
+                    return this;
                 }
-            }
-        };
-        websockets.push(wsobj);
+            };
+
+        WsLogger.append(wsLog);
+
         return wsobj;
     };
 });
