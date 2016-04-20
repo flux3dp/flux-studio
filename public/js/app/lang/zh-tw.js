@@ -786,7 +786,7 @@ define(function() {
             please_enter_password: '請輸入密碼',
             auth_failure: '認證失敗',
             retry: '重新選擇',
-            unable_to_connect: '無法與機器建立UDP連線'
+            unable_to_connect: '#008 無法與機器建立穩定連線'
         },
         device: {
             camera_on: '啟用鏡頭',
