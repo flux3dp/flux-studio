@@ -38,6 +38,7 @@ define([
                 method: '',
                 port: window.FLUX.ghostPort,
                 autoReconnect: true,
+                ignoreAbnormalDisconnect: false,
                 onMessage: defaultCallback,
                 onError: defaultCallback,
                 onFatal: defaultCallback,
@@ -76,16 +77,16 @@ define([
                     received_data.push(data);
 
                     if ('error' === data.status) {
-                        options.onError(data);
+                        socketOptions.onError(data);
                     }
                     else if ('fatal' === data.status) {
-                        options.onFatal(data);
+                        socketOptions.onFatal(data);
                     }
                     else if ('pong' === data.status) {
                         // it's a heartbeat response. ignore it.
                     }
                     else {
-                        options.onMessage(data);
+                        socketOptions.onMessage(data);
                     }
 
                     hadConnected = true;
@@ -93,7 +94,7 @@ define([
 
                 _ws.onclose = function(result) {
                     ProgressActions.close();
-                    options.onClose(result);
+                    socketOptions.onClose(result);
 
                     var abnormallyId = 'abnormally-close',
                         message = '',
@@ -105,7 +106,8 @@ define([
                     // The connection was closed abnormally without sending or receving data
                     // ref: http://tools.ietf.org/html/rfc6455#section-7.4.1
                     if (1006 === result.code &&
-                        60000 <= (new Date()).getTime() - window.FLUX.timestamp
+                        60000 <= (new Date()).getTime() - window.FLUX.timestamp &&
+                        false === options.ignoreAbnormalDisconnect
                     ) {
                         if (false === hadConnected) {
                             message = lang.message.cant_establish_connection;
