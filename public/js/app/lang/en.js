@@ -972,7 +972,8 @@ define(function() {
             confirmFCodeImport: 'Importing fcode will remove all objects on the scene, are you sure?',
             confirmSceneImport: 'Importing .fsc will remove all objects on the scene, are you sure?',
             brokenFcode: 'unable to open %s',
-            slicingFatalError: 'Error encountered during slicing. Kindly report stl file to customer support.'
+            slicingFatalError: 'Error encountered during slicing. Kindly report stl file to customer support.',
+            unknown_error: 'Unknown Error'
         },
         machine_status: {
             '-10': 'Raw mode',

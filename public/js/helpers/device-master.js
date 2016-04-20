@@ -125,6 +125,11 @@ define([
                             lang.message.monitor_too_old.caption
                         );
                         break;
+                    default:
+                        AlertActions.showPopupError(
+                            'unhandle-exception',
+                            lang.message.unknown_error
+                        );
                     }
                 }
             });

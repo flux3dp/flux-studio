@@ -21,13 +21,13 @@ define([
                         lang = args.state.lang,
                         ipv4Pattern = /^\d{1,3}[.]\d{1,3}[.]\d{1,3}[.]\d{1,3}$/g;
 
-                    if (true === ipv4Pattern.test(ip)) {
-                        // save ip
-                        config().write('poke-ip-addr', ip);
-                    }
-                    else {
+                    if ('' !== ip && false === ipv4Pattern.test(ip)) {
                         me.value = originalIP;
                         AlertActions.showPopupError('laser-upload-error', lang.settings.wrong_ip_format);
+                    }
+                    else {
+                        // save ip
+                        config().write('poke-ip-addr', ip);
                     }
 
                 },
