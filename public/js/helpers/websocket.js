@@ -45,6 +45,13 @@ define([
                 onOpen: defaultCallback
             },
             received_data = [],
+            trimMessage = function(message) {
+                if (100 < message.length) {
+                    message = message.substr(0, 97) + '...';
+                }
+
+                return message;
+            },
             origanizeOptions = function(opts) {
                 for (var name in defaultOptions) {
                     if (false === opts.hasOwnProperty(name) || 'undefined' === typeof opts[name]) {
@@ -63,8 +70,10 @@ define([
                 };
 
                 _ws.onmessage = function(result) {
-                    var data = (true === isJson(result.data) ? JSON.parse(result.data) : result.data);
-                    wsLog.log.push([WsLogger.getTimeLabel(), 'recv', result.data].join(' '));
+                    var data = (true === isJson(result.data) ? JSON.parse(result.data) : result.data),
+                        message = trimMessage([WsLogger.getTimeLabel(), 'recv', result.data].join(' '));
+
+                    wsLog.log.push(message);
 
                     if ('string' === typeof data) {
                         data = data.replace(/\bNaN\b/g, 'null');
@@ -166,13 +175,13 @@ define([
 
                     if (null === ws || readyState.OPEN !== ws.readyState) {
                         ws.onopen = function(e) {
-                            wsLog.log.push([WsLogger.getTimeLabel(), 'sent', data, typeof data].join(' '));
+                            wsLog.log.push(trimMessage([WsLogger.getTimeLabel(), 'sent', data, typeof data].join(' ')));
                             socketOptions.onOpen(e);
                             ws.send(data);
                         };
                     }
                     else {
-                        wsLog.log.push([WsLogger.getTimeLabel(), 'sent', data, typeof data].join(' '));
+                        wsLog.log.push(trimMessage([WsLogger.getTimeLabel(), 'sent', data, typeof data].join(' ')));
                         ws.send(data);
                     }
 
