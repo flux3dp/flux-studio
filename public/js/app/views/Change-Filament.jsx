@@ -53,7 +53,7 @@ define([
                 return {
                     type: this.props.src === 'TUTORIAL' ? DeviceConstants.LOAD_FILAMENT : '',
                     currentStep: this.props.src === 'TUTORIAL' ? steps.GUIDE : steps.HOME,
-                    temperature: 20
+                    temperature: '-'
                 };
             },
 
@@ -124,10 +124,15 @@ define([
                         });
                     };
 
-                DeviceMaster.selectDevice(this.props.device).then(function() {
+                DeviceMaster.selectDevice(self.props.device).then(function() {
                     DeviceMaster.maintain(type).progress(progress).done(done).fail(function(response) {
                         if ('RESOURCE_BUSY' === response.error) {
                             AlertActions.showDeviceBusyPopup('change-filament-device-busy');
+                        }
+                        else if ('TIMEOUT' === response.error) {
+                            DeviceMaster.closeConnection();
+                            AlertActions.showPopupError('change-filament-toolhead-no-response', lang.change_filament.toolhead_no_response);
+                            self.props.onClose();
                         }
                         else if (response.info === 'TYPE_ERROR') {
                             AlertActions.showPopupError('change-filament-device-error', lang.change_filament.maintain_head_type_error);
