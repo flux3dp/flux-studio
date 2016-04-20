@@ -85,7 +85,7 @@ define([
 
         // Lifecycle
         _renderLiftHeight: function(lang) {
-            var min = Math.max(0.1, this.state.defaults.drawHeight);
+            var min = Math.max(5, this.state.defaults.drawHeight);
 
             return {
                 label: (
@@ -128,7 +128,7 @@ define([
                             defaultUnit="mm"
                             defaultValue={this.state.defaults.drawHeight}
                             getValue={this._updateDefaults}
-                            min={0.1}
+                            min={5}
                             max={max}
                         />
                     </div>

@@ -116,6 +116,11 @@ define([
                             lang.message.monitor_too_old.caption
                         );
                         break;
+                    default:
+                        AlertActions.showPopupError(
+                            'unhandle-exception',
+                            lang.message.unknown_error
+                        );
                     }
                 }
             });
@@ -531,44 +536,46 @@ define([
                         device.st_id === DeviceConstants.status.ABORTED
                     ) {
                         if(!defaultPrinterWarningShowed) {
-                            Notification.requestPermission((permission) => {
-                                if(permission === 'granted') {
-                                    var message = '';
-                                    if(device.st_id === DeviceConstants.status.COMPLETED) {
-                                        message = `${lang.device.completed}`;
-                                    }
-                                    else if(device.st_id === DeviceConstants.status.ABORTED) {
-                                        message = `${lang.device.aborted}`;
-                                    }
-                                    else {
-                                        message = `${lang.device.pausedFromError}`;
-                                    }
+                            var message = '';
+                            if(device.st_id === DeviceConstants.status.COMPLETED) {
+                                message = `${lang.device.completed}`;
+                            }
+                            else if(device.st_id === DeviceConstants.status.ABORTED) {
+                                message = `${lang.device.aborted}`;
+                            }
+                            else {
+                                message = `${lang.device.pausedFromError}`;
+                            }
 
-                                    if(device.st_id === DeviceConstants.status.COMPLETED) {
-                                        AlertActions.showInfo(message, function(growl) {
-                                            growl.remove(function() {});
-                                            selectDevice(defaultPrinter).then(function() {
-                                                GlobalActions.showMonitor(defaultPrinter);
-                                            });
-                                        }, true);
-                                    }
-                                    else {
-                                        AlertActions.showWarning(message, function(growl) {
-                                            growl.remove(function() {});
-                                            selectDevice(defaultPrinter).then(function() {
-                                                GlobalActions.showMonitor(defaultPrinter);
-                                            });
-                                        }, true);
-                                    }
-
-                                    var notification = new Notification(device.name, {
-                                        icon: '/img/icon-home-s.png',
-                                        body: message
+                            if(device.st_id === DeviceConstants.status.COMPLETED) {
+                                AlertActions.showInfo(message, function(growl) {
+                                    growl.remove(function() {});
+                                    selectDevice(defaultPrinter).then(function() {
+                                        GlobalActions.showMonitor(defaultPrinter);
                                     });
+                                }, true);
+                            }
+                            else {
+                                AlertActions.showWarning(message, function(growl) {
+                                    growl.remove(function() {});
+                                    selectDevice(defaultPrinter).then(function() {
+                                        GlobalActions.showMonitor(defaultPrinter);
+                                    });
+                                }, true);
+                            }
 
-                                    defaultPrinterWarningShowed = true;
-                                }
-                            });
+                            defaultPrinterWarningShowed = true;
+
+                            if(Config().read('notification') === '1') {
+                                Notification.requestPermission((permission) => {
+                                    if(permission === 'granted') {
+                                        var notification = new Notification(device.name, {
+                                            icon: '/img/icon-home-s.png',
+                                            body: message
+                                        });
+                                    }
+                                });
+                            }
                         }
                     }
                     else {

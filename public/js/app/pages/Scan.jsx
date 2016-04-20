@@ -833,13 +833,15 @@ define([
                 },
 
                 _onScanAgain: function(e) {
-                    var self = this;
+                    var self = this,
+                        onYes = function(id) {
+                            self.state.scanCtrlWebSocket.stopGettingImage();
+                            self.setState(self.getInitialState());
+                            scanedModel.clear();
+                            AlertStore.removeYesListener(onYes);
+                        };
 
-                    AlertStore.onYes(function(id) {
-                        self.setState(self.getInitialState());
-                        scanedModel.clear();
-                        self.state.scanCtrlWebSocket.stopGettingImage();
-                    });
+                    AlertStore.onYes(onYes);
                     AlertActions.showPopupYesNo('scan-again', self.state.lang.scan.scan_again_confirm);
                 },
 
@@ -1330,13 +1332,10 @@ define([
                         closeSubPopup = function(e) {
                             self.refs.setupPanel.openSubPopup(e);
                         },
-                        cameraImage = (self.state.cameraImageSrc || '/img/menu/main_logo.svg'),
-                        camera_inline_style = {
-                            'background-image': 'url(' + cameraImage + ')'
-                        };
+                        cameraImage = (self.state.cameraImageSrc || '/img/menu/main_logo.svg');
 
                     camera_image_class = cx({
-                        'camera-image' : true,
+                        'camera-image' : true === this.state.showCamera,
                         'hide' : false === this.state.showCamera
                     });
 
@@ -1344,7 +1343,7 @@ define([
                         <section ref="operatingSection" className="operating-section">
                             {meshThumbnails}
                             <div id="model-displayer" className="model-displayer">
-                                <div style={camera_inline_style} className={camera_image_class} onClick={closeSubPopup}/>
+                                <img src={cameraImage} className={camera_image_class} onClick={closeSubPopup}/>
                             </div>
                             {settingPanel}
                             {manipulationPanel}

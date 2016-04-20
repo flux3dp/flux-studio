@@ -12,6 +12,7 @@ define([
         args = args || {};
 
         var options = [],
+            notificationOptions = [],
             View = React.createClass({
                 _checkIPFormat: function(e) {
                     var me = e.currentTarget,
@@ -20,15 +21,19 @@ define([
                         lang = args.state.lang,
                         ipv4Pattern = /^\d{1,3}[.]\d{1,3}[.]\d{1,3}[.]\d{1,3}$/g;
 
-                    if (true === ipv4Pattern.test(ip)) {
-                        // save ip
-                        config().write('poke-ip-addr', ip);
-                    }
-                    else {
+                    if ('' !== ip && false === ipv4Pattern.test(ip)) {
                         me.value = originalIP;
                         AlertActions.showPopupError('laser-upload-error', lang.settings.wrong_ip_format);
                     }
+                    else {
+                        // save ip
+                        config().write('poke-ip-addr', ip);
+                    }
 
+                },
+
+                _switchNotification: function(e) {
+                    config().write('notification', e.currentTarget.value);
                 },
 
                 render : function() {
@@ -61,9 +66,7 @@ define([
                                 </div>
 
                                 <div className="span8">
-                                    <select className="font3">
-                                        <option>None</option>
-                                    </select>
+                                    <SelectView className="font3" options={notificationOptions} onChange={this._switchNotification}/>
                                 </div>
 
                             </div>
@@ -82,7 +85,7 @@ define([
 
                             </div>
                         </div>
-                    )
+                    );
                 },
 
                 getInitialState: function() {
@@ -98,6 +101,19 @@ define([
                 selected: lang_code === i18n.getActiveLang()
             });
         }
+
+        notificationOptions = [
+            {
+                value: 0,
+                label: args.state.lang.settings.notification_off,
+                selected: config().read('notification') === '0'
+            },
+            {
+                value: 1,
+                label: args.state.lang.settings.notification_on,
+                selected: config().read('notification') === '1'
+            }
+        ];
 
         return View;
     };

@@ -6,8 +6,9 @@ define([
     'jquery',
     'helpers/websocket',
     'helpers/file-system',
-    'helpers/point-cloud'
-], function($, Websocket, fileSystem, PointCloudHelper) {
+    'helpers/point-cloud',
+    'helpers/rsa-key'
+], function($, Websocket, fileSystem, PointCloudHelper, rsaKey) {
     'use strict';
 
     return function(uuid, opts) {
@@ -98,6 +99,8 @@ define([
             },
             onError: errorHandler
         });
+
+        ws.send(rsaKey());
 
         return {
             connection: ws,

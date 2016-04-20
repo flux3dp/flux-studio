@@ -288,7 +288,9 @@ define(function() {
             },
             connect_printer: {
                 title: '選擇連接成型機'
-            }
+            },
+            notification_on: '開啟',
+            notification_off: '關閉'
         },
         print: {
             import: '匯入',
@@ -969,7 +971,8 @@ define(function() {
             confirmFCodeImport: '載入.fc檔案將清除目前所有場景，繼續？',
             confirmSceneImport: '載入.fsc檔案將清除目前所有場景，繼續？',
             brokenFcode: '無法開啟 %s',
-            slicingFatalError: '切片時發生錯誤，請上傳模型檔案給 FLUX 客服'
+            slicingFatalError: '切片時發生錯誤，請上傳模型檔案給 FLUX 客服',
+            unknown_error: '發生不明錯誤'
         },
         machine_status: {
             '-10': 'Raw Mode',

@@ -5,8 +5,9 @@
 define([
     'jquery',
     'helpers/websocket',
-    'helpers/api/config'
-], function($, Websocket, Config) {
+    'helpers/api/config',
+    'helpers/rsa-key'
+], function($, Websocket, Config, rsaKey) {
     'use strict';
 
     var ws;
@@ -99,17 +100,28 @@ define([
             connect: function(port, opts) {
                 opts = reorganizeOptions(opts);
 
-                var args = [
-                    'connect',
-                    port
-                ];
+                var currentCommand = 'key',
+                    args = [
+                        currentCommand,
+                        rsaKey()
+                    ];
 
                 ws.onError(opts.onError);
 
                 events.onMessage = function(data) {
                     if ('ok' === data.status) {
-                        data.port = port;
-                        opts.onSuccess(data);
+                        if ('key' === currentCommand) {
+                            currentCommand = 'connect';
+                            args = [
+                                currentCommand,
+                                port
+                            ];
+                            ws.send(args.join(' '));
+                        }
+                        else {
+                            data.port = port;
+                            opts.onSuccess(data);
+                        }
                     }
                 };
 
