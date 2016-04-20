@@ -66,6 +66,7 @@ define([
                             selectDevice(device, d);
                         }).
                         fail(function(data) {
+                            AlertActions.showPopupError('device-auth-fail', lang.select_printer.auth_failure);
                             goAuth(uuid);
                         });
                     }
