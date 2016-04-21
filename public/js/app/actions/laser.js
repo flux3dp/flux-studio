@@ -57,6 +57,7 @@ define([
             LASER_IMG_CLASS = 'img-container',
             $laser_platform,
             lang = i18n.get(),
+            $uploadDeferred = $.Deferred(),
             PLATFORM_DIAMETER_PIXEL,
             deleteImage = function() {
                 var $img_container = $('.' + LASER_IMG_CLASS).not($target_image),
@@ -538,7 +539,7 @@ define([
                     }
 
                     if (ACCEPTABLE_MIN_SIZE < size.width * size.height) {
-                        file.tooSmall = false;
+                        file.error = [];
 
                         imageData(blob, {
                             width: size.width,
@@ -551,36 +552,34 @@ define([
                                 is_svg: ('svg' === self.state.fileFormat)
                             },
                             onComplete: function(result) {
+                                ProgressActions.close();
+
                                 file.url = result.canvas.toDataURL('svg' === file.extension ? 'image/svg+xml' : 'image/png');
 
-                                self.state.images.push(file);
-                                self.setState({
-                                    images: self.state.images
-                                });
+                                $uploadDeferred.notify(file, isEnd);
+
                                 setupImage(file, size, objectUrl, name);
                             }
                         });
                     }
                     else {
-                        file.tooSmall = true;
-                    }
-
-                    if (true === isEnd) {
-                        deferred.resolve();
+                        file.invaild = true;
+                        file.error = [lang.message.image_is_too_small];
+                        $uploadDeferred.notify(file, isEnd);
                     }
                 };
 
+            file.invaild = false;
             opts.onFinished = onUploadFinished;
-            opts.onError = function(file, warning_collection) {
-                var message = file.name + ':<br>' + warning_collection.map(function(message) {
-                    return sprintf(
-                        lang.laser.svg_fail_messages[message] || lang.laser.svg_fail_messages.SVG_BROKEN,
-                        file.name
-                    );
-                }).join('. ');
+            opts.onError = function(file, warning_collection, isBroken) {
+                warning_collection.forEach(function(errorCode, i) {
+                    warning_collection[i] = lang.laser.svg_fail_messages[errorCode] || lang.laser.svg_fail_messages.SVG_BROKEN;
+                });
 
+                file.invaild = isBroken;
+                file.error = warning_collection;
+                $uploadDeferred.notify(file, isEnd);
                 ProgressActions.close();
-                AlertActions.showPopupWarning('svg-parse-fail', message);
             };
 
             parserSocket.upload(name, file, opts);
@@ -681,7 +680,54 @@ define([
                 var firstFile = e.target.files.item(0),
                     setupPanel = self.refs.setupPanel,
                     extension = self.refs.fileUploader.getFileExtension(firstFile.name),
-                    currentFileFormat = self.state.fileFormat;
+                    currentFileFormat = self.state.fileFormat,
+                    totalfiles = [],
+                    goodFiles = [];
+
+                $uploadDeferred = $.Deferred();
+
+                $uploadDeferred.progress(function(file, isEnd) {
+                    totalfiles.push(file);
+
+                    if (false === file.invaild) {
+                        goodFiles.push(file);
+                    }
+
+                    if (true === isEnd) {
+                        $uploadDeferred.resolve({
+                            total: totalfiles,
+                            good: goodFiles
+                        });
+                    }
+                }).always(function(files) {
+                    var badFiles = files.total.filter(function(file) {
+                            return 0 < file.error.length;
+                        }),
+                        messages = [];
+
+                    badFiles.forEach(function(file, i) {
+                        messages.push('[' + file.name + ']');
+                        messages = messages.concat(file.error);
+                    });
+
+                    if (0 < badFiles.length) {
+                        AlertActions.showPopupWarning('svg-parse-fail', messages.join('\n'));
+                    }
+                }).done(function(files) {
+                    var operationMode = ('svg' === self.state.fileFormat ? 'cut' : 'engrave'),
+                        hasImage = (0 < self.state.images.length + files.good.length);
+
+                    self.state.images = self.state.images.concat(files.good);
+
+                    menuFactory.items.execute.enabled = hasImage;
+                    menuFactory.items.saveTask.enabled = hasImage;
+
+                    self.setState({
+                        images: self.state.images,
+                        hasImage: hasImage,
+                        mode: operationMode
+                    });
+                });
 
                 ProgressActions.open(ProgressConstants.NONSTOP);
 
@@ -722,32 +768,6 @@ define([
                 if ('undefined' !== typeof parserSocket) {
                     handleUploadImage(file, parserSocket, isEnd, deferred);
                 }
-            },
-            onFileReadEnd: function(e, files) {
-                var tooSmallList = files.filter(function(file) {
-                        return true === file.tooSmall;
-                    }),
-                    invalidName,
-                    operationMode = ('svg' === self.state.fileFormat ? 'cut' : 'engrave');
-
-                ProgressActions.close();
-
-                if (0 < tooSmallList.length) {
-                    invalidName = tooSmallList.map(function(image) {
-                        return image.name;
-                    }).join('\n');
-                    AlertActions.showPopupError('has-too-small-image', invalidName + '\n' +  lang.message.image_is_too_small);
-                    operationMode = undefined;
-                }
-
-                self.setState({
-                    step: (0 < tooSmallList.length ? self.state.step : 'start'),
-                    hasImage: 0 < (self.state.images.length + files.length - tooSmallList.length),
-                    mode: operationMode
-                });
-
-                menuFactory.items.execute.enabled = true;
-                menuFactory.items.saveTask.enabled = true;
             },
             thresholdChanged: function(threshold) {
                 var $el = $('.image-active:eq(0)');
