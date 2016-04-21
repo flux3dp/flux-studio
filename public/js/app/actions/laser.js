@@ -725,7 +725,8 @@ define([
                     self.setState({
                         images: self.state.images,
                         hasImage: hasImage,
-                        mode: operationMode
+                        mode: operationMode,
+                        fileFormat: (0 < self.state.images ? currentFileFormat : undefined)
                     });
                 });
 
@@ -757,7 +758,8 @@ define([
                         parserSocket = svgWebSocket;
                     }
                     else {
-                        // TODO: ignore non-svg file?
+                        ProgressActions.close();
+                        AlertActions.showPopupError('svg-only', lang.laser.svg_only);
                     }
                 }
                 // go bitmap process
