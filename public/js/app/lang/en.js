@@ -20,13 +20,13 @@ define(function() {
             firmware: {
                 caption: 'A Firmware Update to FLUX Delta is available',
                 message_pattern_1: '"%s" is now ready for firmware update.',
-                message_pattern_2: 'FLUX Firmware v%s is now available - You have v%s.',
+                message_pattern_2: 'FLUX Delta Firmware v%s is now available - You have v%s.',
                 latest_firmware: {
                     caption: 'Delta Firmware Update',
                     message: 'You have the latest Delta firmware'
                 },
                 confirm: 'UPLOAD',
-                upload_file: 'Upload file',
+                upload_file: 'Firmware upload (*.bin / *.fxfw)',
                 update_success: 'Firmware update successfully uploaded',
                 update_fail: 'Update Fail'
             },
@@ -44,7 +44,7 @@ define(function() {
                     message: 'You have the latest toolhead firmware'
                 },
                 confirm: 'UPLOAD',
-                upload_file: 'Upload file',
+                upload_file: 'Firmware upload (*.bin)',
                 update_success: 'Toolhead Firmware update successfully uploaded',
                 update_fail: 'Update Fail'
             },
@@ -80,13 +80,14 @@ define(function() {
                 undo: 'Undo'
             },
             device: {
-                label: 'Device',
-                new: 'Add New Device',
-                device_monitor: 'Device Monitor',
-                change_filament: 'Change Filaments',
-                default_device: 'Set as Default Device',
-                check_firmware_update: 'Update Delta Firmware',
-                update_toolhead: 'Update Toolhead Firmware'
+                label: 'Devices',
+                new: 'Add a New Device',
+                device_monitor: 'Dashboard',
+                change_filament: 'Change Printing Material',
+                default_device: 'Set as Default',
+                check_firmware_update: 'Update Firmware',
+                update_delta: 'Delta Firmware',
+                update_toolhead: 'Toolhead Firmware'
             },
             window: {
                 label: 'Window',
@@ -241,8 +242,8 @@ define(function() {
                 flux_cloud: 'FLUX Could',
                 printer: 'Printer'
             },
-            ip: 'Device IP',
-            wrong_ip_format: 'Wrong IP',
+            ip: 'Delta\'s IP',
+            wrong_ip_format: 'Wrong IP Formats',
             language: 'Language',
             notifications: 'Notifications',
             close: 'Close',
@@ -473,8 +474,8 @@ define(function() {
                 plaTitle: 'PICK THE COLOR OF THE FILAMENT',
                 transparent: 'TRANSPARENT',
                 qualityTitle: 'It will affect the outcome surface smoothness of your object. Better qualities need more time',
-                raftTitle: 'A Raft are layers built under your part and help it stick to the base plate',
-                supportTitle: 'A Support is a generated structure to support overhanging part of your object, to prevent filament dropping',
+                raftTitle: 'Raft are layers built under your parts and help them stick to the base plate',
+                supportTitle: 'Support are generated structures to supportt overhanging parts of your object, in order to prevent filament dropping',
                 previewTitle: 'Preview the actual path of toolhead during printing task',
                 advancedTitle: 'Detail 3d printing parameters, you may acheive better result than default by adjusting them',
                 confirmExitFcodeMode: 'Exiting preview mode will unload the fcode, are you sure?'
@@ -548,22 +549,22 @@ define(function() {
             name: 'Name',
             go: 'GO',
             process_caption: 'Generating',
-            laser_accepted_images: 'Image only',
-            draw_accepted_images: '僅支援圖片',
+            laser_accepted_images: 'Supported formats: BMP/GIF/JPG/PNG/SVG',
+            draw_accepted_images: 'Supported formats: SVG',
             svg_fail_messages: {
-                'TEXT_TAG': 'Tag &lt;text&gt; is not supported',
-                'DEFS_TAG': 'Tag &lt;defs&gt; is not supported',
-                'CLIP_TAG': 'Tag &lt;clip&gt; is not supported',
-                'FILTER_TAG': 'Tag &lt;filter&gt; is not supported',
+                'TEXT_TAG': 'SVG Tag &lt;text&gt; is not supported',
+                'DEFS_TAG': 'SVG Tag &lt;defs&gt; is not supported',
+                'CLIP_TAG': 'SVG Tag &lt;clip&gt; is not supported',
+                'FILTER_TAG': 'SVG Tag &lt;filter&gt; is not supported',
                 'EMPTY': 'is an empty file',
-                'FAIL_PARSING': 'is parsing fail',
+                'FAIL_PARSING': 'failed on parsing process',
                 'SVG_BROKEN': 'was broken'
             },
             title: {
                 material: 'Select proper material to have the best engraving result.',
                 object_height: 'A Raft are layers built under your part and help it stick to the base plate.',
-                shading: 'Shading enables gradient effect of laser engraving. It takes longer time.',
-                advanced: 'Custom settings for power and speed'
+                shading: 'Shading enables the gradient effect of laser engraving. It takes longer time.',
+                advanced: 'Custom settings for power and speed.'
             },
             print_params: {
                 object_height: {
@@ -766,16 +767,16 @@ define(function() {
             },
             messages: {
                 'not open': {
-                    caption: 'Camera not detect',
+                    caption: 'Camera not detected / Too dark',
                     message: 'Please pull off the scanning camera, until it makes a sound at the end.'
                 },
                 'no object': {
                     caption: 'Calibration tool not detected',
-                    message: 'Insert the calibration tool into the center slot.'
+                    message: 'Insert the calibration tool into the center slot, and make sure there is sufficient lighting.'
                 },
                 'no laser': {
                     caption: 'Scanning laser not detected',
-                    message: 'Press the laser heads to open it.'
+                    message: 'Press the laser heads to open it, and make sure the lighting is not to much.'
                 }
             }
         },
@@ -845,19 +846,19 @@ define(function() {
             record                              : 'Record',
             camera                              : 'Camera',
             connecting                          : 'Connecting, please wait...',
-            HEAD_OFFLINE                        : '#110 Toolhead not connected or missing',
+            HEAD_OFFLINE                        : '#110 Toolhead not detected\nPlease re-attach the toolhead cable <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/218183157">More Info</a>',
             HEAD_ERROR_CALIBRATING              : '#112 Unable to calibrate toolhead\nplease re-attach the toolhead',
             HEAD_ERROR_FAN_FAILURE              : '#113 Cooling fan failed\nKindly spin the fan with a pencil or thin stick. <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/217732178">More Info</a>',
-            HEAD_ERROR_HEAD_OFFLINE             : '#110 Toolhead not detected\nPlease re-attach the module cable <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/218183157">More Info</a>',
+            HEAD_ERROR_HEAD_OFFLINE             : '#110 Toolhead not detected\nPlease re-attach the toolhead cable <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/218183157">More Info</a>',
             HEAD_ERROR_TYPE_ERROR               : '#111 Toolhead incorrect \nPlease attach the correct toolhead',
             HEAD_ERROR_INTLK_TRIG               : '#116 Engraving toolhead tilt detected \nPlease ensure the rods are connected correctly. <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/217085937">More Info</a>',
             'HEAD_ERROR_?'                      : '#199 Toolhead error \nCheck if the toolhead is abnormal',
-            HARDWARE_ERROR_FILAMENT_RUNOUT      : '#121 Filament not detected \nPlease insert new material <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/218183177">More Info</a>',
-            HARDWARE_ERROR_0                    : '#121 Filament not detected \nPlease insert new material <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/218183177">More Info</a>',
+            HARDWARE_ERROR_FILAMENT_RUNOUT      : '#121 Filament not detected \nPlease insert new material <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/218931757">More Info</a>',
+            HARDWARE_ERROR_0                    : '#121 Filament not detected \nPlease insert new material <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/218931757">More Info</a>',
             HARDWARE_ERROR_PLATE_MISSING        : '#122 Unable to detect the base plate\nPlease put on the plate.',
-            HARDWARE_ERROR_ZPROBE_ERROR         : '#123 Unable to calibrate the base plate \nPlease remove left-over on the nozzle',
+            HARDWARE_ERROR_ZPROBE_ERROR         : '#123 Unable to calibrate the base plate\nPlease remove potential obstacles (left-over on the nozzle or the plate ) <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/218931767">More Info</a>',
             HEAD_ERROR_RESET                    : '#114 Toolhead bad connection \nPlease re-attach the toolhead, and ensure the toolhead is connected correctly <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/218183167">More Info</a>',
-            HARDWARE_ERROR_CONVERGENCE_FAILED   : '#123 Unable to calibrate the base plate\nPlease remove left-over on the nozzle',
+            HARDWARE_ERROR_CONVERGENCE_FAILED   : '#123 Unable to calibrate the base plate\nPlease remove potential obstacles (left-over on the nozzle or the plate ) <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/218931767">More Info</a>',
             HARDWARE_ERROR_HOME_FAILED          : '#124 Unable to calibrate origin\nPlease remove the obstacle, and reattach the toolhead',
             HEAD_ERROR_TILT                     : '#162 Toolhead tilt detected\nPlease check ball joint rod is attached correctly',
             HEAD_ERROR_SHAKE                    : '#162 Toolhead tilt detected\nPlease check ball joint rod is attached correctly',
@@ -869,9 +870,9 @@ define(function() {
             SUBSYSTEM_ERROR                     : 'Something went wrong\nPlease restart the device',
             HARDWARE_FAILURE                    : 'Something went wrong\nPlease restart the device',
             MAINBOARD_OFFLINE                   : 'Something went wrong\nPlease restart the device',
-            HEAD_ERROR_HARDWARE_FAILURE         : 'Something went wrong with toolhead\nPlease re-attach the module cable',
-            G28_FAILED                          : 'Unable to calibrate origin\nPlease remove the obstacle',
-            FILAMENT_RUNOUT_0                   : 'Ran out of filament\nPlease insert new material',
+            HEAD_ERROR_HARDWARE_FAILURE         : '#164 Toolhead abnormal temperature detected\nPlease contact FLUX Support <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/218415378">More Info</a>',
+            G28_FAILED                          : '#124 Unable to calibrate origin\nPlease remove the obstacle <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/218931807">More Info</a>',
+            FILAMENT_RUNOUT_0                   : '#121 Ran out of filament\nPlease insert new material <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/218931757">More Info</a>',
             processing                          : 'Processing',
             savingPreview                       : 'Generating thumbnails',
             hour                                : 'h',
@@ -949,7 +950,7 @@ define(function() {
                 message: 'The device is executing another task, try again later. If it stops working, please restart the device.'
             },
             device_is_used: 'The device is being used, do you want to abort current task?',
-            invalidFile: 'The file is not a valid stl file',
+            invalidFile: 'The file is not a valid STL file',
             failGeneratingPreview: 'Fail to generate preview',
             slicingFailed: 'slic3r is unable to slice this model',
             no_password: {
@@ -964,15 +965,15 @@ define(function() {
                 content: 'Please install the latest firmware with <a target="_blank" href="http://helpcenter.flux3dp.com/hc/en-us/articles/216251077">this guide</a>.'
             },
             cant_establish_connection: 'Unable to connect FLUX Studio API. Please <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/requests/new" target="_blank">contact FLUX support.</a>',
-            application_occurs_error: 'Program Error',
+            application_occurs_error: 'The application has encountered an unhandled error.',
             error_log: 'Error Log',
             fcodeForLaser: 'This is a fcode for laser',
             fcodeForPen: 'This is a fcode for pen',
             confirmFCodeImport: 'Importing fcode will remove all objects on the scene, are you sure?',
             confirmSceneImport: 'Importing .fsc will remove all objects on the scene, are you sure?',
-            brokenFcode: 'unable to open %s',
-            slicingFatalError: 'Error encountered during slicing. Kindly report stl file to customer support.',
-            unknown_error: 'Unknown Error'
+            brokenFcode: 'Unable to open %s',
+            slicingFatalError: 'Error encountered during slicing. Kindly report STL file to customer support.',
+            unknown_error: 'The application has encountered an unknown error, please use Help > Menu > Bug Report.'
         },
         machine_status: {
             '-10': 'Raw mode',
