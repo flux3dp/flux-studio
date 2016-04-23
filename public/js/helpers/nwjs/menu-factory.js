@@ -82,7 +82,7 @@ define([
                                 'upload-firmware',
                                 {
                                     type: InputLightboxConstants.TYPE_FILE,
-                                    inputHeader: lang.update.firmware.upload_file,
+                                    caption: lang.update.firmware.upload_file,
                                     onSubmit: onSubmit,
                                     confirmText: lang.update.firmware.confirm
                                 }
@@ -430,18 +430,28 @@ define([
                     }
                 },
                 {
-                    label: lang.device.check_firmware_update,
-                    enabled: true,
-                    onClick: function() {
-                        executeFirmwareUpdate(printer, 'firmware');
-                    }
+                    label: '',
+                    type: 'separator'
                 },
                 {
-                    label: lang.device.update_toolhead,
-                    enabled: true,
-                    onClick: function() {
-                        executeFirmwareUpdate(printer, 'toolhead');
-                    }
+                    label: lang.device.check_firmware_update,
+                    subItems:
+                        [
+                            {
+                                label: lang.device.update_delta,
+                                enabled: true,
+                                onClick: function() {
+                                    executeFirmwareUpdate(printer, 'firmware');
+                                }
+                            },
+                            {
+                                label: lang.device.update_toolhead,
+                                enabled: true,
+                                onClick: function() {
+                                    executeFirmwareUpdate(printer, 'toolhead');
+                                }
+                            }
+                        ]
                 },
                 {
                     label: lang.device.default_device,

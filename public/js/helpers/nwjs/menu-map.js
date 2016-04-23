@@ -272,6 +272,7 @@ define([
                         }
                     }
                 },
+                separator,
                 items.tutorial,
                 {
                     label: lang.help.forum,
@@ -285,6 +286,7 @@ define([
                         }
                     }
                 },
+                separator,
                 {
                     label: lang.help.debug,
                     enabled: true,
