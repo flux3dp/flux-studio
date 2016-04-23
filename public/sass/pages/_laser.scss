@@ -2,6 +2,9 @@
  * Laser
  */
 .laser-studio {
+    $primaryColor: #999;
+    $backgroundColor: #E0E0DF;
+
     .laser-stage {
         @include flexbox();
         height: 100%;
@@ -16,7 +19,7 @@
     .file-importer {
         @include flexbox();
         background: #fff;
-        color: #B3B3B3;
+        color: $primaryColor;
         font-size: 32px;
         font-weight: bold;
         height: 50px;
@@ -77,7 +80,7 @@
             width: 440px;
 
             .custom-presets-list {
-                border: 2px solid #E0E0DF;
+                border: 2px solid $backgroundColor;
                 height: 110px;
                 list-style: none;
                 overflow: scroll;
@@ -85,8 +88,8 @@
 
                 &:empty {
                     @include flexbox();
-                    background: #B3B3B3;
-                    color: #E0E0DF;
+                    background: $primaryColor;
+                    color: $backgroundColor;
                     align-items: center;
                     justify-content: center;
 
@@ -105,8 +108,8 @@
                 }
 
                 .preset-item-name {
-                    border-bottom: 1px solid #E0E0DF;
-                    color: #B3B3B3;
+                    border-bottom: 1px solid $backgroundColor;
+                    color: $primaryColor;
                     cursor: pointer;
                     height: 40px;
                     line-height: 40px;
@@ -140,12 +143,12 @@
             position: relative;
 
             ul {
-                background: #B3B3B3;
+                background: $primaryColor;
                 list-style: none;
                 padding: 0 10px 10px 10px;
 
                 li {
-                    color: #E0E0DF;
+                    color: $backgroundColor;
                     cursor: pointer;
                     margin: 10px 0 0 0;
                 }
@@ -155,8 +158,8 @@
                 display: none;
 
                 &:checked ~ .display-text {
-                    background: #B3B3B3;
-                    color: #E0E0DF;
+                    background: $primaryColor;
+                    color: $backgroundColor;
                 }
 
                 &:checked ~ .popup {
@@ -180,7 +183,7 @@
                 input[type="text"] {
                     background: rgba(0, 0, 0, 0);
                     border: 2px solid #fff;
-                    color: #E0E0DF;
+                    color: $backgroundColor;
                     font-size: 16px;
                     line-height: 32px;
                     padding: 0 5px;
@@ -192,7 +195,7 @@
         .btn-advance {
             background: rgba(0,0,0,0);
             border-radius: 0;
-            color: #b3b3b3;
+            color: $primaryColor;
             font-size: 1.8rem;
             line-height: 40px;
             margin: 0;
@@ -336,7 +339,7 @@
 
         .caption {
             @include flexbox();
-            color: #B3B3B3;
+            color: $primaryColor;
             font-size: 12px;
             line-height: 30px;
             justify-content: space-between;
@@ -371,7 +374,7 @@
 
     .control {
         @include flexbox();
-        color: #B3B3B3;
+        color: $primaryColor;
         font-size: 13px;
         height: 40px;
         line-height: 40px;
@@ -388,14 +391,14 @@
         }
 
         .label {
-            color: #B3B3B3;
+            color: $primaryColor;
             line-height: 1em;
             width: 100px;
             align-self: center;
         }
 
         .value-text {
-            border: 2px solid #E0E0DF;
+            border: 2px solid $backgroundColor;
             line-height: 28px;
             margin: 5px 0 5px 5px;
             padding: 0 5px;

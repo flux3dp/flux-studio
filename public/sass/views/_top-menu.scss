@@ -7,7 +7,7 @@
     z-index: 1;
 
     .brand-logo {
-        cursor: pointer;
+        cursor: default;
         left: 24px;
         position: absolute;
         top: 24px;
@@ -23,10 +23,10 @@
         }
 
         .func-name {
-            color: #B3B3B3;
+            color: #999;
             font-size: 40px;
             font-weight: lighter;
-            line-height: 49px;
+            line-height: 55px;
             padding: 0 0 0 21px;
         }
 
@@ -75,6 +75,7 @@
         padding: 0;
         text-align: center;
         flex: 1;
+        cursor: pointer;
 
         img {
             height: 3.2rem;
@@ -127,7 +128,7 @@
         }
 
         p {
-            color: #B3B3B3;
+            color: #999;
             font-size: 12px;
             font-weight: 500;
             line-height: 12px;
@@ -160,8 +161,8 @@
                 }
 
                 ul {
-                    border: 1px solid #B3B3B3;
-                    color: #B3B3B3;
+                    border: 1px solid $primaryColor;
+                    color: $primaryColor;
                     font-family: Helvetica Neue;
                     font-size: 12px;
                     font-weight: 500;
@@ -198,7 +199,7 @@
                         }
 
                         &:hover {
-                            background-color: #B3B3B3;
+                            background-color: $primaryColor;
                             color: #FFF;
                         }
                     }

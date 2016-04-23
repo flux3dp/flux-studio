@@ -2552,7 +2552,8 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         width: 87px;
         pointer-events: auto; }
         .studio-container .beehive-buttons .btn.btn-disabled {
-            background: #CCC; }
+            background: #999;
+            opacity: 0.5; }
         .studio-container .beehive-buttons .btn {
             background: #B3B3B3;
             border: none;
@@ -2889,7 +2890,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
 .controls {
     overflow: hidden; }
     .controls .label {
-        color: #B3B3B3;
+        color: #999;
         font-size: 13px;
         line-height: 40px;
         width: 100px; }
@@ -3025,12 +3026,15 @@ input[type=range]:focus::-webkit-slider-runnable-track {
 .ui-control-text-input,
 .ui-control-unit-input {
     background: #FFF;
-    border: 2px solid #E0E0DF;
-    color: #B3B3B3;
+    border: 0;
+    color: #999;
     font-size: 1.2rem;
-    height: 40px;
+    height: 48px;
     padding: 2px 5px;
     width: 100%; }
+
+.ui-dialog-menu .ui-control-unit-input {
+    box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.3); }
 
 .ui-dialog-menu {
     list-style: none;
@@ -3043,12 +3047,12 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         /* NEW - Chrome */
         display: flex;
         /* NEW, Spec - Opera 12.1, Firefox 20+ */
-        height: 40px;
-        line-height: 40px; }
+        height: 48px;
+        line-height: 48px; }
     .ui-dialog-menu .dialog-opener {
         display: none; }
         .ui-dialog-menu .dialog-opener:checked ~ .dialog-label {
-            background: #B3B3B3;
+            background: #999;
             color: #E0E0DF; }
         .ui-dialog-menu .dialog-opener:checked ~ .dialog-window {
             display: -webkit-box;
@@ -3058,9 +3062,9 @@ input[type=range]:focus::-webkit-slider-runnable-track {
             display: flex;
             /* NEW, Spec - Opera 12.1, Firefox 20+ */ }
     .ui-dialog-menu .dialog-label {
-        color: #B3B3B3;
+        color: #999;
         cursor: pointer;
-        font-size: 1.8rem;
+        font-size: 1.7rem;
         margin: 0;
         min-width: 200px;
         overflow: hidden;
@@ -3069,7 +3073,10 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         white-space: nowrap;
         word-break: break-all; }
         .ui-dialog-menu .dialog-label:hover .btn, .ui-dialog-menu .dialog-label:hover {
-            background: #B3B3B3;
+            background: #999;
+            color: #E0E0DF; }
+        .ui-dialog-menu .dialog-label:active .btn, .ui-dialog-menu .dialog-label:active {
+            background: #666666;
             color: #E0E0DF; }
         .ui-dialog-menu .dialog-label .btn {
             transition: initial; }
@@ -3083,16 +3090,16 @@ input[type=range]:focus::-webkit-slider-runnable-track {
             padding: 0; }
         .ui-dialog-menu .dialog-window li {
             color: #E0E0DF;
-            font-size: 1.8rem; }
+            font-size: 1.7rem; }
         .ui-dialog-menu .dialog-window .dialog-window-content {
-            background: #B3B3B3;
-            padding: 5px; }
+            background: #999;
+            padding: 8px; }
             .ui-dialog-menu .dialog-window .dialog-window-content li {
                 padding: 0 15px; }
                 .ui-dialog-menu .dialog-window .dialog-window-content li:hover {
                     background: #555; }
         .ui-dialog-menu .dialog-window .arrow {
-            background: #B3B3B3;
+            background: #999;
             transform: translateX(1px);
             align-self: center; }
 
@@ -3399,8 +3406,8 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         /* NEW, Spec - Opera 12.1, Firefox 20+ */
         justify-content: space-between; }
     .modal-update .btn-h-group {
-        position: static;
-        width: 50%; }
+        display: block;
+        text-align: right; }
 
 .modal-change-filament .guide-image {
     border: 2px solid #000;
@@ -3575,7 +3582,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
     width: 100%;
     z-index: 1; }
     .top-menu .brand-logo {
-        cursor: pointer;
+        cursor: default;
         left: 24px;
         position: absolute;
         top: 24px; }
@@ -3586,10 +3593,10 @@ input[type=range]:focus::-webkit-slider-runnable-track {
             transition: all .25s;
             width: 49px; }
         .top-menu .brand-logo .func-name {
-            color: #B3B3B3;
+            color: #999;
             font-size: 40px;
             font-weight: lighter;
-            line-height: 49px;
+            line-height: 55px;
             padding: 0 0 0 21px; }
         .top-menu .brand-logo .menu {
             background: #fff;
@@ -3625,7 +3632,8 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         margin: 0 3.3rem 0 0;
         padding: 0;
         text-align: center;
-        flex: 1; }
+        flex: 1;
+        cursor: pointer; }
         .top-menu .item img {
             height: 3.2rem;
             margin: 0 auto;
@@ -3662,7 +3670,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
             .top-menu .device .device-icon:hover img {
                 transform: rotate(240deg); }
         .top-menu .device p {
-            color: #B3B3B3;
+            color: #999;
             font-size: 12px;
             font-weight: 500;
             line-height: 12px;
@@ -3687,8 +3695,8 @@ input[type=range]:focus::-webkit-slider-runnable-track {
                 .top-menu .device .menu .device-list .select-printer {
                     position: relative; }
                 .top-menu .device .menu .device-list ul {
-                    border: 1px solid #B3B3B3;
-                    color: #B3B3B3;
+                    border: 1px solid #999;
+                    color: #999;
                     font-family: Helvetica Neue;
                     font-size: 12px;
                     font-weight: 500;
@@ -3720,7 +3728,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
                         .top-menu .device .menu .device-list ul li .status {
                             width: 16rem; }
                         .top-menu .device .menu .device-list ul li:hover {
-                            background-color: #B3B3B3;
+                            background-color: #999;
                             color: #FFF; }
             .top-menu .device .menu.show {
                 display: block; }
@@ -3889,7 +3897,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
                 position: absolute;
                 top: 0px;
                 left: 15px;
-                color: #BBB;
+                color: #999;
                 cursor: pointer; }
                 .flux-monitor .main .title .back img {
                     width: 28px;
@@ -3929,7 +3937,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
                     color: white;
                     background: #0950D0; }
                 .flux-monitor .main .body .device-content .folder {
-                    color: #BBB;
+                    color: #999;
                     display: inline-block;
                     width: 33%;
                     height: 80px;
@@ -3938,13 +3946,13 @@ input[type=range]:focus::-webkit-slider-runnable-track {
                     background-repeat: no-repeat;
                     background-size: 72px 60px;
                     background-position: top;
-                    margin-top: 10px;
+                    margin: 10px 0;
                     cursor: pointer; }
                 .flux-monitor .main .body .device-content .folder:hover {
                     color: #333; }
                 .flux-monitor .main .body .device-content .file {
                     text-align: center;
-                    color: #BBB;
+                    color: #999;
                     display: inline-block;
                     width: 33%;
                     height: 80px;
@@ -3952,9 +3960,10 @@ input[type=range]:focus::-webkit-slider-runnable-track {
                     background-repeat: no-repeat;
                     background-size: 72px 60px;
                     background-position: top;
-                    margin-top: 10px;
+                    margin: 10px 0;
                     cursor: pointer; }
                     .flux-monitor .main .body .device-content .file img {
+                        border: 1px solid #B3B3B3;
                         width: 60px; }
                 .flux-monitor .main .body .device-content .file:hover {
                     color: #333; }
@@ -3995,7 +4004,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
             margin-top: 15px; }
             .flux-monitor .main .operation .controls {
                 position: absolute;
-                color: #BBB;
+                color: #999;
                 text-align: center;
                 width: 60px;
                 cursor: pointer; }
@@ -4090,7 +4099,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         .flux-monitor .sub .btn {
             font-size: 1rem;
             color: #FFF;
-            background-color: #BBB;
+            background-color: #999;
             border-radius: 0;
             margin: 0 0.25rem;
             padding: 0 12px;
@@ -4638,7 +4647,7 @@ input.switch:checked ~ label:after {
             width: 100%; }
             .print-studio .advanced-panel .preset-wrapper .preset-list .preset-entry {
                 border-bottom: 1px solid #E0E0DF;
-                color: #B3B3B3;
+                color: #999;
                 cursor: pointer;
                 height: 40px;
                 line-height: 40px; }
@@ -4649,12 +4658,12 @@ input.switch:checked ~ label:after {
                 color: #FFF; }
         .print-studio .advanced-panel .preset-wrapper .preset-content {
             border: 2px solid #E0E0E0;
-            color: #B3B3B3;
+            color: #999;
             height: 275px;
             margin-top: 10px;
             width: 100%; }
         .print-studio .advanced-panel .preset-wrapper .preset-name {
-            color: #B3B3B3;
+            color: #999;
             height: 40px;
             line-height: 40px;
             margin-top: 20px; }
@@ -4665,7 +4674,7 @@ input.switch:checked ~ label:after {
                 width: 300px; }
 
 .print-studio .preview-panel {
-    background-color: #B3B3B3;
+    background-color: #999;
     height: 200px;
     overflow-y: hidden;
     position: relative;
@@ -4692,7 +4701,7 @@ input.switch:checked ~ label:after {
     z-index: 1; }
     .print-studio .importWindow .arrowBox {
         background: #fff;
-        color: #B3B3B3;
+        color: #999;
         cursor: pointer;
         height: 50px;
         position: absolute;
@@ -4819,7 +4828,7 @@ input.switch:checked ~ label:after {
         /* NEW - Chrome */
         display: flex;
         /* NEW, Spec - Opera 12.1, Firefox 20+ */
-        color: #B3B3B3;
+        color: #999;
         height: 40px;
         line-height: 40px;
         margin: 0 0 10px 0;
@@ -4832,7 +4841,7 @@ input.switch:checked ~ label:after {
         /* NEW - Chrome */
         display: flex;
         /* NEW, Spec - Opera 12.1, Firefox 20+ */
-        color: #B3B3B3;
+        color: #999;
         font-size: 12px;
         line-height: 30px;
         justify-content: space-between; }
@@ -5630,7 +5639,7 @@ input.switch:checked ~ label:after {
     display: flex;
     /* NEW, Spec - Opera 12.1, Firefox 20+ */
     background: #fff;
-    color: #B3B3B3;
+    color: #999;
     font-size: 32px;
     font-weight: bold;
     height: 50px;
@@ -5693,7 +5702,7 @@ input.switch:checked ~ label:after {
                 /* NEW - Chrome */
                 display: flex;
                 /* NEW, Spec - Opera 12.1, Firefox 20+ */
-                background: #B3B3B3;
+                background: #999;
                 color: #E0E0DF;
                 align-items: center;
                 justify-content: center; }
@@ -5706,7 +5715,7 @@ input.switch:checked ~ label:after {
                     color: #FFF; }
             .laser-studio .operating-panel .custom-presets-wrapper .custom-presets-list .preset-item-name {
                 border-bottom: 1px solid #E0E0DF;
-                color: #B3B3B3;
+                color: #999;
                 cursor: pointer;
                 height: 40px;
                 line-height: 40px;
@@ -5734,7 +5743,7 @@ input.switch:checked ~ label:after {
         height: 40px;
         position: relative; }
         .laser-studio .operating-panel .popup-selection ul {
-            background: #B3B3B3;
+            background: #999;
             list-style: none;
             padding: 0 10px 10px 10px; }
             .laser-studio .operating-panel .popup-selection ul li {
@@ -5744,7 +5753,7 @@ input.switch:checked ~ label:after {
         .laser-studio .operating-panel .popup-selection .popup-open {
             display: none; }
             .laser-studio .operating-panel .popup-selection .popup-open:checked ~ .display-text {
-                background: #B3B3B3;
+                background: #999;
                 color: #E0E0DF; }
             .laser-studio .operating-panel .popup-selection .popup-open:checked ~ .popup {
                 visibility: visible; }
@@ -5765,7 +5774,7 @@ input.switch:checked ~ label:after {
     .laser-studio .operating-panel .btn-advance {
         background: transparent;
         border-radius: 0;
-        color: #b3b3b3;
+        color: #999;
         font-size: 1.8rem;
         line-height: 40px;
         margin: 0;
@@ -5885,7 +5894,7 @@ input.switch:checked ~ label:after {
         /* NEW - Chrome */
         display: flex;
         /* NEW, Spec - Opera 12.1, Firefox 20+ */
-        color: #B3B3B3;
+        color: #999;
         font-size: 12px;
         line-height: 30px;
         justify-content: space-between; }
@@ -5914,7 +5923,7 @@ input.switch:checked ~ label:after {
     /* NEW - Chrome */
     display: flex;
     /* NEW, Spec - Opera 12.1, Firefox 20+ */
-    color: #B3B3B3;
+    color: #999;
     font-size: 13px;
     height: 40px;
     line-height: 40px;
@@ -5926,7 +5935,7 @@ input.switch:checked ~ label:after {
     .laser-studio .control .value-text {
         width: 120px; }
     .laser-studio .control .label {
-        color: #B3B3B3;
+        color: #999;
         line-height: 1em;
         width: 100px;
         align-self: center; }

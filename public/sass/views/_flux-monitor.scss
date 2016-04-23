@@ -22,7 +22,7 @@
                 position: absolute;
                 top: 0px;
                 left: 15px;
-                color: #BBB;
+                color: $primaryColor;
                 cursor: pointer;
 
                 img {
@@ -72,7 +72,7 @@
                     background: #0950D0;
                 }
                 .folder {
-                    color: #BBB;
+                    color: $primaryColor;
                     display: inline-block;
                     width: 33%;
                     height: 80px;
@@ -81,7 +81,7 @@
                     background-repeat: no-repeat;
                     background-size: 72px 60px;
                     background-position: top;
-                    margin-top: 10px;
+                    margin: 10px 0;
                     cursor: pointer;
 
                 }
@@ -90,7 +90,7 @@
                 }
                 .file {
                     text-align: center;
-                    color: #BBB;
+                    color: $primaryColor;
                     display: inline-block;
                     width: 33%;
                     height: 80px;
@@ -98,9 +98,10 @@
                     background-repeat: no-repeat;
                     background-size: 72px 60px;
                     background-position: top;
-                    margin-top: 10px;
+                    margin: 10px 0;
                     cursor: pointer;
                     img {
+                        border: 1px solid #B3B3B3;
                         width: 60px;
                     }
                 }
@@ -160,7 +161,7 @@
             margin-top: 15px;
             .controls {
                 position: absolute;
-                color: #BBB;
+                color: $primaryColor;
                 text-align: center;
                 width: 60px;
                 cursor: pointer;
@@ -282,7 +283,7 @@
         .btn {
             font-size: 1rem;
             color: #FFF;
-            background-color: #BBB;
+            background-color: $primaryColor;
             border-radius: 0;
             margin: 0 0.25rem;
             padding: 0 12px;
