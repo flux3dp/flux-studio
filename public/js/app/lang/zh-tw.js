@@ -973,7 +973,11 @@ define(function() {
             confirmSceneImport: '載入.fsc檔案將清除目前所有場景，繼續？',
             brokenFcode: '無法開啟 %s',
             slicingFatalError: '切片時發生錯誤，請上傳模型檔案給 FLUX 客服',
-            unknown_error: '發生不明錯誤'
+            unknown_error: '發生不明錯誤',
+            important_update: {
+                caption: '重要更新',
+                message: 'Delta 有重要韌體更新，是否要現在更新？',
+            }
         },
         machine_status: {
             '-10': 'Raw Mode',
