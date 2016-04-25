@@ -48,7 +48,7 @@ define([
                 },
                 {
                     name: 'laser',
-                    displayName: 'LASER',
+                    displayName: 'ENGRAVE',
                     className: genericClassName,
                     label: lang.menu.laser,
                     imgSrc: '/img/menu/icon_laser.svg'

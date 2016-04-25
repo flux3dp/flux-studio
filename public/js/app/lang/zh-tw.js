@@ -10,7 +10,7 @@ define(function() {
             no_webgl: '您的系統不支援 WebGL，建議您使用其他電腦開啟 FLUX Studio'
         },
         device_selection: {
-            no_printers: '無法透過 Wi-Fi 偵測到 FLUX Delta，請檢查您與機器的網路連線是否在同個網路下 <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/215394548">暸解更多</a>',
+            no_printers: '無法透過 Wi-Fi 偵測到 FLUX Delta，請檢查您與機器的網路連線是否在同個網路下 <a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/215394548">暸解更多</a>',
             device_name: 'DEVICE NAME',
             module: 'MODULE',
             status: 'STATUS'
@@ -145,7 +145,7 @@ define(function() {
                 brilliant: '太棒了!',
                 begin_journey: '你可以拔除 Micro USB 傳輸線, 開始使用 FLUX Delta 隨心所欲地進行創作囉！',
                 great: '歡迎使用 FLUX Studio',
-                upload_via_usb: '你可以稍後再設定 Wi-Fi 選項。<br/>如果你沒有 Wi-Fi 環境，請參考<a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/215998327-Connection-Guide-for-Desktop-PCs">PC連線指南</a>',
+                upload_via_usb: '你可以稍後再設定 Wi-Fi 選項。<br/>如果你沒有 Wi-Fi 環境，請參考<a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/215998327-Connection-Guide-for-Desktop-PCs">PC連線指南</a>',
                 back: '回到 Wi-Fi 設定',
                 ok: '開始使用'
             },
@@ -156,7 +156,7 @@ define(function() {
 
                 keep_connect: {
                     caption: '無法透過 USB 連接',
-                    content: '別擔心！請確認電源已被開啟及使用 Micro-Usb 連接機器，並正確安裝驅動程式。<a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/215327328">瞭解更多</a>'
+                    content: '別擔心！請確認電源已被開啟及使用 Micro-Usb 連接機器，並正確安裝驅動程式。<a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/215327328">瞭解更多</a>'
                 },
 
                 wifi_connection: {
@@ -478,7 +478,7 @@ define(function() {
                 supportTitle: 'A Support is a generated structure to support overhanging part of your object, to prevent filament dropping',
                 previewTitle: 'Preview the actual path of toolhead during printing task',
                 advancedTitle: 'Detail 3d printing parameters, you may acheive better result than default by adjusting them',
-                confirmExitFcodeMode: '離開預覽模式將會移除fcode，繼續？'
+                confirmExitFcodeMode: '離開預覽模式將會移除Fcode，是否繼續？'
             },
             right_panel: {
                 get: 'Get',
@@ -853,13 +853,13 @@ define(function() {
             HEAD_ERROR_TYPE_ERROR               : '#111 偵測到錯誤工具頭\n請安裝正確的對應工具頭',
             HEAD_ERROR_INTLK_TRIG               : '#116 偵測到雕刻工具頭傾斜\n請確認金屬棒正確連結，雕刻頭與握架緊密結合以繼續<a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/217085937">瞭解更多</a>',
             'HEAD_ERROR_?'                      : '#199 Toolhead error\nCheck if the toolhead is abnormal',
-            HARDWARE_ERROR_FILAMENT_RUNOUT      : '#121 沒有偵測到線料\n請重新插入新的線料 <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/218931757">瞭解更多</a>',
-            HARDWARE_ERROR_0                    : '#121 沒有偵測到線料\n請重新插入新的線料 <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/218931757">瞭解更多</a>',
+            HARDWARE_ERROR_FILAMENT_RUNOUT      : '#121 沒有偵測到線料\n請重新插入新的線料 <a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/218931757">瞭解更多</a>',
+            HARDWARE_ERROR_0                    : '#121 沒有偵測到線料\n請重新插入新的線料 <a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/218931757">瞭解更多</a>',
             HARDWARE_ERROR_PLATE_MISSING        : '#122 沒有偵測到工作平台\n請放上工作平台金屬板',
-            HARDWARE_ERROR_ZPROBE_ERROR         : '#123 水平校正失敗\n請移除可能影響校正的物體（噴嘴殘料、工作平台上雜質）<a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/218931767">暸解更多</a>',
+            HARDWARE_ERROR_ZPROBE_ERROR         : '#123 水平校正失敗\n請移除可能影響校正的物體（噴嘴殘料、工作平台上雜質）<a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/218931767">暸解更多</a>',
             HEAD_ERROR_RESET                    : '#114 工具頭傳輸線接觸不良\n請確認傳輸線完整插入以繼續 <a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/218183167">暸解更多</a>',
-            HARDWARE_ERROR_CONVERGENCE_FAILED   : '#123 水平校正失敗\n請移除可能影響校正的物體（噴嘴殘料、工作平台上雜質）<a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/218931767">暸解更多</a>',
-            HARDWARE_ERROR_HOME_FAILED          : '#124 原點校正失敗\n請排除軌道上異物，並重新插拔工具頭連接線 <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/218931807">暸解更多</a>',
+            HARDWARE_ERROR_CONVERGENCE_FAILED   : '#123 水平校正失敗\n請移除可能影響校正的物體（噴嘴殘料、工作平台上雜質）<a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/218931767">暸解更多</a>',
+            HARDWARE_ERROR_HOME_FAILED          : '#124 原點校正失敗\n請排除軌道上異物，並重新插拔工具頭連接線 <a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/218931807">暸解更多</a>',
             HEAD_ERROR_TILT                     : '#162 偵測到工具頭傾斜\n請確認球型關節正確附著以繼續',
             HEAD_ERROR_SHAKE                    : '#162 偵測到工具頭傾斜\n請確認球型關節正確附著以繼續',
             WRONG_HEAD                          : '請更換成列印工具頭',
@@ -871,7 +871,7 @@ define(function() {
             HARDWARE_FAILURE                    : '裝置錯誤\n請重新啟動機器',
             MAINBOARD_OFFLINE                   : '裝置錯誤\n請重新啟動機器',
             HEAD_ERROR_HARDWARE_FAILURE         : '#164 工具頭溫度異常\n請聯繫 FLUX 客服<a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/218415378">暸解更多</a>',
-            G28_FAILED                          : '#124 原點校正失敗\n請排除軌道上異物，並重新插拔工具頭連接線 <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/218931807">暸解更多</a>',
+            G28_FAILED                          : '#124 原點校正失敗\n請排除軌道上異物，並重新插拔工具頭連接線 <a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/218931807">暸解更多</a>',
             FILAMENT_RUNOUT_0                   : '#121 沒有偵測到線料\n請重新插入新的線料 <a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/218931757">瞭解更多</a>',
             processing                          : '處理中',
             savingPreview                       : '正在產生預覽圖',
@@ -887,7 +887,7 @@ define(function() {
             cannotPreview                       : '無法預覽此檔案',
             extensionNotSupported               : '上傳檔案不支援此檔案格式',
             fileExistContinue                   : '檔案已存在，是否要覆蓋？',
-            confirmGToF                         : 'GCode 上傳後會自動轉檔成 FCode，是否要繼續？',
+            confirmGToF                         : 'GCode 上傳後會自動轉檔成 FCode，是否繼續？',
             updatePrintPresetSetting            : 'FLUX STUDIO 有新的預設列印參數。\n是否要更新？（會刪除目前參數）',
             confirmFileDelete                   : '是否確定要刪除這個檔案？',
             task: {
@@ -969,8 +969,8 @@ define(function() {
             error_log: '錯誤訊息',
             fcodeForLaser: '檔案為雕刻工作',
             fcodeForPen: '檔案為繪圖工作',
-            confirmFCodeImport: '載入.fc檔案將清除目前所有場景，繼續？',
-            confirmSceneImport: '載入.fsc檔案將清除目前所有場景，繼續？',
+            confirmFCodeImport: '載入.fc檔案將清除目前所有場景，是否繼續？',
+            confirmSceneImport: '載入.fsc檔案將清除目前所有場景，是否繼續？',
             brokenFcode: '無法開啟 %s',
             slicingFatalError: '切片時發生錯誤，請上傳模型檔案給 FLUX 客服',
             unknown_error: '連接時發生未知錯誤，請使用功能表 > 說明 > 錯誤回報'

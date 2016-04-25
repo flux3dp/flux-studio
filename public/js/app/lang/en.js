@@ -112,7 +112,7 @@ define(function() {
             cancel: 'CANCEL',
             confirm: 'CONFIRM',
             connect: 'Connect',
-            no_machine: 'I don\'t have a machine now',
+            no_machine: 'I don\'t have a machine now.',
 
             // specific caption/content
             invalid_device_name: 'The name can only contains chinese, alphabet, numbers, blanks, and special characters  “(”, “)”, “-”, “_”, “’”, “\'”.',
@@ -156,7 +156,7 @@ define(function() {
 
                 keep_connect: {
                     caption: 'USB Device not found',
-                    content: 'Oops! Don\'t worry. We\'re here for you.\nMake sure your FLUX Delta has been powered \non, attached to Micro USB Cable and the driver is installed.\n<a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/215327328">More Info</a>'
+                    content: 'Oops! Don\'t worry. We\'re here for you.\nMake sure your FLUX Delta has been powered \non, attached to Micro USB Cable and the driver \nis installed. <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/215327328">More Info</a>'
                 },
 
                 wifi_connection: {
@@ -228,7 +228,7 @@ define(function() {
         },
         menu: {
             print: 'PRINT',
-            laser: 'LASER',
+            laser: 'ENGRAVE',
             scan: 'SCAN',
             usb: 'USB',
             device: 'Device',
@@ -561,7 +561,7 @@ define(function() {
                 'SVG_BROKEN': 'was broken'
             },
             title: {
-                material: 'Select proper material to have the best engraving result.',
+                material: 'Select a proper material to have the best engraving result.',
                 object_height: 'A Raft are layers built under your part and help it stick to the base plate.',
                 shading: 'Shading enables the gradient effect of laser engraving. It takes longer time.',
                 advanced: 'Custom settings for power and speed.'
@@ -883,10 +883,10 @@ define(function() {
             forceStop                           : 'Abort current task?',
             upload                              : 'Upload',
             download                            : 'Download',
-            fileNotDownloadable                 : 'this file type is not supported for download',
-            cannotPreview                       : 'Can not preview file',
-            extensionNotSupported               : 'file extension not supported',
-            fileExistContinue                   : 'file already exist, continue ? (will replace)',
+            fileNotDownloadable                 : 'This file type is not supported for download',
+            cannotPreview                       : 'Can not preview this file',
+            extensionNotSupported               : 'File format not supported',
+            fileExistContinue                   : 'File already exist, do you want to replace it?',
             confirmGToF                         : 'Uploaded GCode will be converted to FCode, continue (will replace if exist)',
             updatePrintPresetSetting            : 'FLUX STUDIO has new printing preset, do you want to update?\n(will overwrite current parameters)',
             confirmFileDelete                   : 'Are you sure you want to delete this file?',
@@ -967,8 +967,8 @@ define(function() {
             cant_establish_connection: 'Unable to connect FLUX Studio API. Please <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/requests/new" target="_blank">contact FLUX support.</a>',
             application_occurs_error: 'The application has encountered an unhandled error.',
             error_log: 'Error Log',
-            fcodeForLaser: 'This is a fcode for laser',
-            fcodeForPen: 'This is a fcode for pen',
+            fcodeForLaser: 'This is a fcode for engraving',
+            fcodeForPen: 'This is a fcode for drawing',
             confirmFCodeImport: 'Importing fcode will remove all objects on the scene, are you sure?',
             confirmSceneImport: 'Importing .fsc will remove all objects on the scene, are you sure?',
             brokenFcode: 'Unable to open %s',
@@ -1032,7 +1032,7 @@ define(function() {
             startWithFilament: 'Let\'s start with loading filament',
             startWithModel: 'Next, let\'s import some 3D model',
             startTour: 'Welcome!<br/>This is your first time printing,<br/>would you like to start printing tutorial?',
-            clickToImport: 'Click here to import example 3D model',
+            clickToImport: 'Click here to import an example 3D model',
             selectQuality: 'Select quality you preferred',
             clickGo: 'Prepare to print',
             startPrint: 'Apply glue on the plate with no-grid, wait till it\' dry, then you are ready to print',
