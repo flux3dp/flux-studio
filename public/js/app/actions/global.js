@@ -6,7 +6,15 @@ define([
     'helpers/api/config',
     'helpers/nwjs/menu-factory',
     'helpers/logger'
-], function($, i18n, localStorage, shortcuts, config, menuFactory, Logger) {
+], function(
+    $,
+    i18n,
+    localStorage,
+    shortcuts,
+    config,
+    menuFactory,
+    Logger
+) {
     'use strict';
 
     // prevent delete (back) behavior
