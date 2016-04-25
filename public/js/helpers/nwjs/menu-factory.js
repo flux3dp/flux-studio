@@ -19,7 +19,8 @@ define([
     'app/constants/progress-constants',
     'app/actions/input-lightbox-actions',
     'app/constants/input-lightbox-constants',
-    'helpers/api/touch'
+    'helpers/api/touch',
+    'helpers/firmware-updater'
 ], function(
     gui,
     menuMap,
@@ -38,7 +39,8 @@ define([
     ProgressConstants,
     InputLightboxActions,
     InputLightboxConstants,
-    touch
+    touch,
+    firmwareUpdater
 ) {
     'use strict';
 
@@ -72,55 +74,6 @@ define([
                     return $deferred;
                 },
                 updateFirmware = function() {
-                    var doUpdate = (
-                            'firmware' === type ?
-                            DeviceMaster.updateFirmware :
-                            DeviceMaster.updateToolhead
-                        ),
-                        onInstall = function() {
-                            InputLightboxActions.open(
-                                'upload-firmware',
-                                {
-                                    type: InputLightboxConstants.TYPE_FILE,
-                                    inputHeader: lang.update.firmware.upload_file,
-                                    onSubmit: onSubmit,
-                                    confirmText: lang.update.firmware.confirm
-                                }
-                            );
-                        },
-                        onSubmit = function(files, e) {
-                            var file = files.item(0),
-                                onFinishUpdate = function(isSuccess) {
-                                    ProgressActions.close();
-
-                                    if (true === isSuccess) {
-                                        AlertActions.showPopupInfo(
-                                            'firmware-update-success',
-                                            lang.update.firmware.update_success
-                                        );
-                                    }
-                                    else {
-                                        AlertActions.showPopupError(
-                                            'firmware-update-fail',
-                                            lang.update.firmware.update_fail
-                                        );
-                                    }
-                                };
-
-                            ProgressActions.open(ProgressConstants.NONSTOP);
-                            doUpdate(file).
-                                done(onFinishUpdate.bind(null, true)).
-                                fail(onFinishUpdate.bind(null, false));
-                        },
-                        showUpdate = function(response) {
-                            AlertActions.showUpdate(
-                                printer,
-                                type,
-                                response || {},
-                                onInstall
-                            );
-                        };
-
                     checkFirmware(currentPrinter, type).done(function(response) {
                         var latestVersion = currentPrinter.version,
                             caption = lang.update.firmware.latest_firmware.caption,
@@ -133,7 +86,7 @@ define([
                         }
 
                         if (true === response.needUpdate) {
-                            showUpdate(response);
+                            firmwareUpdater(response, printer, type);
                         }
                         else {
                             AlertActions.showPopupInfo(
@@ -144,7 +97,7 @@ define([
                         }
                     }).
                     fail(function(response) {
-                        showUpdate(response);
+                        firmwareUpdater(response, printer, type);
                         AlertActions.showPopupInfo(
                             'latest-firmware',
                             lang.monitor.cant_get_toolhead_version
