@@ -973,7 +973,11 @@ define(function() {
             confirmSceneImport: 'Importing .fsc will remove all objects on the scene, are you sure?',
             brokenFcode: 'unable to open %s',
             slicingFatalError: 'Error encountered during slicing. Kindly report stl file to customer support.',
-            unknown_error: 'Unknown Error'
+            unknown_error: 'Unknown Error',
+            important_update: {
+                caption: 'Important Update',
+                message: 'Important Delta firmware update is available. Do you want to update now?',
+            }
         },
         machine_status: {
             '-10': 'Raw mode',
