@@ -10,7 +10,7 @@ define(function() {
             no_webgl: '您的系統不支援 WebGL，建議您使用其他電腦開啟 FLUX Studio'
         },
         device_selection: {
-            no_printers: '無法透過 Wi-Fi 偵測到 FLUX Delta，請檢查您與機器的網路連線是否在同個網路下 <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/215394548">暸解更多</a>',
+            no_printers: '無法透過 Wi-Fi 偵測到 FLUX Delta，請檢查您與機器的網路連線是否在同個網路下 <a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/215394548">暸解更多</a>',
             device_name: 'DEVICE NAME',
             module: 'MODULE',
             status: 'STATUS'
@@ -26,7 +26,7 @@ define(function() {
                     message: '韌體已經是最新版本'
                 },
                 confirm: '上傳',
-                upload_file: '請上傳檔案',
+                upload_file: '韌體上傳',
                 update_success: '韌體更新上傳成功',
                 update_fail: '更新失敗'
             },
@@ -44,7 +44,7 @@ define(function() {
                     message: '韌體已經是最新版本'
                 },
                 confirm: '上傳',
-                upload_file: '請上傳檔案',
+                upload_file: '韌體上傳',
                 update_success: '韌體更新上傳成功',
                 update_fail: '更新失敗'
             },
@@ -80,13 +80,14 @@ define(function() {
                 undo: '復原'
             },
             device: {
-                label: '裝置',
-                new: '新增裝置',
-                device_monitor: '狀態',
-                change_filament: '自動換料',
-                default_device: '設為預設裝置',
-                check_firmware_update: 'Delta 韌體更新',
-                update_toolhead: '工具頭韌體更新'
+                label: '機器',
+                new: '新增機器',
+                device_monitor: '儀表板',
+                change_filament: '更換線料',
+                default_device: '設為預設',
+                check_firmware_update: '韌體更新',
+                update_delta: 'Delta 韌體',
+                update_toolhead: '工具頭韌體'
             },
             window: {
                 label: '視窗',
@@ -114,14 +115,14 @@ define(function() {
             no_machine : '目前沒有機器，跳過此步驟',
 
             // specific caption/content
-            invalid_device_name: '裝置名稱只能使用中文字，英文字母、數字、空格以及特殊字元  “(”, “)”, “-”, “_”, “’”, “\'”',
+            invalid_device_name: '機器名稱只能使用中文字，英文字母、數字、空格以及特殊字元  “(”, “)”, “-”, “_”, “’”, “\'”',
             require_device_name: '名稱欄位為必填',
             select_language: '請選擇你想使用的語言',
             change_password: {
                 caption: '密碼更改',
                 content: '確定要更改密碼嗎?'
             },
-            connect_flux: '用 USB 連接你的電腦與 FLUX 裝置',
+            connect_flux: '用 USB 連接你的電腦與 FLUX Delta',
             name_your_flux: '為你的 FLUX Delta 取一個獨特的名字',
             wifi_setup: '設定無線網路',
             select_preferred_wifi: '選擇你偏好的網路',
@@ -130,9 +131,9 @@ define(function() {
 
             // page specific
             set_machine_generic: {
-                printer_name: '裝置名稱*',
+                printer_name: '機器名稱*',
                 printer_name_placeholder: '例如：霹靂五號',
-                password: '裝置密碼',
+                password: '機器密碼',
                 set_station_mode: '設定成無線基地台',
                 password_placeholder: '密碼可以保護你的 FLUX Delta'
             },
@@ -144,7 +145,7 @@ define(function() {
                 brilliant: '太棒了!',
                 begin_journey: '你可以拔除 Micro USB 傳輸線, 開始使用 FLUX Delta 隨心所欲地進行創作囉！',
                 great: '歡迎使用 FLUX Studio',
-                upload_via_usb: '你可以稍後再設定 Wi-Fi 選項。<br/>如果你沒有 Wi-Fi 環境，請參考<a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/215998327-Connection-Guide-for-Desktop-PCs">PC連線指南</a>',
+                upload_via_usb: '你可以稍後再設定 Wi-Fi 選項。<br/>如果你沒有 Wi-Fi 環境，請參考<a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/215998327-Connection-Guide-for-Desktop-PCs">PC連線指南</a>',
                 back: '回到 Wi-Fi 設定',
                 ok: '開始使用'
             },
@@ -155,7 +156,7 @@ define(function() {
 
                 keep_connect: {
                     caption: '無法透過 USB 連接',
-                    content: '別擔心！請確認電源已被開啟及使用 Micro-Usb 連接裝置，並正確安裝驅動程式。<a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/215327328">瞭解更多</a>'
+                    content: '別擔心！請確認電源已被開啟及使用 Micro-Usb 連接機器，並正確安裝驅動程式。<a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/215327328">瞭解更多</a>'
                 },
 
                 wifi_connection: {
@@ -230,7 +231,7 @@ define(function() {
             laser: '雷雕',
             scan: '掃描',
             usb: 'USB',
-            device: '裝置',
+            device: '機器',
             setting: '設定',
             draw: '繪製'
         },
@@ -241,7 +242,7 @@ define(function() {
                 flux_cloud: 'FLUX Could',
                 printer: '成型機'
             },
-            ip: '裝置 IP',
+            ip: '機器 IP 位址',
             wrong_ip_format: 'IP格式錯誤',
             language: '語言',
             notifications: '通知',
@@ -334,8 +335,8 @@ define(function() {
                 support_pattern: '支撐圖樣',
                 raft: '底座',
                 raftLayers: '底座層數',
-                brim: '底部延伸圈數',
-                skirts: '邊界預覽',
+                brim: '底部延伸圈數 (Brim)',
+                skirts: '邊界預覽 (Skirt)',
                 movement: '移動速度',
                 structure: '結構速度',
                 traveling: '移動',
@@ -477,7 +478,7 @@ define(function() {
                 supportTitle: 'A Support is a generated structure to support overhanging part of your object, to prevent filament dropping',
                 previewTitle: 'Preview the actual path of toolhead during printing task',
                 advancedTitle: 'Detail 3d printing parameters, you may acheive better result than default by adjusting them',
-                confirmExitFcodeMode: '離開預覽模式將會移除fcode，繼續？'
+                confirmExitFcodeMode: '離開預覽模式將會移除Fcode，是否繼續？'
             },
             right_panel: {
                 get: 'Get',
@@ -526,7 +527,7 @@ define(function() {
             speed: '速度',
             pen_up_title: '筆不會碰到繪製表面的 Z 軸距離',
             pen_down_title: '筆會碰到繪製表面的 Z 軸距離, 必須比移動高度低',
-            speed_title: '握架模組移動的速度',
+            speed_title: '握架工具頭移動的速度',
             units: {
                 mms: 'mm/s',
                 mm: 'mm'
@@ -548,9 +549,9 @@ define(function() {
             name: '名稱',
             go: 'GO',
             process_caption: '輸出中',
-            laser_accepted_images: '只支援圖片',
-            draw_accepted_images: '繪製僅支援 SVG 檔案格式',
-            svg_only: 'This file is not SVG',
+            laser_accepted_images: '雕刻支援格式：BMP/GIF/JPG/PNG/SVG',
+            draw_accepted_images: '繪製支援格式：SVG',
+            svg_only: '非 SVG 格式',
             svg_fail_messages: {
                 'TEXT_TAG': '不支援標籤 &lt;text&gt;',
                 'DEFS_TAG': '不支援標籤 &lt;defs&gt;',
@@ -767,16 +768,16 @@ define(function() {
             },
             messages: {
                 'not open': {
-                    caption: '未偵測到鏡頭畫面',
+                    caption: '未偵測到鏡頭畫面 / 畫面太暗',
                     message: '壓下，然後拉出掃描鏡頭，直至最底端發出固定聲為止。'
                 },
                 'no object': {
                     caption: '未偵測到校正工具',
-                    message: '請將掃描校正工具插在中心溝槽處'
+                    message: '請將掃描校正工具插在中心溝槽處，確保光源充足。'
                 },
                 'no laser': {
                     caption: '未偵測到掃描雷射',
-                    message: '請壓下，並彈出掃描雷射頭。'
+                    message: '請壓下，並彈出掃描雷射頭，確保光源不要過亮。'
                 }
             }
         },
@@ -847,33 +848,33 @@ define(function() {
             record                              : 'RECORD',
             camera                              : '監控',
             connecting                          : '連線中，請稍候',
-            HEAD_OFFLINE                        : '#110 沒有偵測到工具頭',
-            HEAD_ERROR_CALIBRATING              : '#112 模組校正失誤\n請重新裝載模組，並確認磁鐵關節的附著',
+            HEAD_OFFLINE                        : '#110 沒有偵測到工具頭\n請將工具頭連接線完整插入 <a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/218183157">暸解更多</a>',
+            HEAD_ERROR_CALIBRATING              : '#112 工具頭校正失誤\n請重新裝載工具頭，並確認磁鐵關節的附著',
             HEAD_ERROR_FAN_FAILURE              : '#113 風扇無法轉動\n請嘗試用細針戳一下 <a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/217732178">暸解更多</a>',
-            HEAD_ERROR_HEAD_OFFLINE             : '#110 沒有偵測到工具頭\n請重新插入模組連接線 <a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/218183157">暸解更多</a>',
+            HEAD_ERROR_HEAD_OFFLINE             : '#110 沒有偵測到工具頭\n請將工具頭連接線完整插入 <a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/218183157">暸解更多</a>',
             HEAD_ERROR_TYPE_ERROR               : '#111 偵測到錯誤工具頭\n請安裝正確的對應工具頭',
             HEAD_ERROR_INTLK_TRIG               : '#116 偵測到雕刻工具頭傾斜\n請確認金屬棒正確連結，雕刻頭與握架緊密結合以繼續<a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/217085937">瞭解更多</a>',
             'HEAD_ERROR_?'                      : '#199 Toolhead error\nCheck if the toolhead is abnormal',
-            HARDWARE_ERROR_FILAMENT_RUNOUT      : '#121 沒有偵測到線料\n請重新插入新的線料 <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/218183177">瞭解更多</a>',
-            HARDWARE_ERROR_0                    : '#121 沒有偵測到線料\n請重新插入新的線料 <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/218183177">瞭解更多</a>',
+            HARDWARE_ERROR_FILAMENT_RUNOUT      : '#121 沒有偵測到線料\n請重新插入新的線料 <a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/218931757">瞭解更多</a>',
+            HARDWARE_ERROR_0                    : '#121 沒有偵測到線料\n請重新插入新的線料 <a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/218931757">瞭解更多</a>',
             HARDWARE_ERROR_PLATE_MISSING        : '#122 沒有偵測到工作平台\n請放上工作平台金屬板',
-            HARDWARE_ERROR_ZPROBE_ERROR         : '#123 水平校正失敗\n請移除列印模組噴頭上的殘料',
-            HEAD_ERROR_RESET                    : '#114 模組傳輸線接觸不良\n請確認傳輸線完整插入以繼續 <a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/218183167">暸解更多</a>',
-            HARDWARE_ERROR_CONVERGENCE_FAILED   : '#123 水平校正失敗\n請移除列印模組噴頭上的殘料',
-            HARDWARE_ERROR_HOME_FAILED          : '#124 原點校正失敗\n請排除軌道上異物，並重新插拔模組連接線',
+            HARDWARE_ERROR_ZPROBE_ERROR         : '#123 水平校正失敗\n請移除可能影響校正的物體（噴嘴殘料、工作平台上雜質）<a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/218931767">暸解更多</a>',
+            HEAD_ERROR_RESET                    : '#114 工具頭傳輸線接觸不良\n請確認傳輸線完整插入以繼續 <a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/218183167">暸解更多</a>',
+            HARDWARE_ERROR_CONVERGENCE_FAILED   : '#123 水平校正失敗\n請移除可能影響校正的物體（噴嘴殘料、工作平台上雜質）<a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/218931767">暸解更多</a>',
+            HARDWARE_ERROR_HOME_FAILED          : '#124 原點校正失敗\n請排除軌道上異物，並重新插拔工具頭連接線 <a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/218931807">暸解更多</a>',
             HEAD_ERROR_TILT                     : '#162 偵測到工具頭傾斜\n請確認球型關節正確附著以繼續',
             HEAD_ERROR_SHAKE                    : '#162 偵測到工具頭傾斜\n請確認球型關節正確附著以繼續',
             WRONG_HEAD                          : '請更換成列印工具頭',
             USER_OPERATION                      : '別的使用者正在佔用機器',
-            RESOURCE_BUSY                       : '裝置忙碌中\n如果機器沒有在進行動作， 請重新啟動機器',
+            RESOURCE_BUSY                       : '機器忙碌中\n如果機器沒有在進行動作， 請重新啟動機器',
             DEVICE_ERROR                        : '裝置錯誤\n請重新啟動機器',
             NO_RESPONSE                         : '裝置錯誤\n請重新啟動機器',
             SUBSYSTEM_ERROR                     : '裝置錯誤\n請重新啟動機器',
             HARDWARE_FAILURE                    : '裝置錯誤\n請重新啟動機器',
             MAINBOARD_OFFLINE                   : '裝置錯誤\n請重新啟動機器',
-            HEAD_ERROR_HARDWARE_FAILURE         : '工具頭發生錯誤\n請重新裝載模組，並確認傳輸線完整插入',
-            G28_FAILED                          : '歸零失敗\n請排除異物後重試',
-            FILAMENT_RUNOUT_0                   : '沒有偵測到線料\n請重新插入新的線料',
+            HEAD_ERROR_HARDWARE_FAILURE         : '#164 工具頭溫度異常\n請聯繫 FLUX 客服<a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/218415378">暸解更多</a>',
+            G28_FAILED                          : '#124 原點校正失敗\n請排除軌道上異物，並重新插拔工具頭連接線 <a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/218931807">暸解更多</a>',
+            FILAMENT_RUNOUT_0                   : '#121 沒有偵測到線料\n請重新插入新的線料 <a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/218931757">瞭解更多</a>',
             processing                          : '處理中',
             savingPreview                       : '正在產生預覽圖',
             hour                                : '小時',
@@ -888,7 +889,7 @@ define(function() {
             cannotPreview                       : '無法預覽此檔案',
             extensionNotSupported               : '上傳檔案不支援此檔案格式',
             fileExistContinue                   : '檔案已存在，是否要覆蓋？',
-            confirmGToF                         : 'GCode 上傳後會自動轉檔成 FCode，是否要繼續？',
+            confirmGToF                         : 'GCode 上傳後會自動轉檔成 FCode，是否繼續？',
             updatePrintPresetSetting            : 'FLUX STUDIO 有新的預設列印參數。\n是否要更新？（會刪除目前參數）',
             confirmFileDelete                   : '是否確定要刪除這個檔案？',
             task: {
@@ -897,9 +898,9 @@ define(function() {
                 DRAW                            : '繪製工作'
             },
             device: {
-                EXTRUDER                        : '列印模組',
-                LASER                           : '雕刻模組',
-                DRAW                            : '繪製模組'
+                EXTRUDER                        : '列印工具頭',
+                LASER                           : '雕刻工具頭',
+                DRAW                            : '繪製工具頭'
             },
             cant_get_toolhead_version           : '無法取得最新版本資訊'
         },
@@ -943,14 +944,14 @@ define(function() {
             nothingToPrint: 'Nothing to print (source blob missing)',
             connectionTimeout: '請確認你的網路狀態和 FLUX Delta 的 Wi-Fi 指示燈是否為恆亮',
             device_not_found: {
-                caption: '找不到預設裝置',
-                message: '請確認預設裝置的 Wi-Fi 指示燈，或取消設定預設裝置'
+                caption: '找不到預設機器',
+                message: '請確認預設機器的 Wi-Fi 指示燈，或取消設定預設裝置'
             },
             device_busy: {
-                caption: '裝置忙碌中',
-                message: '裝置正在進行另外一項工作，請稍候再試。如果裝置持續沒有回應，請將裝置重新啟動。'
+                caption: '機器忙碌中',
+                message: '機器正在進行另外一項工作，請稍候再試。如果裝置持續沒有回應，請將裝置重新啟動。'
             },
-            device_is_used: '裝置正被使用中，是否要終止現在任務？',
+            device_is_used: '機器正被使用中，是否要終止現在任務？',
             invalidFile: '檔案不是正確的 STL 格式',
             failGeneratingPreview: '無法儲存預覽圖',
             slicingFailed: 'slic3r 無法型成可列印的 model',
@@ -959,22 +960,22 @@ define(function() {
                 caption: '未設定密碼'
             },
             gCodeAreaTooBigCaption: '工作路徑超過列印範圍',
-            gCodeAreaTooBigMessage: '請縮小物體尺寸、關閉底座、Brim或是Skirt',
+            gCodeAreaTooBigMessage: '請縮小物體尺寸、關閉底座、底部延伸圈數或是邊界預覽',
             image_is_too_small: '圖檔內容有誤',
             monitor_too_old: {
                 caption: '韌體需要更新',
                 content: '請按照<a target="_blank" href="http://helpcenter.flux3dp.com/hc/zh-tw/articles/216251077">此說明</a>安裝最新韌體版本'
             },
-            cant_establish_connection: '無法啟動 FLUX Studio API，並<a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/requests/new" target="_blank">聯繫 FLUX 客服</a>',
-            application_occurs_error: '程式發生錯誤',
+            cant_establish_connection: '無法正常啟動 FLUX Studio API，並<a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/requests/new" target="_blank">聯繫 FLUX 客服</a>',
+            application_occurs_error: '應用程式發生錯誤，請使用功能表 > 說明 > 錯誤回報',
             error_log: '錯誤訊息',
             fcodeForLaser: '檔案為雕刻工作',
             fcodeForPen: '檔案為繪圖工作',
-            confirmFCodeImport: '載入.fc檔案將清除目前所有場景，繼續？',
-            confirmSceneImport: '載入.fsc檔案將清除目前所有場景，繼續？',
+            confirmFCodeImport: '載入.fc檔案將清除目前所有場景，是否繼續？',
+            confirmSceneImport: '載入.fsc檔案將清除目前所有場景，是否繼續？',
             brokenFcode: '無法開啟 %s',
             slicingFatalError: '切片時發生錯誤，請上傳模型檔案給 FLUX 客服',
-            unknown_error: '發生不明錯誤',
+            unknown_error: '連接時發生未知錯誤，請使用功能表 > 說明 > 錯誤回報',
             important_update: {
                 caption: '重要更新',
                 message: 'Delta 有重要韌體更新，是否要現在更新？',
@@ -1013,13 +1014,13 @@ define(function() {
             load_filament: '自動進料',
             unload_filament: '自動退料',
             next: '下一步',
-            heating_nozzle: '列印模組加熱中',
+            heating_nozzle: '列印工具頭加熱中',
             unloading: '自動退料中',
             loaded: '進料完成',
             unloaded: '退料完成',
             ok: '確定',
             auto_emerging: '請插入線料',
-            maintain_head_type_error: '列印模組未正確安裝',
+            maintain_head_type_error: '列印工具頭未正確安裝',
             maintain_zombie: '請重新啟動機器',
             toolhead_no_response: '#117 列印模組沒有回應 <a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/218347477">暸解更多</a>'
         },
@@ -1029,12 +1030,12 @@ define(function() {
             password: '密碼'
         },
         set_default: {
-            success: '%s 已設為預設裝置',
-            error: '由於網路問題，無法將 %s 設為預設裝置'
+            success: '%s 已設為預設機器',
+            error: '由於網路問題，無法將 %s 設為預設機器'
         },
         tutorial: {
             set_first_default_caption: '歡迎使用',
-            set_first_default: '是否要將 %s 設為預設裝置?',
+            set_first_default: '是否要將 %s 設為預設機器?',
             startWithFilament: '首先，讓我們先填裝線料',
             startWithModel: '接下來，讓我們載入範例3Ｄ模型',
             startTour: '嗨，歡迎<br/>這是你第一次使用列印功能,<br/>你希望觀看列印功能教學嗎？',

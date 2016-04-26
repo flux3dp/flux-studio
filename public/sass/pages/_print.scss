@@ -568,7 +568,7 @@ input.switch:checked ~ label:after {
 
                 .preset-entry {
                     border-bottom: 1px solid #E0E0DF;
-                    color: #B3B3B3;
+                    color: $primaryColor;
                     cursor: pointer;
                     height: 40px;
                     line-height: 40px;
@@ -585,14 +585,14 @@ input.switch:checked ~ label:after {
 
             .preset-content {
                 border: 2px solid #E0E0E0;
-                color: #B3B3B3;
+                color: $primaryColor;
                 height: 275px;
                 margin-top: 10px;
                 width: 100%;
             }
 
             .preset-name {
-                color: #B3B3B3;
+                color: $primaryColor;
                 height: 40px;
                 line-height: 40px;
                 margin-top: 20px;
@@ -607,7 +607,7 @@ input.switch:checked ~ label:after {
         }
     }
     .preview-panel {
-        background-color: #B3B3B3;
+        background-color: $primaryColor;
         height: 200px;
         overflow-y: hidden;
         position: relative;
@@ -638,7 +638,7 @@ input.switch:checked ~ label:after {
 
         .arrowBox {
             background: #fff;
-            color: #B3B3B3;
+            color: $primaryColor;
             cursor: pointer;
             height: 50px;
             position: absolute;
@@ -787,7 +787,7 @@ input.switch:checked ~ label:after {
 
         .control {
             @include flexbox();
-            color: #B3B3B3;
+            color: $primaryColor;
             height: 40px;
             line-height: 40px;
             margin: 0 0 10px 0;
@@ -797,7 +797,7 @@ input.switch:checked ~ label:after {
 
         .caption {
             @include flexbox();
-            color: #B3B3B3;
+            color: $primaryColor;
             font-size: 12px;
             line-height: 30px;
             justify-content: space-between;

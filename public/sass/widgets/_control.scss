@@ -21,18 +21,22 @@
 .ui-control-text-input,
 .ui-control-unit-input {
     background: #FFF;
-    border: 2px solid #E0E0DF;
-    color: #B3B3B3;
+    border: 0;
+    color: #999;
     font-size: 1.2rem;
-    height: 40px;
+    height: 48px;
     padding: 2px 5px;
     width: 100%;
 }
 
+.ui-dialog-menu .ui-control-unit-input{
+    box-shadow: inset 0 0 3px rgba(0,0,0,0.3);
+}
+
 .ui-dialog-menu {
-    $fontSize: 1.8rem;
-    $backGroundColor: #B3B3B3;
-    $primaryColor: #E0E0DF;
+    $fontSize: 1.7rem;
+    $primaryColor: #999;
+    $backgroundColor: #E0E0DF;
 
     list-style: none;
     margin: 0;
@@ -40,16 +44,16 @@
 
     .ui-dialog-menu-item {
         @include flexbox();
-        height: 40px;
-        line-height: 40px;
+        height: 48px;
+        line-height: 48px;
     }
 
     .dialog-opener {
         display: none;
 
         &:checked ~ .dialog-label {
-            background: $backGroundColor;
-            color: $primaryColor;
+            background: $primaryColor;
+            color: $backgroundColor;
         }
 
         &:checked ~ .dialog-window {
@@ -58,7 +62,7 @@
     }
 
     .dialog-label {
-        color: $backGroundColor;
+        color: $primaryColor;
         cursor: pointer;
         font-size: $fontSize;
         margin: 0;
@@ -71,7 +75,13 @@
 
         &:hover .btn,
         &:hover {
-            background: #B3B3B3;
+            background: $primaryColor;
+            color: #E0E0DF;
+        }
+
+        &:active .btn,
+        &:active {
+            background: darken($primaryColor,20%);
             color: #E0E0DF;
         }
 
@@ -97,8 +107,8 @@
         }
 
         .dialog-window-content {
-            background: $backGroundColor;
-            padding: 5px;
+            background: $primaryColor;
+            padding: 8px;
 
             li {
                 padding: 0 15px;
@@ -110,7 +120,7 @@
         }
 
         .arrow {
-            background: #B3B3B3;
+            background: #999;
             transform: translateX(1px);
             align-self: center;
         }

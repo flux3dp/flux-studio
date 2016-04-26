@@ -302,7 +302,151 @@ define([
 
     if (true === window.FLUX.isNW) {
         createDevice = function(printer) {
+            var subItems = [],
+                showPopup = function(currentPrinter) {
+                    checkDeviceStatus(currentPrinter).done(function(status) {
+                        switch (status) {
+                        case 'ok':
+                            AlertActions.showChangeFilament(currentPrinter);
+                            break;
+                        case 'auth':
+                            var opts = {
+                                onSuccess: function() {
+                                    AlertActions.showChangeFilament(currentPrinter);
+                                },
+                                onError: function() {
+                                    InputLightboxActions.open('auth-device', {
+                                        type         : InputLightboxConstants.TYPE_PASSWORD,
+                                        caption      : lang.select_printer.notification,
+                                        inputHeader  : lang.select_printer.please_enter_password,
+                                        confirmText  : lang.select_printer.submit,
+                                        onSubmit     : function(password) {
+                                            _auth(printer.uuid, password, {
+                                                onError: function(response) {
+                                                    var message = (
+                                                        false === response.reachable ?
+                                                        lang.select_printer.unable_to_connect :
+                                                        lang.select_printer.auth_failure
+                                                    );
+                                                    AlertActions.showPopupError('device-auth-fail', message);
+                                                }
+                                            });
+                                        }
+                                    });
+                                }
+                            };
+                            _auth(currentPrinter.uuid, '', opts);
+                            break;
+                        }
+                    });
+                };
+
             defaultDevice = initializeMachine.defaultPrinter.get();
+
+            // device monitor
+            subItems.push({
+                label: lang.device.device_monitor,
+                enabled: true,
+                onClick: function() {
+                    var currentPrinter = discoverMethods.getLatestPrinter(printer),
+                        lang = i18n.get();
+
+                    DeviceMaster.selectDevice(currentPrinter).then(function(status) {
+
+                        if (status === DeviceConstants.CONNECTED) {
+                            GlobalActions.showMonitor(currentPrinter, '', '', GlobalConstants.DEVICE_LIST);
+                        }
+                        else if (status === DeviceConstants.TIMEOUT) {
+                            AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
+                        }
+                    }).
+                    fail(function(status) {
+                        ProgressActions.close();
+                        AlertActions.showPopupError('fatal-occurred', status);
+                    });
+                }
+            });
+
+            // change filament
+            subItems.push({
+                label: lang.device.change_filament,
+                enabled: true,
+                onClick: function() {
+                    var currentPrinter = discoverMethods.getLatestPrinter(printer);
+
+                    DeviceMaster.selectDevice(currentPrinter).then(function(status) {
+                        var lang = i18n.get();
+
+                        if (status === DeviceConstants.CONNECTED) {
+                            showPopup(currentPrinter);
+                        }
+                        else if (status === DeviceConstants.TIMEOUT) {
+                            AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
+                        }
+                    });
+                }
+            });
+
+            // separator
+            subItems.push({
+                label: '',
+                type: 'separator'
+            });
+
+            // firmware update (delta/toolhead)
+            subItems.push({
+                label: lang.device.check_firmware_update,
+                subItems: [
+                    {
+                        label: lang.device.update_delta,
+                        enabled: true,
+                        onClick: function() {
+                            executeFirmwareUpdate(printer, 'firmware');
+                        }
+                    },
+                    {
+                        label: lang.device.update_toolhead,
+                        enabled: true,
+                        onClick: function() {
+                            executeFirmwareUpdate(printer, 'toolhead');
+                        }
+                    }
+                ]
+            });
+
+            // default device
+            subItems.push({
+                label: lang.device.default_device,
+                enabled: true,
+                type: 'checkbox',
+                onClick: function() {
+                    var _currentPrinters = menuMap.all[menuMap.parentIndex.DEVICE].subItems,
+                        targetPrinter;
+
+                    _currentPrinters.forEach(function(_printer, i) {
+                        if (1 < i) {
+                            _currentPrinters[i].subItems[4].checked = false;
+
+                            if (printer.uuid === _currentPrinters[i].uuid) {
+                                targetPrinter = _currentPrinters[i];
+                            }
+                        }
+                    });
+
+                    targetPrinter.subItems[4].checked = this.checked;
+
+                    if (false === this.checked) {
+                        initializeMachine.defaultPrinter.clear();
+                    }
+                    else {
+                        initializeMachine.defaultPrinter.set(printer);
+                    }
+
+                    methods.refresh();
+                },
+                parent: menuMap.parentIndex.DEVICE,
+                checked: (defaultDevice.uuid === printer.uuid)
+            });
 
             return {
                 isPrinter: true,
@@ -310,129 +454,7 @@ define([
                 label: printer.name,
                 enabled: true,
                 isNew: printer.isNew,
-                subItems: [{
-                    label: lang.device.device_monitor,
-                    enabled: true,
-                    onClick: function() {
-                        var currentPrinter = discoverMethods.getLatestPrinter(printer),
-                            lang = i18n.get();
-
-                        DeviceMaster.selectDevice(currentPrinter).then(function(status) {
-
-                            if (status === DeviceConstants.CONNECTED) {
-                                GlobalActions.showMonitor(currentPrinter, '', '', GlobalConstants.DEVICE_LIST);
-                            }
-                            else if (status === DeviceConstants.TIMEOUT) {
-                                AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
-                            }
-                        }).
-                        fail(function(status) {
-                            ProgressActions.close();
-                            AlertActions.showPopupError('fatal-occurred', status);
-                        });
-                    }
-                },
-                {
-                    label: lang.device.change_filament,
-                    enabled: true,
-                    onClick: function() {
-                        var currentPrinter = discoverMethods.getLatestPrinter(printer),
-                            showPopup = function() {
-                                checkDeviceStatus(currentPrinter).done(function(status) {
-                                    switch (status) {
-                                    case 'ok':
-                                        AlertActions.showChangeFilament(currentPrinter);
-                                        break;
-                                    case 'auth':
-                                        var opts = {
-                                            onSuccess: function() {
-                                                AlertActions.showChangeFilament(currentPrinter);
-                                            },
-                                            onError: function() {
-                                                InputLightboxActions.open('auth-device', {
-                                                    type         : InputLightboxConstants.TYPE_PASSWORD,
-                                                    caption      : lang.select_printer.notification,
-                                                    inputHeader  : lang.select_printer.please_enter_password,
-                                                    confirmText  : lang.select_printer.submit,
-                                                    onSubmit     : function(password) {
-                                                        _auth(printer.uuid, password, {
-                                                            onError: function(response) {
-                                                                var message = (
-                                                                    false === response.reachable ?
-                                                                    lang.select_printer.unable_to_connect :
-                                                                    lang.select_printer.auth_failure
-                                                                );
-                                                                AlertActions.showPopupError('device-auth-fail', message);
-                                                            }
-                                                        });
-                                                    }
-                                                });
-                                            }
-                                        };
-                                        _auth(currentPrinter.uuid, '', opts);
-                                        break;
-                                    }
-                                });
-                            };
-
-                        DeviceMaster.selectDevice(currentPrinter).then(function(status) {
-                            var lang = i18n.get();
-
-                            if (status === DeviceConstants.CONNECTED) {
-                                showPopup();
-                            }
-                            else if (status === DeviceConstants.TIMEOUT) {
-                                AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
-                            }
-                        });
-                    }
-                },
-                {
-                    label: lang.device.check_firmware_update,
-                    enabled: true,
-                    onClick: function() {
-                        executeFirmwareUpdate(printer, 'firmware');
-                    }
-                },
-                {
-                    label: lang.device.update_toolhead,
-                    enabled: true,
-                    onClick: function() {
-                        executeFirmwareUpdate(printer, 'toolhead');
-                    }
-                },
-                {
-                    label: lang.device.default_device,
-                    enabled: true,
-                    type: 'checkbox',
-                    onClick: function() {
-                        var _currentPrinters = menuMap.all[menuMap.parentIndex.DEVICE].subItems,
-                            targetPrinter;
-
-                        _currentPrinters.forEach(function(_printer, i) {
-                            if (1 < i) {
-                                _currentPrinters[i].subItems[4].checked = false;
-
-                                if (printer.uuid === _currentPrinters[i].uuid) {
-                                    targetPrinter = _currentPrinters[i];
-                                }
-                            }
-                        });
-
-                        targetPrinter.subItems[4].checked = this.checked;
-
-                        if (false === this.checked) {
-                            initializeMachine.defaultPrinter.clear();
-                        }
-                        else {
-                            initializeMachine.defaultPrinter.set(printer);
-                        }
-
-                        methods.refresh();
-                    },
-                    parent: menuMap.parentIndex.DEVICE,
-                    checked: (defaultDevice.uuid === printer.uuid)
-                }]
+                subItems: subItems
             };
         };
 
