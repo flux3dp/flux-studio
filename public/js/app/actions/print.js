@@ -2179,6 +2179,7 @@ define([
     }
 
     function doFCodeImport(gcode) {
+        clearScene();
         fcodeConsole = fcodeReader();
         if(gcode) {
             importFromGCode = true;
@@ -2188,8 +2189,6 @@ define([
         }
 
         previewMode = true;
-
-        clearScene();
         _showWait(lang.print.drawingPreview, !showStopButton);
 
         reactSrc.setState({

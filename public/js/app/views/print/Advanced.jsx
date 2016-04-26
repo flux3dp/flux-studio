@@ -270,6 +270,11 @@ define([
         },
 
         _handleParameterChange: function(key, e) {
+            if(e.type === 'keyup') {
+                if(e.keyCode !== 8) {
+                    return;
+                }
+            }
             var value = e.target.value;
             if(e.target.type === 'checkbox') {
                 value = e.target.checked;
@@ -757,7 +762,8 @@ define([
                                         rows="20"
                                         cols="50"
                                         value={this.state.custom}
-                                        onChange={this._handleParameterChange.bind(null, 'custom')} />
+                                        onChange={this._handleParameterChange.bind(null, 'custom')}
+                                        onKeyUp={this._handleParameterChange.bind(null, 'custom')} />
                                 </div>
                             </div>
                         </div>
