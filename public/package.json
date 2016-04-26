@@ -3,10 +3,10 @@
     "name": "FLUX Studio",
     "node-remote": ["http://*/*", "*://*/*"],
     "description": "FLUX Studio",
-    "version": "0.2.9",
+    "version": "{Version}",
     "inject_js_start": "nw-inject-start.js",
     "window": {
-        "title": "FLUX Studio",
+        "title": "FLUX Studio - {Version}",
         "icon": "icon.png",
         "frame": true,
         "width": 1280,

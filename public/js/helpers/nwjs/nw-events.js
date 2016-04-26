@@ -7,7 +7,7 @@ define(['helpers/i18n'], function(i18n) {
             lang = i18n.get(),
             exec = requireNode('child_process').exec;
 
-        win.title = 'FLUX Studio';
+        win.title = 'FLUX Studio - {Version}';
 
         win.on('close', function() {
             if (true === window.confirm(lang.topmenu.sure_to_quit)) {
