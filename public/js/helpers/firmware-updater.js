@@ -43,7 +43,6 @@ define([
             onSubmit = function(files, e) {
                 var file = files.item(0),
                     onFinishUpdate = function(isSuccess) {
-                        // ProgressActions.close();
 
                         if (true === isSuccess) {
                             AlertActions.showPopupInfo(
@@ -59,7 +58,6 @@ define([
                         }
                     };
 
-                // ProgressActions.open(ProgressConstants.NONSTOP);
                 doUpdate(file).
                     done(onFinishUpdate.bind(null, true)).
                     fail(onFinishUpdate.bind(null, false));
