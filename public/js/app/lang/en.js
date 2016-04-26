@@ -786,7 +786,7 @@ define(function() {
             please_enter_password: 'password',
             auth_failure: 'Authentication fail',
             retry: 'Retry',
-            unable_to_connect: 'Unable to connect machine through UDP'
+            unable_to_connect: '#008 Unable to build a stable connection with machine'
         },
         device: {
             camera_on: 'Open Camera',
