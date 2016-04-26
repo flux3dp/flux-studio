@@ -15,7 +15,7 @@ define([
     'app/actions/global-actions',
     'app/constants/input-lightbox-constants',
     'helpers/object-assign',
-    'helpers/array-findIndex'
+    'helpers/array-findindex'
 ], function(
     $,
     i18n,
