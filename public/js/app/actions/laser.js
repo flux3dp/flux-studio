@@ -726,7 +726,7 @@ define([
                         images: self.state.images,
                         hasImage: hasImage,
                         mode: operationMode,
-                        fileFormat: (0 < self.state.images ? currentFileFormat : undefined)
+                        fileFormat: (0 < self.state.images.length ? currentFileFormat : undefined)
                     });
                 });
 
