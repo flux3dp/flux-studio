@@ -94,7 +94,6 @@ define([
                 ws.send(args.join(' '));
             },
             upload = function(name, file, opts) {
-
                 var self = this,
                     order_name = 'upload',
                     args = [
@@ -103,9 +102,9 @@ define([
                         file.size
                     ],
                     warning_collection = [],
-                    showMessages = function() {
+                    showMessages = function(isBroken) {
                         if (0 < warning_collection.length) {
-                            opts.onError(file, warning_collection);
+                            opts.onError(file, warning_collection, isBroken);
                             warning_collection = [];
                         }
                     };
@@ -122,7 +121,7 @@ define([
                     case 'ok':
                         get(name, opts);
 
-                        showMessages();
+                        showMessages(false);
                         break;
                     case 'warning':
                         warning_collection.push(data.message);
@@ -134,7 +133,7 @@ define([
 
                 events.onError = function(data) {
                     warning_collection.push(data.error);
-                    showMessages();
+                    showMessages(true);
                 };
 
                 ws.send(args.join(' '));
@@ -177,8 +176,8 @@ define([
                                     goNextUpload = true;
                                     clearInterval(timer);
                                 },
-                                onError = function(file, data) {
-                                    object.opts.onError(file, data);
+                                onError = function(file, data, isBroken) {
+                                    object.opts.onError(file, data, isBroken);
                                     goNextUpload = true;
                                     clearInterval(timer);
                                 };
