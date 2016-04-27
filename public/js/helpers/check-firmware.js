@@ -1,14 +1,10 @@
 define([
     'jquery',
-    'helpers/api/config',
-    'app/actions/progress-actions',
-    'app/constants/progress-constants'
+    'helpers/api/config'
 ],
 function(
     $,
-    config,
-    ProgressActions,
-    ProgressConstants
+    config
 ) {
     'use strict';
 
@@ -40,13 +36,9 @@ function(
         };
 
         if (true === navigator.onLine) {
-            ProgressActions.open(ProgressConstants.NONSTOP);
-
             $.ajax({
                 url: 'http://software.flux3dp.com/check-update/',
                 data: data
-            }).always(function() {
-                ProgressActions.close();
             }).done(function(response) {
                 response.require_update = ('boolean' === typeof response.require_update ? response.require_update : false);
                 response.needUpdate = (
