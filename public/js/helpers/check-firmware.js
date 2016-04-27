@@ -1,4 +1,11 @@
-define(['jquery', 'helpers/api/config'], function($, config) {
+define([
+    'jquery',
+    'helpers/api/config'
+],
+function(
+    $,
+    config
+) {
     'use strict';
 
     /**
@@ -19,14 +26,21 @@ define(['jquery', 'helpers/api/config'], function($, config) {
                 firmware: 'version',
                 toolhead: 'toolhead_version'
             },
+            data = {},
             versionKey = versionKeyMap[type] || '';
 
         type = typeMap[type] || 'pi';
+        data = {
+            os: type,
+            v: printer[versionKey]
+        };
 
         if (true === navigator.onLine) {
             $.ajax({
-                url: 'http://software.flux3dp.com/check-update/?os=' + type
+                url: 'http://software.flux3dp.com/check-update/',
+                data: data
             }).done(function(response) {
+                response.require_update = ('boolean' === typeof response.require_update ? response.require_update : false);
                 response.needUpdate = (
                     null !== response.latest_version &&
                     'string' === typeof printer[versionKey] &&

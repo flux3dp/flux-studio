@@ -1416,7 +1416,6 @@ define([
                 }
             }
             else if (this.state.mode === mode.PREVIEW) {
-
                 if(
                     statusId === DeviceConstants.status.IDLE ||
                     statusId === DeviceConstants.status.COMPLETED ||
@@ -1433,6 +1432,9 @@ define([
                    statusId === DeviceConstants.status.SCAN
                 ) {
                     middleButtonOn = false;
+                }
+                else {
+                    middleButtonOn = true;
                 }
             }
 

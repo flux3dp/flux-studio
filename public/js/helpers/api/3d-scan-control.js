@@ -68,10 +68,23 @@ define([
             connectingTimer,
             stopGettingImage = function() {
                 return $imageDeferred.notify({ status: imageCommand.STOP });
+            },
+            renewImageDeferred = function() {
+                $imageDeferred = $.Deferred();
+
+                $imageDeferred.progress(function(response) {
+                    if (imageCommand.STOP === response.status) {
+                        $imageDeferred.resolve({ status: imageCommand.STOP });
+                    }
+                });
             };
+
+        renewImageDeferred();
 
         ws = new Websocket({
             method: '3d-scan-control/' + uuid,
+            ignoreAbnormalDisconnect: true,
+            autoReconnect: false,
             onMessage: function(data) {
                 switch (data.status) {
                 case 'connecting':
@@ -97,15 +110,16 @@ define([
                     events.onMessage(data);
                 }
             },
-            onError: errorHandler
+            onError: errorHandler,
+            onOpen: function() {
+                ws.send(rsaKey());
+            }
         });
-
-        ws.send(rsaKey());
 
         return {
             connection: ws,
             getImage: function() {
-                $imageDeferred = $.Deferred();
+                renewImageDeferred();
 
                 var goFetch = function() {
                         return genericSender('image');
@@ -124,13 +138,8 @@ define([
                 };
 
                 $imageDeferred.progress(function(response) {
-                    switch (response.status) {
-                    case imageCommand.IMAGE:
+                    if (imageCommand.IMAGE === response.status) {
                         setTimeout(goFetch, 200);
-                        break;
-                    case imageCommand.STOP:
-                        $imageDeferred.resolve({ status: imageCommand.STOP });
-                        break;
                     }
                 });
 
@@ -163,7 +172,7 @@ define([
                                 // TODO: unexception data
                             }
                         }
-                    }
+                    };
                 }).fail(function(response) {
                     $imageDeferred.reject(response);
                 });
@@ -173,21 +182,21 @@ define([
 
             stopGettingImage: stopGettingImage,
 
-            scan: function(resolution, onRendering) {
+            scan: function(resolution, steps, pointCloud, onRendering) {
                 $scanDeferred = $.Deferred();
 
                 onRendering = onRendering || function() {};
 
-                var pointCloud = new PointCloudHelper(),
-                    next_left = 0,
+                var next_left = 0,
                     next_right = 0,
                     opts = {
                         onProgress: onRendering
                     },
                     command = '',
+                    totalSteps = resolution - steps,
                     runScan = function() {
                         command = scanCommand.SCAN;
-                        genericSender(command);
+                        genericSender([command, resolution - totalSteps].join(' '));
                     },
                     handleResolutionResponse = function(data) {
                         if ('ok' === data.status) {
@@ -203,9 +212,9 @@ define([
                             next_right = parseInt(data.right, 10) * 24;
                         }
                         else if ('ok' === data.status) {
-                            resolution--;
+                            totalSteps--;
 
-                            if (0 === parseInt(resolution, 10)) {
+                            if (0 === parseInt(totalSteps, 10)) {
                                 $scanDeferred.notify({
                                     status: scanCommand.FINISH
                                 });
@@ -252,6 +261,10 @@ define([
                         $scanDeferred.reject(response);
                     });
 
+                });
+
+                ws.onClose(function(response) {
+                    $scanDeferred.reject(response);
                 });
 
                 return $scanDeferred;

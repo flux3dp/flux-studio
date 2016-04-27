@@ -23,7 +23,10 @@ define([
     'app/actions/global-actions',
     'app/stores/global-store',
     'jsx!views/print/Monitor',
-    'jsx!widgets/Modal'
+    'jsx!widgets/Modal',
+    'helpers/api/discover',
+    'helpers/check-firmware',
+    'helpers/firmware-updater'
 ], function(
     $,
     React,
@@ -49,14 +52,18 @@ define([
     GlobalActions,
     GlobalStore,
     Monitor,
-    Modal
+    Modal,
+    discover,
+    checkFirmware,
+    firmwareUpdater
 ) {
     'use strict';
 
     return function(args) {
         args = args || {};
 
-        var lang = args.state.lang;
+        var lang = args.state.lang,
+            FIRST_DEVICE_UPDATE = 'check-first-device-firmware';
 
         return React.createClass({
 
@@ -115,11 +122,20 @@ define([
                         open    : false,
                         device  : {},
                         onClose : function() {}
+                    },
+                    firstDevice: {
+                        info: {}, // device info
+                        apiResponse: {}, // device info
                     }
                 };
             },
 
             componentDidMount: function() {
+                var self = this,
+                    discoverMethods,
+                    firstDevice,
+                    type = 'firmware';
+
                 AlertStore.onNotify(this._handleNotification);
                 AlertStore.onCloseNotify(this._handleCloseNotification);
                 AlertStore.onPopup(this._handlePopup);
@@ -139,13 +155,42 @@ define([
                 GlobalStore.onCloseMonitor(this._handlecloseMonitor);
 
                 this._checkSoftwareUpdate();
+
+                // check first discovered device firmware
+                discoverMethods = discover(
+                    FIRST_DEVICE_UPDATE,
+                    function(printers, fetchDirectly) {
+                        firstDevice = printers[0];
+                        discoverMethods.removeListener(FIRST_DEVICE_UPDATE);
+                        checkFirmware(firstDevice, type).done(function(response) {
+
+                            if (true === response.require_update) {
+                                self.setState({
+                                    firstDevice: {
+                                        info: firstDevice,
+                                        apiResponse: response
+                                    }
+                                });
+
+                                AlertActions.showPopupYesNo(
+                                    FIRST_DEVICE_UPDATE,
+                                    lang.message.important_update.message,
+                                    lang.message.important_update.caption
+                                );
+                            }
+                        });
+                    }
+                );
+
+                AlertStore.onYes(self._onYes);
             },
 
             componentWillUnmount: function() {
                 AlertStore.removeNotifyListener(this._handleNotification);
                 AlertStore.removePopupListener(this._handlePopup);
                 AlertStore.removeClosePopupListener(this._handleClosePopup);
-                AlertStore.removeNotifyListener(this._handleNotification);
+                AlertStore.removeYesListener(this._onYes);
+
                 // progress
                 ProgressStore.removeOpenedListener(this._handleProgress).
                     removeUpdatingListener(this._handleProgress).
@@ -159,6 +204,17 @@ define([
                 GlobalStore.removeCloseMonitorListener();
                 GlobalStore.removeCloseAllViewListener();
                 GlobalStore.removeSliceCompleteListener();
+            },
+
+            _onYes: function(id) {
+                var self = this;
+
+                if (id === FIRST_DEVICE_UPDATE) {
+                    // Use "setTimeout" to avoid dispatch in the middle of a dispatch
+                    setTimeout(function() {
+                        firmwareUpdater(self.state.firstDevice.apiResponse, self.state.firstDevice.info, 'firmware');
+                    }, 0);
+                }
             },
 
             _showChangeFilament: function(payload) {

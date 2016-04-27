@@ -455,7 +455,8 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         pointer-events: auto;
 
         .btn.btn-disabled {
-            background: #CCC;
+            background: #999;
+            opacity: 0.5;
         }
 
         .btn {

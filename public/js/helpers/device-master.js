@@ -14,7 +14,8 @@ define([
     'helpers/api/config',
     'app/actions/global-actions',
     'app/constants/input-lightbox-constants',
-    'helpers/object-assign'
+    'helpers/object-assign',
+    'helpers/array-findindex'
 ], function(
     $,
     i18n,
@@ -64,8 +65,16 @@ define([
                         auth(uuid, password).done(function(data) {
                             selectDevice(device, d);
                         }).
-                        fail(function(data) {
+                        fail(function(response) {
+                            var message = (
+                                false === response.reachable ?
+                                lang.select_printer.unable_to_connect :
+                                lang.select_printer.auth_failure
+                            );
+
                             goAuth(uuid);
+
+                            AlertActions.showPopupError('device-auth-fail', message);
                         });
                     }
                 });
@@ -406,6 +415,11 @@ define([
         });
     }
 
+    function closeConnection() {
+        _device.actions.connection.close();
+        _removeConnection(_device.uuid);
+    }
+
     // Private Functions
 
     function _do(command) {
@@ -498,12 +512,22 @@ define([
         });
     }
 
-    function _switchDevice(uuid) {
-        for(var i = 0; i < _devices.length; i++) {
-            if(_devices[i].uuid === uuid) {
-                return _devices[i];
-            }
+    function _removeConnection(uuid) {
+        var index = _devices.findIndex(function(d) {
+            return d.uuid === uuid;
+        });
+
+        if (-1 < index) {
+            _devices.splice(index, 1);
         }
+    }
+
+    function _switchDevice(uuid) {
+        var index = _devices.findIndex(function(d) {
+            return d.uuid === uuid;
+        });
+
+        return _devices[index];
     }
 
     function _watch() {
@@ -630,6 +654,7 @@ define([
             this.updateFirmware         = updateFirmware;
             this.updateToolhead         = updateToolhead;
             this.headinfo               = headinfo;
+            this.closeConnection        = closeConnection;
 
             Discover(
                 'device-master',

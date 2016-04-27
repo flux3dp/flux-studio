@@ -22,6 +22,7 @@ define([
     'helpers/dnd-handler',
     'helpers/nwjs/menu-factory',
     'helpers/observe',
+    'helpers/point-cloud',
     // non-return
     'helpers/array-findindex',
     'helpers/object-assign',
@@ -49,7 +50,8 @@ define([
     round,
     dndHandler,
     menuFactory,
-    observe
+    observe,
+    PointCloudHelper
 ) {
     'use strict';
 
@@ -58,7 +60,6 @@ define([
 
         var View = React.createClass({
                 MAX_MESHES: 5,
-                AVERAGE_STEP_TIME: 2,    // 2s each step
 
                 getInitialState: function() {
                     return {
@@ -70,11 +71,11 @@ define([
                         cameraImageSrc: undefined,
                         history: [],
                         openProgressBar: false,
-                        blocker: false,
                         hasConvert: false,  // point cloud into stl
                         hasMultiScan: false,    // ready to multi scan
                         progressPercentage: 0,
                         progressRemainingTime: 0,
+                        currentSteps: 0,
                         printerIsReady: false,
                         isScanStarted: false,   // scan getting started
                         showCamera: true,
@@ -344,6 +345,7 @@ define([
                         self.state.scanCtrlWebSocket.stopGettingImage().done(function() {
                            self.state.scanCtrlWebSocket.connection.close(false);
                         });
+                        break;
                     }
                 },
 
@@ -545,10 +547,10 @@ define([
                     };
                 },
 
-                _onRendering: function(views, chunk_length, mesh) {
+                _onRendering: function(views, currentSteps, mesh) {
                     var self = this,
                         scan_speed = self._getScanSpeed(),
-                        left_step = (scan_speed - chunk_length),
+                        left_step = (scan_speed - currentSteps),
                         progressRemainingTime,
                         progressPercentage,
                         elapsedTime = ((new Date()).getTime() - self.state.scanStartTime) / 1000,
@@ -557,20 +559,15 @@ define([
                         model,
                         transformMethods;
 
-                    if (5 > chunk_length) {
-                        progressRemainingTime = self.AVERAGE_STEP_TIME * left_step;
-                    }
-                    else {
-                        progressRemainingTime = parseInt((elapsedTime / chunk_length), 10) * left_step;
-                    }
+                    progressRemainingTime = parseInt((elapsedTime / currentSteps), 10) * left_step;
 
                     progressPercentage = Math.min(
-                        round(chunk_length / scan_speed * 100, -2),
+                        round(currentSteps / scan_speed * 100, -2),
                         100
                     );
 
                     self.setState({
-                        currentSteps: chunk_length,
+                        currentSteps: currentSteps,
                         progressPercentage: progressPercentage,
                         progressRemainingTime: progressRemainingTime
                     });
@@ -750,9 +747,13 @@ define([
                                 openProgressBar: false,
                                 isScanStarted: false,
                                 hasMultiScan: false,
-                                cameraImageSrc: undefined
+                                cameraImageSrc: undefined,
+                                progressPercentage: 0,
+                                progressRemainingTime: 0,
+                                currentSteps: 0
+                            }, function() {
+                                self._openBlocker(false);
                             });
-                            ProgressActions.close();
                         };
 
                     self.state.scanModelingWebSocket.upload(
@@ -760,9 +761,7 @@ define([
                         point_cloud,
                         {
                             onStarting: function() {
-                                ProgressActions.open(
-                                    ProgressConstants.NONSTOP
-                                );
+                                self._openBlocker(true, ProgressConstants.NONSTOP);
                             },
                             onFinished: onUploadFinished
                         }
@@ -783,6 +782,8 @@ define([
                             });
                         },
                         checkLenOpened = function() {
+                            self._openBlocker(true, ProgressConstants.NONSTOP);
+
                             var onPass = function() {
                                 self._openBlocker(false);
                                 openProgressBar(onScan);
@@ -802,12 +803,29 @@ define([
                                 }
                             });
                         },
+                        pointCloud = new PointCloudHelper(),
                         onScan = function() {
                             var scanResolution = self._getScanSpeed(),
-                                scanMethods = self.state.scanCtrlWebSocket.scan(scanResolution, self._onRendering);
+                                scanAction = self.state.scanCtrlWebSocket.scan,
+                                $scanDeferred = scanAction(scanResolution, self.state.currentSteps, pointCloud, self._onRendering),
+                                opts = {
+                                    onError: function(data) {
+                                        self.state.scanCtrlWebSocket.takeControl(function(response) {
+                                            self._openBlocker(false);
+                                        });
+                                    },
+                                    onReady: function() {
+                                        onScan();
+                                    }
+                                };
 
-                            scanMethods.done(function(response) {
+                            $scanDeferred.done(function(response) {
                                 self._onScanFinished(response.pointCloud);
+                            }).fail(function(response) {
+                                self.setState({
+                                    scanCtrlWebSocket: scanControl(self.state.selectedPrinter.uuid, opts)
+                                });
+
                             });
                         },
                         meshes = self.state.meshes,
@@ -939,8 +957,12 @@ define([
                         mesh.name = cut_name;
                     }
 
+                    self._removeCylinder(mesh);
+                },
+
+                _removeCylinder: function(mesh) {
                     scanedModel.cylinder.remove(mesh.model);
-                    self.setState({
+                    this.setState({
                         cylinder: undefined
                     });
                 },
@@ -1004,7 +1026,6 @@ define([
 
                     self._doApplyTransform(function(response) {
                         var onMergeFinished = function(data) {
-                                console.log(data, isEnd(), currentIndex);
                                 if (false === isEnd()) {
                                     currentIndex++;
                                     doingMerge();
@@ -1014,7 +1035,6 @@ define([
                                 }
                             },
                             afterMerge = callback || function(outputName) {
-                                console.log(outputName);
                                 var mesh,
                                     updatedMeshes = [],
                                     deferred = $.Deferred(),
@@ -1131,9 +1151,6 @@ define([
                         ProgressActions.close();
                     }
 
-                    this.setState({
-                        blocker: is_open
-                    });
                 },
 
                 _onScanCancel: function(e) {
@@ -1150,16 +1167,23 @@ define([
                 },
 
                 _onMultiScan: function(isMultiScan) {
-                    this.setState({
+                    var self = this;
+
+                    self.setState({
                         hasMultiScan: isMultiScan,
                         showCamera: isMultiScan
                     });
 
                     if (true === isMultiScan) {
-                        this._refreshCamera();
+                        self._refreshCamera();
+
+                        self.state.selectedMeshes.forEach(function(mesh) {
+                            self._removeCylinder(mesh);
+                        });
+
                     }
                     else {
-                        this.state.scanCtrlWebSocket.stopGettingImage();
+                        self.state.scanCtrlWebSocket.stopGettingImage();
                     }
                 },
 
@@ -1276,6 +1300,36 @@ define([
                     }
                 },
 
+                _connectToScanControl: function(printer) {
+                    var self = this,
+                        ctrlOpts = {
+                            onError: function(data) {
+                                data.info = data.info || '';
+
+                                if (-1 < data.info.toUpperCase().indexOf('ZOMBIE')) {
+                                    self.state.scanCtrlWebSocket.takeControl(function(response) {
+                                        self._openBlocker(false);
+                                    });
+                                }
+                                else if ('DEVICE_BUSY' === data.error) {
+                                    self._openBlocker(false);
+                                    AlertActions.showDeviceBusyPopup('scan-device-busy');
+                                }
+                                else {
+                                    self._openBlocker(false);
+                                    AlertActions.showPopupRetry('scan-retry', data.error);
+                                }
+                            },
+                            onReady: function() {
+                                self._refreshCamera();
+                            }
+                        };
+
+                    self.setState({
+                        scanCtrlWebSocket: scanControl(printer.uuid, ctrlOpts)
+                    });
+                },
+
                 // render sections
                 _renderSettingPanel: function() {
                     var self = this,
@@ -1301,9 +1355,8 @@ define([
 
                     return (
                         0 < state.selectedMeshes.length &&
-                            false === state.blocker &&
-                            false === state.isScanStarted &&
-                            false === state.showCamera ?
+                        false === state.isScanStarted &&
+                        false === state.showCamera ?
                         <ManipulationPanel
                             lang={lang}
                             selectedMeshes={state.selectedMeshes}
@@ -1403,28 +1456,6 @@ define([
 
                 _renderPrinterSelectorWindow: function(lang) {
                     var self = this,
-                        ctrlOpts = {
-                            onError: function(data) {
-                                data.info = data.info || '';
-
-                                if (-1 < data.info.toUpperCase().indexOf('ZOMBIE')) {
-                                    self.state.scanCtrlWebSocket.takeControl(function(response) {
-                                        self._openBlocker(false);
-                                    });
-                                }
-                                else if ('DEVICE_BUSY' === data.error) {
-                                    self._openBlocker(false);
-                                    AlertActions.showDeviceBusyPopup('scan-device-busy');
-                                }
-                                else {
-                                    self._openBlocker(false);
-                                    AlertActions.showPopupRetry('scan-retry', data.error);
-                                }
-                            },
-                            onReady: function() {
-                                self._refreshCamera();
-                            }
-                        },
                         ModelingOpts = {
                             onError: function(data) {
                                 self._openBlocker(false);
@@ -1436,10 +1467,10 @@ define([
                             }
                         },
                         onGettingPrinter = function(auth_printer) {
+                            self._connectToScanControl(auth_printer);
                             self.setState({
                                 gettingStarted: true,
                                 selectedPrinter: auth_printer,
-                                scanCtrlWebSocket: scanControl(auth_printer.uuid, ctrlOpts),
                                 scanModelingWebSocket: scanModeling(ModelingOpts)
                             });
 
@@ -1488,20 +1519,20 @@ define([
 
                                 mesh.transformMethods = transformMethods;
 
-                                if (false === e.shiftKey) {
-                                    meshes.forEach(function(mesh, key) {
+                                meshes.forEach(function(mesh, key) {
+                                    self._removeCylinder(mesh);
+
+                                    if (false === e.shiftKey) {
                                         if (key !== i) {
                                             mesh.transformMethods.hide();
                                             mesh.choose = false;
                                             mesh.model.material.opacity = 0.3;
                                         }
-                                    });
-                                }
-                                else {
-                                    meshes.forEach(function(mesh, key) {
+                                    }
+                                    else {
                                         mesh.transformMethods.hide();
-                                    });
-                                }
+                                    }
+                                });
 
                                 // store selected mesh
                                 mesh.choose = !mesh.choose;

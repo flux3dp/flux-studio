@@ -17,6 +17,8 @@ define([
 ) {
     'use strict';
 
+    window.FLUX.websockets = [];
+
     var hadConnected = false,
         WsLogger = new Logger('websocket');
 
@@ -38,6 +40,7 @@ define([
                 method: '',
                 port: window.FLUX.ghostPort,
                 autoReconnect: true,
+                ignoreAbnormalDisconnect: false,
                 onMessage: defaultCallback,
                 onError: defaultCallback,
                 onFatal: defaultCallback,
@@ -46,8 +49,8 @@ define([
             },
             received_data = [],
             trimMessage = function(message) {
-                if (100 < message.length) {
-                    message = message.substr(0, 97) + '...';
+                if (150 < message.length) {
+                    message = message.substr(0, 150) + '...';
                 }
 
                 return message;
@@ -71,7 +74,7 @@ define([
 
                 _ws.onmessage = function(result) {
                     var data = (true === isJson(result.data) ? JSON.parse(result.data) : result.data),
-                        message = trimMessage([WsLogger.getTimeLabel(), 'recv', result.data].join(' '));
+                        message = trimMessage([WsLogger.getTimeLabel(), '<', result.data].join(' '));
 
                     wsLog.log.push(message);
 
@@ -85,16 +88,16 @@ define([
                     received_data.push(data);
 
                     if ('error' === data.status) {
-                        options.onError(data);
+                        socketOptions.onError(data);
                     }
                     else if ('fatal' === data.status) {
-                        options.onFatal(data);
+                        socketOptions.onFatal(data);
                     }
                     else if ('pong' === data.status) {
                         // it's a heartbeat response. ignore it.
                     }
                     else {
-                        options.onMessage(data);
+                        socketOptions.onMessage(data);
                     }
 
                     hadConnected = true;
@@ -102,7 +105,7 @@ define([
 
                 _ws.onclose = function(result) {
                     ProgressActions.close();
-                    options.onClose(result);
+                    socketOptions.onClose(result);
 
                     var abnormallyId = 'abnormally-close',
                         message = '',
@@ -114,7 +117,8 @@ define([
                     // The connection was closed abnormally without sending or receving data
                     // ref: http://tools.ietf.org/html/rfc6455#section-7.4.1
                     if (1006 === result.code &&
-                        60000 <= (new Date()).getTime() - window.FLUX.timestamp
+                        60000 <= (new Date()).getTime() - window.FLUX.timestamp &&
+                        false === options.ignoreAbnormalDisconnect
                     ) {
                         if (false === hadConnected) {
                             message = lang.message.cant_establish_connection;
@@ -152,7 +156,7 @@ define([
 
         setInterval(function() {
             if (null !== ws && readyState.OPEN === ws.readyState) {
-                wsLog.log.push(['sent', 'ping'].join(' '));
+                wsLog.log.push(['>', 'ping'].join(' '));
                 ws.send('ping');
             }
         }, 60000);
@@ -165,7 +169,7 @@ define([
                 readyState: readyState,
                 options: socketOptions,
                 url: '/ws/' + options.method,
-
+                log: wsLog.log,
                 send: function(data) {
                     var self = this;
 
@@ -175,13 +179,13 @@ define([
 
                     if (null === ws || readyState.OPEN !== ws.readyState) {
                         ws.onopen = function(e) {
-                            wsLog.log.push(trimMessage([WsLogger.getTimeLabel(), 'sent', data, typeof data].join(' ')));
+                            wsLog.log.push(trimMessage([WsLogger.getTimeLabel(), '>', data, typeof data].join(' ')));
                             socketOptions.onOpen(e);
                             ws.send(data);
                         };
                     }
                     else {
-                        wsLog.log.push(trimMessage([WsLogger.getTimeLabel(), 'sent', data, typeof data].join(' ')));
+                        wsLog.log.push(trimMessage([WsLogger.getTimeLabel(), '>', data, typeof data].join(' ')));
                         ws.send(data);
                     }
 
@@ -241,6 +245,8 @@ define([
                     return this;
                 }
             };
+
+        window.FLUX.websockets.push(wsobj);
 
         WsLogger.append(wsLog);
 

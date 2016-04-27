@@ -46,7 +46,6 @@ define([
 
                 getInitialState: function() {
                     return {
-                        step: '',
                         mode: 'engrave',
                         hasImage: false,
                         selectedImage: false,
@@ -293,7 +292,13 @@ define([
 
                 _renderFileUploader: function(lang) {
                     var self = this,
-                        uploadStyle = false === self.state.hasImage ? 'file-importer absolute-center' : 'hide',
+                        cx = React.addons.classSet,
+                        uploadStyle = cx({
+                            'file-importer': false === self.state.hasImage,
+                            'absolute-center': false === self.state.hasImage,
+                            'hide': true === self.state.hasImage
+
+                        }),
                         accept = ('laser' === self.props.page ? 'image/*' : 'image/svg'),
                         onError = function(msg) {
                             ProgressActions.close();
@@ -316,7 +321,6 @@ define([
                                 multiple={true}
                                 onReadFileStarted={this.state.laserEvents.onReadFileStarted}
                                 onReadingFile={this.state.laserEvents.onFileReading}
-                                onReadEnd={this.state.laserEvents.onFileReadEnd}
                                 onError={onError}
                             />
                         </div>

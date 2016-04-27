@@ -400,6 +400,8 @@ define([
                 else if (ext === 'fc') {
                     slicingStatus.canInterrupt = true;
                     importedFCode = files.item(0);
+                    importFromFCode = true;
+                    setDefaultFileName(importedFCode.name)
                     if(objects.length === 0) {
                         doFCodeImport();
                     }
@@ -408,10 +410,12 @@ define([
                             GlobalConstants.IMPORT_FCODE,
                             lang.message.confirmFCodeImport);
                     }
+                    callback();
                 }
                 else if (ext === 'fsc') {
                     slicingStatus.canInterrupt = true;
                     importedScene = files.item(0);
+                    setDefaultFileName(importedScene.name);
                     if(objects.length === 0) {
                         _handleLoadScene(importedScene);
                     }
@@ -421,17 +425,17 @@ define([
                             lang.message.confirmSceneImport
                         );
                     }
+                    callback();
                 }
                 else if (ext === 'gcode') {
                     slicingStatus.canInterrupt = true;
                     importedFCode = files.item(0);
-                    var name = importedFCode.name.split('.');
-                    name.pop();
-                    name = name.join('.');
-                    defaultFileName = name;
+                    importFromGCode = true;
+                    setDefaultFileName(importedFCode.name);
                     if(objects.length === 0) {
                         doFCodeImport('gcode');
                     }
+                    callback();
                 }
                 else {
                     slicingStatus.canInterrupt = true;
@@ -1496,12 +1500,20 @@ define([
         }
     }
 
-    function setDefaultFileName() {
-        if(objects.length) {
-            defaultFileName = objects[0].fileName;
-            defaultFileName = defaultFileName.split('.');
-            defaultFileName.pop();
-            defaultFileName = defaultFileName.join('.');
+    function setDefaultFileName(fileNameWithExtension) {
+        if(!fileNameWithExtension) {
+            if(objects.length) {
+                defaultFileName = objects[0].fileName;
+                defaultFileName = defaultFileName.split('.');
+                defaultFileName.pop();
+                defaultFileName = defaultFileName.join('.');
+            }
+        }
+        else {
+            var name = fileNameWithExtension.split('.');
+            name.pop();
+            name = name.join('.');
+            defaultFileName = name;
         }
     }
 
@@ -2179,6 +2191,7 @@ define([
     }
 
     function doFCodeImport(gcode) {
+        clearScene();
         fcodeConsole = fcodeReader();
         if(gcode) {
             importFromGCode = true;
@@ -2188,8 +2201,6 @@ define([
         }
 
         previewMode = true;
-
-        clearScene();
         _showWait(lang.print.drawingPreview, !showStopButton);
 
         reactSrc.setState({

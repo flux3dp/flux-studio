@@ -176,9 +176,16 @@ define([
                             confirmText  : lang.select_printer.submit,
                             onSubmit     : function(password) {
                                 self._auth(printer.uuid, password, {
-                                    onError: function() {
+                                    onError: function(response) {
+                                        var message = (
+                                            false === response.reachable ?
+                                            lang.select_printer.unable_to_connect :
+                                            lang.select_printer.auth_failure
+                                        );
+
                                         ProgressActions.close();
-                                        AlertActions.showPopupError('device-auth-fail', lang.select_printer.auth_failure);
+
+                                        AlertActions.showPopupError('device-auth-fail', message);
                                     }
                                 });
                             }
@@ -250,7 +257,7 @@ define([
                     },
                     onFail: function(data) {
                         ProgressActions.close();
-                        opts.onError();
+                        opts.onError(data);
                     }
                 },
                 touch_socket;

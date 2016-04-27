@@ -37,7 +37,15 @@ define(function() {
             },
 
             getTimeLabel: function() {
-                return '[' + (new Date()).toTimeString() + ']';
+                var dt = new Date(),
+                    year = dt.getFullYear(),
+                    month = [0, dt.getMonth() + 1].join('').substr(-2),
+                    date = [0, dt.getDate()].join('').substr(-2),
+                    hour = [0, dt.getHours()].join('').substr(-2),
+                    minute = [0, dt.getMinutes()].join('').substr(-2),
+                    second = [0, dt.getSeconds()].join('').substr(-2);
+
+                return `[${year}/${month}/${date} ${hour}:${minute}:${second}]`;
             }
         };
     };

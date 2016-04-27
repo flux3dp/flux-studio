@@ -100,9 +100,12 @@ define([
             };
         }
 
-        if (0 < printers.length) {
-            getPrinters(printers);
-        }
+        // force callback always executed after return
+        setTimeout(function() {
+            if (0 < printers.length) {
+                getPrinters(printers);
+            }
+        }, 0);
 
         return {
             connection: ws,
