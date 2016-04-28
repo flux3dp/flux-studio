@@ -16,6 +16,7 @@ define([
     'app/actions/global-actions',
     'helpers/sprintf',
     'helpers/packer',
+    'lib/rx.lite.min',
     // non-return value
     'threeOrbitControls',
     'threeTrackballControls',
@@ -42,7 +43,8 @@ define([
     MenuFactory,
     GlobalActions,
     Sprintf,
-    packer
+    packer,
+    Rx
 ) {
     'use strict';
 
@@ -91,6 +93,7 @@ define([
         importedFCode = {},
         importedScene = {},
         objectBeforeTransform = {},
+        slicingStatusStream,
         history = [],
         lang = I18n.get();
 
@@ -225,12 +228,13 @@ define([
         setImportWindowPosition();
 
         // init print controller
+        slicingStatusStream = new Rx.Subject();
         slicingStatus.canInterrupt = true;
         slicingStatus.inProgress = false;
+        slicingStatusStream.onNext(slicingStatus);
 
         if(!slicer) {
             slicer = printSlicing();
-            registerSlicingProgress();
         }
 
         registerDragToImport();
@@ -515,6 +519,8 @@ define([
         blobExpired                 = true;
         willReslice                 = false;
 
+        slicingStatusStream.onNext(slicingStatus);
+
         if(objects.length === 0 || !blobExpired) { return; }
         var ids = [];
         objects.forEach(function(obj) {
@@ -531,6 +537,7 @@ define([
         }).then(function() {
             // set again because stop slicing set inProgress to false
             slicingStatus.inProgress = true;
+            slicingStatusStream.onNext(slicingStatus);
             return getBlobFromScene();
         }).then(function(blob) {
             previewUrl = URL.createObjectURL(blob);
@@ -545,7 +552,7 @@ define([
                 }
                 getSlicingReport(function(report) {
                     slicingStatus.lastReport = report;
-                    slicingReport.report = report;
+                    updateSlicingProgressFromReport(report);
                 });
             });
         });
@@ -579,98 +586,95 @@ define([
         }
     }
 
-    function registerSlicingProgress() {
-        Object.observe(slicingReport, function(change) {
+    function updateSlicingProgressFromReport(report) {
+        slicingStatus.inProgress = true;
+        slicingStatusStream.onNext(slicingStatus);
 
-            slicingStatus.inProgress = true;
+        if(slicingStatus.needToCloseWait) {
+            ProgressActions.close();
+            slicingStatus.needToCloseWait = false;
+        }
 
-            if(slicingStatus.needToCloseWait) {
-                ProgressActions.close();
-                slicingStatus.needToCloseWait = false;
-            }
+        var progress = `${lang.slicer[report.status]} - ${'\n' + parseInt(report.percentage * 100)}% - ${report.message}`,
+            complete = lang.print.finishingUp,
+            show = slicingStatus.showProgress,
+            monitorOn = $('.flux-monitor').length > 0;
 
-            var report = change[0].object.report,
-                progress = `${lang.slicer[report.status]} - ${'\n' + parseInt(report.percentage * 100)}% - ${report.message}`,
-                complete = lang.print.finishingUp,
-                show = slicingStatus.showProgress,
-                monitorOn = $('.flux-monitor').length > 0;
+        slicingStatus.lastProgress = progress;
+        if(!slicingStatus.hasError) {
+            slicingStatus.lastReport = report;
+        }
 
-            slicingStatus.lastProgress = progress;
-            if(!slicingStatus.hasError) {
-                slicingStatus.lastReport = report;
-            }
+        if(monitorOn) {
+            GlobalActions.closeMonitor();
+            needToShowMonitor = true;
+        }
 
-            if(monitorOn) {
-                GlobalActions.closeMonitor();
-                needToShowMonitor = true;
-            }
+        if(show) {
+            ProgressActions.open(
+                ProgressConstants.STEPPING,
+                lang.print.rendering,
+                lang.print.savingFilePreview,
+                showStopButton
+            );
+            show = true;
+        }
 
-            if(show) {
-                ProgressActions.open(
-                    ProgressConstants.STEPPING,
-                    lang.print.rendering,
-                    lang.print.savingFilePreview,
-                    showStopButton
-                );
-                show = true;
-            }
-
-            if(report.status === 'error') {
-                clearInterval(slicingStatus.reporter);
-                if(report.error === 'gcode area too big') {
-                    slicingStatus.lastReport.error = lang.message.gCodeAreaTooBigMessage;
-                    slicingStatus.lastReport.caption = lang.message.gCodeAreaTooBigCaption;
-                }
-                else {
-                    slicingStatus.lastReport.caption = lang.alert.error;
-                }
-
-                if(show || previewMode) {
-                    ProgressActions.close();
-                    _closePreview();
-                }
-                else {
-                    slicingStatus.hasError = true;
-                }
-                AlertActions.showPopupError('', slicingStatus.lastReport.error, slicingStatus.lastReport.caption);
-                slicingStatus.lastProgress = '';
-                reactSrc.setState({ hasOutOfBoundsObject: true });
-            }
-            else if(report.status === 'warning') {
-                AlertActions.showWarning(report.message);
-            }
-            else if(report.status !== 'complete') {
-                if(show) {
-                    if(willReslice) {
-                        ProgressActions.updating(lang.print.reRendering, 0);
-                    }
-                    if(report.percentage) {
-                        ProgressActions.updating(progress, parseInt(report.percentage * 100));
-                    }
-                }
+        if(report.status === 'error') {
+            clearInterval(slicingStatus.reporter);
+            if(report.error === 'gcode area too big') {
+                slicingStatus.lastReport.error = lang.message.gCodeAreaTooBigMessage;
+                slicingStatus.lastReport.caption = lang.message.gCodeAreaTooBigCaption;
             }
             else {
-                GlobalActions.sliceComplete(report);
-                if(show) {
-                    ProgressActions.updating(complete, 100);
-                }
-                slicingStatus.canInterrupt = false;
-                slicer.getSlicingResult().then(function(r) {
-                    slicingStatus.canInterrupt = true;
-                    setTimeout(function() {
-                        if(needToShowMonitor) {
-                            reactSrc._handleDeviceSelected();
-                            needToShowMonitor = false;
-                        }
-                    }, 1000);
-
-                    blobExpired = false;
-                    responseBlob = r;
-                    _handleSliceComplete();
-
-                });
+                slicingStatus.lastReport.caption = lang.alert.error;
             }
-        });
+
+            if(show || previewMode) {
+                ProgressActions.close();
+                _closePreview();
+            }
+            else {
+                slicingStatus.hasError = true;
+            }
+            AlertActions.showPopupError('', slicingStatus.lastReport.error, slicingStatus.lastReport.caption);
+            slicingStatus.lastProgress = '';
+            reactSrc.setState({ hasOutOfBoundsObject: true });
+        }
+        else if(report.status === 'warning') {
+            AlertActions.showWarning(report.message);
+        }
+        else if(report.status !== 'complete') {
+            if(show) {
+                if(willReslice) {
+                    ProgressActions.updating(lang.print.reRendering, 0);
+                }
+                if(report.percentage) {
+                    ProgressActions.updating(progress, parseInt(report.percentage * 100));
+                }
+            }
+        }
+        else {
+            GlobalActions.sliceComplete(report);
+            if(show) {
+                ProgressActions.updating(complete, 100);
+            }
+            slicingStatus.canInterrupt = false;
+            slicer.getSlicingResult().then(function(r) {
+                slicingStatus.canInterrupt = true;
+                setTimeout(function() {
+                    if(needToShowMonitor) {
+                        reactSrc._handleDeviceSelected();
+                        needToShowMonitor = false;
+                    }
+                }, 1000);
+
+                blobExpired = false;
+                responseBlob = r;
+                _handleSliceComplete();
+
+            });
+        }
     }
 
     function willUnmount() {
@@ -1092,7 +1096,7 @@ define([
             return d.promise();
         }
         else if(importFromGCode) {
-            fcodeConsole.getFCode().then(function(blob) {
+            fcodeConsole.getFCode().then((blob) => {
                 d.resolve(blob, previewUrl);
             });
             return d.promise();
@@ -1107,17 +1111,16 @@ define([
             return d.promise();
         }
 
-        var execute = function() {
+        var execute = () => {
             if(slicingStatus.inProgress) {
                 _showWait(lang.print.gettingSlicingReport, !showStopButton);
                 slicingStatus.showProgress = true;
-                var observer = function(change) {
-                    if(!change[0].object.inProgress) {
-                        Object.unobserve(slicingStatus, observer);
+                var subscriber = slicingStatusStream.subscribe((status) => {
+                    if(!status.inProgress) {
+                        subscriber.dispose();
                         d.resolve(responseBlob, previewUrl);
                     }
-                };
-                Object.observe(slicingStatus, observer);
+                });
             }
             else {
                 d.resolve(responseBlob, previewUrl);
@@ -1125,7 +1128,7 @@ define([
         };
 
         if(willReslice) {
-            var t = setInterval(function() {
+            var t = setInterval(() => {
                 if(slicingStatus.inProgress) {
                     clearInterval(t);
                     willReslice = false;
@@ -2180,6 +2183,7 @@ define([
         if(slicingStatus.inProgress) {
             slicer.stopSlicing().then(function() {
                 slicingStatus.inProgress = false;
+                slicingStatusStream.onNext(slicingStatus);
                 d.resolve('');
             });
         }
@@ -2366,6 +2370,7 @@ define([
         slicingStatus.inProgress    = false;
         slicingStatus.lastProgress  = null;
         slicingStatus.lastReport    = null;
+        slicingStatusStream.onNext(slicingStatus);
     }
 
     function cancelPreview() {
