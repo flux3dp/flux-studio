@@ -37,6 +37,7 @@ define([
                     inputHeader  : '',
                     defaultValue : '',
                     confirmText  : '',
+                    caption      : '',
                     onClose      : function() {},
                     onSubmit     : function() {}
                 };
@@ -117,7 +118,12 @@ define([
 
             _getMessage: function() {
                 var typeMap = {},
-                    type = 'text';
+                    type = 'text',
+                    inputHeader = (
+                        '' !== this.props.inputHeader ?
+                        <span className="inputHeader">{this.props.inputHeader}</span> :
+                        ''
+                    );
 
                 typeMap[Constants.TYPE_TEXT]     = 'text';
                 typeMap[Constants.TYPE_NUMBER]   = 'number';
@@ -130,7 +136,7 @@ define([
 
                 return (
                     <label className="control">
-                        <span className="inputHeader">{this.props.inputHeader}</span>
+                        {inputHeader}
                         <input
                             type={type}
                             ref="inputField"
