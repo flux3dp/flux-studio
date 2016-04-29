@@ -681,7 +681,6 @@ define([
         previewMode = false;
         importFromFCode = false;
         importFromGCode = false;
-        Object.unobserve(slicingReport, function() {});
     }
 
     function registerDragToImport() {
