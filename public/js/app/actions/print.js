@@ -129,13 +129,12 @@ define([
 
     var models = [];
 
-    // var advancedParameters = ['layerHeight', 'infill', 'travelingSpeed', 'extrudingSpeed', 'temperature', 'advancedSettings'];
-
-    previewColors[0] = new THREE.Color(0x996633); // infill
-    previewColors[1] = new THREE.Color(0xddcc99); // perimeter
-    previewColors[2] = new THREE.Color(0xbbbbbb); // support
-    previewColors[3] = new THREE.Color(0xffffff); // move
-    previewColors[4] = new THREE.Color(0xee9966); // skirt
+    previewColors[0] = new THREE.Color(0xEBE3AA); // infill
+    previewColors[1] = new THREE.Color(0x838689); // perimeter
+    previewColors[2] = new THREE.Color(0xCAD7B2); // support
+    previewColors[3] = new THREE.Color(0xE0E0E0); // move
+    previewColors[4] = new THREE.Color(0x5D4157); // skirt
+    previewColors[5] = new THREE.Color(0x57595b); // outer wall
 
     function init(src) {
 
@@ -344,6 +343,10 @@ define([
             mesh.position.isOutOfBounds = false;
             mesh.scale.locked = true;
             /* end customized property */
+
+            // if (mesh.geometry.type !== 'Geometry') {
+            //     mesh.geometry = new THREE.Geometry().fromBufferGeometry(mesh.geometry);
+            // }
 
             mesh.name = 'custom';
             mesh.file = file;
