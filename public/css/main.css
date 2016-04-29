@@ -2893,7 +2893,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         color: #999;
         font-size: 13px;
         line-height: 40px;
-        width: 100px; }
+        width: 120px; }
     .controls .control {
         line-height: 40px;
         position: relative; }

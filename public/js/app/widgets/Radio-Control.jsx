@@ -27,19 +27,22 @@ define([
             return newPropIsDifferent || newStateIsDifferent;
         },
 
-        _handleChange: function(newValue) {
-            // this.setState({ selected: newValue });
+        _handleChange: function(newValue, disable) {
+            if(disable !== true) {
+                this.setState({ selected: newValue });
+            }
         },
 
         render: function() {
             var _options = this.props.options.map(function(option) {
                 var radioClass = ClassNames(
-                    {'selected': this.state.selected === option.id},
-                    {'grey-out': option.id === 'Experiment'}
+                    {'selected': this.state.selected === option.id}
                 );
                 return (
                     <div className="radio">
-                        <div className={radioClass} onClick={this._handleChange.bind(null, option.id)}></div>
+                        <div
+                            className={radioClass}
+                            onClick={this._handleChange.bind(null, option.id, option.disable)}></div>
                         <span>{option.name}</span>
                     </div>
                 );
