@@ -503,7 +503,7 @@ define([
         _handleSelectFolder: function(pathName) {
             this._clearSelectedItem();
             var dir = this.state.currentDirectoryFolders;
-            // if it's a directory
+            // if it is a directory
             if(dir.some(function(d) {
                 return d === pathName;
             })) {
