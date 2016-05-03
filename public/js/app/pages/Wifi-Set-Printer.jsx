@@ -66,8 +66,9 @@ define([
                 var self        = this,
                     name        = self.refs.name.getDOMNode().value,
                     password    = self.refs.password.getDOMNode().value,
+                    oldPasswordExists = ('undefined' !== typeof self.refs.old_password),
                     oldPassword = (
-                        'WIFI' === self.state.settingPrinter.from ?
+                        'WIFI' === self.state.settingPrinter.from && true === oldPasswordExists ?
                         self.refs.old_password.getDOMNode().value :
                         ''
                     ),
