@@ -19,7 +19,34 @@ define([
         var timeout = 10000,
             timmer,
             isConnected = false,
-            ws = new Websocket({
+            ws,
+            lastOrder = '',
+            dedicatedWs = [],
+            fileInfoWsId = 0,
+            events = {
+                onMessage: function() {},
+                onError: opts.onError
+            },
+            genericOptions = function(opts) {
+                var emptyFunction = function() {};
+
+                opts = opts || {};
+                opts.onStarting = opts.onStarting || function() {};
+                opts.onFinished = opts.onFinished || function() {};
+
+                return opts;
+            },
+            isTimeout = function() {
+                var error = {
+                    'status': 'error',
+                    'error': 'TIMEOUT',
+                    'info': 'connection timeoout'
+                };
+                opts.onError(error);
+            };
+
+        function createWs() {
+            var _ws = new Websocket({
                 method: 'control/' + uuid,
                 onMessage: function(data) {
                     switch (data.status) {
@@ -50,31 +77,21 @@ define([
                     isConnected = false;
                 },
                 autoReconnect: false
-            }),
-            lastOrder = '',
-            events = {
-                onMessage: function() {},
-                onError: opts.onError
-            },
-            genericOptions = function(opts) {
-                var emptyFunction = function() {};
+            });
+            _ws.send(rsaKey());
+            return _ws;
+        }
 
-                opts = opts || {};
-                opts.onStarting = opts.onStarting || function() {};
-                opts.onFinished = opts.onFinished || function() {};
+        // id is int
+        function getDedicatedWs(id) {
+            if(!dedicatedWs[id]) {
+                dedicatedWs[id] = createWs();
+            }
+            return dedicatedWs[id];
+        }
 
-                return opts;
-            },
-            isTimeout = function() {
-                var error = {
-                    'status': 'error',
-                    'error': 'TIMEOUT',
-                    'info': 'connection timeoout'
-                };
-                opts.onError(error);
-            };
-
-        ws.send(rsaKey());
+        ws = createWs();
+        getDedicatedWs(fileInfoWsId);
 
         return {
             connection: ws,
@@ -102,11 +119,13 @@ define([
             fileInfo: function(path, fileName, opt) {
                 opts = genericOptions(opts);
                 var d = $.Deferred(),
-                    data = [];
+                    data = [],
+                    _ws;
 
                 data.push(fileName);
                 lastOrder = 'fileinfo';
-                ws.send(lastOrder + ' ' + path + '/' + fileName);
+                _ws = getDedicatedWs(fileInfoWsId);
+                _ws.send(lastOrder + ' ' + path + '/' + fileName);
                 events.onMessage = function(result) {
                     if(result instanceof Blob) {
                         data.push(result);
