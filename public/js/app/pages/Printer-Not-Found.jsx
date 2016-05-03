@@ -42,11 +42,7 @@ define([
                         clearTimeout(timer);
                         ProgressActions.close();
 
-                        // TODO: remove the specific uuid
-                        currentPrinter = printers.filter((printer) => {
-                            return "46314b30002f6c86d2b02c73dead910b" === printer.uuid
-                        })[0];
-                        // currentPrinter = printers[0];
+                        currentPrinter = printers[0];
                         currentPrinter.from = 'WIFI';
                         upnpMethods = upnpConfig(currentPrinter.uuid);
 
