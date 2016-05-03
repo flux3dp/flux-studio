@@ -161,14 +161,14 @@ define(function() {
             },
 
             notice_from_device: {
-                headline: 'Check the WiFi Indicator on FLUX Delta',
-                subtitle: 'Please mind the status of WiFi connection.',
-                light_on: 'Light On',
-                light_on_desc: 'FLUX Delta has connected to the WiFi you assigned',
-                breathing: 'Breathing',
-                breathing_desc: 'WiFi connection fail, please try setting again.',
-                successfully: 'If FLUX Delta connect successfuly',
-                successfully_statement: 'Please go back to your WiFi list and connect to your PC to %s, then restart FLUX Studio',
+                headline: '檢查 WiFi 指示燈',
+                subtitle: '機器上的綠燈表示了 FLUX Delta 的連線狀態',
+                light_on: 'Light On: 綠燈恆亮',
+                light_on_desc: 'FLUX Delta 已經連上了指定網路',
+                breathing: 'Breathing: 呼吸燈',
+                breathing_desc: '無線網路設定失敗，請嘗試重新設定',
+                successfully: '如果 FLUX Delta 連線成功',
+                successfully_statement: '請將無線網路連線至(%s)，並且重新啟動 FLUX Studio',
                 restart: 'Restart FLUX Studio'
             },
 
