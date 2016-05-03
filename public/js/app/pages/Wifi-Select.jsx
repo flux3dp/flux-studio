@@ -184,6 +184,10 @@ define([
                     apName = self.state.apName,
                     apPass = self.state.apPass;
 
+                settingPrinter.apName = apName;
+                settingPrinter.apPass = apPass;
+                initializeMachine.settingPrinter.set(settingPrinter);
+
                 if ('WIFI' === settingPrinter.from) {
                     self._setApModeViaWifi(apName, apPass);
                 }
