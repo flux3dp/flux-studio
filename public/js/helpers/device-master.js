@@ -333,7 +333,9 @@ define([
     }
 
     function stopCamera() {
-        return _device.scanController.stopGettingImage();
+        if(_device.scanController) {
+            return _device.scanController.stopGettingImage();
+        }
     }
 
     function maintain(type) {
