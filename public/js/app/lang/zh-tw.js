@@ -112,6 +112,8 @@ define(function() {
             cancel: '取消',
             confirm: '確認',
             connect: '連接',
+            back: 'Back',
+            retry: 'RETRY',
             no_machine : '目前沒有機器，跳過此步驟',
 
             // specific caption/content
@@ -122,7 +124,9 @@ define(function() {
                 caption: '密碼更改',
                 content: '確定要更改密碼嗎?'
             },
-            connect_flux: '用 USB 連接你的電腦與 FLUX Delta',
+            connect_flux: '連接 FLUX Delta',
+            via_usb: '使用 USB',
+            via_wifi: '使用 WiFi',
             name_your_flux: '為你的 FLUX Delta 取一個獨特的名字',
             wifi_setup: '設定無線網路',
             select_preferred_wifi: '選擇你偏好的網路',
@@ -133,9 +137,15 @@ define(function() {
             set_machine_generic: {
                 printer_name: '機器名稱*',
                 printer_name_placeholder: '例如：霹靂五號',
+                old_password: '舊密碼',
                 password: '機器密碼',
                 set_station_mode: '設定成無線基地台',
-                password_placeholder: '密碼可以保護你的 FLUX Delta'
+                password_placeholder: '密碼可以保護你的 FLUX Delta',
+                old_password_wrong: '舊密碼錯誤',
+                ap_mode_name: '名稱',
+                ap_mode_pass: '密碼',
+                ap_mode_name_format: '只接受英文及數字',
+                ap_mode_pass_format: '請至少輸入8個字'
             },
 
             setting_completed: {
@@ -150,9 +160,22 @@ define(function() {
                 ok: '開始使用'
             },
 
+            notice_from_device: {
+                headline: 'Check the WiFi Indicator on FLUX Delta',
+                subtitle: 'Please mind the status of WiFi connection.',
+                light_on: 'Light On',
+                light_on_desc: 'FLUX Delta has connected to the WiFi you assigned',
+                breathing: 'Breathing',
+                breathing_desc: 'WiFi connection fail, please try setting again.',
+                successfully: 'If FLUX Delta connect successfuly',
+                successfully_statement: 'Please go back to your WiFi list and connect to your PC to %s, then restart FLUX Studio',
+                restart: 'Restart FLUX Studio'
+            },
+
             // errors
             errors: {
                 error: '錯誤',
+                not_found: '無法找到 FLUX Delta',
 
                 keep_connect: {
                     caption: '無法透過 USB 連接',
