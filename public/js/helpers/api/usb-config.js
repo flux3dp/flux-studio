@@ -128,17 +128,18 @@ define([
                 ws.send(args.join(' '));
             },
 
-            getWifiNetwork: function(opts) {
-                var strength = {
-                    BEST: 'best',
-                    GOOD: 'good',
-                    POOR: 'poor',
-                    BAD: 'bad'
-                };
+            getWifiNetwork: function() {
+                var $deferred = $.Deferred(),
+                    strength = {
+                        BEST: 'best',
+                        GOOD: 'good',
+                        POOR: 'poor',
+                        BAD: 'bad'
+                    };
 
-                opts = reorganizeOptions(opts);
+                // opts = reorganizeOptions(opts);
 
-                ws.onError(opts.onError);
+                // ws.onError(opts.onError);
 
                 events.onMessage = function(data) {
                     if ('ok' === data.status) {
@@ -167,13 +168,20 @@ define([
                                 rssi: wifi.rssi,
                                 strength: wifi.strength
                             });
+
                         });
 
-                        opts.onSuccess(data);
+                        $deferred.resolve(data);
                     }
                 };
 
+                ws.onError(function(response) {
+                    $deferred.fail(response);
+                });
+
                 ws.send('scan_wifi');
+
+                return $deferred.promise();
             },
 
             setWifiNetwork: function(wifi, password, opts) {
@@ -286,13 +294,15 @@ define([
                 };
             },
 
-            setAPMode: function(ssid, opts) {
+            setAPMode: function(ssid, pass, opts) {
                 opts = reorganizeOptions(opts);
 
                 var args = [
                     'set network',
                     JSON.stringify({
                         ssid: ssid,
+                        psk: pass,
+                        security: 'WPA2-PSK',
                         wifi_mode: 'host',
                         method: 'dhcp'
                     })
