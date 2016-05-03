@@ -1,11 +1,13 @@
 define([
     'react',
     'app/actions/initialize-machine',
-    'jsx!widgets/Modal'
+    'jsx!widgets/Modal',
+    'helpers/sprintf'
 ], function(
     React,
     initializeMachine,
-    Modal
+    Modal,
+    sprintf
 ) {
     'use strict';
 
@@ -30,9 +32,11 @@ define([
             render : function() {
                 var lang = this.state.lang,
                     localLang = lang.initialize.notice_from_device,
+                    settingPrinter = initializeMachine.settingPrinter.get(),
                     wrapperClassName = {
                         'initialization': true
                     },
+                    successfullyStatement = sprintf(localLang.successfully_statement, settingPrinter.apName),
                     content = (
                         <div className="notice-from-device text-center">
                             <img className="brand-image" src="/img/menu/main_logo.svg"/>
@@ -60,7 +64,7 @@ define([
                                 </div>
                                 <article>
                                     <p className="headline">{localLang.successfully}</p>
-                                    <p className="subtitle">{localLang.successfully_statement}</p>
+                                    <p className="subtitle">{successfullyStatement}</p>
                                 </article>
                                 <div className="button-group btn-v-group">
                                     <button data-ga-event="restart-flux-studio" className="btn btn-action btn-large" onClick={this._restartStudio}>
