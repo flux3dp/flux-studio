@@ -33,6 +33,8 @@ define([
     }
 
     return function() {
+        var $deferred = $.Deferred();
+
         html2canvas(window.document.body).then(function(canvas) {
             var jpegUrl = canvas.toDataURL("image/jpeg"),
                 _logger = new Logger('websocket'),
@@ -63,6 +65,10 @@ define([
                 report_blob = new Blob([log, report_info], { type : 'text/html' });
                 saveAs(report_blob, 'bugreport_' + Math.floor(Date.now() / 1000) + '.txt');
             });
+
+            $deferred.resolve();
         });
+
+        return $deferred.promise();
     };
 });
