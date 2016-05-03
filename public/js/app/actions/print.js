@@ -1286,6 +1286,7 @@ define([
     }
 
     function setAdvanceParameter(settings) {
+        var d = $.Deferred();
         slicingStatus.pauseReport = true;
 
         var t = setInterval(function() {
@@ -1302,11 +1303,14 @@ define([
                     if(errors.length > 0) {
                         AlertActions.showPopupError(_id, errors.join('\n'));
                     }
+                    d.resolve('');
                 });
                 blobExpired = true;
                 slicingStatus.pauseReport = false;
             }
         }, 500);
+
+        return d.promise();
     }
 
     function setParameter(name, value) {
@@ -2658,6 +2662,10 @@ define([
         return slicingStatus;
     }
 
+    function changeEngine(engine, path) {
+        slicer.changeEngine(engine, path);
+    }
+
     return {
         init                : init,
         appendModel         : appendModel,
@@ -2691,6 +2699,7 @@ define([
         loadScene           : loadScene,
         undo                : undo,
         addHistory          : addHistory,
-        clearScene          : clearScene
+        clearScene          : clearScene,
+        changeEngine        : changeEngine
     };
 });
