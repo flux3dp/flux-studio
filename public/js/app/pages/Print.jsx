@@ -449,7 +449,9 @@ define([
                         raftLayers: _raftLayers,
                         raftOn: _raftLayers !== 0
                     });
-                    return director.setAdvanceParameter(advancedSettings);
+                    director.setAdvanceParameter(advancedSettings).then(() => {
+                        this._handleSlicingEngineChange(advancedSettings.engine);
+                    });
                 },
 
                 _handleImport: function(e) {
@@ -507,7 +509,9 @@ define([
                         openPrinterSelectorWindow: false
                     });
 
-                    director.getFCode().then(function(fcode, previewUrl) {
+                    director.takeSnapShot().then(() => {
+                        return director.getFCode();
+                    }).then(function(fcode, previewUrl) {
                         if(director.getSlicingStatus().inProgress) {
                             return;
                         }
@@ -685,6 +689,11 @@ define([
 
                 _handleClearScene: function() {
                     director.clearScene();
+                },
+
+                _handleSlicingEngineChange: function(engineName) {
+                    var path = Config().read('slicing-engine-path');
+                    director.changeEngine(engineName, path);
                 },
 
                 _getLineFromAdvancedCustomSetting: function(key) {

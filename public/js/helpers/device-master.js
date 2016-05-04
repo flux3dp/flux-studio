@@ -333,6 +333,9 @@ define([
     }
 
     function stopCamera() {
+        if(!_device.scanController) {
+            return $.Deferred().resolve().promise();
+        }
         return _device.scanController.stopGettingImage();
     }
 

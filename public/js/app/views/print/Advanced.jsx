@@ -139,6 +139,8 @@ define([
                 custom = this.state.custom.length === 0 ? [] : this.state.custom.split('\n'),
                 _entry, _keys, lineNumber;
 
+            keys = keys.filter((key) => hiddenPresets.indexOf(key) === -1);
+
             for(var i = 0; i < keys.length; i++) {
                 _keys = keys[i];
                 if(_keys === 'raft_layers') {
@@ -350,9 +352,7 @@ define([
             this._processCustomInput();
 
             var _settings = {};
-            Object.keys(advancedSetting).forEach(function(name) {
-                _settings[name] = advancedSetting[name];
-            });
+            Object.assign(_settings, advancedSetting)
             this.props.onApply(_settings);
             if(!showAdvancedSetting) {
                 this.props.onClose();
@@ -408,12 +408,12 @@ define([
         _renderGeneralSection: function() {
             var options = [
                 {
-                    id: lang.slic3r,
+                    id: 'slic3r',
                     name: lang.slic3r
                 },
                 {
-                    id: lang.experiment,
-                    name: lang.experiment
+                    id: 'cura',
+                    name: lang.cura
                 }
             ];
             return (
@@ -424,7 +424,9 @@ define([
                         <div className="controls">
                             <div className="label"></div>
                             <RadioControl
+                                id="engine"
                                 options={options}
+                                default={advancedSetting.engine}
                                 onChange={this._handleControlValueChange}
                                 />
                         </div>

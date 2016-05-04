@@ -4,9 +4,8 @@
 define([
     'react',
     'jquery',
-    'helpers/i18n',
-    'helpers/observe'
-], function(React, $, i18n, Observe) {
+    'helpers/i18n'
+], function(React, $, i18n) {
     'use strict';
 
     var views = [];
@@ -19,11 +18,12 @@ define([
         args.state.lang = i18n.get();
 
         // watching state and auto update
-        new Observe(args.state, function(changes) {
-            views.forEach(function(view, key) {
-                view.setState(args.state);
-            });
-        });
+        // new Observe(args.state, function(changes) {
+        //     console.log('1');
+        //     views.forEach(function(view, key) {
+        //         view.setState(args.state);
+        //     });
+        // });
 
         view = React.createFactory(view(args));
         view = view();
@@ -34,6 +34,9 @@ define([
 
         $('body').off('change').on('change', '#select-lang', function(e) {
             args.state.lang = i18n.setActiveLang(e.currentTarget.value).get();
+            views.forEach(function(view, key) {
+                view.setState(args.state);
+            });
         });
     };
 });

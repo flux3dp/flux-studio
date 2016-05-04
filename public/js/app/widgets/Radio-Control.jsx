@@ -7,6 +7,7 @@ define([
     return React.createClass({
 
         propTypes: {
+            id: React.PropTypes.string,
             label: React.PropTypes.string,
             default: React.PropTypes.string,
             options: React.PropTypes.array.isRequired,
@@ -15,7 +16,7 @@ define([
 
         getInitialState: function() {
             return {
-                selected: this.props.options[0].id,
+                selected: this.props.default,
                 default: this.props.options[0].id
             };
         },
@@ -27,19 +28,23 @@ define([
             return newPropIsDifferent || newStateIsDifferent;
         },
 
-        _handleChange: function(newValue) {
-            // this.setState({ selected: newValue });
+        _handleChange: function(newValue, disable) {
+            if(disable !== true) {
+                this.setState({ selected: newValue });
+                this.props.onChange(this.props.id, newValue);
+            }
         },
 
         render: function() {
             var _options = this.props.options.map(function(option) {
                 var radioClass = ClassNames(
-                    {'selected': this.state.selected === option.id},
-                    {'grey-out': option.id === 'Experiment'}
+                    {'selected': this.state.selected === option.id}
                 );
                 return (
                     <div className="radio">
-                        <div className={radioClass} onClick={this._handleChange.bind(null, option.id)}></div>
+                        <div
+                            className={radioClass}
+                            onClick={this._handleChange.bind(null, option.id, option.disable)}></div>
                         <span>{option.name}</span>
                     </div>
                 );

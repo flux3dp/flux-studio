@@ -5,7 +5,6 @@ define([
     'helpers/nwjs/gui',
     'helpers/nwjs/menu-map',
     'helpers/i18n',
-    'helpers/observe',
     'helpers/check-firmware',
     'helpers/api/discover',
     'helpers/device-master',
@@ -25,7 +24,6 @@ define([
     gui,
     menuMap,
     i18n,
-    observe,
     checkFirmware,
     discover,
     DeviceMaster,
@@ -293,11 +291,6 @@ define([
 
     if (true === window.FLUX.isNW) {
         initialize(menuMap.all);
-
-        observe(menuMap.items, function(changes) {
-            menuMap.all = menuMap.refresh();
-            initialize(menuMap.all);
-        });
     }
 
     if (true === window.FLUX.isNW) {
@@ -487,9 +480,11 @@ define([
                 }
             );
 
-            setInterval(function() {
+            setInterval(() => {
                 if (true === needRenew(_printers)) {
                     menuMap.items.device.subItems = menuMap.items.device.defaultSubItems.concat(_printers);
+                    menuMap.all = menuMap.refresh();
+                    initialize(menuMap.all);
                 }
 
                 previousPrinters = _printers;

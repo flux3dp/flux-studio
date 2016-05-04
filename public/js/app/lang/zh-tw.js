@@ -314,7 +314,8 @@ define(function() {
                 title: '選擇連接成型機'
             },
             notification_on: '開啟',
-            notification_off: '關閉'
+            notification_off: '關閉',
+            slicing_engine_path: '切片引擎路徑'
         },
         print: {
             import: '匯入',
@@ -332,6 +333,7 @@ define(function() {
                 custom: '專家',
                 slicingEngine: '切片引擎',
                 slic3r: 'Slic3r',
+                cura: 'Cura',
                 experiment: 'Experiment',
                 filament: '線料',
                 temperature: '溫度',

@@ -21,8 +21,8 @@ define([
     'helpers/round',
     'helpers/dnd-handler',
     'helpers/nwjs/menu-factory',
-    'helpers/observe',
     'helpers/point-cloud',
+    'lib/rx.lite.min',
     // non-return
     'helpers/array-findindex',
     'helpers/object-assign',
@@ -50,13 +50,16 @@ define([
     round,
     dndHandler,
     menuFactory,
-    observe,
-    PointCloudHelper
+    PointCloudHelper,
+    Rx
 ) {
     'use strict';
 
     return function(args) {
         args = args || {};
+
+        var meshUpdateStream = new Rx.Subject(),
+            subscribers = [];
 
         var View = React.createClass({
                 MAX_MESHES: 5,
@@ -119,24 +122,41 @@ define([
                                     });
                                 };
 
-                                (function(mesh, arrayIndex) {
-                                    Object.observe(mesh, function(changes) {
-                                        for (var i in changes) {
-                                            if (true === changes.hasOwnProperty(i) &&
-                                                'name' === changes[i].name &&
-                                                true !== changes[i].object.isUndo
-                                            ) {
-                                                object = Object.assign({}, changes[i].object);
-                                                object.oldBlob = self.state.scanModelingWebSocket.History.findByName(changes[i].oldValue)[0].data;
-                                                object.isUndo = false;
-                                                // old name
-                                                object.name = changes[i].oldValue;
-                                                pushToHistory(object, arrayIndex);
-                                            }
-                                        }
-                                    });
-                                })(mesh, arrayIndex);
+                                // (function(mesh, arrayIndex) {
+                                //     Object.observe(mesh, function(changes) {
+                                //         console.log('observing', arrayIndex);
+                                //         for (var i in changes) {
+                                //             if (true === changes.hasOwnProperty(i) &&
+                                //                 'name' === changes[i].name &&
+                                //                 true !== changes[i].object.isUndo
+                                //             ) {
+                                //                 object = Object.assign({}, changes[i].object);
+                                //                 object.oldBlob = self.state.scanModelingWebSocket.History.findByName(changes[i].oldValue)[0].data;
+                                //                 object.isUndo = false;
+                                //                 // old name
+                                //                 object.name = changes[i].oldValue;
+                                //                 pushToHistory(object, arrayIndex);
+                                //                 console.log('original', arrayIndex);
+                                //             }
+                                //         }
+                                //     });
+                                //
+                                // })(mesh, arrayIndex);
 
+                                if(!subscribers[arrayIndex]) {
+                                    var subscriber = meshUpdateStream.subscribe((m) => {
+                                        console.log('subscribing', arrayIndex);
+                                        object = Object.assign({}, m);
+                                        object.oldBlob = self.state.scanModelingWebSocket.History.findByName(m.oldName)[0].data;
+                                        object.isUndo = false;
+                                        // old name
+                                        object.name = m.oldName;
+                                        console.log('rxjs', arrayIndex);
+                                        pushToHistory(object, arrayIndex);
+
+                                    });
+                                    subscribers[arrayIndex] = subscriber;
+                                }
                         },
                         objectGroupObserve = function(meshes, arrayIndex) {
                             meshes.forEach(function(mesh, i) {
@@ -890,13 +910,16 @@ define([
                 },
 
                 _doClearNoise: function(mesh) {
+                    console.log('do clear noise');
                     var self = this,
                         delete_noise_name = 'clear-noise-' + (new Date()).getTime(),
                         onStarting = function(data) {
                             self._openBlocker(true, ProgressConstants.NONSTOP);
                         },
                         onDumpFinished = function(data) {
+                            mesh.oldName = mesh.name;
                             mesh.name = delete_noise_name;
+                            meshUpdateStream.onNext(mesh);
                             self._openBlocker(false);
                         },
                         onDumpReceiving = function(data, len) {
@@ -953,8 +976,9 @@ define([
                             args,
                             opts
                         );
-
+                        mesh.oldName = mesh.name
                         mesh.name = cut_name;
+                        meshUpdateStream.onNext(mesh);
                     }
 
                     self._removeCylinder(mesh);
@@ -1040,8 +1064,10 @@ define([
                                     deferred = $.Deferred(),
                                     onUpdate = function(response) {
                                         mesh = self._getMesh(self.state.scanTimes);
+                                        mesh.oldName = mesh.name;
                                         mesh.name = outputName;
                                         mesh.associted = lengthSelectedMeshes;
+                                        meshUpdateStream.onNext(mesh);
                                     };
 
                                 deferred.done(onUpdate);
