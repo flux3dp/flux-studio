@@ -20,6 +20,7 @@ define([
     window.FLUX.websockets = [];
 
     var hadConnected = false,
+        showProgramErrorPopup = true,
         WsLogger = new Logger('websocket');
 
     // options:
@@ -110,15 +111,30 @@ define([
                     var abnormallyId = 'abnormally-close',
                         message = '',
                         outputLog = function() {
-                            outputError();
+                            outputError().done(onCancel);
+                        },
+                        onCancel = function() {
+                            removeListener();
+                            console.log('output error');
+                            showProgramErrorPopup = true;
+                        },
+                        removeListener = function() {
                             AlertStore.removeCustomListener(outputLog);
+                            AlertStore.removeCancelListener(onCancel);
                         };
 
                     // The connection was closed abnormally without sending or receving data
                     // ref: http://tools.ietf.org/html/rfc6455#section-7.4.1
                     if (1006 === result.code &&
+                        60000 <= (new Date()).getTime() - window.FLUX.timestamp
+                    ) {
+                        wsLog.log.push([WsLogger.getTimeLabel(), '**abnormal disconnection**'].join(' '));
+                    }
+
+                    if (1006 === result.code &&
                         60000 <= (new Date()).getTime() - window.FLUX.timestamp &&
-                        false === options.ignoreAbnormalDisconnect
+                        false === options.ignoreAbnormalDisconnect &&
+                        true === showProgramErrorPopup
                     ) {
                         if (false === hadConnected) {
                             message = lang.message.cant_establish_connection;
@@ -127,9 +143,10 @@ define([
                             message = lang.message.application_occurs_error;
                         }
 
-                        wsLog.log.push([WsLogger.getTimeLabel(), '**abnormal disconnection**'].join(' '));
+                        showProgramErrorPopup = false;
                         AlertActions.showPopupCustom(abnormallyId, message, lang.message.error_log);
                         AlertStore.onCustom(outputLog);
+                        AlertStore.onCancel(onCancel);
                     }
 
                     if (true === options.autoReconnect) {

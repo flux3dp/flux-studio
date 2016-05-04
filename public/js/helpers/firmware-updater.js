@@ -34,7 +34,7 @@ define([
                     'upload-firmware',
                     {
                         type: InputLightboxConstants.TYPE_FILE,
-                        inputHeader: lang.update.firmware.upload_file,
+                        caption: lang.update.firmware.upload_file,
                         onSubmit: onSubmit,
                         confirmText: lang.update.firmware.confirm
                     }
@@ -58,9 +58,11 @@ define([
                         }
                     };
 
-                doUpdate(file).
-                    done(onFinishUpdate.bind(null, true)).
-                    fail(onFinishUpdate.bind(null, false));
+                DeviceMaster.selectDevice(printer).done(function() {
+                    doUpdate(file).
+                        done(onFinishUpdate.bind(null, true)).
+                        fail(onFinishUpdate.bind(null, false));
+                });
             };
 
         AlertActions.showUpdate(

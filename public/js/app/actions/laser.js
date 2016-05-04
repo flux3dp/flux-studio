@@ -92,7 +92,11 @@ define([
                 }
             },
             refreshImage = function($img, threshold) {
-                var box = $img.box();
+                var freetrans = $img.data('freetrans'),
+                    box = {
+                        height: $img.height() * freetrans.scaley,
+                        width: $img.width() * freetrans.scalex,
+                    };
 
                 imageData(
                     $img.data('base'),
@@ -299,7 +303,7 @@ define([
                     angle = elementAngle($el[0]);
                     threshold = $el.data('threshold') || 128;
 
-                    if ('move' !== e.freetransEventType) {
+                    if ('scale' === e.freetransEventType) {
                         refreshImage($el, threshold);
                     }
 
