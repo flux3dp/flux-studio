@@ -32,6 +32,10 @@ define([
 
                 },
 
+                _updateSlicingEnginePath: function(e) {
+                    config().write('slicing-engine-path', e.target.value);
+                },
+
                 _switchNotification: function(e) {
                     config().write('notification', e.currentTarget.value);
                 },
@@ -81,6 +85,20 @@ define([
 
                                 <div className="span8 font3">
                                     <input type="text" autoComplete="false" defaultValue={pokeIP} onBlur={this._checkIPFormat}/>
+                                </div>
+
+                            </div>
+
+                            <div className="row-fluid">
+
+                                <div className="span3 no-left-margin">
+                                    <label className="font2">
+                                        {lang.settings.slicing_engine_path}
+                                    </label>
+                                </div>
+
+                                <div className="span8 font3">
+                                    <input type="text" autoComplete="false" onBlur={this._updateSlicingEnginePath}/>
                                 </div>
 
                             </div>

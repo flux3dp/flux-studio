@@ -291,7 +291,8 @@ define(function() {
                 title: 'Connect with your printer'
             },
             notification_on: 'On',
-            notification_off: 'Off'
+            notification_off: 'Off',
+            slicing_engine_path: 'Slicing Engine Path'
         },
         print: {
             import: 'IMPORT',
@@ -309,6 +310,7 @@ define(function() {
                 custom: 'Expert',
                 slicingEngine: 'Slicing Engine',
                 slic3r: 'Slic3r',
+                cura: 'Cura',
                 experiment: 'Experiment',
                 filament: 'Filament',
                 temperature: 'Temperature',

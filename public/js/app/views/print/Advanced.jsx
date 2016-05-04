@@ -412,8 +412,9 @@ define([
                     name: lang.slic3r
                 },
                 {
-                    id: lang.experiment,
-                    name: lang.experiment
+                    id: lang.cura,
+                    name: lang.cura,
+                    disable: true
                 }
             ];
             return (

@@ -127,8 +127,16 @@ define([
                         }
 
                         if (0 > tryTimes) {
-                            AlertActions.showPopupError('device-not-found', lang.message.device_not_found.message, lang.message.device_not_found.caption);
                             clearInterval(timer);
+                            if(self.state.printOptions.length === 0) {
+                                AlertActions.showPopupError('device-not-found', lang.message.device_not_found.message, lang.message.device_not_found.caption);
+                            }
+                            else {
+                                self.setState({
+                                    loadFinished: false,
+                                    hadDefaultPrinter: false
+                                });
+                            }
                         }
                     };
 
