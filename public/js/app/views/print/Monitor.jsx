@@ -342,7 +342,9 @@ define([
             AlertStore.removeCancelListener(this._handleCancel);
             AlertStore.removeYesListener(this._handleYes);
 
-            this._stopCamera();
+            if(this.state.mode === mode.CAMERA) {
+                this._stopCamera();
+            }
             this._stopReport();
             history = [];
             messageViewed = false;
@@ -559,7 +561,9 @@ define([
             filePreview = false;
             lastAction = history[history.length - 1];
 
-            this._stopCamera();
+            if(this.state.mode === mode.CAMERA) {
+                this._stopCamera();
+            }
             this._clearSelectedItem();
 
             var actions = {

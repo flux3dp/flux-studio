@@ -509,7 +509,9 @@ define([
                         openPrinterSelectorWindow: false
                     });
 
-                    director.getFCode().then(function(fcode, previewUrl) {
+                    director.takeSnapShot().then(() => {
+                        return director.getFCode();
+                    }).then(function(fcode, previewUrl) {
                         if(director.getSlicingStatus().inProgress) {
                             return;
                         }

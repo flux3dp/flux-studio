@@ -541,11 +541,6 @@ define([
             // set again because stop slicing set inProgress to false
             slicingStatus.inProgress = true;
             slicingStatusStream.onNext(slicingStatus);
-            return getBlobFromScene();
-        }).then(function(blob) {
-            previewUrl = URL.createObjectURL(blob);
-            return slicer.uploadPreviewImage(blob);
-        }).then(function() {
             slicer.beginSlicing(ids, slicingType.F).then(function(response) {
                 slicingStatus.canInterrupt = true;
                 slicingStatus.pauseReport = false;
@@ -559,6 +554,17 @@ define([
                 });
             });
         });
+    }
+
+    function takeSnapShot() {
+        var d = $.Deferred();
+        getBlobFromScene().then((blob) => {
+            previewUrl = URL.createObjectURL(blob);
+            slicer.uploadPreviewImage(blob).then(() => {
+                d.resolve(blob);
+            });
+        });
+        return d.promise();
     }
 
     function doSlicing() {
@@ -1936,6 +1942,7 @@ define([
             camera.lookAt(ol);
             toggleTransformControl(false);
             render();
+            console.log(URL.createObjectURL(blob));
             d.resolve(blob);
         });
 
@@ -2700,6 +2707,7 @@ define([
         undo                : undo,
         addHistory          : addHistory,
         clearScene          : clearScene,
-        changeEngine        : changeEngine
+        changeEngine        : changeEngine,
+        takeSnapShot        : takeSnapShot
     };
 });
