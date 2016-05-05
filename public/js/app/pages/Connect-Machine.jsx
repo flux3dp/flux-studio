@@ -59,21 +59,49 @@ define([
                 var self = this,
                     currentPrinter,
                     upnpMethods,
+                    lastError,
                     discoverMethods = discover('upnp-config', (printers) => {
                         clearTimeout(timer);
 
                         currentPrinter = printers[0];
+                        currentPrinter = printers.filter(function(printer) {
+                            return '46314b30002f6c86d2b02c73dead910b' === printer.uuid;
+                            // return false === printer.uuid.startsWith('00000000000');
+                        })[0];
                         currentPrinter.from = 'WIFI';
+                        currentPrinter.apName = currentPrinter.name;
                         upnpMethods = upnpConfig(currentPrinter.uuid);
 
-                        self._setSettingPrinter(currentPrinter);
+                        upnpMethods.ready(function() {
+                            self._toggleBlocker(false);
+
+                            if ('undefined' !== typeof lastError) {
+                                upnpMethods.addKey();
+                            }
+
+                            self._setSettingPrinter(currentPrinter);
+                        }).progress(function(response) {
+
+                            switch (response.status) {
+                            case 'error':
+                                lastError = response;
+                                self._toggleBlocker(false);
+                                break;
+                            case 'waitting':
+                                self._toggleBlocker(true);
+                                break;
+                            }
+                        });
 
                         discoverMethods.removeListener('upnp-config');
                     }),
                     timer = setTimeout(function() {
-                        location.hash = '#initialize/wifi/not-found';
                         clearTimeout(timer);
+                        self._toggleBlocker(false);
+                        location.hash = '#initialize/wifi/not-found';
                     }, 1000);
+
+                self._toggleBlocker(true);
             },
 
             _toggleBlocker: function(open) {
