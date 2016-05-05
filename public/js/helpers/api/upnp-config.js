@@ -5,9 +5,20 @@
 define([
     'jquery',
     'helpers/websocket',
-    'helpers/api/config',
-    'helpers/rsa-key'
-], function($, Websocket, Config, rsaKey) {
+    'helpers/rsa-key',
+    'helpers/i18n',
+    'app/actions/alert-actions',
+    'app/actions/input-lightbox-actions',
+    'app/constants/input-lightbox-constants'
+], function(
+    $,
+    Websocket,
+    rsaKey,
+    i18n,
+    AlertActions,
+    InputLightboxActions,
+    InputLightboxConstants
+) {
     'use strict';
 
     return function(uuid) {
@@ -16,6 +27,8 @@ define([
                 UPLOAD    : 'UPLOAD',
                 CONNECTED : 'CONNECTED'
             },
+            $deferred = $.Deferred(),
+            lang = i18n.get(),
             currentStage = stages.UPLOAD,
             isReady = false,
             onMessage = function(messageHandler, response) {
@@ -36,6 +49,11 @@ define([
                     }
                 }, 0);
             },
+            doConnect = function() {
+                currentStage = stages.CONNECTED;
+
+                ws.send(['connect', uuid].join(' '));
+            },
             ws = new Websocket({
                 method: 'upnp-config',
                 autoReconnect: false,
@@ -45,19 +63,63 @@ define([
                 onMessage: function(response) {
                     switch (currentStage) {
                     case stages.UPLOAD:
-                        currentStage = stages.CONNECTED;
-
-                        ws.send(['connect', uuid].join(' '));
+                        doConnect();
                         break;
 
                     case stages.CONNECTED:
+                        $deferred.resolve();
                         isReady = true;
                         break;
                     }
+                },
+                onError: function(response) {
+
+                    switch (response.error) {
+                    case 'UPNP_PASSWORD_FAIL':
+                        AlertActions.showPopupError(response.error, lang.initialize.set_machine_generic.incorrect_password);
+                    case 'UPNP_CONNECTION_FAIL':
+                        InputLightboxActions.open('need_password', {
+                            type        : InputLightboxConstants.TEXT_INPUT,
+                            caption     : lang.message.need_password,
+                            confirmText : lang.initialize.confirm,
+                            onSubmit    : function(password) {
+                                $deferred.notify({
+                                    status: 'waitting'
+                                });
+                                currentStage = stages.UPLOAD;
+                                ws.send(['upload_password', password].join(' '));
+                            }
+                        });
+                        break;
+                    }
+
+                    $deferred.notify(response);
                 }
             });
 
         return {
+            connection: ws,
+
+            ready: function(callback) {
+                return $deferred.done(callback).promise();
+            },
+
+            addKey: function() {
+                var $deferred = $.Deferred();
+
+                genericSender('add_key', function(response) {
+                    console.log(response);
+
+                    $deferred.resolve(response);
+                });
+
+                ws.onError(onError.bind(null, function(response) {
+                    $deferred.reject(response);
+                }));
+
+                return $deferred.promise();
+            },
+
             getWifiNetwork: function() {
                 var $deferred = $.Deferred(),
                     strength = {
@@ -106,7 +168,7 @@ define([
                 return $deferred.promise();
             },
 
-            configNetwork: function(wifi, password) {
+            setWifiNetwork: function(wifi, password) {
                 var $deferred = $.Deferred(),
                     wifiConfig = {
                         wifi_mode: 'client',
