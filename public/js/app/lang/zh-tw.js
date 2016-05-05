@@ -141,7 +141,8 @@ define(function() {
                 password: '機器密碼',
                 set_station_mode: '設定成無線基地台',
                 password_placeholder: '密碼可以保護你的 FLUX Delta',
-                old_password_wrong: '舊密碼錯誤',
+                incorrect_old_password: '舊密碼錯誤',
+                incorrect_password: '密碼錯誤',
                 ap_mode_name: '名稱',
                 ap_mode_pass: '密碼',
                 ap_mode_name_format: '只接受英文及數字',
@@ -1004,7 +1005,8 @@ define(function() {
             important_update: {
                 caption: '重要更新',
                 message: 'Delta 有重要韌體更新，是否要現在更新？',
-            }
+            },
+            need_password: '需要密碼與 FLUX Delta 建立連線'
         },
         machine_status: {
             '-10': 'Raw Mode',

@@ -141,7 +141,8 @@ define(function() {
                 password: 'Password',
                 set_station_mode: 'Set as a Wi-Fi station',
                 password_placeholder: 'Something secret',
-                old_password_wrong: 'Old Password Wrong',
+                incorrect_old_password: 'Incorrect Old Password',
+                incorrect_password: 'Incorrect Password',
                 ap_mode_name: 'Name',
                 ap_mode_pass: 'Password',
                 ap_mode_name_format: 'Only accept alphabets or numbers',
@@ -1004,7 +1005,8 @@ define(function() {
             important_update: {
                 caption: 'Important Update',
                 message: 'Important Delta firmware update is available. Do you want to update now?',
-            }
+            },
+            need_password: 'Need Password to connect to FLUX Delta'
         },
         machine_status: {
             '-10': 'Raw mode',
