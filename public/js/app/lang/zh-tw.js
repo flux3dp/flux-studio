@@ -981,7 +981,8 @@ define(function() {
             important_update: {
                 caption: '重要更新',
                 message: 'Delta 有重要韌體更新，是否要現在更新？',
-            }
+            },
+            unsupport_osx_version: '不支援此 Mac OS X 版本'
         },
         machine_status: {
             '-10': 'Raw Mode',

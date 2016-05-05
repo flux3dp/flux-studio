@@ -134,6 +134,7 @@ define([
                 var self = this,
                     discoverMethods,
                     firstDevice,
+                    isUnsupportedMacOSX = /Mac OS X 10_[56789]/.test(navigator.userAgent),
                     type = 'firmware';
 
                 AlertStore.onNotify(this._handleNotification);
@@ -142,6 +143,10 @@ define([
                 AlertStore.onClosePopup(this._handleClosePopup);
                 AlertStore.onUpdate(this._showUpdate);
                 AlertStore.onChangeFilament(this._showChangeFilament);
+
+                if (true === isUnsupportedMacOSX) {
+                    AlertActions.showPopupError('unsupported_mac_osx', lang.message.unsupport_osx_version);
+                }
 
                 ProgressStore.onOpened(this._handleProgress).
                     onUpdating(this._handleProgress).

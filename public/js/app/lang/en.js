@@ -981,7 +981,8 @@ define(function() {
             important_update: {
                 caption: 'Important Update',
                 message: 'Important Delta firmware update is available. Do you want to update now?',
-            }
+            },
+            unsupport_osx_version: 'Unsupported Mac OS X Version Detected'
         },
         machine_status: {
             '-10': 'Raw mode',
