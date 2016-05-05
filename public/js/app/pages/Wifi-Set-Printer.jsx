@@ -121,7 +121,7 @@ define([
                             goNext();
                         }).
                         fail(function(response) {
-                            AlertActions.showPopupError('set-machine-error', lang.initialize.set_machine_generic.old_password_wrong);
+                            AlertActions.showPopupError('set-machine-error', lang.initialize.set_machine_generic.incorrect_old_password);
                         });
 
                     },
