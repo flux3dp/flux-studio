@@ -168,11 +168,15 @@ define([
             },
 
             _goToSetPassword: function() {
-                var pageHash = (
-                    'WIFI' === this.state.settingPrinter.from ?
-                    '#initialize/wifi/notice-from-device' :
-                    '#initialize/wifi/set-password'
-                );
+                var pageHash = '#initialize/wifi/set-password',
+                    settingPrinter = this.state.settingPrinter,
+                    settingWifi = initializeMachine.settingWifi.get();
+
+                if ('WIFI' === this.state.settingPrinter.from) {
+                    pageHash = '#initialize/wifi/notice-from-device';
+                    settingPrinter.apName = settingWifi.ssid;
+                    initializeMachine.settingPrinter.set(settingPrinter);
+                }
 
                 location.hash = pageHash;
             },
@@ -185,7 +189,6 @@ define([
                     apPass = self.state.apPass;
 
                 settingPrinter.apName = apName;
-                settingPrinter.apPass = apPass;
                 initializeMachine.settingPrinter.set(settingPrinter);
 
                 if ('WIFI' === settingPrinter.from) {
@@ -230,11 +233,29 @@ define([
                 });
             },
 
+            _settingWifi: function() {
+                var settingPrinter = self.state.settingPrinter,
+                    settingWifi = initializeMachine.settingWifi.get(),
+                    wifiConfig = upnpConfig(settingPrinter.uuid);
+
+                wifiConfig.setWifiNetwork(settingWifi, settingWifi.plain_password).
+                done(function(response) {
+                    console.log('done', response);
+                }).
+                fail(function(response) {
+                    console.log('fail', response);
+                });
+            },
+
             _setWifiWithoutPassword: function() {
-                var settingPrinter = self.state.settingPrinter;
+                var settingPrinter = self.state.settingPrinter,
+                    settingWifi = initializeMachine.settingWifi.get();
 
                 if ('WIFI' === settingPrinter.from) {
+                    settingPrinter.apName = settingWifi.ssid;
+                    initializeMachine.settingPrinter.set(settingPrinter);
                     location.hash = '#initialize/wifi/notice-from-device';
+
                 }
                 else {
                     location.hash = '#initialize/wifi/setup-complete/with-wifi';
