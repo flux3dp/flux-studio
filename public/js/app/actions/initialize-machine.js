@@ -106,7 +106,7 @@ define([
             set: function(printer) {
                 config().write('default-printer', JSON.stringify(printer));
             },
-            isExisting: function() {
+            exist: function() {
                 var defaultPrinter = config().read('default-printer') || {};
 
                 return ('string' === typeof defaultPrinter.uuid);

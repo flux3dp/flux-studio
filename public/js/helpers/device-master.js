@@ -14,7 +14,7 @@ define([
     'helpers/api/config',
     'app/actions/global-actions',
     'app/constants/input-lightbox-constants',
-    'helpers/object-assign',
+    'helpers/device-list',
     'helpers/array-findindex'
 ], function(
     $,
@@ -31,7 +31,8 @@ define([
     Discover,
     Config,
     GlobalActions,
-    InputLightBoxConstants
+    InputLightBoxConstants,
+    DeviceList
 ) {
     'use strict';
 
@@ -540,6 +541,7 @@ define([
     }
 
     function _scanDeviceError(devices) {
+        devices = DeviceList(devices);
         devices.forEach(function(device) {
             if(typeof(_errors[device.serial]) === 'string')  {
                 if(_errors[device.serial] !== device.error_label && device.error_label) {

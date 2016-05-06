@@ -6,64 +6,49 @@ define([
     'helpers/websocket',
     'app/actions/initialize-machine',
     'helpers/api/config',
+    'helpers/device-list',
     'helpers/array-findindex',
-    'helpers/object-assign'
-], function(Websocket, initializeMachine, config) {
+], function(Websocket, initializeMachine, config, DeviceList) {
     'use strict';
 
     var ws = ws || new Websocket({
             method: 'discover'
         }),
         printers = [],
+        discoveredPrinters = [],
         dispatchers = [],
         idList = [],
+        _printers = {},
         sendFoundPrinter = function() {
             dispatchers.forEach(function(dispatcher) {
-                dispatcher.sender(printers);
+                dispatcher.sender(_printers);
             });
         },
         findIndex = function(base, target) {
             return base.uuid === target.uuid;
         },
         onMessage = function(data) {
-            var existing_key = printers.findIndex(findIndex.bind(null, data));
+            discoveredPrinters.push(data);
 
-            if (-1 === existing_key) {
-                if (typeof data === 'string') {
-                    data = data.replace(/NaN/g, null);
-                    data = JSON.parse(data);
-                }
-
-                data.isNew = true;
-                printers.push(data);
-                existing_key = printers.length - 1;
-            }
-            else {
-                printers[existing_key].isNew = false;
-
-                // if existing. update attributes
-                for (var key in data) {
-                    if (true === data.hasOwnProperty(key)) {
-                        printers[existing_key][key] = data[key];
-                    }
-                }
-            }
-
-            // update default device info
-            if (true === initializeMachine.defaultPrinter.isExisting() &&
-                data.uuid === initializeMachine.defaultPrinter.get().uuid
-            ) {
-                initializeMachine.defaultPrinter.set(printers[existing_key]);
-            }
-
-            if (false === data.alive && -1 < existing_key) {
-                // delete it from printers
-                printers.splice(existing_key, 1);
-            }
-
-            // set a sleep
+            // throttle for result
             clearTimeout(timer);
             timer = setTimeout(function() {
+                discoveredPrinters.map((p) => {
+                    if(!_printers[p.serial]) {
+                       _printers[p.serial] = {};
+                   }
+                   Object.assign(_printers[p.serial], p);
+
+                   if (true === initializeMachine.defaultPrinter.exist() &&
+                       p.uuid === initializeMachine.defaultPrinter.get().uuid
+                   ) {
+                       initializeMachine.defaultPrinter.set(p);
+                   }
+                });
+
+                // convert device list object to array
+                printers = DeviceList(_printers);
+                discoveredPrinters.length = 0;
                 sendFoundPrinter();
             }, BUFFER);
         },
@@ -119,14 +104,7 @@ define([
                 ws.send('aggressive');
             },
             getLatestPrinter: function(printer) {
-                var existing_key = printers.findIndex(findIndex.bind(null, printer));
-
-                if (-1 === existing_key) {
-                    return null;
-                }
-                else {
-                    return printers[existing_key];
-                }
+                return _printers[printer.serial];
             }
         };
     };
