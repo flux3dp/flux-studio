@@ -292,7 +292,7 @@ define(function() {
             },
             notification_on: 'On',
             notification_off: 'Off',
-            slicing_engine_path: 'Slicing Engine Path'
+            cura_engine_path: 'Cura Engine Path'
         },
         print: {
             import: 'IMPORT',

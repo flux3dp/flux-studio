@@ -292,7 +292,7 @@ define(function() {
             },
             notification_on: '開啟',
             notification_off: '關閉',
-            slicing_engine_path: '切片引擎路徑'
+            cura_engine_path: 'Cura 引擎路徑'
         },
         print: {
             import: '匯入',

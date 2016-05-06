@@ -321,7 +321,7 @@ define([
                     d.resolve(result);
                 };
 
-                path = path || 'default';
+                path = path.trim() || 'default';
 
                 ws.send(`change_engine ${engine} ${path}`);
 
