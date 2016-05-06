@@ -94,7 +94,7 @@ define([
 
                                 <div className="span3 no-left-margin">
                                     <label className="font2">
-                                        {lang.settings.slicing_engine_path}
+                                        {lang.settings.cura_engine_path}
                                     </label>
                                 </div>
 

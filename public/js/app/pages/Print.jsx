@@ -694,7 +694,10 @@ define([
 
                 _handleSlicingEngineChange: function(engineName) {
                     engineName = engineName || defaultSlicingEngine;
-                    var path = Config().read('slicing-engine-path');
+                    var path = Config().read('slicing-engine-path').trim();
+                    if(engineName === defaultSlicingEngine) {
+                        path = 'default';
+                    }
                     director.changeEngine(engineName, path);
                 },
 
