@@ -26,7 +26,8 @@ define([
     'jsx!widgets/Modal',
     'helpers/api/discover',
     'helpers/check-firmware',
-    'helpers/firmware-updater'
+    'helpers/firmware-updater',
+    'helpers/device-list'
 ], function(
     $,
     React,
@@ -55,7 +56,8 @@ define([
     Modal,
     discover,
     checkFirmware,
-    firmwareUpdater
+    firmwareUpdater,
+    DeviceList
 ) {
     'use strict';
 
