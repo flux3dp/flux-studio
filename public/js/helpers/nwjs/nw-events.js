@@ -14,7 +14,7 @@ define(['helpers/i18n'], function(i18n) {
 
         win.on('close', function() {
             if (true === window.confirm(lang.topmenu.sure_to_quit)) {
-                switch (window.FLUX.os) {
+                switch (window.FLUX.osType) {
                 case 'osx':
                 case 'linux':
                     killCommmand = 'pkill -f flux_api';
