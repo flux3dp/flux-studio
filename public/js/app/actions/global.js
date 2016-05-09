@@ -67,7 +67,7 @@ define([
                     nw.Window.get().showDevTools();
                 });
                 shortcuts.on(['ctrl', 'alt', 'shift', 'd'], function() {
-                    window.location.href = "/debug-panel/index.html";
+                    window.location.href = '/debug-panel/index.html';
                 });
             }
         };
