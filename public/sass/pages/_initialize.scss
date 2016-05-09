@@ -46,6 +46,15 @@
             width: 209px;
         }
 
+        .select-printer {
+            bottom: 0;
+            right: 0;
+
+            .arrow {
+                display: none;
+            }
+        }
+
         .connecting-means {
             @include absolute-center();
             height: 556px;
@@ -103,7 +112,7 @@
         }
 
         .form-ap-mode {
-            padding: 10px 25px 0 25px;
+            padding: 25px 25px 0 25px;
 
             .h-control {
                 @include flexbox();
@@ -114,35 +123,8 @@
             .error {
                 border: 2px solid #c00;
 
-                & ~ .error-notice {
-                    display: block;
-                }
-
                 &:focus {
                     outline: none;
-                }
-            }
-
-            .error-notice {
-                background: #C5ACAC;
-                color: #c00;
-                display: none;
-                font-size: 1rem;
-                padding: 5px;
-                position: absolute;
-                transform: translateY(-20px);
-
-                &::after {
-                    background: #C5ACAC;
-                    content: "";
-                    display: block;
-                    height: 20px;
-                    left: -12px;
-                    -webkit-clip-path: polygon(30% 0, 80% 0, 0 80%);
-                    clip-path: polygon(30% 0, 80% 0, 0 80%);
-                    position: absolute;
-                    top: 100%;
-                    width: 40px;
                 }
             }
 
@@ -323,6 +305,8 @@
         }
 
         .green-light {
+            background: #4d4d4d;
+            border-radius: 50%;
             height: 35px;
             overflow: hidden;
             position: relative;

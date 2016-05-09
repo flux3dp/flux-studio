@@ -5513,6 +5513,11 @@ input.switch:checked ~ label:after {
         height: 209px;
         margin: 0 0 10px 0;
         width: 209px; }
+    .initialization .connect-machine .select-printer {
+        bottom: 0;
+        right: 0; }
+        .initialization .connect-machine .select-printer .arrow {
+            display: none; }
     .initialization .connect-machine .connecting-means {
         bottom: 0;
         display: block;
@@ -5557,7 +5562,7 @@ input.switch:checked ~ label:after {
     .initialization .select-wifi .modal-body {
         box-shadow: 0 0 14px 1px rgba(0, 0, 0, 0.7); }
     .initialization .select-wifi .form-ap-mode {
-        padding: 10px 25px 0 25px; }
+        padding: 25px 25px 0 25px; }
         .initialization .select-wifi .form-ap-mode .h-control {
             display: -webkit-box;
             /* OLD - iOS 6-, Safari 3.1-6 */
@@ -5569,29 +5574,8 @@ input.switch:checked ~ label:after {
             margin: 0 0 10px 0; }
         .initialization .select-wifi .form-ap-mode .error {
             border: 2px solid #c00; }
-            .initialization .select-wifi .form-ap-mode .error ~ .error-notice {
-                display: block; }
             .initialization .select-wifi .form-ap-mode .error:focus {
                 outline: none; }
-        .initialization .select-wifi .form-ap-mode .error-notice {
-            background: #C5ACAC;
-            color: #c00;
-            display: none;
-            font-size: 1rem;
-            padding: 5px;
-            position: absolute;
-            transform: translateY(-20px); }
-            .initialization .select-wifi .form-ap-mode .error-notice::after {
-                background: #C5ACAC;
-                content: "";
-                display: block;
-                height: 20px;
-                left: -12px;
-                -webkit-clip-path: polygon(30% 0, 80% 0, 0 80%);
-                clip-path: polygon(30% 0, 80% 0, 0 80%);
-                position: absolute;
-                top: 100%;
-                width: 40px; }
         .initialization .select-wifi .form-ap-mode .header {
             font-size: 14px;
             line-height: 16.8px;
@@ -5716,6 +5700,8 @@ input.switch:checked ~ label:after {
         margin: 0 30px 0 0;
         width: 207px; }
     .initialization .notice-from-device .green-light {
+        background: #4d4d4d;
+        border-radius: 50%;
         height: 35px;
         overflow: hidden;
         position: relative;
