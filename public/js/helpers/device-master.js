@@ -541,7 +541,6 @@ define([
     }
 
     function _scanDeviceError(devices) {
-        devices = DeviceList(devices);
         devices.forEach(function(device) {
             if(typeof(_errors[device.serial]) === 'string')  {
                 if(_errors[device.serial] !== device.error_label && device.error_label) {
@@ -664,6 +663,7 @@ define([
             Discover(
                 'device-master',
                 function(devices) {
+                    devices = DeviceList(devices);
                     for(var i in devices) {
                         _deviceNameMap[devices[i].name] = devices[i];
                     }

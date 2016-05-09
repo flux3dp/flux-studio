@@ -160,6 +160,7 @@ define([
                 discoverMethods = discover(
                     FIRST_DEVICE_UPDATE,
                     function(printers, fetchDirectly) {
+                        printers = DeviceList(printers);
                         firstDevice = printers[0];
                         discoverMethods.removeListener(FIRST_DEVICE_UPDATE);
                         checkFirmware(firstDevice, type).done(function(response) {
