@@ -176,7 +176,7 @@ define([
                         security: wifi.security,
                         method: 'dhcp'
                     },
-                    comamnd = ['config_network', ''].join(' ');
+                    comamnd = ['config_network'];
 
                 switch (wifiConfig.security.toUpperCase()) {
                 case 'WEP':
@@ -188,7 +188,9 @@ define([
                     break;
                 }
 
-                genericSender(comamnd, function(response) {
+                comamnd.push(JSON.stringify(wifiConfig));
+
+                genericSender(comamnd.join(' '), function(response) {
                     $deferred.resolve(response);
                 });
 
