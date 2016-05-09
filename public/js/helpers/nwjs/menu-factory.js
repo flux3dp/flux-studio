@@ -455,7 +455,6 @@ define([
 
         createDeviceList = function(printers) {
             var _printers = [];
-            printers = Object.keys(printers).map((p) => printers[p]);
             printers.forEach(function(printer) {
                 _printers.push(createDevice(printer));
             });
@@ -478,6 +477,7 @@ define([
             discoverMethods = discover(
                 'menu-factory',
                 function(printers) {
+                    printers = DeviceList(printers);
                     _printers = createDeviceList(printers);
                 }
             );

@@ -17,7 +17,8 @@ define([
     'app/actions/input-lightbox-actions',
     'app/constants/input-lightbox-constants',
     'helpers/sprintf',
-    'helpers/check-device-status'
+    'helpers/check-device-status',
+    'helpers/device-list'
 ], function(
     React,
     $,
@@ -37,7 +38,8 @@ define([
     InputLightboxActions,
     InputLightboxConstants,
     sprintf,
-    checkDeviceStatus
+    checkDeviceStatus,
+    DeviceList
 ) {
     'use strict';
 
@@ -109,6 +111,7 @@ define([
                 discoverMethods: discover(
                     self.state.discoverId,
                     function(printers) {
+                        printers = DeviceList(printers);
                         refreshOption(printers);
                     }
                 )

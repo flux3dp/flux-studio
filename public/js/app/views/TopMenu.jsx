@@ -140,13 +140,14 @@ define([
                 var self = this,
                     refreshOption = function(devices) {
                         self.setState({
-                            deviceList: DeviceList(devices)
+                            deviceList: devices
                         });
                     };
 
                 Discover(
                     'top-menu',
                     function(printers) {
+                        printers = DeviceList(printers);
                         refreshOption(printers);
                     }
                 );
