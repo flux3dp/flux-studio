@@ -5571,6 +5571,8 @@ input.switch:checked ~ label:after {
             border: 2px solid #c00; }
             .initialization .select-wifi .form-ap-mode .error ~ .error-notice {
                 display: block; }
+            .initialization .select-wifi .form-ap-mode .error:focus {
+                outline: none; }
         .initialization .select-wifi .form-ap-mode .error-notice {
             background: #C5ACAC;
             color: #c00;

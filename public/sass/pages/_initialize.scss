@@ -117,6 +117,10 @@
                 & ~ .error-notice {
                     display: block;
                 }
+
+                &:focus {
+                    outline: none;
+                }
             }
 
             .error-notice {
