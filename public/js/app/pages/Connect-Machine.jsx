@@ -5,6 +5,7 @@ define([
     'helpers/api/usb-config',
     'helpers/api/upnp-config',
     'jsx!widgets/Modal',
+    'jsx!views/Print-Selector',
     'app/actions/alert-actions',
     'app/actions/progress-actions',
     'app/constants/progress-constants'
@@ -15,6 +16,7 @@ define([
     usbConfig,
     upnpConfig,
     Modal,
+    PrinterSelector,
     AlertActions,
     ProgressActions,
     ProgressConstants
@@ -57,41 +59,23 @@ define([
 
             _onWifiStartingSetUp: function(e) {
                 var self = this,
-                    currentPrinter,
-                    upnpMethods,
-                    lastError,
                     discoverMethods = discover('upnp-config', (printers) => {
                         clearTimeout(timer);
 
-                        currentPrinter = printers[0];
-                        currentPrinter = printers.filter(function(printer) {
+                        // TODO: remove it
+                        printers = printers.filter(function(printer) {
                             return '46314b30002f6c86d2b02c73dead910b' === printer.uuid;
-                            // return false === printer.uuid.startsWith('00000000000');
-                        })[0];
-                        currentPrinter.from = 'WIFI';
-                        currentPrinter.apName = currentPrinter.name;
-                        upnpMethods = upnpConfig(currentPrinter.uuid);
-
-                        upnpMethods.ready(function() {
-                            self._toggleBlocker(false);
-
-                            if ('undefined' !== typeof lastError) {
-                                upnpMethods.addKey();
-                            }
-
-                            self._setSettingPrinter(currentPrinter);
-                        }).progress(function(response) {
-
-                            switch (response.status) {
-                            case 'error':
-                                lastError = response;
-                                self._toggleBlocker(false);
-                                break;
-                            case 'waitting':
-                                self._toggleBlocker(true);
-                                break;
-                            }
                         });
+
+                        if (0 < printers.length) {
+                            self._toggleBlocker(false);
+                            self.setState({
+                                showPrinters: true
+                            });
+                        }
+                        else {
+                            self._onGettingPrinter(printers[0]);
+                        }
 
                         discoverMethods.removeListener('upnp-config');
                     }),
@@ -113,11 +97,67 @@ define([
                 }
             },
 
+            _onGettingPrinter: function(currentPrinter) {
+                var self = this,
+                    upnpMethods,
+                    lastError;
+
+                currentPrinter.from = 'WIFI';
+                currentPrinter.apName = currentPrinter.name;
+                upnpMethods = upnpConfig(currentPrinter.uuid);
+
+                upnpMethods.ready(function() {
+                    self._toggleBlocker(false);
+
+                    if ('undefined' !== typeof lastError) {
+                        upnpMethods.addKey();
+                    }
+
+                    self._setSettingPrinter(currentPrinter);
+                }).progress(function(response) {
+
+                    switch (response.status) {
+                    case 'error':
+                        lastError = response;
+                        self._toggleBlocker(false);
+                        break;
+                    case 'waitting':
+                        self._toggleBlocker(true);
+                        break;
+                    }
+                });
+            },
+
+            _closePrinterList: function() {
+                this.setState({
+                    showPrinters: false
+                });
+            },
+
             // Lifecycle
             getInitialState: function() {
                 return {
-                    lang: args.state.lang
+                    lang: args.state.lang,
+                    showPrinters: false
                 };
+            },
+
+            _renderPrinters: function(lang) {
+                var content = (
+                    <PrinterSelector
+                        uniqleId="connect-via-wifi"
+                        className="absolute-center"
+                        lang={lang}
+                        onClose={this._closePrinterList}
+                        onGettingPrinter={this._onGettingPrinter}
+                    />
+                );
+
+                return (
+                    true === this.state.showPrinters ?
+                    <Modal content={content}/> :
+                    ''
+                );
             },
 
             render : function() {
@@ -125,6 +165,7 @@ define([
                     wrapperClassName = {
                         'initialization': true
                     },
+                    printersSelection = this._renderPrinters(lang),
                     content = (
                         <div className="connect-machine text-center">
                             <img className="brand-image" src="/img/menu/main_logo.svg"/>
@@ -145,6 +186,7 @@ define([
                                     {lang.initialize.no_machine}
                                 </a>
                             </div>
+                            {printersSelection}
                         </div>
                     );
 
