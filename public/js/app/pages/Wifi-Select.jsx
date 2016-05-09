@@ -29,10 +29,11 @@ define([
 ) {
     'use strict';
     var actionMap = {
-        BACK_TO_SET_PASSWARD      : 'BACK_TO_SET_PASSWARD',
-        AP_MODE                   : 'AP_MODE',
-        SET_WIFI_WITHOUT_PASSWORD : 'SET_WIFI_WITHOUT_PASSWORD'
-    };
+            BACK_TO_SET_PASSWARD      : 'BACK_TO_SET_PASSWARD',
+            AP_MODE                   : 'AP_MODE',
+            SET_WIFI_WITHOUT_PASSWORD : 'SET_WIFI_WITHOUT_PASSWORD'
+        },
+        globalWifiAPI;
 
     return function(args) {
         args = args || {};
@@ -56,7 +57,8 @@ define([
                     alertContent: {},
                     settingPrinter: initializeMachine.settingPrinter.get(),
                     apModeNameIsVaild: true,
-                    apModePassIsVaild: true
+                    apModePassIsVaild: true,
+                    isFormSubmitted: false
                 };
             },
 
@@ -66,7 +68,7 @@ define([
                     settingWifi = initializeMachine.settingWifi.get(),
                     settingPrinter = self.state.settingPrinter,
                     timer,
-                    wifiAPI = upnpConfig(settingPrinter.uuid),
+                    wifiAPI,
                     getWifi = function() {
                         wifiOptions = [];
 
@@ -135,6 +137,16 @@ define([
                     );
                 });
 
+
+                if ('WIFI' === settingPrinter.from) {
+                    wifiAPI = upnpConfig(settingPrinter.uuid);
+                    // defined at top
+                    globalWifiAPI = upnpConfig(settingPrinter.uuid);
+                }
+                else {
+                    wifiAPI = usbConfig();
+                }
+
                 getWifi();
 
                 AlertStore.onCancel(self._onCancel);
@@ -168,17 +180,15 @@ define([
             },
 
             _goToSetPassword: function() {
-                var pageHash = '#initialize/wifi/set-password',
-                    settingPrinter = this.state.settingPrinter,
+                var settingPrinter = this.state.settingPrinter,
                     settingWifi = initializeMachine.settingWifi.get();
 
                 if ('WIFI' === this.state.settingPrinter.from) {
-                    pageHash = '#initialize/wifi/notice-from-device';
-                    settingPrinter.apName = settingWifi.ssid;
-                    initializeMachine.settingPrinter.set(settingPrinter);
+                    this._settingWifiViaWifi();
                 }
-
-                location.hash = pageHash;
+                else {
+                    location.hash = '#initialize/wifi/set-password';
+                }
             },
 
             _setApMode: function() {
@@ -221,10 +231,9 @@ define([
             _setApModeViaWifi: function(name, pass) {
                 var self = this,
                     lang = self.state.lang,
-                    settingPrinter = self.state.settingPrinter,
-                    wifiConfig = upnpConfig(settingPrinter.uuid);
+                    settingPrinter = self.state.settingPrinter;
 
-                wifiConfig.setAPMode(name, pass).
+                globalWifiAPI.setAPMode(name, pass).
                 done(function(response) {
                     location.hash = 'initialize/wifi/setup-complete/station-mode';
                 }).
@@ -233,14 +242,21 @@ define([
                 });
             },
 
-            _settingWifi: function() {
-                var settingPrinter = self.state.settingPrinter,
-                    settingWifi = initializeMachine.settingWifi.get(),
-                    wifiConfig = upnpConfig(settingPrinter.uuid);
+            _settingWifiViaWifi: function() {
+                var settingPrinter = this.state.settingPrinter,
+                    settingWifi = initializeMachine.settingWifi.get();
 
-                wifiConfig.setWifiNetwork(settingWifi, settingWifi.plain_password).
+                settingPrinter.apName = settingWifi.ssid;
+                initializeMachine.settingPrinter.set(settingPrinter);
+                ProgressActions.open(ProgressConstants.NONSTOP);
+
+                globalWifiAPI.setWifiNetwork(settingWifi, settingWifi.plain_password).
+                always(function() {
+                    ProgressActions.close();
+                }).
                 done(function(response) {
                     console.log('done', response);
+                    location.hash = '#initialize/wifi/notice-from-device';
                 }).
                 fail(function(response) {
                     console.log('fail', response);
@@ -254,8 +270,7 @@ define([
                 if ('WIFI' === settingPrinter.from) {
                     settingPrinter.apName = settingWifi.ssid;
                     initializeMachine.settingPrinter.set(settingPrinter);
-                    location.hash = '#initialize/wifi/notice-from-device';
-
+                    this._settingWifiViaWifi();
                 }
                 else {
                     location.hash = '#initialize/wifi/setup-complete/with-wifi';
@@ -334,6 +349,9 @@ define([
                     pass = this.refs.ap_mode_password.getDOMNode().value;
 
                 if (true === this._checkApModeSetting()) {
+                    this.setState({
+                        isFormSubmitted: true
+                    });
                     this._stopScan(actionMap.AP_MODE);
                 }
             },
@@ -403,6 +421,10 @@ define([
                     passClass = classSet({
                         'error': false === self.state.apModePassIsVaild
                     }),
+                    submitButtonClass = classSet({
+                        'btn btn-action btn-large': true,
+                        'btn-disabled': self.state.isFormSubmitted
+                    }),
                     content = (
                         <form className="form form-ap-mode" onSubmit={self._setAsStationMode}>
                             <label className="h-control">
@@ -416,9 +438,11 @@ define([
                                     placeholder=""
                                     defaultValue={self.state.settingPrinter.name}
                                     autoFocus={true}
+                                    required={true}
+                                    pattern="^[a-zA-Z0-9]+$"
+                                    title={lang.initialize.set_machine_generic.ap_mode_name_format}
                                     onKeyUp={self._checkApModeSetting}
                                 />
-                                <div className="error-notice">{lang.initialize.set_machine_generic.ap_mode_name_format}</div>
                             </label>
                             <label className="h-control">
                                 <span className="header">
@@ -430,9 +454,11 @@ define([
                                     className={passClass}
                                     placeholder=""
                                     defaultValue=""
+                                    required={true}
+                                    pattern="^[a-zA-Z0-9]{8,}$"
+                                    title={lang.initialize.set_machine_generic.ap_mode_pass_format}
                                     onKeyUp={self._checkApModeSetting}
                                 />
-                                <div className="error-notice">{lang.initialize.set_machine_generic.ap_mode_pass_format}</div>
                             </label>
                             <div className="button-group btn-v-group">
                                 <button className="btn btn-action btn-large" type="submit">{lang.initialize.confirm}</button>
@@ -504,7 +530,8 @@ define([
                         },
                         onClick: function(e) {
                             self.setState({
-                                openApModeForm: true
+                                openApModeForm: true,
+                                isFormSubmitted: false
                             });
                         }
                     },
