@@ -137,10 +137,6 @@ define([
                         BAD: 'bad'
                     };
 
-                // opts = reorganizeOptions(opts);
-
-                // ws.onError(opts.onError);
-
                 events.onMessage = function(data) {
                     if ('ok' === data.status) {
                         data.items = data.items || [];
