@@ -388,6 +388,7 @@ define([
 
                 _handleGoClick: function() {
                     AlertStore.removeCancelListener(this._handleDefaultCancel);
+                    director.takeSnapShot();
                     listeningToCancel = false;
                     this.setState({
                         openPrinterSelectorWindow: true
