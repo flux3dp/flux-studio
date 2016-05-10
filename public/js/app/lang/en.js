@@ -675,7 +675,7 @@ define(function() {
                         unit: 'mm/s',
                         fast: 'Fast',
                         slow: 'Slow',
-                        min: 0.1,
+                        min: 0.8,
                         max: 20,
                         step: 0.1
                     },
