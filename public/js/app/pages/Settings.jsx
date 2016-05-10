@@ -66,7 +66,15 @@ define([
 
             _handleDone: function() {
                 location.hash = '#studio/print';
-                window.location.reload();
+
+                if (true === window.FLUX.isNW) {
+                    window.FLUX.close().always(function() {
+                        window.location.reload();
+                    });
+                }
+                else {
+                    window.location.reload();
+                }
             },
 
             render : function() {
