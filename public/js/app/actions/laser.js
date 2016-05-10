@@ -738,6 +738,7 @@ define([
 
                 if ('string' !== typeof currentFileFormat) {
                     currentFileFormat = ('svg' === extension ? 'svg' : 'bitmap');
+                    currentFileFormat = (self.props.page === 'draw' ? 'svg' : currentFileFormat);
                     self.setState({
                         fileFormat: currentFileFormat
                     });
