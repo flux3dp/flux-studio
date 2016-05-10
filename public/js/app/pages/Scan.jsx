@@ -68,6 +68,7 @@ define([
                     return {
                         lang: args.state.lang,
                         gettingStarted: false,  // selecting machine
+                        openBlocker: false,  // blocker is open
                         scanTimes: 0,   // how many scan executed
                         selectedPrinter: undefined, // which machine selected
                         deleting_mesh: undefined,
@@ -1169,6 +1170,9 @@ define([
                 },
 
                 _openBlocker: function(is_open, type, message, hasStop, caption) {
+                    this.setState({
+                        openBlocker: is_open
+                    });
 
                     if (true === is_open) {
                         ProgressActions.open(type, caption ? caption : '', message, hasStop);
@@ -1382,7 +1386,8 @@ define([
                     return (
                         0 < state.selectedMeshes.length &&
                         false === state.isScanStarted &&
-                        false === state.showCamera ?
+                        false === state.showCamera &&
+                        false === state.openBlocker ?
                         <ManipulationPanel
                             lang={lang}
                             selectedMeshes={state.selectedMeshes}
