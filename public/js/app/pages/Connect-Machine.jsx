@@ -148,14 +148,13 @@ define([
                         uniqleId="connect-via-wifi"
                         className="absolute-center"
                         lang={lang}
-                        onClose={this._closePrinterList}
                         onGettingPrinter={this._onGettingPrinter}
                     />
                 );
 
                 return (
                     true === this.state.showPrinters ?
-                    <Modal content={content}/> :
+                    <Modal onClose={this._closePrinterList} content={content}/> :
                     ''
                 );
             },
