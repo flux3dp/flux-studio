@@ -75,7 +75,7 @@ define([
 
                 _ws.onmessage = function(result) {
                     var data = (true === isJson(result.data) ? JSON.parse(result.data) : result.data),
-                        message = trimMessage([WsLogger.getTimeLabel(), '<', result.data].join(' '));
+                        message = trimMessage(['<', result.data].join(' '));
 
                     wsLog.log.push(message);
 
@@ -128,7 +128,7 @@ define([
                     if (1006 === result.code &&
                         60000 <= (new Date()).getTime() - window.FLUX.timestamp
                     ) {
-                        wsLog.log.push([WsLogger.getTimeLabel(), '**abnormal disconnection**'].join(' '));
+                        wsLog.log.push(['**abnormal disconnection**'].join(' '));
                     }
 
                     if (1006 === result.code &&
@@ -196,13 +196,13 @@ define([
 
                     if (null === ws || readyState.OPEN !== ws.readyState) {
                         ws.onopen = function(e) {
-                            wsLog.log.push(trimMessage([WsLogger.getTimeLabel(), '>', data, typeof data].join(' ')));
+                            wsLog.log.push(trimMessage(['>', data, typeof data].join(' ')));
                             socketOptions.onOpen(e);
                             ws.send(data);
                         };
                     }
                     else {
-                        wsLog.log.push(trimMessage([WsLogger.getTimeLabel(), '>', data, typeof data].join(' ')));
+                        wsLog.log.push(trimMessage(['>', data, typeof data].join(' ')));
                         ws.send(data);
                     }
 
