@@ -29,7 +29,7 @@ function(React, $, Backbone, display, config, appSettings, detectWebgl) {
                     [/^.*$/, 'e404', this.e404],
                     // initialize Flux Printer
                     [
-                        /^initialize\/wifi\/?(connect-machine|select|set-printer|set-password|setup-complete)\/?(.*)?/,
+                        /^initialize\/wifi\/?(connect-machine|select|not-found|notice-from-device|set-printer|set-password|setup-complete)\/?(.*)?/,
                         'initial',
                         this.initial
                     ],
@@ -67,6 +67,8 @@ function(React, $, Backbone, display, config, appSettings, detectWebgl) {
         initial: function(step, other) {
             var map = {
                     'connect-machine': 'Connect-Machine',
+                    'not-found': 'Printer-Not-Found',
+                    'notice-from-device': 'Notice-From-Device',
                     'select': 'Wifi-Select',
                     'set-printer': 'Wifi-Set-Printer',
                     'set-password': 'Wifi-Set-Password',

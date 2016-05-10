@@ -149,7 +149,7 @@ define([
                         AlertStore.onCancel(onCancel);
                     }
 
-                    if (true === options.autoReconnect) {
+                    if (true === socketOptions.autoReconnect) {
                         received_data = [];
                         ws = createWebSocket(options);
                     }

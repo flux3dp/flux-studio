@@ -5,7 +5,10 @@ define([
     'jsx!widgets/Modal',
     'app/actions/alert-actions',
     'app/stores/alert-store',
-    'helpers/api/config'
+    'helpers/api/config',
+    'helpers/api/upnp-config',
+    'app/actions/progress-actions',
+    'app/constants/progress-constants'
 ], function(
     React,
     initializeMachine,
@@ -13,7 +16,10 @@ define([
     Modal,
     AlertActions,
     AlertStore,
-    Config
+    Config,
+    upnpConfig,
+    ProgressActions,
+    ProgressConstants
 ) {
     'use strict';
 
@@ -41,7 +47,13 @@ define([
             },
 
             _onCancel: function(id) {
-                if ('#initialize/wifi/set-printer' === location.hash) {
+                if ('set-machine-error' === id) {
+                    return;
+                };
+
+                if ('#initialize/wifi/set-printer' === location.hash &&
+                    'WIFI' === this.state.settingPrinter.from
+                ) {
                     var usb = usbConfig();
                     usb.close();
                     location.hash = 'initialize/wifi/connect-machine';
@@ -54,15 +66,23 @@ define([
                 var self        = this,
                     name        = self.refs.name.getDOMNode().value,
                     password    = self.refs.password.getDOMNode().value,
-                    usb         = usbConfig(),
+                    oldPasswordExists = ('undefined' !== typeof self.refs.old_password),
+                    oldPassword = (
+                        'WIFI' === self.state.settingPrinter.from && true === oldPasswordExists ?
+                        self.refs.old_password.getDOMNode().value :
+                        ''
+                    ),
+                    usb,
                     lang        = self.state.lang,
                     onError     = function(response) {
+                        ProgressActions.close();
                         AlertActions.showPopupError('set-machine-error', response.error);
                     },
                     goNext = function() {
                         self.state.settingPrinter.name = name;
                         initializeMachine.settingPrinter.set(self.state.settingPrinter);
                         location.hash = '#initialize/wifi/select';
+                        ProgressActions.close();
                     },
                     setPassword = function(password) {
                         setMachine.password(password, {
@@ -71,7 +91,8 @@ define([
                             }
                         });
                     },
-                    startSetting = function() {
+                    startSettingWithUsb = function() {
+                        usb = usbConfig();
                         setMachine = usb.setMachine({
                             onError: onError
                         });
@@ -87,27 +108,53 @@ define([
                                 Config().write("configured-printer", name);
                             }
                         });
-                        AlertStore.removeYesListener(startSetting);
-                        AlertStore.removeNoListener(cancelSetting);
+                    },
+                    startSettingWithWifi = function() {
+                        var upnpMethods = upnpConfig(self.state.settingPrinter.uuid),
+                            $deferred = $.Deferred();
+
+                        $.when(upnpMethods.name(name), upnpMethods.password(oldPassword, password)).
+                        always(function() {
+                            ProgressActions.close();
+                        }).
+                        done(function() {
+                            goNext();
+                        }).
+                        fail(function(response) {
+                            AlertActions.showPopupError('set-machine-error', lang.initialize.set_machine_generic.incorrect_old_password);
+                        });
+
                     },
                     cancelSetting = function() {
-                        AlertStore.removeYesListener(startSetting);
+                        AlertStore.removeYesListener(settingPrinter);
                         AlertStore.removeNoListener(cancelSetting);
                     },
                     setMachine,
-                    isValid;
+                    isValidName,
+                    settingPrinter = function() {
+                        AlertStore.removeYesListener(settingPrinter);
+                        AlertStore.removeNoListener(cancelSetting);
+                        ProgressActions.open(ProgressConstants.NONSTOP);
 
-                isValid = (name !== '' && false === /[^()\u4e00-\u9fa5a-zA-Z0-9 ’'_-]+/g.test(name));
+                        if ('WIFI' === self.state.settingPrinter.from) {
+                            startSettingWithWifi();
+                        }
+                        else {
+                            startSettingWithUsb();
+                        }
+                    };
+
+                isValidName = (name !== '' && false === /[^()\u4e00-\u9fa5a-zA-Z0-9 ’'_-]+/g.test(name));
 
                 self.setState({
-                    requirePrinterName: (name !== ''),
-                    validPrinterName: isValid
+                    requirePrinterName   : (name !== ''),
+                    validPrinterName     : isValidName
                 });
 
-                if (true === isValid) {
+                if (true === isValidName) {
 
                     if (true === self.state.settingPrinter.password && '' !== password) {
-                        AlertStore.onYes(startSetting);
+                        AlertStore.onYes(settingPrinter);
                         AlertStore.onNo(cancelSetting);
                         AlertActions.showPopupYesNo(
                             'change-password',
@@ -116,7 +163,7 @@ define([
                         );
                     }
                     else {
-                        startSetting();
+                        settingPrinter();
                     }
 
                 }
@@ -161,6 +208,7 @@ define([
                     },
                     cx = React.addons.classSet,
                     invalidPrinterNameMessage = lang.initialize.invalid_device_name,
+                    oldPassword,
                     printerNameClass,
                     invalidPrinterNameClass,
                     printerPasswordClass,
@@ -178,6 +226,16 @@ define([
                     'error-message': true,
                     'hide': this.state.validPrinterName
                 });
+
+                oldPassword = (
+                    true === this.state.settingPrinter.password && 'WIFI' === this.state.settingPrinter.from ?
+                    <label className="control" for="printer-old-password">
+                        <h4 className="input-head">{lang.initialize.set_machine_generic.old_password}</h4>
+                        <input ref="old_password" for="printer-old-password" type="password" className={printerPasswordClass}
+                        placeholder={lang.initialize.set_machine_generic.old_password}/>
+                    </label> :
+                    ''
+                );
 
                 if (false === this.state.requirePrinterName) {
                     invalidPrinterNameMessage = lang.initialize.require_device_name;
@@ -201,6 +259,7 @@ define([
                                     />
                                     <span className={invalidPrinterNameClass}>{invalidPrinterNameMessage}</span>
                                 </label>
+                                {oldPassword}
                                 <label className="control" for="printer-password">
                                     <h4 className="input-head">{lang.initialize.set_machine_generic.password}</h4>
                                     <input ref="password" for="printer-password" type="password" className={printerPasswordClass}

@@ -112,6 +112,8 @@ define(function() {
             cancel: 'CANCEL',
             confirm: 'CONFIRM',
             connect: 'Connect',
+            back: 'Back',
+            retry: 'RETRY',
             no_machine: 'I don\'t have a machine now.',
 
             // specific caption/content
@@ -122,7 +124,9 @@ define(function() {
                 content: 'Are you sure about changing the password?',
                 caption: 'Changing password'
             },
-            connect_flux: 'Connect FLUX Delta with the USB Cable',
+            connect_flux: 'Connect FLUX Delta',
+            via_usb: 'Using USB Cable',
+            via_wifi: 'Using WiFi',
             name_your_flux: 'Name Your FLUX Delta',
             wifi_setup: 'Wi-Fi Setup',
             select_preferred_wifi: 'Select your preferred network.',
@@ -133,9 +137,16 @@ define(function() {
             set_machine_generic: {
                 printer_name: 'Name*',
                 printer_name_placeholder: 'Give your Delta an unique name',
+                old_password: 'Old Password',
                 password: 'Password',
                 set_station_mode: 'Set as a Wi-Fi station',
-                password_placeholder: 'Something secret'
+                password_placeholder: 'Something secret',
+                incorrect_old_password: 'Incorrect Old Password',
+                incorrect_password: 'Incorrect Password',
+                ap_mode_name: 'Name',
+                ap_mode_pass: 'Password',
+                ap_mode_name_format: 'Only accept alphabets or numbers',
+                ap_mode_pass_format: 'At least 8 characters'
             },
 
             setting_completed: {
@@ -150,9 +161,22 @@ define(function() {
                 ok: 'START CREATING'
             },
 
+            notice_from_device: {
+                headline: 'Check the WiFi Indicator on FLUX Delta',
+                subtitle: 'Please mind the status of WiFi connection.',
+                light_on: 'Light On',
+                light_on_desc: 'FLUX Delta has connected to the WiFi you assigned',
+                breathing: 'Breathing',
+                breathing_desc: 'WiFi connection fail, please try setting again.',
+                successfully: 'If FLUX Delta connect successfuly',
+                successfully_statement: 'Please go back to your WiFi list and connect to your PC to %s, then restart FLUX Studio',
+                restart: 'Restart FLUX Studio'
+            },
+
             // errors
             errors: {
                 error: 'Error',
+                not_found: 'Not Found',
 
                 keep_connect: {
                     caption: 'USB Device not found',
@@ -982,7 +1006,8 @@ define(function() {
                 caption: 'Important Update',
                 message: 'Important Delta firmware update is available. Do you want to update now?',
             },
-            unsupport_osx_version: 'Unsupported Mac OS X Version Detected'
+            unsupport_osx_version: 'Unsupported Mac OS X Version Detected',
+            need_password: 'Need Password to connect to FLUX Delta'
         },
         machine_status: {
             '-10': 'Raw mode',

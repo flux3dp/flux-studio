@@ -19,6 +19,13 @@ define([
 
     // prevent delete (back) behavior
     var genericLogger = new Logger('generic'),
+        forceReload = function() {
+            if (true === window.FLUX.isNW) {
+                window.FLUX.close().always(function() {
+                    window.location.reload();
+                });
+            }
+        },
         defaultKeyBehavior = function() {
             shortcuts.on(['BACK'], function(e) {
                 // always prevent default, and implement delete function our own.
@@ -55,8 +62,8 @@ define([
                 }
             });
 
-            shortcuts.on(['cmd', 'r'], function() { window.location.reload(); });
-            shortcuts.on(['ctrl', 'r'], function() { window.location.reload(); });
+            shortcuts.on(['cmd', 'r'], function() { forceReload(); });
+            shortcuts.on(['ctrl', 'r'], function() { forceReload(); });
             shortcuts.on(['cmd', 'c'], function() { window.document.execCommand('copy'); });
             shortcuts.on(['cmd', 'a'], function() { window.document.execCommand('selectAll'); });
             shortcuts.on(['cmd', 'x'], function() { window.document.execCommand('cut'); });

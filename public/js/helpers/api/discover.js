@@ -68,14 +68,18 @@ define([
             }, BUFFER);
         },
         BUFFER = 100,
-        pokeIP,
+        pokeIP = config().read('poke-ip-addr'),
         timer;
+
+    if ('' === pokeIP) {
+        config().write('poke-ip-addr', '192.168.1.1');
+    }
 
     ws.onMessage(onMessage);
 
-    setInterval(function() {
-        pokeIP = config().read('poke-ip-addr');
 
+
+    setInterval(function() {
         if ('string' === typeof pokeIP && '' !== pokeIP) {
             ws.send(JSON.stringify({ "cmd" : "poke", "ipaddr": pokeIP }));
         }
