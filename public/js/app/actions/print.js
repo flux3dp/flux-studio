@@ -80,6 +80,7 @@ define([
         importFromFCode = false,
         importFromGCode = false,
         needToShowMonitor = false,
+        hasPreviewImage = false,
         ddHelper = 0,
         defaultFileName = '',
         cameraLight,
@@ -560,8 +561,13 @@ define([
         var d = $.Deferred();
         getBlobFromScene().then((blob) => {
             previewUrl = URL.createObjectURL(blob);
+            console.log(previewUrl, blob);
             slicer.uploadPreviewImage(blob).then(() => {
-                d.resolve(blob);
+                return slicer.getSlicingResult();
+            }).then((r) => {
+                responseBlob = r;
+                hasPreviewImage = true;
+                d.resolve(r);
             });
         });
         return d.promise();
@@ -570,6 +576,7 @@ define([
     function doSlicing() {
         _clearPath();
         blobExpired = true;
+        hasPreviewImage = false;
         willReslice = true;
 
         if(slicingStatus.inProgress) {
@@ -855,6 +862,7 @@ define([
                     SELECTED.outlineMesh.position.x = location.x - movingOffsetX;
                     SELECTED.outlineMesh.position.y = location.y - movingOffsetY;
                     blobExpired = true;
+                    hasPreviewImage = false;
                     setObjectDialoguePosition();
                     render();
                     return;
@@ -1312,6 +1320,7 @@ define([
                     d.resolve('');
                 });
                 blobExpired = true;
+                hasPreviewImage = false;
                 slicingStatus.pauseReport = false;
             }
         }, 500);
@@ -1323,6 +1332,7 @@ define([
         slicingStatus.pauseReport = true;
         var d = $.Deferred();
         blobExpired = true;
+        hasPreviewImage = false;
 
         var t = setInterval(function() {
             if(slicingStatus.canInterrupt) {
@@ -1497,6 +1507,7 @@ define([
             SELECTED.outlineMesh.position.y -= reference.y;
             SELECTED.outlineMesh.position.z -= reference.z;
             blobExpired = true;
+            hasPreviewImage = false;
 
             checkOutOfBounds(SELECTED);
             render();
@@ -1512,6 +1523,7 @@ define([
                 mesh.outlineMesh.position.z -= reference.z;
             }
             blobExpired = true;
+            hasPreviewImage = false;
         }
     }
 
@@ -1862,6 +1874,7 @@ define([
         fileName = fileName + '.gcode';
 
         blobExpired = true;
+        hasPreviewImage = false;
         selectObject(null);
         var d = $.Deferred();
         if(objects.length > 0) {
@@ -1895,13 +1908,22 @@ define([
         var d = $.Deferred();
         if(objects.length > 0) {
             if (!blobExpired) {
-                d.resolve(saveAs(responseBlob, fileName));
+                if(hasPreviewImage) {
+                    d.resolve(saveAs(responseBlob, fileName));
+                }
+                else {
+                    takeSnapShot().then(() => {
+                        d.resolve(saveAs(responseBlob, fileName));
+                    });
+                }
             }
             else {
                 getFCode().then(function(blob) {
                     if (blob instanceof Blob) {
-                        ProgressActions.close();
-                        d.resolve(saveAs(blob, fileName));
+                        takeSnapShot().then(() => {
+                            ProgressActions.close();
+                            d.resolve(saveAs(responseBlob, fileName));
+                        });
                     }
                 });
             }

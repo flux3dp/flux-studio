@@ -42,7 +42,8 @@ define([
 
                 render : function() {
                     var lang = args.state.lang,
-                        pokeIP = config().read('poke-ip-addr');
+                        pokeIP = config().read('poke-ip-addr'),
+                        enginePath = config().read('slicing-engine-path');
 
                     return (
                         <div className="form general">
@@ -93,12 +94,12 @@ define([
 
                                 <div className="span3 no-left-margin">
                                     <label className="font2">
-                                        {lang.settings.slicing_engine_path}
+                                        {lang.settings.cura_engine_path}
                                     </label>
                                 </div>
 
                                 <div className="span8 font3">
-                                    <input type="text" autoComplete="false" onBlur={this._updateSlicingEnginePath}/>
+                                    <input type="text" autoComplete="false" defaultValue={enginePath} onBlur={this._updateSlicingEnginePath}/>
                                 </div>
 
                             </div>

@@ -93,6 +93,7 @@ define([
             allowDeleteObject = true,
             tutorialMode = false,
             nwjsMenu = menuFactory.items,
+            defaultSlicingEngine = 'slic3r',
             tourGuide = [
                 {
                     selector: '.arrowBox',
@@ -692,7 +693,11 @@ define([
                 },
 
                 _handleSlicingEngineChange: function(engineName) {
-                    var path = Config().read('slicing-engine-path');
+                    engineName = engineName || defaultSlicingEngine;
+                    var path = Config().read('slicing-engine-path').trim();
+                    if(engineName === defaultSlicingEngine) {
+                        path = 'default';
+                    }
                     director.changeEngine(engineName, path);
                 },
 
