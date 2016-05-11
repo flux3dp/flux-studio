@@ -2893,7 +2893,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         color: #999;
         font-size: 13px;
         line-height: 40px;
-        width: 100px; }
+        width: 120px; }
     .controls .control {
         line-height: 40px;
         position: relative; }
@@ -3974,7 +3974,8 @@ input[type=range]:focus::-webkit-slider-runnable-track {
                     top: 200px; }
                 .flux-monitor .main .body .device-content .camera-image {
                     width: 100%;
-                    height: 249px; }
+                    height: 100%;
+                    object-fit: cover; }
                 .flux-monitor .main .body .device-content .status-info {
                     position: absolute;
                     width: 332px;
@@ -5513,6 +5514,47 @@ input.switch:checked ~ label:after {
         height: 209px;
         margin: 0 0 10px 0;
         width: 209px; }
+    .initialization .connect-machine .select-printer {
+        bottom: 0;
+        right: 0; }
+        .initialization .connect-machine .select-printer .arrow {
+            display: none; }
+    .initialization .connect-machine .connecting-means {
+        bottom: 0;
+        display: block;
+        left: 0;
+        margin: auto;
+        position: absolute;
+        right: 0;
+        top: 0;
+        height: 556px;
+        width: 755px; }
+    .initialization .connect-machine .btn-h-group {
+        margin: 0 auto 75px auto; }
+    .initialization .connect-machine .btn-action,
+    .initialization .connect-machine .btn-action:hover {
+        background: transparent;
+        height: 458px;
+        max-width: initial;
+        opacity: 1;
+        transition: box-shadow .3s ease;
+        width: 335px; }
+        .initialization .connect-machine .btn-action .headline,
+        .initialization .connect-machine .btn-action .subtitle,
+        .initialization .connect-machine .btn-action:hover .headline,
+        .initialization .connect-machine .btn-action:hover .subtitle {
+            color: #666;
+            font-size: 24px;
+            line-height: 30px;
+            margin: 0;
+            text-align: center; }
+        .initialization .connect-machine .btn-action .subtitle,
+        .initialization .connect-machine .btn-action:hover .subtitle {
+            margin: 0 0 30px 0; }
+    .initialization .connect-machine .btn-action:hover {
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.3); }
+    .initialization .connect-machine .btn-action:first-child {
+        margin: 0 85px 0 0; }
     .initialization .select-wifi .notice {
         margin: 0 0 34px 0; }
         .initialization .select-wifi .notice P {
@@ -5520,16 +5562,51 @@ input.switch:checked ~ label:after {
             margin: 0; }
     .initialization .select-wifi .modal-body {
         box-shadow: 0 0 14px 1px rgba(0, 0, 0, 0.7); }
+    .initialization .select-wifi .form-ap-mode {
+        padding: 25px 25px 0 25px; }
+        .initialization .select-wifi .form-ap-mode h2 {
+            margin: 0 0 10px 0; }
+        .initialization .select-wifi .form-ap-mode .h-control {
+            display: -webkit-box;
+            /* OLD - iOS 6-, Safari 3.1-6 */
+            display: -webkit-flex;
+            /* NEW - Chrome */
+            display: flex;
+            /* NEW, Spec - Opera 12.1, Firefox 20+ */
+            align-items: center;
+            margin: 0 0 10px 0; }
+        .initialization .select-wifi .form-ap-mode .error {
+            border: 2px solid #c00; }
+            .initialization .select-wifi .form-ap-mode .error:focus {
+                outline: none; }
+        .initialization .select-wifi .form-ap-mode .header {
+            font-size: 14px;
+            line-height: 16.8px;
+            flex: 1.5;
+            margin: 0 10px 0 0;
+            text-align: right; }
+        .initialization .select-wifi .form-ap-mode input {
+            flex: 2;
+            height: 36px;
+            padding: 0 0 0 5px; }
     .initialization .select-wifi .form-wifi-password {
-        background: #DEDEDE;
-        overflow: scroll;
         width: 300px; }
-        .initialization .select-wifi .form-wifi-password .notice {
+    .initialization .select-wifi .form-ap-mode {
+        width: 400px; }
+        .initialization .select-wifi .form-ap-mode input {
+            flex: 3; }
+    .initialization .select-wifi .form-wifi-password,
+    .initialization .select-wifi .form-ap-mode {
+        background: #DEDEDE;
+        overflow: scroll; }
+        .initialization .select-wifi .form-wifi-password .notice,
+        .initialization .select-wifi .form-ap-mode .notice {
             color: #989898;
             font-size: 14px;
             line-height: 16.8px;
             margin: 20px 0; }
-        .initialization .select-wifi .form-wifi-password .password-input {
+        .initialization .select-wifi .form-wifi-password .password-input,
+        .initialization .select-wifi .form-ap-mode .password-input {
             height: 36px;
             margin: 0 0 10px 0;
             padding: 0 0 0 5px;
@@ -5615,6 +5692,55 @@ input.switch:checked ~ label:after {
                 padding: 0 0 0 104px;
                 text-align: left;
                 width: 100%; }
+    .initialization .device-not-found .not-found-img {
+        width: 60%; }
+    .initialization .notice-from-device .headline {
+        color: #666;
+        font-size: 24px;
+        line-height: 1.2em; }
+    .initialization .notice-from-device .subtitle {
+        color: #808080;
+        font-size: 15px;
+        font-weight: normal;
+        margin: 0 0 55px 0; }
+    .initialization .notice-from-device .signal-description {
+        text-align: left; }
+    .initialization .notice-from-device .signal-position {
+        height: 207px;
+        margin: 0 30px 0 0;
+        width: 207px; }
+    .initialization .notice-from-device .green-light {
+        background: #4d4d4d;
+        border-radius: 50%;
+        height: 35px;
+        overflow: hidden;
+        position: relative;
+        transform: translateY(50%);
+        width: 35px; }
+        .initialization .notice-from-device .green-light::before, .initialization .notice-from-device .green-light::after {
+            content: "";
+            border-radius: 50%;
+            display: block;
+            height: 100%;
+            left: 0;
+            position: absolute;
+            top: 0;
+            width: 100%; }
+        .initialization .notice-from-device .green-light::after {
+            border: 4px solid #4d4d4d; }
+        .initialization .notice-from-device .green-light::before {
+            background: #99e046; }
+    .initialization .notice-from-device .breathing::before {
+        -webkit-animation: breath 4s infinite ease;
+        animation: breath 4s infinite ease; }
+    .initialization .notice-from-device .green-light-desc {
+        margin: 0 0 25px 0;
+        padding: 0 0 0 36px;
+        font-size: 24px;
+        font-weight: normal; }
+        .initialization .notice-from-device .green-light-desc p {
+            font-size: 15px;
+            font-weight: normal; }
 
 /**
  * Laser

@@ -233,7 +233,7 @@ define([
                             <UnitInput
                                 ref="speed"
                                 className={{ 'value-text': true }}
-                                step={0.1}
+                                step={0.8}
                                 min={lang.form.laser_speed.min}
                                 max={lang.form.laser_speed.max}
                                 defaultUnit="mm/s"

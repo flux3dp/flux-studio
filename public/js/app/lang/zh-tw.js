@@ -112,6 +112,8 @@ define(function() {
             cancel: '取消',
             confirm: '確認',
             connect: '連接',
+            back: 'Back',
+            retry: 'RETRY',
             no_machine : '目前沒有機器，跳過此步驟',
 
             // specific caption/content
@@ -122,7 +124,9 @@ define(function() {
                 caption: '密碼更改',
                 content: '確定要更改密碼嗎?'
             },
-            connect_flux: '用 USB 連接你的電腦與 FLUX Delta',
+            connect_flux: '連接 FLUX Delta',
+            via_usb: '使用 USB',
+            via_wifi: '使用 WiFi',
             name_your_flux: '為你的 FLUX Delta 取一個獨特的名字',
             wifi_setup: '設定無線網路',
             select_preferred_wifi: '選擇你偏好的網路',
@@ -133,9 +137,19 @@ define(function() {
             set_machine_generic: {
                 printer_name: '機器名稱*',
                 printer_name_placeholder: '例如：霹靂五號',
+                old_password: '舊密碼',
                 password: '機器密碼',
                 set_station_mode: '設定成無線基地台',
-                password_placeholder: '密碼可以保護你的 FLUX Delta'
+                password_placeholder: '密碼可以保護你的 FLUX Delta',
+                incorrect_old_password: '舊密碼錯誤',
+                incorrect_password: '密碼錯誤',
+                ap_mode_name: '網路名稱',
+                ap_mode_pass: '密碼',
+                ap_mode_name_format: '只接受英文及數字',
+                ap_mode_pass_format: '請至少輸入 8 個字',
+                ap_mode_name_placeholder: '最多 32 個字',
+                ap_mode_pass_placeholder: '至少 8 個字',
+                create_network: '建立網路'
             },
 
             setting_completed: {
@@ -150,9 +164,22 @@ define(function() {
                 ok: '開始使用'
             },
 
+            notice_from_device: {
+                headline: '檢查 WiFi 指示燈',
+                subtitle: '機器上的綠燈表示了 FLUX Delta 的連線狀態',
+                light_on: 'Light On: 綠燈恆亮',
+                light_on_desc: 'FLUX Delta 已經連上了指定網路',
+                breathing: 'Breathing: 呼吸燈',
+                breathing_desc: '無線網路設定失敗，請嘗試重新設定',
+                successfully: '如果 FLUX Delta 連線成功',
+                successfully_statement: '請將無線網路連線至(%s)，並且重新啟動 FLUX Studio',
+                restart: 'Restart FLUX Studio'
+            },
+
             // errors
             errors: {
                 error: '錯誤',
+                not_found: '無法找到 FLUX Delta',
 
                 keep_connect: {
                     caption: '無法透過 USB 連接',
@@ -291,7 +318,8 @@ define(function() {
                 title: '選擇連接成型機'
             },
             notification_on: '開啟',
-            notification_off: '關閉'
+            notification_off: '關閉',
+            cura_engine_path: 'Cura 引擎路徑'
         },
         print: {
             import: '匯入',
@@ -309,6 +337,7 @@ define(function() {
                 custom: '專家',
                 slicingEngine: '切片引擎',
                 slic3r: 'Slic3r',
+                cura: 'Cura',
                 experiment: 'Experiment',
                 filament: '線料',
                 temperature: '溫度',
@@ -326,6 +355,16 @@ define(function() {
                 rectilinear: 'rectilinear',         // do not change
                 rectilinearGrid: 'rectilinear-grid',// do not change
                 honeycomb: 'honeycomb',             // do not change
+                curaInfill: {
+                    automatic: 'AUTOMATIC',
+                    grid: 'GRID',
+                    lines: 'LINES',
+                    concentric: 'CONCENTRIC'
+                },
+                curaSupport: {
+                    grid: 'GRID',
+                    lines: 'LINES'
+                },
                 blackMagic: '黑魔法',
                 spiral: '螺旋',
                 generalSupport: '支撐',
@@ -649,7 +688,7 @@ define(function() {
                         unit: 'mm/s',
                         fast: '快',
                         slow: '慢',
-                        min: 0.1,
+                        min: 0.8,
                         max: 20,
                         step: 0.1
                     },
@@ -979,7 +1018,9 @@ define(function() {
             important_update: {
                 caption: '重要更新',
                 message: 'Delta 有重要韌體更新，是否要現在更新？',
-            }
+            },
+            unsupport_osx_version: '不支援此 Mac OS X 版本',
+            need_password: '需要密碼與 FLUX Delta 建立連線'
         },
         machine_status: {
             '-10': 'Raw Mode',

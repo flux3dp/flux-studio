@@ -112,6 +112,8 @@ define(function() {
             cancel: 'CANCEL',
             confirm: 'CONFIRM',
             connect: 'Connect',
+            back: 'Back',
+            retry: 'RETRY',
             no_machine: 'I don\'t have a machine now.',
 
             // specific caption/content
@@ -122,7 +124,9 @@ define(function() {
                 content: 'Are you sure about changing the password?',
                 caption: 'Changing password'
             },
-            connect_flux: 'Connect FLUX Delta with the USB Cable',
+            connect_flux: 'Connect FLUX Delta',
+            via_usb: 'Using USB Cable',
+            via_wifi: 'Using Wi-Fi',
             name_your_flux: 'Name Your FLUX Delta',
             wifi_setup: 'Wi-Fi Setup',
             select_preferred_wifi: 'Select your preferred network.',
@@ -133,9 +137,19 @@ define(function() {
             set_machine_generic: {
                 printer_name: 'Name*',
                 printer_name_placeholder: 'Give your Delta an unique name',
+                old_password: 'Current Password',
                 password: 'Password',
-                set_station_mode: 'Set as a Wi-Fi station',
-                password_placeholder: 'Something secret'
+                set_station_mode: 'Create a Network',
+                password_placeholder: 'Something secret',
+                incorrect_old_password: 'Incorrect Current Password',
+                incorrect_password: 'Incorrect Password',
+                ap_mode_name: 'Network Name',
+                ap_mode_pass: 'Password',
+                ap_mode_name_format: 'Only accept alphabets or numbers',
+                ap_mode_pass_format: 'At least 8 characters',
+                ap_mode_name_placeholder: 'Up to 32 characters.',
+                ap_mode_pass_placeholder: 'Must have at least 8 characters.',
+                create_network: 'Create Network'
             },
 
             setting_completed: {
@@ -150,9 +164,22 @@ define(function() {
                 ok: 'START CREATING'
             },
 
+            notice_from_device: {
+                headline: 'Check the Wi-Fi Indicator on FLUX Delta',
+                subtitle: 'Please mind the status of Wi-Fi connection.',
+                light_on: 'Light On',
+                light_on_desc: 'FLUX Delta has connected to the Wi-Fi you assigned',
+                breathing: 'Breathing',
+                breathing_desc: 'Wi-Fi connection failed. Please try setting again.',
+                successfully: 'If FLUX Delta connect successfully',
+                successfully_statement: 'Please go back to your Wi-Fi list and connect to your PC to %s, then restart FLUX Studio',
+                restart: 'Restart FLUX Studio'
+            },
+
             // errors
             errors: {
                 error: 'Error',
+                not_found: 'Not Found',
 
                 keep_connect: {
                     caption: 'USB Device not found',
@@ -171,14 +198,14 @@ define(function() {
         },
         wifi: {
             home: {
-                line1: 'Do you have available wifi could be able access?',
-                line2: 'We are helping your FLUX to connecting to wifi',
+                line1: 'Do you have available Wi-Fi could be able access?',
+                line2: 'We are helping your FLUX to connecting to Wi-Fi',
                 select: 'Yes',
                 no_available_wifi: 'No, I haven\'t'
             },
             select: {
-                choose_wifi: 'Please choose wifi what you wanna connect',
-                no_wifi_available: 'There is no available wifi'
+                choose_wifi: 'Please choose Wi-Fi what you wanna connect',
+                no_wifi_available: 'There is no available Wi-Fi'
             },
             set_password: {
                 line1: '請輸入「',
@@ -214,16 +241,16 @@ define(function() {
                 start: 'Start Using FLUX'
             },
             configuring_flux: {
-                caption: 'We\'re configuring your FLUX Detla as a wifi station',
-                description: 'so you can control your FLUX Detla through wifi network',
+                caption: 'We\'re configuring your FLUX Detla as a Wi-Fi station',
+                description: 'so you can control your FLUX Detla through Wi-Fi network',
                 next: 'next',
-                footer: 'I want to swtich back to wifi connection'
+                footer: 'I want to swtich back to Wi-Fi connection'
             },
             configured_flux: {
-                caption: 'Your FLUX Detla is now a wifi station',
+                caption: 'Your FLUX Detla is now a Wi-Fi station',
                 description: 'you can start using it after few simple setting',
                 next: 'next',
-                footer: 'I want to swtich back to wifi connection'
+                footer: 'I want to swtich back to Wi-Fi connection'
             }
         },
         menu: {
@@ -291,7 +318,8 @@ define(function() {
                 title: 'Connect with your printer'
             },
             notification_on: 'On',
-            notification_off: 'Off'
+            notification_off: 'Off',
+            cura_engine_path: 'Cura Engine Path'
         },
         print: {
             import: 'IMPORT',
@@ -309,6 +337,7 @@ define(function() {
                 custom: 'Expert',
                 slicingEngine: 'Slicing Engine',
                 slic3r: 'Slic3r',
+                cura: 'Cura',
                 experiment: 'Experiment',
                 filament: 'Filament',
                 temperature: 'Temperature',
@@ -326,6 +355,16 @@ define(function() {
                 rectilinear: 'rectilinear',         // do not change
                 rectilinearGrid: 'rectilinear-grid',// do not change
                 honeycomb: 'honeycomb',             // do not change
+                curaInfill: {
+                    automatic: 'AUTOMATIC',
+                    grid: 'GRID',
+                    lines: 'LINES',
+                    concentric: 'CONCENTRIC'
+                },
+                curaSupport: {
+                    grid: 'GRID',
+                    lines: 'LINES'
+                },
                 blackMagic: 'Black Magic',
                 spiral: 'Spiral',
                 generalSupport: 'General Support',
@@ -649,7 +688,7 @@ define(function() {
                         unit: 'mm/s',
                         fast: 'Fast',
                         slow: 'Slow',
-                        min: 0.1,
+                        min: 0.8,
                         max: 20,
                         step: 0.1
                     },
@@ -979,7 +1018,9 @@ define(function() {
             important_update: {
                 caption: 'Important Update',
                 message: 'Important Delta firmware update is available. Do you want to update now?',
-            }
+            },
+            unsupport_osx_version: 'Unsupported Mac OS X Version Detected',
+            need_password: 'Need Password to connect to FLUX Delta'
         },
         machine_status: {
             '-10': 'Raw mode',

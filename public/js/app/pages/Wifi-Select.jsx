@@ -7,6 +7,7 @@ define([
     'jsx!widgets/Button-Group',
     'jsx!widgets/Alert',
     'helpers/api/usb-config',
+    'helpers/api/upnp-config',
     'app/actions/progress-actions',
     'app/constants/progress-constants',
     'app/actions/alert-actions',
@@ -20,6 +21,7 @@ define([
     ButtonGroup,
     Alert,
     usbConfig,
+    upnpConfig,
     ProgressActions,
     ProgressConstants,
     AlertActions,
@@ -27,17 +29,17 @@ define([
 ) {
     'use strict';
     var actionMap = {
-        BACK_TO_SET_PASSWARD      : 'BACK_TO_SET_PASSWARD',
-        AP_MODE                   : 'AP_MODE',
-        SET_WIFI_WITHOUT_PASSWORD : 'SET_WIFI_WITHOUT_PASSWORD'
-    };
+            BACK_TO_SET_PASSWARD      : 'BACK_TO_SET_PASSWARD',
+            AP_MODE                   : 'AP_MODE',
+            SET_WIFI_WITHOUT_PASSWORD : 'SET_WIFI_WITHOUT_PASSWORD'
+        },
+        globalWifiAPI;
 
     return function(args) {
         args = args || {};
 
         return React.createClass({
 
-            scanWifi: true,
             action: '',
             deferred: $.Deferred(),
 
@@ -49,81 +51,101 @@ define([
                     selectedWifi: false,
                     openAlert: false,
                     openPassword: false,
-                    alertContent: {}
+                    openApModeForm: false,
+                    apName: initializeMachine.settingPrinter.get().name,
+                    apPass: '',
+                    alertContent: {},
+                    settingPrinter: initializeMachine.settingPrinter.get(),
+                    apModeNameIsVaild: true,
+                    apModePassIsVaild: true,
+                    isFormSubmitted: false
                 };
             },
 
             componentDidMount : function() {
                 var self = this,
-                    usb = usbConfig(),
                     wifiOptions = [],
                     settingWifi = initializeMachine.settingWifi.get(),
+                    settingPrinter = self.state.settingPrinter,
+                    timer,
+                    wifiAPI,
                     getWifi = function() {
                         wifiOptions = [];
 
-                        usb.getWifiNetwork({
-                            onSuccess: function(response) {
-                                var item;
+                        wifiAPI.getWifiNetwork().done(function(response) {
+                            var item;
 
-                                response.items = response.items.sort(function(a, b) {
-                                    var aSSid = a.ssid.toUpperCase(),
-                                        bSsid = b.ssid.toUpperCase();
+                            response.items = response.items.sort(function(a, b) {
+                                var aSSid = a.ssid.toUpperCase(),
+                                    bSsid = b.ssid.toUpperCase();
 
-                                    if (aSSid === bSsid) {
-                                        return 0;
-                                    }
-                                    else if (aSSid > bSsid) {
-                                        return 1;
-                                    }
-                                    else {
-                                        return -1;
-                                    }
-                                });
-
-                                response.items.forEach(function(el) {
-                                    item = self._renderWifiItem(el);
-                                    wifiOptions.push({
-                                        value: el.ssid,
-                                        label: {item}
-                                    });
-
-                                    if (settingWifi.ssid === el.ssid) {
-                                        self.setState({
-                                            selectedWifi: true
-                                        });
-                                    }
-
-                                    self.setState({
-                                        wifiOptions: wifiOptions
-                                    });
-                                });
-
-                                if (true === self.scanWifi) {
-                                    self.deferred.notify();
+                                if (aSSid === bSsid) {
+                                    return 0;
+                                }
+                                else if (aSSid > bSsid) {
+                                    return 1;
                                 }
                                 else {
-                                    ProgressActions.open(ProgressConstants.NONSTOP);
-                                    self.deferred.resolve({
-                                        action: self.action
+                                    return -1;
+                                }
+                            });
+
+                            response.items.forEach(function(el) {
+                                item = self._renderWifiItem(el);
+                                wifiOptions.push({
+                                    value: el.ssid,
+                                    label: {item}
+                                });
+
+                                if (settingWifi.ssid === el.ssid) {
+                                    self.setState({
+                                        selectedWifi: true
                                     });
                                 }
-                            },
-                            onError: function(response) {
-                                self.deferred.reject(response);
-                            }
+
+                                self.setState({
+                                    wifiOptions: wifiOptions
+                                });
+                            });
+
+                            self.deferred.notify('SCAN_WIFI');
+                        }).
+                        fail(function(response) {
+                            self.deferred.reject(response);
                         });
                     };
 
-                self.deferred.progress(function() {
-                    getWifi();
+                self.deferred.progress(function(nextAction) {
+
+                    switch (nextAction) {
+                    case 'SCAN_WIFI':
+                        getWifi();
+                        break;
+                    case 'STOP_SCAN':
+                        ProgressActions.open(ProgressConstants.NONSTOP);
+                        self._afterStopWifiScanning({
+                            action: self.action
+                        });
+                        break;
+                    }
+
                 }).
-                done(self._afterStopWifiScanning).
                 fail(function(response) {
                     AlertActions.showPopupError(
                         'wifi-scan-error',
                         response.error
                     );
                 });
+
+
+                if ('WIFI' === settingPrinter.from) {
+                    wifiAPI = upnpConfig(settingPrinter.uuid);
+                    // defined at top
+                    globalWifiAPI = upnpConfig(settingPrinter.uuid);
+                }
+                else {
+                    wifiAPI = usbConfig();
+                }
 
                 getWifi();
 
@@ -140,41 +162,61 @@ define([
             },
 
             _afterStopWifiScanning: function(args) {
-                var self = this,
-                    lang = self.state.lang,
-                    settingDevice = initializeMachine.settingPrinter.get(),
-                    usb = usbConfig();
+                var self = this;
 
-                self.deferred.done(function() {
-                    ProgressActions.close();
+                ProgressActions.close();
 
-                    switch (args.action) {
-                    case actionMap.BACK_TO_SET_PASSWARD:
-                        self._backToSetPassword();
-                        break;
-                    case actionMap.AP_MODE:
-                        self._setApMode();
-                        break;
-                    case actionMap.SET_WIFI_WITHOUT_PASSWORD:
-                        self._setWifiWithPassword();
-                        break;
-                    }
-
-                });
+                switch (args.action) {
+                case actionMap.BACK_TO_SET_PASSWARD:
+                    self._goToSetPassword();
+                    break;
+                case actionMap.AP_MODE:
+                    self._setApMode();
+                    break;
+                case actionMap.SET_WIFI_WITHOUT_PASSWORD:
+                    self._setWifiWithoutPassword();
+                    break;
+                }
             },
 
-            _backToSetPassword: function() {
-                location.hash = '#initialize/wifi/set-password';
+            _goToSetPassword: function() {
+                var settingPrinter = this.state.settingPrinter,
+                    settingWifi = initializeMachine.settingWifi.get();
+
+                if ('WIFI' === this.state.settingPrinter.from) {
+                    this._settingWifiViaWifi();
+                }
+                else {
+                    location.hash = '#initialize/wifi/set-password';
+                }
             },
 
             _setApMode: function() {
                 var self = this,
                     lang = self.state.lang,
-                    settingDevice = initializeMachine.settingPrinter.get(),
+                    settingPrinter = self.state.settingPrinter,
+                    apName = self.state.apName,
+                    apPass = self.state.apPass;
+
+                settingPrinter.apName = apName;
+                initializeMachine.settingPrinter.set(settingPrinter);
+
+                if ('WIFI' === settingPrinter.from) {
+                    self._setApModeViaWifi(apName, apPass);
+                }
+                else {
+                    self._setApModeViaUsb(apName, apPass);
+                }
+            },
+
+            _setApModeViaUsb: function(name, pass) {
+                var self = this,
+                    lang = self.state.lang,
                     usb = usbConfig();
 
                 usb.setAPMode(
-                    settingDevice.name,
+                    name,
+                    pass,
                     {
                         onSuccess: function(response) {
                             location.hash = 'initialize/wifi/setup-complete/station-mode';
@@ -186,8 +228,53 @@ define([
                 );
             },
 
-            _setWifiWithPassword: function() {
-                location.hash = '#initialize/wifi/setup-complete/with-wifi';
+            _setApModeViaWifi: function(name, pass) {
+                var self = this,
+                    lang = self.state.lang,
+                    settingPrinter = self.state.settingPrinter;
+
+                globalWifiAPI.setAPMode(name, pass).
+                done(function(response) {
+                    location.hash = 'initialize/wifi/setup-complete/station-mode';
+                }).
+                fail(function(response) {
+                    AlertActions.showPopupError('ap-mode-fail', lang.initialize.errors.select_wifi.ap_mode_fail);
+                });
+            },
+
+            _settingWifiViaWifi: function() {
+                var settingPrinter = this.state.settingPrinter,
+                    settingWifi = initializeMachine.settingWifi.get();
+
+                settingPrinter.apName = settingWifi.ssid;
+                initializeMachine.settingPrinter.set(settingPrinter);
+                ProgressActions.open(ProgressConstants.NONSTOP);
+
+                globalWifiAPI.setWifiNetwork(settingWifi, settingWifi.plain_password).
+                always(function() {
+                    ProgressActions.close();
+                }).
+                done(function(response) {
+                    console.log('done', response);
+                    location.hash = '#initialize/wifi/notice-from-device';
+                }).
+                fail(function(response) {
+                    console.log('fail', response);
+                });
+            },
+
+            _setWifiWithoutPassword: function() {
+                var settingPrinter = self.state.settingPrinter,
+                    settingWifi = initializeMachine.settingWifi.get();
+
+                if ('WIFI' === settingPrinter.from) {
+                    settingPrinter.apName = settingWifi.ssid;
+                    initializeMachine.settingPrinter.set(settingPrinter);
+                    this._settingWifiViaWifi();
+                }
+                else {
+                    location.hash = '#initialize/wifi/setup-complete/with-wifi';
+                }
             },
 
             _handleSetPassword: function(e) {
@@ -199,12 +286,7 @@ define([
                 wifi.plain_password = self.refs.password.getDOMNode().value;
 
                 initializeMachine.settingWifi.set(wifi);
-                self.scanWifi = false;
-                self.action = actionMap.BACK_TO_SET_PASSWARD;
-
-                if ('undefined' === typeof self.deferred) {
-                    this._setWifiWithPassword();
-                }
+                self._stopScan(actionMap.BACK_TO_SET_PASSWARD);
             },
 
             // UI events
@@ -219,13 +301,18 @@ define([
                     });
                 }
                 else {
-                    self.scanWifi = false;
-                        self.action = actionMap.SET_WIFI_WITHOUT_PASSWORD;
-
-                    if ('undefined' === typeof self.deferred) {
-                        this._();
-                    }
+                    this._stopScan(actionMap.SET_WIFI_WITHOUT_PASSWORD);
                 }
+            },
+
+            _stopScan: function(action) {
+                this.action = action;
+                this.deferred.notify('STOP_SCAN');
+            },
+
+            _startScan: function() {
+                this.action = '';
+                this.deferred.notify('SCAN_WIFI');
             },
 
             _selectWifi: function(e) {
@@ -239,11 +326,33 @@ define([
                 initializeMachine.settingWifi.set(meta);
             },
 
+            _checkApModeSetting: function(e) {
+                var name = this.refs.ap_mode_name.getDOMNode().value,
+                    pass = this.refs.ap_mode_password.getDOMNode().value,
+                    apModeNameIsVaild = /^[a-zA-Z0-9]+$/g.test(name),
+                    apModePassIsVaild = /^[a-zA-Z0-9]{8,}$/g.test(pass);
+
+                this.setState({
+                    apName: name,
+                    apPass: pass,
+                    apModeNameIsVaild: apModeNameIsVaild,
+                    apModePassIsVaild: apModePassIsVaild
+                });
+
+                return (true === apModeNameIsVaild && true === apModePassIsVaild);
+            },
+
             _setAsStationMode: function(e) {
-                this.scanWifi = false;
-                this.action = actionMap.AP_MODE;
-                if ('undefined' === typeof self.deferred) {
-                    this._setApMode();
+                e.preventDefault();
+
+                var name = this.refs.ap_mode_name.getDOMNode().value,
+                    pass = this.refs.ap_mode_password.getDOMNode().value;
+
+                if (true === this._checkApModeSetting()) {
+                    this.setState({
+                        isFormSubmitted: true
+                    });
+                    this._stopScan(actionMap.AP_MODE);
                 }
             },
 
@@ -298,6 +407,77 @@ define([
                 );
             },
 
+            _renderApModeForm: function(lang) {
+                var self = this,
+                    closeForm = function(e) {
+                        self.setState({
+                            openApModeForm: false
+                        });
+                    },
+                    classSet = React.addons.classSet,
+                    nameClass = classSet({
+                        'error': false === self.state.apModeNameIsVaild
+                    }),
+                    passClass = classSet({
+                        'error': false === self.state.apModePassIsVaild
+                    }),
+                    submitButtonClass = classSet({
+                        'btn btn-action btn-large': true,
+                        'btn-disabled': self.state.isFormSubmitted
+                    }),
+                    content = (
+                        <form className="form form-ap-mode" onSubmit={self._setAsStationMode}>
+                            <h2>{lang.initialize.set_machine_generic.create_network}</h2>
+                            <label className="h-control">
+                                <span className="header">
+                                    {lang.initialize.set_machine_generic.ap_mode_name}
+                                </span>
+                                <input
+                                    ref="ap_mode_name"
+                                    type="text"
+                                    className={nameClass}
+                                    placeholder=""
+                                    defaultValue={self.state.settingPrinter.name}
+                                    autoFocus={true}
+                                    required={true}
+                                    pattern="^[a-zA-Z0-9]+$"
+                                    maxLength="32"
+                                    title={lang.initialize.set_machine_generic.ap_mode_name_format}
+                                    placeholder={lang.initialize.set_machine_generic.ap_mode_name_placeholder}
+                                    onKeyUp={self._checkApModeSetting}
+                                />
+                            </label>
+                            <label className="h-control">
+                                <span className="header">
+                                    {lang.initialize.set_machine_generic.ap_mode_pass}
+                                </span>
+                                <input
+                                    ref="ap_mode_password"
+                                    type="password"
+                                    className={passClass}
+                                    placeholder=""
+                                    defaultValue=""
+                                    required={true}
+                                    pattern="^[a-zA-Z0-9]{8,}$"
+                                    title={lang.initialize.set_machine_generic.ap_mode_pass_format}
+                                    placeholder={lang.initialize.set_machine_generic.ap_mode_pass_placeholder}
+                                    onKeyUp={self._checkApModeSetting}
+                                />
+                            </label>
+                            <div className="button-group btn-v-group">
+                                <button className="btn btn-action btn-large" type="submit">{lang.initialize.confirm}</button>
+                                <button className="btn btn-action btn-large btn-link" onClick={closeForm}>{lang.initialize.cancel}</button>
+                            </div>
+                        </form>
+                    );
+
+                return (
+                    true === this.state.openApModeForm ?
+                    <Modal content={content}/> :
+                    ''
+                );
+            },
+
             _renderWifiItem: function(wifi) {
                 var settingWifi = initializeMachine.settingWifi.get(),
                     lockClassName = 'fa ' + (true === wifi.password ? 'fa-lock' : ''),
@@ -332,18 +512,19 @@ define([
             },
 
             render: function() {
-                var lang = this.state.lang,
+                var self = this,
+                    lang = self.state.lang,
                     wrapperClassName = {
                         'initialization': true
                     },
-                    items = this._renderWifiOptions(lang),
+                    items = self._renderWifiOptions(lang),
                     buttons = [{
                         label: lang.initialize.next,
-                        className: 'btn-action btn-large' + (true === this.state.selectedWifi ? '' : ' btn-disabled'),
+                        className: 'btn-action btn-large' + (true === self.state.selectedWifi ? '' : ' btn-disabled'),
                         dataAttrs: {
                             'ga-event': 'pickup-a-wifi'
                         },
-                        onClick: this._confirmWifi
+                        onClick: self._confirmWifi
                     },
                     {
                         label: lang.initialize.set_machine_generic.set_station_mode,
@@ -351,7 +532,12 @@ define([
                         dataAttrs: {
                             'ga-event': 'set-as-station-mode'
                         },
-                        onClick: this._setAsStationMode
+                        onClick: function(e) {
+                            self.setState({
+                                openApModeForm: true,
+                                isFormSubmitted: false
+                            });
+                        }
                     },
                     {
                         label: lang.initialize.skip,
@@ -363,6 +549,7 @@ define([
                         href: '#initialize/wifi/setup-complete/with-usb'
                     }],
                     passwordForm = this._renderPasswordForm(lang),
+                    apModeForm = this._renderApModeForm(lang),
                     content = (
                         <div className="select-wifi text-center">
                             <img className="brand-image" src="/img/menu/main_logo.svg"/>
@@ -373,6 +560,7 @@ define([
                                 <ButtonGroup className="btn-v-group" buttons={buttons}/>
                             </div>
                             {passwordForm}
+                            {apModeForm}
                         </div>
                     );
 
