@@ -94,6 +94,9 @@ define([
                     }
 
                     $deferred.notify(response);
+                },
+                onFatal: function(response) {
+                    AlertActions.showPopupError(response.error, response.error);
                 }
             });
 
@@ -108,8 +111,6 @@ define([
                 var $deferred = $.Deferred();
 
                 genericSender('add_key', function(response) {
-                    console.log(response);
-
                     $deferred.resolve(response);
                 });
 
