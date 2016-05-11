@@ -143,10 +143,13 @@ define(function() {
                 password_placeholder: '密碼可以保護你的 FLUX Delta',
                 incorrect_old_password: '舊密碼錯誤',
                 incorrect_password: '密碼錯誤',
-                ap_mode_name: '名稱',
+                ap_mode_name: '網路名稱',
                 ap_mode_pass: '密碼',
                 ap_mode_name_format: '只接受英文及數字',
-                ap_mode_pass_format: '請至少輸入8個字'
+                ap_mode_pass_format: '請至少輸入 8 個字',
+                ap_mode_name_placeholder: '最多 32 個字',
+                ap_mode_pass_placeholder: '至少 8 個字',
+                create_network: '建立網路'
             },
 
             setting_completed: {
