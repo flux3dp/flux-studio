@@ -62,11 +62,6 @@ define([
                     discoverMethods = discover('upnp-config', (printers) => {
                         clearTimeout(timer);
 
-                        // TODO: remove it
-                        printers = printers.filter(function(printer) {
-                            return '46314b30002f6c86d2b02c73dead910b' === printer.uuid;
-                        });
-
                         if (0 < printers.length) {
                             self._toggleBlocker(false);
                             self.setState({
