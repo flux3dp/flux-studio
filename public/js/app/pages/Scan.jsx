@@ -933,8 +933,9 @@ define([
                             args,
                             opts
                         );
-                        mesh.oldName = mesh.name
+                        mesh.oldName = mesh.name;
                         mesh.name = cut_name;
+                        meshUpdateStream.onNext(mesh);
                     }
 
                     self._removeCylinder(mesh);
