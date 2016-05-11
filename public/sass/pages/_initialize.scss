@@ -114,6 +114,10 @@
         .form-ap-mode {
             padding: 25px 25px 0 25px;
 
+            h2 {
+                margin: 0 0 10px 0;
+            }
+
             .h-control {
                 @include flexbox();
                 align-items: center;
@@ -131,7 +135,9 @@
             .header {
                 font-size: 14px;
                 line-height: 16.8px;
-                flex: 1;
+                flex: 1.5;
+                margin: 0 10px 0 0;
+                text-align: right;
             }
 
             input {
@@ -141,11 +147,22 @@
             }
         }
 
+        .form-wifi-password {
+            width: 300px;
+        }
+
+        .form-ap-mode {
+            width: 400px;
+
+            input {
+                flex: 3;
+            }
+        }
+
         .form-wifi-password,
         .form-ap-mode {
             background: $primary-background-color;
             overflow: scroll;
-            width: 300px;
 
             .notice {
                 color: #989898;

@@ -5564,6 +5564,8 @@ input.switch:checked ~ label:after {
         box-shadow: 0 0 14px 1px rgba(0, 0, 0, 0.7); }
     .initialization .select-wifi .form-ap-mode {
         padding: 25px 25px 0 25px; }
+        .initialization .select-wifi .form-ap-mode h2 {
+            margin: 0 0 10px 0; }
         .initialization .select-wifi .form-ap-mode .h-control {
             display: -webkit-box;
             /* OLD - iOS 6-, Safari 3.1-6 */
@@ -5580,16 +5582,23 @@ input.switch:checked ~ label:after {
         .initialization .select-wifi .form-ap-mode .header {
             font-size: 14px;
             line-height: 16.8px;
-            flex: 1; }
+            flex: 1.5;
+            margin: 0 10px 0 0;
+            text-align: right; }
         .initialization .select-wifi .form-ap-mode input {
             flex: 2;
             height: 36px;
             padding: 0 0 0 5px; }
+    .initialization .select-wifi .form-wifi-password {
+        width: 300px; }
+    .initialization .select-wifi .form-ap-mode {
+        width: 400px; }
+        .initialization .select-wifi .form-ap-mode input {
+            flex: 3; }
     .initialization .select-wifi .form-wifi-password,
     .initialization .select-wifi .form-ap-mode {
         background: #DEDEDE;
-        overflow: scroll;
-        width: 300px; }
+        overflow: scroll; }
         .initialization .select-wifi .form-wifi-password .notice,
         .initialization .select-wifi .form-ap-mode .notice {
             color: #989898;
