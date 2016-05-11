@@ -355,6 +355,16 @@ define(function() {
                 rectilinear: 'rectilinear',         // do not change
                 rectilinearGrid: 'rectilinear-grid',// do not change
                 honeycomb: 'honeycomb',             // do not change
+                curaInfill: {
+                    automatic: 'AUTOMATIC',
+                    grid: 'GRID',
+                    lines: 'LINES',
+                    concentric: 'CONCENTRIC'
+                },
+                curaSupport: {
+                    grid: 'GRID',
+                    lines: 'LINES'
+                },
                 blackMagic: '黑魔法',
                 spiral: '螺旋',
                 generalSupport: '支撐',
