@@ -427,6 +427,7 @@ define([
                     }),
                     content = (
                         <form className="form form-ap-mode" onSubmit={self._setAsStationMode}>
+                            <h2>{lang.initialize.set_machine_generic.create_network}</h2>
                             <label className="h-control">
                                 <span className="header">
                                     {lang.initialize.set_machine_generic.ap_mode_name}
@@ -440,7 +441,9 @@ define([
                                     autoFocus={true}
                                     required={true}
                                     pattern="^[a-zA-Z0-9]+$"
+                                    maxLength="32"
                                     title={lang.initialize.set_machine_generic.ap_mode_name_format}
+                                    placeholder={lang.initialize.set_machine_generic.ap_mode_name_placeholder}
                                     onKeyUp={self._checkApModeSetting}
                                 />
                             </label>
@@ -457,6 +460,7 @@ define([
                                     required={true}
                                     pattern="^[a-zA-Z0-9]{8,}$"
                                     title={lang.initialize.set_machine_generic.ap_mode_pass_format}
+                                    placeholder={lang.initialize.set_machine_generic.ap_mode_pass_placeholder}
                                     onKeyUp={self._checkApModeSetting}
                                 />
                             </label>
