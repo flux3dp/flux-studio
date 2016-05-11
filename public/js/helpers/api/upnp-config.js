@@ -96,7 +96,12 @@ define([
                     $deferred.notify(response);
                 },
                 onFatal: function(response) {
-                    AlertActions.showPopupError(response.error, response.error);
+                    if (0 < response.error.indexOf('not supported')) {
+                        AlertActions.showPopupError('not-supported', lang.initialize.errors.not_support);
+                    }
+                    else {
+                        AlertActions.showPopupError(response.error, lang.initialize.errors.not_support);
+                    }
                 }
             });
 
