@@ -59,7 +59,9 @@ define([
         args = args || {};
 
         var meshUpdateStream = new Rx.Subject(),
-            subscribers = [];
+            meshAddRemoveStream = new Rx.Subject(),
+            subscriber,
+            meshAddRemoveSubscriber;
 
         var View = React.createClass({
                 MAX_MESHES: 5,
@@ -68,7 +70,6 @@ define([
                     return {
                         lang: args.state.lang,
                         gettingStarted: false,  // selecting machine
-                        openBlocker: false,  // blocker is open
                         scanTimes: 0,   // how many scan executed
                         selectedPrinter: undefined, // which machine selected
                         deleting_mesh: undefined,
@@ -112,98 +113,36 @@ define([
 
                 componentDidMount: function() {
                     var self = this,
-                        object,
-                        objectObserve = function(mesh, arrayIndex) {
-                            var pushToHistory = function(mesh, arrayIndex) {
-                                    mesh.type = 'update';
-                                    mesh.arrayIndex = arrayIndex;
-                                    self.state.history.push(mesh);
-                                    self.setState({
-                                        history: self.state.history
-                                    });
-                                };
+                        object;
 
-                                // (function(mesh, arrayIndex) {
-                                //     Object.observe(mesh, function(changes) {
-                                //         console.log('observing', arrayIndex);
-                                //         for (var i in changes) {
-                                //             if (true === changes.hasOwnProperty(i) &&
-                                //                 'name' === changes[i].name &&
-                                //                 true !== changes[i].object.isUndo
-                                //             ) {
-                                //                 object = Object.assign({}, changes[i].object);
-                                //                 object.oldBlob = self.state.scanModelingWebSocket.History.findByName(changes[i].oldValue)[0].data;
-                                //                 object.isUndo = false;
-                                //                 // old name
-                                //                 object.name = changes[i].oldValue;
-                                //                 pushToHistory(object, arrayIndex);
-                                //                 console.log('original', arrayIndex);
-                                //             }
-                                //         }
-                                //     });
-                                //
-                                // })(mesh, arrayIndex);
+                    var pushToHistory = function(mesh, arrayIndex) {
+                               mesh.type = 'update';
+                               mesh.arrayIndex = arrayIndex;
+                               self.setState({
+                                   history: self.state.history.concat([mesh])
+                               });
+                           };
 
-                                if(!subscribers[arrayIndex]) {
-                                    var subscriber = meshUpdateStream.subscribe((m) => {
-                                        console.log('subscribing', arrayIndex);
-                                        object = Object.assign({}, m);
-                                        object.oldBlob = self.state.scanModelingWebSocket.History.findByName(m.oldName)[0].data;
-                                        object.isUndo = false;
-                                        // old name
-                                        object.name = m.oldName;
-                                        console.log('rxjs', arrayIndex);
-                                        pushToHistory(object, arrayIndex);
+                    subscriber = meshUpdateStream.subscribe((m) => {
+                        object = Object.assign({}, m);
+                        object.oldBlob = self.state.scanModelingWebSocket.History.findByName(m.oldName)[0].data;
+                        object.isUndo = false;
+                        object.name = m.oldName;
+                        pushToHistory(object, m.arrayIndex);
+                    });
 
-                                    });
-                                    subscribers[arrayIndex] = subscriber;
-                                }
-                        },
-                        objectGroupObserve = function(meshes, arrayIndex) {
-                            meshes.forEach(function(mesh, i) {
-                                objectObserve(mesh, arrayIndex);
-                            });
-                        };
-
-                    Array.observe(this.state.meshes, function(changes) {
-                        changes.forEach(function(change, i) {
-                            // add new entry
-                            if (0 < change.addedCount) {
-                                object = Object.assign({}, change.object[change.index]);
-
-                                if (true !== change.object[change.index].isUndo) {
-                                    object.type = 'add';
-                                    object.arrayIndex = change.index;
-                                    self.state.history.push(object);
-                                    self.setState({
-                                        history: self.state.history
-                                    });
-                                }
-                                else {
-                                    change.object[change.index].isUndo = false;
-                                }
-
-                                // each new mesh needs to be observe
-                                objectGroupObserve(change.object, change.index);
-                            }
-
-                            // remove an entry
-                            if (0 < change.removed.length) {
-                                change.removed.forEach(function(object) {
-                                    if (true !== object.isUndo) {
-                                        object = Object.assign({}, object);
-                                        object.type = 'remove';
-                                        object.arrayIndex = change.index;
-                                        self.state.history.push(object);
-                                    }
-                                    else {
-                                        object.isUndo = false;
-                                    }
-                                });
-
+                    meshAddRemoveSubscriber = meshAddRemoveStream.subscribe((changedMeshes) => {
+                        changedMeshes.forEach((m) => {
+                            var o = Object.assign({}, m.mesh);
+                            if(o.isUndo !== true) {
+                                o.type = m.type;
                                 self.setState({
-                                    history: self.state.history
+                                    history: self.state.history.concat([o])
+                                }, () => {
                                 });
+                            }
+                            else {
+                                m.mesh.isUndo = false;
                             }
                         });
                     });
@@ -251,6 +190,8 @@ define([
                     stopGettingImage();
 
                     scanedModel.destroy();
+                    subscriber.dispose();
+                    meshAddRemoveSubscriber.dispose();
                 },
 
                 // ui events
@@ -308,10 +249,11 @@ define([
                                     newMesh.isUndo = true;
                                     meshes.splice(mesh.arrayIndex, 0, newMesh);
                                     self.state.scanCtrlWebSocket.stopGettingImage();
-
                                     self.setState({
                                         showCamera: false,
                                         meshes: meshes
+                                    }, () => {
+                                        meshAddRemoveStream.onNext([{mesh: newMesh, type:'add'}]);
                                     });
                                 };
 
@@ -325,10 +267,11 @@ define([
                                 scanedModel.add(mesh.model);
                                 self.state.meshes.splice(mesh.arrayIndex, 0, mesh);
                                 self.state.scanCtrlWebSocket.stopGettingImage();
-
                                 self.setState({
                                     showCamera: false,
                                     meshes: self.state.meshes
+                                }, () => {
+                                    meshAddRemoveStream.onNext([{mesh: mesh, type:'remove'}]);
                                 });
                             }
                         },
@@ -535,6 +478,17 @@ define([
                     return meshes[existingIndex];
                 },
 
+                _updateMeshInHistory: function(mesh) {
+                    var temp = this.state.history.map((h) => {
+                        if(h.name === mesh.oldName) {
+                            h.oldName = mesh.oldName;
+                            h.name = mesh.name;
+                            h.associted = mesh.associted;
+                        }
+                        return h;
+                    });
+                },
+
                 _getScanSpeed: function() {
                     return parseInt(this.refs.setupPanel.getSettings().resolution.value, 10);
                 },
@@ -595,17 +549,20 @@ define([
 
                     if ('undefined' === typeof mesh) {
                         model = scanedModel.appendModel(views);
-
-                        meshes.push(self._newMesh({
+                        var newMesh = self._newMesh({
                             name: 'scan-' + (new Date()).getTime(),
                             model: model,
                             index: self.state.scanTimes
-                        }));
+                        });
+                        newMesh.arrayIndex = meshes.length;
+                        meshes.push(newMesh);
 
                         self.setState({
                             meshes: meshes,
                             progressPercentage: progressPercentage,
                             progressRemainingTime: progressRemainingTime
+                        }, () => {
+                            meshAddRemoveStream.onNext([{mesh: newMesh, type: 'add'}]);
                         });
                     }
                     else {
@@ -911,7 +868,6 @@ define([
                 },
 
                 _doClearNoise: function(mesh) {
-                    console.log('do clear noise');
                     var self = this,
                         delete_noise_name = 'clear-noise-' + (new Date()).getTime(),
                         onStarting = function(data) {
@@ -979,7 +935,6 @@ define([
                         );
                         mesh.oldName = mesh.name
                         mesh.name = cut_name;
-                        meshUpdateStream.onNext(mesh);
                     }
 
                     self._removeCylinder(mesh);
@@ -1068,7 +1023,7 @@ define([
                                         mesh.oldName = mesh.name;
                                         mesh.name = outputName;
                                         mesh.associted = lengthSelectedMeshes;
-                                        meshUpdateStream.onNext(mesh);
+                                        self._updateMeshInHistory(mesh);
                                     };
 
                                 deferred.done(onUpdate);
@@ -1087,6 +1042,7 @@ define([
 
                                             for (var i = self.state.meshes.length - 1; i >= 0; i--) {
                                                 if (true === self.state.meshes[i].choose) {
+                                                    meshAddRemoveStream.onNext([{mesh: self.state.meshes[i], type: 'remove'}]);
                                                     self.state.meshes.splice(i, 1);
                                                 }
                                             }
@@ -1133,6 +1089,7 @@ define([
                                         }
                                     );
                                 }
+
                             },
                             baseName,
                             baseMesh,
@@ -1170,9 +1127,6 @@ define([
                 },
 
                 _openBlocker: function(is_open, type, message, hasStop, caption) {
-                    this.setState({
-                        openBlocker: is_open
-                    });
 
                     if (true === is_open) {
                         ProgressActions.open(type, caption ? caption : '', message, hasStop);
@@ -1386,8 +1340,7 @@ define([
                     return (
                         0 < state.selectedMeshes.length &&
                         false === state.isScanStarted &&
-                        false === state.showCamera &&
-                        false === state.openBlocker ?
+                        false === state.showCamera ?
                         <ManipulationPanel
                             lang={lang}
                             selectedMeshes={state.selectedMeshes}
