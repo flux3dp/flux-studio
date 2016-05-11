@@ -12,7 +12,8 @@ define([
     'app/actions/alert-actions',
     'app/stores/alert-store',
     'app/actions/global-actions',
-    'app/stores/global-store'
+    'app/stores/global-store',
+    'helpers/device-list'
 ], function(
     $,
     React,
@@ -27,7 +28,8 @@ define([
     AlertActions,
     AlertStore,
     GlobalActions,
-    GlobalStore
+    GlobalStore,
+    DeviceList
 ) {
     'use strict';
 
@@ -145,6 +147,7 @@ define([
                 Discover(
                     'top-menu',
                     function(printers) {
+                        printers = DeviceList(printers);
                         refreshOption(printers);
                     }
                 );

@@ -19,7 +19,8 @@ define([
     'app/actions/input-lightbox-actions',
     'app/constants/input-lightbox-constants',
     'helpers/api/touch',
-    'helpers/firmware-updater'
+    'helpers/firmware-updater',
+    'helpers/device-list'
 ], function(
     gui,
     menuMap,
@@ -38,7 +39,8 @@ define([
     InputLightboxActions,
     InputLightboxConstants,
     touch,
-    firmwareUpdater
+    firmwareUpdater,
+    DeviceList
 ) {
     'use strict';
 
@@ -453,7 +455,6 @@ define([
 
         createDeviceList = function(printers) {
             var _printers = [];
-
             printers.forEach(function(printer) {
                 _printers.push(createDevice(printer));
             });
@@ -476,6 +477,7 @@ define([
             discoverMethods = discover(
                 'menu-factory',
                 function(printers) {
+                    printers = DeviceList(printers);
                     _printers = createDeviceList(printers);
                 }
             );
