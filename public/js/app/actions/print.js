@@ -133,7 +133,7 @@ define([
     previewColors[0] = new THREE.Color(0xEBE3AA); // infill
     previewColors[1] = new THREE.Color(0x838689); // perimeter
     previewColors[2] = new THREE.Color(0xCAD7B2); // support
-    previewColors[3] = new THREE.Color(0xE0E0E0); // move
+    previewColors[3] = new THREE.Color(0xFFFFFF); // move
     previewColors[4] = new THREE.Color(0x5D4157); // skirt
     previewColors[5] = new THREE.Color(0x57595b); // outer wall
 
@@ -462,9 +462,14 @@ define([
                 // if there's a result
                 if(!!result) {
                     if(!!result.error) {
-                        console.log('error');
-                        AlertActions.showPopupError('fcode-error', Sprintf(lang.message.brokenFcode, file.name));
-                        cancelPreview();
+                        if(result.error === 'gcode area too big') {
+                            // disable go button
+                            reactSrc.setState({ hasObject: false });
+                        }
+                        else {
+                            AlertActions.showPopupError('fcode-error', Sprintf(lang.message.brokenFcode, file.name));
+                            cancelPreview();
+                        }
                     }
                 }
                 fcodeConsole.getMetadata(processMetadata);
