@@ -94,6 +94,14 @@ define([
                     }
 
                     $deferred.notify(response);
+                },
+                onFatal: function(response) {
+                    if (0 < response.error.indexOf('not supported')) {
+                        AlertActions.showPopupError('not-supported', lang.initialize.errors.not_support);
+                    }
+                    else {
+                        AlertActions.showPopupError(response.error, lang.initialize.errors.not_support);
+                    }
                 }
             });
 
@@ -108,8 +116,6 @@ define([
                 var $deferred = $.Deferred();
 
                 genericSender('add_key', function(response) {
-                    console.log(response);
-
                     $deferred.resolve(response);
                 });
 

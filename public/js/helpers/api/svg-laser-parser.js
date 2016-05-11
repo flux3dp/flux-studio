@@ -7,12 +7,14 @@ define([
     'helpers/convertToTypedArray',
     'helpers/data-history',
     'helpers/api/set-params',
-    'app/actions/alert-actions'
-], function(Websocket, convertToTypedArray, history, setParams, AlertActions) {
+    'app/actions/alert-actions',
+    'lib/rx.lite.min'
+], function(Websocket, convertToTypedArray, history, setParams, AlertActions, Rx) {
     'use strict';
 
     // Because the preview image size is 640x640
-    var MAXWIDTH = 640;
+    var MAXWIDTH = 640,
+        uploadQueueUpdateStream = new Rx.Subject();
 
     return function(opts) {
         opts = opts || {};
@@ -157,42 +159,35 @@ define([
                 };
             };
 
-        // listen upload request
-        Array.observe(uploadQueue, function(changes) {
-            var change = changes[0],
-                timer;
+        uploadQueueUpdateStream.subscribe((q) => {
+            var timer;
 
-            // push a new entry will make this value greater than zero.
-            if (0 < change.addedCount) {
-                // keep the current change.
-                timer = setInterval((function(change) {
+            timer = setInterval((function(task) {
 
-                    return function() {
+                return function() {
 
-                        if (true === goNextUpload) {
-                            var object = change.object[change.index],
-                                onFinished = function(blob, size) {
-                                    object.opts.onFinished(blob, size);
-                                    goNextUpload = true;
-                                    clearInterval(timer);
-                                },
-                                onError = function(file, data, isBroken) {
-                                    object.opts.onError(file, data, isBroken);
-                                    goNextUpload = true;
-                                    clearInterval(timer);
-                                };
+                    if (true === goNextUpload) {
+                        var onFinished = function(blob, size) {
+                                task.opts.onFinished(blob, size);
+                                goNextUpload = true;
+                                clearInterval(timer);
+                            },
+                            onError = function(file, data, isBroken) {
+                                task.opts.onError(file, data, isBroken);
+                                goNextUpload = true;
+                                clearInterval(timer);
+                            };
 
-                            goNextUpload = false;
+                        goNextUpload = false;
 
-                            upload(object.name, object.file, {
-                                onFinished: onFinished,
-                                onError: onError
-                            });
-                        }
+                        upload(task.name, task.file, {
+                            onFinished: onFinished,
+                            onError: onError
+                        });
+                    }
 
-                    };
-                })(change), 0);
-            }
+                };
+            })(q), 0);
         });
 
         return {
@@ -214,7 +209,8 @@ define([
 
                 // NOTICE: it's very tricky for modified this array.
                 // it will fire observe function then get what you changed (and where you changed)
-                uploadQueue.push({ name: name, file: file, opts: opts });
+                // uploadQueue.push({ name: name, file: file, opts: opts });
+                uploadQueueUpdateStream.onNext({ name: name, file: file, opts: opts });
             },
             /**
              * get svg

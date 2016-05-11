@@ -20,10 +20,6 @@ define(function() {
 
         return {
             append: function(message) {
-                if ('string' === typeof message) {
-                    message = [this.getTimeLabel(), message].join(' ');
-                }
-
                 loggingStore[name].push(message);
                 return this;
             },

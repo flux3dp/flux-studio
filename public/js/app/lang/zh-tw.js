@@ -143,10 +143,13 @@ define(function() {
                 password_placeholder: '密碼可以保護你的 FLUX Delta',
                 incorrect_old_password: '舊密碼錯誤',
                 incorrect_password: '密碼錯誤',
-                ap_mode_name: '名稱',
+                ap_mode_name: '網路名稱',
                 ap_mode_pass: '密碼',
                 ap_mode_name_format: '只接受英文及數字',
-                ap_mode_pass_format: '請至少輸入8個字'
+                ap_mode_pass_format: '請至少輸入 8 個字',
+                ap_mode_name_placeholder: '最多 32 個字',
+                ap_mode_pass_placeholder: '至少 8 個字',
+                create_network: '建立網路'
             },
 
             setting_completed: {
@@ -177,6 +180,7 @@ define(function() {
             errors: {
                 error: '錯誤',
                 not_found: '無法找到 FLUX Delta',
+                not_support: '請更新 Delta 韌體到 v1.2b1 以上',
 
                 keep_connect: {
                     caption: '無法透過 USB 連接',
@@ -352,6 +356,16 @@ define(function() {
                 rectilinear: 'rectilinear',         // do not change
                 rectilinearGrid: 'rectilinear-grid',// do not change
                 honeycomb: 'honeycomb',             // do not change
+                curaInfill: {
+                    automatic: 'AUTOMATIC',
+                    grid: 'GRID',
+                    lines: 'LINES',
+                    concentric: 'CONCENTRIC'
+                },
+                curaSupport: {
+                    grid: 'GRID',
+                    lines: 'LINES'
+                },
                 blackMagic: '黑魔法',
                 spiral: '螺旋',
                 generalSupport: '支撐',
@@ -675,7 +689,7 @@ define(function() {
                         unit: 'mm/s',
                         fast: '快',
                         slow: '慢',
-                        min: 0.1,
+                        min: 0.8,
                         max: 20,
                         step: 0.1
                     },
