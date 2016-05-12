@@ -14,6 +14,7 @@ define([
     'helpers/round',
     'helpers/duration-formatter',
     'helpers/shortcuts',
+    'helpers/api/camera'
 ], function(
     $,
     React,
@@ -29,7 +30,8 @@ define([
     sprintf,
     round,
     formatDuration,
-    shortcuts
+    shortcuts,
+    Camera
 ) {
     'use strict';
 
@@ -708,14 +710,15 @@ define([
 
         _handleToggleCamera: function() {
             if(this.state.mode === mode.CAMERA) {
+                DeviceMaster.stopStreamCamera();
                 this._handleBack();
                 return;
             }
-            DeviceMaster.readyCamera().then(function() {
-                DeviceMaster.startCamera(this._processImage);
-            }.bind(this));
 
-            this._stopReport();
+            var cameraStream;
+            cameraStream = DeviceMaster.streamCamera(this.props.selectedDevice.uuid);
+            cameraStream.subscribe(this._processImage);
+
             this.setState({
                 waiting: true,
                 mode: mode.CAMERA
@@ -1002,9 +1005,10 @@ define([
             timmer = null;
         },
 
-        _processImage: function(response) {
+        _processImage: function(imageBlob) {
+            $('.camera-image').attr('src', URL.createObjectURL(imageBlob));
             this.setState({
-                cameraImageUrl: response.url,
+                // cameraImageUrl: URL.createObjectURL(imageBlob),
                 waiting: false
             });
         },
@@ -1368,14 +1372,15 @@ define([
                 }
             }
 
-            if(currentStatus !== DeviceConstants.READY) {
-                rightButtonOn = false;
-            }
-
             // CAMERA mode
             if(this.state.mode === mode.CAMERA) {
-                leftButtonOn = false;
-                middleButtonOn = false;
+                if(
+                    statusId === DeviceConstants.status.IDLE ||
+                    statusId === DeviceConstants.status.COMPLETED ||
+                    statusId === DeviceConstants.status.ABORTED
+                ) {
+                    leftButtonOn = false;
+                }
             }
 
             // BROWSE_FILE mode
@@ -1396,7 +1401,6 @@ define([
 
                 if(this.state.currentStatus === DeviceConstants.STARTING) {
                     middleButtonOn = false;
-                    rightButtonOn = false;
                 }
 
                 if(statusId === DeviceConstants.status.PAUSING_FROM_RUNNING) {
@@ -1422,7 +1426,8 @@ define([
                 }
 
                 if(statusId === DeviceConstants.status.MAINTAIN ||
-                   statusId === DeviceConstants.status.SCAN
+                   statusId === DeviceConstants.status.SCAN ||
+                   statusId === DeviceConstants.status.ABORTED
                 ) {
                     middleButtonOn = false;
                 }
