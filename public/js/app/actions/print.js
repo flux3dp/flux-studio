@@ -566,15 +566,17 @@ define([
         var d = $.Deferred();
         getBlobFromScene().then((blob) => {
             previewUrl = URL.createObjectURL(blob);
-            console.log(previewUrl, blob);
-            slicer.uploadPreviewImage(blob).then(() => {
-                return slicer.getSlicingResult();
-            }).then((r) => {
-                responseBlob = r;
-                hasPreviewImage = true;
-                d.resolve(r);
-            });
+
+            var t = setInterval(() => {
+                if(slicingStatus.canInterrupt) {
+                    clearInterval(t);
+                    slicer.uploadPreviewImage(blob).then(() => {
+                        d.resolve(blob);
+                    });
+                }
+            }, 500);
         });
+
         return d.promise();
     }
 
