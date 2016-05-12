@@ -1579,6 +1579,8 @@ define([
                     setImportWindowPosition();
                 });
             }
+
+            _clearPath();
         }
     }
 
@@ -2489,6 +2491,7 @@ define([
 
         selectObject(null);
         previewMode = true;
+        transformControl.detach(SELECTED);
 
         if(blobExpired) {
             var progress;
