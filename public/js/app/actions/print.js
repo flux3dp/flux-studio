@@ -566,17 +566,14 @@ define([
         var d = $.Deferred();
         getBlobFromScene().then((blob) => {
             previewUrl = URL.createObjectURL(blob);
-
-            var t = setInterval(() => {
-                if(slicingStatus.canInterrupt) {
-                    clearInterval(t);
-                    slicer.uploadPreviewImage(blob).then(() => {
-                        d.resolve(blob);
-                    });
-                }
-            }, 500);
+            slicer.uploadPreviewImage(blob).then(() => {
+                return slicer.getSlicingResult();
+            }).then((r) => {
+                responseBlob = r;
+                hasPreviewImage = true;
+                d.resolve(r);
+            });
         });
-
         return d.promise();
     }
 
@@ -1973,7 +1970,6 @@ define([
             camera.lookAt(ol);
             toggleTransformControl(false);
             render();
-            console.log(URL.createObjectURL(blob));
             d.resolve(blob);
         });
 
