@@ -1477,7 +1477,7 @@ define([
                             )
                     },
                     {
-                        'hide': this.state.mode === 'CAMERA'
+                        'hide': this.state.mode === 'CAMERA' || this._isAbortedOrCompleted()
                     }
                 );
 
