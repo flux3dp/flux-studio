@@ -553,6 +553,38 @@ define([
 
                 return d.promise();
             },
+            calibrate: function() {
+                var d = $.Deferred();
+
+                events.onMessage = function(result) {
+                    console.log(result);
+                    if(result.status === 'ok') {
+                        if(result.task === 'maintain') {
+                            ws.send(`maintain calibrating`);
+                        }
+                        else if(result.task === '') {
+                            d.resolve(result);
+                        }
+                        else {
+                            ws.send('task quit');
+                        }
+                    }
+                };
+
+                events.onError = function(result) {
+                    ws.send(`task quit`);
+                    d.reject(result);
+                };
+
+                events.onFatal = function(result) {
+                    ws.send(`task quit`);
+                    d.reject(result);
+                };
+
+                ws.send(`task maintain`);
+
+                return d.promise();
+            },
 
             /**
              * maintain mode

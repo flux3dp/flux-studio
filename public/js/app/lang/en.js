@@ -87,7 +87,8 @@ define(function() {
                 default_device: 'Set as Default',
                 check_firmware_update: 'Update Firmware',
                 update_delta: 'Delta Firmware',
-                update_toolhead: 'Toolhead Firmware'
+                update_toolhead: 'Toolhead Firmware',
+                calibrate: 'Calibrate'
             },
             window: {
                 label: 'Window',
