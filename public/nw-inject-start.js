@@ -4,6 +4,9 @@ window.requireNode = nw.require || function() {};
 var process = nw.process,
     fs = requireNode('fs'),
     os = requireNode('os'),
+    updater = requireNode('node-webkit-updater'),
+    pkg = requireNode('./package.json'), // Insert your app's manifest here
+    upd = new updater(pkg),
     path = requireNode('path'),
     nwPath = process.execPath,
     nwDir = path.dirname(nwPath),
@@ -173,3 +176,32 @@ default:
 probe(currentPort, findPort);
 
 delete window.require;
+
+nw.App.checkUpdate = function(cb) {
+    cb = cb || function() {};
+
+    return upd.checkNewVersion(function(error, newVersionExists, manifest) {
+        cb.apply(null, arguments);
+    });
+};
+
+nw.App.downloadUpdate = function(manifest, cb, onProgress) {
+    cb = cb || function() {};
+
+    return upd.download(function(error, filename) {
+        cb.apply(null, arguments);
+    }, manifest, onProgress);
+};
+
+nw.App.runInstaller = function(filename, manifest, cb) {
+    cb = cb || function() {};
+
+    return upd.unpack(filename, function(error, newAppPath) {
+        cb.apply(null, arguments);
+
+        if (!error) {
+            upd.runInstaller(newAppPath, [upd.getAppPath(), upd.getAppExec()],{});
+            nw.App.quit();
+        }
+    }, manifest);
+};
