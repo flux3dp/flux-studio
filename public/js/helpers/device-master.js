@@ -546,8 +546,16 @@ define([
         return cameraStream;
     }
 
-    function stopStreamCamera(uuid) {
+    function stopStreamCamera() {
         _device.camera.closeStream();
+    }
+
+    function calibrate() {
+        _device.actions.calibrate().then((response) => {
+            console.log(response);
+        }, (error) => {
+            console.log('error from calibration', error);
+        });
     }
 
     function _scanDeviceError(devices) {
@@ -671,6 +679,7 @@ define([
             this.closeConnection        = closeConnection;
             this.streamCamera           = streamCamera;
             this.stopStreamCamera       = stopStreamCamera;
+            this.calibrate              = calibrate;
 
             Discover(
                 'device-master',
