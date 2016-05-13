@@ -40,7 +40,6 @@ define([
             var matches = [];
 
             keyup_event();
-            console.log(special_key_map, e.keyCode);
 
             if (false === isMetaKey(e.keyCode)) {
                 keyCodeStatus.push(e.keyCode);
