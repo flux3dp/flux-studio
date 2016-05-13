@@ -525,6 +525,7 @@ define([
         slicingStatus.canInterrupt  = false;
         slicingStatus.pauseReport   = true;
         slicingStatus.hasError      = false;
+        slicingStatus.isComplete    = false;
         blobExpired                 = true;
         willReslice                 = false;
 
