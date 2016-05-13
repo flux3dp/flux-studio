@@ -568,9 +568,15 @@ define([
             previewUrl = URL.createObjectURL(blob);
 
             var t = setInterval(() => {
-                if(slicingStatus.canInterrupt) {
+                if(!slicingStatus.isComplete) {
+                    slicingStatus.showProgress = true;
+                }
+                if(slicingStatus.canInterrupt && slicingStatus.isComplete) {
+                    slicingStatus.showProgress = false;
+                    slicingStatus.canInterrupt = false;
                     clearInterval(t);
                     slicer.uploadPreviewImage(blob).then(() => {
+                        slicingStatus.canInterrupt = true;
                         d.resolve(blob);
                     });
                 }
