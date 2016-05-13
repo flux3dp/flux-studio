@@ -1374,12 +1374,12 @@ define([
 
             // CAMERA mode
             if(this.state.mode === mode.CAMERA) {
-                if(
-                    statusId === DeviceConstants.status.IDLE ||
-                    statusId === DeviceConstants.status.COMPLETED ||
-                    statusId === DeviceConstants.status.ABORTED
-                ) {
-                    leftButtonOn = false;
+                leftButtonOn = false;
+                if(openSource === 'PRINT') {
+                    middleButtonOn = true;
+                }
+                else {
+                    middleButtonOn = false;
                 }
             }
 
