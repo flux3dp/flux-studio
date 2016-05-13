@@ -345,9 +345,9 @@ define([
             mesh.scale.locked = true;
             /* end customized property */
 
-            // if (mesh.geometry.type !== 'Geometry') {
-            //     mesh.geometry = new THREE.Geometry().fromBufferGeometry(mesh.geometry);
-            // }
+            if (mesh.geometry.type !== 'Geometry') {
+                mesh.geometry = new THREE.Geometry().fromBufferGeometry(mesh.geometry);
+            }
 
             mesh.name = 'custom';
             mesh.file = file;
