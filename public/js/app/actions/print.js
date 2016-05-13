@@ -345,9 +345,9 @@ define([
             mesh.scale.locked = true;
             /* end customized property */
 
-            // if (mesh.geometry.type !== 'Geometry') {
-            //     mesh.geometry = new THREE.Geometry().fromBufferGeometry(mesh.geometry);
-            // }
+            if (mesh.geometry.type !== 'Geometry') {
+                mesh.geometry = new THREE.Geometry().fromBufferGeometry(mesh.geometry);
+            }
 
             mesh.name = 'custom';
             mesh.file = file;
@@ -566,15 +566,23 @@ define([
         var d = $.Deferred();
         getBlobFromScene().then((blob) => {
             previewUrl = URL.createObjectURL(blob);
-            console.log(previewUrl, blob);
-            slicer.uploadPreviewImage(blob).then(() => {
-                return slicer.getSlicingResult();
-            }).then((r) => {
-                responseBlob = r;
-                hasPreviewImage = true;
-                d.resolve(r);
-            });
+
+            var t = setInterval(() => {
+                if(!slicingStatus.isComplete) {
+                    slicingStatus.showProgress = true;
+                }
+                if(slicingStatus.canInterrupt && slicingStatus.isComplete) {
+                    slicingStatus.showProgress = false;
+                    slicingStatus.canInterrupt = false;
+                    clearInterval(t);
+                    slicer.uploadPreviewImage(blob).then(() => {
+                        slicingStatus.canInterrupt = true;
+                        d.resolve(blob);
+                    });
+                }
+            }, 500);
         });
+
         return d.promise();
     }
 
@@ -1577,6 +1585,8 @@ define([
                     setImportWindowPosition();
                 });
             }
+
+            _clearPath();
         }
     }
 
@@ -2487,6 +2497,7 @@ define([
 
         selectObject(null);
         previewMode = true;
+        transformControl.detach(SELECTED);
 
         if(blobExpired) {
             var progress;
