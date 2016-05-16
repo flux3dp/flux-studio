@@ -507,7 +507,7 @@ define([
                     ignoreVersions = config().read('software-update-ignore-list') || [],
                     installNewApp = function() {
                         nw.App.runInstaller(filename, manifest);
-                        AlertActions.showPopupInfo('ruinstalling', 'Executing...');
+                        // AlertActions.showPopupInfo('ruinstalling', 'Executing...');
                         AlertStore.removeYesListener(installNewApp);
                     },
                     handleDownloadProgress = function(data, downloadSize, contentLength) {
@@ -553,7 +553,6 @@ define([
                                         },
                                         handleDownloadProgress
                                     );
-                                    console.log(updater);
                                 }
                             });
                         }
