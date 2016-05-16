@@ -21,7 +21,7 @@ define(function() {
         print_config: {
             color_border_out_side: 0xFF0000,
             color_border_selected: 0xFFFF00,
-            color_border_unselected: 0x333333,
+            color_object: 0x333333,
             color_infill: 0xEBE3AA,
             color_perimeter: 0x838689,
             color_support: 0xCAD7B2,
