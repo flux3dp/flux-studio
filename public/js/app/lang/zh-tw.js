@@ -1021,7 +1021,9 @@ define(function() {
                 message: 'Delta 有重要韌體更新，是否要現在更新？',
             },
             unsupport_osx_version: '不支援此 Mac OS X 版本',
-            need_password: '需要密碼與 FLUX Delta 建立連線'
+            need_password: '需要密碼與 FLUX Delta 建立連線',
+            new_app_downloading: '下載中',
+            ask_for_upgrade: '馬上升級嗎?'
         },
         machine_status: {
             '-10': 'Raw Mode',
