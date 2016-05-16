@@ -388,8 +388,10 @@ define([
 
                 _handleGoClick: function() {
                     AlertStore.removeCancelListener(this._handleDefaultCancel);
-                    director.takeSnapShot();
                     listeningToCancel = false;
+                    director.takeSnapShot().then(() =>{
+                        return director.getFCode();
+                    });
                     this.setState({
                         openPrinterSelectorWindow: true
                     });
@@ -491,9 +493,11 @@ define([
                 },
 
                 _handlePreview: function(isOn) {
-                    this.setState({ previewMode: isOn }, function() {
-                        director.togglePreview(isOn);
-                    });
+                    if(this.state.previewMode !== isOn) {
+                        this.setState({ previewMode: isOn }, function() {
+                            director.togglePreview();
+                        });
+                    }
                 },
 
                 _handlePrinterSelectorWindowClose: function() {
@@ -511,36 +515,67 @@ define([
                         openPrinterSelectorWindow: false
                     });
 
-                    director.takeSnapShot().then(() => {
-                        return director.getFCode();
-                    }).then(function(fcode, previewUrl) {
-                        if(director.getSlicingStatus().inProgress) {
-                            return;
+                    var t = setInterval(() => {
+                        if(director.getSlicingStatus().isComplete) {
+                            clearInterval(t);
+                            director.getFCode().then((fcode, previewUrl) => {
+                                if(!(fcode instanceof Blob)) {
+                                    AlertActions.showPopupError('', lang.print.out_of_range_message, lang.print.out_of_range);
+                                    return;
+                                }
+                                AlertStore.removeCancelListener(this._handleDefaultCancel);
+                                removeCancelListener = false;
+                                GlobalActions.showMonitor(selectedPrinter, fcode, previewUrl, GlobalConstants.PRINT);
+                                //Tour popout after show monitor delay
+                                setTimeout(() => {
+                                    if(tutorialMode) {
+                                        this.setState({
+                                            tutorialOn: true,
+                                            currentTutorialStep: 6
+                                        });
+                                        //Insert into root html
+                                        $('.tour-overlay').append($('.tour'));
+                                        $('.tour').click(() => {
+                                            $('.print-studio').append($('.tour'));
+                                            this._handleTutorialComplete();
+                                        });
+                                    };
+                                }, 1000);
+                            });
                         }
-                        if(!(fcode instanceof Blob)) {
-                            AlertActions.showPopupError('', lang.print.out_of_range_message, lang.print.out_of_range);
-                            return;
-                        }
-                        AlertStore.removeCancelListener(this._handleDefaultCancel);
-                        removeCancelListener = false;
-                        GlobalActions.showMonitor(selectedPrinter, fcode, previewUrl, GlobalConstants.PRINT);
-                        //Tour popout after show monitor delay
-                        setTimeout(function() {
-                            if(tutorialMode) {
-                                this.setState({
-                                    tutorialOn: true,
-                                    currentTutorialStep: 6
-                                });
-                                //Insert into root html
-                                $('.tour-overlay').append($('.tour'));
-                                $('.tour').click(function(){
-                                    $('.print-studio').append($('.tour'));
-                                    this._handleTutorialComplete();
-                                }.bind(this));
-                            };
-                        }.bind(this), 1000);
 
-                    }.bind(this));
+                    }, 500);
+
+                    // director.takeSnapShot().then(() => {
+                    //     return director.getFCode();
+                    // }).then(function(fcode, previewUrl) {
+                    //     if(director.getSlicingStatus().inProgress) {
+                    //         return;
+                    //     }
+                    //     if(!(fcode instanceof Blob)) {
+                    //         AlertActions.showPopupError('', lang.print.out_of_range_message, lang.print.out_of_range);
+                    //         return;
+                    //     }
+                    //     AlertStore.removeCancelListener(this._handleDefaultCancel);
+                    //     removeCancelListener = false;
+                    //     GlobalActions.showMonitor(selectedPrinter, fcode, previewUrl, GlobalConstants.PRINT);
+                    //     //Tour popout after show monitor delay
+                    //     setTimeout(function() {
+                    //         if(tutorialMode) {
+                    //             this.setState({
+                    //                 tutorialOn: true,
+                    //                 currentTutorialStep: 6
+                    //             });
+                    //             //Insert into root html
+                    //             $('.tour-overlay').append($('.tour'));
+                    //             $('.tour').click(function(){
+                    //                 $('.print-studio').append($('.tour'));
+                    //                 this._handleTutorialComplete();
+                    //             }.bind(this));
+                    //         };
+                    //     }.bind(this), 1000);
+                    //
+                    // }.bind(this));
 
                 },
 
