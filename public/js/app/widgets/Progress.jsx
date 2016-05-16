@@ -41,6 +41,18 @@ function(React, Modal, Alert, ProgressConstants) {
             };
         },
 
+        getInitialState: function() {
+            return {
+                percentage: this.props.percentage
+            };
+        },
+
+        componentWillReceiveProps: function(nextProps) {
+            this.setState({
+                percentage: nextProps.percentage
+            });
+        },
+
         _getButton: function() {
             var buttons = [];
 
@@ -94,7 +106,7 @@ function(React, Modal, Alert, ProgressConstants) {
         _renderIcon: function() {
             var icon,
                 progressStyle = {
-                    width: (this.props.percentage || 0) + '%'
+                    width: (this.state.percentage || 0) + '%'
                 };
 
             switch (this.props.type) {
