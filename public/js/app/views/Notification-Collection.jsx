@@ -499,68 +499,66 @@ define([
 
             _checkSoftwareUpdate: function() {
                 var self = this,
-                    data = {
-                        os: ''
-                    },
+                    isIgnore,
+                    filename,
+                    manifest,
+                    firmwareUpdater,
+                    downloadPercentage = 0,
                     ignoreVersions = config().read('software-update-ignore-list') || [],
-                    fetchProfile = function() {
-                        var deferred = $.Deferred();
-
-                        $.ajax({
-                            url: 'package.json',
-                            dataType: 'json'
-                        }).then(function(response) {
-                            if(typeof(response) === 'object') {
-                                deferred.resolve(response);
-                            }
-                            else {
-                                deferred.resolve(JSON.parse(response));
-                            }
-                        });
-
-                        return deferred;
+                    installNewApp = function() {
+                        nw.App.runInstaller(filename, manifest);
+                        AlertActions.showPopupInfo('ruinstalling', 'Executing...');
+                        AlertStore.removeYesListener(installNewApp);
                     },
-                    fetchLatestVersion = function(currentProfile) {
-                        var deferred = $.Deferred();
+                    handleDownloadProgress = function(data, downloadSize, contentLength) {
+                        downloadPercentage = parseInt((downloadSize / contentLength).toFixed(3) * 100, 10);
 
-                        data.os = (window.FLUX.osType || '') + '-' + (window.FLUX.arch || '');
+                        if (true === self.state.progress.open) {
+                            ProgressActions.updating(
+                                lang.message.new_app_downloading + ' (' + downloadPercentage + '%)',
+                                downloadPercentage
+                            );
 
-                        $.ajax({
-                            url: 'http://software.flux3dp.com/check-update/',
-                            data: data
-                        }).then(function(response) {
-                            deferred.resolve(currentProfile, response);
-                        });
-
-                        return deferred;
+                            if (100 === downloadPercentage) {
+                                ProgressActions.close();
+                                AlertActions.showPopupYesNo('install-new-app', lang.message.ask_for_upgrade);
+                                AlertStore.onYes(installNewApp);
+                            }
+                        }
+                        else {
+                            updater.abort();
+                        }
                     };
 
-                fetchProfile().then(fetchLatestVersion).done(function(currentProfile, currentVersion) {
-                    var isIgnore = -1 < ignoreVersions.indexOf(currentVersion.latest_version);
+                if (true === window.FLUX.isNW) {
+                    nw.App.checkUpdate(function(error, newVersionExists, _manifest) {
+                        manifest = _manifest;
+                        isIgnore = -1 < ignoreVersions.indexOf(manifest.version);
 
-                    if (false === isIgnore &&
-                        null !== currentVersion.latest_version &&
-                        currentVersion.latest_version > currentProfile.version
-                    ) {
-                        self._showUpdate({
-                            type: 'software',
-                            device: {},
-                            updateInfo: {
-                                currentVersion: currentProfile.version,
-                                latestVersion: currentVersion.latest_version,
-                                releaseNote: currentVersion.changelog,
-                            },
-                            onInstall: function() {
-                                if (true === window.FLUX.isNW) {
-                                    nw.Shell.openExternal('https://flux3dp.com/downloads/');
+                        if (!error && true === newVersionExists && false === isIgnore) {
+                            self._showUpdate({
+                                type: 'software',
+                                device: {},
+                                updateInfo: {
+                                    currentVersion: window.FLUX.version,
+                                    latestVersion: manifest.version,
+                                    releaseNote: manifest.changelog,
+                                },
+                                onInstall: function() {
+                                    ProgressActions.open(ProgressConstants.STEPPING, '', lang.message.new_app_downloading, true);
+                                    updater = nw.App.downloadUpdate(
+                                        manifest,
+                                        function(error, _filename) {
+                                            filename = _filename;
+                                        },
+                                        handleDownloadProgress
+                                    );
+                                    console.log(updater);
                                 }
-                                else {
-                                    window.open('https://flux3dp.com/downloads/');
-                                }
-                            }
-                        });
-                    }
-                });
+                            });
+                        }
+                    });
+                }
             },
 
             _renderChangeFilament: function() {
