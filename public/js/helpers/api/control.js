@@ -569,15 +569,16 @@ define([
                             ws.send('task quit');
                         }
                     }
+                    else if(result.status === 'error') {
+                        d.resolve(result.error || 'error');
+                    };
                 };
 
                 events.onError = function(result) {
-                    ws.send(`task quit`);
                     d.reject(result);
                 };
 
                 events.onFatal = function(result) {
-                    ws.send(`task quit`);
                     d.reject(result);
                 };
 
