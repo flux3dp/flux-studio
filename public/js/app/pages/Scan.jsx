@@ -76,6 +76,7 @@ define([
                         cameraImageSrc: undefined,
                         history: [],
                         openProgressBar: false,
+                        openBlocker: false,
                         hasConvert: false,  // point cloud into stl
                         hasMultiScan: false,    // ready to multi scan
                         progressPercentage: 0,
@@ -1128,6 +1129,9 @@ define([
                 },
 
                 _openBlocker: function(is_open, type, message, hasStop, caption) {
+                    this.setState({
+                        openBlocker: is_open
+                    });
 
                     if (true === is_open) {
                         ProgressActions.open(type, caption ? caption : '', message, hasStop);
@@ -1341,6 +1345,7 @@ define([
                     return (
                         0 < state.selectedMeshes.length &&
                         false === state.isScanStarted &&
+                        false === state.openBlocker &&
                         false === state.showCamera ?
                         <ManipulationPanel
                             lang={lang}

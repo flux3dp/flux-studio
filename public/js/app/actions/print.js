@@ -345,9 +345,9 @@ define([
             mesh.scale.locked = true;
             /* end customized property */
 
-            // if (mesh.geometry.type !== 'Geometry') {
-            //     mesh.geometry = new THREE.Geometry().fromBufferGeometry(mesh.geometry);
-            // }
+            if (mesh.geometry.type !== 'Geometry') {
+                mesh.geometry = new THREE.Geometry().fromBufferGeometry(mesh.geometry);
+            }
 
             mesh.name = 'custom';
             mesh.file = file;
@@ -525,6 +525,7 @@ define([
         slicingStatus.canInterrupt  = false;
         slicingStatus.pauseReport   = true;
         slicingStatus.hasError      = false;
+        slicingStatus.isComplete    = false;
         blobExpired                 = true;
         willReslice                 = false;
 
@@ -563,18 +564,35 @@ define([
     }
 
     function takeSnapShot() {
-        var d = $.Deferred();
+        var d = $.Deferred(),
+            wasInPreviewMode = false;
+
+        if(previewMode) {
+            togglePreview();
+            wasInPreviewMode = true;
+        }
         getBlobFromScene().then((blob) => {
+            if(wasInPreviewMode) {
+                togglePreview();
+            }
             previewUrl = URL.createObjectURL(blob);
-            console.log(previewUrl, blob);
-            slicer.uploadPreviewImage(blob).then(() => {
-                return slicer.getSlicingResult();
-            }).then((r) => {
-                responseBlob = r;
-                hasPreviewImage = true;
-                d.resolve(r);
-            });
+            console.log(previewUrl);
+            var t = setInterval(() => {
+                if(!slicingStatus.isComplete) {
+                    slicingStatus.showProgress = true;
+                }
+                if(slicingStatus.canInterrupt && slicingStatus.isComplete) {
+                    slicingStatus.showProgress = false;
+                    slicingStatus.canInterrupt = false;
+                    clearInterval(t);
+                    slicer.uploadPreviewImage(blob).then(() => {
+                        slicingStatus.canInterrupt = true;
+                        d.resolve(blob);
+                    });
+                }
+            }, 500);
         });
+
         return d.promise();
     }
 
@@ -1137,7 +1155,7 @@ define([
                 _showWait(lang.print.gettingSlicingReport, !showStopButton);
                 slicingStatus.showProgress = true;
                 var subscriber = slicingStatusStream.subscribe((status) => {
-                    if(!status.inProgress) {
+                    if(status.isComplete) {
                         subscriber.dispose();
                         d.resolve(responseBlob, previewUrl);
                     }
@@ -1577,6 +1595,8 @@ define([
                     setImportWindowPosition();
                 });
             }
+
+            _clearPath();
         }
     }
 
@@ -1969,7 +1989,6 @@ define([
             camera.lookAt(ol);
             toggleTransformControl(false);
             render();
-            console.log(URL.createObjectURL(blob));
             d.resolve(blob);
         });
 
@@ -2033,11 +2052,14 @@ define([
         }
     }
 
-    function togglePreview(isOn) {
+    function togglePreview() {
         if (objects.length === 0) {
             return;
         } else {
-            isOn ? _showPreview() : _hidePreview();
+            console.log(previewMode);
+            previewMode ? _hidePreview() : _showPreview();
+            previewMode = !previewMode;
+            render();
         }
     }
 
@@ -2383,7 +2405,7 @@ define([
     }
 
     function _hidePreview() {
-        previewMode = false;
+        // previewMode = false;
         render();
         _setProgressMessage('');
     }
@@ -2486,7 +2508,8 @@ define([
         }
 
         selectObject(null);
-        previewMode = true;
+        // previewMode = true;
+        transformControl.detach(SELECTED);
 
         if(blobExpired) {
             var progress;
@@ -2540,11 +2563,13 @@ define([
     }
 
     function _closePreview() {
-        previewMode = false;
-        reactSrc.setState({ previewMode: false }, function() {
-            togglePreview(false);
-            $('#preview').parents('label').find('input').prop('checked',false);
-        });
+        if(previewMode) {
+            previewMode = false;
+            reactSrc.setState({ previewMode: false }, function() {
+                togglePreview();
+                $('#preview').parents('label').find('input').prop('checked',false);
+            });
+        }
     }
 
     function _drawPath() {
@@ -2697,7 +2722,15 @@ define([
     }
 
     function changeEngine(engine, path) {
-        slicer.changeEngine(engine, path);
+        var t = setInterval(() => {
+            if(slicingStatus.canInterrupt) {
+                clearInterval(t);
+                slicingStatus.canInterrupt = false;
+                slicer.changeEngine(engine, path).then(() => {
+                    slicingStatus.canInterrupt = true;
+                });
+            }
+        }, 500);
     }
 
     return {
