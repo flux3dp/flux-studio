@@ -17,6 +17,7 @@ define([
     'helpers/sprintf',
     'helpers/packer',
     'lib/rx.lite.min',
+    'app/app-settings',
     // non-return value
     'threeOrbitControls',
     'threeTrackballControls',
@@ -44,7 +45,8 @@ define([
     GlobalActions,
     Sprintf,
     packer,
-    Rx
+    Rx,
+    Settings
 ) {
     'use strict';
 
@@ -104,22 +106,22 @@ define([
         height: 180,
         step: 10,
         upVector: new THREE.Vector3(0, 0, 1),
-        color: 0x777777,
+        color: Settings.print_config.color_base_plate,
         opacity: 0.2,
         text: true,
-        textColor: '#000000',
+        textColor: '#FFFFFF',
         textPosition: 'center',
-        colorOutside: 0xFF0000,
-        colorSelected: 0xFFFF00,
-        colorUnselected: 0x333333,
+        colorOutside: Settings.print_config.color_border_out_side,
+        colorSelected: Settings.print_config.color_border_selected,
+        objectColor: Settings.print_config.color_object,
         degreeStep: 5,
         scalePrecision: 1, // decimal places,
         allowedMin: 1 // (mm)
     };
 
     var commonMaterial = new THREE.MeshPhongMaterial({
-        color: s.colorUnselected,
-        specular: 0x888888,
+        color: s.objectColor,
+        specular: 0xFFFFFF,
         shininess: 1
     });
 
@@ -130,12 +132,12 @@ define([
 
     var models = [];
 
-    previewColors[0] = new THREE.Color(0xEBE3AA); // infill
-    previewColors[1] = new THREE.Color(0x838689); // perimeter
-    previewColors[2] = new THREE.Color(0xCAD7B2); // support
-    previewColors[3] = new THREE.Color(0xFFFFFF); // move
-    previewColors[4] = new THREE.Color(0x5D4157); // skirt
-    previewColors[5] = new THREE.Color(0x57595b); // outer wall
+    previewColors[0] = new THREE.Color(Settings.print_config.color_infill);
+    previewColors[1] = new THREE.Color(Settings.print_config.color_perimeter);
+    previewColors[2] = new THREE.Color(Settings.print_config.color_support);
+    previewColors[3] = new THREE.Color(Settings.print_config.color_move);
+    previewColors[4] = new THREE.Color(Settings.print_config.color_skirt);
+    previewColors[5] = new THREE.Color(Settings.print_config.color_perimeter);
 
     function init(src) {
 
@@ -576,7 +578,7 @@ define([
                 togglePreview();
             }
             previewUrl = URL.createObjectURL(blob);
-
+            console.log(previewUrl);
             var t = setInterval(() => {
                 if(!slicingStatus.isComplete) {
                     slicingStatus.showProgress = true;
