@@ -204,7 +204,7 @@ nw.App.runInstaller = function(filename, manifest, cb) {
             upd.runInstaller(newAppPath, [upd.getAppPath(), upd.getAppExec()],{});
 
             if ('Windows_NT' !== osType) {
-                nw.App.quit();
+                // nw.App.quit();
             }
         }
     }, manifest);
