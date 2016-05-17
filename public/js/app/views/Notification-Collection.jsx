@@ -506,7 +506,11 @@ define([
                     downloadPercentage = 0,
                     ignoreVersions = config().read('software-update-ignore-list') || [],
                     installNewApp = function() {
-                        nw.App.runInstaller(filename, manifest);
+                        nw.App.runInstaller(filename, manifest, function(err, newAppPath) {
+                            if (err) {
+                                AlertActions.showPopupInfo('ruinstalling', 'Upgrade failed');
+                            }
+                        });
                         // AlertActions.showPopupInfo('ruinstalling', 'Executing...');
                         AlertStore.removeYesListener(installNewApp);
                     },
