@@ -115,13 +115,13 @@ define([
         colorSelected: Settings.print_config.color_border_selected,
         objectColor: Settings.print_config.color_object,
         degreeStep: 5,
-        scalePrecision: 1, // decimal places,
-        allowedMin: 1 // (mm)
+        scalePrecision: 1,  // decimal places,
+        allowedMin: 1       // (mm)
     };
 
     var commonMaterial = new THREE.MeshPhongMaterial({
         color: s.objectColor,
-        specular: 0xFFFFFF,
+        specular: Settings.print_config.color_object,
         shininess: 1
     });
 
@@ -2724,15 +2724,33 @@ define([
     }
 
     function changeEngine(engine, path) {
+        var d = $.Deferred();
+
         var t = setInterval(() => {
             if(slicingStatus.canInterrupt) {
                 clearInterval(t);
                 slicingStatus.canInterrupt = false;
-                slicer.changeEngine(engine, path).then(() => {
+                if(engine !== Settings.default_engine) {
+                    slicer.checkEngine(engine, path).then((result) => {
+                        if(result.status === 'ok') {
+                            return slicer.changeEngine(engine, path);
+                        }
+                        else {
+                            d.resolve(result);
+                        }
+                    }).then(() => {
+                        slicingStatus.canInterrupt = true;
+                        d.resolve();
+                    });
+                }
+                else {
                     slicingStatus.canInterrupt = true;
-                });
+                    d.resolve();
+                }
             }
         }, 500);
+
+        return d.promise();
     }
 
     return {
