@@ -202,10 +202,7 @@ nw.App.runInstaller = function(filename, manifest, cb) {
         console.log(filename, error, newAppPath);
         if (!error) {
             upd.runInstaller(newAppPath, [upd.getAppPath(), upd.getAppExec()],{});
-
-            if ('Windows_NT' !== osType) {
-                // nw.App.quit();
-            }
+            nw.App.quit();
         }
     }, manifest);
 };
