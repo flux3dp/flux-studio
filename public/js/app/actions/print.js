@@ -578,7 +578,7 @@ define([
                 togglePreview();
             }
             previewUrl = URL.createObjectURL(blob);
-            console.log(previewUrl);
+
             var t = setInterval(() => {
                 if(!slicingStatus.isComplete) {
                     slicingStatus.showProgress = true;
@@ -594,7 +594,6 @@ define([
                 }
             }, 500);
         });
-
         return d.promise();
     }
 
