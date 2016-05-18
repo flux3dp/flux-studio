@@ -21,7 +21,8 @@ define([
 
     var hadConnected = false,
         showProgramErrorPopup = true,
-        WsLogger = new Logger('websocket');
+        WsLogger = new Logger('websocket'),
+        logLimit = 100;
 
     // options:
     //      hostname      - host name (Default: localhost)
@@ -51,7 +52,7 @@ define([
             received_data = [],
             trimMessage = function(message) {
                 if (150 < message.length) {
-                    message = message.substr(0, 150) + '...';
+                    return message.substr(0, 150) + '...';
                 }
 
                 return message;
@@ -77,6 +78,9 @@ define([
                     var data = (true === isJson(result.data) ? JSON.parse(result.data) : result.data),
                         message = trimMessage(['<', result.data].join(' '));
 
+                    while(wsLog.log.length >= logLimit) {
+                        wsLog.log.shift();
+                    }
                     wsLog.log.push(message);
 
                     if ('string' === typeof data) {
@@ -86,6 +90,9 @@ define([
 
                     data = (true === isJson(data) ? JSON.parse(data) : data);
 
+                    while(received_data.length >= logLimit) {
+                        received_data.shift();
+                    }
                     received_data.push(data);
 
                     if ('error' === data.status) {

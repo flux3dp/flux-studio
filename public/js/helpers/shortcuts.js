@@ -53,6 +53,10 @@ define([
                 keyCodeStatus.push(special_key_map.ALT);
             }
 
+            if (true === e.shiftKey) {
+                keyCodeStatus.push(special_key_map.SHIFT);
+            }
+
             if (true === e.metaKey) {
                 keyCodeStatus.push(special_key_map.CMD);
             }

@@ -14,7 +14,7 @@ define([
     'helpers/api/config',
     'app/actions/global-actions',
     'app/constants/input-lightbox-constants',
-    'helpers/object-assign',
+    'helpers/device-list',
     'helpers/array-findindex'
 ], function(
     $,
@@ -31,7 +31,8 @@ define([
     Discover,
     Config,
     GlobalActions,
-    InputLightBoxConstants
+    InputLightBoxConstants,
+    DeviceList
 ) {
     'use strict';
 
@@ -662,6 +663,7 @@ define([
             Discover(
                 'device-master',
                 function(devices) {
+                    devices = DeviceList(devices);
                     for(var i in devices) {
                         _deviceNameMap[devices[i].name] = devices[i];
                     }
