@@ -353,7 +353,7 @@ define([
                     var newValue = `raft_layers = ${currentRaftLayers}`;
 
                     advancedSettings.custom = advancedSettings.custom.replace(oldValue, newValue);
-                    Config().write('advanced-settings', JSON.stringify(advancedSettings));
+                    this._saveSetting();
 
                     director.setParameter('raft_layers', _raftLayers).then(function() {
                         this.setState({
@@ -377,7 +377,7 @@ define([
                     advancedSettings.custom = advancedSettings.custom.replace(
                         `support_material = ${isOn ? 0 : 1}`,
                         `support_material = ${isOn ? 1 : 0}`);
-                    Config().write('advanced-settings', JSON.stringify(advancedSettings));
+                    this._saveSetting();
                 },
 
                 _handleToggleAdvancedSettingPanel: function() {
@@ -442,7 +442,7 @@ define([
                     // remove old properties
                     delete advancedSettings.raft;
                     delete advancedSettings.raft_on;
-                    Config().write('advanced-settings', JSON.stringify(advancedSettings));
+                    this._saveSetting();
                     var _raftLayers = parseInt(this._getValueFromAdvancedCustomSettings('raft_layers'));
                     if(_raftLayers !== 0) {
                         advancedSettings.raft_layers = _raftLayers;
@@ -616,7 +616,7 @@ define([
                         }
                     }
                     advancedSettings.custom = _settings.join('\n');
-                    Config().write('advanced-settings', JSON.stringify(advancedSettings));
+                    this._saveSetting();
                 },
 
                 _handleTutorialStep: function() {
@@ -734,7 +734,21 @@ define([
                     if(engineName === defaultSlicingEngine) {
                         path = 'default';
                     }
-                    director.changeEngine(engineName, path);
+                    director.changeEngine(engineName, path).then((result) => {
+                        if(result) {
+                            advancedSettings.engine = 'slic3r';
+                            this._saveSetting();
+                            AlertActions.showPopupWarning(
+                                'engine-change',
+                                lang.settings.engine_change_fail[result.error],
+                                `${lang.settings.engine_change_fail.caption} ${engineName}`
+                            );
+                        }
+                    });
+                },
+
+                _saveSetting: function() {
+                    Config().write('advanced-settings', JSON.stringify(advancedSettings));
                 },
 
                 _getLineFromAdvancedCustomSetting: function(key) {

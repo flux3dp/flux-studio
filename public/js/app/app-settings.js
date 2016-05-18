@@ -18,6 +18,8 @@ define(function() {
             }
         },
 
+        default_engine: 'slic3r',
+
         print_config: {
             color_border_out_side: 0xFF0000,
             color_border_selected: 0xFFFF00,
