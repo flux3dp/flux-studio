@@ -603,7 +603,7 @@ define([
                 typeMap[DeviceConstants.LOAD_FILAMENT]   = 'load_filament';
                 typeMap[DeviceConstants.UNLOAD_FILAMENT] = 'unload_filament';
 
-                events.onMessage = function(result) {
+                events.onMessage = (result) => {
                     clearTimeout(timeout);
                     timeout = setTimeout(function() {
                         deferred.reject({
@@ -613,19 +613,24 @@ define([
                     }, 30000); // magic timeout duration
 
                     if ('ok' === result.status && 'begining' === currentTask) {
-                        currentTask = typeMap[type];
-                        args = [
-                            'maintain',
-                            currentTask,
-                            0, // extruder id
-                            220 // temperature
-                        ];
-                        setTimeout(
-                            function() {
-                                ws.send(args.join(' '));
-                            },
-                            3000
-                        );
+                        if(result.task === 'maintain') {
+                            ws.send('maintain home');
+                        }
+                        else {
+                            currentTask = typeMap[type];
+                            args = [
+                                'maintain',
+                                currentTask,
+                                0, // extruder id
+                                220 // temperature
+                            ];
+                            setTimeout(
+                                function() {
+                                    ws.send(args.join(' '));
+                                },
+                                3000
+                            );
+                        }
                     }
                     else if (-1 < ['loading', 'unloading'].indexOf(result.status.toLowerCase())) {
                         deferred.notify(result);
