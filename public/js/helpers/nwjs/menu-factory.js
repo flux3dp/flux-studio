@@ -388,6 +388,24 @@ define([
                 type: 'separator'
             });
 
+            subItems.push({
+                label: lang.device.calibrate,
+                onClick: function() {
+                    console.log('check 0');
+                    var currentPrinter = discoverMethods.getLatestPrinter(printer);
+
+                    DeviceMaster.selectDevice(currentPrinter).then(function(status) {
+
+                        if (status === DeviceConstants.CONNECTED) {
+                            DeviceMaster.calibrate();
+                        }
+                        else if (status === DeviceConstants.TIMEOUT) {
+                            AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
+                        }
+                    });
+                }
+            });
+
             // firmware update (delta/toolhead)
             subItems.push({
                 label: lang.device.check_firmware_update,

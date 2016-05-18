@@ -87,7 +87,8 @@ define(function() {
                 default_device: 'Set as Default',
                 check_firmware_update: 'Update Firmware',
                 update_delta: 'Delta Firmware',
-                update_toolhead: 'Toolhead Firmware'
+                update_toolhead: 'Toolhead Firmware',
+                calibrate: 'Calibrate'
             },
             window: {
                 label: 'Window',
@@ -320,7 +321,14 @@ define(function() {
             },
             notification_on: 'On',
             notification_off: 'Off',
-            cura_engine_path: 'Cura Engine Path'
+            cura_engine_path: 'Cura Engine Path',
+            engine_change_fail: {
+                'caption': 'unable to change engine ',
+                '1': 'error during checking',
+                '2': 'cura version error',
+                '3': 'path is not cura',
+                '4': 'path is not a exist file, please check engine path in setting section'
+            }
         },
         print: {
             import: 'IMPORT',

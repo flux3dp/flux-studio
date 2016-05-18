@@ -553,6 +553,38 @@ define([
 
                 return d.promise();
             },
+            calibrate: function() {
+                var d = $.Deferred();
+
+                events.onMessage = function(result) {
+                    console.log(result);
+                    if(result.status === 'ok') {
+                        if(result.task === 'maintain') {
+                            ws.send(`maintain calibrating`);
+                        }
+                        else if(result.task === '') {
+                            d.resolve(result);
+                        }
+                        else {
+                            ws.send('task quit');
+                        }
+                    }
+                };
+
+                events.onError = function(result) {
+                    ws.send(`task quit`);
+                    d.reject(result);
+                };
+
+                events.onFatal = function(result) {
+                    ws.send(`task quit`);
+                    d.reject(result);
+                };
+
+                ws.send(`task maintain`);
+
+                return d.promise();
+            },
 
             /**
              * maintain mode
@@ -571,7 +603,7 @@ define([
                 typeMap[DeviceConstants.LOAD_FILAMENT]   = 'load_filament';
                 typeMap[DeviceConstants.UNLOAD_FILAMENT] = 'unload_filament';
 
-                events.onMessage = function(result) {
+                events.onMessage = (result) => {
                     clearTimeout(timeout);
                     timeout = setTimeout(function() {
                         deferred.reject({
@@ -581,19 +613,24 @@ define([
                     }, 30000); // magic timeout duration
 
                     if ('ok' === result.status && 'begining' === currentTask) {
-                        currentTask = typeMap[type];
-                        args = [
-                            'maintain',
-                            currentTask,
-                            0, // extruder id
-                            220 // temperature
-                        ];
-                        setTimeout(
-                            function() {
-                                ws.send(args.join(' '));
-                            },
-                            3000
-                        );
+                        if(result.task === 'maintain') {
+                            ws.send('maintain home');
+                        }
+                        else {
+                            currentTask = typeMap[type];
+                            args = [
+                                'maintain',
+                                currentTask,
+                                0, // extruder id
+                                220 // temperature
+                            ];
+                            setTimeout(
+                                function() {
+                                    ws.send(args.join(' '));
+                                },
+                                3000
+                            );
+                        }
                     }
                     else if (-1 < ['loading', 'unloading'].indexOf(result.status.toLowerCase())) {
                         deferred.notify(result);

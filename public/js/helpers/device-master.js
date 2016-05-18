@@ -15,6 +15,7 @@ define([
     'app/actions/global-actions',
     'app/constants/input-lightbox-constants',
     'helpers/device-list',
+    'helpers/api/camera',
     'helpers/array-findindex'
 ], function(
     $,
@@ -32,7 +33,8 @@ define([
     Config,
     GlobalActions,
     InputLightBoxConstants,
-    DeviceList
+    DeviceList,
+    Camera
 ) {
     'use strict';
 
@@ -534,10 +536,26 @@ define([
         return _devices[index];
     }
 
-    function _watch() {
-        setInterval(getReport().then(function(report) {
-            console.log(report);
-        }), 1000);
+    function streamCamera(uuid) {
+        var cameraStream = new Rx.Subject();
+        _device.camera = Camera(uuid);
+        _device.camera.startStream((imageBlob) => {
+            cameraStream.onNext(imageBlob);
+        });
+
+        return cameraStream;
+    }
+
+    function stopStreamCamera() {
+        _device.camera.closeStream();
+    }
+
+    function calibrate() {
+        _device.actions.calibrate().then((response) => {
+            console.log(response);
+        }, (error) => {
+            console.log('error from calibration', error);
+        });
     }
 
     function _scanDeviceError(devices) {
@@ -659,6 +677,9 @@ define([
             this.updateToolhead         = updateToolhead;
             this.headinfo               = headinfo;
             this.closeConnection        = closeConnection;
+            this.streamCamera           = streamCamera;
+            this.stopStreamCamera       = stopStreamCamera;
+            this.calibrate              = calibrate;
 
             Discover(
                 'device-master',
