@@ -320,7 +320,14 @@ define(function() {
             },
             notification_on: '開啟',
             notification_off: '關閉',
-            cura_engine_path: 'Cura 引擎路徑'
+            cura_engine_path: 'Cura 引擎路徑',
+            engine_change_fail: {
+                'caption': 'unable to change engine ',
+                '1': 'error during checking',
+                '2': 'cura version error',
+                '3': 'path is not cura',
+                '4': 'path is not a exist file, please check engine path in setting section'
+            }
         },
         print: {
             import: '匯入',
