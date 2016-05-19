@@ -43,7 +43,7 @@ define([
             send: function(uuid, password) {
                 password = password || '';
 
-                var args = JSON.stringify({ uuid: uuid, password: password, key: rsaKey() });
+                var args = JSON.stringify({ uuid: uuid, password: password, key: rsaKey(opts.checkPassword) });
 
                 ws.send(args);
             }
