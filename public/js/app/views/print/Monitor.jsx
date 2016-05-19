@@ -1202,15 +1202,14 @@ define([
 
         _processErrorCode: function(errorCode) {
             console.log(errorCode);
-            var digit = 9,
+            var digit = 10,
                 pad,
                 message = '';
 
-            pad = function (num, digit) { return (1e9 + num + '').slice(-digit) }
+            pad = function (num) { return (Array(digit).join('0') + num).slice(-digit) }
 
             if(Number(errorCode) === parseInt(errorCode, 10)) {
-                var m = pad(Number(parseInt(errorCode).toString(2))).split('');
-                // console.log('m is', m);
+                var m = pad(parseInt(errorCode).toString(2)).split('');
                 message = m.map((flag, index) => {
                     return flag === '1' ? lang.head_module.error[index] : '';
                 });
