@@ -62,7 +62,7 @@ define([
                     discoverMethods = discover('upnp-config', (printers) => {
                         clearTimeout(timer);
 
-                        if (0 < printers.length) {
+                        if (1 < printers.length) {
                             self._toggleBlocker(false);
                             self.setState({
                                 showPrinters: true
@@ -97,6 +97,8 @@ define([
                     upnpMethods,
                     lastError;
 
+                self._toggleBlocker(true);
+
                 currentPrinter.from = 'WIFI';
                 currentPrinter.apName = currentPrinter.name;
                 upnpMethods = upnpConfig(currentPrinter.uuid);
@@ -116,7 +118,8 @@ define([
                         lastError = response;
                         self._toggleBlocker(false);
                         break;
-                    case 'waitting':
+                    case 'waiting':
+                        currentPrinter.plaintext_password = response.plaintext_password;
                         self._toggleBlocker(true);
                         break;
                     }
@@ -143,6 +146,7 @@ define([
                         uniqleId="connect-via-wifi"
                         className="absolute-center"
                         lang={lang}
+                        forceAuth={true}
                         onGettingPrinter={this._onGettingPrinter}
                     />
                 );
