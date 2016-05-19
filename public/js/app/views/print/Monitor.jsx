@@ -879,24 +879,11 @@ define([
 
             // jug down errors as main and sub error for later use
             if(report.error.length > 0) {
-                if(typeof(report.error) === 'string') {
-                    mainError = report.error;
+                if(report.error[2]) {
+                    errorMessage = this._processErrorCode(report.error[2]);
                 }
                 else {
-                    mainError = report.error[0] || '';
-                    subError = report.error[1] || '';
-                }
-
-                if(lastError !== mainError) {
-                    messageViewed = false;
-                    lastError = mainError;
-                }
-
-                // this condition can be removed when assembla #45 is fixed
-                if(typeof report.error !== 'string' && report.error !== 'UNKNOWN_ERROR') {
-                    var err = report.error.slice(0);
-                    var err = err.splice(0, 2).join('_');
-                    errorMessage = lang.monitor[err] || err;
+                    errorMessage = lang.head_module.error.missing;
                 }
             }
 
@@ -907,8 +894,6 @@ define([
             if(
                 !messageViewed &&
                 !showingPopup &&
-                mainError !== DeviceConstants.USER_OPERATION &&
-                mainError.length > 0 &&
                 errorMessage.length > 0
             ) {
                 AlertActions.showPopupRetry(_id, errorMessage);
@@ -1213,6 +1198,27 @@ define([
 
         _imageError: function(src) {
             src.target.src = '/img/ph_s.png';
+        },
+
+        _processErrorCode: function(errorCode) {
+            console.log(errorCode);
+            var digit = 9,
+                pad,
+                message = '';
+
+            pad = function (num, digit) { return (1e9 + num + '').slice(-digit) }
+
+            if(Number(errorCode) === parseInt(errorCode, 10)) {
+                var m = pad(Number(parseInt(errorCode).toString(2))).split('');
+                // console.log('m is', m);
+                message = m.map((flag, index) => {
+                    return flag === '1' ? lang.head_module.error[index] : '';
+                });
+                return message.filter(entry => entry !== '').join('\n');
+            }
+            else {
+                return '';
+            }
         },
 
         _renderCameraContent: function() {
