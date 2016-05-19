@@ -1191,21 +1191,23 @@ define([
                 if(willReslice) {
                     return;
                 }
-                slicingStatus.canInterrupt = false;
-                slicingStatus.pauseReport = true;
-                slicer.reportSlicing(function(report) {
-                    slicingStatus.canInterrupt = true;
-                    slicingStatus.pauseReport = false;
-                    slicingStatus.lastReport = report;
-                    if(!report) { return; }
-                    if(report.status === 'complete') {
-                        clearInterval(slicingStatus.reporter);
-                        callback(report);
-                    }
-                    else if(report.status !== 'ok') {
-                        callback(report);
-                    }
-                });
+                if(slicingStatus.canInterrupt) {
+                    slicingStatus.canInterrupt = false;
+                    slicingStatus.pauseReport = true;
+                    slicer.reportSlicing(function(report) {
+                        slicingStatus.canInterrupt = true;
+                        slicingStatus.pauseReport = false;
+                        slicingStatus.lastReport = report;
+                        if(!report) { return; }
+                        if(report.status === 'complete') {
+                            clearInterval(slicingStatus.reporter);
+                            callback(report);
+                        }
+                        else if(report.status !== 'ok') {
+                            callback(report);
+                        }
+                    });
+                }
             }
         }, reportTimmer);
 
