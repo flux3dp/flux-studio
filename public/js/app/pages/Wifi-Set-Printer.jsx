@@ -38,28 +38,6 @@ define([
                 }
             },
 
-            componentDidMount: function() {
-                AlertStore.onCancel(this._onCancel);
-            },
-
-            componentWillUnmount: function() {
-                AlertStore.removeCancelListener(this._onCancel);
-            },
-
-            _onCancel: function(id) {
-                if ('set-machine-error' === id) {
-                    return;
-                };
-
-                if ('#initialize/wifi/set-printer' === location.hash &&
-                    'WIFI' === this.state.settingPrinter.from
-                ) {
-                    var usb = usbConfig();
-                    usb.close();
-                    location.hash = 'initialize/wifi/connect-machine';
-                }
-            },
-
             _handleSetPrinter: function(e) {
                 e.preventDefault();
 
@@ -70,7 +48,7 @@ define([
                     oldPassword = (
                         'WIFI' === self.state.settingPrinter.from && true === oldPasswordExists ?
                         self.refs.old_password.getDOMNode().value :
-                        ''
+                        self.state.settingPrinter.plaintext_password || ''
                     ),
                     usb,
                     lang        = self.state.lang,
@@ -228,7 +206,9 @@ define([
                 });
 
                 oldPassword = (
-                    true === this.state.settingPrinter.password && 'WIFI' === this.state.settingPrinter.from ?
+                    true === this.state.settingPrinter.password &&
+                    '' === (this.state.settingPrinter.plaintext_password || '') &&
+                    'WIFI' === this.state.settingPrinter.from ?
                     <label className="control" for="printer-old-password">
                         <h4 className="input-head">{lang.initialize.set_machine_generic.old_password}</h4>
                         <input ref="old_password" for="printer-old-password" type="password" className={printerPasswordClass}
