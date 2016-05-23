@@ -101,6 +101,7 @@ define(function() {
                 contact: 'Contact Us',
                 troubleshooting: 'Troubleshooting',
                 tutorial: 'Start Printing Tutorial',
+                software_update: 'Software Update',
                 debug: 'Bug Report',
                 forum: 'Community Forum'
             }

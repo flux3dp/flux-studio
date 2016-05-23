@@ -101,6 +101,7 @@ define(function() {
                 contact: '聯絡我們',
                 troubleshooting: '錯誤排除',
                 tutorial: '列印教學',
+                software_update: '軟體更新',
                 debug: '錯誤回報',
                 forum: '社群論壇'
             }
