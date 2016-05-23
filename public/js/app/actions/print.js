@@ -407,13 +407,14 @@ define([
 
                     reader.readAsDataURL(file);
                 }
-                else if (ext === 'fc') {
+                else if (ext === 'fc' || ext === 'gcode') {
                     slicingStatus.canInterrupt = true;
+                    slicingStatus.isComplete = true;
                     importedFCode = files.item(0);
                     importFromFCode = true;
                     setDefaultFileName(importedFCode.name)
                     if(objects.length === 0) {
-                        doFCodeImport();
+                        doFCodeImport(ext);
                     }
                     else {
                         AlertActions.showPopupYesNo(
@@ -437,16 +438,6 @@ define([
                     }
                     callback();
                 }
-                else if (ext === 'gcode') {
-                    slicingStatus.canInterrupt = true;
-                    importedFCode = files.item(0);
-                    importFromGCode = true;
-                    setDefaultFileName(importedFCode.name);
-                    if(objects.length === 0) {
-                        doFCodeImport('gcode');
-                    }
-                    callback();
-                }
                 else {
                     slicingStatus.canInterrupt = true;
                     callback();
@@ -455,7 +446,7 @@ define([
         });
     }
 
-    function appendPreviewPath(file, callback, gcode) {
+    function appendPreviewPath(file, callback, isGcode) {
         var metadata,
             reader = new FileReader();
 
@@ -475,7 +466,7 @@ define([
                     }
                 }
                 fcodeConsole.getMetadata(processMetadata);
-            }, gcode);
+            }, isGcode);
         });
 
         var processMetadata = function(m) {
@@ -2059,7 +2050,6 @@ define([
         if (objects.length === 0) {
             return;
         } else {
-            console.log(previewMode);
             previewMode ? _hidePreview() : _showPreview();
             previewMode = !previewMode;
             render();
@@ -2259,15 +2249,12 @@ define([
         return d.promise();
     }
 
-    function doFCodeImport(gcode) {
+    // type can be fcode ('fc') or gcode ('gcode')
+    function doFCodeImport(type) {
         clearScene();
         fcodeConsole = fcodeReader();
-        if(gcode) {
-            importFromGCode = true;
-        }
-        else {
-            importFromFCode = true;
-        }
+        importFromGCode = type === 'gcode';
+        importFromFCode = !importFromGCode;
 
         previewMode = true;
         _showWait(lang.print.drawingPreview, !showStopButton);
@@ -2282,7 +2269,7 @@ define([
         appendPreviewPath(importedFCode, function() {
             ProgressActions.close();
             callback();
-        }, gcode);
+        }, importFromGCode);
     }
 
     function downloadScene(fileName) {
@@ -2303,9 +2290,6 @@ define([
             });
         }
         var sceneFile = packer.pack();
-        // var url = URL.createObjectURL(sceneFile);
-        // console.log(url);
-        // location.href = url;
         saveAs(sceneFile, fileName + '.fsc');
     }
 
