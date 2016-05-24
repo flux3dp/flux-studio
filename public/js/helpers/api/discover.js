@@ -44,7 +44,6 @@ define([
 
             clearTimeout(timer);
             timer = setTimeout(() => {
-                console.log('sending');
                 printers = DeviceList(_devices);
                 sendFoundPrinter();
             }, BUFFER);
