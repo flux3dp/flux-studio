@@ -604,6 +604,7 @@ define([
             else {
                 start = 0;
                 socketStatus.cancel = true;
+                this._stopReport();
                 var t = setInterval(function() {
                     if(socketStatus.ready) {
                         clearInterval(t);
@@ -615,7 +616,6 @@ define([
                                 previewUrl = '/img/ph_l.png';
                             }
                             this._processInfo([info[2]]);
-                            previewUrl = '/img/ph_l.png';
                             filePreview = true;
                             pathArray.push(fileName);
                             this.setState({
@@ -873,7 +873,9 @@ define([
             deviceStatus    = report;
 
             clearTimeout(timmer);
-            timmer = setTimeout(this._processTimeout, timeoutLength);
+            if(report.st_label !== DeviceConstants.IDLE) {
+                timmer = setTimeout(this._processTimeout, timeoutLength);
+            }
             report.error = report.error || [];
             // rootMode = statusId === DeviceConstants.status.IDLE ? DeviceConstants.IDLE : DeviceConstants.RUNNING;
 

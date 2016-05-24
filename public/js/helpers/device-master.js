@@ -502,7 +502,7 @@ define([
                     nwConsole.setProgressBar(deviceStatus.st_prog);
                 }
             }
-            else {
+            else if (stId === 64 || stId == 128) {
                 nwConsole.setProgressBar(-1);
             }
         }
@@ -630,6 +630,8 @@ define([
                             defaultPrinterWarningShowed = false;
                         }
                     }
+
+                    updateNWProgress(device);
                 }
             }
         });
