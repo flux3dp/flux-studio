@@ -21,7 +21,7 @@ define([
     var genericLogger = new Logger('generic'),
         forceReload = function() {
             if (true === window.FLUX.isNW) {
-                window.FLUX.close().always(function() {
+                window.FLUX.killAPI().always(function() {
                     window.location.reload();
                 });
             }
