@@ -391,11 +391,12 @@ define([
                     listeningToCancel = false;
                     director.takeSnapShot().then(() =>{
                         return director.getFCode();
+                    }).then(() => {
+                        this.setState({
+                            openPrinterSelectorWindow: true
+                        });
+                        director.clearSelection();
                     });
-                    this.setState({
-                        openPrinterSelectorWindow: true
-                    });
-                    director.clearSelection();
                 },
 
                 _handleRotationChange: function(rotation) {
