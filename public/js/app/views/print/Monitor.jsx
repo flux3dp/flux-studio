@@ -565,6 +565,7 @@ define([
 
             if(this.state.mode === mode.CAMERA) {
                 this._stopCamera();
+                this.setState({ waiting: false });
             }
             this._clearSelectedItem();
 
