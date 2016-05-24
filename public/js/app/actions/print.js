@@ -580,6 +580,9 @@ define([
                     clearInterval(t);
                     slicer.uploadPreviewImage(blob).then(() => {
                         slicingStatus.canInterrupt = true;
+                        return slicer.getSlicingResult();
+                    }).then((r) => {
+                        responseBlob = r;
                         d.resolve(blob);
                     });
                 }
