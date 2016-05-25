@@ -673,7 +673,7 @@ define([
                     svgWebSocket.connection.close(false);
                 }
 
-                shortcuts.off(['cmd', 'del']);
+                shortcuts.off(['del']);
             },
             resetFileFormat: function() {
                 self.setState({
