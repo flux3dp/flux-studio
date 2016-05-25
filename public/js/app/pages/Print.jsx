@@ -391,11 +391,12 @@ define([
                     listeningToCancel = false;
                     director.takeSnapShot().then(() =>{
                         return director.getFCode();
+                    }).then(() => {
+                        this.setState({
+                            openPrinterSelectorWindow: true
+                        });
+                        director.clearSelection();
                     });
-                    this.setState({
-                        openPrinterSelectorWindow: true
-                    });
-                    director.clearSelection();
                 },
 
                 _handleRotationChange: function(rotation) {
@@ -453,9 +454,18 @@ define([
                         raftLayers: _raftLayers,
                         raftOn: _raftLayers !== 0
                     });
-                    director.setAdvanceParameter(advancedSettings).then(() => {
-                        this._handleSlicingEngineChange(advancedSettings.engine);
-                    });
+                    if(!setting) {
+                        director.setAdvanceParameter(advancedSettings).then(() => {
+                            if(advancedSettings.engine !== 'slic3r') {
+                                this._handleSlicingEngineChange(advancedSettings.engine);
+                            }
+                        });
+                    }
+                    else {
+                        this._handleSlicingEngineChange(advancedSettings.engine).then(() => {
+                            director.setAdvanceParameter(advancedSettings);
+                        })
+                    }
                 },
 
                 _handleImport: function(e) {
@@ -730,21 +740,31 @@ define([
 
                 _handleSlicingEngineChange: function(engineName) {
                     engineName = engineName || defaultSlicingEngine;
-                    var path = Config().read('slicing-engine-path').trim();
+                    var d = $.Deferred(),
+                        path = Config().read('slicing-engine-path').trim();
+
                     if(engineName === defaultSlicingEngine) {
                         path = 'default';
                     }
-                    director.changeEngine(engineName, path).then((result) => {
-                        if(result) {
-                            advancedSettings.engine = 'slic3r';
-                            this._saveSetting();
-                            AlertActions.showPopupWarning(
-                                'engine-change',
-                                lang.settings.engine_change_fail[result.error],
-                                `${lang.settings.engine_change_fail.caption} ${engineName}`
-                            );
+
+                    const setDefaultEngine = () => {
+                        advancedSettings.engine = 'slic3r';
+                        this._saveSetting();
+                        AlertActions.showPopupWarning(
+                            'engine-change',
+                            lang.settings.engine_change_fail[result.error],
+                            `${lang.settings.engine_change_fail.caption} ${engineName}`
+                        );
+                    }
+
+                    director.changeEngine(engineName, path).then((error) => {
+                        if(error) {
+                            setDefaultEngine();
                         }
+                        d.resolve();
                     });
+
+                    return d.promise();
                 },
 
                 _saveSetting: function() {

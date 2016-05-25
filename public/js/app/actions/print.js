@@ -580,6 +580,9 @@ define([
                     clearInterval(t);
                     slicer.uploadPreviewImage(blob).then(() => {
                         slicingStatus.canInterrupt = true;
+                        return slicer.getSlicingResult();
+                    }).then((r) => {
+                        responseBlob = r;
                         d.resolve(blob);
                     });
                 }
@@ -2715,23 +2718,17 @@ define([
             if(slicingStatus.canInterrupt) {
                 clearInterval(t);
                 slicingStatus.canInterrupt = false;
-                if(engine !== Settings.default_engine) {
-                    slicer.checkEngine(engine, path).then((result) => {
-                        if(result.status === 'ok') {
-                            return slicer.changeEngine(engine, path);
-                        }
-                        else {
-                            d.resolve(result);
-                        }
-                    }).then(() => {
-                        slicingStatus.canInterrupt = true;
-                        d.resolve();
-                    });
-                }
-                else {
+                slicer.checkEngine(engine, path).then((result) => {
+                    if(result.status === 'ok') {
+                        return slicer.changeEngine(engine, path);
+                    }
+                    else {
+                        d.resolve(result);
+                    }
+                }).then(() => {
                     slicingStatus.canInterrupt = true;
                     d.resolve();
-                }
+                });
             }
         }, 500);
 

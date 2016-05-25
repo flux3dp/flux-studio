@@ -3,8 +3,9 @@ define([
     'helpers/sprintf',
     'app/actions/initialize-machine',
     'helpers/api/config',
+    'helpers/api/usb-config',
     'jsx!widgets/Modal'
-], function(React, sprintf, initializeMachine, config, Modal) {
+], function(React, sprintf, initializeMachine, config, usbConfig, Modal) {
     'use strict';
 
     return function(args) {
@@ -22,7 +23,9 @@ define([
             },
 
             _onStart: function(e) {
+                var usb = usbConfig();
                 initializeMachine.completeSettingUp(true);
+                usb.close();
             },
 
             _getArticle: function(lang) {
