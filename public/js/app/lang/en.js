@@ -181,7 +181,7 @@ define(function() {
             errors: {
                 error: 'Error',
                 not_found: 'Not Found',
-                not_support: 'Please update Delta Firmware to v1.2b1+',
+                not_support: 'Please update Delta Firmware to v1.1+',
 
                 keep_connect: {
                     caption: 'USB Device not found',

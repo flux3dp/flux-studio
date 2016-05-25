@@ -181,7 +181,7 @@ define(function() {
             errors: {
                 error: '錯誤',
                 not_found: '無法找到 FLUX Delta',
-                not_support: '請更新 Delta 韌體到 v1.2b1 以上',
+                not_support: '請更新 Delta 韌體到 v1.1 以上',
 
                 keep_connect: {
                     caption: '無法透過 USB 連接',
