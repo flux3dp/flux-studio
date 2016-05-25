@@ -455,7 +455,11 @@ define([
                         raftOn: _raftLayers !== 0
                     });
                     if(!setting) {
-                        director.setAdvanceParameter(advancedSettings);
+                        director.setAdvanceParameter(advancedSettings).then(() => {
+                            if(advancedSettings.engine !== 'slic3r') {
+                                this._handleSlicingEngineChange(advancedSettings.engine);
+                            }
+                        });
                     }
                     else {
                         this._handleSlicingEngineChange(advancedSettings.engine).then(() => {
