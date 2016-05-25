@@ -35,21 +35,9 @@ define([
 
             componentDidMount: function() {
                 this._handleSetPassword();
-                AlertStore.onCancel(this._onCancel);
-            },
-
-            componentWillUnmount: function() {
-                AlertStore.removeCancelListener(this._onCancel);
             },
 
             // UI events
-            _onCancel: function(id) {
-                if ('#initialize/wifi/set-password' === location.hash) {
-                    var usb = usbConfig();
-                    usb.close();
-                    location.hash = 'initialize/wifi/connect-machine';
-                }
-            },
 
             _onCancelConnection: function(e) {
                 var wifi = initializeMachine.settingWifi.get();

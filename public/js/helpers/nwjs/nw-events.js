@@ -7,40 +7,42 @@ define(['jquery', 'helpers/i18n'], function($, i18n) {
     var win = nw.Window.get(),
         lang = i18n.get();
 
-    window.FLUX.close = function() {
-        var exec = requireNode('child_process').exec,
+    window.FLUX.killAPI = function() {
+        var spawn = requireNode('child_process').spawn,
             $deferred = $.Deferred(),
-            killCommmand;
+            killCommmand,
+            args,
+            options = {
+                detached: true
+            },
+            pkill;
 
         switch (window.FLUX.osType) {
         case 'osx':
         case 'linux':
-            killCommmand = 'pkill -f flux_api';
+            killCommmand = 'pkill';
+            args = ['-f', 'flux_api'];
             break;
         case 'win':
-            killCommmand = 'taskkill /F /FI "IMAGENAME eq flux_api.exe*"';
+            killCommmand = 'taskkill';
+            args = ['/F', '/FI', '"IMAGENAME eq flux_api.exe*"'];
             break;
         }
 
-        exec(killCommmand, function(error, stdout, stderr) {
-            if (error) {
-                $deferred.fail();
-            }
-            else {
-                $deferred.resolve();
-            }
-        });
+        pkill = spawn(killCommmand, args, options);
 
-        return $deferred.promise();
+        return $deferred.resolve().promise();
     };
 
     if (true === window.FLUX.isNW) {
         win.title = 'FLUX Studio - {Version}';
 
         win.on('close', function() {
-            if (true === window.confirm(lang.topmenu.sure_to_quit)) {
-                window.FLUX.close().always(function() {
-                    win.close(true);
+            var isQuit = window.confirm(lang.topmenu.sure_to_quit);
+
+            if (true === isQuit) {
+                window.FLUX.killAPI().always(function() {
+                    nw.App.quit();
                 });
             }
         });

@@ -182,7 +182,7 @@ define(function() {
             errors: {
                 error: '錯誤',
                 not_found: '無法找到 FLUX Delta',
-                not_support: '請更新 Delta 韌體到 v1.2b1 以上',
+                not_support: '請更新 Delta 韌體到 v1.1 以上',
 
                 keep_connect: {
                     caption: '無法透過 USB 連接',
@@ -1057,7 +1057,20 @@ define(function() {
         },
         head_module: {
             EXTRUDER: 'Print',
-            UNKNOWN: ''
+            UNKNOWN: '',
+            error: {
+                'missing': '錯誤訊息不足',
+                '0': 'Heater failure',
+                '1': 'Laser failure',
+                '2': 'Fan failure',
+                '3': 'Hwardware error',
+                '4': 'Head tilted',
+                '5': 'Excessive head shake detected',
+                '6': 'Calibration sensor failure',
+                '7': 'No hello',
+                '8': 'Sensor communication failure',
+                '9': 'Unknown module'
+            }
         },
         change_filament: {
             home_caption: '更換線料',
@@ -1100,6 +1113,9 @@ define(function() {
         },
         slicer: {
             computing: '計算中'
+        },
+        calibration: {
+            RESOURCE_BUSY: '請確認機器的狀態是於待命中',
         }
     };
 });

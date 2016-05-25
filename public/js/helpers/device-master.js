@@ -502,7 +502,7 @@ define([
                     nwConsole.setProgressBar(deviceStatus.st_prog);
                 }
             }
-            else {
+            else if (stId === 64 || stId == 128) {
                 nwConsole.setProgressBar(-1);
             }
         }
@@ -554,6 +554,12 @@ define([
         _device.actions.calibrate().then((response) => {
             console.log(response);
         }, (error) => {
+            if(error.error === DeviceConstants.RESOURCE_BUSY) {
+                AlertActions.showPopupError('device-busy', lang.calibration.RESOURCE_BUSY);
+            }
+            else {
+                AlertActions.showPopupError('device-busy', error.error);
+            }
             console.log('error from calibration', error);
         });
     }
@@ -630,6 +636,8 @@ define([
                             defaultPrinterWarningShowed = false;
                         }
                     }
+
+                    updateNWProgress(device);
                 }
             }
         });

@@ -23,6 +23,7 @@ define([
     'threeTrackballControls',
     'threeTransformControls',
     'threeSTLLoader',
+    'threeOBJLoader',
     'threeCircularGridHelper',
     'plugins/file-saver/file-saver.min',
     'lib/Canvas-To-Blob',
@@ -246,30 +247,28 @@ define([
         });
     }
 
-    function uploadStl(name, file) {
+    function uploadStl(name, file, ext) {
         // pass to slicer
         var d = $.Deferred();
-        slicer.upload(name, file, displayProgress).then(function(result) {
+        slicer.upload(name, file, ext, displayProgress).then((result) => {
             ProgressActions.updating('finishing up', 100);
             d.resolve(result);
         });
         return d.promise();
     }
 
-    function appendModel(fileUrl, file, callback) {
+    function appendModel(fileUrl, file, ext, callback) {
         if(file.size === 0) {
             AlertActions.showPopupError('', lang.message.invalidFile);
             return;
         }
-        var loader = new THREE.STLLoader();
-        var model_file_path = fileUrl;
+        var stlLoader = new THREE.STLLoader(),
+            objLoader = new THREE.OBJLoader(),
+            model_file_path = fileUrl;
+
         callback = callback || function() {};
 
-        reactSrc.setState({
-            openImportWindow: false
-        });
-
-        loader.load(model_file_path, function(geometry) {
+        var loadGeometry = function(geometry) {
             if(geometry.vertices) {
                 if(geometry.vertices.length === 0) {
                     ProgressActions.close();
@@ -285,7 +284,7 @@ define([
             mesh.up = new THREE.Vector3(0, 0, 1);
 
             slicingStatus.pauseReport = true;
-            uploadStl(mesh.uuid, file).then(function(result) {
+            uploadStl(mesh.uuid, file, ext).then(function(result) {
                 slicingStatus.pauseReport = false;
                 if (result.status !== 'ok') {
                     ProgressActions.close();
@@ -308,11 +307,13 @@ define([
             // normalize - resize, align
             var box = new THREE.Box3().setFromObject(mesh),
                 enlarge = parseInt(box.size().x) !== 0 && parseInt(box.size().y) !== 0 && parseInt(box.size().z) !== 0,
-                scale = getScaleDifference(
-                    enlarge ?
-                    getLargestPropertyValue(box.size()) :
-                    getSmallestPropertyValue(box.size())
-                );
+                scale;
+
+            scale = getScaleDifference(
+                enlarge ?
+                getLargestPropertyValue(box.size()) :
+                getSmallestPropertyValue(box.size())
+            );
 
             // alert for auto scalling
             if(scale === Infinity) {
@@ -371,7 +372,26 @@ define([
 
             setDefaultFileName();
             render();
+        }
+
+        reactSrc.setState({
+            openImportWindow: false
         });
+
+        if(ext === 'obj') {
+            objLoader.load(model_file_path, (object) => {
+                var meshes = object.children.filter(c => c instanceof THREE.Mesh);
+                if(meshes.length > 0) {
+                    loadGeometry(new THREE.Geometry().fromBufferGeometry(meshes[0].geometry))
+                }
+                // loadGeometry(new THREE.Geometry().fromBufferGeometry(.geometry))
+            });
+        }
+        else {
+            stlLoader.load(model_file_path, (geometry) => {
+                loadGeometry(geometry);
+            });
+        }
     }
 
     function appendModels(files, index, callback) {
@@ -389,10 +409,10 @@ define([
                 models.push(file);
                 slicingStatus.canInterrupt = false;
                 var ext = file.name.split('.').pop().toLowerCase();
-                if(ext === 'stl') {
+                if(ext === 'stl' || ext === 'obj') {
                     var reader  = new FileReader();
                     reader.addEventListener('load', function () {
-                        appendModel(reader.result, file, function() {
+                        appendModel(reader.result, file, ext, function() {
                             slicingStatus.canInterrupt = true;
                             if(files.length > index + 1) {
                                 appendModels(files, index + 1, callback);
@@ -407,13 +427,14 @@ define([
 
                     reader.readAsDataURL(file);
                 }
-                else if (ext === 'fc') {
+                else if (ext === 'fc' || ext === 'gcode') {
                     slicingStatus.canInterrupt = true;
+                    slicingStatus.isComplete = true;
                     importedFCode = files.item(0);
                     importFromFCode = true;
                     setDefaultFileName(importedFCode.name)
                     if(objects.length === 0) {
-                        doFCodeImport();
+                        doFCodeImport(ext);
                     }
                     else {
                         AlertActions.showPopupYesNo(
@@ -437,16 +458,6 @@ define([
                     }
                     callback();
                 }
-                else if (ext === 'gcode') {
-                    slicingStatus.canInterrupt = true;
-                    importedFCode = files.item(0);
-                    importFromGCode = true;
-                    setDefaultFileName(importedFCode.name);
-                    if(objects.length === 0) {
-                        doFCodeImport('gcode');
-                    }
-                    callback();
-                }
                 else {
                     slicingStatus.canInterrupt = true;
                     callback();
@@ -455,7 +466,7 @@ define([
         });
     }
 
-    function appendPreviewPath(file, callback, gcode) {
+    function appendPreviewPath(file, callback, isGcode) {
         var metadata,
             reader = new FileReader();
 
@@ -475,7 +486,7 @@ define([
                     }
                 }
                 fcodeConsole.getMetadata(processMetadata);
-            }, gcode);
+            }, isGcode);
         });
 
         var processMetadata = function(m) {
@@ -589,6 +600,9 @@ define([
                     clearInterval(t);
                     slicer.uploadPreviewImage(blob).then(() => {
                         slicingStatus.canInterrupt = true;
+                        return slicer.getSlicingResult();
+                    }).then((r) => {
+                        responseBlob = r;
                         d.resolve(blob);
                     });
                 }
@@ -1191,21 +1205,23 @@ define([
                 if(willReslice) {
                     return;
                 }
-                slicingStatus.canInterrupt = false;
-                slicingStatus.pauseReport = true;
-                slicer.reportSlicing(function(report) {
-                    slicingStatus.canInterrupt = true;
-                    slicingStatus.pauseReport = false;
-                    slicingStatus.lastReport = report;
-                    if(!report) { return; }
-                    if(report.status === 'complete') {
-                        clearInterval(slicingStatus.reporter);
-                        callback(report);
-                    }
-                    else if(report.status !== 'ok') {
-                        callback(report);
-                    }
-                });
+                if(slicingStatus.canInterrupt) {
+                    slicingStatus.canInterrupt = false;
+                    slicingStatus.pauseReport = true;
+                    slicer.reportSlicing(function(report) {
+                        slicingStatus.canInterrupt = true;
+                        slicingStatus.pauseReport = false;
+                        slicingStatus.lastReport = report;
+                        if(!report) { return; }
+                        if(report.status === 'complete') {
+                            clearInterval(slicingStatus.reporter);
+                            callback(report);
+                        }
+                        else if(report.status !== 'ok') {
+                            callback(report);
+                        }
+                    });
+                }
             }
         }, reportTimmer);
 
@@ -1665,7 +1681,6 @@ define([
                 }
                 return sourceMesh.geometry.vertices[a].y - sourceMesh.geometry.vertices[b].y;
             });
-            // console.log(stl_index);
 
             // find boundary
 
@@ -2057,7 +2072,6 @@ define([
         if (objects.length === 0) {
             return;
         } else {
-            console.log(previewMode);
             previewMode ? _hidePreview() : _showPreview();
             previewMode = !previewMode;
             render();
@@ -2257,15 +2271,12 @@ define([
         return d.promise();
     }
 
-    function doFCodeImport(gcode) {
+    // type can be fcode ('fc') or gcode ('gcode')
+    function doFCodeImport(type) {
         clearScene();
         fcodeConsole = fcodeReader();
-        if(gcode) {
-            importFromGCode = true;
-        }
-        else {
-            importFromFCode = true;
-        }
+        importFromGCode = type === 'gcode';
+        importFromFCode = !importFromGCode;
 
         previewMode = true;
         _showWait(lang.print.drawingPreview, !showStopButton);
@@ -2280,7 +2291,7 @@ define([
         appendPreviewPath(importedFCode, function() {
             ProgressActions.close();
             callback();
-        }, gcode);
+        }, importFromGCode);
     }
 
     function downloadScene(fileName) {
@@ -2301,9 +2312,6 @@ define([
             });
         }
         var sceneFile = packer.pack();
-        // var url = URL.createObjectURL(sceneFile);
-        // console.log(url);
-        // location.href = url;
         saveAs(sceneFile, fileName + '.fsc');
     }
 
@@ -2729,23 +2737,17 @@ define([
             if(slicingStatus.canInterrupt) {
                 clearInterval(t);
                 slicingStatus.canInterrupt = false;
-                if(engine !== Settings.default_engine) {
-                    slicer.checkEngine(engine, path).then((result) => {
-                        if(result.status === 'ok') {
-                            return slicer.changeEngine(engine, path);
-                        }
-                        else {
-                            d.resolve(result);
-                        }
-                    }).then(() => {
-                        slicingStatus.canInterrupt = true;
-                        d.resolve();
-                    });
-                }
-                else {
+                slicer.checkEngine(engine, path).then((result) => {
+                    if(result.status === 'ok') {
+                        return slicer.changeEngine(engine, path);
+                    }
+                    else {
+                        d.resolve(result);
+                    }
+                }).then(() => {
                     slicingStatus.canInterrupt = true;
                     d.resolve();
-                }
+                });
             }
         }, 500);
 

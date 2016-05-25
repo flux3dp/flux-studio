@@ -182,7 +182,7 @@ define(function() {
             errors: {
                 error: 'Error',
                 not_found: 'Not Found',
-                not_support: 'Please update Delta Firmware to v1.2b1+',
+                not_support: 'Please update Delta Firmware to v1.1+',
 
                 keep_connect: {
                     caption: 'USB Device not found',
@@ -1057,7 +1057,20 @@ define(function() {
         },
         head_module: {
             EXTRUDER: 'Print',
-            UNKNOWN: ''
+            UNKNOWN: '',
+            error: {
+                'missing': 'Error information is missing',
+                '0': 'Heater failure',
+                '1': 'Laser failure',
+                '2': 'Fan failure',
+                '3': 'Hwardware error',
+                '4': 'Head tilted',
+                '5': 'Excessive head shake detected',
+                '6': 'Calibration sensor failure',
+                '7': 'No hello',
+                '8': 'Sensor communication failure',
+                '9': 'Unknown module'
+            }
         },
         change_filament: {
             home_caption: 'Change Filament',
@@ -1100,6 +1113,9 @@ define(function() {
         },
         slicer: {
             computing: 'Computing'
+        },
+        calibration: {
+            RESOURCE_BUSY: 'Please make sure the machine is in idle status',
         }
     };
 });
