@@ -2718,23 +2718,17 @@ define([
             if(slicingStatus.canInterrupt) {
                 clearInterval(t);
                 slicingStatus.canInterrupt = false;
-                if(engine !== Settings.default_engine) {
-                    slicer.checkEngine(engine, path).then((result) => {
-                        if(result.status === 'ok') {
-                            return slicer.changeEngine(engine, path);
-                        }
-                        else {
-                            d.resolve(result);
-                        }
-                    }).then(() => {
-                        slicingStatus.canInterrupt = true;
-                        d.resolve();
-                    });
-                }
-                else {
+                slicer.checkEngine(engine, path).then((result) => {
+                    if(result.status === 'ok') {
+                        return slicer.changeEngine(engine, path);
+                    }
+                    else {
+                        d.resolve(result);
+                    }
+                }).then(() => {
                     slicingStatus.canInterrupt = true;
                     d.resolve();
-                }
+                });
             }
         }, 500);
 
