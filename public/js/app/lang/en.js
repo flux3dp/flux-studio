@@ -1110,6 +1110,9 @@ define(function() {
         },
         slicer: {
             computing: 'Computing'
+        },
+        calibration: {
+            RESOURCE_BUSY: 'Please make sure the machine is in idle status',
         }
     };
 });

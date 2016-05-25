@@ -1110,6 +1110,9 @@ define(function() {
         },
         slicer: {
             computing: '計算中'
+        },
+        calibration: {
+            RESOURCE_BUSY: '請確認機器的狀態是於待命中',
         }
     };
 });

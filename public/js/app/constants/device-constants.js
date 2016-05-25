@@ -43,6 +43,7 @@ define(function() {
         CALIBRATING     : 'CALIBRATING',
         HEATING         : 'HEATING',
         MONITOR_TOO_OLD : 'FLUXMONITOR_VERSION_IS_TOO_OLD',
+        RESOURCE_BUSY   : 'RESOURCE_BUSY',
 
         // folder
         NOT_EXIST       : 'NOT_EXIST',
