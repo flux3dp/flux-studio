@@ -1,6 +1,7 @@
 var ws = require("nodejs-websocket"),
     assert = require('assert'),
-    Q = require('q');
+    Q = require('q'),
+    retryLimit = 10;
 
 exports.executeTest = function(name, apiMethod, testCases) {
     var conn;
@@ -22,10 +23,6 @@ exports.executeTest = function(name, apiMethod, testCases) {
             }
         });
 
-        conn.on('error', function(data) {
-            exports.err(JSON.stringify(data));
-        });
-
         conn.on('close', function(code, reason) {
             exports.err(reason, code);
         });
@@ -38,6 +35,17 @@ exports.executeTest = function(name, apiMethod, testCases) {
 
             return this;
         };
+    });
+
+    conn.on('error', function(data) {
+        if ('ECONNREFUSED' === data.errno && 0 < retryLimit) {
+            exports.response(JSON.stringify(data));
+            retryLimit = retryLimit - 1;
+            exports.executeTest(name, apiMethod, testCases);
+        }
+        else {
+            exports.err(JSON.stringify(data));
+        }
     });
 
     return conn;
