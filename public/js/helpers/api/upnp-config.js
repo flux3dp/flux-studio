@@ -84,7 +84,8 @@ define([
                             confirmText : lang.initialize.confirm,
                             onSubmit    : function(password) {
                                 $deferred.notify({
-                                    status: 'waitting'
+                                    status: 'waiting',
+                                    plaintext_password: password
                                 });
                                 currentStage = stages.UPLOAD;
                                 ws.send(['upload_password', password].join(' '));

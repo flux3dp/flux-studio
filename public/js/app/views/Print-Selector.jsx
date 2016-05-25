@@ -57,6 +57,7 @@ define([
                 uniqleId: '',
                 lang: i18n.get(),
                 className: '',
+                forceAuth: false,
                 onGettingPrinter: function() {},
                 onUnmount: function() {},
                 onClose: function() {}
@@ -186,6 +187,8 @@ define([
                             inputHeader  : lang.select_printer.please_enter_password,
                             confirmText  : lang.select_printer.submit,
                             onSubmit     : function(password) {
+                                printer.plaintext_password = password;
+
                                 self._auth(printer.uuid, password, {
                                     onError: function(response) {
                                         var message = (
@@ -222,6 +225,11 @@ define([
 
                     if (status === DeviceConstants.CONNECTED) {
                         checkDeviceStatus(printer).done(function(status) {
+                            if (true === self.props.forceAuth) {
+                                onError();
+                                return;
+                            }
+
                             switch (status) {
                             case 'ok':
                                 self._returnSelectedPrinter();
@@ -269,7 +277,8 @@ define([
                     onFail: function(data) {
                         ProgressActions.close();
                         opts.onError(data);
-                    }
+                    },
+                    checkPassword: self.props.forceAuth
                 },
                 touch_socket;
 

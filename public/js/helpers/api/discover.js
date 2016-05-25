@@ -15,40 +15,36 @@ define([
             method: 'discover'
         }),
         printers = [],
-        discoveredPrinters = [],
         dispatchers = [],
         idList = [],
-        _printers = {},
+        _devices = {},
         sendFoundPrinter = function() {
             dispatchers.forEach(function(dispatcher) {
-                dispatcher.sender(_printers);
+                dispatcher.sender(_devices);
             });
         },
         findIndex = function(base, target) {
             return base.uuid === target.uuid;
         },
-        onMessage = function(data) {
-            discoveredPrinters.push(data);
+        onMessage = function(device) {
+            if(device.alive) {
+                _devices[device.serial] = device;
+            }
+            else {
+                if(typeof _devices[device.serial] === 'undefined') {
+                    delete _devices[device.serial];
+                }
+            }
 
-            // throttle for result
+            if (true === initializeMachine.defaultPrinter.exist() &&
+                device.uuid === initializeMachine.defaultPrinter.get().uuid
+            ) {
+                initializeMachine.defaultPrinter.set(device);
+            }
+
             clearTimeout(timer);
-            timer = setTimeout(function() {
-                discoveredPrinters.map((p) => {
-                    if(!_printers[p.serial]) {
-                       _printers[p.serial] = {};
-                   }
-                   Object.assign(_printers[p.serial], p);
-
-                   if (true === initializeMachine.defaultPrinter.exist() &&
-                       p.uuid === initializeMachine.defaultPrinter.get().uuid
-                   ) {
-                       initializeMachine.defaultPrinter.set(p);
-                   }
-                });
-
-                // convert device list object to array
-                printers = DeviceList(_printers);
-                discoveredPrinters.length = 0;
+            timer = setTimeout(() => {
+                printers = DeviceList(_devices);
                 sendFoundPrinter();
             }, BUFFER);
         },
@@ -66,7 +62,7 @@ define([
 
     setInterval(function() {
         if ('string' === typeof pokeIP && '' !== pokeIP) {
-            ws.send(JSON.stringify({ "cmd" : "poke", "ipaddr": pokeIP }));
+            ws.send(JSON.stringify({ 'cmd' : 'poke', 'ipaddr': pokeIP }));
         }
     }, 3000);
 
@@ -108,7 +104,7 @@ define([
                 ws.send('aggressive');
             },
             getLatestPrinter: function(printer) {
-                return _printers[printer.serial];
+                return _devices[printer.serial];
             }
         };
     };

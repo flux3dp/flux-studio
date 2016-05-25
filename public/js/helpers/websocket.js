@@ -78,6 +78,10 @@ define([
                     var data = (true === isJson(result.data) ? JSON.parse(result.data) : result.data),
                         message = trimMessage(['<', result.data].join(' '));
 
+                    if(typeof data === 'string') {
+                        data = data.replace(/\\/g, '\\\\');
+                    }
+
                     while(wsLog.log.length >= logLimit) {
                         wsLog.log.shift();
                     }

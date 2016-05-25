@@ -407,13 +407,14 @@ define([
 
                     reader.readAsDataURL(file);
                 }
-                else if (ext === 'fc') {
+                else if (ext === 'fc' || ext === 'gcode') {
                     slicingStatus.canInterrupt = true;
+                    slicingStatus.isComplete = true;
                     importedFCode = files.item(0);
                     importFromFCode = true;
                     setDefaultFileName(importedFCode.name)
                     if(objects.length === 0) {
-                        doFCodeImport();
+                        doFCodeImport(ext);
                     }
                     else {
                         AlertActions.showPopupYesNo(
@@ -437,16 +438,6 @@ define([
                     }
                     callback();
                 }
-                else if (ext === 'gcode') {
-                    slicingStatus.canInterrupt = true;
-                    importedFCode = files.item(0);
-                    importFromGCode = true;
-                    setDefaultFileName(importedFCode.name);
-                    if(objects.length === 0) {
-                        doFCodeImport('gcode');
-                    }
-                    callback();
-                }
                 else {
                     slicingStatus.canInterrupt = true;
                     callback();
@@ -455,7 +446,7 @@ define([
         });
     }
 
-    function appendPreviewPath(file, callback, gcode) {
+    function appendPreviewPath(file, callback, isGcode) {
         var metadata,
             reader = new FileReader();
 
@@ -475,7 +466,7 @@ define([
                     }
                 }
                 fcodeConsole.getMetadata(processMetadata);
-            }, gcode);
+            }, isGcode);
         });
 
         var processMetadata = function(m) {
@@ -578,7 +569,7 @@ define([
                 togglePreview();
             }
             previewUrl = URL.createObjectURL(blob);
-            console.log(previewUrl);
+
             var t = setInterval(() => {
                 if(!slicingStatus.isComplete) {
                     slicingStatus.showProgress = true;
@@ -589,12 +580,14 @@ define([
                     clearInterval(t);
                     slicer.uploadPreviewImage(blob).then(() => {
                         slicingStatus.canInterrupt = true;
+                        return slicer.getSlicingResult();
+                    }).then((r) => {
+                        responseBlob = r;
                         d.resolve(blob);
                     });
                 }
             }, 500);
         });
-
         return d.promise();
     }
 
@@ -1192,21 +1185,23 @@ define([
                 if(willReslice) {
                     return;
                 }
-                slicingStatus.canInterrupt = false;
-                slicingStatus.pauseReport = true;
-                slicer.reportSlicing(function(report) {
-                    slicingStatus.canInterrupt = true;
-                    slicingStatus.pauseReport = false;
-                    slicingStatus.lastReport = report;
-                    if(!report) { return; }
-                    if(report.status === 'complete') {
-                        clearInterval(slicingStatus.reporter);
-                        callback(report);
-                    }
-                    else if(report.status !== 'ok') {
-                        callback(report);
-                    }
-                });
+                if(slicingStatus.canInterrupt) {
+                    slicingStatus.canInterrupt = false;
+                    slicingStatus.pauseReport = true;
+                    slicer.reportSlicing(function(report) {
+                        slicingStatus.canInterrupt = true;
+                        slicingStatus.pauseReport = false;
+                        slicingStatus.lastReport = report;
+                        if(!report) { return; }
+                        if(report.status === 'complete') {
+                            clearInterval(slicingStatus.reporter);
+                            callback(report);
+                        }
+                        else if(report.status !== 'ok') {
+                            callback(report);
+                        }
+                    });
+                }
             }
         }, reportTimmer);
 
@@ -2058,7 +2053,6 @@ define([
         if (objects.length === 0) {
             return;
         } else {
-            console.log(previewMode);
             previewMode ? _hidePreview() : _showPreview();
             previewMode = !previewMode;
             render();
@@ -2258,15 +2252,12 @@ define([
         return d.promise();
     }
 
-    function doFCodeImport(gcode) {
+    // type can be fcode ('fc') or gcode ('gcode')
+    function doFCodeImport(type) {
         clearScene();
         fcodeConsole = fcodeReader();
-        if(gcode) {
-            importFromGCode = true;
-        }
-        else {
-            importFromFCode = true;
-        }
+        importFromGCode = type === 'gcode';
+        importFromFCode = !importFromGCode;
 
         previewMode = true;
         _showWait(lang.print.drawingPreview, !showStopButton);
@@ -2281,7 +2272,7 @@ define([
         appendPreviewPath(importedFCode, function() {
             ProgressActions.close();
             callback();
-        }, gcode);
+        }, importFromGCode);
     }
 
     function downloadScene(fileName) {
@@ -2302,9 +2293,6 @@ define([
             });
         }
         var sceneFile = packer.pack();
-        // var url = URL.createObjectURL(sceneFile);
-        // console.log(url);
-        // location.href = url;
         saveAs(sceneFile, fileName + '.fsc');
     }
 
@@ -2730,23 +2718,17 @@ define([
             if(slicingStatus.canInterrupt) {
                 clearInterval(t);
                 slicingStatus.canInterrupt = false;
-                if(engine !== Settings.default_engine) {
-                    slicer.checkEngine(engine, path).then((result) => {
-                        if(result.status === 'ok') {
-                            return slicer.changeEngine(engine, path);
-                        }
-                        else {
-                            d.resolve(result);
-                        }
-                    }).then(() => {
-                        slicingStatus.canInterrupt = true;
-                        d.resolve();
-                    });
-                }
-                else {
+                slicer.checkEngine(engine, path).then((result) => {
+                    if(result.status === 'ok') {
+                        return slicer.changeEngine(engine, path);
+                    }
+                    else {
+                        d.resolve(result);
+                    }
+                }).then(() => {
                     slicingStatus.canInterrupt = true;
                     d.resolve();
-                }
+                });
             }
         }, 500);
 

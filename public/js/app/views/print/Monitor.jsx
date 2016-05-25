@@ -14,6 +14,7 @@ define([
     'helpers/round',
     'helpers/duration-formatter',
     'helpers/shortcuts',
+    'helpers/api/camera'
 ], function(
     $,
     React,
@@ -29,7 +30,8 @@ define([
     sprintf,
     round,
     formatDuration,
-    shortcuts
+    shortcuts,
+    Camera
 ) {
     'use strict';
 
@@ -563,6 +565,7 @@ define([
 
             if(this.state.mode === mode.CAMERA) {
                 this._stopCamera();
+                this.setState({ waiting: false });
             }
             this._clearSelectedItem();
 
@@ -602,6 +605,7 @@ define([
             else {
                 start = 0;
                 socketStatus.cancel = true;
+                this._stopReport();
                 var t = setInterval(function() {
                     if(socketStatus.ready) {
                         clearInterval(t);
@@ -613,7 +617,6 @@ define([
                                 previewUrl = '/img/ph_l.png';
                             }
                             this._processInfo([info[2]]);
-                            previewUrl = '/img/ph_l.png';
                             filePreview = true;
                             pathArray.push(fileName);
                             this.setState({
@@ -708,14 +711,15 @@ define([
 
         _handleToggleCamera: function() {
             if(this.state.mode === mode.CAMERA) {
+                DeviceMaster.stopStreamCamera();
                 this._handleBack();
                 return;
             }
-            DeviceMaster.readyCamera().then(function() {
-                DeviceMaster.startCamera(this._processImage);
-            }.bind(this));
 
-            this._stopReport();
+            var cameraStream;
+            cameraStream = DeviceMaster.streamCamera(this.props.selectedDevice.uuid);
+            cameraStream.subscribe(this._processImage);
+
             this.setState({
                 waiting: true,
                 mode: mode.CAMERA
@@ -870,7 +874,9 @@ define([
             deviceStatus    = report;
 
             clearTimeout(timmer);
-            timmer = setTimeout(this._processTimeout, timeoutLength);
+            if(report.st_label !== DeviceConstants.IDLE) {
+                timmer = setTimeout(this._processTimeout, timeoutLength);
+            }
             report.error = report.error || [];
             // rootMode = statusId === DeviceConstants.status.IDLE ? DeviceConstants.IDLE : DeviceConstants.RUNNING;
 
@@ -1002,9 +1008,10 @@ define([
             timmer = null;
         },
 
-        _processImage: function(response) {
+        _processImage: function(imageBlob) {
+            $('.camera-image').attr('src', URL.createObjectURL(imageBlob));
             this.setState({
-                cameraImageUrl: response.url,
+                // cameraImageUrl: URL.createObjectURL(imageBlob),
                 waiting: false
             });
         },
@@ -1368,14 +1375,15 @@ define([
                 }
             }
 
-            if(currentStatus !== DeviceConstants.READY) {
-                rightButtonOn = false;
-            }
-
             // CAMERA mode
             if(this.state.mode === mode.CAMERA) {
                 leftButtonOn = false;
-                middleButtonOn = false;
+                if(openSource === 'PRINT') {
+                    middleButtonOn = true;
+                }
+                else {
+                    middleButtonOn = false;
+                }
             }
 
             // BROWSE_FILE mode
@@ -1396,7 +1404,6 @@ define([
 
                 if(this.state.currentStatus === DeviceConstants.STARTING) {
                     middleButtonOn = false;
-                    rightButtonOn = false;
                 }
 
                 if(statusId === DeviceConstants.status.PAUSING_FROM_RUNNING) {
@@ -1422,7 +1429,8 @@ define([
                 }
 
                 if(statusId === DeviceConstants.status.MAINTAIN ||
-                   statusId === DeviceConstants.status.SCAN
+                   statusId === DeviceConstants.status.SCAN ||
+                   statusId === DeviceConstants.status.ABORTED
                 ) {
                     middleButtonOn = false;
                 }
@@ -1477,7 +1485,7 @@ define([
                             )
                     },
                     {
-                        'hide': this.state.mode === 'CAMERA'
+                        'hide': this.state.mode === 'CAMERA' || this._isAbortedOrCompleted()
                     }
                 );
 

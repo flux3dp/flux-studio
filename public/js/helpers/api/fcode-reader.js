@@ -45,7 +45,7 @@ define([
              * @param {Int}         size       - binary data with array buffer type
              * @param {Function}    onFinished - fired when process finished
              */
-            upload: function(data, size, onFinished, gcode) {
+            upload: function(data, size, onFinished, isGcode) {
                 var args = [
                     'upload',
                     size
@@ -70,7 +70,7 @@ define([
                     onFinished(response);
                 };
 
-                args.push(gcode ? '-g' : '-f');
+                args.push(isGcode ? '-g' : '-f');
 
                 ws.send(args.join(' '));
             },

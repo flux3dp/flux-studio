@@ -75,19 +75,8 @@ define([
                         blob = new Blob(blobs);
 
                         if (total_length === blob.size) {
-                            $.ajax({
-                                url: url.createObjectURL(blob)
-                            }).done(function(data) {
-                                var $svg = $(data),
-                                    newSize = computePreviewImageSize(size);
-
-                                $svg.attr('width', newSize.width).attr('height', newSize.height);
-
-                                blob = new Blob([$svg[0].outerHTML.replace('viewbox', 'viewBox')]);
-
-                                History.push(name, { size: size, blob: blob });
-                                opts.onFinished(blob, size);
-                            });
+                            History.push(name, { size: size, blob: blob });
+                            opts.onFinished(blob, size);
                         }
                     }
 

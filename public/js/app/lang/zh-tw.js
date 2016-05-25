@@ -87,7 +87,8 @@ define(function() {
                 default_device: '設為預設',
                 check_firmware_update: '韌體更新',
                 update_delta: 'Delta 韌體',
-                update_toolhead: '工具頭韌體'
+                update_toolhead: '工具頭韌體',
+                calibrate: '校正'
             },
             window: {
                 label: '視窗',
