@@ -605,7 +605,9 @@ define([
             else {
                 start = 0;
                 socketStatus.cancel = true;
-                this._stopReport();
+
+                currentDirectoryContent.files.length = 0; // force render preview to end
+
                 var t = setInterval(function() {
                     if(socketStatus.ready) {
                         clearInterval(t);
@@ -1068,6 +1070,7 @@ define([
                     wait: false
                 }, function() {
                     self._renderFolderFilesWithPreview();
+                    socketStatus.ready = true;
                     d.resolve('');
                 });
             });

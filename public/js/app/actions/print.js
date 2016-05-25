@@ -23,6 +23,7 @@ define([
     'threeTrackballControls',
     'threeTransformControls',
     'threeSTLLoader',
+    'threeOBJLoader',
     'threeCircularGridHelper',
     'plugins/file-saver/file-saver.min',
     'lib/Canvas-To-Blob',
@@ -246,30 +247,28 @@ define([
         });
     }
 
-    function uploadStl(name, file) {
+    function uploadStl(name, file, ext) {
         // pass to slicer
         var d = $.Deferred();
-        slicer.upload(name, file, displayProgress).then(function(result) {
+        slicer.upload(name, file, ext, displayProgress).then((result) => {
             ProgressActions.updating('finishing up', 100);
             d.resolve(result);
         });
         return d.promise();
     }
 
-    function appendModel(fileUrl, file, callback) {
+    function appendModel(fileUrl, file, ext, callback) {
         if(file.size === 0) {
             AlertActions.showPopupError('', lang.message.invalidFile);
             return;
         }
-        var loader = new THREE.STLLoader();
-        var model_file_path = fileUrl;
+        var stlLoader = new THREE.STLLoader(),
+            objLoader = new THREE.OBJLoader(),
+            model_file_path = fileUrl;
+
         callback = callback || function() {};
 
-        reactSrc.setState({
-            openImportWindow: false
-        });
-
-        loader.load(model_file_path, function(geometry) {
+        var loadGeometry = function(geometry) {
             if(geometry.vertices) {
                 if(geometry.vertices.length === 0) {
                     ProgressActions.close();
@@ -285,7 +284,7 @@ define([
             mesh.up = new THREE.Vector3(0, 0, 1);
 
             slicingStatus.pauseReport = true;
-            uploadStl(mesh.uuid, file).then(function(result) {
+            uploadStl(mesh.uuid, file, ext).then(function(result) {
                 slicingStatus.pauseReport = false;
                 if (result.status !== 'ok') {
                     ProgressActions.close();
@@ -308,11 +307,13 @@ define([
             // normalize - resize, align
             var box = new THREE.Box3().setFromObject(mesh),
                 enlarge = parseInt(box.size().x) !== 0 && parseInt(box.size().y) !== 0 && parseInt(box.size().z) !== 0,
-                scale = getScaleDifference(
-                    enlarge ?
-                    getLargestPropertyValue(box.size()) :
-                    getSmallestPropertyValue(box.size())
-                );
+                scale;
+
+            scale = getScaleDifference(
+                enlarge ?
+                getLargestPropertyValue(box.size()) :
+                getSmallestPropertyValue(box.size())
+            );
 
             // alert for auto scalling
             if(scale === Infinity) {
@@ -371,7 +372,26 @@ define([
 
             setDefaultFileName();
             render();
+        }
+
+        reactSrc.setState({
+            openImportWindow: false
         });
+
+        if(ext === 'obj') {
+            objLoader.load(model_file_path, (object) => {
+                var meshes = object.children.filter(c => c instanceof THREE.Mesh);
+                if(meshes.length > 0) {
+                    loadGeometry(new THREE.Geometry().fromBufferGeometry(meshes[0].geometry))
+                }
+                // loadGeometry(new THREE.Geometry().fromBufferGeometry(.geometry))
+            });
+        }
+        else {
+            stlLoader.load(model_file_path, (geometry) => {
+                loadGeometry(geometry);
+            });
+        }
     }
 
     function appendModels(files, index, callback) {
@@ -389,10 +409,10 @@ define([
                 models.push(file);
                 slicingStatus.canInterrupt = false;
                 var ext = file.name.split('.').pop().toLowerCase();
-                if(ext === 'stl') {
+                if(ext === 'stl' || ext === 'obj') {
                     var reader  = new FileReader();
                     reader.addEventListener('load', function () {
-                        appendModel(reader.result, file, function() {
+                        appendModel(reader.result, file, ext, function() {
                             slicingStatus.canInterrupt = true;
                             if(files.length > index + 1) {
                                 appendModels(files, index + 1, callback);
@@ -1661,7 +1681,6 @@ define([
                 }
                 return sourceMesh.geometry.vertices[a].y - sourceMesh.geometry.vertices[b].y;
             });
-            // console.log(stl_index);
 
             // find boundary
 
