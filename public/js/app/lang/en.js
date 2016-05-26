@@ -83,6 +83,7 @@ define(function() {
                 label: 'Devices',
                 new: 'Add a New Device',
                 device_monitor: 'Dashboard',
+                device_info: 'Device Info',
                 change_filament: 'Change Printing Material',
                 default_device: 'Set as Default',
                 check_firmware_update: 'Update Firmware',
@@ -881,7 +882,11 @@ define(function() {
             finishing: 'Finishing',
             initiating: 'Initiating',
             unknown: 'Unknown',
-            pausedFromError: 'paused from error'
+            pausedFromError: 'paused from error',
+            IP: 'IP',
+            serial_number: 'Serial Number',
+            firmware_version: 'Firmware Version',
+            UUID: 'UUID'
         },
         monitor: {
             change_filament                     : 'CHANGE FILAMENT',

@@ -362,6 +362,19 @@ define([
                 }
             });
 
+            // device info
+            subItems.push({
+                label: lang.device.device_info,
+                enabled: true,
+                onClick: function() {
+                    var currentPrinter = discoverMethods.getLatestPrinter(printer),
+                        lang = i18n.get();
+
+                    var deviceInfo = `${lang.device.IP}: ${currentPrinter.ipaddr}\n${lang.device.serial_number}: ${currentPrinter.serial}\n${lang.device.firmware_version}: ${currentPrinter.version}\n${lang.device.UUID}: ${currentPrinter.uuid}`;
+                    AlertActions.showPopupInfo('', deviceInfo);
+                }
+            });
+
             // change filament
             subItems.push({
                 label: lang.device.change_filament,
