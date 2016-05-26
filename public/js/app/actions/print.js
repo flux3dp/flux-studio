@@ -2545,10 +2545,14 @@ define([
             _showWait(lang.print.drawingPreview, !showStopButton);
             if(!printPath || printPath.length === 0) {
                 slicingStatus.canInterrupt = false;
+                console.time('getPath');
                 slicer.getPath().then(function(result) {
+                    console.timeEnd('getPath');
                     slicingStatus.canInterrupt = true;
                     printPath = result;
+                    console.time('drawPath');
                     _drawPath().then(function() {
+                        console.timeEnd('drawPath');
                         _closeWait();
                     });
                 });
