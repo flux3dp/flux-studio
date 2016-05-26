@@ -456,6 +456,7 @@ define([
                     });
                     if(!setting) {
                         director.setAdvanceParameter(advancedSettings).then(() => {
+                            advancedSettings.engine = advancedSettings.engine || defaultSlicingEngine;
                             if(advancedSettings.engine !== 'slic3r') {
                                 this._handleSlicingEngineChange(advancedSettings.engine);
                             }
@@ -464,7 +465,7 @@ define([
                     else {
                         this._handleSlicingEngineChange(advancedSettings.engine).then(() => {
                             director.setAdvanceParameter(advancedSettings);
-                        })
+                        });
                     }
                 },
 
