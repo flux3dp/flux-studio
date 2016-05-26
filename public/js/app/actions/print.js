@@ -491,12 +491,12 @@ define([
 
         var processMetadata = function(m) {
             metadata = m;
-            var fcodeType = m.metadata.HEAD_TYPE
+            var fcodeType = m.metadata.HEAD_TYPE;
             if(fcodeType === 'EXTRUDER') {
                 fcodeConsole.getPath().then(processPath);
             }
             else {
-                var message = fcodeType === 'LASER' ? lang.message.fcodeForLaser : lang.message.fcodeForPen
+                var message = fcodeType === 'LASER' ? lang.message.fcodeForLaser : lang.message.fcodeForPen;
                 ProgressActions.close();
                 importFromFCode = false;
                 importFromGCode = false;
@@ -2420,14 +2420,19 @@ define([
     }
 
     function _handleSliceComplete() {
+        console.log('complete');
         if(previewMode) {
             slicingStatus.isComplete = true;
             _showWait(lang.print.drawingPreview, !showStopButton);
             slicingStatus.canInterrupt = false;
+            console.time('getPath');
             slicer.getPath().then(function(result) {
+                console.timeEnd('getPath');
                 slicingStatus.canInterrupt = true;
                 printPath = result;
+                console.time('drawPath');
                 _drawPath().then(function() {
+                    console.timeEnd('drawPath');
                     ProgressActions.close();
                     slicingStatus.showProgress = false;
                 });
