@@ -511,7 +511,6 @@ define([
                                 AlertActions.showPopupInfo('ruinstalling', 'Upgrade failed');
                             }
                         });
-                        // AlertActions.showPopupInfo('ruinstalling', 'Executing...');
                         AlertStore.removeYesListener(installNewApp);
                     },
                     handleDownloadProgress = function(data, downloadSize, contentLength) {
@@ -536,8 +535,10 @@ define([
 
                 if (true === window.FLUX.isNW) {
                     nw.App.checkUpdate(function(error, newVersionExists, _manifest) {
-                        manifest = _manifest;
-                        isIgnore = -1 < ignoreVersions.indexOf(manifest.version);
+                        if (!error) {
+                            manifest = _manifest;
+                            isIgnore = -1 < ignoreVersions.indexOf(manifest.version);
+                        }
 
                         if (!error && true === newVersionExists && false === isIgnore) {
                             self._showUpdate({
@@ -553,6 +554,10 @@ define([
                                     updater = nw.App.downloadUpdate(
                                         manifest,
                                         function(error, _filename) {
+                                            if (error) {
+                                                ProgressActions.close();
+                                                nw.Shell.openExternal('https://flux3dp.com/downloads');
+                                            }
                                             filename = _filename;
                                         },
                                         handleDownloadProgress
