@@ -2610,11 +2610,11 @@ define([
 
             for (var point = 1; point < printPath[layer].length; point++) {
                 for (var tmp = 1; tmp >= 0; tmp--) {
-                    color.push(previewColors[printPath[layer][point].t]);
+                    color.push(previewColors[printPath[layer][point][3]]);
                     g.vertices.push(new THREE.Vector3(
-                        printPath[layer][point - tmp].p[0],
-                        printPath[layer][point - tmp].p[1],
-                        printPath[layer][point - tmp].p[2]
+                        printPath[layer][point - tmp][0],
+                        printPath[layer][point - tmp][1],
+                        printPath[layer][point - tmp][2]
                     ));
                 }
             }

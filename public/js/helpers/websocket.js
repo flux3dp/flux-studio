@@ -76,7 +76,8 @@ define([
 
                 _ws.onmessage = function(result) {
                     var time = console.timeEnd('raw_get_path');
-                    if(!time) {
+                    if(typeof time !== 'undefined') {
+                    // if(!time) {
                         console.log(time);
                     }
                     var data = (true === isJson(result.data) ? JSON.parse(result.data) : result.data),
