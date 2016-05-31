@@ -80,18 +80,15 @@ define([
                     var data = (true === isJson(result.data) ? JSON.parse(result.data) : result.data),
                         message = trimMessage(['<', result.data].join(' '));
 
-                    if(typeof data === 'string') {
-                        data = data.replace(/\\/g, '\\\\');
-                    }
-
                     while(wsLog.log.length >= logLimit) {
                         wsLog.log.shift();
                     }
                     wsLog.log.push(message);
 
                     if ('string' === typeof data) {
+                        data = data.replace(/\\/g, '\\\\');
                         data = data.replace(/\bNaN\b/g, 'null');
-                        data = data.replace(/\r?\n|\r/g);
+                        data = data.replace(/\r?\n|\r/g, ' ');
                     }
 
                     data = (true === isJson(data) ? JSON.parse(data) : data);
