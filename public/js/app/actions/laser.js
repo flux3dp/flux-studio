@@ -672,8 +672,6 @@ define([
                 if ('undefined' !== typeof svgWebSocket) {
                     svgWebSocket.connection.close(false);
                 }
-
-                shortcuts.off(['del']);
             },
             resetFileFormat: function() {
                 self.setState({
