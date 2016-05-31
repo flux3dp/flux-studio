@@ -2420,7 +2420,6 @@ define([
     }
 
     function _handleSliceComplete() {
-        console.log('complete');
         if(previewMode) {
             slicingStatus.isComplete = true;
             _showWait(lang.print.drawingPreview, !showStopButton);
