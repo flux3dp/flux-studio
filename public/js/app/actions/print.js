@@ -491,12 +491,12 @@ define([
 
         var processMetadata = function(m) {
             metadata = m;
-            var fcodeType = m.metadata.HEAD_TYPE
+            var fcodeType = m.metadata.HEAD_TYPE;
             if(fcodeType === 'EXTRUDER') {
                 fcodeConsole.getPath().then(processPath);
             }
             else {
-                var message = fcodeType === 'LASER' ? lang.message.fcodeForLaser : lang.message.fcodeForPen
+                var message = fcodeType === 'LASER' ? lang.message.fcodeForLaser : lang.message.fcodeForPen;
                 ProgressActions.close();
                 importFromFCode = false;
                 importFromGCode = false;
@@ -2420,6 +2420,7 @@ define([
     }
 
     function _handleSliceComplete() {
+        console.log('complete');
         if(previewMode) {
             slicingStatus.isComplete = true;
             _showWait(lang.print.drawingPreview, !showStopButton);
@@ -2540,10 +2541,14 @@ define([
             _showWait(lang.print.drawingPreview, !showStopButton);
             if(!printPath || printPath.length === 0) {
                 slicingStatus.canInterrupt = false;
+                console.time('getPath');
                 slicer.getPath().then(function(result) {
+                    console.timeEnd('getPath');
                     slicingStatus.canInterrupt = true;
                     printPath = result;
+                    console.time('drawPath');
                     _drawPath().then(function() {
+                        console.timeEnd('drawPath');
                         _closeWait();
                     });
                 });
@@ -2601,11 +2606,11 @@ define([
 
             for (var point = 1; point < printPath[layer].length; point++) {
                 for (var tmp = 1; tmp >= 0; tmp--) {
-                    color.push(previewColors[printPath[layer][point].t]);
+                    color.push(previewColors[printPath[layer][point][3]]);
                     g.vertices.push(new THREE.Vector3(
-                        printPath[layer][point - tmp].p[0],
-                        printPath[layer][point - tmp].p[1],
-                        printPath[layer][point - tmp].p[2]
+                        printPath[layer][point - tmp][0],
+                        printPath[layer][point - tmp][1],
+                        printPath[layer][point - tmp][2]
                     ));
                 }
             }

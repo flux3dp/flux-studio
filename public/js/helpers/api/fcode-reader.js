@@ -130,7 +130,6 @@ define([
                 events.onMessage = function(result) {
                     d.resolve(result);
                 };
-
                 ws.send('get_path');
                 return d.promise();
             },
