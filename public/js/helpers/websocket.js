@@ -75,11 +75,6 @@ define([
                 };
 
                 _ws.onmessage = function(result) {
-                    var time = console.timeEnd('raw_get_path');
-                    if(typeof time !== 'undefined') {
-                    // if(!time) {
-                        console.log(time);
-                    }
                     var data = (true === isJson(result.data) ? JSON.parse(result.data) : result.data),
                         message = trimMessage(['<', result.data].join(' '));
 
@@ -219,9 +214,6 @@ define([
                     }
                     else {
                         wsLog.log.push(trimMessage(['>', data, typeof data].join(' ')));
-                        if(data === 'get_path') {
-                            console.time('raw_get_path');
-                        }
                         ws.send(data);
                     }
 

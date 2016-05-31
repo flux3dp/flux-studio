@@ -2425,14 +2425,10 @@ define([
             slicingStatus.isComplete = true;
             _showWait(lang.print.drawingPreview, !showStopButton);
             slicingStatus.canInterrupt = false;
-            console.time('getPath');
             slicer.getPath().then(function(result) {
-                console.timeEnd('getPath');
                 slicingStatus.canInterrupt = true;
                 printPath = result;
-                console.time('drawPath');
                 _drawPath().then(function() {
-                    console.timeEnd('drawPath');
                     ProgressActions.close();
                     slicingStatus.showProgress = false;
                 });

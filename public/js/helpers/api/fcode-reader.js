@@ -128,14 +128,8 @@ define([
             getPath: function(onFinished) {
                 var d = $.Deferred();
                 events.onMessage = function(result) {
-
-                    console.timeEnd('fcode-get-path');
-
-                    console.log(result)
-
                     d.resolve(result);
                 };
-                console.time('fcode-get-path');
                 ws.send('get_path');
                 return d.promise();
             },
