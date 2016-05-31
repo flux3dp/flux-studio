@@ -886,9 +886,20 @@ define([
             if(report.error.length > 0) {
                 if(report.error[2]) {
                     errorMessage = this._processErrorCode(report.error[2]);
+                    // for wrong type of head
+                    if(report.error[1] === 'TYPE_ERROR') {
+                        errorMessage = lang.monitor[report.error.slice(0,2).join('_')];
+                    }
+
+                    if(errorMessage === '') {
+                        errorMessage = lang.monitor[report.error.slice(0,2).join('_')];
+                    }
                 }
                 else {
-                    errorMessage = lang.head_module.error.missing;
+                    errorMessage = lang.monitor[report.error.slice(0,2).join('_')];
+                    if(errorMessage === '') {
+                        errorMessage = lang.head_module.error.missing;
+                    }
                 }
             }
 
