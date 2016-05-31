@@ -557,7 +557,6 @@ define([
                 var d = $.Deferred();
 
                 events.onMessage = function(result) {
-                    console.log(result);
                     if(result.status === 'ok') {
                         if(result.task === 'maintain') {
                             ws.send(`maintain calibrating`);

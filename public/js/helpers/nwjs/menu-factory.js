@@ -390,14 +390,17 @@ define([
 
             subItems.push({
                 label: lang.device.calibrate,
-                onClick: function() {
-                    console.log('check 0');
-                    var currentPrinter = discoverMethods.getLatestPrinter(printer);
-
-                    DeviceMaster.selectDevice(currentPrinter).then(function(status) {
-
+                onClick: () => {
+                    var currentPrinter = discoverMethods.getLatestPrinter(printer),
+                        lang = i18n.get();
+                    DeviceMaster.selectDevice(currentPrinter).then((status) => {
                         if (status === DeviceConstants.CONNECTED) {
-                            DeviceMaster.calibrate();
+                            checkDeviceStatus(currentPrinter).then(() => {
+                                ProgressActions.open(ProgressConstants.WAITING, lang.device.calibrating, lang.device.pleaseWait, false);
+                                DeviceMaster.calibrate().then(() => {
+                                    ProgressActions.close();
+                                });
+                            });
                         }
                         else if (status === DeviceConstants.TIMEOUT) {
                             AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
