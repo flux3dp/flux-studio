@@ -51,8 +51,10 @@ define([
             },
             received_data = [],
             trimMessage = function(message) {
+                message = message.replace(/\"/g, '');
+
                 if (150 < message.length) {
-                    return message.substr(0, 150) + '...';
+                    return message.substr(0, 200) + '...';
                 }
 
                 return message;
