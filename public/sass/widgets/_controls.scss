@@ -24,13 +24,15 @@
     }
 
     .radio {
+        cursor: pointer;
+
         >div {
             width: 15px;
             height: 15px;
             background-image: url('/img/icon-radio-off.png');
             background-size: 15px 15px;
             display: inline-block;
-            margin-right: 15px;
+            margin-right: 10px;
             cursor: pointer;
         }
 

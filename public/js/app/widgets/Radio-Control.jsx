@@ -41,10 +41,8 @@ define([
                     {'selected': this.state.selected === option.id}
                 );
                 return (
-                    <div className="radio">
-                        <div
-                            className={radioClass}
-                            onClick={this._handleChange.bind(null, option.id, option.disable)}></div>
+                    <div className="radio" onClick={this._handleChange.bind(null, option.id, option.disable)}>
+                        <div className={radioClass}></div>
                         <span>{option.name}</span>
                     </div>
                 );
