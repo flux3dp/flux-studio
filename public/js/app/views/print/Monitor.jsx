@@ -353,6 +353,7 @@ define([
             totalTimeInSeconds = '';
             taskInfo = '';
 
+            DeviceMaster.stopStreamCamera();
             GlobalActions.monitorClosed();
         },
 
@@ -733,6 +734,7 @@ define([
         _handleGo: function() {
             var self = this;
             this._stopReport();
+            messageViewed = false;
 
             if(this.state.currentStatus === DeviceConstants.READY) {
                 var blob = this.props.fCode;
