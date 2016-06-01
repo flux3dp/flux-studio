@@ -1398,23 +1398,30 @@ define([
 
             // CAMERA mode
             if(this.state.mode === mode.CAMERA) {
-                leftButtonOn = false;
                 if(openSource === 'PRINT') {
                     middleButtonOn = true;
+                    leftButtonOn = true;
                 }
                 else {
-                    middleButtonOn = false;
+                    if(
+                        statusId === DeviceConstants.status.IDLE ||
+                        statusId === DeviceConstants.status.COMPLETED ||
+                        statusId === DeviceConstants.status.ABORTED
+                    ) {
+                        leftButtonOn = false;
+                        middleButtonOn = false;
+                    }
                 }
             }
 
             // BROWSE_FILE mode
-            if(this.state.mode === mode.BROWSE_FILE) {
+            else if(this.state.mode === mode.BROWSE_FILE) {
                 leftButtonOn = pathArray.length > 0;
                 middleButtonOn = this.state.selectedItemType === type.FILE;
             }
 
             // PRINT mode
-            if(this.state.mode === mode.PRINT) {
+            else if(this.state.mode === mode.PRINT) {
                 if(
                     statusId === DeviceConstants.status.IDLE ||
                     statusId === DeviceConstants.status.COMPLETED ||
