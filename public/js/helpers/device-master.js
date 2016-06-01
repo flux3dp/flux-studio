@@ -547,7 +547,9 @@ define([
     }
 
     function stopStreamCamera() {
-        _device.camera.closeStream();
+        if(_device.camera) {
+            _device.camera.closeStream();
+        }
     }
 
     function calibrate() {
