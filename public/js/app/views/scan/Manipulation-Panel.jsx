@@ -184,15 +184,27 @@ define([
                         <label className="accordion-body">
                             <div className="control">
                                 <span className="text-center header">X</span>
-                                <input type="number" className="input" defaultValue={position.x} value={position.x} data-type="position.x" onChange={this._onTransform}/>
+                                <UnitInput
+                                    dataAttrs={{ type: 'position.x' }}
+                                    defaultValue={position.x}
+                                    getValue={this._onTransform}
+                                />
                             </div>
                             <div className="control">
                                 <span className="text-center header">Y</span>
-                                <input type="number" className="input" defaultValue={position.y} value={position.y} data-type="position.y" onChange={this._onTransform}/>
+                                <UnitInput
+                                    dataAttrs={{ type: 'position.y' }}
+                                    defaultValue={position.y}
+                                    getValue={this._onTransform}
+                                />
                             </div>
                             <div className="control">
                                 <span className="text-center header">Z</span>
-                                <input type="number" className="input" defaultValue={position.z} value={position.z} data-type="position.z" onChange={this._onTransform}/>
+                                <UnitInput
+                                    dataAttrs={{ type: 'position.z' }}
+                                    defaultValue={position.z}
+                                    getValue={this._onTransform}
+                                />
                             </div>
                         </label>
                     </label>
@@ -209,15 +221,39 @@ define([
                         <label className="accordion-body">
                             <div className="control">
                                 <span className="text-center header">X</span>
-                                <input type="number" className="input" defaultValue={rotation.x} data-type="rotation.x" value={rotation.x} onChange={this._onTransform}/>
+                                <UnitInput
+                                    dataAttrs={{ type: 'rotation.x' }}
+                                    defaultValue={rotation.x}
+                                    min={-180}
+                                    max={180}
+                                    defaultUnitType="angle"
+                                    defaultUnit="°"
+                                    getValue={this._onTransform}
+                                />
                             </div>
                             <div className="control">
                                 <span className="text-center header">Y</span>
-                                <input type="number" className="input" defaultValue={rotation.y} data-type="rotation.y" value={rotation.y} onChange={this._onTransform}/>
+                                <UnitInput
+                                    dataAttrs={{ type: 'rotation.y' }}
+                                    defaultValue={rotation.y}
+                                    min={-180}
+                                    max={180}
+                                    defaultUnitType="angle"
+                                    defaultUnit="°"
+                                    getValue={this._onTransform}
+                                />
                             </div>
                             <div className="control">
                                 <span className="text-center header">Z</span>
-                                <input type="number" className="input" defaultValue={rotation.z} data-type="rotation.z" value={rotation.z} onChange={this._onTransform}/>
+                                <UnitInput
+                                    dataAttrs={{ type: 'rotation.z' }}
+                                    defaultValue={rotation.z}
+                                    min={-180}
+                                    max={180}
+                                    defaultUnitType="angle"
+                                    defaultUnit="°"
+                                    getValue={this._onTransform}
+                                />
                             </div>
                         </label>
                     </label>

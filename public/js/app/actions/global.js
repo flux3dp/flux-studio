@@ -37,11 +37,24 @@ define([
                     deleteStart,
                     deleteCount,
                     me = e.target,
+                    hasSelectionStart = true,
+                    inputType = (me.type || '').toUpperCase(),
                     acceptedInput = ['TEXT', 'NUMBER', 'PASSWORD', 'TEL', 'URL', 'SEARCH', 'EMAIL'];
 
-                if (('INPUT' === me.tagName && -1 < acceptedInput.indexOf(me.type.toUpperCase()) || 'TEXTAREA' === me.tagName) &&
-                    'undefined' !== typeof me.selectionStart
+                if (('INPUT' === me.tagName &&
+                    -1 < acceptedInput.indexOf(inputType) || 'TEXTAREA' === me.tagName)
                 ) {
+                    try {
+                        selectionStart = me.selectionStart;
+                    }
+                    catch (ex) {
+                        hasSelectionStart = false;
+
+                        if ('INPUT' === me.tagName) {
+                            me.setAttribute('type', 'TEXT');
+                        }
+                    }
+
                     selectionStart = me.selectionStart;
                     value = me.value.split('');
                     samePosition = me.selectionEnd === selectionStart;
@@ -59,6 +72,10 @@ define([
                     value.splice(deleteStart, deleteCount);
                     e.target.value = value.join('');
                     e.target.setSelectionRange(selectionStart - 1, selectionStart - 1);
+
+                    if ('INPUT' === me.tagName && false === hasSelectionStart) {
+                        me.setAttribute('type', inputType);
+                    }
                 }
             });
 

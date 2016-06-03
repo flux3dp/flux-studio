@@ -912,6 +912,7 @@ define(function() {
             HARDWARE_ERROR_HOME_FAILED          : '#124 Unable to calibrate origin\nPlease remove the obstacle, and reattach the toolhead',
             HEAD_ERROR_TILT                     : '#162 Toolhead tilt detected\nPlease check ball joint rod is attached correctly',
             HEAD_ERROR_SHAKE                    : '#162 Toolhead tilt detected\nPlease check ball joint rod is attached correctly',
+            HEAD_ERROR_TYPE_ERROR               : 'Incorrect head module, please use the correct head',
             WRONG_HEAD                          : 'Device head is unknown, please connect to a correct toolhead',
             USER_OPERATION                      : 'Machine is being operated by (other) user',
             RESOURCE_BUSY                       : 'Device is busy\nIf the device is not running, please restart the device',
@@ -1054,7 +1055,20 @@ define(function() {
         },
         head_module: {
             EXTRUDER: 'Print',
-            UNKNOWN: ''
+            UNKNOWN: '',
+            error: {
+                'missing': 'Error information is missing',
+                '0': 'Heater failure',
+                '1': 'Laser failure',
+                '2': 'Fan failure',
+                '3': 'Hwardware error',
+                '4': 'Head tilted',
+                '5': 'Excessive head shake detected',
+                '6': 'Calibration sensor failure',
+                '7': 'No hello',
+                '8': 'Sensor communication failure',
+                '9': 'Unknown module'
+            }
         },
         change_filament: {
             home_caption: 'Change Filament',
@@ -1097,6 +1111,9 @@ define(function() {
         },
         slicer: {
             computing: 'Computing'
+        },
+        calibration: {
+            RESOURCE_BUSY: 'Please make sure the machine is in idle status',
         }
     };
 });

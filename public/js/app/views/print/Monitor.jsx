@@ -353,6 +353,7 @@ define([
             totalTimeInSeconds = '';
             taskInfo = '';
 
+            DeviceMaster.stopStreamCamera();
             GlobalActions.monitorClosed();
         },
 
@@ -605,7 +606,9 @@ define([
             else {
                 start = 0;
                 socketStatus.cancel = true;
-                this._stopReport();
+
+                currentDirectoryContent.files.length = 0; // force render preview to end
+
                 var t = setInterval(function() {
                     if(socketStatus.ready) {
                         clearInterval(t);
@@ -731,6 +734,7 @@ define([
         _handleGo: function() {
             var self = this;
             this._stopReport();
+            messageViewed = false;
 
             if(this.state.currentStatus === DeviceConstants.READY) {
                 var blob = this.props.fCode;
@@ -882,24 +886,22 @@ define([
 
             // jug down errors as main and sub error for later use
             if(report.error.length > 0) {
-                if(typeof(report.error) === 'string') {
-                    mainError = report.error;
+                if(report.error[2]) {
+                    errorMessage = this._processErrorCode(report.error[2]);
+                    // for wrong type of head
+                    if(report.error[1] === 'TYPE_ERROR') {
+                        errorMessage = lang.monitor[report.error.slice(0,2).join('_')];
+                    }
+
+                    if(errorMessage === '') {
+                        errorMessage = lang.monitor[report.error.slice(0,2).join('_')];
+                    }
                 }
                 else {
-                    mainError = report.error[0] || '';
-                    subError = report.error[1] || '';
-                }
-
-                if(lastError !== mainError) {
-                    messageViewed = false;
-                    lastError = mainError;
-                }
-
-                // this condition can be removed when assembla #45 is fixed
-                if(typeof report.error !== 'string' && report.error !== 'UNKNOWN_ERROR') {
-                    var err = report.error.slice(0);
-                    var err = err.splice(0, 2).join('_');
-                    errorMessage = lang.monitor[err] || err;
+                    errorMessage = lang.monitor[report.error.slice(0,2).join('_')];
+                    if(errorMessage === '') {
+                        errorMessage = lang.head_module.error.missing;
+                    }
                 }
             }
 
@@ -910,8 +912,6 @@ define([
             if(
                 !messageViewed &&
                 !showingPopup &&
-                mainError !== DeviceConstants.USER_OPERATION &&
-                mainError.length > 0 &&
                 errorMessage.length > 0
             ) {
                 AlertActions.showPopupRetry(_id, errorMessage);
@@ -1068,6 +1068,7 @@ define([
                     wait: false
                 }, function() {
                     self._renderFolderFilesWithPreview();
+                    socketStatus.ready = true;
                     d.resolve('');
                 });
             });
@@ -1216,6 +1217,26 @@ define([
 
         _imageError: function(src) {
             src.target.src = '/img/ph_s.png';
+        },
+
+        _processErrorCode: function(errorCode) {
+            console.log(errorCode);
+            var digit = 10,
+                pad,
+                message = '';
+
+            pad = function (num) { return (Array(digit).join('0') + num).slice(-digit) }
+
+            if(Number(errorCode) === parseInt(errorCode, 10)) {
+                var m = pad(parseInt(errorCode).toString(2)).split('');
+                message = m.map((flag, index) => {
+                    return flag === '1' ? lang.head_module.error[index] : '';
+                });
+                return message.filter(entry => entry !== '').join('\n');
+            }
+            else {
+                return '';
+            }
         },
 
         _renderCameraContent: function() {
@@ -1377,23 +1398,30 @@ define([
 
             // CAMERA mode
             if(this.state.mode === mode.CAMERA) {
-                leftButtonOn = false;
                 if(openSource === 'PRINT') {
                     middleButtonOn = true;
+                    leftButtonOn = true;
                 }
                 else {
-                    middleButtonOn = false;
+                    if(
+                        statusId === DeviceConstants.status.IDLE ||
+                        statusId === DeviceConstants.status.COMPLETED ||
+                        statusId === DeviceConstants.status.ABORTED
+                    ) {
+                        leftButtonOn = false;
+                        middleButtonOn = false;
+                    }
                 }
             }
 
             // BROWSE_FILE mode
-            if(this.state.mode === mode.BROWSE_FILE) {
+            else if(this.state.mode === mode.BROWSE_FILE) {
                 leftButtonOn = pathArray.length > 0;
                 middleButtonOn = this.state.selectedItemType === type.FILE;
             }
 
             // PRINT mode
-            if(this.state.mode === mode.PRINT) {
+            else if(this.state.mode === mode.PRINT) {
                 if(
                     statusId === DeviceConstants.status.IDLE ||
                     statusId === DeviceConstants.status.COMPLETED ||

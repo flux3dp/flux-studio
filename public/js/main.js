@@ -16,6 +16,7 @@ requirejs.config({
         threeOrbitControls: 'lib/three/controls/OrbitControls',
         threeTrackballControls: 'lib/three/controls/TrackballControls',
         threeSTLLoader: 'lib/three/loaders/STLLoader',
+        threeOBJLoader: 'lib/three/loaders/OBJLoader',
         threeTrackball: 'lib/three/controls/TrackballControls',
         threeCircularGridHelper: 'helpers/CircularGridHelper',
         cssHome: '../css/3rd-party-plugins',
@@ -67,6 +68,12 @@ requirejs.config({
                 'threejs'
             ],
             exports: 'STLLoader'
+        },
+        threeOBJLoader: {
+            deps: [
+                'threejs'
+            ],
+            exports: 'OBJLoader'
         },
         freetrans: {
             deps: [

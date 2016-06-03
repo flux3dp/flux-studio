@@ -547,15 +547,27 @@ define([
     }
 
     function stopStreamCamera() {
-        _device.camera.closeStream();
+        if(_device.camera) {
+            _device.camera.closeStream();
+        }
     }
 
     function calibrate() {
+        var d = $.Deferred();
         _device.actions.calibrate().then((response) => {
-            console.log(response);
+            d.resolve();
         }, (error) => {
+            error = error || {};
+            if(error.info === DeviceConstants.RESOURCE_BUSY) {
+                AlertActions.showPopupError('device-busy', lang.calibration.RESOURCE_BUSY);
+            }
+            else {
+                AlertActions.showPopupError('device-busy', error.error);
+            }
             console.log('error from calibration', error);
+            d.resolve();
         });
+        return d.promise();
     }
 
     function _scanDeviceError(devices) {

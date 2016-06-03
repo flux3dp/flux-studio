@@ -28,8 +28,6 @@ THREE.OBJLoader.prototype = {
 
 	parse: function ( text ) {
 
-		console.time( 'OBJLoader' );
-
 		var object, objects = [];
 		var geometry, material;
 
@@ -362,8 +360,6 @@ THREE.OBJLoader.prototype = {
 			container.add( mesh );
 
 		}
-
-		console.timeEnd( 'OBJLoader' );
 
 		return container;
 

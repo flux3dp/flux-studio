@@ -40,7 +40,7 @@ define([
 
         return {
             connection: ws,
-            upload: function(name, file, callback) {
+            upload: function(name, file, ext, callback) {
                 var d = $.Deferred(),
                     CHUNK_PKG_SIZE = 4096;
 
@@ -84,9 +84,16 @@ define([
 
                 events.onError = function(result) {
                     d.resolve(result);
+                };
+
+                if(ext === 'obj') {
+                    ext = ' ' + ext ;
+                }
+                else {
+                    ext = '';
                 }
 
-                ws.send('upload ' + name + ' ' + file.size);
+                ws.send('upload ' + name + ' ' + file.size + ext);
                 lastOrder = 'upload';
                 return d.promise();
             },
@@ -330,7 +337,7 @@ define([
 
             checkEngine: function(engine, path) {
                 var d = $.Deferred();
-                
+
                 events.onMessage = function(result) {
                     d.resolve(result);
                 };

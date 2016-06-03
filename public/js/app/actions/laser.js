@@ -245,8 +245,8 @@ define([
                 return range > limit;
             },
             sleep,
-            resetPosition = function() {
-                var $img_container = $('.' + LASER_IMG_CLASS),
+            resetPosition = function($target) {
+                var $img_container = $target || $('.' + LASER_IMG_CLASS),
                     platform_pos = $laser_platform.box(true),
                     rollback = true,
                     $controlPoints,
@@ -306,6 +306,8 @@ define([
                     if ('scale' === e.freetransEventType) {
                         refreshImage($el, threshold);
                     }
+
+                    resetPosition($el);
 
                     self.setState({
                         position: position,
@@ -638,8 +640,6 @@ define([
             refreshImagePanelPos();
         });
 
-        resetPosTimer = setInterval(resetPosition, 200);
-
         return {
             handleLaser: function(settings) {
                 handleLaser(
@@ -672,8 +672,6 @@ define([
                 if ('undefined' !== typeof svgWebSocket) {
                     svgWebSocket.connection.close(false);
                 }
-
-                shortcuts.off(['del']);
             },
             resetFileFormat: function() {
                 self.setState({

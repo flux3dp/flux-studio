@@ -23,6 +23,7 @@ define([
     'threeTrackballControls',
     'threeTransformControls',
     'threeSTLLoader',
+    'threeOBJLoader',
     'threeCircularGridHelper',
     'plugins/file-saver/file-saver.min',
     'lib/Canvas-To-Blob',
@@ -246,30 +247,28 @@ define([
         });
     }
 
-    function uploadStl(name, file) {
+    function uploadStl(name, file, ext) {
         // pass to slicer
         var d = $.Deferred();
-        slicer.upload(name, file, displayProgress).then(function(result) {
+        slicer.upload(name, file, ext, displayProgress).then((result) => {
             ProgressActions.updating('finishing up', 100);
             d.resolve(result);
         });
         return d.promise();
     }
 
-    function appendModel(fileUrl, file, callback) {
+    function appendModel(fileUrl, file, ext, callback) {
         if(file.size === 0) {
             AlertActions.showPopupError('', lang.message.invalidFile);
             return;
         }
-        var loader = new THREE.STLLoader();
-        var model_file_path = fileUrl;
+        var stlLoader = new THREE.STLLoader(),
+            objLoader = new THREE.OBJLoader(),
+            model_file_path = fileUrl;
+
         callback = callback || function() {};
 
-        reactSrc.setState({
-            openImportWindow: false
-        });
-
-        loader.load(model_file_path, function(geometry) {
+        var loadGeometry = function(geometry) {
             if(geometry.vertices) {
                 if(geometry.vertices.length === 0) {
                     ProgressActions.close();
@@ -285,7 +284,7 @@ define([
             mesh.up = new THREE.Vector3(0, 0, 1);
 
             slicingStatus.pauseReport = true;
-            uploadStl(mesh.uuid, file).then(function(result) {
+            uploadStl(mesh.uuid, file, ext).then(function(result) {
                 slicingStatus.pauseReport = false;
                 if (result.status !== 'ok') {
                     ProgressActions.close();
@@ -308,11 +307,13 @@ define([
             // normalize - resize, align
             var box = new THREE.Box3().setFromObject(mesh),
                 enlarge = parseInt(box.size().x) !== 0 && parseInt(box.size().y) !== 0 && parseInt(box.size().z) !== 0,
-                scale = getScaleDifference(
-                    enlarge ?
-                    getLargestPropertyValue(box.size()) :
-                    getSmallestPropertyValue(box.size())
-                );
+                scale;
+
+            scale = getScaleDifference(
+                enlarge ?
+                getLargestPropertyValue(box.size()) :
+                getSmallestPropertyValue(box.size())
+            );
 
             // alert for auto scalling
             if(scale === Infinity) {
@@ -371,7 +372,26 @@ define([
 
             setDefaultFileName();
             render();
+        }
+
+        reactSrc.setState({
+            openImportWindow: false
         });
+
+        if(ext === 'obj') {
+            objLoader.load(model_file_path, (object) => {
+                var meshes = object.children.filter(c => c instanceof THREE.Mesh);
+                if(meshes.length > 0) {
+                    loadGeometry(new THREE.Geometry().fromBufferGeometry(meshes[0].geometry))
+                }
+                // loadGeometry(new THREE.Geometry().fromBufferGeometry(.geometry))
+            });
+        }
+        else {
+            stlLoader.load(model_file_path, (geometry) => {
+                loadGeometry(geometry);
+            });
+        }
     }
 
     function appendModels(files, index, callback) {
@@ -389,10 +409,10 @@ define([
                 models.push(file);
                 slicingStatus.canInterrupt = false;
                 var ext = file.name.split('.').pop().toLowerCase();
-                if(ext === 'stl') {
+                if(ext === 'stl' || ext === 'obj') {
                     var reader  = new FileReader();
                     reader.addEventListener('load', function () {
-                        appendModel(reader.result, file, function() {
+                        appendModel(reader.result, file, ext, function() {
                             slicingStatus.canInterrupt = true;
                             if(files.length > index + 1) {
                                 appendModels(files, index + 1, callback);
@@ -471,12 +491,12 @@ define([
 
         var processMetadata = function(m) {
             metadata = m;
-            var fcodeType = m.metadata.HEAD_TYPE
+            var fcodeType = m.metadata.HEAD_TYPE;
             if(fcodeType === 'EXTRUDER') {
                 fcodeConsole.getPath().then(processPath);
             }
             else {
-                var message = fcodeType === 'LASER' ? lang.message.fcodeForLaser : lang.message.fcodeForPen
+                var message = fcodeType === 'LASER' ? lang.message.fcodeForLaser : lang.message.fcodeForPen;
                 ProgressActions.close();
                 importFromFCode = false;
                 importFromGCode = false;
@@ -656,6 +676,7 @@ define([
 
         if(report.status === 'error') {
             clearInterval(slicingStatus.reporter);
+
             if(report.error === 'gcode area too big') {
                 slicingStatus.lastReport.error = lang.message.gCodeAreaTooBigMessage;
                 slicingStatus.lastReport.caption = lang.message.gCodeAreaTooBigCaption;
@@ -665,12 +686,15 @@ define([
             }
 
             if(show || previewMode) {
-                ProgressActions.close();
-                _closePreview();
+                setTimeout(() => {
+                    ProgressActions.close();
+                }, 0);
+                if(previewMode) {
+                    _closePreview();
+                    togglePreview();
+                }
             }
-            else {
-                slicingStatus.hasError = true;
-            }
+            slicingStatus.hasError = true;
             AlertActions.showPopupError('', slicingStatus.lastReport.error, slicingStatus.lastReport.caption);
             slicingStatus.lastProgress = '';
             reactSrc.setState({ hasOutOfBoundsObject: true });
@@ -1661,7 +1685,6 @@ define([
                 }
                 return sourceMesh.geometry.vertices[a].y - sourceMesh.geometry.vertices[b].y;
             });
-            // console.log(stl_index);
 
             // find boundary
 
@@ -2521,10 +2544,14 @@ define([
             _showWait(lang.print.drawingPreview, !showStopButton);
             if(!printPath || printPath.length === 0) {
                 slicingStatus.canInterrupt = false;
+                console.time('getPath');
                 slicer.getPath().then(function(result) {
+                    console.timeEnd('getPath');
                     slicingStatus.canInterrupt = true;
                     printPath = result;
+                    console.time('drawPath');
                     _drawPath().then(function() {
+                        console.timeEnd('drawPath');
                         _closeWait();
                     });
                 });
@@ -2555,7 +2582,7 @@ define([
     function _closePreview() {
         if(previewMode) {
             previewMode = false;
-            reactSrc.setState({ previewMode: false }, function() {
+            reactSrc.setState({ previewMode: false }, () => {
                 togglePreview();
                 $('#preview').parents('label').find('input').prop('checked',false);
             });
@@ -2582,11 +2609,11 @@ define([
 
             for (var point = 1; point < printPath[layer].length; point++) {
                 for (var tmp = 1; tmp >= 0; tmp--) {
-                    color.push(previewColors[printPath[layer][point].t]);
+                    color.push(previewColors[printPath[layer][point][3]]);
                     g.vertices.push(new THREE.Vector3(
-                        printPath[layer][point - tmp].p[0],
-                        printPath[layer][point - tmp].p[1],
-                        printPath[layer][point - tmp].p[2]
+                        printPath[layer][point - tmp][0],
+                        printPath[layer][point - tmp][1],
+                        printPath[layer][point - tmp][2]
                     ));
                 }
             }
