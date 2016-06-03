@@ -220,7 +220,6 @@
             content: "";
             display: block;
             height: 100%;
-            transition: width .3s ease;
             width: 0;
         }
     }
@@ -361,6 +360,7 @@
 
     .btn-h-group {
         display: block;
+        flex: 1;
         text-align: right;
     }
 }

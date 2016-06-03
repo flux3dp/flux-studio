@@ -19,5 +19,6 @@
     "chromium-args": "--mixed-context --enable-webgl --ignore-gpu-blacklist",
     "webkit": {
         "plugin": true
-    }
+    },
+    "manifestUrl": "http://192.168.16.202/package.json?v={Version}"
 }

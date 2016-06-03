@@ -102,6 +102,7 @@ define(function() {
                 contact: 'Contact Us',
                 troubleshooting: 'Troubleshooting',
                 tutorial: 'Start Printing Tutorial',
+                software_update: 'Software Update',
                 debug: 'Bug Report',
                 forum: 'Community Forum'
             }
@@ -1035,7 +1036,9 @@ define(function() {
                 message: 'Important Delta firmware update is available. Do you want to update now?',
             },
             unsupport_osx_version: 'Unsupported Mac OS X Version Detected',
-            need_password: 'Need Password to connect to FLUX Delta'
+            need_password: 'Need Password to connect to FLUX Delta',
+            new_app_downloading: 'Downloading',
+            ask_for_upgrade: 'Do you wanna upgrade NOW?'
         },
         machine_status: {
             '-10': 'Raw mode',
