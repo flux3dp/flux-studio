@@ -83,6 +83,7 @@ define(function() {
                 label: '機器',
                 new: '新增機器',
                 device_monitor: '儀表板',
+                device_info: '機器資訊',
                 change_filament: '更換線料',
                 default_device: '設為預設',
                 check_firmware_update: '韌體更新',
@@ -881,7 +882,11 @@ define(function() {
             finishing: '完成中',
             initiating: '啟動中',
             unknown: '未知狀態',
-            pausedFromError: '發生錯誤暫停'
+            pausedFromError: '發生錯誤暫停',
+            IP: 'IP',
+            serial_number: '序號',
+            firmware_version: '韌體版本',
+            UUID: 'UUID'
         },
         monitor: {
             change_filament                     : 'CHANGE FILLAMENT',
