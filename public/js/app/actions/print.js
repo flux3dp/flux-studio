@@ -676,6 +676,7 @@ define([
 
         if(report.status === 'error') {
             clearInterval(slicingStatus.reporter);
+
             if(report.error === 'gcode area too big') {
                 slicingStatus.lastReport.error = lang.message.gCodeAreaTooBigMessage;
                 slicingStatus.lastReport.caption = lang.message.gCodeAreaTooBigCaption;
@@ -685,12 +686,15 @@ define([
             }
 
             if(show || previewMode) {
-                ProgressActions.close();
-                _closePreview();
+                setTimeout(() => {
+                    ProgressActions.close();
+                }, 0);
+                if(previewMode) {
+                    _closePreview();
+                    togglePreview();
+                }
             }
-            else {
-                slicingStatus.hasError = true;
-            }
+            slicingStatus.hasError = true;
             AlertActions.showPopupError('', slicingStatus.lastReport.error, slicingStatus.lastReport.caption);
             slicingStatus.lastProgress = '';
             reactSrc.setState({ hasOutOfBoundsObject: true });
@@ -2420,7 +2424,6 @@ define([
     }
 
     function _handleSliceComplete() {
-        console.log('complete');
         if(previewMode) {
             slicingStatus.isComplete = true;
             _showWait(lang.print.drawingPreview, !showStopButton);
@@ -2579,7 +2582,7 @@ define([
     function _closePreview() {
         if(previewMode) {
             previewMode = false;
-            reactSrc.setState({ previewMode: false }, function() {
+            reactSrc.setState({ previewMode: false }, () => {
                 togglePreview();
                 $('#preview').parents('label').find('input').prop('checked',false);
             });

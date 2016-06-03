@@ -353,6 +353,7 @@ define([
             totalTimeInSeconds = '';
             taskInfo = '';
 
+            DeviceMaster.stopStreamCamera();
             GlobalActions.monitorClosed();
         },
 
@@ -733,6 +734,7 @@ define([
         _handleGo: function() {
             var self = this;
             this._stopReport();
+            messageViewed = false;
 
             if(this.state.currentStatus === DeviceConstants.READY) {
                 var blob = this.props.fCode;
@@ -886,9 +888,20 @@ define([
             if(report.error.length > 0) {
                 if(report.error[2]) {
                     errorMessage = this._processErrorCode(report.error[2]);
+                    // for wrong type of head
+                    if(report.error[1] === 'TYPE_ERROR') {
+                        errorMessage = lang.monitor[report.error.slice(0,2).join('_')];
+                    }
+
+                    if(errorMessage === '') {
+                        errorMessage = lang.monitor[report.error.slice(0,2).join('_')];
+                    }
                 }
                 else {
-                    errorMessage = lang.head_module.error.missing;
+                    errorMessage = lang.monitor[report.error.slice(0,2).join('_')];
+                    if(errorMessage === '') {
+                        errorMessage = lang.head_module.error.missing;
+                    }
                 }
             }
 
@@ -1385,23 +1398,30 @@ define([
 
             // CAMERA mode
             if(this.state.mode === mode.CAMERA) {
-                leftButtonOn = false;
                 if(openSource === 'PRINT') {
                     middleButtonOn = true;
+                    leftButtonOn = true;
                 }
                 else {
-                    middleButtonOn = false;
+                    if(
+                        statusId === DeviceConstants.status.IDLE ||
+                        statusId === DeviceConstants.status.COMPLETED ||
+                        statusId === DeviceConstants.status.ABORTED
+                    ) {
+                        leftButtonOn = false;
+                        middleButtonOn = false;
+                    }
                 }
             }
 
             // BROWSE_FILE mode
-            if(this.state.mode === mode.BROWSE_FILE) {
+            else if(this.state.mode === mode.BROWSE_FILE) {
                 leftButtonOn = pathArray.length > 0;
                 middleButtonOn = this.state.selectedItemType === type.FILE;
             }
 
             // PRINT mode
-            if(this.state.mode === mode.PRINT) {
+            else if(this.state.mode === mode.PRINT) {
                 if(
                     statusId === DeviceConstants.status.IDLE ||
                     statusId === DeviceConstants.status.COMPLETED ||
