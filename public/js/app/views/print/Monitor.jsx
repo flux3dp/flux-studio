@@ -1398,19 +1398,17 @@ define([
 
             // CAMERA mode
             if(this.state.mode === mode.CAMERA) {
-                if(openSource === 'PRINT') {
-                    middleButtonOn = true;
-                    leftButtonOn = true;
+                middleButtonOn = true;
+
+                if(
+                    statusId === DeviceConstants.status.IDLE ||
+                    statusId === DeviceConstants.status.COMPLETED ||
+                    statusId === DeviceConstants.status.ABORTED
+                ) {
+                    leftButtonOn = false;
                 }
                 else {
-                    if(
-                        statusId === DeviceConstants.status.IDLE ||
-                        statusId === DeviceConstants.status.COMPLETED ||
-                        statusId === DeviceConstants.status.ABORTED
-                    ) {
-                        leftButtonOn = false;
-                        middleButtonOn = false;
-                    }
+                    leftButtonOn = true;
                 }
             }
 
@@ -1458,7 +1456,7 @@ define([
 
                 if(statusId === DeviceConstants.status.MAINTAIN ||
                    statusId === DeviceConstants.status.SCAN ||
-                   statusId === DeviceConstants.status.ABORTED
+                   this._isAbortedOrCompleted()
                 ) {
                     middleButtonOn = false;
                 }
@@ -1513,7 +1511,7 @@ define([
                             )
                     },
                     {
-                        'hide': this.state.mode === 'CAMERA' || this._isAbortedOrCompleted()
+                        'hide': (this.state.mode === 'CAMERA' || this._isAbortedOrCompleted()) && !filePreview
                     }
                 );
 
