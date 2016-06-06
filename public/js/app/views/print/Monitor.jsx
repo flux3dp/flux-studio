@@ -633,6 +633,7 @@ define([
                                     this._processReport(report);
                                 }.bind(this));
                                 this._addHistory();
+                                this._startReport();
                             });
                             this.forceUpdate();
                         }.bind(this));
@@ -713,6 +714,7 @@ define([
         },
 
         _handleToggleCamera: function() {
+            filePreview = false;
             if(this.state.mode === mode.CAMERA) {
                 DeviceMaster.stopStreamCamera();
                 this._handleBack();
@@ -1398,7 +1400,12 @@ define([
 
             // CAMERA mode
             if(this.state.mode === mode.CAMERA) {
-                middleButtonOn = true;
+                if(statusId === DeviceConstants.status.MAINTAIN || taskInfo === '') {
+                    middleButtonOn = false;
+                }
+                else {
+                    middleButtonOn = true;
+                }
 
                 if(
                     statusId === DeviceConstants.status.IDLE ||
@@ -1437,7 +1444,9 @@ define([
                 }
 
                 if(statusId === DeviceConstants.status.MAINTAIN ||
-                    statusId === DeviceConstants.status.SCAN ) {
+                    statusId === DeviceConstants.status.SCAN ||
+                    taskInfo === ''
+                 ) {
                     middleButtonOn = false;
                 }
             }
@@ -1505,9 +1514,9 @@ define([
                                 this.state.mode === mode.PREVIEW ||
                                 !!_duration
                             ) && (
-                                statusId !== DeviceConstants.status.SCAN &&
-                                statusId !== DeviceConstants.status.MAINTAIN &&
-                                statusId !== DeviceConstants.status.SCAN
+                                // statusId !== DeviceConstants.status.SCAN &&
+                                taskInfo !== ''
+                                // statusId !== DeviceConstants.status.MAINTAIN
                             )
                     },
                     {
