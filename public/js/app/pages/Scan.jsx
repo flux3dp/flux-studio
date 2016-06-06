@@ -953,7 +953,7 @@ define([
                     nextAction = nextAction || function() {};
 
                     var self = this,
-                        selectedMeshes = this.state.selectedMeshes,
+                        selectedMeshes = self.state.selectedMeshes,
                         endIndex = selectedMeshes.length - 1,
                         currentIndex = 0,
                         isEnd = function() {
@@ -1090,6 +1090,9 @@ define([
                                             onFinished: onMergeFinished
                                         }
                                     );
+                                }
+                                else {
+                                    afterMerge(baseMesh.name);
                                 }
 
                             },
