@@ -114,15 +114,23 @@ define([
 
                 componentDidMount: function() {
                     var self = this,
-                        object;
-
-                    var pushToHistory = function(mesh, arrayIndex) {
-                               mesh.type = 'update';
-                               mesh.arrayIndex = arrayIndex;
-                               self.setState({
-                                   history: self.state.history.concat([mesh])
-                               });
-                           };
+                        lang = self.state.lang,
+                        object,
+                        pushToHistory = function(mesh, arrayIndex) {
+                            mesh.type = 'update';
+                            mesh.arrayIndex = arrayIndex;
+                            self.setState({
+                               history: self.state.history.concat([mesh])
+                            });
+                        },
+                        fireUndo = function() {
+                            if (0 < self.state.history.length) {
+                                self._undo();
+                            }
+                            else {
+                                AlertActions.showPopupError('cant-undo', lang.scan.cant_undo);
+                            }
+                        };
 
                     subscriber = meshUpdateStream.subscribe((m) => {
                         object = Object.assign({}, m);
@@ -139,7 +147,6 @@ define([
                                 o.type = m.type;
                                 self.setState({
                                     history: self.state.history.concat([o])
-                                }, () => {
                                 });
                             }
                             else {
@@ -148,11 +155,7 @@ define([
                         });
                     });
 
-                    shortcuts.on(['ctrl', 'z'], function(e) {
-                        if (false === self.state.isScanStarted) {
-                            self._undo();
-                        }
-                    });
+                    shortcuts.on(['cmd', 'z'], fireUndo);
 
                     AlertStore.onRetry(self._retry);
                     AlertStore.onYes(self._onYes);
@@ -163,7 +166,9 @@ define([
                         stage: scanedModel.init()
                     });
 
-                    menuFactory.items.import.enabled = false;
+                    menuFactory.items.undo.enabled = true;
+                    menuFactory.items.undo.onClick = fireUndo;
+                    menuFactory.items.import.enabled = false === self.state.isScanStarted;
                     menuFactory.items.import.onClick = function() {
                         self.refs.fileUploader.getDOMNode().click();
                     };
