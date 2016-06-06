@@ -949,7 +949,8 @@ define(function() {
             task: {
                 EXTRUDER                        : '列印工作',
                 LASER                           : '雕刻工作',
-                DRAW                            : '繪製工作'
+                DRAW                            : '繪製工作',
+                'N/A'                           : '繪製工作'
             },
             device: {
                 EXTRUDER                        : '列印工具頭',

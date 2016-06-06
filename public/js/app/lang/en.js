@@ -949,7 +949,8 @@ define(function() {
             task: {
                 EXTRUDER                        : 'Printing Task',
                 LASER                           : 'Engraving Task',
-                DRAW                            : 'Drawing Task'
+                DRAW                            : 'Drawing Task',
+                'N/A'                           : 'Drawing Task'
             },
             device: {
                 EXTRUDER                        : 'Printing Toolhead',
