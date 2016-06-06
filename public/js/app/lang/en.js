@@ -746,6 +746,7 @@ define(function() {
                 caption: 'Calibration Done',
                 message: 'You are able to scan now'
             },
+            cant_undo: 'Unable to undo',
             estimating: 'Estimating the time...',
             calibrate_fail: 'Calibration Failed',
             calibration_is_running: 'Calibrating for Scanning',

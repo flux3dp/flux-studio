@@ -746,6 +746,7 @@ define(function() {
                 caption: '校正完成',
                 message: '你可以開始掃描了'
             },
+            cant_undo: '無法復原',
             estimating: '估計中...',
             calibrate_fail: '校正失敗',
             calibration_is_running: '掃描校正中',
