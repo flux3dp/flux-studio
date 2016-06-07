@@ -29,6 +29,7 @@ define([
 
                     if (true === is_success) {
                         events.onSuccess(data);
+                        ws.close();
                     }
                     else {
                         events.onFail(data);
