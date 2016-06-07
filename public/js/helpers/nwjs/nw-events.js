@@ -35,7 +35,7 @@ define(['jquery', 'helpers/i18n'], function($, i18n) {
     };
 
     if (true === window.FLUX.isNW) {
-        win.title = 'FLUX Studio - {Version}';
+        win.title = 'FLUX Studio - ' + window.FLUX.version;
 
         win.on('close', function() {
             var isQuit = window.confirm(lang.topmenu.sure_to_quit);
