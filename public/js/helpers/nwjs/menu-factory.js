@@ -85,16 +85,15 @@ define([
                             message = lang.update.toolhead.latest_firmware.message;
                         }
 
-                        if (true === response.needUpdate) {
-                            firmwareUpdater(response, printer, type);
-                        }
-                        else {
+                        if (false === response.needUpdate) {
                             AlertActions.showPopupInfo(
                                 'latest-firmware',
                                 message + ' (v' + latestVersion + ')',
                                 caption
                             );
                         }
+
+                        firmwareUpdater(response, printer, type);
                     }).
                     fail(function(response) {
                         firmwareUpdater(response, printer, type);
