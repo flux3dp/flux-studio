@@ -23,11 +23,14 @@ var process = nw.process,
     appWindow,
     executeGhost = function(port, libPath) {
         var slic3rPathIndex = 1,
+            curaPathIndex = 5,
             args = [
                 '--slic3r',
                 '',
                 '--port',
-                port
+                port,
+                '--cura',
+                ''
             ],
             ghostCmd = '',
             writeLog = function(message, mode) {
@@ -55,20 +58,24 @@ var process = nw.process,
         if ('Windows_NT' === osType) {
             // TODO: has to assign env root for slic3r
             args[slic3rPathIndex] = libPath + '/lib/Slic3r/slic3r-console.exe';
+            args[curaPathIndex] = libPath + '/lib/CuraEngine/CuraEngin.exe';
             ghostCmd = libPath + '/lib/flux_api/flux_api.exe' ;
         }
         else if ('Linux' === osType) {
             args[slic3rPathIndex] = libPath + '/lib/Slic3r/bin/slic3r';
+            args[curaPathIndex] = libPath + '/lib/CuraEngine';
             ghostCmd = libPath + '/lib/flux_api/flux_api';
         }
         else {
             args[slic3rPathIndex] = libPath + '/lib/slic3r';
+            args[curaPathIndex] = libPath + '/lib/CuraEngine';
             ghostCmd = libPath + '/lib/flux_api/flux_api';
         }
 
         try {
-            fs.chmodSync(ghostCmd, 0777);
             fs.chmodSync(args[slic3rPathIndex], 0777);
+            fs.chmodSync(args[curaPathIndex], 0777);
+            fs.chmodSync(ghostCmd, 0777);
         }
         catch (ex) {
             console.log(ex);
