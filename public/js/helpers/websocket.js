@@ -18,6 +18,11 @@ define([
     'use strict';
 
     window.FLUX.websockets = [];
+    window.FLUX.websockets.list = function() {
+        window.FLUX.websockets.forEach(function(conn, i) {
+            console.log(i, conn.url);
+        });
+    };
 
     var hadConnected = false,
         showProgramErrorPopup = true,
