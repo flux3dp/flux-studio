@@ -97,6 +97,10 @@ exports.TestCase = function(describe, timeout) {
                 length = json.length;
             }
 
+            if ('number' === typeof json.left && 'number' === typeof json.right) {
+                length = (json.left + json.right) * 24;
+            }
+
             deferred.notify(json);
         });
 
@@ -113,10 +117,6 @@ exports.TestCase = function(describe, timeout) {
             });
 
             inStream.on('end', function () {
-                if (buffer.length === length) {
-                    status = 'ok';
-                }
-
                 deferred.notify({ status: status, buffer: buffer });
             });
         });
