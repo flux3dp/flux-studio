@@ -52,10 +52,10 @@ testCases.push(new bootstrap.TestCase('get post-processing svg file').
             height = response.height;
             break;
         case 'progressing':
-            // ignore
+            deferred.resolve(response);
             break;
         case 'ok':
-            deferred.resolve(response);
+            // do nothing
             break;
         case 'fatal':
         default:
