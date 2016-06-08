@@ -58,7 +58,7 @@ var process = nw.process,
         if ('Windows_NT' === osType) {
             // TODO: has to assign env root for slic3r
             args[slic3rPathIndex] = libPath + '/lib/Slic3r/slic3r-console.exe';
-            args[curaPathIndex] = libPath + '/lib/CuraEngine/CuraEngin.exe';
+            args[curaPathIndex] = libPath + '/lib/CuraEngine/CuraEngine.exe';
             ghostCmd = libPath + '/lib/flux_api/flux_api.exe' ;
         }
         else if ('Linux' === osType) {
