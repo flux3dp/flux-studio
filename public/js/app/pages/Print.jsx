@@ -742,11 +742,7 @@ define([
                 _handleSlicingEngineChange: function(engineName) {
                     engineName = engineName || defaultSlicingEngine;
                     var d = $.Deferred(),
-                        path = Config().read('slicing-engine-path').trim();
-
-                    if(engineName === defaultSlicingEngine) {
                         path = 'default';
-                    }
 
                     const setDefaultEngine = () => {
                         advancedSettings.engine = 'slic3r';
