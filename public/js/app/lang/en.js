@@ -957,7 +957,7 @@ define(function() {
                 LASER                           : 'Engraving Toolhead',
                 DRAW                            : 'Drawing Toolhead'
             },
-            cant_get_toolhead_version           : 'Unable to get latest version infomation'
+            cant_get_toolhead_version           : 'Unable to get toolhead information'
         },
         alert: {
             caption: 'Error',
