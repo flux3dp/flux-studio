@@ -6,16 +6,14 @@ var fs = require('fs'),
     bootstrap = require(process.cwd() + '/_test/api/bootstrap'),
     testCases = [],
     startTime,
-    timeLimit = 10000,
+    timeLimit = 100,
     necessaryKeys = {
         alive: { type: 'boolean' },
         serial: { type: 'string', format: /^[A-Z0-9]{10}$/ },
         uuid: { type: 'string', format: /^[a-zA-Z0-9]{32}$/ },
         name: { type: 'string', format: /^.{1,}$/ },
         model: { type: 'string', format: /^.{1,}$/ },
-        password: { type: 'boolean' },
-        head_module: { type: 'string', format: /^(EXTRUDER|LASER|N\/A|OFFLINE)$/ },
-        st_id: { type: 'number' }
+        password: { type: 'boolean' }
     },
     keys = Object.keys(necessaryKeys),
     keyChecker = function(val, validator) {
@@ -33,7 +31,7 @@ var fs = require('fs'),
     },
     conn;
 
-testCases.push(new bootstrap.TestCase('discover', timeLimit).
+testCases.push(new bootstrap.TestCase('discover', 60000).
     onProgress(function(response, deferred, conn) {
         if (0 > timeLimit) {
             deferred.resolve(response);
@@ -45,7 +43,7 @@ testCases.push(new bootstrap.TestCase('discover', timeLimit).
             }
         });
 
-        timeLimit -= 1000;
+        timeLimit -= 1;
     })
 );
 
