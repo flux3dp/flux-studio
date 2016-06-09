@@ -86,7 +86,7 @@ define([
                         }
 
                         if (true === response.needUpdate) {
-                            firmwareUpdater(response, printer, type);
+                            firmwareUpdater(response, currentPrinter, type);
                         }
                         else {
                             AlertActions.showPopupInfo(
