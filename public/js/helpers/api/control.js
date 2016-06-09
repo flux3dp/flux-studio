@@ -76,9 +76,12 @@ define([
                 onClose: function(response) {
                     isConnected = false;
                 },
+                onOpen: function() {
+                    _ws.send(rsaKey());
+                },
                 autoReconnect: false
             });
-            _ws.send(rsaKey());
+
             return _ws;
         }
 
