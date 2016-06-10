@@ -454,8 +454,26 @@ define([
             },
 
             'QUIT': function() {
+                var _getReport = function(result) {
+                        getReport().done(function(response) {
+                            if (0 >= retryTimes) {
+                                d.fail(result);
+                                return;
+                            }
+
+                            if (response.st_id === DeviceConstants.status.IDLE) {
+                                d.resolve(result);
+                            }
+                            else {
+                                _getReport(result);
+                                retryTimes -= 1;
+                            }
+                        });
+                    },
+                    retryTimes = 10;
+
                 _device.actions.quit().then(function(result) {
-                    d.resolve(result);
+                    _getReport(result);
                 });
             },
 
