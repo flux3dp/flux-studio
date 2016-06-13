@@ -1217,11 +1217,11 @@ define([
                         slicingStatus.pauseReport = false;
                         slicingStatus.lastReport = report;
                         if(!report) { return; }
-                        if(report.status === 'complete') {
+                        if(report.slice_status === 'complete') {
                             clearInterval(slicingStatus.reporter);
                             callback(report);
                         }
-                        else if(report.status !== 'ok') {
+                        else if(report.slice_status !== 'ok') {
                             callback(report);
                         }
                     });
