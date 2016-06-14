@@ -51,7 +51,7 @@ THREE.STLLoader.prototype = {
 		}, onProgress, onError );
 
 	},
-	
+
 	parse: function ( data ) {
 
 		var isBinary = function () {
@@ -59,13 +59,18 @@ THREE.STLLoader.prototype = {
 			var expect, face_size, n_faces, reader;
 			reader = new DataView( binData );
 			face_size = (32 / 8 * 3) + ((32 / 8 * 3) * 3) + (16 / 8);
-			n_faces = reader.getUint32(80, true);
+			try {
+				n_faces = reader.getUint32(80, true);
+			}
+			catch(e) {
+				return;
+			}
 			expect = 80 + (32 / 8) + (n_faces * face_size);
-			
+
 			if ( expect === reader.byteLength ) {
-				
+
 				return true;
-				
+
 			}
 
 			// some binary files will have different size from expected,
@@ -74,9 +79,9 @@ THREE.STLLoader.prototype = {
 			for ( var index = 0; index < fileLength; index ++ ) {
 
 				if ( reader.getUint8(index, false) > 127 ) {
-					
+
 					return true;
-					
+
 				}
 
 			}
@@ -255,7 +260,7 @@ THREE.STLLoader.prototype = {
 		} else {
 			return buf;
 		}
-		
+
 	}
 
 };
