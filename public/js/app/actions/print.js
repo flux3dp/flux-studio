@@ -676,7 +676,7 @@ define([
             show = true;
         }
 
-        if(report.status === 'error') {
+        if(report.slice_status === 'error') {
             clearInterval(slicingStatus.reporter);
 
             if(report.error === 'gcode area too big') {
@@ -701,10 +701,10 @@ define([
             slicingStatus.lastProgress = '';
             reactSrc.setState({ hasOutOfBoundsObject: true });
         }
-        else if(report.status === 'warning') {
+        else if(report.slice_status === 'warning') {
             AlertActions.showWarning(report.message);
         }
-        else if(report.status !== 'complete') {
+        else if(report.slice_status !== 'complete') {
             if(show) {
                 if(willReslice) {
                     ProgressActions.updating(lang.print.reRendering, 0);
@@ -1219,11 +1219,13 @@ define([
                         slicingStatus.pauseReport = false;
                         slicingStatus.lastReport = report;
                         if(!report) { return; }
-                        if(report.status === 'complete') {
+                        if(report.slice_status === 'complete') {
                             clearInterval(slicingStatus.reporter);
+                            slicingStatus.isComplete = true;
+                            blobExpired = false;
                             callback(report);
                         }
-                        else if(report.status !== 'ok') {
+                        else if(report.slice_status !== 'ok') {
                             callback(report);
                         }
                     });
@@ -2546,14 +2548,10 @@ define([
             _showWait(lang.print.drawingPreview, !showStopButton);
             if(!printPath || printPath.length === 0) {
                 slicingStatus.canInterrupt = false;
-                console.time('getPath');
                 slicer.getPath().then(function(result) {
-                    console.timeEnd('getPath');
                     slicingStatus.canInterrupt = true;
                     printPath = result;
-                    console.time('drawPath');
                     _drawPath().then(function() {
-                        console.timeEnd('drawPath');
                         _closeWait();
                     });
                 });
