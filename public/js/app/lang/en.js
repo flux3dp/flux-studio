@@ -918,7 +918,6 @@ define(function() {
             HARDWARE_ERROR_HOME_FAILED          : '#124 Unable to calibrate origin\nPlease remove the obstacle, and reattach the toolhead',
             HEAD_ERROR_TILT                     : '#162 Toolhead tilt detected\nPlease check ball joint rod is attached correctly',
             HEAD_ERROR_SHAKE                    : '#162 Toolhead tilt detected\nPlease check ball joint rod is attached correctly',
-            HEAD_ERROR_TYPE_ERROR               : 'Incorrect head module, please use the correct head',
             WRONG_HEAD                          : 'Device head is unknown, please connect to a correct toolhead',
             USER_OPERATION                      : 'Machine is being operated by (other) user',
             RESOURCE_BUSY                       : 'Device is busy\nIf the device is not running, please restart the device',
@@ -950,7 +949,8 @@ define(function() {
             task: {
                 EXTRUDER                        : 'Printing Task',
                 LASER                           : 'Engraving Task',
-                DRAW                            : 'Drawing Task'
+                DRAW                            : 'Drawing Task',
+                'N/A'                           : 'Drawing Task'
             },
             device: {
                 EXTRUDER                        : 'Printing Toolhead',

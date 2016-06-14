@@ -459,6 +459,8 @@ define([
                     callback();
                 }
                 else {
+                    ProgressActions.close();
+                    AlertActions.showPopupError('', lang.monitor.extensionNotSupported);
                     slicingStatus.canInterrupt = true;
                     callback();
                 }
