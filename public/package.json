@@ -12,13 +12,13 @@
         "width": 1280,
         "height": 640,
         "min_width": 1000,
-        "min_height": 600,
-        "js-flags": "--max-old-space-size 1000"
+        "min_height": 600
     },
     "nodejs": true,
     "chromium-args": "--mixed-context --enable-webgl --ignore-gpu-blacklist",
     "webkit": {
         "plugin": true
     },
-    "manifestUrl": "http://192.168.16.202/package.json?v={Version}"
+    "manifestUrl": "http://192.168.16.202/package.json?v={Version}",
+    "js-flags": "--max-old-space-size 2048"
 }

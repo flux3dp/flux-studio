@@ -76,9 +76,12 @@ define([
                 onClose: function(response) {
                     isConnected = false;
                 },
+                onOpen: function() {
+                    _ws.send(rsaKey());
+                },
                 autoReconnect: false
             });
-            _ws.send(rsaKey());
+
             return _ws;
         }
 
@@ -164,17 +167,23 @@ define([
                 ws.send('position');
             },
             report: function(opts) {
+                var $deferred = $.Deferred();
+
                 opts = genericOptions(opts);
 
                 events.onMessage = function(response) {
+                    $deferred.resolve(response);
                     opts.onFinished(response);
                 };
 
                 events.onError = function(response) {
+                    $deferred.fail(response);
                     opts.onFinished(response);
                 };
 
                 ws.send('report');
+
+                return $deferred.promise();
             },
             upload: function(filesize, print_data, opts, callback) {
                 opts = genericOptions(opts);
@@ -230,12 +239,10 @@ define([
 
                             if (true === response.status.startsWith('COMPLETED')) {
                                 self.quit().then(function(data) {
-                                    console.log('do upload 1', data);
                                     doUpload();
                                 });
                             }
                             else {
-                                console.log('do upload 2');
                                 doUpload();
                             }
                         }
@@ -463,7 +470,7 @@ define([
                 };
 
                 events.onError = function(result) {
-                    d.resolve(result);
+                    d.fail(result);
                 }
 
                 ws.send('play quit');
@@ -753,24 +760,35 @@ define([
                     args = [
                         'task',
                         'maintain'
-                    ];
+                    ],
+                    tryLimit = 4,
+                    sendHeadInfoCommand = function() {
+                        args = [
+                            'maintain',
+                            'headinfo'
+                        ];
+
+                        // MAGIC delay
+                        setTimeout(function() {
+                            tryLimit -= 1;
+                            ws.send(args.join(' '));
+                        }, 4000);
+                    };
 
                 events.onMessage = function(result) {
                     switch (result.status) {
                     case 'ok':
                         if ('maintain' === result.task) {
-                            args = [
-                                'maintain',
-                                'headinfo'
-                            ];
-
-                            // MAGIC delay for 5sec
-                            setTimeout(function() {
-                                ws.send(args.join(' '));
-                            }, 5000);
+                            sendHeadInfoCommand();
                         }
                         else {
-                            deferred.resolve(result);
+                            console.log(tryLimit, result);
+                            if (0 < tryLimit && 'N/A' === (result.head_module || 'N/A')) {
+                                sendHeadInfoCommand();
+                            }
+                            else {
+                                deferred.resolve(result);
+                            }
                         }
                         break;
                     default:

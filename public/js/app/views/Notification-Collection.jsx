@@ -585,7 +585,7 @@ define([
                     filament = this.state.changeFilament.open ? this._renderChangeFilament() : '',
                     latestVersion = (
                         'toolhead' === this.state.application.type ?
-                        this.state.application.toolhead_version :
+                        this.state.application.device.toolhead_version :
                         this.state.application.latestVersion
                     );
 

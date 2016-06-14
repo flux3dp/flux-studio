@@ -1,11 +1,4 @@
-define([
-    'jquery',
-    'helpers/api/config'
-],
-function(
-    $,
-    config
-) {
+define(['jquery'], function($) {
     'use strict';
 
     /**
