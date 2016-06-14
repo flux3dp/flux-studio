@@ -883,12 +883,12 @@ define([
         mouseDown = false;
         container.style.cursor = 'auto';
         transformAxisChanged = '';
-        checkOutOfBounds(SELECTED);
-
-        if(blobExpired && objects.length > 0) {
-            slicingStatus.showProgress = false;
-            doSlicing();
-        }
+        checkOutOfBounds(SELECTED).then(() => {
+            if(blobExpired && objects.length > 0 && !reactSrc.state.hasOutOfBoundsObject) {
+                slicingStatus.showProgress = false;
+                doSlicing();
+            }
+        });
         render();
     }
 
@@ -1755,11 +1755,11 @@ define([
     }
 
     function checkOutOfBounds(sourceMesh) {
-
+        var d = $.Deferred();
         if (!$.isEmptyObject(sourceMesh)) {
             var vector = new THREE.Vector3();
             sourceMesh.position.isOutOfBounds = sourceMesh.plane_boundary.some(function(v) {
-                if (sourceMesh.geometry.type == 'Geometry') {
+                if (sourceMesh.geometry.type === 'Geometry') {
                     vector = sourceMesh.geometry.vertices[v].clone();
                 }
                 else{
@@ -1780,8 +1780,11 @@ define([
 
             reactSrc.setState({
                 hasOutOfBoundsObject: hasOutOfBoundsObject
+            }, () => {
+                d.resolve();
             });
         }
+        return d.promise();
     }
 
     function checkCollisionWithAny(src, callback) {
