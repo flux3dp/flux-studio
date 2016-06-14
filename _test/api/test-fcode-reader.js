@@ -18,6 +18,7 @@ testCases.push(new bootstrap.TestCase('upload fcode file').
             conn.sendBinary(fcodeFile);
             break;
         case 'ok':
+        case 'progressing':
             deferred.resolve(response);
             break;
         case 'fatal':
@@ -36,11 +37,10 @@ testCases.push(new bootstrap.TestCase('get image from fcode').
         // progress
         switch (response.status) {
         case 'progressing':
+            deferred.resolve(response);
+            break;
         case 'complete':
             // ignore
-            break;
-        case 'ok':
-            deferred.resolve(response);
             break;
         case 'fatal':
         default:
