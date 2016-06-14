@@ -91,6 +91,7 @@ exports.TestCase = function(describe, timeout) {
         });
 
         conn.off('text').on('text', function(data) {
+            data = data.replace(/NaN/g, 'null');
             var json = JSON.parse(data);
 
             if ('number' === typeof json.length) {
