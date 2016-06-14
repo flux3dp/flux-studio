@@ -549,7 +549,9 @@ define([
         if(objects.length === 0 || !blobExpired) { return; }
         var ids = [];
         objects.forEach(function(obj) {
-            ids.push(obj.uuid);
+            if(!obj.position.isOutOfBounds) {
+                ids.push(obj.uuid);
+            }
         });
 
         if(previewMode) {
@@ -884,7 +886,9 @@ define([
         container.style.cursor = 'auto';
         transformAxisChanged = '';
         checkOutOfBounds(SELECTED).then(() => {
-            if(blobExpired && objects.length > 0 && !reactSrc.state.hasOutOfBoundsObject) {
+            // disable preview when object are all out of bound
+            reactSrc.setState({ hasObject: !allOutOfBound()});
+            if(blobExpired && objects.length > 0 && !allOutOfBound()) {
                 slicingStatus.showProgress = false;
                 doSlicing();
             }
@@ -2080,7 +2084,8 @@ define([
     }
 
     function togglePreview() {
-        if (objects.length === 0) {
+        if (objects.length === 0 || allOutOfBound()) {
+            _closePreview();
             return;
         } else {
             previewMode ? _hidePreview() : _showPreview();
@@ -2548,7 +2553,6 @@ define([
             }
         }
         else {
-            _showWait(lang.print.drawingPreview, !showStopButton);
             if(!printPath || printPath.length === 0) {
                 slicingStatus.canInterrupt = false;
                 slicer.getPath().then(function(result) {
@@ -2583,13 +2587,10 @@ define([
     }
 
     function _closePreview() {
-        if(previewMode) {
-            previewMode = false;
-            reactSrc.setState({ previewMode: false }, () => {
-                togglePreview();
-                $('#preview').parents('label').find('input').prop('checked',false);
-            });
-        }
+        previewMode = false;
+        reactSrc.setState({ previewMode: false }, () => {
+            $('#preview').parents('label').find('input').prop('checked',false);
+        });
     }
 
     function _drawPath() {
@@ -2763,6 +2764,12 @@ define([
         }, 500);
 
         return d.promise();
+    }
+
+    function allOutOfBound() {
+        return !objects.some((o) => {
+            return !o.position.isOutOfBounds;
+        });
     }
 
     return {
