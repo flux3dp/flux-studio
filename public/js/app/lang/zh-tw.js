@@ -1067,16 +1067,16 @@ define(function() {
             UNKNOWN: '',
             error: {
                 'missing': '錯誤訊息不足',
-                '0': 'Heater failure',
-                '1': 'Laser failure',
-                '2': 'Fan failure',
-                '3': 'Hwardware error',
-                '4': 'Head tilted',
-                '5': 'Excessive head shake detected',
-                '6': 'Calibration sensor failure',
-                '7': 'No hello',
-                '8': 'Sensor communication failure',
-                '9': 'Unknown module'
+                '0': 'Unknown module',
+                '1': 'Sensor communication failure',
+                '2': 'No hello', // pi will send head_error_reset before this is issued
+                '3': 'Calibration sensor failure',
+                '4': 'Excessive head shake detected',
+                '5': 'Head tilted 中文',
+                '6': 'Hardware error',
+                '7': 'Fan failure',
+                '8': 'Laser failure',
+                '9': 'Heater failure'
             }
         },
         change_filament: {
