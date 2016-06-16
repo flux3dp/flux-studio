@@ -5,14 +5,12 @@ define([
     'jquery',
     'helpers/i18n',
     'html2canvas',
-    'plugins/file-saver/file-saver.min',
     'helpers/ghost-log-reader',
     'helpers/logger'
 ], function(
     $,
     i18n,
     html2canvas,
-    fileSaver,
     ghostLogReader,
     Logger
 ) {
@@ -36,7 +34,7 @@ define([
         var $deferred = $.Deferred();
 
         html2canvas(window.document.body).then(function(canvas) {
-            var jpegUrl = canvas.toDataURL("image/jpeg"),
+            var jpegUrl = canvas.toDataURL('image/jpeg'),
                 _logger = new Logger('websocket'),
                 allLog = _logger.getAll(),
                 report_info = {

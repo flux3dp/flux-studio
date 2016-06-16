@@ -22,7 +22,7 @@ define([
     'helpers/dnd-handler',
     'helpers/nwjs/menu-factory',
     'helpers/point-cloud',
-    'lib/rx.lite.min',
+    'Rx',
     // non-return
     'helpers/array-findindex',
     'helpers/object-assign',

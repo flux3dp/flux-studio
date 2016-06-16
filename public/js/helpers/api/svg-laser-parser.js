@@ -8,7 +8,7 @@ define([
     'helpers/data-history',
     'helpers/api/set-params',
     'app/actions/alert-actions',
-    'lib/rx.lite.min'
+    'Rx'
 ], function(Websocket, convertToTypedArray, history, setParams, AlertActions, Rx) {
     'use strict';
 
