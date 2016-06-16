@@ -403,7 +403,7 @@ define([
                         });
                         break;
                     default:
-                        // TODO: unexception result?
+                        $deferred.reject(data);
                     }
 
                 };
@@ -436,7 +436,7 @@ define([
                         $deferred.resolve(data);
                         break;
                     default:
-                        $deferred.fail(data);
+                        $deferred.reject(data);
                     }
 
                 };
@@ -476,7 +476,7 @@ define([
                             $deferred.resolve(data);
                             break;
                         default:
-                            $deferred.fail(data);
+                            $deferred.reject(data);
                         }
                     }
 
