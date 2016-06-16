@@ -8,11 +8,9 @@ define([
     'helpers/is-json'
 ], function(Websocket, convertToTypedArray, isJSON) {
     'use strict';
-
     return function(opts) {
         opts = opts || {};
         opts.onError = opts.onError || function() {};
-
         var ws = new Websocket({
                 method: '3dprint-slicing',
                 onMessage: function(data) {
@@ -92,7 +90,6 @@ define([
                 else {
                     ext = '';
                 }
-
                 ws.send('upload ' + name + ' ' + file.size + ext);
                 lastOrder = 'upload';
                 return d.promise();
@@ -110,15 +107,17 @@ define([
                 return d.promise();
             },
 
-            delete: function(name, callback) {
+            delete: function(name) {
+                var d = $.Deferred();
                 events.onMessage = function(result) {
-                    callback(result);
+                    d.resolve(result);
                 };
                 events.onError = function(result) {
-                    callback(result);
+                    d.resolve(result);
                 };
                 ws.send('delete ' + name);
                 lastOrder = 'delete';
+                return d.promise();
             },
 
             // go does not use deferred because multiple response and instant update
@@ -351,6 +350,11 @@ define([
                 ws.send(`check_engine ${engine} ${path}`);
 
                 return d.promise();
+            },
+
+            // this is a helper function for unit test
+            trigger: function(message) {
+                events.onMessage(message);
             }
         };
     };
