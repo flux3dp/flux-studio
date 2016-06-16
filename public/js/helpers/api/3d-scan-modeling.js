@@ -421,7 +421,6 @@ define([
              * @return {Promise}
              */
             export_threading: function(name, fileType) {
-                console.log('export_threading');
                 var self = this,
                     $deferred = $.Deferred(),
                     args = [
@@ -431,7 +430,6 @@ define([
                     ];
 
                 events.onMessage = function(data) {
-                    console.log(data);
 
                     switch (data.status) {
                     case 'ok':
@@ -455,7 +453,6 @@ define([
              * @return {Promise}
              */
             export_collect: function(name) {
-                console.log('export_collect');
                 var self = this,
                     $deferred = $.Deferred(),
                     args = [
