@@ -375,7 +375,7 @@ define([
              */
             import: function(name, fileType, file, fileLength) {
                 var self = this,
-                    deferred = $.Deferred(),
+                    $deferred = $.Deferred(),
                     args = [
                         'import_file',
                         name,
@@ -384,7 +384,7 @@ define([
                     ],
                     opts = {
                         onFinished: function(pointCloud) {
-                            deferred.resolve(pointCloud);
+                            $deferred.resolve(pointCloud);
                         }
                     };
 
@@ -410,7 +410,84 @@ define([
 
                 ws.send(args.join(' '));
 
-                return deferred.promise();
+                return $deferred.promise();
+            },
+            /**
+             * export threading (running in background)
+             *
+             * @param {String} name     - source name
+             * @param {String} fileType - file type (stl, pcd)
+             *
+             * @return {Promise}
+             */
+            export_threading: function(name, fileType) {
+                console.log('export_threading');
+                var self = this,
+                    $deferred = $.Deferred(),
+                    args = [
+                        'export_threading',
+                        name,
+                        fileType
+                    ];
+
+                events.onMessage = function(data) {
+                    console.log(data);
+
+                    switch (data.status) {
+                    case 'ok':
+                        $deferred.resolve(data);
+                        break;
+                    default:
+                        $deferred.fail(data);
+                    }
+
+                };
+
+                ws.send(args.join(' '));
+
+                return $deferred.promise();
+            },
+            /**
+             * export collect (running in background)
+             *
+             * @param {String} name - source name
+             *
+             * @return {Promise}
+             */
+            export_collect: function(name) {
+                console.log('export_collect');
+                var self = this,
+                    $deferred = $.Deferred(),
+                    args = [
+                        'export_collect',
+                        name
+                    ],
+                    length = 0;
+
+                events.onMessage = function(data) {
+                    if (true === data instanceof Blob) {
+                        $deferred.notify({ status: 'binary', data: new Blob([data]) });
+                    }
+                    else {
+                        switch (data.status) {
+                        case 'computing':
+                        case 'continue':
+                            length = data.length || 0;
+                            $deferred.notify(data);
+                            break;
+                        case 'ok':
+                            $deferred.resolve(data);
+                            break;
+                        default:
+                            $deferred.fail(data);
+                        }
+                    }
+
+                };
+
+                ws.send(args.join(' '));
+
+                return $deferred.promise();
             }
         };
     };
