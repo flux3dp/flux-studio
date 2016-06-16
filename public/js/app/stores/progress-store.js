@@ -29,11 +29,6 @@ define([
             return Store;
         },
 
-        onStop: function(callback) {
-            this.on(ProgressConstants.STOP_EVENT, callback);
-            return Store;
-        },
-
         removeOpenedListener: function(callback) {
             this.removeListener(ProgressConstants.OPEN_EVENT, callback);
             return Store;
@@ -49,18 +44,12 @@ define([
             return Store;
         },
 
-        removeStopListener: function(callback) {
-            this.removeListener(ProgressConstants.STOP_EVENT, callback);
-            return Store;
-        },
-
         dispatcherIndex: Dispatcher.register(function(payload) {
             var actionType = payload.actionType,
                 actions = [
                     ProgressConstants.UPDATE_EVENT,
                     ProgressConstants.FINISH_EVENT,
-                    ProgressConstants.OPEN_EVENT,
-                    ProgressConstants.STOP_EVENT
+                    ProgressConstants.OPEN_EVENT
                 ],
                 isMethodExisting = function(method) {
                     return actionType === method;
