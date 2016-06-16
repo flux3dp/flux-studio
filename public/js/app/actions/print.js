@@ -549,7 +549,9 @@ define([
         if(objects.length === 0 || !blobExpired) { return; }
         var ids = [];
         objects.forEach(function(obj) {
-            ids.push(obj.uuid);
+            if(!obj.position.isOutOfBounds) {
+                ids.push(obj.uuid);
+            }
         });
 
         if(previewMode) {
@@ -651,7 +653,7 @@ define([
             slicingStatus.needToCloseWait = false;
         }
 
-        var progress = `${lang.slicer[report.status]} - ${'\n' + parseInt(report.percentage * 100)}% - ${report.message}`,
+        var progress = `${lang.slicer[report.slice_status]} - ${'\n' + parseInt(report.percentage * 100)}% - ${report.message}`,
             complete = lang.print.finishingUp,
             show = slicingStatus.showProgress,
             monitorOn = $('.flux-monitor').length > 0;
@@ -883,12 +885,14 @@ define([
         mouseDown = false;
         container.style.cursor = 'auto';
         transformAxisChanged = '';
-        checkOutOfBounds(SELECTED);
-
-        if(blobExpired && objects.length > 0) {
-            slicingStatus.showProgress = false;
-            doSlicing();
-        }
+        checkOutOfBounds(SELECTED).then(() => {
+            // disable preview when object are all out of bound
+            reactSrc.setState({ hasObject: !allOutOfBound()});
+            if(blobExpired && objects.length > 0 && !allOutOfBound()) {
+                slicingStatus.showProgress = false;
+                doSlicing();
+            }
+        });
         render();
     }
 
@@ -1755,11 +1759,11 @@ define([
     }
 
     function checkOutOfBounds(sourceMesh) {
-
+        var d = $.Deferred();
         if (!$.isEmptyObject(sourceMesh)) {
             var vector = new THREE.Vector3();
             sourceMesh.position.isOutOfBounds = sourceMesh.plane_boundary.some(function(v) {
-                if (sourceMesh.geometry.type == 'Geometry') {
+                if (sourceMesh.geometry.type === 'Geometry') {
                     vector = sourceMesh.geometry.vertices[v].clone();
                 }
                 else{
@@ -1780,8 +1784,11 @@ define([
 
             reactSrc.setState({
                 hasOutOfBoundsObject: hasOutOfBoundsObject
+            }, () => {
+                d.resolve();
             });
         }
+        return d.promise();
     }
 
     function checkCollisionWithAny(src, callback) {
@@ -2077,7 +2084,8 @@ define([
     }
 
     function togglePreview() {
-        if (objects.length === 0) {
+        if (objects.length === 0 || allOutOfBound()) {
+            _closePreview();
             return;
         } else {
             previewMode ? _hidePreview() : _showPreview();
@@ -2545,7 +2553,6 @@ define([
             }
         }
         else {
-            _showWait(lang.print.drawingPreview, !showStopButton);
             if(!printPath || printPath.length === 0) {
                 slicingStatus.canInterrupt = false;
                 slicer.getPath().then(function(result) {
@@ -2580,13 +2587,10 @@ define([
     }
 
     function _closePreview() {
-        if(previewMode) {
-            previewMode = false;
-            reactSrc.setState({ previewMode: false }, () => {
-                togglePreview();
-                $('#preview').parents('label').find('input').prop('checked',false);
-            });
-        }
+        previewMode = false;
+        reactSrc.setState({ previewMode: false }, () => {
+            $('#preview').parents('label').find('input').prop('checked',false);
+        });
     }
 
     function _drawPath() {
@@ -2760,6 +2764,12 @@ define([
         }, 500);
 
         return d.promise();
+    }
+
+    function allOutOfBound() {
+        return !objects.some((o) => {
+            return !o.position.isOutOfBounds;
+        });
     }
 
     return {

@@ -129,7 +129,6 @@ testCases.push(new bootstrap.TestCase('dump point cloud').
             break;
         case 'progressing':
             dumpPointCloud = response.buffer;
-            console.log(dumpPointCloud.length);
             deferred.resolve(response);
             break;
         case 'fatal':
@@ -168,7 +167,6 @@ testCases.push(new bootstrap.TestCase('upload pcd file').
         conn.sendText(['upload test5', left].join(' '));
     }).
     onProgress(function(response, deferred, conn) {
-        console.log(response);
         // progress
         switch (response.status) {
         case 'continue':

@@ -1222,16 +1222,10 @@ define([
         },
 
         _processErrorCode: function(errorCode) {
-            console.log(errorCode);
-            var digit = 10,
-                pad,
-                message = '';
-
-            pad = function (num) { return (Array(digit).join('0') + num).slice(-digit) }
-
+            // map error code to binary, and use index to identify error
             if(Number(errorCode) === parseInt(errorCode, 10)) {
-                var m = pad(parseInt(errorCode).toString(2)).split('');
-                message = m.map((flag, index) => {
+                var m = parseInt(errorCode).toString(2).split('').reverse();
+                let message = m.map((flag, index) => {
                     return flag === '1' ? lang.head_module.error[index] : '';
                 });
                 return message.filter(entry => entry !== '').join('\n');
