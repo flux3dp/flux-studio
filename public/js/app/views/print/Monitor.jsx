@@ -896,7 +896,12 @@ define([
                     }
 
                     if(errorMessage === '') {
-                        errorMessage = lang.monitor[report.error.slice(0,2).join('_')];
+                        if(report.error.length >= 2) {
+                            errorMessage = lang.monitor[report.error.slice(0,2).join('_')];
+                        }
+                        else {
+                            errorMessage = report.error;
+                        }
                     }
                 }
                 else {
