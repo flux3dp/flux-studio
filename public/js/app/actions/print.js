@@ -653,7 +653,7 @@ define([
             slicingStatus.needToCloseWait = false;
         }
 
-        var progress = `${lang.slicer[report.status]} - ${'\n' + parseInt(report.percentage * 100)}% - ${report.message}`,
+        var progress = `${lang.slicer[report.slice_status]} - ${'\n' + parseInt(report.percentage * 100)}% - ${report.message}`,
             complete = lang.print.finishingUp,
             show = slicingStatus.showProgress,
             monitorOn = $('.flux-monitor').length > 0;
