@@ -91,10 +91,15 @@ exports.TestCase = function(describe, timeout) {
         });
 
         conn.off('text').on('text', function(data) {
+            data = data.replace(/NaN/g, 'null');
             var json = JSON.parse(data);
 
             if ('number' === typeof json.length) {
                 length = json.length;
+            }
+
+            if ('number' === typeof json.left && 'number' === typeof json.right) {
+                length = (json.left + json.right) * 24;
             }
 
             deferred.notify(json);
@@ -113,10 +118,6 @@ exports.TestCase = function(describe, timeout) {
             });
 
             inStream.on('end', function () {
-                if (buffer.length === length) {
-                    status = 'ok';
-                }
-
                 deferred.notify({ status: status, buffer: buffer });
             });
         });

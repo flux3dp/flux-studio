@@ -633,6 +633,7 @@ define([
                                     this._processReport(report);
                                 }.bind(this));
                                 this._addHistory();
+                                this._startReport();
                             });
                             this.forceUpdate();
                         }.bind(this));
@@ -713,6 +714,7 @@ define([
         },
 
         _handleToggleCamera: function() {
+            filePreview = false;
             if(this.state.mode === mode.CAMERA) {
                 DeviceMaster.stopStreamCamera();
                 this._handleBack();
@@ -1220,16 +1222,10 @@ define([
         },
 
         _processErrorCode: function(errorCode) {
-            console.log(errorCode);
-            var digit = 10,
-                pad,
-                message = '';
-
-            pad = function (num) { return (Array(digit).join('0') + num).slice(-digit) }
-
+            // map error code to binary, and use index to identify error
             if(Number(errorCode) === parseInt(errorCode, 10)) {
-                var m = pad(parseInt(errorCode).toString(2)).split('');
-                message = m.map((flag, index) => {
+                var m = parseInt(errorCode).toString(2).split('').reverse();
+                let message = m.map((flag, index) => {
                     return flag === '1' ? lang.head_module.error[index] : '';
                 });
                 return message.filter(entry => entry !== '').join('\n');
@@ -1398,19 +1394,22 @@ define([
 
             // CAMERA mode
             if(this.state.mode === mode.CAMERA) {
-                if(openSource === 'PRINT') {
-                    middleButtonOn = true;
-                    leftButtonOn = true;
+                if(statusId === DeviceConstants.status.MAINTAIN || taskInfo === '') {
+                    middleButtonOn = false;
                 }
                 else {
-                    if(
-                        statusId === DeviceConstants.status.IDLE ||
-                        statusId === DeviceConstants.status.COMPLETED ||
-                        statusId === DeviceConstants.status.ABORTED
-                    ) {
-                        leftButtonOn = false;
-                        middleButtonOn = false;
-                    }
+                    middleButtonOn = true;
+                }
+
+                if(
+                    statusId === DeviceConstants.status.IDLE ||
+                    statusId === DeviceConstants.status.COMPLETED ||
+                    statusId === DeviceConstants.status.ABORTED
+                ) {
+                    leftButtonOn = false;
+                }
+                else {
+                    leftButtonOn = true;
                 }
             }
 
@@ -1439,7 +1438,9 @@ define([
                 }
 
                 if(statusId === DeviceConstants.status.MAINTAIN ||
-                    statusId === DeviceConstants.status.SCAN ) {
+                    statusId === DeviceConstants.status.SCAN ||
+                    taskInfo === ''
+                 ) {
                     middleButtonOn = false;
                 }
             }
@@ -1458,7 +1459,7 @@ define([
 
                 if(statusId === DeviceConstants.status.MAINTAIN ||
                    statusId === DeviceConstants.status.SCAN ||
-                   statusId === DeviceConstants.status.ABORTED
+                   this._isAbortedOrCompleted()
                 ) {
                     middleButtonOn = false;
                 }
@@ -1507,13 +1508,13 @@ define([
                                 this.state.mode === mode.PREVIEW ||
                                 !!_duration
                             ) && (
-                                statusId !== DeviceConstants.status.SCAN &&
-                                statusId !== DeviceConstants.status.MAINTAIN &&
-                                statusId !== DeviceConstants.status.SCAN
+                                // statusId !== DeviceConstants.status.SCAN &&
+                                taskInfo !== ''
+                                // statusId !== DeviceConstants.status.MAINTAIN
                             )
                     },
                     {
-                        'hide': this.state.mode === 'CAMERA' || this._isAbortedOrCompleted()
+                        'hide': (this.state.mode === 'CAMERA' || this._isAbortedOrCompleted()) && !filePreview
                     }
                 );
 

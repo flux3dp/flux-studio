@@ -83,6 +83,7 @@ define(function() {
                 label: 'Devices',
                 new: 'Add a New Device',
                 device_monitor: 'Dashboard',
+                device_info: 'Device Info',
                 change_filament: 'Change Printing Material',
                 default_device: 'Set as Default',
                 check_firmware_update: 'Update Firmware',
@@ -101,6 +102,7 @@ define(function() {
                 contact: 'Contact Us',
                 troubleshooting: 'Troubleshooting',
                 tutorial: 'Start Printing Tutorial',
+                software_update: 'Software Update',
                 debug: 'Bug Report',
                 forum: 'Community Forum'
             }
@@ -744,6 +746,7 @@ define(function() {
                 caption: 'Calibration Done',
                 message: 'You are able to scan now'
             },
+            cant_undo: 'Unable to undo',
             estimating: 'Estimating the time...',
             calibrate_fail: 'Calibration Failed',
             calibration_is_running: 'Calibrating for Scanning',
@@ -881,7 +884,11 @@ define(function() {
             finishing: 'Finishing',
             initiating: 'Initiating',
             unknown: 'Unknown',
-            pausedFromError: 'paused from error'
+            pausedFromError: 'paused from error',
+            IP: 'IP',
+            serial_number: 'Serial Number',
+            firmware_version: 'Firmware Version',
+            UUID: 'UUID'
         },
         monitor: {
             change_filament                     : 'CHANGE FILAMENT',
@@ -896,33 +903,34 @@ define(function() {
             record                              : 'Record',
             camera                              : 'Camera',
             connecting                          : 'Connecting, please wait...',
-            HEAD_OFFLINE                        : '#110 Toolhead not detected\nPlease re-attach the toolhead cable <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/218183157">More Info</a>',
-            HEAD_ERROR_CALIBRATING              : '#112 Unable to calibrate toolhead\nplease re-attach the toolhead',
+            HEAD_OFFLINE                        : '#110 Toolhead not detected\nMake sure the toolhead cable is attached correctly <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/218183157">More Info</a>',
+            HEAD_ERROR_CALIBRATING              : '#112 Unable to calibrate toolhead\'s internal gyro\nPlease re-attach the toolhead',
             HEAD_ERROR_FAN_FAILURE              : '#113 Cooling fan failed\nKindly spin the fan with a pencil or thin stick. <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/217732178">More Info</a>',
-            HEAD_ERROR_HEAD_OFFLINE             : '#110 Toolhead not detected\nPlease re-attach the toolhead cable <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/218183157">More Info</a>',
+            HEAD_ERROR_HEAD_OFFLINE             : '#110 Toolhead not detected\nMake sure the toolhead cable is attached correctly <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/218183157">More Info</a>',
             HEAD_ERROR_TYPE_ERROR               : '#111 Toolhead incorrect \nPlease attach the correct toolhead',
             HEAD_ERROR_INTLK_TRIG               : '#116 Engraving toolhead tilt detected \nPlease ensure the rods are connected correctly. <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/217085937">More Info</a>',
+            HEAD_ERROR_RESET                    : '#114 Toolhead bad connection\nMake sure the toolhead is connected correctly, kindly contact support if this error pops out twice in one print <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/218183167">More Info</a>',
+            HEAD_ERROR_TILT                     : '#162 Toolhead tilt detected\nPlease check ball joint rod is attached correctly',
+            HEAD_ERROR_SHAKE                    : '#162 Toolhead tilt detected\nPlease check ball joint rod is attached correctly',
+            HEAD_ERROR_HARDWARE_FAILURE         : '#164 Toolhead abnormal temperature detected\nPlease contact FLUX Support <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/218415378">More Info</a>',
             'HEAD_ERROR_?'                      : '#199 Toolhead error \nCheck if the toolhead is abnormal',
             HARDWARE_ERROR_FILAMENT_RUNOUT      : '#121 Filament not detected \nPlease insert new material <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/218931757">More Info</a>',
             HARDWARE_ERROR_0                    : '#121 Filament not detected \nPlease insert new material <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/218931757">More Info</a>',
             HARDWARE_ERROR_PLATE_MISSING        : '#122 Unable to detect the base plate\nPlease put on the plate.',
             HARDWARE_ERROR_ZPROBE_ERROR         : '#123 Unable to calibrate the base plate\nPlease remove potential obstacles (left-over on the nozzle or the plate ) <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/218931767">More Info</a>',
-            HEAD_ERROR_RESET                    : '#114 Toolhead bad connection \nPlease re-attach the toolhead, and ensure the toolhead is connected correctly <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/218183167">More Info</a>',
             HARDWARE_ERROR_CONVERGENCE_FAILED   : '#123 Unable to calibrate the base plate\nPlease remove potential obstacles (left-over on the nozzle or the plate ) <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/218931767">More Info</a>',
-            HARDWARE_ERROR_HOME_FAILED          : '#124 Unable to calibrate origin\nPlease remove the obstacle, and reattach the toolhead',
-            HEAD_ERROR_TILT                     : '#162 Toolhead tilt detected\nPlease check ball joint rod is attached correctly',
-            HEAD_ERROR_SHAKE                    : '#162 Toolhead tilt detected\nPlease check ball joint rod is attached correctly',
-            HEAD_ERROR_TYPE_ERROR               : 'Incorrect head module, please use the correct head',
+            HARDWARE_ERROR_HOME_FAILED          : '#124 Unable to calibrate origin (home)\nPlease remove obstacles on rails, and make sure toolhead cables are not caught by carriages.',
+            HARDWARE_ERROR_MAINBOARD_ERROR      : '#401 Critical Error: Mainboard offline. Please contact FLUX Support.',
+            HARDWARE_ERROR_SUBSYSTEM_ERROR      : '#402 Critical Error: Subsystem no response. Please contact FLUX Support.',
             WRONG_HEAD                          : 'Device head is unknown, please connect to a correct toolhead',
             USER_OPERATION                      : 'Machine is being operated by (other) user',
             RESOURCE_BUSY                       : 'Device is busy\nIf the device is not running, please restart the device',
             DEVICE_ERROR                        : 'Something went wrong\nPlease restart the device',
             NO_RESPONSE                         : 'Something went wrong\nPlease restart the device',
-            SUBSYSTEM_ERROR                     : 'Something went wrong\nPlease restart the device',
+            SUBSYSTEM_ERROR                     : '#402 Critical Error: Subsystem no response. Please contact FLUX Support.',
             HARDWARE_FAILURE                    : 'Something went wrong\nPlease restart the device',
             MAINBOARD_OFFLINE                   : 'Something went wrong\nPlease restart the device',
-            HEAD_ERROR_HARDWARE_FAILURE         : '#164 Toolhead abnormal temperature detected\nPlease contact FLUX Support <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/218415378">More Info</a>',
-            G28_FAILED                          : '#124 Unable to calibrate origin\nPlease remove the obstacle <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/218931807">More Info</a>',
+            G28_FAILED                          : '#124 Unable to calibrate origin (home)\nPlease remove obstacles on rails, and make sure toolhead cables are not caught by carriages.',
             FILAMENT_RUNOUT_0                   : '#121 Ran out of filament\nPlease insert new material <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/218931757">More Info</a>',
             processing                          : 'Processing',
             savingPreview                       : 'Generating thumbnails',
@@ -944,14 +952,15 @@ define(function() {
             task: {
                 EXTRUDER                        : 'Printing Task',
                 LASER                           : 'Engraving Task',
-                DRAW                            : 'Drawing Task'
+                DRAW                            : 'Drawing Task',
+                'N/A'                           : 'Drawing Task'
             },
             device: {
                 EXTRUDER                        : 'Printing Toolhead',
                 LASER                           : 'Engraving Toolhead',
                 DRAW                            : 'Drawing Toolhead'
             },
-            cant_get_toolhead_version           : 'Unable to get latest version infomation'
+            cant_get_toolhead_version           : 'Unable to get toolhead information'
         },
         alert: {
             caption: 'Error',
@@ -1030,7 +1039,9 @@ define(function() {
                 message: 'Important Delta firmware update is available. Do you want to update now?',
             },
             unsupport_osx_version: 'Unsupported Mac OS X Version Detected',
-            need_password: 'Need Password to connect to FLUX Delta'
+            need_password: 'Need Password to connect to FLUX Delta',
+            new_app_downloading: 'Downloading',
+            ask_for_upgrade: 'Do you wanna upgrade NOW?'
         },
         machine_status: {
             '-10': 'Raw mode',
@@ -1058,16 +1069,16 @@ define(function() {
             UNKNOWN: '',
             error: {
                 'missing': 'Error information is missing',
-                '0': 'Heater failure',
-                '1': 'Laser failure',
-                '2': 'Fan failure',
-                '3': 'Hwardware error',
-                '4': 'Head tilted',
-                '5': 'Excessive head shake detected',
-                '6': 'Calibration sensor failure',
-                '7': 'No hello',
-                '8': 'Sensor communication failure',
-                '9': 'Unknown module'
+                '0': 'Unknown module',
+                '1': 'Sensor communication failure',
+                '2': 'No hello', // pi will send head_error_reset before this is issued
+                '3': '#112 Unable to calibrate toolhead\'s internal gyro\nPlease re-attach the toolhead',
+                '4': '#162 Toolhead tilt detected\nPlease check ball joint rod is attached correctly',
+                '5': '#162 Toolhead tilt detected\nPlease check ball joint rod is attached correctly',
+                '6': '#119 Printer toolhead is unable to control temperature. Please contact FLUX Support.',
+                '7': '#113 Cooling fan failed\nKindly spin the fan with a pencil or thin stick. <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/217732178">More Info</a>',
+                '8': '#116 Engraving toolhead tilt detected \nPlease ensure the rods are connected correctly. <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/217085937">More Info</a>',
+                '9': '#118 Printer toolhead is unable to heat. Please contact FLUX Support.'
             }
         },
         change_filament: {

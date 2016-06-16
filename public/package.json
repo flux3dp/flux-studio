@@ -12,12 +12,13 @@
         "width": 1280,
         "height": 640,
         "min_width": 1000,
-        "min_height": 600,
-        "js-flags": "--max-old-space-size 1000"
+        "min_height": 600
     },
     "nodejs": true,
     "chromium-args": "--mixed-context --enable-webgl --ignore-gpu-blacklist",
     "webkit": {
         "plugin": true
-    }
+    },
+    "manifestUrl": "http://software.flux3dp.com/check-update/?os=osx-x64&format=autoupdate",
+    "js-flags": "--max-old-space-size 2048"
 }

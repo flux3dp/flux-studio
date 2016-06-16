@@ -34,6 +34,7 @@
         // set global definition
         window.FLUX = {
             debug: -1 !== location.search.indexOf('debug'),
+            version: "{Version}",
             timestamp: (new Date()).getTime(),
             onLine: navigator.onLine,
             os: ('undefined' === typeof requireNode ? undefined : os),

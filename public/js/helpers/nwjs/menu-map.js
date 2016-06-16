@@ -288,6 +288,13 @@ define([
                 },
                 separator,
                 {
+                    label: lang.help.software_update,
+                    enabled: true,
+                    onClick: function() {
+
+                    }
+                },
+                {
                     label: lang.help.debug,
                     enabled: true,
                     onClick: function() {

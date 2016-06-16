@@ -50,6 +50,7 @@ define([
         args = args || {};
 
         var self = this,    // react component
+            IMAGE_REAL_RATIO = 4.72, // 1mm = 4.72px
             DIAMETER = 170,    // 170mm
             ACCEPTABLE_MIN_SIZE = 1, // width * height > 1
             bitmapWebSocket,
@@ -215,7 +216,6 @@ define([
                 return round(mm, -2);
             },
             convertToHtmlCoordinate = function(n, axis) {
-
                 var ratio = PLATFORM_DIAMETER_PIXEL / DIAMETER, // 1(px) : N(mm)
                     r = DIAMETER / 2,
                     freetrans = $target_image.data('freetrans'),
@@ -297,8 +297,8 @@ define([
                         y: convertToRealCoordinate(el_position.center.y, 'y')
                     };
                     size = {
-                        width: round($el.width() * data.scalex / PLATFORM_DIAMETER_PIXEL * DIAMETER, -2),
-                        height: round($el.height() * data.scaley / PLATFORM_DIAMETER_PIXEL * DIAMETER, -2)
+                        width: round(el_position.width / IMAGE_REAL_RATIO, -2),
+                        height: round(el_position.height / IMAGE_REAL_RATIO, -2)
                     };
                     angle = elementAngle($el[0]);
                     threshold = $el.data('threshold') || 128;
@@ -425,6 +425,8 @@ define([
 
                 doLaser(settings);
             };
+
+        setInterval(resetPosition, 100);
 
         shortcuts.on(
             ['del'],
@@ -802,16 +804,16 @@ define([
                     args[type] = val;
                     break;
                 case 'width':
-                    val = round(val / DIAMETER * PLATFORM_DIAMETER_PIXEL, -2);
-                    args.scalex = round(val / freetrans.originalSize.width, -2);
-                    val = round(params.size.height / DIAMETER * PLATFORM_DIAMETER_PIXEL, -2);
-                    args.scaley = round(val / freetrans.originalSize.height, -2);
+                    val = round(val * IMAGE_REAL_RATIO, -2);
+                    args.scalex = val / freetrans.originalSize.width;
+                    val = round(params.size.height * IMAGE_REAL_RATIO, -2);
+                    args.scaley = val / freetrans.originalSize.height;
                     break;
                 case 'height':
-                    val = round(val / DIAMETER * PLATFORM_DIAMETER_PIXEL, -2);
-                    args.scaley = round(val / freetrans.originalSize.height, -2);
-                    val = round(params.size.width / DIAMETER * PLATFORM_DIAMETER_PIXEL, -2);
-                    args.scalex = round(val / freetrans.originalSize.width, -2);
+                    val = round(val * IMAGE_REAL_RATIO, -2);
+                    args.scaley = val / freetrans.originalSize.height;
+                    val = round(params.size.width * IMAGE_REAL_RATIO, -2);
+                    args.scalex = val / freetrans.originalSize.width;
                     break;
                 case 'angle':
                     args.angle = val;

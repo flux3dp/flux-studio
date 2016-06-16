@@ -32,18 +32,13 @@ define([
 
                 },
 
-                _updateSlicingEnginePath: function(e) {
-                    config().write('slicing-engine-path', e.target.value);
-                },
-
                 _switchNotification: function(e) {
                     config().write('notification', e.currentTarget.value);
                 },
 
                 render : function() {
                     var lang = args.state.lang,
-                        pokeIP = config().read('poke-ip-addr'),
-                        enginePath = config().read('slicing-engine-path');
+                        pokeIP = config().read('poke-ip-addr');
 
                     return (
                         <div className="form general">
@@ -86,20 +81,6 @@ define([
 
                                 <div className="span8 font3">
                                     <input type="text" autoComplete="false" defaultValue={pokeIP} onBlur={this._checkIPFormat}/>
-                                </div>
-
-                            </div>
-
-                            <div className="row-fluid">
-
-                                <div className="span3 no-left-margin">
-                                    <label className="font2">
-                                        {lang.settings.cura_engine_path}
-                                    </label>
-                                </div>
-
-                                <div className="span8 font3">
-                                    <input type="text" autoComplete="false" defaultValue={enginePath} onBlur={this._updateSlicingEnginePath}/>
                                 </div>
 
                             </div>

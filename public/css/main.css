@@ -3306,7 +3306,6 @@ input[type=range]:focus::-webkit-slider-runnable-track {
             content: "";
             display: block;
             height: 100%;
-            transition: width .3s ease;
             width: 0; }
     .modal-progress.waiting .modal-alert {
         padding-bottom: 1.6em; }
@@ -3409,6 +3408,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         justify-content: space-between; }
     .modal-update .btn-h-group {
         display: block;
+        flex: 1;
         text-align: right; }
 
 .modal-change-filament .guide-image {
@@ -4000,7 +4000,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
                         font-size: 1.2em;
                         color: #FFF; }
                 .flux-monitor .main .body .device-content .status-info.running {
-                    background-color: rgba(0, 0, 0, 0.5); }
+                    background-color: rgba(0, 0, 0, 0.7); }
             .flux-monitor .main .body .close {
                 right: 20px; }
         .flux-monitor .main .operation {
