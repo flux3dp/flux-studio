@@ -65,21 +65,12 @@ define([
                         name,
                         point_cloud.left.size / 24,
                         point_cloud.right.size / 24 || 0
-                    ],
-                    chunks = [];
-
-                // split up to pieces
-                splitBinary(point_cloud.total, function(result) {
-                    chunks.push(result);
-                });
+                    ];
 
                 events.onMessage = function(data) {
                     switch (data.status) {
                     case 'continue':
-                        // split up to pieces
-                        chunks.forEach(function(chunk) {
-                            ws.send(chunk);
-                        });
+                        ws.send(point_cloud.total);
 
                         break;
                     case 'ok':
