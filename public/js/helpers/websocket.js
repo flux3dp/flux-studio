@@ -5,7 +5,8 @@ define([
     'app/stores/alert-store',
     'app/actions/progress-actions',
     'helpers/output-error',
-    'helpers/logger'
+    'helpers/logger',
+    'helpers/blob-segments'
 ], function(
     isJson,
     i18n,
@@ -13,7 +14,8 @@ define([
     AlertStore,
     ProgressActions,
     outputError,
-    Logger
+    Logger,
+    blobSegments
 ) {
     'use strict';
 
@@ -175,6 +177,18 @@ define([
 
                 return _ws;
             },
+            sender = function(data) {
+                wsLog.log.push(trimMessage(['>', data, typeof data].join(' ')));
+
+                if (true === data instanceof Blob) {
+                    blobSegments(data, function(chunk) {
+                        ws.send(chunk);
+                    });
+                }
+                else {
+                    ws.send(data);
+                }
+            },
             ws = null,
             readyState = {
                 CONNECTING : 0,
@@ -211,14 +225,12 @@ define([
 
                     if (null === ws || readyState.OPEN !== ws.readyState) {
                         ws.onopen = function(e) {
-                            wsLog.log.push(trimMessage(['>', data, typeof data].join(' ')));
                             socketOptions.onOpen(e);
                             ws.send(data);
                         };
                     }
                     else {
-                        wsLog.log.push(trimMessage(['>', data, typeof data].join(' ')));
-                        ws.send(data);
+                        sender(data);
                     }
 
                     return this;
