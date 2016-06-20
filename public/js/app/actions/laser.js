@@ -140,6 +140,7 @@ define([
                 uploadFCode();
             },
             ExportGCodeProgressing = function(data) {
+                ProgressActions.open(ProgressConstants.STEPPING);
                 ProgressActions.updating(data.message, data.percentage * 100);
             },
             sendToBitmapAPI = function(args, settings, callback, fileMode) {
@@ -437,7 +438,7 @@ define([
             }
         );
 
-        function setupImage(file, size, originalUrl, name) {
+        function setupImage(file, size, originalUrl) {
             var img = new Image(),
                 $img = $(img).addClass(LASER_IMG_CLASS),
                 instantRefresh = function(e, data) {
@@ -447,7 +448,7 @@ define([
 
             $img.addClass(file.extension).
                 attr('src', file.url).
-                data('name', name).
+                data('name', file.uploadName).
                 data('base', originalUrl).
                 data('size', size).
                 data('sizeLock', true).
@@ -478,7 +479,7 @@ define([
                 }
 
                 // onmousedown
-                (function(file, size, originalUrl, name, $img) {
+                (function(file, size, originalUrl, $img) {
 
                     $ftControls.on('mousedown', function(e) {
                         var clone = function() {
@@ -488,7 +489,7 @@ define([
                                 size.height = size.height * data.scaley;
                                 size.angle = elementAngle($img[0]);
 
-                                setupImage(file, size, originalUrl, name);
+                                setupImage(file, size, originalUrl);
 
                                 self.setState({
                                     hasImage: true
@@ -517,7 +518,7 @@ define([
                         menuFactory.items.duplicate.enabled = true;
                         menuFactory.items.duplicate.onClick = clone;
                     });
-                })(file, size, originalUrl, name, $img);
+                })(file, size, originalUrl, $img);
             });
 
 
@@ -526,71 +527,23 @@ define([
             return $img;
         }
 
-        function handleUploadImage(file, parserSocket, isEnd, deferred) {
-            var name = 'image-' + (new Date()).getTime(),
-                opts = {},
-                onUploadFinished = function(data) {
-                    opts.onFinished = onGetFinished;
-                    parserSocket.get(name, opts);
+        function handleUploadImage(file) {
+            imageData(file.blob, {
+                width: file.imgSize.width,
+                height: file.imgSize.height,
+                type: file.type,
+                grayscale: {
+                    is_rgba: true,
+                    is_shading: self.refs.setupPanel.isShading(),
+                    threshold: 128,
+                    is_svg: ('svg' === self.state.fileFormat)
                 },
-                onGetFinished = function(data, size) {
-                    var url = window.URL,
-                        blob = new Blob([data], { type: file.type }),
-                        objectUrl = url.createObjectURL(blob),
-                        platformDiameter = $laser_platform.width(),
-                        ratio = 1;
+                onComplete: function(result) {
+                    file.url = result.canvas.toDataURL('svg' === file.extension ? 'image/svg+xml' : 'image/png');
 
-                    if (platformDiameter < Math.max(size.width , size.height)) {
-                        ratio = Math.min(360 / size.width, 360 / size.height);
-                        size.width = size.width * ratio;
-                        size.height = size.height * ratio;
-                    }
-
-                    if (ACCEPTABLE_MIN_SIZE < size.width * size.height) {
-                        file.error = [];
-
-                        imageData(blob, {
-                            width: size.width,
-                            height: size.height,
-                            type: file.type,
-                            grayscale: {
-                                is_rgba: true,
-                                is_shading: self.refs.setupPanel.isShading(),
-                                threshold: 128,
-                                is_svg: ('svg' === self.state.fileFormat)
-                            },
-                            onComplete: function(result) {
-                                ProgressActions.close();
-
-                                file.url = result.canvas.toDataURL('svg' === file.extension ? 'image/svg+xml' : 'image/png');
-
-                                $uploadDeferred.notify(file, isEnd);
-
-                                setupImage(file, size, objectUrl, name);
-                            }
-                        });
-                    }
-                    else {
-                        file.invaild = true;
-                        file.error = [lang.message.image_is_too_small];
-                        $uploadDeferred.notify(file, isEnd);
-                    }
-                };
-
-            file.invaild = false;
-            opts.onFinished = onUploadFinished;
-            opts.onError = function(file, warning_collection, isBroken) {
-                warning_collection.forEach(function(errorCode, i) {
-                    warning_collection[i] = lang.laser.svg_fail_messages[errorCode] || lang.laser.svg_fail_messages.SVG_BROKEN;
-                });
-
-                file.invaild = isBroken;
-                file.error = warning_collection;
-                $uploadDeferred.notify(file, isEnd);
-                ProgressActions.close();
-            };
-
-            parserSocket.upload(name, file, opts);
+                    setupImage(file, file.imgSize, file.url);
+                }
+            });
         }
 
         function inactiveAllImage($exclude) {
@@ -684,55 +637,7 @@ define([
                 var firstFile = e.target.files.item(0),
                     setupPanel = self.refs.setupPanel,
                     extension = self.refs.fileUploader.getFileExtension(firstFile.name),
-                    currentFileFormat = self.state.fileFormat,
-                    totalfiles = [],
-                    goodFiles = [];
-
-                $uploadDeferred = $.Deferred();
-
-                $uploadDeferred.progress(function(file, isEnd) {
-                    totalfiles.push(file);
-
-                    if (false === file.invaild) {
-                        goodFiles.push(file);
-                    }
-
-                    if (true === isEnd) {
-                        $uploadDeferred.resolve({
-                            total: totalfiles,
-                            good: goodFiles
-                        });
-                    }
-                }).always(function(files) {
-                    var badFiles = files.total.filter(function(file) {
-                            return 0 < file.error.length;
-                        }),
-                        messages = [];
-
-                    badFiles.forEach(function(file, i) {
-                        messages.push('[' + file.name + ']');
-                        messages = messages.concat(file.error);
-                    });
-
-                    if (0 < badFiles.length) {
-                        AlertActions.showPopupWarning('svg-parse-fail', messages.join('\n'));
-                    }
-                }).done(function(files) {
-                    var operationMode = ('svg' === self.state.fileFormat ? 'cut' : 'engrave'),
-                        hasImage = (0 < self.state.images.length + files.good.length);
-
-                    self.state.images = self.state.images.concat(files.good);
-
-                    menuFactory.items.execute.enabled = hasImage;
-                    menuFactory.items.saveTask.enabled = hasImage;
-
-                    self.setState({
-                        images: self.state.images,
-                        hasImage: hasImage,
-                        mode: operationMode,
-                        fileFormat: (0 < self.state.images.length ? currentFileFormat : undefined)
-                    });
-                });
+                    currentFileFormat = self.state.fileFormat;
 
                 ProgressActions.open(ProgressConstants.NONSTOP);
 
@@ -754,28 +659,87 @@ define([
                     bitmapWebSocket = bitmapWebSocket || bitmapLaserParser();
                 }
             },
-            onFileReading: function(file, isEnd, deferred) {
-                var name = 'image-' + (new Date()).getTime(),
-                    parserSocket;
+            onFileReadEnd: function(e, files) {
+                var parserSocket;
 
                 // go svg process
                 if ('svg' === self.state.fileFormat) {
-                    if ('svg' === file.extension) {
-                        parserSocket = svgWebSocket;
-                    }
-                    else {
-                        ProgressActions.close();
-                        AlertActions.showPopupError('svg-only', lang.laser.svg_only);
-                    }
+                    parserSocket = svgWebSocket;
                 }
                 // go bitmap process
                 else {
                     parserSocket = bitmapWebSocket;
                 }
 
-                if ('undefined' !== typeof parserSocket) {
-                    handleUploadImage(file, parserSocket, isEnd, deferred);
-                }
+                // rename
+                files.forEach(function(file) {
+                    file.uploadName = file.url.split('/').pop();
+                });
+
+                parserSocket.upload(files).always(function(response) {
+                    var url = window.URL,
+                        platformDiameter = $laser_platform.width(),
+                        ratio = 1,
+                        badFiles = [],
+                        messages = [];
+
+                    // handle bad files
+                    response.files.forEach((file, i) => {
+                        file.url = url.createObjectURL(file.blob, { type: file.type });
+                        file.imgSize = file.imgSize || { width: 0, height: 0 };
+
+                        if (platformDiameter < Math.max(file.imgSize.width , file.imgSize.height)) {
+                            ratio = Math.min(360 / file.imgSize.width, 360 / file.imgSize.height);
+                            file.imgSize.width = file.imgSize.width * ratio;
+                            file.imgSize.height = file.imgSize.height * ratio;
+                        }
+
+                        if ('good' === file.status &&
+                            ACCEPTABLE_MIN_SIZE > file.imgSize.width * file.imgSize.height
+                        ) {
+                            file.status = 'bad';
+                            file.messages.push(lang.message.image_is_too_small);
+                            file.isBroken = true;
+                        }
+
+                        if ('bad' === file.status) {
+                            messages.push('[' + file.name + ']');
+
+                            file.messages.forEach((errorCode, i) => {
+                                messages.push(lang.laser.svg_fail_messages[errorCode] || lang.laser.svg_fail_messages.SVG_BROKEN);
+                            });
+                        }
+                    });
+
+                    if (0 < messages.length) {
+                        AlertActions.showPopupWarning('svg-parse-fail', messages.join('\n'));
+                    }
+
+                    ProgressActions.close();
+                }).done(function(response) {
+                    var goodFiles = response.files.filter((file) => {
+                            return false === file.isBroken;
+                        }),
+                        currentFileFormat = self.state.fileFormat,
+                        operationMode = ('svg' === currentFileFormat ? 'cut' : 'engrave'),
+                        hasImage = (0 < self.state.images.length + goodFiles.length);
+
+                    self.state.images = self.state.images.concat(goodFiles);
+
+                    menuFactory.items.execute.enabled = hasImage;
+                    menuFactory.items.saveTask.enabled = hasImage;
+
+                    self.setState({
+                        images: self.state.images,
+                        hasImage: hasImage,
+                        mode: operationMode,
+                        fileFormat: (0 < self.state.images.length ? currentFileFormat : undefined)
+                    });
+
+                    goodFiles.forEach(function(file) {
+                        handleUploadImage(file);
+                    });
+                });
             },
             thresholdChanged: function(threshold) {
                 var $el = $('.image-active:eq(0)');
