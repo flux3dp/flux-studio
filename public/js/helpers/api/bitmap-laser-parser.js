@@ -42,23 +42,57 @@ define([
 
         return {
             connection: ws,
-            upload: function(name, file, opts) {
-                opts = opts || {};
-                History.push(name, file);
-                (opts.onFinished || function() {})(file);
-            },
-            get: function(name, opts) {
-                var file = History.findByName(name)[0];
+            upload: function(files) {
+                var self = this,
+                    $deferred = $.Deferred(),
+                    currIndex = 0,
+                    sendFile = function() {
+                        files.forEach((file, i) => {
+                            file.isBroken = false;
 
-                opts = opts || {};
-                opts.onFinished = opts.onFinished || function() {};
+                            self.get(file).done(function(response) {
+                                file.blob = response.blob;
+                                file.imgSize = response.size;
+                                $deferred.notify('next');
+                            });
+                        });
+                    };
 
-                imageData(file.data.blob, {
-                    type: file.type,
-                    onComplete: function(result) {
-                        opts.onFinished(file.data.blob, result.size);
+                $deferred.progress(function(action) {
+                    var file,
+                        hasBadFiles = false;
+
+                    if ('next' === action) {
+                        file = files[currIndex];
+
+                        if ('undefined' === typeof file) {
+                            $deferred.resolve({files: files, hasBadFiles: false });
+                        }
+                        else {
+                            sendFile(file);
+                            currIndex += 1;
+                        }
                     }
                 });
+
+                $deferred.notify('next');
+
+                return $deferred.promise();
+            },
+            get: function(file) {
+                var $deferred = $.Deferred();
+
+                imageData(file.blob, {
+                    type: file.type,
+                    onComplete: function(result) {
+                        $deferred.resolve({
+                            size: result.size,
+                            blob: file.blob
+                        });
+                    }
+                });
+
+                return $deferred.promise();
             },
             /**
              * compute bitmap
