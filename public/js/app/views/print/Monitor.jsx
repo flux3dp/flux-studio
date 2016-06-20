@@ -293,7 +293,7 @@ define([
             this._addHistory();
 
             socketStatus.ready = false;
-            DeviceMaster.getReport().then(function(report) {
+            DeviceMaster.getReport().then((report) => {
                 socketStatus.ready = true;
                 this._processReport(report);
                 if(this.state.mode === mode.BROWSE_FILE) {
@@ -301,29 +301,30 @@ define([
                     this._refreshDirectory();
                 }
                 return this._checkUSBFolderExistance();
-            }.bind(this)).then(function(exist) {
+            }).then((exist) => {
                 usbExist = exist;
 
-                var t = setInterval(function() {
+                var t = setInterval(() => {
                     if(socketStatus.ready) {
                         clearInterval(t);
                         if(openSource === GlobalConstants.DEVICE_LIST) {
                             socketStatus.ready = false;
-                            DeviceMaster.getPreviewInfo().then(function(info) {
+                            DeviceMaster.getPreviewInfo().then((info) => {
                                 if(this.state.mode !== mode.BROWSE_FILE) {
                                     this._startReport();
                                 }
                                 socketStatus.ready = true;
                                 this._processInfo(info);
-                            }.bind(this));
+                            });
                         }
                         else {
                             totalTimeInSeconds = parseInt(this.props.slicingStatus.time || this.props.slicingStatus.metadata.TIME_COST);
+                            this.forceUpdate();
                             this._startReport();
                         }
                     }
-                }.bind(this), 200);
-            }.bind(this));
+                }, 200);
+            });
 
             // listening to key
             shortcuts.on(['DEL'], function(e) {
@@ -1529,7 +1530,12 @@ define([
             }
 
             if(statusId === DeviceConstants.status.IDLE || this._isAbortedOrCompleted()) {
-                if(openSource !== GlobalConstants.PRINT && filePreview !== true) {
+                if(
+                    openSource !== GlobalConstants.PRINT &&
+                    openSource !== GlobalConstants.LASER &&
+                    openSource !== GlobalConstants.DRAW &&
+                    filePreview !== true
+                ) {
                     taskInfo = '';
                     _duration = '';
                     _progress = '';
