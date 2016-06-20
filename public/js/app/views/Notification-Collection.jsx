@@ -333,7 +333,7 @@ define([
                         onFinished: payload.onFinished || self.state.progress.onFinished || function() {}
                     }
                 }, function() {
-                    if(typeof payload.onOpened === 'function') {
+                    if (typeof payload.onOpened === 'function') {
                         payload.onOpened();
                     }
                 });
