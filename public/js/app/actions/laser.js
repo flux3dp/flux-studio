@@ -148,9 +148,7 @@ define([
 
                 var laserParser = bitmapWebSocket,
                     onSetParamsFinished = function() {
-                        laserParser.compute(args, {
-                            onFinished: onUploadFinish
-                        });
+                        laserParser.compute(args).done(onUploadFinish);
                     },
                     onUploadFinish = function() {
                         laserParser.getTaskCode({
@@ -174,9 +172,7 @@ define([
 
                 var laserParser = svgWebSocket,
                     onSetParamsFinished = function() {
-                        laserParser.compute(args, {
-                            onFinished: onComputeFinished
-                        });
+                        laserParser.compute(args).done(onComputeFinished);
                     },
                     onComputeFinished = function() {
                         var names = [],

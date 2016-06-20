@@ -222,24 +222,29 @@ define([
              *      {Float} rotate        - rotate
              *      {Int}   threshold     - threshold (0~255)
              *      {Array} image_data    - grayscale image data
-             * @param {Json} opts - options
-             *      {Function}   onFinished - fire on upload finish
+             * @return {Promise}
              */
-            compute: function(args, opts) {
-                opts = opts || {};
-                opts.onFinished = opts.onFinished || function() {};
+            compute: function(args) {
+                var $deferred = $.Deferred(),
+                    requests = [],
+                    requestHeader,
+                    nextData,
+                    currIndex = 0,
+                    sendData = (nextData) => {
+                        ws.send(nextData);
+                        currIndex += 1;
 
-                var requests_serial = [],
-                    fileReader,
-                    all_ok = false,
-                    request_header,
-                    next_data,
-                    timer;
+                        nextData = requests[currIndex];
+
+                        if (true === nextData instanceof Uint8Array) {
+                            sendData(nextData);
+                        }
+                    };
 
                 lastOrder = 'compute';
 
                 args.forEach(function(obj) {
-                    request_header = [
+                    requestHeader = [
                         lastOrder,
                         obj.name,
                         obj.real_width,
@@ -254,31 +259,16 @@ define([
                         parseInt(obj.height, 10)
                     ];
 
-                    requests_serial.push(request_header.join(' '));
-                    requests_serial.push({
-                        svg: obj.svg_data.blob,
-                        thumbnail: convertToTypedArray(obj.image_data, Uint8Array)
-                    });
+                    requests.push(requestHeader.join(' '));
+                    requests.push(obj.svg_data.blob);
+                    requests.push(convertToTypedArray(obj.image_data, Uint8Array));
                 });
-
-                requests_serial.reverse();
-
-                next_data = requests_serial.pop();
 
                 events.onMessage = function(data) {
                     switch (data.status) {
                     case 'continue':
-                        // ready to sending binary
-                        next_data = requests_serial.pop();
-                        break;
                     case 'ok':
-                        // ready to sending next svg set
-                        if (true === all_ok) {
-                            opts.onFinished();
-                        }
-                        else {
-                            next_data = requests_serial.pop();
-                        }
+                        $deferred.notify('next');
                         break;
                     default:
                         // TODO: do something?
@@ -286,36 +276,20 @@ define([
                     }
                 };
 
-                timer = setInterval(function() {
-                    if ('undefined' !== typeof next_data) {
+                $deferred.progress((action) => {
+                    nextData = requests[currIndex];
 
-                        if ('object' === typeof next_data) {
-                            fileReader = new FileReader();
-
-                            fileReader.onload = function() {
-                                // send svg
-                                ws.send(this.result);
-                                // send thumbnail
-                                ws.send(next_data.thumbnail);
-
-                                fileReader.onload = null;
-
-                                next_data = undefined;
-                            };
-
-                            fileReader.readAsArrayBuffer(next_data.svg);
-                        }
-                        else {
-                            ws.send(next_data);
-                            next_data = undefined;
-                        }
+                    if ('next' === action && 'undefined' !== typeof nextData) {
+                        sendData(nextData);
                     }
-
-                    if (0 === requests_serial.length) {
-                        all_ok = true;
-                        clearInterval(timer);
+                    else {
+                        $deferred.resolve();
                     }
-                }, 0);
+                });
+
+                $deferred.notify('next');
+
+                return $deferred.promise();
             },
             getTaskCode: function(names, opts) {
                 opts = opts || {};
