@@ -3,18 +3,24 @@
  * Ref: https://github.com/flux3dp/fluxghost/wiki/websocket-svg-laser-parser
  */
 define([
+    'jquery',
     'helpers/websocket',
     'helpers/convertToTypedArray',
     'helpers/data-history',
     'helpers/api/set-params',
-    'app/actions/alert-actions',
-    'lib/rx.lite.min'
-], function(Websocket, convertToTypedArray, history, setParams, AlertActions, Rx) {
+    'app/actions/alert-actions'
+], function(
+    $,
+    Websocket,
+    convertToTypedArray,
+    history,
+    setParams,
+    AlertActions
+) {
     'use strict';
 
     // Because the preview image size is 640x640
-    var MAXWIDTH = 640,
-        uploadQueueUpdateStream = new Rx.Subject();
+    var MAXWIDTH = 640;
 
     return function(opts) {
         opts = opts || {};
@@ -44,91 +50,6 @@ define([
             events = {
                 onMessage: function() {}
             },
-            get = function(name, opts) {
-                opts = opts || {};
-                opts.onFinished = opts.onFinished || function() {};
-
-                lastOrder = 'get';
-
-                var args = [
-                        lastOrder,
-                        name
-                    ],
-                    blobs = [],
-                    blob,
-                    url = window.URL,
-                    total_length = 0,
-                    size = {
-                        height: 0,
-                        width: 0
-                    };
-
-                events.onMessage = function(data) {
-
-                    if ('continue' === data.status) {
-                        total_length = data.length;
-                        size.height = data.height;
-                        size.width = data.width;
-                    }
-                    else if (true === data instanceof Blob) {
-                        blobs.push(data);
-                        blob = new Blob(blobs);
-
-                        if (total_length === blob.size) {
-                            History.push(name, { size: size, blob: blob });
-                            opts.onFinished(blob, size);
-                        }
-                    }
-
-                };
-
-                ws.send(args.join(' '));
-            },
-            upload = function(name, file, opts) {
-                var self = this,
-                    order_name = 'upload',
-                    args = [
-                        order_name,
-                        name,
-                        file.size
-                    ],
-                    warning_collection = [],
-                    showMessages = function(isBroken) {
-                        if (0 < warning_collection.length) {
-                            opts.onError(file, warning_collection, isBroken);
-                            warning_collection = [];
-                        }
-                    };
-
-                opts.onFinished = opts.onFinished || function() {};
-                opts.onError = opts.onError || function() {};
-
-                events.onMessage = function(data) {
-
-                    switch (data.status) {
-                    case 'continue':
-                        ws.send(file.data);
-                        break;
-                    case 'ok':
-                        get(name, opts);
-
-                        showMessages(false);
-                        break;
-                    case 'warning':
-                        warning_collection.push(data.message);
-
-                        break;
-                    }
-
-                };
-
-                events.onError = function(data) {
-                    warning_collection.push(data.error);
-                    showMessages(true);
-                };
-
-                ws.send(args.join(' '));
-            },
             History = history(),
             goNextUpload = true,
             uploadQueue = [],
@@ -148,73 +69,145 @@ define([
                 };
             };
 
-        uploadQueueUpdateStream.subscribe((q) => {
-            var timer;
-
-            timer = setInterval((function(task) {
-
-                return function() {
-
-                    if (true === goNextUpload) {
-                        var onFinished = function(blob, size) {
-                                task.opts.onFinished(blob, size);
-                                goNextUpload = true;
-                                clearInterval(timer);
-                            },
-                            onError = function(file, data, isBroken) {
-                                task.opts.onError(file, data, isBroken);
-                                goNextUpload = true;
-                                clearInterval(timer);
-                            };
-
-                        goNextUpload = false;
-
-                        upload(task.name, task.file, {
-                            onFinished: onFinished,
-                            onError: onError
-                        });
-                    }
-
-                };
-            })(q), 0);
-        });
-
         return {
             connection: ws,
             History: History,
             /**
              * upload svg
              *
-             * @param {String} name - name
-             * @param {Json}   file - the file data that convert by File-Uploader
-             * @param {Json}   opts - options
-             *      {Function}   onFinished - fire on upload finish
-             *      {Function}   onError    - fire on parsing fail
+             * @param {ArrayObject} files - the file data that convert by File-Uploader
+             *
+             * @return {Promise}
              */
-            upload: function(name, file, opts) {
-                opts = opts || {};
-                opts.onFinished = opts.onFinished || function() {};
-                opts.onError = opts.onError || function() {};
+            upload: function(files) {
+                var self = this,
+                    $deferred = $.Deferred(),
+                    length = files.length,
+                    currIndex = 0,
+                    order_name = 'upload',
+                    setMessages = function(file, isBroken, warningCollection) {
+                        file.status = (0 < warningCollection.length ? 'bad' : 'good');
+                        file.messages = warningCollection;
+                        file.isBroken = isBroken;
 
-                // NOTICE: it's very tricky for modified this array.
-                // it will fire observe function then get what you changed (and where you changed)
-                // uploadQueue.push({ name: name, file: file, opts: opts });
-                uploadQueueUpdateStream.onNext({ name: name, file: file, opts: opts });
+                        return file;
+                    },
+                    sendFile = function(file, isEnd) {
+                        var warningCollection = [];
+
+                        events.onMessage = function(data) {
+
+                            switch (data.status) {
+                            case 'continue':
+                                ws.send(file.data);
+                                break;
+                            case 'ok':
+                                self.get(file).done(function(response) {
+                                    file.blob = response.blob;
+                                    file.imgSize = response.size;
+
+                                    file = setMessages(file, false, warningCollection);
+                                    $deferred.notify('next');
+                                });
+                                break;
+                            case 'warning':
+                                warningCollection.push(data.message);
+                                break;
+                            }
+
+                        };
+
+                        events.onError = function(data) {
+                            warningCollection.push(data.error);
+                            file = setMessages(file, true, warningCollection);
+                            $deferred.notify('next');
+                        };
+
+                        ws.send([
+                            order_name,
+                            file.uploadName,
+                            file.size
+                        ].join(' '));
+                    };
+
+                $deferred.progress(function(action) {
+                    var file,
+                        hasBadFiles = false;
+
+                    if ('next' === action) {
+                        file = files[currIndex];
+
+                        if ('undefined' === typeof file) {
+                            hasBadFiles = files.some(function(file) {
+                                return 'bad' === file.status;
+                            });
+                            $deferred.resolve({files: files, hasBadFiles: hasBadFiles });
+                        }
+                        else if ('svg' === file.extension) {
+                            sendFile(file);
+                            currIndex += 1;
+                        }
+                        else {
+                            setMessages(file, true, ['NOT_SUPPORT']);
+                            currIndex += 1;
+                            $deferred.notify('next');
+                        }
+                    }
+                });
+
+                $deferred.notify('next');
+
+                return $deferred.promise();
             },
             /**
              * get svg
              *
-             * @param {String} name - svg name has been upload
-             * @param {Json} opts - options
-             *      {Function}   onFinished - fire on upload finish
+             * @param {File} file - the file object
+             *
+             * @return {Promise}
              */
-            get: function(name, opts) {
-                opts = opts || {};
-                opts.onFinished = opts.onFinished || function() {};
+            get: function(file) {
+                lastOrder = 'get';
 
-                var svg = History.findByName(name)[0];
+                var $deferred = $.Deferred(),
+                    args = [
+                        lastOrder,
+                        file.uploadName
+                    ],
+                    blobs = [],
+                    blob,
+                    total_length = 0,
+                    size = {
+                        height: 0,
+                        width: 0
+                    };
 
-                opts.onFinished(svg.data.blob, svg.data.size);
+                events.onMessage = function(data) {
+
+                    if ('continue' === data.status) {
+                        total_length = data.length;
+                        size.height = data.height;
+                        size.width = data.width;
+                    }
+                    else if (true === data instanceof Blob) {
+                        blobs.push(data);
+                        blob = new Blob(blobs, { type: file.type });
+
+                        if (total_length === blob.size) {
+                            History.push(file.uploadName, { size: size, blob: blob });
+                            $deferred.resolve({ size: size, blob: blob });
+                        }
+                    }
+
+                };
+
+                events.onError = function(response) {
+                    $deferred.reject(response);
+                };
+
+                ws.send(args.join(' '));
+
+                return $deferred.promise();
             },
             /**
              * compute svg
