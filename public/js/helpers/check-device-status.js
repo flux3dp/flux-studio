@@ -74,7 +74,7 @@ define([
         case undefined:
         case DeviceConstants.status.IDLE:
             // no problem
-            deferred.resolve('auth');
+            deferred.resolve('ok');
             break;
         case DeviceConstants.status.RAW:
         case DeviceConstants.status.SCAN:

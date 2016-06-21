@@ -83,6 +83,8 @@ define([
                 });
             };
 
+        ProgressActions.open(ProgressConstants.NONSTOP);
+
         if(_existConnection(uuid)) {
             _device = _switchDevice(uuid);
             d.resolve(DeviceConstants.CONNECTED);
@@ -138,7 +140,9 @@ define([
             });
         }
 
-        return d.promise();
+        return d.always(function() {
+            ProgressActions.close();
+        }).promise();
     }
 
     function auth(uuid, password) {

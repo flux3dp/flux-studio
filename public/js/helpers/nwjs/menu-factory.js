@@ -114,34 +114,7 @@ define([
                     };
 
                     checkDeviceStatus(currentPrinter).done(function(status) {
-                        switch (status) {
-                        case 'ok':
-                            goCheckStatus();
-                            break;
-                        case 'auth':
-                            var opts = {
-                                onSuccess: function() {
-                                    goCheckStatus();
-                                },
-                                onError: function() {
-                                    InputLightboxActions.open('auth-device', {
-                                        type         : InputLightboxConstants.TYPE_PASSWORD,
-                                        caption      : lang.select_printer.notification,
-                                        inputHeader  : lang.select_printer.please_enter_password,
-                                        confirmText  : lang.select_printer.submit,
-                                        onSubmit     : function(password) {
-                                            _auth(printer.uuid, password, {
-                                                onError: function() {
-                                                    AlertActions.showPopupError('device-auth-fail', lang.select_printer.auth_failure);
-                                                }
-                                            });
-                                        }
-                                    });
-                                }
-                            };
-                            _auth(currentPrinter.uuid, '', opts);
-                            break;
-                        }
+                        goCheckStatus();
                     });
 
                 };
@@ -169,27 +142,7 @@ define([
         createDevice,
         createDeviceList,
         doDiscover,
-        discoverMethods,
-        _auth = function(uuid, password, opts) {
-            ProgressActions.open(ProgressConstants.NONSTOP);
-            opts = opts || {};
-            opts.onError = opts.onError || function() {};
-            opts.onSuccess = opts.onSuccess || function() {};
-
-            var self = this,
-                _opts = {
-                    onSuccess: function(data) {
-                        ProgressActions.close();
-                        opts.onSuccess();
-                    },
-                    onFail: function(data) {
-                        ProgressActions.close();
-                        opts.onError();
-                    }
-                };
-
-            touch(_opts).send(uuid, password);
-        };
+        discoverMethods;
 
     MenuItem = gui.MenuItem;
     NWjsWindow = gui.Window.get();
