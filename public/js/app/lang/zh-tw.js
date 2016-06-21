@@ -609,7 +609,8 @@ define(function() {
                 'FILTER_TAG': '不支援標籤 &lt;filter&gt;',
                 'EMPTY': '內容為空',
                 'FAIL_PARSING': '解析錯誤',
-                'SVG_BROKEN': '檔案損壞'
+                'SVG_BROKEN': '檔案損壞',
+                'NOT_SUPPORT': '非 SVG 格式'
             },
             title: {
                 material: 'Select proper material to have the best engraving result.',

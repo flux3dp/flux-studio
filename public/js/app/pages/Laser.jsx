@@ -320,7 +320,7 @@ define([
                                 typeErrorMessage={typeErrorMessage}
                                 multiple={true}
                                 onReadFileStarted={this.state.laserEvents.onReadFileStarted}
-                                onReadingFile={this.state.laserEvents.onFileReading}
+                                onReadEnd={this.state.laserEvents.onFileReadEnd}
                                 onError={onError}
                             />
                         </div>

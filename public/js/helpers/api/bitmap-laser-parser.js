@@ -42,23 +42,57 @@ define([
 
         return {
             connection: ws,
-            upload: function(name, file, opts) {
-                opts = opts || {};
-                History.push(name, file);
-                (opts.onFinished || function() {})(file);
-            },
-            get: function(name, opts) {
-                var file = History.findByName(name)[0];
+            upload: function(files) {
+                var self = this,
+                    $deferred = $.Deferred(),
+                    currIndex = 0,
+                    sendFile = function() {
+                        files.forEach((file, i) => {
+                            file.isBroken = false;
 
-                opts = opts || {};
-                opts.onFinished = opts.onFinished || function() {};
+                            self.get(file).done(function(response) {
+                                file.blob = response.blob;
+                                file.imgSize = response.size;
+                                $deferred.notify('next');
+                            });
+                        });
+                    };
 
-                imageData(file.data.blob, {
-                    type: file.type,
-                    onComplete: function(result) {
-                        opts.onFinished(file.data.blob, result.size);
+                $deferred.progress(function(action) {
+                    var file,
+                        hasBadFiles = false;
+
+                    if ('next' === action) {
+                        file = files[currIndex];
+
+                        if ('undefined' === typeof file) {
+                            $deferred.resolve({files: files, hasBadFiles: false });
+                        }
+                        else {
+                            sendFile(file);
+                            currIndex += 1;
+                        }
                     }
                 });
+
+                $deferred.notify('next');
+
+                return $deferred.promise();
+            },
+            get: function(file) {
+                var $deferred = $.Deferred();
+
+                imageData(file.blob, {
+                    type: file.type,
+                    onComplete: function(result) {
+                        $deferred.resolve({
+                            size: result.size,
+                            blob: file.blob
+                        });
+                    }
+                });
+
+                return $deferred.promise();
             },
             /**
              * compute bitmap
@@ -73,26 +107,31 @@ define([
              *      {Float} rotate        - rotate
              *      {Int}   threshold     - threshold (0~255)
              *      {Array} image_data    - grayscale image data
-             * @param {Json} opts - options
-             *      {Function}   onFinished - fire on upload finish
+             * @return {Promise}
              */
-            compute: function(args, opts) {
-                opts = opts || {};
-                opts.onStarting = opts.onStarting || function() {};
-                opts.onFinished = opts.onFinished || function() {};
+            compute: function(args) {
+                var $deferred = $.Deferred(),
+                    CHUNK_PKG_SIZE = 4096,
+                    requests = [],
+                    currIndex = 0,
+                    nextRequest,
+                    requestHeader,
+                    nextData,
+                    sendData = (nextData) => {
+                        ws.send(nextData);
+                        currIndex += 1;
 
-                var CHUNK_PKG_SIZE = 4096,
-                    requests_serial = [],
-                    request_index = 0,
-                    go_next = true,
-                    request_header,
-                    next_data,
-                    timer;
+                        nextData = requests[currIndex];
+
+                        if (true === nextData instanceof Uint8Array) {
+                            sendData(nextData);
+                        }
+                    };
 
                 lastOrder = 'upload';
 
                 args.forEach(function(obj) {
-                    request_header = [
+                    requestHeader = [
                         lastOrder,
                         obj.width,
                         obj.height,
@@ -104,23 +143,20 @@ define([
                         obj.threshold
                     ];
 
-                    requests_serial.push(request_header.join(' '));
+                    requests.push(requestHeader.join(' '));
 
                     for (var i = 0; i < obj.image_data.length; i += CHUNK_PKG_SIZE) {
-                        requests_serial.push(convertToTypedArray(obj.image_data.slice(i, i + CHUNK_PKG_SIZE), Uint8Array));
+                        requests.push(convertToTypedArray(obj.image_data.slice(i, i + CHUNK_PKG_SIZE), Uint8Array));
                     }
 
                 });
 
                 events.onMessage = function(data) {
                     switch (data.status) {
+                    // ready to sending binary
                     case 'continue':
-                        // ready to sending binary
-                        go_next = true;
-                        break;
                     case 'accept':
-                    // ready to sending next image set
-                        go_next = true;
+                        $deferred.notify('next');
                         break;
                     default:
                         // TODO: do something?
@@ -128,23 +164,20 @@ define([
                     }
                 };
 
-                timer = setInterval(function() {
-                    if (true === go_next) {
-                        next_data = requests_serial[request_index];
+                $deferred.progress((action) => {
+                    nextData = requests[currIndex];
 
-                        go_next = ('string' !== typeof next_data);
-
-                        ws.send(next_data);
-                        request_index++;
+                    if ('next' === action && 'undefined' !== typeof nextData) {
+                        sendData(nextData);
                     }
-
-                    if (request_index >= requests_serial.length) {
-                        opts.onFinished();
-                        clearInterval(timer);
+                    else {
+                        $deferred.resolve();
                     }
-                }, 0);
+                });
 
-                opts.onStarting();
+                $deferred.notify('next');
+
+                return $deferred.promise();
             },
             getTaskCode: function(opts) {
                 opts = opts || {};

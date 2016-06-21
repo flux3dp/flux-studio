@@ -144,7 +144,7 @@ define([
                             AlertActions.showDeviceBusyPopup('change-filament-zombie', lang.change_filament.maintain_zombie);
                         }
                         else {
-                            AlertActions.showPopupError('change-filament-device-error', response.error);
+                            AlertActions.showPopupError('change-filament-device-error', response.error + ' : ' + response.info);
                         }
                     });
                 });
