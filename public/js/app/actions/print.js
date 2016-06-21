@@ -584,10 +584,17 @@ define([
         var d = $.Deferred(),
             wasInPreviewMode = false;
 
+        _checkNeedToShowProgress();
+        if(importFromGCode || importFromFCode) {
+            d.resolve();
+            return d.promise();
+        }
+
         if(previewMode) {
             togglePreview();
             wasInPreviewMode = true;
         }
+
         getBlobFromScene().then((blob) => {
             if(wasInPreviewMode) {
                 togglePreview();
@@ -595,9 +602,6 @@ define([
             previewUrl = URL.createObjectURL(blob);
 
             var t = setInterval(() => {
-                if(!slicingStatus.isComplete) {
-                    slicingStatus.showProgress = true;
-                }
                 if(slicingStatus.canInterrupt && slicingStatus.isComplete) {
                     slicingStatus.showProgress = false;
                     slicingStatus.canInterrupt = false;
@@ -659,9 +663,6 @@ define([
             monitorOn = $('.flux-monitor').length > 0;
 
         slicingStatus.lastProgress = progress;
-        if(!slicingStatus.hasError) {
-            slicingStatus.lastReport = report;
-        }
 
         if(monitorOn) {
             GlobalActions.closeMonitor();
@@ -675,7 +676,6 @@ define([
                 lang.print.savingFilePreview,
                 showStopButton
             );
-            show = true;
         }
 
         if(report.slice_status === 'error') {
@@ -712,7 +712,9 @@ define([
                     ProgressActions.updating(lang.print.reRendering, 0);
                 }
                 if(report.percentage) {
-                    ProgressActions.updating(progress, parseInt(report.percentage * 100));
+                    setTimeout(() => {
+                        ProgressActions.updating(progress, parseInt(report.percentage * 100));
+                    }, 0);
                 }
             }
         }
@@ -1153,6 +1155,7 @@ define([
     }
 
     function getFCode() {
+        console.log('get fcode');
         var d = $.Deferred();
 
         if(importFromFCode) {
@@ -1221,7 +1224,6 @@ define([
                     slicer.reportSlicing(function(report) {
                         slicingStatus.canInterrupt = true;
                         slicingStatus.pauseReport = false;
-                        slicingStatus.lastReport = report;
                         if(!report) { return; }
                         if(report.slice_status === 'complete') {
                             clearInterval(slicingStatus.reporter);
@@ -2292,7 +2294,7 @@ define([
         clearScene();
         fcodeConsole = fcodeReader();
         importFromGCode = type === 'gcode';
-        importFromFCode = !importFromGCode;
+        importFromFCode = type === 'fc';
 
         previewMode = true;
         _showWait(lang.print.drawingPreview, !showStopButton);
@@ -2454,6 +2456,7 @@ define([
             ProgressActions.close();
         }
 
+        console.log('erasing last report');
         slicingStatus.inProgress    = false;
         slicingStatus.lastProgress  = null;
         slicingStatus.lastReport    = null;
@@ -2723,6 +2726,15 @@ define([
 
     function _round(float) {
         return parseFloat((Math.round(float * 100) / 100).toFixed(2));
+    }
+
+    function _checkNeedToShowProgress() {
+        if(!slicingStatus.isComplete) {
+            if(!slicingStatus.showProgress) {
+                slicingStatus.showProgress = true;
+            }
+            updateSlicingProgressFromReport(slicingStatus.lastReport);
+        }
     }
 
     function clear() {

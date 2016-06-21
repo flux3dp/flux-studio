@@ -38,7 +38,7 @@ define([
 ) {
     'use strict';
 
-    var lang = i18n.get(),
+    let lang = i18n.get(),
         thisProgress,
         lastProgress,
         defaultPrinter,
@@ -55,7 +55,7 @@ define([
 
     function selectDevice(device, deferred) {
         Object.assign(_selectedDevice, device);
-        var d = deferred || $.Deferred(),
+        let d = deferred || $.Deferred(),
             uuid = device.uuid,
             goAuth = function(uuid) {
                 ProgressActions.close();
@@ -69,7 +69,7 @@ define([
                             selectDevice(device, d);
                         }).
                         fail(function(response) {
-                            var message = (
+                            let message = (
                                 false === response.reachable ?
                                 lang.select_printer.unable_to_connect :
                                 lang.select_printer.auth_failure
@@ -144,7 +144,7 @@ define([
     function auth(uuid, password) {
         ProgressActions.open(ProgressConstants.NONSTOP);
 
-        var d = $.Deferred(),
+        let d = $.Deferred(),
             closeProgress = function() {
                 ProgressActions.close();
             },
@@ -169,7 +169,7 @@ define([
     }
 
     function uploadFile(blob, file, uploadPath, callback) {
-        var d = $.Deferred();
+        let d = $.Deferred();
         if(uploadPath) {
             ProgressActions.open(ProgressConstants.STEPPING, lang.device.starting, '', false);
             _device.actions.uploadToDirectory(blob, uploadPath, file.name, uploadProgress).then(function(result) {
@@ -211,7 +211,7 @@ define([
     }
 
     function go(blob, callbackProgress) {
-        var d = $.Deferred();
+        let d = $.Deferred();
         if(!blob) {
             d.resolve(DeviceConstants.READY);
         }
@@ -225,7 +225,7 @@ define([
     }
 
     function _go(blob, callback) {
-        var d = $.Deferred();
+        let d = $.Deferred();
         uploadFile(blob, null, null, callback).then(function() {
             d.resolve(_status);
         });
@@ -233,7 +233,7 @@ define([
     }
 
     function goFromFile(path, fileName) {
-        var d = $.Deferred();
+        let d = $.Deferred();
         _device.actions.select(path, fileName).then(function(selectResult) {
             if(selectResult.status.toUpperCase() === DeviceConstants.OK) {
                 _device.actions.start().then(function(startResult) {
@@ -248,7 +248,7 @@ define([
     }
 
     function clearConnection() {
-        var d = $.Deferred();
+        let d = $.Deferred();
 
         getReport().then(function(report) {
             if(report.st_label === DeviceConstants.COMPLETED) {
@@ -289,7 +289,7 @@ define([
     }
 
     function ls(path) {
-        var d = $.Deferred();
+        let d = $.Deferred();
         _device.actions.ls(path).then(function(result) {
             d.resolve(result);
         });
@@ -301,17 +301,17 @@ define([
     }
 
     function deleteFile(path, fileName) {
-        var fileNameWithPath = `${path.join('/')}/${fileName}`;
+        let fileNameWithPath = `${path.join('/')}/${fileName}`;
         return _device.actions.deleteFile(fileNameWithPath);
     }
 
     function downloadFile(path, fileName, callbackProgress) {
-        var fileNameWithPath = `${path.join('/')}/${fileName}`;
+        let fileNameWithPath = `${path.join('/')}/${fileName}`;
         return _device.actions.downloadFile(fileNameWithPath, callbackProgress);
     }
 
     function readyCamera() {
-        var d = $.Deferred();
+        let d = $.Deferred();
         _device.scanController = ScanController(_device.uuid, {
             onReady: function() {
                 d.resolve('');
@@ -373,7 +373,7 @@ define([
     }
 
     function getPreviewInfo() {
-        var d = $.Deferred();
+        let d = $.Deferred();
         _device.actions.getPreview().then(function(result) {
             d.resolve(result);
         });
@@ -381,7 +381,7 @@ define([
     }
 
     function getFirstDevice() {
-        for(var i in _deviceNameMap) {
+        for(let i in _deviceNameMap) {
             return i;
         }
     }
@@ -429,7 +429,7 @@ define([
     // Private Functions
 
     function _do(command) {
-        var d = $.Deferred(),
+        let d = $.Deferred(),
             actions;
 
         actions =  {
@@ -454,7 +454,7 @@ define([
             },
 
             'QUIT': function() {
-                var _getReport = function(result) {
+                let _getReport = function(result) {
                         getReport().done(function(response) {
                             if (0 >= retryTimes) {
                                 d.fail(result);
@@ -513,7 +513,7 @@ define([
             if(!nwConsole) {
                 nwConsole = nw.Window.get();
             }
-            var stId = deviceStatus.st_id;
+            let stId = deviceStatus.st_id;
             if(stId !== 0 && stId !== 64 && stId !== 128) {
                 if(deviceStatus.st_prog) {
                     nwConsole.setProgressBar(-1);
@@ -537,7 +537,7 @@ define([
     }
 
     function _removeConnection(uuid) {
-        var index = _devices.findIndex(function(d) {
+        let index = _devices.findIndex(function(d) {
             return d.uuid === uuid;
         });
 
@@ -547,7 +547,7 @@ define([
     }
 
     function _switchDevice(uuid) {
-        var index = _devices.findIndex(function(d) {
+        let index = _devices.findIndex(function(d) {
             return d.uuid === uuid;
         });
 
@@ -555,11 +555,30 @@ define([
     }
 
     function streamCamera(uuid) {
-        var cameraStream = new Rx.Subject();
-        _device.camera = Camera(uuid);
-        _device.camera.startStream((imageBlob) => {
+        let cameraStream = new Rx.Subject(),
+            timeToReset = 20000,
+            tracker;
+
+        const initCamera = () => {
+            _device.camera = Camera(uuid);
+            _device.camera.startStream((imageBlob) => {
+                processCameraResult(imageBlob);
+            });
+        };
+
+        const resetCamera = () => {
+            _device.camera.closeStream();
+            initCamera();
+        };
+
+        const processCameraResult = (imageBlob) => {
+            clearTimeout(tracker);
+            tracker = setTimeout(resetCamera, timeToReset);
             cameraStream.onNext(imageBlob);
-        });
+        };
+
+        initCamera();
+        tracker = setTimeout(resetCamera, timeToReset);
 
         return cameraStream;
     }
@@ -571,7 +590,7 @@ define([
     }
 
     function calibrate() {
-        var d = $.Deferred();
+        let d = $.Deferred();
         _device.actions.calibrate().then((response) => {
             d.resolve();
         }, (error) => {
@@ -612,7 +631,7 @@ define([
                         device.st_id === DeviceConstants.status.ABORTED
                     ) {
                         if(!defaultPrinterWarningShowed) {
-                            var message = '';
+                            let message = '';
                             if(device.st_id === DeviceConstants.status.COMPLETED) {
                                 message = `${lang.device.completed}`;
                             }
@@ -645,7 +664,7 @@ define([
                             if(Config().read('notification') === '1') {
                                 Notification.requestPermission((permission) => {
                                     if(permission === 'granted') {
-                                        var notification = new Notification(device.name, {
+                                        let notification = new Notification(device.name, {
                                             icon: '/img/icon-home-s.png',
                                             body: message
                                         });
@@ -717,7 +736,7 @@ define([
                 'device-master',
                 function(devices) {
                     devices = DeviceList(devices);
-                    for(var i in devices) {
+                    for(let i in devices) {
                         _deviceNameMap[devices[i].name] = devices[i];
                     }
                     _scanDeviceError(devices);

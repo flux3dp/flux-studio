@@ -390,8 +390,6 @@ define([
                     AlertStore.removeCancelListener(this._handleDefaultCancel);
                     listeningToCancel = false;
                     director.takeSnapShot().then(() =>{
-                        return director.getFCode();
-                    }).then(() => {
                         this.setState({
                             openPrinterSelectorWindow: true
                         });
@@ -554,39 +552,7 @@ define([
                                 }, 1000);
                             });
                         }
-
                     }, 500);
-
-                    // director.takeSnapShot().then(() => {
-                    //     return director.getFCode();
-                    // }).then(function(fcode, previewUrl) {
-                    //     if(director.getSlicingStatus().inProgress) {
-                    //         return;
-                    //     }
-                    //     if(!(fcode instanceof Blob)) {
-                    //         AlertActions.showPopupError('', lang.print.out_of_range_message, lang.print.out_of_range);
-                    //         return;
-                    //     }
-                    //     AlertStore.removeCancelListener(this._handleDefaultCancel);
-                    //     removeCancelListener = false;
-                    //     GlobalActions.showMonitor(selectedPrinter, fcode, previewUrl, GlobalConstants.PRINT);
-                    //     //Tour popout after show monitor delay
-                    //     setTimeout(function() {
-                    //         if(tutorialMode) {
-                    //             this.setState({
-                    //                 tutorialOn: true,
-                    //                 currentTutorialStep: 6
-                    //             });
-                    //             //Insert into root html
-                    //             $('.tour-overlay').append($('.tour'));
-                    //             $('.tour').click(function(){
-                    //                 $('.print-studio').append($('.tour'));
-                    //                 this._handleTutorialComplete();
-                    //             }.bind(this));
-                    //         };
-                    //     }.bind(this), 1000);
-                    //
-                    // }.bind(this));
 
                 },
 
