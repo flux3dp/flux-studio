@@ -47,9 +47,11 @@ var process = nw.process,
                     fs.appendFile('message.log', message, 'utf8', callback);
                 }
             },
-            recordOutput = function(data) {
-                console.log(data.toString());
+            recordOutput = function(type, data) {
+                console.log(type, data.toString());
                 writeLog(data.toString());
+
+                process.env.ghostPort = port;
             };
 
         // empty message.log
@@ -84,8 +86,8 @@ var process = nw.process,
 
         if (false === ghostExecuted) {
             ghost = spawn(ghostCmd, args);
-            ghost.stdout.on('data', recordOutput);
-            ghost.stderr.on('data', recordOutput);
+            ghost.stdout.on('data', recordOutput.bind(null, 'stdout'));
+            ghost.stderr.on('data', recordOutput.bind(null, 'stderr'));
 
             ghostExecuted = true;
         }
@@ -100,8 +102,6 @@ var process = nw.process,
             console.log('child process exited with code ' + code);
             writeLog('FLUX API is closed (' + code + ')');
         });
-
-        process.env.ghostPort = port;
     },
     probe = function(port, callback) {
         var socket = new net.Socket(),
