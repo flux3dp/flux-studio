@@ -1155,7 +1155,6 @@ define([
     }
 
     function getFCode() {
-        console.log('get fcode');
         var d = $.Deferred();
 
         if(importFromFCode) {
