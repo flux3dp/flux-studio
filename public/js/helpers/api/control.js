@@ -642,6 +642,9 @@ define([
                     else if (-1 < ['loading', 'unloading'].indexOf(result.status.toLowerCase())) {
                         deferred.notify(result);
                     }
+                    else if (result.status.toLowerCase() === 'operating') {
+                        // skip operating message
+                    }
                     else {
                         deferred.resolve(result);
                     }
