@@ -943,7 +943,7 @@ define([
     }
 
     function onObjectTransform(e) {
-        if(previewMode) { return; }
+        if(previewMode || typeof SELECTED === 'undefined') { return; }
         switch (e.type) {
             case 'mouseDown':
                 objectBeforeTransform = {};
@@ -2459,7 +2459,6 @@ define([
             ProgressActions.close();
         }
 
-        console.log('erasing last report');
         slicingStatus.inProgress    = false;
         slicingStatus.lastProgress  = null;
         slicingStatus.lastReport    = null;
@@ -2736,7 +2735,9 @@ define([
             if(!slicingStatus.showProgress) {
                 slicingStatus.showProgress = true;
             }
-            updateSlicingProgressFromReport(slicingStatus.lastReport);
+            if(typeof slicingStatus.lastReport !== 'undefined' && slicingStatus.lastReport !== null) {
+                updateSlicingProgressFromReport(slicingStatus.lastReport);
+            }
         }
     }
 
