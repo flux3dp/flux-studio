@@ -7,7 +7,7 @@ define([
     'helpers/websocket',
     'app/constants/device-constants',
     'helpers/rsa-key',
-    'lib/rx.lite.min'
+    'Rx'
 ], function($, Websocket, DeviceConstants, rsaKey) {
     'use strict';
 

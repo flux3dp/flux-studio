@@ -16,7 +16,7 @@ define([
     'app/actions/global-actions',
     'helpers/sprintf',
     'helpers/packer',
-    'lib/rx.lite.min',
+    'Rx',
     'app/app-settings',
     // non-return value
     'threeOrbitControls',
@@ -1625,6 +1625,9 @@ define([
                 }, function() {
                     setImportWindowPosition();
                 });
+            }
+            else {
+                doSlicing();
             }
 
             _clearPath();
