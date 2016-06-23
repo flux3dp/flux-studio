@@ -609,7 +609,8 @@ define(function() {
                 'FILTER_TAG': 'SVG Tag &lt;filter&gt; is not supported',
                 'EMPTY': 'is an empty file',
                 'FAIL_PARSING': 'failed on parsing process',
-                'SVG_BROKEN': 'was broken'
+                'SVG_BROKEN': 'was broken',
+                'NOT_SUPPORT': 'This file is not SVG'
             },
             title: {
                 material: 'Select a proper material to have the best engraving result.',

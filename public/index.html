@@ -37,13 +37,13 @@
             version: "{Version}",
             timestamp: (new Date()).getTime(),
             onLine: navigator.onLine,
-            os: ('undefined' === typeof requireNode ? undefined : os),
+            os: ('undefined' === typeof nw ? undefined : os),
             ghostPort: location.port || 8000,
             isNW: ('undefined' !== typeof nw)
         };
 
         // it's not node-webkit
-        if ('undefined' === typeof requireNode) {
+        if ('undefined' === typeof nw) {
             getStarted();
         }
         else {

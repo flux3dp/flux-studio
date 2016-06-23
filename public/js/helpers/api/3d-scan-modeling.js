@@ -65,21 +65,12 @@ define([
                         name,
                         point_cloud.left.size / 24,
                         point_cloud.right.size / 24 || 0
-                    ],
-                    chunks = [];
-
-                // split up to pieces
-                splitBinary(point_cloud.total, function(result) {
-                    chunks.push(result);
-                });
+                    ];
 
                 events.onMessage = function(data) {
                     switch (data.status) {
                     case 'continue':
-                        // split up to pieces
-                        chunks.forEach(function(chunk) {
-                            ws.send(chunk);
-                        });
+                        ws.send(point_cloud.total);
 
                         break;
                     case 'ok':
@@ -375,7 +366,7 @@ define([
              */
             import: function(name, fileType, file, fileLength) {
                 var self = this,
-                    deferred = $.Deferred(),
+                    $deferred = $.Deferred(),
                     args = [
                         'import_file',
                         name,
@@ -384,7 +375,7 @@ define([
                     ],
                     opts = {
                         onFinished: function(pointCloud) {
-                            deferred.resolve(pointCloud);
+                            $deferred.resolve(pointCloud);
                         }
                     };
 
@@ -403,14 +394,88 @@ define([
                         });
                         break;
                     default:
-                        // TODO: unexception result?
+                        $deferred.reject(data);
                     }
 
                 };
 
                 ws.send(args.join(' '));
 
-                return deferred.promise();
+                return $deferred.promise();
+            },
+            /**
+             * export threading (running in background)
+             *
+             * @param {String} name     - source name
+             * @param {String} fileType - file type (stl, pcd)
+             *
+             * @return {Promise}
+             */
+            export_threading: function(name, fileType) {
+                var self = this,
+                    $deferred = $.Deferred(),
+                    args = [
+                        'export_threading',
+                        name,
+                        fileType
+                    ];
+
+                events.onMessage = function(data) {
+
+                    switch (data.status) {
+                    case 'ok':
+                        $deferred.resolve(data);
+                        break;
+                    default:
+                        $deferred.reject(data);
+                    }
+
+                };
+
+                ws.send(args.join(' '));
+
+                return $deferred.promise();
+            },
+            /**
+             * export collect (running in background)
+             *
+             * @param {String} name - source name
+             *
+             * @return {Promise}
+             */
+            export_collect: function(name) {
+                var self = this,
+                    $deferred = $.Deferred(),
+                    args = [
+                        'export_collect',
+                        name
+                    ],
+                    length = 0;
+
+                events.onMessage = function(data) {
+                    if (true === data instanceof Blob) {
+                        $deferred.notify({ status: 'binary', data: new Blob([data]) });
+                    }
+                    else {
+                        switch (data.status) {
+                        case 'computing':
+                        case 'continue':
+                            length = data.length || 0;
+                            $deferred.notify(data);
+                            break;
+                        case 'ok':
+                            $deferred.resolve(data);
+                            break;
+                        default:
+                            $deferred.reject(data);
+                        }
+                    }
+
+                };
+
+                ws.send(args.join(' '));
+
+                return $deferred.promise();
             }
         };
     };

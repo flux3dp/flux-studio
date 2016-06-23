@@ -230,14 +230,7 @@ define([
                                 return;
                             }
 
-                            switch (status) {
-                            case 'ok':
-                                self._returnSelectedPrinter();
-                                break;
-                            case 'auth':
-                                self._auth(printer.uuid, '', opts);
-                                break;
-                            }
+                            self._returnSelectedPrinter();
                         });
                     }
                     else if (status === DeviceConstants.TIMEOUT) {

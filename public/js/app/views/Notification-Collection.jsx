@@ -152,8 +152,7 @@ define([
 
                 ProgressStore.onOpened(this._handleProgress).
                     onUpdating(this._handleProgress).
-                    onClosed(this._handleProgressFinish).
-                    onStop(this._handleProgressStop);
+                    onClosed(this._handleProgressFinish);
                 InputLightboxStore.onInputLightBoxOpened(this._handleInputLightBoxOpen);
 
                 GlobalStore.onShowMonitor(this._handleOpenMonitor);
@@ -202,8 +201,7 @@ define([
                 // progress
                 ProgressStore.removeOpenedListener(this._handleProgress).
                     removeUpdatingListener(this._handleProgress).
-                    removeClosedListener(this._handleProgressFinish).
-                    removeStopListener(this._handleProgressStop);
+                    removeClosedListener(this._handleProgressFinish);
 
                 // input lightbox
                 InputLightboxStore.removeOpenedListener(this._handleInputLightBoxOpen);
@@ -335,7 +333,7 @@ define([
                         onFinished: payload.onFinished || self.state.progress.onFinished || function() {}
                     }
                 }, function() {
-                    if(typeof payload.onOpened === 'function') {
+                    if (typeof payload.onOpened === 'function') {
                         payload.onOpened();
                     }
                 });
@@ -356,7 +354,8 @@ define([
 
             _handleProgressStop: function(payload) {
                 GlobalActions.cancelPreview();
-                this.state.progress.onStop();
+                console.log(this.state.progress.onStop);
+                (this.state.progress.onStop || function() {})();
                 this.setState({
                     progress: {
                         open: false,

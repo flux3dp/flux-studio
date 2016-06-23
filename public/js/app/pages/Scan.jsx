@@ -16,6 +16,7 @@ define([
     'app/actions/alert-actions',
     'app/stores/alert-store',
     'app/actions/progress-actions',
+    'app/stores/progress-store',
     'app/constants/progress-constants',
     'helpers/shortcuts',
     'helpers/round',
@@ -45,6 +46,7 @@ define([
     AlertActions,
     AlertStore,
     ProgressActions,
+    ProgressStore,
     ProgressConstants,
     shortcuts,
     round,
@@ -600,6 +602,8 @@ define([
                 _onConvert: function(e) {
                     var self = this,
                         fileFormat = 'stl',
+                        isStopConvert = false,
+                        collectName = '',
                         onClose = function(stlMesh) {
                             self.state.meshes.forEach(function(mesh, e) {
                                 mesh.model.material.opacity = 0;
@@ -614,27 +618,51 @@ define([
                             });
                             self._switchMeshes(true, false);
                         },
-                        exportSTL = function(outputName) {
-                            self.state.scanModelingWebSocket.export(
-                                outputName,
-                                fileFormat,
-                                {
-                                    onFinished: function(blob) {
-                                        self.setState({
-                                            stlBlob: blob
-                                        });
-
-                                        scanedModel.loadStl(blob, onClose);
-
+                        startExportSTL = function(outputName) {
+                            self.state.scanModelingWebSocket.export_threading(outputName, fileFormat).
+                                done(function(response) {
+                                    endExportSTL(response.collect_name);
+                                });
+                        },
+                        endExportSTL = function(collectName) {
+                            if (false === isStopConvert) {
+                                self.state.scanModelingWebSocket.export_collect(collectName).
+                                    always(function() {
                                         self._openBlocker(false);
-                                    }
-                                }
-                            );
+                                    }).
+                                    progress(function(response) {
+                                        switch (response.status) {
+                                        case 'binary':
+                                            self.setState({
+                                                stlBlob: response.data
+                                            });
+
+                                            scanedModel.loadStl(response.data, onClose);
+                                            break;
+                                        case 'computing':
+                                            endExportSTL(collectName);
+                                            break;
+                                        }
+                                    });
+                            }
+                            else {
+                                self._openBlocker(false);
+                            }
+                        },
+                        doStopConverting = function() {
+                            isStopConvert = true;
+                            self.setState({
+                                saveFileType: 'pcd',
+                                hasConvert: false
+                            });
+                            self._switchMeshes(true, false);
                         };
 
-                    self._openBlocker(true, ProgressConstants.NONSTOP);
+                    self._openBlocker(true, ProgressConstants.WAITING, '', true, '', {
+                        onStop: doStopConverting
+                    });
 
-                    this._mergeAll(exportSTL, false);
+                    this._mergeAll(startExportSTL, false);
                 },
 
                 _switchMeshes: function(display, choose) {
@@ -1136,13 +1164,22 @@ define([
                     }
                 },
 
-                _openBlocker: function(is_open, type, message, hasStop, caption) {
+                _openBlocker: function(is_open, type, message, hasStop, caption, events) {
+                    events = events || {};
                     this.setState({
                         openBlocker: is_open
                     });
 
                     if (true === is_open) {
-                        ProgressActions.open(type, caption ? caption : '', message, hasStop);
+                        ProgressActions.open(
+                            type,
+                            caption ? caption : '',
+                            message,
+                            hasStop,
+                            events.onFinished || function() {},
+                            events.onOpened || function() {},
+                            events.onStop || function() {}
+                        );
                     }
                     else {
                         ProgressActions.close();

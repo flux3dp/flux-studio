@@ -19,6 +19,5 @@
     "webkit": {
         "plugin": true
     },
-    "manifestUrl": "http://software.flux3dp.com/check-update/?os=osx-x64&format=autoupdate",
-    "js-flags": "--max-old-space-size 2048"
+    "manifestUrl": "http://software.flux3dp.com/check-update/?os=osx-x64&format=autoupdate"
 }
