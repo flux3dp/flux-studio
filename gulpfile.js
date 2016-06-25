@@ -9,7 +9,6 @@ var gulp = require('gulp'),
     babel = require('gulp-babel'),
     sourcemaps = require('gulp-sourcemaps'),
     fs = require('fs'),
-    gulpSequence = require('gulp-sequence'),
     mocha = require('gulp-mocha');
 
 gulp.task('deployment', ['babel'], function(cb) {
