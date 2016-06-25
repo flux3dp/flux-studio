@@ -4,8 +4,33 @@ var gulp = require('gulp'),
     sass = require('gulp-sass'),
     webserver = require('gulp-webserver'),
     exec = require('gulp-exec'),
+    uglify = require('gulp-uglify'),
+    pump = require('pump'),
+    babel = require('gulp-babel'),
+    sourcemaps = require('gulp-sourcemaps'),
     fs = require('fs'),
+    gulpSequence = require('gulp-sequence'),
     mocha = require('gulp-mocha');
+
+gulp.task('deployment', ['babel'], function(cb) {
+    pump([
+            gulp.src(['public/js/**/*.js', '!public/js/require.js', '!public/js/main.js']),
+            sourcemaps.init(),
+            uglify(),
+            sourcemaps.write(),
+            gulp.dest('public/js/')
+        ],
+        cb
+    );
+});
+
+gulp.task('babel', function() {
+    return gulp.src(['public/js/**/*.js', '!public/js/require.js', '!public/js/main.js', '!public/js/lib/**/*.js', '!public/js/helpers/CircularGridHelper.js'])
+        .pipe(babel({
+            presets: ['es2015']
+        }))
+        .pipe(gulp.dest('public/js/'));
+});
 
 gulp.task('sass', function () {
     gulp.src('./public/sass/**/*.scss')
