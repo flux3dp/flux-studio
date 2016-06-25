@@ -34,7 +34,11 @@
     "requirejs": "~2.1.22",
     "style-loader": "^0.13.0",
     "squirejs": "~0.2.1",
-    "webpack": "1.13.1"
+    "webpack": "1.13.1",
+    "pump": "~1.0.1",
+    "gulp-sourcemaps": "~1.6.0",
+    "gulp-uglify": "~1.5.4",
+    "gulp-babel": "~6.1.2"
   },
   "scripts": {
     "test": "mocha '_test/unit/slicer.js' --compilers js:babel-core/register"
