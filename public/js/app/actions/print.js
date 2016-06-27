@@ -1120,27 +1120,27 @@ define([
             }).then(function(response) {
                 if (response.status === 'ok') {
                     syncObjectParameter().then(function() {
-                        slicer.goG(ids, function(result) {
-                            if (result instanceof Blob) {
-                                blobExpired = false;
-                                responseBlob = result;
-                                ProgressActions.close();
-                                d.resolve(result);
+                        return slicer.goG(ids);
+                    }).then((result) => {
+                        if (result instanceof Blob) {
+                            blobExpired = false;
+                            responseBlob = result;
+                            ProgressActions.close();
+                            d.resolve(result);
+                        }
+                        else {
+                            if (result.status !== 'error') {
+                                var serverMessage = `${result.status}: ${result.message} (${parseInt(result.percentage * 100)}%)`,
+                                    drawingMessage = `Finishing up... (100%)`,
+                                    message = result.status !== 'complete' ? serverMessage : drawingMessage;
+                                if(!willReslice) {
+                                    ProgressActions.updating(message, parseInt(result.percentage * 100));
+                                }
                             }
                             else {
-                                if (result.status !== 'error') {
-                                    var serverMessage = `${result.status}: ${result.message} (${parseInt(result.percentage * 100)}%)`,
-                                        drawingMessage = `Finishing up... (100%)`,
-                                        message = result.status !== 'complete' ? serverMessage : drawingMessage;
-                                    if(!willReslice) {
-                                        ProgressActions.updating(message, parseInt(result.percentage * 100));
-                                    }
-                                }
-                                else {
-                                    ProgressActions.close();
-                                }
+                                ProgressActions.close();
                             }
-                        });
+                        }
                     });
                 }
                 // error
