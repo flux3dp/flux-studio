@@ -782,7 +782,6 @@ define([
                             sendHeadInfoCommand();
                         }
                         else {
-                            console.log(tryLimit, result);
                             if (0 < tryLimit && 'N/A' === (result.head_module || 'N/A')) {
                                 sendHeadInfoCommand();
                             }
