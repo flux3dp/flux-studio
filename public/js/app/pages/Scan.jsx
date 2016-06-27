@@ -8,7 +8,7 @@ define([
     'helpers/api/3d-scan-modeling',
     'jsx!views/scan/Setup-Panel',
     'jsx!views/scan/Manipulation-Panel',
-    'jsx!views/Print-Selector',
+    'jsx!views/Printer-Selector',
     'jsx!views/scan/Export',
     'jsx!views/scan/Progress-Bar',
     'jsx!views/scan/Action-Buttons',

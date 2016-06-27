@@ -5,7 +5,7 @@ define([
     'helpers/api/usb-config',
     'helpers/api/upnp-config',
     'jsx!widgets/Modal',
-    'jsx!views/Print-Selector',
+    'jsx!views/Printer-Selector',
     'app/actions/alert-actions',
     'app/actions/progress-actions',
     'app/constants/progress-constants'
