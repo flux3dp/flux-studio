@@ -420,9 +420,7 @@ define([
     }
 
     function headinfo() {
-        return _device.actions.headinfo().always(function(response) {
-            _device.actions.quitTask();
-        });
+        return _device.actions.headinfo();
     }
 
     function closeConnection() {
