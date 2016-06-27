@@ -105,17 +105,20 @@ define([
                     }
                     received_data.push(data);
 
-                    if ('error' === data.status) {
+                    switch (data.status) {
+                    case 'error':
                         socketOptions.onError(data);
-                    }
-                    else if ('fatal' === data.status) {
+                        break;
+                    case 'fatal':
                         socketOptions.onFatal(data);
-                    }
-                    else if ('pong' === data.status) {
-                        // it's a heartbeat response. ignore it.
-                    }
-                    else {
+                        break;
+                    // ignore below status
+                    case 'pong':
+                    case 'debug':
+                        break;
+                    default:
                         socketOptions.onMessage(data);
+                        break;
                     }
 
                     hadConnected = true;
