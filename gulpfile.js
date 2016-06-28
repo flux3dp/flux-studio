@@ -28,7 +28,7 @@ gulp.task('deployment', ['babel'], function(cb) {
 });
 
 gulp.task('babel', function() {
-    return gulp.src(['public/js/**/*.js', 'public/js/**/*.jsx', '!public/js/require.js', '!public/js/main.js', '!public/js/lib/**/*.js', '!public/js/helpers/CircularGridHelper.js'])
+    return gulp.src(['public/js/**/*.js', '!public/js/require.js', '!public/js/main.js', '!public/js/lib/**/*.js', '!public/js/helpers/CircularGridHelper.js'])
         .pipe(babel({
             presets: ['es2015']
         }))
