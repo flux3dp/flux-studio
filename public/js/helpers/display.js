@@ -17,14 +17,6 @@ define([
 
         args.state.lang = i18n.get();
 
-        // watching state and auto update
-        // new Observe(args.state, function(changes) {
-        //     console.log('1');
-        //     views.forEach(function(view, key) {
-        //         view.setState(args.state);
-        //     });
-        // });
-
         view = React.createFactory(view(args));
         view = view();
 
