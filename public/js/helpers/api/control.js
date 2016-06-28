@@ -295,13 +295,13 @@ define([
 
                 return {
                     pause: function() {
-                        interrupt('pause');
+                        interrupt('play pause');
                     },
                     resume: function() {
-                        interrupt('resume');
+                        interrupt('play resume');
                     },
                     abort: function() {
-                        interrupt('abort');
+                        interrupt('play abort');
                     }
                 };
             },
