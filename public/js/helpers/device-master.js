@@ -49,6 +49,7 @@ define([
         _selectedDevice = {},
         _deviceNameMap = {},
         _device,
+        _cameraTimeoutTracker,
         nwConsole,
         _devices = [],
         _errors = {};
@@ -328,24 +329,6 @@ define([
         return d.promise();
     }
 
-    function startCamera(callback) {
-        _device.cameraSource = _device.scanController.getImage();
-
-        _device.cameraSource.progress(function(response) {
-            if ('ok' === response.status) {
-                _device.cameraSource.getImage();
-                callback(response);
-            }
-        });
-    }
-
-    function stopCamera() {
-        if(!_device.scanController) {
-            return $.Deferred().resolve().promise();
-        }
-        return _device.scanController.stopGettingImage();
-    }
-
     function maintain(type) {
         return _device.actions.maintain(type);
     }
@@ -558,8 +541,7 @@ define([
 
     function streamCamera(uuid) {
         let cameraStream = new Rx.Subject(),
-            timeToReset = 20000,
-            tracker;
+            timeToReset = 20000;
 
         const initCamera = () => {
             _device.camera = Camera(uuid);
@@ -574,19 +556,20 @@ define([
         };
 
         const processCameraResult = (imageBlob) => {
-            clearTimeout(tracker);
-            tracker = setTimeout(resetCamera, timeToReset);
+            clearTimeout(_cameraTimeoutTracker);
+            _cameraTimeoutTracker = setTimeout(resetCamera, timeToReset);
             cameraStream.onNext(imageBlob);
         };
 
         initCamera();
-        tracker = setTimeout(resetCamera, timeToReset);
+        _cameraTimeoutTracker = setTimeout(resetCamera, timeToReset);
 
         return cameraStream;
     }
 
     function stopStreamCamera() {
         if(_device.camera) {
+            clearTimeout(_cameraTimeoutTracker);
             _device.camera.closeStream();
         }
     }
@@ -714,8 +697,6 @@ define([
             this.getReport              = getReport;
             this.getSelectedDevice      = getSelectedDevice;
             this.readyCamera            = readyCamera;
-            this.startCamera            = startCamera;
-            this.stopCamera             = stopCamera;
             this.ls                     = ls;
             this.fileInfo               = fileInfo;
             this.deleteFile             = deleteFile;

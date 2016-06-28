@@ -363,14 +363,7 @@ define([
         },
 
         _stopCamera: function() {
-            if(this.state.mode === mode.CAMERA) {
-                socketStatus.ready = false;
-                DeviceMaster.stopCamera().then(function() {
-                    return DeviceMaster.kick();
-                }).then(function() {
-                    socketStatus.ready = true;
-                });
-            }
+            DeviceMaster.stopStreamCamera();
         },
 
         _refreshDirectory: function() {
@@ -486,7 +479,7 @@ define([
 
         _handleBrowseFolder: function() {
             this._stopReport();
-            DeviceMaster.stopCamera();
+            this._stopCamera();
             filesInfo = [];
             pathArray = [];
 
