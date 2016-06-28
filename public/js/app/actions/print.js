@@ -260,6 +260,7 @@ define([
     function appendModel(fileUrl, file, ext, callback) {
         if(file.size === 0) {
             AlertActions.showPopupError('', lang.message.invalidFile);
+            slicingStatus.canInterrupt = true;
             return;
         }
         var stlLoader = new THREE.STLLoader(),
@@ -277,6 +278,7 @@ define([
                         openObjectDialogue: false
                     });
                     AlertActions.showPopupError('', lang.message.invalidFile);
+                    slicingStatus.canInterrupt = true;
                     return;
                 }
             }
