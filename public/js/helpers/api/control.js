@@ -642,7 +642,7 @@ define([
                     else if (-1 < ['loading', 'unloading'].indexOf(result.status.toLowerCase())) {
                         deferred.notify(result);
                     }
-                    else {
+                    else if(result.status === 'ok') {
                         deferred.resolve(result);
                     }
                 };
