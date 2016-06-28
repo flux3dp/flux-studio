@@ -48,6 +48,7 @@ define(function() {
                 update_success: '韌體更新上傳成功',
                 update_fail: '更新失敗'
             },
+            updating: '更新中...',
             network_unreachable: '請確認網路連線',
             skip: '跳過此版本',
             later: '稍候',
