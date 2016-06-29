@@ -69,7 +69,7 @@ define([
                     ProgressActions.open(ProgressConstants.STEPPING, '', '', false);
                     doUpdate(file).
                         progress((response) => {
-                            response.percentage = round(response.percentage, -2);
+                            response.percentage = round(response.percentage || 0, -2);
                             ProgressActions.updating(
                                 lang.update.updating + ' (' + response.percentage + '%)',
                                 response.percentage

@@ -684,7 +684,8 @@ define([
                         ws.send(blob);
                         break;
                     case 'uploading':
-                        // ignore
+                        result.percentage = (result.sent || 0) / blob.size * 100;
+                        deferred.notify(result);
                         break;
                     default:
                         deferred.reject(result);
