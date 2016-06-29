@@ -13,7 +13,7 @@ define([
     'helpers/api/control',
     'jsx!widgets/Modal',
     'helpers/api/config',
-    'jsx!views/Print-Selector',
+    'jsx!views/Printer-Selector',
     'helpers/nwjs/menu-factory',
     'helpers/device-master',
     'app/stores/global-store',
