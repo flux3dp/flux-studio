@@ -1019,8 +1019,6 @@ define(function() {
                 content: 'Setup machine password via USB to enable connection for this computer',
                 caption: 'Password not set'
             },
-            gCodeAreaTooBigCaption: 'Toolpath out of range',
-            gCodeAreaTooBigMessage: 'Please reduce the size of the object(s), or try to turn off raft, brim or skirt',
             image_is_too_small: 'The file contains unsupported information',
             monitor_too_old: {
                 caption: 'Firmware Outdated',
@@ -1123,7 +1121,10 @@ define(function() {
             skip: 'Skip Tutorial'
         },
         slicer: {
-            computing: 'Computing'
+            computing: 'Computing',
+            error: {
+                '6': 'Toolpath out of range, please reduce the size of the object(s), or try to turn off raft, brim or skirt'
+            }
         },
         calibration: {
             RESOURCE_BUSY: 'Please make sure the machine is in idle status',

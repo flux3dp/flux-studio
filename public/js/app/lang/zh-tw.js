@@ -1019,8 +1019,6 @@ define(function() {
                 content: '請用 USB 設定機器密碼，以提供此台電腦連線',
                 caption: '未設定密碼'
             },
-            gCodeAreaTooBigCaption: '工作路徑超過列印範圍',
-            gCodeAreaTooBigMessage: '請縮小物體尺寸、關閉底座、底部延伸圈數或是邊界預覽',
             image_is_too_small: '圖檔內容有誤',
             monitor_too_old: {
                 caption: '韌體需要更新',
@@ -1123,7 +1121,10 @@ define(function() {
             skip: '跳過教學'
         },
         slicer: {
-            computing: '計算中'
+            computing: '計算中',
+            error: {
+                '6': '工作路徑超過列印範圍, 請縮小物體尺寸、關閉底座、底部延伸圈數或是邊界預覽'
+            }
         },
         calibration: {
             RESOURCE_BUSY: '請確認機器的狀態是於待命中',
