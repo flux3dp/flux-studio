@@ -237,18 +237,6 @@ define([
                 return d.promise();
             },
 
-            status: function() {
-                var d = $.Deferred();
-                events.onMessage = function(result) {
-                    d.resolve(result);
-                };
-
-                ws.send('position');
-                lastOrder = 'status';
-
-                return d.promise();
-            },
-
             getPath: function() {
                 var d = $.Deferred();
                 events.onMessage = function(result) {
