@@ -48,6 +48,7 @@ define(function() {
                 update_success: 'Toolhead Firmware update successfully uploaded',
                 update_fail: 'Update Fail'
             },
+            updating: 'Updating...',
             network_unreachable: 'Network is unreachable',
             skip: 'Skip This Version',
             later: 'LATER',

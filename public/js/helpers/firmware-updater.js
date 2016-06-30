@@ -9,7 +9,8 @@ define([
     'app/actions/progress-actions',
     'app/constants/progress-constants',
     'app/actions/input-lightbox-actions',
-    'app/constants/input-lightbox-constants'
+    'app/constants/input-lightbox-constants',
+    'helpers/round'
 ], function(
     i18n,
     checkFirmware,
@@ -18,7 +19,8 @@ define([
     ProgressActions,
     ProgressConstants,
     InputLightboxActions,
-    InputLightboxConstants
+    InputLightboxConstants,
+    round
 ) {
     'use strict';
 
@@ -36,6 +38,11 @@ define([
                         type: InputLightboxConstants.TYPE_FILE,
                         caption: lang.update.firmware.upload_file,
                         onSubmit: onSubmit,
+                        onClose: function() {
+                            if ('toolhead' === type) {
+                                DeviceMaster.quitTask();
+                            }
+                        },
                         confirmText: lang.update.firmware.confirm
                     }
                 );
@@ -59,7 +66,18 @@ define([
                     };
 
                 DeviceMaster.selectDevice(printer).done(function() {
+                    ProgressActions.open(ProgressConstants.STEPPING, '', '', false);
                     doUpdate(file).
+                        progress((response) => {
+                            response.percentage = round(response.percentage || 0, -2);
+                            ProgressActions.updating(
+                                lang.update.updating + ' (' + response.percentage + '%)',
+                                response.percentage
+                            );
+                        }).
+                        always(() => {
+                            ProgressActions.close();
+                        }).
                         done(onFinishUpdate.bind(null, true)).
                         fail(onFinishUpdate.bind(null, false));
                 });

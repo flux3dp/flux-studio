@@ -709,19 +709,19 @@ define([
                     var d = $.Deferred(),
                         path = 'default';
 
-                    const setDefaultEngine = () => {
+                    const setDefaultEngine = (result) => {
                         advancedSettings.engine = 'slic3r';
                         this._saveSetting();
                         AlertActions.showPopupWarning(
                             'engine-change',
-                            lang.settings.engine_change_fail[result.error],
+                            lang.settings.engine_change_fail[result.error] + ', ' + result.info,
                             `${lang.settings.engine_change_fail.caption} ${engineName}`
                         );
-                    }
+                    };
 
                     director.changeEngine(engineName, path).then((error) => {
                         if(error) {
-                            setDefaultEngine();
+                            setDefaultEngine(error);
                         }
                         d.resolve();
                     });

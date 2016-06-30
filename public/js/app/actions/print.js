@@ -16,7 +16,7 @@ define([
     'app/actions/global-actions',
     'helpers/sprintf',
     'helpers/packer',
-    'lib/rx.lite.min',
+    'Rx',
     'app/app-settings',
     // non-return value
     'threeOrbitControls',
@@ -260,6 +260,7 @@ define([
     function appendModel(fileUrl, file, ext, callback) {
         if(file.size === 0) {
             AlertActions.showPopupError('', lang.message.invalidFile);
+            slicingStatus.canInterrupt = true;
             return;
         }
         var stlLoader = new THREE.STLLoader(),
@@ -277,6 +278,7 @@ define([
                         openObjectDialogue: false
                     });
                     AlertActions.showPopupError('', lang.message.invalidFile);
+                    slicingStatus.canInterrupt = true;
                     return;
                 }
             }
@@ -1624,6 +1626,9 @@ define([
                 }, function() {
                     setImportWindowPosition();
                 });
+            }
+            else {
+                doSlicing();
             }
 
             _clearPath();

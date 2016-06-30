@@ -1,7 +1,6 @@
 requirejs.config({
     urlArgs: 'v=' + window.FLUX.timestamp,
     baseUrl: 'js/',
-
     paths: {
         jquery: 'lib/jquery-1.11.0.min',
         backbone: 'lib/backbone',
@@ -22,7 +21,10 @@ requirejs.config({
         cssHome: '../css/3rd-party-plugins',
         freetrans: 'plugins/freetrans/jquery.freetrans',
         html2canvas: 'lib/html2canvas.min',
-        events: 'lib/events'
+        events: 'lib/events',
+        window: 'app/window',
+        localStorage: 'app/local-storage',
+        Rx: 'lib/rx.lite.min'
     },
 
     jsx: {
@@ -85,6 +87,9 @@ requirejs.config({
         },
         events: {
             exports: 'events'
+        },
+        Rx: {
+            exports: 'Rx'
         }
     }
 });

@@ -7,7 +7,7 @@ define([
     'helpers/websocket',
     'app/constants/device-constants',
     'helpers/rsa-key',
-    'lib/rx.lite.min'
+    'Rx'
 ], function($, Websocket, DeviceConstants, rsaKey) {
     'use strict';
 
@@ -69,6 +69,7 @@ define([
                     events.onError(response);
                 },
                 onClose: function(response) {
+                    clearTimeout(timmer);
                     isConnected = false;
                 },
                 autoReconnect: false

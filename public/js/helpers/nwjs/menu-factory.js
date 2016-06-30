@@ -93,10 +93,10 @@ define([
                             );
                         }
 
-                        firmwareUpdater(response, printer, type);
+                        firmwareUpdater(response, currentPrinter, type);
                     }).
                     fail(function(response) {
-                        firmwareUpdater(response, printer, type);
+                        firmwareUpdater(response, currentPrinter, type);
                         AlertActions.showPopupInfo(
                             'latest-firmware',
                             lang.monitor.cant_get_toolhead_version

@@ -684,7 +684,8 @@ define([
                         ws.send(blob);
                         break;
                     case 'uploading':
-                        // ignore
+                        result.percentage = (result.sent || 0) / blob.size * 100;
+                        deferred.notify(result);
                         break;
                     default:
                         deferred.reject(result);
@@ -701,7 +702,7 @@ define([
             },
 
             /**
-             * update toolhead firmware
+             * update toolhead firmware - device should in `Maintain mode`
              * @param {File} file - file
              */
             toolheadUpdate: function(file) {
@@ -709,10 +710,6 @@ define([
                     mimeType = 'binary/flux-firmware',
                     blob = new Blob([file], { type: mimeType }),
                     args = [
-                        'task',
-                        'maintain'
-                    ],
-                    updateArgs = [
                         'maintain',
                         'update_hbfw',
                         'binary/fireware',
@@ -722,21 +719,16 @@ define([
                 events.onMessage = function(result) {
                     switch (result.status) {
                     case 'ok':
-                        if ('maintain' === result.task) {
-                            ws.send(updateArgs.join(' '));
-                        }
-                        else {
-                            deferred.resolve(result);
-                        }
-                        break;
-                    case 'uploading':
-                        deferred.notify(result);
+                        deferred.resolve(result);
                         break;
                     case 'continue':
                         deferred.notify(result);
                         ws.send(blob);
                         break;
+                    case 'operating':
+                    case 'uploading':
                     case 'update_hbfw':
+                        result.percentage = (result.written || 0) / blob.size * 100;
                         deferred.notify(result);
                         break;
                     default:
@@ -785,7 +777,6 @@ define([
                             sendHeadInfoCommand();
                         }
                         else {
-                            console.log(tryLimit, result);
                             if (0 < tryLimit && 'N/A' === (result.head_module || 'N/A')) {
                                 sendHeadInfoCommand();
                             }

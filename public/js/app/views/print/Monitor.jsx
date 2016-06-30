@@ -363,14 +363,7 @@ define([
         },
 
         _stopCamera: function() {
-            if(this.state.mode === mode.CAMERA) {
-                socketStatus.ready = false;
-                DeviceMaster.stopCamera().then(function() {
-                    return DeviceMaster.kick();
-                }).then(function() {
-                    socketStatus.ready = true;
-                });
-            }
+            DeviceMaster.stopStreamCamera();
         },
 
         _refreshDirectory: function() {
@@ -486,7 +479,7 @@ define([
 
         _handleBrowseFolder: function() {
             this._stopReport();
-            DeviceMaster.stopCamera();
+            this._stopCamera();
             filesInfo = [];
             pathArray = [];
 
@@ -884,8 +877,8 @@ define([
             if(report.st_label !== DeviceConstants.IDLE) {
                 timmer = setTimeout(this._processTimeout, timeoutLength);
             }
-            report.error = report.error || [];
-            // rootMode = statusId === DeviceConstants.status.IDLE ? DeviceConstants.IDLE : DeviceConstants.RUNNING;
+
+            report.error = (report.error instanceof Array ? report.error : [report.error]);
 
             // jug down errors as main and sub error for later use
             if(report.error.length > 0) {
@@ -916,6 +909,8 @@ define([
             if(errorActions[mainError]) {
                 errorActions[mainError](statusId);
             }
+
+            errorMessage = errorMessage || '';
 
             if(
                 !messageViewed &&

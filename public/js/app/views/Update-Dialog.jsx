@@ -4,8 +4,17 @@ define([
     'jsx!widgets/Button-Group',
     'helpers/api/config',
     'helpers/sprintf',
-    'helpers/i18n'
-], function(React, Modal, ButtonGroup, config, sprintf, i18n) {
+    'helpers/i18n',
+    'helpers/device-master'
+], function(
+    React,
+    Modal,
+    ButtonGroup,
+    config,
+    sprintf,
+    i18n,
+    DeviceMaster
+) {
     'use strict';
 
     var View = React.createClass({
@@ -35,7 +44,11 @@ define([
             this._onClose();
         },
 
-        _onClose: function() {
+        _onClose: function(quit) {
+            if ('toolhead' === this.props.type && true === quit) {
+                DeviceMaster.quitTask();
+            }
+
             this.props.onClose();
         },
 
@@ -50,7 +63,7 @@ define([
                 dataAttrs: {
                     'ga-event': 'update-' + this.props.type.toLowerCase() + '-later'
                 },
-                onClick: this._onClose
+                onClick: this._onClose.bind(this, true)
             },
             {
                 label: ('software' === this.props.type ?

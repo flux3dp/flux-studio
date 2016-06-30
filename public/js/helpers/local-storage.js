@@ -1,4 +1,4 @@
-define(function() {
+define(['localStorage'], function(localStorage) {
     'use strict';
 
     return {
