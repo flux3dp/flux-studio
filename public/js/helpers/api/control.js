@@ -295,13 +295,13 @@ define([
 
                 return {
                     pause: function() {
-                        interrupt('pause');
+                        interrupt('play pause');
                     },
                     resume: function() {
-                        interrupt('resume');
+                        interrupt('play resume');
                     },
                     abort: function() {
-                        interrupt('abort');
+                        interrupt('play abort');
                     }
                 };
             },
@@ -387,8 +387,8 @@ define([
                     d.resolve(result);
                 };
 
-                ws.send('abort');
-                lastOrder = 'abort';
+                ws.send('play abort');
+                lastOrder = 'play abort';
 
                 return d.promise();
             },
@@ -417,8 +417,8 @@ define([
                     d.resolve(result);
                 };
 
-                ws.send('pause');
-                lastOrder = 'pause';
+                ws.send('play pause');
+                lastOrder = 'play pause';
 
                 return d.promise();
             },
@@ -432,8 +432,8 @@ define([
                     d.resolve(result);
                 };
 
-                ws.send('resume');
-                lastOrder = 'resume';
+                ws.send('play resume');
+                lastOrder = 'play resume';
 
                 return d.promise();
             },
@@ -642,6 +642,9 @@ define([
                     else if (-1 < ['loading', 'unloading'].indexOf(result.status.toLowerCase())) {
                         deferred.notify(result);
                     }
+                    else if (result.status.toLowerCase() === 'operating') {
+                        // skip operating message
+                    }
                     else {
                         deferred.resolve(result);
                     }
@@ -681,7 +684,8 @@ define([
                         ws.send(blob);
                         break;
                     case 'uploading':
-                        // ignore
+                        result.percentage = (result.sent || 0) / blob.size * 100;
+                        deferred.notify(result);
                         break;
                     default:
                         deferred.reject(result);

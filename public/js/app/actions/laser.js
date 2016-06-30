@@ -423,7 +423,7 @@ define([
                 doLaser(settings);
             };
 
-        setInterval(resetPosition, 100);
+        resetPosTimer = setInterval(resetPosition, 100);
 
         shortcuts.on(
             ['del'],

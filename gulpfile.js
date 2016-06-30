@@ -12,23 +12,26 @@ var gulp = require('gulp'),
     cleanCSS = require('gulp-clean-css'),
     mocha = require('gulp-mocha');
 
-gulp.task('deployment', ['babel'], function(cb) {
+gulp.task('deployment', ['babel', 'cleancss'], function(cb) {
     pump([
-            gulp.src(['public/js/**/*.js', 'public/js/**/*.jsx', '!public/js/require.js', '!public/js/main.js']),
+            gulp.src(['public/js/**/*.js', '!public/js/require.js', '!public/js/main.js']),
             sourcemaps.init(),
             uglify(),
             sourcemaps.write(),
-            gulp.dest('public/js/'),
-            gulp.src('public/css/**/*.css'),
-            cleanCSS(),
-            gulp.dest('public/css/')
+            gulp.dest('public/js/')
         ],
         cb
     );
 });
 
+gulp.task('cleancss', function() {
+    return gulp.src('public/css/**/*.css')
+        .pipe(cleanCSS())
+        .pipe(gulp.dest('public/css/'));
+});
+
 gulp.task('babel', function() {
-    return gulp.src(['public/js/**/*.js', 'public/js/**/*.jsx', '!public/js/require.js', '!public/js/main.js', '!public/js/lib/**/*.js', '!public/js/helpers/CircularGridHelper.js'])
+    return gulp.src(['public/js/**/*.js', '!public/js/require.js', '!public/js/main.js', '!public/js/plugins/**/*.js', '!public/js/lib/**/*.js', '!public/js/helpers/CircularGridHelper.js'])
         .pipe(babel({
             presets: ['es2015']
         }))

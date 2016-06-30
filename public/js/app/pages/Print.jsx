@@ -522,38 +522,37 @@ define([
                     selectedPrinter = printer;
                     this.setState({
                         openPrinterSelectorWindow: false
+                    }, () => {
+                        let t = setInterval(() => {
+                            if(director.getSlicingStatus().isComplete) {
+                                clearInterval(t);
+                                director.getFCode().then((fcode, previewUrl) => {
+                                    if(!(fcode instanceof Blob)) {
+                                        AlertActions.showPopupError('', lang.print.out_of_range_message, lang.print.out_of_range);
+                                        return;
+                                    }
+                                    AlertStore.removeCancelListener(this._handleDefaultCancel);
+                                    removeCancelListener = false;
+                                    GlobalActions.showMonitor(selectedPrinter, fcode, previewUrl, GlobalConstants.PRINT);
+                                    //Tour popout after show monitor delay
+                                    setTimeout(() => {
+                                        if(tutorialMode) {
+                                            this.setState({
+                                                tutorialOn: true,
+                                                currentTutorialStep: 6
+                                            });
+                                            //Insert into root html
+                                            $('.tour-overlay').append($('.tour'));
+                                            $('.tour').click(() => {
+                                                $('.print-studio').append($('.tour'));
+                                                this._handleTutorialComplete();
+                                            });
+                                        };
+                                    }, 1000);
+                                });
+                            }
+                        }, 500);
                     });
-
-                    var t = setInterval(() => {
-                        if(director.getSlicingStatus().isComplete) {
-                            clearInterval(t);
-                            director.getFCode().then((fcode, previewUrl) => {
-                                if(!(fcode instanceof Blob)) {
-                                    AlertActions.showPopupError('', lang.print.out_of_range_message, lang.print.out_of_range);
-                                    return;
-                                }
-                                AlertStore.removeCancelListener(this._handleDefaultCancel);
-                                removeCancelListener = false;
-                                GlobalActions.showMonitor(selectedPrinter, fcode, previewUrl, GlobalConstants.PRINT);
-                                //Tour popout after show monitor delay
-                                setTimeout(() => {
-                                    if(tutorialMode) {
-                                        this.setState({
-                                            tutorialOn: true,
-                                            currentTutorialStep: 6
-                                        });
-                                        //Insert into root html
-                                        $('.tour-overlay').append($('.tour'));
-                                        $('.tour').click(() => {
-                                            $('.print-studio').append($('.tour'));
-                                            this._handleTutorialComplete();
-                                        });
-                                    };
-                                }, 1000);
-                            });
-                        }
-                    }, 500);
-
                 },
 
                 _handlePreviewLayerChange: function(targetLayer) {
@@ -710,19 +709,19 @@ define([
                     var d = $.Deferred(),
                         path = 'default';
 
-                    const setDefaultEngine = () => {
+                    const setDefaultEngine = (result) => {
                         advancedSettings.engine = 'slic3r';
                         this._saveSetting();
                         AlertActions.showPopupWarning(
                             'engine-change',
-                            lang.settings.engine_change_fail[result.error],
+                            lang.settings.engine_change_fail[result.error] + ', ' + result.info,
                             `${lang.settings.engine_change_fail.caption} ${engineName}`
                         );
-                    }
+                    };
 
                     director.changeEngine(engineName, path).then((error) => {
                         if(error) {
-                            setDefaultEngine();
+                            setDefaultEngine(error);
                         }
                         d.resolve();
                     });

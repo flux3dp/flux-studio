@@ -46,15 +46,13 @@ define([
                 var self = this,
                     $deferred = $.Deferred(),
                     currIndex = 0,
-                    sendFile = function() {
-                        files.forEach((file, i) => {
-                            file.isBroken = false;
+                    sendFile = function(file) {
+                        file.isBroken = false;
 
-                            self.get(file).done(function(response) {
-                                file.blob = response.blob;
-                                file.imgSize = response.size;
-                                $deferred.notify('next');
-                            });
+                        self.get(file).done(function(response) {
+                            file.blob = response.blob;
+                            file.imgSize = response.size;
+                            $deferred.notify('next');
                         });
                     };
 

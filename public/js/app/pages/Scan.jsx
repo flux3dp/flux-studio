@@ -651,6 +651,11 @@ define([
                         },
                         doStopConverting = function() {
                             isStopConvert = true;
+                            self.setState({
+                                saveFileType: 'pcd',
+                                hasConvert: false
+                            });
+                            self._switchMeshes(true, false);
                         };
 
                     self._openBlocker(true, ProgressConstants.WAITING, '', true, '', {

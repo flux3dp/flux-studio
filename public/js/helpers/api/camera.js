@@ -69,6 +69,7 @@ define([
                     events.onError(response);
                 },
                 onClose: function(response) {
+                    clearTimeout(timmer);
                     isConnected = false;
                 },
                 autoReconnect: false

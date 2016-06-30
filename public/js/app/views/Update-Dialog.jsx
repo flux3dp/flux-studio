@@ -6,7 +6,15 @@ define([
     'helpers/sprintf',
     'helpers/i18n',
     'helpers/device-master'
-], function(React, Modal, ButtonGroup, config, sprintf, i18n, DeviceMaster) {
+], function(
+    React,
+    Modal,
+    ButtonGroup,
+    config,
+    sprintf,
+    i18n,
+    DeviceMaster
+) {
     'use strict';
 
     var View = React.createClass({

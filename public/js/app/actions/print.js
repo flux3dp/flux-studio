@@ -260,6 +260,7 @@ define([
     function appendModel(fileUrl, file, ext, callback) {
         if(file.size === 0) {
             AlertActions.showPopupError('', lang.message.invalidFile);
+            slicingStatus.canInterrupt = true;
             return;
         }
         var stlLoader = new THREE.STLLoader(),
@@ -277,6 +278,7 @@ define([
                         openObjectDialogue: false
                     });
                     AlertActions.showPopupError('', lang.message.invalidFile);
+                    slicingStatus.canInterrupt = true;
                     return;
                 }
             }
@@ -943,7 +945,7 @@ define([
     }
 
     function onObjectTransform(e) {
-        if(previewMode) { return; }
+        if(previewMode || typeof SELECTED === 'undefined') { return; }
         switch (e.type) {
             case 'mouseDown':
                 objectBeforeTransform = {};
@@ -1155,7 +1157,6 @@ define([
     }
 
     function getFCode() {
-        console.log('get fcode');
         var d = $.Deferred();
 
         if(importFromFCode) {
@@ -2459,7 +2460,6 @@ define([
             ProgressActions.close();
         }
 
-        console.log('erasing last report');
         slicingStatus.inProgress    = false;
         slicingStatus.lastProgress  = null;
         slicingStatus.lastReport    = null;
@@ -2736,7 +2736,9 @@ define([
             if(!slicingStatus.showProgress) {
                 slicingStatus.showProgress = true;
             }
-            updateSlicingProgressFromReport(slicingStatus.lastReport);
+            if(typeof slicingStatus.lastReport !== 'undefined' && slicingStatus.lastReport !== null) {
+                updateSlicingProgressFromReport(slicingStatus.lastReport);
+            }
         }
     }
 
