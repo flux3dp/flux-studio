@@ -294,8 +294,8 @@ define([
                         y: convertToRealCoordinate(el_position.center.y, 'y')
                     };
                     size = {
-                        width: round(el_position.width / IMAGE_REAL_RATIO, -2),
-                        height: round(el_position.height / IMAGE_REAL_RATIO, -2)
+                        width: round(el_position.width * DIAMETER / PLATFORM_DIAMETER_PIXEL, -2),
+                        height: round(el_position.height * DIAMETER / PLATFORM_DIAMETER_PIXEL, -2)
                     };
                     angle = elementAngle($el[0]);
                     threshold = $el.data('threshold') || 128;
@@ -536,7 +536,6 @@ define([
                 },
                 onComplete: function(result) {
                     file.url = result.canvas.toDataURL('svg' === file.extension ? 'image/svg+xml' : 'image/png');
-
                     setupImage(file, file.imgSize, file.url);
                 }
             });
@@ -684,6 +683,10 @@ define([
                         file.url = url.createObjectURL(file.blob, { type: file.type });
                         file.imgSize = file.imgSize || { width: 0, height: 0 };
 
+                        // convert image size with 120dpi
+                        file.imgSize.width = file.imgSize.width / IMAGE_REAL_RATIO / DIAMETER * platformDiameter;
+                        file.imgSize.height = file.imgSize.height / IMAGE_REAL_RATIO / DIAMETER * platformDiameter;
+
                         if (platformDiameter < Math.max(file.imgSize.width , file.imgSize.height)) {
                             ratio = Math.min(360 / file.imgSize.width, 360 / file.imgSize.height);
                             file.imgSize.width = file.imgSize.width * ratio;
@@ -764,15 +767,15 @@ define([
                     args[type] = val;
                     break;
                 case 'width':
-                    val = round(val * IMAGE_REAL_RATIO, -2);
+                    val = round(val * PLATFORM_DIAMETER_PIXEL / DIAMETER, -2);
                     args.scalex = val / freetrans.originalSize.width;
-                    val = round(params.size.height * IMAGE_REAL_RATIO, -2);
+                    val = round(params.size.height * PLATFORM_DIAMETER_PIXEL / DIAMETER, -2);
                     args.scaley = val / freetrans.originalSize.height;
                     break;
                 case 'height':
-                    val = round(val * IMAGE_REAL_RATIO, -2);
+                    val = round(val * PLATFORM_DIAMETER_PIXEL / DIAMETER, -2);
                     args.scaley = val / freetrans.originalSize.height;
-                    val = round(params.size.width * IMAGE_REAL_RATIO, -2);
+                    val = round(params.size.width * PLATFORM_DIAMETER_PIXEL / DIAMETER, -2);
                     args.scalex = val / freetrans.originalSize.width;
                     break;
                 case 'angle':
