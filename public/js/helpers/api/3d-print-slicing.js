@@ -292,7 +292,7 @@ define([
                 return d.promise();
             },
 
-            stop: function() {
+            changeEngine: function(engine) {
                 var d = $.Deferred();
 
                 events.onMessage = function(result) {
@@ -303,43 +303,7 @@ define([
                     d.resolve(result);
                 };
 
-                ws.send(`stop`);
-
-                return d.promise();
-            },
-
-            changeEngine: function(engine, path) {
-                var d = $.Deferred();
-
-                events.onMessage = function(result) {
-                    d.resolve(result);
-                };
-
-                events.onError = function(result) {
-                    d.resolve(result);
-                };
-
-                path = path.trim() || 'default';
-
-                ws.send(`change_engine ${engine} ${path}`);
-
-                return d.promise();
-            },
-
-            checkEngine: function(engine, path) {
-                var d = $.Deferred();
-
-                events.onMessage = function(result) {
-                    d.resolve(result);
-                };
-
-                events.onError = function(result) {
-                    d.resolve(result);
-                };
-
-                path = path.trim() || 'default';
-
-                ws.send(`check_engine ${engine} ${path}`);
+                ws.send(`change_engine ${engine} default`);
 
                 return d.promise();
             },

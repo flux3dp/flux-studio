@@ -2764,14 +2764,7 @@ define([
             if(slicingStatus.canInterrupt) {
                 clearInterval(t);
                 slicingStatus.canInterrupt = false;
-                slicer.checkEngine(engine, path).then((result) => {
-                    if(result.status === 'ok') {
-                        return slicer.changeEngine(engine, path);
-                    }
-                    else {
-                        d.resolve(result);
-                    }
-                }).then(() => {
+                slicer.changeEngine(engine).then(() => {
                     slicingStatus.canInterrupt = true;
                     d.resolve();
                 });
