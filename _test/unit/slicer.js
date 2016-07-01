@@ -15,7 +15,7 @@ var fs = require('fs'),
 
 var injector,
     slicer,
-    wsReceived,
+    wsBehavior,
     command,
     testModel,
     totalStep,
@@ -24,7 +24,7 @@ var injector,
     wsReturnedMessage = {},
 
     _ok = {'status': 'ok'},
-    _sliceResultMockup = new Blob([JSON.stringify({hello: 'world'}, null, 2)], {type : 'application/json'});
+    _blob = new Blob([JSON.stringify({hello: 'world'}, null, 2)], {type : 'application/json'});
     _continue = {'status': 'continue'};
 
 global.$ = jQuery;
@@ -67,16 +67,11 @@ const saveWsResult = (c, result) => {
  */
 
 const defaultWsBehavior = (c, received) => {
-    // console.log(c, received);
-    wsReceivedMessage[c] = received;
     slicer.trigger(_ok);
 };
 
 const uploadWsBehavior = (c, received) => {
     // 1. respond continue 2. send binary 3. respond ok
-    if(typeof received !== 'object') {
-        wsReceivedMessage[c] = received;
-    }
     switch(typeof received) {
         case 'string':
             slicer.trigger(_continue);
@@ -91,8 +86,6 @@ const uploadWsBehavior = (c, received) => {
 };
 
 const reportSlicingWsBehavior = (c, received) => {
-    wsReceivedMessage[c] = received;
-
     reportSlicingResponse.forEach((response) => {
         slicer.trigger(response);
         slicer.trigger(_ok);
@@ -100,11 +93,14 @@ const reportSlicingWsBehavior = (c, received) => {
 };
 
 const getResultWsBehavior = (c, received) => {
-    wsReceivedMessage[c] = received;
     var okWithInfo = Object.assign({}, _ok);
-    okWithInfo['info'] = _sliceResultMockup.size;
+    okWithInfo['info'] = _blob.size;
     slicer.trigger(okWithInfo);
-    slicer.trigger(_sliceResultMockup);
+    slicer.trigger(_blob);
+};
+
+const getPathWsBehavior = (c, received) => {
+    slicer.trigger('[ [ [ -10.26, -1.36, 0.49, 3 ], [ -0.04, -0.06, 0.49, 0 ], [ -0.04, -0.06, 0.25, 3 ], [ 0.08, 0.05, 0.25, 0 ] ] ]');
 };
 
 /*
@@ -123,6 +119,10 @@ function* TestMaster() {
     yield testReportSlicing();
     yield testGetSlicingResult();
     yield testStopSlicing();
+    yield testGetPath();
+    yield testUploadPreviewImage();
+    yield testDuplicate();
+    yield testChangeEngine();
 }
 
 /*
@@ -130,21 +130,24 @@ function* TestMaster() {
  * Description: Test cases for each api
  */
 
-const testSetParameter = () => {
-    return new Promise((resolve, reject) => {
-        wsReceived = defaultWsBehavior;
-        command = 'set_parameter';
-        slicer.setParameter('advancedSettings','param=1').then((result) => {
-            saveWsResult(command, result);
-            resolve();
-        });
-    });
-
-};
+ const testSetParameter = () => {
+     return new Promise((resolve, reject) => {
+         wsBehavior = defaultWsBehavior;
+         command = 'setParameter1';
+         slicer.setParameter('advancedSettings', 'brim_width = 0').then((result) => {
+             saveWsResult(command, result);
+             command = 'setParameter2';
+             return slicer.setParameter('layer_height', '0.15');
+         }).then((result) => {
+             saveWsResult(command, result);
+             resolve();
+         });
+     });
+ };
 
 const testSet = () => {
     return new Promise((resolve, reject) => {
-        wsReceived = defaultWsBehavior;
+        wsBehavior = defaultWsBehavior;
         command = 'set';
         slicer.set('abc', 0, 0, 5, 0, 0, 0, 1, 1, 1).then((result) => {
             saveWsResult(command, result);
@@ -155,7 +158,7 @@ const testSet = () => {
 
 const testUpload  = () => {
     return new Promise((resolve, reject) => {
-        wsReceived = uploadWsBehavior;
+        wsBehavior = uploadWsBehavior;
         command = 'upload';
         loadTestModel().then((model) => {
             model.size = model.length;
@@ -171,7 +174,7 @@ const testUpload  = () => {
 
 const testGoG = () => {
     return new Promise((resolve, reject) => {
-        wsReceived = defaultWsBehavior;
+        wsBehavior = defaultWsBehavior;
         command = 'goG';
         slicer.goG(ids).then((result) => {
             saveWsResult(command, result);
@@ -182,7 +185,7 @@ const testGoG = () => {
 
 const testGoF = () => {
     return new Promise((resolve, reject) => {
-        wsReceived = defaultWsBehavior;
+        wsBehavior = defaultWsBehavior;
         command = 'goF';
         slicer.goF(ids).then((result) => {
             saveWsResult(command, result);
@@ -193,7 +196,7 @@ const testGoF = () => {
 
 const testBeginSlicingF = () => {
     return new Promise((resolve, reject) => {
-        wsReceived = defaultWsBehavior;
+        wsBehavior = defaultWsBehavior;
         command = 'beginSlicingF';
         slicer.beginSlicing(ids).then((result) => {
             saveWsResult(command, result);
@@ -204,7 +207,7 @@ const testBeginSlicingF = () => {
 
 const testBeginSlicingG = () => {
     return new Promise((resolve, reject) => {
-        wsReceived = defaultWsBehavior;
+        wsBehavior = defaultWsBehavior;
         command = 'beginSlicingG';
         slicer.beginSlicing(ids, 'g').then((result) => {
             saveWsResult(command, result);
@@ -216,7 +219,7 @@ const testBeginSlicingG = () => {
 const testReportSlicing = () => {
     return new Promise((resolve, reject) => {
         command = 'reportSlicing';
-        wsReceived = reportSlicingWsBehavior;
+        wsBehavior = reportSlicingWsBehavior;
         wsReturnedMessage[command] = [];
         slicer.reportSlicing((response) => {
             if(response.slice_status === 'complete') {
@@ -233,7 +236,7 @@ const testReportSlicing = () => {
 const testGetSlicingResult = () => {
     return new Promise((resolve, reject) => {
         command = 'getSlicingResult';
-        wsReceived = getResultWsBehavior;
+        wsBehavior = getResultWsBehavior;
         slicer.getSlicingResult().then((result) => {
             saveWsResult(command, result);
             resolve();
@@ -244,8 +247,52 @@ const testGetSlicingResult = () => {
 const testStopSlicing = () => {
     return new Promise((resolve, reject) => {
         command = 'endSlicing';
-        wsReceived = defaultWsBehavior;
+        wsBehavior = defaultWsBehavior;
         slicer.stopSlicing().then((result) => {
+            saveWsResult(command, result);
+            resolve();
+        });
+    });
+};
+
+const testGetPath = () => {
+    return new Promise((resolve, reject) => {
+        command = 'getPath';
+        wsBehavior = getPathWsBehavior;
+        slicer.getPath().then((result) => {
+            saveWsResult(command, result);
+            resolve();
+        });
+    });
+};
+
+const testUploadPreviewImage = () => {
+    return new Promise((resolve, reject) => {
+        command = 'uploadPreviewImage';
+        wsBehavior = uploadWsBehavior;
+        slicer.uploadPreviewImage(_blob).then((result) => {
+            saveWsResult(command, result);
+            resolve();
+        });
+    });
+};
+
+const testDuplicate = () => {
+    return new Promise((resolve, reject) => {
+        command = 'duplicate';
+        wsBehavior = defaultWsBehavior;
+        slicer.duplicate('name1', 'name2').then((result) => {
+            saveWsResult(command, result);
+            resolve();
+        });
+    });
+};
+
+const testChangeEngine = () => {
+    return new Promise((resolve, reject) => {
+        command = 'changeEngine';
+        wsBehavior = defaultWsBehavior;
+        slicer.changeEngine('cura').then((result) => {
             saveWsResult(command, result);
             resolve();
         });
@@ -262,7 +309,11 @@ injector
         return {
             // this is called when api called ws.send()
             send: function(result) {
-                wsReceived(command, result);
+                if(typeof result !== 'object') {
+                    wsReceivedMessage[command] = result;
+                }
+                // wsReceivedMessage[command] = result;
+                wsBehavior(command, result);
             }
         };
     })
@@ -297,9 +348,11 @@ describe('SLICER TEST', () => {
         });
     });
 
-    it('set slicer parameter', () => {
-        expect(wsReceivedMessage['set_parameter']).to.be.equal('advanced_setting param=1');
-        expect(wsReturnedMessage['set_parameter']).to.be.equal(_ok);
+    it('should set parameter with multiple pair and single pair', () => {
+        expect(wsReceivedMessage['setParameter1']).to.be.equal('advanced_setting brim_width = 0');
+        expect(wsReturnedMessage['setParameter1']).to.be.equal(_ok);
+        expect(wsReceivedMessage['setParameter2']).to.be.equal('advanced_setting layer_height = 0.15');
+        expect(wsReturnedMessage['setParameter2']).to.be.equal(_ok);
     });
 
     it('set object position, rotation and scale', () => {
@@ -340,12 +393,32 @@ describe('SLICER TEST', () => {
     it('receive a blob with the size specified', () => {
         expect(wsReceivedMessage['getSlicingResult']).to.be.equal('get_result');
         expect((wsReturnedMessage['getSlicingResult']) instanceof Blob).to.be.equal(true);
-        expect(wsReturnedMessage['getSlicingResult'].size).to.be.equal(_sliceResultMockup.size);
+        expect(wsReturnedMessage['getSlicingResult'].size).to.be.equal(_blob.size);
     });
 
     it('able to stop slicing', () => {
         expect(wsReceivedMessage['endSlicing']).to.be.equal(`end_slicing`);
         expect(wsReturnedMessage['endSlicing']).to.be.equal(_ok);
+    });
+
+    it('received toolpath as expected', () => {
+        expect(wsReceivedMessage['getPath']).to.be.equal('get_path');
+        expect(wsReturnedMessage['getPath']).to.be.equal('[ [ [ -10.26, -1.36, 0.49, 3 ], [ -0.04, -0.06, 0.49, 0 ], [ -0.04, -0.06, 0.25, 3 ], [ 0.08, 0.05, 0.25, 0 ] ] ]');
+    });
+
+    it('upload preview image for fcode / print file preview', () => {
+        expect(wsReceivedMessage['uploadPreviewImage']).to.be.equal(`upload_image ${_blob.size}`);
+        expect(wsReturnedMessage['uploadPreviewImage']).to.be.equal(_ok);
+    });
+
+    it('duplicate object', () => {
+        expect(wsReceivedMessage['duplicate']).to.be.equal('duplicate name1 name2');
+        expect(wsReturnedMessage['duplicate']).to.be.equal(_ok);
+    });
+
+    it('change engine without problem', () => {
+        expect(wsReceivedMessage['changeEngine']).to.be.equal('change_engine cura default');
+        expect(wsReturnedMessage['changeEngine']).to.be.equal(_ok);
     });
 
 });
