@@ -2,16 +2,11 @@ define(function() {
     'use strict';
 
     return {
-        brand_name : 'FLUX',
-        app : {
-            name : 'Flux Studio - en'
-        },
         support: {
             no_webgl: 'WebGL is not supported. Please use other devices.'
         },
         device_selection: {
             no_printers: 'Cannot detect FLUX Delta through Wi-Fi. Please check if your PC and FLUX Delta are under the same network. <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/215394548">More Info</a>',
-            device_name: 'DEVICE NAME',
             module: 'MODULE',
             status: 'STATUS'
         },
@@ -49,7 +44,6 @@ define(function() {
                 update_fail: 'Update Fail'
             },
             updating: 'Updating...',
-            network_unreachable: 'Network is unreachable',
             skip: 'Skip This Version',
             later: 'LATER',
             install: 'INSTALL',
@@ -67,7 +61,6 @@ define(function() {
             file: {
                 label: 'File',
                 import: 'Import',
-                save_gcode: 'Export Gcode',
                 save_fcode: 'Export FLUX Task',
                 save_scene: 'Save Scene'
             },
@@ -101,7 +94,6 @@ define(function() {
                 label: 'Help',
                 help_center: 'Help Center',
                 contact: 'Contact Us',
-                troubleshooting: 'Troubleshooting',
                 tutorial: 'Start Printing Tutorial',
                 software_update: 'Software Update',
                 debug: 'Bug Report',
@@ -205,12 +197,7 @@ define(function() {
             home: {
                 line1: 'Do you have available Wi-Fi could be able access?',
                 line2: 'We are helping your FLUX to connecting to Wi-Fi',
-                select: 'Yes',
-                no_available_wifi: 'No, I haven\'t'
-            },
-            select: {
-                choose_wifi: 'Please choose Wi-Fi what you wanna connect',
-                no_wifi_available: 'There is no available Wi-Fi'
+                select: 'Yes'
             },
             set_password: {
                 line1: '請輸入「',
@@ -218,8 +205,7 @@ define(function() {
                 password_placeholder: '請輸入 Wi-Fi 密碼',
                 back: 'Back',
                 join: 'Join',
-                connecting: 'Connecting',
-                no_selected: 'No SSID selected'
+                connecting: 'Connecting'
             },
             success: {
                 caption: '太棒了，連線成功!',
@@ -239,23 +225,6 @@ define(function() {
                 password_placeholder: '設定密碼',
                 notice: '設定密碼，可以確保你的 FLUX Delta 只有知道密碼的人可以操作',
                 next: '下一步'
-            },
-            setup_complete: {
-                caption: 'We have completed all settings！',
-                description: 'Lets start your first printing experience！',
-                start: 'Start Using FLUX'
-            },
-            configuring_flux: {
-                caption: 'We\'re configuring your FLUX Detla as a Wi-Fi station',
-                description: 'so you can control your FLUX Detla through Wi-Fi network',
-                next: 'next',
-                footer: 'I want to swtich back to Wi-Fi connection'
-            },
-            configured_flux: {
-                caption: 'Your FLUX Detla is now a Wi-Fi station',
-                description: 'you can start using it after few simple setting',
-                next: 'next',
-                footer: 'I want to swtich back to Wi-Fi connection'
             }
         },
         menu: {
@@ -271,7 +240,6 @@ define(function() {
             caption: 'Settings',
             tabs: {
                 general: 'General',
-                flux_cloud: 'FLUX Could',
                 printer: 'Printer'
             },
             ip: 'Delta\'s IP',
@@ -279,52 +247,13 @@ define(function() {
             language: 'Language',
             notifications: 'Notifications',
             close: 'Close',
-            printer: {
-                new_printer: 'Add new printer',
-                name: 'Printer Name',
-                current_password: 'Current Password',
-                set_password: 'Set Password',
-                security_notice: 'You can protect your printer with password',
-                connected_wi_fi: 'Connected Wi-Fi',
-                advanced: 'Advanced',
-                join_other_network: 'Join Other Network',
-                disconnect_with_this_printer: 'Disconnect With This Printer',
-                your_password: 'Your Password',
-                confirm_password: 'Confirm Password',
-                save_password: 'Save Password'
-            },
-            flux_cloud: {
-                caption: 'Get FLUX 3D Printer be remote!',
-                line1: 'Control your FLUX 3D Printer with FLUX Cloud in anywhere you are',
-                start_to_use: 'Start to Use',
-                i_have_an_account: 'I have an account',
-                email: 'Email',
-                password: 'Password',
-                change_password: 'Change Password',
-                connected_printer: 'Connected Printer',
-                connect: 'Connect'
-            },
             cancel: 'CANCEL',
             done: 'DONE',
-            create_account: {
-                create: 'Create new account',
-                your_email: 'Your Email',
-                password: 'Your Password',
-                confirm_password: 'Confirm Password',
-                signup: 'Sign Up',
-                not_now: 'not now'
-            },
-            activate_info:  {
-                almost_there: 'Almost there!',
-                description: 'Go to your email inbox and activate your account',
-                got_it: 'Got it'
-            },
             connect_printer: {
                 title: 'Connect with your printer'
             },
             notification_on: 'On',
             notification_off: 'Off',
-            cura_engine_path: 'Cura Engine Path',
             engine_change_fail: {
                 'caption': 'unable to change engine ',
                 '1': 'error during checking',
@@ -335,10 +264,7 @@ define(function() {
         },
         print: {
             import: 'IMPORT',
-            go_home: 'Go Home',
             save: 'Save',
-            normal_preview: 'Normal Preview',
-            support_preview: 'Support Preview',
             start_print: 'Print',
             advanced: {
                 general: 'General',
@@ -350,7 +276,6 @@ define(function() {
                 slicingEngine: 'Slicing Engine',
                 slic3r: 'Slic3r',
                 cura: 'Cura',
-                experiment: 'Experiment',
                 filament: 'Filament',
                 temperature: 'Temperature',
                 layer_height_title: 'Layer Height',
@@ -383,7 +308,6 @@ define(function() {
                 spacing: 'Spacing',
                 overhang: 'Overhang',
                 zDistance: 'Z Distance',
-                support_pattern: 'Pattern',
                 raft: 'Raft',
                 raftLayers: 'Raft Layers',
                 brim: 'Brim Width',
@@ -404,7 +328,6 @@ define(function() {
                 save: 'SAVE',
                 saveAsPreset: 'Save Preset',
                 cancel: 'CANCEL',
-                saveAndApply: 'SAVE & APPLY',
                 delete: 'DELETE',
                 loadPreset: 'Load Preset',
                 savePreset: 'Save Preset'
@@ -524,10 +447,8 @@ define(function() {
                 preview: 'PREVIEW',
                 plaTitle: 'PICK THE COLOR OF THE FILAMENT',
                 transparent: 'TRANSPARENT',
-                qualityTitle: 'It will affect the outcome surface smoothness of your object. Better qualities need more time',
                 raftTitle: 'Raft are layers built under your parts and help them stick to the base plate',
                 supportTitle: 'Support are generated structures to supportt overhanging parts of your object, in order to prevent filament dropping',
-                previewTitle: 'Preview the actual path of toolhead during printing task',
                 advancedTitle: 'Detail 3d printing parameters, you may acheive better result than default by adjusting them',
                 confirmExitFcodeMode: 'Exiting preview mode will unload the fcode, are you sure?'
             },
@@ -542,17 +463,13 @@ define(function() {
                 low: 'LOW QUALITY',
                 custom: 'CUSTOM QUALITY'
             },
-            quick_print: 'Quick Print',
             scale: 'SCALE',
             rotate: 'ROTATE',
-            align_center: 'Align Center',
             delete: 'Delete',
             reset: 'Reset',
             cancel: 'CANCEL',
             done: 'DONE',
-            gram: 'g',
             pause: 'PAUSE',
-            continue: 'CONTINUE',
             restart: 'RESTART',
             download_prompt: 'please enter file name',
             importTitle: 'Import 3D models ( .stl )',
@@ -589,20 +506,14 @@ define(function() {
             save: 'Save',
             custom: 'Custom',
             presets: 'Presets',
-            acceptable_files: 'JPG, PNG, SVG',
-            drop_files_to_import: 'Drop your file here or click "import" to upload your file',
             button_advanced: 'ADVANCED',
             confirm: 'Confirm',
-            start_engrave: 'Engrave',
-            start_cut: 'Cut',
-            close_alert: 'Close',
             get_fcode: 'Save<br/>Task',
             name: 'Name',
             go: 'GO',
             process_caption: 'Generating',
             laser_accepted_images: 'Supported formats: BMP/GIF/JPG/PNG/SVG',
             draw_accepted_images: 'Supported formats: SVG',
-            svg_only: 'This file is not SVG',
             svg_fail_messages: {
                 'TEXT_TAG': 'SVG Tag &lt;text&gt; is not supported',
                 'DEFS_TAG': 'SVG Tag &lt;defs&gt; is not supported',
@@ -724,7 +635,6 @@ define(function() {
             }
         },
         scan: {
-            start_scan: 'Scan',
             stop_scan: 'Stop',
             over_quota: 'Over quota',
             convert_to_stl: 'Convert',
@@ -732,7 +642,6 @@ define(function() {
             start_multiscan: 'Extra Scan',
             processing: 'Processing...',
             remaining_time: 'Left',
-            elapsed_time: 'Elapsed Time',
             do_save: 'Save STL',
             go: 'Go',
             rollback: 'Back',
@@ -799,7 +708,6 @@ define(function() {
                 size: 'SIZE',
                 rotate: 'ROTATE',
                 crop: 'Crop',
-                auto_merge: 'Loading filament',
                 manual_merge: 'Merge',
                 clear_noise: 'Denoise',
                 save_pointcloud: 'Export'
@@ -844,13 +752,9 @@ define(function() {
             unable_to_connect: '#008 Unable to build a stable connection with machine'
         },
         device: {
-            camera_on: 'Open Camera',
-            camera_off: 'Close Camera',
-            browse_file: 'Browse Files',
             pause: 'Pause',
             paused: 'Paused',
             pausing: 'Pausing',
-            cancelTask: 'Cancel Task',
             select_printer: 'Select Printer',
             retry: 'Retry',
             status: 'Status',
@@ -859,9 +763,7 @@ define(function() {
             reset: 'Reset (Kick)',
             abort: 'Abort',
             start: 'Start',
-            no_task: 'There are currently no task to do',
             please_wait: 'Please Wait...',
-            unknown_command: 'command cannot be executed in current status',
             quit: 'Quit',
             heating: 'Heating',
             completing: 'Completing',
@@ -881,8 +783,6 @@ define(function() {
             },
             noTask: 'There are currently no task to do',
             pleaseWait: 'Please Wait...',
-            unknownCommand: 'command cannot be executed in current status',
-            working: 'Working',
             finishing: 'Finishing',
             initiating: 'Initiating',
             unknown: 'Unknown',
@@ -978,20 +878,6 @@ define(function() {
             yes: 'YES',
             no: 'NO',
             stop: 'Stop'
-        },
-        color: {
-            green: 'GREEN',
-            red: 'RED',
-            black: 'BLACK',
-            turquoise: 'TURQUOISE',
-            orange: 'ORANGE',
-            gray: 'GRAY',
-            blue: 'BLUE',
-            brown: 'BROWN',
-            white: 'WHITE',
-            purple: 'PURPLE',
-            yellow: 'YELLOW',
-            transparent: 'TRANSPARENT'
         },
         caption: {
             connectionTimeout: 'Connection timeout'
