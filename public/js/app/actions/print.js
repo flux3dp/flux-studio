@@ -133,6 +133,7 @@ define([
 
     var models = [];
 
+    previewColors[-1] = new THREE.Color(Settings.print_config.color_default);
     previewColors[0] = new THREE.Color(Settings.print_config.color_infill);
     previewColors[1] = new THREE.Color(Settings.print_config.color_perimeter);
     previewColors[2] = new THREE.Color(Settings.print_config.color_support);
@@ -683,12 +684,15 @@ define([
         if(report.slice_status === 'error') {
             clearInterval(slicingStatus.reporter);
 
-            if(report.error === 'gcode area too big') {
-                slicingStatus.lastReport.error = lang.message.gCodeAreaTooBigMessage;
-                slicingStatus.lastReport.caption = lang.message.gCodeAreaTooBigCaption;
-            }
-            else {
-                slicingStatus.lastReport.caption = lang.alert.error;
+            slicingStatus.lastReport.info = lang.slicer.error[report.error];
+            slicingStatus.lastReport.caption = lang.alert.error;
+
+            if(report.error === '6') {
+                reactSrc.setState({ disablePreview: true }, () => {
+                    if(previewMode) {
+                        _closePreview();
+                    }
+                });
             }
 
             if(show || previewMode) {
@@ -701,7 +705,7 @@ define([
                 }
             }
             slicingStatus.hasError = true;
-            AlertActions.showPopupError('', slicingStatus.lastReport.error, slicingStatus.lastReport.caption);
+            AlertActions.showPopupError('', slicingStatus.lastReport.info, slicingStatus.lastReport.caption);
             slicingStatus.lastProgress = '';
             reactSrc.setState({ hasOutOfBoundsObject: true });
         }
@@ -881,10 +885,17 @@ define([
 
     function onMouseUp(e) {
         e.preventDefault();
-        reactSrc.setState({
+        let o = {
             isTransforming: false,
             updateCamera: false
-        });
+        };
+
+        if(reactSrc.state.disablePreview) {
+            o = Object.assign(o, { disablePreview: false });
+        }
+
+        reactSrc.setState(o);
+
         orbitControl.enabled = true;
         mouseDown = false;
         container.style.cursor = 'auto';
@@ -2529,15 +2540,6 @@ define([
     }
 
     function _showPreview() {
-        if(slicingStatus.hasError) {
-            AlertActions.showPopupError(
-                '',
-                slicingStatus.lastReport.error,
-                slicingStatus.lastReport.caption);
-            setTimeout(function() { cancelPreview(); }, 500);
-            return;
-        }
-
         selectObject(null);
         // previewMode = true;
         transformControl.detach(SELECTED);
@@ -2602,8 +2604,7 @@ define([
     function _drawPath() {
         var d = $.Deferred(),
             color,
-            g, m, line,
-            type;
+            g, m, line;
 
         previewScene.children.splice(1, previewScene.children.length - 1);
         m = new THREE.LineBasicMaterial({
@@ -2619,7 +2620,7 @@ define([
 
             for (var point = 1; point < printPath[layer].length; point++) {
                 for (var tmp = 1; tmp >= 0; tmp--) {
-                    color.push(previewColors[printPath[layer][point][3]]);
+                    color.push(previewColors[printPath[layer][point][3]] || previewColors[-1]);
                     g.vertices.push(new THREE.Vector3(
                         printPath[layer][point - tmp][0],
                         printPath[layer][point - tmp][1],
