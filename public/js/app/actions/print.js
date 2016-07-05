@@ -2599,6 +2599,7 @@ define([
         reactSrc.setState({ previewMode: false }, () => {
             $('#preview').parents('label').find('input').prop('checked',false);
         });
+        render();
     }
 
     function _drawPath() {
