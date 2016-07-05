@@ -133,6 +133,7 @@ define([
 
     var models = [];
 
+    previewColors[-1] = new THREE.Color(Settings.print_config.color_default);
     previewColors[0] = new THREE.Color(Settings.print_config.color_infill);
     previewColors[1] = new THREE.Color(Settings.print_config.color_perimeter);
     previewColors[2] = new THREE.Color(Settings.print_config.color_support);
@@ -2619,7 +2620,7 @@ define([
 
             for (var point = 1; point < printPath[layer].length; point++) {
                 for (var tmp = 1; tmp >= 0; tmp--) {
-                    color.push(previewColors[printPath[layer][point][3]]);
+                    color.push(previewColors[printPath[layer][point][3]] || previewColors[-1]);
                     g.vertices.push(new THREE.Vector3(
                         printPath[layer][point - tmp][0],
                         printPath[layer][point - tmp][1],

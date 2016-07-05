@@ -31,7 +31,8 @@ define(function() {
             color_skirt: 0x5D4157,
             color_outer_wall: 0x57595b,
             color_base_plate: 0x777777,
-            color_material: 0x888888
+            color_material: 0x888888,
+            color_default: 0xA17898
         }
     };
 });
