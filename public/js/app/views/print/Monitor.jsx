@@ -125,7 +125,6 @@ define([
         rightButtonOn = true;
 
     var opts = {};
-    var temp = [];
 
     operationStatus = [
         DeviceConstants.RUNNING,
@@ -552,8 +551,6 @@ define([
             var self = this;
             if(history.length > 1) {
                 history.pop();
-                pathArray.pop();
-                temp.pop();
             }
             filePreview = false;
             lastAction = history[history.length - 1];
@@ -561,6 +558,9 @@ define([
             if(this.state.mode === mode.CAMERA) {
                 this._stopCamera();
                 this.setState({ waiting: false });
+            }
+            else {
+                pathArray.pop();
             }
             this._clearSelectedItem();
 
