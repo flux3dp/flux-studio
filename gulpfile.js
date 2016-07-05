@@ -50,7 +50,7 @@ gulp.task('sass:watch', function () {
     gulp.watch('./public/sass/**/*.scss', ['sass']);
 });
 
-gulp.task('webserver', function() {
+gulp.task('webserver', ['sass:watch'], function() {
     gulp.src('public')
         .pipe(webserver({
             livereload: true,
