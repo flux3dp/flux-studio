@@ -32,5 +32,10 @@ Build flux API first (See [fluxclient](https://github.com/flux3dp/fluxclient/REA
 1. Copy slic3r (slic3r-console.exe for Windows) and CuraEngine (CuraEngine.exe for Windows) to `[NWJS_APP_PATH]/lib/`
 
 1. Setup fluxclient `[FLUXCLIENT_PATH]/setup.py develop`
+
 1. Package `[FLUXGHOST_PATH]/pyinstaller --clean --noconfirm  ghost.spec`
+
 1. Copy the folder `[FLUXGHOST_PATH]/dist/flux_api` to `[NWJS_APP_PATH]/lib/`
+
+## License
+AGPLv3
