@@ -524,9 +524,18 @@ define([
         }
 
         function handleUploadImage(file) {
+            // if this is svg file that does provide a bigger enough image
+            var width = file.imgSize.width,
+                height = file.imgSize.height;
+
+            if ('svg' === self.state.fileFormat) {
+                width = PLATFORM_DIAMETER_PIXEL;
+                height = PLATFORM_DIAMETER_PIXEL;
+            }
+
             imageData(file.blob, {
-                width: file.imgSize.width,
-                height: file.imgSize.height,
+                width: width,
+                height: height,
                 type: file.type,
                 grayscale: {
                     is_rgba: true,
