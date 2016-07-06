@@ -222,7 +222,7 @@ define([
                 };
 
                 events.onError = function(result) {
-                    errors.push(result.error);
+                    d.reject(result);
                 };
 
                 if(name === 'advancedSettings' && value !== '') {

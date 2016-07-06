@@ -382,7 +382,7 @@ define([
                         cantUpload = function(files) {
                             return files.some(function(file) {
                                 return false === file.isPCD;
-                            })
+                            }) || 0 === files.length;
                         },
                         uploadQuota;
 

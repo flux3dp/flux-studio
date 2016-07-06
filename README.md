@@ -16,7 +16,7 @@ FLUX Studio is the companion application for [FLUX Delta](http://flux3dp.com). I
 `npm install --save-dev`
 
 ## Running
-Build flux API first (See [fluxclient](https://github.com/flux3dp/fluxclient/README.md) and [fluxghost](https://github.com/flux3dp/fluxghost/blob/master/README.md) for more detail)
+Build flux API first (See [fluxclient](https://github.com/flux3dp/fluxclient/blob/master/README.md) and [fluxghost](https://github.com/flux3dp/fluxghost/blob/master/README.md) for more detail)
 
 `gulp webserver`
 

@@ -43,6 +43,6 @@
   },
   "scripts": {
     "test": "mocha '_test/unit/slicer.js' --compilers js:babel-core/register",
-    "start" "gulp webserver"
+    "start": "gulp webserver"
   }
 }

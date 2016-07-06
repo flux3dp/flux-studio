@@ -1009,7 +1009,8 @@ define(function() {
         slicer: {
             computing: 'Computing',
             error: {
-                '6': 'Toolpath out of range, please reduce the size of the object(s), or try to turn off raft, brim or skirt'
+                '6': 'Toolpath out of range, please reduce the size of the object(s), or try to turn off raft, brim or skirt',
+                '7': 'Error setting advanced parameter\n'
             }
         },
         calibration: {

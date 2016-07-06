@@ -1373,16 +1373,16 @@ define([
             if(slicingStatus.canInterrupt) {
                 clearInterval(t);
                 slicingStatus.canInterrupt = false;
-                slicer.setParameter('advancedSettings', settings.custom).then(function(result, errors) {
+                slicer.setParameter('advancedSettings', settings.custom).then((result, errors) => {
                     slicingStatus.canInterrupt = true;
                     slicingStatus.showProgress = false;
                     slicingStatus.pauseReport = false;
                     if(objects.length > 0) {
                         doSlicing();
                     }
-                    if(errors.length > 0) {
-                        AlertActions.showPopupError(_id, errors.join('\n'));
-                    }
+                    d.resolve('');
+                }, (error) => {
+                    AlertActions.showPopupError(_id, lang.slicer.error[error.error] + error.info);
                     d.resolve('');
                 });
                 blobExpired = true;
@@ -2599,6 +2599,7 @@ define([
         reactSrc.setState({ previewMode: false }, () => {
             $('#preview').parents('label').find('input').prop('checked',false);
         });
+        render();
     }
 
     function _drawPath() {

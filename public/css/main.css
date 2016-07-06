@@ -6149,7 +6149,8 @@ input.switch:checked ~ label:after {
             display: block;
             height: 100%;
             margin: 0 auto;
-            object-fit: cover; }
+            object-fit: cover;
+            pointer-events: none; }
     .scan-studio .scan-printer-selection {
         overflow: hidden;
         position: relative;
