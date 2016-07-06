@@ -23,12 +23,5 @@ define([
         view.props = args.props;
 
         views.push(React.render(view, el));
-
-        $('body').off('change').on('change', '#select-lang', function(e) {
-            args.state.lang = i18n.setActiveLang(e.currentTarget.value).get();
-            views.forEach(function(view, key) {
-                view.setState(args.state);
-            });
-        });
     };
 });
