@@ -837,28 +837,27 @@ define([
                 return;
             }
             info = info || [];
-            info[0] = info[0] || {};
 
             if(!this._hasFCode()) {
-                if(info[2] instanceof Blob) {
-                    previewUrl = window.URL.createObjectURL(info[2]);
+                let blobIndex = info.findIndex(o => o instanceof Blob);
+                if(blobIndex > 0) {
+                    previewUrl = window.URL.createObjectURL(info[blobIndex]);
                 }
             }
 
-            if(!info[0].TIME_COST) {
-                return;
+            let o = this._findObjectContainsProperty(info, 'TIME_COST');
+            if(o.length > 0) {
+                totalTimeInSeconds = o[0].TIME_COST;
             }
 
-            if(info[0].TIME_COST) {
-                totalTimeInSeconds = info[0].TIME_COST;
-            }
-
-            if(info[0].HEAD_TYPE) {
-                taskInfo = lang.monitor.task[info[0].HEAD_TYPE.toUpperCase()];
+            o = this._findObjectContainsProperty(info, 'HEAD_TYPE');
+            if(o.length > 0) {
+                taskInfo = lang.monitor.task[o[0].HEAD_TYPE.toUpperCase()];
             }
             else {
                 taskInfo = 'Unknown';
             }
+
             this.forceUpdate();
         },
 
@@ -1234,6 +1233,10 @@ define([
             else {
                 return '';
             }
+        },
+
+        _findObjectContainsProperty: function(infoArray, propertyName) {
+            return infoArray.filter((o) => Object.keys(o).some(o => o === propertyName));
         },
 
         _renderCameraContent: function() {
