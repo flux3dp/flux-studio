@@ -10,7 +10,7 @@ define([
     'jsx!views/laser/Image-Panel',
     'jsx!widgets/File-Uploader',
     'jsx!widgets/Modal',
-    'jsx!views/Print-Selector',
+    'jsx!views/Printer-Selector',
     'jsx!widgets/Button-Group',
     'helpers/api/config',
     'helpers/dnd-handler'

@@ -133,6 +133,7 @@ define([
 
     var models = [];
 
+    previewColors[-1] = new THREE.Color(Settings.print_config.color_default);
     previewColors[0] = new THREE.Color(Settings.print_config.color_infill);
     previewColors[1] = new THREE.Color(Settings.print_config.color_perimeter);
     previewColors[2] = new THREE.Color(Settings.print_config.color_support);
@@ -683,12 +684,15 @@ define([
         if(report.slice_status === 'error') {
             clearInterval(slicingStatus.reporter);
 
-            if(report.error === 'gcode area too big') {
-                slicingStatus.lastReport.error = lang.message.gCodeAreaTooBigMessage;
-                slicingStatus.lastReport.caption = lang.message.gCodeAreaTooBigCaption;
-            }
-            else {
-                slicingStatus.lastReport.caption = lang.alert.error;
+            slicingStatus.lastReport.info = lang.slicer.error[report.error];
+            slicingStatus.lastReport.caption = lang.alert.error;
+
+            if(report.error === '6') {
+                reactSrc.setState({ disablePreview: true }, () => {
+                    if(previewMode) {
+                        _closePreview();
+                    }
+                });
             }
 
             if(show || previewMode) {
@@ -701,7 +705,7 @@ define([
                 }
             }
             slicingStatus.hasError = true;
-            AlertActions.showPopupError('', slicingStatus.lastReport.error, slicingStatus.lastReport.caption);
+            AlertActions.showPopupError('', slicingStatus.lastReport.info, slicingStatus.lastReport.caption);
             slicingStatus.lastProgress = '';
             reactSrc.setState({ hasOutOfBoundsObject: true });
         }
@@ -881,10 +885,17 @@ define([
 
     function onMouseUp(e) {
         e.preventDefault();
-        reactSrc.setState({
+        let o = {
             isTransforming: false,
             updateCamera: false
-        });
+        };
+
+        if(reactSrc.state.disablePreview) {
+            o = Object.assign(o, { disablePreview: false });
+        }
+
+        reactSrc.setState(o);
+
         orbitControl.enabled = true;
         mouseDown = false;
         container.style.cursor = 'auto';
@@ -1122,27 +1133,27 @@ define([
             }).then(function(response) {
                 if (response.status === 'ok') {
                     syncObjectParameter().then(function() {
-                        slicer.goG(ids, function(result) {
-                            if (result instanceof Blob) {
-                                blobExpired = false;
-                                responseBlob = result;
-                                ProgressActions.close();
-                                d.resolve(result);
+                        return slicer.goG(ids);
+                    }).then((result) => {
+                        if (result instanceof Blob) {
+                            blobExpired = false;
+                            responseBlob = result;
+                            ProgressActions.close();
+                            d.resolve(result);
+                        }
+                        else {
+                            if (result.status !== 'error') {
+                                var serverMessage = `${result.status}: ${result.message} (${parseInt(result.percentage * 100)}%)`,
+                                    drawingMessage = `Finishing up... (100%)`,
+                                    message = result.status !== 'complete' ? serverMessage : drawingMessage;
+                                if(!willReslice) {
+                                    ProgressActions.updating(message, parseInt(result.percentage * 100));
+                                }
                             }
                             else {
-                                if (result.status !== 'error') {
-                                    var serverMessage = `${result.status}: ${result.message} (${parseInt(result.percentage * 100)}%)`,
-                                        drawingMessage = `Finishing up... (100%)`,
-                                        message = result.status !== 'complete' ? serverMessage : drawingMessage;
-                                    if(!willReslice) {
-                                        ProgressActions.updating(message, parseInt(result.percentage * 100));
-                                    }
-                                }
-                                else {
-                                    ProgressActions.close();
-                                }
+                                ProgressActions.close();
                             }
-                        });
+                        }
                     });
                 }
                 // error
@@ -1362,16 +1373,16 @@ define([
             if(slicingStatus.canInterrupt) {
                 clearInterval(t);
                 slicingStatus.canInterrupt = false;
-                slicer.setParameter('advancedSettings', settings.custom).then(function(result, errors) {
+                slicer.setParameter('advancedSettings', settings.custom).then((result, errors) => {
                     slicingStatus.canInterrupt = true;
                     slicingStatus.showProgress = false;
                     slicingStatus.pauseReport = false;
                     if(objects.length > 0) {
                         doSlicing();
                     }
-                    if(errors.length > 0) {
-                        AlertActions.showPopupError(_id, errors.join('\n'));
-                    }
+                    d.resolve('');
+                }, (error) => {
+                    AlertActions.showPopupError(_id, lang.slicer.error[error.error] + error.info);
                     d.resolve('');
                 });
                 blobExpired = true;
@@ -2529,15 +2540,6 @@ define([
     }
 
     function _showPreview() {
-        if(slicingStatus.hasError) {
-            AlertActions.showPopupError(
-                '',
-                slicingStatus.lastReport.error,
-                slicingStatus.lastReport.caption);
-            setTimeout(function() { cancelPreview(); }, 500);
-            return;
-        }
-
         selectObject(null);
         // previewMode = true;
         transformControl.detach(SELECTED);
@@ -2597,13 +2599,13 @@ define([
         reactSrc.setState({ previewMode: false }, () => {
             $('#preview').parents('label').find('input').prop('checked',false);
         });
+        render();
     }
 
     function _drawPath() {
         var d = $.Deferred(),
             color,
-            g, m, line,
-            type;
+            g, m, line;
 
         previewScene.children.splice(1, previewScene.children.length - 1);
         m = new THREE.LineBasicMaterial({
@@ -2619,7 +2621,7 @@ define([
 
             for (var point = 1; point < printPath[layer].length; point++) {
                 for (var tmp = 1; tmp >= 0; tmp--) {
-                    color.push(previewColors[printPath[layer][point][3]]);
+                    color.push(previewColors[printPath[layer][point][3]] || previewColors[-1]);
                     g.vertices.push(new THREE.Vector3(
                         printPath[layer][point - tmp][0],
                         printPath[layer][point - tmp][1],

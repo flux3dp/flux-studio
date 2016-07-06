@@ -102,7 +102,7 @@ function(React, $, Backbone, display, config, appSettings, detectWebgl) {
 
         appendSideBar: function(show) {
             show = ('boolean' === typeof show ? show : true);
-            requirejs(['jsx!views/TopMenu'], function(view) {
+            requirejs(['jsx!views/Top-Menu'], function(view) {
                 display(view, {
                     props: {
                         show: show

@@ -42,6 +42,7 @@
     "gulp-clean-css": "~2.0.10"
   },
   "scripts": {
-    "test": "mocha '_test/unit/slicer.js' --compilers js:babel-core/register"
+    "test": "mocha '_test/unit/slicer.js' --compilers js:babel-core/register",
+    "start": "gulp webserver"
   }
 }

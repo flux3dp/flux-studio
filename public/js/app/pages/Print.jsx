@@ -13,7 +13,7 @@ define([
     'helpers/api/control',
     'jsx!widgets/Modal',
     'helpers/api/config',
-    'jsx!views/Print-Selector',
+    'jsx!views/Printer-Selector',
     'helpers/nwjs/menu-factory',
     'helpers/device-master',
     'app/stores/global-store',
@@ -187,6 +187,7 @@ define([
                         leftPanelReady              : true,
                         previewMode                 : false,
                         previewModeOnly             : false,
+                        disablePreview              : false,
                         currentTutorialStep         : 0,
                         layerHeight                 : 0.1,
                         raftLayers                  : _raftLayers,
@@ -801,6 +802,7 @@ define([
                             previewMode                 = {this.state.previewMode}
                             previewModeOnly             = {this.state.previewModeOnly}
                             previewLayerCount           = {this.state.previewLayerCount}
+                            disablePreview              = {this.state.disablePreview}
                             raftOn                      = {this.state.raftOn}
                             supportOn                   = {this.state.supportOn}
                             layerHeight                 = {this.state.layerHeight}

@@ -121,26 +121,30 @@ define([
             },
 
             // go does not use deferred because multiple response and instant update
-            goG: function(nameArray, callback) {
+            goG: function(nameArray) {
+                var d = $.Deferred();
                 events.onMessage = function(result) {
-                    callback(result);
+                    d.resolve(result);
                 };
                 events.onError = function(result) {
-                    callback(result);
+                    d.resolve(result);
                 };
                 ws.send('go ' + nameArray.join(' ') + ' -g');
-                lastOrder = 'go';
+                lastOrder = 'goG';
+                return d.promise();
             },
 
-            goF: function(nameArray, callback) {
+            goF: function(nameArray) {
+                var d = $.Deferred();
                 events.onMessage = function(result) {
-                    callback(result);
+                    d.resolve(result);
                 };
                 events.onError = function(result) {
-                    callback(result);
+                    d.resolve(result);
                 };
                 ws.send('go ' + nameArray.join(' ') + ' -f');
-                lastOrder = 'go';
+                lastOrder = 'goF';
+                return d.promise();
             },
 
             beginSlicing: function(nameArray, type) {
@@ -218,7 +222,7 @@ define([
                 };
 
                 events.onError = function(result) {
-                    errors.push(result.error);
+                    d.reject(result);
                 };
 
                 if(name === 'advancedSettings' && value !== '') {

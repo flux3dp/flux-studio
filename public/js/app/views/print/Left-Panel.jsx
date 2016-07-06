@@ -44,6 +44,7 @@ define([
             enable                      : React.PropTypes.bool,
             previewMode                 : React.PropTypes.bool,
             previewModeOnly             : React.PropTypes.bool,
+            disablePreview              : React.PropTypes.bool,
             hasObject                   : React.PropTypes.bool,
             hasOutOfBoundsObject        : React.PropTypes.bool,
             previewLayerCount           : React.PropTypes.number,
@@ -152,7 +153,7 @@ define([
                     },
 
                     'PREVIEW': function() {
-                        if(e.target.type === 'range' || !self.props.hasObject) {
+                        if(e.target.type === 'range' || !self.props.hasObject || self.props.disablePreview) {
                             e.preventDefault();
                             return;
                         }
