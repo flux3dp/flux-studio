@@ -266,7 +266,7 @@ define([
                 ),
                 content: (
                     <div className="preview-panel">
-                        <input ref="preview" className="range" type="range" value={this.state.previewCurrentLayer} min="0" max={this.state.previewLayerCount} onChange={this._handlePreviewLayerChange} />
+                        <input ref="preview" className="range" type="range" min="0" max={this.state.previewLayerCount} onChange={this._handlePreviewLayerChange} />
                         <div className="layer-count">
                             {this.state.previewCurrentLayer}
                         </div>
