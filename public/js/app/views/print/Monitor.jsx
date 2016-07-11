@@ -184,21 +184,13 @@ define([
         'COMPLETED': function() {
             displayStatus = lang.device.completed;
             currentStatus = '';
-            if(openSource === GlobalConstants.PRINT) {
-                DeviceMaster.quit();
-            }
+            DeviceMaster.quit();
         },
 
         'ABORTED': function() {
             displayStatus = lang.device.aborted;
             currentStatus = '';
-            if(
-                openSource === GlobalConstants.PRINT ||
-                openSource === GlobalConstants.LASER ||
-                openSource === GlobalConstants.DRAW
-            ) {
-                DeviceMaster.quit();
-            }
+            DeviceMaster.quit();
         },
 
         'RESUMING': function() {
@@ -613,7 +605,9 @@ define([
                             else {
                                 previewUrl = '/img/ph_l.png';
                             }
-                            this._processInfo([info[2]]);
+                            if(info[2]) {
+                                this._processInfo([info[2]]);
+                            }
                             filePreview = true;
                             pathArray.push(fileName);
                             this.setState({
