@@ -1437,6 +1437,8 @@ define([
         if (needRender) {
             reactSrc.setState({
                 modelsrc: src.uuid ? src : null
+            }, () => {
+                doSlicing();
             });
             src.plane_boundary = planeBoundary(src);
             groundIt(src);
