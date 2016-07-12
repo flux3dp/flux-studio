@@ -1437,6 +1437,8 @@ define([
         if (needRender) {
             reactSrc.setState({
                 modelsrc: src.uuid ? src : null
+            }, () => {
+                doSlicing();
             });
             src.plane_boundary = planeBoundary(src);
             groundIt(src);
@@ -2118,6 +2120,10 @@ define([
         render();
     }
 
+    function getCurrentPreviewLayer() {
+        return parseInt($('.preview-panel').find('input').val());
+    }
+
     function updateOrbitControl() {
         setObjectDialoguePosition();
         render();
@@ -2461,6 +2467,7 @@ define([
                 slicingStatus.canInterrupt = true;
                 printPath = result;
                 _drawPath().then(function() {
+                    _resetPreviewLayerSlider();
                     ProgressActions.close();
                     slicingStatus.showProgress = false;
                 });
@@ -2567,12 +2574,14 @@ define([
                     slicingStatus.canInterrupt = true;
                     printPath = result;
                     _drawPath().then(function() {
+                        _resetPreviewLayerSlider();
                         _closeWait();
                     });
                 });
             }
             else {
                 _drawPath().then(function() {
+                    changePreviewLayer(getCurrentPreviewLayer());
                     _closeWait();
                 });
             }
@@ -2662,6 +2671,11 @@ define([
     function _clearPath() {
         printPath = [];
         previewScene.children.splice(1, previewScene.children.length - 1);
+    }
+
+    function _resetPreviewLayerSlider() {
+        $('.preview-panel').find('input').val(reactSrc.state.previewLayerCount);
+        $('.preview-panel').find('.layer-count').html(reactSrc.state.previewLayerCount);
     }
 
     function _setProgressMessage(message) {
