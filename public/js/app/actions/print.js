@@ -10,6 +10,7 @@ define([
     'app/constants/global-constants',
     'app/constants/device-constants',
     'app/constants/progress-constants',
+    'app/constants/error-constants',
     'helpers/packer',
     'helpers/i18n',
     'helpers/nwjs/menu-factory',
@@ -40,6 +41,7 @@ define([
     GlobalConstants,
     DeviceConstants,
     ProgressConstants,
+    ErrorConstants,
     Packer,
     I18n,
     MenuFactory,
@@ -480,7 +482,9 @@ define([
                 // if there's a result
                 if(!!result) {
                     if(!!result.error) {
-                        if(result.error === 'gcode area too big') {
+                        // out of bound, can still preview
+                        // 6 = gcode area too big
+                        if(result.error === ErrorConstants.GCODE_AREA_TOO_BIG) {
                             // disable go button
                             reactSrc.setState({ hasObject: false });
                         }
@@ -515,6 +519,7 @@ define([
             previewMode = true;
             printPath = path;
             _drawPathFromFCode();
+            _resetPreviewLayerSlider();
 
             // update the preview image
             getBlobFromScene().then((blob) => {
