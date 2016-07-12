@@ -71,6 +71,8 @@ define([
 ) {
 
     return function(args) {
+        'use strict';
+
         args = args || {};
 
         var advancedSettings = {},
@@ -141,7 +143,7 @@ define([
                     r: 80,
                     position: 'top'
                 }
-            ];
+            ],
             view = React.createClass({
 
                 getInitialState: function() {
