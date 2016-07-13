@@ -10,6 +10,7 @@ define([
     'app/constants/global-constants',
     'app/constants/device-constants',
     'app/constants/progress-constants',
+    'app/constants/error-constants',
     'helpers/packer',
     'helpers/i18n',
     'helpers/nwjs/menu-factory',
@@ -40,6 +41,7 @@ define([
     GlobalConstants,
     DeviceConstants,
     ProgressConstants,
+    ErrorConstants,
     Packer,
     I18n,
     MenuFactory,
@@ -480,7 +482,9 @@ define([
                 // if there's a result
                 if(!!result) {
                     if(!!result.error) {
-                        if(result.error === 'gcode area too big') {
+                        // out of bound, can still preview
+                        // 6 = gcode area too big
+                        if(result.error === ErrorConstants.GCODE_AREA_TOO_BIG) {
                             // disable go button
                             reactSrc.setState({ hasObject: false });
                         }
@@ -515,6 +519,7 @@ define([
             previewMode = true;
             printPath = path;
             _drawPathFromFCode();
+            _resetPreviewLayerSlider();
 
             // update the preview image
             getBlobFromScene().then((blob) => {
@@ -1437,6 +1442,8 @@ define([
         if (needRender) {
             reactSrc.setState({
                 modelsrc: src.uuid ? src : null
+            }, () => {
+                doSlicing();
             });
             src.plane_boundary = planeBoundary(src);
             groundIt(src);
@@ -2118,6 +2125,10 @@ define([
         render();
     }
 
+    function getCurrentPreviewLayer() {
+        return parseInt($('.preview-panel').find('input').val());
+    }
+
     function updateOrbitControl() {
         setObjectDialoguePosition();
         render();
@@ -2461,6 +2472,7 @@ define([
                 slicingStatus.canInterrupt = true;
                 printPath = result;
                 _drawPath().then(function() {
+                    _resetPreviewLayerSlider();
                     ProgressActions.close();
                     slicingStatus.showProgress = false;
                 });
@@ -2567,12 +2579,14 @@ define([
                     slicingStatus.canInterrupt = true;
                     printPath = result;
                     _drawPath().then(function() {
+                        _resetPreviewLayerSlider();
                         _closeWait();
                     });
                 });
             }
             else {
                 _drawPath().then(function() {
+                    changePreviewLayer(getCurrentPreviewLayer());
                     _closeWait();
                 });
             }
@@ -2662,6 +2676,11 @@ define([
     function _clearPath() {
         printPath = [];
         previewScene.children.splice(1, previewScene.children.length - 1);
+    }
+
+    function _resetPreviewLayerSlider() {
+        $('.preview-panel').find('input').val(reactSrc.state.previewLayerCount);
+        $('.preview-panel').find('.layer-count').html(reactSrc.state.previewLayerCount);
     }
 
     function _setProgressMessage(message) {
@@ -2768,14 +2787,7 @@ define([
             if(slicingStatus.canInterrupt) {
                 clearInterval(t);
                 slicingStatus.canInterrupt = false;
-                slicer.checkEngine(engine, path).then((result) => {
-                    if(result.status === 'ok') {
-                        return slicer.changeEngine(engine, path);
-                    }
-                    else {
-                        d.resolve(result);
-                    }
-                }).then(() => {
+                slicer.changeEngine(engine).then(() => {
                     slicingStatus.canInterrupt = true;
                     d.resolve();
                 });

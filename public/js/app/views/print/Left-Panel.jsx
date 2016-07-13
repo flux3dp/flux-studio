@@ -220,48 +220,6 @@ define([
             };
         },
 
-        _renderMaterialPallet: function() {
-            var colors = ['green', 'red', 'black', 'turquoise', 'orange', 'gray', 'blue', 'brown', 'white', 'purple', 'yellow', 'transparent'],
-                colorLang = this.props.lang.color,
-                colorSet,
-                colorClass;
-
-            colorSet = colors.map(function(color) {
-                colorClass = ClassNames('color', color);
-                return (
-                    <div className="set">
-                        <div className={colorClass}></div>
-                        <div className="description" onClick={this._handleSetColor.bind(null, color)}>{colorLang[color]}</div>
-                    </div>
-                );
-            }.bind(this));
-
-            return (
-                <li>
-                    <label className="popup-selection">
-                        <input className="popup-open" name="popup-open" type="checkbox" onClick={this._onOpenSubPopup}/>
-                        <div className="display-text">
-                            <p>
-                                <span>{this.state.color} PLA</span>
-                            </p>
-                        </div>
-                        <label className="popup">
-                            <svg className="arrow light" version="1.1" xmlns="http://www.w3.org/2000/svg"
-                                width="36.8" height="30">
-                                <polygon points="0,15 36.8,0 36.8,30"/>
-                            </svg>
-                            <div className="color light">
-                                <div className="title">{lang.plaTitle}</div>
-                                <div className="colorSets">
-                                    {colorSet}
-                                </div>
-                            </div>
-                        </label>
-                    </label>
-                </li>
-            );
-        },
-
         _renderRaft: function() {
             var _class = ClassNames({'disable': !this.props.enable});
             return {
@@ -308,7 +266,7 @@ define([
                 ),
                 content: (
                     <div className="preview-panel">
-                        <input ref="preview" className="range" type="range" value={this.state.previewCurrentLayer} min="0" max={this.state.previewLayerCount} onChange={this._handlePreviewLayerChange} />
+                        <input ref="preview" className="range" type="range" min="0" max={this.state.previewLayerCount} onChange={this._handlePreviewLayerChange} />
                         <div className="layer-count">
                             {this.state.previewCurrentLayer}
                         </div>

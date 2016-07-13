@@ -2,16 +2,11 @@ define(function() {
     'use strict';
 
     return {
-        brand_name : 'FLUX',
-        app : {
-            name : 'Flux Studio - zh-tw'
-        },
         support: {
             no_webgl: '您的系統不支援 WebGL，建議您使用其他電腦開啟 FLUX Studio'
         },
         device_selection: {
             no_printers: '無法透過 Wi-Fi 偵測到 FLUX Delta，請檢查您與機器的網路連線是否在同個網路下 <a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/215394548">暸解更多</a>',
-            device_name: 'DEVICE NAME',
             module: 'MODULE',
             status: 'STATUS'
         },
@@ -49,7 +44,6 @@ define(function() {
                 update_fail: '更新失敗'
             },
             updating: '更新中...',
-            network_unreachable: '請確認網路連線',
             skip: '跳過此版本',
             later: '稍候',
             install: '下載',
@@ -67,7 +61,6 @@ define(function() {
             file: {
                 label: '檔案',
                 import: '匯入',
-                save_gcode: '匯出 Gcode',
                 save_fcode: '匯出工作',
                 save_scene: '匯出場景'
             },
@@ -101,7 +94,6 @@ define(function() {
                 label: '說明',
                 help_center: '說明中心',
                 contact: '聯絡我們',
-                troubleshooting: '錯誤排除',
                 tutorial: '列印教學',
                 software_update: '軟體更新',
                 debug: '錯誤回報',
@@ -205,12 +197,7 @@ define(function() {
             home: {
                 line1: '請問你所處的環境擁有可以連線的 Wi-Fi 嗎?',
                 line2: '我們將協助你將 FLUX 連線至你家中的 Wi-Fi',
-                select: '是的，開始連線',
-                no_available_wifi: '不，我現在沒有 Wi-Fi'
-            },
-            select: {
-                choose_wifi: '請選擇你要連線的 Wi-Fi',
-                no_wifi_available: '暫時找不到可以連線的 Wi-Fi'
+                select: '是的，開始連線'
             },
             set_password: {
                 line1: '請輸入「',
@@ -218,8 +205,7 @@ define(function() {
                 password_placeholder: '請輸入 Wi-Fi 密碼',
                 back: '上一步',
                 join: '加入',
-                connecting: '連線中',
-                no_selected: '請選擇 Wi-Fi'
+                connecting: '連線中'
             },
             success: {
                 caption: '太棒了，連線成功!',
@@ -239,23 +225,6 @@ define(function() {
                 password_placeholder: '設定密碼',
                 notice: '設定密碼，可以確保你的 FLUX 只有知道密碼的人可以操作',
                 next: '下一步'
-            },
-            setup_complete: {
-                caption: '已經完成所有的設定了！',
-                description: '快點開始進行你的第一次列印',
-                start: '開始使用'
-            },
-            configuring_flux: {
-                caption: '我們正在讓你的FLUX變成一個無線基地台...',
-                description: '如此一來，你就可以透過內部的網路來控制你的FLUX',
-                next: '下一步',
-                footer: '我想要改回使用Wifi連線'
-            },
-            configured_flux: {
-                caption: '你的FLUX已經成為一個無線基地台',
-                description: '只剩下為你的FLUX做一些簡單的設定就可以開始使用了 :)',
-                next: '下一步',
-                footer: '我想要改回使用Wifi連線'
             }
         },
         menu: {
@@ -271,7 +240,6 @@ define(function() {
             caption: '設定',
             tabs: {
                 general: '一般',
-                flux_cloud: 'FLUX Could',
                 printer: '成型機'
             },
             ip: '機器 IP 位址',
@@ -288,7 +256,6 @@ define(function() {
                 connected_wi_fi: 'Wi-Fi 連線',
                 advanced: '進階',
                 join_other_network: '加入其它網路',
-                disconnect_with_this_printer: '中斷這台成型機的連線',
                 your_password: '新密碼',
                 confirm_password: '確認密碼',
                 save_password: '儲存變更'
@@ -306,25 +273,11 @@ define(function() {
             },
             cancel: '取消',
             done: '完成',
-            create_account: {
-                create_account: '建立新帳號',
-                your_email: '電子郵件',
-                password: '密碼',
-                confirm_password: '確認密碼',
-                signup: '建立帳號',
-                not_now: '目前先跳過'
-            },
-            activate_info:  {
-                almost_there: '最後一步了!',
-                description: '到Email帳號裡面使用連結啟動帳號',
-                got_it: '瞭解了！'
-            },
             connect_printer: {
                 title: '選擇連接成型機'
             },
             notification_on: '開啟',
             notification_off: '關閉',
-            cura_engine_path: 'Cura 引擎路徑',
             engine_change_fail: {
                 'caption': 'unable to change engine ',
                 '1': 'error during checking',
@@ -335,9 +288,7 @@ define(function() {
         },
         print: {
             import: '匯入',
-            go_home: 'Go Home',
             save: '儲存⋯',
-            normal_preview: 'Normal Preview',
             support_view: 'Support Preview',
             start_print: '列印',
             advanced: {
@@ -350,7 +301,6 @@ define(function() {
                 slicingEngine: '切片引擎',
                 slic3r: 'Slic3r',
                 cura: 'Cura',
-                experiment: 'Experiment',
                 filament: '線料',
                 temperature: '溫度',
                 layer_height_title: '層高',
@@ -383,7 +333,6 @@ define(function() {
                 spacing: '支撐間隙',
                 overhang: '懸空角度',
                 zDistance: 'Z Distance',
-                support_pattern: '支撐圖樣',
                 raft: '底座',
                 raftLayers: '底座層數',
                 brim: '底部延伸圈數 (Brim)',
@@ -404,7 +353,6 @@ define(function() {
                 save: '儲存',
                 saveAsPreset: '存為預設',
                 cancel: '取消',
-                saveAndApply: '套用設定',
                 delete: '刪除',
                 loadPreset: '載入預設',
                 savePreset: '儲存預設'
@@ -524,10 +472,8 @@ define(function() {
                 preview: '預覽路徑',
                 plaTitle: 'PICK THE COLOR OF THE FILAMENT',
                 transparent: 'TRANSPARENT',
-                qualityTitle: 'It will affect the outcome surface smoothness of your object. Better qualities need more time',
                 raftTitle: 'A Raft are layers built under your part and help it stick to the base plate',
                 supportTitle: 'A Support is a generated structure to support overhanging part of your object, to prevent filament dropping',
-                previewTitle: 'Preview the actual path of toolhead during printing task',
                 advancedTitle: 'Detail 3d printing parameters, you may acheive better result than default by adjusting them',
                 confirmExitFcodeMode: '離開預覽模式將會移除Fcode，是否繼續？'
             },
@@ -542,17 +488,13 @@ define(function() {
                 low: '品質 快速',
                 custom: '品質 自訂'
             },
-            quick_print: 'Quick Print',
             scale: '尺寸',
             rotate: '旋轉',
-            align_center: '置中',
             delete: '刪除',
             reset: '重設',
             cancel: '取消',
             done: '確認',
-            gram: '公克',
             pause: '暫停',
-            continue: '繼續',
             restart: '重新開始',
             download_prompt: '請輸入檔案名稱',
             importTitle: '匯入 3D 模型 ( .stl )',
@@ -589,20 +531,14 @@ define(function() {
             save: '儲存⋯',
             custom: '自訂',
             presets: '預設預設',
-            acceptable_files: 'JPG, PNG, SVG',
-            drop_files_to_import: '拖曳至此以匯入圖片',
             button_advanced: '進階',
             confirm: '確認',
-            start_engrave: '雕刻',
-            start_cut: '切割',
-            close_alert: '關閉',
             get_fcode: '儲存<br/>工作',
             name: '名稱',
             go: 'GO',
             process_caption: '輸出中',
             laser_accepted_images: '雕刻支援格式：BMP/GIF/JPG/PNG/SVG',
             draw_accepted_images: '繪製支援格式：SVG',
-            svg_only: '非 SVG 格式',
             svg_fail_messages: {
                 'TEXT_TAG': '不支援標籤 &lt;text&gt;',
                 'DEFS_TAG': '不支援標籤 &lt;defs&gt;',
@@ -724,7 +660,6 @@ define(function() {
             }
         },
         scan: {
-            start_scan: '開始掃瞄',
             stop_scan: '取消',
             over_quota: '超過可容納點雲',
             convert_to_stl: '轉換成 STL',
@@ -732,7 +667,6 @@ define(function() {
             start_multiscan: '多次掃描',
             processing: '處理中...',
             remaining_time: '剩餘時間',
-            elapsed_time: '已用時間',
             do_save: '儲存 STL',
             go: '開始',
             rollback: '返回',
@@ -799,7 +733,6 @@ define(function() {
                 size: '尺寸',
                 rotate: '旋轉',
                 crop: '剪裁',
-                auto_merge: '自動合併',
                 manual_merge: '手動合併',
                 clear_noise: '去除噪點',
                 save_pointcloud: '輸出點雲'
@@ -844,13 +777,9 @@ define(function() {
             unable_to_connect: '#008 無法與機器建立穩定連線'
         },
         device: {
-            camera_on: '啟用鏡頭',
-            camera_off: '關閉鏡頭',
-            browse_file: '瀏覽檔案',
             pause: '暫停',
             paused: '已暫停',
             pausing: '正在暫停',
-            cancelTask: '終止任務',
             selectPrinter: '選擇成型機',
             retry: '重試',
             status: '狀態',
@@ -859,9 +788,7 @@ define(function() {
             reset: '重設(kick)',
             abort: '取消工作',
             start: '開始',
-            no_task: '目前無任何工作',
             please_wait: '請稍待...',
-            unknown_command: '指令無法在此狀態下被執行',
             quit: '中斷連結',
             heating: '加熱中',
             completing: '完成中',
@@ -881,8 +808,6 @@ define(function() {
             },
             noTask: '目前無任何工作',
             pleaseWait: '請稍待...',
-            unknownCommand: '指令無法在此狀態下被執行',
-            working: '工作中',
             finishing: '完成中',
             initiating: '啟動中',
             unknown: '未知狀態',
@@ -978,20 +903,6 @@ define(function() {
             yes: ' 是',
             no: '否',
             stop: '停止'
-        },
-        color: {
-            green: 'GREEN',
-            red: 'RED',
-            black: 'BLACK',
-            turquoise: 'TURQUOISE',
-            orange: 'ORANGE',
-            gray: 'GRAY',
-            blue: 'BLUE',
-            brown: 'BROWN',
-            white: 'WHITE',
-            purple: 'PURPLE',
-            yellow: 'YELLOW',
-            transparent: 'TRANSPARENT'
         },
         caption: {
             connectionTimeout: '連線逾時'

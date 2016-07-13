@@ -526,11 +526,13 @@ define([
         function handleUploadImage(file) {
             // if this is svg file that does provide a bigger enough image
             var width = file.imgSize.width,
-                height = file.imgSize.height;
+                height = file.imgSize.height,
+                ratio;
 
             if ('svg' === self.state.fileFormat) {
-                width = PLATFORM_DIAMETER_PIXEL;
-                height = PLATFORM_DIAMETER_PIXEL;
+                ratio = Math.max(width, height) / PLATFORM_DIAMETER_PIXEL;
+                width *= ratio;
+                height *= ratio;
             }
 
             imageData(file.blob, {

@@ -10,6 +10,12 @@ define([
         args = args || {};
 
         return React.createClass({
+            getInitialState: function() {
+                return {
+                    lang: args.state.lang
+                };
+            },
+
             // Private methods
             _getLanguageOptions: function() {
                 var options = [];
@@ -25,6 +31,13 @@ define([
                 return options;
             },
 
+            _changeActiveLang: function(e) {
+                i18n.setActiveLang(e.currentTarget.value);
+                this.setState({
+                    lang: i18n.get()
+                });
+            },
+
             // Lifecycle
             render: function() {
                 var lang = this.state.lang,
@@ -38,7 +51,7 @@ define([
                             <div>
                                 <h1 className="headline">{lang.initialize.select_language}</h1>
                                 <div className="language">
-                                    <SelectView id="select-lang" options={options}/>
+                                    <SelectView id="select-lang" options={options} onChange={this._changeActiveLang}/>
                                 </div>
                                 <div>
                                     <a href="#initialize/wifi/connect-machine" className="btn btn-action btn-large">{lang.initialize.next}</a>
@@ -50,12 +63,6 @@ define([
                 return (
                     <Modal className={wrapperClassName} content={content}/>
                 );
-            },
-
-            getInitialState: function() {
-                return {
-                    lang: args.state.lang
-                };
             }
         });
     };
