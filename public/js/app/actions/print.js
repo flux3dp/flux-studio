@@ -297,7 +297,7 @@ define([
                         openImportWindow: true,
                         openObjectDialogue: false
                     });
-                    AlertActions.showPopupError('', result.error);
+                    processSlicerError(result);
                     return;
                 }
                 if(slicingStatus.canInterrupt) {
@@ -502,7 +502,13 @@ define([
             metadata = m;
             var fcodeType = m.metadata.HEAD_TYPE;
             if(fcodeType === 'EXTRUDER') {
-                fcodeConsole.getPath().then(processPath);
+                fcodeConsole.getPath().then((result) => {
+                    if(result.error) {
+                        processSlicerError(result);
+                        return;
+                    }
+                    processPath(result);
+                });
             }
             else {
                 var message = fcodeType === 'LASER' ? lang.message.fcodeForLaser : lang.message.fcodeForPen;
@@ -617,8 +623,13 @@ define([
                     slicer.uploadPreviewImage(blob).then(() => {
                         slicingStatus.canInterrupt = true;
                         return slicer.getSlicingResult();
-                    }).then((r) => {
-                        responseBlob = r;
+                    }).then((result) => {
+                        if(result.error) {
+                            processSlicerError(result);
+                        }
+                        else {
+                            responseBlob = result;
+                        }
                         d.resolve(blob);
                     });
                 }
@@ -735,8 +746,12 @@ define([
                 ProgressActions.updating(complete, 100);
             }
             slicingStatus.canInterrupt = false;
-            slicer.getSlicingResult().then(function(r) {
+            slicer.getSlicingResult().then((result) => {
                 slicingStatus.canInterrupt = true;
+                if(result.error) {
+                    processSlicerError(result);
+                    return;
+                }
                 setTimeout(function() {
                     if(needToShowMonitor) {
                         reactSrc._handleDeviceSelected();
@@ -745,7 +760,7 @@ define([
                 }, 1000);
 
                 blobExpired = false;
-                responseBlob = r;
+                responseBlob = result;
                 _handleSliceComplete();
 
             });
@@ -1619,37 +1634,42 @@ define([
 
     function removeSelected() {
         if (SELECTED && Object.keys(SELECTED).length > 0) {
-            var index,
-                uuid = SELECTED.uuid;
+            slicer.delete(SELECTED.uuid).then((result) => {
+                if(result.error) {
+                    processSlicerError(result);
+                    return;
+                }
 
-            scene.remove(SELECTED.outlineMesh);
-            scene.remove(SELECTED);
-            outlineScene.remove(SELECTED.outlineMesh);
-            index = objects.indexOf(SELECTED);
-            if (index > -1) {
-                objects.splice(index, 1);
-            }
+                let index = objects.indexOf(SELECTED);
 
-            transformControl.detach(SELECTED);
-            selectObject(null);
+                scene.remove(SELECTED.outlineMesh);
+                scene.remove(SELECTED);
+                outlineScene.remove(SELECTED.outlineMesh);
+                if (index > -1) {
+                    objects.splice(index, 1);
+                }
 
-            setDefaultFileName();
-            render();
-            if(objects.length === 0) {
-                clearTimeout(slicingTimmer);
-                registerDragToImport();
-                reactSrc.setState({
-                    openImportWindow: true,
-                    hasObject: false
-                }, function() {
-                    setImportWindowPosition();
-                });
-            }
-            else {
-                doSlicing();
-            }
+                transformControl.detach(SELECTED);
+                selectObject(null);
 
-            _clearPath();
+                setDefaultFileName();
+                render();
+                if(objects.length === 0) {
+                    clearTimeout(slicingTimmer);
+                    registerDragToImport();
+                    reactSrc.setState({
+                        openImportWindow: true,
+                        hasObject: false
+                    }, function() {
+                        setImportWindowPosition();
+                    });
+                }
+                else {
+                    doSlicing();
+                }
+
+                _clearPath();
+            });
         }
     }
 
@@ -1688,7 +1708,12 @@ define([
                     doSlicing();
                 }
                 else {
-                    AlertActions.showPopupError('duplicateError', result.error);
+                    if(result.error === ErrorConstants.NAME_NOT_EXIST) {
+                        AlertActions.showPopupError('duplicateError', lang.slicer.error[result.error]);
+                    }
+                    else {
+                        AlertActions.showPopupError('duplicateError', result.info);
+                    }
                 }
             });
         }
@@ -2422,6 +2447,7 @@ define([
             ).then(function(result) {
                 if (result.status === 'error') {
                     index = o.length;
+                    processSlicerError(result);
                 }
                 if (index < o.length) {
                     _syncObjectParameter(o, index + 1, callback);
@@ -2470,6 +2496,9 @@ define([
             slicingStatus.canInterrupt = false;
             slicer.getPath().then(function(result) {
                 slicingStatus.canInterrupt = true;
+                if(result.error) {
+                    processSlicerError(result);
+                }
                 printPath = result;
                 _drawPath().then(function() {
                     _resetPreviewLayerSlider();
@@ -2577,6 +2606,9 @@ define([
                 slicingStatus.canInterrupt = false;
                 slicer.getPath().then(function(result) {
                     slicingStatus.canInterrupt = true;
+                    if(result.error) {
+                        processSlicerError(result);
+                    }
                     printPath = result;
                     _drawPath().then(function() {
                         _resetPreviewLayerSlider();
@@ -2787,7 +2819,11 @@ define([
             if(slicingStatus.canInterrupt) {
                 clearInterval(t);
                 slicingStatus.canInterrupt = false;
-                slicer.changeEngine(engine).then(() => {
+                slicer.changeEngine(engine).then((result) => {
+                    console.log(result);
+                    if(result.error) {
+                        processSlicerError(result);
+                    }
                     slicingStatus.canInterrupt = true;
                     d.resolve();
                 });
@@ -2795,6 +2831,12 @@ define([
         }, 500);
 
         return d.promise();
+    }
+
+    function processSlicerError(result) {
+        let id = 'SLICER_ERROR',
+        message = lang.slicer.error[result.error] || result.info;
+        AlertActions.showPopupError(id, message);
     }
 
     function allOutOfBound() {
