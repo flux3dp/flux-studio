@@ -1009,8 +1009,14 @@ define(function() {
         slicer: {
             computing: 'Computing',
             error: {
-                '6': 'Toolpath out of range, please reduce the size of the object(s), or try to turn off raft, brim or skirt',
-                '7': 'Error setting advanced parameter\n'
+                '6': 'Calculated toolpath is out of working area. Please reduce the size of the object(s), or try to turn off raft, brim or skirt.',
+                '7': 'Error occurred while setting advanced parameters.',
+                '8': 'API returned empty result.\nRequest for result is probably called before slice complete',
+                '9': 'API returned empty path.\nRequest for toolpath is probably called before slice complete',
+                '10': 'Missing object data. The source object is missing from slicer engine',
+                '13': 'Duplication error\nThe selected ID does not exist. If the error is not resolved by restarting FLUX Studio, please report this error.',
+                '14': 'Error occurred whil setting position. The source object is missing in slicer engine.',
+                '15': 'Uploaded file is corrupt, please check the file and try again.'
             }
         },
         calibration: {

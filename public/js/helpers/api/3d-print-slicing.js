@@ -100,6 +100,9 @@ define([
                 events.onMessage = function(result) {
                     d.resolve(result);
                 };
+                events.onError = function(result) {
+                    d.resolve(result);
+                };
                 var args = [name, positionX, positionY, positionZ, rotationX, rotationY, rotationZ, scaleX, scaleY, scaleZ];
                 ws.send('set ' + args.join(' '));
                 lastOrder = 'set';
@@ -242,7 +245,9 @@ define([
                 events.onMessage = function(result) {
                     d.resolve(result);
                 };
-
+                events.onError = function(result) {
+                    d.resolve(result);
+                };
                 ws.send('get_path');
                 lastOrder = 'get_path';
 
