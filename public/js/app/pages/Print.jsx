@@ -71,6 +71,8 @@ define([
 ) {
 
     return function(args) {
+        'use strict';
+
         args = args || {};
 
         var advancedSettings = {},
@@ -141,7 +143,7 @@ define([
                     r: 80,
                     position: 'top'
                 }
-            ];
+            ],
             view = React.createClass({
 
                 getInitialState: function() {
@@ -244,7 +246,6 @@ define([
 
                     AlertStore.removeYesListener(this._handleYes);
                     AlertStore.removeCancelListener(this._handleDefaultCancel);
-                    removeCancelListener = false;
                     GlobalStore.removeCancelPreviewListener(this._handleCancelPreview);
                     GlobalStore.removeMonitorClosedListener(this._handleMonitorClosed);
                 },
@@ -533,7 +534,6 @@ define([
                                         return;
                                     }
                                     AlertStore.removeCancelListener(this._handleDefaultCancel);
-                                    removeCancelListener = false;
                                     GlobalActions.showMonitor(selectedPrinter, fcode, previewUrl, GlobalConstants.PRINT);
                                     //Tour popout after show monitor delay
                                     setTimeout(() => {
@@ -650,7 +650,6 @@ define([
 
                             oReq.send();
                             AlertStore.removeCancelListener(this._handleDefaultCancel);
-                            removeCancelListener = false;
                         }
                         else if (this.state.currentTutorialStep === 5) {
                             this.setState({ tutorialOn: false });

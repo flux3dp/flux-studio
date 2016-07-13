@@ -484,6 +484,7 @@ define([
 
                 events.onMessage = function(result) {
                     if(result.status === 'ok') {
+                        data.push(result);
                         d.resolve(data);
                     }
                     else {

@@ -893,8 +893,8 @@ define([
                 }
                 else {
                     errorMessage = lang.monitor[report.error.slice(0,2).join('_')];
-                    if(errorMessage === '') {
-                        errorMessage = lang.head_module.error.missing;
+                    if(errorMessage === '' || typeof errorMessage === 'undefined') {
+                        errorMessage = report.error.join(' ');
                     }
                 }
             }
