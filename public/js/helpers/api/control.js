@@ -645,10 +645,14 @@ define([
                 var $deferred = $.Deferred();
 
                 events.onMessage = (result) => {
-                    if ('ok' === result.status) {
+                    switch (result.status) {
+                    case 'ok':
                         $deferred.resolve(result);
-                    }
-                    else {
+                        break;
+                    case 'operating':
+                        // ignore. (When the toolhead is `Home`. This status wouldn't show up)
+                        break;
+                    default:
                         $deferred.reject(result);
                     }
                 };
