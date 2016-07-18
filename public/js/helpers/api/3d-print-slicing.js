@@ -46,8 +46,7 @@ define([
 
             connection: ws,
 
-            upload: (name, file, ext, callback) => {
-
+            upload: (name, file, ext) => {
                 let d = $.Deferred(),
                     progress,
                     currentProgress;
@@ -110,7 +109,7 @@ define([
                     d.reject(error);
                 };
 
-                event.onFatal = (error) => {
+                events.onFatal = (error) => {
                     d.reject(error);
                 }
 
@@ -204,7 +203,7 @@ define([
                 return d.promise();
             },
 
-            reportSlicing: (callback) => {
+            reportSlicing: () => {
 
                 let d = $.Deferred(),
                     progress = [];
@@ -214,15 +213,11 @@ define([
                         if(progress.length > 0) {
                             // only care about the last progress
                             let lastProgress = progress.pop();
-                            if(lastProgress.slice_status === 'complete') {
-                                d.resolve(lastProgress);
-                            }
-                            else {
-                                d.notify(lastProgress)
-                            }
+                            progress.length = 0;
+                            d.resolve(lastProgress);
                         }
                         else {
-                            d.notify();
+                            d.resolve();
                         }
                     }
                     else {
@@ -361,7 +356,7 @@ define([
                     d.reject(error);
                 };
 
-                ws.send('upload_image');// + file.size);
+                ws.send('upload_image ' + file.size);// + file.size);
                 return d.promise();
             },
 
@@ -408,6 +403,7 @@ define([
 
             // this is a helper  for unit test
             trigger: (message, type) => {
+                // console.log(message, type);
                 if(type) {
                     type === 'FATAL' ? events.onFatal(message) : events.onError(message);
                 }

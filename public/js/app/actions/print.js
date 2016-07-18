@@ -1216,14 +1216,12 @@ define([
                     slicer.reportSlicing().then((report) => {
                         slicingStatus.canInterrupt = true;
                         slicingStatus.pauseReport = false;
-                        clearInterval(slicingStatus.reporter);
-                        slicingStatus.isComplete = true;
-                        blobExpired = false;
-                        callback(report);
-                    }).progress((report) => {
-                        slicingStatus.canInterrupt = true;
-                        slicingStatus.pauseReport = false;
                         if(!!report) {
+                            if(report.slice_status === 'complete') {
+                                clearInterval(slicingStatus.reporter);
+                                slicingStatus.isComplete = true;
+                                blobExpired = false;
+                            }
                             callback(report);
                         }
                     }).fail((error) => {
