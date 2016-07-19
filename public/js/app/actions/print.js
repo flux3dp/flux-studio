@@ -436,15 +436,16 @@ define([
                     slicingStatus.canInterrupt = true;
                     slicingStatus.isComplete = true;
                     importedFCode = files.item(0);
-                    importFromFCode = true;
+                    importFromFCode = ext === 'fc';
                     setDefaultFileName(importedFCode.name)
                     if(objects.length === 0) {
                         doFCodeImport(ext);
                     }
                     else {
+                        ProgressActions.close();
                         AlertActions.showPopupYesNo(
                             GlobalConstants.IMPORT_FCODE,
-                            lang.message.confirmFCodeImport);
+                            lang.message.confirmFCodeImport, '', ext);
                     }
                     callback();
                 }
@@ -2822,7 +2823,6 @@ define([
                 clearInterval(t);
                 slicingStatus.canInterrupt = false;
                 slicer.changeEngine(engine).then((result) => {
-                    console.log(result);
                     if(result.error) {
                         processSlicerError(result);
                     }
