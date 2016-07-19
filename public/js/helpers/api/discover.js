@@ -7,18 +7,23 @@ define([
     'app/actions/initialize-machine',
     'helpers/api/config',
     'helpers/device-list',
-    'helpers/array-findindex',
-], function(Websocket, initializeMachine, config, DeviceList) {
+    'helpers/logger',
+    // no return
+    'helpers/array-findindex'
+], function(Websocket, initializeMachine, config, DeviceList, Logger) {
     'use strict';
 
     var ws = ws || new Websocket({
             method: 'discover'
         }),
+        discoverLogger = new Logger('discover'),
         printers = [],
         dispatchers = [],
         idList = [],
         _devices = {},
         sendFoundPrinter = function() {
+            discoverLogger.clear().append(_devices);
+
             dispatchers.forEach(function(dispatcher) {
                 dispatcher.sender(_devices);
             });
@@ -27,12 +32,12 @@ define([
             return base.uuid === target.uuid;
         },
         onMessage = function(device) {
-            if(device.alive) {
-                _devices[device.serial] = device;
+            if (device.alive) {
+                _devices[device.uuid] = device;
             }
             else {
-                if(typeof _devices[device.serial] === 'undefined') {
-                    delete _devices[device.serial];
+                if(typeof _devices[device.uuid] === 'undefined') {
+                    delete _devices[device.uuid];
                 }
             }
 
@@ -57,8 +62,6 @@ define([
     }
 
     ws.onMessage(onMessage);
-
-
 
     setInterval(function() {
         if ('string' === typeof pokeIP && '' !== pokeIP) {
@@ -104,7 +107,7 @@ define([
                 ws.send('aggressive');
             },
             getLatestPrinter: function(printer) {
-                return _devices[printer.serial];
+                return _devices[printer.uuid];
             }
         };
     };
