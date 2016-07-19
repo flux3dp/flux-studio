@@ -100,7 +100,7 @@ define([
                     };
 
                 imageData(
-                    $img.data('base'),
+                    $img.data('file').blob,
                     {
                         height: box.height,
                         width: box.width,
@@ -530,12 +530,6 @@ define([
                 height = file.imgSize.height,
                 ratio;
 
-            if ('svg' === self.state.fileFormat) {
-                ratio = Math.max(width, height) / PLATFORM_DIAMETER_PIXEL;
-                width *= ratio;
-                height *= ratio;
-            }
-
             imageData(file.blob, {
                 width: width,
                 height: height,
@@ -547,7 +541,11 @@ define([
                     is_svg: ('svg' === self.state.fileFormat)
                 },
                 onComplete: function(result) {
-                    setupImage(file, file.imgSize, file.url);
+                    var originalUrl = file.url;
+
+                    file.url = result.canvas.toDataURL('image/png');
+
+                    setupImage(file, file.imgSize, originalUrl);
                 }
             });
         }
