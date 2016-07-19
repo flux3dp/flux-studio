@@ -446,6 +446,7 @@ define([
                 attr('src', file.url).
                 data('name', file.uploadName).
                 data('base', originalUrl).
+                data('file', file).
                 data('size', size).
                 data('sizeLock', true).
                 width(size.width).
@@ -546,7 +547,6 @@ define([
                     is_svg: ('svg' === self.state.fileFormat)
                 },
                 onComplete: function(result) {
-                    file.url = result.canvas.toDataURL('svg' === file.extension ? 'image/svg+xml' : 'image/png');
                     setupImage(file, file.imgSize, file.url);
                 }
             });
