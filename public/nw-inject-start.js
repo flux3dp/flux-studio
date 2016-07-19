@@ -30,7 +30,9 @@ var process = nw.process,
                 '--port',
                 port,
                 '--cura',
-                ''
+                '',
+                '--allow-origin',
+                location.hostname
             ],
             ghostCmd = '',
             writeLog = function(message, mode) {
