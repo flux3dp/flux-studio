@@ -177,7 +177,7 @@ define([
                 this.props.onRotate(rotation);
             }
             else {
-                rotation['entered' + e.target.id.toUpperCase()] = parseInt(e.target.value) || '';
+                rotation['entered' + e.target.id.toUpperCase()] = e.target.value === '0' ? '0' : parseInt(e.target.value) || '';
                 this.forceUpdate();
             }
 
