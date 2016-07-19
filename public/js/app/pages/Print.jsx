@@ -910,7 +910,7 @@ define([
                             <div id="model-displayer" className="model-displayer">
                                 <div className="import-indicator"></div>
                             </div>
-                            <input className="hide" ref="importBtn" type="file" accept=".stl" onChange={this._handleImport} />
+                            <input className="hide" ref="importBtn" type="file" accept=".stl,.fc,.gcode,.obj" onChange={this._handleImport} multiple/>
 
                             <TourGuide
                                 lang={lang}

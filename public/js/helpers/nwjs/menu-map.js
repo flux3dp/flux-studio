@@ -51,7 +51,7 @@ define([
             import: {
                 label: lang.file.import,
                 enabled: true,
-                onClick: emptyFunction,
+                onClick: function() { $('input[type="file"].hide').click(); },
                 key: 'i',
                 modifiers: 'cmd',
                 parent: parentIndex.FILE
