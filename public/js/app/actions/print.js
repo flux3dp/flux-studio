@@ -483,18 +483,20 @@ define([
                 if(!!result) {
                     if(!!result.error) {
                         // out of bound, can still preview
-                        // 6 = gcode area too big
                         if(result.error === ErrorConstants.GCODE_AREA_TOO_BIG) {
                             // disable go button
                             reactSrc.setState({ hasObject: false });
                         }
                         else {
-                            AlertActions.showPopupError('fcode-error', Sprintf(lang.message.brokenFcode, file.name));
+                            _closeWait();
+                            AlertActions.showPopupError('fcode-error', lang.slicer.error[result.error] || result.info);
                             cancelPreview();
                         }
                     }
                 }
-                fcodeConsole.getMetadata(processMetadata);
+                else {
+                    fcodeConsole.getMetadata(processMetadata);
+                }
             }, isGcode);
         });
 
