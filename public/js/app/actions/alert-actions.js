@@ -70,9 +70,9 @@ define([
             });
         },
 
-        showPopupYesNo: function(id, message, caption) {
+        showPopupYesNo: function(id, message, caption, args) {
             AlertDispatcher.dispatch({
-                actionType: AlertConstants.SHOW_POPUP_YES_NO, caption, message, id
+                actionType: AlertConstants.SHOW_POPUP_YES_NO, caption, message, id, args
             });
         },
 
@@ -122,9 +122,9 @@ define([
             });
         },
 
-        notifyYes: function(id) {
+        notifyYes: function(id, args) {
             AlertDispatcher.dispatch({
-                actionType: AlertConstants.NOTIFY_YES, id
+                actionType: AlertConstants.NOTIFY_YES, id, args
             });
         },
 
