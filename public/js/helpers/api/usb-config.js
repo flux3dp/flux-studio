@@ -10,7 +10,7 @@ define([
 ], function($, Websocket, Config, rsaKey) {
     'use strict';
 
-    var ws;
+    var ws = null;
 
     return function(globalOpts) {
         globalOpts = globalOpts || {};
@@ -29,7 +29,7 @@ define([
                 return opts;
             };
 
-        if ('undefined' === typeof ws) {
+        if (null === ws) {
             ws = new Websocket({
                 method: 'usb-config',
                 autoReconnect: false
@@ -338,9 +338,7 @@ define([
 
             close: function() {
                 ws.close();
-                ws = new Websocket({
-                    method: 'usb-config'
-                });
+                ws = null;
             }
         };
     };
