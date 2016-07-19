@@ -397,9 +397,7 @@ define([
     }
 
     function updateToolhead(file) {
-        return _device.actions.toolheadUpdate(file).then(function() {
-            _device.actions.quitTask();
-        });
+        return _device.actions.toolheadUpdate(file);
     }
 
     function headinfo() {
