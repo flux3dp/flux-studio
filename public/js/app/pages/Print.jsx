@@ -278,7 +278,7 @@ define([
                     }
                 },
 
-                _handleYes: function(answer) {
+                _handleYes: function(answer, args) {
                     if(answer === 'tour') {
                         this.setState({ tutorialOn: true });
                         tutorialMode = true;
@@ -326,7 +326,7 @@ define([
                         director.cancelPreview();
                     }
                     else if(answer === GlobalConstants.IMPORT_FCODE) {
-                        director.doFCodeImport();
+                        director.doFCodeImport(args);
                     }
                     else if(answer === GlobalConstants.IMPORT_SCENE) {
                         director.loadScene();

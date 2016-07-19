@@ -179,11 +179,11 @@ define([
                                     }
                                 });
 
-                                AlertActions.showPopupYesNo(
-                                    FIRST_DEVICE_UPDATE,
-                                    lang.message.important_update.message,
-                                    lang.message.important_update.caption
-                                );
+                                // AlertActions.showPopupYesNo(
+                                //     FIRST_DEVICE_UPDATE,
+                                //     lang.message.important_update.message,
+                                //     lang.message.important_update.caption
+                                // );
                             }
                         });
                     }
@@ -354,7 +354,6 @@ define([
 
             _handleProgressStop: function(payload) {
                 GlobalActions.cancelPreview();
-                console.log(this.state.progress.onStop);
                 (this.state.progress.onStop || function() {})();
                 this.setState({
                     progress: {
@@ -409,14 +408,15 @@ define([
                 $('#growls').remove();
             },
 
-            _handlePopup: function(type, id, caption, message, customText) {
+            _handlePopup: function(type, id, caption, message, customText, args) {
                 this.setState({
                     showNotificationModal : true,
                     type                  : type,
                     sourceId              : id,
                     caption               : caption,
                     message               : message,
-                    customText            : customText
+                    customText            : customText,
+                    args                  : args
                 });
             },
 
@@ -446,7 +446,7 @@ define([
                     AlertActions.notifyAbort(this.state.sourceId);
                     break;
                 case 'yes':
-                    AlertActions.notifyYes(this.state.sourceId);
+                    AlertActions.notifyYes(this.state.sourceId, this.state.args);
                     break;
                 }
 
