@@ -595,70 +595,148 @@ define([
             },
 
             /**
-             * maintain mode
-             * @param {string} type - [LOAD|UNLOAD]
+             * enter maintain mode
+             * @param {Int} timeout - timeout (ms)
+             *
+             * @return {Promise}
              */
-            maintain: function(type) {
-                var deferred = $.Deferred(),
+            enterMaintainMode: function(timeout) {
+                var $deferred = $.Deferred(),
+                    timer;
+
+                timeout = timeout || -1;
+
+                events.onMessage = (result) => {
+                    clearTimeout(timer);
+
+                    if ('ok' === result.status) {
+                        $deferred.resolve(result);
+                    }
+                    else {
+                        $deferred.reject(result);
+                    }
+                };
+
+                events.onError = (result) => {
+                    clearTimeout(timer);
+                    $deferred.reject(result);
+                };
+
+                ws.send('task maintain');
+
+                if (-1 < timeout) {
+                    timer = setTimeout(function() {
+                        $deferred.reject({
+                            status: 'error',
+                            error: 'TIMEOUT'
+                        });
+                    }, timeout); // magic timeout duration
+                }
+
+                return $deferred.promise();
+            },
+
+            /**
+             * maintain home
+             *
+             * @return {Promise}
+             */
+            maintainHome: function() {
+                var $deferred = $.Deferred();
+
+                events.onMessage = (result) => {
+                    switch (result.status) {
+                    case 'ok':
+                        $deferred.resolve(result);
+                        break;
+                    case 'operating':
+                        // ignore. (When the toolhead is `Home`. This status wouldn't show up)
+                        break;
+                    default:
+                        $deferred.reject(result);
+                    }
+                };
+
+                events.onError = (result) => {
+                    $deferred.reject(result);
+                };
+
+                ws.send('maintain home');
+
+                return $deferred.promise();
+            },
+
+            /**
+             * change filament
+             * @param {String} type - [LOAD|UNLOAD]
+             *
+             * @return {Promise}
+             */
+            changeFilament: function(type) {
+                var $deferred = $.Deferred(),
+                    self = this,
+                    TIMEOUT = 30000,
                     typeMap = {},
-                    timeout,
-                    args = [
-                        'task',
-                        'maintain'
-                    ],
-                    currentTask = 'begining';
+                    timer,
+                    args,
+                    rejectHandler = (response) => {
+                        $deferred.reject(response);
+                    };
 
                 typeMap[DeviceConstants.LOAD_FILAMENT]   = 'load_filament';
                 typeMap[DeviceConstants.UNLOAD_FILAMENT] = 'unload_filament';
 
-                events.onMessage = (result) => {
-                    clearTimeout(timeout);
-                    timeout = setTimeout(function() {
-                        deferred.reject({
-                            status: 'error',
-                            error: 'TIMEOUT'
-                        });
-                    }, 30000); // magic timeout duration
+                this.enterMaintainMode(TIMEOUT).pipe((response) => {
+                    return this.maintainHome();
+                }, rejectHandler).
+                pipe((response) => {
 
-                    if ('ok' === result.status && 'begining' === currentTask) {
-                        if(result.task === 'maintain') {
-                            ws.send('maintain home');
+                    events.onMessage = (response) => {
+                        clearTimeout(timer);
+                        timer = setTimeout(function() {
+                            $deferred.reject({
+                                status: 'error',
+                                error: 'TIMEOUT'
+                            });
+                        }, 30000); // magic timeout duration
+
+                        if ('ok' === response.status) {
+                            $deferred.resolve(response);
+                        }
+                        else if (-1 < ['loading', 'unloading'].indexOf(response.status.toLowerCase())) {
+                            $deferred.notify(response);
+                        }
+                        else if (response.status.toLowerCase() === 'operating') {
+                            // ignore operating message
                         }
                         else {
-                            currentTask = typeMap[type];
-                            args = [
-                                'maintain',
-                                currentTask,
-                                0, // extruder id
-                                220 // temperature
-                            ];
-                            setTimeout(
-                                function() {
-                                    ws.send(args.join(' '));
-                                },
-                                3000
-                            );
+                            $deferred.resolve(response);
                         }
-                    }
-                    else if (-1 < ['loading', 'unloading'].indexOf(result.status.toLowerCase())) {
-                        deferred.notify(result);
-                    }
-                    else if (result.status.toLowerCase() === 'operating') {
-                        // skip operating message
-                    }
-                    else {
-                        deferred.resolve(result);
-                    }
-                };
+                    };
 
-                events.onError = function(result) {
-                    clearTimeout(timeout);
-                    deferred.reject(result);
-                };
+                    events.onError = function(response) {
+                        clearTimeout(timer);
+                        $deferred.reject(response);
+                    };
 
-                ws.send(args.join(' '));
+                    args = [
+                        'maintain',
+                        typeMap[type],
+                        0, // extruder id
+                        220 // temperature
+                    ];
 
-                return deferred.promise();
+                    // MAGIC DELAY NUMBER for 3s!!!
+                    setTimeout(
+                        function() {
+                            ws.send(args.join(' '));
+                        },
+                        3000
+                    );
+
+                }, rejectHandler);
+
+                return $deferred.promise();
             },
 
             /**
