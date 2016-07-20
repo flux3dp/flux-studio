@@ -252,20 +252,24 @@ define([
 
                 _registerKeyEvents: function() {
                     // delete event
-                    shortcuts.on(['del'], function(e) {
+                    shortcuts.on(['del'], (e) => {
                         if(allowDeleteObject) {
                             director.removeSelected();
                         }
                     });
 
-                    shortcuts.on(['cmd', 'z'], function(e) {
+                    shortcuts.on(['cmd', 'z'], (e) => {
                         director.undo();
+                    });
+
+                    shortcuts.on(['cmd', 'shift', 'x'], (e) => {
+                        this._handleClearScene();
                     });
 
                     // copy event - it will listen by top menu as well in nwjs..
                     if ('undefined' === typeof window.requireNode) {
                         // copy event
-                        shortcuts.on(['cmd', 'd'], function(e) {
+                        shortcuts.on(['cmd', 'd'], (e) => {
                             e.preventDefault();
                             director.duplicateSelected();
                         });

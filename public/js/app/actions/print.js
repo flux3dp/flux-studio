@@ -672,6 +672,7 @@ define([
 
     function updateSlicingProgressFromReport(report) {
         slicingStatus.inProgress = true;
+        slicingStatus.lastError = null;
         slicingStatusStream.onNext(slicingStatus);
 
         if(slicingStatus.needToCloseWait) {
@@ -707,26 +708,43 @@ define([
             slicingStatus.lastReport.caption = lang.alert.error;
 
             if(report.error === '6') {
-                reactSrc.setState({ disablePreview: true }, () => {
+                slicingStatus.lastError = report;
+                if(previewMode) {
+                    slicer.getPath().then(function(result) {
+                        slicingStatus.canInterrupt = true;
+                        if(result.error) {
+                            processSlicerError(result);
+                        }
+                        printPath = result;
+                        _drawPath().then(function() {
+                            _resetPreviewLayerSlider();
+                            ProgressActions.close();
+                            slicingStatus.showProgress = false;
+
+                        });
+                    });
+                }
+
+                AlertActions.showPopupError('', report.info, report.caption);
+                reactSrc.setState({ hasOutOfBoundsObject: true });
+                slicingStatus.isComplete = true;
+                blobExpired = false;
+            }
+            else {
+                if(show || previewMode) {
+                    setTimeout(() => {
+                        ProgressActions.close();
+                    }, 0);
                     if(previewMode) {
                         _closePreview();
+                        togglePreview();
                     }
-                });
-            }
-
-            if(show || previewMode) {
-                setTimeout(() => {
-                    ProgressActions.close();
-                }, 0);
-                if(previewMode) {
-                    _closePreview();
-                    togglePreview();
                 }
+                slicingStatus.hasError = true;
+                AlertActions.showPopupError('', slicingStatus.lastReport.info, slicingStatus.lastReport.caption);
+                slicingStatus.lastProgress = '';
+                reactSrc.setState({ hasOutOfBoundsObject: true });
             }
-            slicingStatus.hasError = true;
-            AlertActions.showPopupError('', slicingStatus.lastReport.info, slicingStatus.lastReport.caption);
-            slicingStatus.lastProgress = '';
-            reactSrc.setState({ hasOutOfBoundsObject: true });
         }
         else if(report.slice_status === 'warning') {
             AlertActions.showWarning(report.message);
@@ -2587,6 +2605,9 @@ define([
         selectObject(null);
         // previewMode = true;
         transformControl.detach(SELECTED);
+        if(slicingStatus.lastError) {
+            AlertActions.showPopupError('', slicingStatus.lastError.info, slicingStatus.lastError.caption);
+        }
 
         if(blobExpired) {
             var progress;
