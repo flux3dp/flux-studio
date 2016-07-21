@@ -436,15 +436,16 @@ define([
                     slicingStatus.canInterrupt = true;
                     slicingStatus.isComplete = true;
                     importedFCode = files.item(0);
-                    importFromFCode = true;
+                    importFromFCode = ext === 'fc';
                     setDefaultFileName(importedFCode.name)
                     if(objects.length === 0) {
                         doFCodeImport(ext);
                     }
                     else {
+                        ProgressActions.close();
                         AlertActions.showPopupYesNo(
                             GlobalConstants.IMPORT_FCODE,
-                            lang.message.confirmFCodeImport);
+                            lang.message.confirmFCodeImport, '', ext);
                     }
                     callback();
                 }
@@ -483,18 +484,20 @@ define([
                 if(!!result) {
                     if(!!result.error) {
                         // out of bound, can still preview
-                        // 6 = gcode area too big
                         if(result.error === ErrorConstants.GCODE_AREA_TOO_BIG) {
                             // disable go button
                             reactSrc.setState({ hasObject: false });
                         }
                         else {
-                            AlertActions.showPopupError('fcode-error', Sprintf(lang.message.brokenFcode, file.name));
+                            _closeWait();
+                            AlertActions.showPopupError('fcode-error', lang.slicer.error[result.error] || result.info);
                             cancelPreview();
                         }
                     }
                 }
-                fcodeConsole.getMetadata(processMetadata);
+                else {
+                    fcodeConsole.getMetadata(processMetadata);
+                }
             }, isGcode);
         });
 
@@ -669,6 +672,7 @@ define([
 
     function updateSlicingProgressFromReport(report) {
         slicingStatus.inProgress = true;
+        slicingStatus.error = null;
         slicingStatusStream.onNext(slicingStatus);
 
         if(slicingStatus.needToCloseWait) {
@@ -704,26 +708,43 @@ define([
             slicingStatus.lastReport.caption = lang.alert.error;
 
             if(report.error === '6') {
-                reactSrc.setState({ disablePreview: true }, () => {
+                slicingStatus.error = report;
+                if(previewMode) {
+                    slicer.getPath().then(function(result) {
+                        slicingStatus.canInterrupt = true;
+                        if(result.error) {
+                            processSlicerError(result);
+                        }
+                        printPath = result;
+                        _drawPath().then(function() {
+                            _resetPreviewLayerSlider();
+                            ProgressActions.close();
+                            slicingStatus.showProgress = false;
+
+                        });
+                    });
+                }
+
+                AlertActions.showPopupError('', report.info, report.caption);
+                reactSrc.setState({ hasOutOfBoundsObject: true });
+                slicingStatus.isComplete = true;
+                blobExpired = false;
+            }
+            else {
+                if(show || previewMode) {
+                    setTimeout(() => {
+                        ProgressActions.close();
+                    }, 0);
                     if(previewMode) {
                         _closePreview();
+                        togglePreview();
                     }
-                });
-            }
-
-            if(show || previewMode) {
-                setTimeout(() => {
-                    ProgressActions.close();
-                }, 0);
-                if(previewMode) {
-                    _closePreview();
-                    togglePreview();
                 }
+                slicingStatus.hasError = true;
+                AlertActions.showPopupError('', slicingStatus.lastReport.info, slicingStatus.lastReport.caption);
+                slicingStatus.lastProgress = '';
+                reactSrc.setState({ hasOutOfBoundsObject: true });
             }
-            slicingStatus.hasError = true;
-            AlertActions.showPopupError('', slicingStatus.lastReport.info, slicingStatus.lastReport.caption);
-            slicingStatus.lastProgress = '';
-            reactSrc.setState({ hasOutOfBoundsObject: true });
         }
         else if(report.slice_status === 'warning') {
             AlertActions.showWarning(report.message);
@@ -946,6 +967,7 @@ define([
                     SELECTED.outlineMesh.position.y = location.y - movingOffsetY;
                     blobExpired = true;
                     hasPreviewImage = false;
+                    slicingStatus.error = null;
                     setObjectDialoguePosition();
                     render();
                     return;
@@ -2584,6 +2606,9 @@ define([
         selectObject(null);
         // previewMode = true;
         transformControl.detach(SELECTED);
+        if(slicingStatus.error) {
+            AlertActions.showPopupError('', slicingStatus.error.info, slicingStatus.error.caption);
+        }
 
         if(blobExpired) {
             var progress;
@@ -2743,6 +2768,7 @@ define([
         MenuFactory.items.scale.onClick = setScaleMode;
         MenuFactory.items.rotate.onClick = setRotateMode;
         MenuFactory.items.reset.onClick = resetObject;
+        MenuFactory.methods.refresh();
     }
 
     function _setObject(ref, target) {
@@ -2820,7 +2846,6 @@ define([
                 clearInterval(t);
                 slicingStatus.canInterrupt = false;
                 slicer.changeEngine(engine).then((result) => {
-                    console.log(result);
                     if(result.error) {
                         processSlicerError(result);
                     }

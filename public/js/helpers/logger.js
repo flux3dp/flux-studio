@@ -14,12 +14,17 @@ define(function() {
             throw new Error('Please new this Logger intance');
         }
 
-        if (false === loggingStore.hasOwnProperty(name)) {
-            loggingStore[name] = [];
-        }
-
         return {
+            clear: function() {
+                delete loggingStore[name];
+                return this;
+            },
+
             append: function(message) {
+                if (false === loggingStore.hasOwnProperty(name)) {
+                    loggingStore[name] = [];
+                }
+
                 loggingStore[name].push(message);
                 return this;
             },

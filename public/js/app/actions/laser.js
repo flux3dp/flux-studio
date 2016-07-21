@@ -83,6 +83,7 @@ define([
 
                         menuFactory.items.execute.enabled = false;
                         menuFactory.items.saveTask.enabled = false;
+                        menuFactory.methods.refresh();
                         self.state.fileFormat = undefined;
                     }
                     else {
@@ -100,7 +101,7 @@ define([
                     };
 
                 imageData(
-                    $img.data('base'),
+                    $img.data('file').blob,
                     {
                         height: box.height,
                         width: box.width,
@@ -446,6 +447,7 @@ define([
                 attr('src', file.url).
                 data('name', file.uploadName).
                 data('base', originalUrl).
+                data('file', file).
                 data('size', size).
                 data('sizeLock', true).
                 width(size.width).
@@ -513,6 +515,7 @@ define([
 
                         menuFactory.items.duplicate.enabled = true;
                         menuFactory.items.duplicate.onClick = clone;
+                        menuFactory.methods.refresh();
                     });
                 })(file, size, originalUrl, $img);
             });
@@ -529,12 +532,6 @@ define([
                 height = file.imgSize.height,
                 ratio;
 
-            if ('svg' === self.state.fileFormat) {
-                ratio = Math.max(width, height) / PLATFORM_DIAMETER_PIXEL;
-                width *= ratio;
-                height *= ratio;
-            }
-
             imageData(file.blob, {
                 width: width,
                 height: height,
@@ -546,8 +543,11 @@ define([
                     is_svg: ('svg' === self.state.fileFormat)
                 },
                 onComplete: function(result) {
-                    file.url = result.canvas.toDataURL('svg' === file.extension ? 'image/svg+xml' : 'image/png');
-                    setupImage(file, file.imgSize, file.url);
+                    var originalUrl = file.url;
+
+                    file.url = result.canvas.toDataURL('image/png');
+
+                    setupImage(file, file.imgSize, originalUrl);
                 }
             });
         }
@@ -555,6 +555,7 @@ define([
         function inactiveAllImage($exclude) {
             $('.image-active').not($exclude).removeClass('image-active');
             menuFactory.items.duplicate.enabled = false;
+            menuFactory.methods.refresh();
 
             if (0 === $('.image-active').length) {
                 $target_image = null;
@@ -738,6 +739,7 @@ define([
 
                     menuFactory.items.execute.enabled = hasImage;
                     menuFactory.items.saveTask.enabled = hasImage;
+                    menuFactory.methods.refresh();
 
                     self.setState({
                         images: self.state.images,

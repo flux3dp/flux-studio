@@ -79,8 +79,10 @@ define([
             },
 
             componentWillUnmount: function() {
+                // just in case with forgot to quit
                 DeviceMaster.quitTask();
                 AlertStore.removeCancelListener(this._onCancel);
+                this._onClose();
             },
 
             shouldComponentUpdate: function(nextProps, nextState) {
@@ -92,9 +94,8 @@ define([
             },
 
             _onCancel: function(id) {
-                if(id !== 'change-filament-device-error' && id !== 'change-filament-zombie') {
-                    this._onClose();
-                }
+                // go back to the beginning
+                this.setState(this.getInitialState());
             },
 
             _goMaintain: function(type) {
@@ -122,10 +123,31 @@ define([
                         DeviceMaster.quitTask().done(function() {
                             self._next(steps.COMPLETED);
                         });
+                    },
+                    errorMessageHandler = (response) => {
+                        var messageMap = lang.monitor,
+                            subErrorIndex = 1,
+                            allJoinedMessage = response.symbol.join('_'),
+                            genericMessage = response.symbol.slice(0, 2).join('_');
+
+                        DeviceMaster.quitTask();
+
+                        // has default
+                        if (true === messageMap.hasOwnProperty(genericMessage)) {
+                            AlertActions.showPopupError(genericMessage, messageMap[genericMessage]);
+                        }
+                        // wrong toolhead
+                        else if ('TYPE_ERROR' === response.symbol[subErrorIndex]) {
+                            AlertActions.showPopupError(genericMessage, messageMap.HEAD_ERROR_TYPE_ERROR);
+                        }
+                        // default
+                        else {
+                            AlertActions.showPopupError('change-filament-device-error', response.error + ':' + allJoinedMessage);
+                        }
                     };
 
                 DeviceMaster.selectDevice(self.props.device).then(function() {
-                    DeviceMaster.maintain(type).progress(progress).done(done).fail(function(response) {
+                    DeviceMaster.changeFilament(type).progress(progress).done(done).fail(function(response) {
                         if ('RESOURCE_BUSY' === response.error) {
                             AlertActions.showDeviceBusyPopup('change-filament-device-busy');
                         }
@@ -144,7 +166,7 @@ define([
                             AlertActions.showDeviceBusyPopup('change-filament-zombie', lang.change_filament.maintain_zombie);
                         }
                         else {
-                            AlertActions.showPopupError('change-filament-device-error', response.error + (response.info ? ' : ' + response.info : ''));
+                            errorMessageHandler(response);
                         }
                     });
                 });

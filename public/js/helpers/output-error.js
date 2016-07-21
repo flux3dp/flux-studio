@@ -39,6 +39,7 @@ define([
                 allLog = _logger.getAll(),
                 report_info = {
                     ws: allLog.websocket || '',
+                    discoverDeviceList: allLog.discover || '',
                     screenshot: jpegUrl,
                     localStorage: {},
                     general: allLog.generic || '',
@@ -60,7 +61,10 @@ define([
             }
 
             ghostLogReader().done(function(log) {
-                report_blob = new Blob([log, report_info], { type : 'text/html' });
+                var header = `OS: ${os.type()}\nARCH: ${os.arch()}\nRELEASE: ${os.release()}\n`;
+                header += `USER-AGENT: ${navigator.userAgent}\n\n`;
+
+                report_blob = new Blob([header, log, report_info], { type : 'text/html' });
                 saveAs(report_blob, 'bugreport_' + Math.floor(Date.now() / 1000) + '.txt');
             });
 

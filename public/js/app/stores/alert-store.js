@@ -160,7 +160,7 @@ define([
                 },
 
                 'SHOW_POPUP_YES_NO': function() {
-                    AlertStore.emit(POPUP_EVENT, AlertConstants.YES_NO, payload.id, payload.caption, payload.message);
+                    AlertStore.emit(POPUP_EVENT, AlertConstants.YES_NO, payload.id, payload.caption, payload.message, '', payload.args);
                 },
 
                 'SHOW_POPUP_CUSTOM': function() {
@@ -180,7 +180,7 @@ define([
                 },
 
                 'NOTIFY_YES': function() {
-                    AlertStore.emit(NOTIFY_YES, payload.id);
+                    AlertStore.emit(NOTIFY_YES, payload.id, payload.args);
                 },
 
                 'NOTIFY_NO': function() {

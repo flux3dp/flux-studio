@@ -329,8 +329,8 @@ define([
         return d.promise();
     }
 
-    function maintain(type) {
-        return _device.actions.maintain(type);
+    function changeFilament(type) {
+        return _device.actions.changeFilament(type);
     }
 
     function reconnect() {
@@ -397,9 +397,7 @@ define([
     }
 
     function updateToolhead(file) {
-        return _device.actions.toolheadUpdate(file).then(function() {
-            _device.actions.quitTask();
-        });
+        return _device.actions.toolheadUpdate(file);
     }
 
     function headinfo() {
@@ -702,7 +700,7 @@ define([
             this.deleteFile             = deleteFile;
             this.downloadFile           = downloadFile;
             this.getPreviewInfo         = getPreviewInfo;
-            this.maintain               = maintain;
+            this.changeFilament         = changeFilament;
             this.reconnect              = reconnect;
             this.getDeviceByName        = getDeviceByName;
             this.getDeviceByNameAsync   = getDeviceByNameAsync;

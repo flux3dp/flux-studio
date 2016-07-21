@@ -165,6 +165,7 @@ define([
         _handleRotationChange: function(e) {
             if(e.type === 'blur') {
                 rotation['entered' + e.target.id.toUpperCase()] = parseInt(e.target.value) || 0;
+                this.props.onRotate(rotation);
                 this.forceUpdate();
                 return;
             }
@@ -173,11 +174,10 @@ define([
                 rotation.enteredX = rotation.enteredX || 0;
                 rotation.enteredY = rotation.enteredY || 0;
                 rotation.enteredZ = rotation.enteredZ || 0;
-                console.log('sending rotation', rotation);
                 this.props.onRotate(rotation);
             }
             else {
-                rotation['entered' + e.target.id.toUpperCase()] = parseInt(e.target.value) || '';
+                rotation['entered' + e.target.id.toUpperCase()] = e.target.value;
                 this.forceUpdate();
             }
 

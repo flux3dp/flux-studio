@@ -218,14 +218,15 @@ define([
 
                     nwjsMenu.import.enabled = true;
                     nwjsMenu.import.onClick = () => { $importBtn.click(); };
-                    nwjsMenu.undo.onClick = () => { director.undo(); }
-                    nwjsMenu.duplicate.onClick = () => { director.duplicateSelected(); }
+                    nwjsMenu.undo.onClick = () => { director.undo(); };
+                    nwjsMenu.duplicate.onClick = () => { director.duplicateSelected(); };
                     nwjsMenu.saveTask.onClick = this._handleDownloadFCode;
                     nwjsMenu.saveScene.onClick = this._handleDownloadScene;
                     nwjsMenu.clear.onClick = this._handleClearScene;
                     nwjsMenu.tutorial.onClick = () => {
                         this._handleYes('tour');
                     };
+                    menuFactory.methods.refresh();
 
                     this._registerKeyEvents();
                     if(tutorialMode) {
@@ -252,20 +253,24 @@ define([
 
                 _registerKeyEvents: function() {
                     // delete event
-                    shortcuts.on(['del'], function(e) {
+                    shortcuts.on(['del'], (e) => {
                         if(allowDeleteObject) {
                             director.removeSelected();
                         }
                     });
 
-                    shortcuts.on(['cmd', 'z'], function(e) {
+                    shortcuts.on(['cmd', 'z'], (e) => {
                         director.undo();
+                    });
+
+                    shortcuts.on(['cmd', 'shift', 'x'], (e) => {
+                        this._handleClearScene();
                     });
 
                     // copy event - it will listen by top menu as well in nwjs..
                     if ('undefined' === typeof window.requireNode) {
                         // copy event
-                        shortcuts.on(['cmd', 'd'], function(e) {
+                        shortcuts.on(['cmd', 'd'], (e) => {
                             e.preventDefault();
                             director.duplicateSelected();
                         });
@@ -278,7 +283,7 @@ define([
                     }
                 },
 
-                _handleYes: function(answer) {
+                _handleYes: function(answer, args) {
                     if(answer === 'tour') {
                         this.setState({ tutorialOn: true });
                         tutorialMode = true;
@@ -326,7 +331,7 @@ define([
                         director.cancelPreview();
                     }
                     else if(answer === GlobalConstants.IMPORT_FCODE) {
-                        director.doFCodeImport();
+                        director.doFCodeImport(args);
                     }
                     else if(answer === GlobalConstants.IMPORT_SCENE) {
                         director.loadScene();
@@ -868,10 +873,13 @@ define([
                 },
 
                 _renderNwjsMenu: function() {
-                    nwjsMenu.undo.enabled = this.state.hasObject;
-                    nwjsMenu.saveTask.enabled = this.state.hasObject;
-                    nwjsMenu.saveScene.enabled = this.state.hasObject;
-                    nwjsMenu.clear.enabled = this.state.hasObject;
+                    if(nwjsMenu.undo.enabled !== this.state.hasObject) {
+                        nwjsMenu.undo.enabled = this.state.hasObject;
+                        nwjsMenu.saveTask.enabled = this.state.hasObject;
+                        nwjsMenu.saveScene.enabled = this.state.hasObject;
+                        nwjsMenu.clear.enabled = this.state.hasObject;
+                        menuFactory.methods.refresh();
+                    }
                 },
 
                 render: function() {
@@ -910,7 +918,7 @@ define([
                             <div id="model-displayer" className="model-displayer">
                                 <div className="import-indicator"></div>
                             </div>
-                            <input className="hide" ref="importBtn" type="file" accept=".stl" onChange={this._handleImport} />
+                            <input className="hide" ref="importBtn" type="file" accept=".stl,.fc,.gcode,.obj" onChange={this._handleImport} multiple/>
 
                             <TourGuide
                                 lang={lang}
