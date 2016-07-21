@@ -876,6 +876,7 @@ define([
                     nwjsMenu.saveTask.enabled = this.state.hasObject;
                     nwjsMenu.saveScene.enabled = this.state.hasObject;
                     nwjsMenu.clear.enabled = this.state.hasObject;
+                    menuFactory.methods.refresh();
                 },
 
                 render: function() {
