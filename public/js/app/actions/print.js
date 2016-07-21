@@ -672,7 +672,7 @@ define([
 
     function updateSlicingProgressFromReport(report) {
         slicingStatus.inProgress = true;
-        slicingStatus.lastError = null;
+        slicingStatus.error = null;
         slicingStatusStream.onNext(slicingStatus);
 
         if(slicingStatus.needToCloseWait) {
@@ -708,7 +708,7 @@ define([
             slicingStatus.lastReport.caption = lang.alert.error;
 
             if(report.error === '6') {
-                slicingStatus.lastError = report;
+                slicingStatus.error = report;
                 if(previewMode) {
                     slicer.getPath().then(function(result) {
                         slicingStatus.canInterrupt = true;
@@ -967,6 +967,7 @@ define([
                     SELECTED.outlineMesh.position.y = location.y - movingOffsetY;
                     blobExpired = true;
                     hasPreviewImage = false;
+                    slicingStatus.error = null;
                     setObjectDialoguePosition();
                     render();
                     return;
@@ -2605,8 +2606,8 @@ define([
         selectObject(null);
         // previewMode = true;
         transformControl.detach(SELECTED);
-        if(slicingStatus.lastError) {
-            AlertActions.showPopupError('', slicingStatus.lastError.info, slicingStatus.lastError.caption);
+        if(slicingStatus.error) {
+            AlertActions.showPopupError('', slicingStatus.error.info, slicingStatus.error.caption);
         }
 
         if(blobExpired) {
