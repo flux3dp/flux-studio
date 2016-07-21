@@ -215,8 +215,8 @@ define([
                                 <div className="control">
                                     <UnitInput
                                         className={{'input-fullsize': true}}
-                                        min={0}
-                                        max={360}
+                                        min={-180}
+                                        max={180}
                                         defaultUnitType="angle"
                                         defaultUnit="°"
                                         dataAttrs={{ type: 'angle' }}

@@ -22,19 +22,19 @@ exports.executeTest = function(name, apiMethod, testCases) {
                 });
             }
         });
+    });
 
-        conn.on('close', function(code, reason) {
-            exports.err(reason, code);
-        });
+    // off event
+    conn.off = function(eventName) {
+        if (true === eventName in conn._events) {
+            delete conn._events[eventName];
+        }
 
-        // off event
-        conn.off = function(eventName) {
-            if (true === eventName in conn._events) {
-                delete conn._events[eventName];
-            }
+        return this;
+    };
 
-            return this;
-        };
+    conn.on('close', function(code, reason) {
+        exports.err(reason, code);
     });
 
     conn.on('error', function(data) {

@@ -275,7 +275,7 @@ define([
                 },
 
                 onClose: function(callback) {
-                    socketOptions.onclose = callback;
+                    socketOptions.onClose = callback;
 
                     return this;
                 },

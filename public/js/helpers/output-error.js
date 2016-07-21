@@ -61,7 +61,9 @@ define([
             }
 
             ghostLogReader().done(function(log) {
-                var header = `OS: ${os.type()}\nARCH: ${os.arch()}\nRELEASE: ${os.release()}\n\n`;
+                var header = `OS: ${os.type()}\nARCH: ${os.arch()}\nRELEASE: ${os.release()}\n`;
+                header += `USER-AGENT: ${navigator.userAgent}\n\n`;
+
                 report_blob = new Blob([header, log, report_info], { type : 'text/html' });
                 saveAs(report_blob, 'bugreport_' + Math.floor(Date.now() / 1000) + '.txt');
             });
