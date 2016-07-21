@@ -218,14 +218,15 @@ define([
 
                     nwjsMenu.import.enabled = true;
                     nwjsMenu.import.onClick = () => { $importBtn.click(); };
-                    nwjsMenu.undo.onClick = () => { director.undo(); }
-                    nwjsMenu.duplicate.onClick = () => { director.duplicateSelected(); }
+                    nwjsMenu.undo.onClick = () => { director.undo(); };
+                    nwjsMenu.duplicate.onClick = () => { director.duplicateSelected(); };
                     nwjsMenu.saveTask.onClick = this._handleDownloadFCode;
                     nwjsMenu.saveScene.onClick = this._handleDownloadScene;
                     nwjsMenu.clear.onClick = this._handleClearScene;
                     nwjsMenu.tutorial.onClick = () => {
                         this._handleYes('tour');
                     };
+                    menuFactory.methods.refresh();
 
                     this._registerKeyEvents();
                     if(tutorialMode) {
@@ -872,11 +873,13 @@ define([
                 },
 
                 _renderNwjsMenu: function() {
-                    nwjsMenu.undo.enabled = this.state.hasObject;
-                    nwjsMenu.saveTask.enabled = this.state.hasObject;
-                    nwjsMenu.saveScene.enabled = this.state.hasObject;
-                    nwjsMenu.clear.enabled = this.state.hasObject;
-                    menuFactory.methods.refresh();
+                    if(nwjsMenu.undo.enabled !== this.state.hasObject) {
+                        nwjsMenu.undo.enabled = this.state.hasObject;
+                        nwjsMenu.saveTask.enabled = this.state.hasObject;
+                        nwjsMenu.saveScene.enabled = this.state.hasObject;
+                        nwjsMenu.clear.enabled = this.state.hasObject;
+                        menuFactory.methods.refresh();
+                    }
                 },
 
                 render: function() {

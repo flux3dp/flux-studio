@@ -2768,6 +2768,7 @@ define([
         MenuFactory.items.scale.onClick = setScaleMode;
         MenuFactory.items.rotate.onClick = setRotateMode;
         MenuFactory.items.reset.onClick = resetObject;
+        menuFactory.methods.refresh();
     }
 
     function _setObject(ref, target) {

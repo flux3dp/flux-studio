@@ -83,6 +83,7 @@ define([
 
                         menuFactory.items.execute.enabled = false;
                         menuFactory.items.saveTask.enabled = false;
+                        menuFactory.methods.refresh();
                         self.state.fileFormat = undefined;
                     }
                     else {
@@ -514,6 +515,7 @@ define([
 
                         menuFactory.items.duplicate.enabled = true;
                         menuFactory.items.duplicate.onClick = clone;
+                        menuFactory.methods.refresh();
                     });
                 })(file, size, originalUrl, $img);
             });
@@ -553,6 +555,7 @@ define([
         function inactiveAllImage($exclude) {
             $('.image-active').not($exclude).removeClass('image-active');
             menuFactory.items.duplicate.enabled = false;
+            menuFactory.methods.refresh();
 
             if (0 === $('.image-active').length) {
                 $target_image = null;
@@ -736,6 +739,7 @@ define([
 
                     menuFactory.items.execute.enabled = hasImage;
                     menuFactory.items.saveTask.enabled = hasImage;
+                    menuFactory.methods.refresh();
 
                     self.setState({
                         images: self.state.images,

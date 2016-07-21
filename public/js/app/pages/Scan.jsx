@@ -174,6 +174,7 @@ define([
                     menuFactory.items.import.onClick = function() {
                         self.refs.fileUploader.getDOMNode().click();
                     };
+                    menuFactory.methods.refresh();
                 },
 
                 componentWillUnmount: function() {
@@ -1510,6 +1511,7 @@ define([
                             });
 
                             menuFactory.items.import.enabled = true;
+                            menuFactory.methods.refresh();
                             self._openBlocker(true, ProgressConstants.NONSTOP);
                         },
                         noDeviceAvailable = function() {
