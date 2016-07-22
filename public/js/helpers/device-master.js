@@ -66,7 +66,12 @@ define([
                     confirmText  : lang.input_machine_password.connect,
                     type: InputLightBoxConstants.TYPE_PASSWORD,
                     onSubmit     : function(password) {
-                        auth(uuid, password).done(function(data) {
+                        ProgressActions.open(ProgressConstants.NONSTOP);
+                        auth(uuid, password).
+                        always(() => {
+                            ProgressActions.close();
+                        }).
+                        done(function(data) {
                             selectDevice(device, d);
                         }).
                         fail(function(response) {
@@ -141,7 +146,7 @@ define([
             });
         }
 
-        return d.always(function() {
+        return d.always(() => {
             ProgressActions.close();
         }).promise();
     }
