@@ -35,7 +35,7 @@ define([
                 };
             },
 
-            componentWillUnmount() => {
+            componentWillUnmount: () => {
                 if ('undefined' !== upnpMethods) {
                     upnpMethods.connection.close();
                 }
