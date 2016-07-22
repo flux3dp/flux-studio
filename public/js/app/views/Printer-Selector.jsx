@@ -188,6 +188,7 @@ define([
                             confirmText  : lang.select_printer.submit,
                             onSubmit     : function(password) {
                                 printer.plaintext_password = password;
+                                ProgressActions.open(ProgressConstants.NONSTOP);
 
                                 self._auth(printer.uuid, password, {
                                     onError: function(response) {
@@ -208,9 +209,6 @@ define([
                     else {
                         AlertActions.showPopupInfo('device-auth-fail', lang.message.no_password.content, lang.message.no_password.caption);
                     }
-                },
-                opts = {
-                    onError: onError
                 };
 
             self.selected_printer = printer;
@@ -220,9 +218,8 @@ define([
             }
             else {
                 ProgressActions.open(ProgressConstants.NONSTOP_WITH_MESSAGE, lang.initialize.connecting);
-                DeviceMaster.selectDevice(self.selected_printer).done(function(status) {
-                    ProgressActions.close();
 
+                DeviceMaster.selectDevice(self.selected_printer).done(function(status) {
                     if (status === DeviceConstants.CONNECTED) {
                         checkDeviceStatus(printer).done(function(status) {
                             if (true === self.props.forceAuth) {
@@ -235,7 +232,6 @@ define([
                     }
                     else if (status === DeviceConstants.TIMEOUT) {
                         // TODO: Check default printer
-                        ProgressActions.close();
                         if (self.state.hadDefaultPrinter) {
                             AlertActions.showPopupError(
                                 'printer-connection-timeout',
@@ -248,8 +244,10 @@ define([
                         }
                     }
                 }).
-                fail(function(status) {
+                always(() => {
                     ProgressActions.close();
+                }).
+                fail(function(status) {
                     AlertActions.showPopupError('fatal-occurred', status);
                 });
             }
