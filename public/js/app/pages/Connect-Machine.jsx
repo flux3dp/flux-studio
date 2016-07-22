@@ -111,8 +111,11 @@ define([
                     }
 
                     self._setSettingPrinter(currentPrinter);
-                }).progress(function(response) {
-
+                }).
+                always(() => {
+                    self._toggleBlocker(false);
+                }).
+                progress(function(response) {
                     switch (response.status) {
                     case 'error':
                         lastError = response;
