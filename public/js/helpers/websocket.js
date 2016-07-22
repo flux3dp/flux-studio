@@ -3,7 +3,6 @@ define([
     'helpers/i18n',
     'app/actions/alert-actions',
     'app/stores/alert-store',
-    'app/actions/progress-actions',
     'helpers/output-error',
     'helpers/logger',
     'helpers/blob-segments'
@@ -12,7 +11,6 @@ define([
     i18n,
     AlertActions,
     AlertStore,
-    ProgressActions,
     outputError,
     Logger,
     blobSegments
@@ -125,7 +123,6 @@ define([
                 };
 
                 _ws.onclose = function(result) {
-                    ProgressActions.close();
                     socketOptions.onClose(result);
 
                     var abnormallyId = 'abnormally-close',
