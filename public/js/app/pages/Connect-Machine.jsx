@@ -24,10 +24,17 @@ define([
     'use strict';
 
     return function(args) {
+        var upnpMethods;
 
         args = args || {};
 
         return React.createClass({
+            componentWillUnmount: () => {
+                if ('undefined' !== upnpMethods) {
+                    upnpMethods.connection.close();
+                }
+            },
+
             // UI events
             _setSettingPrinter: function(printer) {
                 // temporary store for setup
@@ -94,7 +101,6 @@ define([
 
             _onGettingPrinter: function(currentPrinter) {
                 var self = this,
-                    upnpMethods,
                     lastError;
 
                 self._toggleBlocker(true);
