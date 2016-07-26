@@ -216,18 +216,7 @@ define([
 
                     $importBtn = this.refs.importBtn.getDOMNode();
 
-                    nwjsMenu.import.enabled = true;
-                    nwjsMenu.import.onClick = () => { $importBtn.click(); };
-                    nwjsMenu.undo.onClick = () => { director.undo(); };
-                    nwjsMenu.duplicate.onClick = () => { director.duplicateSelected(); };
-                    nwjsMenu.saveTask.onClick = this._handleDownloadFCode;
-                    nwjsMenu.saveScene.onClick = this._handleDownloadScene;
-                    nwjsMenu.clear.onClick = this._handleClearScene;
-                    nwjsMenu.tutorial.onClick = () => {
-                        this._handleYes('tour');
-                    };
-                    menuFactory.methods.refresh();
-
+                    this._prepareMenu();
                     this._registerKeyEvents();
                     if(tutorialMode) {
                         //First time using, with usb-configured printer..
@@ -281,6 +270,24 @@ define([
                     if(tutorialMode) {
                         AlertActions.showPopupYesNo('tour', lang.tutorial.startTour);
                     }
+                },
+
+                _prepareMenu: function() {
+                    nwjsMenu.import.enabled = true;
+                    nwjsMenu.import.onClick = () => { $importBtn.click(); };
+                    nwjsMenu.undo.onClick = () => { director.undo(); };
+                    nwjsMenu.duplicate.onClick = () => { director.duplicateSelected(); };
+                    nwjsMenu.saveTask.onClick = this._handleDownloadFCode;
+                    nwjsMenu.saveScene.onClick = this._handleDownloadScene;
+                    nwjsMenu.clear.onClick = this._handleClearScene;
+                    nwjsMenu.tutorial.onClick = () => {
+                        this._handleYes('tour');
+                    };
+                    nwjsMenu.undo.enabled = false;
+                    nwjsMenu.saveTask.enabled = false;
+                    nwjsMenu.saveScene.enabled = false;
+                    nwjsMenu.clear.enabled = false;
+                    menuFactory.methods.refresh();
                 },
 
                 _handleYes: function(answer, args) {
