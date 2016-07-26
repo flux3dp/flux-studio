@@ -33,6 +33,7 @@ define([
     'app/default-print-settings',
     'app/actions/input-lightbox-actions',
     'app/constants/input-lightbox-constants',
+    'helpers/local-storage'
 ], function(
     $,
     React,
@@ -67,7 +68,8 @@ define([
     packer,
     DefaultPrintSettings,
     InputLightboxActions,
-    InputLightboxConstants
+    InputLightboxConstants,
+    LocalStorage
 ) {
 
     return function(args) {
@@ -226,6 +228,10 @@ define([
                     nwjsMenu.tutorial.onClick = () => {
                         this._handleYes('tour');
                     };
+                    nwjsMenu.clearLocalstorage.enabled = true;
+                    nwjsMenu.clearLocalstorage.onClick = () => {
+                        LocalStorage.clearAllExceptIP();
+                    };
                     menuFactory.methods.refresh();
 
                     this._registerKeyEvents();
@@ -265,6 +271,10 @@ define([
 
                     shortcuts.on(['cmd', 'shift', 'x'], (e) => {
                         this._handleClearScene();
+                    });
+
+                    shortcuts.on(['cmd', 'shift', 'a'], (e) => {
+                        LocalStorage.clearAllExceptIP();
                     });
 
                     // copy event - it will listen by top menu as well in nwjs..

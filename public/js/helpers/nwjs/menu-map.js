@@ -82,6 +82,12 @@ define([
                 onClick: emptyFunction,
                 parent: parentIndex.FILE
             },
+            clearLocalstorage: {
+                label: lang.file.reset,
+                enabled: false,
+                onClick: emptyFunction,
+                parent: parentIndex.FILE
+            },
             duplicate: {
                 label: lang.edit.duplicate,
                 enabled: false,
@@ -192,7 +198,8 @@ define([
                 items.import,
                 separator,
                 items.saveTask,
-                items.saveScene
+                items.saveScene,
+                items.clearLocalstorage
             ];
 
             if (1 === menuIndexOffset) {
