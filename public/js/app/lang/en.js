@@ -927,7 +927,8 @@ define(function() {
             unsupport_osx_version: 'Unsupported Mac OS X Version Detected',
             need_password: 'Need Password to connect to FLUX Delta',
             new_app_downloading: 'Downloading',
-            ask_for_upgrade: 'Do you wanna upgrade NOW?'
+            ask_for_upgrade: 'Do you wanna upgrade NOW?',
+            need_1_1_7_above: 'Please update Delta Firmware to v1.1.7+'
         },
         machine_status: {
             '-10': 'Raw mode',

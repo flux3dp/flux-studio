@@ -67,14 +67,12 @@ define([
                     type: InputLightBoxConstants.TYPE_PASSWORD,
                     onSubmit     : function(password) {
                         ProgressActions.open(ProgressConstants.NONSTOP);
-                        auth(uuid, password).
-                        always(() => {
+
+                        auth(uuid, password).always(() => {
                             ProgressActions.close();
-                        }).
-                        done(function(data) {
+                        }).done((data) => {
                             selectDevice(device, d);
-                        }).
-                        fail(function(response) {
+                        }).fail((response) => {
                             let message = (
                                 false === response.reachable ?
                                 lang.select_printer.unable_to_connect :
@@ -122,11 +120,18 @@ define([
                             goAuth(_device.uuid);
                         }
                         else {
-                            AlertActions.showPopupInfo(
-                                'auth-error-with-diff-computer',
-                                lang.message.no_password.content,
-                                lang.message.no_password.caption
-                            );
+                            ProgressActions.open(ProgressConstants.NONSTOP);
+
+                            auth(_device.uuid, '').always(() => {
+                                ProgressActions.close();
+                            }).done((data) => {
+                                selectDevice(device, d);
+                            }).fail(() => {
+                                AlertActions.showPopupError(
+                                    'auth-error-with-diff-computer',
+                                    lang.message.need_1_1_7_above
+                                );
+                            });
                         }
                         break;
                     case DeviceConstants.MONITOR_TOO_OLD:
