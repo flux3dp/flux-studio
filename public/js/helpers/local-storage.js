@@ -73,6 +73,19 @@ define(['localStorage'], function(localStorage) {
         },
 
         /**
+         * clear all except poke-ip-address
+         *
+         * @return this
+         */
+        clearAllExceptIP : function() {
+            let ip = this.get('poke-ip-addr');
+            this.clearAll();
+            this.set('poke-ip-addr', ip);
+
+            return this;
+        },
+
+        /**
          * key is existing
          *
          * @param {string} key - key name
