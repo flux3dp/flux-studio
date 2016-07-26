@@ -6,8 +6,19 @@ define([
     'jsx!views/settings/Setting-General',
     'helpers/display',
     'plugins/classnames/index',
-    'app/app-settings'
-], function($, React, i18n, SelectView, SettingGeneral, Display, ClassNames, settings) {
+    'app/app-settings',
+    'helpers/force-reload'
+], function(
+    $,
+    React,
+    i18n,
+    SelectView,
+    SettingGeneral,
+    Display,
+    ClassNames,
+    settings,
+    forceReload
+) {
     'use strict';
 
     return function(args) {
@@ -23,10 +34,8 @@ define([
             },
 
             _handleDone: function() {
-                location.hash = '#studio/print';
-                this.setState({
-                    lang: i18n.get()
-                });
+                location.hash = 'studio/print';
+                forceReload();
             },
 
             render: function() {
