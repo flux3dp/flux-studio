@@ -250,10 +250,10 @@ define([
                     enabled: true,
                     onClick: function() {
                         if (true === window.FLUX.isNW) {
-                            nw.Shell.openExternal('https://helpcenter.flux3dp.com/');
+                            nw.Shell.openExternal('http://helpcenter.flux3dp.com/');
                         }
                         else {
-                            window.open('https://helpcenter.flux3dp.com/');
+                            window.open('http://helpcenter.flux3dp.com/');
                         }
                     }
                 },
