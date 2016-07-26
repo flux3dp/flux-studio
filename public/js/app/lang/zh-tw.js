@@ -62,7 +62,8 @@ define(function() {
                 label: '檔案',
                 import: '匯入',
                 save_fcode: '匯出工作',
-                save_scene: '匯出場景'
+                save_scene: '匯出場景',
+                reset: '重置設定'
             },
             edit: {
                 label: '編輯',
