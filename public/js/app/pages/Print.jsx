@@ -230,7 +230,9 @@ define([
                     };
                     nwjsMenu.clearLocalstorage.enabled = true;
                     nwjsMenu.clearLocalstorage.onClick = () => {
-                        LocalStorage.clearAllExceptIP();
+                        if(confirm(lang.topmenu.file.confirmReset)) {
+                            LocalStorage.clearAllExceptIP();
+                        }
                     };
                     menuFactory.methods.refresh();
 
