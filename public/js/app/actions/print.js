@@ -502,6 +502,20 @@ define([
                         if(result.error === ErrorConstants.GCODE_AREA_TOO_BIG) {
                             // disable go button
                             reactSrc.setState({ hasObject: false });
+                            if(previewMode) {
+                                fcodeConsole.getPath().then((r) => {
+                                    slicingStatus.canInterrupt = true;
+                                    if(r.error) {
+                                        processSlicerError(r);
+                                    }
+                                    printPath = r;
+                                    _drawPath().then(function() {
+                                        _resetPreviewLayerSlider();
+                                        ProgressActions.close();
+                                        slicingStatus.showProgress = false;
+                                    });
+                                });
+                            }
                         }
                         else {
                             _closeWait();
