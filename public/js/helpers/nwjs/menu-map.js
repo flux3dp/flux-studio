@@ -8,7 +8,8 @@ define([
     'app/actions/initialize-machine',
     'html2canvas',
     'plugins/file-saver/file-saver.min',
-    'helpers/output-error'
+    'helpers/output-error',
+    'helpers/check-software-update'
 ], function(
     $,
     gui,
@@ -16,7 +17,8 @@ define([
     initializeMachine,
     html2canvas,
     fileSaver,
-    outputError
+    outputError,
+    checkSoftwareUpdate
 ) {
     'use strict';
 
@@ -290,9 +292,7 @@ define([
                 {
                     label: lang.help.software_update,
                     enabled: true,
-                    onClick: function() {
-
-                    }
+                    onClick: checkSoftwareUpdate
                 },
                 {
                     label: lang.help.debug,
