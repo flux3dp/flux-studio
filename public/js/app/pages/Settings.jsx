@@ -38,6 +38,12 @@ define([
                 forceReload();
             },
 
+            _onLangChange: function() {
+                this.setState({
+                    lang: i18n.get()
+                });
+            },
+
             render: function() {
                 var lang = this.state.lang,
                     footer;
@@ -53,7 +59,11 @@ define([
                     <div className="studio-container settings-studio">
                         <div className="settings">
                             <div className="tab-container">
-                                <SettingGeneral lang={this.state.lang} supported_langs={settings.i18n.supported_langs}/>
+                                <SettingGeneral
+                                    lang={this.state.lang}
+                                    supported_langs={settings.i18n.supported_langs}
+                                    onLangChange={this._onLangChange}
+                                />
                             </div>
                             {footer}
                         </div>
