@@ -22,6 +22,7 @@ define([
     'use strict';
 
     return function(args) {
+        var upnpMethods;
 
         args = args || {};
 
@@ -34,10 +35,15 @@ define([
                 };
             },
 
+            componentWillUnmount: () => {
+                if ('undefined' !== upnpMethods) {
+                    upnpMethods.connection.close();
+                }
+            },
+
             _retrieveDevice: function(e) {
                 var self = this,
                     currentPrinter,
-                    upnpMethods,
                     discoverMethods = discover('upnp-config', (printers) => {
                         clearTimeout(timer);
                         ProgressActions.close();
