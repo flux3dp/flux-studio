@@ -530,7 +530,7 @@ define(function() {
             import: '匯入',
             save: '儲存⋯',
             custom: '自訂',
-            presets: '預設預設',
+            presets: '預設',
             button_advanced: '進階',
             confirm: '確認',
             get_fcode: '儲存<br/>工作',
