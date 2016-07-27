@@ -234,6 +234,9 @@ define([
                     director.clear();
                     director.willUnmount();
 
+                    nwjsMenu.tutorial.enabled = false;
+                    menuFactory.methods.refresh();
+
                     AlertStore.removeYesListener(this._handleYes);
                     AlertStore.removeCancelListener(this._handleDefaultCancel);
                     GlobalStore.removeCancelPreviewListener(this._handleCancelPreview);
@@ -280,6 +283,7 @@ define([
                     nwjsMenu.saveTask.onClick = this._handleDownloadFCode;
                     nwjsMenu.saveScene.onClick = this._handleDownloadScene;
                     nwjsMenu.clear.onClick = this._handleClearScene;
+                    nwjsMenu.tutorial.enabled = true;
                     nwjsMenu.tutorial.onClick = () => {
                         this._handleYes('tour');
                     };
