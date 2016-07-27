@@ -472,6 +472,7 @@ define([
                         _handleLoadScene(importedScene);
                     }
                     else {
+                        ProgressActions.close();
                         AlertActions.showPopupYesNo(
                             GlobalConstants.IMPORT_SCENE,
                             lang.message.confirmSceneImport
