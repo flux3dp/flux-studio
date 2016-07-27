@@ -501,18 +501,8 @@ define([
                 },
 
                 _handleDownloadScene: function() {
-                    allowDeleteObject = false;
-                    InputLightboxActions.open(GlobalConstants.IMPORT_SCENE, {
-                        type        : InputLightboxConstants.TEXT_INPUT,
-                        caption     : lang.print.download_prompt,
-                        confirmText : lang.select_printer.submit,
-                        onSubmit    : function(fileName) {
-                            director.downloadScene(fileName);
-                        },
-                        onClose     : function() {
-                            allowDeleteObject = true;
-                        }
-                    });
+                    allowDeleteObject = true;
+                    director.downloadScene();
                 },
 
                 _handlePreview: function(isOn) {

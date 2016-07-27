@@ -2337,7 +2337,7 @@ define([
         }, importFromGCode);
     }
 
-    function downloadScene(fileName) {
+    function downloadScene() {
         if(objects.length === 0) { return; }
 
         var parameter;
@@ -2355,7 +2355,7 @@ define([
             });
         }
         var sceneFile = packer.pack();
-        saveAs(sceneFile, fileName + '.fsc');
+        saveAs(sceneFile);
     }
 
     function loadScene() {
