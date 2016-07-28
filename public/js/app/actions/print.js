@@ -654,6 +654,10 @@ define([
                     slicingStatus.showProgress = false;
                     slicingStatus.canInterrupt = false;
                     clearInterval(t);
+                    if(slicingStatus.hasError) {
+                        slicingStatus.canInterrupt = true;
+                        return;
+                    }
                     slicer.uploadPreviewImage(blob).then(() => {
                         slicingStatus.canInterrupt = true;
                         slicer.getSlicingResult().then((result) => {
@@ -736,6 +740,7 @@ define([
 
             slicingStatus.lastReport.info = lang.slicer.error[report.error];
             slicingStatus.lastReport.caption = lang.alert.error;
+            slicingStatus.hasError = true;
 
             if(report.error === '6') {
                 slicingStatus.error = report;
@@ -748,13 +753,13 @@ define([
                         printPath = result;
                         _drawPath().then(function() {
                             _resetPreviewLayerSlider();
-                            ProgressActions.close();
                             slicingStatus.showProgress = false;
 
                         });
                     });
                 }
 
+                ProgressActions.close();
                 AlertActions.showPopupError('', report.info, report.caption);
                 reactSrc.setState({ hasOutOfBoundsObject: true });
                 slicingStatus.isComplete = true;
@@ -770,7 +775,6 @@ define([
                         togglePreview();
                     }
                 }
-                slicingStatus.hasError = true;
                 AlertActions.showPopupError('', slicingStatus.lastReport.info, slicingStatus.lastReport.caption);
                 slicingStatus.lastProgress = '';
                 reactSrc.setState({ hasOutOfBoundsObject: true });
