@@ -9,6 +9,14 @@ define([
     'use strict';
 
     return React.createClass({
+        getDefaultProps: function() {
+            return {
+                lang: {},
+                supported_langs: '',
+                onLangChange: function() {}
+            };
+        },
+
         getInitialState: function() {
             return {
                 lang: this.props.lang
@@ -38,6 +46,7 @@ define([
             this.setState({
                 lang: i18n.get()
             });
+            this.props.onLangChange(e);
         },
 
         _switchNotification: function(e) {

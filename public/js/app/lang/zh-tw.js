@@ -530,7 +530,7 @@ define(function() {
             import: '匯入',
             save: '儲存⋯',
             custom: '自訂',
-            presets: '預設預設',
+            presets: '預設',
             button_advanced: '進階',
             confirm: '確認',
             get_fcode: '儲存<br/>工作',
@@ -953,7 +953,7 @@ define(function() {
             need_password: '需要密碼與 FLUX Delta 建立連線',
             new_app_downloading: '下載中',
             ask_for_upgrade: '馬上升級嗎?',
-            need_1_1_7_above: '請更新 Delta 韌體到 v v1.1.7 以上'
+            need_1_1_7_above: '請更新 Delta 韌體到 v1.1.7 以上'
         },
         machine_status: {
             '-10': 'Raw Mode',

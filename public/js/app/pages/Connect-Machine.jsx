@@ -30,7 +30,7 @@ define([
 
         return React.createClass({
             componentWillUnmount: () => {
-                if ('undefined' !== upnpMethods) {
+                if ('undefined' !== typeof upnpMethods) {
                     upnpMethods.connection.close();
                 }
             },

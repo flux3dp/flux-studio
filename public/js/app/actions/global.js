@@ -5,7 +5,8 @@ define([
     'helpers/shortcuts',
     'helpers/api/config',
     'helpers/nwjs/menu-factory',
-    'helpers/logger'
+    'helpers/logger',
+    'helpers/force-reload'
 ], function(
     $,
     i18n,
@@ -13,19 +14,13 @@ define([
     shortcuts,
     config,
     menuFactory,
-    Logger
+    Logger,
+    forceReload
 ) {
     'use strict';
 
     // prevent delete (back) behavior
     var genericLogger = new Logger('generic'),
-        forceReload = function() {
-            if (true === window.FLUX.isNW) {
-                window.FLUX.killAPI().always(function() {
-                    window.location.reload();
-                });
-            }
-        },
         defaultKeyBehavior = function() {
             shortcuts.on(['BACK'], function(e) {
                 // always prevent default, and implement delete function our own.

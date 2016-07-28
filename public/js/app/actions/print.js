@@ -472,6 +472,7 @@ define([
                         _handleLoadScene(importedScene);
                     }
                     else {
+                        ProgressActions.close();
                         AlertActions.showPopupYesNo(
                             GlobalConstants.IMPORT_SCENE,
                             lang.message.confirmSceneImport
@@ -502,6 +503,20 @@ define([
                         if(result.error === ErrorConstants.GCODE_AREA_TOO_BIG) {
                             // disable go button
                             reactSrc.setState({ hasObject: false });
+                            if(previewMode) {
+                                fcodeConsole.getPath().then((r) => {
+                                    slicingStatus.canInterrupt = true;
+                                    if(r.error) {
+                                        processSlicerError(r);
+                                    }
+                                    printPath = r;
+                                    _drawPath().then(function() {
+                                        _resetPreviewLayerSlider();
+                                        ProgressActions.close();
+                                        slicingStatus.showProgress = false;
+                                    });
+                                });
+                            }
                         }
                         else {
                             _closeWait();
@@ -2323,7 +2338,7 @@ define([
         }, importFromGCode);
     }
 
-    function downloadScene(fileName) {
+    function downloadScene() {
         if(objects.length === 0) { return; }
 
         var parameter;
@@ -2341,7 +2356,7 @@ define([
             });
         }
         var sceneFile = packer.pack();
-        saveAs(sceneFile, fileName + '.fsc');
+        saveAs(sceneFile);
     }
 
     function loadScene() {

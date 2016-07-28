@@ -86,19 +86,16 @@ define([
             this.props.onTransform(e, newParams);
         },
 
-        _lockRatio: function(which) {
+        _lockRatio: function(which, e) {
+            e.preventDefault();
+
             var self = this,
-                state;
+                state = self.state;
 
-            return function(e) {
-                e.preventDefault();
+            state[which] = !self.state[which];
+            self.setState(state);
 
-                state = {};
-                state[which] = !self.state[which];
-                self.setState(state);
-
-                self._onTransform(e);
-            };
+            self._onTransform(e);
         },
 
         _renderThreshold: function(lang, props, state) {
@@ -202,7 +199,7 @@ define([
                                         getValue={this._onTransform}
                                     />
                                 </div>
-                                <img className="icon-locker" src={lockerImage.size} onClick={this._lockRatio('sizeLock')}/>
+                                <img className="icon-locker" src={lockerImage.size} onClick={this._lockRatio.bind(this, 'sizeLock')}/>
                             </label>
                         </label>
                         <label className="controls accordion">
