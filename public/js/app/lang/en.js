@@ -62,7 +62,9 @@ define(function() {
                 label: 'File',
                 import: 'Import',
                 save_fcode: 'Export FLUX Task',
-                save_scene: 'Save Scene'
+                save_scene: 'Save Scene',
+                reset: 'Reset',
+                confirmReset: 'Are you sure you want to reset all settings?'
             },
             edit: {
                 label: 'Edit',
