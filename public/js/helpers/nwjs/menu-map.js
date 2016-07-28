@@ -8,7 +8,8 @@ define([
     'app/actions/initialize-machine',
     'html2canvas',
     'plugins/file-saver/file-saver.min',
-    'helpers/output-error'
+    'helpers/output-error',
+    'helpers/check-software-update'
 ], function(
     $,
     gui,
@@ -16,7 +17,8 @@ define([
     initializeMachine,
     html2canvas,
     fileSaver,
-    outputError
+    outputError,
+    checkSoftwareUpdate
 ) {
     'use strict';
 
@@ -248,10 +250,10 @@ define([
                     enabled: true,
                     onClick: function() {
                         if (true === window.FLUX.isNW) {
-                            nw.Shell.openExternal('https://helpcenter.flux3dp.com/');
+                            nw.Shell.openExternal('http://helpcenter.flux3dp.com/');
                         }
                         else {
-                            window.open('https://helpcenter.flux3dp.com/');
+                            window.open('http://helpcenter.flux3dp.com/');
                         }
                     }
                 },
@@ -290,9 +292,7 @@ define([
                 {
                     label: lang.help.software_update,
                     enabled: true,
-                    onClick: function() {
-
-                    }
+                    onClick: checkSoftwareUpdate
                 },
                 {
                     label: lang.help.debug,

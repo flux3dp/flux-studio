@@ -100,6 +100,7 @@ define([
         importedScene = {},
         objectBeforeTransform = {},
         slicingStatusStream,
+        uploadProgress,
         history = [],
         lang = I18n.get();
 
@@ -253,9 +254,13 @@ define([
     function uploadStl(name, file, ext) {
         // pass to slicer
         var d = $.Deferred();
-        slicer.upload(name, file, ext, displayProgress).then((result) => {
+        slicer.upload(name, file, ext).then((result) => {
             ProgressActions.updating('finishing up', 100);
             d.resolve(result);
+        }).progress(displayProgress)
+        .fail((error) => {
+            console.log('reject with error', error);
+            d.reject(error);
         });
         return d.promise();
     }
@@ -272,7 +277,7 @@ define([
 
         callback = callback || function() {};
 
-        var loadGeometry = function(geometry) {
+        var loadGeometry = (geometry) => {
             if(geometry.vertices) {
                 if(geometry.vertices.length === 0) {
                     ProgressActions.close();
@@ -289,95 +294,103 @@ define([
             mesh.up = new THREE.Vector3(0, 0, 1);
 
             slicingStatus.pauseReport = true;
-            uploadStl(mesh.uuid, file, ext).then(function(result) {
+            uploadStl(mesh.uuid, file, ext).then((result) => {
                 slicingStatus.pauseReport = false;
-                if (result.status !== 'ok') {
-                    ProgressActions.close();
-                    reactSrc.setState({
-                        openImportWindow: true,
-                        openObjectDialogue: false
-                    });
-                    processSlicerError(result);
-                    return;
-                }
-                if(slicingStatus.canInterrupt) {
-                    startSlicing(slicingType.F);
-                }
+                let t = setInterval(() => {
+                    if(slicingStatus.canInterrupt) {
+                        clearInterval(t);
+                        startSlicing(slicingType.F);
+                    };
+                }, 200);
                 ProgressActions.close();
+                addToScene();
                 callback();
-            });
-
-            geometry.center();
-
-            // normalize - resize, align
-            var box = new THREE.Box3().setFromObject(mesh),
-                enlarge = parseInt(box.size().x) !== 0 && parseInt(box.size().y) !== 0 && parseInt(box.size().z) !== 0,
-                scale;
-
-            scale = getScaleDifference(
-                enlarge ?
-                getLargestPropertyValue(box.size()) :
-                getSmallestPropertyValue(box.size())
-            );
-
-            // alert for auto scalling
-            if(scale === Infinity) {
+            }).progress((steps, total) => {
+                console.log(steps, total);
+            }).fail((error) => {
+                slicingStatus.pauseReport = false;
                 reactSrc.setState({
                     openImportWindow: true,
                     openObjectDialogue: false
-                }, function() {
-                    AlertActions.showPopupError('', lang.message.slicingFailed);
+                }, () => {
+                    ProgressActions.close();
                 });
+                processSlicerError(error);
                 return;
-            }
-            else if (scale !== 1) {
-                console.log('this model has been scaled for better printing ratio');
-            }
-
-            mesh.scale.set(scale, scale, scale);
-            mesh.scale._x = scale;
-            mesh.scale._y = scale;
-            mesh.scale._z = scale;
-
-            mesh.rotation.order = 'ZYX';
-
-            /* customized properties */
-            mesh.scale.enteredX = 1;
-            mesh.scale.enteredY = 1;
-            mesh.scale.enteredZ = 1;
-            mesh.scale.locked = true;
-            mesh.rotation.enteredX = 0;
-            mesh.rotation.enteredY = 0;
-            mesh.rotation.enteredZ = 0;
-            mesh.position.isOutOfBounds = false;
-            mesh.scale.locked = true;
-            /* end customized property */
-
-            if (mesh.geometry.type !== 'Geometry') {
-                mesh.geometry = new THREE.Geometry().fromBufferGeometry(mesh.geometry);
-            }
-
-            mesh.name = 'custom';
-            mesh.file = file;
-            mesh.fileName = file.name;
-            mesh.plane_boundary = planeBoundary(mesh);
-
-            autoArrange(mesh);
-            addSizeProperty(mesh);
-            groundIt(mesh);
-            selectObject(mesh);
-            createOutline(mesh);
-
-            scene.add(mesh);
-            outlineScene.add(mesh.outlineMesh);
-            objects.push(mesh);
-            reactSrc.setState({
-                hasObject: true
             });
 
-            setDefaultFileName();
-            render();
-        }
+            const addToScene = () => {
+                geometry.center();
+
+                // normalize - resize, align
+                var box = new THREE.Box3().setFromObject(mesh),
+                    enlarge = parseInt(box.size().x) !== 0 && parseInt(box.size().y) !== 0 && parseInt(box.size().z) !== 0,
+                    scale;
+
+                scale = getScaleDifference(
+                    enlarge ?
+                    getLargestPropertyValue(box.size()) :
+                    getSmallestPropertyValue(box.size())
+                );
+
+                // alert for auto scalling
+                if(scale === Infinity) {
+                    reactSrc.setState({
+                        openImportWindow: true,
+                        openObjectDialogue: false
+                    }, function() {
+                        AlertActions.showPopupError('', lang.message.slicingFailed);
+                    });
+                    return;
+                }
+                else if (scale !== 1) {
+                    console.log('this model has been scaled for better printing ratio');
+                }
+
+                mesh.scale.set(scale, scale, scale);
+                mesh.scale._x = scale;
+                mesh.scale._y = scale;
+                mesh.scale._z = scale;
+
+                mesh.rotation.order = 'ZYX';
+
+                /* customized properties */
+                mesh.scale.enteredX = 1;
+                mesh.scale.enteredY = 1;
+                mesh.scale.enteredZ = 1;
+                mesh.scale.locked = true;
+                mesh.rotation.enteredX = 0;
+                mesh.rotation.enteredY = 0;
+                mesh.rotation.enteredZ = 0;
+                mesh.position.isOutOfBounds = false;
+                mesh.scale.locked = true;
+                /* end customized property */
+
+                if (mesh.geometry.type !== 'Geometry') {
+                    mesh.geometry = new THREE.Geometry().fromBufferGeometry(mesh.geometry);
+                }
+
+                mesh.name = 'custom';
+                mesh.file = file;
+                mesh.fileName = file.name;
+                mesh.plane_boundary = planeBoundary(mesh);
+
+                autoArrange(mesh);
+                addSizeProperty(mesh);
+                groundIt(mesh);
+                selectObject(mesh);
+                createOutline(mesh);
+                scene.add(mesh);
+                outlineScene.add(mesh.outlineMesh);
+                objects.push(mesh);
+                reactSrc.setState({
+                    hasObject: true
+                });
+
+                setDefaultFileName();
+                render();
+            };
+        };
 
         reactSrc.setState({
             openImportWindow: false
@@ -417,15 +430,17 @@ define([
                 if(ext === 'stl' || ext === 'obj') {
                     var reader  = new FileReader();
                     reader.addEventListener('load', function () {
-                        appendModel(reader.result, file, ext, function() {
-                            slicingStatus.canInterrupt = true;
-                            if(files.length > index + 1) {
-                                appendModels(files, index + 1, callback);
-                            }
-                            else {
+                        appendModel(reader.result, file, ext, function(err) {
+                            if(!err) {
                                 slicingStatus.canInterrupt = true;
-                                startSlicing(slicingType.F);
-                                callback();
+                                if(files.length > index + 1) {
+                                    appendModels(files, index + 1, callback);
+                                }
+                                else {
+                                    slicingStatus.canInterrupt = true;
+                                    startSlicing(slicingType.F);
+                                    callback();
+                                }
                             }
                         });
                     }, false);
@@ -457,6 +472,7 @@ define([
                         _handleLoadScene(importedScene);
                     }
                     else {
+                        ProgressActions.close();
                         AlertActions.showPopupYesNo(
                             GlobalConstants.IMPORT_SCENE,
                             lang.message.confirmSceneImport
@@ -487,6 +503,20 @@ define([
                         if(result.error === ErrorConstants.GCODE_AREA_TOO_BIG) {
                             // disable go button
                             reactSrc.setState({ hasObject: false });
+                            if(previewMode) {
+                                fcodeConsole.getPath().then((r) => {
+                                    slicingStatus.canInterrupt = true;
+                                    if(r.error) {
+                                        processSlicerError(r);
+                                    }
+                                    printPath = r;
+                                    _drawPath().then(function() {
+                                        _resetPreviewLayerSlider();
+                                        ProgressActions.close();
+                                        slicingStatus.showProgress = false;
+                                    });
+                                });
+                            }
                         }
                         else {
                             _closeWait();
@@ -585,14 +615,15 @@ define([
             slicer.beginSlicing(ids, slicingType.F).then(function(response) {
                 slicingStatus.canInterrupt = true;
                 slicingStatus.pauseReport = false;
-                if(response.status === 'fatal') {
-                    AlertActions.showPopupError('slicingFatalError', lang.message.slicingFatalError);
-                    return;
-                }
                 getSlicingReport(function(report) {
                     slicingStatus.lastReport = report;
                     updateSlicingProgressFromReport(report);
                 });
+            }).fail((error) => {
+                slicingStatus.canInterrupt = true;
+                slicingStatus.pauseReport = false;
+                processSlicerError(error);
+                return;
             });
         });
     }
@@ -625,15 +656,14 @@ define([
                     clearInterval(t);
                     slicer.uploadPreviewImage(blob).then(() => {
                         slicingStatus.canInterrupt = true;
-                        return slicer.getSlicingResult();
-                    }).then((result) => {
-                        if(result.error) {
-                            processSlicerError(result);
-                        }
-                        else {
+                        slicer.getSlicingResult().then((result) => {
                             responseBlob = result;
-                        }
-                        d.resolve(blob);
+                            d.resolve(blob);
+                        }).fail((error) => {
+                            processSlicerError(error);
+                        });
+                    }).fail((error) => {
+                        processSlicerError(error);
                     });
                 }
             }, 500);
@@ -783,7 +813,8 @@ define([
                 blobExpired = false;
                 responseBlob = result;
                 _handleSliceComplete();
-
+            }).fail((error) => {
+                console.log(error);
             });
         }
     }
@@ -1153,62 +1184,6 @@ define([
         }
     }
 
-    function getGCode() {
-        var d = $.Deferred();
-        var ids = [];
-
-        objects.forEach(function(obj) {
-            ids.push(obj.uuid);
-        });
-
-        ProgressActions.open(
-            ProgressConstants.STEPPING,
-            lang.monitor.processing,
-            lang.monitor.savingPreview,
-            !showStopButton
-        );
-
-        getBlobFromScene().then(function(blob){
-            cropImageUsingCanvas(blob).then(function(blob) {
-                reactSrc.setState({ previewUrl: URL.createObjectURL(blob) });
-                return slicer.uploadPreviewImage(blob);
-            }).then(function(response) {
-                if (response.status === 'ok') {
-                    syncObjectParameter().then(function() {
-                        return slicer.goG(ids);
-                    }).then((result) => {
-                        if (result instanceof Blob) {
-                            blobExpired = false;
-                            responseBlob = result;
-                            ProgressActions.close();
-                            d.resolve(result);
-                        }
-                        else {
-                            if (result.status !== 'error') {
-                                var serverMessage = `${result.status}: ${result.message} (${parseInt(result.percentage * 100)}%)`,
-                                    drawingMessage = `Finishing up... (100%)`,
-                                    message = result.status !== 'complete' ? serverMessage : drawingMessage;
-                                if(!willReslice) {
-                                    ProgressActions.updating(message, parseInt(result.percentage * 100));
-                                }
-                            }
-                            else {
-                                ProgressActions.close();
-                            }
-                        }
-                    });
-                }
-                // error
-                else {
-                    _setProgressMessage('');
-                    d.resolve(result);
-                }
-            });
-        });
-
-        return d.promise();
-    }
-
     function getFCode() {
         var d = $.Deferred();
 
@@ -1275,19 +1250,19 @@ define([
                 if(slicingStatus.canInterrupt) {
                     slicingStatus.canInterrupt = false;
                     slicingStatus.pauseReport = true;
-                    slicer.reportSlicing(function(report) {
+                    slicer.reportSlicing().then((report) => {
                         slicingStatus.canInterrupt = true;
                         slicingStatus.pauseReport = false;
-                        if(!report) { return; }
-                        if(report.slice_status === 'complete') {
-                            clearInterval(slicingStatus.reporter);
-                            slicingStatus.isComplete = true;
-                            blobExpired = false;
+                        if(!!report) {
+                            if(report.slice_status === 'complete') {
+                                clearInterval(slicingStatus.reporter);
+                                slicingStatus.isComplete = true;
+                                blobExpired = false;
+                            }
                             callback(report);
                         }
-                        else if(report.slice_status !== 'ok') {
-                            callback(report);
-                        }
+                    }).fail((error) => {
+                        console.log(error);
                     });
                 }
             }
@@ -1415,7 +1390,7 @@ define([
             if(slicingStatus.canInterrupt) {
                 clearInterval(t);
                 slicingStatus.canInterrupt = false;
-                slicer.setParameter('advancedSettings', settings.custom).then((result, errors) => {
+                slicer.setParameter('advancedSettings', settings.custom).then((result) => {
                     slicingStatus.canInterrupt = true;
                     slicingStatus.showProgress = false;
                     slicingStatus.pauseReport = false;
@@ -1423,8 +1398,8 @@ define([
                         doSlicing();
                     }
                     d.resolve('');
-                }, (error) => {
-                    AlertActions.showPopupError(_id, lang.slicer.error[error.error] + error.info);
+                }).fail((error) => {
+                    processSlicerError(error);
                     d.resolve('');
                 });
                 blobExpired = true;
@@ -1445,12 +1420,16 @@ define([
         var t = setInterval(function() {
             if(slicingStatus.canInterrupt) {
                 clearInterval(t);
-                slicer.setParameter(name, value).then(function() {
+                slicer.setParameter(name, value).then(() => {
                     slicingStatus.showProgress = false;
                     slicingStatus.pauseReport = false;
                     if(objects.length > 0) {
                         doSlicing();
                     }
+                    d.resolve('');
+                }).fail((error) => {
+                    console.log('yo', error);
+                    processSlicerError(error);
                     d.resolve('');
                 });
             }
@@ -1657,10 +1636,6 @@ define([
     function removeSelected() {
         if (SELECTED && Object.keys(SELECTED).length > 0) {
             slicer.delete(SELECTED.uuid).then((result) => {
-                if(result.error) {
-                    processSlicerError(result);
-                    return;
-                }
 
                 let index = objects.indexOf(SELECTED);
 
@@ -1691,6 +1666,10 @@ define([
                 }
 
                 _clearPath();
+
+            }).fail((error) => {
+                processSlicerError(error);
+                return;
             });
         }
     }
@@ -1737,6 +1716,8 @@ define([
                         AlertActions.showPopupError('duplicateError', result.info);
                     }
                 }
+            }).fail((error) => {
+                processSlicerError(error);
             });
         }
     }
@@ -1991,37 +1972,6 @@ define([
         });
 
         return d.promise();
-    }
-
-    function downloadGCode(fileName) {
-        if(!fileName) {
-            fileName = defaultFileName;
-        }
-
-        fileName = fileName + '.gcode';
-
-        blobExpired = true;
-        hasPreviewImage = false;
-        selectObject(null);
-        var d = $.Deferred();
-        if(objects.length > 0) {
-            if (!blobExpired) {
-                d.resolve(saveAs(responseBlob, fileName));
-            } else {
-                getGCode().then(function(blob) {
-                    if (blob instanceof Blob) {
-                        _setProgressMessage('');
-                        d.resolve(saveAs(blob, fileName));
-                    }
-                });
-            }
-
-            return d.promise();
-        }
-        else {
-            d.resolve('');
-            return d.promise();
-        }
     }
 
     function downloadFCode(fileName) {
@@ -2339,9 +2289,12 @@ define([
         render();
     }
 
-    function displayProgress(step, total) {
+    function displayProgress(step, total, progress) {
         if(step === total) {
             ProgressActions.updating(lang.print.uploaded, 80);
+        }
+        else {
+            ProgressActions.updating(lang.print.uploaded, progress * 0.8);
         }
     }
 
@@ -2385,7 +2338,7 @@ define([
         }, importFromGCode);
     }
 
-    function downloadScene(fileName) {
+    function downloadScene() {
         if(objects.length === 0) { return; }
 
         var parameter;
@@ -2403,7 +2356,7 @@ define([
             });
         }
         var sceneFile = packer.pack();
-        saveAs(sceneFile, fileName + '.fsc');
+        saveAs(sceneFile);
     }
 
     function loadScene() {
@@ -2466,14 +2419,13 @@ define([
                 o[index].scale.x,
                 o[index].scale.y,
                 o[index].scale.z
-            ).then(function(result) {
-                if (result.status === 'error') {
-                    index = o.length;
-                    processSlicerError(result);
-                }
+            ).then((result) => {
                 if (index < o.length) {
                     _syncObjectParameter(o, index + 1, callback);
                 }
+            }).fail((error) => {
+                index = o.length;
+                processSlicerError(error);
             });
         } else {
             callback();
@@ -2518,15 +2470,14 @@ define([
             slicingStatus.canInterrupt = false;
             slicer.getPath().then(function(result) {
                 slicingStatus.canInterrupt = true;
-                if(result.error) {
-                    processSlicerError(result);
-                }
                 printPath = result;
                 _drawPath().then(function() {
                     _resetPreviewLayerSlider();
                     ProgressActions.close();
                     slicingStatus.showProgress = false;
                 });
+            }).fail((error) => {
+                processSlicerError(error);
             });
         }
         else {
@@ -2629,16 +2580,18 @@ define([
         else {
             if(!printPath || printPath.length === 0) {
                 slicingStatus.canInterrupt = false;
-                slicer.getPath().then(function(result) {
+                slicer.getPath().then((result) => {
                     slicingStatus.canInterrupt = true;
                     if(result.error) {
                         processSlicerError(result);
                     }
                     printPath = result;
-                    _drawPath().then(function() {
+                    _drawPath().then(() => {
                         _resetPreviewLayerSlider();
                         _closeWait();
                     });
+                }).fail((error) => {
+                    processSlicerError(error);
                 });
             }
             else {
@@ -2851,6 +2804,8 @@ define([
                     }
                     slicingStatus.canInterrupt = true;
                     d.resolve();
+                }).fail((error) => {
+                    processSlicerError(error);
                 });
             }
         }, 500);
@@ -2861,6 +2816,12 @@ define([
     function processSlicerError(result) {
         let id = 'SLICER_ERROR',
         message = lang.slicer.error[result.error] || result.info;
+        if(result.error === ErrorConstants.INVALID_PARAMETER) {
+            message = `${message} ${result.info}`;
+        }
+        if(!message) {
+            message = result.error;
+        }
         AlertActions.showPopupError(id, message);
     }
 
@@ -2880,13 +2841,11 @@ define([
         removeSelected      : removeSelected,
         duplicateSelected   : duplicateSelected,
         setSize             : setSize,
-        downloadGCode       : downloadGCode,
         downloadFCode       : downloadFCode,
         setRotateMode       : setRotateMode,
         setScaleMode        : setScaleMode,
         setAdvanceParameter : setAdvanceParameter,
         setParameter        : setParameter,
-        getGCode            : getGCode,
         getFCode            : getFCode,
         getModelCount       : getModelCount,
         togglePreview       : togglePreview,

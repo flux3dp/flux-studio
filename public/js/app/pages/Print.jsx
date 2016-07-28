@@ -216,18 +216,7 @@ define([
 
                     $importBtn = this.refs.importBtn.getDOMNode();
 
-                    nwjsMenu.import.enabled = true;
-                    nwjsMenu.import.onClick = () => { $importBtn.click(); };
-                    nwjsMenu.undo.onClick = () => { director.undo(); };
-                    nwjsMenu.duplicate.onClick = () => { director.duplicateSelected(); };
-                    nwjsMenu.saveTask.onClick = this._handleDownloadFCode;
-                    nwjsMenu.saveScene.onClick = this._handleDownloadScene;
-                    nwjsMenu.clear.onClick = this._handleClearScene;
-                    nwjsMenu.tutorial.onClick = () => {
-                        this._handleYes('tour');
-                    };
-                    menuFactory.methods.refresh();
-
+                    this._prepareMenu();
                     this._registerKeyEvents();
                     if(tutorialMode) {
                         //First time using, with usb-configured printer..
@@ -244,6 +233,9 @@ define([
                 componentWillUnmount: function() {
                     director.clear();
                     director.willUnmount();
+
+                    nwjsMenu.tutorial.enabled = false;
+                    menuFactory.methods.refresh();
 
                     AlertStore.removeYesListener(this._handleYes);
                     AlertStore.removeCancelListener(this._handleDefaultCancel);
@@ -281,6 +273,25 @@ define([
                     if(tutorialMode) {
                         AlertActions.showPopupYesNo('tour', lang.tutorial.startTour);
                     }
+                },
+
+                _prepareMenu: function() {
+                    nwjsMenu.import.enabled = true;
+                    nwjsMenu.import.onClick = () => { $importBtn.click(); };
+                    nwjsMenu.undo.onClick = () => { director.undo(); };
+                    nwjsMenu.duplicate.onClick = () => { director.duplicateSelected(); };
+                    nwjsMenu.saveTask.onClick = this._handleDownloadFCode;
+                    nwjsMenu.saveScene.onClick = this._handleDownloadScene;
+                    nwjsMenu.clear.onClick = this._handleClearScene;
+                    nwjsMenu.tutorial.enabled = true;
+                    nwjsMenu.tutorial.onClick = () => {
+                        this._handleYes('tour');
+                    };
+                    nwjsMenu.undo.enabled = false;
+                    nwjsMenu.saveTask.enabled = false;
+                    nwjsMenu.saveScene.enabled = false;
+                    nwjsMenu.clear.enabled = false;
+                    menuFactory.methods.refresh();
                 },
 
                 _handleYes: function(answer, args) {
@@ -494,18 +505,8 @@ define([
                 },
 
                 _handleDownloadScene: function() {
-                    allowDeleteObject = false;
-                    InputLightboxActions.open(GlobalConstants.IMPORT_SCENE, {
-                        type        : InputLightboxConstants.TEXT_INPUT,
-                        caption     : lang.print.download_prompt,
-                        confirmText : lang.select_printer.submit,
-                        onSubmit    : function(fileName) {
-                            director.downloadScene(fileName);
-                        },
-                        onClose     : function() {
-                            allowDeleteObject = true;
-                        }
-                    });
+                    allowDeleteObject = true;
+                    director.downloadScene();
                 },
 
                 _handlePreview: function(isOn) {

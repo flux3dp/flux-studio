@@ -3,6 +3,7 @@ define([
     'react',
     'lib/jquery.growl',
     'helpers/api/config',
+    'helpers/check-software-update',
     // alert dialog
     'app/actions/alert-actions',
     'app/stores/alert-store',
@@ -33,6 +34,7 @@ define([
     React,
     Notifier,
     config,
+    checkSoftwareUpdate,
     // alert
     AlertActions,
     AlertStore,
@@ -160,7 +162,7 @@ define([
                 GlobalStore.onSliceComplete(this._handleSliceReport);
                 GlobalStore.onCloseMonitor(this._handlecloseMonitor);
 
-                this._checkSoftwareUpdate();
+                checkSoftwareUpdate();
 
                 // check first discovered device firmware
                 discoverMethods = discover(
@@ -179,11 +181,11 @@ define([
                                     }
                                 });
 
-                                // AlertActions.showPopupYesNo(
-                                //     FIRST_DEVICE_UPDATE,
-                                //     lang.message.important_update.message,
-                                //     lang.message.important_update.caption
-                                // );
+                                AlertActions.showPopupYesNo(
+                                    FIRST_DEVICE_UPDATE,
+                                    lang.message.important_update.message,
+                                    lang.message.important_update.caption
+                                );
                             }
                         });
                     }
@@ -494,78 +496,6 @@ define([
                         lang    = {lang}
                         content ={content} />
                 );
-            },
-
-            _checkSoftwareUpdate: function() {
-                var self = this,
-                    isIgnore,
-                    filename,
-                    manifest,
-                    firmwareUpdater,
-                    downloadPercentage = 0,
-                    ignoreVersions = config().read('software-update-ignore-list') || [],
-                    installNewApp = function() {
-                        nw.App.runInstaller(filename, manifest, function(err, newAppPath) {
-                            if (err) {
-                                AlertActions.showPopupInfo('ruinstalling', 'Upgrade failed');
-                            }
-                        });
-                        AlertStore.removeYesListener(installNewApp);
-                    },
-                    handleDownloadProgress = function(data, downloadSize, contentLength) {
-                        downloadPercentage = parseInt((downloadSize / contentLength).toFixed(3) * 100, 10);
-
-                        if (true === self.state.progress.open) {
-                            ProgressActions.updating(
-                                lang.message.new_app_downloading + ' (' + downloadPercentage + '%)',
-                                downloadPercentage
-                            );
-
-                            if (100 === downloadPercentage) {
-                                ProgressActions.close();
-                                AlertActions.showPopupYesNo('install-new-app', lang.message.ask_for_upgrade);
-                                AlertStore.onYes(installNewApp);
-                            }
-                        }
-                        else {
-                            updater.abort();
-                        }
-                    };
-
-                if (true === window.FLUX.isNW) {
-                    nw.App.checkUpdate(function(error, newVersionExists, _manifest) {
-                        if (!error) {
-                            manifest = _manifest;
-                            isIgnore = -1 < ignoreVersions.indexOf(manifest.version);
-                        }
-
-                        if (!error && true === newVersionExists && false === isIgnore) {
-                            self._showUpdate({
-                                type: 'software',
-                                device: {},
-                                updateInfo: {
-                                    currentVersion: window.FLUX.version,
-                                    latestVersion: manifest.version,
-                                    releaseNote: manifest.changelog,
-                                },
-                                onInstall: function() {
-                                    ProgressActions.open(ProgressConstants.STEPPING, '', lang.message.new_app_downloading, true);
-                                    updater = nw.App.downloadUpdate(
-                                        manifest,
-                                        function(error, _filename) {
-                                            if (error) {
-                                                ProgressActions.close();
-                                                nw.Shell.openExternal('https://flux3dp.com/downloads');
-                                            }
-                                            filename = _filename;
-                                        },
-                                        handleDownloadProgress
-                                    );
-                                }
-                            });
-                        }
-                    });
-                }
             },
 
             _renderChangeFilament: function() {

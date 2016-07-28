@@ -24,6 +24,8 @@ define([
     'use strict';
 
     return function(args) {
+        var upnpMethods;
+
         args = args || {};
 
         return React.createClass({
@@ -88,8 +90,9 @@ define([
                         });
                     },
                     startSettingWithWifi = function() {
-                        var upnpMethods = upnpConfig(self.state.settingPrinter.uuid),
-                            $deferred = $.Deferred();
+                        var $deferred = $.Deferred();
+
+                        upnpMethods = upnpConfig(self.state.settingPrinter.uuid);
 
                         $.when(upnpMethods.name(name), upnpMethods.password(oldPassword, password)).
                         always(function() {

@@ -33,6 +33,7 @@ define([
             AP_MODE                   : 'AP_MODE',
             SET_WIFI_WITHOUT_PASSWORD : 'SET_WIFI_WITHOUT_PASSWORD'
         },
+        wifiAPI,
         globalWifiAPI;
 
     return function(args) {
@@ -42,6 +43,16 @@ define([
 
             action: '',
             deferred: $.Deferred(),
+
+            componentWillUnmount: () => {
+                if ('undefined' !== wifiAPI) {
+                    wifiAPI.connection.close();
+                }
+
+                if ('undefined' !== globalWifiAPI) {
+                    globalWifiAPI.connection.close();
+                }
+            },
 
             // Lifecycle
             getInitialState: function() {
@@ -68,7 +79,6 @@ define([
                     settingWifi = initializeMachine.settingWifi.get(),
                     settingPrinter = self.state.settingPrinter,
                     timer,
-                    wifiAPI,
                     getWifi = function() {
                         wifiOptions = [];
 
