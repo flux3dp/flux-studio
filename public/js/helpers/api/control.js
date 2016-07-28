@@ -567,13 +567,16 @@ define([
                 events.onMessage = function(result) {
                     if(result.status === 'ok') {
                         if(result.task === 'maintain') {
-                            ws.send(`maintain calibrating`);
+                            ws.send('maintain home');
+                        }
+                        else if(result.data) {
+                            ws.send('task quit');
                         }
                         else if(result.task === '') {
                             d.resolve(result);
                         }
                         else {
-                            ws.send('task quit');
+                            ws.send(`maintain calibrating`);
                         }
                     }
                     else if(result.status === 'error') {
