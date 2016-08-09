@@ -45,10 +45,6 @@ define([
             deferred: $.Deferred(),
 
             componentWillUnmount: () => {
-                if ('undefined' !== typeof wifiAPI) {
-                    wifiAPI.connection.close();
-                }
-
                 if ('undefined' !== typeof globalWifiAPI) {
                     globalWifiAPI.connection.close();
                 }
