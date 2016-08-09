@@ -30,3 +30,5 @@ if %OS%==32BIT (
 ) else (
     set FILE_NAME=VC_redist.x64.exe
 )
+
+".\%FILE_NAME%" /install /q /norestart
