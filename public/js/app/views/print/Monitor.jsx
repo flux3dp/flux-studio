@@ -501,8 +501,8 @@ define([
 
                 if(fCode) {
                     DeviceMaster.go(fCode).then(() => {
-                    }).progress((step, total) => {
-                        let p = parseInt(step / total * 100);
+                    }).progress((progress) => {
+                        let p = parseInt(progress.step / progress.total * 100);
                         store.dispatch(MonitorActionCreator.setUploadProgress(p !== 100 ? p : ''));
                     });
                 }

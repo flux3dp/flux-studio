@@ -217,7 +217,7 @@ define([
                             fileReader = new FileReader();
 
                             fileReader.onloadend = (e) => {
-                                d.notify(step++, total);
+                                step++;
                                 ws.send(e.target.result);
 
                             };
@@ -227,7 +227,10 @@ define([
                         }
 
                     }
-                    else if ('ok' === result.status) {
+                    else if (result.status === 'uploading') {
+                        d.notify({step: result.sent, total: filesize});
+                    }
+                    else if (result.status === 'ok') {
                         d.resolve();
                     }
                     else if(result.status === 'error') {

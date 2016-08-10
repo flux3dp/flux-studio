@@ -234,7 +234,7 @@ define([
         }
         else {
             const handleOk = () => { d.resolve(); };
-            const handleProgress = (step, total) => { d.notify(step, total); };
+            const handleProgress = (progress) => { d.notify(progress); };
             const handleError = (error) => { d.reject(error); };
 
             SocketMaster.addTask('upload', blob.size, blob).then(handleOk).progress(handleProgress).fail(handleError);

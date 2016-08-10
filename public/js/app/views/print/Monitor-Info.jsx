@@ -64,10 +64,6 @@ define([
                 return `${lang.monitor.processing} ${parseInt((Monitor.downloadProgress.size - Monitor.downloadProgress.left) / Monitor.downloadProgress.size * 100)}%`;
             }
 
-            if(Monitor.uploadProgress) {
-                return `{lang.monitor.processing} ${Monitor.uploadProgress}`;
-            }
-
             if(Device.status.st_label) {
                 let { displayStatus } = MonitorStatus[Device.status.st_label]();
                 return displayStatus;
@@ -95,6 +91,10 @@ define([
         },
 
         _getProgress: function() {
+            if(Number.isInteger(Monitor.uploadProgress)) {
+                return `${lang.monitor.processing} ${Monitor.uploadProgress}%`;
+            }
+
             let o = findObjectContainsProperty(Device.jobInfo, 'TIME_COST');
 
             if(
