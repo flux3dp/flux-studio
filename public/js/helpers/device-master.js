@@ -16,6 +16,7 @@ define([
     'app/constants/input-lightbox-constants',
     'helpers/device-list',
     'helpers/api/camera',
+    'helpers/socket-master',
     'helpers/array-findindex'
 ], function(
     $,
@@ -34,7 +35,8 @@ define([
     GlobalActions,
     InputLightBoxConstants,
     DeviceList,
-    Camera
+    Camera,
+    SocketMaster
 ) {
     'use strict';
 
@@ -44,8 +46,6 @@ define([
         defaultPrinter,
         defaultPrinterWarningShowed = false,
         _instance = null,
-        _password = '',
-        _status = DeviceConstants.READY,
         _selectedDevice = {},
         _deviceNameMap = {},
         _device,
@@ -149,6 +149,8 @@ define([
                     }
                 }
             });
+
+            SocketMaster.setWebSocket(_device.actions);
         }
 
         return d.always(() => {
@@ -187,23 +189,23 @@ define([
         let d = $.Deferred();
         if(uploadPath) {
             ProgressActions.open(ProgressConstants.STEPPING, lang.device.starting, '', false);
-            _device.actions.uploadToDirectory(blob, uploadPath, file.name, uploadProgress).then(function(result) {
+            SocketMaster.addTask('uploadToDirectory', blob, uploadPath, file.name, uploadProgress).then(function(result) {
                 ProgressActions.close();
                 d.resolve(result);
             });
         }
         else {
+            let callback = (step, total) => {
+                thisProgress = parseInt(step / total * 100);
+                if(thisProgress !== lastProgress) {
+                    lastProgress = thisProgress;
+                }
+            };
             _device.print = _device.actions.upload(blob.size, blob, {
                 onFinished: function(result) {
                     d.resolve(result);
                 }
-            }, function(step, total) {
-                thisProgress = parseInt(step / total * 100);
-                if(thisProgress !== lastProgress) {
-                    callback(parseInt(step / total * 100));
-                    lastProgress = thisProgress;
-                }
-            });
+            }, callback);
         }
 
         return d.promise();
@@ -225,34 +227,31 @@ define([
 
     }
 
-    function go(blob, callbackProgress) {
+    function go(blob) {
         let d = $.Deferred();
-        if(!blob) {
+        if(!blob || !(blob instanceof Blob)) {
             d.resolve(DeviceConstants.READY);
         }
         else {
-            _go(blob, callbackProgress).then(function(status) {
-                d.resolve(status);
-            });
+            const handleOk = () => { d.resolve(); };
+            const handleProgress = (step, total) => { d.notify(step, total); };
+            const handleError = (error) => { d.reject(error); };
+
+            SocketMaster.addTask('upload', blob.size, blob).then(handleOk).progress(handleProgress).fail(handleError);
+            SocketMaster.addTask('start').then(handleOk).fail(handleError);
         }
 
-        return d.promise();
-    }
-
-    function _go(blob, callback) {
-        let d = $.Deferred();
-        uploadFile(blob, null, null, callback).then(function() {
-            d.resolve(_status);
-        });
         return d.promise();
     }
 
     function goFromFile(path, fileName) {
         let d = $.Deferred();
-        _device.actions.select(path, fileName).then(function(selectResult) {
+        SocketMaster.addTask('select', path, fileName).then((selectResult) => {
             if(selectResult.status.toUpperCase() === DeviceConstants.OK) {
-                _device.actions.start().then(function(startResult) {
+                SocketMaster.addTask('start').then((startResult) => {
                     d.resolve(startResult);
+                }).fail((error) => {
+                    d.reject(error);
                 });
             }
             else {
@@ -265,16 +264,14 @@ define([
     function clearConnection() {
         let d = $.Deferred();
 
-        getReport().then(function(report) {
+        getReport().then((report) => {
             if(report.st_label === DeviceConstants.COMPLETED) {
-                this.quit().then(function() {
-                    d.resolve(DeviceConstants.READY);
-                });
+                this.quit().then(() => { d.resolve(DeviceConstants.READY); });
             }
             else {
                 d.resolve(DeviceConstants.READY);
             }
-        }.bind(this));
+        });
 
         return d.promise();
     }
@@ -304,25 +301,20 @@ define([
     }
 
     function ls(path) {
-        let d = $.Deferred();
-        _device.actions.ls(path).then(function(result) {
-            d.resolve(result);
-        });
-        return d.promise();
+        return SocketMaster.addTask('ls', path);
     }
 
     function fileInfo(path, fileName) {
-        return _device.actions.fileInfo(path, fileName);
+        return SocketMaster.addTask('fileInfo', path, fileName);
     }
 
     function deleteFile(path, fileName) {
-        let fileNameWithPath = `${path.join('/')}/${fileName}`;
-        return _device.actions.deleteFile(fileNameWithPath);
+        let fileNameWithPath = `${path}/${fileName}`;
+        return SocketMaster.addTask('deleteFile', fileNameWithPath);
     }
 
-    function downloadFile(path, fileName, callbackProgress) {
-        let fileNameWithPath = `${path.join('/')}/${fileName}`;
-        return _device.actions.downloadFile(fileNameWithPath, callbackProgress);
+    function downloadFile(path, fileName) {
+        return SocketMaster.addTask('downloadFile', `${path}/${fileName}`);
     }
 
     function readyCamera() {
@@ -340,7 +332,7 @@ define([
     }
 
     function changeFilament(type) {
-        return _device.actions.changeFilament(type);
+        return SocketMaster.addTask('changeFilament', type);
     }
 
     function reconnect() {
@@ -351,12 +343,6 @@ define([
         });
 
         return selectDevice(_selectedDevice);
-    }
-
-    // set functions
-
-    function setPassword(password) {
-        _password = password;
     }
 
     // get functions
@@ -371,7 +357,7 @@ define([
 
     function getPreviewInfo() {
         let d = $.Deferred();
-        _device.actions.getPreview().then(function(result) {
+        SocketMaster.addTask('getPreview').then((result) => {
             d.resolve(result);
         });
         return d.promise();
@@ -379,6 +365,7 @@ define([
 
     function getFirstDevice() {
         for(let i in _deviceNameMap) {
+            console.log('get first device',i, _deviceNameMap);
             return i;
         }
     }
@@ -403,15 +390,15 @@ define([
     }
 
     function updateFirmware(file) {
-        return _device.actions.fwUpdate(file);
+        return SocketMaster.addTask('fwUpdate', file);
     }
 
     function updateToolhead(file) {
-        return _device.actions.toolheadUpdate(file);
+        return SocketMaster.addTask('toolheadUpdate', file);
     }
 
     function headinfo() {
-        return _device.actions.headinfo();
+        return SocketMaster.addTask('headinfo');
     }
 
     function closeConnection() {
@@ -422,83 +409,31 @@ define([
     // Private Functions
 
     function _do(command) {
-        let d = $.Deferred(),
-            actions;
+        let actions =  {
+            'RESUME'    : () => SocketMaster.addTask('resume'),
+            'PAUSE'     : () => SocketMaster.addTask('pause'),
+            'STOP'      : () => SocketMaster.addTask('abort'),
+            'QUIT'      : () => SocketMaster.addTask('quit'),
+            'KICK'      : () => SocketMaster.addTask('kick'),
+            'QUIT_TASK' : () => SocketMaster.addTask('quitTask'),
 
-        actions =  {
-
-            'RESUME': function() {
-                _device.actions.resume().then(function() {
-                    d.resolve('');
-                });
-            },
-
-            'PAUSE': function() {
-                _device.actions.pause().then(function() {
-                    d.resolve('');
-                });
-            },
-
-            'STOP': function() {
-                _device.actions.abort().then(function() {
-                    _status = DeviceConstants.READY;
-                    d.resolve('');
-                });
-            },
-
-            'QUIT': function() {
-                let _getReport = function(result) {
-                        getReport().done(function(response) {
-                            if (0 >= retryTimes) {
-                                d.fail(result);
-                                return;
-                            }
-
-                            if (response.st_id === DeviceConstants.status.IDLE) {
-                                d.resolve(result);
-                            }
-                            else {
-                                _getReport(result);
-                                retryTimes -= 1;
-                            }
-                        });
-                    },
-                    retryTimes = 10;
-
-                _device.actions.quit().then(function(result) {
-                    _getReport(result);
-                });
-            },
-
-            'KICK': function() {
-                _device.actions.reset().then(function(result) {
-                    d.resolve(result);
-                });
-            },
-
-            'QUIT_TASK': function() {
-                _device.actions.quitTask().then(function(result) {
-                    d.resolve(result);
-                });
-            },
-
-            'REPORT': function() {
-                _device.actions.report({
-                    onFinished: function(report) {
-                        if(typeof(report) === 'string') {
-                            report = report.replace(/NaN/g,'');
-                            d.resolve(JSON.parse(report));
-                        }
-                        else {
-                            d.resolve(report);
-                        }
+            'REPORT'    : () => {
+                let d = $.Deferred();
+                SocketMaster.addTask('report').then((result) => {
+                    // force update st_label for a backend inconsistancy
+                    let s = result.device_status
+                    if(s.st_id === DeviceConstants.status.ABORTED) {
+                        s.st_label = 'ABORTED';
                     }
+                    d.resolve(s);
+                }).fail((error) => {
+                    d.reject(error);
                 });
+                return d.promise();
             }
         };
 
-        actions[command]();
-        return d.promise();
+        return actions[command]();
     }
 
     function updateNWProgress(deviceStatus) {
@@ -513,14 +448,10 @@ define([
                     nwConsole.setProgressBar(deviceStatus.st_prog);
                 }
             }
-            else if (stId === 64 || stId == 128) {
+            else if (stId === 64 || stId === 128) {
                 nwConsole.setProgressBar(-1);
             }
         }
-    }
-
-    function _isPrinting() {
-        return _status === DeviceConstants.RUNNING;
     }
 
     function _existConnection(uuid) {
@@ -584,7 +515,7 @@ define([
 
     function calibrate() {
         let d = $.Deferred();
-        _device.actions.calibrate().then((response) => {
+        SocketMaster.addTask('calibrate').then(() => {
             d.resolve();
         }, (error) => {
             error = error || {};
