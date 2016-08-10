@@ -632,7 +632,6 @@ define([
             this.quit                   = quit;
             this.quitTask               = quitTask;
             this.kick                   = kick;
-            this.setPassword            = setPassword;
             this.getReport              = getReport;
             this.getSelectedDevice      = getSelectedDevice;
             this.readyCamera            = readyCamera;
