@@ -325,27 +325,7 @@ define([
                 // normalize - resize, align
                 var box = new THREE.Box3().setFromObject(mesh),
                     enlarge = parseInt(box.size().x) !== 0 && parseInt(box.size().y) !== 0 && parseInt(box.size().z) !== 0,
-                    scale;
-
-                scale = getScaleDifference(
-                    enlarge ?
-                    getLargestPropertyValue(box.size()) :
-                    getSmallestPropertyValue(box.size())
-                );
-
-                // alert for auto scalling
-                if(scale === Infinity) {
-                    reactSrc.setState({
-                        openImportWindow: true,
-                        openObjectDialogue: false
-                    }, function() {
-                        AlertActions.showPopupError('', lang.message.slicingFailed);
-                    });
-                    return;
-                }
-                else if (scale !== 1) {
-                    console.log('this model has been scaled for better printing ratio');
-                }
+                    scale = 1;
 
                 mesh.scale.set(scale, scale, scale);
                 mesh.scale._x = scale;
