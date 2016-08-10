@@ -16,7 +16,7 @@ define([
         opts.onError = opts.onError || function() {};
         opts.onConnect = opts.onConnect || function() {};
 
-        var timeout = 10000,
+        let timeout = 10000,
             timmer,
             isConnected = false,
             ws,
@@ -28,7 +28,7 @@ define([
                 onError: opts.onError
             },
             genericOptions = function(opts) {
-                var emptyFunction = function() {};
+                let emptyFunction = function() {};
 
                 opts = opts || {};
                 opts.onStarting = opts.onStarting || function() {};
@@ -37,7 +37,7 @@ define([
                 return opts;
             },
             isTimeout = function() {
-                var error = {
+                let error = {
                     'status': 'error',
                     'error': 'TIMEOUT',
                     'info': 'connection timeoout'
@@ -46,7 +46,7 @@ define([
             };
 
         function createWs() {
-            var _ws = new Websocket({
+            let _ws = new Websocket({
                 method: 'control/' + uuid,
                 onMessage: function(data) {
                     switch (data.status) {
@@ -57,6 +57,7 @@ define([
                         break;
                     case 'connected':
                         clearTimeout(timmer);
+                        createDedicatedWs(fileInfoWsId);
                         opts.onConnect(data);
                         break;
                     default:
@@ -65,7 +66,6 @@ define([
                         break;
                     }
                 },
-                // onError: opts.onError,
                 onError: function(response) {
                     events.onError(response);
                 },
@@ -86,75 +86,73 @@ define([
         }
 
         // id is int
-        function getDedicatedWs(id) {
+        function createDedicatedWs(id) {
             if(!dedicatedWs[id]) {
                 dedicatedWs[id] = createWs();
             }
             return dedicatedWs[id];
         }
 
+        const useDefaultResponse = (command) => {
+            let d = $.Deferred();
+
+            events.onMessage = (response) => { d.resolve(response); };
+            events.onError = (response) => { d.reject(response); };
+            events.onFatal = (response) => { d.reject(response); };
+
+            ws.send(command);
+            return d.promise();
+        };
+
         ws = createWs();
-        getDedicatedWs(fileInfoWsId);
 
         return {
             connection: ws,
-            ls: function(path) {
-                var d = $.Deferred();
-                events.onMessage = function(result) {
+            ls: (path) => {
+                let d = $.Deferred();
+                events.onMessage = (result) => {
                     switch (result.status) {
-                        case 'connected':
-                            break;
                         case 'ok':
                             d.resolve(result);
                             break;
+                        case 'connected':
                         default:
                             break;
                     }
                 };
-                events.onError = function(result) {
-                    d.resolve(result);
-                };
-                lastOrder = 'file ls';
-                ws.send(lastOrder + ' ' + path);
 
+                events.onError = (response) => { d.reject(response); };
+                events.onFatal = (response) => { d.reject(response); };
+
+                ws.send(`file ls ${path}`);
                 return d.promise();
             },
-            fileInfo: function(path, fileName, opt) {
-                opts = genericOptions(opts);
-                var d = $.Deferred(),
+
+            fileInfo: function(path, fileName) {
+                let d = $.Deferred(),
                     data = [],
                     _ws;
 
                 data.push(fileName);
-                lastOrder = 'fileinfo';
-                _ws = getDedicatedWs(fileInfoWsId);
-                _ws.send(lastOrder + ' ' + path + '/' + fileName);
+                _ws = createDedicatedWs(fileInfoWsId);
+
                 events.onMessage = function(result) {
-                    if(result instanceof Blob) {
+                    if(result instanceof Blob || data.length === 2) {
                         data.push(result);
                     }
-                    else if(data.length === 2) {
-                        //Play info info..
-                        data.push(result);
+
+                    if(result.status === 'ok') {
+                        d.resolve(data);
                     }
-                    switch(result.status) {
-                        case 'ok':
-                            d.resolve(data);
-                            break;
-                        default:
-                            break;
-                    }
-                };
-                events.onError = function(result) {
-                    d.resolve(result);
                 };
 
+                events.onError = (response) => { d.reject(response); };
+                events.onFatal = (response) => { d.reject(response); };
+
+                _ws.send(`file fileinfo ${path}/${fileName}`);
                 return d.promise();
             },
-            selectFile: function(filename) {
-                lastOrder = 'select';
-                ws.send(lastOrder + ' ' + filename);
-            },
+
             position: function(opts) {
                 opts = genericOptions(opts);
 
@@ -166,94 +164,50 @@ define([
 
                 ws.send('position');
             },
-            report: function(opts) {
-                var $deferred = $.Deferred();
 
-                opts = genericOptions(opts);
+            report: function() {
+                // return useDefaultResponse('play report');
+                let d = $.Deferred(),
+                    counter = 0;
 
                 events.onMessage = function(response) {
-                    $deferred.resolve(response);
-                    opts.onFinished(response);
-                };
-
-                events.onError = function(response) {
-                    $deferred.fail(response);
-                    opts.onFinished(response);
-                };
-
-                ws.send('report');
-
-                return $deferred.promise();
-            },
-            upload: function(filesize, print_data, opts, callback) {
-                opts = genericOptions(opts);
-
-                var self = this,
-                    CHUNK_PKG_SIZE = 4096,
-                    length = print_data.length || print_data.size,
-                    interrupt,
-                    positioning,
-                    reporting,
-                    uploading,
-                    doUpload;
-
-                var step = 0,
-                    total = parseInt(filesize / CHUNK_PKG_SIZE);
-
-                interrupt = function(cmd) {
-                    if ('start' === lastOrder) {
-                        ws.send(cmd);
+                    if(response.status === 'ok') {
+                        counter = 0;
+                        d.resolve(response);
+                    }
+                    else {
+                        // 3 consecutive error should alert restart machine
+                        if(counter >= 3) {
+                            d.reject(response);
+                        }
+                        else {
+                            counter++;
+                            ws.send('play report');
+                        }
                     }
                 };
 
-                positioning = function() {
-                    self.position({
-                        onFinished: function(response) {
-                            if ('PlayTask' === response.location) {
-                                console.log('reporting');
-                                reporting();
-                            }
-                            else {
-                                console.log('do upload');
-                                doUpload();
-                            }
-                        }
-                    });
-                };
+                events.onError = (response) => { d.reject(response); };
+                events.onFatal = (response) => { d.reject(response); };
 
-                reporting = function() {
-                    self.report({
-                        onFinished: function(response) {
-                            if(typeof(response) === 'string') {
-                                try {
-                                    response = JSON.parse(response);
-                                } catch (variable) {
-                                    response.status = 'ERROR';
-                                } finally {
-                                    response.status = response.status.toUpperCase();
-                                }
-                            }
-                            else {
-                                response.status = response.status.toUpperCase();
-                            }
+                ws.send('play report');
+                return d.promise();
+            },
 
-                            if (true === response.status.startsWith('COMPLETED')) {
-                                self.quit().then(function(data) {
-                                    doUpload();
-                                });
-                            }
-                            else {
-                                doUpload();
-                            }
-                        }
-                    });
-                };
+            upload: function(filesize, print_data) {
+                let d = $.Deferred(),
+                    CHUNK_PKG_SIZE = 4096,
+                    length = print_data.length || print_data.size,
+                    uploading,
+                    doUpload,
+                    step = 0,
+                    total = parseInt(filesize / CHUNK_PKG_SIZE);
 
-                uploading = function(data) {
-                    if ('continue' === data.status) {
-                        var fileReader, chunk;
+                uploading = (result) => {
+                    if ('continue' === result.status) {
+                        let fileReader, chunk;
 
-                        for (var i = 0; i < length; i += CHUNK_PKG_SIZE) {
+                        for (let i = 0; i < length; i += CHUNK_PKG_SIZE) {
                             chunk = print_data.slice(i, i + CHUNK_PKG_SIZE);
 
                             if (print_data instanceof Array) {
@@ -262,9 +216,10 @@ define([
 
                             fileReader = new FileReader();
 
-                            fileReader.onloadend = function(e) {
-                                callback(step++, total);
-                                ws.send(this.result);
+                            fileReader.onloadend = (e) => {
+                                d.notify(step++, total);
+                                ws.send(e.target.result);
+
                             };
 
                             fileReader.readAsArrayBuffer(chunk);
@@ -272,44 +227,27 @@ define([
                         }
 
                     }
-                    else if ('ok' === data.status) {
-                        self.start(opts).then(function() {
-                            opts.onFinished(data);
-                        });
+                    else if ('ok' === result.status) {
+                        d.resolve();
                     }
-                    else if(data.status === 'error') {
-                        opts.onError(data);
+                    else if(result.status === 'error') {
+                        d.reject(result);
                     }
                 };
 
-                doUpload = function() {
+                doUpload = () => {
                     events.onMessage = uploading;
-                    ws.send(lastOrder + ' application/fcode ' + filesize);
+                    ws.send(`file upload application/fcode ${filesize}`);
                 };
-
-                lastOrder = 'upload';
-
-                events.onMessage = positioning;
 
                 doUpload();
-
-                return {
-                    pause: function() {
-                        interrupt('play pause');
-                    },
-                    resume: function() {
-                        interrupt('play resume');
-                    },
-                    abort: function() {
-                        interrupt('play abort');
-                    }
-                };
+                return d.promise();
             },
             uploadToDirectory: function(blob, uploadPath, fileName, callback) {
-                var d = $.Deferred(),
+                let d = $.Deferred(),
                     CHUNK_PKG_SIZE = 4096;
 
-                var step = 0,
+                let step = 0,
                     total = parseInt(blob.size / CHUNK_PKG_SIZE);
 
 
@@ -319,11 +257,11 @@ define([
                         d.resolve(result);
                         break;
                     case 'continue':
-                        var fileReader,
+                        let fileReader,
                             chunk,
                             length = blob.length || blob.size;
 
-                        for (var i = 0; i < length; i += CHUNK_PKG_SIZE) {
+                        for (let i = 0; i < length; i += CHUNK_PKG_SIZE) {
                             chunk = blob.slice(i, i + CHUNK_PKG_SIZE);
 
                             if (blob instanceof Array) {
@@ -352,7 +290,7 @@ define([
                 };
 
                 fileName = fileName.replace(/ /g, '_');
-                var ext = fileName.split('.');
+                let ext = fileName.split('.');
                 if(ext[ext.length - 1] === 'fc') {
 
                     ws.send(`upload application/fcode ${blob.size} ${uploadPath}/${fileName}`);
@@ -368,7 +306,7 @@ define([
                 return d.promise();
             },
             getStatus: function() {
-                var d = $.Deferred();
+                let d = $.Deferred();
                 events.onMessage = function(result) {
                     d.resolve(result);
                 };
@@ -379,107 +317,50 @@ define([
                 return d.promise();
             },
             abort: function() {
-                var d = $.Deferred();
-                events.onMessage = function(result) {
-                    d.resolve(result);
-                };
-                events.onError = function(result) {
-                    d.resolve(result);
-                };
-
-                ws.send('play abort');
-                lastOrder = 'play abort';
-
-                return d.promise();
+                return useDefaultResponse('play abort');
             },
             start: function() {
-                var d = $.Deferred();
-                events.onMessage = function(result) {
-                    d.resolve(result);
-                };
-
-                events.onError = function(result) {
-                    d.resolve(result);
-                };
-
-                ws.send('play start');
-                lastOrder = 'play start';
-
-                return d.promise();
+                return useDefaultResponse('play start');
             },
             pause: function() {
-                var d = $.Deferred();
-                events.onMessage = function(result) {
-                    d.resolve(result);
-                };
-
-                events.onError = function(result) {
-                    d.resolve(result);
-                };
-
-                ws.send('play pause');
-                lastOrder = 'play pause';
-
-                return d.promise();
+                return useDefaultResponse('play pause');
             },
             resume: function() {
-                var d = $.Deferred();
-                events.onMessage = function(result) {
-                    d.resolve(result);
-                };
-
-                events.onError = function(result) {
-                    d.resolve(result);
-                };
-
-                ws.send('play resume');
-                lastOrder = 'play resume';
-
-                return d.promise();
+                return useDefaultResponse('play resume');
             },
-            reset: function() {
-                var d = $.Deferred();
-                events.onMessage = function(result) {
-                    d.resolve(result);
-                };
-
-                ws.send('kick');
-                lastOrder = 'kick';
-
-                return d.promise();
+            kick: function() {
+                return useDefaultResponse('kick');
             },
             quitTask: function() {
-                var d = $.Deferred();
-                events.onMessage = function(result) {
-                    d.resolve(result);
-                };
-
-                events.onError = function(result) {
-                    d.reject(result);
-                }
-
-                ws.send('task quit');
-                lastOrder = 'task quit';
-
-                return d.promise();
+                return useDefaultResponse('task quit');
             },
             quit: function() {
-                var d = $.Deferred();
-                events.onMessage = function(result) {
-                    d.resolve(result);
+                let d = $.Deferred(),
+                    counter = 0;
+
+                const retryLength = 2000;
+
+                const isIdle = (result) => {
+                    result.device_status = result.device_status || {};
+                    return result.device_status.st_id === 0;
                 };
 
-                events.onError = function(result) {
-                    d.fail(result);
-                }
+                const retry = () => {
+                    counter++;
+                    setTimeout(() => {
+                        ws.send('play report');
+                    }, retryLength);
+                };
+
+                events.onMessage = (result) => { isIdle(result) ? d.resolve() : retry(); };
+                events.onError = (error) => { counter >= 3 ? d.reject(error) : retry(); };
+                events.onFatal = (error) => { counter >= 3 ? d.reject(error) : retry(); };
 
                 ws.send('play quit');
-                lastOrder = 'play quit';
-
                 return d.promise();
             },
             getPreview: function() {
-                var d       = $.Deferred(),
+                let d       = $.Deferred(),
                     data    = [];
 
                 events.onMessage = function(result) {
@@ -492,57 +373,26 @@ define([
                     }
                 };
 
-                events.onError = function(result) {
-                    d.resolve('');
-                };
+                events.onError = (error) => { d.reject(error); };
+                events.onFatal = (error) => { d.resolve(error); };
 
                 ws.send('play info');
-                lastOrder = 'play info';
-
                 return d.promise();
             },
             select: function(path, fileName) {
-                var d = $.Deferred();
-
-                events.onMessage = function(result) {
-                    d.resolve(result);
-                };
-
-                events.onError = function(result) {
-                    d.resolve(result);
-                };
-
-                if(fileName === '') {
-                    ws.send(`select ${path.join('/')}`);
-                }
-                else {
-                    ws.send(`select ${path.join('/')}/${fileName}`);
-                }
-
-                return d.promise();
+                return useDefaultResponse(fileName === '' ? `play select ${path.join('/')}` : `play select ${path}/${fileName}`);
             },
             deleteFile: function(fileNameWithPath) {
-                var d = $.Deferred();
-
-                events.onMessage = function(result) {
-                    d.resolve(result);
-                };
-
-                events.onError = function(result) {
-                    d.resolve(result);
-                };
-
-                ws.send(`file rmfile ${fileNameWithPath}`);
-
-                return d.promise();
+                return useDefaultResponse(`file rmfile ${fileNameWithPath}`);
             },
-            downloadFile: function(fileNameWithPath, callbackProgress) {
-                var d = $.Deferred(),
+
+            downloadFile: function(fileNameWithPath) {
+                let d = $.Deferred(),
                     file = [];
 
                 events.onMessage = function(result) {
                     if(result.status === 'continue') {
-                        callbackProgress(result);
+                        d.notify(result);
                     }
                     else {
                         file.push(result);
@@ -553,16 +403,15 @@ define([
                     }
                 };
 
-                events.onError = function(result) {
-                    d.resolve(result);
-                };
+                events.onError = (error) => { d.reject(error); };
+                events.onFatal = (error) => { d.resolve(error); };
 
                 ws.send(`file download ${fileNameWithPath}`);
-
                 return d.promise();
             },
+
             calibrate: function() {
-                var d = $.Deferred();
+                let d = $.Deferred();
 
                 events.onMessage = function(result) {
                     if(result.status === 'ok') {
@@ -584,13 +433,8 @@ define([
                     };
                 };
 
-                events.onError = function(result) {
-                    d.reject(result);
-                };
-
-                events.onFatal = function(result) {
-                    d.reject(result);
-                };
+                events.onError = (error) => { d.reject(error); };
+                events.onFatal = (error) => { d.resolve(error); };
 
                 ws.send(`task maintain`);
 
@@ -604,7 +448,7 @@ define([
              * @return {Promise}
              */
             enterMaintainMode: function(timeout) {
-                var $deferred = $.Deferred(),
+                let d = $.Deferred(),
                     timer;
 
                 timeout = timeout || -1;
@@ -613,30 +457,35 @@ define([
                     clearTimeout(timer);
 
                     if ('ok' === result.status) {
-                        $deferred.resolve(result);
+                        d.resolve(result);
                     }
                     else {
-                        $deferred.reject(result);
+                        d.reject(result);
                     }
                 };
 
-                events.onError = (result) => {
+                events.onError = (error) => {
                     clearTimeout(timer);
-                    $deferred.reject(result);
+                    d.reject(error);
+                };
+
+                events.onFatal = (error) => {
+                    clearTimeout(timer);
+                    d.reject(error);
                 };
 
                 ws.send('task maintain');
 
                 if (-1 < timeout) {
                     timer = setTimeout(function() {
-                        $deferred.reject({
+                        d.reject({
                             status: 'error',
                             error: 'TIMEOUT'
                         });
                     }, timeout); // magic timeout duration
                 }
 
-                return $deferred.promise();
+                return d.promise();
             },
 
             /**
@@ -645,28 +494,27 @@ define([
              * @return {Promise}
              */
             maintainHome: function() {
-                var $deferred = $.Deferred();
+                let d = $.Deferred();
 
                 events.onMessage = (result) => {
                     switch (result.status) {
                     case 'ok':
-                        $deferred.resolve(result);
+                        d.resolve(result);
                         break;
                     case 'operating':
                         // ignore. (When the toolhead is `Home`. This status wouldn't show up)
                         break;
                     default:
-                        $deferred.reject(result);
+                        d.reject(result);
                     }
                 };
 
-                events.onError = (result) => {
-                    $deferred.reject(result);
-                };
+                events.onError = (error) => { d.reject(error); };
+                events.onFatal = (error) => { d.reject(error); };
 
                 ws.send('maintain home');
 
-                return $deferred.promise();
+                return d.promise();
             },
 
             /**
@@ -676,14 +524,13 @@ define([
              * @return {Promise}
              */
             changeFilament: function(type) {
-                var $deferred = $.Deferred(),
-                    self = this,
+                let d = $.Deferred(),
                     TIMEOUT = 30000,
                     typeMap = {},
                     timer,
                     args,
                     rejectHandler = (response) => {
-                        $deferred.reject(response);
+                        d.reject(response);
                     };
 
                 typeMap[DeviceConstants.LOAD_FILAMENT]   = 'load_filament';
@@ -691,35 +538,40 @@ define([
 
                 this.enterMaintainMode(TIMEOUT).pipe((response) => {
                     return this.maintainHome();
-                }, rejectHandler).
-                pipe((response) => {
+                }, rejectHandler)
+                .pipe((response) => {
 
                     events.onMessage = (response) => {
                         clearTimeout(timer);
-                        timer = setTimeout(function() {
-                            $deferred.reject({
+                        timer = setTimeout(() => {
+                            d.reject({
                                 status: 'error',
                                 error: 'TIMEOUT'
                             });
                         }, 30000); // magic timeout duration
 
                         if ('ok' === response.status) {
-                            $deferred.resolve(response);
+                            d.resolve(response);
                         }
                         else if (-1 < ['loading', 'unloading'].indexOf(response.status.toLowerCase())) {
-                            $deferred.notify(response);
+                            d.notify(response);
                         }
                         else if (response.status.toLowerCase() === 'operating') {
                             // ignore operating message
                         }
                         else {
-                            $deferred.resolve(response);
+                            d.resolve(response);
                         }
                     };
 
-                    events.onError = function(response) {
+                    events.onError = (error) => {
                         clearTimeout(timer);
-                        $deferred.reject(response);
+                        d.reject(error);
+                    };
+
+                    events.onFatal = (error) => {
+                        clearTimeout(timer);
+                        d.reject(error);
                     };
 
                     args = [
@@ -731,15 +583,13 @@ define([
 
                     // MAGIC DELAY NUMBER for 3s!!!
                     setTimeout(
-                        function() {
-                            ws.send(args.join(' '));
-                        },
+                        () => { ws.send(args.join(' ')); },
                         3000
                     );
 
                 }, rejectHandler);
 
-                return $deferred.promise();
+                return d.promise();
             },
 
             /**
@@ -747,7 +597,7 @@ define([
              * @param {File} file - file
              */
             fwUpdate: function(file) {
-                var deferred = $.Deferred(),
+                let d = $.Deferred(),
                     mimeType = 'binary/flux-firmware',
                     blob = new Blob([file], { type: mimeType }),
                     args = [
@@ -756,31 +606,30 @@ define([
                         blob.size
                     ];
 
-                events.onMessage = function(result) {
+                events.onMessage = (result) => {
                     switch (result.status) {
                     case 'ok':
-                        deferred.resolve(result);
+                        d.resolve(result);
                         break;
                     case 'continue':
-                        deferred.notify(result);
+                        d.notify(result);
                         ws.send(blob);
                         break;
                     case 'uploading':
                         result.percentage = (result.sent || 0) / blob.size * 100;
-                        deferred.notify(result);
+                        d.notify(result);
                         break;
                     default:
-                        deferred.reject(result);
+                        d.reject(result);
                     }
                 };
 
-                events.onError = function(result) {
-                    deferred.reject(result);
-                };
+                events.onError = (error) => { d.reject(error); };
+                events.onFatal = (error) => { d.reject(error); };
 
                 ws.send(args.join(' '));
 
-                return deferred.promise();
+                return d.promise();
             },
 
             /**
@@ -788,7 +637,7 @@ define([
              * @param {File} file - file
              */
             toolheadUpdate: function(file) {
-                var deferred = $.Deferred(),
+                let d = $.Deferred(),
                     mimeType = 'binary/flux-firmware',
                     blob = new Blob([file], { type: mimeType }),
                     args = [
@@ -798,33 +647,31 @@ define([
                         blob.size
                     ];
 
-                events.onMessage = function(result) {
+                events.onMessage = (result) => {
                     switch (result.status) {
                     case 'ok':
-                        deferred.resolve(result);
+                        d.resolve(result);
                         break;
                     case 'continue':
-                        deferred.notify(result);
+                        d.notify(result);
                         ws.send(blob);
                         break;
                     case 'operating':
                     case 'uploading':
                     case 'update_hbfw':
                         result.percentage = (result.written || 0) / blob.size * 100;
-                        deferred.notify(result);
+                        d.notify(result);
                         break;
                     default:
-                        deferred.reject(result);
+                        d.reject(result);
                     }
                 };
 
-                events.onError = function(result) {
-                    deferred.reject(result);
-                };
+                events.onError = (error) => { d.reject(error); };
+                events.onFatal = (error) => { d.reject(error); };
 
                 ws.send(args.join(' '));
-
-                return deferred.promise();
+                return d.promise();
             },
 
             /**
@@ -833,26 +680,26 @@ define([
              * @return Promise
              */
             headinfo: function() {
-                var deferred = $.Deferred(),
+                let d = $.Deferred(),
                     args = [
                         'task',
                         'maintain'
                     ],
                     tryLimit = 4,
-                    sendHeadInfoCommand = function() {
+                    sendHeadInfoCommand = () => {
                         args = [
                             'maintain',
                             'headinfo'
                         ];
 
                         // MAGIC delay
-                        setTimeout(function() {
-                            tryLimit -= 1;
-                            ws.send(args.join(' '));
-                        }, 4000);
+                        setTimeout(
+                            () => { tryLimit -= 1; ws.send(args.join(' ')); },
+                            4000
+                        );
                     };
 
-                events.onMessage = function(result) {
+                events.onMessage = (result) => {
                     switch (result.status) {
                     case 'ok':
                         if ('maintain' === result.task) {
@@ -863,22 +710,20 @@ define([
                                 sendHeadInfoCommand();
                             }
                             else {
-                                deferred.resolve(result);
+                                d.resolve(result);
                             }
                         }
                         break;
                     default:
-                        deferred.reject(result);
+                        d.reject(result);
                     }
                 };
 
-                events.onError = function(result) {
-                    deferred.reject(result);
-                };
+                events.onError = (error) => { d.reject(error); };
+                events.onFatal = (error) => { d.reject(error); };
 
                 ws.send(args.join(' '));
-
-                return deferred.promise();
+                return d.promise();
             }
         };
     };
