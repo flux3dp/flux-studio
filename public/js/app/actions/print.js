@@ -259,7 +259,6 @@ define([
             d.resolve(result);
         }).progress(displayProgress)
         .fail((error) => {
-            console.log('reject with error', error);
             d.reject(error);
         });
         return d.promise();
@@ -1412,7 +1411,6 @@ define([
                     }
                     d.resolve('');
                 }).fail((error) => {
-                    console.log('yo', error);
                     processSlicerError(error);
                     d.resolve('');
                 });
