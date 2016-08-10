@@ -15,6 +15,13 @@ define([], function(){
         LASER                           : 'LASER',
         DRAW                            : 'DRAW',
         DEVICE_LIST                     : 'DEVICE_LIST',
+
+        // Monitor mode
+        PREVIEW                         : 'PREVIEW',
+        FILE                            : 'FILE',
+        CAMERA                          : 'CAMERA',
+        FILE_PREVIEW                    : 'FILE_PREVIEW',
+
         DEFAULT_PRINT_SETTING_VERSION   : '0.29'
     };
 });
