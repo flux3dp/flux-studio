@@ -181,7 +181,7 @@ define([
                     opts.onFinished(response);
                 };
 
-                ws.send('report');
+                ws.send('play report');
 
                 return $deferred.promise();
             },
