@@ -185,51 +185,23 @@ define([
         return d.promise();
     }
 
-    function uploadFile(blob, file, uploadPath, callback) {
+    function uploadToDirectory(data, path, fileName) {
         let d = $.Deferred();
-        if(uploadPath) {
-            ProgressActions.open(ProgressConstants.STEPPING, lang.device.starting, '', false);
-            SocketMaster.addTask('uploadToDirectory', blob, uploadPath, file.name, uploadProgress).then(function(result) {
-                ProgressActions.close();
-                d.resolve(result);
-            });
-        }
-        else {
-            let callback = (step, total) => {
-                thisProgress = parseInt(step / total * 100);
-                if(thisProgress !== lastProgress) {
-                    lastProgress = thisProgress;
-                }
-            };
-            _device.print = _device.actions.upload(blob.size, blob, {
-                onFinished: function(result) {
-                    d.resolve(result);
-                }
-            }, callback);
-        }
+
+        SocketMaster.addTask('upload', data, path, fileName).then(() => {
+            d.resolve();
+        }).progress((progress) => {
+            d.notify(progress);
+        }).fail((error) => {
+            d.reject(error);
+        });
 
         return d.promise();
     }
 
-    function uploadProgress(step, total) {
-        thisProgress = parseInt(step / total * 100);
-        if(thisProgress !== lastProgress) {
-            // update every 20%
-            if(parseInt(step / total * 100) % 20 === 0) {
-                console.log('update', parseInt(step / total * 100));
-                ProgressActions.updating(lang.device.uploading, parseInt(step / total * 100));
-            }
-            if(parseInt(step / total * 100) === 100) {
-                ProgressActions.updating(lang.device.please_wait, 100);
-            }
-            lastProgress = thisProgress;
-        }
-
-    }
-
-    function go(blob) {
+    function go(data) {
         let d = $.Deferred();
-        if(!blob || !(blob instanceof Blob)) {
+        if(!data || !(data instanceof Blob)) {
             d.resolve(DeviceConstants.READY);
         }
         else {
@@ -237,7 +209,7 @@ define([
             const handleProgress = (progress) => { d.notify(progress); };
             const handleError = (error) => { d.reject(error); };
 
-            SocketMaster.addTask('upload', blob.size, blob).then(handleOk).progress(handleProgress).fail(handleError);
+            SocketMaster.addTask('upload', data).then(handleOk).progress(handleProgress).fail(handleError);
             SocketMaster.addTask('start').then(handleOk).fail(handleError);
         }
 
@@ -258,21 +230,6 @@ define([
                 d.resolve({status: 'error'});
             }
         });
-        return d.promise();
-    }
-
-    function clearConnection() {
-        let d = $.Deferred();
-
-        getReport().then((report) => {
-            if(report.st_label === DeviceConstants.COMPLETED) {
-                this.quit().then(() => { d.resolve(DeviceConstants.READY); });
-            }
-            else {
-                d.resolve(DeviceConstants.READY);
-            }
-        });
-
         return d.promise();
     }
 
@@ -623,7 +580,7 @@ define([
     DeviceSingleton.prototype = {
         init: function() {
             this.selectDevice           = selectDevice;
-            this.uploadFile             = uploadFile;
+            this.uploadToDirectory      = uploadToDirectory;
             this.go                     = go;
             this.goFromFile             = goFromFile;
             this.resume                 = resume;

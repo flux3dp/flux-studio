@@ -24,19 +24,10 @@ define([
             dedicatedWs = [],
             fileInfoWsId = 0,
             events = {
-                onMessage: function() {},
+                onMessage: () => {},
                 onError: opts.onError
             },
-            genericOptions = function(opts) {
-                let emptyFunction = function() {};
-
-                opts = opts || {};
-                opts.onStarting = opts.onStarting || function() {};
-                opts.onFinished = opts.onFinished || function() {};
-
-                return opts;
-            },
-            isTimeout = function() {
+            isTimeout = () => {
                 let error = {
                     'status': 'error',
                     'error': 'TIMEOUT',
@@ -45,10 +36,10 @@ define([
                 opts.onError(error);
             };
 
-        function createWs() {
+        const createWs = () => {
             let _ws = new Websocket({
                 method: 'control/' + uuid,
-                onMessage: function(data) {
+                onMessage: (data) => {
                     switch (data.status) {
                     case 'connecting':
                         opts.onConnect(data);
@@ -66,17 +57,17 @@ define([
                         break;
                     }
                 },
-                onError: function(response) {
+                onError: (response) => {
                     events.onError(response);
                 },
-                onFatal: function(response) {
+                onFatal: (response) => {
                     clearTimeout(timmer);
                     events.onError(response);
                 },
-                onClose: function(response) {
+                onClose: (response) => {
                     isConnected = false;
                 },
-                onOpen: function() {
+                onOpen: () => {
                     _ws.send(rsaKey());
                 },
                 autoReconnect: false
@@ -86,12 +77,12 @@ define([
         }
 
         // id is int
-        function createDedicatedWs(id) {
+        const createDedicatedWs = (id) => {
             if(!dedicatedWs[id]) {
                 dedicatedWs[id] = createWs();
             }
             return dedicatedWs[id];
-        }
+        };
 
         const useDefaultResponse = (command) => {
             let d = $.Deferred();
@@ -104,16 +95,57 @@ define([
             return d.promise();
         };
 
+        const prepareUpload = (d, data) => {
+            const CHUNK_PKG_SIZE = 4096;
+            let length = data.length || data.size,
+                step = 0;
+
+            events.onMessage = (response) => {
+                if ('continue' === response.status) {
+                    let fileReader, chunk;
+
+                    for (let i = 0; i < length; i += CHUNK_PKG_SIZE) {
+                        chunk = data.slice(i, i + CHUNK_PKG_SIZE);
+
+                        if (data instanceof Array) {
+                            chunk = convertToTypedArray(chunk, Uint8Array);
+                        }
+
+                        fileReader = new FileReader();
+
+                        fileReader.onloadend = (e) => {
+                            step++;
+                            ws.send(e.target.result);
+                        };
+
+                        fileReader.readAsArrayBuffer(chunk);
+                    }
+                }
+                else if (response.status === 'uploading') {
+                    d.notify({step: response.sent, total: data.size});
+                }
+                else if (response.status === 'ok') {
+                    d.resolve();
+                }
+                else if(response.status === 'error') {
+                    d.reject(response);
+                }
+            };
+
+            events.onError = (response) => { d.reject(response); };
+            events.onFatal = (response) => { d.reject(response); };
+        }
+
         ws = createWs();
 
         return {
             connection: ws,
             ls: (path) => {
                 let d = $.Deferred();
-                events.onMessage = (result) => {
-                    switch (result.status) {
+                events.onMessage = (response) => {
+                    switch (response.status) {
                         case 'ok':
-                            d.resolve(result);
+                            d.resolve(response);
                             break;
                         case 'connected':
                         default:
@@ -128,7 +160,7 @@ define([
                 return d.promise();
             },
 
-            fileInfo: function(path, fileName) {
+            fileInfo: (path, fileName) => {
                 let d = $.Deferred(),
                     data = [],
                     _ws;
@@ -136,12 +168,12 @@ define([
                 data.push(fileName);
                 _ws = createDedicatedWs(fileInfoWsId);
 
-                events.onMessage = function(result) {
-                    if(result instanceof Blob || data.length === 2) {
-                        data.push(result);
+                events.onMessage = (response) => {
+                    if(response instanceof Blob || data.length === 2) {
+                        data.push(response);
                     }
 
-                    if(result.status === 'ok') {
+                    if(response.status === 'ok') {
                         d.resolve(data);
                     }
                 };
@@ -153,24 +185,11 @@ define([
                 return d.promise();
             },
 
-            position: function(opts) {
-                opts = genericOptions(opts);
-
-                events.onMessage = function(response) {
-                    if ('position' === response.status) {
-                        opts.onFinished(response);
-                    }
-                };
-
-                ws.send('position');
-            },
-
-            report: function() {
-                // return useDefaultResponse('play report');
+            report: () => {
                 let d = $.Deferred(),
                     counter = 0;
 
-                events.onMessage = function(response) {
+                events.onMessage = (response) => {
                     if(response.status === 'ok') {
                         counter = 0;
                         d.resolve(response);
@@ -194,158 +213,57 @@ define([
                 return d.promise();
             },
 
-            upload: function(filesize, print_data) {
+            // upload: function(filesize, print_data) {
+            upload: (data, path, fileName) => {
                 let d = $.Deferred(),
                     CHUNK_PKG_SIZE = 4096,
-                    length = print_data.length || print_data.size,
+                    length = data.length || data.size,
                     uploading,
-                    doUpload,
-                    step = 0,
-                    total = parseInt(filesize / CHUNK_PKG_SIZE);
+                    step = 0;
 
-                uploading = (result) => {
-                    if ('continue' === result.status) {
-                        let fileReader, chunk;
+                prepareUpload(d, data);
 
-                        for (let i = 0; i < length; i += CHUNK_PKG_SIZE) {
-                            chunk = print_data.slice(i, i + CHUNK_PKG_SIZE);
-
-                            if (print_data instanceof Array) {
-                                chunk = convertToTypedArray(chunk, Uint8Array);
-                            }
-
-                            fileReader = new FileReader();
-
-                            fileReader.onloadend = (e) => {
-                                step++;
-                                ws.send(e.target.result);
-
-                            };
-
-                            fileReader.readAsArrayBuffer(chunk);
-
-                        }
-
+                if(path && fileName) {
+                    fileName = fileName.replace(/ /g, '_');
+                    let ext = fileName.split('.');
+                    if(ext[ext.length - 1] === 'fc') {
+                        ws.send(`upload application/fcode ${data.size} ${path}/${fileName}`);
                     }
-                    else if (result.status === 'uploading') {
-                        d.notify({step: result.sent, total: filesize});
+                    else if(ext[ext.length - 1] === 'gcode') {
+                        fileName = fileName.split('.');
+                        fileName.pop();
+                        fileName.push('fc');
+                        fileName = fileName.join('.');
+                        ws.send(`upload text/gcode ${data.size} ${path}/${fileName}`);
                     }
-                    else if (result.status === 'ok') {
-                        d.resolve();
-                    }
-                    else if(result.status === 'error') {
-                        d.reject(result);
-                    }
-                };
-
-                doUpload = () => {
-                    events.onMessage = uploading;
-                    ws.send(`file upload application/fcode ${filesize}`);
-                };
-
-                doUpload();
-                return d.promise();
-            },
-            uploadToDirectory: function(blob, uploadPath, fileName, callback) {
-                let d = $.Deferred(),
-                    CHUNK_PKG_SIZE = 4096;
-
-                let step = 0,
-                    total = parseInt(blob.size / CHUNK_PKG_SIZE);
-
-
-                events.onMessage = function(result) {
-                    switch (result.status) {
-                    case 'ok':
-                        d.resolve(result);
-                        break;
-                    case 'continue':
-                        let fileReader,
-                            chunk,
-                            length = blob.length || blob.size;
-
-                        for (let i = 0; i < length; i += CHUNK_PKG_SIZE) {
-                            chunk = blob.slice(i, i + CHUNK_PKG_SIZE);
-
-                            if (blob instanceof Array) {
-                                chunk = convertToTypedArray(chunk, Uint8Array);
-                            }
-
-                            fileReader = new FileReader();
-
-                            fileReader.onloadend = function(e) {
-                                ws.send(this.result);
-                                callback(step++, total);
-                            };
-
-                            fileReader.readAsArrayBuffer(chunk);
-                        }
-
-                        break;
-                    default:
-                        // TODO: do something?
-                        break;
-                    }
-                };
-
-                events.onError = function(error) {
-                    console.log(error);
-                };
-
-                fileName = fileName.replace(/ /g, '_');
-                let ext = fileName.split('.');
-                if(ext[ext.length - 1] === 'fc') {
-
-                    ws.send(`upload application/fcode ${blob.size} ${uploadPath}/${fileName}`);
                 }
-                else if(ext[ext.length - 1] === 'gcode') {
-                    fileName = fileName.split('.');
-                    fileName.pop();
-                    fileName.push('fc');
-                    fileName = fileName.join('.');
-                    ws.send(`upload text/gcode ${blob.size} ${uploadPath}/${fileName}`);
+                else {
+                    ws.send(`file upload application/fcode ${data.size}`);
                 }
-
                 return d.promise();
             },
-            getStatus: function() {
-                let d = $.Deferred();
-                events.onMessage = function(result) {
-                    d.resolve(result);
-                };
 
-                ws.send('position');
-                lastOrder = 'status';
+            abort: () => { return useDefaultResponse('play abort'); },
 
-                return d.promise();
-            },
-            abort: function() {
-                return useDefaultResponse('play abort');
-            },
-            start: function() {
-                return useDefaultResponse('play start');
-            },
-            pause: function() {
-                return useDefaultResponse('play pause');
-            },
-            resume: function() {
-                return useDefaultResponse('play resume');
-            },
-            kick: function() {
-                return useDefaultResponse('kick');
-            },
-            quitTask: function() {
-                return useDefaultResponse('task quit');
-            },
-            quit: function() {
+            start: () => { return useDefaultResponse('play start'); },
+
+            pause: () => { return useDefaultResponse('play pause'); },
+
+            resume: () => { return useDefaultResponse('play resume'); },
+
+            kick: () => { return useDefaultResponse('kick'); },
+
+            quitTask: () => { return useDefaultResponse('task quit'); },
+
+            quit: () => {
                 let d = $.Deferred(),
                     counter = 0;
 
                 const retryLength = 2000;
 
-                const isIdle = (result) => {
-                    result.device_status = result.device_status || {};
-                    return result.device_status.st_id === 0;
+                const isIdle = (response) => {
+                    response.device_status = response.device_status || {};
+                    return response.device_status.st_id === 0;
                 };
 
                 const retry = () => {
@@ -355,89 +273,92 @@ define([
                     }, retryLength);
                 };
 
-                events.onMessage = (result) => { isIdle(result) ? d.resolve() : retry(); };
-                events.onError = (error) => { counter >= 3 ? d.reject(error) : retry(); };
-                events.onFatal = (error) => { counter >= 3 ? d.reject(error) : retry(); };
+                events.onMessage = (response) => { isIdle(response) ? d.resolve() : retry(); };
+                events.onError = (response) => { counter >= 3 ? d.reject(response) : retry(); };
+                events.onFatal = (response) => { counter >= 3 ? d.reject(response) : retry(); };
 
                 ws.send('play quit');
                 return d.promise();
             },
-            getPreview: function() {
+
+            getPreview: () => {
                 let d       = $.Deferred(),
                     data    = [];
 
-                events.onMessage = function(result) {
-                    if(result.status === 'ok') {
-                        data.push(result);
+                events.onMessage = (response) => {
+                    if(response.status === 'ok') {
+                        data.push(response);
                         d.resolve(data);
                     }
                     else {
-                        data.push(result);
+                        data.push(response);
                     }
                 };
 
-                events.onError = (error) => { d.reject(error); };
-                events.onFatal = (error) => { d.resolve(error); };
+                events.onError = (response) => { d.reject(response); };
+                events.onFatal = (response) => { d.resolve(response); };
 
                 ws.send('play info');
                 return d.promise();
             },
-            select: function(path, fileName) {
+
+            select: (path, fileName) => {
                 return useDefaultResponse(fileName === '' ? `play select ${path.join('/')}` : `play select ${path}/${fileName}`);
             },
-            deleteFile: function(fileNameWithPath) {
+
+            deleteFile: (fileNameWithPath) => {
                 return useDefaultResponse(`file rmfile ${fileNameWithPath}`);
             },
 
-            downloadFile: function(fileNameWithPath) {
+            downloadFile: (fileNameWithPath) => {
                 let d = $.Deferred(),
                     file = [];
 
-                events.onMessage = function(result) {
-                    if(result.status === 'continue') {
-                        d.notify(result);
+                events.onMessage = (response) => {
+                    if(response.status === 'continue') {
+                        d.notify(response);
                     }
                     else {
-                        file.push(result);
+                        file.push(response);
                     }
 
-                    if(result instanceof Blob) {
+                    if(response instanceof Blob) {
                         d.resolve(file);
                     }
                 };
 
-                events.onError = (error) => { d.reject(error); };
-                events.onFatal = (error) => { d.resolve(error); };
+                events.onError = (response) => { d.reject(response); };
+                events.onFatal = (response) => { d.resolve(response); };
 
                 ws.send(`file download ${fileNameWithPath}`);
                 return d.promise();
             },
 
-            calibrate: function() {
+            calibrate: () => {
                 let d = $.Deferred();
 
-                events.onMessage = function(result) {
-                    if(result.status === 'ok') {
-                        if(result.task === 'maintain') {
+                events.onMessage = (response) => {
+                    if(response.status === 'ok') {
+                        if(response.task === 'maintain') {
                             ws.send('maintain home');
                         }
-                        else if(result.data) {
+                        else if(response.data) {
                             ws.send('task quit');
                         }
-                        else if(result.task === '') {
-                            d.resolve(result);
+                        else if(response.task === '') {
+                            d.resolve(response);
                         }
                         else {
                             ws.send(`maintain calibrating`);
                         }
                     }
-                    else if(result.status === 'error') {
-                        d.resolve(result.error || 'error');
+                    else if(response.status === 'error') {
+                        d.resolve(response.error || 'error');
                     };
                 };
 
-                events.onError = (error) => { d.reject(error); };
-                events.onFatal = (error) => { d.resolve(error); };
+                events.onError = (response) => { d.reject(response); };
+                events.onFatal = (response) => { d.resolve(response); };
 
                 ws.send(`task maintain`);
 
@@ -450,37 +371,37 @@ define([
              *
              * @return {Promise}
              */
-            enterMaintainMode: function(timeout) {
+            enterMaintainMode: (timeout) => {
                 let d = $.Deferred(),
                     timer;
 
                 timeout = timeout || -1;
 
-                events.onMessage = (result) => {
+                events.onMessage = (response) => {
                     clearTimeout(timer);
 
-                    if ('ok' === result.status) {
-                        d.resolve(result);
+                    if ('ok' === response.status) {
+                        d.resolve(response);
                     }
                     else {
-                        d.reject(result);
+                        d.reject(response);
                     }
                 };
 
-                events.onError = (error) => {
+                events.onError = (response) => {
                     clearTimeout(timer);
-                    d.reject(error);
+                    d.reject(response);
                 };
 
-                events.onFatal = (error) => {
+                events.onFatal = (response) => {
                     clearTimeout(timer);
-                    d.reject(error);
+                    d.reject(response);
                 };
 
                 ws.send('task maintain');
 
                 if (-1 < timeout) {
-                    timer = setTimeout(function() {
+                    timer = setTimeout(() => {
                         d.reject({
                             status: 'error',
                             error: 'TIMEOUT'
@@ -496,24 +417,24 @@ define([
              *
              * @return {Promise}
              */
-            maintainHome: function() {
+            maintainHome: () => {
                 let d = $.Deferred();
 
-                events.onMessage = (result) => {
-                    switch (result.status) {
+                events.onMessage = (response) => {
+                    switch (response.status) {
                     case 'ok':
-                        d.resolve(result);
+                        d.resolve(response);
                         break;
                     case 'operating':
                         // ignore. (When the toolhead is `Home`. This status wouldn't show up)
                         break;
                     default:
-                        d.reject(result);
+                        d.reject(response);
                     }
                 };
 
-                events.onError = (error) => { d.reject(error); };
-                events.onFatal = (error) => { d.reject(error); };
+                events.onError = (response) => { d.reject(response); };
+                events.onFatal = (response) => { d.reject(response); };
 
                 ws.send('maintain home');
 
@@ -526,7 +447,7 @@ define([
              *
              * @return {Promise}
              */
-            changeFilament: function(type) {
+            changeFilament: (type) => {
                 let d = $.Deferred(),
                     TIMEOUT = 30000,
                     typeMap = {},
@@ -567,14 +488,14 @@ define([
                         }
                     };
 
-                    events.onError = (error) => {
+                    events.onError = (response) => {
                         clearTimeout(timer);
-                        d.reject(error);
+                        d.reject(response);
                     };
 
-                    events.onFatal = (error) => {
+                    events.onFatal = (response) => {
                         clearTimeout(timer);
-                        d.reject(error);
+                        d.reject(response);
                     };
 
                     args = [
@@ -599,7 +520,7 @@ define([
              * update firmware
              * @param {File} file - file
              */
-            fwUpdate: function(file) {
+            fwUpdate: (file) => {
                 let d = $.Deferred(),
                     mimeType = 'binary/flux-firmware',
                     blob = new Blob([file], { type: mimeType }),
@@ -609,26 +530,26 @@ define([
                         blob.size
                     ];
 
-                events.onMessage = (result) => {
-                    switch (result.status) {
+                events.onMessage = (response) => {
+                    switch (response.status) {
                     case 'ok':
-                        d.resolve(result);
+                        d.resolve(response);
                         break;
                     case 'continue':
-                        d.notify(result);
+                        d.notify(response);
                         ws.send(blob);
                         break;
                     case 'uploading':
-                        result.percentage = (result.sent || 0) / blob.size * 100;
-                        d.notify(result);
+                        response.percentage = (response.sent || 0) / blob.size * 100;
+                        d.notify(response);
                         break;
                     default:
-                        d.reject(result);
+                        d.reject(response);
                     }
                 };
 
-                events.onError = (error) => { d.reject(error); };
-                events.onFatal = (error) => { d.reject(error); };
+                events.onError = (response) => { d.reject(response); };
+                events.onFatal = (response) => { d.reject(response); };
 
                 ws.send(args.join(' '));
 
@@ -639,7 +560,7 @@ define([
              * update toolhead firmware - device should in `Maintain mode`
              * @param {File} file - file
              */
-            toolheadUpdate: function(file) {
+            toolheadUpdate: (file) => {
                 let d = $.Deferred(),
                     mimeType = 'binary/flux-firmware',
                     blob = new Blob([file], { type: mimeType }),
@@ -650,28 +571,28 @@ define([
                         blob.size
                     ];
 
-                events.onMessage = (result) => {
-                    switch (result.status) {
+                events.onMessage = (response) => {
+                    switch (response.status) {
                     case 'ok':
-                        d.resolve(result);
+                        d.resolve(response);
                         break;
                     case 'continue':
-                        d.notify(result);
+                        d.notify(response);
                         ws.send(blob);
                         break;
                     case 'operating':
                     case 'uploading':
                     case 'update_hbfw':
-                        result.percentage = (result.written || 0) / blob.size * 100;
-                        d.notify(result);
+                        response.percentage = (response.written || 0) / blob.size * 100;
+                        d.notify(response);
                         break;
                     default:
-                        d.reject(result);
+                        d.reject(response);
                     }
                 };
 
-                events.onError = (error) => { d.reject(error); };
-                events.onFatal = (error) => { d.reject(error); };
+                events.onError = (response) => { d.reject(response); };
+                events.onFatal = (response) => { d.reject(response); };
 
                 ws.send(args.join(' '));
                 return d.promise();
@@ -682,7 +603,7 @@ define([
              *
              * @return Promise
              */
-            headinfo: function() {
+            headinfo: () => {
                 let d = $.Deferred(),
                     args = [
                         'task',
@@ -702,28 +623,28 @@ define([
                         );
                     };
 
-                events.onMessage = (result) => {
-                    switch (result.status) {
+                events.onMessage = (response) => {
+                    switch (response.status) {
                     case 'ok':
-                        if ('maintain' === result.task) {
+                        if ('maintain' === response.task) {
                             sendHeadInfoCommand();
                         }
                         else {
-                            if (0 < tryLimit && 'N/A' === (result.head_module || 'N/A')) {
+                            if (0 < tryLimit && 'N/A' === (response.head_module || 'N/A')) {
                                 sendHeadInfoCommand();
                             }
                             else {
-                                d.resolve(result);
+                                d.resolve(response);
                             }
                         }
                         break;
                     default:
-                        d.reject(result);
+                        d.reject(response);
                     }
                 };
 
-                events.onError = (error) => { d.reject(error); };
-                events.onFatal = (error) => { d.reject(error); };
+                events.onError = (response) => { d.reject(response); };
+                events.onFatal = (response) => { d.reject(response); };
 
                 ws.send(args.join(' '));
                 return d.promise();

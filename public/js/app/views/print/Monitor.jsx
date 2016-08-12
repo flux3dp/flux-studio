@@ -262,7 +262,7 @@ define([
             let reader = new FileReader();
 
             reader.readAsArrayBuffer(file);
-            reader.onload = function() {
+            reader.onload = () => {
                 let fileInfo = file.name.split('.'),
                     ext = fileInfo[fileInfo.length - 1],
                     type,
@@ -281,8 +281,14 @@ define([
                     let { Monitor } = store.getState();
                     let blob = new Blob([reader.result], type);
 
-                    DeviceMaster.uploadFile(blob, file, Monitor.currentPath).then(() => {
+                    DeviceMaster.uploadToDirectory(blob, Monitor.currentPath, file.name).then(() => {
+                        store.dispatch(MonitorActionCreator.setUploadProgress(''));
                         this._refreshDirectory();
+                    }).progress((progress) => {
+                        let p = parseInt(progress.step / progress.total * 100);
+                        store.dispatch(MonitorActionCreator.setUploadProgress(p));
+                    }).fail((error) => {
+                        // TODO: show upload error
                     });
                 }
                 else {
@@ -501,9 +507,10 @@ define([
 
                 if(fCode) {
                     DeviceMaster.go(fCode).then(() => {
+                        store.dispatch(MonitorActionCreator.setUploadProgress(''));
                     }).progress((progress) => {
                         let p = parseInt(progress.step / progress.total * 100);
-                        store.dispatch(MonitorActionCreator.setUploadProgress(p !== 100 ? p : ''));
+                        store.dispatch(MonitorActionCreator.setUploadProgress(p));
                     });
                 }
                 else {
