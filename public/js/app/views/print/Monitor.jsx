@@ -145,9 +145,8 @@ define([
             AlertStore.onYes(this._handleYes);
 
             // listening to key
-            this.deleteKeyListener = shortcuts.on(['DEL'], (e) => {
+            this.unsubscribeDeleteKey = shortcuts.on(['DEL'], (e) => {
                 e.preventDefault();
-                console.log('delete from monitor fired');
                 if(store.getState().Monitor.selectedItem) {
                     AlertActions.showPopupYesNo('DELETE_FILE', lang.monitor.confirmFileDelete);
                 }
@@ -173,6 +172,7 @@ define([
             GlobalActions.monitorClosed();
 
             clearInterval(this.reporter);
+            this.unsubscribeDeleteKey();
         },
 
         childContextTypes: {

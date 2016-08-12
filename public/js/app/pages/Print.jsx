@@ -260,7 +260,7 @@ define([
                 _registerKeyEvents: function() {
                     // delete event
                     shortcuts.on(['del'], (e) => {
-                        if(allowDeleteObject) {
+                        if(allowDeleteObject && !this._isMonitorOn()) {
                             director.removeSelected();
                         }
                     });
@@ -772,6 +772,11 @@ define([
                     if(!version || version !== GlobalConstants.DEFAULT_PRINT_SETTING_VERSION) {
                         AlertActions.showPopupYesNo('print-setting-version', lang.monitor.updatePrintPresetSetting);
                     }
+                },
+
+                _isMonitorOn: function() {
+                    // yuk! needs to be changed when redux is fully implemented
+                    return $('.flux-monitor').length > 0;
                 },
 
                 _renderAdvancedPanel: function() {

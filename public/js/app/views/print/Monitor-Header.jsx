@@ -59,7 +59,6 @@ define([
                 <div></div>
             );
 
-            console.log(`mode is: ${Monitor.mode}, status is ${Device.status.st_label}, history length ${history.length}`);
             if(source === GlobalConstants.DEVICE_LIST) {
                 let go = {};
 
