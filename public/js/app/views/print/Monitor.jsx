@@ -660,6 +660,11 @@ define([
                         showingPopup = true;
                     }
                 }
+
+                // auto clear abort and complete when not opened from device-list
+                if(openedFrom !== GlobalConstants.DEVICE_LIST && this._isAbortedOrCompleted()) {
+                    DeviceMaster.quit();
+                }
             }
         },
 
