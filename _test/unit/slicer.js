@@ -19,6 +19,7 @@ var injector,
     command,
     testModel,
     totalStep,
+    reportTimes = 0;
 
     wsReceivedMessage = {},
     wsReturnedMessage = {},
@@ -86,10 +87,9 @@ const uploadWsBehavior = (c, received) => {
 };
 
 const reportSlicingWsBehavior = (c, received) => {
-    reportSlicingResponse.forEach((response) => {
-        slicer.trigger(response);
-        slicer.trigger(_ok);
-    });
+    slicer.trigger(reportSlicingResponse[reportTimes]);
+    slicer.trigger(_ok);
+    reportTimes++;
 };
 
 const getResultWsBehavior = (c, received) => {
@@ -112,7 +112,7 @@ function* TestMaster() {
     yield testSetParameter();
     yield testSet();
     yield testUpload();
-    yield testGoG();
+    // yield testGoG();
     yield testGoF();
     yield testBeginSlicingF();
     yield testBeginSlicingG();
@@ -162,26 +162,27 @@ const testUpload  = () => {
         command = 'upload';
         loadTestModel().then((model) => {
             model.size = model.length;
-            return slicer.upload(id, model, 'stl', (step, total) => {
-                totalStep = total;
-            });
+            return slicer.upload(id, model, 'stl');
         }).then((result) => {
             saveWsResult(command, result);
             resolve();
+        }).progress((step, total, progress) => {
+            totalStep = total;
         });
     });
 };
 
-const testGoG = () => {
-    return new Promise((resolve, reject) => {
-        wsBehavior = defaultWsBehavior;
-        command = 'goG';
-        slicer.goG(ids).then((result) => {
-            saveWsResult(command, result);
-            resolve();
-        });
-    });
-};
+// const testGoG = () => {
+//     console.log(2);
+//     return new Promise((resolve, reject) => {
+//         wsBehavior = defaultWsBehavior;
+//         command = 'goG';
+//         slicer.goG(ids).then((result) => {
+//             saveWsResult(command, result);
+//             resolve();
+//         });
+//     });
+// };
 
 const testGoF = () => {
     return new Promise((resolve, reject) => {
@@ -221,15 +222,18 @@ const testReportSlicing = () => {
         command = 'reportSlicing';
         wsBehavior = reportSlicingWsBehavior;
         wsReturnedMessage[command] = [];
-        slicer.reportSlicing((response) => {
-            if(response.slice_status === 'complete') {
-                wsReturnedMessage[command].push(response);
-                resolve();
-            }
-            else {
-                wsReturnedMessage[command].push(response);
-            }
-        });
+        var t = setInterval(() => {
+            slicer.reportSlicing().then((response) => {
+                if(response.slice_status === 'complete') {
+                    wsReturnedMessage[command].push(response);
+                    clearInterval(t);
+                    resolve();
+                }
+                else {
+                    wsReturnedMessage[command].push(response);
+                }
+            });
+        }, 10);
     });
 };
 
@@ -365,10 +369,10 @@ describe('SLICER TEST', () => {
         expect(wsReturnedMessage['upload']).to.be.equal(_ok);
     });
 
-    it('go (execute) g code in the machine', () => {
-        expect(wsReceivedMessage['goG']).to.be.equal(`go ${ids.join(' ')} -g`);
-        expect(wsReturnedMessage['goG']).to.be.equal(_ok);
-    });
+    // it('go (execute) g code in the machine', () => {
+    //     expect(wsReceivedMessage['goG']).to.be.equal(`go ${ids.join(' ')} -g`);
+    //     expect(wsReturnedMessage['goG']).to.be.equal(_ok);
+    // });
 
     it('go (execute) f code in the machine', () => {
         expect(wsReceivedMessage['goF']).to.be.equal(`go ${ids.join(' ')} -f`);
