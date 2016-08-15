@@ -132,10 +132,14 @@ define([
                         });
                     },
                     parseFCode = function() {
-                        fcodeReaderMethods.getThumbnail(goToMonitor, goToMonitor);
+                        fcodeReaderMethods.getThumbnail().then((data) => {
+                            goToMonitor(data);
+                        });
                     },
                     uploadFCode = function() {
-                        fcodeReaderMethods.upload(blob, blob.size, parseFCode);
+                        fcodeReaderMethods.upload(blob).then(() => {
+                            parseFCode();
+                        });
                     };
 
                 uploadFCode();

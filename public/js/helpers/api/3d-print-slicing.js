@@ -226,7 +226,7 @@ define([
                 };
 
                 events.onError = (error) => {
-                    d.reject(error)
+                    d.reject(error);
                 };
 
                 events.onFatal = (error) => {
