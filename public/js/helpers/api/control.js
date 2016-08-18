@@ -339,30 +339,19 @@ define([
 
                 events.onMessage = (response) => {
                     if(response.status === 'ok') {
-                        if(response.task === 'maintain') {
-                            ws.send('maintain home');
-                        }
-                        else if(response.data) {
-                            ws.send('task quit');
-                        }
-                        else if(response.task === '') {
-                            d.resolve(response);
-                        }
-                        else {
-                            ws.send(`maintain calibrating`);
-                        }
+                        d.resolve(response);
                     }
-                    else if(response.status === 'error') {
-                        d.resolve(response.error || 'error');
-                    };
                 };
 
                 events.onError = (response) => { d.reject(response); };
                 events.onFatal = (response) => { d.resolve(response); };
 
-                ws.send(`task maintain`);
-
+                ws.send(`maintain calibrating`);
                 return d.promise();
+            },
+
+            getHeadInfo: () => {
+                return useDefaultResponse('maintain headinfo');
             },
 
             /**
@@ -372,44 +361,11 @@ define([
              * @return {Promise}
              */
             enterMaintainMode: (timeout) => {
-                let d = $.Deferred(),
-                    timer;
+                return useDefaultResponse('task maintain');
+            },
 
-                timeout = timeout || -1;
-
-                events.onMessage = (response) => {
-                    clearTimeout(timer);
-
-                    if ('ok' === response.status) {
-                        d.resolve(response);
-                    }
-                    else {
-                        d.reject(response);
-                    }
-                };
-
-                events.onError = (response) => {
-                    clearTimeout(timer);
-                    d.reject(response);
-                };
-
-                events.onFatal = (response) => {
-                    clearTimeout(timer);
-                    d.reject(response);
-                };
-
-                ws.send('task maintain');
-
-                if (-1 < timeout) {
-                    timer = setTimeout(() => {
-                        d.reject({
-                            status: 'error',
-                            error: 'TIMEOUT'
-                        });
-                    }, timeout); // magic timeout duration
-                }
-
-                return d.promise();
+            endMaintainMode: () => {
+                return useDefaultResponse('task quit');
             },
 
             /**
@@ -418,27 +374,7 @@ define([
              * @return {Promise}
              */
             maintainHome: () => {
-                let d = $.Deferred();
-
-                events.onMessage = (response) => {
-                    switch (response.status) {
-                    case 'ok':
-                        d.resolve(response);
-                        break;
-                    case 'operating':
-                        // ignore. (When the toolhead is `Home`. This status wouldn't show up)
-                        break;
-                    default:
-                        d.reject(response);
-                    }
-                };
-
-                events.onError = (response) => { d.reject(response); };
-                events.onFatal = (response) => { d.reject(response); };
-
-                ws.send('maintain home');
-
-                return d.promise();
+                return useDefaultResponse('maintain home');
             },
 
             /**
@@ -448,70 +384,22 @@ define([
              * @return {Promise}
              */
             changeFilament: (type) => {
-                let d = $.Deferred(),
-                    TIMEOUT = 30000,
-                    typeMap = {},
-                    timer,
-                    args,
-                    rejectHandler = (response) => {
-                        d.reject(response);
-                    };
+                let d = $.Deferred();
 
-                typeMap[DeviceConstants.LOAD_FILAMENT]   = 'load_filament';
-                typeMap[DeviceConstants.UNLOAD_FILAMENT] = 'unload_filament';
+                const getType = (t) => {
+                    return t === DeviceConstants.LOAD_FILAMENT ? 'load_filament' : 'unload_filament';
+                };
 
-                this.enterMaintainMode(TIMEOUT).pipe((response) => {
-                    return this.maintainHome();
-                }, rejectHandler)
-                .pipe((response) => {
+                events.onMessage = (response) => {
+                    response.status !== 'ok' ? d.notify(response) : d.resolve(response);
+                };
 
-                    events.onMessage = (response) => {
-                        clearTimeout(timer);
-                        timer = setTimeout(() => {
-                            d.reject({
-                                status: 'error',
-                                error: 'TIMEOUT'
-                            });
-                        }, 30000); // magic timeout duration
+                events.onError = (response) => { d.reject(response); };
+                events.onFatal = (response) => { d.reject(response); };
 
-                        if ('ok' === response.status) {
-                            d.resolve(response);
-                        }
-                        else if (-1 < ['loading', 'unloading'].indexOf(response.status.toLowerCase())) {
-                            d.notify(response);
-                        }
-                        else if (response.status.toLowerCase() === 'operating') {
-                            // ignore operating message
-                        }
-                        else {
-                            d.resolve(response);
-                        }
-                    };
-
-                    events.onError = (response) => {
-                        clearTimeout(timer);
-                        d.reject(response);
-                    };
-
-                    events.onFatal = (response) => {
-                        clearTimeout(timer);
-                        d.reject(response);
-                    };
-
-                    args = [
-                        'maintain',
-                        typeMap[type],
-                        0, // extruder id
-                        220 // temperature
-                    ];
-
-                    // MAGIC DELAY NUMBER for 3s!!!
-                    setTimeout(
-                        () => { ws.send(args.join(' ')); },
-                        3000
-                    );
-
-                }, rejectHandler);
+                setTimeout(() => {
+                    ws.send(`maintain ${getType(type)} 0 220`);
+                }, 3000);
 
                 return d.promise();
             },
@@ -522,13 +410,7 @@ define([
              */
             fwUpdate: (file) => {
                 let d = $.Deferred(),
-                    mimeType = 'binary/flux-firmware',
-                    blob = new Blob([file], { type: mimeType }),
-                    args = [
-                        'update_fw',
-                        'binary/flux-firmware',  // mimeType
-                        blob.size
-                    ];
+                    blob = new Blob([file], { type: 'binary/flux-firmware' });
 
                 events.onMessage = (response) => {
                     switch (response.status) {
@@ -551,7 +433,7 @@ define([
                 events.onError = (response) => { d.reject(response); };
                 events.onFatal = (response) => { d.reject(response); };
 
-                ws.send(args.join(' '));
+                ws.send(`update_fw binary/flux-firmware ${blob.size}`);
 
                 return d.promise();
             },

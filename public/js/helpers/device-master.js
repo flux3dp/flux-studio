@@ -289,7 +289,23 @@ define([
     }
 
     function changeFilament(type) {
-        return SocketMaster.addTask('changeFilament', type);
+        let d = $.Deferred();
+        SocketMaster.addTask('enterMaintainMode').then(() => {
+            return SocketMaster.addTask('maintainHome');
+        }).then(() => {
+            return SocketMaster.addTask('changeFilament', type);
+        }).then(() => {
+            d.resolve();
+        }).progress((progress) => {
+            console.log('progress is', progress);
+            d.notify(progress);
+        }).fail((error) => {
+            console.log('error is', error);
+            d.reject(error);
+        });
+
+        // SocketMaster.addTask('changeFilament', type)
+        return d.promise();
     }
 
     function reconnect() {
@@ -472,19 +488,64 @@ define([
 
     function calibrate() {
         let d = $.Deferred();
-        SocketMaster.addTask('calibrate').then(() => {
-            d.resolve();
-        }, (error) => {
-            error = error || {};
-            if(error.info === DeviceConstants.RESOURCE_BUSY) {
+
+        const processError = (error = {}) => {
+            if(!error.module) {
+                AlertActions.showPopupError('device-busy', lang.calibration.headMissing);
+                SocketMaster.addTask('endMaintainMode');
+            }
+            else if(error.info === DeviceConstants.RESOURCE_BUSY) {
                 AlertActions.showPopupError('device-busy', lang.calibration.RESOURCE_BUSY);
             }
             else {
                 AlertActions.showPopupError('device-busy', error.error);
             }
-            console.log('error from calibration', error);
+        };
+
+        const step1 = () => {
+            let _d = $.Deferred();
+            SocketMaster.addTask('enterMaintainMode').then((response) => {
+                if(response.status === 'ok') {
+                    return SocketMaster.addTask('getHeadInfo');
+                }
+                else {
+                    _d.reject(response);
+                }
+            }).then((response) => {
+                !response.module ? _d.reject(response) : _d.resolve();
+            }).fail((error) => {
+                _d.reject(error);
+            });
+            return _d.promise();
+        };
+
+        const step2 = () => {
+            let _d = $.Deferred();
+            SocketMaster.addTask('maintainHome').then(() => {
+                console.log('maintain home done');
+                return SocketMaster.addTask('calibrate');
+            }).then(() => {
+                console.log('calibrate');
+                return SocketMaster.addTask('endMaintainMode');
+            }).then(() => {
+                console.log('end maintain');
+                _d.resolve();
+            }).fail(() => {
+                _d.reject();
+            });
+            return _d.promise();
+        };
+
+        step1().then(() => {
+            console.log('step 1 done');
+            return step2();
+        }).then(() => {
             d.resolve();
+        }).fail((error) => {
+            processError(error);
+            d.reject(error);
         });
+
         return d.promise();
     }
 
