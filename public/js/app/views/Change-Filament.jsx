@@ -102,7 +102,7 @@ define([
                 var self = this,
                     nextStep = (self.state.type === DeviceConstants.LOAD_FILAMENT ? steps.EMERGING : steps.UNLOADING),
                     progress = function(response) {
-                        switch (response.nav) {
+                        switch (response.stage[0]) {
                         case 'WAITTING':
                         case 'WAITING':
                         case 'LOADING':
@@ -114,7 +114,7 @@ define([
                         default:
                             // update temperature
                             self.setState({
-                                temperature: parseFloat(response.nav.replace('HEATING ', ''), 10)
+                                temperature: response.temperature || 220
                             });
                             break;
                         }
@@ -127,8 +127,8 @@ define([
                     errorMessageHandler = (response) => {
                         var messageMap = lang.monitor,
                             subErrorIndex = 1,
-                            allJoinedMessage = response.symbol.join('_'),
-                            genericMessage = response.symbol.slice(0, 2).join('_');
+                            allJoinedMessage = response.error.join('_'),
+                            genericMessage = response.error.slice(0, 2).join('_');
 
                         DeviceMaster.quitTask();
 
@@ -137,7 +137,7 @@ define([
                             AlertActions.showPopupError(genericMessage, messageMap[genericMessage]);
                         }
                         // wrong toolhead
-                        else if ('TYPE_ERROR' === response.symbol[subErrorIndex]) {
+                        else if ('TYPE_ERROR' === response.error[subErrorIndex]) {
                             AlertActions.showPopupError(genericMessage, messageMap.HEAD_ERROR_TYPE_ERROR);
                         }
                         // default
@@ -148,10 +148,10 @@ define([
 
                 DeviceMaster.selectDevice(self.props.device).then(function() {
                     DeviceMaster.changeFilament(type).progress(progress).done(done).fail(function(response) {
-                        if ('RESOURCE_BUSY' === response.error) {
+                        if ('RESOURCE_BUSY' === response.error[0]) {
                             AlertActions.showDeviceBusyPopup('change-filament-device-busy');
                         }
-                        else if ('TIMEOUT' === response.error) {
+                        else if ('TIMEOUT' === response.error[0]) {
                             DeviceMaster.closeConnection();
                             AlertActions.showPopupError('change-filament-toolhead-no-response', lang.change_filament.toolhead_no_response);
                             self.props.onClose();
@@ -162,8 +162,11 @@ define([
                                 self.setState({ currentStep: steps.GUIDE });
                             });
                         }
-                        else if ('UNKNOWN_COMMAND' === response.error) {
+                        else if ('UNKNOWN_COMMAND' === response.error[0]) {
                             AlertActions.showDeviceBusyPopup('change-filament-zombie', lang.change_filament.maintain_zombie);
+                        }
+                        else if ('KICKED' === response.error[0]) {
+                            self.props.onClose();
                         }
                         else {
                             errorMessageHandler(response);
