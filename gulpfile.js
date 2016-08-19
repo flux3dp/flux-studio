@@ -33,7 +33,7 @@ gulp.task('cleancss', function() {
 gulp.task('babel', function() {
     return gulp.src(['public/js/**/*.js*', '!public/js/require.js', '!public/js/main.js', '!public/js/plugins/**/*.js', '!public/js/lib/**/*.js', '!public/js/helpers/CircularGridHelper.js'])
         .pipe(babel({
-            presets: ['es2015','react']
+            presets: ['es2015','stage-0']
         }))
         .pipe(gulp.dest('public/js'));
 });
