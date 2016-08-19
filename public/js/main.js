@@ -24,7 +24,8 @@ requirejs.config({
         events: 'lib/events',
         window: 'app/window',
         localStorage: 'app/local-storage',
-        Rx: 'lib/rx.lite.min'
+        Rx: 'lib/rx.lite.min',
+        Redux: 'lib/redux.min'
     },
 
     jsx: {
@@ -90,6 +91,9 @@ requirejs.config({
         },
         Rx: {
             exports: 'Rx'
+        },
+        Redux: {
+            exports: 'Redux'
         }
     }
 });
