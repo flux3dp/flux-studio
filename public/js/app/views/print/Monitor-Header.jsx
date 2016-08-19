@@ -8,7 +8,7 @@ define([
     DeviceConstants
 ) => {
 
-    return monitorHeader = React.createClass({
+    return React.createClass({
         PropTypes: {
             name:           React.PropTypes.string,
             source:         React.PropTypes.string,
