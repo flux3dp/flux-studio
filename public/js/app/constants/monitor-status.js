@@ -2,79 +2,81 @@ define([
     'app/constants/device-constants',
 ], (
     DeviceConstants
-) => ({
-        setLang: (lang) => {
-            this.lang = lang;
+) => {
+    let lang;
+    return {
+        setLang: (l) => {
+            lang = l;
         },
 
         IDLE: () => ({
-            displayStatus: this.lang.device.ready,
+            displayStatus: lang.device.ready,
             currentStatus: DeviceConstants.READY
         }),
 
         INIT: () => ({
-            displayStatus: this.lang.device.starting,
+            displayStatus: lang.device.starting,
             currentStatus: DeviceConstants.STARTING
         }),
 
         STARTING: () => ({
-            displayStatus: this.lang.device.starting,
+            displayStatus: lang.device.starting,
             currentStatus: ''
         }),
 
         RUNNING: () => ({
-            displayStatus: this.lang.device.running,
+            displayStatus: lang.device.running,
             currentStatus: DeviceConstants.RUNNING
         }),
 
         PAUSED: () => ({
-            displayStatus: this.lang.device.paused,
+            displayStatus: lang.device.paused,
             currentStatus: DeviceConstants.PAUSED
         }),
 
         PAUSING: () => ({
-            displayStatus: this.lang.device.pausing,
+            displayStatus: lang.device.pausing,
             currentStatus: DeviceConstants.PAUSED
         }),
 
         WAITING_HEAD: () => ({
-            displayStatus: this.lang.device.heating,
+            displayStatus: lang.device.heating,
             currentStatus: DeviceConstants.HEATING
         }),
 
         CORRECTING: () => ({
-            displayStatus: this.lang.device.calibrating,
+            displayStatus: lang.device.calibrating,
             currentStatus: DeviceConstants.CALIBRATING
         }),
 
         COMPLETING: () => ({
-            displayStatus: this.lang.device.completing,
+            displayStatus: lang.device.completing,
             currentStatus: ''
         }),
 
         COMPLETED: () => ({
-            displayStatus: this.lang.device.completed,
+            displayStatus: lang.device.completed,
             currentStatus: ''
         }),
 
         ABORTED: () => ({
-            displayStatus: this.lang.device.aborted,
+            displayStatus: lang.device.aborted,
             currentStatus: ''
         }),
 
         RESUMING: () => ({
-            displayStatus: this.lang.device.starting,
+            displayStatus: lang.device.starting,
             currentStatus: DeviceConstants.RUNNING
         }),
 
         OCCUPIED: () => ({
-            displayStatus: this.lang.device.occupied,
+            displayStatus: lang.device.occupied,
             currentStatus: DeviceConstants.PAUSED
         }),
 
         SCANNING: () => ({
-            displayStatus: this.lang.device.scanning,
+            displayStatus: lang.device.scanning,
             currentStatus: ''
         })
-    })
-);
+    };
+});
