@@ -18,9 +18,6 @@ define([
         return infoArray.filter((o) => Object.keys(o).some(n => n === propertyName));
     };
 
-    let Monitor,
-        Device;
-
     return React.createClass({
         contextTypes: {
             store: React.PropTypes.object,
@@ -33,14 +30,8 @@ define([
 
             this.lang = lang;
             this.unsubscribe = store.subscribe(() => {
-                Monitor = this.context.store.getState().Monitor;
-                Device = this.context.store.getState().Device;
-
                 this.forceUpdate();
             });
-
-            Monitor = this.context.store.getState().Monitor;
-            Device = this.context.store.getState().Device;
         },
 
         componentWillUnmount: function() {
@@ -49,6 +40,7 @@ define([
         },
 
         _isAbortedOrCompleted: function() {
+            let { Device } = this.context.store.getState();
             return (
                 Device.status.st_id === DeviceConstants.status.ABORTED ||
                 Device.status.st_id === DeviceConstants.status.COMPLETED
@@ -56,10 +48,12 @@ define([
         },
 
         _getHeadInfo: function() {
+            let { Device } = this.context.store.getState();
             return Device.status.module ? this.lang.monitor.device[Device.status.module] : '';
         },
 
         _getStatus: function() {
+            let { Device } = this.context.store.getState();
             if(Device.status.st_label) {
                 let { displayStatus } = MonitorStatus[Device.status.st_label]();
                 return displayStatus;
@@ -70,6 +64,7 @@ define([
         },
 
         _getTemperature: function() {
+            let { Device } = this.context.store.getState();
             if(!Device.status || this._isAbortedOrCompleted()) {
                 return '';
             }
@@ -87,6 +82,7 @@ define([
         },
 
         _getProgress: function() {
+            let { Monitor, Device } = this.context.store.getState()
             if(Number.isInteger(Monitor.uploadProgress)) {
                 return `${lang.monitor.processing} ${Monitor.uploadProgress}%`;
             }

@@ -20,8 +20,6 @@ define([
     const maxFileNameLength = 12;
 
     let selectedItem = '',
-        Monitor,
-        Device,
         previewUrl = defaultImage;
 
     const findObjectContainsProperty = (infoArray = [], propertyName) => {
@@ -47,19 +45,8 @@ define([
             const { store } = this.context;
 
             this.unsubscribe = store.subscribe(() => {
-                Monitor = this.context.store.getState().Monitor;
-                Device = this.context.store.getState().Device;
-
                 this.forceUpdate();
             });
-
-            Monitor = this.context.store.getState().Monitor;
-            Device = this.context.store.getState().Device;
-        },
-
-        componentDidMount: function() {
-            // console.log('preview is', previewUrl);
-            this._initialize();
         },
 
         componentWillUpdate: function() {
@@ -71,30 +58,8 @@ define([
             this.unsubscribe();
         },
 
-        _initialize: function() {
-            // console.log(Monitor.mode);
-            // const go = (result) => {
-            //     if(!result.done) {
-            //         result.value.then(() => {
-            //             go(s.next());
-            //         });
-            //     };
-            // };
-            //
-            // const starter = function*() {
-            //     if(Monitor.mode === GlobalConstants.FILE) {
-            //         yield this._retrieveFolderContent();
-            //     }
-            //     else if(Monitor.mode === GlobalConstants.PREVIEW) {
-            //
-            //     }
-            // }.bind(this);
-            //
-            // let s = starter();
-            // go(s.next());
-        },
-
         _getPreviewUrl: function() {
+            let { Monitor, Device } = this.context.store.getState();
             const setUrl = (info) => {
                 let blobIndex = info.findIndex(o => o instanceof Blob);
                 previewUrl = blobIndex > 0 ? window.URL.createObjectURL(info[blobIndex]) : defaultImage;
@@ -104,10 +69,6 @@ define([
                 if(Monitor.mode === GlobalConstants.FILE_PREVIEW) {
                     setUrl(Monitor.selectedFileInfo);
                 }
-                // else if(Monitor.mode === GlobalConstants.PREVIEW) {
-                //     previewUrl = this.props.previewUrl;
-                // }
-                // else if(typeof Device.jobInfo !== 'undefined') {
                 else if(Device.jobInfo.length > 0) {
                     setUrl(Device.jobInfo);
                 }
@@ -130,30 +91,12 @@ define([
 
             return (<div style={divStyle} />);
         },
-
-        // _showFilePreview: function() {
-        //     // if(Monitor.mode === GlobalConstants.FILE_PREVIEW) {
-        //     //     previewUrl = Monitor.previewUrl;
-        //     // }
-        //     console.log(Monitor.previewUrl);
-        //     let divStyle = {
-        //         backgroundColor: '#E0E0E0',
-        //         backgroundImage: `url(${Monitor.previewUrl})`,
-        //         backgroundSize: 'cover',
-        //         backgroundPosition: '50% 50%',
-        //         width: '100%',
-        //         height: '100%'
-        //     };
-        //
-        //     return (<div style={divStyle} />);
-        // },
-
         _imageError: function(src) {
             src.target.src = '/img/ph_s.png';
         },
 
         _listFolderContent: function() {
-            // console.log(Monitor);
+            let { Monitor, Device } = this.context.store.getState();
             let { files, directories } = Monitor.currentFolderContent;
             previewUrl = defaultImage; // reset preview image
 
@@ -164,7 +107,6 @@ define([
             // console.log(directories);
 
             let _folders = directories.map((folder) => {
-                // console.log(Monitor.selectedItem.name, folder);
                 let folderNameClass = ClassNames('name', {'selected': Monitor.selectedItem.name === folder});
                 return (
                     <div
@@ -226,6 +168,7 @@ define([
         },
 
         _getJobType: function() {
+            let { Monitor, Device } = this.context.store.getState()
             let { lang } = this.context, jobInfo, o;
 
             jobInfo = Monitor.mode === GlobalConstants.FILE_PREVIEW ? Monitor.selectedFileInfo : Device.jobInfo;
@@ -240,6 +183,7 @@ define([
         },
 
         _getJobTime: function() {
+            let { Monitor, Device } = this.context.store.getState()
             let jobInfo, o;
 
             jobInfo = Monitor.mode === GlobalConstants.FILE_PREVIEW ? Monitor.selectedFileInfo : Device.jobInfo;
@@ -248,6 +192,7 @@ define([
         },
 
         _getJobProgress: function() {
+            let { Monitor, Device } = this.context.store.getState()
             if(Monitor.mode === GlobalConstants.FILE_PREVIEW  || this._isAbortedOrCompleted()) {
                 return '';
             }
@@ -255,6 +200,7 @@ define([
         },
 
         _isAbortedOrCompleted: function() {
+            let { Device } = this.context.store.getState();
             return (
                 Device.status.st_id === DeviceConstants.status.ABORTED ||
                 Device.status.st_id === DeviceConstants.status.COMPLETED
@@ -262,7 +208,6 @@ define([
         },
 
         _renderDisplay: function(mode) {
-            // console.log(`mode is: ${mode}, status is ${Device.status.st_label}`);
             if(mode !== GlobalConstants.CAMERA) {
                 this.cameraStream = null;
             }
@@ -282,12 +227,12 @@ define([
         },
 
         _renderJobInfo: function() {
+            let { Monitor, Device } = this.context.store.getState();
             if(Monitor.mode === GlobalConstants.FILE || Monitor.mode === GlobalConstants.CAMERA) {
                 return '';
             }
 
             let { slicingResult } = this.context;
-
             let jobTime = FormatDuration(this._getJobTime()) || '',
                 jobProgress = this._getJobProgress(),
                 jobType = this._getJobType(),
@@ -333,6 +278,7 @@ define([
         },
 
         render: function() {
+            let { Monitor, Device } = this.context.store.getState();
             let content = this._renderDisplay(Monitor.mode),
                 jobInfo = this._renderJobInfo();
 
