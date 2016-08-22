@@ -414,15 +414,9 @@ define([
                         }
                     });
 
-                    targetPrinter.subItems[4].checked = this.checked;
-
-                    if (false === this.checked) {
-                        initializeMachine.defaultPrinter.clear();
-                    }
-                    else {
-                        initializeMachine.defaultPrinter.set(printer);
-                    }
-
+                    initializeMachine.defaultPrinter.clear();
+                    targetPrinter.subItems[6].checked = true;
+                    initializeMachine.defaultPrinter.set(printer);
                     methods.refresh();
                 },
                 parent: menuMap.parentIndex.DEVICE,
