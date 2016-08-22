@@ -8,7 +8,7 @@ define([
     DeviceConstants
 ) => {
 
-    return monitorHeader = React.createClass({
+    return React.createClass({
         PropTypes: {
             name:           React.PropTypes.string,
             source:         React.PropTypes.string,
@@ -79,17 +79,6 @@ define([
                 else {
                     return history.length > 1 ? back() : folder();
                 }
-
-                // if(Monitor.mode === GlobalConstants.CAMERA) {
-                //     return back();
-                // }
-                // else if(Monitor.mode === GlobalConstants.FILE) {
-                //     if(Device.status.st_id === DeviceConstants.status.IDLE) {
-                //         return history.length > 1 ? back() : none();
-                //     }
-                //     return back();
-                // }
-                // return history.length > 1 ? back() : folder();
             }
             else {
                 return (Monitor.mode === GlobalConstants.PREVIEW && history.length === 0) ?

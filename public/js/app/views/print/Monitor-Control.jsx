@@ -18,8 +18,6 @@ define([
 
     const type = { FILE: 'FILE', FOLDER: 'FOLDER' };
 
-    let Monitor, Device;
-
     return React.createClass({
         PropTypes: {
 
@@ -34,14 +32,8 @@ define([
             let { store } = this.context;
 
             this.unsubscribe = store.subscribe(() => {
-                Monitor = this.context.store.getState().Monitor;
-                Device = this.context.store.getState().Device;
-
                 this.forceUpdate();
             });
-
-            Monitor = this.context.store.getState().Monitor;
-            Device = this.context.store.getState().Device;
         },
 
         componentWillUpdate: function() {
@@ -53,6 +45,7 @@ define([
         },
 
         _operation: function() {
+            let { Monitor, Device } = this.context.store.getState();
             let { lang } = this.context;
 
             let cameraClass = ClassNames('btn-camera btn-control', { 'on': Monitor.mode === GlobalConstants.CAMERA }),
@@ -135,6 +128,7 @@ define([
         },
 
         _isAbortedOrCompleted: function(statusId) {
+            let { Device } = this.context.store.getState();
             statusId = statusId || Device.status.st_id;
             return (
                 statusId === DeviceConstants.status.ABORTED ||
@@ -144,6 +138,7 @@ define([
 
         _getJobType: function() {
             let { lang } = this.context, jobInfo, o;
+            let { Monitor, Device } = this.context.store.getState();
 
             jobInfo = Monitor.mode === GlobalConstants.FILE_PREVIEW ? Monitor.selectedFileInfo : Device.jobInfo;
             o = findObjectContainsProperty(jobInfo, 'HEAD_TYPE');
@@ -157,12 +152,9 @@ define([
         },
 
         _renderButtons: function() {
-            // let { store } = this.context,
-                // { Device } = store.getState(),
+            let { Monitor, Device } = this.context.store.getState()
             let { selectedItem } = Monitor;
-
             let commands, action, statusId, currentStatus;
-
             let leftButtonOn = false,
                 middleButtonOn = false,
                 rightButtonOn = true;
@@ -203,14 +195,7 @@ define([
                 }
             };
 
-            // console.log(`current status ${currentStatus}`);
             action = !!commands[currentStatus] ? commands[currentStatus]() : '';
-
-            // if(!this.props.fCode && !this.state.selectedItem) {
-            //     if(currentStatus === DeviceConstants.READY) {
-            //         middleButtonOn = false;
-            //     }
-            // }
 
             // CAMERA mode
             if(Monitor.mode === GlobalConstants.CAMERA) {
@@ -241,16 +226,7 @@ define([
 
             // PRINT mode
             else if(Monitor.mode === GlobalConstants.PRINT) {
-                // if(
-                //     statusId === DeviceConstants.status.IDLE ||
-                //     statusId === DeviceConstants.status.COMPLETED ||
-                //     statusId === DeviceConstants.status.ABORTED
-                // ) {
-                //     leftButtonOn = false;
-                // }
-                // else {
-                    leftButtonOn = true;
-                // }
+                leftButtonOn = true;
 
                 if(
                     currentStatus === DeviceConstants.STARTING ||
@@ -277,10 +253,6 @@ define([
                 ) {
                     leftButtonOn = false;
                 }
-
-                // if(statusId === DeviceConstants.status.PAUSED_FROM_RUNNING) {
-                //     leftButtonOn = true;
-                // }
 
                 if(statusId === DeviceConstants.status.MAINTAIN ||
                    statusId === DeviceConstants.status.SCAN ||

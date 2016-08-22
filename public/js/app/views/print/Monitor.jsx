@@ -152,6 +152,8 @@ define([
                 }
             });
 
+            console.log(this.unsubscribeDeleteKey);
+
             this._startReport();
         },
 
@@ -391,7 +393,7 @@ define([
             if(_history.length === 0) { return; }
             lastAction = _history.pop();
 
-            let { Monitor } = store.getState().Monitor;
+            let { Monitor } = store.getState();
 
             if(Monitor.mode === mode.CAMERA) {
                 this._stopCamera();
