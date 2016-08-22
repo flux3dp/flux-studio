@@ -117,17 +117,19 @@ define([
                     events.splice(i, 1);
                 }
             }
+        },
+        unsubscribe = function() {
+            events = events.filter(e => e !== this);
         };
 
     return {
         on: function(keys, callback) {
             var keyCodes = convertToKeyCode(keys);
-
-            events.push({ key: keys, keyCode: generateKey(keyCodes), callback: callback });
+            let e = { key: keys, keyCode: generateKey(keyCodes), callback: callback };
+            events.push(e);
 
             initialize();
-
-            return this;
+            return unsubscribe.bind(e);
         },
         off: function(keys) {
             var keyCodes = convertToKeyCode(keys),

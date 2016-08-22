@@ -259,7 +259,6 @@ define([
             d.resolve(result);
         }).progress(displayProgress)
         .fail((error) => {
-            console.log('reject with error', error);
             d.reject(error);
         });
         return d.promise();
@@ -325,27 +324,7 @@ define([
                 // normalize - resize, align
                 var box = new THREE.Box3().setFromObject(mesh),
                     enlarge = parseInt(box.size().x) !== 0 && parseInt(box.size().y) !== 0 && parseInt(box.size().z) !== 0,
-                    scale;
-
-                scale = getScaleDifference(
-                    enlarge ?
-                    getLargestPropertyValue(box.size()) :
-                    getSmallestPropertyValue(box.size())
-                );
-
-                // alert for auto scalling
-                if(scale === Infinity) {
-                    reactSrc.setState({
-                        openImportWindow: true,
-                        openObjectDialogue: false
-                    }, function() {
-                        AlertActions.showPopupError('', lang.message.slicingFailed);
-                    });
-                    return;
-                }
-                else if (scale !== 1) {
-                    console.log('this model has been scaled for better printing ratio');
-                }
+                    scale = 1;
 
                 mesh.scale.set(scale, scale, scale);
                 mesh.scale._x = scale;
@@ -452,7 +431,7 @@ define([
                     slicingStatus.isComplete = true;
                     importedFCode = files.item(0);
                     importFromFCode = ext === 'fc';
-                    setDefaultFileName(importedFCode.name)
+                    setDefaultFileName(importedFCode.name);
                     if(objects.length === 0) {
                         doFCodeImport(ext);
                     }
@@ -495,40 +474,36 @@ define([
             reader = new FileReader();
 
         reader.addEventListener('load', function() {
-            fcodeConsole.upload(reader.result, file.size, function(result) {
-                // if there's a result
-                if(!!result) {
-                    if(!!result.error) {
-                        // out of bound, can still preview
-                        if(result.error === ErrorConstants.GCODE_AREA_TOO_BIG) {
-                            // disable go button
-                            reactSrc.setState({ hasObject: false });
-                            if(previewMode) {
-                                fcodeConsole.getPath().then((r) => {
-                                    slicingStatus.canInterrupt = true;
-                                    if(r.error) {
-                                        processSlicerError(r);
-                                    }
-                                    printPath = r;
-                                    _drawPath().then(function() {
-                                        _resetPreviewLayerSlider();
-                                        ProgressActions.close();
-                                        slicingStatus.showProgress = false;
-                                    });
-                                });
+            fcodeConsole.upload(reader.result, isGcode).then(() => {
+                fcodeConsole.getMetadata().then((data) => {
+                    processMetadata(data);
+                });
+            }).fail((response) => {
+                // out of bound, can still preview
+                if(response.error === ErrorConstants.GCODE_AREA_TOO_BIG) {
+                    // disable go button
+                    reactSrc.setState({ hasObject: false });
+                    if(previewMode) {
+                        fcodeConsole.getPath().then((r) => {
+                            slicingStatus.canInterrupt = true;
+                            if(r.error) {
+                                processSlicerError(r);
                             }
-                        }
-                        else {
-                            _closeWait();
-                            AlertActions.showPopupError('fcode-error', lang.slicer.error[result.error] || result.info);
-                            cancelPreview();
-                        }
+                            printPath = r;
+                            _drawPath().then(function() {
+                                _resetPreviewLayerSlider();
+                                ProgressActions.close();
+                                slicingStatus.showProgress = false;
+                            });
+                        });
                     }
                 }
                 else {
-                    fcodeConsole.getMetadata(processMetadata);
+                    _closeWait();
+                    AlertActions.showPopupError('fcode-error', lang.slicer.error[response.error] || response.info);
+                    cancelPreview();
                 }
-            }, isGcode);
+            });
         });
 
         var processMetadata = function(m) {
@@ -564,16 +539,12 @@ define([
             getBlobFromScene().then((blob) => {
                 if(blob instanceof Blob) {
                     previewUrl = URL.createObjectURL(blob);
-                    var d = fcodeConsole.changeImage(blob);
-
-                    d.then(() => {
+                    fcodeConsole.changeImage(blob).then(() => {
                         blobExpired = false;
                         responseBlob = new Blob([reader.result]);
                         GlobalActions.sliceComplete(metadata);
-                    });
-
-                    d.catch((error) => {
-                        console.log('error from change image', error);
+                    }).fail((error) => {
+                        // TODO: log error
                     });
                 }
             });
@@ -1432,7 +1403,6 @@ define([
                     }
                     d.resolve('');
                 }).fail((error) => {
-                    console.log('yo', error);
                     processSlicerError(error);
                     d.resolve('');
                 });

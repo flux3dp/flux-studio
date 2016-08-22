@@ -10,29 +10,24 @@ define([
 ], function(Websocket, convertToTypedArray, history, setParams) {
     'use strict';
 
-    // Because the preview image size is 640x640
-    var MAXWIDTH = 640;
-
-    return function(opts) {
-        opts = opts || {};
-
+    return function() {
         var ws = new Websocket({
                 method: 'fcode-reader',
-                onMessage: function(data) {
+                onMessage: (data) => {
                     events.onMessage(data);
 
                 },
-                onError: function(response) {
+                onError: (response) => {
                     events.onError(response);
                 },
-                onFatal: function(response) {
+                onFatal: (response) => {
                     events.onFatal(response);
                 }
             }),
             events = {
-                onMessage: function() {},
-                onError: opts.onError,
-                onFatal: opts.onFatal
+                onMessage   : () => {},
+                onError     : () => {},
+                onFatal     : () => {}
             };
 
         return {
@@ -41,104 +36,87 @@ define([
             /**
              * upload fcode
              *
-             * @param {ArrayBuffer} data       - binary data with array buffer type
-             * @param {Int}         size       - binary data with array buffer type
-             * @param {Function}    onFinished - fired when process finished
+             * @param {ArrayBuffer} data    - binary data with array buffer type
+             * @param {Bool}        isGCode - fired when process finished
              */
-            upload: function(data, size, onFinished, isGcode) {
-                var args = [
-                    'upload',
-                    size
-                ];
-
-                events.onMessage = function(response) {
-
-                    if ('continue' === response.status) {
-                        ws.send(data);
-                    }
-                    else if ('ok' === response.status) {
-                        onFinished();
-                    }
-
+            upload: (data, isGcode) => {
+                let d = $.Deferred();
+                events.onMessage = (response) => {
+                    response.status === 'ok' ? d.resolve() : ws.send(data);
                 };
 
-                events.onError = function(response) {
-                    onFinished(response);
-                };
+                events.onError = (response) => { d.reject(response); };
+                events.onFatal = (response) => { d.resolve(response); };
 
-                events.onFatal = function(response) {
-                    onFinished(response);
-                };
-
-                args.push(isGcode ? '-g' : '-f');
-
-                ws.send(args.join(' '));
+                ws.send(`upload ${data.size || data.byteLength} ${isGcode ? '-g' : '-f'}`);
+                return d.promise();
             },
 
             /**
              * get thumbnail from the last uploaded fcode
-             *
-             * @param {Function} onFinished - fired when process finished
              */
-            getThumbnail: function(onFinished) {
+            getThumbnail: () => {
+                let d = $.Deferred();
                 var blobs = [],
                     totalLength = 0,
                     blob;
 
-                events.onMessage = function(response) {
-
+                events.onMessage = (response) => {
                     if ('complete' === response.status) {
                         totalLength = response.length;
                     }
                     else if (response instanceof Blob) {
                         blobs.push(response);
                         blob = new Blob(blobs, { type: 'image/png' });
-
                         if (totalLength === blob.size) {
-                            onFinished(blob);
+                            // onFinished(blob);
+                            d.resolve(blob);
                         }
                     }
                 };
 
-                events.onError = function(response) {
-                    onFinished(response);
-                };
-
+                events.onError = (response) => { d.reject(response); };
+                events.onFatal = (response) => { d.resolve(response); };
 
                 ws.send('get_img');
+                return d.promise();
             },
 
             /**
              * get metadata from the last uploaded fcode
-             *
-             * @param {Function} onFinished - fired when process finished
              */
-            getMetadata: function(onFinished) {
-                events.onMessage = function(response) {
+            getMetadata: () => {
+                let d = $.Deferred();
 
+                events.onMessage = (response) => {
                     if ('complete' === response.status) {
-                        onFinished(response);
+                        d.resolve(response);
                     }
-
                 };
+
+                events.onError = (response) => { d.reject(response); };
+                events.onFatal = (response) => { d.resolve(response); };
 
                 ws.send('get_meta');
+                return d.promise();
             },
 
-            getPath: function(onFinished) {
-                var d = $.Deferred();
-                events.onMessage = function(result) {
-                    d.resolve(result);
-                };
+            getPath: () => {
+                let d = $.Deferred();
+
+                events.onMessage = (response) => { d.resolve(response); };
+                events.onError = (response) => { d.reject(response); };
+                events.onFatal = (response) => { d.resolve(response); };
+
                 ws.send('get_path');
                 return d.promise();
             },
 
-            getFCode: function() {
-                var d = $.Deferred(),
+            getFCode: () => {
+                let d = $.Deferred(),
                     totalLength = 0;
 
-                events.onMessage = function(response) {
+                events.onMessage = (response) => {
                     if (response.status === 'complete') {
                         totalLength = response.length;
                     }
@@ -149,37 +127,25 @@ define([
                     }
                 };
 
+                events.onError = (response) => { d.reject(response); };
+                events.onFatal = (response) => { d.resolve(response); };
+
                 ws.send('get_fcode');
                 return d.promise();
             },
 
-            changeImage: function(data, size) {
+            changeImage: (data) => {
+                let d = $.Deferred();
 
-                return new Promise((resolve, reject) => {
+                events.onMessage = (response) => {
+                    response.status === 'ok' ? d.resolve() : ws.send(data);
+                };
 
-                    events.onMessage = (response) => {
-                        switch(response.status) {
-                            case 'ok':
-                                resolve('');
-                                break;
-                            case 'continue':
-                                ws.send(data);
-                                break;
-                            default: break;
-                        }
-                    };
+                events.onError = (response) => { d.reject(response); };
+                events.onFatal = (response) => { d.resolve(response); };
 
-                    events.onError = (response) => {
-                        reject(response);
-                    };
-
-                    events.onFatal = (response) => {
-                        reject(response);
-                    };
-
-                    ws.send(`change_img ${data.size}`);
-
-                });
+                ws.send(`change_img ${data.size}`);
+                return d.promise();
             }
         };
     };

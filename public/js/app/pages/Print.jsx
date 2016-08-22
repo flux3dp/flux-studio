@@ -1,16 +1,13 @@
 define([
     'jquery',
     'react',
-    'helpers/display',
     'app/actions/print',
-    'jsx!widgets/Radio-Group',
     'plugins/classnames/index',
     'jsx!views/print/Advanced',
     'jsx!views/print/Left-Panel',
     'jsx!views/print/Right-Panel',
     'jsx!views/print/Monitor',
     'jsx!views/print/Object-Dialogue',
-    'helpers/api/control',
     'jsx!widgets/Modal',
     'helpers/api/config',
     'jsx!views/Printer-Selector',
@@ -33,19 +30,17 @@ define([
     'app/default-print-settings',
     'app/actions/input-lightbox-actions',
     'app/constants/input-lightbox-constants',
+    'helpers/local-storage'
 ], function(
     $,
     React,
-    display,
     director,
-    RadioGroupView,
     ClassNames,
     AdvancedPanel,
     LeftPanel,
     RightPanel,
     Monitor,
     ObjectDialogue,
-    PrinterController,
     Modal,
     Config,
     PrinterSelector,
@@ -67,7 +62,8 @@ define([
     packer,
     DefaultPrintSettings,
     InputLightboxActions,
-    InputLightboxConstants
+    InputLightboxConstants,
+    LocalStorage
 ) {
 
     return function(args) {
@@ -217,6 +213,24 @@ define([
                     $importBtn = this.refs.importBtn.getDOMNode();
 
                     this._prepareMenu();
+                    nwjsMenu.import.enabled = true;
+                    nwjsMenu.import.onClick = () => { $importBtn.click(); };
+                    nwjsMenu.undo.onClick = () => { director.undo(); };
+                    nwjsMenu.duplicate.onClick = () => { director.duplicateSelected(); };
+                    nwjsMenu.saveTask.onClick = this._handleDownloadFCode;
+                    nwjsMenu.saveScene.onClick = this._handleDownloadScene;
+                    nwjsMenu.clear.onClick = this._handleClearScene;
+                    nwjsMenu.tutorial.onClick = () => {
+                        this._handleYes('tour');
+                    };
+                    nwjsMenu.clearLocalstorage.enabled = true;
+                    nwjsMenu.clearLocalstorage.onClick = () => {
+                        if(confirm(lang.topmenu.file.confirmReset)) {
+                            LocalStorage.clearAllExceptIP();
+                        }
+                    };
+                    menuFactory.methods.refresh();
+
                     this._registerKeyEvents();
                     if(tutorialMode) {
                         //First time using, with usb-configured printer..
@@ -246,7 +260,7 @@ define([
                 _registerKeyEvents: function() {
                     // delete event
                     shortcuts.on(['del'], (e) => {
-                        if(allowDeleteObject) {
+                        if(allowDeleteObject && !this._isMonitorOn()) {
                             director.removeSelected();
                         }
                     });
@@ -257,6 +271,10 @@ define([
 
                     shortcuts.on(['cmd', 'shift', 'x'], (e) => {
                         this._handleClearScene();
+                    });
+
+                    shortcuts.on(['cmd', 'shift', 'a'], (e) => {
+                        LocalStorage.clearAllExceptIP();
                     });
 
                     // copy event - it will listen by top menu as well in nwjs..
@@ -754,6 +772,11 @@ define([
                     if(!version || version !== GlobalConstants.DEFAULT_PRINT_SETTING_VERSION) {
                         AlertActions.showPopupYesNo('print-setting-version', lang.monitor.updatePrintPresetSetting);
                     }
+                },
+
+                _isMonitorOn: function() {
+                    // yuk! needs to be changed when redux is fully implemented
+                    return $('.flux-monitor').length > 0;
                 },
 
                 _renderAdvancedPanel: function() {

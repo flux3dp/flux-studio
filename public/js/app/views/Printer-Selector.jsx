@@ -221,8 +221,9 @@ define([
 
                 DeviceMaster.selectDevice(self.selected_printer).done(function(status) {
                     if (status === DeviceConstants.CONNECTED) {
+                        printer = self.state.discoverMethods.getLatestPrinter(printer);
                         checkDeviceStatus(printer).done(function(status) {
-                            if (true === self.props.forceAuth) {
+                            if (true === self.props.forceAuth && true === printer.password) {
                                 onError();
                                 return;
                             }
