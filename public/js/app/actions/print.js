@@ -709,7 +709,7 @@ define([
         if(report.slice_status === 'error') {
             clearInterval(slicingStatus.reporter);
 
-            slicingStatus.lastReport.info = lang.slicer.error[report.error];
+            slicingStatus.lastReport.info = lang.slicer.error[report.error] || report.info;
             slicingStatus.lastReport.caption = lang.alert.error;
             slicingStatus.hasError = true;
 
@@ -1229,7 +1229,7 @@ define([
                         slicingStatus.canInterrupt = true;
                         slicingStatus.pauseReport = false;
                         if(!!report) {
-                            if(report.slice_status === 'complete') {
+                            if(report.slice_status === 'complete' || report.slice_status === 'error') {
                                 clearInterval(slicingStatus.reporter);
                                 slicingStatus.isComplete = true;
                                 blobExpired = false;

@@ -9,6 +9,7 @@ define([
     'app/actions/input-lightbox-actions',
     'plugins/classnames/index',
     'helpers/api/config',
+    'app/actions/alert-actions',
     'app/default-print-settings',
     'helpers/object-assign'
 ], function(
@@ -22,6 +23,7 @@ define([
     InputLightboxActions,
     ClassNames,
     Config,
+    AlertActions,
     DefaultPrintSettings
 ) {
     'use strict';
@@ -349,6 +351,16 @@ define([
                     advancedSetting[id] = value;
                 }
             }
+
+            if(id === 'engine') {
+                advancedSetting.fill_pattern = value === 'slic3r' ? 'rectilinear' : 'AUTOMATIC';
+            }
+
+            let { engine, fill_density, fill_pattern } = advancedSetting;
+            if(engine === 'slic3r' && fill_density === '100' && fill_pattern !== 'rectilinear') {
+                AlertActions.showPopupError('', this.props.lang.slicer.pattern_not_supported_at_100_percent_infill);
+            }
+
             this._updateCustomField();
         },
 
@@ -564,17 +576,6 @@ define([
                             onChange={this._handleControlValueChange} />
 
                     </div>
-
-                    {/*<div className="section">
-                        <div className="title">{lang.blackMagic}</div>
-
-                        <SwitchControl
-                            id="spiral_vase"
-                            label={lang.spiral}
-                            default={advancedSetting.spiral_vase === 1}
-                            onChange={this._handleControlValueChange} />
-
-                    </div>*/}
 
                 </div>
             );

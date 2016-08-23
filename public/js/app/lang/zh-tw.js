@@ -1045,7 +1045,8 @@ define(function() {
                 '13': '重制錯誤，複製原始ID不存在。請重新啟動程式，\n若此錯誤持續發生，請回報相關錯誤',
                 '14': '無法設定物件位置及相關資訊，原始模型不存在於切片引擎',
                 '15': '上傳檔案內容錯誤，請確認檔案內容後再上傳'
-            }
+            },
+            pattern_not_supported_at_100_percent_infill: 'Slic3r 的 rectilinear 填充圖樣只支援 100% 的填充密度'
         },
         calibration: {
             RESOURCE_BUSY: '請確認機器的狀態是於待命中',
