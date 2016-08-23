@@ -119,6 +119,47 @@ define([
                 return d.promise();
             },
 
+            upload_via_path: (name, file, ext, fileUrl) => {
+                let d = $.Deferred(),
+                    progress,
+                    currentProgress;
+
+                events.onMessage = (result) => {
+
+                    switch (result.status) {
+
+                    case 'ok':
+                        d.resolve(result);
+                        break;
+
+                    case 'continue':
+                        break;
+
+                    case 'error':
+                        d.reject(result);
+                        break;
+
+                    default:
+                        // TODO: do something?
+                        break;
+                    }
+
+                };
+
+                events.onError = (error) => {
+                    d.reject(error);
+                };
+
+                events.onFatal = (error) => {
+                    d.reject(error);
+                }
+
+                ext = ext === 'obj' ? ' ' + ext : '';
+                ws.send('load_stl_from_path ' + name + ' ' + fileUrl + ext);
+
+                return d.promise();
+            },
+
             set: (name, positionX, positionY, positionZ, rotationX, rotationY, rotationZ, scaleX, scaleY, scaleZ) => {
 
                 let d = $.Deferred();

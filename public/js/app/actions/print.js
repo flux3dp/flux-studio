@@ -254,7 +254,8 @@ define([
     function uploadStl(name, file, ext) {
         // pass to slicer
         var d = $.Deferred();
-        slicer.upload(name, file, ext).then((result) => {
+        var uploadCaller = file.path ? slicer.upload_via_path(name, file, ext, file.path) : slicer.upload(name,file,ext);
+        uploadCaller.then((result) => {
             ProgressActions.updating('finishing up', 100);
             d.resolve(result);
         }).progress(displayProgress)
@@ -403,6 +404,7 @@ define([
             if(slicingStatus.canInterrupt) {
                 clearInterval(t);
                 var file = files.item ? files.item(index) : files[index];
+                console.log(file);
                 models.push(file);
                 slicingStatus.canInterrupt = false;
                 var ext = file.name.split('.').pop().toLowerCase();
