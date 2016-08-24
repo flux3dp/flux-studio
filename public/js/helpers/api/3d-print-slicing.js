@@ -153,7 +153,8 @@ define([
                 events.onFatal = (error) => {
                     d.reject(error);
                 }
-
+                
+                fileUrl = encodeURI(fileUrl);
                 ext = ext === 'obj' ? ' ' + ext : '';
                 ws.send('load_stl_from_path ' + name + ' ' + fileUrl + ext);
 
