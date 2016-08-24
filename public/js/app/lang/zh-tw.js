@@ -334,7 +334,7 @@ define(function() {
                 generalSupport: '支撐',
                 spacing: '支撐間隙',
                 overhang: '懸空角度',
-                zDistance: 'Z Distance',
+                zDistance: 'Z 軸間隙',
                 raft: '底座',
                 raftLayers: '底座層數',
                 brim: '底部延伸圈數 (Brim)',
@@ -353,11 +353,12 @@ define(function() {
                 name: '名稱',
                 apply: '套用',
                 save: '儲存',
-                saveAsPreset: '存為預設',
+                saveAsPreset: '儲存參數',
                 cancel: '取消',
                 delete: '刪除',
-                loadPreset: '載入預設',
-                savePreset: '儲存預設'
+                loadPreset: '載入參數',
+                savePreset: '儲存參數',
+                reloadPreset: '重置參數'
             },
             mode: [
                 {
@@ -927,7 +928,7 @@ define(function() {
             device_is_used: '機器正被使用中，是否要終止現在任務？',
             invalidFile: '檔案不是正確的 STL 格式',
             failGeneratingPreview: '無法儲存預覽圖',
-            slicingFailed: 'slic3r 無法型成可列印的 model',
+            slicingFailed: 'Slic3r 切片錯誤',
             no_password: {
                 content: '請用 USB 設定機器密碼，以提供此台電腦連線',
                 caption: '未設定密碼'
@@ -937,8 +938,8 @@ define(function() {
                 caption: '韌體需要更新',
                 content: '請按照<a target="_blank" href="http://helpcenter.flux3dp.com/hc/zh-tw/articles/216251077">此說明</a>安裝最新韌體版本'
             },
-            cant_establish_connection: '無法正常啟動 FLUX Studio API，並<a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/requests/new" target="_blank">聯繫 FLUX 客服</a>',
-            application_occurs_error: '應用程式發生錯誤，請使用功能表 > 說明 > 錯誤回報',
+            cant_establish_connection: '無法正常啟動 FLUX Studio API，建議手動安裝 Visual C++ Redistributable 2015，如持續發生，請<a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/requests/new" target="_blank">聯繫 FLUX 客服</a>',
+            application_occurs_error: '應用程式發生異常，請使用「功能表 > 說明 > 錯誤回報」',
             error_log: '錯誤訊息',
             fcodeForLaser: '檔案為雕刻工作',
             fcodeForPen: '檔案為繪圖工作',
@@ -946,7 +947,7 @@ define(function() {
             confirmSceneImport: '載入.fsc檔案將清除目前所有場景，是否繼續？',
             brokenFcode: '無法開啟 %s',
             slicingFatalError: '切片時發生錯誤，請上傳模型檔案給 FLUX 客服',
-            unknown_error: '連接時發生未知錯誤，請使用功能表 > 說明 > 錯誤回報',
+            unknown_error: '無法與機器建立連線，請使用「功能表 > 說明 > 錯誤回報」',
             important_update: {
                 caption: '重要更新',
                 message: 'Delta 有重要韌體更新，是否要現在更新？',
@@ -958,13 +959,13 @@ define(function() {
             need_1_1_7_above: '請更新 Delta 韌體到 v1.1.7 以上'
         },
         machine_status: {
-            '-10': 'Raw Mode',
+            '-10': '原生模式',
             '-2': '掃描中',
             '-1': '維護中',
             0: '待命中',
             1: '初始化',
             2: 'ST_TRANSFORM',
-            4: 'Starting',
+            4: '啟動中',
             6: '回復中',
             16: '工作中',
             18: '回復中',
@@ -976,7 +977,7 @@ define(function() {
             64: '已完成',
             66: '完成中',
             128: '已中斷',
-            UNKNOWN: 'UNKNOWN'
+            UNKNOWN: '-'
         },
         head_module: {
             EXTRUDER: 'Print',
