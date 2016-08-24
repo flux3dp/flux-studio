@@ -1653,46 +1653,51 @@ define([
             var mesh = new THREE.Mesh(SELECTED.geometry, SELECTED.material);
             mesh.up = new THREE.Vector3(0, 0, 1);
 
-            slicer.duplicate(SELECTED.uuid, mesh.uuid).then(function(result) {
-                if(result.status.toUpperCase() === DeviceConstants.OK) {
-                    Object.assign(mesh.scale, SELECTED.scale);
-                    mesh.rotation.enteredX = SELECTED.rotation.enteredX;
-                    mesh.rotation.enteredY = SELECTED.rotation.enteredY;
-                    mesh.rotation.enteredZ = SELECTED.rotation.enteredZ;
-                    mesh.rotation.x = SELECTED.rotation.x;
-                    mesh.rotation.y = SELECTED.rotation.y;
-                    mesh.rotation.z = SELECTED.rotation.z;
-                    mesh.rotation.order = 'ZYX';
+            let t = setInterval(() => {
+                if(slicer.canInterrupt) {
+                    clearInterval(t);
+                    slicer.duplicate(SELECTED.uuid, mesh.uuid).then(function(result) {
+                        if(result.status.toUpperCase() === DeviceConstants.OK) {
+                            Object.assign(mesh.scale, SELECTED.scale);
+                            mesh.rotation.enteredX = SELECTED.rotation.enteredX;
+                            mesh.rotation.enteredY = SELECTED.rotation.enteredY;
+                            mesh.rotation.enteredZ = SELECTED.rotation.enteredZ;
+                            mesh.rotation.x = SELECTED.rotation.x;
+                            mesh.rotation.y = SELECTED.rotation.y;
+                            mesh.rotation.z = SELECTED.rotation.z;
+                            mesh.rotation.order = 'ZYX';
 
-                    mesh.name = 'custom';
-                    mesh.plane_boundary = planeBoundary(mesh);
+                            mesh.name = 'custom';
+                            mesh.plane_boundary = planeBoundary(mesh);
 
-                    autoArrange(mesh);
-                    addSizeProperty(mesh);
-                    groundIt(mesh);
-                    createOutline(mesh);
+                            autoArrange(mesh);
+                            addSizeProperty(mesh);
+                            groundIt(mesh);
+                            createOutline(mesh);
 
-                    selectObject(null);
-                    selectObject(mesh);
+                            selectObject(null);
+                            selectObject(mesh);
 
-                    scene.add(mesh);
-                    outlineScene.add(mesh.outlineMesh);
-                    objects.push(mesh);
+                            scene.add(mesh);
+                            outlineScene.add(mesh.outlineMesh);
+                            objects.push(mesh);
 
-                    render();
-                    doSlicing();
+                            render();
+                            doSlicing();
+                        }
+                        else {
+                            if(result.error === ErrorConstants.NAME_NOT_EXIST) {
+                                AlertActions.showPopupError('duplicateError', lang.slicer.error[result.error]);
+                            }
+                            else {
+                                AlertActions.showPopupError('duplicateError', result.info);
+                            }
+                        }
+                    }).fail((error) => {
+                        processSlicerError(error);
+                    });
                 }
-                else {
-                    if(result.error === ErrorConstants.NAME_NOT_EXIST) {
-                        AlertActions.showPopupError('duplicateError', lang.slicer.error[result.error]);
-                    }
-                    else {
-                        AlertActions.showPopupError('duplicateError', result.info);
-                    }
-                }
-            }).fail((error) => {
-                processSlicerError(error);
-            });
+            },100);
         }
     }
 
