@@ -82,7 +82,9 @@ define([
         },
 
         _getProgress: function() {
-            let { Monitor, Device } = this.context.store.getState()
+            let { Monitor, Device } = this.context.store.getState();
+                lang = this.lang.monitor;
+
             if(Number.isInteger(Monitor.uploadProgress)) {
                 return `${lang.monitor.processing} ${Monitor.uploadProgress}%`;
             }
