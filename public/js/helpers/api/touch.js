@@ -42,7 +42,7 @@ define([
         return {
             connection: ws,
             send: function(uuid, password) {
-                password = password || '';
+                password = password || 'default';
 
                 var args = JSON.stringify({ uuid: uuid, password: password, key: rsaKey(opts.checkPassword) });
 
