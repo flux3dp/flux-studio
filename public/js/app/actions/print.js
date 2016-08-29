@@ -1231,8 +1231,6 @@ define([
                         if(!!report) {
                             if(report.slice_status === 'complete' || report.slice_status === 'error') {
                                 clearInterval(slicingStatus.reporter);
-                                slicingStatus.isComplete = true;
-                                blobExpired = false;
                             }
                             callback(report);
                         }
@@ -1974,7 +1972,7 @@ define([
                 }
             }
             else {
-                getFCode().then(function(blob) {
+                getFCode().then((blob) => {
                     if (blob instanceof Blob) {
                         takeSnapShot().then(() => {
                             ProgressActions.close();
