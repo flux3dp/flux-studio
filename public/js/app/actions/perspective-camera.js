@@ -23,7 +23,7 @@ define([
 
         var aspect = controllerWidth / controllerHeight,
             d = 200;
-        
+
         camera = new THREE.OrthographicCamera(-d * aspect, d * aspect, d, -d, 1, 1000);
         camera.position.set( 0, -300, 110 );
         camera.up = new THREE.Vector3(0, 0, 1);
@@ -39,73 +39,91 @@ define([
             domEvents,
             cube;
 
-        material.front      = new THREE.MeshBasicMaterial({ map: THREE.ImageUtils.loadTexture('img/pc-front.png') });
-        material.back       = new THREE.MeshBasicMaterial({ map: THREE.ImageUtils.loadTexture('img/pc-back.png') });
-        material.left       = new THREE.MeshBasicMaterial({ map: THREE.ImageUtils.loadTexture('img/pc-left.png') });
-        material.right      = new THREE.MeshBasicMaterial({ map: THREE.ImageUtils.loadTexture('img/pc-right.png') });
-        material.bottom     = new THREE.MeshBasicMaterial({ map: THREE.ImageUtils.loadTexture('img/pc-bottom.png') });
-        material.top        = new THREE.MeshBasicMaterial({ map: THREE.ImageUtils.loadTexture('img/pc-top.png') });
-        material.hover      = [
-            new THREE.MeshBasicMaterial({ map: THREE.ImageUtils.loadTexture('img/pc-right-hover.png') }),
-            new THREE.MeshBasicMaterial({ map: THREE.ImageUtils.loadTexture('img/pc-left-hover.png') }),
-            new THREE.MeshBasicMaterial({ map: THREE.ImageUtils.loadTexture('img/pc-back-hover.png') }),
-            new THREE.MeshBasicMaterial({ map: THREE.ImageUtils.loadTexture('img/pc-front-hover.png') }),
-            new THREE.MeshBasicMaterial({ map: THREE.ImageUtils.loadTexture('img/pc-top-hover.png') }),
-            new THREE.MeshBasicMaterial({ map: THREE.ImageUtils.loadTexture('img/pc-bottom-hover.png') })
-        ];
-        meshFaceMaterial    = new THREE.MeshFaceMaterial([material.right, material.left, material.back, material.front, material.top, material.bottom]);
+        let p01 = getMaterialFromImage('img/pc-front.png'),
+            p02 = getMaterialFromImage('img/pc-back.png'),
+            p03 = getMaterialFromImage('img/pc-left.png'),
+            p04 = getMaterialFromImage('img/pc-right.png'),
+            p05 = getMaterialFromImage('img/pc-bottom.png'),
+            p06 = getMaterialFromImage('img/pc-top.png'),
 
-        cube = new THREE.Mesh(geometry, meshFaceMaterial);
-        scene.add(cube);
+            p07 = getMaterialFromImage('img/pc-right-hover.png'),
+            p08 = getMaterialFromImage('img/pc-left-hover.png'),
+            p09 = getMaterialFromImage('img/pc-back-hover.png'),
+            p10 = getMaterialFromImage('img/pc-front-hover.png'),
+            p11 = getMaterialFromImage('img/pc-top-hover.png'),
+            p12 = getMaterialFromImage('img/pc-bottom-hover.png');
 
-        THREE.DefaultLoadingManager.onLoad = function () {
+        $.when(p01, p02, p03, p04, p05, p06, p07, p08, p09, p10, p11, p12)
+        .done((front, back, left, right, bottom, top, frontOn, backOn, leftOn, rightOn, bottomOn, topOn) => {
+            buildCube({
+                front, back, left, right, bottom, top,
+                frontOn, backOn, leftOn, rightOn, bottomOn, topOn
+            });
+        });
+
+
+        const buildCube = (m) => {
+            material.front = m.front;
+            material.back = m.back;
+            material.left = m.left;
+            material.right = m.right;
+            material.bottom = m.bottom;
+            material.top = m.top;
+            material.hover = [m.frontOn, m.backOn, m.leftOn, m.rightOn, m.bottomOn, m.topOn];
+            meshFaceMaterial    = new THREE.MeshFaceMaterial([material.right, material.left, material.back, material.front, material.top, material.bottom]);
+
+            cube = new THREE.Mesh(geometry, meshFaceMaterial);
+            scene.add(cube);
+
+            THREE.DefaultLoadingManager.onLoad = function () {
+                render();
+            };
+
+            scene.add(new THREE.AmbientLight(0x777777));
+            _addShadowedLight(1, 1, 1, 0xffffff, 1.35);
+            _addShadowedLight(0.5, 1, -1, 0xffaa00, 1);
+            _addShadowedLight(-1, -1, -1, 0xffffff, 1.35);
+            _addShadowedLight(-0.5, -1, 1, 0xffaa00, 1);
+
+            // renderer
+            renderer = new THREE.WebGLRenderer({
+                preserveDrawingBuffer: true,
+                alpha: true
+            });
+            renderer.setClearColor(0x000000, 0);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.setSize(controllerWidth, controllerHeight);
+            renderer.sortObjects = false;
+            container.appendChild(renderer.domElement);
+
+            domEvents = new THREEx.DomEvents(camera, renderer.domElement);
+
+            orbitControl = new THREE.OrbitControls(camera, renderer.domElement);
+            orbitControl.maxPolarAngle = Math.PI / 4 * 3;
+            orbitControl.maxDistance = 300;
+            orbitControl.noKeys = true;
+            orbitControl.noZoom = true;
+            orbitControl.noPan = true;
+            orbitControl.addEventListener('change', updateMainOrbitControl);
+
+            var resetMeshMaterial = function() {
+                cube.material.materials = [material.right, material.left, material.back, material.front, material.top, material.bottom];
+            };
+
+            domEvents.addEventListener(cube, 'mousemove', function(event) {
+                var faceIndex = event.intersect.face.materialIndex;
+                resetMeshMaterial();
+                cube.material.materials[faceIndex] = material.hover[faceIndex];
+                render();
+            });
+
+            domEvents.addEventListener(cube, 'mouseout', function() {
+                resetMeshMaterial();
+                render();
+            });
+
             render();
         };
-
-        scene.add(new THREE.AmbientLight(0x777777));
-        _addShadowedLight(1, 1, 1, 0xffffff, 1.35);
-        _addShadowedLight(0.5, 1, -1, 0xffaa00, 1);
-        _addShadowedLight(-1, -1, -1, 0xffffff, 1.35);
-        _addShadowedLight(-0.5, -1, 1, 0xffaa00, 1);
-
-        // renderer
-        renderer = new THREE.WebGLRenderer({
-            preserveDrawingBuffer: true,
-            alpha: true
-        });
-        renderer.setClearColor(0x000000, 0);
-        renderer.setPixelRatio(window.devicePixelRatio);
-        renderer.setSize(controllerWidth, controllerHeight);
-        renderer.sortObjects = false;
-        container.appendChild(renderer.domElement);
-
-        domEvents = new THREEx.DomEvents(camera, renderer.domElement);
-
-        orbitControl = new THREE.OrbitControls(camera, renderer.domElement);
-        orbitControl.maxPolarAngle = Math.PI / 4 * 3;
-        orbitControl.maxDistance = 300;
-        orbitControl.noKeys = true;
-        orbitControl.noZoom = true;
-        orbitControl.noPan = true;
-        orbitControl.addEventListener('change', updateMainOrbitControl);
-
-        var resetMeshMaterial = function() {
-            cube.material.materials = [material.right, material.left, material.back, material.front, material.top, material.bottom];
-        };
-
-        domEvents.addEventListener(cube, 'mousemove', function(event) {
-            var faceIndex = event.intersect.face.materialIndex;
-            resetMeshMaterial();
-            cube.material.materials[faceIndex] = material.hover[faceIndex];
-            render();
-        });
-
-        domEvents.addEventListener(cube, 'mouseout', function() {
-            resetMeshMaterial();
-            render();
-        });
-
-        render();
     }
 
     function setCameraPosition(refCamera) {
@@ -131,21 +149,23 @@ define([
         directionalLight.castShadow = true;
 
         var d = 1;
-        directionalLight.shadowCameraLeft = -d;
-        directionalLight.shadowCameraRight = d;
-        directionalLight.shadowCameraTop = d;
-        directionalLight.shadowCameraBottom = -d;
+        directionalLight.shadow.camera.left = -d;
+        directionalLight.shadow.camera.right = d;
+        directionalLight.shadow.camera.top = d;
+        directionalLight.shadow.camera.bottom = -d;
 
-        directionalLight.shadowCameraNear = 1;
-        directionalLight.shadowCameraFar = 4;
+        directionalLight.shadow.camera.near = 1;
+        directionalLight.shadow.camera.far = 4;
 
-        directionalLight.shadowMapWidth = 1024;
-        directionalLight.shadowMapHeight = 1024;
+        directionalLight.shadow.mapSize.width = 1024;
+        directionalLight.shadow.mapSize.height = 1024;
 
-        directionalLight.shadowBias = -0.005;
-        directionalLight.shadowDarkness = 0.15;
+        directionalLight.shadow.bias = -0.005;
+        // directionalLight.shadowDarkness = 0.15;
 
-        directionalLight.shadowCameraVisible = true;
+        // directionalLight.shadowCameraVisible = true;
+        directionalLight.castShadow = true;
+        scene.add(new THREE.CameraHelper(directionalLight.shadow.camera));
     }
 
     function updateMainOrbitControl(e) {
@@ -159,7 +179,18 @@ define([
     }
 
     function render() {
-        renderer.render(scene, camera);
+        if(renderer) {
+            renderer.render(scene, camera);
+        }
+    }
+
+    function getMaterialFromImage(url) {
+        let d = $.Deferred();
+        let loader = new THREE.TextureLoader();
+        loader.load(url, (texture) => {
+            d.resolve(new THREE.MeshBasicMaterial({ map: texture }));
+        });
+        return d.promise();
     }
 
     return {
