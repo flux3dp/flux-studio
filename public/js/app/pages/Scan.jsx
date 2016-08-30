@@ -24,6 +24,7 @@ define([
     'helpers/nwjs/menu-factory',
     'helpers/point-cloud',
     'Rx',
+    'helpers/duration-formatter',
     // non-return
     'helpers/array-findindex',
     'helpers/object-assign',
@@ -53,7 +54,8 @@ define([
     dndHandler,
     menuFactory,
     PointCloudHelper,
-    Rx
+    Rx,
+    FormatDuration
 ) {
     'use strict';
 
@@ -537,13 +539,13 @@ define([
                         left_step = (scan_speed - currentSteps),
                         progressRemainingTime,
                         progressPercentage,
-                        elapsedTime = ((new Date()).getTime() - self.state.scanStartTime) / 1000,
                         meshes = self.state.meshes,
                         mesh = mesh || self._getMesh(self.state.scanTimes),
                         model,
                         transformMethods;
 
-                    progressRemainingTime = parseInt((elapsedTime / currentSteps), 10) * left_step;
+                    console.log(left_step, FormatDuration(left_step));
+                    progressRemainingTime = FormatDuration(left_step);
 
                     progressPercentage = Math.min(
                         round(currentSteps / scan_speed * 100, -2),
@@ -850,7 +852,7 @@ define([
                     });
 
                     self.setState({
-                        progressRemainingTime: self.AVERAGE_STEP_TIME * self._getScanSpeed(),
+                        // progressRemainingTime: self.AVERAGE_STEP_TIME * self._getScanSpeed(),
                         scanStartTime: (new Date()).getTime(),
                         scanTimes: self.state.scanTimes + 1,
                         isScanStarted: true,
