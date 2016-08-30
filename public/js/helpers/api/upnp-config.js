@@ -175,7 +175,7 @@ define([
                 return $deferred.promise();
             },
 
-            setWifiNetwork: function(wifi, password) {
+            setWifiNetwork: function(wifi, password, hiddenSSID) {
                 var $deferred = $.Deferred(),
                     wifiConfig = {
                         wifi_mode: 'client',
@@ -195,6 +195,9 @@ define([
                     break;
                 }
 
+                if(hiddenSSID) {
+                    wifiConfig.scan_ssid = '1';
+                }
                 comamnd.push(JSON.stringify(wifiConfig));
 
                 genericSender(comamnd.join(' '), function(response) {

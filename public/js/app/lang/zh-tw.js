@@ -147,7 +147,9 @@ define(function() {
                 ap_mode_pass_format: '請至少輸入 8 個字',
                 ap_mode_name_placeholder: '最多 32 個字',
                 ap_mode_pass_placeholder: '至少 8 個字',
-                create_network: '建立網路'
+                create_network: '建立網路',
+                join_network: '加入網路',
+                security: '安全層級'
             },
 
             setting_completed: {

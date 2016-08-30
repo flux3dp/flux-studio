@@ -119,7 +119,7 @@ define(function() {
             require_device_name: 'Name is required',
             select_language: 'Select Language',
             change_password: {
-                content: 'Are you sure about changing the password?',
+                content: 'Are you sure to change the password?',
                 caption: 'Changing password'
             },
             connect_flux: 'Connect FLUX Delta',
@@ -147,7 +147,9 @@ define(function() {
                 ap_mode_pass_format: 'At least 8 characters',
                 ap_mode_name_placeholder: 'Up to 32 characters.',
                 ap_mode_pass_placeholder: 'Must have at least 8 characters.',
-                create_network: 'Create Network'
+                create_network: 'Create Network',
+                join_network: 'Join Network',
+                security: 'Security'
             },
 
             setting_completed: {
