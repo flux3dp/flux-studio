@@ -14,6 +14,7 @@ define([
     'app/actions/global-actions',
     'app/constants/global-constants',
     'app/actions/alert-actions',
+    'app/stores/alert-store',
     'app/actions/progress-actions',
     'app/constants/progress-constants',
     'app/actions/input-lightbox-actions',
@@ -34,6 +35,7 @@ define([
     GlobalActions,
     GlobalConstants,
     AlertActions,
+    AlertStore,
     ProgressActions,
     ProgressConstants,
     InputLightboxActions,
@@ -56,7 +58,7 @@ define([
                     ProgressActions.open(ProgressConstants.NONSTOP);
 
                     if ('toolhead' === type) {
-                        DeviceMaster.headinfo().done(function(response) {
+                        DeviceMaster.headInfo().done(function(response) {
                             currentPrinter.toolhead_version = response.version || '';
 
                             if ('undefined' === typeof response.version) {
@@ -113,10 +115,44 @@ define([
                         });
                     };
 
-                    checkDeviceStatus(currentPrinter).done(function(status) {
-                        goCheckStatus();
-                    });
+                    let informHeadMissing = false;
 
+                    const detect = () => {
+                        DeviceMaster.detectHead().then(() => {
+                            checkDeviceStatus(currentPrinter).done(() => {
+                                goCheckStatus();
+                            });
+                        }).fail((error = {}) => {
+                            if(!error.module) {
+                                AlertActions.showPopupRetry('head-missing', lang.update.toolhead.waiting);
+                            }
+                        });
+                    };
+
+                    const handleYes = (id) => {
+                        if(id === 'head-missing') {
+                            detect();
+                        }
+                    };
+
+                    const handleCancel = (id) => {
+                        if(id === 'head-missing') {
+                            AlertStore.removeYesListener(handleYes);
+                            AlertStore.removeCancelListener(handleCancel);
+                            DeviceMaster.endMaintainMode();
+                        }
+                    };
+
+                    AlertStore.onRetry(handleYes);
+                    AlertStore.onCancel(handleCancel);
+
+                    ProgressActions.open(ProgressConstants.NONSTOP);
+                    DeviceMaster.enterMaintainMode().then(() => {
+                        setTimeout(() => {
+                            ProgressActions.close();
+                            detect();
+                        }, 3000);
+                    });
                 };
 
             DeviceMaster.selectDevice(printer).then(function(status) {

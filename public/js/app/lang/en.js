@@ -41,7 +41,8 @@ define(function() {
                 confirm: 'UPLOAD',
                 upload_file: 'Firmware upload (*.bin)',
                 update_success: 'Toolhead Firmware update successfully uploaded',
-                update_fail: 'Update Fail'
+                update_fail: 'Update Fail',
+                waiting: 'Please connect the toolhead'
             },
             updating: 'Updating...',
             skip: 'Skip This Version',

@@ -302,8 +302,27 @@ define([
             d.reject(error);
         });
 
-        // SocketMaster.addTask('changeFilament', type)
         return d.promise();
+    }
+
+    function detectHead() {
+        let d = $.Deferred();
+
+        SocketMaster.addTask('getHeadInfo').then((response) => {
+            response.module ? d.resolve() : d.reject(response);
+        }).fail(() => {
+            d.reject();
+        });
+
+        return d.promise();
+    }
+
+    function enterMaintainMode() {
+        return SocketMaster.addTask('enterMaintainMode');
+    }
+
+    function endMaintainMode() {
+        return SocketMaster.addTask('endMaintainMode');
     }
 
     function reconnect() {
@@ -368,8 +387,8 @@ define([
         return SocketMaster.addTask('toolheadUpdate', file);
     }
 
-    function headinfo() {
-        return SocketMaster.addTask('headinfo');
+    function headInfo() {
+        return SocketMaster.addTask('getHeadInfo');
     }
 
     function closeConnection() {
@@ -515,10 +534,7 @@ define([
                 else {
                     _d.reject(response);
                 }
-            }).then(() => {
-                return SocketMaster.addTask('getHeadInfo');
-            })
-            .then((response) => {
+            }).then((response) => {
                 !response.module ? _d.reject(response) : _d.resolve();
             }).fail((error) => {
                 _d.reject(error);
@@ -666,11 +682,14 @@ define([
             this.getFirstDevice         = getFirstDevice;
             this.updateFirmware         = updateFirmware;
             this.updateToolhead         = updateToolhead;
-            this.headinfo               = headinfo;
+            this.headInfo               = headInfo;
             this.closeConnection        = closeConnection;
             this.streamCamera           = streamCamera;
             this.stopStreamCamera       = stopStreamCamera;
             this.calibrate              = calibrate;
+            this.detectHead             = detectHead;
+            this.enterMaintainMode      = enterMaintainMode;
+            this.endMaintainMode        = endMaintainMode;
 
             Discover(
                 'device-master',

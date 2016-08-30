@@ -74,7 +74,7 @@ define([
             });
 
             return _ws;
-        }
+        };
 
         // id is int
         const createDedicatedWs = (id) => {
@@ -497,58 +497,6 @@ define([
                     case 'update_hbfw':
                         response.percentage = (response.written || 0) / blob.size * 100;
                         d.notify(response);
-                        break;
-                    default:
-                        d.reject(response);
-                    }
-                };
-
-                events.onError = (response) => { d.reject(response); };
-                events.onFatal = (response) => { d.reject(response); };
-
-                ws.send(args.join(' '));
-                return d.promise();
-            },
-
-            /**
-             * fetch toolhead info
-             *
-             * @return Promise
-             */
-            headinfo: () => {
-                let d = $.Deferred(),
-                    args = [
-                        'task',
-                        'maintain'
-                    ],
-                    tryLimit = 4,
-                    sendHeadInfoCommand = () => {
-                        args = [
-                            'maintain',
-                            'headinfo'
-                        ];
-
-                        // MAGIC delay
-                        setTimeout(
-                            () => { tryLimit -= 1; ws.send(args.join(' ')); },
-                            4000
-                        );
-                    };
-
-                events.onMessage = (response) => {
-                    switch (response.status) {
-                    case 'ok':
-                        if ('maintain' === response.task) {
-                            sendHeadInfoCommand();
-                        }
-                        else {
-                            if (0 < tryLimit && 'N/A' === (response.head_module || 'N/A')) {
-                                sendHeadInfoCommand();
-                            }
-                            else {
-                                d.resolve(response);
-                            }
-                        }
                         break;
                     default:
                         d.reject(response);

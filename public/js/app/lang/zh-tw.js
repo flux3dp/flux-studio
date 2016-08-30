@@ -41,7 +41,8 @@ define(function() {
                 confirm: '上傳',
                 upload_file: '韌體上傳',
                 update_success: '韌體更新上傳成功',
-                update_fail: '更新失敗'
+                update_fail: '更新失敗',
+                waiting: '請確認已裝置工具頭'
             },
             updating: '更新中...',
             skip: '跳過此版本',
