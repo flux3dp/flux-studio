@@ -4090,7 +4090,12 @@ input[type=range]:focus::-webkit-slider-runnable-track {
                 .flux-monitor .sub .wrapper .row div {
                     display: inline-block; }
                 .flux-monitor .sub .wrapper .row .right {
-                    float: right; }
+                    float: right;
+                    text-align: right; }
+            .flux-monitor .sub .wrapper .temperature {
+                float: left;
+                width: 50%;
+                height: 20px; }
         .flux-monitor .sub .actions {
             position: absolute;
             text-align: center;

@@ -269,7 +269,13 @@
                 }
                 .right {
                     float: right;
+                    text-align: right;
                 }
+            }
+            .temperature {
+                float: left;
+                width: 50%;
+                height: 20px;
             }
         }
         .actions {
