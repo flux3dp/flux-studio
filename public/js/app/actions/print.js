@@ -365,6 +365,7 @@ define([
                 reactSrc.setState({
                     hasObject: true
                 });
+                addHistory('ADD', mesh);
 
                 setDefaultFileName();
                 render();
@@ -1605,44 +1606,80 @@ define([
         }
     }
 
-    function removeSelected() {
+    function removeSelected(addToHistory = true) {
         if (SELECTED && Object.keys(SELECTED).length > 0) {
-            slicer.delete(SELECTED.uuid).then((result) => {
+            if(addToHistory) {
+                addHistory('DELETE', SELECTED);
+            }
 
-                let index = objects.indexOf(SELECTED);
+            let index = objects.indexOf(SELECTED);
 
-                scene.remove(SELECTED.outlineMesh);
-                scene.remove(SELECTED);
-                outlineScene.remove(SELECTED.outlineMesh);
-                if (index > -1) {
-                    objects.splice(index, 1);
-                }
+            scene.remove(SELECTED.outlineMesh);
+            scene.remove(SELECTED);
+            outlineScene.remove(SELECTED.outlineMesh);
+            if (index > -1) {
+                objects.splice(index, 1);
+            }
 
-                transformControl.detach(SELECTED);
-                selectObject(null);
+            transformControl.detach(SELECTED);
+            selectObject(null);
 
-                setDefaultFileName();
-                render();
-                if(objects.length === 0) {
-                    clearTimeout(slicingTimmer);
-                    registerDragToImport();
-                    reactSrc.setState({
-                        openImportWindow: true,
-                        hasObject: false
-                    }, function() {
-                        setImportWindowPosition();
-                    });
-                }
-                else {
-                    doSlicing();
-                }
+            setDefaultFileName();
+            render();
+            if(objects.length === 0) {
+                clearTimeout(slicingTimmer);
+                registerDragToImport();
+                reactSrc.setState({
+                    openImportWindow: true,
+                    hasObject: false
+                }, function() {
+                    setImportWindowPosition();
+                });
+            }
+            else {
+                doSlicing();
+            }
 
-                _clearPath();
+            _clearPath();
 
-            }).fail((error) => {
-                processSlicerError(error);
-                return;
-            });
+
+
+            // slicer.delete(SELECTED.uuid).then((result) => {
+            //
+            //     let index = objects.indexOf(SELECTED);
+            //
+            //     scene.remove(SELECTED.outlineMesh);
+            //     scene.remove(SELECTED);
+            //     outlineScene.remove(SELECTED.outlineMesh);
+            //     if (index > -1) {
+            //         objects.splice(index, 1);
+            //     }
+            //
+            //     transformControl.detach(SELECTED);
+            //     selectObject(null);
+            //
+            //     setDefaultFileName();
+            //     render();
+            //     if(objects.length === 0) {
+            //         clearTimeout(slicingTimmer);
+            //         registerDragToImport();
+            //         reactSrc.setState({
+            //             openImportWindow: true,
+            //             hasObject: false
+            //         }, function() {
+            //             setImportWindowPosition();
+            //         });
+            //     }
+            //     else {
+            //         doSlicing();
+            //     }
+            //
+            //     _clearPath();
+            //
+            // }).fail((error) => {
+            //     processSlicerError(error);
+            //     return;
+            // });
         }
     }
 
@@ -2475,14 +2512,21 @@ define([
         }
     }
 
-    function addHistory() {
+    function addHistory(cmd, obj) {
         if(SELECTED) {
-            var entry = { size: {}, rotation: {}, position: {}, scale: {} };
-            entry.uuid = SELECTED.uuid;
-            Object.assign(entry.position, SELECTED.position);
-            Object.assign(entry.size, SELECTED.size);
-            Object.assign(entry.rotation, SELECTED.rotation);
-            Object.assign(entry.scale, SELECTED.scale);
+            let entry = { size: {}, rotation: {}, position: {}, scale: {} };
+
+            if(cmd === 'DELETE' || cmd === 'ADD') {
+                entry.cmd = cmd;
+                entry.src = obj;
+            }
+            else {
+                entry.uuid = SELECTED.uuid;
+                Object.assign(entry.position, SELECTED.position);
+                Object.assign(entry.size, SELECTED.size);
+                Object.assign(entry.rotation, SELECTED.rotation);
+                Object.assign(entry.scale, SELECTED.scale);
+            }
             history.push(entry);
         }
     }
@@ -2490,13 +2534,28 @@ define([
     function undo() {
         if(history.length > 0) {
             var entry = history.pop();
-            objects.forEach(function(model) {
-                if(model.uuid === entry.uuid) {
-                    _setObject(entry, model);
-                    setObjectDialoguePosition(model);
-                    selectObject(model);
-                }
-            });
+            if(entry.cmd === 'DELETE') {
+                objects.push(entry.src);
+                scene.add(entry.src);
+                scene.add(entry.src.outlineMesh);
+                outlineScene.add(entry.src.outlineMesh);
+                SELECTED = entry.src;
+                selectObject(SELECTED);
+                reactSrc.setState({ hasObject: true });
+            }
+            else if(entry.cmd === 'ADD') {
+                SELECTED = entry.src;
+                removeSelected(false);
+            }
+            else {
+                objects.forEach(function(model) {
+                    if(model.uuid === entry.uuid) {
+                        _setObject(entry, model);
+                        setObjectDialoguePosition(model);
+                        selectObject(model);
+                    }
+                });
+            }
         }
     }
 
