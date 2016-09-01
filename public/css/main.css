@@ -4096,6 +4096,8 @@ input[type=range]:focus::-webkit-slider-runnable-track {
                 float: left;
                 width: 50%;
                 height: 20px; }
+            .flux-monitor .sub .wrapper .time-left {
+                width: 50%; }
         .flux-monitor .sub .actions {
             position: absolute;
             text-align: center;
