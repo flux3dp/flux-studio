@@ -41,7 +41,8 @@ define(function() {
                 confirm: 'UPLOAD',
                 upload_file: 'Firmware upload (*.bin)',
                 update_success: 'Toolhead Firmware update successfully uploaded',
-                update_fail: 'Update Fail'
+                update_fail: 'Update Fail',
+                waiting: 'Please connect the toolhead'
             },
             updating: 'Updating...',
             skip: 'Skip This Version',
@@ -119,7 +120,7 @@ define(function() {
             require_device_name: 'Name is required',
             select_language: 'Select Language',
             change_password: {
-                content: 'Are you sure about changing the password?',
+                content: 'Are you sure to change the password?',
                 caption: 'Changing password'
             },
             connect_flux: 'Connect FLUX Delta',
@@ -147,7 +148,9 @@ define(function() {
                 ap_mode_pass_format: 'At least 8 characters',
                 ap_mode_name_placeholder: 'Up to 32 characters.',
                 ap_mode_pass_placeholder: 'Must have at least 8 characters.',
-                create_network: 'Create Network'
+                create_network: 'Create Network',
+                join_network: 'Join Network',
+                security: 'Security'
             },
 
             setting_completed: {
@@ -1020,7 +1023,8 @@ define(function() {
                 '13': 'Duplication error\nThe selected ID does not exist. If the error is not resolved by restarting FLUX Studio, please report this error.',
                 '14': 'Error occurred whil setting position. The source object is missing in slicer engine.',
                 '15': 'Uploaded file is corrupt, please check the file and try again.'
-            }
+            },
+            pattern_not_supported_at_100_percent_infill: 'Slic3r only supports 100% infill with rectilinear infill pattern'
         },
         calibration: {
             RESOURCE_BUSY: 'Please make sure the machine is in idle status',

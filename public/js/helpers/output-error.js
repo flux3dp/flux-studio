@@ -61,7 +61,13 @@ define([
             }
 
             ghostLogReader().done(function(log) {
-                var header = `OS: ${os.type()}\nARCH: ${os.arch()}\nRELEASE: ${os.release()}\n`;
+                let header = '';
+                if(typeof os === 'undefined') {
+                    header = `FS: ${window.FLUX.version}\nOS: NA\nARCH: NA\nRELEASE: NA\n`;
+                }
+                else {
+                    header = `OS: ${os.type()}\nARCH: ${os.arch()}\nRELEASE: ${os.release()}\n`;
+                }
                 header += `USER-AGENT: ${navigator.userAgent}\n\n`;
 
                 report_blob = new Blob([header, log, report_info], { type : 'text/html' });

@@ -41,7 +41,8 @@ define(function() {
                 confirm: '上傳',
                 upload_file: '韌體上傳',
                 update_success: '韌體更新上傳成功',
-                update_fail: '更新失敗'
+                update_fail: '更新失敗',
+                waiting: '請確認已裝置工具頭'
             },
             updating: '更新中...',
             skip: '跳過此版本',
@@ -147,7 +148,9 @@ define(function() {
                 ap_mode_pass_format: '請至少輸入 8 個字',
                 ap_mode_name_placeholder: '最多 32 個字',
                 ap_mode_pass_placeholder: '至少 8 個字',
-                create_network: '建立網路'
+                create_network: '建立網路',
+                join_network: '加入網路',
+                security: '安全層級'
             },
 
             setting_completed: {
@@ -1045,7 +1048,8 @@ define(function() {
                 '13': '重制錯誤，複製原始ID不存在。請重新啟動程式，\n若此錯誤持續發生，請回報相關錯誤',
                 '14': '無法設定物件位置及相關資訊，原始模型不存在於切片引擎',
                 '15': '上傳檔案內容錯誤，請確認檔案內容後再上傳'
-            }
+            },
+            pattern_not_supported_at_100_percent_infill: 'Slic3r 的 rectilinear 填充圖樣只支援 100% 的填充密度'
         },
         calibration: {
             RESOURCE_BUSY: '請確認機器的狀態是於待命中',

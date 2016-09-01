@@ -59,11 +59,7 @@ define([
             _renderProgress: function() {
                 var self = this,
                     lang = self.props.lang,
-                    estimatedTime = (
-                        self.ESTIMATED_STEP < self.props.currentSteps ?
-                        self._formatSecondToTime(self.props.remainingTime) :
-                        lang.scan.estimating
-                    ),
+                    estimatedTime = self.props.remainingTime,
                     textRemainingTime = (
                         self.ESTIMATED_STEP < self.props.currentSteps ?
                         lang.scan.remaining_time :

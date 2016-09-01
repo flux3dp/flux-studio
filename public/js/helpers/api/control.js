@@ -74,7 +74,7 @@ define([
             });
 
             return _ws;
-        }
+        };
 
         // id is int
         const createDedicatedWs = (id) => {
@@ -243,7 +243,37 @@ define([
                 return d.promise();
             },
 
-            abort: () => { return useDefaultResponse('play abort'); },
+            abort: () => {
+                let d = $.Deferred(),
+                    counter = 0;
+
+                const retryLength = 2000;
+
+                const isIdle = (response) => {
+                    response.device_status = response.device_status || {};
+                    return response.device_status.st_id === 0;
+                };
+
+                const retry = (needsQuit) => {
+                    counter++;
+                    setTimeout(() => {
+                        needsQuit ? ws.send('play abort') : ws.send('play report');
+                    }, retryLength);
+                };
+
+                events.onMessage = (response) => {
+                    if(counter >= 3) {
+                        console.log('tried 3 times');
+                        d.reject(response);
+                    }
+                    isIdle(response) ? d.resolve() : retry(response.status !== 'ok');
+                };
+                events.onError = (response) => { counter >= 3 ? d.reject(response) : retry(); };
+                events.onFatal = (response) => { counter >= 3 ? d.reject(response) : retry(); };
+
+                ws.send('play abort');
+                return d.promise();
+            },
 
             start: () => { return useDefaultResponse('play start'); },
 
@@ -266,14 +296,14 @@ define([
                     return response.device_status.st_id === 0;
                 };
 
-                const retry = () => {
+                const retry = (needsQuit) => {
                     counter++;
                     setTimeout(() => {
-                        ws.send('play report');
+                        needsQuit ? ws.send('play quit') : ws.send('play report');
                     }, retryLength);
                 };
 
-                events.onMessage = (response) => { isIdle(response) ? d.resolve() : retry(); };
+                events.onMessage = (response) => { isIdle(response) ? d.resolve() : retry(response.status !== 'ok'); };
                 events.onError = (response) => { counter >= 3 ? d.reject(response) : retry(); };
                 events.onFatal = (response) => { counter >= 3 ? d.reject(response) : retry(); };
 
@@ -467,58 +497,6 @@ define([
                     case 'update_hbfw':
                         response.percentage = (response.written || 0) / blob.size * 100;
                         d.notify(response);
-                        break;
-                    default:
-                        d.reject(response);
-                    }
-                };
-
-                events.onError = (response) => { d.reject(response); };
-                events.onFatal = (response) => { d.reject(response); };
-
-                ws.send(args.join(' '));
-                return d.promise();
-            },
-
-            /**
-             * fetch toolhead info
-             *
-             * @return Promise
-             */
-            headinfo: () => {
-                let d = $.Deferred(),
-                    args = [
-                        'task',
-                        'maintain'
-                    ],
-                    tryLimit = 4,
-                    sendHeadInfoCommand = () => {
-                        args = [
-                            'maintain',
-                            'headinfo'
-                        ];
-
-                        // MAGIC delay
-                        setTimeout(
-                            () => { tryLimit -= 1; ws.send(args.join(' ')); },
-                            4000
-                        );
-                    };
-
-                events.onMessage = (response) => {
-                    switch (response.status) {
-                    case 'ok':
-                        if ('maintain' === response.task) {
-                            sendHeadInfoCommand();
-                        }
-                        else {
-                            if (0 < tryLimit && 'N/A' === (response.head_module || 'N/A')) {
-                                sendHeadInfoCommand();
-                            }
-                            else {
-                                d.resolve(response);
-                            }
-                        }
                         break;
                     default:
                         d.reject(response);

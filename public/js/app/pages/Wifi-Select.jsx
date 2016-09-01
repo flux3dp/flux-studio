@@ -362,6 +362,24 @@ define([
                 }
             },
 
+            _joinNetwork: function(e) {
+                e.preventDefault();
+
+                var ssid = this.refs.network_name.getDOMNode().value,
+                    wepkey = this.refs.network_password.getDOMNode().value,
+                    security = this.refs.network_security.getDOMNode().value;
+
+                let wifi = { ssid, security };
+
+                globalWifiAPI.setWifiNetwork(wifi, wepkey, true).then((result) => {
+                    if(result.status === 'ok') {
+                        location.hash = '#initialize/wifi/notice-from-device';
+                    }
+                }).fail((error) => {
+                    console.log(error);
+                });
+            },
+
             _renderPasswordForm: function(lang) {
                 var self = this,
                     settingWifi = initializeMachine.settingWifi.get(),
@@ -417,7 +435,8 @@ define([
                 var self = this,
                     closeForm = function(e) {
                         self.setState({
-                            openApModeForm: false
+                            openApModeForm: false,
+                            openJoinNetworkForm: false
                         });
                     },
                     classSet = React.addons.classSet,
@@ -484,6 +503,75 @@ define([
                 );
             },
 
+            _renderJoinNetworkForm: function(lang) {
+                var self = this,
+                    closeForm = function(e) {
+                        self.setState({
+                            openJoinNetworkForm: false
+                        });
+                    },
+                    classSet = React.addons.classSet,
+                    nameClass = classSet({
+                        'error': false === self.state.apModeNameIsVaild
+                    }),
+                    passClass = classSet({
+                        'error': false === self.state.apModePassIsVaild
+                    }),
+                    submitButtonClass = classSet({
+                        'btn btn-action btn-large': true,
+                        'btn-disabled': self.state.isFormSubmitted
+                    }),
+                    content = (
+                        <form className="form form-ap-mode">
+                            <h2>{lang.initialize.set_machine_generic.join_network}</h2>
+                            <label className="h-control">
+                                <span className="header">
+                                    {lang.initialize.set_machine_generic.ap_mode_name}
+                                </span>
+                                <input
+                                    ref="network_name"
+                                    type="text"
+                                    className={nameClass}
+                                    autoFocus={true}
+                                    required={true}
+                                    pattern="^[a-zA-Z0-9]+$"
+                                    maxLength="32"
+                                />
+                            </label>
+                            <label className="h-control">
+                                <span className="header">
+                                    {lang.initialize.set_machine_generic.ap_mode_pass}
+                                </span>
+                                <input
+                                    ref="network_password"
+                                    type="password"
+                                    className={passClass}
+                                    required={true}
+                                    pattern="^[a-zA-Z0-9]{8,}$"
+                                />
+                            </label>
+                            <label className="h-control">
+                                <span className="header">
+                                    {lang.initialize.set_machine_generic.security}
+                                </span>
+                                <select ref="network_security" className="security">
+                                    <option value="NONE">NONE</option>
+                                    <option value="WEP">WEP</option>
+                                    <option value="WPA2-PSK">WPA2-PSK</option>
+                                </select>
+                            </label>
+                            <div className="button-group btn-v-group">
+                                <button className="btn btn-action btn-large" type="submit" onClick={this._joinNetwork}>{lang.initialize.confirm}</button>
+                                <button className="btn btn-action btn-large btn-link" onClick={closeForm}>{lang.initialize.cancel}</button>
+                            </div>
+                        </form>
+                    );
+
+                return (
+                    this.state.openJoinNetworkForm ? <Modal content={content}/> : ''
+                );
+            },
+
             _renderWifiItem: function(wifi) {
                 var settingWifi = initializeMachine.settingWifi.get(),
                     lockClassName = 'fa ' + (true === wifi.password ? 'fa-lock' : ''),
@@ -546,6 +634,19 @@ define([
                         }
                     },
                     {
+                        label: lang.initialize.set_machine_generic.join_network,
+                        className: 'btn-action btn-large btn-set-station-mode',
+                        dataAttrs: {
+                            'ga-event': 'set-as-station-mode'
+                        },
+                        onClick: function(e) {
+                            self.setState({
+                                openJoinNetworkForm: true,
+                                isFormSubmitted: false
+                            });
+                        }
+                    },
+                    {
                         label: lang.initialize.skip,
                         className: 'btn-link btn-large',
                         type: 'link',
@@ -556,6 +657,7 @@ define([
                     }],
                     passwordForm = this._renderPasswordForm(lang),
                     apModeForm = this._renderApModeForm(lang),
+                    joinNetworkForm = this._renderJoinNetworkForm(lang),
                     content = (
                         <div className="select-wifi text-center">
                             <img className="brand-image" src="/img/menu/main_logo.svg"/>
@@ -567,6 +669,7 @@ define([
                             </div>
                             {passwordForm}
                             {apModeForm}
+                            {joinNetworkForm}
                         </div>
                     );
 

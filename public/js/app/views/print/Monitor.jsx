@@ -152,8 +152,6 @@ define([
                 }
             });
 
-            console.log(this.unsubscribeDeleteKey);
-
             this._startReport();
         },
 
@@ -622,6 +620,13 @@ define([
 
                 // always process as error, hard fix for backend
                 error = (error instanceof Array ? error : [error]);
+
+                if(showingPopup) {
+                    if(error.length === 0) {
+                        showingPopup = false;
+                        AlertActions.closePopup();
+                    }
+                }
 
                 // only display error during these state
                 if(state.indexOf(report.st_id) >= 0) {

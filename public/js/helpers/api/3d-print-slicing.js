@@ -74,7 +74,7 @@ define([
                             step++;
                             currentProgress = parseInt((step - step % (total/nth)) / total * 100);
                             if(currentProgress !== progress) {
-                                progress = currentProgress
+                                progress = currentProgress;
                                 d.notify(step++, total, progress);
                             }
 
@@ -111,7 +111,7 @@ define([
 
                 events.onFatal = (error) => {
                     d.reject(error);
-                }
+                };
 
                 ext = ext === 'obj' ? ' ' + ext : '';
                 ws.send('upload ' + name + ' ' + file.size + ext);
