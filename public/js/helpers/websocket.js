@@ -105,9 +105,11 @@ define([
 
                     switch (data.status) {
                     case 'error':
+                        Raven.captureException(data);
                         socketOptions.onError(data);
                         break;
                     case 'fatal':
+                        Raven.captureException(data);
                         socketOptions.onFatal(data);
                         break;
                     // ignore below status

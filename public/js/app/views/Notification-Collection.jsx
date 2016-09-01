@@ -192,6 +192,9 @@ define([
                 );
 
                 AlertStore.onYes(self._onYes);
+
+                // add information for Raven, to be removed when root.js is implemented
+                Raven.setUserContext({ extra: { version: window.FLUX.version } });
             },
 
             componentWillUnmount: function() {
