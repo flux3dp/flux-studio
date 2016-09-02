@@ -609,6 +609,10 @@ define([
                 if(this._isAbortedOrCompleted() && openedFrom !== GlobalConstants.DEVICE_LIST) {
                     DeviceMaster.quit();
                 }
+                if(showingPopup) {
+                    showingPopup = false;
+                    AlertActions.closePopup();
+                }
             }
             else {
                 let { error } = report;
@@ -668,8 +672,7 @@ define([
                     }
                 }
 
-                // auto clear abort and complete when not opened from device-list
-                if(openedFrom !== GlobalConstants.DEVICE_LIST && this._isAbortedOrCompleted()) {
+                if(this._isAbortedOrCompleted()) {
                     DeviceMaster.quit();
                 }
             }
