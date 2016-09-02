@@ -411,7 +411,7 @@ define([
                 let d = $.Deferred();
                 SocketMaster.addTask('report').then((result) => {
                     // force update st_label for a backend inconsistancy
-                    let s = result.device_status
+                    let s = result.device_status;
                     if(s.st_id === DeviceConstants.status.ABORTED) {
                         s.st_label = 'ABORTED';
                     }

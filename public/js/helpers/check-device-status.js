@@ -25,36 +25,34 @@ define([
     return function(printer) {
         var deferred = $.Deferred(),
             onYes = function(id) {
-                var timer,
-                    _deferred = $.Deferred();
+                var timer;
 
                 DeviceMaster.selectDevice(printer).then(function() {
                     switch (id) {
                     case 'kick':
-                        DeviceMaster.kick().done(function() {
+                        DeviceMaster.kick().then(function() {
                             deferred.resolve('ok');
                         });
                         break;
                     case 'abort':
-                        DeviceMaster.stop().done(function() {
+                        DeviceMaster.stop().then(function() {
                             timer = setInterval(function() {
-                                DeviceMaster.getReport().done(function(report) {
-                                    _deferred.notify(report);
+                                DeviceMaster.getReport().then(function(report) {
+                                    if (report.st_id === DeviceConstants.status.ABORTED) {
+                                        setTimeout(function() {
+                                            DeviceMaster.quit().then(function() {
+                                                deferred.resolve('ok');
+                                            });
+                                        }, 500);
+
+                                        clearInterval(timer);
+                                    }
+                                    else if(report.st_id === DeviceConstants.status.IDLE) {
+                                        clearInterval(timer);
+                                        deferred.resolve('ok');
+                                    }
                                 });
                             }, 100);
-
-                            _deferred.progress(function(report) {
-                                if (report.st_id === DeviceConstants.status.ABORTED) {
-                                    setTimeout(function() {
-                                        DeviceMaster.quit().done(function() {
-                                            deferred.resolve('ok');
-                                            _deferred.resolve('ok');
-                                        });
-                                    }, 500);
-
-                                    clearInterval(timer);
-                                }
-                            });
                         });
                         break;
                     }
