@@ -267,7 +267,7 @@ define([
 
             // FILE PREVIEW mode
             else if (Monitor.mode === GlobalConstants.FILE_PREVIEW) {
-                leftButtonOn = false;
+                leftButtonOn = true;
                 middleButtonOn = true;
             }
 

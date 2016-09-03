@@ -550,26 +550,16 @@ define([
                 AlertActions.showPopupYesNo('KICK', lang.monitor.forceStop);
             }
             else {
+                let { Monitor } = store.getState();
                 if(this._isAbortedOrCompleted()) {
                     DeviceMaster.quit();
                     store.dispatch(MonitorActionCreator.showWait());
                 }
                 else {
-                    DeviceMaster.stop();
-                }
-
-                this._isAbortedOrCompleted() ? DeviceMaster.quit() : DeviceMaster.stop();
-                let { Monitor } = store.getState();
-                if(openedFrom === GlobalConstants.DEVICE_LIST) {
-                    if(this._isAbortedOrCompleted()) {
-                        this._dispatchFolderContent('');
-                    }
-                }
-                else if(!Monitor.selectedItem.name !== '' && typeof Monitor.selectedItem.name !== 'undefined') {
-                    store.dispatch(MonitorActionCreator.changeMode(GlobalConstants.FILE_PREVIEW));
-                }
-                else {
-                    store.dispatch(MonitorActionCreator.changeMode(GlobalConstants.PREVIEW));
+                    DeviceMaster.stop().always(() => {
+                        let mode = Monitor.selectedFileInfo.length > 0 ? GlobalConstants.FILE_PREVIEW : GlobalConstants.PREVIEW;
+                        store.dispatch(MonitorActionCreator.changeMode(mode));
+                    });
                 }
             }
         },

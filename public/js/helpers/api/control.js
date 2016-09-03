@@ -249,9 +249,9 @@ define([
 
                 const retryLength = 2000;
 
-                const isIdle = (response) => {
+                const isAborted = (response) => {
                     response.device_status = response.device_status || {};
-                    return response.device_status.st_id === 0;
+                    return response.device_status.st_id === 128;
                 };
 
                 const retry = (needsQuit) => {
@@ -266,7 +266,7 @@ define([
                         console.log('tried 3 times');
                         d.reject(response);
                     }
-                    isIdle(response) ? d.resolve() : retry(response.status !== 'ok');
+                    isAborted(response) ? d.resolve() : retry(response.status !== 'ok');
                 };
                 events.onError = (response) => { counter >= 3 ? d.reject(response) : retry(); };
                 events.onFatal = (response) => { counter >= 3 ? d.reject(response) : retry(); };
@@ -303,7 +303,7 @@ define([
                     }, retryLength);
                 };
 
-                events.onMessage = (response) => { isIdle(response) ? d.resolve() : retry(response.status !== 'ok'); };
+                events.onMessage = (response) => { isIdle(response) ? d.resolve() : retry(response.status !== 'ok') };
                 events.onError = (response) => { counter >= 3 ? d.reject(response) : retry(); };
                 events.onFatal = (response) => { counter >= 3 ? d.reject(response) : retry(); };
 
