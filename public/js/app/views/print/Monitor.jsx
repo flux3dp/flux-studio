@@ -421,6 +421,7 @@ define([
                 }));
             }
             else {
+                this._addHistory();
                 let { Monitor } = store.getState();
                 start = 0;
                 currentDirectoryContent.files.length = 0; // clear folder content
@@ -436,7 +437,6 @@ define([
                         this._generatePreview([info[2]]);
                     }
                     store.dispatch(MonitorActionCreator.previewFile(info));
-                    this._addHistory();
                     this.forceUpdate();
                 });
             }
