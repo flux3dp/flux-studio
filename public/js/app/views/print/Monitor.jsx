@@ -649,6 +649,9 @@ define([
                             }
                         }
                     }
+                    else {
+                        errorMessage = '';
+                    }
 
                     errorMessage = errorMessage || '';
 
