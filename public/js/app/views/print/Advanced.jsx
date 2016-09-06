@@ -360,7 +360,6 @@ define([
                 AlertActions.showPopupError('', this.props.lang.slicer.pattern_not_supported_at_100_percent_infill);
             }
             let { engine, fill_density, fill_pattern } = advancedSetting;
-            console.log(fill_density, fill_pattern);
 
             if(id === 'engine') {
                 fill_pattern = value === 'slic3r' ? 'rectilinear' : 'AUTOMATIC';

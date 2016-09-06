@@ -373,7 +373,8 @@ define([
                 config.timeout -= 500;
                 getDeviceByNameAsync(name, config);
             },500);
-        }else{
+        }
+        else{
             config.onTimeout();
         }
     }
