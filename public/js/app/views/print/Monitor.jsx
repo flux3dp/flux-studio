@@ -109,7 +109,14 @@ define([
             onClose             : React.PropTypes.func
         },
 
-        getInitialState: function() {
+        componentWillMount: function() {
+            lang        = this.props.lang;
+            previewUrl  = this.props.previewUrl;
+            statusId    = DeviceConstants.status.IDLE;
+
+            socketStatus.ready = true;
+            socketStatus.cancel = false;
+
             let _mode = mode.PREVIEW;
             openedFrom = this.props.opener || GlobalConstants.DEVICE_LIST;
             if(openedFrom === GlobalConstants.DEVICE_LIST) {
@@ -124,17 +131,6 @@ define([
 
             store = Redux.createStore(MainReducer);
             store.dispatch(MonitorActionCreator.changeMode(_mode));
-
-            return {};
-        },
-
-        componentWillMount: function() {
-            lang        = this.props.lang;
-            previewUrl  = this.props.previewUrl;
-            statusId    = DeviceConstants.status.IDLE;
-
-            socketStatus.ready = true;
-            socketStatus.cancel = false;
 
             this._preFetchInfo();
         },
@@ -156,7 +152,7 @@ define([
         },
 
         shouldComponentUpdate: function(nextProps, nextState) {
-            return JSON.stringify(this.state) !== JSON.stringify(nextState);
+            return false;
         },
 
         componentWillUnmount: function() {
@@ -164,7 +160,10 @@ define([
             AlertStore.removeCancelListener(this._handleCancel);
             AlertStore.removeYesListener(this._handleYes);
 
-            if(this.state.mode === mode.CAMERA) { this._stopCamera(); }
+            let { Monitor } = store.getState();
+            if(Monitor.mode === GlobalConstants.CAMERA) {
+                this._stopCamera();
+            }
             _history = [];
             messageViewed = false;
 

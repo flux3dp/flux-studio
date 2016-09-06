@@ -134,7 +134,7 @@ define([
 
             events.onError = (response) => { d.reject(response); };
             events.onFatal = (response) => { d.reject(response); };
-        }
+        };
 
         ws = createWs();
 
