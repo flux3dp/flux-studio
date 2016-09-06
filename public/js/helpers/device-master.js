@@ -88,7 +88,6 @@ define([
             };
 
         ProgressActions.open(ProgressConstants.NONSTOP);
-
         if(_existConnection(uuid)) {
             _device = _switchDevice(uuid);
             d.resolve(DeviceConstants.CONNECTED);
@@ -149,9 +148,9 @@ define([
                     }
                 }
             });
-
-            SocketMaster.setWebSocket(_device.actions);
         }
+
+        SocketMaster.setWebSocket(_device.actions);
 
         return d.always(() => {
             ProgressActions.close();
