@@ -76,6 +76,10 @@ define([
                     previewUrl = this.props.previewUrl;
                 }
             }
+
+            if(!previewUrl) {
+                return '';
+            }
             return `url(${previewUrl})`;
         },
 
