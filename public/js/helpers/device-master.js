@@ -535,7 +535,7 @@ define([
                     _d.reject(response);
                 }
             }).then((response) => {
-                !response.module ? _d.reject(response) : _d.resolve();
+                response.status === 'ok' ? _d.resolve() : _d.reject();
             }).fail((error) => {
                 _d.reject(error);
             });

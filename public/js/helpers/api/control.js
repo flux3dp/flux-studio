@@ -369,7 +369,12 @@ define([
 
                 events.onMessage = (response) => {
                     if(response.status === 'ok') {
-                        d.resolve(response);
+                        if(response.data.length > 1) {
+                            ws.send(`maintain zprobe`);
+                        }
+                        else {
+                            d.resolve(response);
+                        }
                     }
                 };
 
