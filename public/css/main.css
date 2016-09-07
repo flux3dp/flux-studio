@@ -3315,10 +3315,15 @@ input[type=range]:focus::-webkit-slider-runnable-track {
     margin: auto;
     width: 4rem; }
 
+.modal-progress-nonstop .modal-body {
+    width: 130px;
+    height: 120px; }
+
 .modal-progress-nonstop .modal-alert {
     height: 8rem;
     min-height: 8rem;
-    width: 8rem; }
+    width: 100%;
+    height: 100%; }
 
 .modal-progress-nonstop-with-message .spinner-roller {
     height: 4rem;
