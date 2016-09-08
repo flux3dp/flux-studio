@@ -365,19 +365,13 @@ define([
             },
 
             calibrate: () => {
-                let d = $.Deferred();
-                    errCount = 0;
+                let d = $.Deferred(),
+                    errorCount = 0;
+
                 events.onMessage = (response) => {
-                    if(response.status === 'error') {
-                        if(errCount === 0 && response.error[0] === 'HEAD_ERROR') {
-                            setTimeout(() => {
-                                ws.send('maintain calibrating');
-                            }, 500);
-                        }
-                    }
-                    else if(response.status === 'ok') {
+                    if(response.status === 'ok') {
                         if(response.data.length > 1) {
-                            ws.send('maintain zprobe');
+                            ws.send(`maintain zprobe`);
                         }
                         else {
                             d.resolve(response);
@@ -385,10 +379,22 @@ define([
                     }
                 };
 
-                events.onError = (response) => { d.reject(response); };
+                events.onError = (response) => {
+                    if(response.status === 'error') {
+                        if(errorCount === 0 && response.error[0] === 'HEAD_ERROR') {
+                            setTimeout(() => {
+                                errorCount++;
+                                ws.send('maintain calibrating');
+                            }, 500);
+                        }
+                    }
+                    else {
+                        d.reject(response);
+                    }
+                };
                 events.onFatal = (response) => { d.resolve(response); };
 
-                ws.send('maintain calibrating');
+                ws.send(`maintain calibrating`);
                 return d.promise();
             },
 
