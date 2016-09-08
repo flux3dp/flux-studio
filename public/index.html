@@ -38,7 +38,7 @@
         window.FLUX = {
             debug: -1 !== location.search.indexOf('debug'),
             version: "{Version}",
-            timestamp: dev ? '' : (new Date()).getTime(),
+            timestamp: (new Date()).getTime(),
             onLine: navigator.onLine,
             os: ('undefined' === typeof nw ? undefined : os),
             ghostPort: location.port || 8000,
