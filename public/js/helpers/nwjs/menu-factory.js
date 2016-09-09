@@ -391,7 +391,11 @@ define([
                         if (status === DeviceConstants.CONNECTED) {
                             checkDeviceStatus(currentPrinter).then(() => {
                                 ProgressActions.open(ProgressConstants.WAITING, lang.device.calibrating, lang.device.pleaseWait, false);
-                                DeviceMaster.calibrate().always(() => {
+                                DeviceMaster.calibrate().done(() => {
+                                    setTimeout(() => {
+                                        AlertActions.showPopupInfo('calibrated', lang.calibration.calibrated);
+                                    }, 100);
+                                }).always(() => {
                                     ProgressActions.close();
                                 });
                             });

@@ -1053,7 +1053,8 @@ define(function() {
         },
         calibration: {
             RESOURCE_BUSY: '請確認機器的狀態是於待命中',
-            headMissing: '無法取得工具頭資訊，請確認工具頭是否連接於機器'
+            headMissing: '無法取得工具頭資訊，請確認工具頭是否連接於機器',
+            calibrated: '機器已校正'
         }
     };
 });
