@@ -260,6 +260,7 @@ define([
         _doFileUpload: function(file) {
             let reader = new FileReader();
 
+            store.dispatch(MonitorActionCreator.setUploadProgress(0));
             reader.readAsArrayBuffer(file);
             reader.onload = () => {
                 let fileInfo = file.name.split('.'),
