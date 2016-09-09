@@ -61,8 +61,13 @@ define([
                     events.onError(response);
                 },
                 onFatal: (response) => {
-                    clearTimeout(timmer);
-                    events.onError(response);
+                    if(response.error === 'REMOTE_IDENTIFY_ERROR') {
+                        createWs();
+                    }
+                    else {
+                        clearTimeout(timmer);
+                        events.onError(response);
+                    }
                 },
                 onClose: (response) => {
                     isConnected = false;
