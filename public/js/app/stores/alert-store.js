@@ -124,7 +124,7 @@ define([
                 action = {
 
                 'SHOW_INFO': function() {
-                    AlertStore.emit(NOTIFY_EVENT, AlertConstants.INFO, payload.message);
+                    AlertStore.emit(NOTIFY_EVENT, AlertConstants.INFO, payload.message, payload.callback);
                 },
 
                 'SHOW_WARNING': function() {
