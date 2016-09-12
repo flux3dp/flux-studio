@@ -8,6 +8,9 @@
 </head>
 
 <body>
+    <script src="https://cdn.ravenjs.com/3.6.1/raven.min.js"></script>
+    <script src="/js/lib/three/three.min.js"></script>
+    <script src='https://www.google-analytics.com/analytics.js'></script>
     <div class="wrapper">
         <section class="top-menu"></section>
         <section class="tour-overlay"></section>
@@ -20,13 +23,13 @@
 <script>
     (function() {
         var script = document.createElement('script'),
-            analytics = document.createElement('script'),
             cssLink = document.createElement('link'),
             head = document.querySelector('head'),
             body = document.querySelector('body'),
+            dev = Boolean(localStorage['dev']),
             getStarted = function(ghostPort) {
                 script.setAttribute('src', 'js/require.js');
-                script.dataset.main = 'js/main.js?v=' + window.FLUX.timestamp;
+                script.dataset.main = 'js/main.js?v=' + (dev ? '' : window.FLUX.timestamp);
                 body.appendChild(script);
             },
             timer;
@@ -41,6 +44,11 @@
             ghostPort: location.port || 8000,
             isNW: ('undefined' !== typeof nw)
         };
+
+        // google analytics
+        window.GA=window.GA||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+        ga('create', 'UA-40862421-6', 'auto');
+        ga('send', 'pageview');
 
         // it's not node-webkit
         if ('undefined' === typeof nw) {
@@ -68,18 +76,19 @@
                     }
                 }
             }, 100);
+
+            if(!window.FLUX.debug) {
+                Raven.config('http://17dabb846f4743288d575b76dc5aaae8@sentry.io/95257');
+                Raven.debug = false;
+                try { Raven.setRelease("{Version}"); } catch (e) { }
+                Raven.install();
+            }
         }
 
         cssLink.setAttribute('rel', 'stylesheet');
         cssLink.setAttribute('href', 'css/main.css?v=' + window.FLUX.timestamp);
         head.appendChild(cssLink);
         head.appendChild(cssLink);
-
-        if (true === window.FLUX.onLine) {
-            analytics.setAttribute('src', 'https://www.google-analytics.com/analytics.js');
-            analytics.setAttribute('async', true);
-            body.appendChild(analytics);
-        }
     })();
 </script>
 

@@ -53,7 +53,11 @@ define([
         },
 
         _getStatus: function() {
-            let { Device } = this.context.store.getState();
+            let { Monitor, Device } = this.context.store.getState();
+
+            if(Boolean(Monitor.uploadProgress)) {
+                return this.lang.device.uploading;
+            }
             if(Device.status.st_label) {
                 let { displayStatus } = MonitorStatus[Device.status.st_label]();
                 return displayStatus;

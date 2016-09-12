@@ -352,14 +352,29 @@ define([
                 }
             }
 
-            if(id === 'engine') {
-                advancedSetting.fill_pattern = value === 'slic3r' ? 'rectilinear' : 'AUTOMATIC';
-            }
-
-            let { engine, fill_density, fill_pattern } = advancedSetting;
-            if(engine === 'slic3r' && fill_density === '100' && fill_pattern !== 'rectilinear') {
+            const setFillPatternToRectilinear = () => {
+                advancedSetting.fill_pattern = 'rectilinear';
+                this.removeInfillSection = true;
+                this.forceUpdate();
+                setTimeout(() => { this.forceUpdate(); }, 10);
                 AlertActions.showPopupError('', this.props.lang.slicer.pattern_not_supported_at_100_percent_infill);
             }
+            let { engine, fill_density, fill_pattern } = advancedSetting;
+
+            if(id === 'engine') {
+                fill_pattern = value === 'slic3r' ? 'rectilinear' : 'AUTOMATIC';
+            }
+            else if(id === 'fill_pattern' && value !== 'rectilinear') {
+                if(engine === 'slic3r' && fill_density === '100') {
+                    setFillPatternToRectilinear();
+                }
+            }
+            else if(id === 'fill_density' && value === '100') {
+                if(engine === 'slic3r' && fill_pattern !== 'rectilinear') {
+                    setFillPatternToRectilinear();
+                }
+            }
+
 
             this._updateCustomField();
         },
@@ -544,6 +559,10 @@ define([
         },
 
         _renderInfillSection: function() {
+            if(this.removeInfillSection) {
+                this.removeInfillSection = false;
+                return <div></div>;
+            }
             var infillPattern;
             if(advancedSetting.engine === 'cura') {
                 infillPattern = curaInfill;

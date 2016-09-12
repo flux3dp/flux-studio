@@ -13,9 +13,9 @@ define([
 
     return {
 
-        showInfo: function(message) {
+        showInfo: function(message, callback) {
             AlertDispatcher.dispatch({
-                actionType: AlertConstants.SHOW_INFO, message
+                actionType: AlertConstants.SHOW_INFO, message, callback
             });
         },
 

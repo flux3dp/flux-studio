@@ -50,7 +50,9 @@ define([
             onSubmit = function(files, e) {
                 var file = files.item(0),
                     onFinishUpdate = function(isSuccess, response) {
-                        DeviceMaster.quitTask();
+                        if(type === 'toolhead') {
+                            DeviceMaster.quitTask();
+                        }
 
                         if (true === isSuccess) {
                             AlertActions.showPopupInfo(

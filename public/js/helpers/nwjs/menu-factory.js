@@ -106,7 +106,9 @@ define([
                     });
                 },
                 checkStatus = function() {
-                    var goCheckStatus = function() {
+                    let informHeadMissing = false;
+
+                    const processUpdate = () => {
                         checkToolheadFirmware().always(function() {
                             ProgressActions.close();
                             updateFirmware();
@@ -115,23 +117,9 @@ define([
                         });
                     };
 
-                    let informHeadMissing = false;
-
-                    const detect = () => {
-                        DeviceMaster.detectHead().then(() => {
-                            checkDeviceStatus(currentPrinter).done(() => {
-                                goCheckStatus();
-                            });
-                        }).fail((error = {}) => {
-                            if(!error.module) {
-                                AlertActions.showPopupRetry('head-missing', lang.update.toolhead.waiting);
-                            }
-                        });
-                    };
-
                     const handleYes = (id) => {
                         if(id === 'head-missing') {
-                            detect();
+                            processUpdate();
                         }
                     };
 
@@ -147,12 +135,17 @@ define([
                     AlertStore.onCancel(handleCancel);
 
                     ProgressActions.open(ProgressConstants.NONSTOP);
-                    DeviceMaster.enterMaintainMode().then(() => {
-                        setTimeout(() => {
-                            ProgressActions.close();
-                            detect();
-                        }, 3000);
-                    });
+                    if(type === 'toolhead') {
+                        DeviceMaster.enterMaintainMode().then(() => {
+                            setTimeout(() => {
+                                ProgressActions.close();
+                                processUpdate();
+                            }, 3000);
+                        });
+                    }
+                    else {
+                        processUpdate();
+                    }
                 };
 
             DeviceMaster.selectDevice(printer).then(function(status) {
@@ -398,7 +391,11 @@ define([
                         if (status === DeviceConstants.CONNECTED) {
                             checkDeviceStatus(currentPrinter).then(() => {
                                 ProgressActions.open(ProgressConstants.WAITING, lang.device.calibrating, lang.device.pleaseWait, false);
-                                DeviceMaster.calibrate().always(() => {
+                                DeviceMaster.calibrate().done(() => {
+                                    setTimeout(() => {
+                                        AlertActions.showPopupInfo('calibrated', lang.calibration.calibrated);
+                                    }, 100);
+                                }).always(() => {
                                     ProgressActions.close();
                                 });
                             });

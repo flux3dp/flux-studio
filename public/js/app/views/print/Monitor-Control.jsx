@@ -241,6 +241,11 @@ define([
                 else {
                     middleButtonOn = true;
                 }
+
+                if(this.props.source === GlobalConstants.DEVICE_LIST && statusId === DeviceConstants.status.IDLE) {
+                    leftButtonOn = false;
+                    middleButtonOn = false;
+                }
             }
 
             // PREVIEW mode
@@ -267,7 +272,7 @@ define([
 
             // FILE PREVIEW mode
             else if (Monitor.mode === GlobalConstants.FILE_PREVIEW) {
-                leftButtonOn = false;
+                leftButtonOn = true;
                 middleButtonOn = true;
             }
 

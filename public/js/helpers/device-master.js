@@ -88,7 +88,6 @@ define([
             };
 
         ProgressActions.open(ProgressConstants.NONSTOP);
-
         if(_existConnection(uuid)) {
             _device = _switchDevice(uuid);
             d.resolve(DeviceConstants.CONNECTED);
@@ -149,9 +148,9 @@ define([
                     }
                 }
             });
-
-            SocketMaster.setWebSocket(_device.actions);
         }
+
+        SocketMaster.setWebSocket(_device.actions);
 
         return d.always(() => {
             ProgressActions.close();
@@ -374,7 +373,8 @@ define([
                 config.timeout -= 500;
                 getDeviceByNameAsync(name, config);
             },500);
-        }else{
+        }
+        else{
             config.onTimeout();
         }
     }
@@ -411,7 +411,7 @@ define([
                 let d = $.Deferred();
                 SocketMaster.addTask('report').then((result) => {
                     // force update st_label for a backend inconsistancy
-                    let s = result.device_status
+                    let s = result.device_status;
                     if(s.st_id === DeviceConstants.status.ABORTED) {
                         s.st_label = 'ABORTED';
                     }
@@ -535,7 +535,7 @@ define([
                     _d.reject(response);
                 }
             }).then((response) => {
-                !response.module ? _d.reject(response) : _d.resolve();
+                response.status === 'ok' ? _d.resolve() : _d.reject();
             }).fail((error) => {
                 _d.reject(error);
             });

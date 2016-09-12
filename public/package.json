@@ -7,7 +7,7 @@
     "inject_js_start": "nw-inject-start.js",
     "window": {
         "title": "FLUX Studio - {Version}",
-        "icon": "icon.icns",
+        "icon": "icon.png",
         "frame": true,
         "width": 1280,
         "height": 640,
