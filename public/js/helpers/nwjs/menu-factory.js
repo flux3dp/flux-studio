@@ -14,6 +14,7 @@ define([
     'app/actions/global-actions',
     'app/constants/global-constants',
     'app/actions/alert-actions',
+    'app/stores/alert-store',
     'app/actions/progress-actions',
     'app/constants/progress-constants',
     'app/actions/input-lightbox-actions',
@@ -34,6 +35,7 @@ define([
     GlobalActions,
     GlobalConstants,
     AlertActions,
+    AlertStore,
     ProgressActions,
     ProgressConstants,
     InputLightboxActions,
@@ -56,7 +58,7 @@ define([
                     ProgressActions.open(ProgressConstants.NONSTOP);
 
                     if ('toolhead' === type) {
-                        DeviceMaster.headinfo().done(function(response) {
+                        DeviceMaster.headInfo().done(function(response) {
                             currentPrinter.toolhead_version = response.version || '';
 
                             if ('undefined' === typeof response.version) {
@@ -104,7 +106,9 @@ define([
                     });
                 },
                 checkStatus = function() {
-                    var goCheckStatus = function() {
+                    let informHeadMissing = false;
+
+                    const processUpdate = () => {
                         checkToolheadFirmware().always(function() {
                             ProgressActions.close();
                             updateFirmware();
@@ -113,10 +117,35 @@ define([
                         });
                     };
 
-                    checkDeviceStatus(currentPrinter).done(function(status) {
-                        goCheckStatus();
-                    });
+                    const handleYes = (id) => {
+                        if(id === 'head-missing') {
+                            processUpdate();
+                        }
+                    };
 
+                    const handleCancel = (id) => {
+                        if(id === 'head-missing') {
+                            AlertStore.removeYesListener(handleYes);
+                            AlertStore.removeCancelListener(handleCancel);
+                            DeviceMaster.endMaintainMode();
+                        }
+                    };
+
+                    AlertStore.onRetry(handleYes);
+                    AlertStore.onCancel(handleCancel);
+
+                    ProgressActions.open(ProgressConstants.NONSTOP);
+                    if(type === 'toolhead') {
+                        DeviceMaster.enterMaintainMode().then(() => {
+                            setTimeout(() => {
+                                ProgressActions.close();
+                                processUpdate();
+                            }, 3000);
+                        });
+                    }
+                    else {
+                        processUpdate();
+                    }
                 };
 
             DeviceMaster.selectDevice(printer).then(function(status) {
@@ -362,7 +391,11 @@ define([
                         if (status === DeviceConstants.CONNECTED) {
                             checkDeviceStatus(currentPrinter).then(() => {
                                 ProgressActions.open(ProgressConstants.WAITING, lang.device.calibrating, lang.device.pleaseWait, false);
-                                DeviceMaster.calibrate().always(() => {
+                                DeviceMaster.calibrate().done(() => {
+                                    setTimeout(() => {
+                                        AlertActions.showPopupInfo('calibrated', lang.calibration.calibrated);
+                                    }, 100);
+                                }).always(() => {
                                     ProgressActions.close();
                                 });
                             });
@@ -414,15 +447,9 @@ define([
                         }
                     });
 
-                    targetPrinter.subItems[4].checked = this.checked;
-
-                    if (false === this.checked) {
-                        initializeMachine.defaultPrinter.clear();
-                    }
-                    else {
-                        initializeMachine.defaultPrinter.set(printer);
-                    }
-
+                    initializeMachine.defaultPrinter.clear();
+                    targetPrinter.subItems[6].checked = true;
+                    initializeMachine.defaultPrinter.set(printer);
                     methods.refresh();
                 },
                 parent: menuMap.parentIndex.DEVICE,

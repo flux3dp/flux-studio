@@ -105,9 +105,11 @@ define([
 
                     switch (data.status) {
                     case 'error':
+                        Raven.captureException(data);
                         socketOptions.onError(data);
                         break;
                     case 'fatal':
+                        Raven.captureException(data);
                         socketOptions.onFatal(data);
                         break;
                     // ignore below status
@@ -202,8 +204,7 @@ define([
 
         setInterval(function() {
             if (null !== ws && readyState.OPEN === ws.readyState) {
-                wsLog.log.push(['>', 'ping'].join(' '));
-                ws.send('ping');
+                sender('ping');
             }
         }, 60000);
 
@@ -226,7 +227,7 @@ define([
                     if (null === ws || readyState.OPEN !== ws.readyState) {
                         ws.onopen = function(e) {
                             socketOptions.onOpen(e);
-                            ws.send(data);
+                            sender(data);
                         };
                     }
                     else {

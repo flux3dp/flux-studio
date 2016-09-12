@@ -9,6 +9,7 @@ define([
     'app/actions/input-lightbox-actions',
     'plugins/classnames/index',
     'helpers/api/config',
+    'app/actions/alert-actions',
     'app/default-print-settings',
     'helpers/object-assign'
 ], function(
@@ -22,6 +23,7 @@ define([
     InputLightboxActions,
     ClassNames,
     Config,
+    AlertActions,
     DefaultPrintSettings
 ) {
     'use strict';
@@ -349,6 +351,31 @@ define([
                     advancedSetting[id] = value;
                 }
             }
+
+            const setFillPatternToRectilinear = () => {
+                advancedSetting.fill_pattern = 'rectilinear';
+                this.removeInfillSection = true;
+                this.forceUpdate();
+                setTimeout(() => { this.forceUpdate(); }, 10);
+                AlertActions.showPopupError('', this.props.lang.slicer.pattern_not_supported_at_100_percent_infill);
+            }
+            let { engine, fill_density, fill_pattern } = advancedSetting;
+
+            if(id === 'engine') {
+                fill_pattern = value === 'slic3r' ? 'rectilinear' : 'AUTOMATIC';
+            }
+            else if(id === 'fill_pattern' && value !== 'rectilinear') {
+                if(engine === 'slic3r' && fill_density === '100') {
+                    setFillPatternToRectilinear();
+                }
+            }
+            else if(id === 'fill_density' && value === '100') {
+                if(engine === 'slic3r' && fill_pattern !== 'rectilinear') {
+                    setFillPatternToRectilinear();
+                }
+            }
+
+
             this._updateCustomField();
         },
 
@@ -532,6 +559,10 @@ define([
         },
 
         _renderInfillSection: function() {
+            if(this.removeInfillSection) {
+                this.removeInfillSection = false;
+                return <div></div>;
+            }
             var infillPattern;
             if(advancedSetting.engine === 'cura') {
                 infillPattern = curaInfill;
@@ -564,17 +595,6 @@ define([
                             onChange={this._handleControlValueChange} />
 
                     </div>
-
-                    {/*<div className="section">
-                        <div className="title">{lang.blackMagic}</div>
-
-                        <SwitchControl
-                            id="spiral_vase"
-                            label={lang.spiral}
-                            default={advancedSetting.spiral_vase === 1}
-                            onChange={this._handleControlValueChange} />
-
-                    </div>*/}
 
                 </div>
             );

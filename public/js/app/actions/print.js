@@ -365,6 +365,7 @@ define([
                 reactSrc.setState({
                     hasObject: true
                 });
+                addHistory('ADD', mesh);
 
                 setDefaultFileName();
                 render();
@@ -709,7 +710,7 @@ define([
         if(report.slice_status === 'error') {
             clearInterval(slicingStatus.reporter);
 
-            slicingStatus.lastReport.info = lang.slicer.error[report.error];
+            slicingStatus.lastReport.info = lang.slicer.error[report.error] || report.info;
             slicingStatus.lastReport.caption = lang.alert.error;
             slicingStatus.hasError = true;
 
@@ -1229,10 +1230,8 @@ define([
                         slicingStatus.canInterrupt = true;
                         slicingStatus.pauseReport = false;
                         if(!!report) {
-                            if(report.slice_status === 'complete') {
+                            if(report.slice_status === 'complete' || report.slice_status === 'error') {
                                 clearInterval(slicingStatus.reporter);
-                                slicingStatus.isComplete = true;
-                                blobExpired = false;
                             }
                             callback(report);
                         }
@@ -1607,44 +1606,80 @@ define([
         }
     }
 
-    function removeSelected() {
+    function removeSelected(addToHistory = true) {
         if (SELECTED && Object.keys(SELECTED).length > 0) {
-            slicer.delete(SELECTED.uuid).then((result) => {
+            if(addToHistory) {
+                addHistory('DELETE', SELECTED);
+            }
 
-                let index = objects.indexOf(SELECTED);
+            let index = objects.indexOf(SELECTED);
 
-                scene.remove(SELECTED.outlineMesh);
-                scene.remove(SELECTED);
-                outlineScene.remove(SELECTED.outlineMesh);
-                if (index > -1) {
-                    objects.splice(index, 1);
-                }
+            scene.remove(SELECTED.outlineMesh);
+            scene.remove(SELECTED);
+            outlineScene.remove(SELECTED.outlineMesh);
+            if (index > -1) {
+                objects.splice(index, 1);
+            }
 
-                transformControl.detach(SELECTED);
-                selectObject(null);
+            transformControl.detach(SELECTED);
+            selectObject(null);
 
-                setDefaultFileName();
-                render();
-                if(objects.length === 0) {
-                    clearTimeout(slicingTimmer);
-                    registerDragToImport();
-                    reactSrc.setState({
-                        openImportWindow: true,
-                        hasObject: false
-                    }, function() {
-                        setImportWindowPosition();
-                    });
-                }
-                else {
-                    doSlicing();
-                }
+            setDefaultFileName();
+            render();
+            if(objects.length === 0) {
+                clearTimeout(slicingTimmer);
+                registerDragToImport();
+                reactSrc.setState({
+                    openImportWindow: true,
+                    hasObject: false
+                }, function() {
+                    setImportWindowPosition();
+                });
+            }
+            else {
+                doSlicing();
+            }
 
-                _clearPath();
+            _clearPath();
 
-            }).fail((error) => {
-                processSlicerError(error);
-                return;
-            });
+
+
+            // slicer.delete(SELECTED.uuid).then((result) => {
+            //
+            //     let index = objects.indexOf(SELECTED);
+            //
+            //     scene.remove(SELECTED.outlineMesh);
+            //     scene.remove(SELECTED);
+            //     outlineScene.remove(SELECTED.outlineMesh);
+            //     if (index > -1) {
+            //         objects.splice(index, 1);
+            //     }
+            //
+            //     transformControl.detach(SELECTED);
+            //     selectObject(null);
+            //
+            //     setDefaultFileName();
+            //     render();
+            //     if(objects.length === 0) {
+            //         clearTimeout(slicingTimmer);
+            //         registerDragToImport();
+            //         reactSrc.setState({
+            //             openImportWindow: true,
+            //             hasObject: false
+            //         }, function() {
+            //             setImportWindowPosition();
+            //         });
+            //     }
+            //     else {
+            //         doSlicing();
+            //     }
+            //
+            //     _clearPath();
+            //
+            // }).fail((error) => {
+            //     processSlicerError(error);
+            //     return;
+            // });
         }
     }
 
@@ -1653,45 +1688,47 @@ define([
             var mesh = new THREE.Mesh(SELECTED.geometry, SELECTED.material);
             mesh.up = new THREE.Vector3(0, 0, 1);
 
-            slicer.duplicate(SELECTED.uuid, mesh.uuid).then(function(result) {
-                if(result.status.toUpperCase() === DeviceConstants.OK) {
-                    Object.assign(mesh.scale, SELECTED.scale);
-                    mesh.rotation.enteredX = SELECTED.rotation.enteredX;
-                    mesh.rotation.enteredY = SELECTED.rotation.enteredY;
-                    mesh.rotation.enteredZ = SELECTED.rotation.enteredZ;
-                    mesh.rotation.x = SELECTED.rotation.x;
-                    mesh.rotation.y = SELECTED.rotation.y;
-                    mesh.rotation.z = SELECTED.rotation.z;
-                    mesh.rotation.order = 'ZYX';
+            stopSlicing().then(() => {
+                slicer.duplicate(SELECTED.uuid, mesh.uuid).then(function(result) {
+                    if(result.status.toUpperCase() === DeviceConstants.OK) {
+                        Object.assign(mesh.scale, SELECTED.scale);
+                        mesh.rotation.enteredX = SELECTED.rotation.enteredX;
+                        mesh.rotation.enteredY = SELECTED.rotation.enteredY;
+                        mesh.rotation.enteredZ = SELECTED.rotation.enteredZ;
+                        mesh.rotation.x = SELECTED.rotation.x;
+                        mesh.rotation.y = SELECTED.rotation.y;
+                        mesh.rotation.z = SELECTED.rotation.z;
+                        mesh.rotation.order = 'ZYX';
 
-                    mesh.name = 'custom';
-                    mesh.plane_boundary = planeBoundary(mesh);
+                        mesh.name = 'custom';
+                        mesh.plane_boundary = planeBoundary(mesh);
 
-                    autoArrange(mesh);
-                    addSizeProperty(mesh);
-                    groundIt(mesh);
-                    createOutline(mesh);
+                        autoArrange(mesh);
+                        addSizeProperty(mesh);
+                        groundIt(mesh);
+                        createOutline(mesh);
 
-                    selectObject(null);
-                    selectObject(mesh);
+                        selectObject(null);
+                        selectObject(mesh);
 
-                    scene.add(mesh);
-                    outlineScene.add(mesh.outlineMesh);
-                    objects.push(mesh);
+                        scene.add(mesh);
+                        outlineScene.add(mesh.outlineMesh);
+                        objects.push(mesh);
 
-                    render();
-                    doSlicing();
-                }
-                else {
-                    if(result.error === ErrorConstants.NAME_NOT_EXIST) {
-                        AlertActions.showPopupError('duplicateError', lang.slicer.error[result.error]);
+                        render();
+                        doSlicing();
                     }
                     else {
-                        AlertActions.showPopupError('duplicateError', result.info);
+                        if(result.error === ErrorConstants.NAME_NOT_EXIST) {
+                            AlertActions.showPopupError('duplicateError', lang.slicer.error[result.error]);
+                        }
+                        else {
+                            AlertActions.showPopupError('duplicateError', result.info);
+                        }
                     }
-                }
-            }).fail((error) => {
-                processSlicerError(error);
+                }).fail((error) => {
+                    processSlicerError(error);
+                });
             });
         }
     }
@@ -1969,7 +2006,7 @@ define([
                 }
             }
             else {
-                getFCode().then(function(blob) {
+                getFCode().then((blob) => {
                     if (blob instanceof Blob) {
                         takeSnapShot().then(() => {
                             ProgressActions.close();
@@ -2275,9 +2312,10 @@ define([
     function stopSlicing() {
         var d = $.Deferred();
         clearInterval(slicingStatus.reporter);
+        slicingStatus.inProgress = false;
+        slicingStatus.canInterrupt = true;
         if(slicingStatus.inProgress) {
             slicer.stopSlicing().then(function() {
-                slicingStatus.inProgress = false;
                 slicingStatusStream.onNext(slicingStatus);
                 d.resolve('');
             });
@@ -2474,14 +2512,21 @@ define([
         }
     }
 
-    function addHistory() {
+    function addHistory(cmd, obj) {
         if(SELECTED) {
-            var entry = { size: {}, rotation: {}, position: {}, scale: {} };
-            entry.uuid = SELECTED.uuid;
-            Object.assign(entry.position, SELECTED.position);
-            Object.assign(entry.size, SELECTED.size);
-            Object.assign(entry.rotation, SELECTED.rotation);
-            Object.assign(entry.scale, SELECTED.scale);
+            let entry = { size: {}, rotation: {}, position: {}, scale: {} };
+
+            if(cmd === 'DELETE' || cmd === 'ADD') {
+                entry.cmd = cmd;
+                entry.src = obj;
+            }
+            else {
+                entry.uuid = SELECTED.uuid;
+                Object.assign(entry.position, SELECTED.position);
+                Object.assign(entry.size, SELECTED.size);
+                Object.assign(entry.rotation, SELECTED.rotation);
+                Object.assign(entry.scale, SELECTED.scale);
+            }
             history.push(entry);
         }
     }
@@ -2489,13 +2534,28 @@ define([
     function undo() {
         if(history.length > 0) {
             var entry = history.pop();
-            objects.forEach(function(model) {
-                if(model.uuid === entry.uuid) {
-                    _setObject(entry, model);
-                    setObjectDialoguePosition(model);
-                    selectObject(model);
-                }
-            });
+            if(entry.cmd === 'DELETE') {
+                objects.push(entry.src);
+                scene.add(entry.src);
+                scene.add(entry.src.outlineMesh);
+                outlineScene.add(entry.src.outlineMesh);
+                SELECTED = entry.src;
+                selectObject(SELECTED);
+                reactSrc.setState({ hasObject: true });
+            }
+            else if(entry.cmd === 'ADD') {
+                SELECTED = entry.src;
+                removeSelected(false);
+            }
+            else {
+                objects.forEach(function(model) {
+                    if(model.uuid === entry.uuid) {
+                        _setObject(entry, model);
+                        setObjectDialoguePosition(model);
+                        selectObject(model);
+                    }
+                });
+            }
         }
     }
 

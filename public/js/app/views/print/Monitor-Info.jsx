@@ -53,7 +53,11 @@ define([
         },
 
         _getStatus: function() {
-            let { Device } = this.context.store.getState();
+            let { Monitor, Device } = this.context.store.getState();
+
+            if(Boolean(Monitor.uploadProgress)) {
+                return this.lang.device.uploading;
+            }
             if(Device.status.st_label) {
                 let { displayStatus } = MonitorStatus[Device.status.st_label]();
                 return displayStatus;
@@ -82,13 +86,15 @@ define([
         },
 
         _getProgress: function() {
-            let { Monitor, Device } = this.context.store.getState()
+            let { Monitor, Device } = this.context.store.getState(),
+                lang = this.lang.monitor;
+
             if(Number.isInteger(Monitor.uploadProgress)) {
-                return `${lang.monitor.processing} ${Monitor.uploadProgress}%`;
+                return `${lang.processing} ${Monitor.uploadProgress}%`;
             }
 
             if(Monitor.downloadProgress.size !== '') {
-                return `${lang.monitor.processing} ${parseInt((Monitor.downloadProgress.size - Monitor.downloadProgress.left) / Monitor.downloadProgress.size * 100)}%`;
+                return `${lang.processing} ${parseInt((Monitor.downloadProgress.size - Monitor.downloadProgress.left) / Monitor.downloadProgress.size * 100)}%`;
             }
 
             let o = findObjectContainsProperty(Device.jobInfo, 'TIME_COST');

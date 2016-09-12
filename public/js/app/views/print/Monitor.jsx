@@ -109,7 +109,14 @@ define([
             onClose             : React.PropTypes.func
         },
 
-        getInitialState: function() {
+        componentWillMount: function() {
+            lang        = this.props.lang;
+            previewUrl  = this.props.previewUrl;
+            statusId    = DeviceConstants.status.IDLE;
+
+            socketStatus.ready = true;
+            socketStatus.cancel = false;
+
             let _mode = mode.PREVIEW;
             openedFrom = this.props.opener || GlobalConstants.DEVICE_LIST;
             if(openedFrom === GlobalConstants.DEVICE_LIST) {
@@ -124,17 +131,6 @@ define([
 
             store = Redux.createStore(MainReducer);
             store.dispatch(MonitorActionCreator.changeMode(_mode));
-
-            return {};
-        },
-
-        componentWillMount: function() {
-            lang        = this.props.lang;
-            previewUrl  = this.props.previewUrl;
-            statusId    = DeviceConstants.status.IDLE;
-
-            socketStatus.ready = true;
-            socketStatus.cancel = false;
 
             this._preFetchInfo();
         },
@@ -152,13 +148,11 @@ define([
                 }
             });
 
-            console.log(this.unsubscribeDeleteKey);
-
             this._startReport();
         },
 
         shouldComponentUpdate: function(nextProps, nextState) {
-            return JSON.stringify(this.state) !== JSON.stringify(nextState);
+            return false;
         },
 
         componentWillUnmount: function() {
@@ -166,7 +160,10 @@ define([
             AlertStore.removeCancelListener(this._handleCancel);
             AlertStore.removeYesListener(this._handleYes);
 
-            if(this.state.mode === mode.CAMERA) { this._stopCamera(); }
+            let { Monitor } = store.getState();
+            if(Monitor.mode === GlobalConstants.CAMERA) {
+                this._stopCamera();
+            }
             _history = [];
             messageViewed = false;
 
@@ -263,6 +260,7 @@ define([
         _doFileUpload: function(file) {
             let reader = new FileReader();
 
+            store.dispatch(MonitorActionCreator.setUploadProgress(0));
             reader.readAsArrayBuffer(file);
             reader.onload = () => {
                 let fileInfo = file.name.split('.'),
@@ -423,6 +421,7 @@ define([
                 }));
             }
             else {
+                this._addHistory();
                 let { Monitor } = store.getState();
                 start = 0;
                 currentDirectoryContent.files.length = 0; // clear folder content
@@ -438,7 +437,6 @@ define([
                         this._generatePreview([info[2]]);
                     }
                     store.dispatch(MonitorActionCreator.previewFile(info));
-                    this._addHistory();
                     this.forceUpdate();
                 });
             }
@@ -552,26 +550,16 @@ define([
                 AlertActions.showPopupYesNo('KICK', lang.monitor.forceStop);
             }
             else {
+                let { Monitor } = store.getState();
                 if(this._isAbortedOrCompleted()) {
                     DeviceMaster.quit();
                     store.dispatch(MonitorActionCreator.showWait());
                 }
                 else {
-                    DeviceMaster.stop();
-                }
-
-                this._isAbortedOrCompleted() ? DeviceMaster.quit() : DeviceMaster.stop();
-                let { Monitor } = store.getState();
-                if(openedFrom === GlobalConstants.DEVICE_LIST) {
-                    if(this._isAbortedOrCompleted()) {
-                        this._dispatchFolderContent('');
-                    }
-                }
-                else if(!Monitor.selectedItem.name !== '' && typeof Monitor.selectedItem.name !== 'undefined') {
-                    store.dispatch(MonitorActionCreator.changeMode(GlobalConstants.FILE_PREVIEW));
-                }
-                else {
-                    store.dispatch(MonitorActionCreator.changeMode(GlobalConstants.PREVIEW));
+                    DeviceMaster.stop().always(() => {
+                        let mode = Monitor.selectedFileInfo.length > 0 ? GlobalConstants.FILE_PREVIEW : GlobalConstants.PREVIEW;
+                        store.dispatch(MonitorActionCreator.changeMode(mode));
+                    });
                 }
             }
         },
@@ -611,6 +599,10 @@ define([
                 if(this._isAbortedOrCompleted() && openedFrom !== GlobalConstants.DEVICE_LIST) {
                     DeviceMaster.quit();
                 }
+                if(showingPopup) {
+                    showingPopup = false;
+                    AlertActions.closePopup();
+                }
             }
             else {
                 let { error } = report;
@@ -622,6 +614,13 @@ define([
 
                 // always process as error, hard fix for backend
                 error = (error instanceof Array ? error : [error]);
+
+                if(showingPopup) {
+                    if(error.length === 0) {
+                        showingPopup = false;
+                        AlertActions.closePopup();
+                    }
+                }
 
                 // only display error during these state
                 if(state.indexOf(report.st_id) >= 0) {
@@ -650,6 +649,9 @@ define([
                             }
                         }
                     }
+                    else {
+                        errorMessage = '';
+                    }
 
                     errorMessage = errorMessage || '';
 
@@ -663,8 +665,7 @@ define([
                     }
                 }
 
-                // auto clear abort and complete when not opened from device-list
-                if(openedFrom !== GlobalConstants.DEVICE_LIST && this._isAbortedOrCompleted()) {
+                if(this._isAbortedOrCompleted()) {
                     DeviceMaster.quit();
                 }
             }

@@ -269,7 +269,14 @@
                 }
                 .right {
                     float: right;
+                    text-align: right;
                 }
+            }
+            .temperature {
+                float: left;
+                height: 20px;
+            }
+            .time-left {
             }
         }
         .actions {
