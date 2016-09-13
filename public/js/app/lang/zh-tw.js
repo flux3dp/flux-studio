@@ -694,31 +694,31 @@ define(function() {
             resolution: [{
                 id: 'best',
                 text: '最佳',
-                time: '~60min',
+                time: '~30分鐘',
                 value: 1200
             },
             {
                 id: 'high',
                 text: '精細',
-                time: '~40min',
+                time: '~20分鐘',
                 value: 800
             },
             {
                 id: 'normal',
                 text: '中等',
-                time: '~20min',
+                time: '~10分鐘',
                 value: 400
             },
             {
                 id: 'low',
                 text: '快速',
-                time: '~10min',
+                time: '~5分鐘',
                 value: 200
             },
             {
                 id: 'draft',
                 text: '草稿',
-                time: '~5min',
+                time: '~2分鐘',
                 value: 100
             }],
             save_mode: [

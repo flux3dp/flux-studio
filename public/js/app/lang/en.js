@@ -669,31 +669,31 @@ define(function() {
             resolution: [{
                 id: 'best',
                 text: 'Best',
-                time: '~60min',
+                time: '~30min',
                 value: 1200
             },
             {
                 id: 'high',
                 text: 'High',
-                time: '~40min',
+                time: '~20min',
                 value: 800
             },
             {
                 id: 'normal',
                 text: 'Normal',
-                time: '~20min',
+                time: '~10min',
                 value: 400
             },
             {
                 id: 'low',
                 text: 'Low',
-                time: '~10min',
+                time: '~5min',
                 value: 200
             },
             {
                 id: 'draft',
                 text: 'Draft',
-                time: '~5min',
+                time: '~2min',
                 value: 100
             }],
             save_mode: [
