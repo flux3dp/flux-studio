@@ -10,7 +10,6 @@ requirejs.config({
         views: 'app/views',
         pages: 'app/pages',
         widgets: 'app/widgets',
-        threejs: 'lib/three/three.min',
         threeTransformControls: 'lib/three/controls/TransformControls',
         threeOrbitControls: 'lib/three/controls/OrbitControls',
         threeTrackballControls: 'lib/three/controls/TrackballControls',
@@ -44,9 +43,6 @@ requirejs.config({
     },
 
     shim: {
-        threejs: {
-            exports: 'threejs'
-        },
         backbone: {
             deps: [
                 'underscore',
@@ -61,21 +57,12 @@ requirejs.config({
             exports: '_'
         },
         threeTransformControls: {
-            deps: [
-                'threejs'
-            ],
             exports: 'TransformControls'
         },
         threeSTLLoader: {
-            deps: [
-                'threejs'
-            ],
             exports: 'STLLoader'
         },
         threeOBJLoader: {
-            deps: [
-                'threejs'
-            ],
             exports: 'OBJLoader'
         },
         freetrans: {
@@ -103,8 +90,7 @@ requirejs([
     'backbone',
     'app/router',
     'app/actions/global',
-    'helpers/tracker',
-    'threejs'
+    'helpers/tracker'
 ], function($, Backbone, Router, globalEvents) {
     'use strict';
 
