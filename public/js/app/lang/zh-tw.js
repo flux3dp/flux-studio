@@ -245,7 +245,7 @@ define(function() {
             caption: '設定',
             tabs: {
                 general: '一般',
-                printer: '成型機'
+                device: '機器'
             },
             ip: '機器 IP 位址',
             wrong_ip_format: 'IP格式錯誤',
@@ -824,7 +824,41 @@ define(function() {
             IP: 'IP',
             serial_number: '序號',
             firmware_version: '韌體版本',
-            UUID: 'UUID'
+            UUID: 'UUID',
+            select: '選擇',
+            deviceList: '機器列表',
+            calibration: {
+                title: '自動校正',
+                A: '水平與高度',
+                H: '高度',
+                N: '關閉',
+                byFile: '根據 FCODE 設定'
+            },
+            detectFilament: {
+                title: '偵測線料',
+                on: '開啟',
+                off: '關閉',
+                byFile: '根據 FCODE 設定'
+            },
+            filterHeadError: {
+                title: '工具頭錯誤偵測',
+                shake: '過度搖晃',
+                tilt: '傾斜',
+                fan_failure: '風扇故障',
+                laser_down: '雷射安全鎖',
+                byFile: '根據 FCODE 設定'
+            },
+            autoresume: {
+                title: '智慧工作恢復',
+                on: '開啟',
+                off: '關閉'
+            },
+            broadcast: {
+                title: 'UPNP 廣播',
+                L: '預設',
+                A: '密集',
+                N: '關閉'
+            }
         },
         monitor: {
             change_filament                     : 'CHANGE FILLAMENT',

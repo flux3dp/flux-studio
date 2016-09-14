@@ -245,7 +245,7 @@ define(function() {
             caption: 'Settings',
             tabs: {
                 general: 'General',
-                printer: 'Printer'
+                device: 'Device'
             },
             ip: 'Delta\'s IP',
             wrong_ip_format: 'Wrong IP Formats',
@@ -799,7 +799,41 @@ define(function() {
             IP: 'IP',
             serial_number: 'Serial Number',
             firmware_version: 'Firmware Version',
-            UUID: 'UUID'
+            UUID: 'UUID',
+            select: 'Select',
+            deviceList: 'Device List',
+            calibration: {
+                title: 'Auto Calibration',
+                A: 'Leveling & Height',
+                H: 'Height Only',
+                N: 'Off',
+                byFile: 'By File'
+            },
+            detectFilament: {
+                title: 'Filament Detection',
+                on: 'On',
+                off: 'Off',
+                byFile: 'By File'
+            },
+            filterHeadError: {
+                title: 'Toolhead Error Detection',
+                shake: 'Shake',
+                tilt: 'Tilt',
+                fan_failure: 'Fan Failure',
+                laser_down: 'Laser Interlock',
+                byFile: 'By File'
+            },
+            autoresume: {
+                title: 'Smart Task Continuation',
+                on: 'On',
+                off: 'Off'
+            },
+            broadcast: {
+                title: 'UPNP Broadcast',
+                L: 'Default',
+                A: 'Active',
+                N: 'No'
+            }
         },
         monitor: {
             change_filament                     : 'CHANGE FILAMENT',

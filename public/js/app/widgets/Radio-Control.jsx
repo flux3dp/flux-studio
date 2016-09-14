@@ -21,11 +21,13 @@ define([
             };
         },
 
-        shouldComponentUpdate: function(nextProps, nextState) {
-            var newPropIsDifferent = nextProps.default !== this.state.selected,
-                newStateIsDifferent = this.state.selected !== nextState.selected;
+        componentWillReceiveProps(nextProps) {
+            let _new = nextProps.default,
+                _old = this.state.selected;
 
-            return newPropIsDifferent || newStateIsDifferent;
+            if(_new !== _old) {
+                this.setState({ selected: nextProps.default });
+            }
         },
 
         _handleChange: function(newValue, disable) {

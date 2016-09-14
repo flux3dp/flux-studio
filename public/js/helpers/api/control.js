@@ -220,11 +220,7 @@ define([
 
             // upload: function(filesize, print_data) {
             upload: (data, path, fileName) => {
-                let d = $.Deferred(),
-                    CHUNK_PKG_SIZE = 4096,
-                    length = data.length || data.size,
-                    uploading,
-                    step = 0;
+                let d = $.Deferred();
 
                 prepareUpload(d, data);
 
@@ -308,7 +304,7 @@ define([
                     }, retryLength);
                 };
 
-                events.onMessage = (response) => { isIdle(response) ? d.resolve() : retry(response.status !== 'ok') };
+                events.onMessage = (response) => { isIdle(response) ? d.resolve() : retry(response.status !== 'ok'); };
                 events.onError = (response) => { counter >= 3 ? d.reject(response) : retry(); };
                 events.onFatal = (response) => { counter >= 3 ? d.reject(response) : retry(); };
 
@@ -376,7 +372,7 @@ define([
                 events.onMessage = (response) => {
                     if(response.status === 'ok') {
                         if(response.data.length > 1) {
-                            ws.send(`maintain zprobe`);
+                            ws.send('maintain zprobe');
                         }
                         else {
                             d.resolve(response);
@@ -399,12 +395,24 @@ define([
                 };
                 events.onFatal = (response) => { d.resolve(response); };
 
-                ws.send(`maintain calibrating`);
+                ws.send('maintain calibrating');
                 return d.promise();
             },
 
             getHeadInfo: () => {
                 return useDefaultResponse('maintain headinfo');
+            },
+
+            getDeviceSetting: (name) => {
+                return useDefaultResponse(`config get ${name}`);
+            },
+
+            setDeviceSetting: (name, value) => {
+                return useDefaultResponse(`config set ${name} ${value}`);
+            },
+
+            deleteDeviceSetting: (name) => {
+                return useDefaultResponse(`config del ${name}`);
             },
 
             /**

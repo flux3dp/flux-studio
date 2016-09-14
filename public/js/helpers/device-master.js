@@ -645,6 +645,49 @@ define([
         });
     }
 
+    function getDeviceList() {
+        return _deviceNameMap;
+    }
+
+    function getDeviceSettings() {
+        let d = $.Deferred(),
+            settings = {},
+            _settings = ['correction', 'filament_detect', 'head_error_level', 'autoresume', 'broadcast'];
+
+        const worker = function*() {
+            for(let i = 0; i < _settings.length; i++) {
+                yield SocketMaster.addTask('getDeviceSetting', _settings[i]);
+            }
+        };
+
+        const go = (result) => {
+            if(!result.done) {
+                result.value.then((r) => {
+                    let { key, value } = r;
+                    settings[key] = value;
+                    go(w.next());
+                });
+            }
+            else {
+                d.resolve(settings);
+            }
+        };
+
+        let w = worker();
+        go(w.next());
+
+        return d.promise();
+    }
+
+    function setDeviceSetting(name, value) {
+        if(value === 'delete') {
+            return SocketMaster.addTask('deleteDeviceSetting', name);
+        }
+        else {
+            return SocketMaster.addTask('setDeviceSetting', name, value);
+        }
+    }
+
     // Core
 
     function DeviceSingleton() {
@@ -690,6 +733,9 @@ define([
             this.detectHead             = detectHead;
             this.enterMaintainMode      = enterMaintainMode;
             this.endMaintainMode        = endMaintainMode;
+            this.getDeviceList          = getDeviceList;
+            this.getDeviceSettings      = getDeviceSettings;
+            this.setDeviceSetting       = setDeviceSetting;
 
             Discover(
                 'device-master',
