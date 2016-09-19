@@ -61,8 +61,17 @@ define([
                 if(source === 'delete') {
                     value = ['delete'];
                 }
+                else if(source === 'N') {
+                    value = ['N'];
+                    v = 0;
+                }
                 else {
                     let i = value.indexOf('delete');
+                    if(i !== -1) {
+                        value = value.slice(0, i).concat(value.slice(i + 1));
+                    }
+
+                    i = value.indexOf('N');
                     if(i !== -1) {
                         value = value.slice(0, i).concat(value.slice(i + 1));
                     }
@@ -131,7 +140,7 @@ define([
             DeviceMaster.selectDevice(this.devices[deviceName]).then(() => {
                 return DeviceMaster.getDeviceSettings();
             }).then((config) => {
-                config.head_error_level = mapNumberToTypeArray(parseInt(config.head_error_level));
+                config.head_error_level = config.head_error_level ? null : mapNumberToTypeArray(parseInt(config.head_error_level));
                 this.setState({ config });
             });
         },
@@ -154,7 +163,7 @@ define([
                     <RadioControl
                         id="correction"
                         options={options}
-                        default={this.state.config['correction'] || 'N'}
+                        default={this.state.config['correction'] || 'delete'}
                         onChange={this._handleComponentValueChange}/>
                 </div>
             )
@@ -179,7 +188,7 @@ define([
                     <RadioControl
                         id="filament_detect"
                         options={options}
-                        default={this.state.config['filament_detect'] || 'N'}
+                        default={this.state.config['filament_detect'] || 'delete'}
                         onChange={this._handleComponentValueChange}/>
                 </div>
             )
@@ -197,16 +206,18 @@ define([
                 { id: 'FAN_FAILURE', name: lang.device.filterHeadError.fan_failure},
                 { id: 'TILT', name: lang.device.filterHeadError.tilt},
                 { id: 'SHAKE', name: lang.device.filterHeadError.shake},
+                { id: 'N', name: lang.device.filterHeadError.no},
                 { id: 'delete', name: lang.device.filterHeadError.byFile}
             ];
 
             content = (
+
                 <div className="controls">
                     <div className="label">{lang.device.filterHeadError.title}</div>
                     <CheckboxControl
                         id="head_error_level"
                         options={options}
-                        default={this.state.config['head_error_level']}
+                        default={this.state.config['head_error_level'] || ['delete']}
                         onChange={this._handleComponentValueChange}/>
                 </div>
             )

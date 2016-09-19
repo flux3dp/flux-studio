@@ -821,7 +821,8 @@ define(function() {
                 tilt: 'Tilt',
                 fan_failure: 'Fan Failure',
                 laser_down: 'Laser Interlock',
-                byFile: 'By File'
+                byFile: 'By File',
+                no: 'No'
             },
             autoresume: {
                 title: 'Smart Task Continuation',

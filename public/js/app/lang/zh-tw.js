@@ -846,7 +846,8 @@ define(function() {
                 tilt: '傾斜',
                 fan_failure: '風扇故障',
                 laser_down: '雷射安全鎖',
-                byFile: '根據 FCODE 設定'
+                byFile: '根據 FCODE 設定',
+                no: '關閉'
             },
             autoresume: {
                 title: '智慧工作恢復',
