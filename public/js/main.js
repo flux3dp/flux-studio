@@ -104,6 +104,7 @@ requirejs([
     }
 
     globalEvents(function() {
+        let router = new Router();
         Backbone.history.start();
     });
 });
