@@ -769,7 +769,7 @@ define([
 
                 _checkDefaultPrintSettingsVersion: function() {
                     var version = Config().read('print-setting-version');
-                    if(!version || version !== GlobalConstants.DEFAULT_PRINT_SETTING_VERSION) {
+                    if(version && version !== GlobalConstants.DEFAULT_PRINT_SETTING_VERSION) {
                         AlertActions.showPopupYesNo('print-setting-version', lang.monitor.updatePrintPresetSetting);
                     }
                 },
