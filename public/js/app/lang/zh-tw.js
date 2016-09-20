@@ -139,7 +139,7 @@ define(function() {
                 old_password: '舊密碼',
                 password: '機器密碼',
                 set_station_mode: '設定成無線基地台',
-                password_placeholder: '密碼可以保護你的 FLUX Delta',
+                password_placeholder: '從壞人手上保護你的 Delta',
                 incorrect_old_password: '舊密碼錯誤',
                 incorrect_password: '密碼錯誤',
                 ap_mode_name: '網路名稱',
@@ -773,10 +773,10 @@ define(function() {
             }
         },
         select_printer: {
-            choose_printer: '選擇一個成型機',
-            notification: '請輸入密碼',
+            choose_printer: '請選擇要設定的機器',
+            notification: '"%s" 需要密碼',
             submit: '送出',
-            please_enter_password: '請輸入密碼',
+            please_enter_password: '"密碼',
             auth_failure: '認證失敗',
             retry: '重新選擇',
             unable_to_connect: '#008 無法與機器建立穩定連線'

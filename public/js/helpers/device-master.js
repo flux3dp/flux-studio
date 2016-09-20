@@ -71,6 +71,7 @@ define([
                         auth(uuid, password).always(() => {
                             ProgressActions.close();
                         }).done((data) => {
+                            device.plaintext_password = password;
                             selectDevice(device, d);
                         }).fail((response) => {
                             let message = (

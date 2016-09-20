@@ -139,7 +139,7 @@ define(function() {
                 old_password: 'Current Password',
                 password: 'Password',
                 set_station_mode: 'Create a Network',
-                password_placeholder: 'Something secret',
+                password_placeholder: 'Secure your Delta from bad people',
                 incorrect_old_password: 'Incorrect Current Password',
                 incorrect_password: 'Incorrect Password',
                 ap_mode_name: 'Network Name',
@@ -173,7 +173,7 @@ define(function() {
                 breathing: 'Breathing',
                 breathing_desc: 'Wi-Fi connection failed. Please try setting again.',
                 successfully: 'If FLUX Delta connect successfully',
-                successfully_statement: 'Please go back to your Wi-Fi list and connect to your PC to %s, then restart FLUX Studio',
+                successfully_statement: 'Please go back to Wi-Fi list and connect your computer to %s, then restart FLUX Studio',
                 restart: 'Restart FLUX Studio'
             },
 
@@ -748,10 +748,10 @@ define(function() {
             }
         },
         select_printer: {
-            choose_printer: 'Choose a printer',
-            notification: 'Please enter the password',
+            choose_printer: 'Choose a device',
+            notification: '"%s" requires a password',
             submit: 'SUBMIT',
-            please_enter_password: 'password',
+            please_enter_password: 'Password',
             auth_failure: 'Authentication fail',
             retry: 'Retry',
             unable_to_connect: '#008 Unable to build a stable connection with machine'
