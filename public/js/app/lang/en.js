@@ -149,7 +149,7 @@ define(function() {
                 ap_mode_name_placeholder: 'Up to 32 characters.',
                 ap_mode_pass_placeholder: 'Must have at least 8 characters.',
                 create_network: 'Create Network',
-                join_network: 'Join Network',
+                join_network: 'Join Other Network',
                 security: 'Security'
             },
 
