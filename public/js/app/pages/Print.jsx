@@ -232,12 +232,15 @@ define([
                     menuFactory.methods.refresh();
 
                     this._registerKeyEvents();
+                    this._registerTracking();
+
                     if(tutorialMode) {
                         //First time using, with usb-configured printer..
                         AlertActions.showPopupYesNo('set_default', sprintf(lang.tutorial.set_first_default,Config().read('configured-printer')),lang.tutorial.set_first_default_caption);
                     }
 
                     AlertStore.onYes(this._handleYes);
+                    AlertStore.onNo(this._handleNo);
                     AlertStore.onCancel(this._handleDefaultCancel);
                     listeningToCancel = true;
                     GlobalStore.onCancelPreview(this._handleCancelPreview);
@@ -293,6 +296,13 @@ define([
                     }
                 },
 
+                _registerTracking: function() {
+                    let allowTracking = LocalStorage.get('allow-tracking');
+                    if(allowTracking === '') {
+                        AlertActions.showPopupYesNo('allow_tracking', lang.settings.allow_tracking);
+                    }
+                },
+
                 _prepareMenu: function() {
                     nwjsMenu.import.enabled = true;
                     nwjsMenu.import.onClick = () => { $importBtn.click(); };
@@ -313,6 +323,7 @@ define([
                 },
 
                 _handleYes: function(answer, args) {
+                    console.log(answer, args);
                     if(answer === 'tour') {
                         this.setState({ tutorialOn: true });
                         tutorialMode = true;
@@ -365,6 +376,13 @@ define([
                     else if(answer === GlobalConstants.IMPORT_SCENE) {
                         director.loadScene();
                     }
+                    else if(answer === 'allow-tracking') {
+                        LocalStorage.set('allow-tracking', true);
+                    }
+                },
+
+                _handleNo(answer, args) {
+                    console.log(answer);
                 },
 
                 _handleCancelTutorial: function(answer) {
@@ -713,6 +731,10 @@ define([
                     }
                     else if (ans === 'print-setting-version') {
                         Config().write('print-setting-version', GlobalConstants.DEFAULT_PRINT_SETTING_VERSION);
+                    }
+                    else if(ans === 'allow_tracking') {
+                        LocalStorage.set('allow-tracking', false);
+                        window.location.reload();
                     }
 
                     setTimeout(function() {

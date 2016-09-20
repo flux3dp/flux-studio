@@ -1,5 +1,5 @@
 requirejs.config({
-    urlArgs: 'v=' + window.FLUX.timestamp,
+    urlArgs: 'v=' + (Boolean(localStorage.dev) ? '' : window.FLUX.timestamp),
     baseUrl: 'js/',
     paths: {
         jquery: 'lib/jquery-1.11.0.min',
@@ -98,22 +98,12 @@ requirejs([
         window.$ = window.jQuery = $;
     }
 
-    // GA setting up
-    // NOTICE: rename ga as GA to prevent conflict with requirejs
-    window.GA = ('undefined' !== typeof ga ? ga : function() {});
-
-    GA(
-        'create',
-        'UA-40862421-6',
-        {
-            'cookieDomain': 'none'
-        }
-    );
-
-    GA('send', 'pageview', location.hash);
+    // google analytics
+    if(window.FLUX.allowTracking) {
+        $.getScript('/js/helpers/analytics.js');
+    }
 
     globalEvents(function() {
-        var router = new Router();
         Backbone.history.start();
     });
 });

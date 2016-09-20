@@ -289,7 +289,8 @@ define(function() {
                 '2': 'cura version error',
                 '3': 'path is not cura',
                 '4': 'path is not a exist file, please check engine path in setting section'
-            }
+            },
+            allow_tracking: 'would you like to send anonymous usage to FLUX to improve future FLUX Studio?'
         },
         print: {
             import: '匯入',
