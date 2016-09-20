@@ -383,7 +383,7 @@ define([
             objLoader.load(model_file_path, (object) => {
                 var meshes = object.children.filter(c => c instanceof THREE.Mesh);
                 if(meshes.length > 0) {
-                    loadGeometry(new THREE.Geometry().fromBufferGeometry(meshes[0].geometry))
+                    loadGeometry(new THREE.Geometry().fromBufferGeometry(meshes[0].geometry));
                 }
                 // loadGeometry(new THREE.Geometry().fromBufferGeometry(.geometry))
             });
@@ -407,7 +407,6 @@ define([
             if(slicingStatus.canInterrupt) {
                 clearInterval(t);
                 var file = files.item ? files.item(index) : files[index];
-                console.log(file);
                 models.push(file);
                 slicingStatus.canInterrupt = false;
                 var ext = file.name.split('.').pop().toLowerCase();
@@ -1708,6 +1707,11 @@ define([
                         addSizeProperty(mesh);
                         groundIt(mesh);
                         createOutline(mesh);
+
+                        let source = objects.filter(o => o.uuid === SELECTED.uuid)[0];
+                        if(typeof source !== 'undefined') {
+                            mesh.file = source.file;
+                        }
 
                         selectObject(null);
                         selectObject(mesh);
