@@ -24,8 +24,9 @@ define([
 
             _onStart: function(e) {
                 var usb = usbConfig();
-                initializeMachine.completeSettingUp(true);
-                usb.close();
+                initializeMachine.completeSettingUp(true).always(() => {
+                    usb.close();
+                });                
             },
 
             _getArticle: function(lang) {
