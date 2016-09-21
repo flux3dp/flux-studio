@@ -86,6 +86,16 @@ define([
             });
         },
 
+        showPopupCustomCancel: function(id, message, customText, caption) {
+            AlertDispatcher.dispatch({
+                actionType: AlertConstants.SHOW_POPUP_CUSTOM_CANCEL,
+                id: id,
+                caption: caption,
+                message: message,
+                customText: customText
+            });
+        },
+
         showPopupQuestion: function(id, message, caption) {
             AlertDispatcher.dispatch({
                 actionType: AlertConstants.SHOW_POPUP_QUESTION, caption, message, id
