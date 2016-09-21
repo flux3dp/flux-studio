@@ -86,7 +86,14 @@ define(function() {
                 check_firmware_update: 'Update Firmware',
                 update_delta: 'Delta Firmware',
                 update_toolhead: 'Toolhead Firmware',
-                calibrate: 'Calibrate'
+                calibrate: 'Run Auto Leveling',
+                set_to_origin: 'Calibrate Origin ( Home )',
+                scan_laser_calibrate: 'Turn On Scanning Laser',
+                clean_calibration: 'Run Auto Leveling with Clean Data',
+                commands: 'Commands', 
+                set_to_origin_complete: 'Delta has calibrated its origin.',
+                scan_laser_complete: 'Delta has turned on its scanning laser. Click "Finish" to turn it off.',
+                finish: 'FINISH',
             },
             window: {
                 label: 'Window',
@@ -1029,7 +1036,7 @@ define(function() {
         calibration: {
             RESOURCE_BUSY: 'Please make sure the machine is in idle status',
             headMissing: 'Cannot retrieve head module information, please make sure it\'s attached',
-            calibrated: 'Device has been calibrated'
+            calibrated: 'Auto Leveling Completed'
         }
     };
 });

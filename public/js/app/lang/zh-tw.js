@@ -86,7 +86,14 @@ define(function() {
                 check_firmware_update: '韌體更新',
                 update_delta: 'Delta 韌體',
                 update_toolhead: '工具頭韌體',
-                calibrate: '校正'
+                calibrate: '校正平台',
+                set_to_origin: '回歸原點',
+                scan_laser_calibrate: '打開掃描雷射',
+                clean_calibration: '校正平台（清除原始資料）',
+                commands: '指令', 
+                set_to_origin_complete: 'Delta 已回歸原點',
+                scan_laser_complete: '掃描雷射已開啟，點擊 "完成" 以關閉雷射',
+                finish: '完成'
             },
             window: {
                 label: '視窗',
@@ -1054,7 +1061,7 @@ define(function() {
         calibration: {
             RESOURCE_BUSY: '請確認機器的狀態是於待命中',
             headMissing: '無法取得工具頭資訊，請確認工具頭是否連接於機器',
-            calibrated: '機器已校正'
+            calibrated: '平台校正完成'
         }
     };
 });
