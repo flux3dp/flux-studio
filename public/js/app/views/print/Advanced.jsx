@@ -486,14 +486,14 @@ define([
                             step={1}
                             default={advancedSetting.temperature}
                             onChange={this._handleControlValueChange} />
-                        <SwitchControl
+                        {/* <SwitchControl
                             id="detect_filament_runout"
                             label={lang.detect_filament_runout}
                             default={advancedSetting.detect_filament_runout === 1}
-                            onChange={this._handleControlValueChange} />
+                            onChange={this._handleControlValueChange} /> */}
                     </div>
 
-                    <div className="section">
+                    {/* <div className="section">
                         <div className="title">{lang.general}</div>
                         <SwitchControl
                             id="flux_calibration"
@@ -505,7 +505,7 @@ define([
                             label={lang.detect_head_tilt}
                             default={advancedSetting.detect_head_tilt === 1}
                             onChange={this._handleControlValueChange} />
-                    </div>
+                    </div> */}
 
                 </div>
             );
