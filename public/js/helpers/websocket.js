@@ -114,7 +114,11 @@ define([
                         break;
                     // ignore below status
                     case 'pong':
+                        break;
                     case 'debug':
+                        if(socketOptions.onDebug){
+                            socketOptions.onDebug(data);
+                        }
                         break;
                     default:
                         socketOptions.onMessage(data);
@@ -163,7 +167,7 @@ define([
                         }
 
                         showProgramErrorPopup = false;
-                        AlertActions.showPopupCustom(abnormallyId, message, lang.message.error_log);
+                        AlertActions.showPopupCustomCancel(abnormallyId, message, lang.message.error_log);
                         AlertStore.onCustom(outputLog);
                         AlertStore.onCancel(onCancel);
                     }
