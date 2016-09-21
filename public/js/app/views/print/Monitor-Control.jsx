@@ -190,6 +190,10 @@ define([
                     return this._operation().preparing;
                 },
 
+                'RESUMING': () => {
+                    return this._operation().pause;
+                },
+
                 'COMPLETED': () => {
                     return this._operation().go;
                 }
@@ -230,6 +234,7 @@ define([
 
                 if(
                     currentStatus === DeviceConstants.STARTING ||
+                    currentStatus === DeviceConstants.RESUMING ||
                     statusId === DeviceConstants.status.PAUSING_FROM_RUNNING ||
                     statusId === DeviceConstants.status.MAINTAIN ||
                     statusId === DeviceConstants.status.SCAN ||
