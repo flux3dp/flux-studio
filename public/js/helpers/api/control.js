@@ -421,7 +421,7 @@ define([
              *
              * @return {Promise}
              */
-            enterMaintainMode: (timeout) => {
+            enterMaintainMode: () => {
                 return useDefaultResponse('task maintain');
             },
 
