@@ -126,7 +126,7 @@ define([
                     position: 'left'
                 },
                 {
-                    selector: '.flux-monitor .operation',
+                    selector: '',
                     text: lang.tutorial.startPrint,
                     offset_y: 25,
                     r: 80,
@@ -221,7 +221,9 @@ define([
                     nwjsMenu.saveScene.onClick = this._handleDownloadScene;
                     nwjsMenu.clear.onClick = this._handleClearScene;
                     nwjsMenu.tutorial.onClick = () => {
-                        this._handleYes('tour');
+                        this.setState({ currentTutorialStep: 0 }, () => {
+                            this._handleYes('tour');
+                        });
                     };
                     nwjsMenu.clearLocalstorage.enabled = true;
                     nwjsMenu.clearLocalstorage.onClick = () => {
@@ -325,6 +327,9 @@ define([
                 _handleYes: function(answer, args) {
                     console.log(answer, args);
                     if(answer === 'tour') {
+                        if(this.state.hasObject) {
+                            director.clearScene();
+                        }
                         this.setState({ tutorialOn: true });
                         tutorialMode = true;
                     }
@@ -928,6 +933,18 @@ define([
                     }
                 },
 
+                _renderTourGuide: function() {
+                    return (
+                        <TourGuide
+                            lang={lang}
+                            enable={this.state.tutorialOn}
+                            guides={tourGuide}
+                            step={this.state.currentTutorialStep}
+                            onNextClick={this._handleTutorialStep}
+                            onComplete={this._handleTutorialComplete} />
+                    );
+                },
+
                 render: function() {
                     var advancedPanel           = this.state.showAdvancedSettings ? this._renderAdvancedPanel() : '',
                         importWindow            = this._renderImportWindow(),
@@ -936,7 +953,8 @@ define([
                         objectDialogue          = this.state.openObjectDialogue ? this._renderObjectDialogue() : '',
                         printerSelectorWindow   = this.state.openPrinterSelectorWindow ? this._renderPrinterSelectorWindow() : '',
                         waitWindow              = this.state.openWaitWindow ? this._renderWaitWindow() : '',
-                        progressWindow          = this.state.progressMessage ? this._renderProgressWindow() : '';
+                        progressWindow          = this.state.progressMessage ? this._renderProgressWindow() : '',
+                        tourGuideSection        = this.state.tutorialOn ? this._renderTourGuide() : '';
 
                     this._renderNwjsMenu();
 
@@ -966,13 +984,7 @@ define([
                             </div>
                             <input className="hide" ref="importBtn" type="file" accept=".stl,.fc,.gcode,.obj" onChange={this._handleImport} multiple/>
 
-                            <TourGuide
-                                lang={lang}
-                                enable={this.state.tutorialOn}
-                                guides={tourGuide}
-                                step={this.state.currentTutorialStep}
-                                onNextClick={this._handleTutorialStep}
-                                onComplete={this._handleTutorialComplete} />
+                            {tourGuideSection}
 
                         </div>
                     );
