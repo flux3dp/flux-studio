@@ -57,6 +57,10 @@ define([
                         break;
                     }
                 },
+                onDebug: (response) => {
+                    if(events.onDebug)
+                        events.onDebug(response);
+                },
                 onError: (response) => {
                     events.onError(response);
                 },
@@ -369,9 +373,10 @@ define([
                 return d.promise();
             },
 
-            calibrate: () => {
+            calibrate: (clean) => {
                 let d = $.Deferred(),
-                    errorCount = 0;
+                    errorCount = 0,
+                    temp = { debug: [] };
 
                 events.onMessage = (response) => {
                     if(response.status === 'ok') {
@@ -379,8 +384,24 @@ define([
                             ws.send(`maintain zprobe`);
                         }
                         else {
+                            response.debug = temp.debug;
                             d.resolve(response);
                         }
+                    }else if(response.status === 'operating'){
+                        temp.operation_info = response;
+                    }
+                };
+
+                events.onDebug = (response) => {
+                    if(response.log){
+                        if(temp.operation_info){
+                            if(typeof temp.operation_info.pos !== 'undefined'){
+                                response.log += " POS " + temp.operation_info.pos;
+                            }else{
+                                response.log += " Z"
+                            }
+                        }
+                        temp.debug.push(response.log);
                     }
                 };
 
@@ -389,7 +410,10 @@ define([
                         if(errorCount === 0 && response.error[0] === 'HEAD_ERROR') {
                             setTimeout(() => {
                                 errorCount++;
-                                ws.send('maintain calibrating');
+                                if(clean === true)
+                                    ws.send('maintain calibrating clean');
+                                else
+                                    ws.send('maintain calibrating');
                             }, 500);
                         }
                     }
@@ -428,6 +452,15 @@ define([
              */
             maintainHome: () => {
                 return useDefaultResponse('maintain home');
+            },
+
+            /**
+             * maintain clean
+             *
+             * @return {Promise}
+             */
+            maintainClean: () => {
+                return calibrate(true)
             },
 
             /**
