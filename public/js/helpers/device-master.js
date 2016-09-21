@@ -567,6 +567,58 @@ define([
         return d.promise();
     }
 
+
+    function home() {
+        let d = $.Deferred();
+
+        const processError = (error = {}) => {
+            let message = '';
+            if(error.status === 'error') {
+                message = lang.monitor[error.error.join('_')];
+            }
+            else if(error.info === DeviceConstants.RESOURCE_BUSY) {
+                message = lang.calibration.RESOURCE_BUSY;
+            }
+            else if(!error.module) {
+                message = lang.calibration.headMissing;
+            }
+            else {
+                message = error.error.join(' ');
+            }
+
+            AlertActions.showPopupError('device-busy', message);
+            SocketMaster.addTask('endMaintainMode');
+        };
+
+        const step1 = () => {
+            let _d = $.Deferred();
+            SocketMaster.addTask('enterMaintainMode').then((response) => {
+                if(response.status === 'ok') {
+                    return SocketMaster.addTask('maintainHome');
+                }
+                else {
+                    _d.reject(response);
+                }
+            }).then((response) => {
+                response.status === 'ok' ? _d.resolve() : _d.reject();
+            }).fail((error) => {
+                _d.reject(error);
+            });
+            return _d.promise();
+        };
+
+        step1().then(() => {
+            return SocketMaster.addTask('endMaintainMode');
+        }).then(() => {
+            d.resolve();
+        }).fail((error) => {
+            processError(error);
+            d.reject(error);
+        });
+
+        return d.promise();
+    }
+
     function _scanDeviceError(devices) {
         devices.forEach(function(device) {
             if(typeof(_errors[device.serial]) === 'string')  {
