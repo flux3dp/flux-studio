@@ -147,7 +147,7 @@ define([
 
         ws = createWs();
 
-        return {
+        let ctrl = {
             connection: ws,
             ls: (path) => {
                 let d = $.Deferred();
@@ -455,15 +455,6 @@ define([
             },
 
             /**
-             * maintain clean
-             *
-             * @return {Promise}
-             */
-            maintainClean: () => {
-                return calibrate(true)
-            },
-
-            /**
              * change filament
              * @param {String} type - [LOAD|UNLOAD]
              *
@@ -566,5 +557,11 @@ define([
                 return d.promise();
             }
         };
+
+        ctrl.maintainClean = function(){
+            return ctrl.calibrate(true);
+        }
+
+        return ctrl;
     };
 });
