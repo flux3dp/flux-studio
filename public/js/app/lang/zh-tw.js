@@ -290,7 +290,7 @@ define(function() {
                 '3': 'path is not cura',
                 '4': 'path is not a exist file, please check engine path in setting section'
             },
-            allow_tracking: 'would you like to send anonymous usage to FLUX to improve future FLUX Studio?'
+            allow_tracking: '您是否願意自動傳送匿名用量資料，協助 FLUX 改進產品和服務？'
         },
         print: {
             import: '匯入',

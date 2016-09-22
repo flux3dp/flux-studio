@@ -266,7 +266,7 @@ define(function() {
                 '3': 'path is not cura',
                 '4': 'path is not a exist file, please check engine path in setting section'
             },
-            allow_tracking: 'would you like to send anonymous usage to FLUX to improve future FLUX Studio?'
+            allow_tracking: 'Would you like to send anonymous usage statistics to FLUX to improve the app?'
         },
         print: {
             import: 'IMPORT',
