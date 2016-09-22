@@ -24,7 +24,8 @@ requirejs.config({
         window: 'app/window',
         localStorage: 'app/local-storage',
         Rx: 'lib/rx.lite.min',
-        Redux: 'lib/redux.min'
+        Redux: 'lib/redux.min',
+        Raven: 'helpers/raven.min'
     },
 
     jsx: {
@@ -81,6 +82,9 @@ requirejs.config({
         },
         Redux: {
             exports: 'Redux'
+        },
+        Raven: {
+            exports: 'Raven'
         }
     }
 });
@@ -90,17 +94,24 @@ requirejs([
     'backbone',
     'app/router',
     'app/actions/global',
+    'Raven',
     'helpers/tracker'
-], function($, Backbone, Router, globalEvents) {
+], function($, Backbone, Router, globalEvents, Raven) {
     'use strict';
 
     if (true === window.FLUX.isNW) {
         window.$ = window.jQuery = $;
     }
 
-    // google analytics
     if(window.FLUX.allowTracking) {
+        // google analytics
         $.getScript('/js/helpers/analytics.js');
+
+        // sentry
+        Raven.config('http://17dabb846f4743288d575b76dc5aaae8@sentry.io/95257');
+        Raven.debug = false;
+        try { window.Raven.setRelease(window.FLUX.version); } catch (e) { }
+        Raven.install();
     }
 
     globalEvents(function() {

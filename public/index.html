@@ -8,7 +8,6 @@
 </head>
 
 <body>
-    <script src="https://cdn.ravenjs.com/3.6.1/raven.min.js"></script>
     <script src="/js/lib/three/three.min.js"></script>
     <div class="wrapper">
         <section class="top-menu"></section>
@@ -71,13 +70,6 @@
                     }
                 }
             }, 100);
-
-            if(!window.FLUX.debug) {
-                Raven.config('http://17dabb846f4743288d575b76dc5aaae8@sentry.io/95257');
-                Raven.debug = false;
-                try { Raven.setRelease("{Version}"); } catch (e) { }
-                Raven.install();
-            }
         }
 
         cssLink.setAttribute('rel', 'stylesheet');
