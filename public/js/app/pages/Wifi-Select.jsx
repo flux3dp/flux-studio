@@ -290,7 +290,6 @@ define([
                     wifi = initializeMachine.settingWifi.get();
 
                 wifi.plain_password = self.refs.password.getDOMNode().value;
-
                 initializeMachine.settingWifi.set(wifi);
                 self._stopScan(actionMap.BACK_TO_SET_PASSWARD);
             },
@@ -370,7 +369,7 @@ define([
                     security = this.refs.network_security.getDOMNode().value;
 
                 let wifi = { ssid, security };
-
+                initializeMachine.settingWifi.set(wifi);
                 globalWifiAPI.setWifiNetwork(wifi, wepkey, true).then((result) => {
                     if(result.status === 'ok') {
                         location.hash = '#initialize/wifi/notice-from-device';

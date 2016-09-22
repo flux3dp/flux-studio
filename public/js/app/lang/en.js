@@ -173,7 +173,7 @@ define(function() {
                 breathing: 'Breathing',
                 breathing_desc: 'Wi-Fi connection failed. Please try setting again.',
                 successfully: 'If FLUX Delta connect successfully',
-                successfully_statement: 'Please go back to your Wi-Fi list and connect to your PC to %s, then restart FLUX Studio',
+                successfully_statement: 'Please go back to your Wi-Fi list and connect your PC to %s, then restart FLUX Studio',
                 restart: 'Restart FLUX Studio'
             },
 
