@@ -6,7 +6,9 @@ define([
     'helpers/api/config',
     'helpers/nwjs/menu-factory',
     'helpers/logger',
-    'helpers/force-reload'
+    'helpers/force-reload',
+    'app/actions/alert-actions',
+    'app/stores/alert-store'
 ], function(
     $,
     i18n,
@@ -15,10 +17,13 @@ define([
     config,
     menuFactory,
     Logger,
-    forceReload
+    forceReload,
+    AlertActions,
+    AlertStore
 ) {
     'use strict';
 
+    var lang = i18n.get();
     // prevent delete (back) behavior
     var genericLogger = new Logger('generic'),
         defaultKeyBehavior = function() {
@@ -101,20 +106,40 @@ define([
         defaultKeyBehavior();
     });
 
-    // listener of all ga event
+    // GA Import Begin
     $('body').on('click', '[data-ga-event]', function(e) {
         var $self = $(e.currentTarget);
 
         window.GA('send', 'event', 'button', 'click', $self.data('ga-event'));
     });
 
+    //GA Import End
+
     window.onerror = function(message, source, lineno, colno, error) {
         genericLogger.append([message, source, lineno].join(' '));
     };
 
-    if (true === window.FLUX.isNW) {
+    if (window.FLUX.isNW) {
         requirejs(['helpers/nwjs/nw-events']);
     }
+
+    //Process Visual C++ Redistributable Check
+    window.FLUX.processPythonException = function(exception_str){
+        if(exception_str.indexOf("ImportError: DLL load failed") !== -1){
+            AlertActions.showPopupError(
+                'error-vcredist',
+                lang.support.no_vcredist
+            );
+        }
+    }
+
+    //Process OS X Version Check
+    if(window.navigator.userAgent.indexOf("Intel Mac OS X 10_9") !== -1){
+        AlertActions.showPopupError(
+            'error-osx_10_9',
+            lang.support.osx_10_9
+        );
+    };
 
     return function(callback) {
         var $body = $('body'),

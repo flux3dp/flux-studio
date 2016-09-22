@@ -3,7 +3,9 @@ define(function() {
 
     return {
         support: {
-            no_webgl: 'WebGL is not supported. Please use other devices.'
+            no_webgl: 'WebGL is not supported. Please use other devices.',
+            no_vcredist: 'Please install Visual C++ Redistributable 2015',
+            osx_10_9: 'OS X 10.9 is not supported. Please update to newer version'
         },
         device_selection: {
             no_printers: 'Cannot detect FLUX Delta through Wi-Fi. Please check if your PC and FLUX Delta are under the same network. <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/215394548">More Info</a>',

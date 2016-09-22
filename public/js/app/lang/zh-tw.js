@@ -3,7 +3,9 @@ define(function() {
 
     return {
         support: {
-            no_webgl: '您的系統不支援 WebGL，建議您使用其他電腦開啟 FLUX Studio'
+            no_webgl: '您的系統不支援 WebGL，建議您使用其他電腦開啟 FLUX Studio',
+            no_vcredist: 'Please install Visual C++ Redistributable 2015',
+            osx_10_9: 'FLUX Studio 目前不支援 OS X 10.9，敬請更新至更新的版本。'
         },
         device_selection: {
             no_printers: '無法透過 Wi-Fi 偵測到 FLUX Delta，請檢查您與機器的網路連線是否在同個網路下 <a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/215394548">暸解更多</a>',
