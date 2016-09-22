@@ -588,8 +588,10 @@ define([
                 slicingStatus.canInterrupt = true;
                 slicingStatus.pauseReport = false;
                 getSlicingReport(function(report) {
-                    slicingStatus.lastReport = report;
-                    updateSlicingProgressFromReport(report);
+                    if(report.status != 'ok'){
+                        slicingStatus.lastReport = report;
+                    }
+                    updateSlicingProgressFromReport(slicingStatus.lastReport);
                 });
             }).fail((error) => {
                 slicingStatus.canInterrupt = true;
