@@ -84,7 +84,7 @@ define([
 
                     self.state.laserEvents.menuFactory.items.saveTask.enabled = false;
                     self.state.laserEvents.menuFactory.items.saveTask.onClick = function() {
-                        self._onExport('-g');
+                        self._onExport('-f');
                     };
                 },
 
