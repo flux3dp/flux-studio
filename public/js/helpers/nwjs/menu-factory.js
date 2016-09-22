@@ -422,7 +422,7 @@ define([
                                 console.log("selected device");
                                 if (status === DeviceConstants.CONNECTED) {
                                     checkDeviceStatus(currentPrinter).then(() => {
-                                        ProgressActions.open(ProgressConstants.WAITING);
+                                        ProgressActions.open(ProgressConstants.NONSTOP);
                                         DeviceMaster.home().done(() => {
                                             ProgressActions.close();
                                             setTimeout(() => {
