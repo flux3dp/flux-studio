@@ -336,15 +336,16 @@ define(function() {
                 outerShell: 'Outer Shell',
                 bridge: 'Bridge',
                 config: 'Expert Settings',
-                presets: 'Presets',
+                presets: 'Configs',
                 name: 'Name',
                 apply: 'APPLY',
                 save: 'SAVE',
-                saveAsPreset: 'Save Preset',
+                saveAsPreset: 'Save Config',
                 cancel: 'CANCEL',
                 delete: 'DELETE',
-                loadPreset: 'Load Preset',
-                savePreset: 'Save Preset'
+                loadPreset: 'Load Config',
+                savePreset: 'Save Config',
+                reloadPreset: 'Reset Config'
             },
             mode: [
                 {
@@ -519,7 +520,7 @@ define(function() {
             import: 'IMPORT',
             save: 'Save',
             custom: 'Custom',
-            presets: 'Presets',
+            presets: 'Load Config',
             button_advanced: 'ADVANCED',
             confirm: 'Confirm',
             get_fcode: 'Save<br/>Task',
@@ -641,8 +642,8 @@ define(function() {
                 },
                 save_and_apply: 'SAVE & APPLY',
                 save_as_preset: 'SAVE',
-                save_as_preset_title: 'Save Preset',
-                load_preset_title: 'Load Preset',
+                save_as_preset_title: 'Save Config',
+                load_preset_title: 'Load Config',
                 apply: 'APPLY',
                 cancel: 'CANCEL',
                 save: 'SAVE'
@@ -855,15 +856,15 @@ define(function() {
             second                              : 's',
             left                                : 'left',
             temperature                         : 'Temperature',
-            forceStop                           : 'Abort current task?',
+            forceStop                           : 'Do you want to abort current task?',
             upload                              : 'Upload',
             download                            : 'Download',
             fileNotDownloadable                 : 'This file type is not supported for download',
-            cannotPreview                       : 'Can not preview this file',
-            extensionNotSupported               : 'File format not supported',
-            fileExistContinue                   : 'File already exist, do you want to replace it?',
-            confirmGToF                         : 'Uploaded GCode will be converted to FCode, continue (will replace if exist)',
-            updatePrintPresetSetting            : 'FLUX STUDIO has new printing preset, do you want to update?\n(will overwrite current parameters)',
+            cannotPreview                       : 'Can not preview this file format',
+            extensionNotSupported               : 'This file format is not supported',
+            fileExistContinue                   : 'File already exists, do you want to replace it?',
+            confirmGToF                         : 'The GCode will be converted to FCode, do you want to continue? ( will replace if exists )',
+            updatePrintPresetSetting            : 'FLUX STUDIO has new default printing parameters, do you want to update?\n( Current one will be overwritten )',
             confirmFileDelete                   : 'Are you sure you want to delete this file?',
             task: {
                 EXTRUDER                        : 'Printing Task',
@@ -978,8 +979,8 @@ define(function() {
                 '5': '#162 Toolhead tilt detected\nPlease check ball joint rod is attached correctly',
                 '6': '#119 Printer toolhead is unable to control temperature. Please contact FLUX Support.',
                 '7': '#113 Cooling fan failed\nKindly spin the fan with a pencil or thin stick. <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/217732178">More Info</a>',
-                '8': '#116 Engraving toolhead tilt detected \nPlease ensure the rods are connected correctly. <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/217085937">More Info</a>',
-                '9': '#118 Printer toolhead is unable to heat. Please contact FLUX Support.'
+                '8': '#116 Engraving toolhead tilt detected\nPlease ensure the rods are connected correctly. <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/217085937">More Info</a>',
+                '9': '#118 Unable to heat printer toolhead\nPlease contact FLUX Support.'
             }
         },
         change_filament: {

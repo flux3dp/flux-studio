@@ -802,7 +802,7 @@ define([
 
                     <div className="section">
                         <div className="title">{lang.config}
-                            <div className="load-preset" onClick={this._handleLoadPreset}>{lang.loadPreset}</div>
+                            <div className="load-preset" onClick={this._handleLoadPreset}>{lang.reloadPreset}</div>
                         </div>
 
                         <div className="controls">
