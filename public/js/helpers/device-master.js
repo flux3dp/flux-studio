@@ -514,6 +514,9 @@ define([
             else if(error.info === DeviceConstants.RESOURCE_BUSY) {
                 message = lang.calibration.RESOURCE_BUSY;
             }
+            else if(error.module === 'LASER') {
+                message = lang.calibration.extruderOnly;
+            }
             else if(!error.module) {
                 message = lang.calibration.headMissing;
             }
@@ -529,10 +532,20 @@ define([
             let _d = $.Deferred();
             SocketMaster.addTask('enterMaintainMode').then((response) => {
                 if(response.status === 'ok') {
-                    return SocketMaster.addTask('maintainHome');
+                    return SocketMaster.addTask('getHeadInfo');
                 }
                 else {
                     _d.reject(response);
+                }
+            }).then((headInfo) => {
+                if(headInfo.module === null) {
+                    return $.Deferred().reject();
+                }
+                else if(headInfo.module !== 'EXTRUDER') {
+                    return $.Deferred().reject({module:'LASER'});
+                }
+                else {
+                    return SocketMaster.addTask('maintainHome');
                 }
             }).then((response) => {
                 response.status === 'ok' ? _d.resolve() : _d.reject();

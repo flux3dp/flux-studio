@@ -381,17 +381,7 @@ define([
                 };
 
                 events.onError = (response) => {
-                    if(response.status === 'error') {
-                        if(errorCount === 0 && response.error[0] === 'HEAD_ERROR') {
-                            setTimeout(() => {
-                                errorCount++;
-                                ws.send('maintain calibrating');
-                            }, 500);
-                        }
-                    }
-                    else {
-                        d.reject(response);
-                    }
+                    d.reject(response);
                 };
                 events.onFatal = (response) => { d.resolve(response); };
 
@@ -422,7 +412,14 @@ define([
              * @return {Promise}
              */
             enterMaintainMode: () => {
-                return useDefaultResponse('task maintain');
+                let d = $.Deferred();
+
+                events.onMessage = (response) => { setTimeout(() => {d.resolve(response);},3000); };
+                events.onError = (response) => { d.reject(response); };
+                events.onFatal = (response) => { d.reject(response); };
+
+                ws.send('task maintain');
+                return d.promise();
             },
 
             endMaintainMode: () => {

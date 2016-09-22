@@ -1069,7 +1069,8 @@ define(function() {
         calibration: {
             RESOURCE_BUSY: 'Please make sure the machine is in idle status',
             headMissing: 'Cannot retrieve head module information, please make sure it\'s attached',
-            calibrated: 'Device has been calibrated'
+            calibrated: 'Device has been calibrated',
+            extruderOnly: 'Please use the extruder head for calibration'
         }
     };
 });
