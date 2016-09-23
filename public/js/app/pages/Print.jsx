@@ -928,7 +928,7 @@ define([
                         printerSelectorWindow   = this.state.openPrinterSelectorWindow ? this._renderPrinterSelectorWindow() : '',
                         waitWindow              = this.state.openWaitWindow ? this._renderWaitWindow() : '',
                         progressWindow          = this.state.progressMessage ? this._renderProgressWindow() : '',
-                        percentageBar           = this.state.slicingPercentage > 0 ? this._renderPercentageBar() : '';
+                        percentageBar           = (!this.state.openImportWindow) ? this._renderPercentageBar() : '';
 
                     this._renderNwjsMenu();
 
