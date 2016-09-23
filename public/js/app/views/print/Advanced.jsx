@@ -537,7 +537,7 @@ define([
                             key="top_solid_layers"
                             label={lang.solidLayerTop}
                             min={0}
-                            max={6}
+                            max={12}
                             step={1}
                             default={advancedSetting.top_solid_layers}
                             onChange={this._handleControlValueChange} />
@@ -547,7 +547,7 @@ define([
                             key="bottom_solid_layers"
                             label={lang.solidLayerBottom}
                             min={0}
-                            max={6}
+                            max={12}
                             step={1}
                             default={advancedSetting.bottom_solid_layers}
                             onChange={this._handleControlValueChange} />
