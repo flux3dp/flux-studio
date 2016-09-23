@@ -389,7 +389,7 @@ define([
         else {
             stlLoader.load(model_file_path, (geometry) => {
                 loadGeometry(geometry);
-            }, null, (error) => {
+            }, function(){}, (error) => {
                 //on error
                 loadGeometry({vertices: []});
             });
