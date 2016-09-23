@@ -6,7 +6,6 @@ requirejs.config({
         backbone: 'lib/backbone',
         underscore: 'lib/underscore',
         react: 'lib/react/react-with-addons.min',
-        JSXTransformer: 'lib/react/JSXTransformer',
         views: 'app/views',
         pages: 'app/pages',
         widgets: 'app/widgets',
@@ -36,7 +35,6 @@ requirejs.config({
 
     map: {
         '*': {
-            jsx: 'lib/react/jsx',
             css: 'lib/css-loader',
             text: 'lib/text',
             domReady: 'lib/domReady',
