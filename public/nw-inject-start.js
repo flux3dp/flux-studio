@@ -60,6 +60,7 @@ var process = nw.process,
             process.env.processPythonException = function(str){
                 //Note: this function might be replaced from globa.js, in order to interact with react component
                 console.log("Unhandled exception occured.");
+                process.env.ghostPort = 8000;
             };
 
         // empty message.log
@@ -204,7 +205,7 @@ nw.App.downloadUpdate = function(manifest, cb, onProgress) {
     cb = cb || function() {};
 
     return upd.download(function(error, filename) {
-        cb.apply(null, arguments);
+        cb.apply(null, arguments); 
     }, manifest, onProgress);
 };
 

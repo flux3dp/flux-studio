@@ -45,9 +45,11 @@ THREE.STLLoader.prototype = {
 		loader.setCrossOrigin( this.crossOrigin );
 		loader.setResponseType('arraybuffer');
 		loader.load( url, function ( text ) {
-
-			onLoad( scope.parse( text ) );
-
+			try{
+				onLoad( scope.parse( text ) );
+			}catch(e){
+				onError("Failed to parse");
+			}
 		}, onProgress, onError );
 
 	},
