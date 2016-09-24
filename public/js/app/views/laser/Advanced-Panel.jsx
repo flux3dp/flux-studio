@@ -9,17 +9,19 @@ define([
     'helpers/round',
     'app/actions/input-lightbox-actions',
     'plugins/jquery/serializeObject',
-    'helpers/array-findindex',
+    'helpers/array-findindex', 
+    'jsx!widgets/File-Uploader',
 ], function(
     React,
     SelectView,
     ButtonGroup,
     TextInput,
-    UnitInput,
+    UnitInput, 
     config,
     classNames,
     round,
-    InputLightboxActions
+    InputLightboxActions,
+    FileUploader
 ) {
     'use strict';
 
@@ -67,6 +69,14 @@ define([
                         'ga-event': 'save-as-preset'
                     },
                     onClick: this._onSaveAndApply
+                },
+                {
+                    label: lang.background,
+                    className: 'pull-left btn-default btn-apply',
+                    dataAttrs: {
+                        'ga-event': 'apply-laser-background'
+                    },
+                    onClick: this._onCustomBackground
                 },
                 {
                     label: lang.apply,
@@ -128,6 +138,10 @@ define([
                     return '' !== presetName;
                 }
             });
+        },
+
+        _onCustomBackground: function(e) {
+            $('input[data-ref=importBg]').click();
         },
 
         _onApply: function(e) {
@@ -276,6 +290,27 @@ define([
             );
         },
 
+        _renderFileUploader: function() {
+            var style = {display: 'none'}
+            return (
+                <input style={style} data-ref="importBg" type="file" accept=".jpg,.png,.bmp" onChange={this._handleImport} />
+            );
+        },
+
+        _handleImport: function(e) {
+            var t = e.target;
+            console.log(t.files[0]);
+             if (t.files.length) {
+                var fr = new FileReader();
+                fr.onload = function () {
+                    $('.laser-object').css({background :'url(' + fr.result + ')', 'background-size': '100% 100%'});
+                    config().write('laser-custom-bg', fr.result);
+                };
+                fr.readAsDataURL(t.files[0]);
+            }
+
+        },
+
         render: function() {
             var self = this,
                 lang = this.props.lang.laser,
@@ -284,10 +319,12 @@ define([
                     this._renderDefaultForm(lang) :
                     this._renderSaveForm(lang)
                 ),
-                footer = this._renderFooter(lang);
+                footer = this._renderFooter(lang),
+                fileUploader = this._renderFileUploader();
 
             return (
                 <div className="advanced-panel">
+                    {fileUploader}
                     {form}
                     {footer}
                 </div>

@@ -86,6 +86,10 @@ define([
                     self.state.laserEvents.menuFactory.items.saveTask.onClick = function() {
                         self._onExport('-g');
                     };
+
+                    var laser_custom_bg = config().read('laser-custom-bg');
+                    if(laser_custom_bg)
+                        $('.laser-object').css({background :'url(' + laser_custom_bg + ')', 'background-size': '100% 100%'});
                 },
 
                 componentWillUnmount: function () {

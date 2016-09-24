@@ -659,6 +659,7 @@ define(function() {
                 save_as_preset: '儲存',
                 save_as_preset_title: '儲存預設',
                 load_preset_title: '載入',
+                background: '自訂背景',
                 apply: '套用',
                 cancel: '取消',
                 save: '儲存'

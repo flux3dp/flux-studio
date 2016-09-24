@@ -634,6 +634,7 @@ define(function() {
                 save_as_preset: 'SAVE',
                 save_as_preset_title: 'Save Preset',
                 load_preset_title: 'Load Preset',
+                background: 'Background',
                 apply: 'APPLY',
                 cancel: 'CANCEL',
                 save: 'SAVE'
