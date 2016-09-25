@@ -289,6 +289,7 @@ define([
                         caption      : payload.caption,
                         inputHeader  : payload.inputHeader,
                         defaultValue : payload.defaultValue,
+                        maxLength    : payload.maxLength,
                         confirmText  : payload.confirmText,
                         onClose      : payload.onClose || function() {},
                         onSubmit     : payload.onSubmit || function() {}
@@ -543,6 +544,7 @@ define([
                             inputHeader={this.state.inputLightbox.inputHeader}
                             defaultValue={this.state.inputLightbox.defaultValue}
                             confirmText={this.state.inputLightbox.confirmText}
+                            maxLength={this.state.inputLightbox.maxLength}
                             onClose={this._handleInputLightBoxClosed}
                             onSubmit={this._handleInputLightBoxSubmit}
                         />

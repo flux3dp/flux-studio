@@ -17,6 +17,7 @@ define([
                 caption      : args.caption,
                 inputHeader  : args.inputHeader,
                 defaultValue : args.defaultValue,
+                maxLength    : args.maxLength,
                 confirmText  : args.confirmText,
                 onClose      : args.onClose,
                 onSubmit     : args.onSubmit

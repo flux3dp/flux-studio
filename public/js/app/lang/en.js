@@ -644,6 +644,7 @@ define(function() {
                 save_as_preset: 'SAVE',
                 save_as_preset_title: 'Save Config',
                 load_preset_title: 'Load Config',
+                background: 'Background',
                 apply: 'APPLY',
                 cancel: 'CANCEL',
                 save: 'SAVE'
