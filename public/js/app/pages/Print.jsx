@@ -897,7 +897,7 @@ define([
                     );
                 },
 
-                _renderPercentageBar: function()  : ''{
+                _renderPercentageBar: function() {
                     var computed_style = {
                         width: (this.state.slicingPercentage*100 + '%')
                     };

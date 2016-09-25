@@ -70,7 +70,7 @@ gulp.task('webserver', ['sass:watch'], function() {
         }));
 });
 
-gulp.task('dev', ['sass:watch', 'jsx:watch', 'webserver']);
+gulp.task('dev', ['sass:watch', 'jsx:watch', 'jsx', 'webserver']);
 
 gulp.task('unit-test', function() {
     return gulp.
