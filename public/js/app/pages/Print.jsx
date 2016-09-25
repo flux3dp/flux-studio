@@ -186,6 +186,7 @@ define([
                         previewMode                 : false,
                         previewModeOnly             : false,
                         disablePreview              : false,
+                        slicingPercentage           : 0,
                         currentTutorialStep         : 0,
                         layerHeight                 : 0.1,
                         raftLayers                  : _raftLayers,
@@ -896,6 +897,18 @@ define([
                     );
                 },
 
+                _renderPercentageBar: function()  : ''{
+                    var computed_style = {
+                        width: (this.state.slicingPercentage*100 + '%')
+                    };
+                    return (
+                        <div className="slicingProgressBar">
+                            <div className="slicingProgressBarInner" style={computed_style}> 
+                            </div>
+                        </div>
+                    );
+                },
+
                 _renderNwjsMenu: function() {
                     if(nwjsMenu.undo.enabled !== this.state.hasObject) {
                         nwjsMenu.undo.enabled = this.state.hasObject;
@@ -914,7 +927,8 @@ define([
                         objectDialogue          = this.state.openObjectDialogue ? this._renderObjectDialogue() : '',
                         printerSelectorWindow   = this.state.openPrinterSelectorWindow ? this._renderPrinterSelectorWindow() : '',
                         waitWindow              = this.state.openWaitWindow ? this._renderWaitWindow() : '',
-                        progressWindow          = this.state.progressMessage ? this._renderProgressWindow() : '';
+                        progressWindow          = this.state.progressMessage ? this._renderProgressWindow() : '',
+                        percentageBar           = (!this.state.openImportWindow) ? this._renderPercentageBar() : '';
 
                     this._renderNwjsMenu();
 
@@ -925,7 +939,11 @@ define([
 
                             {leftPanel}
 
+                            {percentageBar}
+
                             {rightPanel}
+
+
 
                             {objectDialogue}
 
@@ -936,7 +954,6 @@ define([
                             {waitWindow}
 
                             {progressWindow}
-
 
 
                             <div id="model-displayer" className="model-displayer">

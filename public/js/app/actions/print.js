@@ -590,6 +590,8 @@ define([
             slicingStatus.inProgress = true;
             slicingStatusStream.onNext(slicingStatus);
             slicer.beginSlicing(ids, slicingType.F).then(function(response) {
+                slicingStatus.percentage = 0.05;
+                reactSrc.setState({slicingPercentage: 0.05});
                 slicingStatus.canInterrupt = true;
                 slicingStatus.pauseReport = false;
                 getSlicingReport(function(report) {
@@ -698,6 +700,14 @@ define([
             show = slicingStatus.showProgress,
             monitorOn = $('.flux-monitor').length > 0;
 
+        if(report.slice_status === "complete"){
+            report.percentage = 1;
+        }
+        if(report.percentage !== slicingStatus.percentage){
+            slicingStatus.percentage = report.percentage;
+            reactSrc.setState({slicingPercentage: slicingStatus.percentage});
+        }
+        console.log(report);
         slicingStatus.lastProgress = progress;
 
         if(monitorOn) {
