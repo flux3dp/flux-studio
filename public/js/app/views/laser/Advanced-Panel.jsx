@@ -123,6 +123,7 @@ define([
                 caption      : lang.laser.save_as_preset,
                 inputHeader  : lang.laser.name,
                 confirmText  : lang.laser.advanced.save,
+                maxLength    : 20,
                 onSubmit     : function(presetName) {
                     var canSave = ('' !== presetName);
 
@@ -211,13 +212,14 @@ define([
         },
 
         _renderSaveForm: function(lang) {
+            var maxLength = 10;
             return (
                 <div className="form">
                     <header class="header">{lang.save_as_preset}</header>
                     <div className="controls">
                         <div className="control">
                             <label className="label">{lang.name}</label>
-                            <TextInput ref="presetName"/>
+                            <TextInput ref="presetName" maxLength={maxLength}/>
                         </div>
                     </div>
                 </div>
