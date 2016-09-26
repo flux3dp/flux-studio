@@ -28,7 +28,8 @@ define([
     'helpers/api/discover',
     'helpers/check-firmware',
     'helpers/firmware-updater',
-    'helpers/device-list'
+    'helpers/device-list',
+    'Raven',
 ], function(
     $,
     React,
@@ -59,7 +60,8 @@ define([
     discover,
     checkFirmware,
     firmwareUpdater,
-    DeviceList
+    DeviceList,
+    Raven
 ) {
     'use strict';
 

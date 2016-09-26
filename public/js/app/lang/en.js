@@ -1079,7 +1079,7 @@ define(function() {
         calibration: {
             RESOURCE_BUSY: 'Please make sure the machine is in idle status',
             headMissing: 'Cannot retrieve head module information, please make sure it\'s attached',
-            calibrated: 'Auto Leveling Completed'
+            calibrated: 'Auto Leveling Completed',
             extruderOnly: 'Please use the printing toolhead for calibration'
         }
     };

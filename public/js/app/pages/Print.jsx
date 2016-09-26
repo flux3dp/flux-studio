@@ -300,8 +300,9 @@ define([
                 },
 
                 _registerTracking: function() {
-                    let allowTracking = LocalStorage.get('allow-tracking');
-                    if(allowTracking === '') {
+                    let allowTracking = Config().read('allow-tracking');
+                    console.log(allowTracking); 
+                    if(allowTracking == '') {
                         AlertActions.showPopupYesNo('allow_tracking', lang.settings.allow_tracking);
                     }
                 },
@@ -383,7 +384,7 @@ define([
                         director.loadScene();
                     }
                     else if(answer === 'allow-tracking') {
-                        LocalStorage.set('allow-tracking', true);
+                        Config().write('allow-tracking', 'true');
                     }
                 },
 
@@ -739,7 +740,7 @@ define([
                         Config().write('print-setting-version', GlobalConstants.DEFAULT_PRINT_SETTING_VERSION);
                     }
                     else if(ans === 'allow_tracking') {
-                        LocalStorage.set('allow-tracking', false);
+                        Config().write('allow-tracking', 'false');
                         window.location.reload();
                     }
 
