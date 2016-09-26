@@ -516,6 +516,9 @@ define([
             else if(error.info === DeviceConstants.RESOURCE_BUSY) {
                 message = lang.calibration.RESOURCE_BUSY;
             }
+            else if(error.module === 'LASER') {
+                message = lang.calibration.extruderOnly;
+            }
             else if(!error.module) {
                 message = lang.calibration.headMissing;
             }
@@ -531,10 +534,20 @@ define([
             let _d = $.Deferred();
             SocketMaster.addTask('enterMaintainMode').then((response) => {
                 if(response.status === 'ok') {
-                    return SocketMaster.addTask('maintainHome');
+                    return SocketMaster.addTask('getHeadInfo');
                 }
                 else {
                     _d.reject(response);
+                }
+            }).then((headInfo) => {
+                if(headInfo.module === null) {
+                    return $.Deferred().reject();
+                }
+                else if(headInfo.module !== 'EXTRUDER') {
+                    return $.Deferred().reject({module:'LASER'});
+                }
+                else {
+                    return SocketMaster.addTask('maintainHome');
                 }
             }).then((response) => {
                 response.status === 'ok' ? _d.resolve() : _d.reject();
@@ -751,6 +764,49 @@ define([
         });
     }
 
+    function getDeviceList() {
+        return _deviceNameMap;
+    }
+
+    function getDeviceSettings() {
+        let d = $.Deferred(),
+            settings = {},
+            _settings = ['correction', 'filament_detect', 'head_error_level', 'autoresume', 'broadcast'];
+
+        const worker = function*() {
+            for(let i = 0; i < _settings.length; i++) {
+                yield SocketMaster.addTask('getDeviceSetting', _settings[i]);
+            }
+        };
+
+        const go = (result) => {
+            if(!result.done) {
+                result.value.then((r) => {
+                    let { key, value } = r;
+                    settings[key] = value;
+                    go(w.next());
+                });
+            }
+            else {
+                d.resolve(settings);
+            }
+        };
+
+        let w = worker();
+        go(w.next());
+
+        return d.promise();
+    }
+
+    function setDeviceSetting(name, value) {
+        if(value === 'delete') {
+            return SocketMaster.addTask('deleteDeviceSetting', name);
+        }
+        else {
+            return SocketMaster.addTask('setDeviceSetting', name, value);
+        }
+    }
+
     // Core
 
     function DeviceSingleton() {
@@ -798,6 +854,9 @@ define([
             this.detectHead             = detectHead;
             this.enterMaintainMode      = enterMaintainMode;
             this.endMaintainMode        = endMaintainMode;
+            this.getDeviceList          = getDeviceList;
+            this.getDeviceSettings      = getDeviceSettings;
+            this.setDeviceSetting       = setDeviceSetting;
 
             Discover(
                 'device-master',

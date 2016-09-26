@@ -30,13 +30,14 @@ define([
             },
 
             render : function() {
+                let wifi = initializeMachine.settingWifi.get();
                 var lang = this.state.lang,
                     localLang = lang.initialize.notice_from_device,
                     settingPrinter = initializeMachine.settingPrinter.get(),
                     wrapperClassName = {
                         'initialization': true
                     },
-                    successfullyStatement = sprintf(localLang.successfully_statement, settingPrinter.apName),
+                    successfullyStatement = sprintf(localLang.successfully_statement, wifi.ssid),
                     content = (
                         <div className="notice-from-device text-center">
                             <img className="brand-image" src="/img/menu/main_logo.svg"/>

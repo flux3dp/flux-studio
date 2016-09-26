@@ -56,6 +56,9 @@ define([
             // General
             engine                              : '',
             temperature                         : 215,
+            detect_filament_runout              : 1,
+            flux_calibration                    : 1,
+            detect_head_tilt                    : 1,
 
             // Layers
             layer_height                        : 0.15,
@@ -483,8 +486,26 @@ define([
                             step={1}
                             default={advancedSetting.temperature}
                             onChange={this._handleControlValueChange} />
-
+                        {/* <SwitchControl
+                            id="detect_filament_runout"
+                            label={lang.detect_filament_runout}
+                            default={advancedSetting.detect_filament_runout === 1}
+                            onChange={this._handleControlValueChange} /> */}
                     </div>
+
+                    {/* <div className="section">
+                        <div className="title">{lang.general}</div>
+                        <SwitchControl
+                            id="flux_calibration"
+                            label={lang.flux_calibration}
+                            default={advancedSetting.flux_calibration === 1}
+                            onChange={this._handleControlValueChange} />
+                        <SwitchControl
+                            id="detect_head_tilt"
+                            label={lang.detect_head_tilt}
+                            default={advancedSetting.detect_head_tilt === 1}
+                            onChange={this._handleControlValueChange} />
+                    </div> */}
 
                 </div>
             );

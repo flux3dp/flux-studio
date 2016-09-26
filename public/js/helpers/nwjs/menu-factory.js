@@ -224,7 +224,9 @@ define([
                 menuItem = new MenuItem(menuOption);
 
                 menuItem.on('click', function() {
-                    window.GA('send', 'event', 'menubar-button', 'click', el.label);
+                    if(window.FLUX.allowTracking) {
+                        window.analytics.event('send', 'event', 'menubar-button', 'click', el.label);
+                    }
                 });
 
                 subMenu.append(menuItem);

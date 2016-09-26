@@ -182,7 +182,7 @@ define(function() {
                 breathing: 'Breathing',
                 breathing_desc: 'Wi-Fi connection failed. Please try setting again.',
                 successfully: 'If FLUX Delta connect successfully',
-                successfully_statement: 'Please go back to Wi-Fi list and connect your computer to %s, then restart FLUX Studio',
+                successfully_statement: 'Please go back to your Wi-Fi list and connect your PC to %s, then restart FLUX Studio',
                 restart: 'Restart FLUX Studio'
             },
 
@@ -254,7 +254,7 @@ define(function() {
             caption: 'Settings',
             tabs: {
                 general: 'General',
-                printer: 'Printer'
+                device: 'Device'
             },
             ip: 'Delta\'s IP',
             wrong_ip_format: 'Wrong IP Formats',
@@ -274,7 +274,8 @@ define(function() {
                 '2': 'cura version error',
                 '3': 'path is not cura',
                 '4': 'path is not a exist file, please check engine path in setting section'
-            }
+            },
+            allow_tracking: 'Would you like to send anonymous usage statistics to FLUX to improve the app?'
         },
         print: {
             import: 'IMPORT',
@@ -292,6 +293,9 @@ define(function() {
                 cura: 'Cura',
                 filament: 'Filament',
                 temperature: 'Temperature',
+                detect_filament_runout: 'Filament Detection',
+                flux_calibration: 'Auto Calibration',
+                detect_head_tilt: 'Tilt Detection',
                 layer_height_title: 'Layer Height',
                 layer_height: 'Layer Height',
                 firstLayerHeight: 'First Layer Height',
@@ -680,31 +684,31 @@ define(function() {
             resolution: [{
                 id: 'best',
                 text: 'Best',
-                time: '~60min',
+                time: '~30min',
                 value: 1200
             },
             {
                 id: 'high',
                 text: 'High',
-                time: '~40min',
+                time: '~20min',
                 value: 800
             },
             {
                 id: 'normal',
                 text: 'Normal',
-                time: '~20min',
+                time: '~10min',
                 value: 400
             },
             {
                 id: 'low',
                 text: 'Low',
-                time: '~10min',
+                time: '~5min',
                 value: 200
             },
             {
                 id: 'draft',
                 text: 'Draft',
-                time: '~5min',
+                time: '~2min',
                 value: 100
             }],
             save_mode: [
@@ -806,7 +810,42 @@ define(function() {
             IP: 'IP',
             serial_number: 'Serial Number',
             firmware_version: 'Firmware Version',
-            UUID: 'UUID'
+            UUID: 'UUID',
+            select: 'Select',
+            deviceList: 'Device List',
+            calibration: {
+                title: 'Auto Calibration',
+                A: 'Leveling & Height',
+                H: 'Height Only',
+                N: 'Off',
+                byFile: 'By File'
+            },
+            detectFilament: {
+                title: 'Filament Detection',
+                on: 'On',
+                off: 'Off',
+                byFile: 'By File'
+            },
+            filterHeadError: {
+                title: 'Toolhead Error Detection',
+                shake: 'Shake',
+                tilt: 'Tilt',
+                fan_failure: 'Fan Failure',
+                laser_down: 'Laser Interlock',
+                byFile: 'By File',
+                no: 'No'
+            },
+            autoresume: {
+                title: 'Smart Task Continuation',
+                on: 'On',
+                off: 'Off'
+            },
+            broadcast: {
+                title: 'UPNP Broadcast',
+                L: 'Default',
+                A: 'Active',
+                N: 'No'
+            }
         },
         monitor: {
             change_filament                     : 'CHANGE FILAMENT',
@@ -1041,6 +1080,7 @@ define(function() {
             RESOURCE_BUSY: 'Please make sure the machine is in idle status',
             headMissing: 'Cannot retrieve head module information, please make sure it\'s attached',
             calibrated: 'Auto Leveling Completed'
+            extruderOnly: 'Please use the printing toolhead for calibration'
         }
     };
 });

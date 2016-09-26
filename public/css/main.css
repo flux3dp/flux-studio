@@ -2920,6 +2920,22 @@ input[type=range]:focus::-webkit-slider-runnable-track {
             cursor: auto; }
         .controls .radio .grey-out + span {
             color: #E0E0E0; }
+    .controls .checkbox {
+        cursor: pointer; }
+        .controls .checkbox > div {
+            width: 15px;
+            height: 15px;
+            background-image: url("/img/icon-checkbox-off.png");
+            background-size: 15px 15px;
+            display: inline-block;
+            margin-right: 10px;
+            cursor: pointer; }
+        .controls .checkbox .selected {
+            background-image: url("/img/icon-checkbox-on.png"); }
+        .controls .checkbox .grey-out {
+            cursor: auto; }
+        .controls .checkbox .grey-out + span {
+            color: #E0E0E0; }
     .controls .switch-container {
         margin-left: 30px;
         position: relative; }
@@ -4978,131 +4994,113 @@ input.switch:checked ~ label:after {
     height: 600px;
     background-color: #FFF;
     box-shadow: 0px 0px 12px 0px rgba(128, 128, 128, 0.8); }
-
-.settings header {
-    height: 47px;
-    padding-top: 30px; }
-
-.settings a {
-    text-decoration: none;
-    cursor: pointer; }
-
-.settings .center {
-    text-align: center; }
-
-.settings .btn-long {
-    width: 240px;
-    height: 38px;
-    line-height: 38px; }
-
-.settings ul.nav {
-    list-style-type: none;
-    padding: 0;
-    margin: 0 auto;
-    width: 70%;
-    background-color: #FFF;
-    text-align: center; }
-
-.settings .nav li.nav-item {
-    width: 100%;
-    height: 47px;
-    line-height: 47px;
-    display: inline;
-    float: left;
-    border-bottom: 2px #E0E0E0 solid; }
-
-.settings .nav li.active {
-    border-bottom: 2px #424242 solid; }
-
-.settings .nav a {
-    font-size: 16px;
-    letter-spacing: 0.3px;
-    color: #777777;
-    text-decoration: none; }
-
-.settings .tabs .active {
-    background: rgba(255, 255, 255, 0.7); }
-
-.settings .tab-container {
-    margin-top: 40px;
-    display: inline-block;
-    width: 100%; }
-
-.settings .tab-container.no-top-margin {
-    margin-top: 0px; }
-
-.settings .form {
-    width: 70%;
-    margin: 0 auto; }
-
-.settings .form .no-left-margin {
-    margin-left: 0; }
-
-.settings .printer-list ul {
-    list-style: none;
-    padding: 0; }
-
-.settings .general .row-fluid {
-    margin: 0 0 20px 0; }
-
-.settings .general input[type="text"],
-.settings .general select {
-    width: 240px;
-    height: 32px;
-    overflow: hidden;
-    border: 1px solid #ccc;
-    background-color: #FFFFFF;
-    padding-left: 10px; }
-
-.settings footer {
-    width: 100%;
-    height: 100px;
-    border-top: 1px #E0E0E0 solid;
-    text-align: center; }
-
-.settings footer .actions {
-    padding-top: 30px; }
-
-.settings footer .actions a {
-    margin: 0 13px; }
-
-.settings footer .actions .btn-cancel {
-    background-color: #FFFFFF;
-    border: 1px #E0E0E0 solid;
-    font-size: 14px;
-    color: #000; }
-
-.settings footer .actions .btn-cancel:hover {
-    border: 1px #4A4A4A solid; }
-
-.settings footer .actions .btn-done {
-    background-color: #424242;
-    font-size: 14px;
-    color: #FFF; }
-
-.settings footer .actions .btn-done:hover {
-    background-color: #000; }
-
-.settings .font1 {
-    font-size: 18px;
-    font-weight: 500;
-    letter-spacing: 0.3px;
-    color: #424242; }
-
-.settings .font2 {
-    font-size: 15px;
-    letter-spacing: 0.3px;
-    color: #777777; }
-
-.settings .font3 {
-    font-size: 14px;
-    letter-spacing: 0.3px;
-    color: #424242; }
-
-.settings .font4 {
-    font-size: 13px;
-    letter-spacing: 0.3px;
-    color: #777777; }
+    .settings header {
+        height: 47px;
+        padding-top: 30px; }
+    .settings a {
+        text-decoration: none;
+        cursor: pointer; }
+    .settings .center {
+        text-align: center; }
+    .settings .btn-long {
+        width: 240px;
+        height: 38px;
+        line-height: 38px; }
+    .settings ul.nav {
+        list-style-type: none;
+        padding: 0;
+        margin: 0 auto;
+        width: 70%;
+        background-color: #FFF;
+        text-align: center; }
+        .settings ul.nav li.nav-item {
+            width: 50%;
+            height: 47px;
+            line-height: 47px;
+            display: inline;
+            float: left;
+            border-bottom: 2px #E0E0E0 solid; }
+        .settings ul.nav li.active {
+            border-bottom: 2px #424242 solid; }
+        .settings ul.nav a {
+            font-size: 16px;
+            letter-spacing: 0.3px;
+            color: #777777;
+            text-decoration: none; }
+    .settings .tabs .active {
+        background: rgba(255, 255, 255, 0.7); }
+    .settings .tab-container {
+        margin-top: 40px;
+        display: inline-block;
+        width: 100%; }
+    .settings .tab-container.no-top-margin {
+        margin-top: 0px; }
+    .settings .form {
+        width: 70%;
+        margin: 0 auto; }
+        .settings .form .no-left-margin {
+            margin-left: 0; }
+    .settings .printer-list ul {
+        list-style: none;
+        padding: 0; }
+    .settings .general {
+        height: 350px;
+        overflow-x: hidden;
+        overflow-y: auto; }
+        .settings .general input[type="text"],
+        .settings .general select {
+            width: 240px;
+            height: 32px;
+            overflow: hidden;
+            border: 1px solid #ccc;
+            background-color: #FFFFFF;
+            padding-left: 10px; }
+        .settings .general .row-fluid {
+            margin: 0 0 20px 0; }
+        .settings .general .controls {
+            padding-bottom: 5px; }
+            .settings .general .controls .label {
+                width: 200px;
+                font-size: 14px; }
+            .settings .general .controls span {
+                font-size: 14px; }
+    .settings footer {
+        width: 100%;
+        height: 100px;
+        border-top: 1px #E0E0E0 solid;
+        text-align: center; }
+        .settings footer .actions {
+            padding-top: 30px; }
+            .settings footer .actions .btn-cancel {
+                background-color: #FFFFFF;
+                border: 1px #E0E0E0 solid;
+                font-size: 14px;
+                color: #000; }
+            .settings footer .actions .btn-cancel:hover {
+                border: 1px #4A4A4A solid; }
+            .settings footer .actions .btn-done {
+                background-color: #424242;
+                font-size: 14px;
+                color: #FFF; }
+            .settings footer .actions .btn-done:hover {
+                background-color: #000; }
+    .settings .font1 {
+        font-size: 18px;
+        font-weight: 500;
+        letter-spacing: 0.3px;
+        color: #424242; }
+    .settings .font2 {
+        font-size: 15px;
+        letter-spacing: 0.3px;
+        color: #777777; }
+    .settings .font3 {
+        font-size: 14px;
+        letter-spacing: 0.3px;
+        color: #424242; }
+    .settings .font4 {
+        font-size: 13px;
+        letter-spacing: 0.3px;
+        color: #777777; }
 
 /*for cloud*/
 .settings .cloud {

@@ -100,7 +100,9 @@ define([
 
     // detached keyup and keydown event
     window.addEventListener('popstate', function(e) {
-        window.GA('send', 'pageview', location.hash);
+        if(window.FLUX.allowTracking) {
+            window.analytics.event('send', 'pageview', location.hash);
+        }
         shortcuts.disableAll();
         menuFactory.methods.refresh();
         defaultKeyBehavior();
@@ -109,8 +111,9 @@ define([
     // GA Import Begin
     $('body').on('click', '[data-ga-event]', function(e) {
         var $self = $(e.currentTarget);
-
-        window.GA('send', 'event', 'button', 'click', $self.data('ga-event'));
+        if(window.FLUX.allowTracking) {
+            window.analytics('send', 'event', 'button', 'click', $self.data('ga-event'));
+        }
     });
 
     //GA Import End

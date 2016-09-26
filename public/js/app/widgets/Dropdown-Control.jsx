@@ -38,6 +38,12 @@ define([
             });
         },
 
+        componentWillReceiveProps: function(nextProps) {
+            if(nextProps.options.length !== this.props.options.length) {
+                this.forceUpdate();
+            }
+        },
+
         render: function() {
             var self = this,
                 _options;

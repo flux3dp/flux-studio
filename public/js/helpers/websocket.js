@@ -105,11 +105,15 @@ define([
 
                     switch (data.status) {
                     case 'error':
-                        Raven.captureException(data);
+                        if(window.FLUX.allowTracking) {
+                            window.Raven.captureException(data);
+                        }
                         socketOptions.onError(data);
                         break;
                     case 'fatal':
-                        Raven.captureException(data);
+                        if(window.FLUX.allowTracking) {
+                            window.Raven.captureException(data);
+                        }
                         socketOptions.onFatal(data);
                         break;
                     // ignore below status
@@ -138,7 +142,6 @@ define([
                         },
                         onCancel = function() {
                             removeListener();
-                            console.log('output error');
                             showProgramErrorPopup = true;
                         },
                         removeListener = function() {
@@ -278,13 +281,11 @@ define([
 
                 onClose: function(callback) {
                     socketOptions.onClose = callback;
-
                     return this;
                 },
 
                 onError: function(callback) {
                     socketOptions.onError = callback;
-
                     return this;
                 },
 

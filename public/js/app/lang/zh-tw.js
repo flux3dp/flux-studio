@@ -254,7 +254,7 @@ define(function() {
             caption: '設定',
             tabs: {
                 general: '一般',
-                printer: '成型機'
+                device: '機器'
             },
             ip: '機器 IP 位址',
             wrong_ip_format: 'IP格式錯誤',
@@ -298,7 +298,8 @@ define(function() {
                 '2': 'cura version error',
                 '3': 'path is not cura',
                 '4': 'path is not a exist file, please check engine path in setting section'
-            }
+            },
+            allow_tracking: '您是否願意自動傳送匿名用量資料，協助 FLUX 改進產品和服務？'
         },
         print: {
             import: '匯入',
@@ -317,6 +318,9 @@ define(function() {
                 cura: 'Cura',
                 filament: '線料',
                 temperature: '溫度',
+                detect_filament_runout: '偵測線料',
+                flux_calibration: '自動校正',
+                detect_head_tilt: '偵測工具頭傾斜',
                 layer_height_title: '層高',
                 layer_height: '一般層高',
                 firstLayerHeight: '底層層高',
@@ -705,31 +709,31 @@ define(function() {
             resolution: [{
                 id: 'best',
                 text: '最佳',
-                time: '~60min',
+                time: '~30分鐘',
                 value: 1200
             },
             {
                 id: 'high',
                 text: '精細',
-                time: '~40min',
+                time: '~20分鐘',
                 value: 800
             },
             {
                 id: 'normal',
                 text: '中等',
-                time: '~20min',
+                time: '~10分鐘',
                 value: 400
             },
             {
                 id: 'low',
                 text: '快速',
-                time: '~10min',
+                time: '~5分鐘',
                 value: 200
             },
             {
                 id: 'draft',
                 text: '草稿',
-                time: '~5min',
+                time: '~2分鐘',
                 value: 100
             }],
             save_mode: [
@@ -831,7 +835,42 @@ define(function() {
             IP: 'IP',
             serial_number: '序號',
             firmware_version: '韌體版本',
-            UUID: 'UUID'
+            UUID: 'UUID',
+            select: '選擇',
+            deviceList: '機器列表',
+            calibration: {
+                title: '自動校正',
+                A: '水平與高度',
+                H: '高度',
+                N: '關閉',
+                byFile: '根據 FCODE 設定'
+            },
+            detectFilament: {
+                title: '偵測線料',
+                on: '開啟',
+                off: '關閉',
+                byFile: '根據 FCODE 設定'
+            },
+            filterHeadError: {
+                title: '工具頭錯誤偵測',
+                shake: '過度搖晃',
+                tilt: '傾斜',
+                fan_failure: '風扇故障',
+                laser_down: '雷射安全鎖',
+                byFile: '根據 FCODE 設定',
+                no: '關閉'
+            },
+            autoresume: {
+                title: '智慧工作恢復',
+                on: '開啟',
+                off: '關閉'
+            },
+            broadcast: {
+                title: 'UPNP 廣播',
+                L: '預設',
+                A: '密集',
+                N: '關閉'
+            }
         },
         monitor: {
             change_filament                     : 'CHANGE FILLAMENT',
@@ -1066,6 +1105,7 @@ define(function() {
             RESOURCE_BUSY: '請確認機器的狀態是於待命中',
             headMissing: '無法取得工具頭資訊，請確認工具頭是否連接於機器',
             calibrated: '平台校正完成'
+            extruderOnly: '請使用列印工具頭來做校正'
         }
     };
 });
