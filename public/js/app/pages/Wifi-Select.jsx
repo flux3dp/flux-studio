@@ -290,7 +290,6 @@ define([
                     wifi = initializeMachine.settingWifi.get();
 
                 wifi.plain_password = self.refs.password.getDOMNode().value;
-
                 initializeMachine.settingWifi.set(wifi);
                 self._stopScan(actionMap.BACK_TO_SET_PASSWARD);
             },
@@ -370,7 +369,7 @@ define([
                     security = this.refs.network_security.getDOMNode().value;
 
                 let wifi = { ssid, security };
-
+                initializeMachine.settingWifi.set(wifi);
                 globalWifiAPI.setWifiNetwork(wifi, wepkey, true).then((result) => {
                     if(result.status === 'ok') {
                         location.hash = '#initialize/wifi/notice-from-device';
@@ -591,10 +590,10 @@ define([
 
             _renderWifiOptions: function(lang) {
                 return (
-                    0 < this.state.wifiOptions.length ?
+                    this.state.wifiOptions.length > 0 ?
                     <ListView
                         ref="wifiList"
-                        className="pure-list wifi-list clearfix"
+                        className={"pure-list wifi-list clearfix " + (this.state.wifiOptions.length > 0 ? 'active' : '')  }
                         ondblclick={this._confirmWifi}
                         onClick={this._selectWifi}
                         items={this.state.wifiOptions}
@@ -614,7 +613,7 @@ define([
                     items = self._renderWifiOptions(lang),
                     buttons = [{
                         label: lang.initialize.next,
-                        className: 'btn-action btn-large' + (true === self.state.selectedWifi ? '' : ' btn-disabled'),
+                        className: 'btn-action btn-large btn-set-client-mode' + (true === self.state.selectedWifi ? '' : ' btn-disabled'),
                         dataAttrs: {
                             'ga-event': 'pickup-a-wifi'
                         },

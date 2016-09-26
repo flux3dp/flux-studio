@@ -153,7 +153,7 @@ define([
                             defaultUnitType="speed"
                             defaultValue={this.state.defaults.speed}
                             getValue={this._updateDefaults}
-                            min={0.1}
+                            min={0.8}
                             max={150}
                         />
                     </div>

@@ -28,7 +28,8 @@ define([
     'helpers/api/discover',
     'helpers/check-firmware',
     'helpers/firmware-updater',
-    'helpers/device-list'
+    'helpers/device-list',
+    'Raven',
 ], function(
     $,
     React,
@@ -59,7 +60,8 @@ define([
     discover,
     checkFirmware,
     firmwareUpdater,
-    DeviceList
+    DeviceList,
+    Raven
 ) {
     'use strict';
 
@@ -289,6 +291,7 @@ define([
                         caption      : payload.caption,
                         inputHeader  : payload.inputHeader,
                         defaultValue : payload.defaultValue,
+                        maxLength    : payload.maxLength,
                         confirmText  : payload.confirmText,
                         onClose      : payload.onClose || function() {},
                         onSubmit     : payload.onSubmit || function() {}
@@ -543,6 +546,7 @@ define([
                             inputHeader={this.state.inputLightbox.inputHeader}
                             defaultValue={this.state.inputLightbox.defaultValue}
                             confirmText={this.state.inputLightbox.confirmText}
+                            maxLength={this.state.inputLightbox.maxLength}
                             onClose={this._handleInputLightBoxClosed}
                             onSubmit={this._handleInputLightBoxSubmit}
                         />

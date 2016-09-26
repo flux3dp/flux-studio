@@ -3,7 +3,9 @@ define(function() {
 
     return {
         support: {
-            no_webgl: 'WebGL is not supported. Please use other devices.'
+            no_webgl: 'WebGL is not supported. Please use other devices.',
+            no_vcredist: 'Please install Visual C++ Redistributable 2015',
+            osx_10_9: 'OS X 10.9 is not supported. Please update to newer version'
         },
         device_selection: {
             no_printers: 'Cannot detect FLUX Delta through Wi-Fi. Please check if your PC and FLUX Delta are under the same network. <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/215394548">More Info</a>',
@@ -86,7 +88,14 @@ define(function() {
                 check_firmware_update: 'Update Firmware',
                 update_delta: 'Delta Firmware',
                 update_toolhead: 'Toolhead Firmware',
-                calibrate: 'Calibrate'
+                calibrate: 'Run Auto Leveling',
+                set_to_origin: 'Calibrate Origin ( Home )',
+                scan_laser_calibrate: 'Turn On Scanning Laser',
+                clean_calibration: 'Run Auto Leveling with Clean Data',
+                commands: 'Commands', 
+                set_to_origin_complete: 'Delta has calibrated its origin.',
+                scan_laser_complete: 'Delta has turned on its scanning laser. Click "Finish" to turn it off.',
+                finish: 'FINISH',
             },
             window: {
                 label: 'Window',
@@ -139,7 +148,7 @@ define(function() {
                 old_password: 'Current Password',
                 password: 'Password',
                 set_station_mode: 'Create a Network',
-                password_placeholder: 'Something secret',
+                password_placeholder: 'Secure your Delta from bad people',
                 incorrect_old_password: 'Incorrect Current Password',
                 incorrect_password: 'Incorrect Password',
                 ap_mode_name: 'Network Name',
@@ -149,7 +158,7 @@ define(function() {
                 ap_mode_name_placeholder: 'Up to 32 characters.',
                 ap_mode_pass_placeholder: 'Must have at least 8 characters.',
                 create_network: 'Create Network',
-                join_network: 'Join Network',
+                join_network: 'Join Other Network',
                 security: 'Security'
             },
 
@@ -173,7 +182,7 @@ define(function() {
                 breathing: 'Breathing',
                 breathing_desc: 'Wi-Fi connection failed. Please try setting again.',
                 successfully: 'If FLUX Delta connect successfully',
-                successfully_statement: 'Please go back to your Wi-Fi list and connect to your PC to %s, then restart FLUX Studio',
+                successfully_statement: 'Please go back to your Wi-Fi list and connect your PC to %s, then restart FLUX Studio',
                 restart: 'Restart FLUX Studio'
             },
 
@@ -245,7 +254,7 @@ define(function() {
             caption: 'Settings',
             tabs: {
                 general: 'General',
-                printer: 'Printer'
+                device: 'Device'
             },
             ip: 'Delta\'s IP',
             wrong_ip_format: 'Wrong IP Formats',
@@ -265,7 +274,8 @@ define(function() {
                 '2': 'cura version error',
                 '3': 'path is not cura',
                 '4': 'path is not a exist file, please check engine path in setting section'
-            }
+            },
+            allow_tracking: 'Would you like to send anonymous usage statistics to FLUX to improve the app?'
         },
         print: {
             import: 'IMPORT',
@@ -283,6 +293,9 @@ define(function() {
                 cura: 'Cura',
                 filament: 'Filament',
                 temperature: 'Temperature',
+                detect_filament_runout: 'Filament Detection',
+                flux_calibration: 'Auto Calibration',
+                detect_head_tilt: 'Tilt Detection',
                 layer_height_title: 'Layer Height',
                 layer_height: 'Layer Height',
                 firstLayerHeight: 'First Layer Height',
@@ -327,15 +340,16 @@ define(function() {
                 outerShell: 'Outer Shell',
                 bridge: 'Bridge',
                 config: 'Expert Settings',
-                presets: 'Presets',
+                presets: 'Configs',
                 name: 'Name',
                 apply: 'APPLY',
                 save: 'SAVE',
-                saveAsPreset: 'Save Preset',
+                saveAsPreset: 'Save Config',
                 cancel: 'CANCEL',
                 delete: 'DELETE',
-                loadPreset: 'Load Preset',
-                savePreset: 'Save Preset'
+                loadPreset: 'Load Config',
+                savePreset: 'Save Config',
+                reloadPreset: 'Reset Config'
             },
             mode: [
                 {
@@ -510,7 +524,7 @@ define(function() {
             import: 'IMPORT',
             save: 'Save',
             custom: 'Custom',
-            presets: 'Presets',
+            presets: 'Load Config',
             button_advanced: 'ADVANCED',
             confirm: 'Confirm',
             get_fcode: 'Save<br/>Task',
@@ -632,8 +646,9 @@ define(function() {
                 },
                 save_and_apply: 'SAVE & APPLY',
                 save_as_preset: 'SAVE',
-                save_as_preset_title: 'Save Preset',
-                load_preset_title: 'Load Preset',
+                save_as_preset_title: 'Save Config',
+                load_preset_title: 'Load Config',
+                background: 'Background',
                 apply: 'APPLY',
                 cancel: 'CANCEL',
                 save: 'SAVE'
@@ -669,31 +684,31 @@ define(function() {
             resolution: [{
                 id: 'best',
                 text: 'Best',
-                time: '~60min',
+                time: '~30min',
                 value: 1200
             },
             {
                 id: 'high',
                 text: 'High',
-                time: '~40min',
+                time: '~20min',
                 value: 800
             },
             {
                 id: 'normal',
                 text: 'Normal',
-                time: '~20min',
+                time: '~10min',
                 value: 400
             },
             {
                 id: 'low',
                 text: 'Low',
-                time: '~10min',
+                time: '~5min',
                 value: 200
             },
             {
                 id: 'draft',
                 text: 'Draft',
-                time: '~5min',
+                time: '~2min',
                 value: 100
             }],
             save_mode: [
@@ -748,10 +763,10 @@ define(function() {
             }
         },
         select_printer: {
-            choose_printer: 'Choose a printer',
-            notification: 'Please enter the password',
+            choose_printer: 'Choose a device',
+            notification: '"%s" requires a password',
             submit: 'SUBMIT',
-            please_enter_password: 'password',
+            please_enter_password: 'Password',
             auth_failure: 'Authentication fail',
             retry: 'Retry',
             unable_to_connect: '#008 Unable to build a stable connection with machine'
@@ -795,7 +810,42 @@ define(function() {
             IP: 'IP',
             serial_number: 'Serial Number',
             firmware_version: 'Firmware Version',
-            UUID: 'UUID'
+            UUID: 'UUID',
+            select: 'Select',
+            deviceList: 'Device List',
+            calibration: {
+                title: 'Auto Calibration',
+                A: 'Leveling & Height',
+                H: 'Height Only',
+                N: 'Off',
+                byFile: 'By File'
+            },
+            detectFilament: {
+                title: 'Filament Detection',
+                on: 'On',
+                off: 'Off',
+                byFile: 'By File'
+            },
+            filterHeadError: {
+                title: 'Toolhead Error Detection',
+                shake: 'Shake',
+                tilt: 'Tilt',
+                fan_failure: 'Fan Failure',
+                laser_down: 'Laser Interlock',
+                byFile: 'By File',
+                no: 'No'
+            },
+            autoresume: {
+                title: 'Smart Task Continuation',
+                on: 'On',
+                off: 'Off'
+            },
+            broadcast: {
+                title: 'UPNP Broadcast',
+                L: 'Default',
+                A: 'Active',
+                N: 'No'
+            }
         },
         monitor: {
             change_filament                     : 'CHANGE FILAMENT',
@@ -846,15 +896,15 @@ define(function() {
             second                              : 's',
             left                                : 'left',
             temperature                         : 'Temperature',
-            forceStop                           : 'Abort current task?',
+            forceStop                           : 'Do you want to abort current task?',
             upload                              : 'Upload',
             download                            : 'Download',
             fileNotDownloadable                 : 'This file type is not supported for download',
-            cannotPreview                       : 'Can not preview this file',
-            extensionNotSupported               : 'File format not supported',
-            fileExistContinue                   : 'File already exist, do you want to replace it?',
-            confirmGToF                         : 'Uploaded GCode will be converted to FCode, continue (will replace if exist)',
-            updatePrintPresetSetting            : 'FLUX STUDIO has new printing preset, do you want to update?\n(will overwrite current parameters)',
+            cannotPreview                       : 'Can not preview this file format',
+            extensionNotSupported               : 'This file format is not supported',
+            fileExistContinue                   : 'File already exists, do you want to replace it?',
+            confirmGToF                         : 'The GCode will be converted to FCode, do you want to continue? ( will replace if exists )',
+            updatePrintPresetSetting            : 'FLUX STUDIO has new default printing parameters, do you want to update?\n( Current one will be overwritten )',
             confirmFileDelete                   : 'Are you sure you want to delete this file?',
             task: {
                 EXTRUDER                        : 'Printing Task',
@@ -969,8 +1019,8 @@ define(function() {
                 '5': '#162 Toolhead tilt detected\nPlease check ball joint rod is attached correctly',
                 '6': '#119 Printer toolhead is unable to control temperature. Please contact FLUX Support.',
                 '7': '#113 Cooling fan failed\nKindly spin the fan with a pencil or thin stick. <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/217732178">More Info</a>',
-                '8': '#116 Engraving toolhead tilt detected \nPlease ensure the rods are connected correctly. <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/217085937">More Info</a>',
-                '9': '#118 Printer toolhead is unable to heat. Please contact FLUX Support.'
+                '8': '#116 Engraving toolhead tilt detected\nPlease ensure the rods are connected correctly. <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/217085937">More Info</a>',
+                '9': '#118 Unable to heat printer toolhead\nPlease contact FLUX Support.'
             }
         },
         change_filament: {
@@ -1029,7 +1079,8 @@ define(function() {
         calibration: {
             RESOURCE_BUSY: 'Please make sure the machine is in idle status',
             headMissing: 'Cannot retrieve head module information, please make sure it\'s attached',
-            calibrated: 'Device has been calibrated'
+            calibrated: 'Auto Leveling Completed',
+            extruderOnly: 'Please use the printing toolhead for calibration'
         }
     };
 });

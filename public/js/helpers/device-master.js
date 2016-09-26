@@ -71,6 +71,7 @@ define([
                         auth(uuid, password).always(() => {
                             ProgressActions.close();
                         }).done((data) => {
+                            device.plaintext_password = password;
                             selectDevice(device, d);
                         }).fail((response) => {
                             let message = (
@@ -505,6 +506,85 @@ define([
 
     function calibrate() {
         let d = $.Deferred();
+        let debug_data = {};
+
+        const processError = (error = {}) => {
+            let message = '';
+            if(error.status === 'error') {
+                message = lang.monitor[error.error.join('_')];
+            }
+            else if(error.info === DeviceConstants.RESOURCE_BUSY) {
+                message = lang.calibration.RESOURCE_BUSY;
+            }
+            else if(error.module === 'LASER') {
+                message = lang.calibration.extruderOnly;
+            }
+            else if(!error.module) {
+                message = lang.calibration.headMissing;
+            }
+            else {
+                message = error.error.join(' ');
+            }
+
+            AlertActions.showPopupError('device-busy', message);
+            SocketMaster.addTask('endMaintainMode');
+        };
+
+        const step1 = () => {
+            let _d = $.Deferred();
+            SocketMaster.addTask('enterMaintainMode').then((response) => {
+                if(response.status === 'ok') {
+                    return SocketMaster.addTask('getHeadInfo');
+                }
+                else {
+                    _d.reject(response);
+                }
+            }).then((headInfo) => {
+                if(headInfo.module === null) {
+                    return $.Deferred().reject();
+                }
+                else if(headInfo.module !== 'EXTRUDER') {
+                    return $.Deferred().reject({module:'LASER'});
+                }
+                else {
+                    return SocketMaster.addTask('maintainHome');
+                }
+            }).then((response) => {
+                response.status === 'ok' ? _d.resolve() : _d.reject();
+            }).fail((error) => {
+                _d.reject(error);
+            });
+            return _d.promise();
+        };
+
+        const step2 = () => {
+            let _d = $.Deferred();
+            SocketMaster.addTask('calibrate').then((response) => {
+                console.log("calibrate resp", response)
+                debug_data = response.debug;
+                return SocketMaster.addTask('endMaintainMode');
+            }).then(() => {
+                _d.resolve();
+            }).fail((error) => {
+                _d.reject(error);
+            });
+            return _d.promise();
+        };
+
+        step1().then(() => {
+            return step2();
+        }).then(() => {
+            d.resolve(debug_data);
+        }).fail((error) => {
+            processError(error);
+            d.reject(error);
+        });
+
+        return d.promise();
+    }
+
+    function home() {
+        let d = $.Deferred();
 
         const processError = (error = {}) => {
             let message = '';
@@ -542,12 +622,51 @@ define([
             return _d.promise();
         };
 
-        const step2 = () => {
+        step1().then(() => {
+            return SocketMaster.addTask('endMaintainMode');
+        }).then(() => {
+            d.resolve();
+        }).fail((error) => {
+            processError(error);
+            d.reject(error);
+        });
+
+        return d.promise();
+    }
+
+    function cleanCalibration() {
+        let d = $.Deferred();
+
+        const processError = (error = {}) => {
+            let message = '';
+            if(error.status === 'error') {
+                message = lang.monitor[error.error.join('_')];
+            }
+            else if(error.info === DeviceConstants.RESOURCE_BUSY) {
+                message = lang.calibration.RESOURCE_BUSY;
+            }
+            else if(!error.module) {
+                message = lang.calibration.headMissing;
+            }
+            else {
+                message = error.error.join(' ');
+            }
+
+            AlertActions.showPopupError('device-busy', message);
+            SocketMaster.addTask('endMaintainMode');
+        };
+
+        const step1 = () => {
             let _d = $.Deferred();
-            SocketMaster.addTask('calibrate').then(() => {
-                return SocketMaster.addTask('endMaintainMode');
-            }).then(() => {
-                _d.resolve();
+            SocketMaster.addTask('enterMaintainMode').then((response) => {
+                if(response.status === 'ok') {
+                    return SocketMaster.addTask('maintainClean');
+                }
+                else {
+                    _d.reject(response);
+                }
+            }).then((response) => {
+                response.status === 'ok' ? _d.resolve() : _d.reject();
             }).fail((error) => {
                 _d.reject(error);
             });
@@ -555,7 +674,7 @@ define([
         };
 
         step1().then(() => {
-            return step2();
+            return SocketMaster.addTask('endMaintainMode');
         }).then(() => {
             d.resolve();
         }).fail((error) => {
@@ -645,6 +764,49 @@ define([
         });
     }
 
+    function getDeviceList() {
+        return _deviceNameMap;
+    }
+
+    function getDeviceSettings() {
+        let d = $.Deferred(),
+            settings = {},
+            _settings = ['correction', 'filament_detect', 'head_error_level', 'autoresume', 'broadcast'];
+
+        const worker = function*() {
+            for(let i = 0; i < _settings.length; i++) {
+                yield SocketMaster.addTask('getDeviceSetting', _settings[i]);
+            }
+        };
+
+        const go = (result) => {
+            if(!result.done) {
+                result.value.then((r) => {
+                    let { key, value } = r;
+                    settings[key] = value;
+                    go(w.next());
+                });
+            }
+            else {
+                d.resolve(settings);
+            }
+        };
+
+        let w = worker();
+        go(w.next());
+
+        return d.promise();
+    }
+
+    function setDeviceSetting(name, value) {
+        if(value === 'delete') {
+            return SocketMaster.addTask('deleteDeviceSetting', name);
+        }
+        else {
+            return SocketMaster.addTask('setDeviceSetting', name, value);
+        }
+    }
+
     // Core
 
     function DeviceSingleton() {
@@ -687,9 +849,14 @@ define([
             this.streamCamera           = streamCamera;
             this.stopStreamCamera       = stopStreamCamera;
             this.calibrate              = calibrate;
+            this.home                   = home;
+            this.cleanCalibration       = cleanCalibration;
             this.detectHead             = detectHead;
             this.enterMaintainMode      = enterMaintainMode;
             this.endMaintainMode        = endMaintainMode;
+            this.getDeviceList          = getDeviceList;
+            this.getDeviceSettings      = getDeviceSettings;
+            this.setDeviceSetting       = setDeviceSetting;
 
             Discover(
                 'device-master',

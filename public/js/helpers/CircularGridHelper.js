@@ -119,8 +119,8 @@ CircularGridHelper.prototype._drawGrid = function() {
         }
       }
       //create main & sub grid objects
-      this.mainGrid = new THREE.Line(gridGeometry, gridMaterial, THREE.LinePieces);
-      this.subGrid = new THREE.Line(subGridGeometry, subGridMaterial, THREE.LinePieces);
+      this.mainGrid = new THREE.LineSegments(gridGeometry, gridMaterial);
+      this.subGrid = new THREE.LineSegments(subGridGeometry, subGridMaterial);
 
       //create margin
       var offsetWidth  = width + this.marginSize;

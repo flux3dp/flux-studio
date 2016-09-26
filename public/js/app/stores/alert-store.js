@@ -164,6 +164,10 @@ define([
                 },
 
                 'SHOW_POPUP_CUSTOM': function() {
+                    AlertStore.emit(POPUP_EVENT, AlertConstants.CUSTOM, payload.id, payload.caption, payload.message, payload.customText);
+                },
+
+                'SHOW_POPUP_CUSTOM_CANCEL': function() {
                     AlertStore.emit(POPUP_EVENT, AlertConstants.CUSTOM_CANCEL, payload.id, payload.caption, payload.message, payload.customText);
                 },
 

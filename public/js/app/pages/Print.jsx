@@ -126,7 +126,7 @@ define([
                     position: 'left'
                 },
                 {
-                    selector: '.flux-monitor .operation',
+                    selector: '',
                     text: lang.tutorial.startPrint,
                     offset_y: 25,
                     r: 80,
@@ -186,6 +186,7 @@ define([
                         previewMode                 : false,
                         previewModeOnly             : false,
                         disablePreview              : false,
+                        slicingPercentage           : 0,
                         currentTutorialStep         : 0,
                         layerHeight                 : 0.1,
                         raftLayers                  : _raftLayers,
@@ -221,7 +222,9 @@ define([
                     nwjsMenu.saveScene.onClick = this._handleDownloadScene;
                     nwjsMenu.clear.onClick = this._handleClearScene;
                     nwjsMenu.tutorial.onClick = () => {
-                        this._handleYes('tour');
+                        this.setState({ currentTutorialStep: 0 }, () => {
+                            this._handleYes('tour');
+                        });
                     };
                     nwjsMenu.clearLocalstorage.enabled = true;
                     nwjsMenu.clearLocalstorage.onClick = () => {
@@ -232,12 +235,15 @@ define([
                     menuFactory.methods.refresh();
 
                     this._registerKeyEvents();
+                    this._registerTracking();
+
                     if(tutorialMode) {
                         //First time using, with usb-configured printer..
                         AlertActions.showPopupYesNo('set_default', sprintf(lang.tutorial.set_first_default,Config().read('configured-printer')),lang.tutorial.set_first_default_caption);
                     }
 
                     AlertStore.onYes(this._handleYes);
+                    AlertStore.onNo(this._handleNo);
                     AlertStore.onCancel(this._handleDefaultCancel);
                     listeningToCancel = true;
                     GlobalStore.onCancelPreview(this._handleCancelPreview);
@@ -293,6 +299,14 @@ define([
                     }
                 },
 
+                _registerTracking: function() {
+                    let allowTracking = Config().read('allow-tracking');
+                    console.log(allowTracking); 
+                    if(allowTracking == '') {
+                        AlertActions.showPopupYesNo('allow_tracking', lang.settings.allow_tracking);
+                    }
+                },
+
                 _prepareMenu: function() {
                     nwjsMenu.import.enabled = true;
                     nwjsMenu.import.onClick = () => { $importBtn.click(); };
@@ -313,7 +327,11 @@ define([
                 },
 
                 _handleYes: function(answer, args) {
+                    console.log(answer, args);
                     if(answer === 'tour') {
+                        if(this.state.hasObject) {
+                            director.clearScene();
+                        }
                         this.setState({ tutorialOn: true });
                         tutorialMode = true;
                     }
@@ -365,6 +383,13 @@ define([
                     else if(answer === GlobalConstants.IMPORT_SCENE) {
                         director.loadScene();
                     }
+                    else if(answer === 'allow-tracking') {
+                        Config().write('allow-tracking', 'true');
+                    }
+                },
+
+                _handleNo(answer, args) {
+                    console.log(answer);
                 },
 
                 _handleCancelTutorial: function(answer) {
@@ -714,6 +739,10 @@ define([
                     else if (ans === 'print-setting-version') {
                         Config().write('print-setting-version', GlobalConstants.DEFAULT_PRINT_SETTING_VERSION);
                     }
+                    else if(ans === 'allow_tracking') {
+                        Config().write('allow-tracking', 'false');
+                        window.location.reload();
+                    }
 
                     setTimeout(function() {
                         this._registerTutorial();
@@ -769,7 +798,7 @@ define([
 
                 _checkDefaultPrintSettingsVersion: function() {
                     var version = Config().read('print-setting-version');
-                    if(!version || version !== GlobalConstants.DEFAULT_PRINT_SETTING_VERSION) {
+                    if(version && version !== GlobalConstants.DEFAULT_PRINT_SETTING_VERSION) {
                         AlertActions.showPopupYesNo('print-setting-version', lang.monitor.updatePrintPresetSetting);
                     }
                 },
@@ -896,6 +925,18 @@ define([
                     );
                 },
 
+                _renderPercentageBar: function() {
+                    var computed_style = {
+                        width: (this.state.slicingPercentage*100 + '%')
+                    };
+                    return (
+                        <div className="slicingProgressBar">
+                            <div className="slicingProgressBarInner" style={computed_style}> 
+                            </div>
+                        </div>
+                    );
+                },
+
                 _renderNwjsMenu: function() {
                     if(nwjsMenu.undo.enabled !== this.state.hasObject) {
                         nwjsMenu.undo.enabled = this.state.hasObject;
@@ -906,6 +947,18 @@ define([
                     }
                 },
 
+                _renderTourGuide: function() {
+                    return (
+                        <TourGuide
+                            lang={lang}
+                            enable={this.state.tutorialOn}
+                            guides={tourGuide}
+                            step={this.state.currentTutorialStep}
+                            onNextClick={this._handleTutorialStep}
+                            onComplete={this._handleTutorialComplete} />
+                    );
+                },
+
                 render: function() {
                     var advancedPanel           = this.state.showAdvancedSettings ? this._renderAdvancedPanel() : '',
                         importWindow            = this._renderImportWindow(),
@@ -914,7 +967,9 @@ define([
                         objectDialogue          = this.state.openObjectDialogue ? this._renderObjectDialogue() : '',
                         printerSelectorWindow   = this.state.openPrinterSelectorWindow ? this._renderPrinterSelectorWindow() : '',
                         waitWindow              = this.state.openWaitWindow ? this._renderWaitWindow() : '',
-                        progressWindow          = this.state.progressMessage ? this._renderProgressWindow() : '';
+                        progressWindow          = this.state.progressMessage ? this._renderProgressWindow() : '',
+                        percentageBar           = (!this.state.openImportWindow) ? this._renderPercentageBar() : '',
+                        tourGuideSection        = this.state.tutorialOn ? this._renderTourGuide() : '';
 
                     this._renderNwjsMenu();
 
@@ -925,7 +980,11 @@ define([
 
                             {leftPanel}
 
+                            {percentageBar}
+
                             {rightPanel}
+
+
 
                             {objectDialogue}
 
@@ -938,19 +997,12 @@ define([
                             {progressWindow}
 
 
-
                             <div id="model-displayer" className="model-displayer">
                                 <div className="import-indicator"></div>
                             </div>
                             <input className="hide" ref="importBtn" type="file" accept=".stl,.fc,.gcode,.obj" onChange={this._handleImport} multiple/>
 
-                            <TourGuide
-                                lang={lang}
-                                enable={this.state.tutorialOn}
-                                guides={tourGuide}
-                                step={this.state.currentTutorialStep}
-                                onNextClick={this._handleTutorialStep}
-                                onComplete={this._handleTutorialComplete} />
+                            {tourGuideSection}
 
                         </div>
                     );

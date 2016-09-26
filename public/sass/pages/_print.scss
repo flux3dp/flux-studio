@@ -401,6 +401,7 @@ input.switch:empty ~ label:after {
     transition: all 100ms ease-in;
     width: 2.8em;
 }
+
 input.switch:empty ~ label:after {
     background-color: #fff;
     border-radius: 0.5em;
@@ -410,9 +411,11 @@ input.switch:empty ~ label:after {
     top: 0.1em;
     width: 1em;
 }
+
 input.switch:checked ~ label:before {
     background-color: #393;
 }
+
 input.switch:checked ~ label:after {
     margin-left: 1.6em;
     margin-top: 0.05em;
@@ -916,4 +919,19 @@ input.switch:checked ~ label:after {
 }
 .onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-switch {
     right: 0;
+}
+
+.slicingProgressBar{
+    position: fixed;
+    z-index: 999;
+    left: 35px;
+    bottom: 35px;
+    height: 10px;
+    width: 150px;
+    background: #BBB;
+    .slicingProgressBarInner{
+        height: 10px;
+        background: #666;
+        transition: width 0.5s;
+    }
 }

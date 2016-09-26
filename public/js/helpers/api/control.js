@@ -57,6 +57,10 @@ define([
                         break;
                     }
                 },
+                onDebug: (response) => {
+                    if(events.onDebug)
+                        events.onDebug(response);
+                },
                 onError: (response) => {
                     events.onError(response);
                 },
@@ -143,7 +147,7 @@ define([
 
         ws = createWs();
 
-        return {
+        let ctrl = {
             connection: ws,
             ls: (path) => {
                 let d = $.Deferred();
@@ -220,11 +224,7 @@ define([
 
             // upload: function(filesize, print_data) {
             upload: (data, path, fileName) => {
-                let d = $.Deferred(),
-                    CHUNK_PKG_SIZE = 4096,
-                    length = data.length || data.size,
-                    uploading,
-                    step = 0;
+                let d = $.Deferred();
 
                 prepareUpload(d, data);
 
@@ -308,7 +308,7 @@ define([
                     }, retryLength);
                 };
 
-                events.onMessage = (response) => { isIdle(response) ? d.resolve() : retry(response.status !== 'ok') };
+                events.onMessage = (response) => { isIdle(response) ? d.resolve() : retry(response.status !== 'ok'); };
                 events.onError = (response) => { counter >= 3 ? d.reject(response) : retry(); };
                 events.onFatal = (response) => { counter >= 3 ? d.reject(response) : retry(); };
 
@@ -369,18 +369,35 @@ define([
                 return d.promise();
             },
 
-            calibrate: () => {
+            calibrate: (clean) => {
                 let d = $.Deferred(),
-                    errorCount = 0;
+                    errorCount = 0,
+                    temp = { debug: [] };
 
                 events.onMessage = (response) => {
                     if(response.status === 'ok') {
                         if(response.data.length > 1) {
-                            ws.send(`maintain zprobe`);
+                            ws.send('maintain zprobe');
                         }
                         else {
+                            response.debug = temp.debug;
                             d.resolve(response);
                         }
+                    }else if(response.status === 'operating'){
+                        temp.operation_info = response;
+                    }
+                };
+
+                events.onDebug = (response) => {
+                    if(response.log){
+                        if(temp.operation_info){
+                            if(typeof temp.operation_info.pos !== 'undefined'){
+                                response.log += " POS " + temp.operation_info.pos;
+                            }else{
+                                response.log += " Z"
+                            }
+                        }
+                        temp.debug.push(response.log);
                     }
                 };
 
@@ -389,7 +406,10 @@ define([
                         if(errorCount === 0 && response.error[0] === 'HEAD_ERROR') {
                             setTimeout(() => {
                                 errorCount++;
-                                ws.send('maintain calibrating');
+                                if(clean === true)
+                                    ws.send('maintain calibrating clean');
+                                else
+                                    ws.send('maintain calibrating');
                             }, 500);
                         }
                     }
@@ -399,12 +419,24 @@ define([
                 };
                 events.onFatal = (response) => { d.resolve(response); };
 
-                ws.send(`maintain calibrating`);
+                ws.send('maintain calibrating');
                 return d.promise();
             },
 
             getHeadInfo: () => {
                 return useDefaultResponse('maintain headinfo');
+            },
+
+            getDeviceSetting: (name) => {
+                return useDefaultResponse(`config get ${name}`);
+            },
+
+            setDeviceSetting: (name, value) => {
+                return useDefaultResponse(`config set ${name} ${value}`);
+            },
+
+            deleteDeviceSetting: (name) => {
+                return useDefaultResponse(`config del ${name}`);
             },
 
             /**
@@ -413,8 +445,15 @@ define([
              *
              * @return {Promise}
              */
-            enterMaintainMode: (timeout) => {
-                return useDefaultResponse('task maintain');
+            enterMaintainMode: () => {
+                let d = $.Deferred();
+
+                events.onMessage = (response) => { setTimeout(() => {d.resolve(response);},3000); };
+                events.onError = (response) => { d.reject(response); };
+                events.onFatal = (response) => { d.reject(response); };
+
+                ws.send('task maintain');
+                return d.promise();
             },
 
             endMaintainMode: () => {
@@ -533,5 +572,11 @@ define([
                 return d.promise();
             }
         };
+
+        ctrl.maintainClean = function(){
+            return ctrl.calibrate(true);
+        }
+
+        return ctrl;
     };
 });

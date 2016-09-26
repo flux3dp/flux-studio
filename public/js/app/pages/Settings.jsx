@@ -4,6 +4,7 @@ define([
     'helpers/i18n',
     'jsx!widgets/Select',
     'jsx!views/settings/Setting-General',
+    'jsx!views/settings/Setting-Device',
     'helpers/display',
     'plugins/classnames/index',
     'app/app-settings',
@@ -13,7 +14,8 @@ define([
     React,
     i18n,
     SelectView,
-    SettingGeneral,
+    GeneralSetting,
+    DeviceSetting,
     Display,
     ClassNames,
     settings,
@@ -44,9 +46,60 @@ define([
                 });
             },
 
+            _renderContent: function() {
+                var content = {},
+                    view = args.child;
+
+                content.general = () => {
+                    return (
+                        <GeneralSetting
+                            lang={this.state.lang}
+                            supported_langs={settings.i18n.supported_langs}
+                            onLangChange={this._onLangChange} />
+                    );
+                }
+
+                content.device = () => {
+                    return (
+                        <DeviceSetting
+                            lang={this.state.lang} />
+                    )
+                }
+
+                if(typeof content[view] === 'undefined') { view = 'general'; }
+                return content[view]();
+            },
+
             render: function() {
                 var lang = this.state.lang,
+                    menu_item = 'nav-item',
+                    generalClass = ClassNames(
+                        menu_item,
+                        {active: args.child === 'general'}),
+                    deviceClass = ClassNames(
+                        menu_item,
+                        {active: args.child === 'device'}),
+                    printerClass = ClassNames(
+                        menu_item,
+                        {active: 'printer' === args.child}),
+                    tabContainerClass = ClassNames(
+                        'tab-container',
+                        {'no-top-margin': !this.state.displayMenu}),
+                    tabs,
                     footer;
+
+                tabs = (
+                    <header>
+                        <ul className="nav clearfix">
+                            <li className={generalClass}>
+                                <a href="#studio/settings/general">{lang.settings.tabs.general}</a>
+                            </li>
+                            <li className={deviceClass}>
+                                <a href="#studio/settings/device">{lang.settings.tabs.device}</a>
+                            </li>
+                        </ul>
+                    </header>
+                )
 
                 footer =
                     <footer className="sticky-bottom">
@@ -58,12 +111,9 @@ define([
                 return (
                     <div className="studio-container settings-studio">
                         <div className="settings">
+                            {tabs}
                             <div className="tab-container">
-                                <SettingGeneral
-                                    lang={this.state.lang}
-                                    supported_langs={settings.i18n.supported_langs}
-                                    onLangChange={this._onLangChange}
-                                />
+                                {this._renderContent()}
                             </div>
                             {footer}
                         </div>

@@ -3,7 +3,9 @@ define(function() {
 
     return {
         support: {
-            no_webgl: '您的系統不支援 WebGL，建議您使用其他電腦開啟 FLUX Studio'
+            no_webgl: '您的系統不支援 WebGL，建議您使用其他電腦開啟 FLUX Studio',
+            no_vcredist: 'Please install Visual C++ Redistributable 2015',
+            osx_10_9: 'FLUX Studio 目前不支援 OS X 10.9，敬請更新至更新的版本。'
         },
         device_selection: {
             no_printers: '無法透過 Wi-Fi 偵測到 FLUX Delta，請檢查您與機器的網路連線是否在同個網路下 <a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/215394548">暸解更多</a>',
@@ -86,7 +88,14 @@ define(function() {
                 check_firmware_update: '韌體更新',
                 update_delta: 'Delta 韌體',
                 update_toolhead: '工具頭韌體',
-                calibrate: '校正'
+                calibrate: '校正平台',
+                set_to_origin: '回歸原點',
+                scan_laser_calibrate: '打開掃描雷射',
+                clean_calibration: '校正平台（清除原始資料）',
+                commands: '指令', 
+                set_to_origin_complete: 'Delta 已回歸原點',
+                scan_laser_complete: '掃描雷射已開啟，點擊 "完成" 以關閉雷射',
+                finish: '完成'
             },
             window: {
                 label: '視窗',
@@ -139,7 +148,7 @@ define(function() {
                 old_password: '舊密碼',
                 password: '機器密碼',
                 set_station_mode: '設定成無線基地台',
-                password_placeholder: '密碼可以保護你的 FLUX Delta',
+                password_placeholder: '從壞人手上保護你的 Delta',
                 incorrect_old_password: '舊密碼錯誤',
                 incorrect_password: '密碼錯誤',
                 ap_mode_name: '網路名稱',
@@ -245,7 +254,7 @@ define(function() {
             caption: '設定',
             tabs: {
                 general: '一般',
-                printer: '成型機'
+                device: '機器'
             },
             ip: '機器 IP 位址',
             wrong_ip_format: 'IP格式錯誤',
@@ -289,7 +298,8 @@ define(function() {
                 '2': 'cura version error',
                 '3': 'path is not cura',
                 '4': 'path is not a exist file, please check engine path in setting section'
-            }
+            },
+            allow_tracking: '您是否願意自動傳送匿名用量資料，協助 FLUX 改進產品和服務？'
         },
         print: {
             import: '匯入',
@@ -308,6 +318,9 @@ define(function() {
                 cura: 'Cura',
                 filament: '線料',
                 temperature: '溫度',
+                detect_filament_runout: '偵測線料',
+                flux_calibration: '自動校正',
+                detect_head_tilt: '偵測工具頭傾斜',
                 layer_height_title: '層高',
                 layer_height: '一般層高',
                 firstLayerHeight: '底層層高',
@@ -337,7 +350,7 @@ define(function() {
                 generalSupport: '支撐',
                 spacing: '支撐間隙',
                 overhang: '懸空角度',
-                zDistance: 'Z Distance',
+                zDistance: 'Z 軸間隙',
                 raft: '底座',
                 raftLayers: '底座層數',
                 brim: '底部延伸圈數 (Brim)',
@@ -356,11 +369,12 @@ define(function() {
                 name: '名稱',
                 apply: '套用',
                 save: '儲存',
-                saveAsPreset: '存為預設',
+                saveAsPreset: '儲存參數',
                 cancel: '取消',
                 delete: '刪除',
-                loadPreset: '載入預設',
-                savePreset: '儲存預設'
+                loadPreset: '載入參數',
+                savePreset: '儲存參數',
+                reloadPreset: '重置參數'
             },
             mode: [
                 {
@@ -659,6 +673,7 @@ define(function() {
                 save_as_preset: '儲存',
                 save_as_preset_title: '儲存預設',
                 load_preset_title: '載入',
+                background: '自訂背景',
                 apply: '套用',
                 cancel: '取消',
                 save: '儲存'
@@ -694,31 +709,31 @@ define(function() {
             resolution: [{
                 id: 'best',
                 text: '最佳',
-                time: '~60min',
+                time: '~30分鐘',
                 value: 1200
             },
             {
                 id: 'high',
                 text: '精細',
-                time: '~40min',
+                time: '~20分鐘',
                 value: 800
             },
             {
                 id: 'normal',
                 text: '中等',
-                time: '~20min',
+                time: '~10分鐘',
                 value: 400
             },
             {
                 id: 'low',
                 text: '快速',
-                time: '~10min',
+                time: '~5分鐘',
                 value: 200
             },
             {
                 id: 'draft',
                 text: '草稿',
-                time: '~5min',
+                time: '~2分鐘',
                 value: 100
             }],
             save_mode: [
@@ -773,10 +788,10 @@ define(function() {
             }
         },
         select_printer: {
-            choose_printer: '選擇一個成型機',
-            notification: '請輸入密碼',
+            choose_printer: '請選擇要設定的機器',
+            notification: '"%s" 需要密碼',
             submit: '送出',
-            please_enter_password: '請輸入密碼',
+            please_enter_password: '"密碼',
             auth_failure: '認證失敗',
             retry: '重新選擇',
             unable_to_connect: '#008 無法與機器建立穩定連線'
@@ -820,7 +835,42 @@ define(function() {
             IP: 'IP',
             serial_number: '序號',
             firmware_version: '韌體版本',
-            UUID: 'UUID'
+            UUID: 'UUID',
+            select: '選擇',
+            deviceList: '機器列表',
+            calibration: {
+                title: '自動校正',
+                A: '水平與高度',
+                H: '高度',
+                N: '關閉',
+                byFile: '根據 FCODE 設定'
+            },
+            detectFilament: {
+                title: '偵測線料',
+                on: '開啟',
+                off: '關閉',
+                byFile: '根據 FCODE 設定'
+            },
+            filterHeadError: {
+                title: '工具頭錯誤偵測',
+                shake: '過度搖晃',
+                tilt: '傾斜',
+                fan_failure: '風扇故障',
+                laser_down: '雷射安全鎖',
+                byFile: '根據 FCODE 設定',
+                no: '關閉'
+            },
+            autoresume: {
+                title: '智慧工作恢復',
+                on: '開啟',
+                off: '關閉'
+            },
+            broadcast: {
+                title: 'UPNP 廣播',
+                L: '預設',
+                A: '密集',
+                N: '關閉'
+            }
         },
         monitor: {
             change_filament                     : 'CHANGE FILLAMENT',
@@ -930,7 +980,7 @@ define(function() {
             device_is_used: '機器正被使用中，是否要終止現在任務？',
             invalidFile: '檔案不是正確的 STL 格式',
             failGeneratingPreview: '無法儲存預覽圖',
-            slicingFailed: 'slic3r 無法型成可列印的 model',
+            slicingFailed: 'Slic3r 切片錯誤',
             no_password: {
                 content: '請用 USB 設定機器密碼，以提供此台電腦連線',
                 caption: '未設定密碼'
@@ -940,8 +990,8 @@ define(function() {
                 caption: '韌體需要更新',
                 content: '請按照<a target="_blank" href="http://helpcenter.flux3dp.com/hc/zh-tw/articles/216251077">此說明</a>安裝最新韌體版本'
             },
-            cant_establish_connection: '無法正常啟動 FLUX Studio API，並<a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/requests/new" target="_blank">聯繫 FLUX 客服</a>',
-            application_occurs_error: '應用程式發生錯誤，請使用功能表 > 說明 > 錯誤回報',
+            cant_establish_connection: '無法正常啟動 FLUX Studio API，建議手動安裝 Visual C++ Redistributable 2015，如持續發生，請<a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/requests/new" target="_blank">聯繫 FLUX 客服</a>',
+            application_occurs_error: '應用程式發生異常，請使用「功能表 > 說明 > 錯誤回報」',
             error_log: '錯誤訊息',
             fcodeForLaser: '檔案為雕刻工作',
             fcodeForPen: '檔案為繪圖工作',
@@ -949,7 +999,7 @@ define(function() {
             confirmSceneImport: '載入.fsc檔案將清除目前所有場景，是否繼續？',
             brokenFcode: '無法開啟 %s',
             slicingFatalError: '切片時發生錯誤，請上傳模型檔案給 FLUX 客服',
-            unknown_error: '連接時發生未知錯誤，請使用功能表 > 說明 > 錯誤回報',
+            unknown_error: '無法與機器建立連線，請使用「功能表 > 說明 > 錯誤回報」',
             important_update: {
                 caption: '重要更新',
                 message: 'Delta 有重要韌體更新，是否要現在更新？',
@@ -961,13 +1011,13 @@ define(function() {
             need_1_1_7_above: '請更新 Delta 韌體到 v1.1.7 以上'
         },
         machine_status: {
-            '-10': 'Raw Mode',
+            '-10': '原生模式',
             '-2': '掃描中',
             '-1': '維護中',
             0: '待命中',
             1: '初始化',
             2: 'ST_TRANSFORM',
-            4: 'Starting',
+            4: '啟動中',
             6: '回復中',
             16: '工作中',
             18: '回復中',
@@ -979,7 +1029,7 @@ define(function() {
             64: '已完成',
             66: '完成中',
             128: '已中斷',
-            UNKNOWN: 'UNKNOWN'
+            UNKNOWN: '-'
         },
         head_module: {
             EXTRUDER: 'Print',
@@ -1054,7 +1104,8 @@ define(function() {
         calibration: {
             RESOURCE_BUSY: '請確認機器的狀態是於待命中',
             headMissing: '無法取得工具頭資訊，請確認工具頭是否連接於機器',
-            calibrated: '機器已校正'
+            calibrated: '平台校正完成',
+            extruderOnly: '請使用列印工具頭來做校正'
         }
     };
 });

@@ -1,16 +1,14 @@
 requirejs.config({
-    urlArgs: 'v=' + window.FLUX.timestamp,
+    urlArgs: 'v=' + (Boolean(localStorage.dev) ? '' : window.FLUX.timestamp),
     baseUrl: 'js/',
     paths: {
         jquery: 'lib/jquery-1.11.0.min',
         backbone: 'lib/backbone',
         underscore: 'lib/underscore',
         react: 'lib/react/react-with-addons.min',
-        JSXTransformer: 'lib/react/JSXTransformer',
         views: 'app/views',
         pages: 'app/pages',
         widgets: 'app/widgets',
-        threejs: 'lib/three/three.min',
         threeTransformControls: 'lib/three/controls/TransformControls',
         threeOrbitControls: 'lib/three/controls/OrbitControls',
         threeTrackballControls: 'lib/three/controls/TrackballControls',
@@ -25,7 +23,8 @@ requirejs.config({
         window: 'app/window',
         localStorage: 'app/local-storage',
         Rx: 'lib/rx.lite.min',
-        Redux: 'lib/redux.min'
+        Redux: 'lib/redux.min',
+        Raven: 'helpers/raven.min'
     },
 
     jsx: {
@@ -36,7 +35,6 @@ requirejs.config({
 
     map: {
         '*': {
-            jsx: 'lib/react/jsx',
             css: 'lib/css-loader',
             text: 'lib/text',
             domReady: 'lib/domReady',
@@ -44,9 +42,6 @@ requirejs.config({
     },
 
     shim: {
-        threejs: {
-            exports: 'threejs'
-        },
         backbone: {
             deps: [
                 'underscore',
@@ -61,21 +56,12 @@ requirejs.config({
             exports: '_'
         },
         threeTransformControls: {
-            deps: [
-                'threejs'
-            ],
             exports: 'TransformControls'
         },
         threeSTLLoader: {
-            deps: [
-                'threejs'
-            ],
             exports: 'STLLoader'
         },
         threeOBJLoader: {
-            deps: [
-                'threejs'
-            ],
             exports: 'OBJLoader'
         },
         freetrans: {
@@ -94,6 +80,9 @@ requirejs.config({
         },
         Redux: {
             exports: 'Redux'
+        },
+        Raven: {
+            exports: 'Raven'
         }
     }
 });
@@ -103,31 +92,28 @@ requirejs([
     'backbone',
     'app/router',
     'app/actions/global',
-    'helpers/tracker',
-    'threejs'
-], function($, Backbone, Router, globalEvents) {
+    'Raven',
+    'helpers/tracker'
+], function($, Backbone, Router, globalEvents, Raven) {
     'use strict';
 
     if (true === window.FLUX.isNW) {
         window.$ = window.jQuery = $;
     }
 
-    // GA setting up
-    // NOTICE: rename ga as GA to prevent conflict with requirejs
-    window.GA = ('undefined' !== typeof ga ? ga : function() {});
+    if(window.FLUX.allowTracking) {
+        // google analytics
+        $.getScript('/js/helpers/analytics.js');
 
-    GA(
-        'create',
-        'UA-40862421-6',
-        {
-            'cookieDomain': 'none'
-        }
-    );
-
-    GA('send', 'pageview', location.hash);
+        // sentry
+        Raven.config('http://17dabb846f4743288d575b76dc5aaae8@sentry.io/95257');
+        Raven.debug = false;
+        try { window.Raven.setRelease(window.FLUX.version); } catch (e) { }
+        Raven.install();
+    }
 
     globalEvents(function() {
-        var router = new Router();
+        let router = new Router();
         Backbone.history.start();
     });
 });

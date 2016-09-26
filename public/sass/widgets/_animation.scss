@@ -65,9 +65,9 @@
     }
 
     &:after {
-        background: #DEDEDC;
-        width: 75%;
-        height: 75%;
+        background: #E0E0E0; 
+        width: 80%;
+        height: 80%;
         border-radius: 50%;
         content: '';
         margin: auto;
@@ -80,7 +80,7 @@
 }
 
 .spinner-roller-reverse {
-    background: linear-gradient(to right, #DEDEDC 10%, rgba(255, 255, 255, 0) 42%);
+    background: linear-gradient(to right, #E0E0E0 10%, rgba(255, 255, 255, 0) 42%);
 
     &::before {
         left: -1px;
