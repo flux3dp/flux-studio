@@ -143,6 +143,7 @@ define([
     previewColors[3] = new THREE.Color(Settings.print_config.color_move);
     previewColors[4] = new THREE.Color(Settings.print_config.color_skirt);
     previewColors[5] = new THREE.Color(Settings.print_config.color_perimeter);
+    previewColors[9] = new THREE.Color(Settings.print_config.color_highlight);
 
     function init(src) {
 
