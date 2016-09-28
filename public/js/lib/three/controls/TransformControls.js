@@ -971,7 +971,7 @@
 					if ( scope.axis === "XYZ" || scope.object.scale.locked) {
 
 						// locked is added from print.js to determine if the scaling is locked
-						let sensitivityAdjustment = 1.5; // more is less sensitive
+						let sensitivityAdjustment = 5.5; // more is less sensitive
 						let sensitivity = Math.max( oldScale.x, oldScale.y, oldScale.z ) * sensitivityAdjustment;
 
 						if( scope.axis === "XYZ") {
