@@ -1,11 +1,23 @@
 define([
     'jquery',
     'react',
-    'jsx!views/cloud/sign-in'
+    'jsx!views/cloud/sign-in',
+    'jsx!views/cloud/sign-up',
+    'jsx!views/cloud/sign-up-success',
+    'jsx!views/cloud/sign-up-fail',
+    'jsx!views/cloud/forgot-password',
+    'jsx!views/cloud/email-sent',
+    'jsx!views/cloud/bind-machine'
 ], function(
     $,
     React,
-    SignIn
+    SignIn,
+    SignUp,
+    SignUpSuccess,
+    SignUpFail,
+    ForgotPassword,
+    EmailSent,
+    BindMachine
 ) {
     'use strict';
 
@@ -26,19 +38,15 @@ define([
                 var content = {},
                     view = args.child;
 
-                content['sign-in'] = () => {
-                    return (
-                        <SignIn />
-                    );
-                }
+                    console.log(view);
+                content['sign-in'] = () => <SignIn lang={this.state.lang} />
+                content['sign-up'] = () => <SignUp lang={this.state.lang} />
+                content['sign-up-success'] = () => <SignUpSuccess lang={this.state.lang} />
+                content['sign-up-fail'] = () => <SignUpFail lang={this.state.lang} />
+                content['forgot-password'] = () => <ForgotPassword lang={this.state.lang} />
+                content['email-sent'] = () => <EmailSent lang={this.state.lang} />
+                content['bind-machine'] = () => <BindMachine lang={this.state.lang} />
 
-                content['sign-up'] = () => {
-                    return (
-                        <div>sign up</div>
-                    )
-                }
-
-                console.log(view);
                 if(typeof content[view] === 'undefined') { view = 'sign-in'; }
                 return content[view]();
             },

@@ -1,21 +1,35 @@
 define([
     'jquery',
-    'react'
+    'react',
+    'helpers/sprintf',
 ], function(
     $,
-    React
+    React,
+    Sprintf
 ) {
     'use strict';
 
     return React.createClass({
 
+        _handleForgotPassword: function() {
+            location.hash = '#/studio/cloud/forgot-password';
+        },
+
+        _handleCancel: function() {
+            location.hash = '#/studio/print';
+        },
+
+        _handleSignIn: function() {
+            location.hash = '#/studio/cloud/bind-machine';
+        },
+
         render: function() {
+            let lang = this.props.lang.settings.flux_cloud;
             return(
                 <div className="cloud">
                     <div className="container">
-                        <div className="title1">
-                            <h3>SIGN IN</h3>
-                            <h2>FLUX CLOUD</h2>
+                        <div className="title">
+                            <h3>{lang.select_to_bind}</h3>
                         </div>
                         <div className="controls">
                             <div>
@@ -25,10 +39,11 @@ define([
                                 <input type="text" placeholder="Password" />
                             </div>
                             <div className="forget-password">
-                                <a>Forget your password?</a>
+                                <a href="#/studio/cloud/forgot-password">{lang.forgot_password}</a>
                             </div>
-                            <div className="sign-up-description">
-                                If you don't have the FLUX ID, please <a>SIGN UP</a> here.
+                            <div className="sign-up-description" dangerouslySetInnerHTML={
+                                {__html: Sprintf(lang.sign_up_statement, "#/studio/cloud/sign-up")}
+                            }>
                             </div>
                         </div>
                     </div>
@@ -37,8 +52,8 @@ define([
                             <hr />
                         </div>
                         <div className="actions">
-                            <button className="btn btn-cancel">CANCEL</button>
-                            <button className="btn btn-default">SIGN IN</button>
+                            <button className="btn btn-cancel" onClick={this._handleCancel}>{lang.cancel}</button>
+                            <button className="btn btn-default" onClick={this._handleSignIn}>{lang.sign_in}</button>
                         </div>
                     </div>
                 </div>

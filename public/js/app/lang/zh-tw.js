@@ -266,15 +266,7 @@ define(function() {
                 save_password: '儲存變更'
             },
             flux_cloud: {
-                caption: 'Get FLUX 3D Printer be remote!',
-                line1: 'Control your FLUX 3D Printer with FLUX Cloud in anywhere you are',
-                start_to_use: 'Start to Use',
-                i_have_an_account: 'I have an account',
-                email: '電子信箱',
-                password: '密碼',
-                change_password: '變更密碼',
-                connected_printer: '已連接成型機',
-                connect: '連接'
+                
             },
             cancel: '取消',
             done: '完成',

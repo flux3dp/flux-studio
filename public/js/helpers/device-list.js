@@ -9,6 +9,6 @@ define([
             let list = bl.split(',');
             return Object.keys(deviceListObject).filter(o => list.indexOf(deviceListObject[o].name) === -1).map((p) => deviceListObject[p]);
         }
-        return Object.keys(deviceListObject).map((p) => deviceListObject[p]);
+        return Object.keys(deviceListObject).filter(k => k !== '').map((p) => deviceListObject[p]);
     };
 });

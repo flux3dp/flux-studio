@@ -645,6 +645,10 @@ define([
         });
     }
 
+    function getDeviceList() {
+        return _deviceNameMap;
+    }
+
     // Core
 
     function DeviceSingleton() {
@@ -690,6 +694,7 @@ define([
             this.detectHead             = detectHead;
             this.enterMaintainMode      = enterMaintainMode;
             this.endMaintainMode        = endMaintainMode;
+            this.getDeviceList          = getDeviceList;
 
             Discover(
                 'device-master',
@@ -699,6 +704,7 @@ define([
                         _deviceNameMap[devices[i].name] = devices[i];
                     }
                     _scanDeviceError(devices);
+
                 }
             );
         }
