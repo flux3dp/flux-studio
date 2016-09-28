@@ -24,7 +24,8 @@ requirejs.config({
         localStorage: 'app/local-storage',
         Rx: 'lib/rx.lite.min',
         Redux: 'lib/redux.min',
-        Raven: 'helpers/raven.min'
+        Raven: 'helpers/raven.min',
+        threejs: 'lib/three/three.min'
     },
 
     jsx: {
