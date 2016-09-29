@@ -278,6 +278,7 @@ define(function() {
                 cancel: 'CANCEL',
                 try_again: 'TRY AGAIN',
                 bind: 'BIND',
+                bind_another: 'BIND ANOTHER',
                 username: 'Username',
                 email: 'Email',
                 password: 'Password',
@@ -292,7 +293,10 @@ define(function() {
                 error_blank_username: 'Username can\'t be blank',
                 error_email_used: 'The email address has been used',
                 error_password_not_match: 'Password confirmation doesn\'t match Password',
-                select_to_bind: 'Select a machine to bind'
+                select_to_bind: 'Select a machine to bind',
+                binding_success: 'Binding Success!',
+                binding_fail: 'Binding Fail',
+                binding: 'Binding...'
             }
         },
         print: {

@@ -265,9 +265,6 @@ define(function() {
                 confirm_password: '確認密碼',
                 save_password: '儲存變更'
             },
-            flux_cloud: {
-                
-            },
             cancel: '取消',
             done: '完成',
             connect_printer: {
@@ -281,6 +278,38 @@ define(function() {
                 '2': 'cura version error',
                 '3': 'path is not cura',
                 '4': 'path is not a exist file, please check engine path in setting section'
+            },
+            flux_cloud: {
+                flux_cloud: 'FLUX CLOUD',
+                back: '上一步',
+                next: '下一步',
+                done: '結束',
+                sign_in: '登入',
+                sign_up: '註冊',
+                success: '成功',
+                fail: '失敗',
+                cancel: '取消',
+                try_again: '再試一次',
+                bind: '連結',
+                bind_another: '連結另一部機器',
+                username: '使用者名稱',
+                email: '電子信箱',
+                password: '密碼',
+                re_enter_password: '重新輸入密碼',
+                forgot_password: '忘記密碼?',
+                sign_up_statement: '如果尚未持有FLUX ID，可以<a href="%s">按此註冊</a>',
+                try_sign_up_again: '請重新<a href="%s">註冊</a>',
+                agreement: '同意 FLUX-Cloud 使用條款',
+                pleaseSignIn: '請使用 FLUX ID 登入',
+                enter_email: '請輸入您的電子信箱',
+                check_inbox: '請至您的電子信箱確認!',
+                error_blank_username: '請輸入使用者名稱',
+                error_email_used: '此電子信箱已被使用',
+                error_password_not_match: '確認密碼與密碼不相同',
+                select_to_bind: '請選擇欲連結的機器',
+                binding_success: '連結成功!',
+                binding_fail: '連結失敗',
+                binding: '連結中...'
             }
         },
         print: {

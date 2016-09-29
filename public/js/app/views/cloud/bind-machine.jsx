@@ -4,14 +4,16 @@ define([
     'helpers/i18n',
     'helpers/device-master',
     'helpers/device-list',
-    'helpers/pad-string'
+    'helpers/pad-string',
+    'plugins/classnames/index',
 ], function(
     $,
     React,
     i18n,
     DeviceMaster,
     DeviceList,
-    PadString
+    PadString,
+    ClassNames
 ) {
     'use strict';
 
@@ -20,49 +22,100 @@ define([
         lang: {},
 
         getInitialState: function() {
-            return {};
+            return {
+                selectedDevice: {},
+                bindingInProgress: false
+            };
         },
 
         componentWillMount: function() {
-            // console.log(i18n.get());
             this.lang = i18n.get();
         },
 
         componentDidMount: function() {
-            setInterval(() => {
+            let getList = () => {
                 let deviceList = DeviceList(DeviceMaster.getDeviceList());
-                // let list = DeviceMaster.getDeviceList();
-                // let deviceNames = Object.keys(list).filter((k) => k !== '');
-                // let deviceList = deviceNames.map((name) => list[name]);
                 this.setState({ deviceList });
+            }
+            getList();
+            
+            setInterval(() => {
+                getList();
             }, 2000);
+        },
+
+        _handleSelectDevice: function(device) {
+            console.log(device);
+            this.setState({ selectedDevice: device});
         },
 
         _handleCancel: function() {
             location.hash = '#/studio/print';
         },
 
+        _handleCancelBinding: function() {
+            this.setState({ bindingInProgress: false });
+        },
+
         _handleBind: function() {
-            location.hash = '#/studio/cloud/forgot-password';
+            this.setState({ bindingInProgress: true });
+            setTimeout(() => {
+                this.setState({ bindingInProgress: false });
+                location.hash = '#studio/cloud/bind-success';
+            }, 2000);
+            // location.hash = '#/studio/cloud/forgot-password';
+        },
+
+        _renderBindingWindow: function() {
+            let lang = this.props.lang.settings.flux_cloud,
+                bindingWindow;
+
+            bindingWindow = (
+                <div className="binding-window">
+                    <h1>{lang.binding}</h1>
+                    <div className="spinner-roller absolute-center"></div>
+                    <div className="footer">
+                        <a onClick={this._handleCancelBinding}>{lang.cancel}</a>
+                    </div>
+                </div>
+            )
+
+            return this.state.bindingInProgress ? bindingWindow : '';
+        },
+
+        _renderBlind: function() {
+            let blind = (
+                <div className="blind"></div>
+            );
+
+            return this.state.bindingInProgress ? blind : '';
         },
 
         render: function() {
             let lang = this.props.lang.settings.flux_cloud,
-                deviceList;
-            // console.log(this.lang);
+                deviceList,
+                bindingWindow,
+                blind;
+
+            bindingWindow = this._renderBindingWindow();
+            blind = this._renderBlind();
+
             if(!this.state.deviceList) {
-                deviceList = <option>{this.lang.device.please_wait}</option>;
+                deviceList = <div>{this.lang.device.please_wait}</div>;
             }
             else {
                 deviceList = this.state.deviceList.map((d) => {
+                    let c = ClassNames(
+                        'device',
+                        {'selected': this.state.selectedDevice.name === d.name}
+                    );
+
                     return (
-                        <option dangerouslySetInnerHTML={{
-                            __html: `${PadString(d.name, 20, false)} ${this.lang.machine_status[d.st_id]}`
-                        }}></option>
-                    )
-                    // return (
-                    //     <option>{`${PadString(d.name, 20, false)} ${this.lang.machine_status[d.st_id]}`}</option>
-                    // );
+                        <div className={c} onClick={this._handleSelectDevice.bind(null, d)}>
+                            <div className="name">{d.name}</div>
+                            <div className="status">{this.lang.machine_status[d.st_id]}</div>
+                        </div>
+                    );
                 });
             }
 
@@ -74,9 +127,10 @@ define([
                         </div>
                         <div className="controls">
                             <div className="select">
-                                <select size="8">
+                                {deviceList}
+                                {/* <select size="8">
                                     {deviceList}
-                                </select>
+                                </select> */}
                             </div>
                             <div className="user-info">
                                 <div className="name">Ryoko Hirosue</div>
@@ -93,6 +147,8 @@ define([
                             <button className="btn btn-default" onClick={this._handleBind}>{lang.bind}</button>
                         </div>
                     </div>
+                    {bindingWindow}
+                    {blind}
                 </div>
             );
         }

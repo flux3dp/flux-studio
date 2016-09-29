@@ -6457,18 +6457,39 @@ input.switch:checked ~ label:after {
             height: 40px;
             vertical-align: middle; }
         .cloud .controls select {
-            width: 500px;
+            /* width: 500px;
             height: 250px;
             background-image: none;
             padding: 0;
-            margin: 0; }
-            .cloud .controls select option {
+            margin: 0;
+
+            option {
                 font-family: 'Courier New';
                 font-weight: 500;
                 padding: 5px;
-                background: #FFF; }
+                background: #FFF;
+            } */ }
         .cloud .controls a {
             font-size: 16px; }
+        .cloud .controls .select {
+            border: 1px #999 solid;
+            text-align: center;
+            margin: 0 100px;
+            height: 250px;
+            overflow-y: scroll;
+            overflow-x: hidden; }
+            .cloud .controls .select .device {
+                text-align: left;
+                font-size: 16px;
+                padding: 10px;
+                cursor: pointer; }
+                .cloud .controls .select .device div {
+                    display: inline-block; }
+                .cloud .controls .select .device .name {
+                    width: 250px; }
+            .cloud .controls .select .selected {
+                background-color: #999;
+                color: #FFF; }
         .cloud .controls .forget-password {
             padding-top: 15px; }
         .cloud .controls .error {
@@ -6489,3 +6510,48 @@ input.switch:checked ~ label:after {
         .cloud .bind-machine .user-info .name {
             font-weight: bold;
             margin: 5px; }
+    .cloud .binding-window {
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        margin: auto;
+        position: absolute;
+        width: 400px;
+        height: 300px;
+        background-color: #FFF;
+        box-shadow: 0px 0px 12px 0px rgba(128, 128, 128, 0.8);
+        text-align: center;
+        z-index: 9999; }
+        .cloud .binding-window h1 {
+            font-weight: 400;
+            color: #999; }
+        .cloud .binding-window .footer {
+            bottom: 30px;
+            position: absolute;
+            width: 100%; }
+            .cloud .binding-window .footer a {
+                font-size: 18px;
+                color: #999; }
+        .cloud .binding-window .spinner-roller {
+            background: linear-gradient(to right, #DEDEDC 10%, rgba(255, 255, 255, 0) 42%);
+            height: 5rem;
+            width: 5rem;
+            position: absolute;
+            margin: auto; }
+            .cloud .binding-window .spinner-roller::after {
+                background: #fff; }
+    .cloud .blind {
+        /* position element so the z-index can be set */
+        position: absolute;
+        /* set z-index so the blind will cover all page content */
+        /* z-index:9999; */
+        /* set the top, left, width and height so the blind covers the browser window */
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        background-color: #000000; }
+    .cloud .bind-success button.btn {
+        width: 150px; }

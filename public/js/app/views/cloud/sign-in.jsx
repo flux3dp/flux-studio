@@ -29,7 +29,8 @@ define([
                 <div className="cloud">
                     <div className="container">
                         <div className="title">
-                            <h3>{lang.select_to_bind}</h3>
+                            <h3>{lang.sign_in}</h3>
+                            <h2>{lang.flux_cloud}</h2>
                         </div>
                         <div className="controls">
                             <div>
