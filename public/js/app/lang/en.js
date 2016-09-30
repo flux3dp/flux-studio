@@ -92,7 +92,7 @@ define(function() {
                 set_to_origin: 'Calibrate Origin ( Home )',
                 scan_laser_calibrate: 'Turn On Scanning Laser',
                 clean_calibration: 'Run Auto Leveling with Clean Data',
-                commands: 'Commands', 
+                commands: 'Commands',
                 set_to_origin_complete: 'Delta has calibrated its origin.',
                 scan_laser_complete: 'Delta has turned on its scanning laser. Click "Finish" to turn it off.',
                 finish: 'FINISH',
@@ -349,7 +349,9 @@ define(function() {
                 delete: 'DELETE',
                 loadPreset: 'Load Config',
                 savePreset: 'Save Config',
-                reloadPreset: 'Reset Config'
+                reloadPreset: 'Reset Config',
+                printing: 'Printing',
+                firstLayerTemperature: 'First Layer'
             },
             mode: [
                 {
