@@ -52,15 +52,15 @@ var process = nw.process,
                 console.log(type, str);
                 writeLog(str);
                 if(str.indexOf('Unhandled exception') >= 0){
-                    process.env.processPythonException(str)
+                    process.env.processPythonException(str);
                 }
-                process.env.ghostPort = 8000;
+                process.env.ghostPort = port;
             };
 
             process.env.processPythonException = function(str){
                 //Note: this function might be replaced from globa.js, in order to interact with react component
-                console.log("Unhandled exception occured.");
-                process.env.ghostPort = 8000;
+                console.log('Unhandled exception occured.', str);
+                process.env.ghostPort = port;
             };
 
         // empty message.log
@@ -205,7 +205,7 @@ nw.App.downloadUpdate = function(manifest, cb, onProgress) {
     cb = cb || function() {};
 
     return upd.download(function(error, filename) {
-        cb.apply(null, arguments); 
+        cb.apply(null, arguments);
     }, manifest, onProgress);
 };
 
