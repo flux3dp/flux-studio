@@ -54,7 +54,7 @@ define([
         },
 
         _handleComponentValueChange: function(id, value, source) {
-            let config = { ...this.state.config };
+            let config = Object.assign({}, this.state.config);
 
             if(id === 'head_error_level') {
                 let v = 'delete';
