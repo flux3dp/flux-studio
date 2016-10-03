@@ -382,7 +382,7 @@ define([
                     else if(answer === GlobalConstants.IMPORT_SCENE) {
                         director.loadScene();
                     }
-                    else if(answer === 'allow-tracking') {
+                    else if(answer === 'allow_tracking') {
                         Config().write('allow-tracking', 'true');
                     }
                 },
