@@ -111,6 +111,7 @@ requirejs([
         Raven.debug = false;
         try { window.Raven.setRelease(window.FLUX.version); } catch (e) { }
         Raven.install();
+        window.Raven = Raven;
     }
 
     globalEvents(function() {
