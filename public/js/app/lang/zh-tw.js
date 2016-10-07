@@ -92,7 +92,7 @@ define(function() {
                 set_to_origin: '回歸原點',
                 scan_laser_calibrate: '打開掃描雷射',
                 clean_calibration: '校正平台（清除原始資料）',
-                commands: '指令', 
+                commands: '指令',
                 set_to_origin_complete: 'Delta 已回歸原點',
                 scan_laser_complete: '掃描雷射已開啟，點擊 "完成" 以關閉雷射',
                 finish: '完成'
@@ -374,7 +374,9 @@ define(function() {
                 delete: '刪除',
                 loadPreset: '載入參數',
                 savePreset: '儲存參數',
-                reloadPreset: '重置參數'
+                reloadPreset: '重置參數',
+                printing: '列印溫度',
+                firstLayerTemperature: '首層溫度'
             },
             mode: [
                 {

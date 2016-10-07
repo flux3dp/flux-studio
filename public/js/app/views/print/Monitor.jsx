@@ -490,7 +490,6 @@ define([
                 this._addHistory();
                 store.dispatch(MonitorActionCreator.changeMode(GlobalConstants.CAMERA));
             }
-            store.dispatch(MonitorActionCreator.changeMode(GlobalConstants.CAMERA));
         },
 
         _handleGo: function() {

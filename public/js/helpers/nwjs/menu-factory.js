@@ -392,14 +392,19 @@ define([
                         lang = i18n.get();
                     DeviceMaster.selectDevice(currentPrinter).then((status) => {
                         if (status === DeviceConstants.CONNECTED) {
-                            checkDeviceStatus(currentPrinter).then(() => {                                
+                            checkDeviceStatus(currentPrinter).then(() => {
                             ProgressActions.open(ProgressConstants.WAITING, lang.device.calibrating, lang.device.pleaseWait, false);
                                 DeviceMaster.calibrate().done((debug_message) => {
                                     setTimeout(() => {
                                         AlertActions.showPopupInfo('calibrated', JSON.stringify(debug_message), lang.calibration.calibrated);
                                     }, 100);
                                 }).fail((error) => {
-                                    AlertActions.showPopupError('calibrate-fail', error.error.join(' '));
+                                    if(error.module === 'LASER') {
+                                        AlertActions.showPopupError('calibrate-fail', lang.calibration.extruderOnly);
+                                    }
+                                    else {
+                                        AlertActions.showPopupError('calibrate-fail', error.error.join(' '));
+                                    }
                                 }).always(() => {
                                     ProgressActions.close();
                                 });

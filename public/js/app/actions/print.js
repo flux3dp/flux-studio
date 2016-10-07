@@ -143,6 +143,7 @@ define([
     previewColors[3] = new THREE.Color(Settings.print_config.color_move);
     previewColors[4] = new THREE.Color(Settings.print_config.color_skirt);
     previewColors[5] = new THREE.Color(Settings.print_config.color_perimeter);
+    previewColors[9] = new THREE.Color(Settings.print_config.color_highlight);
 
     function init(src) {
 
@@ -1656,45 +1657,6 @@ define([
             }
 
             _clearPath();
-
-
-
-            // slicer.delete(SELECTED.uuid).then((result) => {
-            //
-            //     let index = objects.indexOf(SELECTED);
-            //
-            //     scene.remove(SELECTED.outlineMesh);
-            //     scene.remove(SELECTED);
-            //     outlineScene.remove(SELECTED.outlineMesh);
-            //     if (index > -1) {
-            //         objects.splice(index, 1);
-            //     }
-            //
-            //     transformControl.detach(SELECTED);
-            //     selectObject(null);
-            //
-            //     setDefaultFileName();
-            //     render();
-            //     if(objects.length === 0) {
-            //         clearTimeout(slicingTimmer);
-            //         registerDragToImport();
-            //         reactSrc.setState({
-            //             openImportWindow: true,
-            //             hasObject: false
-            //         }, function() {
-            //             setImportWindowPosition();
-            //         });
-            //     }
-            //     else {
-            //         doSlicing();
-            //     }
-            //
-            //     _clearPath();
-            //
-            // }).fail((error) => {
-            //     processSlicerError(error);
-            //     return;
-            // });
         }
     }
 

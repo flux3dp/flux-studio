@@ -86,6 +86,10 @@ define([
             },
 
             shouldComponentUpdate: function(nextProps, nextState) {
+                if(this.state.currentStep === nextState.currentStep && this.state.temperature === nextState.temperature) {
+                    return false;
+                }
+
                 if (steps.HEATING === nextState.currentStep && steps.HEATING !== this.state.currentStep) {
                     this._goMaintain(nextState.type);
                 }
@@ -365,6 +369,13 @@ define([
 
                 renderName[0] = renderName[0].toUpperCase();
                 renderName = '_section' + renderName.join('').replace('_', '');
+
+                if(this.state.currentStep === steps.COMPLETED) {
+                    renderName = '_sectionCompleted';
+                }
+                else if(this.state.temperature === 220) {
+                    renderName = '_sectionEmerging';
+                }
 
                 if (true === self.hasOwnProperty(renderName)) {
                     renderFunc = self[renderName];

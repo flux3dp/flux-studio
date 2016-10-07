@@ -125,6 +125,7 @@ use_volumetric_e = 0
 vibration_limit = 0
 wipe = 0
 xy_size_compensation = -0.07
-z_offset = 0`
+z_offset = 0
+pause_at_layers = `
     }
 });

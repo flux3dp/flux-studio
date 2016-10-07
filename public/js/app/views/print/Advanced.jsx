@@ -56,6 +56,7 @@ define([
             // General
             engine                              : '',
             temperature                         : 215,
+            first_layer_temperature             : 230,
             detect_filament_runout              : 1,
             flux_calibration                    : 1,
             detect_head_tilt                    : 1,
@@ -476,15 +477,24 @@ define([
                     </div>
 
                     <div className="section">
-                        <div className="title">{lang.filament}</div>
+                        <div className="title">{lang.temperature}</div>
                         <SliderControl
                             id="temperature"
                             key="temperature"
-                            label={lang.temperature}
+                            label={lang.printing}
                             min={180}
                             max={230}
                             step={1}
                             default={advancedSetting.temperature}
+                            onChange={this._handleControlValueChange} />
+                        <SliderControl
+                            id="first_layer_temperature"
+                            key="first_layer_temperature"
+                            label={lang.firstLayerTemperature}
+                            min={180}
+                            max={230}
+                            step={1}
+                            default={advancedSetting.first_layer_temperature}
                             onChange={this._handleControlValueChange} />
                         {/* <SwitchControl
                             id="detect_filament_runout"

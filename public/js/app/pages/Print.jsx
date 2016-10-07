@@ -301,7 +301,6 @@ define([
 
                 _registerTracking: function() {
                     let allowTracking = Config().read('allow-tracking');
-                    console.log(allowTracking); 
                     if(allowTracking == '') {
                         AlertActions.showPopupYesNo('allow_tracking', lang.settings.allow_tracking);
                     }
@@ -383,7 +382,7 @@ define([
                     else if(answer === GlobalConstants.IMPORT_SCENE) {
                         director.loadScene();
                     }
-                    else if(answer === 'allow-tracking') {
+                    else if(answer === 'allow_tracking') {
                         Config().write('allow-tracking', 'true');
                     }
                 },
@@ -926,12 +925,15 @@ define([
                 },
 
                 _renderPercentageBar: function() {
+                    if(this.state.slicingPercentage === 1) {
+                        return '';
+                    }
                     var computed_style = {
                         width: (this.state.slicingPercentage*100 + '%')
                     };
                     return (
                         <div className="slicingProgressBar">
-                            <div className="slicingProgressBarInner" style={computed_style}> 
+                            <div className="slicingProgressBarInner" style={computed_style}>
                             </div>
                         </div>
                     );
