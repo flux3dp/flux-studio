@@ -412,6 +412,9 @@ define([
                                     ws.send('maintain calibrating');
                             }, 500);
                         }
+                        else {
+                            d.reject(response);
+                        }
                     }
                     else {
                         d.reject(response);
