@@ -36,7 +36,7 @@
 
         // set global definition
         window.FLUX = {
-            debug: -1 !== location.search.indexOf('debug'),
+            debug: location.search.indexOf('debug') !== -1 || dev,
             version: "{Version}",
             timestamp: (new Date()).getTime(),
             onLine: navigator.onLine,
