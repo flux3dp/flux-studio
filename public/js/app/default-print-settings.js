@@ -12,6 +12,8 @@ complete_objects = 0
 cooling = 1
 default_acceleration = 0
 detect_filament_runout = 1
+detect_head_tilt = 1
+flux_calibration = 1
 disable_fan_first_layers = 3
 dont_support_bridges = 1
 duplicate_distance = 6
@@ -123,6 +125,7 @@ use_volumetric_e = 0
 vibration_limit = 0
 wipe = 0
 xy_size_compensation = -0.07
-z_offset = 0`
+z_offset = 0
+pause_at_layers = `
     }
 });

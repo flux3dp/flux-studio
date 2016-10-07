@@ -15,7 +15,6 @@ define([
         propTypes: {
             lang: React.PropTypes.object,
             guides: React.PropTypes.array,
-            enable: React.PropTypes.bool,
             step: React.PropTypes.number,
             onNextClick: React.PropTypes.func,
             onComplete: React.PropTypes.func
@@ -58,10 +57,6 @@ define([
         },
 
         render: function() {
-            if(!this.props.enable) {
-                return (<div></div>);
-            }
-
             var _o = $(this.props.guides[this.props.step].selector),
                 _offset_x = this.props.guides[this.props.step].offset_x,
                 _offset_y = this.props.guides[this.props.step].offset_y,
@@ -82,7 +77,7 @@ define([
                 _hole.y = _o.offset().top + _o.height() / 2 + _offset_y;
             } else {
                 _hole.x = _hole.y = 0;
-                console.error("Unknown selector", this.props.guides[this.props.step].selector);
+                // console.error("Unknown selector", this.props.guides[this.props.step].selector);
             }
 
 

@@ -105,16 +105,24 @@ define([
 
                     switch (data.status) {
                     case 'error':
-                        Raven.captureException(data);
+                        if(window.FLUX.allowTracking) {
+                            window.Raven.captureException(data);
+                        }
                         socketOptions.onError(data);
                         break;
                     case 'fatal':
-                        Raven.captureException(data);
+                        if(window.FLUX.allowTracking) {
+                            window.Raven.captureException(data);
+                        }
                         socketOptions.onFatal(data);
                         break;
                     // ignore below status
                     case 'pong':
+                        break;
                     case 'debug':
+                        if(socketOptions.onDebug){
+                            socketOptions.onDebug(data);
+                        }
                         break;
                     default:
                         socketOptions.onMessage(data);
@@ -134,7 +142,6 @@ define([
                         },
                         onCancel = function() {
                             removeListener();
-                            console.log('output error');
                             showProgramErrorPopup = true;
                         },
                         removeListener = function() {
@@ -163,7 +170,7 @@ define([
                         }
 
                         showProgramErrorPopup = false;
-                        AlertActions.showPopupCustom(abnormallyId, message, lang.message.error_log);
+                        AlertActions.showPopupCustomCancel(abnormallyId, message, lang.message.error_log);
                         AlertStore.onCustom(outputLog);
                         AlertStore.onCancel(onCancel);
                     }
@@ -274,13 +281,11 @@ define([
 
                 onClose: function(callback) {
                     socketOptions.onClose = callback;
-
                     return this;
                 },
 
                 onError: function(callback) {
                     socketOptions.onError = callback;
-
                     return this;
                 },
 

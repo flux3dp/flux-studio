@@ -179,11 +179,13 @@ define([
                 lang = self.props.lang,
                 onError = function() {
                     ProgressActions.close();
-
-                    if (true === printer.password) {
+                    if(self.selected_printer.plaintext_password){
+                        //Skip if user entered password for the first time.
+                        self._returnSelectedPrinter();
+                    }else{
                         InputLightboxActions.open('auth-device', {
                             type         : InputLightboxConstants.TYPE_PASSWORD,
-                            caption      : lang.select_printer.notification,
+                            caption      : sprintf(lang.select_printer.notification, printer.name),
                             inputHeader  : lang.select_printer.please_enter_password,
                             confirmText  : lang.select_printer.submit,
                             onSubmit     : function(password) {
@@ -206,9 +208,7 @@ define([
                             }
                         });
                     }
-                    else {
-                        AlertActions.showPopupInfo('device-auth-fail', lang.message.no_password.content, lang.message.no_password.caption);
-                    }
+                    
                 };
 
             self.selected_printer = printer;

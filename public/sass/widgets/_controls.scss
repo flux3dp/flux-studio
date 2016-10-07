@@ -47,6 +47,30 @@
         }
     }
 
+    .checkbox {
+        cursor: pointer;
+
+        >div {
+            width: 15px;
+            height: 15px;
+            background-image: url('/img/icon-checkbox-off.png');
+            background-size: 15px 15px;
+            display: inline-block;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
+        .selected {
+            background-image: url('/img/icon-checkbox-on.png');
+        }
+        .grey-out {
+            cursor: auto;
+        }
+        .grey-out + span {
+            color: #E0E0E0;
+        }
+    }
+
     .switch-container {
         margin-left: 30px;
         position: relative;

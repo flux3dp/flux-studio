@@ -21,7 +21,8 @@ define([
     'app/constants/input-lightbox-constants',
     'helpers/api/touch',
     'helpers/firmware-updater',
-    'helpers/device-list'
+    'helpers/device-list',
+    'helpers/api/3d-scan-control'
 ], function(
     gui,
     menuMap,
@@ -42,7 +43,8 @@ define([
     InputLightboxConstants,
     touch,
     firmwareUpdater,
-    DeviceList
+    DeviceList,
+    ScanControl
 ) {
     'use strict';
 
@@ -222,7 +224,9 @@ define([
                 menuItem = new MenuItem(menuOption);
 
                 menuItem.on('click', function() {
-                    window.GA('send', 'event', 'menubar-button', 'click', el.label);
+                    if(window.FLUX.allowTracking) {
+                        window.analytics.event('send', 'event', 'menubar-button', 'click', el.label);
+                    }
                 });
 
                 subMenu.append(menuItem);
@@ -356,6 +360,11 @@ define([
                 }
             });
 
+            subItems.push({
+                label: '',
+                type: 'separator'
+            });
+
             // change filament
             subItems.push({
                 label: lang.device.change_filament,
@@ -376,12 +385,6 @@ define([
                 }
             });
 
-            // separator
-            subItems.push({
-                label: '',
-                type: 'separator'
-            });
-
             subItems.push({
                 label: lang.device.calibrate,
                 onClick: () => {
@@ -390,11 +393,18 @@ define([
                     DeviceMaster.selectDevice(currentPrinter).then((status) => {
                         if (status === DeviceConstants.CONNECTED) {
                             checkDeviceStatus(currentPrinter).then(() => {
-                                ProgressActions.open(ProgressConstants.WAITING, lang.device.calibrating, lang.device.pleaseWait, false);
-                                DeviceMaster.calibrate().done(() => {
+                            ProgressActions.open(ProgressConstants.WAITING, lang.device.calibrating, lang.device.pleaseWait, false);
+                                DeviceMaster.calibrate().done((debug_message) => {
                                     setTimeout(() => {
-                                        AlertActions.showPopupInfo('calibrated', lang.calibration.calibrated);
+                                        AlertActions.showPopupInfo('calibrated', JSON.stringify(debug_message), lang.calibration.calibrated);
                                     }, 100);
+                                }).fail((error) => {
+                                    if(error.module === 'LASER') {
+                                        AlertActions.showPopupError('calibrate-fail', lang.calibration.extruderOnly);
+                                    }
+                                    else {
+                                        AlertActions.showPopupError('calibrate-fail', error.error.join(' '));
+                                    }
                                 }).always(() => {
                                     ProgressActions.close();
                                 });
@@ -405,6 +415,108 @@ define([
                         }
                     });
                 }
+            });
+
+            subItems.push({
+                label: lang.device.commands,
+                subItems: [
+                    {
+                        label: lang.device.set_to_origin,
+                        enabled: true,
+                        onClick: function() {
+                            var currentPrinter = discoverMethods.getLatestPrinter(printer);
+                            DeviceMaster.selectDevice(currentPrinter).then((status) => {
+                                console.log("selected device");
+                                if (status === DeviceConstants.CONNECTED) {
+                                    checkDeviceStatus(currentPrinter).then(() => {
+                                        ProgressActions.open(ProgressConstants.NONSTOP);
+                                        DeviceMaster.home().done(() => {
+                                            ProgressActions.close();
+                                            setTimeout(() => {
+                                                AlertActions.showPopupInfo('set-to-origined', lang.device.set_to_origin_complete);
+                                            }, 100);
+                                        }).always(() => {
+                                            ProgressActions.close();
+                                        });
+                                    });
+                                }
+                                else if (status === DeviceConstants.TIMEOUT) {
+                                    AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
+                                }
+                            });
+                        }
+                    },
+                    {
+                        label: lang.device.scan_laser_calibrate,
+                        enabled: true,
+                        onClick: function() {
+                            var currentPrinter = discoverMethods.getLatestPrinter(printer);
+                            DeviceMaster.selectDevice(currentPrinter).then((status) => {
+                                if (status === DeviceConstants.CONNECTED) {
+                                    ProgressActions.open(ProgressConstants.WAITING);
+                                    checkDeviceStatus(currentPrinter).then(() => {
+                                        ProgressActions.open(ProgressConstants.WAITING, lang.device.calibrating, lang.device.pleaseWait, false);
+                                        var scan_control,
+                                            opts = {
+                                                onError: (data) => {
+                                                    scan_control.takeControl(function(response) {
+                                                        self._openBlocker(false);
+                                                    });
+                                                },
+                                                onReady: () => {
+                                                    ProgressActions.close();
+                                                    scan_control.turnLaser(true).then(() => {
+                                                        AlertActions.showPopupCustom('scan-laser-turned-on', lang.device.scan_laser_complete, lang.device.finish, "");
+                                                        var _handleFinish = (dialog_name) => {
+                                                            scan_control.turnLaser(false).then(() => {
+                                                                scan_control.quit();
+                                                            })
+                                                            AlertStore.removeCustomListener(_handleFinish);
+                                                        };
+                                                        AlertStore.onCustom(_handleFinish);
+                                                    });
+                                                }
+                                            };
+                                        scan_control = ScanControl(currentPrinter.uuid, opts);
+                                    });
+                                }
+                                else if (status === DeviceConstants.TIMEOUT) {
+                                    AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
+                                }
+                            });
+                        }
+                    },
+                    {
+                        label: lang.device.clean_calibration,
+                        enabled: true,
+                        onClick: function() {
+                            var currentPrinter = discoverMethods.getLatestPrinter(printer),
+                                lang = i18n.get();
+                            DeviceMaster.selectDevice(currentPrinter).then((status) => {
+                                if (status === DeviceConstants.CONNECTED) {
+                                    checkDeviceStatus(currentPrinter).then(() => {
+                                        ProgressActions.open(ProgressConstants.WAITING, lang.device.calibrating, lang.device.pleaseWait, false);
+                                        DeviceMaster.cleanCalibration().done(() => {
+                                            setTimeout(() => {
+                                                AlertActions.showPopupInfo('calibrated', lang.calibration.calibrated);
+                                            }, 100);
+                                        }).always(() => {
+                                            ProgressActions.close();
+                                        });
+                                    });
+                                }
+                                else if (status === DeviceConstants.TIMEOUT) {
+                                    AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
+                                }
+                            });
+                        }
+                    }
+                ]
+            });
+
+            subItems.push({
+                label: '',
+                type: 'separator'
             });
 
             // firmware update (delta/toolhead)

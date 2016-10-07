@@ -319,6 +319,33 @@ define([
                 return $deferred.promise();
             },
 
+            turnLaser: function(laser) {
+                var $deferred = $.Deferred();
+
+                stopGettingImage();
+
+                checkDeviceIsReady().done(function() {
+                    events.onMessage = function(data) {
+                        switch (data.status) {
+                        case 'ok':
+                            $deferred.resolve(data);
+                            break;
+                        case 'fail':
+                            $deferred.reject(data);
+                            break;
+                        }
+                    };
+
+                    if(laser){
+                        genericSender('turn_on_laser');
+                    }else{
+                        genericSender('turn_off_laser');
+                    }
+                });
+
+                return $deferred.promise();
+            },
+
             retry: function(callback) {
 
                 checkDeviceIsReady().done(function() {

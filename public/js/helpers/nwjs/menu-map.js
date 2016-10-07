@@ -162,7 +162,7 @@ define([
                     url: 'package.json',
                     dataType: 'json'
                 }).done(function(response) {
-                    alert(lang.version + ':' + response.version);
+                    alert('FLUX Studio ' + lang.version + ': ' + response.version + '\r\nNwjs ' + lang.version + ': ' + process.versions['node-webkit']);
                 });
             }
         },

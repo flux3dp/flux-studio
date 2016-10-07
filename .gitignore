@@ -6,6 +6,7 @@ node_modules
 _tools/nwjs*
 _tools/build
 public/lib
+public/js/jsx
 
 osx-cache
 win-x86-cache
@@ -39,3 +40,4 @@ public/npm-debug.log
 public/output.fc
 public/output.ini
 public/output.stl
+public/js/jsx

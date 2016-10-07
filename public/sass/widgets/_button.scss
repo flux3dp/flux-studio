@@ -64,9 +64,9 @@
 .btn-disabled {
     pointer-events: none;
     position: relative;
-
+    opacity: .5;
     &::after {
-        background: rgba(255, 255, 255, .5);
+        background: rgba(255, 255, 255, 0);
         content: "";
         display: block;
         height: 100%;

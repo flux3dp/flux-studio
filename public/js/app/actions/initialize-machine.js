@@ -19,6 +19,7 @@ define([
             callback();
         },
         completeSettingUp: function(redirect) {
+            let d = $.Deferred();
             var completed = methods.hasBeenCompleted();
 
             redirect = ('boolean' === typeof redirect ? redirect : true);
@@ -39,8 +40,10 @@ define([
                     if (true === redirect) {
                         location.hash = '#studio/print/';
                     }
+                    d.resolve();
                 }
             });
+            return d.promise();
         },
         hasBeenCompleted: function() {
             return ('true' === config().read('printer-is-ready') ? true : false);

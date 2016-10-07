@@ -490,7 +490,6 @@ define([
                 this._addHistory();
                 store.dispatch(MonitorActionCreator.changeMode(GlobalConstants.CAMERA));
             }
-            store.dispatch(MonitorActionCreator.changeMode(GlobalConstants.CAMERA));
         },
 
         _handleGo: function() {
@@ -550,14 +549,19 @@ define([
                 AlertActions.showPopupYesNo('KICK', lang.monitor.forceStop);
             }
             else {
-                let { Monitor } = store.getState();
+                let { Monitor, Device } = store.getState();
                 if(this._isAbortedOrCompleted()) {
                     DeviceMaster.quit();
                     store.dispatch(MonitorActionCreator.showWait());
                 }
                 else {
-                    DeviceMaster.stop().always(() => {
+                    let p = Device.status.st_id < 0 ? DeviceMaster.kick() : DeviceMaster.stop();
+                    p.always(() => {
                         let mode = Monitor.selectedFileInfo.length > 0 ? GlobalConstants.FILE_PREVIEW : GlobalConstants.PREVIEW;
+                        if(Device.status.st_id < 0) {
+                            mode = GlobalConstants.FILE;
+                            this._dispatchFolderContent('');
+                        }
                         store.dispatch(MonitorActionCreator.changeMode(mode));
                     });
                 }

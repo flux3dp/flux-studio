@@ -4,6 +4,7 @@ var gulp = require('gulp'),
     sass = require('gulp-sass'),
     webserver = require('gulp-webserver'),
     exec = require('gulp-exec'),
+    react = require('gulp-react'),
     uglify = require('gulp-uglify'),
     pump = require('pump'),
     babel = require('gulp-babel'),
@@ -41,13 +42,23 @@ gulp.task('babel', function() {
 gulp.task('sass', function () {
     gulp.src('./public/sass/**/*.scss')
         .pipe(sass({
-            indentWidth: 4
+            indentWidth: 4 
         }).on('error', sass.logError))
         .pipe(gulp.dest('./public/css/'));
 });
 
+gulp.task('jsx', function () {
+    gulp.src('./public/js/**/*.jsx') 
+        .pipe(react())
+        .pipe(gulp.dest('./public/js/jsx/'));
+});
+
 gulp.task('sass:watch', function () {
     gulp.watch('./public/sass/**/*.scss', ['sass']);
+});
+
+gulp.task('jsx:watch', function () {
+    gulp.watch('./public/js/**/*.jsx', ['jsx']);
 });
 
 gulp.task('webserver', ['sass:watch'], function() {
@@ -59,7 +70,7 @@ gulp.task('webserver', ['sass:watch'], function() {
         }));
 });
 
-gulp.task('dev', ['sass:watch', 'webserver']);
+gulp.task('dev', ['sass:watch', 'jsx:watch', 'jsx', 'webserver']);
 
 gulp.task('unit-test', function() {
     return gulp.

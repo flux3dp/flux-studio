@@ -143,6 +143,7 @@ define([
     previewColors[3] = new THREE.Color(Settings.print_config.color_move);
     previewColors[4] = new THREE.Color(Settings.print_config.color_skirt);
     previewColors[5] = new THREE.Color(Settings.print_config.color_perimeter);
+    previewColors[9] = new THREE.Color(Settings.print_config.color_highlight);
 
     function init(src) {
 
@@ -171,15 +172,18 @@ define([
         scene.add(circularGridHelper);
         previewScene = scene.clone();
 
-        var geometry = new THREE.CircleGeometry(s.radius, 80),
+        var geometry = new THREE.PlaneBufferGeometry( 250, 250, 0, 0 ),
             material = new THREE.MeshBasicMaterial({
-                color: 0xCCCCCC,
-                transparent: true
+                color: 0xE0E0E0,
+                wireframe: true
             }),
             refMesh = new THREE.Mesh(geometry, material);
 
+        material.depthWrite = false;
+
         refMesh.up = new THREE.Vector3(0, 0, 1);
-        refMesh.visible = false;
+        refMesh.visible = true;
+        refMesh.name = 'reference';
         scene.add(refMesh);
         referenceMeshes.push(refMesh);
 
@@ -197,7 +201,6 @@ define([
         scene.add(cameraLight);
 
         // renderer
-        // renderer = new THREE.WebGLRenderer();
         renderer.autoClear = false;
         renderer.setClearColor(0xE0E0E0, 1);
         renderer.setPixelRatio(window.devicePixelRatio);
@@ -254,7 +257,8 @@ define([
     function uploadStl(name, file, ext) {
         // pass to slicer
         var d = $.Deferred();
-        slicer.upload(name, file, ext).then((result) => {
+        var uploadCaller = file.path ? slicer.upload_via_path(name, file, ext, file.path) : slicer.upload(name,file,ext);
+        uploadCaller.then((result) => {
             ProgressActions.updating('finishing up', 100);
             d.resolve(result);
         }).progress(displayProgress)
@@ -380,7 +384,7 @@ define([
             objLoader.load(model_file_path, (object) => {
                 var meshes = object.children.filter(c => c instanceof THREE.Mesh);
                 if(meshes.length > 0) {
-                    loadGeometry(new THREE.Geometry().fromBufferGeometry(meshes[0].geometry))
+                    loadGeometry(new THREE.Geometry().fromBufferGeometry(meshes[0].geometry));
                 }
                 // loadGeometry(new THREE.Geometry().fromBufferGeometry(.geometry))
             });
@@ -388,6 +392,9 @@ define([
         else {
             stlLoader.load(model_file_path, (geometry) => {
                 loadGeometry(geometry);
+            }, function(){}, (error) => {
+                //on error
+                loadGeometry({vertices: []});
             });
         }
     }
@@ -585,11 +592,15 @@ define([
             slicingStatus.inProgress = true;
             slicingStatusStream.onNext(slicingStatus);
             slicer.beginSlicing(ids, slicingType.F).then(function(response) {
+                slicingStatus.percentage = 0.05;
+                reactSrc.setState({slicingPercentage: 0.05});
                 slicingStatus.canInterrupt = true;
                 slicingStatus.pauseReport = false;
                 getSlicingReport(function(report) {
-                    slicingStatus.lastReport = report;
-                    updateSlicingProgressFromReport(report);
+                    if(report.status != 'ok'){
+                        slicingStatus.lastReport = report;
+                    }
+                    updateSlicingProgressFromReport(slicingStatus.lastReport);
                 });
             }).fail((error) => {
                 slicingStatus.canInterrupt = true;
@@ -691,6 +702,14 @@ define([
             show = slicingStatus.showProgress,
             monitorOn = $('.flux-monitor').length > 0;
 
+        if(report.slice_status === "complete"){
+            report.percentage = 1;
+        }
+        if(report.percentage !== slicingStatus.percentage){
+            slicingStatus.percentage = report.percentage;
+            reactSrc.setState({slicingPercentage: slicingStatus.percentage});
+        }
+        console.log(report);
         slicingStatus.lastProgress = progress;
 
         if(monitorOn) {
@@ -1064,20 +1083,17 @@ define([
 
     // get ray intersect with reference mesh
     function getReferenceIntersectLocation(e) {
-        var offx = 0,
-            offy = 0;
+        e.preventDefault();
+        let onClickPosition = new THREE.Vector2(),
+            array = getMousePosition( container, e.clientX, e.clientY );
 
-        var vector = new THREE.Vector3(
-            ((e.offsetX - offx) / container.offsetWidth) * 2 - 1, -((e.offsetY - offy) / container.offsetHeight) * 2 + 1,
-            0.5
-        ).unproject(camera);
-
-        var ray = new THREE.Raycaster(camera.position, vector.sub(camera.position).normalize());
-        var intersects = ray.intersectObjects(referenceMeshes);
-
-        if (intersects.length > 0) {
+		onClickPosition.fromArray( array );
+		let intersects = getIntersects( onClickPosition, scene.children.filter(o => o.name === 'reference') );
+        if(intersects[0]) {
             return intersects[0].point;
         }
+
+        return { x: 0, y: 0, z: 0};
     }
 
     // calculate the distance from reference mesh
@@ -1641,45 +1657,6 @@ define([
             }
 
             _clearPath();
-
-
-
-            // slicer.delete(SELECTED.uuid).then((result) => {
-            //
-            //     let index = objects.indexOf(SELECTED);
-            //
-            //     scene.remove(SELECTED.outlineMesh);
-            //     scene.remove(SELECTED);
-            //     outlineScene.remove(SELECTED.outlineMesh);
-            //     if (index > -1) {
-            //         objects.splice(index, 1);
-            //     }
-            //
-            //     transformControl.detach(SELECTED);
-            //     selectObject(null);
-            //
-            //     setDefaultFileName();
-            //     render();
-            //     if(objects.length === 0) {
-            //         clearTimeout(slicingTimmer);
-            //         registerDragToImport();
-            //         reactSrc.setState({
-            //             openImportWindow: true,
-            //             hasObject: false
-            //         }, function() {
-            //             setImportWindowPosition();
-            //         });
-            //     }
-            //     else {
-            //         doSlicing();
-            //     }
-            //
-            //     _clearPath();
-            //
-            // }).fail((error) => {
-            //     processSlicerError(error);
-            //     return;
-            // });
         }
     }
 
@@ -1707,6 +1684,11 @@ define([
                         addSizeProperty(mesh);
                         groundIt(mesh);
                         createOutline(mesh);
+
+                        let source = objects.filter(o => o.uuid === SELECTED.uuid)[0];
+                        if(typeof source !== 'undefined') {
+                            mesh.file = source.file;
+                        }
 
                         selectObject(null);
                         selectObject(mesh);
@@ -2452,21 +2434,23 @@ define([
         directionalLight.castShadow = true;
 
         var d = 1;
-        directionalLight.shadowCameraLeft = -d;
-        directionalLight.shadowCameraRight = d;
-        directionalLight.shadowCameraTop = d;
-        directionalLight.shadowCameraBottom = -d;
+        directionalLight.shadow.camera.left = -d;
+        directionalLight.shadow.camera.right = d;
+        directionalLight.shadow.camera.top = d;
+        directionalLight.shadow.camera.bottom = -d;
 
-        directionalLight.shadowCameraNear = 1;
-        directionalLight.shadowCameraFar = 4;
+        directionalLight.shadow.camera.near = 1;
+        directionalLight.shadow.camera.far = 4;
 
-        directionalLight.shadowMapWidth = 1024;
-        directionalLight.shadowMapHeight = 1024;
+        directionalLight.shadow.mapSize.width = 1024;
+        directionalLight.shadow.mapSize.height = 1024;
 
-        directionalLight.shadowBias = -0.005;
-        directionalLight.shadowDarkness = 0.15;
+        directionalLight.shadow.bias = -0.005;
+        // directionalLight.shadowDarkness = 0.15;
 
-        directionalLight.shadowCameraVisible = true;
+        // directionalLight.shadowCameraVisible = true;
+        directionalLight.castShadow = true;
+        // scene.add(new THREE.CameraHelper(directionalLight.shadow.camera));
     }
 
     function _hidePreview() {
@@ -2864,6 +2848,29 @@ define([
             return !o.position.isOutOfBounds;
         });
     }
+
+    function addPoint(p) {
+        let g = new THREE.BoxGeometry(1,1,1);
+        let m = new THREE.MeshBasicMaterial({ color: 0x444444 });
+        let cube = new THREE.Mesh(g, m);
+        cube.position.x = p.x;
+        cube.position.y = p.y;
+        cube.position.z = 0.5;
+        cube.up = new THREE.Vector3(0, 0, 1);
+        scene.add(cube);
+        render();
+    }
+
+    function getMousePosition( dom, x, y ) {
+        var rect = dom.getBoundingClientRect();
+        return [ ( x - rect.left ) / rect.width, ( y - rect.top ) / rect.height ];
+    }
+
+    function getIntersects( point, o ) {
+        mouse.set( ( point.x * 2 ) - 1, - ( point.y * 2 ) + 1 );
+        raycaster.setFromCamera( mouse, camera );
+        return raycaster.intersectObjects( o );
+    };
 
     return {
         init                : init,

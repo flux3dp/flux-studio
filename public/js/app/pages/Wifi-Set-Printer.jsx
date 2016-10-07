@@ -213,7 +213,7 @@ define([
                     '' === (this.state.settingPrinter.plaintext_password || '') &&
                     'WIFI' === this.state.settingPrinter.from ?
                     <label className="control" for="printer-old-password">
-                        <h4 className="input-head">{lang.initialize.set_machine_generic.old_password}</h4>
+                        <h4 className="input-head padleft">{lang.initialize.set_machine_generic.old_password}</h4>
                         <input ref="old_password" for="printer-old-password" type="password" className={printerPasswordClass}
                         placeholder={lang.initialize.set_machine_generic.old_password}/>
                     </label> :

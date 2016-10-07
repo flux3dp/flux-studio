@@ -125,6 +125,9 @@ define([
                 case AlertConstants.CUSTOM_CANCEL:
                     caption = lang.close;
                     break;
+                case AlertConstants.FINISH:
+                    caption = lang.finish;
+                    break;
                 }
 
                 return caption;
@@ -177,6 +180,15 @@ define([
                         },
                         onClick: this._onRetry
                     });
+                    break;
+                case AlertConstants.CUSTOM:
+                    buttons = [{
+                        label: this.props.customText,
+                        dataAttrs: {
+                            'ga-event': 'cancel'
+                        },
+                        onClick: this._onCustom
+                    }];
                     break;
                 case AlertConstants.CUSTOM_CANCEL:
                     buttons.push({

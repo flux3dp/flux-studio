@@ -2695,9 +2695,9 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         left: 0;
         content: ''; }
     .spinner-roller:after {
-        background: #DEDEDC;
-        width: 75%;
-        height: 75%;
+        background: #E0E0E0;
+        width: 80%;
+        height: 80%;
         border-radius: 50%;
         content: '';
         margin: auto;
@@ -2708,7 +2708,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         right: 0; }
 
 .spinner-roller-reverse {
-    background: linear-gradient(to right, #DEDEDC 10%, rgba(255, 255, 255, 0) 42%); }
+    background: linear-gradient(to right, #E0E0E0 10%, rgba(255, 255, 255, 0) 42%); }
     .spinner-roller-reverse::before {
         left: -1px;
         top: -1px; }
@@ -2819,9 +2819,10 @@ input[type=range]:focus::-webkit-slider-runnable-track {
 
 .btn-disabled {
     pointer-events: none;
-    position: relative; }
+    position: relative;
+    opacity: .5; }
     .btn-disabled::after {
-        background: rgba(255, 255, 255, 0.5);
+        background: rgba(255, 255, 255, 0);
         content: "";
         display: block;
         height: 100%;
@@ -2919,6 +2920,22 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         .controls .radio .grey-out {
             cursor: auto; }
         .controls .radio .grey-out + span {
+            color: #E0E0E0; }
+    .controls .checkbox {
+        cursor: pointer; }
+        .controls .checkbox > div {
+            width: 15px;
+            height: 15px;
+            background-image: url("/img/icon-checkbox-off.png");
+            background-size: 15px 15px;
+            display: inline-block;
+            margin-right: 10px;
+            cursor: pointer; }
+        .controls .checkbox .selected {
+            background-image: url("/img/icon-checkbox-on.png"); }
+        .controls .checkbox .grey-out {
+            cursor: auto; }
+        .controls .checkbox .grey-out + span {
             color: #E0E0E0; }
     .controls .switch-container {
         margin-left: 30px;
@@ -4964,6 +4981,19 @@ input.switch:checked ~ label:after {
 .onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-switch {
     right: 0; }
 
+.slicingProgressBar {
+    position: fixed;
+    z-index: 999;
+    left: 35px;
+    bottom: 35px;
+    height: 10px;
+    width: 150px;
+    background: #BBB; }
+    .slicingProgressBar .slicingProgressBarInner {
+        height: 10px;
+        background: #666;
+        transition: width 0.5s; }
+
 .settings-studio {
     background-color: #F5F5F5; }
 
@@ -4978,131 +5008,113 @@ input.switch:checked ~ label:after {
     height: 600px;
     background-color: #FFF;
     box-shadow: 0px 0px 12px 0px rgba(128, 128, 128, 0.8); }
-
-.settings header {
-    height: 47px;
-    padding-top: 30px; }
-
-.settings a {
-    text-decoration: none;
-    cursor: pointer; }
-
-.settings .center {
-    text-align: center; }
-
-.settings .btn-long {
-    width: 240px;
-    height: 38px;
-    line-height: 38px; }
-
-.settings ul.nav {
-    list-style-type: none;
-    padding: 0;
-    margin: 0 auto;
-    width: 70%;
-    background-color: #FFF;
-    text-align: center; }
-
-.settings .nav li.nav-item {
-    width: 100%;
-    height: 47px;
-    line-height: 47px;
-    display: inline;
-    float: left;
-    border-bottom: 2px #E0E0E0 solid; }
-
-.settings .nav li.active {
-    border-bottom: 2px #424242 solid; }
-
-.settings .nav a {
-    font-size: 16px;
-    letter-spacing: 0.3px;
-    color: #777777;
-    text-decoration: none; }
-
-.settings .tabs .active {
-    background: rgba(255, 255, 255, 0.7); }
-
-.settings .tab-container {
-    margin-top: 40px;
-    display: inline-block;
-    width: 100%; }
-
-.settings .tab-container.no-top-margin {
-    margin-top: 0px; }
-
-.settings .form {
-    width: 70%;
-    margin: 0 auto; }
-
-.settings .form .no-left-margin {
-    margin-left: 0; }
-
-.settings .printer-list ul {
-    list-style: none;
-    padding: 0; }
-
-.settings .general .row-fluid {
-    margin: 0 0 20px 0; }
-
-.settings .general input[type="text"],
-.settings .general select {
-    width: 240px;
-    height: 32px;
-    overflow: hidden;
-    border: 1px solid #ccc;
-    background-color: #FFFFFF;
-    padding-left: 10px; }
-
-.settings footer {
-    width: 100%;
-    height: 100px;
-    border-top: 1px #E0E0E0 solid;
-    text-align: center; }
-
-.settings footer .actions {
-    padding-top: 30px; }
-
-.settings footer .actions a {
-    margin: 0 13px; }
-
-.settings footer .actions .btn-cancel {
-    background-color: #FFFFFF;
-    border: 1px #E0E0E0 solid;
-    font-size: 14px;
-    color: #000; }
-
-.settings footer .actions .btn-cancel:hover {
-    border: 1px #4A4A4A solid; }
-
-.settings footer .actions .btn-done {
-    background-color: #424242;
-    font-size: 14px;
-    color: #FFF; }
-
-.settings footer .actions .btn-done:hover {
-    background-color: #000; }
-
-.settings .font1 {
-    font-size: 18px;
-    font-weight: 500;
-    letter-spacing: 0.3px;
-    color: #424242; }
-
-.settings .font2 {
-    font-size: 15px;
-    letter-spacing: 0.3px;
-    color: #777777; }
-
-.settings .font3 {
-    font-size: 14px;
-    letter-spacing: 0.3px;
-    color: #424242; }
-
-.settings .font4 {
-    font-size: 13px;
-    letter-spacing: 0.3px;
-    color: #777777; }
+    .settings header {
+        height: 47px;
+        padding-top: 30px; }
+    .settings a {
+        text-decoration: none;
+        cursor: pointer; }
+    .settings .center {
+        text-align: center; }
+    .settings .btn-long {
+        width: 240px;
+        height: 38px;
+        line-height: 38px; }
+    .settings ul.nav {
+        list-style-type: none;
+        padding: 0;
+        margin: 0 auto;
+        width: 70%;
+        background-color: #FFF;
+        text-align: center; }
+        .settings ul.nav li.nav-item {
+            width: 50%;
+            height: 47px;
+            line-height: 47px;
+            display: inline;
+            float: left;
+            border-bottom: 2px #E0E0E0 solid; }
+        .settings ul.nav li.active {
+            border-bottom: 2px #424242 solid; }
+        .settings ul.nav a {
+            font-size: 16px;
+            letter-spacing: 0.3px;
+            color: #777777;
+            text-decoration: none; }
+    .settings .tabs .active {
+        background: rgba(255, 255, 255, 0.7); }
+    .settings .tab-container {
+        margin-top: 40px;
+        display: inline-block;
+        width: 100%; }
+    .settings .tab-container.no-top-margin {
+        margin-top: 0px; }
+    .settings .form {
+        width: 70%;
+        margin: 0 auto; }
+        .settings .form .no-left-margin {
+            margin-left: 0; }
+    .settings .printer-list ul {
+        list-style: none;
+        padding: 0; }
+    .settings .general {
+        height: 350px;
+        overflow-x: hidden;
+        overflow-y: auto; }
+        .settings .general input[type="text"],
+        .settings .general select {
+            width: 240px;
+            height: 32px;
+            overflow: hidden;
+            border: 1px solid #ccc;
+            background-color: #FFFFFF;
+            padding-left: 10px; }
+        .settings .general .row-fluid {
+            margin: 0 0 20px 0; }
+        .settings .general .controls {
+            padding-bottom: 5px; }
+            .settings .general .controls .label {
+                width: 200px;
+                font-size: 14px; }
+            .settings .general .controls span {
+                font-size: 14px; }
+    .settings footer {
+        width: 100%;
+        height: 100px;
+        border-top: 1px #E0E0E0 solid;
+        text-align: center; }
+        .settings footer .actions {
+            padding-top: 30px; }
+            .settings footer .actions .btn-cancel {
+                background-color: #FFFFFF;
+                border: 1px #E0E0E0 solid;
+                font-size: 14px;
+                color: #000; }
+            .settings footer .actions .btn-cancel:hover {
+                border: 1px #4A4A4A solid; }
+            .settings footer .actions .btn-done {
+                background-color: #424242;
+                font-size: 14px;
+                color: #FFF; }
+            .settings footer .actions .btn-done:hover {
+                background-color: #000; }
+    .settings .font1 {
+        font-size: 18px;
+        font-weight: 500;
+        letter-spacing: 0.3px;
+        color: #424242; }
+    .settings .font2 {
+        font-size: 15px;
+        letter-spacing: 0.3px;
+        color: #777777; }
+    .settings .font3 {
+        font-size: 14px;
+        letter-spacing: 0.3px;
+        color: #424242; }
+    .settings .font4 {
+        font-size: 13px;
+        letter-spacing: 0.3px;
+        color: #777777; }
 
 /*for cloud*/
 .settings .cloud {
@@ -5527,7 +5539,8 @@ input.switch:checked ~ label:after {
         width: 209px; }
     .initialization .connect-machine .select-printer {
         bottom: 0;
-        right: 0; }
+        right: 0;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3), 0 16px 40px rgba(0, 0, 0, 0.5); }
         .initialization .connect-machine .select-printer .arrow {
             display: none; }
     .initialization .connect-machine .connecting-means {
@@ -5572,7 +5585,7 @@ input.switch:checked ~ label:after {
             line-height: 2rem;
             margin: 0; }
     .initialization .select-wifi .modal-body {
-        box-shadow: 0 0 14px 1px rgba(0, 0, 0, 0.7); }
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3), 0 16px 40px rgba(0, 0, 0, 0.5); }
     .initialization .select-wifi .form-ap-mode {
         padding: 25px 25px 0 25px; }
         .initialization .select-wifi .form-ap-mode h2 {
@@ -5597,6 +5610,7 @@ input.switch:checked ~ label:after {
             margin: 0 10px 0 0;
             text-align: right; }
         .initialization .select-wifi .form-ap-mode input {
+            border: 2px solid #E0E0DF;
             flex: 2;
             height: 36px;
             padding: 0 0 0 5px; }
@@ -5605,7 +5619,8 @@ input.switch:checked ~ label:after {
     .initialization .select-wifi .form-ap-mode {
         width: 400px; }
         .initialization .select-wifi .form-ap-mode input {
-            flex: 3; }
+            flex: 3;
+            border: 2px solid #E0E0DF; }
     .initialization .select-wifi .form-wifi-password,
     .initialization .select-wifi .form-ap-mode {
         background: #DEDEDE;
@@ -5626,7 +5641,9 @@ input.switch:checked ~ label:after {
         height: 175px;
         overflow: scroll;
         position: relative;
-        width: 252px; }
+        width: 250px; }
+        .initialization .select-wifi .wifi-list.active {
+            background: #F9F9F9; }
         .initialization .select-wifi .wifi-list .spinner-roller {
             height: 5em;
             position: absolute;
@@ -5647,17 +5664,26 @@ input.switch:checked ~ label:after {
         .initialization .select-wifi .wifi-list .wifi-ssid {
             text-overflow: ellipsis;
             width: calc(100% - 50px); }
+        .initialization .select-wifi .wifi-list li {
+            text-align: left; }
+            .initialization .select-wifi .wifi-list li:hover {
+                background: #BBB;
+                color: #F8F8F8; }
         .initialization .select-wifi .wifi-list span {
             display: block;
-            line-height: 40px; }
+            line-height: 40px;
+            padding-left: 10px; }
         .initialization .select-wifi .wifi-list input[type="radio"] {
             display: none; }
             .initialization .select-wifi .wifi-list input[type="radio"]:checked + .row-fluid {
-                background: #ccc; }
+                background: #B2B2B2;
+                color: white; }
         .initialization .select-wifi .wifi-list .fa {
             font-size: 1.2405951937882669rem; }
     .initialization .select-wifi .btn-set-station-mode {
-        line-height: 22px; }
+        line-height: 25px; }
+    .initialization .select-wifi .btn-set-client-mode {
+        line-height: 40px; }
     .initialization .connecting-wifi {
         position: relative; }
         .initialization .connecting-wifi .spinner-roller {
@@ -5695,7 +5721,12 @@ input.switch:checked ~ label:after {
             .initialization .h-form .control .input-head {
                 font-weight: 200;
                 flex: 1;
-                margin: 0 3px 0 0; }
+                margin: 0 10px 0 0;
+                text-align: right; }
+                .initialization .h-form .control label.padleft,
+                .initialization .h-form .control .input-head.padleft {
+                    flex: 2;
+                    margin-left: -106px; }
             .initialization .h-form .control .error-message {
                 color: #c00;
                 font-size: 12px;
@@ -5703,6 +5734,10 @@ input.switch:checked ~ label:after {
                 padding: 0 0 0 104px;
                 text-align: left;
                 width: 100%; }
+        .initialization .h-form .controls {
+            overflow: visible;
+            margin-bottom: 10px;
+            margin-left: -35px; }
     .initialization .device-not-found .not-found-img {
         width: 60%; }
     .initialization .notice-from-device .headline {
@@ -5926,9 +5961,6 @@ input.switch:checked ~ label:after {
         list-style: none;
         padding: 0; }
 
-.laser-studio .stage {
-    background: #E0E0E0; }
-
 .laser-studio .laser-object {
     bottom: 0;
     display: block;
@@ -6046,6 +6078,7 @@ input.switch:checked ~ label:after {
         margin: 0 0 10px 0;
         position: static; }
         .laser-studio .advanced-panel .footer .btn {
+            min-width: 40px;
             line-height: 30px;
             margin: 0 10px 0 0;
             padding: 0 10px;
