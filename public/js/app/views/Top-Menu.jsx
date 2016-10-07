@@ -217,13 +217,14 @@ define([
                     headModule = lang.head_module,
                     statusText,
                     headText,
+                    progress,
                     deviceList = this.state.deviceList,
                     options = deviceList.map(function(device) {
                         statusText = status[device.st_id] || status.UNKNOWN,
                         headText = headModule[device.head_module] || headModule.UNKNOWN;
 
                         if (16 === device.st_id && 'number' === typeof device.st_prog) {
-                            statusText += ' - ' + (parseInt(device.st_prog * 1000) * 0.1).toFixed(1) + '%';
+                            progress = (parseInt(device.st_prog * 1000) * 0.1).toFixed(1) + '%'
                         }
 
                         return (
@@ -232,6 +233,7 @@ define([
                                 onClick={this._handleSelectDevice.bind(null, device)}>
                                 <label className="name">{device.name}</label>
                                 <label className="status">{headText} {statusText}</label>
+                                <label className="progress">{progress}</label>
                             </li>
                         )
                     }, this),
