@@ -69,6 +69,11 @@ THREE.STLLoader.prototype = {
 
 			}
 
+			// Support utf8 solid name.
+			if(reader.getUTF8String(0,5) == 'solid' || reader.getUTF8String(1,5) == 'solid'){
+				return false;
+			}
+			
 			// some binary files will have different size from expected,
 			// checking characters higher than ASCII to confirm is binary
 			var fileLength = reader.byteLength;
