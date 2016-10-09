@@ -127,6 +127,6 @@ wipe = 0
 xy_size_compensation = -0.07
 z_offset = 0
 pause_at_layers = 
-support_material = 0`
+support_everywhere = 0`
     }
 });

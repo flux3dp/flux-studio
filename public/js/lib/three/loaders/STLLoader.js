@@ -33,6 +33,15 @@ THREE.STLLoader = function ( manager ) {
 
 };
 
+DataView.prototype.getUTF8String = function(offset, length) {
+    var utf16 = new ArrayBuffer(length * 2);
+    var utf16View = new Uint16Array(utf16);
+    for (var i = 0; i < length; ++i) {
+        utf16View[i] = this.getUint8(offset + i);
+    }
+    return String.fromCharCode.apply(null, utf16View);
+};
+
 THREE.STLLoader.prototype = {
 
 	constructor: THREE.STLLoader,
@@ -73,7 +82,7 @@ THREE.STLLoader.prototype = {
 			if(reader.getUTF8String(0,5) == 'solid' || reader.getUTF8String(1,5) == 'solid'){
 				return false;
 			}
-			
+
 			// some binary files will have different size from expected,
 			// checking characters higher than ASCII to confirm is binary
 			var fileLength = reader.byteLength;
