@@ -1,7 +1,10 @@
 # FLUX Studio 0.4.3 Change log
 
+### New Features
+- added expert parameter "support_everywhere" for Cura Engine
+
 ### Bug Fixes
-- Cura minimalLayerHeight unit
+- Cura minimalLayerTime unit
 
 # FLUX Studio 0.4.2 Change log
 
