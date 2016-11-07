@@ -190,13 +190,15 @@
                         }
 
                         .name {
-                            padding: 0 0 0 0.8rem;
-                            width: 12rem;
+                            padding-left: 5px;
+                            width: 150px;
                         }
 
                         .status {
-                            width: 16rem;
+                            width: 130px;
                         }
+
+                        .progress {}
 
                         &:hover {
                             background-color: $primaryColor;

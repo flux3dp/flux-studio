@@ -3747,10 +3747,10 @@ input[type=range]:focus::-webkit-slider-runnable-track {
                         .top-menu .device .menu .device-list ul li label {
                             cursor: pointer; }
                         .top-menu .device .menu .device-list ul li .name {
-                            padding: 0 0 0 0.8rem;
-                            width: 12rem; }
+                            padding-left: 5px;
+                            width: 150px; }
                         .top-menu .device .menu .device-list ul li .status {
-                            width: 16rem; }
+                            width: 130px; }
                         .top-menu .device .menu .device-list ul li:hover {
                             background-color: #999;
                             color: #FFF; }

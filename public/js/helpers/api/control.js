@@ -415,6 +415,9 @@ define([
                                 }
                             }, 500);
                         }
+                        else {
+                            d.reject(response);
+                        }
                     }
                     else {
                         d.reject(response);
