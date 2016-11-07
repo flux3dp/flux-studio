@@ -2,6 +2,9 @@ define(function() {
     'use strict';
 
     return {
+        general: {
+            wait: 'Processing, please wait'
+        },
         support: {
             no_webgl: 'WebGL is not supported. Please use other devices.',
             no_vcredist: 'Please install Visual C++ Redistributable 2015',
@@ -275,7 +278,53 @@ define(function() {
                 '3': 'path is not cura',
                 '4': 'path is not a exist file, please check engine path in setting section'
             },
-            allow_tracking: 'Would you like to send anonymous usage statistics to FLUX to improve the app?'
+            allow_tracking: 'Would you like to send anonymous usage statistics to FLUX to improve the app?',
+            flux_cloud: {
+                processing: 'Processing...',
+                flux_cloud: 'FLUX CLOUD',
+                back: 'BACK',
+                next: 'NEXT',
+                done: 'DONE',
+                sign_in: 'SIGN IN',
+                sign_up: 'SIGN UP',
+                success: 'SUCCESS',
+                fail: 'FAIL',
+                cancel: 'CANCEL',
+                try_again: 'TRY AGAIN',
+                bind: 'BIND',
+                bind_another: 'BIND ANOTHER',
+                username: 'Username',
+                nickname: 'Nickname',
+                email: 'Email',
+                password: 'Password',
+                re_enter_password: 'Re-Enter Password',
+                forgot_password: 'Forgot your password?',
+                sign_up_statement: 'If you don\'t have a FLUX ID, please <a href="%s">SIGN UP</a> here',
+                try_sign_up_again: 'Please try <a href="%s">SIGN UP</a> again',
+                agreement: 'Agree to the FLUX Terms & Conditions.',
+                pleaseSignIn: 'Please Sign In with your FLUX ID',
+                enter_email: 'Please fill in your email address',
+                check_inbox: 'Go and check your mail box!',
+                error_blank_username: 'Nickname can\'t be blank',
+                error_blank_email: 'Email cannot be blank',
+                error_email_format: 'Please provide a correct email',
+                error_email_used: 'The email address has been used',
+                error_password_not_match: 'Password confirmation doesn\'t match Password',
+                select_to_bind: 'Select a machine to bind',
+                binding_success: 'Binding Success!',
+                binding_fail: 'Binding Fail',
+                binding: 'Binding...',
+                check_email: 'Please check your email for instruction',
+                email_exists: 'Email exists',
+                not_verified: 'Email has not been verified',
+                user_not_found: 'Incorrect login information',
+                resend_verification: 'Resend verification email',
+                contact_us: 'Please contact FLUX support with your email and issue you encountered',
+                confirm_reset_password: 'Would you like to reset your password?',
+                format_error: 'Incorrect credentials',
+                agree_to_terms: 'Please agree to terms',
+                back_to_list: 'Back To List'
+            }
         },
         print: {
             import: 'IMPORT',

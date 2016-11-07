@@ -397,6 +397,10 @@ define([
         _removeConnection(_device.uuid);
     }
 
+    function getCloudValidationCode() {
+        return SocketMaster.addTask('getCloudValidationCode');
+    }
+
     // Private Functions
 
     function _do(command) {
@@ -857,6 +861,7 @@ define([
             this.getDeviceList          = getDeviceList;
             this.getDeviceSettings      = getDeviceSettings;
             this.setDeviceSetting       = setDeviceSetting;
+            this.getCloudValidationCode = getCloudValidationCode;
 
             Discover(
                 'device-master',
@@ -866,6 +871,7 @@ define([
                         _deviceNameMap[devices[i].name] = devices[i];
                     }
                     _scanDeviceError(devices);
+
                 }
             );
         }

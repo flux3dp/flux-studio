@@ -2,6 +2,9 @@ define(function() {
     'use strict';
 
     return {
+        general: {
+            wait: '處理中，請稍待'
+        },
         support: {
             no_webgl: '您的系統不支援 WebGL，建議您使用其他電腦開啟 FLUX Studio',
             no_vcredist: 'Please install Visual C++ Redistributable 2015',
@@ -274,17 +277,6 @@ define(function() {
                 confirm_password: '確認密碼',
                 save_password: '儲存變更'
             },
-            flux_cloud: {
-                caption: 'Get FLUX 3D Printer be remote!',
-                line1: 'Control your FLUX 3D Printer with FLUX Cloud in anywhere you are',
-                start_to_use: 'Start to Use',
-                i_have_an_account: 'I have an account',
-                email: '電子信箱',
-                password: '密碼',
-                change_password: '變更密碼',
-                connected_printer: '已連接成型機',
-                connect: '連接'
-            },
             cancel: '取消',
             done: '完成',
             connect_printer: {
@@ -299,7 +291,53 @@ define(function() {
                 '3': 'path is not cura',
                 '4': 'path is not a exist file, please check engine path in setting section'
             },
-            allow_tracking: '您是否願意自動傳送匿名用量資料，協助 FLUX 改進產品和服務？'
+            allow_tracking: '您是否願意自動傳送匿名用量資料，協助 FLUX 改進產品和服務？',
+            flux_cloud: {
+                processing: '處理中...',
+                flux_cloud: 'FLUX CLOUD',
+                back: '上一步',
+                next: '下一步',
+                done: '結束',
+                sign_in: '登入',
+                sign_up: '註冊',
+                success: '成功',
+                fail: '失敗',
+                cancel: '取消',
+                try_again: '再試一次',
+                bind: '連結',
+                bind_another: '連結另一部機器',
+                username: '使用者名稱',
+                nickname: '使用者別名',
+                email: '電子信箱',
+                password: '密碼',
+                re_enter_password: '重新輸入密碼',
+                forgot_password: '忘記密碼?',
+                sign_up_statement: '如果尚未持有FLUX ID，可以<a href="%s">按此註冊</a>',
+                try_sign_up_again: '請重新<a href="%s">註冊</a>',
+                agreement: '同意 FLUX-Cloud 使用條款',
+                pleaseSignIn: '請使用 FLUX ID 登入',
+                enter_email: '請輸入您的電子信箱',
+                check_inbox: '請至您的電子信箱確認!',
+                error_blank_username: '請輸入使用者別名',
+                error_blank_email: '請輸入電子信箱',
+                error_email_format: '請輸入正確的電子信箱',
+                error_email_used: '此電子信箱已被使用',
+                error_password_not_match: '確認密碼與密碼不相同',
+                select_to_bind: '請選擇欲連結的機器',
+                binding_success: '連結成功!',
+                binding_fail: '連結失敗',
+                binding: '連結中...',
+                check_email: '相關信進已寄出到您的電子信箱，請確認',
+                email_exists: '電子信箱已被使用',
+                not_verified: '請於您的電子信箱開啟確認信件',
+                user_not_found: '登入訊息錯誤',
+                resend_verification: '重新寄送確認信件',
+                contact_us: '請與 FLUX 客服聯絡',
+                confirm_reset_password: '需要重新設定密碼嗎？',
+                format_error: '登入失敗，請重新登入',
+                agree_to_terms: '請同意使用者條款',
+                back_to_list: '回機器列表'
+            }
         },
         print: {
             import: '匯入',
