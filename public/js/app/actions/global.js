@@ -100,7 +100,7 @@ define([
 
     // detached keyup and keydown event
     window.addEventListener('popstate', function(e) {
-        if(window.FLUX.allowTracking) {
+        if(window.FLUX.allowTracking && window.analytics) {
             window.analytics.event('send', 'pageview', location.hash);
         }
         shortcuts.disableAll();
@@ -111,7 +111,7 @@ define([
     // GA Import Begin
     $('body').on('click', '[data-ga-event]', function(e) {
         var $self = $(e.currentTarget);
-        if(window.FLUX.allowTracking) {
+        if(window.FLUX.allowTracking && window.analytics) {
             window.analytics('send', 'event', 'button', 'click', $self.data('ga-event'));
         }
     });
