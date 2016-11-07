@@ -396,6 +396,10 @@ define([
         _removeConnection(_device.uuid);
     }
 
+    function getCloudValidationCode() {
+        return SocketMaster.addTask('getCloudValidationCode');
+    }
+
     // Private Functions
 
     function _do(command) {
@@ -695,6 +699,7 @@ define([
             this.enterMaintainMode      = enterMaintainMode;
             this.endMaintainMode        = endMaintainMode;
             this.getDeviceList          = getDeviceList;
+            this.getCloudValidationCode = getCloudValidationCode;
 
             Discover(
                 'device-master',

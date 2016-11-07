@@ -1,20 +1,42 @@
 define([
     'jquery',
-    'react'
+    'react',
+    'helpers/api/cloud'
 ], function(
     $,
-    React
+    React,
+    CloudApi
 ) {
     'use strict';
 
     return React.createClass({
+
+        getInitialState: function() {
+            return {
+                email: ''
+            }
+        },
+
+        _handleEnterEmail: function(e) {
+            console.log(e.target.value);
+            this.setState({ email: e.target.value });
+        },
 
         _handleBack: function() {
             location.hash = '#studio/cloud/sign-in';
         },
 
         _handleNext: function() {
-            location.hash = '#studio/cloud/email-sent';
+            let lang = this.props.lang.settings.flux_cloud;
+            CloudApi.resetPassword(this.state.email).then(response => {
+                if(response.ok) {
+                    location.hash = '#studio/cloud/email-sent';
+                }
+                else {
+                    alert(lang.contact_us);
+                }
+            })
+
         },
 
         render: function() {
@@ -28,7 +50,7 @@ define([
                             </div>
                             <div className="controls">
                                 <div className="control">
-                                    <input type="text" placeholder="Email"/>
+                                    <input type="text" placeholder="Email" onBlur={this._handleEnterEmail} />
                                 </div>
                             </div>
                         </div>

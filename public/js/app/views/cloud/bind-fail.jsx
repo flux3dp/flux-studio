@@ -1,19 +1,21 @@
 define([
     'jquery',
-    'react'
+    'react',
+    'helpers/device-master'
 ], function(
     $,
-    React
+    React,
+    DeviceMaster
 ) {
     'use strict';
 
     return React.createClass({
 
-        _handleTryAgain: function() {
+        _handleBackToList: function() {
             location.hash = '#studio/cloud/bind-machine';
         },
 
-        _handleDone: function() {
+        _handleCancel: function() {
             location.hash = '#studio/print';
         },
 
@@ -34,8 +36,8 @@ define([
                             <hr />
                         </div>
                         <div className="actions">
-                        <button className="btn btn-cancel" onClick={this._handleDone}>{lang.done}</button>
-                            <button className="btn btn-default" onClick={this._handleTryAgain}>{lang.try_again}</button>
+                        <button className="btn btn-cancel" onClick={this._handleCancel}>{lang.cancel}</button>
+                            <button className="btn btn-default" onClick={this._handleBackToList}>{lang.back_to_list}</button>
                         </div>
                     </div>
                 </div>

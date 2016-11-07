@@ -407,6 +407,10 @@ define([
                 return useDefaultResponse('maintain headinfo');
             },
 
+            getCloudValidationCode: () => {
+                return useDefaultResponse('cloud_validate_code');
+            },
+
             /**
              * enter maintain mode
              * @param {Int} timeout - timeout (ms)

@@ -6,6 +6,7 @@ define([
     'helpers/device-list',
     'helpers/pad-string',
     'plugins/classnames/index',
+    'helpers/api/cloud'
 ], function(
     $,
     React,
@@ -13,7 +14,8 @@ define([
     DeviceMaster,
     DeviceList,
     PadString,
-    ClassNames
+    ClassNames,
+    CloudApi
 ) {
     'use strict';
 
@@ -24,7 +26,8 @@ define([
         getInitialState: function() {
             return {
                 selectedDevice: {},
-                bindingInProgress: false
+                bindingInProgress: false,
+                me: {}
             };
         },
 
@@ -33,15 +36,27 @@ define([
         },
 
         componentDidMount: function() {
+            let lang = this.props.lang.settings.flux_cloud;
             let getList = () => {
                 let deviceList = DeviceList(DeviceMaster.getDeviceList());
                 this.setState({ deviceList });
             }
             getList();
-            
+
             setInterval(() => {
                 getList();
             }, 2000);
+
+            CloudApi.getMe().then(response => {
+                if(response.ok) {
+                    response.json().then(content => {
+                        this.setState({ me: content });
+                        if(content.needPasswordReset) {
+                            // confirm(lang.confirm_reset_password);
+                        }
+                    });
+                }
+            });
         },
 
         _handleSelectDevice: function(device) {
@@ -59,10 +74,37 @@ define([
 
         _handleBind: function() {
             this.setState({ bindingInProgress: true });
-            setTimeout(() => {
-                this.setState({ bindingInProgress: false });
-                location.hash = '#studio/cloud/bind-success';
-            }, 2000);
+            DeviceMaster.selectDevice(this.state.selectedDevice).then((status) => {
+                console.log(status);
+                if(status === 'TIMEOUT') {
+                    location.hash = '#/studio/cloud/bind-fail';
+                }
+                else {
+                    return DeviceMaster.getCloudValidationCode();
+                }
+            }).then((response) => {
+                console.log(response);
+                let { token, signature } = response.code,
+                    { uuid } = this.state.selectedDevice,
+                    accessId = response.code.access_id;
+
+                signature = encodeURIComponent(signature);
+
+                CloudApi.bindDevice(uuid, token, accessId, signature).then(r => {
+                    console.log(r);
+                    if(r.ok) {
+                        this.setState({ bindingInProgress: false });
+                        location.hash = '#/studio/cloud/bind-success';
+                    }
+                    else {
+                        location.hash = '#/studio/cloud/bind-fail';
+                    }
+                });
+            });
+            // setTimeout(() => {
+            //     this.setState({ bindingInProgress: false });
+            //     location.hash = '#studio/cloud/bind-success';
+            // }, 2000);
             // location.hash = '#/studio/cloud/forgot-password';
         },
 
@@ -133,8 +175,8 @@ define([
                                 </select> */}
                             </div>
                             <div className="user-info">
-                                <div className="name">Ryoko Hirosue</div>
-                                <div className="email">ryoko@gmail.com</div>
+                                <div className="name">{this.state.me.nickname}</div>
+                                <div className="email">{this.state.me.email}</div>
                             </div>
                         </div>
                     </div>

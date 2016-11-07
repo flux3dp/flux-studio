@@ -2,10 +2,12 @@ define([
     'jquery',
     'react',
     'helpers/sprintf',
+    'helpers/api/cloud',
 ], function(
     $,
     React,
-    Sprintf
+    Sprintf,
+    CloudApi
 ) {
     'use strict';
 
@@ -14,12 +16,12 @@ define([
             this.props.onEntered(this.props.id, e.target.value);
         },
         render: function() {
-            let {label, errorMessage, errorOn} = this.props;
+            let {label, errorMessage, errorOn, type} = this.props;
             return (
                 <div className="controls">
                     <div className="label">{label}</div>
                     <div className="control">
-                        <input type="text" onBlur={this._handleEntered.bind(this)} />
+                        <input type={type || 'text'} onBlur={this._handleEntered.bind(this)} />
                     </div>
                     <div className="error">
                         {errorOn ? errorMessage : ' '}
@@ -32,9 +34,8 @@ define([
     return React.createClass({
 
         values: {
-            userName: '',
             password: '',
-            confirmPassword: '',
+            rePassword: '',
             email: ''
         },
 
@@ -47,43 +48,116 @@ define([
         },
 
         _checkValue: function(id, value) {
-            let f = {};
+            console.log(id, value);
+            let lang = this.props.lang.settings.flux_cloud,
+                f = {};
 
-            f['userName'] = () => {
-                this.values['userName'] = value;
+            f['nickname'] = () => {
+                this.values['nickname'] = value;
+                this.setState({ userNameError: value === '' });
             };
 
             f['email'] = () => {
                 this.values['email'] = value;
+                let emailRegex = /^[-a-z0-9~!$%^&*_=+}{\'?]+(\.[-a-z0-9~!$%^&*_=+}{\'?]+)*@([a-z0-9_][-a-z0-9_]*(\.[-a-z0-9_]+)*\.(aero|arpa|biz|com|coop|edu|gov|info|int|mil|museum|name|net|org|pro|travel|mobi|[a-z][a-z])|([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}))(:[0-9]{1,5})?$/i;
+                let emailFormatError = !emailRegex.test(value);
+                let message = '';
+                // this.setState({ emailFormatError: lang.error_email_used });
+                if(value === '') {
+                    message = lang.error_blank_email;
+                }
+                else if(emailFormatError) {
+                    message = lang.error_email_format;
+                }
+
+                this.setState({
+                    emailError: message !== '',
+                    emailErrorMessage: message
+                });
             };
 
             f['password'] = () => {
                 this.values['password'] = value;
             };
 
-            f['confirmPassword'] = () => {
-                this.values['confirmPassword'] = value;
+            f['rePassword'] = () => {
+                this.values['rePassword'] = value;
             };
+
+            f['agreeToTerms'] = () => {
+                this.values[id] = value
+            }
 
             if(typeof f[id] !== 'undefined') {
                 f[id]();
             };
 
-            if(this.values.password !== '' && this.values.confirmPassword !== '') {
-                let mismatch = this.values.password !== this.values.confirmPassword
+            if(this.values.password !== '' && this.values.rePassword !== '') {
+                let mismatch = this.values.password !== this.values.rePassword
                 this.setState({ passwordMismatch: mismatch});
             }
+        },
 
-            this.setState({ userNameError: this.values.userName === '' });
-            
+        _allValid: function() {
+            console.log(this.values, this.state);
+            let { nickname, email, password, rePassword, agreeToTerms } = this.values,
+                { emailError } = this.state,
+                lang = this.props.lang.settings.flux_cloud;
+
+            this.setState({ errorMessage: agreeToTerms ? '' : lang.agree_to_terms });
+
+    		return (
+    			nickname !== '' &&
+    			email !== '' &&
+    			emailError === false &&
+    			password !== '' &&
+    			password === rePassword &&
+    			agreeToTerms === true
+    		);
+        },
+
+        _handleAgreementChange: function(e) {
+            this._checkValue(e.target.id, e.target.checked);
         },
 
         _handleSignUp: function() {
-            location.hash = '#studio/cloud/sign-up-success';
+            if(this._allValid()) {
+                this.setState({ processing: true });
+                let { nickname, email, password } = this.values;
+                let lang = this.props.lang.settings.flux_cloud;
+
+                CloudApi.signUp(nickname, email, password).then(response => {
+                    if(response.ok) {
+                        this.setState({ processing: false });
+                        alert(lang.check_email);
+                        location.hash = '#studio/cloud/sign-in';
+                    }
+                    else {
+                        response.json().then(error => {
+                            this.setState({
+                                processing: false,
+                                emailError: true,
+                                emailErrorMessage: lang[error.message.toLowerCase()]
+                            });
+                            console.log(error.message);
+                        });
+                    }
+                });
+            }
+            // location.hash = '#studio/cloud/sign-up-success';
+        },
+
+        _handleCancel: function() {
+            location.hash = '#studio/cloud/sign-in';
         },
 
         render: function() {
-            let lang = this.props.lang.settings.flux_cloud;
+            let lang = this.props.lang.settings.flux_cloud,
+                message = '';
+
+            if(this.state.processing) {
+                message = lang.processing;
+            }
             return(
                 <div className="cloud">
                     <div className="container">
@@ -93,24 +167,29 @@ define([
                         </div>
                         <div className="row">
                             <Controls
-                                id="userName"
-                                label={lang.username}
+                                id="nickname"
+                                label={lang.nickname}
                                 errorMessage={lang.error_blank_username}
                                 errorOn={this.state.userNameError}
                                 onEntered={this._checkValue}
                             />
-                            <Controls id="password" label={lang.password} onEntered={this._checkValue} />
-                        </div>
-                        <div className="row">
                             <Controls
                                 id="email"
                                 label={lang.email}
-                                errorMessage={lang.error_email_used}
+                                errorMessage={this.state.emailErrorMessage}
                                 errorOn={this.state.emailError}
                                 onEntered={this._checkValue}
                             />
+                        </div>
+                        <div className="row">
                             <Controls
-                                id="confirmPassword"
+                                id="password"
+                                type="password"
+                                label={lang.password}
+                                onEntered={this._checkValue} />
+                            <Controls
+                                id="rePassword"
+                                type="password"
                                 label={lang.re_enter_password}
                                 errorMessage={lang.error_password_not_match}
                                 errorOn={this.state.passwordMismatch}
@@ -119,17 +198,23 @@ define([
                         </div>
                         <div className="controls">
                             <div className="control">
-                                <input className="pointer" id="agreement" type="checkbox" />
-                                <label className="pointer" htmlFor="agreement"> {lang.agreement}</label>
+                                <input id="agreeToTerms" className="pointer" type="checkbox" onChange={this._handleAgreementChange} />
+                                <label className="pointer" htmlFor="agreeToTerms"> {lang.agreement}</label>
                             </div>
                         </div>
+                        <div className="processing-error">
+                            <label>{this.state.errorMessage}</label><br/>
+                        </div>
+                    </div>
+                    <div className="processing">
+                        <label>{message}</label>
                     </div>
                     <div className="footer">
                         <div className="divider">
                             <hr />
                         </div>
                         <div className="actions">
-                            <button className="btn btn-cancel">{lang.cancel}</button>
+                            <button className="btn btn-cancel" onClick={this._handleCancel}>{lang.cancel}</button>
                             <button className="btn btn-default" onClick={this._handleSignUp}>{lang.sign_up}</button>
                         </div>
                     </div>

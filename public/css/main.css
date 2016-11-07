@@ -6386,7 +6386,7 @@ input.switch:checked ~ label:after {
     box-shadow: 0px 0px 12px 0px rgba(128, 128, 128, 0.8);
     text-align: center; }
     .cloud .container {
-        height: 430px; }
+        height: 400px; }
         .cloud .container .icon {
             margin-top: 60px; }
         .cloud .container .title {
@@ -6445,7 +6445,7 @@ input.switch:checked ~ label:after {
     .cloud .controls {
         color: #999;
         font-size: 14px; }
-        .cloud .controls input[type="text"] {
+        .cloud .controls input[type="text"], .cloud .controls input[type="password"] {
             width: 300px;
             height: 40px;
             border-width: 3px;
@@ -6555,3 +6555,18 @@ input.switch:checked ~ label:after {
         background-color: #000000; }
     .cloud .bind-success button.btn {
         width: 150px; }
+    .cloud .error-container {
+        margin-top: 20px; }
+    .cloud .processing-error {
+        margin-top: 40px;
+        border: 0; }
+        .cloud .processing-error label {
+            color: red; }
+        .cloud .processing-error a {
+            font-size: 16px; }
+    .cloud .hide {
+        display: none; }
+    .cloud .processing {
+        min-height: 20px; }
+        .cloud .processing label {
+            color: #777; }

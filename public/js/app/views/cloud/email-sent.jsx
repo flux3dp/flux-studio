@@ -10,7 +10,7 @@ define([
     return React.createClass({
 
         _handleDone: function() {
-            location.hash = '#studio/print';
+            location.hash = '#studio/cloud';
         },
 
         render: function() {
