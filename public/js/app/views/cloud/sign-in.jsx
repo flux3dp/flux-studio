@@ -149,7 +149,7 @@ define([
                             <hr />
                         </div>
                         <div className="actions">
-                            <button className="btn btn-cancel" onClick={this._handleCancel}>{lang.cancel}</button>
+                            <button className="btn btn-cancel" onClick={this._handleCancel}>{lang.back}</button>
                             <button className="btn btn-default" onClick={this._handleSignIn}>{lang.sign_in}</button>
                         </div>
                     </div>

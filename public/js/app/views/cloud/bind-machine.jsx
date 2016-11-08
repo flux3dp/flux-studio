@@ -60,6 +60,12 @@ define([
             });
         },
 
+        _handleSignout: function() {
+            CloudApi.signOut().then(() => {
+                location.hash = '#studio/cloud/sign-in';
+            });
+        },
+
         _handleSelectDevice: function(device) {
             // console.log(device);
             this.setState({ selectedDevice: device});
@@ -158,7 +164,7 @@ define([
                     );
 
                     linkedClass = ClassNames({
-                        'linked': Object.keys(me.devices).indexOf(d.uuid) !== -1
+                        'linked': Object.keys(me.devices || {}).indexOf(d.uuid) !== -1
                     });
 
                     return (
@@ -188,7 +194,7 @@ define([
                                 <div className="name">{this.state.me.nickname}</div>
                                 <div className="email">{this.state.me.email}</div>
                                 <div className="change-password-link">
-                                    <a href="#/studio/cloud/change-password">{lang.change_password.toLowerCase()}</a>
+                                    <a href="#/studio/cloud/change-password">{lang.change_password}</a> / <a href="#/studio/cloud/bind-machine" onClick={this._handleSignout}>{lang.sign_out}</a>
                                 </div>
                             </div>
                         </div>

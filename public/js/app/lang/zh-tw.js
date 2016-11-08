@@ -348,7 +348,9 @@ define(function() {
                 confirm_password: '確認新密碼',
                 empty_password_warning: '密碼不可為空白',
                 WRONG_OLD_PASSWORD: '舊密碼錯誤',
-                FORMAT_ERROR: '密碼格式錯誤'
+                FORMAT_ERROR: '密碼格式錯誤',
+                submit: '儲存',
+                sign_out: '登出'
             }
         },
         print: {

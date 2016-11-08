@@ -3,6 +3,7 @@
 }
 
 .cloud {
+    $bodyDark: #777;
     top: 0;
     right: 0;
     bottom: 0;
@@ -12,8 +13,18 @@
     width: 800px;
     height: 600px;
     background-color: #FFF;
-    box-shadow: 0px 0px 12px 0px rgba(50%,50%,50%,0.8);
+    box-shadow: 0px 5px 8px 0px rgba(50%,50%,50%,0.3);
     text-align: center;
+
+    a {
+        color: #00A0E9;
+    }
+
+    .controls{
+        .label {
+            color: $bodyDark;
+        }
+    }
 
     .container {
         height: 400px;
@@ -80,6 +91,8 @@
 
     .footer {
         hr {
+            border-top: 2px solid $bodyDark;
+            border-bottom: 0;
             width: 80%;
         }
         .btn {
@@ -89,14 +102,23 @@
         .actions {
             margin-top: 15px;
             .btn-cancel {
+                transition: none;
                 background-color: #FFF;
-                color: #999;
-                border: #BBB 2px solid;
+                color: $bodyDark;
+                border: $bodyDark 2px solid;
+                &:hover {
+                    border: 2px solid #000;
+                }
             }
             .btn-default {
-                background-color: #999;
+                transition: none;
+                background-color: $bodyDark;
                 color: #FFF;
-                border: #999 2px solid;
+                border: $bodyDark 2px solid;
+                &:hover {
+                    background-color: #000;
+                    border: 2px solid #000;
+                }
             }
         }
     }
@@ -113,7 +135,7 @@
     }
 
     label {
-        color: #999;
+        color: $bodyDark;
     }
 
     .pointer {
@@ -121,16 +143,18 @@
     }
 
     .controls {
-        color: #999;
+        color: $bodyDark;
         font-size: 14px;
 
         input[type="text"],input[type="password"] {
             width: 300px;
             height: 40px;
-            border-width: 3px;
-            margin: 10px;
+            border: 2px solid $bodyDark;
+            margin: 3px 10px;
             font-size: 16px;
-            font-weight: 500;
+            font-weight: 400;
+            color: $bodyDark;
+            box-shadow: 0 0 3px rgba(0,0,0,0.05);
         }
         input[type="checkbox"] {
             width: 20px;
@@ -156,10 +180,10 @@
         }
 
         .select {
-            border: 1px #999 solid;
+            border: 2px $bodyDark solid;
             text-align: center;
             margin: 0 100px;
-            height: 250px;
+            height: 230px;
             overflow-y: scroll;
             overflow-x: hidden;
 
@@ -179,7 +203,7 @@
             }
 
             .selected {
-                background-color: #999;
+                background-color: $bodyDark;
                 color: #FFF;
             }
         }
@@ -191,8 +215,8 @@
         .error {
             border: none;
             text-align: left;
-            margin-left: 35px;
-            color: red;
+            margin-left: 10px;
+            color: #e74c3c;
             position: absolute;
         }
     }
@@ -205,7 +229,7 @@
 
     .sign-up-description {
         margin-top: 50px;
-        color: #999999;
+        color: $bodyDark;
 
         a {
             font-size: 16px;
@@ -214,10 +238,10 @@
 
     .bind-machine {
         &.container {
-            height: 420px;
+            height: 400px;
         }
         .user-info {
-            margin-top: 35px;
+            margin-top: 20px;
             .name {
                 font-weight: bold;
                 margin: 5px;
@@ -242,7 +266,7 @@
 
         h1 {
             font-weight: 400;
-            color: #999;
+            color: $bodyDark;
         }
 
         .footer {
@@ -252,7 +276,7 @@
 
             a {
                 font-size: 18px;
-                color: #999;
+                color: $bodyDark;
             }
         }
 
@@ -299,7 +323,7 @@
         border: 0;
 
         label {
-            color: red;
+            color: #e74c3c;
         }
 
         a {
@@ -312,6 +336,7 @@
     }
 
     .processing {
+        margin-top: -20px;
         min-height: 20px;
         label {
             color: #777;
@@ -330,7 +355,7 @@
     .change-password.container {
 
         .title {
-            margin-top: 50px;
+            margin-top: 80px;
         }
 
         .error {
@@ -340,9 +365,7 @@
     }
 
     .change-password.footer {
-        position: absolute;
         width: 100%;
-        bottom: 30px;
 
         .btn {
             width: 180px;
@@ -350,7 +373,7 @@
 
         span {
             border: 0;
-            color: red;
+            color: #e74c3c;
         }
     }
 }

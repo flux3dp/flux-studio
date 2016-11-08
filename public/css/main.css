@@ -3623,6 +3623,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
             line-height: 55px;
             padding: 0 0 0 21px; }
         .top-menu .brand-logo .menu {
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
             background: #fff;
             display: none;
             left: 5.05rem;
@@ -3630,6 +3631,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
             position: relative;
             top: 27px; }
             .top-menu .brand-logo .menu .arrow-top-left-flat {
+                box-shadow: -1px -1px 5px rgba(0, 0, 0, 0.1);
                 left: 0;
                 position: absolute;
                 top: 0;
@@ -5007,7 +5009,7 @@ input.switch:checked ~ label:after {
     width: 800px;
     height: 600px;
     background-color: #FFF;
-    box-shadow: 0px 0px 12px 0px rgba(128, 128, 128, 0.8); }
+    box-shadow: 0px 5px 8px 0px rgba(128, 128, 128, 0.3); }
     .settings header {
         height: 47px;
         padding-top: 30px; }
@@ -5074,6 +5076,7 @@ input.switch:checked ~ label:after {
         .settings .general .controls {
             padding-bottom: 5px; }
             .settings .general .controls .label {
+                color: #555;
                 width: 200px;
                 font-size: 14px; }
             .settings .general .controls span {
@@ -5093,7 +5096,8 @@ input.switch:checked ~ label:after {
             .settings footer .actions .btn-cancel:hover {
                 border: 1px #4A4A4A solid; }
             .settings footer .actions .btn-done {
-                background-color: #424242;
+                min-width: 5em;
+                background-color: #555;
                 font-size: 14px;
                 color: #FFF; }
             .settings footer .actions .btn-done:hover {
@@ -5106,7 +5110,7 @@ input.switch:checked ~ label:after {
     .settings .font2 {
         font-size: 15px;
         letter-spacing: 0.3px;
-        color: #777777; }
+        color: #555; }
     .settings .font3 {
         font-size: 14px;
         letter-spacing: 0.3px;
@@ -5114,7 +5118,7 @@ input.switch:checked ~ label:after {
     .settings .font4 {
         font-size: 13px;
         letter-spacing: 0.3px;
-        color: #777777; }
+        color: #555; }
 
 /*for cloud*/
 .settings .cloud {
@@ -6416,8 +6420,12 @@ input.switch:checked ~ label:after {
     width: 800px;
     height: 600px;
     background-color: #FFF;
-    box-shadow: 0px 0px 12px 0px rgba(128, 128, 128, 0.8);
+    box-shadow: 0px 5px 8px 0px rgba(128, 128, 128, 0.3);
     text-align: center; }
+    .cloud a {
+        color: #00A0E9; }
+    .cloud .controls .label {
+        color: #777; }
     .cloud .container {
         height: 400px; }
         .cloud .container .icon {
@@ -6457,19 +6465,28 @@ input.switch:checked ~ label:after {
                 text-decoration: none;
                 font-size: 12px; }
     .cloud .footer hr {
+        border-top: 2px solid #777;
+        border-bottom: 0;
         width: 80%; }
     .cloud .footer .btn {
         width: 130px; }
     .cloud .footer .actions {
         margin-top: 15px; }
         .cloud .footer .actions .btn-cancel {
+            transition: none;
             background-color: #FFF;
-            color: #999;
-            border: #BBB 2px solid; }
+            color: #777;
+            border: #777 2px solid; }
+            .cloud .footer .actions .btn-cancel:hover {
+                border: 2px solid #000; }
         .cloud .footer .actions .btn-default {
-            background-color: #999;
+            transition: none;
+            background-color: #777;
             color: #FFF;
-            border: #999 2px solid; }
+            border: #777 2px solid; }
+            .cloud .footer .actions .btn-default:hover {
+                background-color: #000;
+                border: 2px solid #000; }
     .cloud .middle {
         position: relative;
         top: 50%;
@@ -6478,19 +6495,21 @@ input.switch:checked ~ label:after {
         color: #777777;
         font-weight: 300; }
     .cloud label {
-        color: #999; }
+        color: #777; }
     .cloud .pointer {
         cursor: pointer; }
     .cloud .controls {
-        color: #999;
+        color: #777;
         font-size: 14px; }
         .cloud .controls input[type="text"], .cloud .controls input[type="password"] {
             width: 300px;
             height: 40px;
-            border-width: 3px;
-            margin: 10px;
+            border: 2px solid #777;
+            margin: 3px 10px;
             font-size: 16px;
-            font-weight: 500; }
+            font-weight: 400;
+            color: #777;
+            box-shadow: 0 0 3px rgba(0, 0, 0, 0.05); }
         .cloud .controls input[type="checkbox"] {
             width: 20px;
             height: 40px;
@@ -6511,10 +6530,10 @@ input.switch:checked ~ label:after {
         .cloud .controls a {
             font-size: 16px; }
         .cloud .controls .select {
-            border: 1px #999 solid;
+            border: 2px #777 solid;
             text-align: center;
             margin: 0 100px;
-            height: 250px;
+            height: 230px;
             overflow-y: scroll;
             overflow-x: hidden; }
             .cloud .controls .select .device {
@@ -6527,27 +6546,27 @@ input.switch:checked ~ label:after {
                 .cloud .controls .select .device .name {
                     width: 250px; }
             .cloud .controls .select .selected {
-                background-color: #999;
+                background-color: #777;
                 color: #FFF; }
         .cloud .controls .forget-password {
             padding-top: 15px; }
         .cloud .controls .error {
             border: none;
             text-align: left;
-            margin-left: 35px;
-            color: red;
+            margin-left: 10px;
+            color: #e74c3c;
             position: absolute; }
     .cloud .forgot-password input[type="text"] {
         width: 400px; }
     .cloud .sign-up-description {
         margin-top: 50px;
-        color: #999999; }
+        color: #777; }
         .cloud .sign-up-description a {
             font-size: 16px; }
     .cloud .bind-machine.container {
-        height: 420px; }
+        height: 400px; }
     .cloud .bind-machine .user-info {
-        margin-top: 35px; }
+        margin-top: 20px; }
         .cloud .bind-machine .user-info .name {
             font-weight: bold;
             margin: 5px; }
@@ -6566,14 +6585,14 @@ input.switch:checked ~ label:after {
         z-index: 9999; }
         .cloud .binding-window h1 {
             font-weight: 400;
-            color: #999; }
+            color: #777; }
         .cloud .binding-window .footer {
             bottom: 30px;
             position: absolute;
             width: 100%; }
             .cloud .binding-window .footer a {
                 font-size: 18px;
-                color: #999; }
+                color: #777; }
         .cloud .binding-window .spinner-roller {
             background: linear-gradient(to right, #DEDEDC 10%, rgba(255, 255, 255, 0) 42%);
             height: 5rem;
@@ -6602,12 +6621,13 @@ input.switch:checked ~ label:after {
         margin-top: 40px;
         border: 0; }
         .cloud .processing-error label {
-            color: red; }
+            color: #e74c3c; }
         .cloud .processing-error a {
             font-size: 16px; }
     .cloud .hide {
         display: none; }
     .cloud .processing {
+        margin-top: -20px;
         min-height: 20px; }
         .cloud .processing label {
             color: #777; }
@@ -6619,15 +6639,13 @@ input.switch:checked ~ label:after {
         background-image: url("/img/connect-icon.svg");
         background-repeat: no-repeat; }
     .cloud .change-password.container .title {
-        margin-top: 50px; }
+        margin-top: 80px; }
     .cloud .change-password.container .error {
         margin-left: 10px; }
     .cloud .change-password.footer {
-        position: absolute;
-        width: 100%;
-        bottom: 30px; }
+        width: 100%; }
         .cloud .change-password.footer .btn {
             width: 180px; }
         .cloud .change-password.footer span {
             border: 0;
-            color: red; }
+            color: #e74c3c; }

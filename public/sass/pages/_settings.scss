@@ -12,7 +12,7 @@
     width: 800px;
     height: 600px;
     background-color: #FFF;
-    box-shadow: 0px 0px 12px 0px rgba(50%,50%,50%,0.8);
+    box-shadow: 0px 5px 8px 0px rgba(50%,50%,50%,0.3);
 
     header {
         height: 47px;
@@ -118,6 +118,7 @@
         .controls {
             padding-bottom: 5px;
             .label {
+                color: #555;
                 width: 200px;
                 font-size: 14px;
             }
@@ -148,7 +149,8 @@
             }
 
             .btn-done {
-                background-color: #424242;
+                min-width: 5em;
+                background-color: #555;
                 font-size: 14px;
                 color: #FFF;
             }
@@ -169,7 +171,7 @@
     .font2 {
         font-size: 15px;
         letter-spacing: 0.3px;
-        color: #777777;
+        color: #555;
     }
 
     .font3 {
@@ -181,7 +183,7 @@
     .font4 {
         font-size: 13px;
         letter-spacing: 0.3px;
-        color: #777777;
+        color: #555;
     }
 }
 
