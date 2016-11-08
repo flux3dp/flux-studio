@@ -27,18 +27,23 @@ define([
             var me = e.currentTarget,
                 lang = this.state.lang,
                 originalIP = config().read('poke-ip-addr'),
-                ip = me.value,
-                ipv4Pattern = /^\d{1,3}[.]\d{1,3}[.]\d{1,3}[.]\d{1,3}$/g;
-
-            if ('' !== ip && false === ipv4Pattern.test(ip)) {
-                me.value = originalIP;
-                AlertActions.showPopupError('laser-upload-error', lang.settings.wrong_ip_format);
+                ips = me.value.split(','),
+                ipv4Pattern = /^\d{1,3}[.]\d{1,3}[.]\d{1,3}[.]\d{1,3}$/g,
+                isCorrectFormat = true;
+            
+            for(var i in ips){
+                let ip = ips[i];
+                if ('' !== ip && false === ipv4Pattern.test(ip)) {
+                    me.value = originalIP;
+                    AlertActions.showPopupError('wrong-ip-error', lang.settings.wrong_ip_format);
+                    isCorrectFormat = false;
+                    break;
+                }
             }
-            else {
-                // save ip
-                config().write('poke-ip-addr', ip);
-            }
 
+            if(isCorrectFormat){
+                config().write('poke-ip-addr', me.value);
+            }
         },
 
         _changeActiveLang: function(e) {
