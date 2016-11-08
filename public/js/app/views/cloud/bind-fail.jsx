@@ -28,7 +28,7 @@ define([
                             <h3>{lang.binding_fail}</h3>
                         </div>
                         <div className="icon">
-                            <img src="http://placehold.it/150x150" />
+                            <img src="img/error-icon.svg" />
                         </div>
                     </div>
                     <div className="footer">

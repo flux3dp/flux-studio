@@ -22,7 +22,8 @@ define([
     'helpers/api/touch',
     'helpers/firmware-updater',
     'helpers/device-list',
-    'helpers/api/3d-scan-control'
+    'helpers/api/3d-scan-control',
+    'helpers/api/cloud'
 ], function(
     gui,
     menuMap,
@@ -44,7 +45,8 @@ define([
     touch,
     firmwareUpdater,
     DeviceList,
-    ScanControl
+    ScanControl,
+    CloudApi
 ) {
     'use strict';
 
@@ -173,7 +175,9 @@ define([
         createDevice,
         createDeviceList,
         doDiscover,
-        discoverMethods;
+        discoverMethods,
+        accountDisplayName,
+        timer;
 
     MenuItem = gui.MenuItem;
     NWjsWindow = gui.Window.get();
@@ -258,7 +262,14 @@ define([
             var menuItem = mainmenu.items[parentIndex],
                 subMenu = methods.createSubMenu(menu.subItems);
 
-            menuItem.submenu = subMenu;
+            menuItem.subMenu = subMenu;
+        },
+
+        updateAccountDisplay: function(name) {
+            if(typeof mainmenu.items === 'undefined') { return; }
+            var account = mainmenu.items[5].submenu.items[0];
+            account.label = name || lang.account.sign_in;
+            accountDisplayName = name;
         }
 
     };
@@ -267,13 +278,37 @@ define([
         var subMenu;
 
         methods.clear();
+        menuMap = updateAccountMenu(menuMap);
 
         menuMap.forEach(function(menu) {
             subMenu = methods.createSubMenu(menu.subItems);
             methods.appendToMenu(menu.label, subMenu);
         });
 
+        methods.updateAccountDisplay(accountDisplayName);
+        // console.log('sub menu count', mainmenu.items[5].submenu.itemss);
+        // methods.refresh();
         NWjsWindow.menu = mainmenu;
+    }
+
+    function updateAccountMenu(m) {
+        // console.log('account display name', accountDisplayName);
+        if(accountDisplayName === '' || typeof accountDisplayName === 'undefined') {
+            m[5].subItems.splice(0,2);
+        }
+
+        if(m[5].subItems.length >= 3) {
+            // clicked on sign out
+            m[5].subItems[2].onClick = () => {
+                methods.updateAccountDisplay('');
+                CloudApi.signOut();
+                setTimeout(() => {
+                    location.hash = '#studio/cloud/sign-in';
+                }, 1000);
+            };
+        }
+        // console.log(m[5].subItems[0]);
+        return m;
     }
 
     if (true === window.FLUX.isNW) {
@@ -427,7 +462,6 @@ define([
                         onClick: function() {
                             var currentPrinter = discoverMethods.getLatestPrinter(printer);
                             DeviceMaster.selectDevice(currentPrinter).then((status) => {
-                                console.log("selected device");
                                 if (status === DeviceConstants.CONNECTED) {
                                     checkDeviceStatus(currentPrinter).then(() => {
                                         ProgressActions.open(ProgressConstants.NONSTOP);

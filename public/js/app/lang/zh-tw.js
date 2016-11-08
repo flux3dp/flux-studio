@@ -113,6 +113,11 @@ define(function() {
                 software_update: '軟體更新',
                 debug: '錯誤回報',
                 forum: '社群論壇'
+            },
+            account: {
+                label: 'Account',
+                sign_in: 'Sign In',
+                sign_out: 'Sign Out'
             }
         },
         initialize: {
@@ -336,7 +341,14 @@ define(function() {
                 confirm_reset_password: '需要重新設定密碼嗎？',
                 format_error: '登入失敗，請重新登入',
                 agree_to_terms: '請同意使用者條款',
-                back_to_list: '回機器列表'
+                back_to_list: '回機器列表',
+                change_password: '密碼變更',
+                current_password: '目前登入密碼',
+                new_password: '新密碼',
+                confirm_password: '確認新密碼',
+                empty_password_warning: '密碼不可為空白',
+                WRONG_OLD_PASSWORD: '舊密碼錯誤',
+                FORMAT_ERROR: '密碼格式錯誤'
             }
         },
         print: {

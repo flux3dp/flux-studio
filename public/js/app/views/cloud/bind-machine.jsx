@@ -41,6 +41,7 @@ define([
                 let deviceList = DeviceList(DeviceMaster.getDeviceList());
                 this.setState({ deviceList });
             }
+
             getList();
 
             setInterval(() => {
@@ -52,7 +53,7 @@ define([
                     response.json().then(content => {
                         this.setState({ me: content });
                         if(content.needPasswordReset) {
-                            // confirm(lang.confirm_reset_password);
+                            location.hash = '#/studio/cloud/change-password';
                         }
                     });
                 }
@@ -60,7 +61,7 @@ define([
         },
 
         _handleSelectDevice: function(device) {
-            console.log(device);
+            // console.log(device);
             this.setState({ selectedDevice: device});
         },
 
@@ -75,7 +76,7 @@ define([
         _handleBind: function() {
             this.setState({ bindingInProgress: true });
             DeviceMaster.selectDevice(this.state.selectedDevice).then((status) => {
-                console.log(status);
+                // console.log(status);
                 if(status === 'TIMEOUT') {
                     location.hash = '#/studio/cloud/bind-fail';
                 }
@@ -83,7 +84,7 @@ define([
                     return DeviceMaster.getCloudValidationCode();
                 }
             }).then((response) => {
-                console.log(response);
+                // console.log(response);
                 let { token, signature } = response.code,
                     { uuid } = this.state.selectedDevice,
                     accessId = response.code.access_id;
@@ -91,7 +92,7 @@ define([
                 signature = encodeURIComponent(signature);
 
                 CloudApi.bindDevice(uuid, token, accessId, signature).then(r => {
-                    console.log(r);
+                    // console.log(r);
                     if(r.ok) {
                         this.setState({ bindingInProgress: false });
                         location.hash = '#/studio/cloud/bind-success';
@@ -101,11 +102,6 @@ define([
                     }
                 });
             });
-            // setTimeout(() => {
-            //     this.setState({ bindingInProgress: false });
-            //     location.hash = '#studio/cloud/bind-success';
-            // }, 2000);
-            // location.hash = '#/studio/cloud/forgot-password';
         },
 
         _renderBindingWindow: function() {
@@ -147,15 +143,23 @@ define([
             }
             else {
                 deviceList = this.state.deviceList.map((d) => {
-                    let c = ClassNames(
+                    let { me } = this.state,
+                        rowClass, linkedClass;
+
+                    rowClass = ClassNames(
                         'device',
                         {'selected': this.state.selectedDevice.name === d.name}
                     );
 
+                    linkedClass = ClassNames({
+                        'linked': Object.keys(me.devices).indexOf(d.uuid) !== -1
+                    });
+
                     return (
-                        <div className={c} onClick={this._handleSelectDevice.bind(null, d)}>
+                        <div className={rowClass} onClick={this._handleSelectDevice.bind(null, d)}>
                             <div className="name">{d.name}</div>
                             <div className="status">{this.lang.machine_status[d.st_id]}</div>
+                            <div className={linkedClass}></div>
                         </div>
                     );
                 });
@@ -177,6 +181,9 @@ define([
                             <div className="user-info">
                                 <div className="name">{this.state.me.nickname}</div>
                                 <div className="email">{this.state.me.email}</div>
+                                <div className="change-password-link">
+                                    <a href="#/studio/cloud/change-password">{lang.change_password.toLowerCase()}</a>
+                                </div>
                             </div>
                         </div>
                     </div>

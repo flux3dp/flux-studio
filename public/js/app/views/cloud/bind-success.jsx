@@ -26,7 +26,7 @@ define([
                             <h3>{lang.binding_success}</h3>
                         </div>
                         <div className="icon">
-                            <img src="http://placehold.it/150x150" />
+                            <img src="img/ok-icon.svg" />
                         </div>
                     </div>
                     <div className="footer">

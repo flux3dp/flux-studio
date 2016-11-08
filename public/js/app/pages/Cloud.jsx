@@ -9,7 +9,9 @@ define([
     'jsx!views/cloud/email-sent',
     'jsx!views/cloud/bind-machine',
     'jsx!views/cloud/bind-success',
-    'jsx!views/cloud/bind-fail'
+    'jsx!views/cloud/bind-fail',
+    'jsx!views/cloud/sign-out',
+    'jsx!views/cloud/change-password',
 ], function(
     $,
     React,
@@ -21,7 +23,9 @@ define([
     EmailSent,
     BindMachine,
     BindSuccess,
-    BindFail
+    BindFail,
+    SignOut,
+    ChangePassword
 ) {
     'use strict';
 
@@ -42,7 +46,6 @@ define([
                 var content = {},
                     view = args.child;
 
-                    console.log(view);
                 content['sign-in'] = () => <SignIn lang={this.state.lang} />
                 content['sign-up'] = () => <SignUp lang={this.state.lang} />
                 content['sign-up-success'] = () => <SignUpSuccess lang={this.state.lang} />
@@ -52,6 +55,9 @@ define([
                 content['bind-machine'] = () => <BindMachine lang={this.state.lang} />
                 content['bind-success'] = () => <BindSuccess lang={this.state.lang} />
                 content['bind-fail'] = () => <BindFail lang={this.state.lang} />
+                content['change-password'] = () => <ChangePassword lang={this.state.lang} />
+                content['sign-out'] = () => <SignOut />
+
 
                 if(typeof content[view] === 'undefined') { view = 'sign-in'; }
                 return content[view]();

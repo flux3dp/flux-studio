@@ -9,7 +9,8 @@ define([
     'html2canvas',
     'plugins/file-saver/file-saver.min',
     'helpers/output-error',
-    'helpers/check-software-update'
+    'helpers/check-software-update',
+    'helpers/api/cloud'
 ], function(
     $,
     gui,
@@ -18,7 +19,8 @@ define([
     html2canvas,
     fileSaver,
     outputError,
-    checkSoftwareUpdate
+    checkSoftwareUpdate,
+    CloudApi
 ) {
     'use strict';
 
@@ -38,7 +40,8 @@ define([
             EDIT   : 2 - menuIndexOffset,
             DEVICE : 3 - menuIndexOffset,
             WINDOW : 4 - menuIndexOffset,
-            HELP   : 5 - menuIndexOffset
+            ACCOUNT: 5 - menuIndexOffset,
+            HELP   : 6 - menuIndexOffset
         },
         newDevice = {
             label: lang.device.new,
@@ -243,6 +246,29 @@ define([
                         enabled: true,
                         onClick: function() {
                             gui.Window.get().maximize();
+                        }
+                    }
+                ]
+            },
+            {
+                label: lang.account.label,
+                subItems: [
+                    {
+                        label: lang.account.sign_in,
+                        enabled: true,
+                        onClick: function() {
+                            location.hash = '#studio/cloud';
+                        }
+                    },
+                    separator,
+                    {
+                        label: lang.account.sign_out,
+                        enabled: true,
+                        onClick: function() {
+                            CloudApi.signOut();
+                            setTimeout(() => {
+                                location.hash = '#studio/cloud/sign-in';
+                            }, 1000);
                         }
                     }
                 ]
