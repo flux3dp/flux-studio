@@ -90,7 +90,7 @@ define([
                     return DeviceMaster.enableCloud();
                 }
             }).then((response) => {
-                if(r.status === 'ok') {
+                if(response.status === 'ok') {
                     return DeviceMaster.getCloudValidationCode();
                 } else {
                     location.hash = '#/studio/cloud/bind-fail';

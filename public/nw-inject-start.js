@@ -49,9 +49,12 @@ var process = nw.process,
             },
             recordOutput = function(type, data) {
                 str = data.toString();
-                console.log(type, str);
                 writeLog(str);
-                if(str.indexOf('Unhandled exception') >= 0){
+                if (str.indexOf('Poke error') > 0) {
+                    return;
+                }
+                console.log(type, str);
+                if (str.indexOf('Unhandled exception') >= 0) {
                     process.env.processPythonException(str);
                 }
                 process.env.ghostPort = port;
