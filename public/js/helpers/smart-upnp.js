@@ -75,6 +75,7 @@ define(['helpers/i18n'], function (i18n) {
             startPoke(ip);
         },
         getLocalAddresses: function(){
+            if(!window['requireNode']) return ["192.168.1.1"];
             var os = requireNode('os');
             var ifaces = os.networkInterfaces();        
             var addresses = [];
