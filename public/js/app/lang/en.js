@@ -113,6 +113,11 @@ define(function() {
                 software_update: 'Software Update',
                 debug: 'Bug Report',
                 forum: 'Community Forum'
+            },
+            account: {
+                label: 'Account',
+                sign_in: 'Sign In',
+                sign_out: 'Sign Out'
             }
         },
         initialize: {
@@ -323,7 +328,14 @@ define(function() {
                 confirm_reset_password: 'Would you like to reset your password?',
                 format_error: 'Incorrect credentials',
                 agree_to_terms: 'Please agree to terms',
-                back_to_list: 'Back To List'
+                back_to_list: 'Back To List',
+                change_password: 'CHANGE PASSWORD',
+                current_password: 'Current Password',
+                new_password: 'New Password',
+                confirm_password: 'Confirm Password',
+                empty_password_warning: 'Password cannot be empty',
+                WRONG_OLD_PASSWORD: 'current password is incorrect',
+                FORMAT_ERROR: 'password format error'
             }
         },
         print: {

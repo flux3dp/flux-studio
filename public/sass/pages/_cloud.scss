@@ -67,6 +67,15 @@
                 letter-spacing: 1px;
             }
         }
+
+        .change-password-link {
+            padding-top: 5px;
+            a {
+                color: #aaa;
+                text-decoration: none;
+                font-size: 12px;
+            }
+        }
     }
 
     .footer {
@@ -204,6 +213,9 @@
     }
 
     .bind-machine {
+        &.container {
+            height: 420px;
+        }
         .user-info {
             margin-top: 35px;
             .name {
@@ -212,6 +224,7 @@
             }
         }
     }
+
 
     .binding-window {
         top: 0;
@@ -302,6 +315,42 @@
         min-height: 20px;
         label {
             color: #777;
+        }
+    }
+
+    .linked {
+        float: right;
+        width: 32px;
+        height: 13px;
+        margin-top: 5px;
+        background-image: url('/img/connect-icon.svg');
+        background-repeat: no-repeat;
+    }
+
+    .change-password.container {
+
+        .title {
+            margin-top: 50px;
+        }
+
+        .error {
+            margin-left: 10px;
+        }
+
+    }
+
+    .change-password.footer {
+        position: absolute;
+        width: 100%;
+        bottom: 30px;
+
+        .btn {
+            width: 180px;
+        }
+
+        span {
+            border: 0;
+            color: red;
         }
     }
 }

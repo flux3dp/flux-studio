@@ -4,14 +4,16 @@ define([
     'helpers/sprintf',
     'helpers/api/cloud',
     'plugins/classnames/index',
-    'jsx!app/widgets/Wait-Wording'
+    'jsx!app/widgets/Wait-Wording',
+    'helpers/nwjs/menu-factory',
 ], function(
     $,
     React,
     Sprintf,
     CloudApi,
     ClassNames,
-    WaitWording
+    WaitWording,
+    menuFactory
 ) {
     'use strict';
 
@@ -32,8 +34,10 @@ define([
                     return response.json();
                 }
             }).then(response => {
-                console.log(response);
-                location.hash = '#/studio/cloud/bind-machine';
+                // console.log('response is ',response);
+                if(response) {
+                    location.hash = '#/studio/cloud/bind-machine';
+                }
             });
         },
 
@@ -57,7 +61,7 @@ define([
             let lang = this.props.lang.settings.flux_cloud;
 
             CloudApi.resendVerification(email).then(response => {
-                console.log(response);
+                // console.log(response);
                 if(response.ok) {
                     location.hash = '#studio/cloud/email-sent';
                 }
@@ -80,7 +84,13 @@ define([
             CloudApi.signIn(email, password).then((response) => {
                 console.log(response);
                 if(response.ok) {
-                    location.hash = '#/studio/cloud/bind-machine';
+                    response.json().then(r => {
+                        let { nickname, email } = r;
+                        let displayName = nickname || email;
+                        menuFactory.methods.updateAccountDisplay(displayName);
+                        location.hash = '#/studio/cloud/bind-machine';
+                    });
+
                 }
                 else {
                     response.json().then(error => {
@@ -100,7 +110,6 @@ define([
                 verificationClass = ClassNames('resend', {hide: !this.state.showResendVerificationEmail }),
                 message = '';
 
-            console.log(message);
             if(this.state.processing) {
                 message = lang.processing;
             }

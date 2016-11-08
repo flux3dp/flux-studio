@@ -6450,6 +6450,12 @@ input.switch:checked ~ label:after {
             margin-bottom: 20px; }
             .cloud .container .description h3 {
                 letter-spacing: 1px; }
+        .cloud .container .change-password-link {
+            padding-top: 5px; }
+            .cloud .container .change-password-link a {
+                color: #aaa;
+                text-decoration: none;
+                font-size: 12px; }
     .cloud .footer hr {
         width: 80%; }
     .cloud .footer .btn {
@@ -6538,6 +6544,8 @@ input.switch:checked ~ label:after {
         color: #999999; }
         .cloud .sign-up-description a {
             font-size: 16px; }
+    .cloud .bind-machine.container {
+        height: 420px; }
     .cloud .bind-machine .user-info {
         margin-top: 35px; }
         .cloud .bind-machine .user-info .name {
@@ -6603,3 +6611,23 @@ input.switch:checked ~ label:after {
         min-height: 20px; }
         .cloud .processing label {
             color: #777; }
+    .cloud .linked {
+        float: right;
+        width: 32px;
+        height: 13px;
+        margin-top: 5px;
+        background-image: url("/img/connect-icon.svg");
+        background-repeat: no-repeat; }
+    .cloud .change-password.container .title {
+        margin-top: 50px; }
+    .cloud .change-password.container .error {
+        margin-left: 10px; }
+    .cloud .change-password.footer {
+        position: absolute;
+        width: 100%;
+        bottom: 30px; }
+        .cloud .change-password.footer .btn {
+            width: 180px; }
+        .cloud .change-password.footer span {
+            border: 0;
+            color: red; }

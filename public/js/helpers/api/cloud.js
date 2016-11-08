@@ -1,5 +1,6 @@
 define([], function() {
-    const ip = 'https://35.161.43.14:3000';
+    // const ip = 'https://35.161.43.14:3000';
+    const ip = 'https://cloudserv1.flux3dp.com:3000';
     // const ip = 'https://localhost:3000';
     const userProtocol = '/users';
     const deviceProtocol = '/devices';
@@ -9,7 +10,7 @@ define([], function() {
     const deviceUrl = (name) => { return `${ip}${deviceProtocol}/${name}`; };
 
     const constructBody = (obj) => {
-    let body = Object.keys(obj).map(key => `${key}=${obj[key]}&`).join('');
+    let body = Object.keys(obj).map(key => `${key}=${encodeURIComponent(obj[key])}&`).join('');
        return body.slice(0, body.length - 1);
     };
 
@@ -34,6 +35,10 @@ define([], function() {
     	return post(userUrl('signUp'), body);
     };
 
+    const signOut = () => {
+    	return post(userUrl('logout'), '');
+    };
+
     const resendVerification = (email) => {
         let body = constructBody({email});
     	return post(userUrl('resendVerification'), body);
@@ -42,6 +47,11 @@ define([], function() {
     const resetPassword = (email) => {
     	let body = constructBody({ email });
     	return post(userUrl('forgotPassword'), body);
+    };
+
+    const changePassword = (param) => {
+        let body = constructBody(param);
+        return post(userUrl('updateInfo'), body);
     };
 
     const getMe = () => {
@@ -59,8 +69,10 @@ define([], function() {
     return {
         signIn,
         signUp,
+        signOut,
         resendVerification,
         resetPassword,
+        changePassword,
         getMe,
         bindDevice
     };
