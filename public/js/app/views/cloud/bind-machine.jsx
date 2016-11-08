@@ -87,7 +87,13 @@ define([
                     location.hash = '#/studio/cloud/bind-fail';
                 }
                 else {
+                    return DeviceMaster.enableCloud();
+                }
+            }).then((response) => {
+                if(r.status === 'ok') {
                     return DeviceMaster.getCloudValidationCode();
+                } else {
+                    location.hash = '#/studio/cloud/bind-fail';
                 }
             }).then((response) => {
                 // console.log(response);
@@ -97,22 +103,16 @@ define([
 
                 signature = encodeURIComponent(signature);
 
-                DeviceMaster.enableCloud().then(function(r) {
-                    if(r.status === 'ok') {
-                        CloudApi.bindDevice(uuid, token, accessId, signature).then(r => {
-                            if(r.ok) {
-                                this.setState({ bindingInProgress: false });
-                                location.hash = '#/studio/cloud/bind-success';
-                            }
-                            else {
-                                location.hash = '#/studio/cloud/bind-fail';
-                            }
-                        });
+                CloudApi.bindDevice(uuid, token, accessId, signature).then(r => {
+                    if(r.ok) {
+                        this.setState({ bindingInProgress: false });
+                        location.hash = '#/studio/cloud/bind-success';
                     }
                     else {
                         location.hash = '#/studio/cloud/bind-fail';
                     }
                 });
+                   
             });
         },
 
