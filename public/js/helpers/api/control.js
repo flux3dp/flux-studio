@@ -449,6 +449,10 @@ define([
                 return useDefaultResponse('cloud_validate_code');
             },
 
+            enableCloud: () => {
+                return useDefaultResponse('config set enable_cloud A');
+            },
+
             /**
              * enter maintain mode
              * @param {Int} timeout - timeout (ms)

@@ -91,11 +91,17 @@ define([
 
                 signature = encodeURIComponent(signature);
 
-                CloudApi.bindDevice(uuid, token, accessId, signature).then(r => {
-                    // console.log(r);
-                    if(r.ok) {
-                        this.setState({ bindingInProgress: false });
-                        location.hash = '#/studio/cloud/bind-success';
+                DeviceMaster.enableCloud().then(function(r) {
+                    if(r.status === 'ok') {
+                        CloudApi.bindDevice(uuid, token, accessId, signature).then(r => {
+                            if(r.ok) {
+                                this.setState({ bindingInProgress: false });
+                                location.hash = '#/studio/cloud/bind-success';
+                            }
+                            else {
+                                location.hash = '#/studio/cloud/bind-fail';
+                            }
+                        });
                     }
                     else {
                         location.hash = '#/studio/cloud/bind-fail';
