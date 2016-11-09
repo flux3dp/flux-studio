@@ -24,6 +24,7 @@ define([
                     <div className="container">
                         <div className="title">
                             <h3>{lang.binding_success}</h3>
+                            <label>{lang.binding_success_description}</label>
                         </div>
                         <div className="icon">
                             <img src="img/ok-icon.svg" />

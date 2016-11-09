@@ -6615,6 +6615,10 @@ input.switch:checked ~ label:after {
         background-color: #000000; }
     .cloud .bind-success button.btn {
         width: 150px; }
+    .cloud .bind-success .container {
+        margin-bottom: -60px; }
+        .cloud .bind-success .container .title {
+            margin-top: 140px; }
     .cloud .error-container {
         margin-top: 20px; }
     .cloud .processing-error {
