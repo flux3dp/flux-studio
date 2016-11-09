@@ -1606,7 +1606,7 @@ define([
     }
 
     function setDefaultFileName(fileNameWithExtension) {
-        if(!fileNameWithExtension) {
+        if(typeof fileNameWithExtension === 'undefined') {
             if(objects.length) {
                 defaultFileName = objects[0].fileName;
                 defaultFileName = defaultFileName.split('.');
