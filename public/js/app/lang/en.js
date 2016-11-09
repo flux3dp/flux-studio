@@ -912,6 +912,11 @@ define(function() {
                 L: 'Default',
                 A: 'Active',
                 N: 'No'
+            },
+            enableCloud: {
+                title: 'Enable Cloud',
+                A: 'Active',
+                N: 'No'
             }
         },
         monitor: {

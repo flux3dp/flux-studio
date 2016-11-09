@@ -926,6 +926,11 @@ define(function() {
                 L: '預設',
                 A: '密集',
                 N: '關閉'
+            },
+            enableCloud: {
+                title: '雲端操作',
+                A: '開啟',
+                N: '關閉'
             }
         },
         monitor: {

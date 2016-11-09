@@ -779,7 +779,7 @@ define([
     function getDeviceSettings() {
         let d = $.Deferred(),
             settings = {},
-            _settings = ['correction', 'filament_detect', 'head_error_level', 'autoresume', 'broadcast'];
+            _settings = ['correction', 'filament_detect', 'head_error_level', 'autoresume', 'broadcast', 'enable_cloud'];
 
         const worker = function*() {
             for(let i = 0; i < _settings.length; i++) {
