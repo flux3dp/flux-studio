@@ -98,7 +98,6 @@ define([
         },
 
         _allValid: function() {
-            console.log(this.values, this.state);
             let { nickname, email, password, rePassword, agreeToTerms } = this.values,
                 { emailError } = this.state,
                 lang = this.props.lang.settings.flux_cloud;
@@ -138,12 +137,10 @@ define([
                                 emailError: true,
                                 emailErrorMessage: lang[error.message.toLowerCase()]
                             });
-                            console.log(error.message);
                         });
                     }
                 });
             }
-            // location.hash = '#studio/cloud/sign-up-success';
         },
 
         _handleCancel: function() {

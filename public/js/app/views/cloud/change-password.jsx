@@ -90,7 +90,6 @@ define([
                 f[id]();
             };
 
-            console.log(this.values);
             if(this.values.newPassword !== '' && this.values.confirmPassword !== '') {
                 let mismatch = this.values.newPassword !== this.values.confirmPassword
                 this.setState({ confirmPasswordError: mismatch ? lang.error_password_not_match : ''});

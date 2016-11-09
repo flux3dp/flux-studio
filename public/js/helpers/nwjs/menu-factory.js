@@ -286,13 +286,10 @@ define([
         });
 
         methods.updateAccountDisplay(accountDisplayName);
-        // console.log('sub menu count', mainmenu.items[5].submenu.itemss);
-        // methods.refresh();
         NWjsWindow.menu = mainmenu;
     }
 
     function updateAccountMenu(m) {
-        // console.log('account display name', accountDisplayName);
         if(accountDisplayName === '' || typeof accountDisplayName === 'undefined') {
             m[5].subItems.splice(0,2);
         }
@@ -307,7 +304,6 @@ define([
                 }, 1000);
             };
         }
-        // console.log(m[5].subItems[0]);
         return m;
     }
 

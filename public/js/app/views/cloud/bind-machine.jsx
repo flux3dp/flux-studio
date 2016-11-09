@@ -67,7 +67,6 @@ define([
         },
 
         _handleSelectDevice: function(device) {
-            // console.log(device);
             this.setState({ selectedDevice: device});
         },
 
@@ -82,7 +81,6 @@ define([
         _handleBind: function() {
             this.setState({ bindingInProgress: true });
             DeviceMaster.selectDevice(this.state.selectedDevice).then((status) => {
-                // console.log(status);
                 if(status === 'TIMEOUT') {
                     location.hash = '#/studio/cloud/bind-fail';
                 }
@@ -96,7 +94,6 @@ define([
                     location.hash = '#/studio/cloud/bind-fail';
                 }
             }).then((response) => {
-                // console.log(response);
                 let { token, signature } = response.code,
                     { uuid } = this.state.selectedDevice,
                     accessId = response.code.access_id;
@@ -112,7 +109,7 @@ define([
                         location.hash = '#/studio/cloud/bind-fail';
                     }
                 });
-                   
+
             });
         },
 

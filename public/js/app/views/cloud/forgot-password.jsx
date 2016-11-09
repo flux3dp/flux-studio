@@ -18,7 +18,6 @@ define([
         },
 
         _handleEnterEmail: function(e) {
-            console.log(e.target.value);
             this.setState({ email: e.target.value });
         },
 

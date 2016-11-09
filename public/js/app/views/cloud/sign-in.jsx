@@ -34,7 +34,6 @@ define([
                     return response.json();
                 }
             }).then(response => {
-                // console.log('response is ',response);
                 if(response) {
                     location.hash = '#/studio/cloud/bind-machine';
                 }
@@ -61,7 +60,6 @@ define([
             let lang = this.props.lang.settings.flux_cloud;
 
             CloudApi.resendVerification(email).then(response => {
-                // console.log(response);
                 if(response.ok) {
                     location.hash = '#studio/cloud/email-sent';
                 }
@@ -82,7 +80,6 @@ define([
             });
 
             CloudApi.signIn(email, password).then((response) => {
-                console.log(response);
                 if(response.ok) {
                     response.json().then(r => {
                         let { nickname, email } = r;
@@ -94,7 +91,6 @@ define([
                 }
                 else {
                     response.json().then(error => {
-                        console.log(error);
                         this.setState({
                             showResendVerificationEmail: error.message === 'NOT_VERIFIED',
                             errorMessage: lang[error.message.toLowerCase()],
