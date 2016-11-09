@@ -319,7 +319,7 @@ define(function() {
                 forgot_password: '忘記密碼?',
                 sign_up_statement: '如果尚未持有FLUX ID，可以<a href="%s">按此註冊</a>',
                 try_sign_up_again: '請重新<a href="%s">註冊</a>',
-                agreement: '同意 FLUX-Cloud 使用條款',
+                agreement: '同意 FLUX-Cloud <a href="#/studio/cloud/privacy">隱私權政策</a>, <a href="#/studio/cloud/terms">使用條款</a>',
                 pleaseSignIn: '請使用 FLUX ID 登入',
                 enter_email: '請輸入您的電子信箱',
                 check_inbox: '請至您的電子信箱確認!',

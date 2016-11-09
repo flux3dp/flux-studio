@@ -26,7 +26,7 @@ define(['helpers/i18n'], function (i18n) {
             //Start from self ip address
             var myIPAddresses = self.getLocalAddresses();
             myIPAddresses.forEach( x => self.guessFromIP(x) );
-            console.log(guessIPs);
+            // console.log(guessIPs);
         },
         /**
          * Return if smart unpn has been initiated
@@ -77,7 +77,7 @@ define(['helpers/i18n'], function (i18n) {
         getLocalAddresses: function(){
             if(!window['requireNode']) return ["192.168.1.1"];
             var os = requireNode('os');
-            var ifaces = os.networkInterfaces();        
+            var ifaces = os.networkInterfaces();
             var addresses = [];
             Object.keys(ifaces).forEach(function (ifname) {
                 var alias = 0;
@@ -94,7 +94,7 @@ define(['helpers/i18n'], function (i18n) {
         },
         /**
         * Start auto poke for IP
-        * @param {String} targetIP 
+        * @param {String} targetIP
         * @returns {Object} An auto-upnp-poke object
         */
         startPoke: (targetIP) => {
@@ -112,7 +112,7 @@ define(['helpers/i18n'], function (i18n) {
         },
         /**
          * Stop auto poke object
-         * @param {Number} obj.clock 
+         * @param {Number} obj.clock
          */
         stopPoke: (obj) => {
             clearInterval(obj.clock);

@@ -6649,3 +6649,8 @@ input.switch:checked ~ label:after {
         .cloud .change-password.footer span {
             border: 0;
             color: #e74c3c; }
+    .cloud .terms .container, .cloud .privacy .container {
+        overflow: auto;
+        padding: 0 20px;
+        text-align: left;
+        height: 500px; }

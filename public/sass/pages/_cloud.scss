@@ -376,4 +376,13 @@
             color: #e74c3c;
         }
     }
+
+    .terms, .privacy {
+        .container {
+            overflow: auto;
+            padding: 0 20px;
+            text-align: left;
+            height: 500px;
+        }
+    }
 }

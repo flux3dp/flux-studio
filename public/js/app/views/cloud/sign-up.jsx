@@ -48,7 +48,6 @@ define([
         },
 
         _checkValue: function(id, value) {
-            console.log(id, value);
             let lang = this.props.lang.settings.flux_cloud,
                 f = {};
 
@@ -199,7 +198,7 @@ define([
                         <div className="controls">
                             <div className="control">
                                 <input id="agreeToTerms" className="pointer" type="checkbox" onChange={this._handleAgreementChange} />
-                                <label className="pointer" htmlFor="agreeToTerms"> {lang.agreement}</label>
+                                <label dangerouslySetInnerHTML={{ __html: lang.agreement }}></label>
                             </div>
                         </div>
                         <div className="processing-error">

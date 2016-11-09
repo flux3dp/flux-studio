@@ -306,7 +306,7 @@ define(function() {
                 forgot_password: 'Forgot your password?',
                 sign_up_statement: 'If you don\'t have a FLUX ID, please <a href="%s">SIGN UP</a> here',
                 try_sign_up_again: 'Please try <a href="%s">SIGN UP</a> again',
-                agreement: 'Agree to the FLUX Terms & Conditions.',
+                agreement: 'Agree to the FLUX <a href="#/studio/cloud/privacy">Privacy</a>, <a href="#/studio/cloud/terms">Terms & Conditions</a>',
                 pleaseSignIn: 'Please Sign In with your FLUX ID',
                 enter_email: 'Please fill in your email address',
                 check_inbox: 'Go and check your mail box!',
