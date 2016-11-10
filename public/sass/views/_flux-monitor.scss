@@ -124,18 +124,17 @@
                     width: 332px;
                     height: 100px;
                     bottom: 84px;
-                    opacity: 0.5;
-                    padding: 10px;
+                    padding: 35px 10px 10px 10px;
+                    text-shadow: 0 2px 5px rgba(0,0,0,0.15);
 
                     .verticle-align {
+                        float: left;
                         position: relative;
-                        top: 50%;
-                        transform: translateY(-50%);
+                        bottom: -8px;
                         color: #FFF;
 
                         div {
                             margin: 5px 0;
-                            font-size: 1.2rem;
                         }
 
                         .status-info-duration {
@@ -151,7 +150,7 @@
                     }
                 }
                 .status-info.running {
-                    background-color: rgba(0,0,0,0.7);
+                    background: linear-gradient(rgba(0,0,0,0), rgba(0,0,0,0.5));
                 }
             }
             .close {
