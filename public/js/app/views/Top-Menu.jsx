@@ -223,7 +223,10 @@ define([
                         statusText = status[device.st_id] || status.UNKNOWN,
                         headText = headModule[device.head_module] || headModule.UNKNOWN;
 
-                        if (16 === device.st_id && 'number' === typeof device.st_prog) {
+                        if(device.st_prog === 0) {
+                            progress = '';
+                        }
+                        else if (16 === device.st_id && 'number' === typeof device.st_prog) {
                             progress = (parseInt(device.st_prog * 1000) * 0.1).toFixed(1) + '%'
                         }
 
