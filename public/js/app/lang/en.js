@@ -346,6 +346,7 @@ define(function() {
             import: 'IMPORT',
             save: 'Save',
             start_print: 'Print',
+            gram: 'g',
             advanced: {
                 general: 'General',
                 layers: 'Layers',
