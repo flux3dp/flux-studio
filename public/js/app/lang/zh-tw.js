@@ -358,6 +358,7 @@ define(function() {
         print: {
             import: '匯入',
             save: '儲存⋯',
+            gram: '克',
             support_view: 'Support Preview',
             start_print: '列印',
             advanced: {
