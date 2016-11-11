@@ -215,7 +215,6 @@ define([
                     }).then(content => {
                         let { nickname, email } = content || {};
                         let displayName = (nickname || email || '');
-                        console.log('updating display name', displayName);
                         menuFactory.methods.updateAccountDisplay(displayName);
                         menuFactory.methods.refresh();
                     });;

@@ -403,7 +403,8 @@ define([
 
                 'PREVIEW' : () => {},
                 'FILE': () => { this._dispatchFolderContent(lastAction.path); },
-                'CAMERA': () => {}
+                'CAMERA': () => {},
+                'PRINT': () => { store.dispatch(MonitorActionCreator.changeMode(GlobalConstants.PRINT)); }
             };
 
             if(actions[lastAction.mode]) {
@@ -569,8 +570,10 @@ define([
         },
 
         _addHistory: function() {
-            let { Monitor } = store.getState();
-            _history.push({ mode: Monitor.mode, previewUrl: previewUrl, path: Monitor.currentPath });
+            let { Monitor } = store.getState(),
+                history = { mode: Monitor.mode, previewUrl: previewUrl, path: Monitor.currentPath };
+
+            _history.push(history);
         },
 
         _startReport: function() {
