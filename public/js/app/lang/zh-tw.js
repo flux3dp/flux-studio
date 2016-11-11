@@ -115,9 +115,9 @@ define(function() {
                 forum: '社群論壇'
             },
             account: {
-                label: 'Account',
-                sign_in: 'Sign In',
-                sign_out: 'Sign Out'
+                label: '帳號',
+                sign_in: '登入',
+                sign_out: '登出'
             }
         },
         initialize: {
@@ -128,8 +128,8 @@ define(function() {
             cancel: '取消',
             confirm: '確認',
             connect: '連接',
-            back: 'Back',
-            retry: 'RETRY',
+            back: '返回',
+            retry: '重試',
             no_machine : '目前沒有機器，跳過此步驟',
 
             // specific caption/content
@@ -300,7 +300,7 @@ define(function() {
             flux_cloud: {
                 processing: '處理中...',
                 flux_cloud: 'FLUX CLOUD',
-                back: '上一步',
+                back: '返回',
                 next: '下一步',
                 done: '結束',
                 sign_in: '登入',
