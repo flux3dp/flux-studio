@@ -352,7 +352,8 @@ define(function() {
                 WRONG_OLD_PASSWORD: '舊密碼錯誤',
                 FORMAT_ERROR: '密碼格式錯誤',
                 submit: '儲存',
-                sign_out: '登出'
+                sign_out: '登出',
+                not_supported_firmware: '支援 FLUX cloud 需要 FLUX Delta 韌體 1.5＋'
             }
         },
         print: {

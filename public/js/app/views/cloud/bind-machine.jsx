@@ -6,7 +6,8 @@ define([
     'helpers/device-list',
     'helpers/pad-string',
     'plugins/classnames/index',
-    'helpers/api/cloud'
+    'helpers/api/cloud',
+    'app/actions/alert-actions'
 ], function(
     $,
     React,
@@ -15,7 +16,8 @@ define([
     DeviceList,
     PadString,
     ClassNames,
-    CloudApi
+    CloudApi,
+    AlertActions
 ) {
     'use strict';
 
@@ -67,6 +69,48 @@ define([
         },
 
         _handleSelectDevice: function(device) {
+            const cloudRequiredVersion = '1.5';
+            const meetVersionRequirement = (installed) => {
+                let a = installed.split('.');
+                let b = cloudRequiredVersion.split('.');
+
+                for (let i = 0; i < a.length; ++i) {
+                    a[i] = Number(a[i]);
+                }
+                for (let i = 0; i < b.length; ++i) {
+                    b[i] = Number(b[i]);
+                }
+                if (a.length === 2) {
+                    a[2] = 0;
+                }
+
+                if (a[0] > b[0]) { return true; }
+                if (a[0] < b[0]) { return false; }
+
+                if (a[1] > b[1]) { return true; }
+                if (a[1] < b[1]) { return false; }
+
+                if (a[2] > b[2]) { return true; }
+                if (a[2] < b[2]) { return false; }
+
+                return true;
+            };
+
+            let version = device.version,
+                vRegex = /([\d.]+)(a|b)?(\d)?/g,
+                match = vRegex.exec(version),
+                lang = this.props.lang.settings.flux_cloud;
+
+            if(match.length > 2) {
+                let meetRequirement = meetVersionRequirement(match[1]);
+                this.setState({ meetVersionRequirement: meetRequirement });
+                if(!meetRequirement) {
+                    AlertActions.showPopupError(
+                        'error-vcredist',
+                        lang.not_supported_firmware
+                    );
+                }
+            }
             this.setState({ selectedDevice: device});
         },
 
@@ -125,7 +169,7 @@ define([
                         <a onClick={this._handleCancelBinding}>{lang.cancel}</a>
                     </div>
                 </div>
-            )
+            );
 
             return this.state.bindingInProgress ? bindingWindow : '';
         },
@@ -202,7 +246,7 @@ define([
                         </div>
                         <div className="actions">
                             <button className="btn btn-cancel" onClick={this._handleCancel}>{lang.cancel}</button>
-                            <button className="btn btn-default" onClick={this._handleBind}>{lang.bind}</button>
+                            <button className="btn btn-default" disabled={!this.state.meetVersionRequirement} onClick={this._handleBind}>{lang.bind}</button>
                         </div>
                     </div>
                     {bindingWindow}

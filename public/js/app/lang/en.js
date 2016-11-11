@@ -339,7 +339,8 @@ define(function() {
                 WRONG_OLD_PASSWORD: 'Incorrect Current Password',
                 FORMAT_ERROR: 'Wrong password format',
                 submit: 'SAVE',
-                sign_out: 'Sign out'
+                sign_out: 'Sign out',
+                not_supported_firmware: 'Please upgrade your FLUX Delta firmware\nto 1.5+ for cloud feature'
             }
         },
         print: {
