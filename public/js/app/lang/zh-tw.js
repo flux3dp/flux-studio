@@ -191,7 +191,7 @@ define(function() {
                 breathing_desc: '無線網路設定失敗，請嘗試重新設定',
                 successfully: '如果 FLUX Delta 連線成功',
                 successfully_statement: '請將無線網路連線至(%s)，並且重新啟動 FLUX Studio',
-                restart: 'Restart FLUX Studio'
+                restart: '重啟 FLUX Studio'
             },
 
             // errors
@@ -290,10 +290,10 @@ define(function() {
             notification_on: '開啟',
             notification_off: '關閉',
             engine_change_fail: {
-                'caption': 'unable to change engine ',
-                '1': 'error during checking',
-                '2': 'cura version error',
-                '3': 'path is not cura',
+                'caption': '無法變更切片引擎',
+                '1': '檢查時發生錯誤',
+                '2': 'cura 版本錯誤',
+                '3': '路徑不是 Cura',
                 '4': 'path is not a exist file, please check engine path in setting section'
             },
             allow_tracking: '您是否願意自動傳送匿名用量資料，協助 FLUX 改進產品和服務？',
@@ -360,7 +360,7 @@ define(function() {
             import: '匯入',
             save: '儲存⋯',
             gram: '克',
-            support_view: 'Support Preview',
+            support_view: '支援預覽',
             start_print: '列印',
             advanced: {
                 general: '一般',
@@ -437,12 +437,12 @@ define(function() {
             mode: [
                 {
                     value: 'beginner',
-                    label: 'Beginner',
+                    label: '入門',
                     checked: true
                 },
                 {
                     value: 'expert',
-                    label: 'Expert'
+                    label: '專家'
                 }
             ],
             params: {
@@ -1095,12 +1095,12 @@ define(function() {
             UNKNOWN: '-'
         },
         head_module: {
-            EXTRUDER: 'Print',
+            EXTRUDER: '列印',
             UNKNOWN: '',
             error: {
                 'missing': '錯誤訊息不足',
-                '0': 'Unknown module',
-                '1': 'Sensor communication failure',
+                '0': '未知模組工具頭',
+                '1': '偵測感應器無法連線',
                 '2': 'No hello', // pi will send head_error_reset before this is issued
                 '3': '#112 工具頭校正失誤\n請重新裝載工具頭，並確認磁鐵關節的附著',
                 '4': '#162 偵測到工具頭傾斜\n請確認球型關節正確附著以繼續',
