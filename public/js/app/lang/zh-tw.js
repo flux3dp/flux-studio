@@ -1096,6 +1096,7 @@ define(function() {
         },
         head_module: {
             EXTRUDER: '列印',
+            LASER: '雷射',
             UNKNOWN: '',
             error: {
                 'missing': '錯誤訊息不足',

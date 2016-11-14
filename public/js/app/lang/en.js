@@ -1082,6 +1082,7 @@ define(function() {
         },
         head_module: {
             EXTRUDER: 'Print',
+            LASER: 'Laser',
             UNKNOWN: '',
             error: {
                 'missing': 'Error information is missing',
