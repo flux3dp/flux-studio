@@ -353,7 +353,8 @@ define(function() {
                 FORMAT_ERROR: '密碼格式錯誤',
                 submit: '儲存',
                 sign_out: '登出',
-                not_supported_firmware: '支援 FLUX cloud 需要 FLUX Delta 韌體 1.5＋'
+                not_supported_firmware: '支援 FLUX cloud 需要 FLUX Delta 韌體 1.5＋',
+                unbind_device: '確認要不再連結此機器?'
             }
         },
         print: {
