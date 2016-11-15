@@ -38,7 +38,7 @@ fill_pattern = honeycomb
 first_layer_acceleration = 0
 first_layer_bed_temperature = 0
 first_layer_extrusion_width = 125%
-first_layer_height = 0.25
+first_layer_height = 0.4
 first_layer_speed = 20
 first_layer_temperature = 230
 gap_fill_speed = 20
@@ -96,7 +96,7 @@ solid_infill_extrusion_width = 0.4
 solid_infill_speed = 20
 spiral_vase = 0
 standby_temperature_delta = -5
-start_gcode = G1 Z5 F5000 ; lift nozzle\n
+start_gcode = G1 Z5 F5000 ; lift nozzle;\\nG92 Z4.9
 support_material = 0
 support_material_angle = 0
 support_material_contact_distance = 0.22
@@ -126,7 +126,7 @@ vibration_limit = 0
 wipe = 0
 xy_size_compensation = -0.07
 z_offset = 0
-pause_at_layers = 
+pause_at_layers =
 support_everywhere = 0`
     }
 });

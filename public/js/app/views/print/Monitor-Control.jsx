@@ -162,41 +162,18 @@ define([
             statusId = Device.status.st_id;
             currentStatus = Device.status.st_label;
             commands = {
-                'IDLE': () => {
-                    return this._operation().go;
-                },
-
-                'RUNNING': () => {
-                    return this._operation().pause;
-                },
-
-                'STARTING': () => {
-                    return this._operation().preparing;
-                },
-
-                'PAUSED': () => {
-                    return this._operation().go;
-                },
-
-                'ABORTED': () => {
-                    return this._operation().go;
-                },
-
-                'HEATING': () => {
-                    return this._operation().preparing;
-                },
-
-                'CALIBRATING': () => {
-                    return this._operation().preparing;
-                },
-
-                'RESUMING': () => {
-                    return this._operation().pause;
-                },
-
-                'COMPLETED': () => {
-                    return this._operation().go;
-                }
+                'IDLE'          : () => { return this._operation().go; },
+                'RUNNING'       : () => { return this._operation().pause; },
+                'STARTING'      : () => { return this._operation().preparing; },
+                'INIT'          : () => { return this._operation().preparing; },
+                'WAITING_HEAD'  : () => { return this._operation().preparing; },
+                'CORRECTING'    : () => { return this._operation().preparing; },
+                'PAUSED'        : () => { return this._operation().go; },
+                'ABORTED'       : () => { return this._operation().go; },
+                'HEATING'       : () => { return this._operation().preparing; },
+                'CALIBRATING'   : () => { return this._operation().preparing; },
+                'RESUMING'      : () => { return this._operation().pause; },
+                'COMPLETED'     : () => { return this._operation().go; }
             };
 
             action = !!commands[currentStatus] ? commands[currentStatus]() : '';

@@ -138,7 +138,14 @@ define([
 
                         // has default
                         if (true === messageMap.hasOwnProperty(genericMessage)) {
-                            AlertActions.showPopupError(genericMessage, messageMap[genericMessage]);
+                            if(response.error.length === 4) {
+                                if(response.error[3] === 'N/A') {
+                                    AlertActions.showPopupError('', lang.change_filament.NA);;
+                                }
+                            }
+                            else {
+                                AlertActions.showPopupError(genericMessage, messageMap[genericMessage]);
+                            }
                         }
                         // wrong toolhead
                         else if ('TYPE_ERROR' === response.error[subErrorIndex]) {

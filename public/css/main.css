@@ -2545,6 +2545,13 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         color: #fff;
         background-color: #c9302c;
         border-color: #ac2925; }
+    .studio-container .preview-time-cost {
+        position: fixed;
+        color: #4D4D4D;
+        bottom: 68px;
+        right: 117px;
+        font-weight: bold;
+        text-align: right; }
     .studio-container .beehive-buttons {
         bottom: 28px;
         position: fixed;
@@ -4007,16 +4014,15 @@ input[type=range]:focus::-webkit-slider-runnable-track {
                     width: 332px;
                     height: 100px;
                     bottom: 84px;
-                    opacity: 0.5;
-                    padding: 10px; }
+                    padding: 35px 10px 10px 10px;
+                    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.15); }
                     .flux-monitor .main .body .device-content .status-info .verticle-align {
+                        float: left;
                         position: relative;
-                        top: 50%;
-                        transform: translateY(-50%);
+                        bottom: -8px;
                         color: #FFF; }
                         .flux-monitor .main .body .device-content .status-info .verticle-align div {
-                            margin: 5px 0;
-                            font-size: 1.2rem; }
+                            margin: 5px 0; }
                     .flux-monitor .main .body .device-content .status-info .status-info-progress {
                         float: right;
                         bottom: -8px;
@@ -4024,7 +4030,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
                         font-size: 1.2em;
                         color: #FFF; }
                 .flux-monitor .main .body .device-content .status-info.running {
-                    background-color: rgba(0, 0, 0, 0.7); }
+                    background: linear-gradient(transparent, rgba(0, 0, 0, 0.5)); }
             .flux-monitor .main .body .close {
                 right: 20px; }
         .flux-monitor .main .operation {
@@ -4110,7 +4116,8 @@ input[type=range]:focus::-webkit-slider-runnable-track {
             padding: 1.5rem 1.5rem 0 1.5rem; }
             .flux-monitor .sub .wrapper .row {
                 font-size: 1.2rem;
-                color: #888; }
+                color: #888;
+                width: 100%; }
                 .flux-monitor .sub .wrapper .row div {
                     display: inline-block; }
                 .flux-monitor .sub .wrapper .row .right {

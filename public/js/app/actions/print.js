@@ -297,14 +297,8 @@ define([
             mesh.up = new THREE.Vector3(0, 0, 1);
 
             slicingStatus.pauseReport = true;
-            uploadStl(mesh.uuid, file, ext).then((result) => {
+            uploadStl(mesh.uuid, file, ext).then(() => {
                 slicingStatus.pauseReport = false;
-                let t = setInterval(() => {
-                    if(slicingStatus.canInterrupt) {
-                        clearInterval(t);
-                        startSlicing(slicingType.F);
-                    };
-                }, 200);
                 ProgressActions.close();
                 addToScene();
                 callback();
