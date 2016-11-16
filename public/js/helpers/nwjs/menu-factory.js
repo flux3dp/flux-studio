@@ -177,12 +177,15 @@ define([
         doDiscover,
         discoverMethods,
         accountDisplayName,
-        timer;
+        timer,
+        subMenuCache = {},
+        subMenuIndex = {},
+        submenuId = 0;
 
     MenuItem = gui.MenuItem;
     NWjsWindow = gui.Window.get();
     Menu = gui.Menu;
-    mainmenu = new Menu({ type: 'menubar', title: 'FLUX Studio', label: 'FLUX Studio' });
+    mainmenu = new Menu({ type: 'menubar', title: 'FLUX Studio', label: 'FLUX Studio' }),
 
     methods = {
         createMenu: function() {
@@ -190,7 +193,7 @@ define([
         },
 
         createSubMenu: function(items) {
-            var subMenu = this.createMenu(),
+            var subMenu = this.createMenu({id: ++submenuId}),
                 menuItem,
                 menuOption;
 
@@ -239,10 +242,10 @@ define([
             return subMenu;
         },
 
-        appendToMenu: function(label, subMenu) {
-            var item = new MenuItem({ label: label, submenu: subMenu });
+        appendToMenu: function(item) {
             itemMap.push(item);
             mainmenu.append(item);
+            return  itemMap.length - 1;
         },
 
         getMenu: function() {
@@ -253,9 +256,14 @@ define([
             mainmenu = new Menu({ type: 'menubar', title: 'FLUX Studio', label: 'FLUX Studio' });
         },
 
-        refresh: function() {
-            menuMap.all = menuMap.refresh();
-            initialize(menuMap.all);
+        refresh: function(submenuId) {
+            if(submenuId) {
+                menuMap.all = menuMap.refresh();
+                initialize(menuMap.all);
+            } else {
+                menuMap.all = menuMap.refresh();
+                initialize(menuMap.all);
+            }
         },
 
         updateMenu: function(menu, parentIndex) {
@@ -267,6 +275,7 @@ define([
 
         updateAccountDisplay: function(name) {
             if(typeof mainmenu.items === 'undefined') { return; }
+            if(typeof mainmenu.items[5].submenu.items === 'undefined') { return; }
             var account = mainmenu.items[5].submenu.items[0];
             account.label = name || lang.account.sign_in;
             accountDisplayName = name;
@@ -276,13 +285,40 @@ define([
 
     function initialize(menuMap) {
         var subMenu;
-
-        methods.clear();
+        
+        //methods.clear();
+        
         menuMap = updateAccountMenu(menuMap);
-
+        
+        // if(Object.keys(subMenuCache).length > 0 && NWjsWindow.menu.items) {
+        //     while(NWjsWindow.menu.items.length > 0) {
+        //         NWjsWindow.menu.removeAt(0);
+        //     }
+        // }
+        
         menuMap.forEach(function(menu) {
-            subMenu = methods.createSubMenu(menu.subItems);
-            methods.appendToMenu(menu.label, subMenu);
+            if(!subMenuCache[menu.label] || JSON.stringify(menu.subItems) != subMenuCache[menu.label].json){
+                let i = 0;
+                subMenu = methods.createSubMenu(menu.subItems);
+                let menuItem = new MenuItem({ label: menu.label, submenu: subMenu });
+
+                if(subMenuCache[menu.label]){
+                    for(i = 0; i<NWjsWindow.menu.items.length; i++){
+                        if(NWjsWindow.menu.items[i].id == subMenuCache[menu.label].menuItem.id){
+                            NWjsWindow.menu.removeAt(i);
+                            break;
+                        }
+                    }
+                    subMenuCache[menu.label] = { menuItem: menuItem, json: JSON.stringify(menu.subItems) };
+                    NWjsWindow.menu.insert(menuItem, i);
+                } else {
+                    subMenuCache[menu.label] = { menuItem: menuItem, json: JSON.stringify(menu.subItems) };
+                    methods.appendToMenu(menuItem);
+                }
+            } else {
+                //console.log('cache ', menu.label);
+                //methods.appendToMenu(subMenuCache[menu.label].menuItem);
+            }
         });
 
         methods.updateAccountDisplay(accountDisplayName);
@@ -290,6 +326,7 @@ define([
     }
 
     function updateAccountMenu(m) {
+        if(!m) { return };
         if(accountDisplayName === '' || typeof accountDisplayName === 'undefined') {
             m[5].subItems.splice(0,2);
         }
