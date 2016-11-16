@@ -168,6 +168,7 @@ define([
                 'INIT'          : () => { return this._operation().preparing; },
                 'WAITING_HEAD'  : () => { return this._operation().preparing; },
                 'CORRECTING'    : () => { return this._operation().preparing; },
+                'PAUSING'       : () => { return this._operation().go; },
                 'PAUSED'        : () => { return this._operation().go; },
                 'ABORTED'       : () => { return this._operation().go; },
                 'HEATING'       : () => { return this._operation().preparing; },
