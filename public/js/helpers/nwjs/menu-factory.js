@@ -274,32 +274,22 @@ define([
         },
 
         updateAccountDisplay: function(name) {
-            if(typeof mainmenu.items === 'undefined') { return; }
-            else if(mainmenu.items[5].submenu) {
-                var account = mainmenu.items[5].submenu.items[0];
-                account.label = name || lang.account.sign_in;
-                accountDisplayName = name;
-            }
+            accountDisplayName = name;
+            methods.refresh();
         }
 
     };
 
     function initialize(menuMap) {
-        var subMenu;
-
-        //methods.clear();
-
-        menuMap = updateAccountMenu(menuMap);
-
-        // if(Object.keys(subMenuCache).length > 0 && NWjsWindow.menu.items) {
-        //     while(NWjsWindow.menu.items.length > 0) {
-        //         NWjsWindow.menu.removeAt(0);
-        //     }
-        // }
-
+        var subMenu, 
+            i, 
+            menuItem, 
+            menuChanged = false;
+        
+        updateAccountMenu(menuMap);
+        
         menuMap.forEach(function(menu) {
             if(!subMenuCache[menu.label] || JSON.stringify(menu.subItems) != subMenuCache[menu.label].json){
-                let i = 0;
                 subMenu = methods.createSubMenu(menu.subItems);
                 let menuItem = new MenuItem({ label: menu.label, submenu: subMenu });
 
@@ -316,25 +306,28 @@ define([
                     subMenuCache[menu.label] = { menuItem: menuItem, json: JSON.stringify(menu.subItems) };
                     methods.appendToMenu(menuItem);
                 }
+                menuChanged = true;
             } else {
-                //console.log('cache ', menu.label);
-                //methods.appendToMenu(subMenuCache[menu.label].menuItem);
+                // No chanage no update
             }
         });
-
-        methods.updateAccountDisplay(accountDisplayName);
-        NWjsWindow.menu = mainmenu;
+        if(menuChanged) {
+            NWjsWindow.menu = mainmenu;
+        }
     }
 
-    function updateAccountMenu(m) {
-        if(!m) { return };
+    function updateAccountMenu(menuMap) {
+        if(!menuMap) { return };
+
         if(accountDisplayName === '' || typeof accountDisplayName === 'undefined') {
-            m[5].subItems.splice(0,2);
+            menuMap[5].subItems.splice(0,2);
+        } else {
+            menuMap[5].submenu.items[0].label = name || lang.account.sign_in;
         }
 
-        if(m[5].subItems.length >= 3) {
+        if(menuMap[5].subItems.length >= 3) {
             // clicked on sign out
-            m[5].subItems[2].onClick = () => {
+            menuMap[5].subItems[2].onClick = () => {
                 methods.updateAccountDisplay('');
                 CloudApi.signOut();
                 setTimeout(() => {
@@ -342,7 +335,7 @@ define([
                 }, 1000);
             };
         }
-        return m;
+        return menuMap;
     }
 
     if (true === window.FLUX.isNW) {
