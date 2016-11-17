@@ -113,8 +113,7 @@ define([
                 _onDropUpload: function(e) {
                     e.preventDefault();
 
-                    var self = this,
-                        uploadedFiles = e.originalEvent.dataTransfer.files;
+                    var uploadedFiles = e.originalEvent.dataTransfer.files;
 
                     e.target.files = uploadedFiles;
                     this.refs.fileUploader.readFiles(e, uploadedFiles);

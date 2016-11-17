@@ -267,9 +267,11 @@ define([
 
         updateAccountDisplay: function(name) {
             if(typeof mainmenu.items === 'undefined') { return; }
-            var account = mainmenu.items[5].submenu.items[0];
-            account.label = name || lang.account.sign_in;
-            accountDisplayName = name;
+            else if(mainmenu.items[5].submenu) {
+                var account = mainmenu.items[5].submenu.items[0];
+                account.label = name || lang.account.sign_in;
+                accountDisplayName = name;
+            }
         }
 
     };
