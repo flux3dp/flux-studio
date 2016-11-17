@@ -983,6 +983,7 @@ define(function() {
             confirmFileDelete                   : 'Are you sure you want to delete this file?',
             task: {
                 EXTRUDER                        : 'Printing Task',
+                PRINT                           : 'Printing Task',
                 LASER                           : 'Engraving Task',
                 DRAW                            : 'Drawing Task',
                 'N/A'                           : 'Drawing Task'

@@ -997,6 +997,7 @@ define(function() {
             confirmFileDelete                   : '是否確定要刪除這個檔案？',
             task: {
                 EXTRUDER                        : '列印工作',
+                PRINT                           : '列印工作',
                 LASER                           : '雕刻工作',
                 DRAW                            : '繪製工作',
                 'N/A'                           : '繪製工作'
@@ -1129,8 +1130,7 @@ define(function() {
             auto_emerging: '請插入線料',
             maintain_head_type_error: '列印工具頭未正確安裝',
             maintain_zombie: '請重新啟動機器',
-            toolhead_no_response: '#117 列印模組沒有回應 <a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/218347477">暸解更多</a>',
-            NA: '請確認機器是否有接上列印工具頭'
+            toolhead_no_response: '#117 列印模組沒有回應 <a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/218347477">暸解更多</a>'
         },
         input_machine_password: {
             require_password: '"%s" 需要密碼',
