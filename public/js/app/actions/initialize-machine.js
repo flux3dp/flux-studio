@@ -46,7 +46,8 @@ define([
             return d.promise();
         },
         hasBeenCompleted: function() {
-            return ('true' === config().read('printer-is-ready') ? true : false);
+            // If you initialized before and you're not in initialization screen
+            return 'true' === config().read('printer-is-ready') && (!~location.href.indexOf('initialize/'));
         },
         settingPrinter: {
             get: function() {

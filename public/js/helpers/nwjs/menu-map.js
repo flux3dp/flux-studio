@@ -200,7 +200,7 @@ define([
             });
         }
 
-        if (true === initializeMachine.hasBeenCompleted()) {
+        if (initializeMachine.hasBeenCompleted()) {
             subItems = [
                 items.import,
                 separator,
@@ -275,6 +275,13 @@ define([
                     }
                 ]
             });
+        } else {
+            if (1 === menuIndexOffset) {
+                menuMap.push({
+                    label: lang.file.label,
+                    subItems: aboutSubItems
+                });
+            }
         }
 
         menuMap.push({

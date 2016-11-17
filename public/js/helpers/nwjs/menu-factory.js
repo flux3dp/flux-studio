@@ -165,9 +165,8 @@ define([
         },
         originalMenuMap = JSON.parse(JSON.stringify(menuMap)),
         lang = i18n.get().topmenu,
-        itemMap = [],
         NWjsWindow,
-        mainmenu,
+        topMenu,
         Menu,
         MenuItem,
         methods,
@@ -185,7 +184,6 @@ define([
     MenuItem = gui.MenuItem;
     NWjsWindow = gui.Window.get();
     Menu = gui.Menu;
-    mainmenu = new Menu({ type: 'menubar', title: 'FLUX Studio', label: 'FLUX Studio' }),
 
     methods = {
         createMenu: function() {
@@ -242,32 +240,13 @@ define([
             return subMenu;
         },
 
-        appendToMenu: function(item) {
-            itemMap.push(item);
-            mainmenu.append(item);
-            return  itemMap.length - 1;
-        },
-
-        getMenu: function() {
-            return mainmenu;
-        },
-
-        clear: function() {
-            mainmenu = new Menu({ type: 'menubar', title: 'FLUX Studio', label: 'FLUX Studio' });
-        },
-
-        refresh: function(submenuId) {
-            if(submenuId) {
-                menuMap.all = menuMap.refresh();
-                initialize(menuMap.all);
-            } else {
-                menuMap.all = menuMap.refresh();
-                initialize(menuMap.all);
-            }
+        refresh: function() {
+            menuMap.all = menuMap.refresh();
+            initialize(menuMap.all);
         },
 
         updateMenu: function(menu, parentIndex) {
-            var menuItem = mainmenu.items[parentIndex],
+            var menuItem = topMenu.items[parentIndex],
                 subMenu = methods.createSubMenu(menu.subItems);
 
             menuItem.subMenu = subMenu;
@@ -281,53 +260,54 @@ define([
     };
 
     function initialize(menuMap) {
-        var subMenu, 
-            i, 
-            menuItem, 
-            menuChanged = false;
+        topMenu = topMenu ? NWjsWindow.menu : new Menu({ type: 'menubar', title: 'FLUX Studio', label: 'FLUX Studio' });
+        let initialLength = topMenu.items.length; 
+        let updateMenu = topMenu.items.length == 0;
         
         updateAccountMenu(menuMap);
-        
-        menuMap.forEach(function(menu) {
-            if(!subMenuCache[menu.label] || JSON.stringify(menu.subItems) != subMenuCache[menu.label].json){
-                subMenu = methods.createSubMenu(menu.subItems);
+        menuMap.map((menu, i) => {
+            if(!subMenuCache[i] || JSON.stringify(menu.subItems) != subMenuCache[i].json) {
+                let subMenu = methods.createSubMenu(menu.subItems);
                 let menuItem = new MenuItem({ label: menu.label, submenu: subMenu });
 
-                if(subMenuCache[menu.label]){
-                    for(i = 0; i<NWjsWindow.menu.items.length; i++){
-                        if(NWjsWindow.menu.items[i].id == subMenuCache[menu.label].menuItem.id){
-                            NWjsWindow.menu.removeAt(i);
-                            break;
-                        }
-                    }
-                    subMenuCache[menu.label] = { menuItem: menuItem, json: JSON.stringify(menu.subItems) };
-                    NWjsWindow.menu.insert(menuItem, i);
+                if(subMenuCache[i]) {
+                    topMenu.removeAt(i);                
+                    topMenu.insert(menuItem, i);
                 } else {
-                    subMenuCache[menu.label] = { menuItem: menuItem, json: JSON.stringify(menu.subItems) };
-                    methods.appendToMenu(menuItem);
+                    topMenu.append(menuItem);
+                    updateMenu = true;
                 }
-                menuChanged = true;
+                subMenuCache[i] = { id: menuItem.id, json: JSON.stringify(menu.subItems) };
             } else {
-                // No chanage no update
+                // No change no update
             }
         });
-        if(menuChanged) {
-            NWjsWindow.menu = mainmenu;
+
+        while(topMenu.items.length > menuMap.length) {
+            let i = topMenu.items.length - 1;
+            subMenuCache[i] = null;
+            topMenu.removeAt(i);   
+            updateMenu = true;
+        };
+
+        if (updateMenu) {
+            NWjsWindow.menu = topMenu;
         }
     }
 
     function updateAccountMenu(menuMap) {
         if(!menuMap) { return };
-
+        let accountMenu = menuMap.filter(v => v.label == lang.account.label)[0];
+        if(!accountMenu) { return };
         if(accountDisplayName === '' || typeof accountDisplayName === 'undefined') {
-            menuMap[5].subItems.splice(0,2);
+            accountMenu.subItems.splice(0,2);
         } else {
-            menuMap[5].submenu.items[0].label = name || lang.account.sign_in;
+            accountMenu.subItems[0].label = accountDisplayName || lang.account.sign_in;
         }
 
-        if(menuMap[5].subItems.length >= 3) {
+        if(accountMenu.subItems.length >= 3) {
             // clicked on sign out
-            menuMap[5].subItems[2].onClick = () => {
+            accountMenu.subItems[2].onClick = () => {
                 methods.updateAccountDisplay('');
                 CloudApi.signOut();
                 setTimeout(() => {
@@ -455,7 +435,7 @@ define([
                     DeviceMaster.selectDevice(currentPrinter).then((status) => {
                         if (status === DeviceConstants.CONNECTED) {
                             checkDeviceStatus(currentPrinter).then(() => {
-                            ProgressActions.open(ProgressConstants.WAITING, lang.device.calibrating, lang.device.pleaseWait, false);
+                                ProgressActions.open(ProgressConstants.WAITING, lang.device.calibrating, lang.device.pleaseWait, false);
                                 DeviceMaster.calibrate().done((debug_message) => {
                                     setTimeout(() => {
                                         AlertActions.showPopupInfo('calibrated', JSON.stringify(debug_message), lang.calibration.calibrated);
