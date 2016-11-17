@@ -66,7 +66,7 @@ define([
                 },
 
                 componentDidMount: function() {
-                    var self = this;
+                    var self = this, lang = args.state.lang;
 
                     dndHandler.plug(document, self._onDropUpload);
 
@@ -236,7 +236,7 @@ define([
                         paramPanel,
                         setupPanelDefaults;
 
-                    paramPanel = (
+                    paramPanel = this.state.setupPanelDefaults ? (
                         'laser' === this.props.page ?
                         <LaserSetupPanel
                             lang={lang}
@@ -255,7 +255,7 @@ define([
                             defaults={this.state.setupPanelDefaults}
                             ref="setupPanel"
                         />
-                    );
+                    ) : null;
 
                     return (
                         <div ref="laserStage" className="laser-stage">
