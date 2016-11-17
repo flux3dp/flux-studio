@@ -508,28 +508,23 @@ define([
                             };
 
                         if (false === $img.hasClass('image-active')) {
-                            console.log('start selecting image', +(new Date()));
-                            console.log('inactiveAllImage', +(new Date()));
                             inactiveAllImage(null, true);
 
                             $target_image = $img;
-                            console.log('refersh object param', +(new Date()));
                             let objectParamState = refreshObjectParams({ freetransEventType: 'move' }, $img, true);
 
                             // $img.on('transitionend', function(e) {
                             //     refreshImagePanelPos();
                             // });
-                            console.log('set state', +(new Date()));
 
                             self.setState(Object.assign({
                                 selectedImage: true,
                                 sizeLock: $img.data('sizeLock')
                             }, objectParamState), refreshImagePanelPos );
 
-                            
+
 
                             $img.addClass('image-active');
-                            console.log('end selecting image', +(new Date()));
                         }
                         setTimeout(() => {
                             // Async heavy call
