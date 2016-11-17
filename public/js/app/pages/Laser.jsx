@@ -90,6 +90,42 @@ define([
                     var laser_custom_bg = config().read('laser-custom-bg');
                     if(laser_custom_bg)
                         $('.laser-object').css({background :'url(' + laser_custom_bg + ')', 'background-size': '100% 100%'});
+
+
+                    config().read(storageDefaultKey, {
+                        onFinished: function(response) {
+                            let setupPanelDefaults = response || {};
+
+                            if ('laser' === self.props.page) {
+                                if ('undefined' === typeof setupPanelDefaults.material) {
+                                    setupPanelDefaults.material = lang.laser.advanced.form.object_options.options[0];
+                                }
+
+                                setupPanelDefaults.objectHeight = setupPanelDefaults.objectHeight || 0;
+                                setupPanelDefaults.isShading = (
+                                    'boolean' === typeof setupPanelDefaults.isShading ?
+                                    setupPanelDefaults.isShading :
+                                    true
+                                );
+                            }
+                            // holder
+                            else {
+                                setupPanelDefaults = {
+                                    liftHeight: response.liftHeight || 55,
+                                    drawHeight: response.drawHeight || 50,
+                                    speed: response.speed || 20
+                                }
+                            }
+
+                            if ('' === response) {
+                                config().write(storageDefaultKey, setupPanelDefaults);
+                            }
+
+                            self.setState({
+                                setupPanelDefaults: setupPanelDefaults
+                            });
+                        }
+                    });
                 },
 
                 componentWillUnmount: function () {
@@ -201,37 +237,6 @@ define([
                         paramPanel,
                         setupPanelDefaults;
 
-                    config().read(storageDefaultKey, {
-                        onFinished: function(response) {
-                            setupPanelDefaults = response || {};
-
-                            if ('laser' === self.props.page) {
-                                if ('undefined' === typeof setupPanelDefaults.material) {
-                                    setupPanelDefaults.material = lang.laser.advanced.form.object_options.options[0];
-                                }
-
-                                setupPanelDefaults.objectHeight = setupPanelDefaults.objectHeight || 0;
-                                setupPanelDefaults.isShading = (
-                                    'boolean' === typeof setupPanelDefaults.isShading ?
-                                    setupPanelDefaults.isShading :
-                                    true
-                                );
-                            }
-                            // holder
-                            else {
-                                setupPanelDefaults = {
-                                    liftHeight: response.liftHeight || 55,
-                                    drawHeight: response.drawHeight || 50,
-                                    speed: response.speed || 20
-                                }
-                            }
-
-                            if ('' === response) {
-                                config().write(storageDefaultKey, setupPanelDefaults);
-                            }
-                        }
-                    });
-
                     paramPanel = (
                         'laser' === this.props.page ?
                         <LaserSetupPanel
@@ -239,7 +244,7 @@ define([
                             page={this.props.page}
                             className="operating-panel"
                             imageFormat={this.state.fileFormat}
-                            defaults={setupPanelDefaults}
+                            defaults={this.state.setupPanelDefaults}
                             ref="setupPanel"
                             onShadingChanged={this._onShadingChanged}
                         /> :
@@ -248,7 +253,7 @@ define([
                             page={this.props.page}
                             className="operating-panel"
                             imageFormat={this.state.fileFormat}
-                            defaults={setupPanelDefaults}
+                            defaults={this.state.setupPanelDefaults}
                             ref="setupPanel"
                         />
                     );
