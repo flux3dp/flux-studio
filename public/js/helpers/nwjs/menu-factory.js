@@ -260,18 +260,19 @@ define([
     };
 
     function initialize(menuMap) {
+        if(!window.FLUX.isNW) { return; }
         topMenu = topMenu ? NWjsWindow.menu : new Menu({ type: 'menubar', title: 'FLUX Studio', label: 'FLUX Studio' });
-        let initialLength = topMenu.items.length; 
-        let updateMenu = topMenu.items.length == 0;
-        
+        let initialLength = topMenu.items.length;
+        let updateMenu = topMenu.items.length === 0;
+
         updateAccountMenu(menuMap);
         menuMap.map((menu, i) => {
-            if(!subMenuCache[i] || JSON.stringify(menu.subItems) != subMenuCache[i].json) {
+            if(!subMenuCache[i] || JSON.stringify(menu.subItems) !== subMenuCache[i].json) {
                 let subMenu = methods.createSubMenu(menu.subItems);
                 let menuItem = new MenuItem({ label: menu.label, submenu: subMenu });
 
                 if(subMenuCache[i]) {
-                    topMenu.removeAt(i);                
+                    topMenu.removeAt(i);
                     topMenu.insert(menuItem, i);
                 } else {
                     topMenu.append(menuItem);
@@ -286,7 +287,7 @@ define([
         while(topMenu.items.length > menuMap.length) {
             let i = topMenu.items.length - 1;
             subMenuCache[i] = null;
-            topMenu.removeAt(i);   
+            topMenu.removeAt(i);
             updateMenu = true;
         };
 
@@ -296,9 +297,9 @@ define([
     }
 
     function updateAccountMenu(menuMap) {
-        if(!menuMap) { return };
-        let accountMenu = menuMap.filter(v => v.label == lang.account.label)[0];
-        if(!accountMenu) { return };
+        if(!menuMap) { return; }
+        let accountMenu = menuMap.filter(v => v.label === lang.account.label)[0];
+        if(!accountMenu) { return; }
         if(accountDisplayName === '' || typeof accountDisplayName === 'undefined') {
             accountMenu.subItems.splice(0,2);
         } else {
@@ -508,11 +509,11 @@ define([
                                                 onReady: () => {
                                                     ProgressActions.close();
                                                     scan_control.turnLaser(true).then(() => {
-                                                        AlertActions.showPopupCustom('scan-laser-turned-on', lang.device.scan_laser_complete, lang.device.finish, "");
+                                                        AlertActions.showPopupCustom('scan-laser-turned-on', lang.device.scan_laser_complete, lang.device.finish, '');
                                                         var _handleFinish = (dialog_name) => {
                                                             scan_control.turnLaser(false).then(() => {
                                                                 scan_control.quit();
-                                                            })
+                                                            });
                                                             AlertStore.removeCustomListener(_handleFinish);
                                                         };
                                                         AlertStore.onCustom(_handleFinish);

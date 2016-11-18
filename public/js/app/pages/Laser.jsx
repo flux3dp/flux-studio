@@ -36,7 +36,7 @@ define([
     return function(args) {
         args = args || {};
 
-        var storageDefaultKey = storageDefaultKey = args.props.page.toLowerCase() + '-defaults',
+        var storageDefaultKey = args.props.page.toLowerCase() + '-defaults',
             view = React.createClass({
                 getDefaultProps: function() {
                     return {
@@ -61,7 +61,8 @@ define([
                         sizeLock: false,
                         angle: 0,
                         threshold: 128,
-                        images: []
+                        images: [],
+                        setupPanelDefaults: {material: {value: 'wood', label: 'Wood', data: { laser_speed: 20, power: 50 }}}
                     };
                 },
 

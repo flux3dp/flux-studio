@@ -1634,6 +1634,10 @@ define([
             transformControl.detach(SELECTED);
             selectObject(null);
 
+            slicer.stopSlicing();
+            clearInterval(slicingStatus.reporter);
+            reactSrc.setState({ slicingPercentage: 0 });
+
             setDefaultFileName();
             render();
             if(objects.length === 0) {
