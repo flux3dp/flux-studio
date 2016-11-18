@@ -1,3 +1,27 @@
+# FLUX Studio 0.5.0 Change log
+
+### New Feature
+
+-   FLUX Cloud - now you can create an account, bind devices and control it through your mobile phone (requires FLUX App)
+
+### Changes
+
+-   Flux-monitor's middle button behavior, changed from disappear to disable
+-   Updated device list format
+
+### Bug Fixes
+
+-   Fixed device list display wrong progress status
+-   Fixed unable to turn off camera
+-   Fixed double slicing command fired when imported a file
+-   Updated svg closepath processing
+
+### Other Improvements
+
+-   Added time and filament cost information
+-   Updated IP format pattern
+-   Update menu rendering process for faster speed
+
 # FLUX Studio 0.4.3 Change log
 
 ### New Features
