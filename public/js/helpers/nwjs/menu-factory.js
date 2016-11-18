@@ -300,7 +300,7 @@ define([
         let accountMenu = menuMap.filter(v => v.label == lang.account.label)[0];
         if(!accountMenu) { return };
         if(accountDisplayName === '' || typeof accountDisplayName === 'undefined') {
-            accountMenu.subItems.splice(0,2);
+            accountMenu.subItems.splice(1,2);
         } else {
             accountMenu.subItems[0].label = accountDisplayName || lang.account.sign_in;
         }

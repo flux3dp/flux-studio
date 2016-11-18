@@ -183,7 +183,7 @@ define([
 					<h1>{lang.binding}</h1>
 					<div className="spinner-roller absolute-center"></div>
 					<div className="footer">
-						<a onClick={this._handleCancelBinding}>{lang.cancel}</a>
+						<a onClick={this._handleCancelBinding}>{lang.back}</a>
 					</div>
 				</div>
 			);
