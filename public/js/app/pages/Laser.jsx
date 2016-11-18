@@ -322,7 +322,7 @@ define([
 
                     return (
                         <div className={uploadStyle}>
-                            <lable>{lang.laser.import}</lable>
+                            <label htmlFor="file-uploader">{lang.laser.import}</label>
                             <FileUploader
                                 ref="fileUploader"
                                 accept={accept}

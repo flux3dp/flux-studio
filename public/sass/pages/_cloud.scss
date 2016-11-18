@@ -107,6 +107,7 @@
                 color: $bodyDark;
                 border: $bodyDark 2px solid;
                 &:hover {
+                    color: #000;
                     border: 2px solid #000;
                 }
             }

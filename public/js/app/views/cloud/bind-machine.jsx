@@ -262,7 +262,7 @@ define([
 							<hr />
 						</div>
 						<div className="actions">
-							<button className="btn btn-cancel" onClick={this._handleCancel}>{lang.cancel}</button>
+							<button className="btn btn-cancel" onClick={this._handleCancel}>{lang.back}</button>
 							<button className="btn btn-default" disabled={!this.state.meetVersionRequirement} onClick={this._handleBind}>{lang.bind}</button>
 						</div>
 					</div>
