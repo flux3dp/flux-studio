@@ -183,7 +183,7 @@ define([
 					<h1>{lang.binding}</h1>
 					<div className="spinner-roller absolute-center"></div>
 					<div className="footer">
-						<a onClick={this._handleCancelBinding}>{lang.back}</a>
+						<a onClick={this._handleCancelBinding}>{lang.cancel}</a>
 					</div>
 				</div>
 			);
@@ -262,7 +262,7 @@ define([
 							<hr />
 						</div>
 						<div className="actions">
-							<button className="btn btn-cancel" onClick={this._handleCancel}>{lang.cancel}</button>
+							<button className="btn btn-cancel" onClick={this._handleCancel}>{lang.back}</button>
 							<button className="btn btn-default" disabled={!this.state.meetVersionRequirement} onClick={this._handleBind}>{lang.bind}</button>
 						</div>
 					</div>
