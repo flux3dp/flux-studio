@@ -241,6 +241,7 @@ define([
         },
 
         refresh: function() {
+            if(!window.FLUX.isNW) return;
             menuMap.all = menuMap.refresh();
             initialize(menuMap.all);
         },
