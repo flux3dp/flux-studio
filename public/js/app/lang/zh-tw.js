@@ -309,8 +309,8 @@ define(function() {
                 fail: '失敗',
                 cancel: '取消',
                 try_again: '再試一次',
-                bind: '連結',
-                bind_another: '連結另一部機器',
+                bind: '綁定',
+                bind_another: '綁定另一部機器',
                 username: '使用者名稱',
                 nickname: '使用者別名',
                 email: '電子信箱',
@@ -328,12 +328,12 @@ define(function() {
                 error_email_format: '請輸入正確的電子信箱',
                 error_email_used: '此電子信箱已被使用',
                 error_password_not_match: '確認密碼與密碼不相同',
-                select_to_bind: '請選擇欲連結的機器',
+                select_to_bind: '請選擇欲綁定的機器',
                 binding_success: '綁定成功!',
                 binding_success_description: '您可以開始使用 FLUX App 來監控機器',
                 binding_fail: '綁定失敗',
                 binding_fail_description: '網路可能有問題，請再試一次',
-                binding: '連結中...',
+                binding: '綁定中...',
                 check_email: '相關信進已寄出到您的電子信箱，請確認',
                 email_exists: '電子信箱已被使用',
                 not_verified: '請於您的電子信箱開啟確認信件',
@@ -353,8 +353,8 @@ define(function() {
                 FORMAT_ERROR: '密碼格式錯誤',
                 submit: '儲存',
                 sign_out: '登出',
-                not_supported_firmware: '支援 FLUX cloud 需要 FLUX Delta 韌體 1.5＋',
-                unbind_device: '確認要不再連結此機器?'
+                not_supported_firmware: '支援 FLUX cloud 需要 FLUX Delta 韌體 v1.5＋',
+                unbind_device: '確認要不再綁定此機器?'
             }
         },
         print: {

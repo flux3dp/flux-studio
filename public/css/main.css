@@ -5815,12 +5815,6 @@ input.switch:checked ~ label:after {
     box-shadow: 0 4px 40px 0px rgba(0, 0, 0, 0.5); }
 
 .laser-studio .file-importer {
-    display: -webkit-box;
-    /* OLD - iOS 6-, Safari 3.1-6 */
-    display: -webkit-flex;
-    /* NEW - Chrome */
-    display: flex;
-    /* NEW, Spec - Opera 12.1, Firefox 20+ */
     background: #fff;
     color: #999;
     font-size: 32px;
@@ -5831,6 +5825,16 @@ input.switch:checked ~ label:after {
     width: 200px;
     align-items: center;
     justify-content: center; }
+    .laser-studio .file-importer label {
+        width: 200px;
+        height: 50px;
+        padding: 0;
+        line-height: 50px;
+        text-align: center;
+        cursor: pointer;
+        display: block; }
+    .laser-studio .file-importer input[type="file"] {
+        position: static; }
     .laser-studio .file-importer:hover {
         color: #888; }
     .laser-studio .file-importer:after {
@@ -6485,6 +6489,7 @@ input.switch:checked ~ label:after {
             color: #777;
             border: #777 2px solid; }
             .cloud .footer .actions .btn-cancel:hover {
+                color: #000;
                 border: 2px solid #000; }
         .cloud .footer .actions .btn-default {
             transition: none;

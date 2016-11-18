@@ -66,7 +66,7 @@ define([
                 else {
                     alert(lang.contact_us);
                 }
-            })
+            });
         },
 
         _handleSignIn: function(e) {

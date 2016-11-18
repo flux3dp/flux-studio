@@ -340,7 +340,7 @@ define(function() {
                 FORMAT_ERROR: 'Wrong password format',
                 submit: 'SAVE',
                 sign_out: 'Sign out',
-                not_supported_firmware: 'Please upgrade your FLUX Delta firmware\nto 1.5+ for cloud feature',
+                not_supported_firmware: 'Please upgrade your FLUX Delta firmware\nto v1.5+ for cloud feature',
                 unbind_device: 'Would you like to unbind this device?'
             }
         },
