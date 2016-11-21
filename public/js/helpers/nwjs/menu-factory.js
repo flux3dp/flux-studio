@@ -447,7 +447,7 @@ define([
                                         AlertActions.showPopupError('calibrate-fail', lang.calibration.extruderOnly);
                                     }
                                     else {
-                                        let message = lang.monitor[error.error.join('_')];
+                                        let message = error.error ? lang.monitor[error.error.join('_')] : lang.monitor[error.join('_')];
                                         AlertActions.showPopupError('calibrate-fail', message || error.error.join(' '));
                                     }
                                 }).always(() => {
