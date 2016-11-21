@@ -549,7 +549,7 @@ define([
                 }
             }).then((headInfo) => {
                 if(headInfo.module === null) {
-                    return $.Deferred().reject();
+                    return $.Deferred().reject({module:null});
                 }
                 else if(headInfo.module !== 'EXTRUDER') {
                     return $.Deferred().reject({module:'LASER'});
