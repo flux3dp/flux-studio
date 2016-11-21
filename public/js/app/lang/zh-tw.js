@@ -978,6 +978,7 @@ define(function() {
             MAINBOARD_OFFLINE                   : '裝置錯誤\n請重新啟動機器',
             G28_FAILED                          : '#124 原點校正失敗\n請排除軌道上異物，並重新插拔工具頭連接線 <a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/218931807">暸解更多</a>',
             FILAMENT_RUNOUT_0                   : '#121 沒有偵測到線料\n請重新插入新的線料 <a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/218931757">瞭解更多</a>',
+            USER_OPERATION_FROM_CODE            : '使用操作暫停（更換線料）',
             processing                          : '處理中',
             savingPreview                       : '正在產生預覽圖',
             hour                                : '小時',
