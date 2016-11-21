@@ -26,6 +26,7 @@ define([
                     <div className="container">
                         <div className="title">
                             <h3>{lang.binding_fail}</h3>
+                            <label>{lang.binding_fail_description}</label>
                         </div>
                         <div className="icon">
                             <img src="img/error-icon.svg" />

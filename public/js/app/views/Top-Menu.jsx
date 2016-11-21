@@ -212,19 +212,24 @@ define([
             },
 
             _renderDeviceList: function() {
-                var meta,
-                    status = lang.machine_status,
+                var status = lang.machine_status,
                     headModule = lang.head_module,
                     statusText,
                     headText,
                     progress,
                     deviceList = this.state.deviceList,
                     options = deviceList.map(function(device) {
-                        statusText = status[device.st_id] || status.UNKNOWN,
+                        statusText = status[device.st_id] || status.UNKNOWN;
                         headText = headModule[device.head_module] || headModule.UNKNOWN;
-
-                        if (16 === device.st_id && 'number' === typeof device.st_prog) {
-                            progress = (parseInt(device.st_prog * 1000) * 0.1).toFixed(1) + '%'
+                        
+                        if(device.st_prog === 0) {
+                            progress = '';
+                        }
+                        else if (16 === device.st_id && 'number' === typeof device.st_prog) {
+                            progress = (parseInt(device.st_prog * 1000) * 0.1).toFixed(1) + '%';
+                        }
+                        else {
+                            progress = '';
                         }
 
                         return (
@@ -235,7 +240,7 @@ define([
                                 <label className="status">{headText} {statusText}</label>
                                 <label className="progress">{progress}</label>
                             </li>
-                        )
+                        );
                     }, this),
                     list;
 

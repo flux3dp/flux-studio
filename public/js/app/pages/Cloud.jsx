@@ -12,6 +12,8 @@ define([
     'jsx!views/cloud/bind-fail',
     'jsx!views/cloud/sign-out',
     'jsx!views/cloud/change-password',
+    'jsx!views/cloud/terms',
+    'jsx!views/cloud/privacy',
 ], function(
     $,
     React,
@@ -25,7 +27,9 @@ define([
     BindSuccess,
     BindFail,
     SignOut,
-    ChangePassword
+    ChangePassword,
+    Terms,
+    Privacy
 ) {
     'use strict';
 
@@ -57,6 +61,8 @@ define([
                 content['bind-fail'] = () => <BindFail lang={this.state.lang} />
                 content['change-password'] = () => <ChangePassword lang={this.state.lang} />
                 content['sign-out'] = () => <SignOut />
+                content['terms'] = () => <Terms lang={this.state.lang} />
+                content['privacy'] = () => <Privacy lang={this.state.lang} />
 
 
                 if(typeof content[view] === 'undefined') { view = 'sign-in'; }

@@ -1,3 +1,28 @@
+# FLUX Studio 0.5.0 Change Log
+
+### New Features
+
+- FLUX Cloud - create an account, bind devices and control your Delta through FLUX App
+
+### Changes
+
+- Added time and filament cost information
+- Device list, dashboard, preferences style adjustment
+- Display behavior of dashboard middle button
+- Actively send discovering packets to devices in local network
+
+### Bug Fixes
+
+- Fixed device list displaying wrong progress status
+- Fixed unable to turn off camera
+- Fixed double slicing command fired when imported a file
+- Fixed SVG close-path processing issue
+
+### Other Improvements
+
+- Updated IP format pattern
+- Disable unnecessary menu re-rendering
+
 # FLUX Studio 0.4.3 Change log
 
 ### New Features

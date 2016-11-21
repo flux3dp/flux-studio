@@ -286,7 +286,7 @@ define([
                     }
                 });
             },
-            refreshObjectParams = function(e, $el) {
+            refreshObjectParams = function(e, $el, returnState) {
                 var el_position, el_offset_position, position, size, angle, threshold, data;
 
                 if (null !== $el) {
@@ -311,14 +311,23 @@ define([
 
                     resetPosition($el);
 
-                    self.setState({
-                        position: position,
-                        size: size,
-                        angle: angle,
-                        threshold: threshold
-                    }, function() {
-                        refreshImagePanelPos();
-                    });
+                    if (!returnState) {
+                        self.setState({
+                            position: position,
+                            size: size,
+                            angle: angle,
+                            threshold: threshold
+                        }, function() {
+                            refreshImagePanelPos();
+                        });
+                    } else {
+                        return {
+                            position: position,
+                            size: size,
+                            angle: angle,
+                            threshold: threshold
+                        };
+                    }
                 }
             },
             $target_image = null, // changing when image clicked
@@ -499,27 +508,30 @@ define([
                             };
 
                         if (false === $img.hasClass('image-active')) {
-                            inactiveAllImage();
+                            inactiveAllImage(null, true);
 
                             $target_image = $img;
+                            let objectParamState = refreshObjectParams({ freetransEventType: 'move' }, $img, true);
 
-                            refreshObjectParams({ freetransEventType: 'move' }, $img);
+                            // $img.on('transitionend', function(e) {
+                            //     refreshImagePanelPos();
+                            // });
 
-                            $img.on('transitionend', function(e) {
-                                refreshImagePanelPos();
-                            });
-
-                            self.setState({
+                            self.setState(Object.assign({
                                 selectedImage: true,
                                 sizeLock: $img.data('sizeLock')
-                            });
+                            }, objectParamState), refreshImagePanelPos );
+
+
 
                             $img.addClass('image-active');
                         }
-
-                        menuFactory.items.duplicate.enabled = true;
-                        menuFactory.items.duplicate.onClick = clone;
-                        menuFactory.methods.refresh();
+                        setTimeout(() => {
+                            // Async heavy call
+                            menuFactory.items.duplicate.enabled = true;
+                            menuFactory.items.duplicate.onClick = clone;
+                            menuFactory.methods.refresh();
+                        }, 50);
                     });
                 })(file, size, originalUrl, $img);
             });
@@ -556,21 +568,32 @@ define([
             });
         }
 
-        function inactiveAllImage($exclude) {
-            $('.image-active').not($exclude).removeClass('image-active');
-            menuFactory.items.duplicate.enabled = false;
-            menuFactory.methods.refresh();
+        function inactiveAllImage($exclude, dontRefresh) {
+            let $imageActive = $('img.image-active');
+            if ($exclude) {
+                $imageActive = $imageActive.not($exclude);
+            }
+            $imageActive.removeClass('image-active');
 
-            if (0 === $('.image-active').length) {
+            if (!dontRefresh) {
+                menuFactory.items.duplicate.enabled = false;
+                menuFactory.methods.refresh();
+            }
+
+            if (!$exclude || ($exclude && $('img.image-active').length == 0)) {
                 $target_image = null;
 
-                self.setState({
-                    selectedImage: false
-                });
+                if (!dontRefresh) {
+                    self.setState({
+                        selectedImage: false
+                    });
+                } else {
+                    return { selectedImage: false }
+                }
             }
         }
 
-        function refreshImagePanelPos() {
+        function refreshImagePanelPos(returnState) {
             if (null !== $target_image) {
                 var pos = $target_image.box(true),
                     imagePanel = self.refs.imagePanel,
@@ -595,9 +618,15 @@ define([
                     initialPosition.left = platformPos.right + 10;
                 }
 
-                self.setState({
-                    initialPosition: initialPosition
-                });
+                if (!returnState) {
+                    self.setState({
+                        initialPosition: initialPosition
+                    });
+                } else {
+                    return {
+                        initialPosition: initialPosition
+                    };
+                }
             }
         }
 

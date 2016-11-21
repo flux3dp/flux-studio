@@ -215,7 +215,6 @@ define([
                     }).then(content => {
                         let { nickname, email } = content || {};
                         let displayName = (nickname || email || '');
-                        console.log('updating display name', displayName);
                         menuFactory.methods.updateAccountDisplay(displayName);
                         menuFactory.methods.refresh();
                     });;
@@ -266,6 +265,7 @@ define([
                     listeningToCancel = true;
                     GlobalStore.onCancelPreview(this._handleCancelPreview);
                     GlobalStore.onMonitorClosed(this._handleMonitorClosed);
+                    GlobalStore.onSliceComplete(this._handleSliceReport);
                 },
 
                 componentWillUnmount: function() {
@@ -279,6 +279,7 @@ define([
                     AlertStore.removeCancelListener(this._handleDefaultCancel);
                     GlobalStore.removeCancelPreviewListener(this._handleCancelPreview);
                     GlobalStore.removeMonitorClosedListener(this._handleMonitorClosed);
+                    GlobalStore.removeSliceCompleteListener(this._handleSliceReport);
                 },
 
                 _registerKeyEvents: function() {
@@ -767,6 +768,10 @@ define([
                     }.bind(this), 10);
                 },
 
+                _handleSliceReport: function(data) {
+                    this.setState({ slicingStatus: data.report });
+                },
+
                 _handleCancelPreview: function() {
                     director.cancelPreview();
                 },
@@ -894,6 +899,8 @@ define([
                     return (
                         <RightPanel
                             lang                    = {lang}
+                            slicingPercentage       = {this.state.slicingPercentage}
+                            slicingStatus           = {this.state.slicingStatus}
                             camera                  = {this.state.camera}
                             updateCamera            = {this.state.updateCamera}
                             hasObject               = {this.state.hasObject}

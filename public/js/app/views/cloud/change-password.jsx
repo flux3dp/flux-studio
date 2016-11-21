@@ -90,7 +90,6 @@ define([
                 f[id]();
             };
 
-            console.log(this.values);
             if(this.values.newPassword !== '' && this.values.confirmPassword !== '') {
                 let mismatch = this.values.newPassword !== this.values.confirmPassword
                 this.setState({ confirmPasswordError: mismatch ? lang.error_password_not_match : ''});
@@ -125,6 +124,8 @@ define([
             }).then(j => {
                 if(j.status === 'error') {
                     this.setState({ responseError: lang[j.message] })
+                } else {
+                    location.hash = "#/studio/cloud/bind-machine";
                 }
             });
         },
@@ -136,8 +137,7 @@ define([
                 <div className="cloud">
                     <div className="change-password container">
                         <div className="title">
-                            <h3>{lang.change_password}</h3>
-                            <h2>{lang.flux_cloud}</h2>
+                            <h3>{lang.change_password.toUpperCase()}</h3>
                         </div>
                         <div className="row">
                             <Controls
@@ -177,7 +177,7 @@ define([
                         </div>
                         <div className="actions">
                             <button className="btn btn-cancel" onClick={this._handleCancel}>{lang.cancel}</button>
-                            <button className="btn btn-default" onClick={this._handleChangePassword}>{lang.change_password}</button>
+                            <button className="btn btn-default" onClick={this._handleChangePassword}>{lang.submit}</button>
                         </div>
                     </div>
                 </div>

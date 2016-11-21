@@ -401,6 +401,10 @@ define([
         return SocketMaster.addTask('getCloudValidationCode');
     }
 
+    function enableCloud() {
+        return SocketMaster.addTask('enableCloud');
+    }
+
     // Private Functions
 
     function _do(command) {
@@ -775,7 +779,7 @@ define([
     function getDeviceSettings() {
         let d = $.Deferred(),
             settings = {},
-            _settings = ['correction', 'filament_detect', 'head_error_level', 'autoresume', 'broadcast'];
+            _settings = ['correction', 'filament_detect', 'head_error_level', 'autoresume', 'broadcast', 'enable_cloud'];
 
         const worker = function*() {
             for(let i = 0; i < _settings.length; i++) {
@@ -862,6 +866,7 @@ define([
             this.getDeviceSettings      = getDeviceSettings;
             this.setDeviceSetting       = setDeviceSetting;
             this.getCloudValidationCode = getCloudValidationCode;
+            this.enableCloud            = enableCloud;
 
             Discover(
                 'device-master',

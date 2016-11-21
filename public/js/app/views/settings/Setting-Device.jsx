@@ -274,13 +274,38 @@ define([
             return Object.keys(this.state.config).length > 0 ? content : '';
         },
 
+        _renderEnableCloud: function() {
+            let { lang } = this.props,
+                options,
+                content;
+
+            options = [
+                { id: 'A', name: lang.device.enableCloud.A},
+                { id: 'N', name: lang.device.enableCloud.N}
+            ];
+
+            content = (
+                <div className="controls">
+                    <div className="label">{lang.device.enableCloud.title}</div>
+                    <RadioControl
+                        id="enable_cloud"
+                        options={options}
+                        default={this.state.config['enable_cloud'] || 'N'}
+                        onChange={this._handleComponentValueChange}/>
+                </div>
+            )
+
+            return Object.keys(this.state.config).length > 0 ? content : '';
+        },
+
         render : function() {
             let deviceList = this._getDeviceList(),
                 correction = this._renderCorrectionSetting(),
                 detectFilament = this._renderDetectFilamentSetting(),
                 filterHeadError = this._renderFilterHeadErrorSetting(),
                 autoResume = this._renderAutoResumeSetting(),
-                broadcast = this._renderBroadcast();
+                broadcast = this._renderBroadcast(),
+                cloud = this._renderEnableCloud();
 
             return (
                 <div className="form general">
@@ -290,6 +315,7 @@ define([
                     {filterHeadError}
                     {autoResume}
                     {broadcast}
+                    {cloud}
                 </div>
             );
         }

@@ -165,9 +165,8 @@ define([
         },
         originalMenuMap = JSON.parse(JSON.stringify(menuMap)),
         lang = i18n.get().topmenu,
-        itemMap = [],
         NWjsWindow,
-        mainmenu,
+        topMenu,
         Menu,
         MenuItem,
         methods,
@@ -177,12 +176,14 @@ define([
         doDiscover,
         discoverMethods,
         accountDisplayName,
-        timer;
+        timer,
+        subMenuCache = {},
+        subMenuIndex = {},
+        submenuId = 0;
 
     MenuItem = gui.MenuItem;
     NWjsWindow = gui.Window.get();
     Menu = gui.Menu;
-    mainmenu = new Menu({ type: 'menubar', title: 'FLUX Studio', label: 'FLUX Studio' });
 
     methods = {
         createMenu: function() {
@@ -190,7 +191,7 @@ define([
         },
 
         createSubMenu: function(items) {
-            var subMenu = this.createMenu(),
+            var subMenu = this.createMenu({id: ++submenuId}),
                 menuItem,
                 menuOption;
 
@@ -239,67 +240,76 @@ define([
             return subMenu;
         },
 
-        appendToMenu: function(label, subMenu) {
-            var item = new MenuItem({ label: label, submenu: subMenu });
-            itemMap.push(item);
-            mainmenu.append(item);
-        },
-
-        getMenu: function() {
-            return mainmenu;
-        },
-
-        clear: function() {
-            mainmenu = new Menu({ type: 'menubar', title: 'FLUX Studio', label: 'FLUX Studio' });
-        },
-
         refresh: function() {
+            if(!window.FLUX.isNW) return;
             menuMap.all = menuMap.refresh();
             initialize(menuMap.all);
         },
 
         updateMenu: function(menu, parentIndex) {
-            var menuItem = mainmenu.items[parentIndex],
+            var menuItem = topMenu.items[parentIndex],
                 subMenu = methods.createSubMenu(menu.subItems);
 
             menuItem.subMenu = subMenu;
         },
 
         updateAccountDisplay: function(name) {
-            if(typeof mainmenu.items === 'undefined') { return; }
-            var account = mainmenu.items[5].submenu.items[0];
-            account.label = name || lang.account.sign_in;
             accountDisplayName = name;
+            methods.refresh();
         }
 
     };
 
     function initialize(menuMap) {
-        var subMenu;
+        if(!window.FLUX.isNW) { return; }
+        topMenu = topMenu ? NWjsWindow.menu : new Menu({ type: 'menubar', title: 'FLUX Studio', label: 'FLUX Studio' });
+        let initialLength = topMenu.items.length;
+        let updateMenu = topMenu.items.length === 0;
 
-        methods.clear();
-        menuMap = updateAccountMenu(menuMap);
+        updateAccountMenu(menuMap);
+        menuMap.map((menu, i) => {
+            if(!subMenuCache[i] || JSON.stringify(menu.subItems) !== subMenuCache[i].json) {
+                let subMenu = methods.createSubMenu(menu.subItems);
+                let menuItem = new MenuItem({ label: menu.label, submenu: subMenu });
 
-        menuMap.forEach(function(menu) {
-            subMenu = methods.createSubMenu(menu.subItems);
-            methods.appendToMenu(menu.label, subMenu);
+                if(subMenuCache[i]) {
+                    topMenu.removeAt(i);
+                    topMenu.insert(menuItem, i);
+                } else {
+                    topMenu.append(menuItem);
+                    updateMenu = true;
+                }
+                subMenuCache[i] = { id: menuItem.id, json: JSON.stringify(menu.subItems) };
+            } else {
+                // No change no update
+            }
         });
 
-        methods.updateAccountDisplay(accountDisplayName);
-        // console.log('sub menu count', mainmenu.items[5].submenu.itemss);
-        // methods.refresh();
-        NWjsWindow.menu = mainmenu;
+        while(topMenu.items.length > menuMap.length) {
+            let i = topMenu.items.length - 1;
+            subMenuCache[i] = null;
+            topMenu.removeAt(i);
+            updateMenu = true;
+        };
+
+        if (updateMenu) {
+            NWjsWindow.menu = topMenu;
+        }
     }
 
-    function updateAccountMenu(m) {
-        // console.log('account display name', accountDisplayName);
+    function updateAccountMenu(menuMap) {
+        if(!menuMap) { return; }
+        let accountMenu = menuMap.filter(v => v.label === lang.account.label)[0];
+        if(!accountMenu) { return; }
         if(accountDisplayName === '' || typeof accountDisplayName === 'undefined') {
-            m[5].subItems.splice(0,2);
+            accountMenu.subItems.splice(1,2);
+        } else {
+            accountMenu.subItems[0].label = accountDisplayName || lang.account.sign_in;
         }
 
-        if(m[5].subItems.length >= 3) {
+        if(accountMenu.subItems.length >= 3) {
             // clicked on sign out
-            m[5].subItems[2].onClick = () => {
+            accountMenu.subItems[2].onClick = () => {
                 methods.updateAccountDisplay('');
                 CloudApi.signOut();
                 setTimeout(() => {
@@ -307,8 +317,7 @@ define([
                 }, 1000);
             };
         }
-        // console.log(m[5].subItems[0]);
-        return m;
+        return menuMap;
     }
 
     if (true === window.FLUX.isNW) {
@@ -428,7 +437,7 @@ define([
                     DeviceMaster.selectDevice(currentPrinter).then((status) => {
                         if (status === DeviceConstants.CONNECTED) {
                             checkDeviceStatus(currentPrinter).then(() => {
-                            ProgressActions.open(ProgressConstants.WAITING, lang.device.calibrating, lang.device.pleaseWait, false);
+                                ProgressActions.open(ProgressConstants.WAITING, lang.device.calibrating, lang.device.pleaseWait, false);
                                 DeviceMaster.calibrate().done((debug_message) => {
                                     setTimeout(() => {
                                         AlertActions.showPopupInfo('calibrated', JSON.stringify(debug_message), lang.calibration.calibrated);
@@ -501,11 +510,11 @@ define([
                                                 onReady: () => {
                                                     ProgressActions.close();
                                                     scan_control.turnLaser(true).then(() => {
-                                                        AlertActions.showPopupCustom('scan-laser-turned-on', lang.device.scan_laser_complete, lang.device.finish, "");
+                                                        AlertActions.showPopupCustom('scan-laser-turned-on', lang.device.scan_laser_complete, lang.device.finish, '');
                                                         var _handleFinish = (dialog_name) => {
                                                             scan_control.turnLaser(false).then(() => {
                                                                 scan_control.quit();
-                                                            })
+                                                            });
                                                             AlertStore.removeCustomListener(_handleFinish);
                                                         };
                                                         AlertStore.onCustom(_handleFinish);

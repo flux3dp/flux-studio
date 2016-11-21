@@ -112,7 +112,7 @@ define([
     $('body').on('click', '[data-ga-event]', function(e) {
         var $self = $(e.currentTarget);
         if(window.FLUX.allowTracking && window.analytics) {
-            window.analytics('send', 'event', 'button', 'click', $self.data('ga-event'));
+            window.analytics.event('send', 'event', 'button', 'click', $self.data('ga-event'));
         }
     });
 

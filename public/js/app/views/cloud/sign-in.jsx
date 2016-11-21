@@ -34,7 +34,6 @@ define([
                     return response.json();
                 }
             }).then(response => {
-                // console.log('response is ',response);
                 if(response) {
                     location.hash = '#/studio/cloud/bind-machine';
                 }
@@ -61,14 +60,13 @@ define([
             let lang = this.props.lang.settings.flux_cloud;
 
             CloudApi.resendVerification(email).then(response => {
-                // console.log(response);
                 if(response.ok) {
                     location.hash = '#studio/cloud/email-sent';
                 }
                 else {
                     alert(lang.contact_us);
                 }
-            })
+            });
         },
 
         _handleSignIn: function(e) {
@@ -82,7 +80,6 @@ define([
             });
 
             CloudApi.signIn(email, password).then((response) => {
-                console.log(response);
                 if(response.ok) {
                     response.json().then(r => {
                         let { nickname, email } = r;
@@ -94,7 +91,6 @@ define([
                 }
                 else {
                     response.json().then(error => {
-                        console.log(error);
                         this.setState({
                             showResendVerificationEmail: error.message === 'NOT_VERIFIED',
                             errorMessage: lang[error.message.toLowerCase()],
@@ -149,7 +145,7 @@ define([
                             <hr />
                         </div>
                         <div className="actions">
-                            <button className="btn btn-cancel" onClick={this._handleCancel}>{lang.cancel}</button>
+                            <button className="btn btn-cancel" onClick={this._handleCancel}>{lang.back}</button>
                             <button className="btn btn-default" onClick={this._handleSignIn}>{lang.sign_in}</button>
                         </div>
                     </div>

@@ -33,6 +33,7 @@ define([
         },
         lang = i18n.get().topmenu,
         menuMap = [],
+        staticMenuMap = [],
         menuIndexOffset = ('osx' === window.FLUX.osType ? 0 : 1),
         parentIndex = {
             ABOUT  : 0 - menuIndexOffset,
@@ -189,6 +190,7 @@ define([
         subItems;
 
     function bindMap() {
+       // if (staticMenuMap.length > 3) return staticMenuMap;
         menuMap = [];
 
         if (1 !== menuIndexOffset) {
@@ -198,7 +200,7 @@ define([
             });
         }
 
-        if (true === initializeMachine.hasBeenCompleted()) {
+        if (initializeMachine.hasBeenCompleted()) {
             subItems = [
                 items.import,
                 separator,
@@ -273,6 +275,13 @@ define([
                     }
                 ]
             });
+        } else {
+            if (1 === menuIndexOffset) {
+                menuMap.push({
+                    label: lang.file.label,
+                    subItems: aboutSubItems
+                });
+            }
         }
 
         menuMap.push({
@@ -336,6 +345,8 @@ define([
                 }
             ]
         });
+
+        staticMenuMap = menuMap;
 
         return menuMap;
     }

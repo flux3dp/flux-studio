@@ -447,6 +447,15 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         border-color: #ac2925;
     }
 
+    .preview-time-cost {
+        position: fixed;
+        color: #4D4D4D;
+        bottom: 68px;
+        right: 117px;
+        font-weight: bold;
+        text-align: right;
+    }
+
     .beehive-buttons {
         bottom: 28px;
         position: fixed;

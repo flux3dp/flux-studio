@@ -48,7 +48,6 @@ define([
         },
 
         _checkValue: function(id, value) {
-            console.log(id, value);
             let lang = this.props.lang.settings.flux_cloud,
                 f = {};
 
@@ -99,7 +98,6 @@ define([
         },
 
         _allValid: function() {
-            console.log(this.values, this.state);
             let { nickname, email, password, rePassword, agreeToTerms } = this.values,
                 { emailError } = this.state,
                 lang = this.props.lang.settings.flux_cloud;
@@ -139,12 +137,10 @@ define([
                                 emailError: true,
                                 emailErrorMessage: lang[error.message.toLowerCase()]
                             });
-                            console.log(error.message);
                         });
                     }
                 });
             }
-            // location.hash = '#studio/cloud/sign-up-success';
         },
 
         _handleCancel: function() {
@@ -199,7 +195,7 @@ define([
                         <div className="controls">
                             <div className="control">
                                 <input id="agreeToTerms" className="pointer" type="checkbox" onChange={this._handleAgreementChange} />
-                                <label className="pointer" htmlFor="agreeToTerms"> {lang.agreement}</label>
+                                <label dangerouslySetInnerHTML={{ __html: lang.agreement }}></label>
                             </div>
                         </div>
                         <div className="processing-error">

@@ -170,9 +170,12 @@ define([
                         }
 
                         showProgramErrorPopup = false;
-                        AlertActions.showPopupCustomCancel(abnormallyId, message, lang.message.error_log);
-                        AlertStore.onCustom(outputLog);
-                        AlertStore.onCancel(onCancel);
+                        // this is a hack to counter flux-ghost backened bug with opcode = -1
+                        if(location.hash.split('/')[1] !== 'print' || options.method !== 'usb-config') {
+                            AlertActions.showPopupCustomCancel(abnormallyId, message, lang.message.error_log);
+                            AlertStore.onCustom(outputLog);
+                            AlertStore.onCancel(onCancel);
+                        }
                     }
 
                     if (true === socketOptions.autoReconnect) {

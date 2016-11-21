@@ -297,14 +297,8 @@ define([
             mesh.up = new THREE.Vector3(0, 0, 1);
 
             slicingStatus.pauseReport = true;
-            uploadStl(mesh.uuid, file, ext).then((result) => {
+            uploadStl(mesh.uuid, file, ext).then(() => {
                 slicingStatus.pauseReport = false;
-                let t = setInterval(() => {
-                    if(slicingStatus.canInterrupt) {
-                        clearInterval(t);
-                        startSlicing(slicingType.F);
-                    };
-                }, 200);
                 ProgressActions.close();
                 addToScene();
                 callback();
@@ -1606,7 +1600,7 @@ define([
     }
 
     function setDefaultFileName(fileNameWithExtension) {
-        if(!fileNameWithExtension) {
+        if(typeof fileNameWithExtension === 'undefined') {
             if(objects.length) {
                 defaultFileName = objects[0].fileName;
                 defaultFileName = defaultFileName.split('.');
@@ -1639,6 +1633,10 @@ define([
 
             transformControl.detach(SELECTED);
             selectObject(null);
+
+            slicer.stopSlicing();
+            clearInterval(slicingStatus.reporter);
+            reactSrc.setState({ slicingPercentage: 0 });
 
             setDefaultFileName();
             render();
