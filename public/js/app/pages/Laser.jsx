@@ -36,7 +36,7 @@ define([
     return function(args) {
         args = args || {};
 
-        var storageDefaultKey = storageDefaultKey = args.props.page.toLowerCase() + '-defaults',
+        var storageDefaultKey = args.props.page.toLowerCase() + '-defaults',
             view = React.createClass({
                 getDefaultProps: function() {
                     return {
@@ -61,12 +61,13 @@ define([
                         sizeLock: false,
                         angle: 0,
                         threshold: 128,
-                        images: []
+                        images: [],
+                        setupPanelDefaults: {material: {value: 'wood', label: 'Wood', data: { laser_speed: 20, power: 50 }}}
                     };
                 },
 
                 componentDidMount: function() {
-                    var self = this;
+                    var self = this, lang = args.state.lang;
 
                     dndHandler.plug(document, self._onDropUpload);
 
@@ -90,6 +91,42 @@ define([
                     var laser_custom_bg = config().read('laser-custom-bg');
                     if(laser_custom_bg)
                         $('.laser-object').css({background :'url(' + laser_custom_bg + ')', 'background-size': '100% 100%'});
+
+
+                    config().read(storageDefaultKey, {
+                        onFinished: function(response) {
+                            let setupPanelDefaults = response || {};
+
+                            if ('laser' === self.props.page) {
+                                if ('undefined' === typeof setupPanelDefaults.material) {
+                                    setupPanelDefaults.material = lang.laser.advanced.form.object_options.options[0];
+                                }
+
+                                setupPanelDefaults.objectHeight = setupPanelDefaults.objectHeight || 0;
+                                setupPanelDefaults.isShading = (
+                                    'boolean' === typeof setupPanelDefaults.isShading ?
+                                    setupPanelDefaults.isShading :
+                                    true
+                                );
+                            }
+                            // holder
+                            else {
+                                setupPanelDefaults = {
+                                    liftHeight: response.liftHeight || 55,
+                                    drawHeight: response.drawHeight || 50,
+                                    speed: response.speed || 20
+                                }
+                            }
+
+                            if ('' === response) {
+                                config().write(storageDefaultKey, setupPanelDefaults);
+                            }
+
+                            self.setState({
+                                setupPanelDefaults: setupPanelDefaults
+                            });
+                        }
+                    });
                 },
 
                 componentWillUnmount: function () {
@@ -113,8 +150,7 @@ define([
                 _onDropUpload: function(e) {
                     e.preventDefault();
 
-                    var self = this,
-                        uploadedFiles = e.originalEvent.dataTransfer.files;
+                    var uploadedFiles = e.originalEvent.dataTransfer.files;
 
                     e.target.files = uploadedFiles;
                     this.refs.fileUploader.readFiles(e, uploadedFiles);
@@ -201,45 +237,14 @@ define([
                         paramPanel,
                         setupPanelDefaults;
 
-                    config().read(storageDefaultKey, {
-                        onFinished: function(response) {
-                            setupPanelDefaults = response || {};
-
-                            if ('laser' === self.props.page) {
-                                if ('undefined' === typeof setupPanelDefaults.material) {
-                                    setupPanelDefaults.material = lang.laser.advanced.form.object_options.options[0];
-                                }
-
-                                setupPanelDefaults.objectHeight = setupPanelDefaults.objectHeight || 0;
-                                setupPanelDefaults.isShading = (
-                                    'boolean' === typeof setupPanelDefaults.isShading ?
-                                    setupPanelDefaults.isShading :
-                                    true
-                                );
-                            }
-                            // holder
-                            else {
-                                setupPanelDefaults = {
-                                    liftHeight: response.liftHeight || 55,
-                                    drawHeight: response.drawHeight || 50,
-                                    speed: response.speed || 20
-                                }
-                            }
-
-                            if ('' === response) {
-                                config().write(storageDefaultKey, setupPanelDefaults);
-                            }
-                        }
-                    });
-
-                    paramPanel = (
+                    paramPanel = this.state.setupPanelDefaults ? (
                         'laser' === this.props.page ?
                         <LaserSetupPanel
                             lang={lang}
                             page={this.props.page}
                             className="operating-panel"
                             imageFormat={this.state.fileFormat}
-                            defaults={setupPanelDefaults}
+                            defaults={this.state.setupPanelDefaults}
                             ref="setupPanel"
                             onShadingChanged={this._onShadingChanged}
                         /> :
@@ -248,10 +253,10 @@ define([
                             page={this.props.page}
                             className="operating-panel"
                             imageFormat={this.state.fileFormat}
-                            defaults={setupPanelDefaults}
+                            defaults={this.state.setupPanelDefaults}
                             ref="setupPanel"
                         />
-                    );
+                    ) : null;
 
                     return (
                         <div ref="laserStage" className="laser-stage">
@@ -317,7 +322,7 @@ define([
 
                     return (
                         <div className={uploadStyle}>
-                            <lable>{lang.laser.import}</lable>
+                            <label htmlFor="file-uploader">{lang.laser.import}</label>
                             <FileUploader
                                 ref="fileUploader"
                                 accept={accept}

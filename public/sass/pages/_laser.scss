@@ -17,7 +17,6 @@
     }
 
     .file-importer {
-        @include flexbox();
         background: #fff;
         color: $primaryColor;
         font-size: 32px;
@@ -28,6 +27,20 @@
         width: 200px;
         align-items: center;
         justify-content: center;
+
+        label {
+            width: 200px;
+            height: 50px;
+            padding: 0;
+            line-height: 50px;
+            text-align: center;
+            cursor: pointer;
+            display: block;
+        }
+
+        input[type="file"] {
+            position: static;
+        }
 
         &:hover {
             color: #888;

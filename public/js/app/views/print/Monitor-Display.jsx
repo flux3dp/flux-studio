@@ -172,22 +172,22 @@ define([
         },
 
         _getJobType: function() {
-            let { Monitor, Device } = this.context.store.getState()
+            let { Monitor, Device } = this.context.store.getState();
             let { lang } = this.context, jobInfo, o;
 
             jobInfo = Monitor.mode === GlobalConstants.FILE_PREVIEW ? Monitor.selectedFileInfo : Device.jobInfo;
             o = findObjectContainsProperty(jobInfo, 'HEAD_TYPE');
 
-            // this should be updated when slicer returns the same info as play info
-            if(jobInfo.length === 0 && this.props.previewUrl) {
-                return lang.monitor.task['EXTRUDER'];
+            if(o.length === 0) {
+                let operatingFunction = location.hash.split('/')[1];
+                return lang.monitor.task[operatingFunction.toUpperCase()];
             }
 
-            return o.length > 0 ? lang.monitor.task[o[0].HEAD_TYPE.toUpperCase()] : '';
+            return lang.monitor.task[o[0].HEAD_TYPE.toUpperCase()];
         },
 
         _getJobTime: function() {
-            let { Monitor, Device } = this.context.store.getState()
+            let { Monitor, Device } = this.context.store.getState();
             let jobInfo, o;
 
             jobInfo = Monitor.mode === GlobalConstants.FILE_PREVIEW ? Monitor.selectedFileInfo : Device.jobInfo;

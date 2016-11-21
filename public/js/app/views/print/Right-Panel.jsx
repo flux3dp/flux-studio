@@ -4,8 +4,9 @@ define([
     'app/actions/perspective-camera',
     'jsx!widgets/Button-Group',
     'app/actions/alert-actions',
-    'app/stores/alert-store'
-], function($, React, PerspectiveCamera, ButtonGroup, AlertActions, AlertStore) {
+    'app/stores/alert-store',
+    'helpers/duration-formatter'
+], function($, React, PerspectiveCamera, ButtonGroup, AlertActions, AlertStore, DurationFormatter) {
     'use strict';
 
     return React.createClass({
@@ -106,13 +107,22 @@ define([
             );
         },
 
+        _renderTimeAndCost: function(lang){
+            let { slicingStatus, slicingPercentage, hasObject, hasOutOfBoundsObject} = this.props;
+            return slicingStatus && hasObject && !hasOutOfBoundsObject && slicingPercentage ==1 ? (
+                <div className="preview-time-cost">{Math.round(slicingStatus.filament_length*0.03)/10}{lang.print.gram} / {DurationFormatter(slicingStatus.time).split(' ').join('')}</div>
+            ): '';
+        },
+
         render: function() {
             var lang            = this.props.lang,
-                actionButtons   = this._renderActionButtons(lang);
+                actionButtons   = this._renderActionButtons(lang),
+                previewTimeAndCost = this._renderTimeAndCost(lang);
 
             return (
                 <div className='rightPanel'>
                     <div id="cameraViewController" className="cameraViewController"></div>
+                    {previewTimeAndCost}
                     {actionButtons}
                 </div>
             );

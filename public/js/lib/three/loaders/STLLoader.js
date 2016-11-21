@@ -57,6 +57,7 @@ THREE.STLLoader.prototype = {
 				onLoad( scope.parse( text ) );
 			}catch(e){
 				onError("Failed to parse");
+				throw e;
 			}
 		}, onProgress, onError );
 

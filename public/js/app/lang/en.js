@@ -2,6 +2,9 @@ define(function() {
     'use strict';
 
     return {
+        general: {
+            wait: 'Processing, please wait'
+        },
         support: {
             no_webgl: 'WebGL is not supported. Please use other devices.',
             no_vcredist: 'Please install Visual C++ Redistributable 2015',
@@ -110,6 +113,11 @@ define(function() {
                 software_update: 'Software Update',
                 debug: 'Bug Report',
                 forum: 'Community Forum'
+            },
+            account: {
+                label: 'Account',
+                sign_in: 'Sign In',
+                sign_out: 'Sign Out'
             }
         },
         initialize: {
@@ -275,12 +283,72 @@ define(function() {
                 '3': 'path is not cura',
                 '4': 'path is not a exist file, please check engine path in setting section'
             },
-            allow_tracking: 'Would you like to send anonymous usage statistics to FLUX to improve the app?'
+            allow_tracking: 'Would you like to send anonymous usage statistics to FLUX to improve the app?',
+            flux_cloud: {
+                processing: 'Processing...',
+                flux_cloud: 'FLUX CLOUD',
+                back: 'BACK',
+                next: 'NEXT',
+                done: 'DONE',
+                sign_in: 'SIGN IN',
+                sign_up: 'SIGN UP',
+                success: 'SUCCESS',
+                fail: 'FAIL',
+                cancel: 'CANCEL',
+                try_again: 'TRY AGAIN',
+                bind: 'BIND',
+                bind_another: 'BIND ANOTHER',
+                username: 'Username',
+                nickname: 'Nickname',
+                email: 'Email',
+                password: 'Password',
+                re_enter_password: 'Re-Enter Password',
+                forgot_password: 'Forgot your password?',
+                sign_up_statement: 'If you don\'t have a FLUX ID, please <a href="%s">SIGN UP</a> here',
+                try_sign_up_again: 'Please try <a href="%s">SIGN UP</a> again',
+                agreement: 'Agree to the FLUX <a href="#/studio/cloud/privacy">Privacy</a>, <a href="#/studio/cloud/terms">Terms & Conditions</a>',
+                pleaseSignIn: 'Please Sign In with your FLUX ID',
+                enter_email: 'Please fill in your email address',
+                check_inbox: 'Go and check your mail box!',
+                error_blank_username: 'Nickname can\'t be blank',
+                error_blank_email: 'Email cannot be blank',
+                error_email_format: 'Please provide a correct email',
+                error_email_used: 'The email address has been used',
+                error_password_not_match: 'Password does not match the confirm password.',
+                select_to_bind: 'Select a machine to bind',
+                binding_success: 'Binding Success!',
+                binding_success_description: 'You can now use FLUX app to check your machine status',
+                binding_fail: 'Binding Fail',
+                binding_fail_description: 'May due to network error. Try it again',
+                binding: 'Binding...',
+                check_email: 'Please check your email for instruction',
+                email_exists: 'Email exists',
+                not_verified: 'Email has not been verified',
+                user_not_found: 'Incorrect Email or Password',
+                resend_verification: 'Resend verification email',
+                contact_us: 'Please contact FLUX support with your email and issue you encountered',
+                confirm_reset_password: 'Reset your password?',
+                format_error: 'Incorrect credentials',
+                agree_to_terms: 'Please agree to terms',
+                back_to_list: 'Back To List',
+                change_password: 'Change password',
+                current_password: 'Current Password',
+                new_password: 'New Password',
+                confirm_password: 'Confirm Password',
+                empty_password_warning: 'Password cannot be empty',
+                WRONG_OLD_PASSWORD: 'Incorrect Current Password',
+                FORMAT_ERROR: 'Wrong password format',
+                submit: 'SAVE',
+                sign_out: 'Sign out',
+                not_supported_firmware: 'Please upgrade your FLUX Delta firmware\nto v1.5+ for cloud feature',
+                unbind_device: 'Would you like to unbind this device?'
+            }
         },
         print: {
             import: 'IMPORT',
             save: 'Save',
             start_print: 'Print',
+            gram: 'g',
             advanced: {
                 general: 'General',
                 layers: 'Layers',
@@ -847,6 +915,11 @@ define(function() {
                 L: 'Default',
                 A: 'Active',
                 N: 'No'
+            },
+            enableCloud: {
+                title: 'Enable Cloud',
+                A: 'Active',
+                N: 'No'
             }
         },
         monitor: {
@@ -910,6 +983,7 @@ define(function() {
             confirmFileDelete                   : 'Are you sure you want to delete this file?',
             task: {
                 EXTRUDER                        : 'Printing Task',
+                PRINT                           : 'Printing Task',
                 LASER                           : 'Engraving Task',
                 DRAW                            : 'Drawing Task',
                 'N/A'                           : 'Drawing Task'
@@ -1010,6 +1084,7 @@ define(function() {
         },
         head_module: {
             EXTRUDER: 'Print',
+            LASER: 'Laser',
             UNKNOWN: '',
             error: {
                 'missing': 'Error information is missing',
@@ -1041,7 +1116,8 @@ define(function() {
             auto_emerging: 'Please insert filament',
             maintain_head_type_error: 'Toolhead not installed correctly',
             maintain_zombie: 'Please restart the device',
-            toolhead_no_response: '#117 Module no response <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/218347477">More</a>'
+            toolhead_no_response: '#117 Module no response <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/218347477">More</a>',
+            NA: 'Toolhead is not connected'
         },
         input_machine_password: {
             require_password: '"%s" requires a password',

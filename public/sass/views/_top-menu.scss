@@ -31,6 +31,7 @@
         }
 
         .menu {
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
             background: #fff;
             display: none;
             left: 5.05rem;
@@ -39,6 +40,7 @@
             top: 27px;
 
             .arrow-top-left-flat {
+                box-shadow: -1px -1px 5px rgba(0,0,0,0.1);
                 left: 0;
                 position: absolute;
                 top: 0;
@@ -190,13 +192,15 @@
                         }
 
                         .name {
-                            padding: 0 0 0 0.8rem;
-                            width: 12rem;
+                            padding-left: 5px;
+                            width: 150px;
                         }
 
                         .status {
-                            width: 16rem;
+                            width: 130px;
                         }
+
+                        .progress {}
 
                         &:hover {
                             background-color: $primaryColor;

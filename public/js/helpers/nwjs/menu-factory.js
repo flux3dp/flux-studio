@@ -22,7 +22,8 @@ define([
     'helpers/api/touch',
     'helpers/firmware-updater',
     'helpers/device-list',
-    'helpers/api/3d-scan-control'
+    'helpers/api/3d-scan-control',
+    'helpers/api/cloud'
 ], function(
     gui,
     menuMap,
@@ -44,7 +45,8 @@ define([
     touch,
     firmwareUpdater,
     DeviceList,
-    ScanControl
+    ScanControl,
+    CloudApi
 ) {
     'use strict';
 
@@ -163,9 +165,8 @@ define([
         },
         originalMenuMap = JSON.parse(JSON.stringify(menuMap)),
         lang = i18n.get().topmenu,
-        itemMap = [],
         NWjsWindow,
-        mainmenu,
+        topMenu,
         Menu,
         MenuItem,
         methods,
@@ -173,12 +174,16 @@ define([
         createDevice,
         createDeviceList,
         doDiscover,
-        discoverMethods;
+        discoverMethods,
+        accountDisplayName,
+        timer,
+        subMenuCache = {},
+        subMenuIndex = {},
+        submenuId = 0;
 
     MenuItem = gui.MenuItem;
     NWjsWindow = gui.Window.get();
     Menu = gui.Menu;
-    mainmenu = new Menu({ type: 'menubar', title: 'FLUX Studio', label: 'FLUX Studio' });
 
     methods = {
         createMenu: function() {
@@ -186,7 +191,7 @@ define([
         },
 
         createSubMenu: function(items) {
-            var subMenu = this.createMenu(),
+            var subMenu = this.createMenu({id: ++submenuId}),
                 menuItem,
                 menuOption;
 
@@ -235,45 +240,84 @@ define([
             return subMenu;
         },
 
-        appendToMenu: function(label, subMenu) {
-            var item = new MenuItem({ label: label, submenu: subMenu });
-            itemMap.push(item);
-            mainmenu.append(item);
-        },
-
-        getMenu: function() {
-            return mainmenu;
-        },
-
-        clear: function() {
-            mainmenu = new Menu({ type: 'menubar', title: 'FLUX Studio', label: 'FLUX Studio' });
-        },
-
         refresh: function() {
+            if(!window.FLUX.isNW) return;
             menuMap.all = menuMap.refresh();
             initialize(menuMap.all);
         },
 
         updateMenu: function(menu, parentIndex) {
-            var menuItem = mainmenu.items[parentIndex],
+            var menuItem = topMenu.items[parentIndex],
                 subMenu = methods.createSubMenu(menu.subItems);
 
-            menuItem.submenu = subMenu;
+            menuItem.subMenu = subMenu;
+        },
+
+        updateAccountDisplay: function(name) {
+            accountDisplayName = name;
+            methods.refresh();
         }
 
     };
 
     function initialize(menuMap) {
-        var subMenu;
+        if(!window.FLUX.isNW) { return; }
+        topMenu = topMenu ? NWjsWindow.menu : new Menu({ type: 'menubar', title: 'FLUX Studio', label: 'FLUX Studio' });
+        let initialLength = topMenu.items.length;
+        let updateMenu = topMenu.items.length === 0;
 
-        methods.clear();
+        updateAccountMenu(menuMap);
+        menuMap.map((menu, i) => {
+            if(!subMenuCache[i] || JSON.stringify(menu.subItems) !== subMenuCache[i].json) {
+                let subMenu = methods.createSubMenu(menu.subItems);
+                let menuItem = new MenuItem({ label: menu.label, submenu: subMenu });
 
-        menuMap.forEach(function(menu) {
-            subMenu = methods.createSubMenu(menu.subItems);
-            methods.appendToMenu(menu.label, subMenu);
+                if(subMenuCache[i]) {
+                    topMenu.removeAt(i);
+                    topMenu.insert(menuItem, i);
+                } else {
+                    topMenu.append(menuItem);
+                    updateMenu = true;
+                }
+                subMenuCache[i] = { id: menuItem.id, json: JSON.stringify(menu.subItems) };
+            } else {
+                // No change no update
+            }
         });
 
-        NWjsWindow.menu = mainmenu;
+        while(topMenu.items.length > menuMap.length) {
+            let i = topMenu.items.length - 1;
+            subMenuCache[i] = null;
+            topMenu.removeAt(i);
+            updateMenu = true;
+        };
+
+        if (updateMenu) {
+            NWjsWindow.menu = topMenu;
+        }
+    }
+
+    function updateAccountMenu(menuMap) {
+        if(!menuMap) { return; }
+        let accountMenu = menuMap.filter(v => v.label === lang.account.label)[0];
+        if(!accountMenu) { return; }
+        if(accountDisplayName === '' || typeof accountDisplayName === 'undefined') {
+            accountMenu.subItems.splice(1,2);
+        } else {
+            accountMenu.subItems[0].label = accountDisplayName || lang.account.sign_in;
+        }
+
+        if(accountMenu.subItems.length >= 3) {
+            // clicked on sign out
+            accountMenu.subItems[2].onClick = () => {
+                methods.updateAccountDisplay('');
+                CloudApi.signOut();
+                setTimeout(() => {
+                    location.hash = '#studio/cloud/sign-in';
+                }, 1000);
+            };
+        }
+        return menuMap;
     }
 
     if (true === window.FLUX.isNW) {
@@ -393,7 +437,7 @@ define([
                     DeviceMaster.selectDevice(currentPrinter).then((status) => {
                         if (status === DeviceConstants.CONNECTED) {
                             checkDeviceStatus(currentPrinter).then(() => {
-                            ProgressActions.open(ProgressConstants.WAITING, lang.device.calibrating, lang.device.pleaseWait, false);
+                                ProgressActions.open(ProgressConstants.WAITING, lang.device.calibrating, lang.device.pleaseWait, false);
                                 DeviceMaster.calibrate().done((debug_message) => {
                                     setTimeout(() => {
                                         AlertActions.showPopupInfo('calibrated', JSON.stringify(debug_message), lang.calibration.calibrated);
@@ -403,7 +447,8 @@ define([
                                         AlertActions.showPopupError('calibrate-fail', lang.calibration.extruderOnly);
                                     }
                                     else {
-                                        AlertActions.showPopupError('calibrate-fail', error.error.join(' '));
+                                        let message = lang.monitor[error.error.join('_')];
+                                        AlertActions.showPopupError('calibrate-fail', message || error.error.join(' '));
                                     }
                                 }).always(() => {
                                     ProgressActions.close();
@@ -426,7 +471,6 @@ define([
                         onClick: function() {
                             var currentPrinter = discoverMethods.getLatestPrinter(printer);
                             DeviceMaster.selectDevice(currentPrinter).then((status) => {
-                                console.log("selected device");
                                 if (status === DeviceConstants.CONNECTED) {
                                     checkDeviceStatus(currentPrinter).then(() => {
                                         ProgressActions.open(ProgressConstants.NONSTOP);
@@ -466,11 +510,11 @@ define([
                                                 onReady: () => {
                                                     ProgressActions.close();
                                                     scan_control.turnLaser(true).then(() => {
-                                                        AlertActions.showPopupCustom('scan-laser-turned-on', lang.device.scan_laser_complete, lang.device.finish, "");
+                                                        AlertActions.showPopupCustom('scan-laser-turned-on', lang.device.scan_laser_complete, lang.device.finish, '');
                                                         var _handleFinish = (dialog_name) => {
                                                             scan_control.turnLaser(false).then(() => {
                                                                 scan_control.quit();
-                                                            })
+                                                            });
                                                             AlertStore.removeCustomListener(_handleFinish);
                                                         };
                                                         AlertStore.onCustom(_handleFinish);

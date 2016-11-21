@@ -1,0 +1,395 @@
+.settings-cloud {
+    background-color: #F5F5F5;
+}
+
+.cloud {
+    $bodyDark: #777;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    margin: auto;
+    position: absolute;
+    width: 800px;
+    height: 600px;
+    background-color: #FFF;
+    box-shadow: 0px 5px 8px 0px rgba(50%,50%,50%,0.3);
+    text-align: center;
+
+    a {
+        color: #00A0E9;
+    }
+
+    .controls{
+        .label {
+            color: $bodyDark;
+        }
+    }
+
+    .container {
+        height: 400px;
+
+        .icon {
+            margin-top: 60px;
+        }
+
+        .title {
+            color: #777777;
+            margin-top: 80px;
+            margin-bottom: 40px;
+
+            h2 {
+                font-size: 30px;
+                font-weight: 500;
+                margin-top: 0px;
+            }
+
+            h3 {
+                font-size: 30px;
+                font-weight: 300;
+                margin-bottom: 5px;
+            }
+        }
+
+        .no-margin {
+            margin: 0px;
+        }
+
+        .row {
+            padding-bottom: 20px;
+
+            .controls {
+                display: inline-block;
+                padding: 0 15px;
+
+                .label {
+                    text-align: left;
+                    margin-left: 10px;
+                    line-height: 20px;
+                }
+            }
+        }
+
+        .description {
+            margin-top: 60px;
+            margin-bottom: 20px;
+
+            h3 {
+                letter-spacing: 1px;
+            }
+        }
+
+        .change-password-link {
+            padding-top: 5px;
+            a {
+                color: #aaa;
+                text-decoration: none;
+                font-size: 12px;
+            }
+        }
+    }
+
+    .footer {
+        hr {
+            border-top: 2px solid $bodyDark;
+            border-bottom: 0;
+            width: 80%;
+        }
+        .btn {
+            width: 130px;
+        }
+
+        .actions {
+            margin-top: 15px;
+            .btn-cancel {
+                transition: none;
+                background-color: #FFF;
+                color: $bodyDark;
+                border: $bodyDark 2px solid;
+                &:hover {
+                    color: #000;
+                    border: 2px solid #000;
+                }
+            }
+            .btn-default {
+                transition: none;
+                background-color: $bodyDark;
+                color: #FFF;
+                border: $bodyDark 2px solid;
+                &:hover {
+                    background-color: #000;
+                    border: 2px solid #000;
+                }
+            }
+        }
+    }
+
+    .middle {
+        position: relative;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    h3 {
+        color: #777777;
+        font-weight: 300;
+    }
+
+    label {
+        color: $bodyDark;
+    }
+
+    .pointer {
+        cursor: pointer;
+    }
+
+    .controls {
+        color: $bodyDark;
+        font-size: 14px;
+
+        input[type="text"],input[type="password"] {
+            width: 300px;
+            height: 40px;
+            border: 2px solid $bodyDark;
+            margin: 3px 10px;
+            font-size: 16px;
+            font-weight: 400;
+            color: $bodyDark;
+            box-shadow: 0 0 3px rgba(0,0,0,0.05);
+        }
+        input[type="checkbox"] {
+            width: 20px;
+            height: 40px;
+            vertical-align: middle;
+        }
+        select {
+            /* width: 500px;
+            height: 250px;
+            background-image: none;
+            padding: 0;
+            margin: 0;
+
+            option {
+                font-family: 'Courier New';
+                font-weight: 500;
+                padding: 5px;
+                background: #FFF;
+            } */
+        }
+        a {
+            font-size: 16px;
+        }
+
+        .select {
+            border: 2px $bodyDark solid;
+            text-align: center;
+            margin: 0 100px;
+            height: 230px;
+            overflow-y: scroll;
+            overflow-x: hidden;
+
+            .device {
+                text-align: left;
+                font-size: 16px;
+                padding: 10px;
+                cursor: pointer;
+
+                div {
+                    display: inline-block;
+                }
+
+                .name {
+                    width: 250px;
+                }
+            }
+
+            .selected {
+                background-color: $bodyDark;
+                color: #FFF;
+            }
+        }
+
+        .forget-password {
+            padding-top: 15px;
+        }
+
+        .error {
+            border: none;
+            text-align: left;
+            margin-left: 10px;
+            color: #e74c3c;
+            position: absolute;
+        }
+    }
+
+    .forgot-password {
+        input[type="text"] {
+            width: 400px;
+        }
+    }
+
+    .sign-up-description {
+        margin-top: 50px;
+        color: $bodyDark;
+
+        a {
+            font-size: 16px;
+        }
+    }
+
+    .bind-machine {
+        &.container {
+            height: 400px;
+        }
+        .user-info {
+            margin-top: 20px;
+            .name {
+                font-weight: bold;
+                margin: 5px;
+            }
+        }
+    }
+
+
+    .binding-window {
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        margin: auto;
+        position: absolute;
+        width: 400px;
+        height: 300px;
+        background-color: #FFF;
+        box-shadow: 0px 0px 12px 0px rgba(50%,50%,50%,0.8);
+        text-align: center;
+        z-index: 9999;
+
+        h1 {
+            font-weight: 400;
+            color: $bodyDark;
+        }
+
+        .footer {
+            bottom: 30px;
+            position: absolute;
+            width: 100%;
+
+            a {
+                font-size: 18px;
+                color: $bodyDark;
+            }
+        }
+
+        .spinner-roller {
+            background: linear-gradient(to right, #DEDEDC 10%, rgba(255, 255, 255, 0) 42%);
+            height: 5rem;
+            width: 5rem;
+            position: absolute;
+            margin: auto;
+
+            &::after {
+                background: #fff;
+            }
+        }
+    }
+
+    .blind
+    {
+       /* position element so the z-index can be set */
+       position:absolute;
+       /* set z-index so the blind will cover all page content */
+       /* z-index:9999; */
+       /* set the top, left, width and height so the blind covers the browser window */
+       top:0;
+       left:0;
+       width:100%;
+       height:100%;
+       opacity: 0;
+       background-color:#000000;
+    }
+
+    .bind-success {
+        button.btn {
+            width: 150px;
+        }
+        .container {
+            margin-bottom: -60px;
+            .title {
+                margin-top: 140px;
+            }
+        }
+    }
+
+    .error-container {
+        margin-top: 20px;
+    }
+
+    .processing-error {
+        margin-top: 40px;
+        border: 0;
+
+        label {
+            color: #e74c3c;
+        }
+
+        a {
+            font-size: 16px;
+        }
+    }
+
+    .hide {
+        display: none;
+    }
+
+    .processing {
+        margin-top: -20px;
+        min-height: 20px;
+        label {
+            color: #777;
+        }
+    }
+
+    .linked {
+        float: right;
+        width: 32px;
+        height: 13px;
+        margin-top: 5px;
+        background-image: url('/img/connect-icon.svg');
+        background-repeat: no-repeat;
+    }
+
+    .change-password.container {
+
+        .title {
+            margin-top: 80px;
+        }
+
+        .error {
+            margin-left: 10px;
+        }
+
+    }
+
+    .change-password.footer {
+        width: 100%;
+
+        .btn {
+            width: 180px;
+        }
+
+        span {
+            border: 0;
+            color: #e74c3c;
+        }
+    }
+
+    .terms, .privacy {
+        .container {
+            overflow: auto;
+            padding: 0 20px;
+            text-align: left;
+            height: 500px;
+        }
+    }
+}

@@ -30,7 +30,8 @@ define([
     'app/default-print-settings',
     'app/actions/input-lightbox-actions',
     'app/constants/input-lightbox-constants',
-    'helpers/local-storage'
+    'helpers/local-storage',
+    'helpers/api/cloud'
 ], function(
     $,
     React,
@@ -63,7 +64,8 @@ define([
     DefaultPrintSettings,
     InputLightboxActions,
     InputLightboxConstants,
-    LocalStorage
+    LocalStorage,
+    CloudApi
 ) {
 
     return function(args) {
@@ -200,8 +202,22 @@ define([
                         camera                      : {},
                         rotation                    : {},
                         scale                       : _scale,
-                        printerControllerStatus     : ''
+                        printerControllerStatus     : '',
+                        me                          : {}
                     });
+                },
+
+                componentWillMount: function() {
+                    CloudApi.getMe().then(response => {
+                        if(response.ok) {
+                            return response.json();
+                        }
+                    }).then(content => {
+                        let { nickname, email } = content || {};
+                        let displayName = (nickname || email || '');
+                        menuFactory.methods.updateAccountDisplay(displayName);
+                        menuFactory.methods.refresh();
+                    });;
                 },
 
                 componentDidMount: function() {
@@ -232,6 +248,7 @@ define([
                             LocalStorage.clearAllExceptIP();
                         }
                     };
+
                     menuFactory.methods.refresh();
 
                     this._registerKeyEvents();
@@ -248,6 +265,7 @@ define([
                     listeningToCancel = true;
                     GlobalStore.onCancelPreview(this._handleCancelPreview);
                     GlobalStore.onMonitorClosed(this._handleMonitorClosed);
+                    GlobalStore.onSliceComplete(this._handleSliceReport);
                 },
 
                 componentWillUnmount: function() {
@@ -261,6 +279,7 @@ define([
                     AlertStore.removeCancelListener(this._handleDefaultCancel);
                     GlobalStore.removeCancelPreviewListener(this._handleCancelPreview);
                     GlobalStore.removeMonitorClosedListener(this._handleMonitorClosed);
+                    GlobalStore.removeSliceCompleteListener(this._handleSliceReport);
                 },
 
                 _registerKeyEvents: function() {
@@ -322,6 +341,7 @@ define([
                     nwjsMenu.saveTask.enabled = false;
                     nwjsMenu.saveScene.enabled = false;
                     nwjsMenu.clear.enabled = false;
+
                     menuFactory.methods.refresh();
                 },
 
@@ -748,6 +768,10 @@ define([
                     }.bind(this), 10);
                 },
 
+                _handleSliceReport: function(data) {
+                    this.setState({ slicingStatus: data.report });
+                },
+
                 _handleCancelPreview: function() {
                     director.cancelPreview();
                 },
@@ -875,6 +899,8 @@ define([
                     return (
                         <RightPanel
                             lang                    = {lang}
+                            slicingPercentage       = {this.state.slicingPercentage}
+                            slicingStatus           = {this.state.slicingStatus}
                             camera                  = {this.state.camera}
                             updateCamera            = {this.state.updateCamera}
                             hasObject               = {this.state.hasObject}
@@ -925,7 +951,8 @@ define([
                 },
 
                 _renderPercentageBar: function() {
-                    if(this.state.slicingPercentage === 1) {
+                    let { slicingPercentage } = this.state;
+                    if(slicingPercentage === 1 || slicingPercentage === 0) {
                         return '';
                     }
                     var computed_style = {
@@ -945,6 +972,7 @@ define([
                         nwjsMenu.saveTask.enabled = this.state.hasObject;
                         nwjsMenu.saveScene.enabled = this.state.hasObject;
                         nwjsMenu.clear.enabled = this.state.hasObject;
+                        nwjsMenu.signIn = { label: this.state.nickname, enabled: true, parent: 5}
                         menuFactory.methods.refresh();
                     }
                 },
@@ -970,7 +998,7 @@ define([
                         printerSelectorWindow   = this.state.openPrinterSelectorWindow ? this._renderPrinterSelectorWindow() : '',
                         waitWindow              = this.state.openWaitWindow ? this._renderWaitWindow() : '',
                         progressWindow          = this.state.progressMessage ? this._renderProgressWindow() : '',
-                        percentageBar           = (!this.state.openImportWindow) ? this._renderPercentageBar() : '',
+                        percentageBar           = this._renderPercentageBar(),
                         tourGuideSection        = this.state.tutorialOn ? this._renderTourGuide() : '';
 
                     this._renderNwjsMenu();

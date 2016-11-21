@@ -1,3 +1,73 @@
+# FLUX Studio 0.5.0 Change Log
+
+### New Features
+
+- FLUX Cloud - create an account, bind devices and control your Delta through FLUX App
+
+### Changes
+
+- Added time and filament cost information
+- Device list, dashboard, preferences style adjustment
+- Display behavior of dashboard middle button
+- Actively send discovering packets to devices in local network
+
+### Bug Fixes
+
+- Fixed device list displaying wrong progress status
+- Fixed unable to turn off camera
+- Fixed double slicing command fired when imported a file
+- Fixed SVG close-path processing issue
+
+### Other Improvements
+
+- Updated IP format pattern
+- Disable unnecessary menu re-rendering
+
+# FLUX Studio 0.4.3 Change log
+
+### New Features
+- added expert parameter "support_everywhere" for Cura Engine
+
+### Bug Fixes
+- Cura minimalLayerTime unit
+
+# FLUX Studio 0.4.2 Change log
+
+### New Feature
+
+- Device settings are now available. User can now enable / disable functions such as
+  - Calibration
+  - Filament detection
+  - Toolhead error detection
+  - Smart task continuation due to error (#114 - bad connection)
+  - UPnP broadcast
+- Display current slicing status on bottom left
+- Added first layer temperature settings
+- Auto pause at Nth layer (beta)
+- Load selected image as engraving interface background
+
+### Changes
+
+- User can disable UI/UX improvement tracking through GA
+- FS monitor can quit from maintaining mode
+- Display calibration data at end of calibration process
+
+### Bug Fixes
+
+- Unable to export scene when model is duplicated through ctrl (cmd) + D
+- Not displaying correct SSID name at the end of wifi setup
+- Fixed broken tutorial step at loading filament
+- Unable to export scene from menu
+- Fixed wrong extension when exporting from pen drawing function
+- Other minor fixes
+
+### Other Improvements
+
+- Threejs upgraded from version r71 to r80
+- Improve file loading speed
+- Calibration before checking head (only extruder is allowed)
+
+
 # FLUX Studio 0.4.1 Change log
 
 ### New Feature

@@ -9,7 +9,8 @@ define([
     'html2canvas',
     'plugins/file-saver/file-saver.min',
     'helpers/output-error',
-    'helpers/check-software-update'
+    'helpers/check-software-update',
+    'helpers/api/cloud'
 ], function(
     $,
     gui,
@@ -18,7 +19,8 @@ define([
     html2canvas,
     fileSaver,
     outputError,
-    checkSoftwareUpdate
+    checkSoftwareUpdate,
+    CloudApi
 ) {
     'use strict';
 
@@ -31,6 +33,7 @@ define([
         },
         lang = i18n.get().topmenu,
         menuMap = [],
+        staticMenuMap = [],
         menuIndexOffset = ('osx' === window.FLUX.osType ? 0 : 1),
         parentIndex = {
             ABOUT  : 0 - menuIndexOffset,
@@ -38,7 +41,8 @@ define([
             EDIT   : 2 - menuIndexOffset,
             DEVICE : 3 - menuIndexOffset,
             WINDOW : 4 - menuIndexOffset,
-            HELP   : 5 - menuIndexOffset
+            ACCOUNT: 5 - menuIndexOffset,
+            HELP   : 6 - menuIndexOffset
         },
         newDevice = {
             label: lang.device.new,
@@ -186,6 +190,7 @@ define([
         subItems;
 
     function bindMap() {
+       // if (staticMenuMap.length > 3) return staticMenuMap;
         menuMap = [];
 
         if (1 !== menuIndexOffset) {
@@ -195,7 +200,7 @@ define([
             });
         }
 
-        if (true === initializeMachine.hasBeenCompleted()) {
+        if (initializeMachine.hasBeenCompleted()) {
             subItems = [
                 items.import,
                 separator,
@@ -246,7 +251,37 @@ define([
                         }
                     }
                 ]
+            },
+            {
+                label: lang.account.label,
+                subItems: [
+                    {
+                        label: lang.account.sign_in,
+                        enabled: true,
+                        onClick: function() {
+                            location.hash = '#studio/cloud';
+                        }
+                    },
+                    separator,
+                    {
+                        label: lang.account.sign_out,
+                        enabled: true,
+                        onClick: function() {
+                            CloudApi.signOut();
+                            setTimeout(() => {
+                                location.hash = '#studio/cloud/sign-in';
+                            }, 1000);
+                        }
+                    }
+                ]
             });
+        } else {
+            if (1 === menuIndexOffset) {
+                menuMap.push({
+                    label: lang.file.label,
+                    subItems: aboutSubItems
+                });
+            }
         }
 
         menuMap.push({
@@ -310,6 +345,8 @@ define([
                 }
             ]
         });
+
+        staticMenuMap = menuMap;
 
         return menuMap;
     }

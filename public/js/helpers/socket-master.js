@@ -13,7 +13,6 @@ define([
     };
 
     const addTask = (command, ...args) => {
-        // console.log('add task', command, ...args);
         let d = $.Deferred();
         _tasks.push({d, command, args});
 
@@ -26,7 +25,6 @@ define([
 
     const doTask = () => {
         _task = _tasks.shift();
-        // console.log('doing task', _task);
 
         _ws[_task.command](..._task.args).then((result) => {
             _task.d.resolve(result);
@@ -40,7 +38,6 @@ define([
     };
 
     const doNext = () => {
-        // console.log('task count: ' + _tasks.length);
         _tasks.length > 0 ? doTask() : _task = null;
     };
 

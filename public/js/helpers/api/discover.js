@@ -8,9 +8,9 @@ define([
     'helpers/api/config',
     'helpers/device-list',
     'helpers/logger',
-    // no return
+    'helpers/smart-upnp',
     'helpers/array-findindex'
-], function(Websocket, initializeMachine, config, DeviceList, Logger) {
+], function(Websocket, initializeMachine, config, DeviceList, Logger, SmartUpnp, ArrayFinxIndex) {
     'use strict';
 
     var ws = ws || new Websocket({
@@ -34,6 +34,7 @@ define([
         onMessage = function(device) {
             if (device.alive) {
                 _devices[device.uuid] = device;
+                //SmartUpnp.addSolidIP(device.ip);
             }
             else {
                 if(typeof _devices[device.uuid] === 'undefined') {
@@ -53,23 +54,21 @@ define([
                 sendFoundPrinter();
             }, BUFFER);
         },
+        poke = function(targetIP){
+            ws.send(JSON.stringify({ 'cmd' : 'poke', 'ipaddr': targetIP }))
+        },
         BUFFER = 100,
-        pokeIP = config().read('poke-ip-addr'),
+        pokeIPs = config().read('poke-ip-addr').split(';'),
         timer;
 
-    if ('' === pokeIP) {
+    if ('' === pokeIPs[0]) {
         config().write('poke-ip-addr', '192.168.1.1');
+        pokeIPs = ['192.168.1.1'];
     }
 
     ws.onMessage(onMessage);
 
-    setInterval(function() {
-        if ('string' === typeof pokeIP && '' !== pokeIP) {
-            ws.send(JSON.stringify({ 'cmd' : 'poke', 'ipaddr': pokeIP }));
-        }
-    }, 3000);
-
-    return function(id, getPrinters) {
+    var self = function(id, getPrinters) {
         getPrinters = getPrinters || function() {};
 
         var index = idList.indexOf(id);
@@ -97,6 +96,12 @@ define([
 
         return {
             connection: ws,
+            poke: poke,
+            countDevices: function(){
+                let count = 0;
+                for(var i in _devices) count++;
+                return count;
+            },
             removeListener: function(_id) {
                 var _index = idList.indexOf(_id);
 
@@ -111,4 +116,11 @@ define([
             }
         };
     };
+
+    SmartUpnp.init(self());
+    for(var i in pokeIPs){
+        SmartUpnp.startPoke(pokeIPs[i]);
+    }
+
+    return self;
 });

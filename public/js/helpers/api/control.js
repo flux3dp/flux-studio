@@ -392,9 +392,10 @@ define([
                     if(response.log){
                         if(temp.operation_info){
                             if(typeof temp.operation_info.pos !== 'undefined'){
-                                response.log += " POS " + temp.operation_info.pos;
-                            }else{
-                                response.log += " Z"
+                                response.log += ' POS ' + temp.operation_info.pos;
+                            }
+                            else{
+                                response.log += ' Z';
                             }
                         }
                         temp.debug.push(response.log);
@@ -406,11 +407,16 @@ define([
                         if(errorCount === 0 && response.error[0] === 'HEAD_ERROR') {
                             setTimeout(() => {
                                 errorCount++;
-                                if(clean === true)
+                                if(clean === true) {
                                     ws.send('maintain calibrating clean');
-                                else
+                                }
+                                else {
                                     ws.send('maintain calibrating');
+                                }
                             }, 500);
+                        }
+                        else {
+                            d.reject(response);
                         }
                     }
                     else {
@@ -437,6 +443,14 @@ define([
 
             deleteDeviceSetting: (name) => {
                 return useDefaultResponse(`config del ${name}`);
+            },
+
+            getCloudValidationCode: () => {
+                return useDefaultResponse('cloud_validate_code');
+            },
+
+            enableCloud: () => {
+                return useDefaultResponse('config set enable_cloud A');
             },
 
             /**

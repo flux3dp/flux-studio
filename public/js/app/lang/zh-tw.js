@@ -2,6 +2,9 @@ define(function() {
     'use strict';
 
     return {
+        general: {
+            wait: '處理中，請稍待'
+        },
         support: {
             no_webgl: '您的系統不支援 WebGL，建議您使用其他電腦開啟 FLUX Studio',
             no_vcredist: 'Please install Visual C++ Redistributable 2015',
@@ -110,6 +113,11 @@ define(function() {
                 software_update: '軟體更新',
                 debug: '錯誤回報',
                 forum: '社群論壇'
+            },
+            account: {
+                label: '帳號',
+                sign_in: '登入',
+                sign_out: '登出'
             }
         },
         initialize: {
@@ -120,8 +128,8 @@ define(function() {
             cancel: '取消',
             confirm: '確認',
             connect: '連接',
-            back: 'Back',
-            retry: 'RETRY',
+            back: '返回',
+            retry: '重試',
             no_machine : '目前沒有機器，跳過此步驟',
 
             // specific caption/content
@@ -183,7 +191,7 @@ define(function() {
                 breathing_desc: '無線網路設定失敗，請嘗試重新設定',
                 successfully: '如果 FLUX Delta 連線成功',
                 successfully_statement: '請將無線網路連線至(%s)，並且重新啟動 FLUX Studio',
-                restart: 'Restart FLUX Studio'
+                restart: '重啟 FLUX Studio'
             },
 
             // errors
@@ -274,17 +282,6 @@ define(function() {
                 confirm_password: '確認密碼',
                 save_password: '儲存變更'
             },
-            flux_cloud: {
-                caption: 'Get FLUX 3D Printer be remote!',
-                line1: 'Control your FLUX 3D Printer with FLUX Cloud in anywhere you are',
-                start_to_use: 'Start to Use',
-                i_have_an_account: 'I have an account',
-                email: '電子信箱',
-                password: '密碼',
-                change_password: '變更密碼',
-                connected_printer: '已連接成型機',
-                connect: '連接'
-            },
             cancel: '取消',
             done: '完成',
             connect_printer: {
@@ -293,18 +290,78 @@ define(function() {
             notification_on: '開啟',
             notification_off: '關閉',
             engine_change_fail: {
-                'caption': 'unable to change engine ',
-                '1': 'error during checking',
-                '2': 'cura version error',
-                '3': 'path is not cura',
+                'caption': '無法變更切片引擎',
+                '1': '檢查時發生錯誤',
+                '2': 'cura 版本錯誤',
+                '3': '路徑不是 Cura',
                 '4': 'path is not a exist file, please check engine path in setting section'
             },
-            allow_tracking: '您是否願意自動傳送匿名用量資料，協助 FLUX 改進產品和服務？'
+            allow_tracking: '您是否願意自動傳送匿名用量資料，協助 FLUX 改進產品和服務？',
+            flux_cloud: {
+                processing: '處理中...',
+                flux_cloud: 'FLUX CLOUD',
+                back: '返回',
+                next: '下一步',
+                done: '結束',
+                sign_in: '登入',
+                sign_up: '註冊',
+                success: '成功',
+                fail: '失敗',
+                cancel: '取消',
+                try_again: '再試一次',
+                bind: '綁定',
+                bind_another: '綁定另一部機器',
+                username: '使用者名稱',
+                nickname: '使用者別名',
+                email: '電子信箱',
+                password: '密碼',
+                re_enter_password: '重新輸入密碼',
+                forgot_password: '忘記密碼?',
+                sign_up_statement: '如果尚未持有FLUX ID，可以<a href="%s">按此註冊</a>',
+                try_sign_up_again: '請重新<a href="%s">註冊</a>',
+                agreement: '同意 FLUX-Cloud <a href="#/studio/cloud/privacy">隱私權政策</a>, <a href="#/studio/cloud/terms">使用條款</a>',
+                pleaseSignIn: '請使用 FLUX ID 登入',
+                enter_email: '請輸入您的電子信箱',
+                check_inbox: '請至您的電子信箱確認!',
+                error_blank_username: '請輸入使用者別名',
+                error_blank_email: '請輸入電子信箱',
+                error_email_format: '請輸入正確的電子信箱',
+                error_email_used: '此電子信箱已被使用',
+                error_password_not_match: '確認密碼與密碼不相同',
+                select_to_bind: '請選擇欲綁定的機器',
+                binding_success: '綁定成功!',
+                binding_success_description: '您可以開始使用 FLUX App 來監控機器',
+                binding_fail: '綁定失敗',
+                binding_fail_description: '網路可能有問題，請再試一次',
+                binding: '綁定中...',
+                check_email: '相關信進已寄出到您的電子信箱，請確認',
+                email_exists: '電子信箱已被使用',
+                not_verified: '請於您的電子信箱開啟確認信件',
+                user_not_found: '登入訊息錯誤',
+                resend_verification: '重新寄送確認信件',
+                contact_us: '請與 FLUX 客服聯絡',
+                confirm_reset_password: '需要重新設定密碼嗎？',
+                format_error: '登入失敗，請重新登入',
+                agree_to_terms: '請同意使用者條款',
+                back_to_list: '回機器列表',
+                change_password: '密碼變更',
+                current_password: '目前登入密碼',
+                new_password: '新密碼',
+                confirm_password: '確認新密碼',
+                empty_password_warning: '密碼不可為空白',
+                WRONG_OLD_PASSWORD: '舊密碼錯誤',
+                FORMAT_ERROR: '密碼格式錯誤',
+                submit: '儲存',
+                sign_out: '登出',
+                not_supported_firmware: '支援 FLUX cloud 需要 FLUX Delta 韌體 v1.5＋',
+                unbind_device: '確認要不再綁定此機器?'
+            }
         },
         print: {
             import: '匯入',
             save: '儲存⋯',
-            support_view: 'Support Preview',
+            gram: '克',
+            support_view: '支援預覽',
             start_print: '列印',
             advanced: {
                 general: '一般',
@@ -381,12 +438,12 @@ define(function() {
             mode: [
                 {
                     value: 'beginner',
-                    label: 'Beginner',
+                    label: '入門',
                     checked: true
                 },
                 {
                     value: 'expert',
-                    label: 'Expert'
+                    label: '專家'
                 }
             ],
             params: {
@@ -872,6 +929,11 @@ define(function() {
                 L: '預設',
                 A: '密集',
                 N: '關閉'
+            },
+            enableCloud: {
+                title: '雲端操作',
+                A: '開啟',
+                N: '關閉'
             }
         },
         monitor: {
@@ -935,6 +997,7 @@ define(function() {
             confirmFileDelete                   : '是否確定要刪除這個檔案？',
             task: {
                 EXTRUDER                        : '列印工作',
+                PRINT                           : '列印工作',
                 LASER                           : '雕刻工作',
                 DRAW                            : '繪製工作',
                 'N/A'                           : '繪製工作'
@@ -1034,12 +1097,13 @@ define(function() {
             UNKNOWN: '-'
         },
         head_module: {
-            EXTRUDER: 'Print',
+            EXTRUDER: '列印',
+            LASER: '雷射',
             UNKNOWN: '',
             error: {
                 'missing': '錯誤訊息不足',
-                '0': 'Unknown module',
-                '1': 'Sensor communication failure',
+                '0': '未知模組工具頭',
+                '1': '偵測感應器無法連線',
                 '2': 'No hello', // pi will send head_error_reset before this is issued
                 '3': '#112 工具頭校正失誤\n請重新裝載工具頭，並確認磁鐵關節的附著',
                 '4': '#162 偵測到工具頭傾斜\n請確認球型關節正確附著以繼續',

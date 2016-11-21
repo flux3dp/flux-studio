@@ -35,7 +35,7 @@ function(React, $, Backbone, display, config, appSettings, detectWebgl) {
                     ],
                     // go to studio
                     [
-                        /^studio\/?(print|laser|scan|usb|settings|draw)\/?(.*)?/,
+                        /^studio\/?(print|laser|scan|usb|settings|draw|cloud)\/?(.*)?/,
                         'studio',
                         this.studio
                     ],
@@ -125,7 +125,8 @@ function(React, $, Backbone, display, config, appSettings, detectWebgl) {
                     'draw': this.laser.bind(null, page),
                     'scan': this.scan,
                     'usb': this.usb,
-                    'device': this.device
+                    'device': this.device,
+                    'cloud': this.cloud
                 },
                 func = this.print;
 
@@ -186,6 +187,19 @@ function(React, $, Backbone, display, config, appSettings, detectWebgl) {
                         page: page
                     }
                 };
+                _display(view, args);
+            });
+        },
+
+        cloud: function(child, requests) {
+            requirejs(['jsx!pages/Cloud', 'app/app-settings'], function(view) {
+                child = (child || 'general').toLowerCase();
+
+                var args = {
+                    child: child,
+                    requests: requests
+                };
+
                 _display(view, args);
             });
         },
