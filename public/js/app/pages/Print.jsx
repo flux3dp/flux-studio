@@ -232,21 +232,28 @@ define([
                     this._prepareMenu();
                     nwjsMenu.import.enabled = true;
                     nwjsMenu.import.onClick = () => { $importBtn.click(); };
-                    nwjsMenu.undo.onClick = () => { director.undo(); };
+                    nwjsMenu.undo.onClick = () => { console.log('undo'); director.undo(); };
+                    nwjsMenu.tutorial.onClick = () => { console.log('undo'); director.undo(); };
                     nwjsMenu.duplicate.onClick = () => { director.duplicateSelected(); };
                     nwjsMenu.saveTask.onClick = this._handleDownloadFCode;
                     nwjsMenu.saveScene.onClick = this._handleDownloadScene;
                     nwjsMenu.clear.onClick = this._handleClearScene;
-                    nwjsMenu.tutorial.onClick = () => {
-                        this.setState({ currentTutorialStep: 0 }, () => {
-                            this._handleYes('tour');
-                        });
-                    };
                     nwjsMenu.clearLocalstorage.enabled = true;
                     nwjsMenu.clearLocalstorage.onClick = () => {
                         if(confirm(lang.topmenu.file.confirmReset)) {
                             LocalStorage.clearAllExceptIP();
                         }
+                    };
+
+                    // to catch the tutorial click from menuMap
+                    // this mod is implemented after menu-map refactored, using cache to reduce refresh, boot performance
+                    if(!window.customEvent) {
+                        window.customEvent = {};
+                    }
+                    window.customEvent.onTutorialClick = () => {
+                        this.setState({ currentTutorialStep: 0 }, () => {
+                            this._handleYes('tour');
+                        });
                     };
 
                     menuFactory.methods.refresh();
@@ -335,6 +342,7 @@ define([
                     nwjsMenu.clear.onClick = this._handleClearScene;
                     nwjsMenu.tutorial.enabled = true;
                     nwjsMenu.tutorial.onClick = () => {
+                        console.log('tour on');
                         this._handleYes('tour');
                     };
                     nwjsMenu.undo.enabled = false;
