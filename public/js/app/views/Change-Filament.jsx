@@ -200,6 +200,12 @@ define([
                 }
             },
 
+            _loadFilamentFromComplete: function() {
+                this.setState(this.getInitialState(), () => {
+                    this._next(steps.GUIDE, DeviceConstants.LOAD_FILAMENT);
+                });
+            },
+
             _makeCaption: function(caption) {
                 if ('undefined' === typeof caption) {
                     caption = (
@@ -321,7 +327,11 @@ define([
                     },
                     {
                         label: [
-                            <span className="auto-emerging">{lang.change_filament.auto_emerging}</span>,
+                            <span className="auto-emerging">
+                                {this.state.type === DeviceConstants.LOAD_FILAMENT ?
+                                    lang.change_filament.auto_emerging : ''
+                                }
+                            </span>,
                             <div className="spinner-roller spinner-roller-reverse"/>
                         ],
                         type: 'icon',
@@ -334,8 +344,6 @@ define([
             },
 
             _sectionUnloading: function() {
-                var self = this;
-
                 return {
                     message: (
                         <div className="message-container">
@@ -348,15 +356,23 @@ define([
             },
 
             _sectionCompleted: function() {
-                var messageText = (
-                    DeviceConstants.LOAD_FILAMENT === this.state.type ?
-                    lang.change_filament.loaded :
-                    lang.change_filament.unloaded
+                let loaded, unloaded;
+
+                loaded = (<div className="message-container">{lang.change_filament.loaded}</div>);
+
+                unloaded = (
+                    <div className="message-container">{lang.change_filament.unloaded}
+                        <p>
+                            <a onClick={this._loadFilamentFromComplete}>
+                                {lang.change_filament.load_filament}
+                            </a>
+                        </p>
+                    </div>
                 );
 
                 return {
                     message: (
-                        <div className="message-container">{messageText}</div>
+                        this.state.type === DeviceConstants.LOAD_FILAMENT ? loaded : unloaded
                     ),
                     buttons: [{
                         label: lang.change_filament.ok,
@@ -399,7 +415,7 @@ define([
                                 onClick: self.props.onClose
                             }]
                         };
-                    }
+                    };
                 }
 
                 return renderFunc();
