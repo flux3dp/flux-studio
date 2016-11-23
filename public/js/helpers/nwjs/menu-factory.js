@@ -447,7 +447,13 @@ define([
                                         AlertActions.showPopupError('calibrate-fail', lang.calibration.extruderOnly);
                                     }
                                     else {
-                                        let message = error.error ? lang.monitor[error.error.join('_')] : lang.monitor[error.join('_')];
+                                        let message = '';
+                                        if(error.module === null) {
+                                            message = lang.monitor.HEAD_OFFLINE;
+                                        }
+                                        else {
+                                            message = error.error ? lang.monitor[error.error.join('_')] : lang.monitor[error.join('_')];
+                                        }
                                         AlertActions.showPopupError('calibrate-fail', message || error.error.join(' '));
                                     }
                                 }).always(() => {
