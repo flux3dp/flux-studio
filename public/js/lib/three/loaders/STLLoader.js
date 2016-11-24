@@ -26,6 +26,13 @@
  *  var mesh = new THREE.Mesh( geometry, material );
  */
 
+if (window.requireNode) {
+	try { 
+		window.cSTLHelper = requireNode('cSTLHelper');
+	} catch(e) {
+		console.log("Platform doesn't support FLUX::cSTLHelper, fallback to js");
+	}
+}
 
 THREE.STLLoader = function ( manager ) {
 
@@ -52,6 +59,7 @@ THREE.STLLoader.prototype = {
 
 		var loader = new THREE.XHRLoader( scope.manager );
 		loader.setResponseType( 'arraybuffer' );
+		console.log('start loading stl url ', url.length);
 		loader.load( url, function ( text ) {
 			try{
 				onLoad( scope.parse( text ) );
@@ -111,6 +119,8 @@ THREE.STLLoader.prototype = {
 
 	parseBinary: function ( data ) {
 
+		console.log("Start parsing binary");
+
 		var reader = new DataView( data );
 		var faces = reader.getUint32( 80, true );
 
@@ -145,63 +155,73 @@ THREE.STLLoader.prototype = {
 
 		var geometry = new THREE.BufferGeometry();
 
+		
 		var vertices = new Float32Array( faces * 3 * 3 );
 		var normals = new Float32Array( faces * 3 * 3 );
 
-		for ( var face = 0; face < faces; face ++ ) {
+		if (window.cSTLHelper) {
+			var result = window.cSTLHelper.parseStl(data, dataOffset, faces, vertices, normals);
+		} else {
+			vertices = new Float32Array( faces * 3 * 3 );
+			normals = new Float32Array( faces * 3 * 3 );
 
-			var start = dataOffset + face * faceLength;
-			var normalX = reader.getFloat32( start, true );
-			var normalY = reader.getFloat32( start + 4, true );
-			var normalZ = reader.getFloat32( start + 8, true );
+			for ( var face = 0; face < faces; face ++ ) {
 
-			if ( hasColors ) {
-
-				var packedColor = reader.getUint16( start + 48, true );
-
-				if ( ( packedColor & 0x8000 ) === 0 ) {
-
-					// facet has its own unique color
-
-					r = ( packedColor & 0x1F ) / 31;
-					g = ( ( packedColor >> 5 ) & 0x1F ) / 31;
-					b = ( ( packedColor >> 10 ) & 0x1F ) / 31;
-
-				} else {
-
-					r = defaultR;
-					g = defaultG;
-					b = defaultB;
-
-				}
-
-			}
-
-			for ( var i = 1; i <= 3; i ++ ) {
-
-				var vertexstart = start + i * 12;
-
-				vertices[ offset ] = reader.getFloat32( vertexstart, true );
-				vertices[ offset + 1 ] = reader.getFloat32( vertexstart + 4, true );
-				vertices[ offset + 2 ] = reader.getFloat32( vertexstart + 8, true );
-
-				normals[ offset ] = normalX;
-				normals[ offset + 1 ] = normalY;
-				normals[ offset + 2 ] = normalZ;
+				var start = dataOffset + face * faceLength;
+				var normalX = reader.getFloat32( start, true );
+				var normalY = reader.getFloat32( start + 4, true );
+				var normalZ = reader.getFloat32( start + 8, true );
 
 				if ( hasColors ) {
 
-					colors[ offset ] = r;
-					colors[ offset + 1 ] = g;
-					colors[ offset + 2 ] = b;
+					var packedColor = reader.getUint16( start + 48, true );
+
+					if ( ( packedColor & 0x8000 ) === 0 ) {
+
+						// facet has its own unique color
+
+						r = ( packedColor & 0x1F ) / 31;
+						g = ( ( packedColor >> 5 ) & 0x1F ) / 31;
+						b = ( ( packedColor >> 10 ) & 0x1F ) / 31;
+
+					} else {
+
+						r = defaultR;
+						g = defaultG;
+						b = defaultB;
+
+					}
 
 				}
 
-				offset += 3;
+				for ( var i = 1; i <= 3; i ++ ) {
+
+					var vertexstart = start + i * 12;
+
+					vertices[ offset ] = reader.getFloat32( vertexstart, true );
+					vertices[ offset + 1 ] = reader.getFloat32( vertexstart + 4, true );
+					vertices[ offset + 2 ] = reader.getFloat32( vertexstart + 8, true );
+
+					normals[ offset ] = normalX;
+					normals[ offset + 1 ] = normalY;
+					normals[ offset + 2 ] = normalZ;
+
+					if ( hasColors ) {
+
+						colors[ offset ] = r;
+						colors[ offset + 1 ] = g;
+						colors[ offset + 2 ] = b;
+
+					}
+
+					offset += 3;
+
+				}
 
 			}
-
 		}
+
+		console.log("finished parsing");
 
 		geometry.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
 		geometry.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
@@ -214,11 +234,15 @@ THREE.STLLoader.prototype = {
 
 		}
 
+		console.log("added geometry");
+
 		return geometry;
 
 	},
 
 	parseASCII: function ( data ) {
+
+		console.log("Start parsing ascii");
 
 		var geometry, length, normal, patternFace, patternNormal, patternVertex, result, text;
 		geometry = new THREE.Geometry();

@@ -259,7 +259,7 @@ define([
         var d = $.Deferred();
         var uploadCaller = file.path ? slicer.upload_via_path(name, file, ext, file.path) : slicer.upload(name,file,ext);
         uploadCaller.then((result) => {
-            ProgressActions.updating('finishing up', 100);
+            ProgressActions.updating('Finishing up', 100);
             d.resolve(result);
         }).progress(displayProgress)
         .fail((error) => {
@@ -297,9 +297,14 @@ define([
             mesh.up = new THREE.Vector3(0, 0, 1);
 
             slicingStatus.pauseReport = true;
+
+            setTimeout(() => {
+                console.log('Processing meshes');
+                ProgressActions.updating('Processing meshes', 50);
+            }, 1);
+
             uploadStl(mesh.uuid, file, ext).then(() => {
                 slicingStatus.pauseReport = false;
-                ProgressActions.close();
                 addToScene();
                 callback();
             }).progress((steps, total) => {
@@ -343,20 +348,46 @@ define([
                 mesh.scale.locked = true;
                 /* end customized property */
 
-                if (mesh.geometry.type !== 'Geometry') {
-                    mesh.geometry = new THREE.Geometry().fromBufferGeometry(mesh.geometry);
-                }
+                // if (mesh.geometry.type !== 'Geometry') {
+                //     console.log("Heavy ops:: ", "Buffer geometry to geometry");
+                //     mesh.geometry = new THREE.Geometry().fromBufferGeometry(mesh.geometry);
+                // }
 
                 mesh.name = 'custom';
                 mesh.file = file;
                 mesh.fileName = file.name;
+                setTimeout(() => {
+                    console.log('Calculating boundary');
+                    ProgressActions.updating('Calculating boundary', 50);
+                }, 1);
+
                 mesh.plane_boundary = planeBoundary(mesh);
 
+                setTimeout(() => {
+                    ProgressActions.updating('Arranging position', 80);
+                }, 1);
+                
                 autoArrange(mesh);
                 addSizeProperty(mesh);
+
+                setTimeout(() => {
+                    console.log('Grounding');
+                    ProgressActions.updating('Grouding', 85);
+                }, 1);
+                
                 groundIt(mesh);
                 selectObject(mesh);
+
+                setTimeout(() => {
+                    ProgressActions.updating('Creating outline', 90);
+                }, 1);
+                
                 createOutline(mesh);
+
+                setTimeout(() => {
+                    ProgressActions.updating('Adding to scene', 95);
+                }, 1);
+                
                 scene.add(mesh);
                 outlineScene.add(mesh.outlineMesh);
                 objects.push(mesh);
@@ -366,6 +397,10 @@ define([
                 addHistory('ADD', mesh);
 
                 setDefaultFileName();
+                setTimeout(() => {
+                    ProgressActions.close();
+                }, 1); 
+
                 render();
             };
         };
@@ -411,6 +446,7 @@ define([
                 if(ext === 'stl' || ext === 'obj') {
                     var reader  = new FileReader();
                     reader.addEventListener('load', function () {
+                        ProgressActions.updating('Loading as ' + ext, 10);
                         appendModel(reader.result, file, ext, function(err) {
                             if(!err) {
                                 slicingStatus.canInterrupt = true;
@@ -427,6 +463,7 @@ define([
                     }, false);
 
                     reader.readAsDataURL(file);
+                    ProgressActions.updating('Start Loading', 5);
                 }
                 else if (ext === 'fc' || ext === 'gcode') {
                     slicingStatus.canInterrupt = true;
@@ -1721,6 +1758,9 @@ define([
         // sort the index of each point in stl
         var stl_index = [];
         var boundary = [];
+
+        console.log('calculating boundary for geometry');
+
         if (sourceMesh.geometry.type === 'Geometry') {
             // define Cross product function on 2d plane
             var cross = (function cross(p0, p1, p2) {
@@ -1728,7 +1768,7 @@ define([
             });
 
             for (var i = 0; i < sourceMesh.geometry.vertices.length; i += 1) {
-              stl_index.push(i);
+                stl_index.push(i);
             }
             stl_index.sort(function(a, b) {
                 if (sourceMesh.geometry.vertices[a].y === sourceMesh.geometry.vertices[b].y) {
@@ -1741,9 +1781,9 @@ define([
 
             // compute upper hull
             for (var i = 0; i < stl_index.length; i += 1) {
-              while( boundary.length >= 2 && cross(sourceMesh.geometry.vertices[boundary[boundary.length - 2]], sourceMesh.geometry.vertices[boundary[boundary.length - 1]], sourceMesh.geometry.vertices[stl_index[i]]) <= 0){
-                boundary.pop();
-              }
+                while( boundary.length >= 2 && cross(sourceMesh.geometry.vertices[boundary[boundary.length - 2]], sourceMesh.geometry.vertices[boundary[boundary.length - 1]], sourceMesh.geometry.vertices[stl_index[i]]) <= 0){
+                    boundary.pop();
+                }
                 boundary.push(stl_index[i]);
             }
             // compute lower hull
@@ -1758,39 +1798,42 @@ define([
             boundary.pop();
         }
         else{
+            let vertices = sourceMesh.geometry.getAttribute('position');
             // define Cross product function on 2d plane for buffergeometry
-            var cross = (function cross(sm, p0, p1, p2) {
+            var cross = (function cross(p0, p1, p2) {
 
-                return ((sm.geometry.attributes.position.array[p1 * 3 + 0] - sm.geometry.attributes.position.array[p0 * 3 + 0]) *
-                        (sm.geometry.attributes.position.array[p2 * 3 + 1] - sm.geometry.attributes.position.array[p0 * 3 + 1])) -
-                       ((sm.geometry.attributes.position.array[p1 * 3 + 1] - sm.geometry.attributes.position.array[p0 * 3 + 1]) *
-                        (sm.geometry.attributes.position.array[p2 * 3 + 0] - sm.geometry.attributes.position.array[p0 * 3 + 0]))
+                return ((vertices[p1 * 3 + 0] - vertices[p0 * 3 + 0]) *
+                        (vertices[p2 * 3 + 1] - vertices[p0 * 3 + 1])) -
+                       ((vertices[p1 * 3 + 1] - vertices[p0 * 3 + 1]) *
+                        (vertices[p2 * 3 + 0] - vertices[p0 * 3 + 0]))
             });
 
-            for (var i = 0; i < sourceMesh.geometry.attributes.position.length / sourceMesh.geometry.attributes.position.itemSize; i += 1) {
-              stl_index.push(i);
+            let meshSize = vertices.count / vertices.itemSize;
+
+            for (var i = 0; i < meshSize; i += 1) {
+                stl_index.push(i);
             }
 
             stl_index.sort(function(a, b) {
-                if (sourceMesh.geometry.attributes.position.array[a * 3 + 1] === sourceMesh.geometry.attributes.position.array[b * 3 + 1]) {
-                    return sourceMesh.geometry.attributes.position.array[a * 3 + 0] - sourceMesh.geometry.attributes.position.array[b * 3 + 0];
+                if (vertices[a * 3 + 1] === vertices[b * 3 + 1]) {
+                    return vertices[a * 3 + 0] - vertices[b * 3 + 0];
                 }
-                return sourceMesh.geometry.attributes.position.array[a * 3 + 1] - sourceMesh.geometry.attributes.position.array[b * 3 + 1];
+                return vertices[a * 3 + 1] - vertices[b * 3 + 1];
             });
 
             // find boundary
 
             // compute upper hull
             for (var i = 0; i < stl_index.length; i += 1) {
-              while( boundary.length >= 2 && cross(sourceMesh, boundary[boundary.length - 2], boundary[boundary.length - 1], stl_index[i]) <= 0){
-                boundary.pop();
-              }
+                while ( boundary.length >= 2 && cross(boundary[boundary.length - 2], boundary[boundary.length - 1], stl_index[i]) <= 0) {
+                    boundary.pop();
+                }
                 boundary.push(stl_index[i]);
             }
             // compute lower hull
             var t = boundary.length + 1;
             for (var i = stl_index.length - 2 ; i >= 0; i -= 1) {
-                while( boundary.length >= t && cross(sourceMesh, boundary[boundary.length - 2], boundary[boundary.length - 1], stl_index[i]) <= 0){
+                while( boundary.length >= t && cross(boundary[boundary.length - 2], boundary[boundary.length - 1], stl_index[i]) <= 0) {
                     boundary.pop();
                 }
                 boundary.push(stl_index[i]);
