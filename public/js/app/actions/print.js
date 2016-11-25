@@ -136,14 +136,23 @@ define([
 
     var models = [];
 
-    previewColors[-1] = new THREE.Color(Settings.print_config.color_default);
-    previewColors[0] = new THREE.Color(Settings.print_config.color_infill);
-    previewColors[1] = new THREE.Color(Settings.print_config.color_perimeter);
-    previewColors[2] = new THREE.Color(Settings.print_config.color_support);
-    previewColors[3] = new THREE.Color(Settings.print_config.color_move);
-    previewColors[4] = new THREE.Color(Settings.print_config.color_skirt);
-    previewColors[5] = new THREE.Color(Settings.print_config.color_perimeter);
+    previewColors[0] = new THREE.Color(Settings.print_config.color_default);
+    previewColors[1] = new THREE.Color(Settings.print_config.color_infill);
+    previewColors[2] = new THREE.Color(Settings.print_config.color_perimeter);
+    previewColors[3] = new THREE.Color(Settings.print_config.color_support);
+    previewColors[4] = new THREE.Color(Settings.print_config.color_move);
+    previewColors[5] = new THREE.Color(Settings.print_config.color_skirt);
+    previewColors[6] = new THREE.Color(Settings.print_config.color_innerwall);
+    previewColors[7] = new THREE.Color(Settings.print_config.color_raft);
+    previewColors[8] = new THREE.Color(Settings.print_config.color_skin);
     previewColors[9] = new THREE.Color(Settings.print_config.color_highlight);
+
+
+    let emphasizeLineMaterial = new THREE.LineBasicMaterial({
+        color: 0xffffff,
+        linewidth: 5,
+        vertexColors: THREE.VertexColors
+    });
 
     function init(src) {
 
@@ -2149,10 +2158,46 @@ define([
         }
     }
 
+
     function changePreviewLayer(layerNumber) {
-        for (var i = 1; i < previewScene.children.length; i++) {
-            previewScene.children[i].visible = i - 1 < layerNumber;
+            
+        for (let i = 1; i < previewScene.children.length; i++) {
+            previewScene.children[i].visible = i <= layerNumber;
         }
+        
+        if ( previewScene.children.length > printPath.length && previewScene.children.length > 0)  {
+            previewScene.children.splice( previewScene.children.length - 1, 1) ;
+        }
+
+        let g = new THREE.BufferGeometry(),
+            i = 0,
+            layer = printPath[layerNumber];
+            
+        if ( layer && layer.length ) {
+            var positions = new Float32Array(layer.length * 3 * 2 - 6);
+            var colors = new Float32Array(layer.length * 3 * 2 - 6);
+            for (var p = 1; p < layer.length; p++) {
+                for (var tmp = 1; tmp >= 0; tmp--) {
+                    positions[i * 3] = layer[p - tmp][0];
+                    positions[i * 3 + 1] = layer[p - tmp][1];
+                    positions[i * 3 + 2] = layer[p - tmp][2];
+                    let color = previewColors[layer[p][3]+1];
+                    colors[i * 3] = Math.min(1, color.r * 0.8);
+                    colors[i * 3 + 1] = Math.min(1, color.g * 0.8);
+                    colors[i * 3 + 2] = Math.min(1, color.b * 0.8);
+                    i++;
+                }
+            }
+
+            g.addAttribute('position', new THREE.BufferAttribute(positions,3));
+            g.addAttribute('color', new THREE.BufferAttribute(colors, 3));
+            g.computeBoundingSphere();    
+        }
+
+        let line = new THREE.Line(g, emphasizeLineMaterial); // A layer is a "continuos line"
+        line.name = 'line';
+        previewScene.add(line);
+
         render();
     }
 
@@ -2686,35 +2731,42 @@ define([
     }
 
     function _drawPath() {
-        var d = $.Deferred(),
-            color,
-            g, m, line;
+        var d = $.Deferred(), lineMaterial, line;
 
         previewScene.children.splice(1, previewScene.children.length - 1);
-        m = new THREE.LineBasicMaterial({
+        lineMaterial = new THREE.LineBasicMaterial({
             color: 0xffffff,
-            opacity: 10,
             linewidth: 1,
+            opacity: 0.3,
             vertexColors: THREE.VertexColors
         });
 
-        for (var layer = 0; layer < printPath.length; layer++) {
-            g = new THREE.Geometry();
-            color = [];
+        for (var l = 0; l < printPath.length; l++) {
+            let g = new THREE.BufferGeometry(),
+                i = 0,
+                layer = printPath[l];
+                
+            var positions = new Float32Array(layer.length * 3 * 2 - 6);
+            var colors = new Float32Array(layer.length * 3 * 2 - 6);
 
-            for (var point = 1; point < printPath[layer].length; point++) {
+            for (var p = 1; p < layer.length; p++) {
                 for (var tmp = 1; tmp >= 0; tmp--) {
-                    color.push(previewColors[printPath[layer][point][3]] || previewColors[-1]);
-                    g.vertices.push(new THREE.Vector3(
-                        printPath[layer][point - tmp][0],
-                        printPath[layer][point - tmp][1],
-                        printPath[layer][point - tmp][2]
-                    ));
+                    positions[i * 3] = layer[p - tmp][0];
+                    positions[i * 3 + 1] = layer[p - tmp][1];
+                    positions[i * 3 + 2] = layer[p - tmp][2];
+                    let color = previewColors[layer[p][3]+1];
+                    colors[i * 3] = color.r;
+                    colors[i * 3 + 1] = color.g;
+                    colors[i * 3 + 2] = color.b;
+                    i++;
                 }
             }
 
-            g.colors = color;
-            line = new THREE.Line(g, m);
+            g.addAttribute('position', new THREE.BufferAttribute(positions,3));
+            g.addAttribute('color', new THREE.BufferAttribute(colors, 3));
+            g.computeBoundingSphere();
+
+            line = new THREE.Line(g, lineMaterial); // A layer is a "continuos line"
             line.name = 'line';
             previewScene.add(line);
         }
