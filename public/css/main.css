@@ -3330,7 +3330,8 @@ input[type=range]:focus::-webkit-slider-runnable-track {
             content: "";
             display: block;
             height: 100%;
-            width: 0; }
+            width: 0;
+            transition: width 0.3s; }
     .modal-progress.waiting .modal-alert {
         padding-bottom: 1.6em; }
 
