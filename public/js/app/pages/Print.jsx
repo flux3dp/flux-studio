@@ -88,6 +88,7 @@ define([
             lang = args.state.lang,
             selectedPrinter,
             $importBtn,
+            finishedSnapshot = false,
             listeningToCancel = false,
             defaultRaftLayer = 4,
             allowDeleteObject = true,
@@ -469,11 +470,13 @@ define([
                 _handleGoClick: function() {
                     AlertStore.removeCancelListener(this._handleDefaultCancel);
                     listeningToCancel = false;
+                    finishedSnapshot = false;
                     director.takeSnapShot().then(() =>{
-                        this.setState({
-                            openPrinterSelectorWindow: true
-                        });
+                        finishedSnapshot = true;
                         director.clearSelection();
+                    });
+                    this.setState({
+                        openPrinterSelectorWindow: true
                     });
                 },
 
@@ -594,7 +597,7 @@ define([
                         openPrinterSelectorWindow: false
                     }, () => {
                         let t = setInterval(() => {
-                            if(director.getSlicingStatus().isComplete) {
+                            if(director.getSlicingStatus().isComplete && finishedSnapshot) {
                                 clearInterval(t);
                                 director.getFCode().then((fcode, previewUrl) => {
                                     if(!(fcode instanceof Blob)) {
