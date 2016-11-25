@@ -277,15 +277,9 @@ define([
         return d.promise();
     }
 
-    function appendModel(fileUrl, file, ext, callback) {
-        if(file.size === 0) {
-            AlertActions.showPopupError('', lang.message.invalidFile);
-            slicingStatus.canInterrupt = true;
-            return;
-        }
+    function appendModel(binary, file, ext, callback) {
         var stlLoader = new THREE.STLLoader(),
-            objLoader = new THREE.OBJLoader(),
-            model_file_path = fileUrl;
+            objLoader = new THREE.OBJLoader();
 
         callback = callback || function() {};
 
@@ -419,7 +413,7 @@ define([
         });
 
         if(ext === 'obj') {
-            objLoader.load(model_file_path, (object) => {
+            objLoader.load(binary, (object) => {
                 var meshes = object.children.filter(c => c instanceof THREE.Mesh);
                 if(meshes.length > 0) {
                     loadGeometry(new THREE.Geometry().fromBufferGeometry(meshes[0].geometry));
@@ -428,10 +422,11 @@ define([
             });
         }
         else {
-            stlLoader.load(model_file_path, (geometry) => {
+            stlLoader.load(binary, (geometry) => {
                 loadGeometry(geometry);
-            }, function(){}, (error) => {
-                //on error
+            }, function() { }, (error) => {
+                throw error;
+                // on error
                 loadGeometry({vertices: []});
             });
         }
@@ -453,26 +448,24 @@ define([
                 slicingStatus.canInterrupt = false;
                 var ext = file.name.split('.').pop().toLowerCase();
                 if(ext === 'stl' || ext === 'obj') {
-                    var reader  = new FileReader();
-                    reader.addEventListener('load', function () {
+                    let fr = new FileReader();
+                    fr.addEventListener('load', (e) => { 
                         ProgressActions.updating('Loading as ' + ext, 10);
-                        appendModel(reader.result, file, ext, function(err) {
+                        appendModel(fr.result, file, ext, function(err) {
                             if(!err) {
                                 slicingStatus.canInterrupt = true;
                                 if(files.length > index + 1) {
                                     appendModels(files, index + 1, callback);
-                                }
-                                else {
+                                } else {
                                     slicingStatus.canInterrupt = true;
                                     startSlicing(slicingType.F);
                                     callback();
                                 }
                             }
                         });
-                    }, false);
-
-                    reader.readAsDataURL(file);
+                    });
                     ProgressActions.updating('Start Loading', 5);
+                    fr.readAsArrayBuffer(file);
                 }
                 else if (ext === 'fc' || ext === 'gcode') {
                     slicingStatus.canInterrupt = true;
