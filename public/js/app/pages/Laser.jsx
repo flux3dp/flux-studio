@@ -61,12 +61,12 @@ define([
                         sizeLock: false,
                         angle: 0,
                         threshold: 128,
-                        images: [],
-                        setupPanelDefaults: {material: {value: 'wood', label: 'Wood', data: { laser_speed: 20, power: 50 }}}
+                        images: []
                     };
                 },
 
                 componentDidMount: function() {
+                    console.log("Mount Laser!!!");
                     var self = this, lang = args.state.lang;
 
                     dndHandler.plug(document, self._onDropUpload);
@@ -93,39 +93,34 @@ define([
                         $('.laser-object').css({background :'url(' + laser_custom_bg + ')', 'background-size': '100% 100%'});
 
 
-                    config().read(storageDefaultKey, {
-                        onFinished: function(response) {
-                            let setupPanelDefaults = response || {};
-
-                            if ('laser' === self.props.page) {
-                                if ('undefined' === typeof setupPanelDefaults.material) {
-                                    setupPanelDefaults.material = lang.laser.advanced.form.object_options.options[0];
-                                }
-
-                                setupPanelDefaults.objectHeight = setupPanelDefaults.objectHeight || 0;
-                                setupPanelDefaults.isShading = (
-                                    'boolean' === typeof setupPanelDefaults.isShading ?
-                                    setupPanelDefaults.isShading :
-                                    true
-                                );
-                            }
-                            // holder
-                            else {
-                                setupPanelDefaults = {
-                                    liftHeight: response.liftHeight || 55,
-                                    drawHeight: response.drawHeight || 50,
-                                    speed: response.speed || 20
-                                }
-                            }
-
-                            if ('' === response) {
-                                config().write(storageDefaultKey, setupPanelDefaults);
-                            }
-
-                            self.setState({
-                                setupPanelDefaults: setupPanelDefaults
-                            });
+                    let setupPanelDefaults = config().read(storageDefaultKey) || {};
+                    if ('laser' === self.props.page) {
+                        if ('undefined' === typeof setupPanelDefaults.material) {
+                            setupPanelDefaults.material = lang.laser.advanced.form.object_options.options[0];
                         }
+
+                        setupPanelDefaults.objectHeight = setupPanelDefaults.objectHeight || 0;
+                        setupPanelDefaults.isShading = (
+                            'boolean' === typeof setupPanelDefaults.isShading ?
+                            setupPanelDefaults.isShading :
+                            true
+                        );
+                    } else {
+                        setupPanelDefaults = {
+                            liftHeight: setupPanelDefaults.liftHeight || 55,
+                            drawHeight: setupPanelDefaults.drawHeight || 50,
+                            speed: setupPanelDefaults.speed || 20
+                        }
+                    }
+
+                    if ('' === setupPanelDefaults) {
+                        config().write(storageDefaultKey, setupPanelDefaults);
+                    }
+
+
+                    console.log(storageDefaultKey, setupPanelDefaults);
+                    self.setState({
+                        setupPanelDefaults
                     });
                 },
 
@@ -234,8 +229,7 @@ define([
                                 self._inactiveSelectImage(e);
                             }
                         },
-                        paramPanel,
-                        setupPanelDefaults;
+                        paramPanel;
 
                     paramPanel = this.state.setupPanelDefaults ? (
                         'laser' === this.props.page ?
