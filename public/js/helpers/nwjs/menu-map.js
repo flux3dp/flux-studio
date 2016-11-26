@@ -150,7 +150,12 @@ define([
             tutorial: {
                 label: lang.help.tutorial,
                 enabled: true,
-                parent: parentIndex.HELP
+                parent: parentIndex.HELP,
+                onClick: function() {
+                    if(typeof window.customEvent.onTutorialClick === 'function') {
+                        window.customEvent.onTutorialClick();
+                    }
+                }
             }
         },
         defaultDevice = initializeMachine.defaultPrinter.get(),

@@ -25,7 +25,7 @@ define([
                 password: '',
                 processing: false,
                 showResendVerificationEmail: false
-            }
+            };
         },
 
         componentDidMount: function() {

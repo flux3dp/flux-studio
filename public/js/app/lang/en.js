@@ -967,6 +967,7 @@ define(function() {
             MAINBOARD_OFFLINE                   : 'Something went wrong\nPlease restart the device',
             G28_FAILED                          : '#124 Unable to calibrate origin (home)\nPlease remove obstacles on rails, and make sure toolhead cables are not caught by carriages.',
             FILAMENT_RUNOUT_0                   : '#121 Ran out of filament\nPlease insert new material <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/218931757">More Info</a>',
+            USER_OPERATION_FROM_CODE            : 'Paused for operation (filament change)',
             processing                          : 'Processing',
             savingPreview                       : 'Generating thumbnails',
             hour                                : 'h',
