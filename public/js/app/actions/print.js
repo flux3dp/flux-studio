@@ -262,7 +262,6 @@ define([
 
         // init print controller
         slicingStatusStream = new Rx.Subject();
-        slicingStatus.canInterrupt = true;
         slicingStatus.inProgress = false;
         slicingStatusStream.onNext(slicingStatus);
 
@@ -306,7 +305,6 @@ define([
                         openObjectDialogue: false
                     });
                     AlertActions.showPopupError('', lang.message.invalidFile);
-                    slicingStatus.canInterrupt = true;
                     return;
                 }
             }
@@ -455,11 +453,10 @@ define([
         );
 
         var t = setInterval(function() {
-            if(slicingStatus.canInterrupt) {
+            if(!slicer.queueLocked()) {
                 clearInterval(t);
                 var file = files.item ? files.item(index) : files[index];
                 models.push(file);
-                slicingStatus.canInterrupt = false;
                 var ext = file.name.split('.').pop().toLowerCase();
                 if(ext === 'stl' || ext === 'obj') {
                     let fr = new FileReader();
@@ -467,11 +464,9 @@ define([
                         ProgressActions.updating('Loading as ' + ext, 10);
                         appendModel(fr.result, file, ext, function(err) {
                             if(!err) {
-                                slicingStatus.canInterrupt = true;
                                 if(files.length > index + 1) {
                                     appendModels(files, index + 1, callback);
                                 } else {
-                                    slicingStatus.canInterrupt = true;
                                     startSlicing(slicingType.F);
                                     callback();
                                 }
@@ -482,7 +477,6 @@ define([
                     fr.readAsArrayBuffer(file);
                 }
                 else if (ext === 'fc' || ext === 'gcode') {
-                    slicingStatus.canInterrupt = true;
                     slicingStatus.isComplete = true;
                     importedFCode = files.item(0);
                     importFromFCode = ext === 'fc';
@@ -499,7 +493,6 @@ define([
                     callback();
                 }
                 else if (ext === 'fsc') {
-                    slicingStatus.canInterrupt = true;
                     importedScene = files.item(0);
                     setDefaultFileName(importedScene.name);
                     if(objects.length === 0) {
@@ -517,7 +510,6 @@ define([
                 else {
                     ProgressActions.close();
                     AlertActions.showPopupError('', lang.monitor.extensionNotSupported);
-                    slicingStatus.canInterrupt = true;
                     callback();
                 }
             }
@@ -540,7 +532,6 @@ define([
                     reactSrc.setState({ hasObject: false });
                     if(previewMode) {
                         fcodeConsole.getPath().then((r) => {
-                            slicingStatus.canInterrupt = true;
                             if(r.error) {
                                 processSlicerError(r);
                             }
@@ -610,7 +601,6 @@ define([
 
     function startSlicing(type) {
         slicingStatus.inProgress    = true;
-        slicingStatus.canInterrupt  = false;
         slicingStatus.pauseReport   = true;
         slicingStatus.hasError      = false;
         slicingStatus.isComplete    = false;
@@ -635,8 +625,6 @@ define([
         syncObjectParameter().then(function() {
             return stopSlicing();
         }).then(function() {
-            console.log("Begin Slice:: Start");
-
             // set again because stop slicing set inProgress to false
             slicingStatus.inProgress = true;
             slicingStatusStream.onNext(slicingStatus);
@@ -644,7 +632,6 @@ define([
             slicer.beginSlicing(ids, slicingType.F).then(function(response) {
                 slicingStatus.percentage = 0.05;
                 reactSrc.setState({slicingPercentage: 0.05});
-                slicingStatus.canInterrupt = true;
                 slicingStatus.pauseReport = false;
                 getSlicingReport(function(report) {
                     if (report.status != 'ok') {
@@ -653,7 +640,6 @@ define([
                     updateSlicingProgressFromReport(slicingStatus.lastReport);
                 });
             }).fail((error) => {
-                slicingStatus.canInterrupt = true;
                 slicingStatus.pauseReport = false;
                 processSlicerError(error);
                 return;
@@ -685,14 +671,11 @@ define([
             var t = setInterval(() => {
                 if(slicingStatus.canInterrupt && slicingStatus.isComplete) {
                     slicingStatus.showProgress = false;
-                    slicingStatus.canInterrupt = false;
                     clearInterval(t);
                     if(slicingStatus.hasError) {
-                        slicingStatus.canInterrupt = true;
                         return;
                     }
                     slicer.uploadPreviewImage(blob).then(() => {
-                        slicingStatus.canInterrupt = true;
                         slicer.getSlicingResult().then((result) => {
                             responseBlob = result;
                             d.resolve(blob);
@@ -747,7 +730,7 @@ define([
             clearTimeout(slicingTimmer);
             slicingTimmer = setTimeout(function() {
                 var t = setInterval(function() {
-                    if(slicingStatus.canInterrupt) {
+                    if(!slicer.queueLocked()) {
                         clearInterval(t);
                         slicingStatus.isComplete = false;
                         startSlicing(slicingType.F);
@@ -757,7 +740,7 @@ define([
         }
         else {
             var t = setInterval(function() {
-                if(slicingStatus.canInterrupt) {
+                if(!slicer.queueLocked()) {
                     clearInterval(t);
                     slicingStatus.isComplete = false;
                     startSlicing(slicingType.F);
@@ -816,7 +799,6 @@ define([
                 slicingStatus.error = report;
                 if(previewMode) {
                     slicer.getPath().then(function(result) {
-                        slicingStatus.canInterrupt = true;
                         if(result.error) {
                             processSlicerError(result);
                         }
@@ -870,9 +852,7 @@ define([
             if(show) {
                 ProgressActions.updating(complete, 100);
             }
-            slicingStatus.canInterrupt = false;
             slicer.getSlicingResult().then((result) => {
-                slicingStatus.canInterrupt = true;
                 if(result.error) {
                     processSlicerError(result);
                     return;
@@ -888,7 +868,7 @@ define([
                 responseBlob = result;
                 _handleSliceComplete();
             }).fail((error) => {
-                console.log(error);
+                console.log("Slicining Error:: ", error);
             });
         }
     }
@@ -1318,11 +1298,9 @@ define([
                 if(willReslice) {
                     return;
                 }
-                if(slicingStatus.canInterrupt) {
-                    slicingStatus.canInterrupt = false;
+                if(!slicer.queueLocked()) {
                     slicingStatus.pauseReport = true;
                     slicer.reportSlicing().then((report) => {
-                        slicingStatus.canInterrupt = true;
                         slicingStatus.pauseReport = false;
                         if(!!report) {
                             if(report.slice_status === 'complete' || report.slice_status === 'error') {
@@ -1331,7 +1309,7 @@ define([
                             callback(report);
                         }
                     }).fail((error) => {
-                        console.log(error);
+                        console.log("Slice report", error);
                     });
                 }
             }
@@ -1456,12 +1434,10 @@ define([
         slicingStatus.pauseReport = true;
 
         var t = setInterval(function() {
-            if(slicingStatus.canInterrupt) {
+            if(!slicer.queueLocked()) {
                 clearInterval(t);
-                slicingStatus.canInterrupt = false;
                 slicer.setParameter('advancedSettings', settings.custom).then((result) => {
                     Object.assign(fullSliceParameters.settings, settings);
-                    slicingStatus.canInterrupt = true;
                     slicingStatus.showProgress = false;
                     slicingStatus.pauseReport = false;
                     if(objects.length > 0) {
@@ -1469,8 +1445,6 @@ define([
                     }
                     deferred.resolve('');
                 }).fail((error) => {
-                    slicingStatus.canInterrupt = true;
-                    console.log("Advance setting error", error);
                     // Fallback to fine settings
                     Object.assign(settings, fineSettings);
                     processSlicerError(error);
@@ -1492,7 +1466,7 @@ define([
         hasPreviewImage = false;
 
         var t = setInterval(function() {
-            if(slicingStatus.canInterrupt) {
+            if(!slicer.queueLocked()) {
                 clearInterval(t);
                 slicer.setParameter(name, value).then(() => {
                     fullSliceParameters.settings[name] = value;
@@ -1720,6 +1694,8 @@ define([
             outlineScene.remove(SELECTED.outlineMesh);
             if (index > -1) {
                 objects.splice(index, 1);
+            } else {
+                console.log("Remove:: Object cannot find" , SELECTED);
             }
 
             transformControl.detach(SELECTED);
@@ -1814,7 +1790,6 @@ define([
             console.log("PlaneBoundary:: Skipping redundant calculation");
             return sourceMesh.plane_boundary;
         } else {
-            console.log("compare", transformation, sourceMesh.jTransformation);
         }
         sourceMesh.jTransformation = transformation;
         // ref: http://www.csie.ntnu.edu.tw/~u91029/ConvexHull.html#4
@@ -1832,10 +1807,8 @@ define([
                 return ((p1.x - p0.x) * (p2.y - p0.y)) - ((p1.y - p0.y) * (p2.x - p0.x));
             });
 
-            console.log("PlaneBoundary:: Allocating", + new Date());
             stl_index = new Uint32Array(vs.length);
 
-            console.log("PlaneBoundary:: Sorting", + new Date());
             for (var i = 0; i < vs.length; i += 1) {
                 stl_index[i] = i;
             }
@@ -1846,8 +1819,6 @@ define([
             });
 
             // find boundary
-
-            console.log("PlaneBoundary:: Computing upper hull", + new Date());
             // compute upper hull
             for (var i = 0; i < stl_index.length; i += 1) {
                 while( boundary.length >= 2 && cross(vs[boundary[boundary.length - 2]], vs[boundary[boundary.length - 1]], vs[stl_index[i]]) <= 0){
@@ -1887,15 +1858,12 @@ define([
                 stl_index[i] = i;
             }
 
-            console.log("PlaneBoundary:: Sorting", + new Date());
             stl_index.sort((a, b) => {
                 let c = vs[a * 3 + 1] - vs[b * 3 + 1];
                 return c ? c : vs[a * 3 + 0] - vs[b * 3 + 0];
             });
 
             // find boundary
-
-            console.log("PlaneBoundary:: Computing upper hull", + new Date());
             // compute upper hull
             for (var i = 0; i < stl_index.length; i += 1) {
                 while ( boundary.length >= 2 && cross(boundary[boundary.length - 2], boundary[boundary.length - 1], stl_index[i]) <= 0) {
@@ -2077,7 +2045,7 @@ define([
 
     function syncObjectParameter() {
         var d = $.Deferred();
-        _syncObjectParameter(objects, 0, function() {
+        _syncObjectParameter(objects, 0, () => {
             d.resolve('');
         });
 
@@ -2297,8 +2265,11 @@ define([
         if (!$.isEmptyObject(SELECTED)) {
             updateFromScene('TransformControl');
         }
+        
         renderer.clear();
-        renderer.render( outlineScene, camera );
+        if (outlineScene.children.length > 0) {
+            renderer.render( outlineScene, camera );
+        }
 
         renderer.clearDepth();
         renderer.render(previewMode ? previewScene : scene, camera);
@@ -2450,7 +2421,6 @@ define([
         var d = $.Deferred();
         clearInterval(slicingStatus.reporter);
         slicingStatus.inProgress = false;
-        slicingStatus.canInterrupt = true;
         if(slicingStatus.inProgress) {
             slicer.stopSlicing().then(function() {
                 slicingStatusStream.onNext(slicingStatus);
@@ -2618,9 +2588,7 @@ define([
         if(previewMode) {
             slicingStatus.isComplete = true;
             _showWait(lang.print.drawingPreview, !showStopButton);
-            slicingStatus.canInterrupt = false;
             slicer.getPath().then(function(result) {
-                slicingStatus.canInterrupt = true;
                 printPath = result;
                 _drawPath().then(function() {
                     _resetPreviewLayerSlider();
@@ -2752,9 +2720,7 @@ define([
         }
         else {
             if(!printPath || printPath.length === 0) {
-                slicingStatus.canInterrupt = false;
                 slicer.getPath().then((result) => {
-                    slicingStatus.canInterrupt = true;
                     if(result.error) {
                         processSlicerError(result);
                     }
@@ -2975,14 +2941,12 @@ define([
         var d = $.Deferred();
 
         var t = setInterval(() => {
-            if(slicingStatus.canInterrupt) {
+            if(!slicer.queueLocked()) {
                 clearInterval(t);
-                slicingStatus.canInterrupt = false;
                 slicer.changeEngine(engine).then((result) => {
                     if(result.error) {
                         processSlicerError(result);
                     }
-                    slicingStatus.canInterrupt = true;
                     d.resolve();
                 }).fail((error) => {
                     processSlicerError(error);
@@ -2994,12 +2958,13 @@ define([
     }
 
     function processSlicerError(result) {
+
         let id = 'SLICER_ERROR',
         message = lang.slicer.error[result.error] || result.info;
-        if(result.error === ErrorConstants.INVALID_PARAMETER) {
+        if (result.error === ErrorConstants.INVALID_PARAMETER) {
             message = `${message} ${result.info}`;
         }
-        if(!message) {
+        if (!message) {
             message = result.error;
         }
         AlertActions.showPopupError(id, message);
