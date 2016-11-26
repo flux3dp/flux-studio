@@ -74,6 +74,7 @@ define([
         args = args || {};
 
         var advancedSettings = {},
+            fineAdvancedSettings = {},
             _scale = {
                 locked  : true,
                 x       : 1,
@@ -544,16 +545,34 @@ define([
                         raftOn: _raftLayers !== 0
                     });
                     if(!setting) {
+                        console.log("AdvancedSettings:: Apply parameter default");
                         director.setAdvanceParameter(advancedSettings).then(() => {
+                            console.log("AdvancedSettings:: Apply default parameter end");
+                            Object.assign(fineAdvancedSettings, advancedSettings);
                             advancedSettings.engine = advancedSettings.engine || defaultSlicingEngine;
                             if(advancedSettings.engine !== 'slic3r') {
                                 this._handleSlicingEngineChange(advancedSettings.engine);
                             }
+                        }).fail(() => {
+                            console.log("AdvancedSettings:: Application failed, falling back");
+                            Object.assign(advancedSettings, fineAdvancedSettings);
+                            director.setAdvanceParameter(advancedSettings); 
+                            this._saveSetting();
                         });
                     }
                     else {
+                        console.log("AdvancedSettings:: Apply parameter with engine");
                         this._handleSlicingEngineChange(advancedSettings.engine).then(() => {
-                            director.setAdvanceParameter(advancedSettings);
+                            director.setAdvanceParameter(advancedSettings).then(() => {
+                                console.log("AdvancedSettings:: Apply engine parameter end");
+                                Object.assign(fineAdvancedSettings, advancedSettings);
+                                director.setAdvanceParameter(advancedSettings);
+                            }).fail(() => {
+                                console.log("AdvancedSettings:: Application with engine failed, falling back ", fineAdvancedSettings);
+                                Object.assign(advancedSettings, fineAdvancedSettings);
+                                director.setAdvanceParameter(advancedSettings);
+                                this._saveSetting();
+                            });
                         });
                     }
                 },

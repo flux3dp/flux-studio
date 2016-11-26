@@ -105,6 +105,7 @@ define([
         objectBeforeTransform = {},
         slicingStatusStream,
         uploadProgress,
+        fineSettings = {},
         history = [],
         lang = I18n.get();
 
@@ -731,8 +732,6 @@ define([
         });
         if (sliceParams === lastSliceParams) {
             console.log("Begin Slice:: Skipping redundant slicing");
-            console.log(sliceParams);
-            console.log(lastSliceParams);
             return;
         } else {
             console.log("Begin Slice:: Remove sliced results");
@@ -1453,7 +1452,7 @@ define([
     }
 
     function setAdvanceParameter(settings) {
-        var d = $.Deferred();
+        var deferred = $.Deferred();
         slicingStatus.pauseReport = true;
 
         var t = setInterval(function() {
@@ -1468,10 +1467,14 @@ define([
                     if(objects.length > 0) {
                         doSlicing();
                     }
-                    d.resolve('');
+                    deferred.resolve('');
                 }).fail((error) => {
+                    slicingStatus.canInterrupt = true;
+                    console.log("Advance setting error", error);
+                    // Fallback to fine settings
+                    Object.assign(settings, fineSettings);
                     processSlicerError(error);
-                    d.resolve('');
+                    deferred.reject(new Error(error));
                 });
                 blobExpired = true;
                 hasPreviewImage = false;
@@ -1479,7 +1482,7 @@ define([
             }
         }, 500);
 
-        return d.promise();
+        return deferred.promise();
     }
 
     function setParameter(name, value) {
