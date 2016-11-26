@@ -302,7 +302,7 @@ define([
             slicingStatus.pauseReport = true;
 
             setTimeout(() => {
-                console.log('Processing meshes');
+                console.log('New Mesh:: Py Processing meshes');
                 ProgressActions.updating('Processing meshes', 50);
             }, 1);
 
@@ -360,7 +360,7 @@ define([
                 mesh.file = file;
                 mesh.fileName = file.name;
                 setTimeout(() => {
-                    console.log('Calculating boundary');
+                    console.log('New Mesh:: Calculating boundary');
                     ProgressActions.updating('Calculating boundary', 50);
                 }, 1);
 
@@ -374,7 +374,7 @@ define([
                 addSizeProperty(mesh);
 
                 setTimeout(() => {
-                    console.log('Grounding');
+                    console.log('New Mesh:: Grounding');
                     ProgressActions.updating('Grouding', 85);
                 }, 1);
                 
@@ -1349,7 +1349,7 @@ define([
         });
 
         if (center) {
-            src.plane_boundary = planeBoundary(src);
+            // src.plane_boundary = planeBoundary(src);
             groundIt(src);
             checkOutOfBounds(src);
             render();
@@ -1753,6 +1753,18 @@ define([
     }
 
     function planeBoundary(sourceMesh) {
+        let transformation = JSON.stringify({ p: sourceMesh.position, s: sourceMesh.scale, r: sourceMesh.rotation}, (key, val) => {
+            // Fix precision
+            return val.toFixed ? Number(val.toFixed(5)) : val;
+        });
+        console.log("PlaneBoundary:: Transformation ", transformation);
+        if (sourceMesh.jTransformation == transformation) {
+            console.log("PlaneBoundary:: Skipping redundant calculation");
+            return;
+        } else {
+            console.log("compare", transformation, sourceMesh.jTransformation);
+        }
+        sourceMesh.jTransformation = transformation;
         // ref: http://www.csie.ntnu.edu.tw/~u91029/ConvexHull.html#4
         // Andrew's Monotone Chain
 
@@ -1761,29 +1773,32 @@ define([
         var stl_index = [];
         var boundary = [];
 
-        console.log('calculating boundary for geometry');
-
         if (sourceMesh.geometry.type === 'Geometry') {
             // define Cross product function on 2d plane
+            let vs = sourceMesh.geometry.vertices;
             var cross = (function cross(p0, p1, p2) {
                 return ((p1.x - p0.x) * (p2.y - p0.y)) - ((p1.y - p0.y) * (p2.x - p0.x));
             });
 
-            for (var i = 0; i < sourceMesh.geometry.vertices.length; i += 1) {
-                stl_index.push(i);
+            console.log("PlaneBoundary:: Allocating", + new Date());
+            stl_index = new Uint32Array(vs.length);
+
+            console.log("PlaneBoundary:: Sorting", + new Date());
+            for (var i = 0; i < vs.length; i += 1) {
+                stl_index[i] = i;
             }
-            stl_index.sort(function(a, b) {
-                if (sourceMesh.geometry.vertices[a].y === sourceMesh.geometry.vertices[b].y) {
-                    return sourceMesh.geometry.vertices[a].x - sourceMesh.geometry.vertices[b].x;
-                }
-                return sourceMesh.geometry.vertices[a].y - sourceMesh.geometry.vertices[b].y;
+
+            stl_index.sort((a, b) => {
+                let c = vs[a].y === vs[b].y;
+                return c ? c : vs[a].x - vs[b].x;
             });
 
             // find boundary
 
+            console.log("PlaneBoundary:: Computing upper hull", + new Date());
             // compute upper hull
             for (var i = 0; i < stl_index.length; i += 1) {
-                while( boundary.length >= 2 && cross(sourceMesh.geometry.vertices[boundary[boundary.length - 2]], sourceMesh.geometry.vertices[boundary[boundary.length - 1]], sourceMesh.geometry.vertices[stl_index[i]]) <= 0){
+                while( boundary.length >= 2 && cross(vs[boundary[boundary.length - 2]], vs[boundary[boundary.length - 1]], vs[stl_index[i]]) <= 0){
                     boundary.pop();
                 }
                 boundary.push(stl_index[i]);
@@ -1791,40 +1806,44 @@ define([
             // compute lower hull
             var t = boundary.length + 1;
             for (var i = stl_index.length - 2 ; i >= 0; i -= 1) {
-                while( boundary.length >= t && cross(sourceMesh.geometry.vertices[boundary[boundary.length - 2]], sourceMesh.geometry.vertices[boundary[boundary.length - 1]], sourceMesh.geometry.vertices[stl_index[i]]) <= 0){
+                while( boundary.length >= t && cross(vs[boundary[boundary.length - 2]], vs[boundary[boundary.length - 1]], vs[stl_index[i]]) <= 0){
                     boundary.pop();
                 }
                 boundary.push(stl_index[i]);
             }
+            
             // delete redundant point(i.e., starting point)
+            console.log("PlaneBoundary:: Finished", + new Date());
             boundary.pop();
         }
         else{
-            let vertices = sourceMesh.geometry.getAttribute('position');
-            // define Cross product function on 2d plane for buffergeometry
+            let vs = sourceMesh.geometry.getAttribute('position');
+            // define Cross product function on 2d plane for BufferGeometry
             var cross = (function cross(p0, p1, p2) {
 
-                return ((vertices[p1 * 3 + 0] - vertices[p0 * 3 + 0]) *
-                        (vertices[p2 * 3 + 1] - vertices[p0 * 3 + 1])) -
-                       ((vertices[p1 * 3 + 1] - vertices[p0 * 3 + 1]) *
-                        (vertices[p2 * 3 + 0] - vertices[p0 * 3 + 0]))
+                return ((vs[p1 * 3 + 0] - vs[p0 * 3 + 0]) *
+                        (vs[p2 * 3 + 1] - vs[p0 * 3 + 1])) -
+                       ((vs[p1 * 3 + 1] - vs[p0 * 3 + 1]) *
+                        (vs[p2 * 3 + 0] - vs[p0 * 3 + 0]))
             });
 
-            let meshSize = vertices.count / vertices.itemSize;
+            let meshSize = vs.count / vs.itemSize;
 
+            console.log("PlaneBoundary:: Allocating", + new Date());
+            stl_index = new Uint32Array(meshSize);
             for (var i = 0; i < meshSize; i += 1) {
-                stl_index.push(i);
+                stl_index[i] = i;
             }
 
-            stl_index.sort(function(a, b) {
-                if (vertices[a * 3 + 1] === vertices[b * 3 + 1]) {
-                    return vertices[a * 3 + 0] - vertices[b * 3 + 0];
-                }
-                return vertices[a * 3 + 1] - vertices[b * 3 + 1];
+            console.log("PlaneBoundary:: Sorting", + new Date());
+            stl_index.sort((a, b) => {
+                let c = vs[a * 3 + 1] - vs[b * 3 + 1];
+                return c ? c : vs[a * 3 + 0] - vs[b * 3 + 0];
             });
 
             // find boundary
 
+            console.log("PlaneBoundary:: Computing upper hull", + new Date());
             // compute upper hull
             for (var i = 0; i < stl_index.length; i += 1) {
                 while ( boundary.length >= 2 && cross(boundary[boundary.length - 2], boundary[boundary.length - 1], stl_index[i]) <= 0) {
@@ -1832,6 +1851,8 @@ define([
                 }
                 boundary.push(stl_index[i]);
             }
+
+            console.log("PlaneBoundary:: Computing lower hull", + new Date());
             // compute lower hull
             var t = boundary.length + 1;
             for (var i = stl_index.length - 2 ; i >= 0; i -= 1) {
@@ -1841,6 +1862,7 @@ define([
                 boundary.push(stl_index[i]);
             }
             // delete redundant point(i.e., starting point)
+            console.log("PlaneBoundary:: Finished", + new Date());
             boundary.pop();
         };
         return boundary;
@@ -2159,7 +2181,9 @@ define([
         }
         
         if ( previewScene.children.length > printPath.length && previewScene.children.length > 0)  {
+            // let trashLine = previewScene.children[previewScene.children.length - 1]
             previewScene.children.splice( previewScene.children.length - 1, 1) ;
+            // trashLine.dispose();
         }
 
         let g = new THREE.BufferGeometry(),
