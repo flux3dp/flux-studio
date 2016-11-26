@@ -60,7 +60,9 @@ define([
     var orbitControl, transformControl, reactSrc;
 
     var objects = [],
-        referenceMeshes = [];
+        referenceMeshes = [],
+        fullSliceParameters = {},
+        lastSliceParams = "";
 
     var raycaster = new THREE.Raycaster(),
         mouse = new THREE.Vector2(),
@@ -619,18 +621,43 @@ define([
         }
 
         syncObjectParameter().then(function() {
+            // syncing all objects rotation, transformation, position
+            fullSliceParameters.objs = {}
+            objects.forEach((o) => {
+                fullSliceParameters.objs[o.uuid] = [
+                    o.position.x,
+                    o.position.y,
+                    o.position.z,
+                    o.rotation.x,
+                    o.rotation.y,
+                    o.rotation.z,
+                    o.scale.x,
+                    o.scale.y,
+                    o.scale.z
+                ]
+            });
             return stopSlicing();
         }).then(function() {
             // set again because stop slicing set inProgress to false
             slicingStatus.inProgress = true;
             slicingStatusStream.onNext(slicingStatus);
+
+            let sliceParams = JSON.stringify(fullSliceParameters);
+            console.log("Begin Slice:: Skipping redudant slicing");
+            
+            if (sliceParams === lastSliceParams) {
+                return;
+            } else {
+                lastSliceParams = sliceParams;
+            }
+
             slicer.beginSlicing(ids, slicingType.F).then(function(response) {
                 slicingStatus.percentage = 0.05;
                 reactSrc.setState({slicingPercentage: 0.05});
                 slicingStatus.canInterrupt = true;
                 slicingStatus.pauseReport = false;
                 getSlicingReport(function(report) {
-                    if(report.status != 'ok'){
+                    if (report.status != 'ok') {
                         slicingStatus.lastReport = report;
                     }
                     updateSlicingProgressFromReport(slicingStatus.lastReport);
@@ -1414,6 +1441,7 @@ define([
                 clearInterval(t);
                 slicingStatus.canInterrupt = false;
                 slicer.setParameter('advancedSettings', settings.custom).then((result) => {
+                    fullSliceParameters.settings = settings;
                     slicingStatus.canInterrupt = true;
                     slicingStatus.showProgress = false;
                     slicingStatus.pauseReport = false;
@@ -1444,6 +1472,7 @@ define([
             if(slicingStatus.canInterrupt) {
                 clearInterval(t);
                 slicer.setParameter(name, value).then(() => {
+                    fullSliceParameters.settings[name] = value;
                     slicingStatus.showProgress = false;
                     slicingStatus.pauseReport = false;
                     if(objects.length > 0) {
