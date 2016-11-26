@@ -58,10 +58,15 @@ define([
             config().write('notification', e.currentTarget.value);
         },
 
+        _changeProjection: function(e) {
+            config().write('camera-projection', e.currentTarget.value);
+        },
+
         render : function() {
             var pokeIP = config().read('poke-ip-addr'),
                 lang = this.state.lang,
                 notificationOptions = [],
+                projectionOptions = [],
                 options = [];
 
             for (var lang_code in this.props.supported_langs) {
@@ -82,6 +87,19 @@ define([
                     value: 1,
                     label: lang.settings.notification_on,
                     selected: config().read('notification') === '1'
+                }
+            ];
+
+            projectionOptions = [
+                {
+                    value: 'Perspective',
+                    label: lang.settings.projection_perspective,
+                    selected: config().read('camera-projection') === 'Perspective'
+                },
+                {
+                    value: 'Orthographic',
+                    label: lang.settings.projection_orthographic,
+                    selected: config().read('camera-projection') === 'Orthographic'
                 }
             ];
 
@@ -126,6 +144,20 @@ define([
 
                         <div className="span8 font3">
                             <input type="text" autoComplete="false" defaultValue={pokeIP} onBlur={this._checkIPFormat}/>
+                        </div>
+
+                    </div>
+
+                    <div className="row-fluid">
+
+                        <div className="span3 no-left-margin">
+                            <label className="font2">
+                                {lang.settings.projection}
+                            </label>
+                        </div>
+
+                        <div className="span8 font3">
+                            <SelectView id="select-lang" className="font3" options={projectionOptions} onChange={this._changeProjection}/>
                         </div>
 
                     </div>

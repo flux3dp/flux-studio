@@ -13,6 +13,7 @@ define([
     'app/constants/error-constants',
     'helpers/packer',
     'helpers/i18n',
+    'helpers/api/config',
     'helpers/nwjs/menu-factory',
     'app/actions/global-actions',
     'helpers/sprintf',
@@ -28,7 +29,7 @@ define([
     'threeCircularGridHelper',
     'plugins/file-saver/file-saver.min',
     'lib/Canvas-To-Blob',
-    'helpers/object-assign'
+    'helpers/object-assign',
 ], function(
     $,
     display,
@@ -44,6 +45,7 @@ define([
     ErrorConstants,
     Packer,
     I18n,
+    Config,
     MenuFactory,
     GlobalActions,
     Sprintf,
@@ -161,8 +163,17 @@ define([
         reactSrc = src;
         container = document.getElementById('model-displayer');
 
-        camera = new THREE.PerspectiveCamera(60, (container.offsetWidth) / container.offsetHeight, 1, 30000);
-        camera.position.set(0, -200, 100);
+        let width = container.offsetWidth, height = container.offsetHeight;
+
+        if (Config().read('camera-projection') == 'Orthographic') {
+            camera = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, 1, 1000 );
+            camera.position.set(0, -200, 100);
+            camera.zoom = 4;
+            camera.updateProjectionMatrix();
+        } else {
+            camera = new THREE.PerspectiveCamera(60, width/height, 1, 30000);
+            camera.position.set(0, -200, 100);
+        }
         camera.up = new THREE.Vector3(0, 0, 1);
 
         scene = new THREE.Scene();

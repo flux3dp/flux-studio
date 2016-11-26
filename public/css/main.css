@@ -3530,7 +3530,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         min-width: 60px; }
 
 .shadow-modal .modal-body {
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3), 0 16px 40px rgba(0, 0, 0, 0.5); }
+    box-shadow: 0 7px 15px rgba(0, 0, 0, 0.2), 0 10px 20px rgba(0, 0, 0, 0.1); }
 
 .modal-progress.modal-window .button-group button.btn-default {
     margin-bottom: 15px; }
@@ -3918,7 +3918,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         height: 40rem;
         width: 31rem;
         position: relative;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3), 0 16px 40px rgba(0, 0, 0, 0.5); }
+        box-shadow: 0 7px 15px rgba(0, 0, 0, 0.2), 0 10px 20px rgba(0, 0, 0, 0.1); }
         .flux-monitor .main .title {
             height: 5rem;
             text-align: center; }
@@ -4112,7 +4112,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         width: 31rem;
         position: relative;
         margin-top: 5px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3), 0 16px 40px rgba(0, 0, 0, 0.5); }
+        box-shadow: 0 7px 15px rgba(0, 0, 0, 0.2), 0 10px 20px rgba(0, 0, 0, 0.1); }
         .flux-monitor .sub .wrapper {
             padding: 1.5rem 1.5rem 0 1.5rem; }
             .flux-monitor .sub .wrapper .row {
@@ -4582,7 +4582,7 @@ input.switch:checked ~ label:after {
     margin-top: 0.05em; }
 
 .box-shadow .modal-body {
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3), 0 16px 40px rgba(0, 0, 0, 0.5); }
+    box-shadow: 0 7px 15px rgba(0, 0, 0, 0.2), 0 10px 20px rgba(0, 0, 0, 0.1); }
 
 /* Advanced Panel */
 .print-studio .import-indicator {
@@ -4596,7 +4596,7 @@ input.switch:checked ~ label:after {
 
 .print-studio .advanced-panel {
     background-color: #fff;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3), 0 16px 40px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 7px 15px rgba(0, 0, 0, 0.2), 0 10px 20px rgba(0, 0, 0, 0.1);
     padding: 0;
     position: relative;
     height: 540px;
@@ -5597,7 +5597,7 @@ input.switch:checked ~ label:after {
             line-height: 2rem;
             margin: 0; }
     .initialization .select-wifi .modal-body {
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3), 0 16px 40px rgba(0, 0, 0, 0.5); }
+        box-shadow: 0 7px 15px rgba(0, 0, 0, 0.2), 0 10px 20px rgba(0, 0, 0, 0.1); }
     .initialization .select-wifi .form-ap-mode {
         padding: 25px 25px 0 25px; }
         .initialization .select-wifi .form-ap-mode h2 {

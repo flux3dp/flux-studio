@@ -264,8 +264,11 @@ define(function() {
                 general: 'General',
                 device: 'Device'
             },
-            ip: 'Delta\'s IP',
+            ip: 'Machine IP',
             wrong_ip_format: 'Wrong IP Formats',
+            projection: 'View Projection',
+            projection_perspective: 'Perspective',
+            projection_orthographic: 'Orthographic',
             language: 'Language',
             notifications: 'Notifications',
             close: 'Close',

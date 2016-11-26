@@ -422,7 +422,7 @@ input.switch:checked ~ label:after {
 }
 
 .box-shadow .modal-body{
-    box-shadow: 0 4px 15px rgba(0,0,0,.3), 0 16px 40px rgba(0,0,0,.5);
+    box-shadow: 0 7px 15px rgba(0, 0, 0, .2), 0 10px 20px rgba(0, 0, 0, 0.1);
 }
 
 /* Advanced Panel */
@@ -440,7 +440,7 @@ input.switch:checked ~ label:after {
     .advanced-panel {
         $border-color: #DDD;
         background-color: #fff;
-        box-shadow: 0 4px 15px rgba(0,0,0,.3), 0 16px 40px rgba(0,0,0,.5);
+        box-shadow: 0 7px 15px rgba(0, 0, 0, .2), 0 10px 20px rgba(0, 0, 0, 0.1);
         padding: 0;
         position: relative;
         height: 540px;
