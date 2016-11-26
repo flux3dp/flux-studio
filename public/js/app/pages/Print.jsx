@@ -94,7 +94,7 @@ define([
             allowDeleteObject = true,
             tutorialMode = false,
             nwjsMenu = menuFactory.items,
-            defaultSlicingEngine = 'slic3r',
+            defaultSlicingEngine = 'cura',
             tourGuide = [
                 {
                     selector: '.arrowBox',

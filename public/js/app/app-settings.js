@@ -18,7 +18,7 @@ define(function() {
             }
         },
 
-        default_engine: 'slic3r',
+        default_engine: 'cura',
 
         print_config: {
             color_border_out_side: 0xFF0000,
