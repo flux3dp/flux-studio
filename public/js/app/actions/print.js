@@ -61,7 +61,7 @@ define([
 
     var objects = [],
         referenceMeshes = [],
-        fullSliceParameters = {},
+        fullSliceParameters = {settings: {}},
         lastSliceParams = "";
 
     var raycaster = new THREE.Raycaster(),
@@ -621,35 +621,13 @@ define([
         }
 
         syncObjectParameter().then(function() {
-            // syncing all objects rotation, transformation, position
-            fullSliceParameters.objs = {}
-            objects.forEach((o) => {
-                fullSliceParameters.objs[o.uuid] = [
-                    o.position.x,
-                    o.position.y,
-                    o.position.z,
-                    o.rotation.x,
-                    o.rotation.y,
-                    o.rotation.z,
-                    o.scale.x,
-                    o.scale.y,
-                    o.scale.z
-                ]
-            });
             return stopSlicing();
         }).then(function() {
+            console.log("Begin Slice:: Start");
+
             // set again because stop slicing set inProgress to false
             slicingStatus.inProgress = true;
             slicingStatusStream.onNext(slicingStatus);
-
-            let sliceParams = JSON.stringify(fullSliceParameters);
-            console.log("Begin Slice:: Skipping redudant slicing");
-            
-            if (sliceParams === lastSliceParams) {
-                return;
-            } else {
-                lastSliceParams = sliceParams;
-            }
 
             slicer.beginSlicing(ids, slicingType.F).then(function(response) {
                 slicingStatus.percentage = 0.05;
@@ -719,6 +697,37 @@ define([
     }
 
     function doSlicing() {
+
+        // Check if slicing is necessary
+        fullSliceParameters.objs = {}
+        objects.forEach((o) => {
+            fullSliceParameters.objs[o.uuid] = [
+                o.position.x,
+                o.position.y,
+                o.position.z,
+                o.rotation.x,
+                o.rotation.y,
+                o.rotation.z,
+                o.scale.x,
+                o.scale.y,
+                o.scale.z
+            ]
+        });
+
+        let sliceParams = JSON.stringify(fullSliceParameters, (key, val) => {
+            // Fix precision to .00001
+            return val.toFixed ? Number(val.toFixed(5)) : val;
+        });
+        if (sliceParams === lastSliceParams) {
+            console.log("Begin Slice:: Skipping redundant slicing");
+            console.log(sliceParams);
+            console.log(lastSliceParams);
+            return;
+        } else {
+            console.log("Begin Slice:: Remove sliced results");
+            lastSliceParams = sliceParams;
+        }
+
         _clearPath();
         blobExpired = true;
         hasPreviewImage = false;
@@ -1441,7 +1450,7 @@ define([
                 clearInterval(t);
                 slicingStatus.canInterrupt = false;
                 slicer.setParameter('advancedSettings', settings.custom).then((result) => {
-                    fullSliceParameters.settings = settings;
+                    Object.assign(fullSliceParameters.settings, settings);
                     slicingStatus.canInterrupt = true;
                     slicingStatus.showProgress = false;
                     slicingStatus.pauseReport = false;
@@ -1783,13 +1792,13 @@ define([
 
     function planeBoundary(sourceMesh) {
         let transformation = JSON.stringify({ p: sourceMesh.position, s: sourceMesh.scale, r: sourceMesh.rotation}, (key, val) => {
-            // Fix precision
+            // Fix precision to .00001
             return val.toFixed ? Number(val.toFixed(5)) : val;
         });
         console.log("PlaneBoundary:: Transformation ", transformation);
         if (sourceMesh.jTransformation == transformation) {
             console.log("PlaneBoundary:: Skipping redundant calculation");
-            return;
+            return sourceMesh.plane_boundary;
         } else {
             console.log("compare", transformation, sourceMesh.jTransformation);
         }
