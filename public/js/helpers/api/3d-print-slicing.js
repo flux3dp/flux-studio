@@ -44,6 +44,8 @@ define([
             queueLock = false,
             queuedCommands = [];
 
+        
+        // When the queue is free, resolve to run the next "Command", and send a wrapped "Psuedo - Promise" 
         setInterval(() => {
             // Check queue
             if (!queueLock && queuedCommands.length > 0) {
