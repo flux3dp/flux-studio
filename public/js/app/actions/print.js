@@ -448,9 +448,10 @@ define([
             !showStopButton
         );
 
-        var file = files.item ? files.item(index) : files[index];
+        let file = files.item ? files.item(index) : files[index];
+        let ext = file.name.split('.').pop().toLowerCase();
+
         models.push(file);
-        var ext = file.name.split('.').pop().toLowerCase();
         if(ext === 'stl' || ext === 'obj') {
             let fr = new FileReader();
             fr.addEventListener('load', (e) => { 
@@ -601,26 +602,22 @@ define([
         slicingStatusStream.onNext(slicingStatus);
 
         if(objects.length === 0 || !blobExpired) { return; }
-        var ids = [];
-        objects.forEach(function(obj) {
-            if(!obj.position.isOutOfBounds) {
-                ids.push(obj.uuid);
-            }
-        });
+
+        var ids = objects.filter(v => !v.position.isOutOfBounds).map(v => v.uuid);
 
         if(previewMode) {
             _clearPath();
             _showPreview();
         }
 
-        syncObjectParameter().then(function() {
+        syncObjectParameter().then(() => {
             return stopSlicing();
-        }).then(function() {
+        }).then(() => {
             // set again because stop slicing set inProgress to false
             slicingStatus.inProgress = true;
             slicingStatusStream.onNext(slicingStatus);
 
-            slicer.beginSlicing(ids, slicingType.F).then(function(response) {
+            slicer.beginSlicing(ids, slicingType.F).then(() => {
                 slicingStatus.percentage = 0.05;
                 reactSrc.setState({slicingPercentage: 0.05});
                 getSlicingReport(function(report) {
@@ -824,20 +821,15 @@ define([
         }
         else {
             GlobalActions.sliceComplete(report);
-            if(show) {
-                ProgressActions.updating(complete, 100);
-            }
+            if(show) { ProgressActions.updating(complete, 100); }
             slicer.getSlicingResult().then((result) => {
-                if(result.error) {
-                    processSlicerError(result);
-                    return;
-                }
+                if(result.error) { return processSlicerError(result); }
                 setTimeout(function() {
                     if(needToShowMonitor) {
                         reactSrc._handleDeviceSelected();
                         needToShowMonitor = false;
                     }
-                }, 1000);
+                }, 300);
 
                 blobExpired = false;
                 responseBlob = result;
@@ -1139,74 +1131,6 @@ define([
             ref.y = box.center().y;
             ref.z = box.min.z;
             return ref;
-        }
-    }
-
-    function getFileByteArray(filePath) {
-        getFileObject(filePath, function(fileObject) {
-            var reader = new FileReader();
-
-            reader.onload = function(e) {
-                var arrayBuffer = reader.result;
-            };
-
-            reader.readAsArrayBuffer(fileObject);
-        });
-    }
-
-    // compare and return the largest axis value (for scaling)
-    function getLargestPropertyValue(obj) {
-        var v = 0;
-        for (var property in obj) {
-            if (obj.hasOwnProperty(property)) {
-                if (obj[property] > v) {
-                    v = obj[property];
-                }
-            }
-        }
-        return v;
-    }
-
-    function getSmallestPropertyValue(obj) {
-        var v = 1;
-        for (var property in obj) {
-            if (obj.hasOwnProperty(property)) {
-                if (obj[property] < v) {
-                    v = obj[property];
-                }
-            }
-        }
-        return v;
-    }
-
-    // return the scale to fit the area
-    function getScaleDifference(value) {
-        var done = false,
-            scale = 1;
-
-        // if loaded object is smaller, enlarge it. offset by *10
-        if (value < s.diameter) {
-            while(!done) {
-                if (value * scale < s.allowedMin) {
-                    scale = scale * 10;
-                }
-                else {
-                    done = true;
-                }
-            }
-
-            return scale;
-        }
-        // if loaded object exceed printed area, shrink it (no offset)
-        else {
-            while (!done) {
-                if (value / scale < s.diameter) {
-                    done = true;
-                } else {
-                    scale = scale * 10;
-                }
-            }
-            return 1 / scale;
         }
     }
 
@@ -2269,14 +2193,6 @@ define([
         return (parseInt(degree / degreeStep) * degreeStep);
     }
 
-    function updateScaleWithStep(scale) {
-        // if no decimal after scale precision, ex: 1.1, not 1.143
-        if (parseInt(scale * Math.pow(10, s.scalePrecision)) === scale * Math.pow(10, s.scalePrecision)) {
-            return scale;
-        }
-        return (parseInt(scale * Math.pow(10, s.scalePrecision)) + 1) / Math.pow(10, s.scalePrecision);
-    }
-
     function updateObjectSize(src) {
         src.size.enteredX = src.scale.x * src.size.originalX;
         src.size.enteredY = src.scale.y * src.size.originalY;
@@ -2292,18 +2208,6 @@ define([
             modelSelected: src
         });
 
-    }
-
-    function getLargestPropertyValue(obj) {
-        var v = 0;
-        for (var property in obj) {
-            if (obj.hasOwnProperty(property)) {
-                if (obj[property] > v) {
-                    v = obj[property];
-                }
-            }
-        }
-        return v;
     }
 
     function updateObjectRotation(src) {
@@ -2416,22 +2320,21 @@ define([
     function downloadScene() {
         if(objects.length === 0) { return; }
 
-        var parameter;
         packer.clear();
 
         if(objects.length > 0) {
             objects.forEach(function(model) {
-                parameter = {};
-                parameter.size = model.size;
-                parameter.rotation = model.rotation;
-                parameter.position = model.position;
-                parameter.scale = model.scale;
-                packer.addInfo(parameter);
+                packer.addInfo({
+                    size : model.size,
+                    rotation : model.rotation,
+                    position : model.position,
+                    scale : model.scale
+                });
                 packer.addFile(model.file);
             });
         }
-        var sceneFile = packer.pack();
-        saveAs(sceneFile);
+        
+        saveAs(packer.pack());
     }
 
     function loadScene() {
@@ -2494,7 +2397,7 @@ define([
                 o[index].scale.x,
                 o[index].scale.y,
                 o[index].scale.z
-            ).then((result) => {
+            ).then(() => {
                 if (index < o.length) {
                     _syncObjectParameter(o, index + 1, callback);
                 }
@@ -2867,10 +2770,9 @@ define([
 
     function _checkNeedToShowProgress() {
         if(!slicingStatus.isComplete) {
-            if(!slicingStatus.showProgress) {
-                slicingStatus.showProgress = true;
-            }
-            if(typeof slicingStatus.lastReport !== 'undefined' && slicingStatus.lastReport !== null) {
+            slicingStatus.showProgress = true;
+
+            if(!!slicingStatus.lastReport) {
                 updateSlicingProgressFromReport(slicingStatus.lastReport);
             }
         }
