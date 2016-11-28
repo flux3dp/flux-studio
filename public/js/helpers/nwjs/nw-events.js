@@ -38,7 +38,7 @@ define(['jquery', 'helpers/i18n'], function($, i18n) {
         win.title = 'FLUX Studio - ' + window.FLUX.version;
 
         win.on('close', function() {
-            var isQuit = window.confirm(lang.topmenu.sure_to_quit);
+            var isQuit = window ? window.confirm(lang.topmenu.sure_to_quit) : true;
 
             if (true === isQuit) {
                 window.FLUX.killAPI().always(function() {
