@@ -52,7 +52,6 @@ define([
         },
 
         _handleDetectEnterKey: function(e) {
-            e.preventDefault();
             if(e.key === 'Enter') {
                 this._handleSignIn(e);
             }
