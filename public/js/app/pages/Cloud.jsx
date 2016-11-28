@@ -10,6 +10,7 @@ define([
     'jsx!views/cloud/bind-machine',
     'jsx!views/cloud/bind-success',
     'jsx!views/cloud/bind-fail',
+    'jsx!views/cloud/bind-error',
     'jsx!views/cloud/sign-out',
     'jsx!views/cloud/change-password',
     'jsx!views/cloud/terms',
@@ -26,6 +27,7 @@ define([
     BindMachine,
     BindSuccess,
     BindFail,
+    BindError,
     SignOut,
     ChangePassword,
     Terms,
@@ -48,7 +50,8 @@ define([
 
             _renderContent: function() {
                 var content = {},
-                    view = args.child;
+                    view = args.child,
+                    self = this;
 
                 content['sign-in'] = () => <SignIn lang={this.state.lang} />
                 content['sign-up'] = () => <SignUp lang={this.state.lang} />
@@ -59,6 +62,7 @@ define([
                 content['bind-machine'] = () => <BindMachine lang={this.state.lang} />
                 content['bind-success'] = () => <BindSuccess lang={this.state.lang} />
                 content['bind-fail'] = () => <BindFail lang={this.state.lang} />
+                content['bind-error'] = () => <BindError lang={this.state.lang} />
                 content['change-password'] = () => <ChangePassword lang={this.state.lang} />
                 content['sign-out'] = () => <SignOut />
                 content['terms'] = () => <Terms lang={this.state.lang} />

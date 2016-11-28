@@ -128,31 +128,62 @@ define([
 					location.hash = '#/studio/cloud/bind-fail';
 				}
 				else {
-					return DeviceMaster.enableCloud();
+					DeviceMaster.getDeviceInfo().then(response => {
+
+						const bindDevice = (uuid, token, accessId, signature) => {
+							CloudApi.bindDevice(uuid, token, accessId, signature).then(r => {
+								if(r.ok) {
+									this.setState({ bindingInProgress: false });
+									location.hash = '#/studio/cloud/bind-success';
+								}
+								else {
+									location.hash = '#/studio/cloud/bind-fail';
+								}
+							});
+						};
+
+						const processEnableCloudResult = (cloudResult) => {
+							if(typeof cloudResult === 'undefined') {
+								return new Promise(r => r.resolve());
+							}
+							if(cloudResult.status === 'ok') {
+								DeviceMaster.getCloudValidationCode().then(r => {
+									let { token, signature } = r.code,
+										{ uuid } = this.state.selectedDevice,
+										accessId = r.code.access_id;
+
+									signature = encodeURIComponent(signature);
+									bindDevice(uuid, token, accessId, signature);
+								});
+							} else {
+								location.hash = '#/studio/cloud/bind-fail';
+							}
+						};
+
+						const processBindError = () => {
+							location.hash = `#/studio/cloud/bind-error/${this.state.selectedDevice.uuid}`;
+						};
+
+						if(!Boolean(response.cloud)) {
+							processBindError();
+						}
+						else if(response.cloud[0] === true) {
+							DeviceMaster.enableCloud().then(processEnableCloudResult);
+						}
+						else if(!response.cloud[0]) {
+							let reason = response.cloud[1].split(',');
+							if(reason[0] === 'DISABLE') {
+								DeviceMaster.enableCloud().then(processEnableCloudResult);
+							}
+							else if(response.cloud[1] === 'UNKNOWN_ERROR') {
+								processBindError();
+							}
+							else {
+								location.hash = '#/studio/cloud/bind-fail';
+							}
+						}
+					});
 				}
-			}).then((response) => {
-				if(response.status === 'ok') {
-					return DeviceMaster.getCloudValidationCode();
-				} else {
-					location.hash = '#/studio/cloud/bind-fail';
-				}
-			}).then((response) => {
-				let { token, signature } = response.code,
-					{ uuid } = this.state.selectedDevice,
-					accessId = response.code.access_id;
-
-				signature = encodeURIComponent(signature);
-
-				CloudApi.bindDevice(uuid, token, accessId, signature).then(r => {
-					if(r.ok) {
-						this.setState({ bindingInProgress: false });
-						location.hash = '#/studio/cloud/bind-success';
-					}
-					else {
-						location.hash = '#/studio/cloud/bind-fail';
-					}
-				});
-
 			});
 		},
 

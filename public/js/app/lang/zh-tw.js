@@ -336,6 +336,8 @@ define(function() {
                 binding_success_description: '您可以開始使用 FLUX App 來監控機器',
                 binding_fail: '綁定失敗',
                 binding_fail_description: '網路可能有問題，請再試一次',
+                binding_error_description: '無法開啟雲端功能，請與客服人員聯絡，並附上機器錯誤記錄',
+                retrieve_error_log: '下載錯誤記錄',
                 binding: '綁定中...',
                 check_email: '相關信進已寄出到您的電子信箱，請確認',
                 email_exists: '電子信箱已被使用',

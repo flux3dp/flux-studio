@@ -323,6 +323,8 @@ define(function() {
                 binding_success_description: 'You can now use FLUX app to check your machine status',
                 binding_fail: 'Binding Fail',
                 binding_fail_description: 'May due to network error. Try it again',
+                binding_error_description: 'Unable to turn on cloud feature of the machine. Please contact support with the error log',
+                retrieve_error_log: 'Download error',
                 binding: 'Binding...',
                 check_email: 'Please check your email for instruction',
                 email_exists: 'Email exists',
