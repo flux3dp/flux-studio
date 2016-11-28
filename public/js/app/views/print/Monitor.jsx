@@ -556,7 +556,18 @@ define([
                     store.dispatch(MonitorActionCreator.showWait());
                 }
                 else {
-                    let p = Device.status.st_id < 0 ? DeviceMaster.kick() : DeviceMaster.stop();
+                    let p = $.Deferred();
+                    if(Device.status.st_id < 0) {
+                        if(confirm(lang.monitor.forceStop)) {
+                            p = DeviceMaster.kick();
+                        }
+                        else {
+                            p.resolve();
+                        }
+                    }
+                    else {
+                        p = DeviceMaster.stop();
+                    }
                     p.always(() => {
                         let mode = Monitor.selectedFileInfo.length > 0 ? GlobalConstants.FILE_PREVIEW : GlobalConstants.PREVIEW;
                         if(Device.status.st_id < 0) {

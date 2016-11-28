@@ -74,6 +74,7 @@ define([
         args = args || {};
 
         var advancedSettings = {},
+            fineAdvancedSettings = {},
             _scale = {
                 locked  : true,
                 x       : 1,
@@ -88,12 +89,13 @@ define([
             lang = args.state.lang,
             selectedPrinter,
             $importBtn,
+            finishedSnapshot = false,
             listeningToCancel = false,
             defaultRaftLayer = 4,
             allowDeleteObject = true,
             tutorialMode = false,
             nwjsMenu = menuFactory.items,
-            defaultSlicingEngine = 'slic3r',
+            defaultSlicingEngine = 'cura',
             tourGuide = [
                 {
                     selector: '.arrowBox',
@@ -232,21 +234,28 @@ define([
                     this._prepareMenu();
                     nwjsMenu.import.enabled = true;
                     nwjsMenu.import.onClick = () => { $importBtn.click(); };
-                    nwjsMenu.undo.onClick = () => { director.undo(); };
+                    nwjsMenu.undo.onClick = () => { console.log('undo'); director.undo(); };
+                    nwjsMenu.tutorial.onClick = () => { console.log('undo'); director.undo(); };
                     nwjsMenu.duplicate.onClick = () => { director.duplicateSelected(); };
                     nwjsMenu.saveTask.onClick = this._handleDownloadFCode;
                     nwjsMenu.saveScene.onClick = this._handleDownloadScene;
                     nwjsMenu.clear.onClick = this._handleClearScene;
-                    nwjsMenu.tutorial.onClick = () => {
-                        this.setState({ currentTutorialStep: 0 }, () => {
-                            this._handleYes('tour');
-                        });
-                    };
                     nwjsMenu.clearLocalstorage.enabled = true;
                     nwjsMenu.clearLocalstorage.onClick = () => {
                         if(confirm(lang.topmenu.file.confirmReset)) {
                             LocalStorage.clearAllExceptIP();
                         }
+                    };
+
+                    // to catch the tutorial click from menuMap
+                    // this mod is implemented after menu-map refactored, using cache to reduce refresh, boot performance
+                    if(!window.customEvent) {
+                        window.customEvent = {};
+                    }
+                    window.customEvent.onTutorialClick = () => {
+                        this.setState({ currentTutorialStep: 0 }, () => {
+                            this._handleYes('tour');
+                        });
                     };
 
                     menuFactory.methods.refresh();
@@ -335,6 +344,7 @@ define([
                     nwjsMenu.clear.onClick = this._handleClearScene;
                     nwjsMenu.tutorial.enabled = true;
                     nwjsMenu.tutorial.onClick = () => {
+                        console.log('tour on');
                         this._handleYes('tour');
                     };
                     nwjsMenu.undo.enabled = false;
@@ -469,11 +479,13 @@ define([
                 _handleGoClick: function() {
                     AlertStore.removeCancelListener(this._handleDefaultCancel);
                     listeningToCancel = false;
+                    finishedSnapshot = false;
                     director.takeSnapShot().then(() =>{
-                        this.setState({
-                            openPrinterSelectorWindow: true
-                        });
+                        finishedSnapshot = true;
                         director.clearSelection();
+                    });
+                    this.setState({
+                        openPrinterSelectorWindow: true
                     });
                 },
 
@@ -533,16 +545,34 @@ define([
                         raftOn: _raftLayers !== 0
                     });
                     if(!setting) {
+                        console.log("AdvancedSettings:: Apply parameter default");
                         director.setAdvanceParameter(advancedSettings).then(() => {
+                            console.log("AdvancedSettings:: Apply default parameter end");
+                            Object.assign(fineAdvancedSettings, advancedSettings);
                             advancedSettings.engine = advancedSettings.engine || defaultSlicingEngine;
                             if(advancedSettings.engine !== 'slic3r') {
                                 this._handleSlicingEngineChange(advancedSettings.engine);
                             }
+                        }).fail(() => {
+                            console.log("AdvancedSettings:: Application failed, falling back");
+                            Object.assign(advancedSettings, fineAdvancedSettings);
+                            director.setAdvanceParameter(advancedSettings); 
+                            this._saveSetting();
                         });
                     }
                     else {
+                        console.log("AdvancedSettings:: Apply parameter with engine");
                         this._handleSlicingEngineChange(advancedSettings.engine).then(() => {
-                            director.setAdvanceParameter(advancedSettings);
+                            director.setAdvanceParameter(advancedSettings).then(() => {
+                                console.log("AdvancedSettings:: Apply engine parameter end");
+                                Object.assign(fineAdvancedSettings, advancedSettings);
+                                director.setAdvanceParameter(advancedSettings);
+                            }).fail(() => {
+                                console.log("AdvancedSettings:: Application with engine failed, falling back ", fineAdvancedSettings);
+                                Object.assign(advancedSettings, fineAdvancedSettings);
+                                director.setAdvanceParameter(advancedSettings);
+                                this._saveSetting();
+                            });
                         });
                     }
                 },
@@ -594,7 +624,7 @@ define([
                         openPrinterSelectorWindow: false
                     }, () => {
                         let t = setInterval(() => {
-                            if(director.getSlicingStatus().isComplete) {
+                            if(director.getSlicingStatus().isComplete && finishedSnapshot) {
                                 clearInterval(t);
                                 director.getFCode().then((fcode, previewUrl) => {
                                     if(!(fcode instanceof Blob)) {
@@ -620,7 +650,7 @@ define([
                                     }, 1000);
                                 });
                             }
-                        }, 500);
+                        }, 100);
                     });
                 },
 

@@ -264,8 +264,11 @@ define(function() {
                 general: 'General',
                 device: 'Device'
             },
-            ip: 'Delta\'s IP',
+            ip: 'Machine IP',
             wrong_ip_format: 'Wrong IP Formats',
+            projection: 'View Projection',
+            projection_perspective: 'Perspective',
+            projection_orthographic: 'Orthographic',
             language: 'Language',
             notifications: 'Notifications',
             close: 'Close',
@@ -964,6 +967,7 @@ define(function() {
             MAINBOARD_OFFLINE                   : 'Something went wrong\nPlease restart the device',
             G28_FAILED                          : '#124 Unable to calibrate origin (home)\nPlease remove obstacles on rails, and make sure toolhead cables are not caught by carriages.',
             FILAMENT_RUNOUT_0                   : '#121 Ran out of filament\nPlease insert new material <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/218931757">More Info</a>',
+            USER_OPERATION_FROM_CODE            : 'Paused for operation (filament change)',
             processing                          : 'Processing',
             savingPreview                       : 'Generating thumbnails',
             hour                                : 'h',
@@ -1145,12 +1149,13 @@ define(function() {
             error: {
                 '6': 'Calculated toolpath is out of working area. Please reduce the size of the object(s), or try to turn off raft, brim or skirt.',
                 '7': 'Error occurred while setting advanced parameters.',
-                '8': 'API returned empty result.\nRequest for result is probably called before slice complete',
-                '9': 'API returned empty path.\nRequest for toolpath is probably called before slice complete',
-                '10': 'Missing object data. The source object is missing from slicer engine',
-                '13': 'Duplication error\nThe selected ID does not exist. If the error is not resolved by restarting FLUX Studio, please report this error.',
-                '14': 'Error occurred whil setting position. The source object is missing in slicer engine.',
-                '15': 'Uploaded file is corrupt, please check the file and try again.'
+                '8': 'Slicing:: API returned empty result.\nRequest for result is probably called before slice complete',
+                '9': 'Slicing:: API returned empty path.\nRequest for toolpath is probably called before slice complete',
+                '10': 'Slicing:: Missing object data. The source object is missing from slicer engine',
+                '13': 'Slicing:: Duplication error\nThe selected ID does not exist. If the error is not resolved by restarting FLUX Studio, please report this error.',
+                '14': 'Slicing:: Error occurred while setting position. The source object is missing in slicer engine.',
+                '15': 'Slicing:: Uploaded file is corrupt, please check the file and try again.',
+                '16': 'Slicing:: Slicing engine exited abnormally, kindly slice again.'
             },
             pattern_not_supported_at_100_percent_infill: 'Slic3r only supports 100% infill with rectilinear infill pattern'
         },
