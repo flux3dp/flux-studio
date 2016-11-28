@@ -31,16 +31,15 @@ define([
                 ipv4Pattern = /^\d{1,3}[\.]\d{1,3}[\.]\d{1,3}[\.]\d{1,3}$/g,
                 isCorrectFormat = true;
             
-            for(var i in ips){
-                let ip = ips[i];
-                if ('' !== ip && false === ipv4Pattern.test(ip)) {
-                    console.log("ip", ip);
+            ips.forEach((ip) => {
+                if ('' !== ip && typeof ips == 'string' && false === ipv4Pattern.test(ip)) { 
                     me.value = originalIP;
                     AlertActions.showPopupError('wrong-ip-error', lang.settings.wrong_ip_format + '\n' + ip);
                     isCorrectFormat = false;
-                    break;
+                    return;
                 }
-            }
+            });
+
 
             if(isCorrectFormat){
                 config().write('poke-ip-addr', me.value);
