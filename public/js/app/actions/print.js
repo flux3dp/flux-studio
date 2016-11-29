@@ -20,6 +20,7 @@ define([
     'helpers/packer',
     'Rx',
     'app/app-settings',
+    'helpers/local-storage',
     // non-return value
     'threeOrbitControls',
     'threeTrackballControls',
@@ -51,7 +52,8 @@ define([
     Sprintf,
     packer,
     Rx,
-    Settings
+    Settings,
+    localStorage
 ) {
     'use strict';
 
@@ -64,11 +66,12 @@ define([
     var objects = [],
         referenceMeshes = [],
         fullSliceParameters = {settings: {}},
-        lastSliceParams = "";
+        lastSliceParams = '',
+        enableAntiAlias = Boolean(localStorage.get('antialias')) || false;
 
     var raycaster = new THREE.Raycaster(),
         mouse = new THREE.Vector2(),
-        renderer = new THREE.WebGLRenderer();
+        renderer = new THREE.WebGLRenderer({ antialias: enableAntiAlias });
 
     var circularGridHelper, mouseDown, SELECTED;
 
@@ -377,7 +380,7 @@ define([
                 setTimeout(() => {
                     ProgressActions.updating('Arranging position', 80);
                 }, 1);
-                
+
                 autoArrange(mesh);
                 addSizeProperty(mesh);
 
@@ -385,20 +388,20 @@ define([
                     console.log('New Mesh:: Grounding');
                     ProgressActions.updating('Grouding', 85);
                 }, 1);
-                
+
                 groundIt(mesh);
                 selectObject(mesh);
 
                 setTimeout(() => {
                     ProgressActions.updating('Creating outline', 90);
                 }, 1);
-                
+
                 createOutline(mesh);
 
                 setTimeout(() => {
                     ProgressActions.updating('Adding to scene', 95);
                 }, 1);
-                
+
                 scene.add(mesh);
                 outlineScene.add(mesh.outlineMesh);
                 objects.push(mesh);
@@ -410,7 +413,7 @@ define([
                 setDefaultFileName();
                 setTimeout(() => {
                     ProgressActions.close();
-                }, 1); 
+                }, 1);
 
                 render();
             };
@@ -454,7 +457,7 @@ define([
         models.push(file);
         if(ext === 'stl' || ext === 'obj') {
             let fr = new FileReader();
-            fr.addEventListener('load', (e) => { 
+            fr.addEventListener('load', (e) => {
                 ProgressActions.updating('Loading as ' + ext, 10);
                 appendModel(fr.result, file, ext, function(err) {
                     if(!err) {
@@ -506,7 +509,7 @@ define([
             AlertActions.showPopupError('', lang.monitor.extensionNotSupported);
             callback();
         }
-            
+
     }
 
     function appendPreviewPath(file, callback, isGcode) {
@@ -1342,7 +1345,7 @@ define([
         });
         blobExpired = true;
         hasPreviewImage = false;
-        
+
         return deferred.promise();
     }
 
@@ -1714,7 +1717,7 @@ define([
                 }
                 boundary.push(stl_index[i]);
             }
-            
+
             // delete redundant point(i.e., starting point)
             console.log("PlaneBoundary:: Finished", + new Date());
             boundary.pop();
@@ -2075,11 +2078,11 @@ define([
 
 
     function changePreviewLayer(layerNumber) {
-            
+
         for (let i = 1; i < previewScene.children.length; i++) {
             previewScene.children[i].visible = i <= layerNumber;
         }
-        
+
         if ( previewScene.children.length > printPath.length && previewScene.children.length > 0)  {
             // let trashLine = previewScene.children[previewScene.children.length - 1]
             previewScene.children.splice( previewScene.children.length - 1, 1) ;
@@ -2089,7 +2092,7 @@ define([
         let g = new THREE.BufferGeometry(),
             i = 0,
             layer = printPath[layerNumber];
-            
+
         if ( layer && layer.length ) {
             var positions = new Float32Array(layer.length * 3 * 2 - 6);
             var colors = new Float32Array(layer.length * 3 * 2 - 6);
@@ -2108,7 +2111,7 @@ define([
 
             g.addAttribute('position', new THREE.BufferAttribute(positions,3));
             g.addAttribute('color', new THREE.BufferAttribute(colors, 3));
-            g.computeBoundingSphere();    
+            g.computeBoundingSphere();
         }
 
         let line = new THREE.Line(g, emphasizeLineMaterial); // A layer is a "continuos line"
@@ -2145,7 +2148,7 @@ define([
         if (!$.isEmptyObject(SELECTED)) {
             updateFromScene('TransformControl');
         }
-        
+
         renderer.clear();
         if (outlineScene.children.length > 0) {
             renderer.render( outlineScene, camera );
@@ -2333,7 +2336,7 @@ define([
                 packer.addFile(model.file);
             });
         }
-        
+
         saveAs(packer.pack());
     }
 
@@ -2639,7 +2642,7 @@ define([
             let g = new THREE.BufferGeometry(),
                 i = 0,
                 layer = printPath[l];
-                
+
             var positions = new Float32Array(layer.length * 3 * 2 - 6);
             var colors = new Float32Array(layer.length * 3 * 2 - 6);
 
