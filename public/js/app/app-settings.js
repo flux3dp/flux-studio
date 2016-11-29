@@ -36,6 +36,19 @@ define(function() {
             color_base_plate: 0x777777,
             color_material: 0x888888,
             color_default: 0xA17898
+        },
+
+        laser_default: {
+            material: {
+                value: 'custom',
+                label: 'Custom',
+                data: {
+                    laser_speed:3,
+                    power:255
+                }
+            },
+            objectHeight:0,
+            isShading: true
         }
 
         // print_config: {

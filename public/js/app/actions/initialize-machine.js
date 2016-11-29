@@ -4,11 +4,13 @@
 define([
     'helpers/api/config',
     'helpers/nwjs/menu-factory',
-    'helpers/local-storage'
+    'helpers/local-storage',
+    'app/app-settings'
 ], function(
     config,
     menuFactory,
-    _localStorage
+    _localStorage,
+    settings
 ) {
     'use strict';
 
@@ -23,6 +25,9 @@ define([
             var completed = methods.hasBeenCompleted();
 
             redirect = ('boolean' === typeof redirect ? redirect : true);
+
+            // add laser-default
+            config().write('laser-defaults', JSON.stringify(settings.laser_default));
 
             config().write('printer-is-ready', true, {
                 onFinished: function() {
