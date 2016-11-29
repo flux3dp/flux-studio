@@ -125,7 +125,7 @@ define([
                         }
                     };
 
-                isValidName = (name !== '' && false === /[^()\u4e00-\u9fa5a-zA-Z0-9 ’'_-]+/g.test(name));
+                isValidName = (name !== '' && false === /[^()\u4e00-\u9fa5a-zA-Z0-9\+ ’'_\-]+/g.test(name));
 
                 self.setState({
                     requirePrinterName   : (name !== ''),
