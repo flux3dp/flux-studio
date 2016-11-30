@@ -1,3 +1,27 @@
+# FLUX Studio 0.6.0 Change log
+
+### New Features
+
+- Orthographic camera view
+
+### Changes
+
+- Uses Cura as default slicing engine
+- Improved toolpath previewing colors
+- Improved slicing algorithm for printing
+- Improved boundary calculation algorithm
+- Reduced device selection delay
+- Added Load filament button after unloading
+- Added more validation before binding machine to cloud
+
+### Bug Fixes
+
+- Fixed tutorial not able to run under certain circumstances
+- Fixed fresh installed studio with first laser job will stall the program
+- Removed redundant auto reslicing
+
+
+
 # FLUX Studio 0.5.0 Change Log
 
 ### New Features
@@ -26,7 +50,7 @@
 # FLUX Studio 0.4.3 Change log
 
 ### New Features
-- added expert parameter "support_everywhere" for Cura Engine
+- Added expert parameter "support_everywhere" for Cura Engine
 
 ### Bug Fixes
 - Cura minimalLayerTime unit
@@ -75,24 +99,24 @@
 - FLUX Delta is now able to connect to hidden SSID during wifi setup through "join network"
 
 ### Changes
-- remove auto resize when importing model, it will display the original size
+- Remove auto resize when importing model, it will display the original size
 
 
 ### Bug Fixes
-- delete file in flux monitor will delete model if model is selected
+- Delete file in flux monitor will delete model if model is selected
 - when re-slicing after clicked go and encountered error, wrong fcode will be sent to device and cause error
-- cura overhang setting is not working
-- using set default printer function from device menu (default printer is not checked)
-- fixed save task clicked during slicing will not trigger download prompt
-- fixed script error when clicked on the bottom left "complete" notification (when a default device is set)
+- Cura overhang setting is not working
+- Using set default printer function from device menu (default printer is not checked)
+- Fixed save task clicked during slicing will not trigger download prompt
+- Fixed script error when clicked on the bottom left "complete" notification (when a default device is set)
 
 
 ### Other Improvements
-- flux monitor should be more responsive
-- calibration will check for head existance
+- Flux dashboard should be more responsive
+- Calibration will check for head existance
 - Slic3r will detect 100% infill with wrong infill pattern
-- added FLUX Studio version information in bug report
-- increase buffer size to prevent file loading freeze
-- update better time estimate for scanning
-- undo function now support add / remove object
-- reconnect when the machine restarts and connect with a different RSA key
+- Added FLUX Studio version information in bug report
+- Increase buffer size to prevent file loading freeze
+- Update better time estimate for scanning
+- Undo function now support add / remove object
+- Reconnect when the machine restarts and connect with a different RSA key
