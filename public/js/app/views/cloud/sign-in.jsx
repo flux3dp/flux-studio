@@ -51,6 +51,12 @@ define([
             });
         },
 
+        _handleDetectEnterKey: function(e) {
+            if(e.key === 'Enter') {
+                this._handleSignIn(e);
+            }
+        },
+
         _handleCancel: function() {
             location.hash = '#/studio/print';
         },
@@ -122,7 +128,7 @@ define([
                                 <input id="email" type="text" placeholder="Email" onChange={this._handleEditValue} />
                             </div>
                             <div>
-                                <input id="password" type="password" placeholder="Password" onChange={this._handleEditValue} />
+                                <input id="password" type="password" placeholder="Password" onChange={this._handleEditValue} onKeyPress={this._handleDetectEnterKey} />
                             </div>
                             <div className="forget-password">
                                 <a href="#/studio/cloud/forgot-password">{lang.forgot_password}</a>

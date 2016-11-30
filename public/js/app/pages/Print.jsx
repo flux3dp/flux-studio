@@ -156,24 +156,20 @@ define([
 
                     if(!_setting) {
                         advancedSettings = {};
-                        advancedSettings.raft_layers = defaultRaftLayer;
+                        advancedSettings.raft = 1;
                         advancedSettings.support_material = 0;
                         advancedSettings.custom = DefaultPrintSettings.custom;
                     }
                     else {
                         advancedSettings = _setting;
-                    }
-
-                    if(!advancedSettings.raft_layers || advancedSettings.raft_layers === '0') {
-                        advancedSettings.raft_layers = defaultRaftLayer;
+                        if (advancedSettings.raft == null) {
+                            advancedSettings.raft = 1;
+                        }
                     }
 
                     if(tutorialFinished !== 'true' && configuredPrinter !== '') {
                         tutorialMode = true;
                     }
-
-
-                    _raftLayers = parseInt(this._getValueFromAdvancedCustomSettings('raft_layers'));
 
                     return ({
                         showAdvancedSettings        : false,
@@ -193,8 +189,7 @@ define([
                         slicingPercentage           : 0,
                         currentTutorialStep         : 0,
                         layerHeight                 : 0.1,
-                        raftLayers                  : _raftLayers,
-                        raftOn                      : advancedSettings.custom.raft_layers !== 0,
+                        raftOn                      : advancedSettings.raft === 1,
                         supportOn                   : advancedSettings.support_material === 1,
                         mode                        : 'scale',
                         previewLayerCount           : 0,
@@ -431,27 +426,18 @@ define([
 
                 _handleRaftClick: function() {
                     this.setState({ leftPanelReady: false });
-                    var isOn = !this.state.raftOn,
-                        _raftLayers = isOn ? advancedSettings.raft_layers : 0;
-
-                    if(!isOn) {
-                        advancedSettings.raft_layers = this.state.raftLayers || advancedSettings.raft_layers;
-                    }
-
-                    var currentRaftLayers = isOn ? advancedSettings.raft_layers : 0;
-                    var oldValue = this._getLineFromAdvancedCustomSetting('raft_layers');
-                    var newValue = `raft_layers = ${currentRaftLayers}`;
-
-                    advancedSettings.custom = advancedSettings.custom.replace(oldValue, newValue);
-                    this._saveSetting();
-
-                    director.setParameter('raft_layers', _raftLayers).then(function() {
+                    var isOn = !this.state.raftOn;
+                    director.setParameter('raft', isOn ? '1' : '0').then(function() {
                         this.setState({
                             leftPanelReady: true,
-                            raftLayers: currentRaftLayers,
                             raftOn: isOn
                         });
                     }.bind(this));
+                    advancedSettings.raft = isOn ? 1 : 0;
+                    advancedSettings.custom = advancedSettings.custom.replace(
+                        `raft = ${isOn ? 0 : 1}`,
+                        `raft = ${isOn ? 1 : 0}`);
+                    this._saveSetting();
                 },
 
                 _handleSupportClick: function() {
@@ -531,18 +517,14 @@ define([
                 _handleApplyAdvancedSetting: function(setting) {
                     Object.assign(advancedSettings, setting);
                     // remove old properties
-                    delete advancedSettings.raft;
                     delete advancedSettings.raft_on;
+
                     this._saveSetting();
-                    var _raftLayers = parseInt(this._getValueFromAdvancedCustomSettings('raft_layers'));
-                    if(_raftLayers !== 0) {
-                        advancedSettings.raft_layers = _raftLayers;
-                    }
+
                     this.setState({
                         supportOn: advancedSettings.support_material === 1,
                         layerHeight: advancedSettings.layer_height,
-                        raftLayers: _raftLayers,
-                        raftOn: _raftLayers !== 0
+                        raftOn:  advancedSettings.raft === 1
                     });
                     if(!setting) {
                         console.log("AdvancedSettings:: Apply parameter default");

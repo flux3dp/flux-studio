@@ -815,6 +815,14 @@ define([
         }
     }
 
+    function getDeviceInfo() {
+        return SocketMaster.addTask('deviceInfo');
+    }
+
+    function downloadErrorLog() {
+        return _device.actions.downloadErrorLog();
+    }
+
     // Core
 
     function DeviceSingleton() {
@@ -867,6 +875,8 @@ define([
             this.setDeviceSetting       = setDeviceSetting;
             this.getCloudValidationCode = getCloudValidationCode;
             this.enableCloud            = enableCloud;
+            this.getDeviceInfo          = getDeviceInfo;
+            this.downloadErrorLog       = downloadErrorLog;
 
             Discover(
                 'device-master',
