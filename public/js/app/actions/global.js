@@ -88,6 +88,7 @@ define([
 
             if (true === window.FLUX.debug && true === window.FLUX.isNW) {
                 shortcuts.on(['ctrl', 'alt', 'd'], function(e) {
+                    e.preventDefault();
                     nw.Window.get().showDevTools();
                 });
                 shortcuts.on(['ctrl', 'alt', 'shift', 'd'], function() {

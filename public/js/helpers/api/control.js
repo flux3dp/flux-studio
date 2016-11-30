@@ -316,6 +316,8 @@ define([
                 return d.promise();
             },
 
+            deviceInfo: () => { return useDefaultResponse('deviceinfo'); },
+
             getPreview: () => {
                 let d       = $.Deferred(),
                     data    = [];
@@ -366,6 +368,27 @@ define([
                 events.onFatal = (response) => { d.resolve(response); };
 
                 ws.send(`file download ${fileNameWithPath}`);
+                return d.promise();
+            },
+
+            downloadErrorLog: () => {
+                let d = $.Deferred(),
+                    file = [];
+
+                events.onMessage = (response) => {
+                    if(!~Object.keys(response).indexOf('completed')) {
+                        file.push(response);
+                    }
+
+                    if(response instanceof Blob) {
+                        d.resolve(file);
+                    }
+                };
+
+                events.onError = (response) => { d.reject(response); };
+                events.onFatal = (response) => { d.resolve(response); };
+
+                ws.send('fetch_log fluxcloudd.log');
                 return d.promise();
             },
 

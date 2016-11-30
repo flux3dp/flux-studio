@@ -5,6 +5,7 @@
   "dependencies": {
     "jquery": "^1.11.0",
     "jsdom-global": "^1.6.2",
+    "nan": "^2.4.0",
     "socket.io-client": "^1.4.6",
     "squirejs": "^0.2.1"
   },

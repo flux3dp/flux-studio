@@ -194,6 +194,10 @@ define([
                     statusId === DeviceConstants.status.ABORTED
                 ) {
                     leftButtonOn = false;
+
+                    if(this.props.source === 'DEVICE_LIST') {
+                        middleButtonOn = false;
+                    }
                 }
                 else {
                     leftButtonOn = true;

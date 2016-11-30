@@ -74,6 +74,7 @@ define([
         args = args || {};
 
         var advancedSettings = {},
+            fineAdvancedSettings = {},
             _scale = {
                 locked  : true,
                 x       : 1,
@@ -88,12 +89,13 @@ define([
             lang = args.state.lang,
             selectedPrinter,
             $importBtn,
+            finishedSnapshot = false,
             listeningToCancel = false,
             defaultRaftLayer = 4,
             allowDeleteObject = true,
             tutorialMode = false,
             nwjsMenu = menuFactory.items,
-            defaultSlicingEngine = 'slic3r',
+            defaultSlicingEngine = 'cura',
             tourGuide = [
                 {
                     selector: '.arrowBox',
@@ -154,24 +156,20 @@ define([
 
                     if(!_setting) {
                         advancedSettings = {};
-                        advancedSettings.raft_layers = defaultRaftLayer;
+                        advancedSettings.raft = 1;
                         advancedSettings.support_material = 0;
                         advancedSettings.custom = DefaultPrintSettings.custom;
                     }
                     else {
                         advancedSettings = _setting;
-                    }
-
-                    if(!advancedSettings.raft_layers || advancedSettings.raft_layers === '0') {
-                        advancedSettings.raft_layers = defaultRaftLayer;
+                        if (advancedSettings.raft == null) {
+                            advancedSettings.raft = 1;
+                        }
                     }
 
                     if(tutorialFinished !== 'true' && configuredPrinter !== '') {
                         tutorialMode = true;
                     }
-
-
-                    _raftLayers = parseInt(this._getValueFromAdvancedCustomSettings('raft_layers'));
 
                     return ({
                         showAdvancedSettings        : false,
@@ -191,8 +189,7 @@ define([
                         slicingPercentage           : 0,
                         currentTutorialStep         : 0,
                         layerHeight                 : 0.1,
-                        raftLayers                  : _raftLayers,
-                        raftOn                      : advancedSettings.custom.raft_layers !== 0,
+                        raftOn                      : advancedSettings.raft === 1,
                         supportOn                   : advancedSettings.support_material === 1,
                         mode                        : 'scale',
                         previewLayerCount           : 0,
@@ -232,21 +229,28 @@ define([
                     this._prepareMenu();
                     nwjsMenu.import.enabled = true;
                     nwjsMenu.import.onClick = () => { $importBtn.click(); };
-                    nwjsMenu.undo.onClick = () => { director.undo(); };
+                    nwjsMenu.undo.onClick = () => { console.log('undo'); director.undo(); };
+                    nwjsMenu.tutorial.onClick = () => { console.log('undo'); director.undo(); };
                     nwjsMenu.duplicate.onClick = () => { director.duplicateSelected(); };
                     nwjsMenu.saveTask.onClick = this._handleDownloadFCode;
                     nwjsMenu.saveScene.onClick = this._handleDownloadScene;
                     nwjsMenu.clear.onClick = this._handleClearScene;
-                    nwjsMenu.tutorial.onClick = () => {
-                        this.setState({ currentTutorialStep: 0 }, () => {
-                            this._handleYes('tour');
-                        });
-                    };
                     nwjsMenu.clearLocalstorage.enabled = true;
                     nwjsMenu.clearLocalstorage.onClick = () => {
                         if(confirm(lang.topmenu.file.confirmReset)) {
                             LocalStorage.clearAllExceptIP();
                         }
+                    };
+
+                    // to catch the tutorial click from menuMap
+                    // this mod is implemented after menu-map refactored, using cache to reduce refresh, boot performance
+                    if(!window.customEvent) {
+                        window.customEvent = {};
+                    }
+                    window.customEvent.onTutorialClick = () => {
+                        this.setState({ currentTutorialStep: 0 }, () => {
+                            this._handleYes('tour');
+                        });
                     };
 
                     menuFactory.methods.refresh();
@@ -335,6 +339,7 @@ define([
                     nwjsMenu.clear.onClick = this._handleClearScene;
                     nwjsMenu.tutorial.enabled = true;
                     nwjsMenu.tutorial.onClick = () => {
+                        console.log('tour on');
                         this._handleYes('tour');
                     };
                     nwjsMenu.undo.enabled = false;
@@ -421,27 +426,18 @@ define([
 
                 _handleRaftClick: function() {
                     this.setState({ leftPanelReady: false });
-                    var isOn = !this.state.raftOn,
-                        _raftLayers = isOn ? advancedSettings.raft_layers : 0;
-
-                    if(!isOn) {
-                        advancedSettings.raft_layers = this.state.raftLayers || advancedSettings.raft_layers;
-                    }
-
-                    var currentRaftLayers = isOn ? advancedSettings.raft_layers : 0;
-                    var oldValue = this._getLineFromAdvancedCustomSetting('raft_layers');
-                    var newValue = `raft_layers = ${currentRaftLayers}`;
-
-                    advancedSettings.custom = advancedSettings.custom.replace(oldValue, newValue);
-                    this._saveSetting();
-
-                    director.setParameter('raft_layers', _raftLayers).then(function() {
+                    var isOn = !this.state.raftOn;
+                    director.setParameter('raft', isOn ? '1' : '0').then(function() {
                         this.setState({
                             leftPanelReady: true,
-                            raftLayers: currentRaftLayers,
                             raftOn: isOn
                         });
                     }.bind(this));
+                    advancedSettings.raft = isOn ? 1 : 0;
+                    advancedSettings.custom = advancedSettings.custom.replace(
+                        `raft = ${isOn ? 0 : 1}`,
+                        `raft = ${isOn ? 1 : 0}`);
+                    this._saveSetting();
                 },
 
                 _handleSupportClick: function() {
@@ -469,11 +465,13 @@ define([
                 _handleGoClick: function() {
                     AlertStore.removeCancelListener(this._handleDefaultCancel);
                     listeningToCancel = false;
+                    finishedSnapshot = false;
                     director.takeSnapShot().then(() =>{
-                        this.setState({
-                            openPrinterSelectorWindow: true
-                        });
+                        finishedSnapshot = true;
                         director.clearSelection();
+                    });
+                    this.setState({
+                        openPrinterSelectorWindow: true
                     });
                 },
 
@@ -519,30 +517,44 @@ define([
                 _handleApplyAdvancedSetting: function(setting) {
                     Object.assign(advancedSettings, setting);
                     // remove old properties
-                    delete advancedSettings.raft;
                     delete advancedSettings.raft_on;
+
                     this._saveSetting();
-                    var _raftLayers = parseInt(this._getValueFromAdvancedCustomSettings('raft_layers'));
-                    if(_raftLayers !== 0) {
-                        advancedSettings.raft_layers = _raftLayers;
-                    }
+
                     this.setState({
                         supportOn: advancedSettings.support_material === 1,
                         layerHeight: advancedSettings.layer_height,
-                        raftLayers: _raftLayers,
-                        raftOn: _raftLayers !== 0
+                        raftOn:  advancedSettings.raft === 1
                     });
                     if(!setting) {
+                        console.log("AdvancedSettings:: Apply parameter default");
                         director.setAdvanceParameter(advancedSettings).then(() => {
+                            console.log("AdvancedSettings:: Apply default parameter end");
+                            Object.assign(fineAdvancedSettings, advancedSettings);
                             advancedSettings.engine = advancedSettings.engine || defaultSlicingEngine;
                             if(advancedSettings.engine !== 'slic3r') {
                                 this._handleSlicingEngineChange(advancedSettings.engine);
                             }
+                        }).fail(() => {
+                            console.log("AdvancedSettings:: Application failed, falling back");
+                            Object.assign(advancedSettings, fineAdvancedSettings);
+                            director.setAdvanceParameter(advancedSettings); 
+                            this._saveSetting();
                         });
                     }
                     else {
+                        console.log("AdvancedSettings:: Apply parameter with engine");
                         this._handleSlicingEngineChange(advancedSettings.engine).then(() => {
-                            director.setAdvanceParameter(advancedSettings);
+                            director.setAdvanceParameter(advancedSettings).then(() => {
+                                console.log("AdvancedSettings:: Apply engine parameter end");
+                                Object.assign(fineAdvancedSettings, advancedSettings);
+                                director.setAdvanceParameter(advancedSettings);
+                            }).fail(() => {
+                                console.log("AdvancedSettings:: Application with engine failed, falling back ", fineAdvancedSettings);
+                                Object.assign(advancedSettings, fineAdvancedSettings);
+                                director.setAdvanceParameter(advancedSettings);
+                                this._saveSetting();
+                            });
                         });
                     }
                 },
@@ -594,7 +606,7 @@ define([
                         openPrinterSelectorWindow: false
                     }, () => {
                         let t = setInterval(() => {
-                            if(director.getSlicingStatus().isComplete) {
+                            if(director.getSlicingStatus().isComplete && finishedSnapshot) {
                                 clearInterval(t);
                                 director.getFCode().then((fcode, previewUrl) => {
                                     if(!(fcode instanceof Blob)) {
@@ -620,7 +632,7 @@ define([
                                     }, 1000);
                                 });
                             }
-                        }, 500);
+                        }, 100);
                     });
                 },
 

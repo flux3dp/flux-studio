@@ -40,16 +40,78 @@ define([
             events = {
                 onMessage: () => {},
                 onError: () => {}
+            },
+            queueLock = false,
+            queuedCommands = [];
+
+        
+        // When the queue is free, resolve to run the next "Command", and send a wrapped "Psuedo - Promise" 
+        setInterval(() => {
+            // Check queue
+            if (!queueLock && queuedCommands.length > 0) {
+                queueLock = true;
+                // Pop 1 command
+                let command = queuedCommands.splice(0,1)[0];
+                console.log("Pop Command", command.name);
+                command.q.resolve(command.wrapped);
+            }
+        }, 10);
+
+        function getQueuePromise(api_name) {
+            let qPromise = $.Deferred();
+            
+            let jPromise = $.Deferred();
+            let wrapped = {
+                resolve: (...args) => {
+                    queueLock = false;
+                    console.log("Resolve:: ", args);
+                    jPromise.resolve.apply(jPromise, args);
+                },
+                reject: (...args) => {
+                    queueLock = false;
+                    jPromise.reject.apply(jPromise, args);
+                },
+                notify: (...args) => {
+                    jPromise.notify.apply(jPromise, args);
+                },
+                promise: () => {
+                    let promise = jPromise.promise();
+                    return {           
+                        then: (cb) => {
+                            return promise.then(cb);
+                        },
+                        fail: (cb) =>{
+                            return promise.fail(cb);
+                        },
+                        catch: (cb) => {
+                            console.log("WARNING:: ES2016 Promise catch is not supported")
+                            queueLock = false;
+                            return promise.fail(cb);
+                        },
+                        progress: (cb) => {
+                            return promise.progres(cb);
+                        }
+                    }
+                }
             };
+            
+            queuedCommands.push({name: api_name, q: qPromise, wrapped: wrapped});
+            return { q: qPromise.promise(), wrapped: wrapped };
+        }
 
         return {
 
             connection: ws,
 
+            queueLocked() {
+                return queueLock;
+            },
+
             upload: (name, file, ext) => {
-                let d = $.Deferred(),
-                    progress,
-                    currentProgress;
+                let queuedPromise = getQueuePromise('upload');
+                queuedPromise.q.then((d) => {
+                let progress,
+                currentProgress;
 
                 const CHUNK_PKG_SIZE = 4096;
                 const nth = 5;
@@ -115,14 +177,15 @@ define([
 
                 ext = ext === 'obj' ? ' ' + ext : '';
                 ws.send('upload ' + name + ' ' + file.size + ext);
-
-                return d.promise();
+                });
+                return queuedPromise.wrapped.promise();
             },
 
             upload_via_path: (name, file, ext, fileUrl) => {
-                let d = $.Deferred(),
-                    progress,
-                    currentProgress;
+                let queuedPromise = getQueuePromise('upload_via_path');
+                queuedPromise.q.then((d) => {
+                let progress,
+                currentProgress;
 
                 events.onMessage = (result) => {
 
@@ -159,12 +222,13 @@ define([
                 ws.send('load_stl_from_path ' + name + ' ' + fileUrl + ext);
 
                 return d.promise();
+                });
+                return queuedPromise.wrapped.promise();
             },
 
             set: (name, positionX, positionY, positionZ, rotationX, rotationY, rotationZ, scaleX, scaleY, scaleZ) => {
-
-                let d = $.Deferred();
-
+                let queuedPromise = getQueuePromise('set');
+                queuedPromise.q.then((d) => {
                 events.onMessage = (result) => {
                     d.resolve(result);
                 };
@@ -181,11 +245,14 @@ define([
                 ws.send('set ' + args.join(' '));
 
                 return d.promise();
+                });
+                return queuedPromise.wrapped.promise();
             },
 
             delete: (name) => {
 
-                let d = $.Deferred();
+                let queuedPromise = getQueuePromise('delete');
+                queuedPromise.q.then((d) => {
 
                 events.onMessage = (result) => {
                     d.resolve(result);
@@ -201,12 +268,15 @@ define([
 
                 ws.send('delete ' + name);
                 return d.promise();
+                });
+                return queuedPromise.wrapped.promise();
             },
 
             // need revisit
             goF: (nameArray) => {
 
-                let d = $.Deferred();
+                let queuedPromise = getQueuePromise('goF');
+                queuedPromise.q.then((d) => {
 
                 events.onMessage = (result) => {
                     d.resolve(result);
@@ -222,11 +292,14 @@ define([
 
                 ws.send('go ' + nameArray.join(' ') + ' -f');
                 return d.promise();
+                });
+                return queuedPromise.wrapped.promise();
             },
 
             beginSlicing: (nameArray, type) => {
 
-                let d = $.Deferred();
+                let queuedPromise = getQueuePromise('beginSlicing');
+                queuedPromise.q.then((d) => {
                 type = type || 'f';
 
                 events.onMessage = (result) => {
@@ -243,45 +316,50 @@ define([
 
                 ws.send(`begin_slicing ${nameArray.join(' ')} -${type}`);
                 return d.promise();
+                });
+                return queuedPromise.wrapped.promise();
             },
 
             reportSlicing: () => {
+                let queuedPromise = getQueuePromise('reportSlicing');
+                queuedPromise.q.then((d) => {
+                    let progress = [];
 
-                let d = $.Deferred(),
-                    progress = [];
-
-                events.onMessage = (result) => {
-                    if(result.status === 'ok') {
-                        if(progress.length > 0) {
-                            // only care about the last progress
-                            let lastProgress = progress.pop();
-                            progress.length = 0;
-                            d.resolve(lastProgress);
+                    events.onMessage = (result) => {
+                        if(result.status === 'ok') {
+                            if(progress.length > 0) {
+                                // only care about the last progress
+                                let lastProgress = progress.pop();
+                                progress.length = 0;
+                                d.resolve(lastProgress);
+                            }
+                            else {
+                                d.resolve();
+                            }
                         }
                         else {
-                            d.resolve();
+                            progress.push(result);
                         }
-                    }
-                    else {
-                        progress.push(result);
-                    }
-                };
+                    };
 
-                events.onError = (error) => {
-                    d.reject(error);
-                };
+                    events.onError = (error) => {
+                        d.reject(error);
+                    };
 
-                events.onFatal = (error) => {
-                    d.reject(error);
-                };
+                    events.onFatal = (error) => {
+                        d.reject(error);
+                    };
 
-                ws.send(`report_slicing`);
-                return d.promise();
+                    ws.send(`report_slicing`);
+                    return d.promise();
+                });
+                return queuedPromise.wrapped.promise();
             },
 
             getSlicingResult: () => {
 
-                let d = $.Deferred();
+                let queuedPromise = getQueuePromise('getSlicingResult');
+                queuedPromise.q.then((d) => {
 
                 events.onMessage = (result) => {
                     if(result instanceof Blob) {
@@ -299,11 +377,15 @@ define([
 
                 ws.send(`get_result`);
                 return d.promise();
+
+                });
+                return queuedPromise.wrapped.promise();
             },
 
             stopSlicing: () => {
 
-                let d = $.Deferred();
+                let queuedPromise = getQueuePromise('stopSlicing');
+                queuedPromise.q.then((d) => {
 
                 events.onMessage = (result) => {
                     d.resolve(result);
@@ -319,12 +401,17 @@ define([
 
                 ws.send(`end_slicing`);
                 return d.promise();
+
+                });
+                return queuedPromise.wrapped.promise();
             },
 
             setParameter: (name, value) => {
 
-                let d = $.Deferred(),
-                    errors = [];
+                let queuedPromise = getQueuePromise('setParameter');
+                queuedPromise.q.then((d) => {
+                
+                let errors = [];
 
                 events.onMessage = (result) => {
                     d.resolve(result, errors);
@@ -346,11 +433,15 @@ define([
                 }
 
                 return d.promise();
+
+                });
+                return queuedPromise.wrapped.promise();
             },
 
             getPath: () => {
 
-                let d = $.Deferred();
+                let queuedPromise = getQueuePromise('getPath');
+                queuedPromise.q.then((d) => {
 
                 events.onMessage = (result) => {
                     d.resolve(result);
@@ -366,11 +457,15 @@ define([
 
                 ws.send('get_path');
                 return d.promise();
+
+                });
+                return queuedPromise.wrapped.promise();
             },
 
             uploadPreviewImage: (file) => {
 
-                let d = $.Deferred();
+                let queuedPromise = getQueuePromise('uploadPreviewImage');
+                queuedPromise.q.then((d) => {
 
                 events.onMessage = (result) => {
 
@@ -400,11 +495,15 @@ define([
 
                 ws.send('upload_image ' + file.size);// + file.size);
                 return d.promise();
+
+                });
+                return queuedPromise.wrapped.promise();
             },
 
             duplicate: (oldName, newName) => {
 
-                let d = $.Deferred();
+                let queuedPromise = getQueuePromise('duplicate');
+                queuedPromise.q.then((d) => {
 
                 events.onMessage = (result) => {
                     d.resolve(result);
@@ -421,11 +520,15 @@ define([
                 ws.send(`duplicate ${oldName} ${newName}`);
 
                 return d.promise();
+
+                });
+                return queuedPromise.wrapped.promise();
             },
 
             changeEngine: (engine) => {
 
-                let d = $.Deferred();
+                let queuedPromise = getQueuePromise('changeEngine');
+                queuedPromise.q.then((d) => {
 
                 events.onMessage = (result) => {
                     d.resolve(result);
@@ -441,6 +544,9 @@ define([
 
                 ws.send(`change_engine ${engine} default`);
                 return d.promise();
+
+                });
+                return queuedPromise.wrapped.promise();
             },
 
             // this is a helper  for unit test

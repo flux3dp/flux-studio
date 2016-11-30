@@ -13,12 +13,14 @@ define([
     'app/constants/error-constants',
     'helpers/packer',
     'helpers/i18n',
+    'helpers/api/config',
     'helpers/nwjs/menu-factory',
     'app/actions/global-actions',
     'helpers/sprintf',
     'helpers/packer',
     'Rx',
     'app/app-settings',
+    'helpers/local-storage',
     // non-return value
     'threeOrbitControls',
     'threeTrackballControls',
@@ -28,7 +30,7 @@ define([
     'threeCircularGridHelper',
     'plugins/file-saver/file-saver.min',
     'lib/Canvas-To-Blob',
-    'helpers/object-assign'
+    'helpers/object-assign',
 ], function(
     $,
     display,
@@ -44,12 +46,14 @@ define([
     ErrorConstants,
     Packer,
     I18n,
+    Config,
     MenuFactory,
     GlobalActions,
     Sprintf,
     packer,
     Rx,
-    Settings
+    Settings,
+    localStorage
 ) {
     'use strict';
 
@@ -60,11 +64,14 @@ define([
     var orbitControl, transformControl, reactSrc;
 
     var objects = [],
-        referenceMeshes = [];
+        referenceMeshes = [],
+        fullSliceParameters = {settings: {}},
+        lastSliceParams = '',
+        enableAntiAlias = localStorage.get('antialias') === 'true';
 
     var raycaster = new THREE.Raycaster(),
         mouse = new THREE.Vector2(),
-        renderer = new THREE.WebGLRenderer();
+        renderer = new THREE.WebGLRenderer({ antialias: enableAntiAlias });
 
     var circularGridHelper, mouseDown, SELECTED;
 
@@ -101,6 +108,7 @@ define([
         objectBeforeTransform = {},
         slicingStatusStream,
         uploadProgress,
+        fineSettings = {},
         history = [],
         lang = I18n.get();
 
@@ -136,22 +144,40 @@ define([
 
     var models = [];
 
-    previewColors[-1] = new THREE.Color(Settings.print_config.color_default);
-    previewColors[0] = new THREE.Color(Settings.print_config.color_infill);
-    previewColors[1] = new THREE.Color(Settings.print_config.color_perimeter);
-    previewColors[2] = new THREE.Color(Settings.print_config.color_support);
-    previewColors[3] = new THREE.Color(Settings.print_config.color_move);
-    previewColors[4] = new THREE.Color(Settings.print_config.color_skirt);
-    previewColors[5] = new THREE.Color(Settings.print_config.color_perimeter);
+    previewColors[0] = new THREE.Color(Settings.print_config.color_default);
+    previewColors[1] = new THREE.Color(Settings.print_config.color_infill);
+    previewColors[2] = new THREE.Color(Settings.print_config.color_perimeter);
+    previewColors[3] = new THREE.Color(Settings.print_config.color_support);
+    previewColors[4] = new THREE.Color(Settings.print_config.color_move);
+    previewColors[5] = new THREE.Color(Settings.print_config.color_skirt);
+    previewColors[6] = new THREE.Color(Settings.print_config.color_innerwall);
+    previewColors[7] = new THREE.Color(Settings.print_config.color_raft);
+    previewColors[8] = new THREE.Color(Settings.print_config.color_skin);
     previewColors[9] = new THREE.Color(Settings.print_config.color_highlight);
+
+
+    let emphasizeLineMaterial = new THREE.LineBasicMaterial({
+        color: 0xffffff,
+        linewidth: 5,
+        vertexColors: THREE.VertexColors
+    });
 
     function init(src) {
 
         reactSrc = src;
         container = document.getElementById('model-displayer');
 
-        camera = new THREE.PerspectiveCamera(60, (container.offsetWidth) / container.offsetHeight, 1, 30000);
-        camera.position.set(0, -200, 100);
+        let width = container.offsetWidth, height = container.offsetHeight;
+
+        if (Config().read('camera-projection') == 'Orthographic') {
+            camera = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, 1, 1000 );
+            camera.position.set(0, -200, 100);
+            camera.zoom = 4;
+            camera.updateProjectionMatrix();
+        } else {
+            camera = new THREE.PerspectiveCamera(60, width/height, 1, 30000);
+            camera.position.set(0, -200, 100);
+        }
         camera.up = new THREE.Vector3(0, 0, 1);
 
         scene = new THREE.Scene();
@@ -239,7 +265,6 @@ define([
 
         // init print controller
         slicingStatusStream = new Rx.Subject();
-        slicingStatus.canInterrupt = true;
         slicingStatus.inProgress = false;
         slicingStatusStream.onNext(slicingStatus);
 
@@ -259,7 +284,7 @@ define([
         var d = $.Deferred();
         var uploadCaller = file.path ? slicer.upload_via_path(name, file, ext, file.path) : slicer.upload(name,file,ext);
         uploadCaller.then((result) => {
-            ProgressActions.updating('finishing up', 100);
+            ProgressActions.updating('Finishing up', 100);
             d.resolve(result);
         }).progress(displayProgress)
         .fail((error) => {
@@ -268,15 +293,9 @@ define([
         return d.promise();
     }
 
-    function appendModel(fileUrl, file, ext, callback) {
-        if(file.size === 0) {
-            AlertActions.showPopupError('', lang.message.invalidFile);
-            slicingStatus.canInterrupt = true;
-            return;
-        }
+    function appendModel(binary, file, ext, callback) {
         var stlLoader = new THREE.STLLoader(),
-            objLoader = new THREE.OBJLoader(),
-            model_file_path = fileUrl;
+            objLoader = new THREE.OBJLoader();
 
         callback = callback || function() {};
 
@@ -289,23 +308,23 @@ define([
                         openObjectDialogue: false
                     });
                     AlertActions.showPopupError('', lang.message.invalidFile);
-                    slicingStatus.canInterrupt = true;
                     return;
                 }
             }
             var mesh = new THREE.Mesh(geometry, commonMaterial);
             mesh.up = new THREE.Vector3(0, 0, 1);
 
-            slicingStatus.pauseReport = true;
+            setTimeout(() => {
+                console.log('New Mesh:: Py Processing meshes');
+                ProgressActions.updating('Processing meshes', 50);
+            }, 1);
+
             uploadStl(mesh.uuid, file, ext).then(() => {
-                slicingStatus.pauseReport = false;
-                ProgressActions.close();
                 addToScene();
                 callback();
             }).progress((steps, total) => {
                 console.log(steps, total);
             }).fail((error) => {
-                slicingStatus.pauseReport = false;
                 reactSrc.setState({
                     openImportWindow: true,
                     openObjectDialogue: false
@@ -343,20 +362,46 @@ define([
                 mesh.scale.locked = true;
                 /* end customized property */
 
-                if (mesh.geometry.type !== 'Geometry') {
-                    mesh.geometry = new THREE.Geometry().fromBufferGeometry(mesh.geometry);
-                }
+                // if (mesh.geometry.type !== 'Geometry') {
+                //     console.log("Heavy ops:: ", "Buffer geometry to geometry");
+                //     mesh.geometry = new THREE.Geometry().fromBufferGeometry(mesh.geometry);
+                // }
 
                 mesh.name = 'custom';
                 mesh.file = file;
                 mesh.fileName = file.name;
+                setTimeout(() => {
+                    console.log('New Mesh:: Calculating boundary');
+                    ProgressActions.updating('Calculating boundary', 50);
+                }, 1);
+
                 mesh.plane_boundary = planeBoundary(mesh);
+
+                setTimeout(() => {
+                    ProgressActions.updating('Arranging position', 80);
+                }, 1);
 
                 autoArrange(mesh);
                 addSizeProperty(mesh);
+
+                setTimeout(() => {
+                    console.log('New Mesh:: Grounding');
+                    ProgressActions.updating('Grouding', 85);
+                }, 1);
+
                 groundIt(mesh);
                 selectObject(mesh);
+
+                setTimeout(() => {
+                    ProgressActions.updating('Creating outline', 90);
+                }, 1);
+
                 createOutline(mesh);
+
+                setTimeout(() => {
+                    ProgressActions.updating('Adding to scene', 95);
+                }, 1);
+
                 scene.add(mesh);
                 outlineScene.add(mesh.outlineMesh);
                 objects.push(mesh);
@@ -366,6 +411,10 @@ define([
                 addHistory('ADD', mesh);
 
                 setDefaultFileName();
+                setTimeout(() => {
+                    ProgressActions.close();
+                }, 1);
+
                 render();
             };
         };
@@ -375,7 +424,7 @@ define([
         });
 
         if(ext === 'obj') {
-            objLoader.load(model_file_path, (object) => {
+            objLoader.load(binary, (object) => {
                 var meshes = object.children.filter(c => c instanceof THREE.Mesh);
                 if(meshes.length > 0) {
                     loadGeometry(new THREE.Geometry().fromBufferGeometry(meshes[0].geometry));
@@ -384,10 +433,11 @@ define([
             });
         }
         else {
-            stlLoader.load(model_file_path, (geometry) => {
+            stlLoader.load(binary, (geometry) => {
                 loadGeometry(geometry);
-            }, function(){}, (error) => {
-                //on error
+            }, function() { }, (error) => {
+                throw error;
+                // on error
                 loadGeometry({vertices: []});
             });
         }
@@ -401,74 +451,65 @@ define([
             !showStopButton
         );
 
-        var t = setInterval(function() {
-            if(slicingStatus.canInterrupt) {
-                clearInterval(t);
-                var file = files.item ? files.item(index) : files[index];
-                models.push(file);
-                slicingStatus.canInterrupt = false;
-                var ext = file.name.split('.').pop().toLowerCase();
-                if(ext === 'stl' || ext === 'obj') {
-                    var reader  = new FileReader();
-                    reader.addEventListener('load', function () {
-                        appendModel(reader.result, file, ext, function(err) {
-                            if(!err) {
-                                slicingStatus.canInterrupt = true;
-                                if(files.length > index + 1) {
-                                    appendModels(files, index + 1, callback);
-                                }
-                                else {
-                                    slicingStatus.canInterrupt = true;
-                                    startSlicing(slicingType.F);
-                                    callback();
-                                }
-                            }
-                        });
-                    }, false);
+        let file = files.item ? files.item(index) : files[index];
+        let ext = file.name.split('.').pop().toLowerCase();
 
-                    reader.readAsDataURL(file);
-                }
-                else if (ext === 'fc' || ext === 'gcode') {
-                    slicingStatus.canInterrupt = true;
-                    slicingStatus.isComplete = true;
-                    importedFCode = files.item(0);
-                    importFromFCode = ext === 'fc';
-                    setDefaultFileName(importedFCode.name);
-                    if(objects.length === 0) {
-                        doFCodeImport(ext);
+        models.push(file);
+        if(ext === 'stl' || ext === 'obj') {
+            let fr = new FileReader();
+            fr.addEventListener('load', (e) => {
+                ProgressActions.updating('Loading as ' + ext, 10);
+                appendModel(fr.result, file, ext, function(err) {
+                    if(!err) {
+                        if(files.length > index + 1) {
+                            appendModels(files, index + 1, callback);
+                        } else {
+                            startSlicing(slicingType.F);
+                            callback();
+                        }
                     }
-                    else {
-                        ProgressActions.close();
-                        AlertActions.showPopupYesNo(
-                            GlobalConstants.IMPORT_FCODE,
-                            lang.message.confirmFCodeImport, '', ext);
-                    }
-                    callback();
-                }
-                else if (ext === 'fsc') {
-                    slicingStatus.canInterrupt = true;
-                    importedScene = files.item(0);
-                    setDefaultFileName(importedScene.name);
-                    if(objects.length === 0) {
-                        _handleLoadScene(importedScene);
-                    }
-                    else {
-                        ProgressActions.close();
-                        AlertActions.showPopupYesNo(
-                            GlobalConstants.IMPORT_SCENE,
-                            lang.message.confirmSceneImport
-                        );
-                    }
-                    callback();
-                }
-                else {
-                    ProgressActions.close();
-                    AlertActions.showPopupError('', lang.monitor.extensionNotSupported);
-                    slicingStatus.canInterrupt = true;
-                    callback();
-                }
+                });
+            });
+            ProgressActions.updating('Start Loading', 5);
+            fr.readAsArrayBuffer(file);
+        }
+        else if (ext === 'fc' || ext === 'gcode') {
+            slicingStatus.isComplete = true;
+            importedFCode = files.item(0);
+            importFromFCode = ext === 'fc';
+            setDefaultFileName(importedFCode.name);
+            if(objects.length === 0) {
+                doFCodeImport(ext);
             }
-        });
+            else {
+                ProgressActions.close();
+                AlertActions.showPopupYesNo(
+                    GlobalConstants.IMPORT_FCODE,
+                    lang.message.confirmFCodeImport, '', ext);
+            }
+            callback();
+        }
+        else if (ext === 'fsc') {
+            importedScene = files.item(0);
+            setDefaultFileName(importedScene.name);
+            if(objects.length === 0) {
+                _handleLoadScene(importedScene);
+            }
+            else {
+                ProgressActions.close();
+                AlertActions.showPopupYesNo(
+                    GlobalConstants.IMPORT_SCENE,
+                    lang.message.confirmSceneImport
+                );
+            }
+            callback();
+        }
+        else {
+            ProgressActions.close();
+            AlertActions.showPopupError('', lang.monitor.extensionNotSupported);
+            callback();
+        }
+
     }
 
     function appendPreviewPath(file, callback, isGcode) {
@@ -487,7 +528,6 @@ define([
                     reactSrc.setState({ hasObject: false });
                     if(previewMode) {
                         fcodeConsole.getPath().then((r) => {
-                            slicingStatus.canInterrupt = true;
                             if(r.error) {
                                 processSlicerError(r);
                             }
@@ -557,8 +597,6 @@ define([
 
     function startSlicing(type) {
         slicingStatus.inProgress    = true;
-        slicingStatus.canInterrupt  = false;
-        slicingStatus.pauseReport   = true;
         slicingStatus.hasError      = false;
         slicingStatus.isComplete    = false;
         blobExpired                 = true;
@@ -567,38 +605,31 @@ define([
         slicingStatusStream.onNext(slicingStatus);
 
         if(objects.length === 0 || !blobExpired) { return; }
-        var ids = [];
-        objects.forEach(function(obj) {
-            if(!obj.position.isOutOfBounds) {
-                ids.push(obj.uuid);
-            }
-        });
+
+        var ids = objects.filter(v => !v.position.isOutOfBounds).map(v => v.uuid);
 
         if(previewMode) {
             _clearPath();
             _showPreview();
         }
 
-        syncObjectParameter().then(function() {
+        syncObjectParameter().then(() => {
             return stopSlicing();
-        }).then(function() {
+        }).then(() => {
             // set again because stop slicing set inProgress to false
             slicingStatus.inProgress = true;
             slicingStatusStream.onNext(slicingStatus);
-            slicer.beginSlicing(ids, slicingType.F).then(function(response) {
+
+            slicer.beginSlicing(ids, slicingType.F).then(() => {
                 slicingStatus.percentage = 0.05;
                 reactSrc.setState({slicingPercentage: 0.05});
-                slicingStatus.canInterrupt = true;
-                slicingStatus.pauseReport = false;
                 getSlicingReport(function(report) {
-                    if(report.status != 'ok'){
+                    if (report.status != 'ok') {
                         slicingStatus.lastReport = report;
                     }
                     updateSlicingProgressFromReport(slicingStatus.lastReport);
                 });
             }).fail((error) => {
-                slicingStatus.canInterrupt = true;
-                slicingStatus.pauseReport = false;
                 processSlicerError(error);
                 return;
             });
@@ -627,16 +658,13 @@ define([
             previewUrl = URL.createObjectURL(blob);
 
             var t = setInterval(() => {
-                if(slicingStatus.canInterrupt && slicingStatus.isComplete) {
+                if(slicingStatus.isComplete) {
                     slicingStatus.showProgress = false;
-                    slicingStatus.canInterrupt = false;
                     clearInterval(t);
                     if(slicingStatus.hasError) {
-                        slicingStatus.canInterrupt = true;
                         return;
                     }
                     slicer.uploadPreviewImage(blob).then(() => {
-                        slicingStatus.canInterrupt = true;
                         slicer.getSlicingResult().then((result) => {
                             responseBlob = result;
                             d.resolve(blob);
@@ -647,12 +675,41 @@ define([
                         processSlicerError(error);
                     });
                 }
-            }, 500);
+            }, 100);
         });
         return d.promise();
     }
 
     function doSlicing() {
+
+        // Check if slicing is necessary
+        fullSliceParameters.objs = {}
+        objects.forEach((o) => {
+            fullSliceParameters.objs[o.uuid] = [
+                o.position.x,
+                o.position.y,
+                o.position.z,
+                o.rotation.x,
+                o.rotation.y,
+                o.rotation.z,
+                o.scale.x,
+                o.scale.y,
+                o.scale.z
+            ]
+        });
+
+        let sliceParams = JSON.stringify(fullSliceParameters, (key, val) => {
+            // Fix precision to .00001
+            return val.toFixed ? Number(val.toFixed(5)) : val;
+        });
+        if (sliceParams === lastSliceParams) {
+            console.log("Begin Slice:: Skipping redundant slicing");
+            return;
+        } else {
+            console.log("Begin Slice:: Remove sliced results");
+            lastSliceParams = sliceParams;
+        }
+
         _clearPath();
         blobExpired = true;
         hasPreviewImage = false;
@@ -660,24 +717,10 @@ define([
 
         if(slicingStatus.inProgress) {
             clearTimeout(slicingTimmer);
-            slicingTimmer = setTimeout(function() {
-                var t = setInterval(function() {
-                    if(slicingStatus.canInterrupt) {
-                        clearInterval(t);
-                        slicingStatus.isComplete = false;
-                        startSlicing(slicingType.F);
-                    }
-                }, 500);
-            }, slicingWaitTime);
+            startSlicing(slicingType.F);
         }
         else {
-            var t = setInterval(function() {
-                if(slicingStatus.canInterrupt) {
-                    clearInterval(t);
-                    slicingStatus.isComplete = false;
-                    startSlicing(slicingType.F);
-                }
-            }, 500);
+            startSlicing(slicingType.F);
         }
     }
 
@@ -686,7 +729,7 @@ define([
         slicingStatus.error = null;
         slicingStatusStream.onNext(slicingStatus);
 
-        if(slicingStatus.needToCloseWait) {
+        if (slicingStatus.needToCloseWait) {
             ProgressActions.close();
             slicingStatus.needToCloseWait = false;
         }
@@ -696,10 +739,10 @@ define([
             show = slicingStatus.showProgress,
             monitorOn = $('.flux-monitor').length > 0;
 
-        if(report.slice_status === "complete"){
+        if (report.slice_status === "complete") {
             report.percentage = 1;
         }
-        if(report.percentage !== slicingStatus.percentage){
+        if (report.percentage !== slicingStatus.percentage) {
             slicingStatus.percentage = report.percentage;
             reactSrc.setState({slicingPercentage: slicingStatus.percentage});
         }
@@ -731,7 +774,6 @@ define([
                 slicingStatus.error = report;
                 if(previewMode) {
                     slicer.getPath().then(function(result) {
-                        slicingStatus.canInterrupt = true;
                         if(result.error) {
                             processSlicerError(result);
                         }
@@ -782,28 +824,21 @@ define([
         }
         else {
             GlobalActions.sliceComplete(report);
-            if(show) {
-                ProgressActions.updating(complete, 100);
-            }
-            slicingStatus.canInterrupt = false;
+            if(show) { ProgressActions.updating(complete, 100); }
             slicer.getSlicingResult().then((result) => {
-                slicingStatus.canInterrupt = true;
-                if(result.error) {
-                    processSlicerError(result);
-                    return;
-                }
+                if(result.error) { return processSlicerError(result); }
                 setTimeout(function() {
                     if(needToShowMonitor) {
                         reactSrc._handleDeviceSelected();
                         needToShowMonitor = false;
                     }
-                }, 1000);
+                }, 300);
 
                 blobExpired = false;
                 responseBlob = result;
                 _handleSliceComplete();
             }).fail((error) => {
-                console.log(error);
+                console.log("Slicining Error:: ", error);
             });
         }
     }
@@ -1102,74 +1137,6 @@ define([
         }
     }
 
-    function getFileByteArray(filePath) {
-        getFileObject(filePath, function(fileObject) {
-            var reader = new FileReader();
-
-            reader.onload = function(e) {
-                var arrayBuffer = reader.result;
-            };
-
-            reader.readAsArrayBuffer(fileObject);
-        });
-    }
-
-    // compare and return the largest axis value (for scaling)
-    function getLargestPropertyValue(obj) {
-        var v = 0;
-        for (var property in obj) {
-            if (obj.hasOwnProperty(property)) {
-                if (obj[property] > v) {
-                    v = obj[property];
-                }
-            }
-        }
-        return v;
-    }
-
-    function getSmallestPropertyValue(obj) {
-        var v = 1;
-        for (var property in obj) {
-            if (obj.hasOwnProperty(property)) {
-                if (obj[property] < v) {
-                    v = obj[property];
-                }
-            }
-        }
-        return v;
-    }
-
-    // return the scale to fit the area
-    function getScaleDifference(value) {
-        var done = false,
-            scale = 1;
-
-        // if loaded object is smaller, enlarge it. offset by *10
-        if (value < s.diameter) {
-            while(!done) {
-                if (value * scale < s.allowedMin) {
-                    scale = scale * 10;
-                }
-                else {
-                    done = true;
-                }
-            }
-
-            return scale;
-        }
-        // if loaded object exceed printed area, shrink it (no offset)
-        else {
-            while (!done) {
-                if (value / scale < s.diameter) {
-                    done = true;
-                } else {
-                    scale = scale * 10;
-                }
-            }
-            return 1 / scale;
-        }
-    }
-
     function getFCode() {
         var d = $.Deferred();
 
@@ -1229,26 +1196,20 @@ define([
         var reportTimmer = 1000; // 1 sec
 
         slicingStatus.reporter = setInterval(function() {
-            if(!slicingStatus.pauseReport) {
+            if (!slicingStatus.pauseReport) {
                 if(willReslice) {
                     return;
                 }
-                if(slicingStatus.canInterrupt) {
-                    slicingStatus.canInterrupt = false;
-                    slicingStatus.pauseReport = true;
-                    slicer.reportSlicing().then((report) => {
-                        slicingStatus.canInterrupt = true;
-                        slicingStatus.pauseReport = false;
-                        if(!!report) {
-                            if(report.slice_status === 'complete' || report.slice_status === 'error') {
-                                clearInterval(slicingStatus.reporter);
-                            }
-                            callback(report);
+                slicer.reportSlicing().then((report) => {
+                    if(!!report) {
+                        if(report.slice_status === 'complete' || report.slice_status === 'error') {
+                            clearInterval(slicingStatus.reporter);
                         }
-                    }).fail((error) => {
-                        console.log(error);
-                    });
-                }
+                        callback(report);
+                    }
+                }).fail((error) => {
+                    console.log("Slice report", error);
+                });
             }
         }, reportTimmer);
 
@@ -1310,7 +1271,7 @@ define([
         });
 
         if (center) {
-            src.plane_boundary = planeBoundary(src);
+            // src.plane_boundary = planeBoundary(src);
             groundIt(src);
             checkOutOfBounds(src);
             render();
@@ -1367,56 +1328,43 @@ define([
     }
 
     function setAdvanceParameter(settings) {
-        var d = $.Deferred();
-        slicingStatus.pauseReport = true;
+        var deferred = $.Deferred();
 
-        var t = setInterval(function() {
-            if(slicingStatus.canInterrupt) {
-                clearInterval(t);
-                slicingStatus.canInterrupt = false;
-                slicer.setParameter('advancedSettings', settings.custom).then((result) => {
-                    slicingStatus.canInterrupt = true;
-                    slicingStatus.showProgress = false;
-                    slicingStatus.pauseReport = false;
-                    if(objects.length > 0) {
-                        doSlicing();
-                    }
-                    d.resolve('');
-                }).fail((error) => {
-                    processSlicerError(error);
-                    d.resolve('');
-                });
-                blobExpired = true;
-                hasPreviewImage = false;
-                slicingStatus.pauseReport = false;
+        slicer.setParameter('advancedSettings', settings.custom).then((result) => {
+            Object.assign(fullSliceParameters.settings, settings);
+            slicingStatus.showProgress = false;
+            if(objects.length > 0) {
+                doSlicing();
             }
-        }, 500);
+            deferred.resolve('');
+        }).fail((error) => {
+            // Fallback to fine settings
+            Object.assign(settings, fineSettings);
+            processSlicerError(error);
+            deferred.reject(new Error(error));
+        });
+        blobExpired = true;
+        hasPreviewImage = false;
 
-        return d.promise();
+        return deferred.promise();
     }
 
     function setParameter(name, value) {
-        slicingStatus.pauseReport = true;
         var d = $.Deferred();
         blobExpired = true;
         hasPreviewImage = false;
 
-        var t = setInterval(function() {
-            if(slicingStatus.canInterrupt) {
-                clearInterval(t);
-                slicer.setParameter(name, value).then(() => {
-                    slicingStatus.showProgress = false;
-                    slicingStatus.pauseReport = false;
-                    if(objects.length > 0) {
-                        doSlicing();
-                    }
-                    d.resolve('');
-                }).fail((error) => {
-                    processSlicerError(error);
-                    d.resolve('');
-                });
+        slicer.setParameter(name, value).then(() => {
+            fullSliceParameters.settings[name] = value;
+            slicingStatus.showProgress = false;
+            if(objects.length > 0) {
+                doSlicing();
             }
-        }, 500);
+            d.resolve('');
+        }).fail((error) => {
+            processSlicerError(error);
+            d.resolve('');
+        });
 
         return d.promise();
     }
@@ -1629,6 +1577,8 @@ define([
             outlineScene.remove(SELECTED.outlineMesh);
             if (index > -1) {
                 objects.splice(index, 1);
+            } else {
+                console.log("Remove:: Object cannot find" , SELECTED);
             }
 
             transformControl.detach(SELECTED);
@@ -1714,6 +1664,17 @@ define([
     }
 
     function planeBoundary(sourceMesh) {
+        let transformation = JSON.stringify({ p: sourceMesh.position, s: sourceMesh.scale, r: sourceMesh.rotation}, (key, val) => {
+            // Fix precision to .00001
+            return val.toFixed ? Number(val.toFixed(5)) : val;
+        });
+        console.log("PlaneBoundary:: Transformation ", transformation);
+        if (sourceMesh.jTransformation == transformation) {
+            console.log("PlaneBoundary:: Skipping redundant calculation");
+            return sourceMesh.plane_boundary;
+        } else {
+        }
+        sourceMesh.jTransformation = transformation;
         // ref: http://www.csie.ntnu.edu.tw/~u91029/ConvexHull.html#4
         // Andrew's Monotone Chain
 
@@ -1721,81 +1682,90 @@ define([
         // sort the index of each point in stl
         var stl_index = [];
         var boundary = [];
+
         if (sourceMesh.geometry.type === 'Geometry') {
             // define Cross product function on 2d plane
+            let vs = sourceMesh.geometry.vertices;
             var cross = (function cross(p0, p1, p2) {
                 return ((p1.x - p0.x) * (p2.y - p0.y)) - ((p1.y - p0.y) * (p2.x - p0.x));
             });
 
-            for (var i = 0; i < sourceMesh.geometry.vertices.length; i += 1) {
-              stl_index.push(i);
+            stl_index = new Uint32Array(vs.length);
+
+            for (var i = 0; i < vs.length; i += 1) {
+                stl_index[i] = i;
             }
-            stl_index.sort(function(a, b) {
-                if (sourceMesh.geometry.vertices[a].y === sourceMesh.geometry.vertices[b].y) {
-                    return sourceMesh.geometry.vertices[a].x - sourceMesh.geometry.vertices[b].x;
-                }
-                return sourceMesh.geometry.vertices[a].y - sourceMesh.geometry.vertices[b].y;
+
+            stl_index.sort((a, b) => {
+                let c = vs[a].y === vs[b].y;
+                return c ? c : vs[a].x - vs[b].x;
             });
 
             // find boundary
-
             // compute upper hull
             for (var i = 0; i < stl_index.length; i += 1) {
-              while( boundary.length >= 2 && cross(sourceMesh.geometry.vertices[boundary[boundary.length - 2]], sourceMesh.geometry.vertices[boundary[boundary.length - 1]], sourceMesh.geometry.vertices[stl_index[i]]) <= 0){
-                boundary.pop();
-              }
+                while( boundary.length >= 2 && cross(vs[boundary[boundary.length - 2]], vs[boundary[boundary.length - 1]], vs[stl_index[i]]) <= 0){
+                    boundary.pop();
+                }
                 boundary.push(stl_index[i]);
             }
             // compute lower hull
             var t = boundary.length + 1;
             for (var i = stl_index.length - 2 ; i >= 0; i -= 1) {
-                while( boundary.length >= t && cross(sourceMesh.geometry.vertices[boundary[boundary.length - 2]], sourceMesh.geometry.vertices[boundary[boundary.length - 1]], sourceMesh.geometry.vertices[stl_index[i]]) <= 0){
+                while( boundary.length >= t && cross(vs[boundary[boundary.length - 2]], vs[boundary[boundary.length - 1]], vs[stl_index[i]]) <= 0){
                     boundary.pop();
                 }
                 boundary.push(stl_index[i]);
             }
+
             // delete redundant point(i.e., starting point)
+            console.log("PlaneBoundary:: Finished", + new Date());
             boundary.pop();
         }
         else{
-            // define Cross product function on 2d plane for buffergeometry
-            var cross = (function cross(sm, p0, p1, p2) {
+            let vs = sourceMesh.geometry.getAttribute('position');
+            // define Cross product function on 2d plane for BufferGeometry
+            var cross = (function cross(p0, p1, p2) {
 
-                return ((sm.geometry.attributes.position.array[p1 * 3 + 0] - sm.geometry.attributes.position.array[p0 * 3 + 0]) *
-                        (sm.geometry.attributes.position.array[p2 * 3 + 1] - sm.geometry.attributes.position.array[p0 * 3 + 1])) -
-                       ((sm.geometry.attributes.position.array[p1 * 3 + 1] - sm.geometry.attributes.position.array[p0 * 3 + 1]) *
-                        (sm.geometry.attributes.position.array[p2 * 3 + 0] - sm.geometry.attributes.position.array[p0 * 3 + 0]))
+                return ((vs[p1 * 3 + 0] - vs[p0 * 3 + 0]) *
+                        (vs[p2 * 3 + 1] - vs[p0 * 3 + 1])) -
+                       ((vs[p1 * 3 + 1] - vs[p0 * 3 + 1]) *
+                        (vs[p2 * 3 + 0] - vs[p0 * 3 + 0]))
             });
 
-            for (var i = 0; i < sourceMesh.geometry.attributes.position.length / sourceMesh.geometry.attributes.position.itemSize; i += 1) {
-              stl_index.push(i);
+            let meshSize = vs.count / vs.itemSize;
+
+            console.log("PlaneBoundary:: Allocating", + new Date());
+            stl_index = new Uint32Array(meshSize);
+            for (var i = 0; i < meshSize; i += 1) {
+                stl_index[i] = i;
             }
 
-            stl_index.sort(function(a, b) {
-                if (sourceMesh.geometry.attributes.position.array[a * 3 + 1] === sourceMesh.geometry.attributes.position.array[b * 3 + 1]) {
-                    return sourceMesh.geometry.attributes.position.array[a * 3 + 0] - sourceMesh.geometry.attributes.position.array[b * 3 + 0];
-                }
-                return sourceMesh.geometry.attributes.position.array[a * 3 + 1] - sourceMesh.geometry.attributes.position.array[b * 3 + 1];
+            stl_index.sort((a, b) => {
+                let c = vs[a * 3 + 1] - vs[b * 3 + 1];
+                return c ? c : vs[a * 3 + 0] - vs[b * 3 + 0];
             });
 
             // find boundary
-
             // compute upper hull
             for (var i = 0; i < stl_index.length; i += 1) {
-              while( boundary.length >= 2 && cross(sourceMesh, boundary[boundary.length - 2], boundary[boundary.length - 1], stl_index[i]) <= 0){
-                boundary.pop();
-              }
+                while ( boundary.length >= 2 && cross(boundary[boundary.length - 2], boundary[boundary.length - 1], stl_index[i]) <= 0) {
+                    boundary.pop();
+                }
                 boundary.push(stl_index[i]);
             }
+
+            console.log("PlaneBoundary:: Computing lower hull", + new Date());
             // compute lower hull
             var t = boundary.length + 1;
             for (var i = stl_index.length - 2 ; i >= 0; i -= 1) {
-                while( boundary.length >= t && cross(sourceMesh, boundary[boundary.length - 2], boundary[boundary.length - 1], stl_index[i]) <= 0){
+                while( boundary.length >= t && cross(boundary[boundary.length - 2], boundary[boundary.length - 1], stl_index[i]) <= 0) {
                     boundary.pop();
                 }
                 boundary.push(stl_index[i]);
             }
             // delete redundant point(i.e., starting point)
+            console.log("PlaneBoundary:: Finished", + new Date());
             boundary.pop();
         };
         return boundary;
@@ -1958,7 +1928,7 @@ define([
 
     function syncObjectParameter() {
         var d = $.Deferred();
-        _syncObjectParameter(objects, 0, function() {
+        _syncObjectParameter(objects, 0, () => {
             d.resolve('');
         });
 
@@ -2106,10 +2076,48 @@ define([
         }
     }
 
+
     function changePreviewLayer(layerNumber) {
-        for (var i = 1; i < previewScene.children.length; i++) {
-            previewScene.children[i].visible = i - 1 < layerNumber;
+
+        for (let i = 1; i < previewScene.children.length; i++) {
+            previewScene.children[i].visible = i <= layerNumber;
         }
+
+        if ( previewScene.children.length > printPath.length && previewScene.children.length > 0)  {
+            // let trashLine = previewScene.children[previewScene.children.length - 1]
+            previewScene.children.splice( previewScene.children.length - 1, 1) ;
+            // trashLine.dispose();
+        }
+
+        let g = new THREE.BufferGeometry(),
+            i = 0,
+            layer = printPath[layerNumber];
+
+        if ( layer && layer.length ) {
+            var positions = new Float32Array(layer.length * 3 * 2 - 6);
+            var colors = new Float32Array(layer.length * 3 * 2 - 6);
+            for (var p = 1; p < layer.length; p++) {
+                for (var tmp = 1; tmp >= 0; tmp--) {
+                    positions[i * 3] = layer[p - tmp][0];
+                    positions[i * 3 + 1] = layer[p - tmp][1];
+                    positions[i * 3 + 2] = layer[p - tmp][2];
+                    let color = previewColors[layer[p][3]+1];
+                    colors[i * 3] = Math.min(1, color.r * 0.8);
+                    colors[i * 3 + 1] = Math.min(1, color.g * 0.8);
+                    colors[i * 3 + 2] = Math.min(1, color.b * 0.8);
+                    i++;
+                }
+            }
+
+            g.addAttribute('position', new THREE.BufferAttribute(positions,3));
+            g.addAttribute('color', new THREE.BufferAttribute(colors, 3));
+            g.computeBoundingSphere();
+        }
+
+        let line = new THREE.Line(g, emphasizeLineMaterial); // A layer is a "continuos line"
+        line.name = 'line';
+        previewScene.add(line);
+
         render();
     }
 
@@ -2140,8 +2148,11 @@ define([
         if (!$.isEmptyObject(SELECTED)) {
             updateFromScene('TransformControl');
         }
+
         renderer.clear();
-        renderer.render( outlineScene, camera );
+        if (outlineScene.children.length > 0) {
+            renderer.render( outlineScene, camera );
+        }
 
         renderer.clearDepth();
         renderer.render(previewMode ? previewScene : scene, camera);
@@ -2185,14 +2196,6 @@ define([
         return (parseInt(degree / degreeStep) * degreeStep);
     }
 
-    function updateScaleWithStep(scale) {
-        // if no decimal after scale precision, ex: 1.1, not 1.143
-        if (parseInt(scale * Math.pow(10, s.scalePrecision)) === scale * Math.pow(10, s.scalePrecision)) {
-            return scale;
-        }
-        return (parseInt(scale * Math.pow(10, s.scalePrecision)) + 1) / Math.pow(10, s.scalePrecision);
-    }
-
     function updateObjectSize(src) {
         src.size.enteredX = src.scale.x * src.size.originalX;
         src.size.enteredY = src.scale.y * src.size.originalY;
@@ -2208,18 +2211,6 @@ define([
             modelSelected: src
         });
 
-    }
-
-    function getLargestPropertyValue(obj) {
-        var v = 0;
-        for (var property in obj) {
-            if (obj.hasOwnProperty(property)) {
-                if (obj[property] > v) {
-                    v = obj[property];
-                }
-            }
-        }
-        return v;
     }
 
     function updateObjectRotation(src) {
@@ -2293,7 +2284,6 @@ define([
         var d = $.Deferred();
         clearInterval(slicingStatus.reporter);
         slicingStatus.inProgress = false;
-        slicingStatus.canInterrupt = true;
         if(slicingStatus.inProgress) {
             slicer.stopSlicing().then(function() {
                 slicingStatusStream.onNext(slicingStatus);
@@ -2333,22 +2323,21 @@ define([
     function downloadScene() {
         if(objects.length === 0) { return; }
 
-        var parameter;
         packer.clear();
 
         if(objects.length > 0) {
             objects.forEach(function(model) {
-                parameter = {};
-                parameter.size = model.size;
-                parameter.rotation = model.rotation;
-                parameter.position = model.position;
-                parameter.scale = model.scale;
-                packer.addInfo(parameter);
+                packer.addInfo({
+                    size : model.size,
+                    rotation : model.rotation,
+                    position : model.position,
+                    scale : model.scale
+                });
                 packer.addFile(model.file);
             });
         }
-        var sceneFile = packer.pack();
-        saveAs(sceneFile);
+
+        saveAs(packer.pack());
     }
 
     function loadScene() {
@@ -2411,7 +2400,7 @@ define([
                 o[index].scale.x,
                 o[index].scale.y,
                 o[index].scale.z
-            ).then((result) => {
+            ).then(() => {
                 if (index < o.length) {
                     _syncObjectParameter(o, index + 1, callback);
                 }
@@ -2461,9 +2450,7 @@ define([
         if(previewMode) {
             slicingStatus.isComplete = true;
             _showWait(lang.print.drawingPreview, !showStopButton);
-            slicingStatus.canInterrupt = false;
             slicer.getPath().then(function(result) {
-                slicingStatus.canInterrupt = true;
                 printPath = result;
                 _drawPath().then(function() {
                     _resetPreviewLayerSlider();
@@ -2595,9 +2582,7 @@ define([
         }
         else {
             if(!printPath || printPath.length === 0) {
-                slicingStatus.canInterrupt = false;
                 slicer.getPath().then((result) => {
-                    slicingStatus.canInterrupt = true;
                     if(result.error) {
                         processSlicerError(result);
                     }
@@ -2643,35 +2628,42 @@ define([
     }
 
     function _drawPath() {
-        var d = $.Deferred(),
-            color,
-            g, m, line;
+        var d = $.Deferred(), lineMaterial, line;
 
         previewScene.children.splice(1, previewScene.children.length - 1);
-        m = new THREE.LineBasicMaterial({
+        lineMaterial = new THREE.LineBasicMaterial({
             color: 0xffffff,
-            opacity: 10,
             linewidth: 1,
+            opacity: 0.3,
             vertexColors: THREE.VertexColors
         });
 
-        for (var layer = 0; layer < printPath.length; layer++) {
-            g = new THREE.Geometry();
-            color = [];
+        for (var l = 0; l < printPath.length; l++) {
+            let g = new THREE.BufferGeometry(),
+                i = 0,
+                layer = printPath[l];
 
-            for (var point = 1; point < printPath[layer].length; point++) {
+            var positions = new Float32Array(layer.length * 3 * 2 - 6);
+            var colors = new Float32Array(layer.length * 3 * 2 - 6);
+
+            for (var p = 1; p < layer.length; p++) {
                 for (var tmp = 1; tmp >= 0; tmp--) {
-                    color.push(previewColors[printPath[layer][point][3]] || previewColors[-1]);
-                    g.vertices.push(new THREE.Vector3(
-                        printPath[layer][point - tmp][0],
-                        printPath[layer][point - tmp][1],
-                        printPath[layer][point - tmp][2]
-                    ));
+                    positions[i * 3] = layer[p - tmp][0];
+                    positions[i * 3 + 1] = layer[p - tmp][1];
+                    positions[i * 3 + 2] = layer[p - tmp][2];
+                    let color = previewColors[layer[p][3]+1];
+                    colors[i * 3] = color.r;
+                    colors[i * 3 + 1] = color.g;
+                    colors[i * 3 + 2] = color.b;
+                    i++;
                 }
             }
 
-            g.colors = color;
-            line = new THREE.Line(g, m);
+            g.addAttribute('position', new THREE.BufferAttribute(positions,3));
+            g.addAttribute('color', new THREE.BufferAttribute(colors, 3));
+            g.computeBoundingSphere();
+
+            line = new THREE.Line(g, lineMaterial); // A layer is a "continuos line"
             line.name = 'line';
             previewScene.add(line);
         }
@@ -2781,10 +2773,9 @@ define([
 
     function _checkNeedToShowProgress() {
         if(!slicingStatus.isComplete) {
-            if(!slicingStatus.showProgress) {
-                slicingStatus.showProgress = true;
-            }
-            if(typeof slicingStatus.lastReport !== 'undefined' && slicingStatus.lastReport !== null) {
+            slicingStatus.showProgress = true;
+
+            if(!!slicingStatus.lastReport) {
                 updateSlicingProgressFromReport(slicingStatus.lastReport);
             }
         }
@@ -2810,32 +2801,26 @@ define([
     function changeEngine(engine, path) {
         var d = $.Deferred();
 
-        var t = setInterval(() => {
-            if(slicingStatus.canInterrupt) {
-                clearInterval(t);
-                slicingStatus.canInterrupt = false;
-                slicer.changeEngine(engine).then((result) => {
-                    if(result.error) {
-                        processSlicerError(result);
-                    }
-                    slicingStatus.canInterrupt = true;
-                    d.resolve();
-                }).fail((error) => {
-                    processSlicerError(error);
-                });
+        slicer.changeEngine(engine).then((result) => {
+            if(result.error) {
+                processSlicerError(result);
             }
-        }, 500);
+            d.resolve();
+        }).fail((error) => {
+            processSlicerError(error);
+        });
 
         return d.promise();
     }
 
     function processSlicerError(result) {
+
         let id = 'SLICER_ERROR',
         message = lang.slicer.error[result.error] || result.info;
-        if(result.error === ErrorConstants.INVALID_PARAMETER) {
+        if (result.error === ErrorConstants.INVALID_PARAMETER) {
             message = `${message} ${result.info}`;
         }
-        if(!message) {
+        if (!message) {
             message = result.error;
         }
         AlertActions.showPopupError(id, message);
