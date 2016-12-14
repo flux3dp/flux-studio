@@ -169,7 +169,7 @@ define([
 
         let width = container.offsetWidth, height = container.offsetHeight;
 
-        if (Config().read('camera-projection') == 'Orthographic') {
+        if (Config().read('camera-projection') === 'Orthographic') {
             camera = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, 1, 1000 );
             camera.position.set(0, -200, 100);
             camera.zoom = 4;

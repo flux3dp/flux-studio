@@ -44,27 +44,27 @@ define([
             queueLock = false,
             queuedCommands = [];
 
-        
-        // When the queue is free, resolve to run the next "Command", and send a wrapped "Psuedo - Promise" 
+
+        // When the queue is free, resolve to run the next "Command", and send a wrapped "Psuedo - Promise"
         setInterval(() => {
             // Check queue
             if (!queueLock && queuedCommands.length > 0) {
                 queueLock = true;
                 // Pop 1 command
                 let command = queuedCommands.splice(0,1)[0];
-                console.log("Pop Command", command.name);
+                // console.log("Pop Command", command.name);
                 command.q.resolve(command.wrapped);
             }
         }, 10);
 
         function getQueuePromise(api_name) {
             let qPromise = $.Deferred();
-            
+
             let jPromise = $.Deferred();
             let wrapped = {
                 resolve: (...args) => {
                     queueLock = false;
-                    console.log("Resolve:: ", args);
+                    // console.log("Resolve:: ", args);
                     jPromise.resolve.apply(jPromise, args);
                 },
                 reject: (...args) => {
@@ -76,7 +76,7 @@ define([
                 },
                 promise: () => {
                     let promise = jPromise.promise();
-                    return {           
+                    return {
                         then: (cb) => {
                             return promise.then(cb);
                         },
@@ -94,7 +94,7 @@ define([
                     }
                 }
             };
-            
+
             queuedCommands.push({name: api_name, q: qPromise, wrapped: wrapped});
             return { q: qPromise.promise(), wrapped: wrapped };
         }
@@ -216,7 +216,7 @@ define([
                 events.onFatal = (error) => {
                     d.reject(error);
                 }
-                
+
                 fileUrl = encodeURI(fileUrl);
                 ext = ext === 'obj' ? ' ' + ext : '';
                 ws.send('load_stl_from_path ' + name + ' ' + fileUrl + ext);
@@ -410,7 +410,7 @@ define([
 
                 let queuedPromise = getQueuePromise('setParameter');
                 queuedPromise.q.then((d) => {
-                
+
                 let errors = [];
 
                 events.onMessage = (result) => {

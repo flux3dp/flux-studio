@@ -98,7 +98,8 @@ define(function() {
                 commands: '指令',
                 set_to_origin_complete: 'Delta 已回歸原點',
                 scan_laser_complete: '掃描雷射已開啟，點擊 "完成" 以關閉雷射',
-                finish: '完成'
+                finish: '完成',
+                cancel: '取消'
             },
             window: {
                 label: '視窗',

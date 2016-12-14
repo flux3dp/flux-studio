@@ -99,6 +99,7 @@ define(function() {
                 set_to_origin_complete: 'Delta has calibrated its origin.',
                 scan_laser_complete: 'Delta has turned on its scanning laser. Click "Finish" to turn it off.',
                 finish: 'FINISH',
+                cancel: 'CANCEL'
             },
             window: {
                 label: 'Window',

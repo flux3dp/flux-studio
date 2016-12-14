@@ -24,6 +24,7 @@ define([
     'use strict';
 
     var lang = i18n.get(),
+        maxTemperature = 220,
         steps = {
             HOME      : 'HOME',
             GUIDE     : 'GUIDE',
@@ -65,12 +66,15 @@ define([
 
             componentDidMount: function() {
                 if (true === this.props.open) {
-                    DeviceMaster.selectDevice(this.props.device).then(function(status) {
-                        if (status !== DeviceConstants.CONNECTED) {
-                            // alert and close
-                            AlertActions.showPopupError('change-filament', status);
-                        }
-                    });
+                    let selectedDevice = DeviceMaster.getSelectedDevice();
+                    if(selectedDevice.uuid !== this.props.device.uuid) {
+                        DeviceMaster.selectDevice(this.props.device).then(function(status) {
+                            if (status !== DeviceConstants.CONNECTED) {
+                                // alert and close
+                                AlertActions.showPopupError('change-filament', status);
+                            }
+                        });
+                    }
 
                     if(this.props.src !== 'TUTORIAL') {
                         AlertStore.onCancel(this._onCancel);
@@ -102,6 +106,12 @@ define([
                 this.setState(this.getInitialState());
             },
 
+            _handleCancelJob: function(e) {
+                e.preventDefault();
+                DeviceMaster.killSelf();
+                this._onCancel(e);
+            },
+
             _goMaintain: function(type) {
                 var self = this,
                     nextStep = (self.state.type === DeviceConstants.LOAD_FILAMENT ? steps.EMERGING : steps.UNLOADING),
@@ -116,10 +126,17 @@ define([
                             self._next(steps.UNLOADING);
                             break;
                         default:
-                            // update temperature
-                            self.setState({
-                                temperature: response.temperature || 220
-                            });
+                            if(response.error) {
+                                if(response.error[0] === 'KICKED') {
+                                    this.setState(this.getInitialState());
+                                }
+                            }
+                            else {
+                                // update temperature
+                                self.setState({
+                                    temperature: response.temperature || 220
+                                });
+                            }
                             break;
                         }
                     },
@@ -177,7 +194,7 @@ define([
                             AlertActions.showDeviceBusyPopup('change-filament-zombie', lang.change_filament.maintain_zombie);
                         }
                         else if ('KICKED' === response.error[0]) {
-                            self.props.onClose();
+                            // self.props.onClose();
                         }
                         else {
                             errorMessageHandler(response);
@@ -289,12 +306,17 @@ define([
                         <div className="message-container">
                             <p className="temperature">
                                 <span>{lang.change_filament.heating_nozzle}</span>
-                                <span>{temperature} / 220°C</span>
+                                <span>{temperature} / {maxTemperature}°C</span>
                             </p>
                             <div className="spinner-roller spinner-roller-reverse"/>
                         </div>
                     ),
-                    buttons: []
+                    buttons: [
+                        {
+                            label: lang.change_filament.cancel,
+                            onClick: this._handleCancelJob
+                        }
+                    ]
                 };
             },
 
@@ -332,6 +354,7 @@ define([
                                     lang.change_filament.auto_emerging : ''
                                 }
                             </span>,
+                            <div className="cancel" onClick={this._handleCancelJob}>{lang.change_filament.cancel}</div>,
                             <div className="spinner-roller spinner-roller-reverse"/>
                         ],
                         type: 'icon',
