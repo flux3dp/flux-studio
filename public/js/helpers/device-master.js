@@ -299,7 +299,11 @@ define([
     }
 
     function stop() {
-        return _do(DeviceConstants.STOP);
+        let d = $.Deferred();
+        _do(DeviceConstants.QUIT).then(r => {
+            d.resolve(r);
+        });
+        return d.promise();
     }
 
     function quit() {
@@ -319,8 +323,9 @@ define([
         _device.actions.killSelf().then(response => {
             d.resolve(response);
         }).fail(error => {
-            reconnectWs();
             d.resolve(error);
+        }).always(() => {
+            reconnectWs();
         });
         return d.promise();
     }
@@ -425,10 +430,7 @@ define([
     }
 
     function getFirstDevice() {
-        for(let i in _deviceNameMap) {
-            console.log('get first device',i, _deviceNameMap);
-            return i;
-        }
+        return _deviceNameMap[0];
     }
 
     function getDeviceByName(name) {

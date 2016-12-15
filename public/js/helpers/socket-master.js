@@ -10,12 +10,13 @@ define([
 
     const setWebSocket = (ws) => {
         _ws = ws;
+        _task = null;
+        _tasks = [];
     };
 
     const addTask = (command, ...args) => {
         let d = $.Deferred();
         _tasks.push({d, command, args});
-
         if(!_task) {
             doTask();
         }
