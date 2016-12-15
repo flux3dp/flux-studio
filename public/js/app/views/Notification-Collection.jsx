@@ -183,11 +183,13 @@ define([
                                     }
                                 });
 
-                                AlertActions.showPopupYesNo(
-                                    FIRST_DEVICE_UPDATE,
-                                    lang.message.important_update.message,
-                                    lang.message.important_update.caption
-                                );
+                                if(!window.FLUX.dev) {
+                                    AlertActions.showPopupYesNo(
+                                        FIRST_DEVICE_UPDATE,
+                                        lang.message.important_update.message,
+                                        lang.message.important_update.caption
+                                    );
+                                }
                             }
                         });
                     }
@@ -196,7 +198,9 @@ define([
                 AlertStore.onYes(self._onYes);
 
                 // add information for Raven, to be removed when root.js is implemented
-                Raven.setUserContext({ extra: { version: window.FLUX.version } });
+                if(!window.FLUX.dev) {
+                    Raven.setUserContext({ extra: { version: window.FLUX.version } });
+                }
             },
 
             componentWillUnmount: function() {
@@ -328,7 +332,6 @@ define([
                 else {
                     hasStop = ('boolean' === typeof payload.hasStop ? payload.hasStop : true);
                 }
-
                 this.setState({
                     progress: {
                         open: true,
@@ -337,8 +340,8 @@ define([
                         percentage: payload.percentage || 0,
                         type: payload.type || self.state.progress.type || ProgressConstants.WAITING,
                         hasStop: hasStop,
-                        onStop: payload.onStop || self.state.progress.onStop || function() {},
-                        onFinished: payload.onFinished || self.state.progress.onFinished || function() {}
+                        onStop: payload.onStop || function() {},
+                        onFinished: payload.onFinished || function() {}
                     }
                 }, function() {
                     if (typeof payload.onOpened === 'function') {
@@ -563,6 +566,7 @@ define([
                             onRetry={this._handlePopupFeedBack.bind(null, 'retry')}
                             onAbort={this._handlePopupFeedBack.bind(null, 'abort')}
                             onYes={this._handlePopupFeedBack.bind(null, 'yes')}
+                            onNo={this._handlePopupFeedBack.bind(null,'no')}
                             onCustom={this._handlePopupFeedBack.bind(null, 'custom')}
                             onClose={this._handleNotificationModalClose}
                         />
