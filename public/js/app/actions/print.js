@@ -67,7 +67,7 @@ define([
         referenceMeshes = [],
         fullSliceParameters = {settings: {}},
         lastSliceParams = '',
-        enableAntiAlias = localStorage.get('antialias') === 'true';
+        enableAntiAlias = localStorage.get('antialiasing') === '1';
 
     var raycaster = new THREE.Raycaster(),
         mouse = new THREE.Vector2(),

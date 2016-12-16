@@ -260,6 +260,8 @@ define(function() {
             draw: '繪製'
         },
         settings: {
+            on: '開',
+            off: '關',
             caption: '設定',
             tabs: {
                 general: '一般',
@@ -270,6 +272,7 @@ define(function() {
             projection: '視角投影',
             projection_perspective: '透視投影',
             projection_orthographic: '正投影',
+            antialiasing: '反鋸齒',
             language: '語言',
             notifications: '通知',
             close: '關閉',

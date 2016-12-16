@@ -260,6 +260,8 @@ define(function() {
             draw: 'DRAW'
         },
         settings: {
+            on: 'On',
+            off: 'Off',
             caption: 'Settings',
             tabs: {
                 general: 'General',
@@ -270,6 +272,7 @@ define(function() {
             projection: 'View Projection',
             projection_perspective: 'Perspective',
             projection_orthographic: 'Orthographic',
+            antialiasing: 'Anti-aliasing',
             language: 'Language',
             notifications: 'Notifications',
             close: 'Close',
