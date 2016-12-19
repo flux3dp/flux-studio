@@ -171,7 +171,8 @@ define([
 							DeviceMaster.enableCloud().then(processEnableCloudResult);
 						}
 						else if(!response.cloud[0]) {
-							let reason = response.cloud[1].split(',');
+							let { cloud } = response,
+								reason = Array.isArray(cloud) ? cloud[1] : cloud[1].split(',');
 							if(reason[0] === 'DISABLE') {
 								DeviceMaster.enableCloud().then(processEnableCloudResult);
 							}

@@ -436,8 +436,19 @@ define([
                         lang = i18n.get();
                     DeviceMaster.selectDevice(currentPrinter).then((status) => {
                         if (status === DeviceConstants.CONNECTED) {
+                            const handleStopCalibrate = () => {
+                                DeviceMaster.killSelf();
+                            };
                             checkDeviceStatus(currentPrinter).then(() => {
-                                ProgressActions.open(ProgressConstants.WAITING, lang.device.calibrating, lang.device.pleaseWait, false);
+                                ProgressActions.open(
+                                    ProgressConstants.WAITING,
+                                    lang.device.calibrating,
+                                    lang.device.pleaseWait,
+                                    true,
+                                    emptyFunction,
+                                    emptyFunction,
+                                    handleStopCalibrate
+                                );
                                 DeviceMaster.calibrate().done((debug_message) => {
                                     setTimeout(() => {
                                         AlertActions.showPopupInfo('calibrated', JSON.stringify(debug_message), lang.calibration.calibrated);
@@ -577,14 +588,18 @@ define([
                         label: lang.device.update_delta,
                         enabled: true,
                         onClick: function() {
-                            executeFirmwareUpdate(printer, 'firmware');
+                            checkDeviceStatus(printer).then(() => {
+                                executeFirmwareUpdate(printer, 'firmware');
+                            });
                         }
                     },
                     {
                         label: lang.device.update_toolhead,
                         enabled: true,
                         onClick: function() {
-                            executeFirmwareUpdate(printer, 'toolhead');
+                            checkDeviceStatus(printer).then(() => {
+                                executeFirmwareUpdate(printer, 'toolhead');
+                            });
                         }
                     }
                 ]

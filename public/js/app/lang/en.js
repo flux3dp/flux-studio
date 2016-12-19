@@ -99,6 +99,7 @@ define(function() {
                 set_to_origin_complete: 'Delta has calibrated its origin.',
                 scan_laser_complete: 'Delta has turned on its scanning laser. Click "Finish" to turn it off.',
                 finish: 'FINISH',
+                cancel: 'CANCEL'
             },
             window: {
                 label: 'Window',
@@ -259,6 +260,8 @@ define(function() {
             draw: 'DRAW'
         },
         settings: {
+            on: 'On',
+            off: 'Off',
             caption: 'Settings',
             tabs: {
                 general: 'General',
@@ -269,6 +272,7 @@ define(function() {
             projection: 'View Projection',
             projection_perspective: 'Perspective',
             projection_orthographic: 'Orthographic',
+            antialiasing: 'Anti-aliasing',
             language: 'Language',
             notifications: 'Notifications',
             close: 'Close',

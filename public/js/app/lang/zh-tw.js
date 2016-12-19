@@ -98,7 +98,8 @@ define(function() {
                 commands: '指令',
                 set_to_origin_complete: 'Delta 已回歸原點',
                 scan_laser_complete: '掃描雷射已開啟，點擊 "完成" 以關閉雷射',
-                finish: '完成'
+                finish: '完成',
+                cancel: '取消'
             },
             window: {
                 label: '視窗',
@@ -259,6 +260,8 @@ define(function() {
             draw: '繪製'
         },
         settings: {
+            on: '開',
+            off: '關',
             caption: '設定',
             tabs: {
                 general: '一般',
@@ -269,6 +272,7 @@ define(function() {
             projection: '視角投影',
             projection_perspective: '透視投影',
             projection_orthographic: '正投影',
+            antialiasing: '反鋸齒',
             language: '語言',
             notifications: '通知',
             close: '關閉',

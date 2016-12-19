@@ -2,11 +2,13 @@
 .DS_Store
 Desktop.ini
 node_modules
+bower_components
 !/public/node_modules
 _tools/nwjs*
 _tools/build
 public/lib
 public/js/jsx
+public/node_modules/*
 
 osx-cache
 win-x86-cache
@@ -41,3 +43,7 @@ public/output.fc
 public/output.ini
 public/output.stl
 public/js/jsx
+
+# other
+_tools/environment
+.eslintrc.json

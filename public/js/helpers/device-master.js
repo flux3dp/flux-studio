@@ -185,6 +185,63 @@ define([
         return d.promise();
     }
 
+    function reconnectWs() {
+        let d = $.Deferred();
+        _device.actions = DeviceController(_selectedDevice.uuid, {
+            onConnect: function(response) {
+                d.notify(response);
+
+                if (response.status.toUpperCase() === DeviceConstants.CONNECTED) {
+                    d.resolve(DeviceConstants.CONNECTED);
+                }
+            },
+            onError: function(response) {
+                // TODO: shouldn't do replace
+                response.error = response.error.replace(/^.*\:\s+(\w+)$/g, '$1');
+                switch (response.error.toUpperCase()) {
+                case DeviceConstants.TIMEOUT:
+                    d.resolve(DeviceConstants.TIMEOUT);
+                    break;
+                case DeviceConstants.AUTH_ERROR:
+                case DeviceConstants.AUTH_FAILED:
+                    if (true === device.password) {
+                        goAuth(_device.uuid);
+                    }
+                    else {
+                        ProgressActions.open(ProgressConstants.NONSTOP);
+
+                        auth(_device.uuid, '').always(() => {
+                            ProgressActions.close();
+                        }).done((data) => {
+                            selectDevice(device, d);
+                        }).fail(() => {
+                            AlertActions.showPopupError(
+                                'auth-error-with-diff-computer',
+                                lang.message.need_1_1_7_above
+                            );
+                        });
+                    }
+                    break;
+                case DeviceConstants.MONITOR_TOO_OLD:
+                    AlertActions.showPopupError(
+                        'fatal-occurred',
+                        lang.message.monitor_too_old.content,
+                        lang.message.monitor_too_old.caption
+                    );
+                    break;
+                default:
+                    AlertActions.showPopupError(
+                        'unhandle-exception',
+                        lang.message.unknown_error
+                    );
+                }
+            }
+        });
+
+        SocketMaster.setWebSocket(_device.actions);
+        return d.promise();
+    }
+
     function uploadToDirectory(data, path, fileName) {
         let d = $.Deferred();
 
@@ -242,7 +299,11 @@ define([
     }
 
     function stop() {
-        return _do(DeviceConstants.STOP);
+        let d = $.Deferred();
+        _do(DeviceConstants.QUIT).then(r => {
+            d.resolve(r);
+        });
+        return d.promise();
     }
 
     function quit() {
@@ -255,6 +316,18 @@ define([
 
     function kick() {
         return _do(DeviceConstants.KICK);
+    }
+
+    function killSelf() {
+        let d = $.Deferred();
+        _device.actions.killSelf().then(response => {
+            d.resolve(response);
+        }).fail(error => {
+            d.resolve(error);
+        }).always(() => {
+            reconnectWs();
+        });
+        return d.promise();
     }
 
     function ls(path) {
@@ -290,16 +363,19 @@ define([
 
     function changeFilament(type) {
         let d = $.Deferred();
-        SocketMaster.addTask('enterMaintainMode').then(() => {
+        SocketMaster.addTask('enterMaintainMode').then((response) => {
             return SocketMaster.addTask('maintainHome');
-        }).then(() => {
+        }).then((response) => {
             return SocketMaster.addTask('changeFilament', type);
-        }).then(() => {
+        }).then((response) => {
             d.resolve();
-        }).progress((progress) => {
-            d.notify(progress);
-        }).fail((error) => {
-            d.reject(error);
+        }).progress((response) => {
+            d.notify(response);
+        }).fail((response) => {
+            if(response.error[0] === 'KICKED') {
+                reconnectWs();
+            }
+            d.reject(response);
         });
 
         return d.promise();
@@ -354,10 +430,7 @@ define([
     }
 
     function getFirstDevice() {
-        for(let i in _deviceNameMap) {
-            console.log('get first device',i, _deviceNameMap);
-            return i;
-        }
+        return _deviceNameMap[0];
     }
 
     function getDeviceByName(name) {
@@ -623,6 +696,7 @@ define([
                     _d.reject(response);
                 }
             }).then((response) => {
+                console.log('task home', response);
                 response.status === 'ok' ? _d.resolve() : _d.reject();
             }).fail((error) => {
                 _d.reject(error);
@@ -877,6 +951,7 @@ define([
             this.enableCloud            = enableCloud;
             this.getDeviceInfo          = getDeviceInfo;
             this.downloadErrorLog       = downloadErrorLog;
+            this.killSelf               = killSelf;
 
             Discover(
                 'device-master',
