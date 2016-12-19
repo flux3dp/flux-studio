@@ -526,6 +526,7 @@ define([
                         layerHeight: advancedSettings.layer_height,
                         raftOn:  advancedSettings.raft === 1
                     });
+                    
                     if(!setting) {
                         // console.log("AdvancedSettings:: Apply parameter default");
                         director.setAdvanceParameter(advancedSettings).then(() => {
