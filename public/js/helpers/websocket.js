@@ -42,9 +42,9 @@ define([
     return function(options) {
         var lang = i18n.get(),
             defaultCallback = function(result) {},
-            // hostname = window.FLUX.isNW === true ? 'localhost' : location.hostname
+            hostname = window.FLUX.isNW === true ? 'localhost' : location.hostname,
             defaultOptions = {
-                hostname: window.FLUX.dev ? '127.0.0.1' : location.hostname,
+                hostname: window.FLUX.dev ? '127.0.0.1' : hostname,
                 method: '',
                 port: window.FLUX.dev ? '8000' : window.FLUX.ghostPort,
                 autoReconnect: true,

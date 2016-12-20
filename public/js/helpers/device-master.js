@@ -300,7 +300,7 @@ define([
 
     function stop() {
         let d = $.Deferred();
-        _do(DeviceConstants.QUIT).then(r => {
+        _do(DeviceConstants.STOP).then(r => {
             d.resolve(r);
         });
         return d.promise();
