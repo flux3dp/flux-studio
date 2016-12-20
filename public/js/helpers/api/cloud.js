@@ -1,7 +1,10 @@
 define([], function() {
 	// const ip = 'https://35.161.43.14:3000';
-	const ip = 'https://cloudserv1.flux3dp.com:3000';
-	// const ip = 'https://localhost:3000';
+	const _ip = {
+		dev: 'https://localhost:3000',
+		prod: 'https://cloudserv1.flux3dp.com:3000'
+	};
+	const ip = window.FLUX.dev ? _ip.dev : _ip.prod;
 	const userProtocol = '/users';
 	const deviceProtocol = '/devices';
 	const headers = new Headers({ 'Content-type': 'application/x-www-form-urlencoded; charset=UTF-8'});

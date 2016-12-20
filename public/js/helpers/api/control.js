@@ -58,8 +58,9 @@ define([
                     }
                 },
                 onDebug: (response) => {
-                    if(events.onDebug)
+                    if(events.onDebug) {
                         events.onDebug(response);
+                    }
                 },
                 onError: (response) => {
                     events.onError(response);
@@ -313,6 +314,18 @@ define([
                 events.onFatal = (response) => { counter >= 3 ? d.reject(response) : retry(); };
 
                 ws.send('play quit');
+                return d.promise();
+            },
+
+            killSelf: () => {
+                let d = $.Deferred();
+
+                events.onMessage = (response) => { d.resolve(response); };
+                events.onError = (response) => { d.reject(response); };
+                events.onFatal = (response) => { d.reject(response); };
+
+                dedicatedWs[fileInfoWsId].send('kick');
+                dedicatedWs[fileInfoWsId].close();
                 return d.promise();
             },
 

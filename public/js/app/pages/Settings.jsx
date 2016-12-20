@@ -57,14 +57,9 @@ define([
                             supported_langs={settings.i18n.supported_langs}
                             onLangChange={this._onLangChange} />
                     );
-                }
+                };
 
-                content.device = () => {
-                    return (
-                        <DeviceSetting
-                            lang={this.state.lang} />
-                    )
-                }
+                content.device = () => (<DeviceSetting lang={this.state.lang} />);
 
                 if(typeof content[view] === 'undefined') { view = 'general'; }
                 return content[view]();
@@ -73,18 +68,10 @@ define([
             render: function() {
                 var lang = this.state.lang,
                     menu_item = 'nav-item',
-                    generalClass = ClassNames(
-                        menu_item,
-                        {active: args.child === 'general'}),
-                    deviceClass = ClassNames(
-                        menu_item,
-                        {active: args.child === 'device'}),
-                    printerClass = ClassNames(
-                        menu_item,
-                        {active: 'printer' === args.child}),
-                    tabContainerClass = ClassNames(
-                        'tab-container',
-                        {'no-top-margin': !this.state.displayMenu}),
+                    generalClass = ClassNames( menu_item, {active: args.child === 'general'}),
+                    deviceClass = ClassNames( menu_item, {active: args.child === 'device'}),
+                    // printerClass = ClassNames( menu_item, {active: 'printer' === args.child}),
+                    // tabContainerClass = ClassNames( 'tab-container', {'no-top-margin': !this.state.displayMenu}),
                     tabs,
                     footer;
 
@@ -99,14 +86,15 @@ define([
                             </li>
                         </ul>
                     </header>
-                )
+                );
 
-                footer =
+                footer = (
                     <footer className="sticky-bottom">
                         <div className="actions">
                             <a className="btn btn-done" onClick={this._handleDone}>{lang.settings.done}</a>
                         </div>
-                    </footer>;
+                    </footer>
+                );
 
                 return (
                     <div className="studio-container settings-studio">

@@ -41,7 +41,8 @@
             os: ('undefined' === typeof nw ? undefined : os),
             ghostPort: location.port || 8000,
             isNW: ('undefined' !== typeof nw),
-            allowTracking: localStorage['allow-tracking'] === 'true'
+            allowTracking: localStorage['allow-tracking'] === 'true',
+            dev: localStorage['dev'] === 'true'
         };
 
         // it's not node-webkit

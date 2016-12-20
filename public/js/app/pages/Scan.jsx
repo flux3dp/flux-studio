@@ -723,6 +723,30 @@ define([
                     self._openBlocker(true, ProgressConstants.NONSTOP);
                 },
 
+                _onSaveASC: function() {
+                    var self = this,
+                        selectedMeshes = self.state.selectedMeshes,
+                        fileName = (new Date()).getTime() + '.asc';
+
+                    self._doManualMerge(
+                        selectedMeshes,
+                        function(outputName) {
+                            self.state.scanModelingWebSocket.export(
+                                outputName,
+                                'asc',
+                                {
+                                    onFinished: function(blob) {
+                                        saveAs(blob, fileName);
+                                        self._openBlocker(false);
+                                    }
+                                }
+                            );
+                        },
+                        false
+                    );
+                    self._openBlocker(true, ProgressConstants.NONSTOP);
+                },
+
                 _onSave: function(e) {
                     var self = this,
                         exportFile = function(outputName) {
@@ -1403,6 +1427,7 @@ define([
                             onCropOff={this._doCropOff}
                             onClearNoise={this._doClearNoise}
                             onSavePCD={this._onSavePCD}
+                            onSaveASC={this._onSaveASC}
                             onManualMerge={this._doManualMerge}
                             object={state.selectedObject}
                             position={state.objectDialogPosition}

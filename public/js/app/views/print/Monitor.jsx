@@ -555,6 +555,9 @@ define([
                     DeviceMaster.quit();
                     store.dispatch(MonitorActionCreator.showWait());
                 }
+                else if(this._isPaused()) {
+                    DeviceMaster.stop();
+                }
                 else {
                     let p = $.Deferred();
                     if(Device.status.st_id < 0) {

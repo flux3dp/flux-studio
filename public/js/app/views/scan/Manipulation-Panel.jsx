@@ -22,6 +22,7 @@ define([
                 onCropOn: function() {},
                 onCropOff: function() {},
                 onSavePCD: function() {},
+                onSaveASC: function() {},
                 onClearNoise: function() {},
                 onManualMerge: function() {},
                 onReset: function() {},
@@ -47,6 +48,11 @@ define([
         _onSavePCD: function(e) {
             this.props.onSavePCD();
         },
+
+        _onSaveASC: function(e) {
+            this.props.onSaveASC();
+        },
+
 
         _onCrop: function(e) {
             var me = e.currentTarget,
@@ -166,7 +172,13 @@ define([
                             <div className="control">
                                 <button className="btn btn-action btn-save-pcd" data-ga-event="save-point-cloud" onClick={this._onSavePCD}>
                                     <img src="/img/icon-export.png"/>
-                                    {lang.scan.manipulation.save_pointcloud}
+                                    {lang.scan.manipulation.save_pointcloud} PCD
+                                </button>
+                            </div>
+                            <div className="control">
+                                <button className="btn btn-action btn-save-pcd" data-ga-event="save-point-cloud" onClick={this._onSaveASC}>
+                                    <img src="/img/icon-export.png"/>
+                                    {lang.scan.manipulation.save_pointcloud} ASC
                                 </button>
                             </div>
                         </div>
