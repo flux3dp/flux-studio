@@ -224,6 +224,7 @@ define([
                     this._isAbortedOrCompleted()
                 ) {
                     middleButtonOn = false;
+                    leftButtonOn = false;
                 }
                 else {
                     middleButtonOn = true;
@@ -232,6 +233,10 @@ define([
                 if(this.props.source === GlobalConstants.DEVICE_LIST && statusId === DeviceConstants.status.IDLE) {
                     leftButtonOn = false;
                     middleButtonOn = false;
+                }
+
+                if(statusId === DeviceConstants.status.INIT) {
+                    leftButtonOn = false;
                 }
             }
 
