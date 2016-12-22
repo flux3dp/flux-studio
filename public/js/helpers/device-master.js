@@ -36,11 +36,12 @@ define([
     InputLightBoxConstants,
     DeviceList,
     Camera,
-    SocketMaster
+    Sm
 ) {
     'use strict';
 
     let lang = i18n.get(),
+        SocketMaster,
         thisProgress,
         lastProgress,
         defaultPrinter,
@@ -151,6 +152,7 @@ define([
             });
         }
 
+        SocketMaster = new Sm();
         SocketMaster.setWebSocket(_device.actions);
 
         return d.always(() => {
@@ -238,6 +240,7 @@ define([
             }
         });
 
+        SocketMaster = new Sm();
         SocketMaster.setWebSocket(_device.actions);
         return d.promise();
     }
