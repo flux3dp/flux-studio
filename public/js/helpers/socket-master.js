@@ -10,7 +10,6 @@ define([
             _ws;
 
         const setWebSocket = (ws) => {
-            console.log('set websocket to', ws);
             _ws = ws;
             _task = null;
             _tasks = [];

@@ -853,10 +853,14 @@ define([
         return _deviceNameMap;
     }
 
-    function getDeviceSettings() {
+    function getDeviceSettings(withBacklash) {
         let d = $.Deferred(),
             settings = {},
             _settings = ['correction', 'filament_detect', 'head_error_level', 'autoresume', 'broadcast', 'enable_cloud'];
+
+        if(withBacklash === true) {
+            _settings.push('backlash');
+        }
 
         const worker = function*() {
             for(let i = 0; i < _settings.length; i++) {
