@@ -929,7 +929,8 @@ define(function() {
                 title: 'Enable Cloud',
                 A: 'Active',
                 N: 'No'
-            }
+            },
+            backlash: 'Geometric Error Correction'
         },
         monitor: {
             change_filament                     : 'CHANGE FILAMENT',

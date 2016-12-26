@@ -27,14 +27,14 @@ define([
             return newPropIsDifferent || newStateIsDifferent;
         },
 
-        _fireChange: function(newValue) {
-            this.props.onChange(this.props.id, newValue);
+        _fireChange: function(newValue, selectedIndex) {
+            this.props.onChange(this.props.id, newValue, selectedIndex);
         },
 
         _handleChange: function(e) {
-            var value = e.target.value;
+            let { value, selectedIndex } = e.target;
             this.setState({ selectedValue: value }, function() {
-                this._fireChange(value);
+                this._fireChange(value, selectedIndex);
             });
         },
 

@@ -186,6 +186,7 @@ define([
                         previewMode                 : false,
                         previewModeOnly             : false,
                         disablePreview              : false,
+                        disableGoButtons            : false,
                         slicingPercentage           : 0,
                         currentTutorialStep         : 0,
                         layerHeight                 : 0.1,
@@ -526,7 +527,7 @@ define([
                         layerHeight: advancedSettings.layer_height,
                         raftOn:  advancedSettings.raft === 1
                     });
-                    
+
                     if(!setting) {
                         // console.log("AdvancedSettings:: Apply parameter default");
                         director.setAdvanceParameter(advancedSettings).then(() => {
@@ -549,7 +550,7 @@ define([
                             director.setAdvanceParameter(advancedSettings).then(() => {
                                 // console.log("AdvancedSettings:: Apply engine parameter end");
                                 Object.assign(fineAdvancedSettings, advancedSettings);
-                                director.setAdvanceParameter(advancedSettings);
+
                             }).fail(() => {
                                 // console.log("AdvancedSettings:: Application with engine failed, falling back ", fineAdvancedSettings);
                                 Object.assign(advancedSettings, fineAdvancedSettings);
@@ -917,6 +918,7 @@ define([
                             camera                  = {this.state.camera}
                             updateCamera            = {this.state.updateCamera}
                             hasObject               = {this.state.hasObject}
+                            disableGoButtons        = {this.state.disableGoButtons}
                             hasOutOfBoundsObject    = {this.state.hasOutOfBoundsObject}
                             onGoClick               = {this._handleGoClick}
                             onDownloadGCode         = {this._handleDownloadGCode}
