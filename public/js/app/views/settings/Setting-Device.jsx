@@ -168,10 +168,9 @@ define([
                     backlashAllowed = vc.meetMainVersion(1.6);
 
                 this.setState({ showBacklash: backlashAllowed });
-
                 return DeviceMaster.getDeviceSettings(backlashAllowed);
             }).then((config) => {
-                config.head_error_level = config.head_error_level ? null : mapNumberToTypeArray(parseInt(config.head_error_level));
+                config.head_error_level = config.head_error_level ? mapNumberToTypeArray(parseInt(config.head_error_level)) : null;
                 this.setState({ config });
 
                 if(config['backlash']) {
