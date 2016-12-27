@@ -163,9 +163,9 @@ define([
             DeviceMaster.selectDevice(this.devices[deviceName]).then(() => {
                 return DeviceMaster.getDeviceInfo();
             }).then((deviceInfo) => {
-                // using backlash feature requires firmware 1.6+
+                // using backlash feature requires firmware 1.5b12+
                 let vc = VersionChecker(deviceInfo.version),
-                    backlashAllowed = vc.meetMainVersion(1.6);
+                    backlashAllowed = vc.meetVersion('1.5b12');
 
                 this.setState({ showBacklash: backlashAllowed });
                 return DeviceMaster.getDeviceSettings(backlashAllowed);
