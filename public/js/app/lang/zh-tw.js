@@ -943,7 +943,8 @@ define(function() {
                 title: '雲端操作',
                 A: '開啟',
                 N: '關閉'
-            }
+            },
+            backlash: '路徑幾何誤差補正'
         },
         monitor: {
             change_filament                     : 'CHANGE FILLAMENT',

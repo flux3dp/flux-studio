@@ -6,6 +6,7 @@ define([
     'jsx!widgets/Select',
     'app/actions/alert-actions',
     'helpers/device-master',
+    'helpers/version-checker',
     'jsx!widgets/Dropdown-Control',
     'jsx!widgets/Radio-Control',
     'jsx!widgets/Checkbox-Control'
@@ -17,6 +18,7 @@ define([
     SelectView,
     AlertActions,
     DeviceMaster,
+    VersionChecker,
     DropdownControl,
     RadioControl,
     CheckboxControl
@@ -34,8 +36,9 @@ define([
 
         getInitialState: function() {
             return {
-                config: {}
-            }
+                config: {},
+                showBacklash: false
+            };
         },
 
         componentDidMount: function() {
@@ -48,9 +51,13 @@ define([
             clearTimeout(this.t);
         },
 
-        _handleDeviceChange: function(dropdownId, deviceName) {
+        _handleDeviceChange: function(dropdownId, deviceName, selectedIndex) {
+            if(selectedIndex === 0) {
+                this.setState({ config: {} });
+                return;
+            }
             clearTimeout(this.t);
-            this._getDeviceConfig(deviceName)
+            this._getDeviceConfig(deviceName);
         },
 
         _handleComponentValueChange: function(id, value, source) {
@@ -92,6 +99,20 @@ define([
             this.setState({ config });
         },
 
+        _updateBacklash: function(e) {
+            let v = parseFloat(e.target.value);
+
+            // max backlash is 0.2
+            if(v > 0.2) { v = 0.2; }
+
+            this.setState({ backlash: v });
+
+            if(e.type === 'blur') {
+                v = v * 80; // 80 is the offset value for backend
+                DeviceMaster.setDeviceSetting('backlash', `"A:${v} B:${v} C:${v}"`);
+            }
+        },
+
         _getDeviceList: function() {
             let devices = DeviceMaster.getDeviceList(),
                 nameList = (Object.keys(devices)).filter(o => o !== ''),
@@ -102,7 +123,7 @@ define([
             if(nameList.length === 0) {
                 return (
                     <div>{lang.device.please_wait}</div>
-                )
+                );
             }
 
             nameList.unshift(lang.device.select);
@@ -113,14 +134,16 @@ define([
                     label={lang.device.deviceList}
                     onChange={this._handleDeviceChange}
                     options={nameList}/>
-            )
+            );
         },
 
         _getDeviceConfig: function(deviceName) {
             const types = ['LASER_DOWN', 'FAN_FAILURE', 'TILT', 'SHAKE'];
             const pad = (num, size) => {
-                var s = num+"";
-                while (s.length < size) s = "0" + s;
+                var s = num + '';
+                while(s.length < size) {
+                    s = '0' + s;
+                }
                 return s;
             };
             const mapNumberToTypeArray = (num) => {
@@ -138,10 +161,23 @@ define([
             };
 
             DeviceMaster.selectDevice(this.devices[deviceName]).then(() => {
-                return DeviceMaster.getDeviceSettings();
+                return DeviceMaster.getDeviceInfo();
+            }).then((deviceInfo) => {
+                // using backlash feature requires firmware 1.6+
+                let vc = VersionChecker(deviceInfo.version),
+                    backlashAllowed = vc.meetMainVersion(1.6);
+
+                this.setState({ showBacklash: backlashAllowed });
+                return DeviceMaster.getDeviceSettings(backlashAllowed);
             }).then((config) => {
-                config.head_error_level = config.head_error_level ? null : mapNumberToTypeArray(parseInt(config.head_error_level));
+                config.head_error_level = config.head_error_level ? mapNumberToTypeArray(parseInt(config.head_error_level)) : null;
                 this.setState({ config });
+
+                if(config['backlash']) {
+                    let _value = this.state.config['backlash'];
+                    _value = _value.split(' ')[0].split(':')[1];
+                    this.setState({ backlash: parseFloat(_value) / 80 });
+                }
             });
         },
 
@@ -155,7 +191,7 @@ define([
                 { id: 'H', name: lang.device.calibration.H},
                 { id: 'N', name: lang.device.calibration.N},
                 { id: 'delete', name: lang.device.calibration.byFile}
-            ]
+            ];
 
             content = (
                 <div className="controls">
@@ -164,9 +200,10 @@ define([
                         id="correction"
                         options={options}
                         default={this.state.config['correction'] || 'delete'}
-                        onChange={this._handleComponentValueChange}/>
+                        onChange={this._handleComponentValueChange}
+                    />
                 </div>
-            )
+            );
 
             return Object.keys(this.state.config).length > 0 ? content : '';
         },
@@ -189,9 +226,10 @@ define([
                         id="filament_detect"
                         options={options}
                         default={this.state.config['filament_detect'] || 'delete'}
-                        onChange={this._handleComponentValueChange}/>
+                        onChange={this._handleComponentValueChange}
+                    />
                 </div>
-            )
+            );
 
             return Object.keys(this.state.config).length > 0 ? content : '';
         },
@@ -218,9 +256,10 @@ define([
                         id="head_error_level"
                         options={options}
                         default={this.state.config['head_error_level'] || ['delete']}
-                        onChange={this._handleComponentValueChange}/>
+                        onChange={this._handleComponentValueChange}
+                    />
                 </div>
-            )
+            );
 
             return Object.keys(this.state.config).length > 0 ? content : '';
         },
@@ -242,9 +281,10 @@ define([
                         id="autoresume"
                         options={options}
                         default={this.state.config['autoresume'] || 'N'}
-                        onChange={this._handleComponentValueChange}/>
+                        onChange={this._handleComponentValueChange}
+                    />
                 </div>
-            )
+            );
 
             return Object.keys(this.state.config).length > 0 ? content : '';
         },
@@ -267,9 +307,10 @@ define([
                         id="broadcast"
                         options={options}
                         default={this.state.config['broadcast'] || 'L'}
-                        onChange={this._handleComponentValueChange}/>
+                        onChange={this._handleComponentValueChange}
+                    />
                 </div>
-            )
+            );
 
             return Object.keys(this.state.config).length > 0 ? content : '';
         },
@@ -291,21 +332,43 @@ define([
                         id="enable_cloud"
                         options={options}
                         default={this.state.config['enable_cloud'] || 'N'}
-                        onChange={this._handleComponentValueChange}/>
+                        onChange={this._handleComponentValueChange}
+                    />
                 </div>
-            )
+            );
 
             return Object.keys(this.state.config).length > 0 ? content : '';
         },
 
+        _renderBackLash: function() {
+            let { lang } = this.props,
+                content;
+
+            content = (
+                <div className="controls">
+                    <div className="label">{lang.device.backlash}</div>
+                    <input
+                        id="backlash"
+                        value={this.state.backlash}
+                        onChange={this._updateBacklash}
+                        onBlur={this._updateBacklash}
+                    />
+                    <label>mm</label>
+                </div>
+            );
+
+            return (this.state.showBacklash && Object.keys(this.state.config).length > 0) ? content : '';
+        },
+
         render : function() {
-            let deviceList = this._getDeviceList(),
-                correction = this._renderCorrectionSetting(),
-                detectFilament = this._renderDetectFilamentSetting(),
+            let deviceList      = this._getDeviceList(),
+                correction      = this._renderCorrectionSetting(),
+                detectFilament  = this._renderDetectFilamentSetting(),
                 filterHeadError = this._renderFilterHeadErrorSetting(),
-                autoResume = this._renderAutoResumeSetting(),
-                broadcast = this._renderBroadcast(),
-                cloud = this._renderEnableCloud();
+                autoResume      = this._renderAutoResumeSetting(),
+                broadcast       = this._renderBroadcast(),
+                cloud           = this._renderEnableCloud(),
+                backlash        = this._renderBackLash();
 
             return (
                 <div className="form general">
@@ -316,6 +379,7 @@ define([
                     {autoResume}
                     {broadcast}
                     {cloud}
+                    {backlash}
                 </div>
             );
         }

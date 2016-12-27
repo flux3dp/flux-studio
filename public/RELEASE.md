@@ -1,3 +1,13 @@
+# FLUX Studio 0.6.2 Change log
+
+### New Features
+
+- Added geometric error correction options in device settings
+
+### Improvement
+
+- Rework on background slicing logic to prevent slice error which might cause unable to click go from slice error or out of bound
+
 # FLUX Studio 0.6.1 Change log
 
 ### New Features

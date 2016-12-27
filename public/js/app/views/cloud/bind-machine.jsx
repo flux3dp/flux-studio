@@ -96,7 +96,7 @@ define([
 			};
 
 			let version = device.version,
-				vRegex = /([\d.]+)(a|b)?(\d)?/g,
+				vRegex = /([\d.]+)(a|b)?(\d*)?/g,
 				match = vRegex.exec(version),
 				lang = this.props.lang.settings.flux_cloud;
 
