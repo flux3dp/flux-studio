@@ -1,3 +1,13 @@
+# FLUX Studio 0.6.1 Change log
+
+### New Features
+
+- Allow cancel during calibration
+- Allow cancel during change filament
+- Anti-aliasing setting in preference
+- Support .asc export for model scanning
+
+
 # FLUX Studio 0.6.0 Change log
 
 ### New Features
