@@ -1,7 +1,6 @@
 define(function() {
     return {
         custom: `avoid_crossing_perimeters = 0
-backlash = 1
 before_layer_gcode =
 bottom_solid_layers = 3
 bridge_acceleration = 0
@@ -46,6 +45,7 @@ gap_fill_speed = 20
 gcode_arcs = 0
 gcode_comments = 0
 gcode_flavor = reprap
+geometric_error_correction_on = 1
 infill_acceleration = 0
 infill_every_layers = 1
 infill_extruder = 1
