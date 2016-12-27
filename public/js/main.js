@@ -107,7 +107,7 @@ requirejs([
         $.getScript('/js/helpers/analytics.js');
 
         // sentry
-        Raven.config('http://17dabb846f4743288d575b76dc5aaae8@sentry.io/95257', {
+        Raven.config('http://6113878f548846998899855e8e83c477@sentry.io/124829', {
             ignoreUrls: [/cloudserv1\.flux3dp\.com:3000/]
         });
         Raven.debug = false;
