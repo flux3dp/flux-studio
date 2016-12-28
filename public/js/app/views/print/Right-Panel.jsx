@@ -112,13 +112,22 @@ define([
 
         _renderTimeAndCost: function(lang) {
             let { slicingStatus, slicingPercentage, hasObject, hasOutOfBoundsObject } = this.props;
-            return slicingStatus && hasObject && !hasOutOfBoundsObject && slicingPercentage === 1 ?
-            <div className="preview-time-cost">
-                {Math.round(slicingStatus.filament_length * 0.03) /10}
-                {lang.print.gram} / {DurationFormatter(slicingStatus.time).split(' ').join('')}
-            </div>
-            :
-            '';
+            if(slicingStatus && hasObject && !hasOutOfBoundsObject && slicingPercentage === 1) {
+                if(!slicingStatus.filament_length) {
+                    return '';
+                }
+                else {
+                    return (
+                        <div className="preview-time-cost">
+                            {Math.round(slicingStatus.filament_length * 0.03) /10}
+                            {lang.print.gram} / {DurationFormatter(slicingStatus.time).split(' ').join('')}
+                        </div>
+                    );
+                }
+            }
+            else {
+                return '';
+            }
         },
 
         render: function() {
