@@ -112,7 +112,6 @@ define([
 
         _renderTimeAndCost: function(lang) {
             let { slicingStatus, slicingPercentage, hasObject, hasOutOfBoundsObject } = this.props;
-            console.log(slicingStatus, slicingPercentage, hasObject, hasOutOfBoundsObject);
             if(slicingStatus && hasObject && !hasOutOfBoundsObject && slicingPercentage === 1) {
                 if(!slicingStatus.filament_length) {
                     return '';
