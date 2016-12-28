@@ -45,6 +45,7 @@ gap_fill_speed = 20
 gcode_arcs = 0
 gcode_comments = 0
 gcode_flavor = reprap
+geometric_error_correction_on = 1
 infill_acceleration = 0
 infill_every_layers = 1
 infill_extruder = 1
@@ -66,6 +67,7 @@ nozzle_diameter = 0.4
 only_retract_when_crossing_perimeters = 1
 ooze_prevention = 0
 overhangs = 0
+pause_at_layers =
 perimeter_acceleration = 0
 perimeter_extruder = 1
 perimeter_extrusion_width = 0.4
@@ -98,6 +100,7 @@ solid_infill_speed = 20
 spiral_vase = 0
 standby_temperature_delta = -5
 start_gcode = G1 Z5 F5000 ; lift nozzle;\\nG92 Z4.9
+support_everywhere = 0
 support_material = 0
 support_material_angle = 0
 support_material_contact_distance = 0.22
@@ -126,8 +129,6 @@ use_volumetric_e = 0
 vibration_limit = 0
 wipe = 0
 xy_size_compensation = -0.07
-z_offset = 0
-pause_at_layers =
-support_everywhere = 0`
-    }
+z_offset = 0`
+    };
 });
