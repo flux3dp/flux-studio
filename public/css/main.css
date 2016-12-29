@@ -3535,6 +3535,19 @@ input[type=range]:focus::-webkit-slider-runnable-track {
 .modal-progress.modal-window .button-group button.btn-default {
     margin-bottom: 15px; }
 
+.head-temperature .section {
+    padding: 10px 0; }
+    .head-temperature .section > div {
+        display: inline-block; }
+    .head-temperature .section .title {
+        width: 150px;
+        display: inline-block; }
+    .head-temperature .section input {
+        width: 150px; }
+
+.head-temperature label {
+    color: #B3B3B3; }
+
 /**
  * the view of printer selector
  */

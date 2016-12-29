@@ -500,3 +500,27 @@
         margin-bottom: 15px;
     }
 }
+
+.head-temperature {
+
+    .section {
+        padding: 10px 0;
+
+        > div {
+            display: inline-block;
+        }
+
+        .title {
+            width: 150px;
+            display: inline-block;;
+        }
+
+        input {
+            width: 150px
+        }
+    }
+
+    label {
+        color: #B3B3B3;
+    }
+}

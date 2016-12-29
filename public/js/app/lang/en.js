@@ -99,7 +99,8 @@ define(function() {
                 set_to_origin_complete: 'Delta has calibrated its origin.',
                 scan_laser_complete: 'Delta has turned on its scanning laser. Click "Finish" to turn it off.',
                 finish: 'FINISH',
-                cancel: 'CANCEL'
+                cancel: 'CANCEL',
+                turn_on_head_temperature: 'Turn on head temperature'
             },
             window: {
                 label: 'Window',
@@ -1129,6 +1130,13 @@ define(function() {
             maintain_zombie: 'Please restart the device',
             toolhead_no_response: '#117 Module no response <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/218347477">More</a>',
             NA: 'Toolhead is not connected'
+        },
+        head_temperature: {
+            title: 'Turn on head temperature',
+            done: 'DONE',
+            target_temperature: 'Target temperature',
+            current_temperature: 'Current temperature',
+            working: 'working'
         },
         input_machine_password: {
             require_password: '"%s" requires a password',
