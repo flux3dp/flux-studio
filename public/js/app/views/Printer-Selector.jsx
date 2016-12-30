@@ -177,39 +177,42 @@ define([
         _selectPrinter: function(printer, e) {
             var self = this,
                 lang = self.props.lang,
-                onError = function() {
-                    ProgressActions.close();
-                    if(self.selected_printer.plaintext_password){
-                        //Skip if user entered password for the first time.
-                        self._returnSelectedPrinter();
-                    }else{
-                        InputLightboxActions.open('auth-device', {
-                            type         : InputLightboxConstants.TYPE_PASSWORD,
-                            caption      : sprintf(lang.select_printer.notification, printer.name),
-                            inputHeader  : lang.select_printer.please_enter_password,
-                            confirmText  : lang.select_printer.submit,
-                            onSubmit     : function(password) {
-                                printer.plaintext_password = password;
-                                ProgressActions.open(ProgressConstants.NONSTOP);
+                onError;
 
-                                self._auth(printer.uuid, password, {
-                                    onError: function(response) {
-                                        var message = (
-                                            false === response.reachable ?
-                                            lang.select_printer.unable_to_connect :
-                                            lang.select_printer.auth_failure
-                                        );
+            ProgressActions.open(ProgressConstants.NONSTOP_WITH_MESSAGE, lang.initialize.connecting);
+            onError = function() {
+                ProgressActions.close();
+                if(self.selected_printer.plaintext_password) {
+                    //Skip if user entered password for the first time.
+                    self._returnSelectedPrinter();
+                }
+                else {
+                    InputLightboxActions.open('auth-device', {
+                        type         : InputLightboxConstants.TYPE_PASSWORD,
+                        caption      : sprintf(lang.select_printer.notification, printer.name),
+                        inputHeader  : lang.select_printer.please_enter_password,
+                        confirmText  : lang.select_printer.submit,
+                        onSubmit     : function(password) {
+                            printer.plaintext_password = password;
+                            ProgressActions.open(ProgressConstants.NONSTOP);
 
-                                        ProgressActions.close();
+                            self._auth(printer.uuid, password, {
+                                onError: function(response) {
+                                    var message = (
+                                        false === response.reachable ?
+                                        lang.select_printer.unable_to_connect :
+                                        lang.select_printer.auth_failure
+                                    );
 
-                                        AlertActions.showPopupError('device-auth-fail', message);
-                                    }
-                                });
-                            }
-                        });
-                    }
-                    
-                };
+                                    ProgressActions.close();
+
+                                    AlertActions.showPopupError('device-auth-fail', message);
+                                }
+                            });
+                        }
+                    });
+                }
+            };
 
             self.selected_printer = printer;
 
@@ -217,7 +220,7 @@ define([
                 self._returnSelectedPrinter();
             }
             else {
-                ProgressActions.open(ProgressConstants.NONSTOP_WITH_MESSAGE, lang.initialize.connecting);
+
 
                 DeviceMaster.selectDevice(self.selected_printer).done(function(status) {
                     if (status === DeviceConstants.CONNECTED) {
@@ -240,15 +243,13 @@ define([
                                 lang.message.device_not_found.caption
                             );
                         }
-                        else{
+                        else {
                             AlertActions.showPopupError('printer-connection-timeout', lang.message.connectionTimeout, lang.caption.connectionTimeout);
                         }
                     }
-                }).
-                always(() => {
+                }).always(() => {
                     ProgressActions.close();
-                }).
-                fail(function(status) {
+                }).fail(function(status) {
                     AlertActions.showPopupError('fatal-occurred', status);
                 });
             }
