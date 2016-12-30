@@ -41,6 +41,7 @@ define([
                     fileReader = new FileReader();
 
                     fileReader.onloadend = function(e) {
+                        window.processDroppedFile = false;
                         blob = new Blob([fileReader.result], { type: thisFile.type });
                         uploadFiles.push({
                             data: fileReader.result,
@@ -72,6 +73,7 @@ define([
                     };
 
                     fileReader.onerror = function() {
+                        window.processDroppedFile = false;
                         self.props.onError();
                         currentTarget.value = '';
                     };
@@ -115,19 +117,15 @@ define([
 
         // UI events
         _onReadFile: function(e) {
-            var self = this,
-                files = e.currentTarget.files;
-
-            self.readFiles(e, files);
+            if(window.processDroppedFile === true) { return; }
+            this.readFiles(e, e.currentTarget.files);
         },
 
         render: function() {
             var self = this,
                 cx = React.addons.classSet,
                 props = self.props,
-                state = self.state,
-                className = cx(props.className),
-                lang = props.lang;
+                className = cx(props.className);
 
             return (
                 <input
