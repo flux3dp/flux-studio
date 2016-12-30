@@ -498,8 +498,13 @@ define([
             let { Monitor, Device } = store.getState();
             let startingStatus = { st_label: 'INIT', st_id: 1 };
 
-            store.dispatch(MonitorActionCreator.changeMode(GlobalConstants.PRINT));
             store.dispatch(DeviceActionCreator.updateDeviceStatus(startingStatus));
+            store.dispatch(MonitorActionCreator.changeMode(
+                Monitor.mode === GlobalConstants.CAMERA ?
+                GlobalConstants.CAMERA
+                :
+                GlobalConstants.PRINT
+            ));
 
             if(Device.status.st_label === DeviceConstants.IDLE) {
                 let { fCode } = this.props;
@@ -572,10 +577,14 @@ define([
                         p = DeviceMaster.stop();
                     }
                     p.always(() => {
+                        console.log(Monitor);
                         let mode = Monitor.selectedFileInfo.length > 0 ? GlobalConstants.FILE_PREVIEW : GlobalConstants.PREVIEW;
                         if(Device.status.st_id < 0) {
                             mode = GlobalConstants.FILE;
                             this._dispatchFolderContent('');
+                        }
+                        else if(Monitor.mode === GlobalConstants.CAMERA) {
+                            mode = GlobalConstants.CAMERA;
                         }
                         store.dispatch(MonitorActionCreator.changeMode(mode));
                     });
