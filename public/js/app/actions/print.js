@@ -2596,6 +2596,7 @@ define([
         }
         else {
             if(!printPath || printPath.length === 0) {
+                _showWait(lang.print.drawingPreview, !showStopButton);
                 sliceMaster.addTask('getPath').then((result) => {
                     if(result.error) {
                         processSlicerError(result);
@@ -2607,6 +2608,8 @@ define([
                     });
                 }).fail((error) => {
                     processSlicerError(error);
+                }).always(() => {
+                    _closeWait();
                 });
             }
             else {
@@ -2813,15 +2816,18 @@ define([
     }
 
     function changeEngine(engine) {
-        let d = $.Deferred();
+        let d = $.Deferred(),
+            requireReslice = slicingStatus.inProgress;
 
-        sliceMaster.clearTasks();
-        sliceMaster.addTask('stopSlicing');
-        sliceMaster.addTask('changeEngine', engine).then((result) => {
-            if(result.error) { processSlicerError(result); }
-            d.resolve();
-        }).fail((error) => {
-            processSlicerError(error);
+        stopSlicing().then(() => {
+            sliceMaster.clearTasks();
+            sliceMaster.addTask('changeEngine', engine).then((result) => {
+                if(result.error) { processSlicerError(result); }
+                else if(requireReslice) { startSlicing(); }
+                d.resolve();
+            }).fail((error) => {
+                processSlicerError(error);
+            });
         });
 
         return d.promise();
