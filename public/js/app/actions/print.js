@@ -122,7 +122,7 @@ define([
         step: 10,
         upVector: new THREE.Vector3(0, 0, 1),
         color: Settings.print_config.color_base_plate,
-        opacity: 0.2,
+        opacity: 0.7,
         text: true,
         textColor: '#FFFFFF',
         textPosition: 'center',
@@ -2144,10 +2144,10 @@ define([
         setObjectDialoguePosition();
         render();
         setImportWindowPosition();
-        reactSrc.setState({
-            camera: camera,
-            updateCamera: true
-        });
+        // reactSrc.setState({
+        //     camera: camera,
+        //     updateCamera: true
+        // });
         panningOffset = camera.position.clone().sub(camera.position.raw);
 
         if(scene.cameraLight) {
