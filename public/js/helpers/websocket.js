@@ -27,8 +27,7 @@ define([
     var hadConnected = false,
         showProgramErrorPopup = true,
         WsLogger = new Logger('websocket'),
-        logLimit = 100,
-        timer; // used for ws keep alive
+        logLimit = 100;
 
     // options:
     //      hostname      - host name (Default: localhost)
@@ -214,15 +213,20 @@ define([
             socketOptions = origanizeOptions(options);
 
         ws = createWebSocket(socketOptions);
-        console.log(ws);
+
+        // this.timer = setInterval(function() {
+        //     if (null !== ws && readyState.OPEN === ws.readyState) {
+        //         sender('ping');
+        //     }
+        // }, 1000);
 
         const keepAlive = () => {
-            clearInterval(timer);
-            timer = setInterval(function() {
+            clearInterval(this.timer);
+            this.timer = setInterval(function() {
                 if (null !== ws && readyState.OPEN === ws.readyState) {
                     sender('ping');
                 }
-            }, 60000);
+            }, 60 * 1000 /* ms */);
         };
 
         keepAlive();
@@ -279,6 +283,7 @@ define([
                 // events
                 onOpen: function(callback) {
                     socketOptions.onOpen = callback;
+
                     return this;
                 },
 
