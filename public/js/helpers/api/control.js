@@ -20,12 +20,17 @@ define([
             timmer,
             isConnected = false,
             ws,
-            lastOrder = '',
+            usingUsb = false,
+            availableUsbChannel,
             dedicatedWs = [],
             fileInfoWsId = 0,
             events = {
                 onMessage: () => {},
                 onError: opts.onError
+            },
+            usbEvents = {
+                onMessage: () => {},
+                onError: () => {}
             },
             isTimeout = () => {
                 let error = {
@@ -37,8 +42,9 @@ define([
             };
 
         const createWs = () => {
+            let url = availableUsbChannel ? `usb/${availableUsbChannel}` : uuid;
             let _ws = new Websocket({
-                method: 'control/' + uuid,
+                method: `control/${url}`,
                 onMessage: (data) => {
                     switch (data.status) {
                     case 'connecting':
@@ -84,6 +90,33 @@ define([
             });
 
             return _ws;
+        };
+
+        const monitorUsbConnection = () => {
+            let _ws = new Websocket({
+                method: 'usb/interfaces',
+                onMessage: (message) => {
+                    availableUsbChannel = Object.keys(message.h2h)[0];
+                    if(availableUsbChannel) {
+                        if(!usingUsb) {
+                            _ws.send(`open ${availableUsbChannel}`);
+                            usingUsb = true;
+                            ws = createWs();
+                        }
+                    }
+                    else {
+                        if(usingUsb) {
+                            usingUsb = false;
+                            ws = createWs();
+                        }
+                    }
+                }
+            });
+
+            _ws.send('list');
+            setInterval(() => {
+                _ws.send('list');
+            }, 2000);
         };
 
         // id is int
@@ -146,7 +179,8 @@ define([
             events.onFatal = (response) => { d.reject(response); };
         };
 
-        ws = createWs();
+        // ws = createWs();
+        monitorUsbConnection();
 
         let ctrl = {
             connection: ws,
