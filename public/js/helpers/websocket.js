@@ -27,7 +27,8 @@ define([
     var hadConnected = false,
         showProgramErrorPopup = true,
         WsLogger = new Logger('websocket'),
-        logLimit = 100;
+        logLimit = 100,
+        timer; // used for ws keep alive
 
     // options:
     //      hostname      - host name (Default: localhost)
@@ -201,6 +202,7 @@ define([
                 else {
                     ws.send(data);
                 }
+                keepAlive();
             },
             ws = null,
             readyState = {
@@ -212,12 +214,18 @@ define([
             socketOptions = origanizeOptions(options);
 
         ws = createWebSocket(socketOptions);
+        console.log(ws);
 
-        setInterval(function() {
-            if (null !== ws && readyState.OPEN === ws.readyState) {
-                sender('ping');
-            }
-        }, 60000);
+        const keepAlive = () => {
+            clearInterval(timer);
+            timer = setInterval(function() {
+                if (null !== ws && readyState.OPEN === ws.readyState) {
+                    sender('ping');
+                }
+            }, 60000);
+        };
+
+        keepAlive();
 
         var wsLog = {
                 url: '/ws/' + options.method,
@@ -271,7 +279,6 @@ define([
                 // events
                 onOpen: function(callback) {
                     socketOptions.onOpen = callback;
-
                     return this;
                 },
 
