@@ -178,6 +178,7 @@ define([
             };
 
             action = !!commands[currentStatus] ? commands[currentStatus]() : '';
+            console.log('mode is', Monitor.mode, statusId, currentStatus);
 
             // CAMERA mode
             if(Monitor.mode === GlobalConstants.CAMERA) {
@@ -215,6 +216,7 @@ define([
                 leftButtonOn = true;
 
                 if(
+                    currentStatus === DeviceConstants.IDLE ||
                     currentStatus === DeviceConstants.STARTING ||
                     currentStatus === DeviceConstants.RESUMING ||
                     statusId === DeviceConstants.status.PAUSING_FROM_RUNNING ||
@@ -266,6 +268,10 @@ define([
             else if (Monitor.mode === GlobalConstants.FILE_PREVIEW) {
                 leftButtonOn = true;
                 middleButtonOn = true;
+
+                if( currentStatus === DeviceConstants.IDLE ) {
+                    leftButtonOn = false;
+                }
             }
 
             let leftButton = Monitor.mode === GlobalConstants.FILE ? this._operation().upload : this._operation().stop,
