@@ -638,10 +638,10 @@ define(function() {
                 'NOT_SUPPORT': '非 SVG 格式'
             },
             title: {
-                material: 'Select proper material to have the best engraving result.',
-                object_height: 'A Raft are layers built under your part and help it stick to the base plate.',
-                shading: 'Shading enables gradient effect of laser engraving. It takes longer time.',
-                advanced: 'Custom settings for power and speed'
+                material: '選擇正確的材質來雕刻出最好的結果',
+                object_height: '物體高度，從底盤到物件最高點之距離',
+                shading: '使用雷射漸層效果，會增加雕刻時間',
+                advanced: '自行調整功率大小以及速度'
             },
             print_params: {
                 object_height: {
@@ -1077,6 +1077,7 @@ define(function() {
             brokenFcode: '無法開啟 %s',
             slicingFatalError: '切片時發生錯誤，請上傳模型檔案給 FLUX 客服',
             unknown_error: '無法與機器建立連線，請使用「功能表 > 說明 > 錯誤回報」',
+            unknown_device: '無法與機器建立連線，請確認 USB 有連接於機器',
             important_update: {
                 caption: '重要更新',
                 message: 'Delta 有重要韌體更新，是否要現在更新？',
