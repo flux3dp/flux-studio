@@ -178,7 +178,6 @@ define([
             };
 
             action = !!commands[currentStatus] ? commands[currentStatus]() : '';
-            console.log('mode is', Monitor.mode, statusId, currentStatus);
 
             // CAMERA mode
             if(Monitor.mode === GlobalConstants.CAMERA) {

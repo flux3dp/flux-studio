@@ -18,9 +18,7 @@ define([
 
         var timeout = 10000,
             timmer,
-            isConnected = false,
             ws,
-            lastOrder = '',
             events = {
                 onMessage: function() {},
                 onError: opts.onError
@@ -36,8 +34,9 @@ define([
             };
 
         function createWs() {
-            var _ws = new Websocket({
-                method: 'camera/' + uuid,
+            let url = opts.availableUsbChannel >= 0 ? `usb/${opts.availableUsbChannel}` : uuid;
+            let _ws = new Websocket({
+                method: `camera/${url}`,
                 onMessage: function(data) {
                     if(data instanceof Blob) {
                         events.onMessage(data);
@@ -54,13 +53,11 @@ define([
                             opts.onConnect(data);
                             break;
                         default:
-                            isConnected = true;
                             events.onMessage(data);
                             break;
                         }
                     }
                 },
-                // onError: opts.onError,
                 onError: function(response) {
                     events.onError(response);
                 },
@@ -70,7 +67,6 @@ define([
                 },
                 onClose: function(response) {
                     clearTimeout(timmer);
-                    isConnected = false;
                 },
                 autoReconnect: false
             });

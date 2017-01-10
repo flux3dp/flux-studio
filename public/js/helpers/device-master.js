@@ -9,6 +9,7 @@ define([
     'app/constants/device-constants',
     'helpers/api/control',
     'helpers/api/3d-scan-control',
+    'helpers/api/usb-checker',
     'helpers/api/touch',
     'helpers/api/discover',
     'helpers/api/config',
@@ -29,6 +30,7 @@ define([
     DeviceConstants,
     DeviceController,
     ScanController,
+    UsbChecker,
     Touch,
     Discover,
     Config,
@@ -89,16 +91,9 @@ define([
                 });
             };
 
-        ProgressActions.open(ProgressConstants.NONSTOP);
-        if(_existConnection(uuid)) {
-            _device = _switchDevice(uuid);
-            d.resolve(DeviceConstants.CONNECTED);
-        }
-        else {
-            _device = {};
-            _device.uuid = uuid;
-            _device.name = device.name;
-            _device.actions = DeviceController(uuid, {
+        const createDeviceActions = (availableUsbChannel = -1) => (
+            DeviceController(uuid, {
+                availableUsbChannel,
                 onConnect: function(response) {
                     d.notify(response);
 
@@ -143,17 +138,39 @@ define([
                         );
                         break;
                     default:
+                        let message = lang.message.unknown_error;
+
+                        if(response.error === 'UNKNOWN_DEVICE') {
+                            message = lang.message.unknown_device;
+                        }
+
                         AlertActions.showPopupError(
                             'unhandle-exception',
-                            lang.message.unknown_error
+                            message
                         );
                     }
                 }
-            });
+            })
+        );
+
+        ProgressActions.open(ProgressConstants.NONSTOP);
+        if(_existConnection(uuid)) {
+            _device = _switchDevice(uuid);
+            d.resolve(DeviceConstants.CONNECTED);
+        }
+        else {
+            _device = {};
+            _device.uuid = uuid;
+            _device.name = device.name;
         }
 
         SocketMaster = new Sm();
-        SocketMaster.setWebSocket(_device.actions);
+
+        UsbChecker((availableUsbChannel) => {
+            this.availableUsbChannel = availableUsbChannel;
+            _device.actions = createDeviceActions(availableUsbChannel);
+            SocketMaster.setWebSocket(_device.actions);
+        });
 
         return d.always(() => {
             ProgressActions.close();
@@ -555,10 +572,16 @@ define([
 
     function streamCamera(uuid) {
         let cameraStream = new Rx.Subject(),
-            timeToReset = 20000;
+            timeToReset = 20000,
+            opts;
+
+        opts = {
+            availableUsbChannel: this.availableUsbChannel,
+            onError: function(message) { console.log('error from camera ws', message); }
+        };
 
         const initCamera = () => {
-            _device.camera = Camera(uuid);
+            _device.camera = Camera(uuid, opts);
             _device.camera.startStream((imageBlob) => {
                 processCameraResult(imageBlob);
             });
@@ -644,7 +667,6 @@ define([
         const step2 = () => {
             let _d = $.Deferred();
             SocketMaster.addTask('calibrate').then((response) => {
-                console.log("calibrate resp", response)
                 debug_data = response.debug;
                 return SocketMaster.addTask('endMaintainMode');
             }).then(() => {
@@ -699,7 +721,6 @@ define([
                     _d.reject(response);
                 }
             }).then((response) => {
-                console.log('task home', response);
                 response.status === 'ok' ? _d.resolve() : _d.reject();
             }).fail((error) => {
                 _d.reject(error);

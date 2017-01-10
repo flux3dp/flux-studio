@@ -4,11 +4,14 @@
  */
 define([
     'jquery',
+    'helpers/i18n',
     'helpers/websocket',
     'helpers/convertToTypedArray',
     'app/constants/device-constants',
-    'helpers/rsa-key'
-], function($, Websocket, convertToTypedArray, DeviceConstants, rsaKey) {
+    'helpers/rsa-key',
+    'app/actions/alert-actions',
+    'app/actions/progress-actions'
+], function($, i18n, Websocket, convertToTypedArray, DeviceConstants, rsaKey, AlertActions, ProgressActions) {
     'use strict';
 
     return function(uuid, opts) {
@@ -19,18 +22,13 @@ define([
         let timeout = 10000,
             timmer,
             isConnected = false,
+            lang = i18n.get(),
             ws,
-            usingUsb = false,
-            availableUsbChannel,
             dedicatedWs = [],
             fileInfoWsId = 0,
             events = {
                 onMessage: () => {},
                 onError: opts.onError
-            },
-            usbEvents = {
-                onMessage: () => {},
-                onError: () => {}
             },
             isTimeout = () => {
                 let error = {
@@ -42,7 +40,7 @@ define([
             };
 
         const createWs = () => {
-            let url = availableUsbChannel ? `usb/${availableUsbChannel}` : uuid;
+            let url = opts.availableUsbChannel >= 0 ? `usb/${opts.availableUsbChannel}` : uuid;
             let _ws = new Websocket({
                 method: `control/${url}`,
                 onMessage: (data) => {
@@ -75,6 +73,13 @@ define([
                     if(response.error === 'REMOTE_IDENTIFY_ERROR') {
                         createWs();
                     }
+                    else if(response.error === 'UNKNOWN_DEVICE') {
+                        ProgressActions.close();
+                        AlertActions.showPopupError(
+                            'unhandle-exception',
+                            lang.message.unknown_device
+                        );
+                    }
                     else {
                         clearTimeout(timmer);
                         events.onError(response);
@@ -90,33 +95,6 @@ define([
             });
 
             return _ws;
-        };
-
-        const monitorUsbConnection = () => {
-            let _ws = new Websocket({
-                method: 'usb/interfaces',
-                onMessage: (message) => {
-                    availableUsbChannel = Object.keys(message.h2h)[0];
-                    if(availableUsbChannel) {
-                        if(!usingUsb) {
-                            _ws.send(`open ${availableUsbChannel}`);
-                            usingUsb = true;
-                            ws = createWs();
-                        }
-                    }
-                    else {
-                        if(usingUsb) {
-                            usingUsb = false;
-                            ws = createWs();
-                        }
-                    }
-                }
-            });
-
-            _ws.send('list');
-            setInterval(() => {
-                _ws.send('list');
-            }, 2000);
         };
 
         // id is int
@@ -179,8 +157,7 @@ define([
             events.onFatal = (response) => { d.reject(response); };
         };
 
-        // ws = createWs();
-        monitorUsbConnection();
+        ws = createWs();
 
         let ctrl = {
             connection: ws,
@@ -581,7 +558,6 @@ define([
             },
 
             setHeadTemperature: (temperature) => {
-                console.log('setting head temperature', temperature);
                 return useDefaultResponse(`maintain set_heater 0 ${temperature}`);
             },
 

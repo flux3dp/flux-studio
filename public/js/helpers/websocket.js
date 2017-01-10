@@ -214,12 +214,6 @@ define([
 
         ws = createWebSocket(socketOptions);
 
-        // this.timer = setInterval(function() {
-        //     if (null !== ws && readyState.OPEN === ws.readyState) {
-        //         sender('ping');
-        //     }
-        // }, 1000);
-
         const keepAlive = () => {
             clearInterval(this.timer);
             this.timer = setInterval(function() {
