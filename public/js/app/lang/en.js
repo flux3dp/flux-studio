@@ -625,7 +625,7 @@ define(function() {
             },
             title: {
                 material: 'Select a proper material to have the best engraving result.',
-                object_height: 'A Raft are layers built under your part and help it stick to the base plate.',
+                object_height: 'Object height measured from the base plate to the max height of the object',
                 shading: 'Shading enables the gradient effect of laser engraving. It takes longer time.',
                 advanced: 'Custom settings for power and speed.'
             },
@@ -1063,6 +1063,7 @@ define(function() {
             brokenFcode: 'Unable to open %s',
             slicingFatalError: 'Error encountered during slicing. Kindly report STL file to customer support.',
             unknown_error: 'The application has encountered an unknown error, please use Help > Menu > Bug Report.',
+            unknown_device: 'Cannot connect to device, please make sure USB is attached to the machine',
             important_update: {
                 caption: 'Important Update',
                 message: 'Important Delta firmware update is available. Do you want to update now?',
