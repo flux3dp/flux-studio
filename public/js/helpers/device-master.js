@@ -164,12 +164,20 @@ define([
             _device.name = device.name;
         }
 
-        SocketMaster = new Sm();
+        const initSocketMaster = () => {
+            SocketMaster = new Sm();
+            // if availableUsbChannel has been defined
+            if(typeof this.availableUsbChannel !== 'undefined') {
+                _device.actions = createDeviceActions(this.availableUsbChannel);
+                SocketMaster.setWebSocket(_device.actions);
+            }
+        };
+
+        initSocketMaster();
 
         UsbChecker((availableUsbChannel) => {
             this.availableUsbChannel = availableUsbChannel;
-            _device.actions = createDeviceActions(availableUsbChannel);
-            SocketMaster.setWebSocket(_device.actions);
+            initSocketMaster();
         });
 
         return d.always(() => {

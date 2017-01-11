@@ -303,6 +303,11 @@ define([
     }
 
     function appendModel(binary, file, ext, callback) {
+        if(binary.byteLength === 0) {
+            ProgressActions.close();
+            AlertActions.showPopupError('', lang.message.empty_file);
+            return;
+        }
         let stlLoader = new THREE.STLLoader(),
             objLoader = new THREE.OBJLoader();
 
@@ -2155,10 +2160,10 @@ define([
         setObjectDialoguePosition();
         render();
         setImportWindowPosition();
-        // reactSrc.setState({
-        //     camera: camera,
-        //     updateCamera: true
-        // });
+        reactSrc.setState({
+            camera: camera,
+            updateCamera: true
+        });
         panningOffset = camera.position.clone().sub(camera.position);
 
         if(scene.cameraLight) {
@@ -2757,7 +2762,7 @@ define([
 
     function _getCameraLook(_camera) {
         let vector = new THREE.Vector3(0, 0, -1);
-        vector.applyEuler(_camera.rotation, _camera.eulerOrder);
+        vector.applyEuler(_camera.rotation, _camera.rotation.order);
         return vector;
     }
 

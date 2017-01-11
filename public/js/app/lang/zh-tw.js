@@ -1086,7 +1086,8 @@ define(function() {
             need_password: '需要密碼與 FLUX Delta 建立連線',
             new_app_downloading: '下載中',
             ask_for_upgrade: '馬上升級嗎?',
-            need_1_1_7_above: '請更新 Delta 韌體到 v1.1.7 以上'
+            need_1_1_7_above: '請更新 Delta 韌體到 v1.1.7 以上',
+            empty_file: '檔案內容不存在'
         },
         machine_status: {
             '-10': '原生模式',
