@@ -376,11 +376,6 @@ define([
                 mesh.scale.locked = true;
                 /* end customized property */
 
-                // if (mesh.geometry.type !== 'Geometry') {
-                //     console.log('Heavy ops:: ', 'Buffer geometry to geometry');
-                //     mesh.geometry = new THREE.Geometry().fromBufferGeometry(mesh.geometry);
-                // }
-
                 mesh.name = 'custom';
                 mesh.file = file;
                 mesh.fileName = file.name;
@@ -2295,24 +2290,12 @@ define([
         outlineMesh.up = new THREE.Vector3(0, 0, 1);
         mesh.outlineMesh = outlineMesh;
     	outlineScene.add(outlineMesh);
-        // let outlineMaterial = new THREE.MeshBasicMaterial({
-        //     color: s.colorSelected,
-        //     side: THREE.BackSide,
-        //     wireframe: true,
-        //     wireframeLinewidth: 50
-        // });
-        // let outlineMesh = new THREE.Mesh(mesh.geometry, outlineMaterial);
-        // outlineMesh.position.set(mesh.position.x, mesh.position.y, mesh.position.z);
-        // outlineMesh.scale.set(mesh.scale.x*1.1, mesh.scale.y*1.1, mesh.scale.z*1.1);
-        // outlineMesh.rotation.set(mesh.rotation.x, mesh.rotation.y, mesh.rotation.z);
-        // outlineMesh.up = new THREE.Vector3(0, 0, 1);
-        // mesh.outlineMesh = outlineMesh;
-        // outlineScene.add(outlineMesh);
     }
 
     function syncObjectOutline(src) {
         src.outlineMesh.rotation.set(src.rotation.x, src.rotation.y, src.rotation.z, 'ZYX');
         src.outlineMesh.scale.set(src.scale.x, src.scale.y, src.scale.z);
+        src.outlineMesh.scale.multiplyScalar(1.05);
         render();
     }
 
