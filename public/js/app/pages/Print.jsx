@@ -221,7 +221,11 @@ define([
                 componentDidMount: function() {
                     director.init(this);
 
-                    this._handleApplyAdvancedSetting();
+                    // prevent user to operate before settings are set
+                    this.showWait();
+                    this._handleApplyAdvancedSetting().then(() => {
+                        this.closeWait();
+                    });
 
                     // events
 
@@ -351,6 +355,14 @@ define([
                     menuFactory.methods.refresh();
                 },
 
+                showWait: function() {
+                    ProgressActions.open(ProgressConstants.NONSTOP);
+                },
+
+                closeWait: function() {
+                    ProgressActions.close();
+                },
+
                 _handleYes: function(answer, args) {
                     console.log(answer, args);
                     if(answer === 'tour') {
@@ -362,7 +374,7 @@ define([
                     }
                     else if(answer === 'set_default') {
                         Config().write('default-printer-name', Config().read('configured-printer'));
-                        ProgressActions.open(ProgressConstants.NONSTOP);
+                        this.showWait();
 
                         DeviceMaster.getDeviceByNameAsync(
                             Config().read('configured-printer'),
@@ -516,6 +528,7 @@ define([
                 },
 
                 _handleApplyAdvancedSetting: function(setting) {
+                    let d = $.Deferred();
                     Object.assign(advancedSettings, setting);
                     // remove old properties
                     delete advancedSettings.raft_on;
@@ -529,36 +542,35 @@ define([
                     });
 
                     if(!setting) {
-                        // console.log("AdvancedSettings:: Apply parameter default");
                         director.setAdvanceParameter(advancedSettings).then(() => {
-                            // console.log("AdvancedSettings:: Apply default parameter end");
                             Object.assign(fineAdvancedSettings, advancedSettings);
                             advancedSettings.engine = advancedSettings.engine || defaultSlicingEngine;
                             if(advancedSettings.engine !== 'slic3r') {
                                 this._handleSlicingEngineChange(advancedSettings.engine);
                             }
                         }).fail(() => {
-                            // console.log("AdvancedSettings:: Application failed, falling back");
                             Object.assign(advancedSettings, fineAdvancedSettings);
                             director.setAdvanceParameter(advancedSettings);
                             this._saveSetting();
+                        }).always(() => {
+                            d.resolve();
                         });
                     }
                     else {
-                        // console.log("AdvancedSettings:: Apply parameter with engine");
                         this._handleSlicingEngineChange(advancedSettings.engine).then(() => {
                             director.setAdvanceParameter(advancedSettings).then(() => {
-                                // console.log("AdvancedSettings:: Apply engine parameter end");
                                 Object.assign(fineAdvancedSettings, advancedSettings);
-
                             }).fail(() => {
-                                // console.log("AdvancedSettings:: Application with engine failed, falling back ", fineAdvancedSettings);
                                 Object.assign(advancedSettings, fineAdvancedSettings);
                                 director.setAdvanceParameter(advancedSettings);
                                 this._saveSetting();
+                            }).always(() => {
+                                d.resolve();
                             });
                         });
                     }
+
+                    return d.promise();
                 },
 
                 _handleImport: function(e) {
@@ -809,7 +821,7 @@ define([
                         );
                     };
 
-                    director.changeEngine(engineName, path).then((error) => {
+                    director.changeEngine(engineName).then((error) => {
                         if(error) {
                             setDefaultEngine(error);
                         }

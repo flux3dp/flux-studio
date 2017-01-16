@@ -122,7 +122,7 @@ define([
         step: 10,
         upVector: new THREE.Vector3(0, 0, 1),
         color: Settings.print_config.color_base_plate,
-        opacity: 0.2,
+        opacity: 0.7,
         text: true,
         textColor: '#FFFFFF',
         textPosition: 'center',
@@ -240,7 +240,7 @@ define([
         orbitControl = new THREE.OrbitControls(camera, renderer.domElement);
         orbitControl.maxPolarAngle = Math.PI / 4 * 3;
         orbitControl.maxDistance = 1000;
-        orbitControl.noKeys = true;
+        orbitControl.enableKeys = false;
         orbitControl.addEventListener('change', updateOrbitControl);
 
         transformControl = new THREE.TransformControls(camera, renderer.domElement);
@@ -349,7 +349,7 @@ define([
 
                 // normalize - resize, align
                 let box = new THREE.Box3().setFromObject(mesh),
-                    enlarge = parseInt(box.size().x) !== 0 && parseInt(box.size().y) !== 0 && parseInt(box.size().z) !== 0,
+                    enlarge = parseInt(box.getSize().x) !== 0 && parseInt(box.getSize().y) !== 0 && parseInt(box.getSize().z) !== 0,
                     scale = 1;
 
                 mesh.scale.set(scale, scale, scale);
@@ -1149,8 +1149,9 @@ define([
         if (mesh) {
             let ref = {},
                 box = new THREE.Box3().setFromObject(mesh);
-            ref.x = box.center().x;
-            ref.y = box.center().y;
+
+            ref.x = box.getCenter().x;
+            ref.y = box.getCenter().y;
             ref.z = box.min.z;
             return ref;
         }
@@ -1435,14 +1436,18 @@ define([
 
         if (!$.isEmptyObject(o)) {
 
-            let box = new THREE.BoundingBoxHelper(o, s.colorSelected),
+            let box = new THREE.BoxHelper(o, s.colorSelected),
+                // box = new THREE.BoundingBoxHelper(o, s.colorSelected),
                 position = toScreenPosition(o, camera),
                 cameraDistance = 0,
                 objectDialogueDistance = 0;
 
-            box.update();
+            box.size = getBoundingBox(o).size;
+            box.update(o);
             cameraDistance = 320 / Math.sqrt(Math.pow(camera.position.x, 2) + Math.pow(camera.position.y, 2) + Math.pow(camera.position.z, 2));
-            objectDialogueDistance = cameraDistance * 1.2 * Math.sqrt(Math.pow(box.box.size().x, 2) + Math.pow(box.box.size().y, 2)) + 15;
+            objectDialogueDistance =
+                cameraDistance * 1.2 * Math.sqrt(Math.pow(box.size.x, 2) +
+                Math.pow(box.size.y, 2)) + 15;
             objectDialogueDistance = parseInt(objectDialogueDistance);
 
             reactSrc.setState({
@@ -1822,32 +1827,35 @@ define([
     function checkCollisionWithAny(src, callback) {
         let _objects,
             collided = false,
-            sourceBox;
+            sourceBox = new THREE.Box3();
 
         _objects = objects.filter(function(o) {
             return o.uuid !== src.uuid;
         });
 
-        sourceBox = new THREE.BoundingBoxHelper(src, s.colorSelected);
-        sourceBox.update();
-        sourceBox.box.intersectsBox = function ( box ) {
-
-		// using 6 splitting planes to rule out intersections.
-
-    		if ( box.max.x < this.min.x || box.min.x > this.max.x ||
-				 box.max.y < this.min.y || box.min.y > this.max.y ||
-				 box.max.z < this.min.z || box.min.z > this.max.z ) {
-
-    			return false;
-    		}
-    		return true;
-    	};
+        sourceBox.setFromObject(src);
+        // sourceBox = new THREE.BoundingBoxHelper(src, s.colorSelected);
+        // sourceBox.update(src);
+        // sourceBox.box.intersectsBox = function ( box ) {
+        //
+		// // using 6 splitting planes to rule out intersections.
+        //
+    	// 	if ( box.max.x < this.min.x || box.min.x > this.max.x ||
+		// 		 box.max.y < this.min.y || box.min.y > this.max.y ||
+		// 		 box.max.z < this.min.z || box.min.z > this.max.z ) {
+        //
+    	// 		return false;
+    	// 	}
+    	// 	return true;
+    	// };
 
         for(let i = 0; i < _objects.length; i++) {
             if(!collided) {
-                let box = new THREE.BoundingBoxHelper(_objects[i], s.colorSelected);
-                box.update();
-                if(sourceBox.box.intersectsBox(box.box)) {
+                let box = new THREE.Box3();
+                // let box = new THREE.BoundingBoxHelper(_objects[i], s.colorSelected);
+                // box.update(_objects[i]);
+                box.setFromObject(_objects[i]);
+                if(sourceBox.intersectsBox(box)) {
                     collided = true;
                     callback(box);
                 }
@@ -1863,7 +1871,8 @@ define([
         let level = 1,
             spacing = 2,
             inserted = false,
-            target = new THREE.BoundingBoxHelper(model),
+            target = new THREE.BoxHelper(model),
+            // target = new THREE.BoundingBoxHelper(model),
             mover,
             arithmetic,
             spacingX,
@@ -1916,9 +1925,10 @@ define([
             }
         };
 
-        target.update();
+        target.update(model);
         mover = function(ref, method) {
-            let size = ref.box.size();
+            let size = getBoundingBox(ref).size;
+            // let size = ref.box.size();
             arithmetic[method.toString()](size);
             checkCollisionWithAny(model, function(collideObject) {
                 if(collideObject !== null) {
@@ -1933,8 +1943,9 @@ define([
 
         checkCollisionWithAny(model, function(collideObject) {
             if(collideObject !== null) {
-                let ref = new THREE.BoundingBoxHelper(collideObject, s.colorSelected);
-                ref.update();
+                let ref = new THREE.BoxHelper(collideObject, s.colorSelected);
+                // let ref = new THREE.BoundingBoxHelper(collideObject, s.colorSelected);
+                ref.update(collideObject);
                 mover(ref, 1);
             }
         });
@@ -2144,11 +2155,11 @@ define([
         setObjectDialoguePosition();
         render();
         setImportWindowPosition();
-        reactSrc.setState({
-            camera: camera,
-            updateCamera: true
-        });
-        panningOffset = camera.position.clone().sub(camera.position.raw);
+        // reactSrc.setState({
+        //     camera: camera,
+        //     updateCamera: true
+        // });
+        panningOffset = camera.position.clone().sub(camera.position);
 
         if(scene.cameraLight) {
             scene.cameraLight.position.copy(camera.position);
@@ -2175,21 +2186,22 @@ define([
 
     function addSizeProperty(obj) {
         if (!$.isEmptyObject(obj)) {
-            let boundingBox = new THREE.BoundingBoxHelper(obj);
-            boundingBox.update();
-            obj.size = boundingBox.box.size();
-            obj.size.enteredX = boundingBox.box.size().x;
-            obj.size.enteredY = boundingBox.box.size().y;
-            obj.size.enteredZ = boundingBox.box.size().z;
+            let boundingBox = getBoundingBox(obj);
+            // let boundingBox = new THREE.BoundingBoxHelper(obj);
+            // boundingBox.update();
+            obj.size = boundingBox.size;
+            obj.size.enteredX = boundingBox.size.x;
+            obj.size.enteredY = boundingBox.size.y;
+            obj.size.enteredZ = boundingBox.size.z;
 
-            obj.size.originalX = boundingBox.box.size().x;
-            obj.size.originalY = boundingBox.box.size().y;
-            obj.size.originalZ = boundingBox.box.size().z;
+            obj.size.originalX = boundingBox.size.x;
+            obj.size.originalY = boundingBox.size.y;
+            obj.size.originalZ = boundingBox.size.z;
 
             obj.size.transformedSize = {};
-            obj.size.transformedSize.x = boundingBox.box.size().x;
-            obj.size.transformedSize.y = boundingBox.box.size().y;
-            obj.size.transformedSize.z = boundingBox.box.size().z;
+            obj.size.transformedSize.x = boundingBox.size.x;
+            obj.size.transformedSize.y = boundingBox.size.y;
+            obj.size.transformedSize.z = boundingBox.size.z;
         }
     }
 
@@ -2229,6 +2241,8 @@ define([
     }
 
     function updateObjectRotation(src) {
+        // scale lock transforming is modified in TransformControls.js source
+        // search for keyword locked
         src.rotation.enteredX = updateDegreeWithStep(radianToDegree(src.rotation.x));
         src.rotation.enteredY = updateDegreeWithStep(radianToDegree(src.rotation.y));
         src.rotation.enteredZ = updateDegreeWithStep(radianToDegree(src.rotation.z));
@@ -2264,20 +2278,31 @@ define([
     }
 
     function createOutline(mesh) {
-        let outlineMaterial = new THREE.MeshBasicMaterial({
+        var outlineMaterial = new THREE.MeshBasicMaterial({
             color: s.colorSelected,
-            side: THREE.BackSide,
-            wireframe: true,
-            wireframeLinewidth: 5
+            side: THREE.BackSide
         });
-        let outlineMesh = new THREE.Mesh(mesh.geometry, outlineMaterial);
-        outlineMesh.position.set(mesh.position.x, mesh.position.y, mesh.position.z);
-        outlineMesh.scale.set(mesh.scale.x, mesh.scale.y, mesh.scale.z);
-        outlineMesh.rotation.set(mesh.rotation.x, mesh.rotation.y, mesh.rotation.z);
+    	var outlineMesh = new THREE.Mesh( mesh.geometry, outlineMaterial ),
+            { x, y, z } = mesh.position;
+
+    	outlineMesh.position.set(x, y, z);
+    	outlineMesh.scale.multiplyScalar(1.05);
         outlineMesh.up = new THREE.Vector3(0, 0, 1);
         mesh.outlineMesh = outlineMesh;
-        outlineScene.add(outlineMesh);
-
+    	outlineScene.add(outlineMesh);
+        // let outlineMaterial = new THREE.MeshBasicMaterial({
+        //     color: s.colorSelected,
+        //     side: THREE.BackSide,
+        //     wireframe: true,
+        //     wireframeLinewidth: 50
+        // });
+        // let outlineMesh = new THREE.Mesh(mesh.geometry, outlineMaterial);
+        // outlineMesh.position.set(mesh.position.x, mesh.position.y, mesh.position.z);
+        // outlineMesh.scale.set(mesh.scale.x*1.1, mesh.scale.y*1.1, mesh.scale.z*1.1);
+        // outlineMesh.rotation.set(mesh.rotation.x, mesh.rotation.y, mesh.rotation.z);
+        // outlineMesh.up = new THREE.Vector3(0, 0, 1);
+        // mesh.outlineMesh = outlineMesh;
+        // outlineScene.add(outlineMesh);
     }
 
     function syncObjectOutline(src) {
@@ -2596,6 +2621,7 @@ define([
         }
         else {
             if(!printPath || printPath.length === 0) {
+                _showWait(lang.print.drawingPreview, !showStopButton);
                 sliceMaster.addTask('getPath').then((result) => {
                     if(result.error) {
                         processSlicerError(result);
@@ -2607,6 +2633,8 @@ define([
                     });
                 }).fail((error) => {
                     processSlicerError(error);
+                }).always(() => {
+                    _closeWait();
                 });
             }
             else {
@@ -2813,15 +2841,18 @@ define([
     }
 
     function changeEngine(engine) {
-        let d = $.Deferred();
+        let d = $.Deferred(),
+            requireReslice = slicingStatus.inProgress;
 
-        sliceMaster.clearTasks();
-        sliceMaster.addTask('stopSlicing');
-        sliceMaster.addTask('changeEngine', engine).then((result) => {
-            if(result.error) { processSlicerError(result); }
-            d.resolve();
-        }).fail((error) => {
-            processSlicerError(error);
+        stopSlicing().then(() => {
+            sliceMaster.clearTasks();
+            sliceMaster.addTask('changeEngine', engine).then((result) => {
+                if(result.error) { processSlicerError(result); }
+                else if(requireReslice) { startSlicing(); }
+                d.resolve();
+            }).fail((error) => {
+                processSlicerError(error);
+            });
         });
 
         return d.promise();
@@ -2868,6 +2899,16 @@ define([
         raycaster.setFromCamera( mouse, camera );
         return raycaster.intersectObjects( o );
     };
+
+    function getBoundingBox(obj) {
+        let box3 = new THREE.Box3(),
+            size = new THREE.Vector3();
+
+        let boundingBox = new THREE.BoxHelper(obj);
+        box3.setFromObject(boundingBox);
+        box3.getSize(size);
+        return { box: box3, size };
+    }
 
     return {
         init                : init,

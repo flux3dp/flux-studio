@@ -120,6 +120,13 @@ define([
             });
         },
 
+        showHeadTemperature: function(device) {
+            AlertDispatcher.dispatch({
+                actionType: AlertConstants.SHOW_HEAD_TEMPERATURE,
+                device: device
+            });
+        },
+
         notifyRetry: function(id) {
             AlertDispatcher.dispatch({
                 actionType: AlertConstants.NOTIFY_RETRY, id

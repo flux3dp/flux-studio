@@ -48,7 +48,7 @@ define([
                         clearTimeout(timer);
                         ProgressActions.close();
 
-                        currentPrinter = printers[0];
+                        currentPrinter = printers[0] || {};
                         currentPrinter.from = 'WIFI';
                         upnpMethods = upnpConfig(currentPrinter.uuid);
 

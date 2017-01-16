@@ -11,6 +11,7 @@ define(['jquery'], function($) {
                 }).
                 on('drop', function(e) {
                     e.preventDefault();
+                    window.processDroppedFile = true;
                     handler(e);
                 });
         },

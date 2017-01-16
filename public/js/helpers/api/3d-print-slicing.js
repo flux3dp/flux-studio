@@ -316,7 +316,6 @@ define([
                 events.onMessage = (result) => { d.resolve(result); };
                 events.onError = (error) => { d.reject(error); };
                 events.onFatal = (error) => { d.reject(error); };
-
                 ws.send('end_slicing');
                 return d.promise();
             },

@@ -10,25 +10,30 @@ define([
 ) {
     'use strict';
 
-    var NOTIFY_EVENT          = 'notify',
-        POPUP_EVENT           = 'popup',
-        CLOSE_NOTIFICATION    = 'closeNotification',
-        CLOSE_POPUP           = 'closePopup',
-        UPDATE_EVENT          = 'update',
-        CHANGE_FILAMENT_EVENT = 'change_filament',
-        NOTIFY_RETRY          = 'retry',
-        NOTIFY_ABORT          = 'abort',
-        NOTIFY_YES            = 'yes',
-        NOTIFY_NO             = 'no',
-        NOTIFY_CANCEL         = 'cancel', // including the "no", "cancel", "ok" button fired
-        NOTIFY_CUSTOM         = 'custom',
-        NOTIFY_ANSWER         = 'answer',
+    var NOTIFY_EVENT            = 'notify',
+        POPUP_EVENT             = 'popup',
+        CLOSE_NOTIFICATION      = 'closeNotification',
+        CLOSE_POPUP             = 'closePopup',
+        UPDATE_EVENT            = 'update',
+        CHANGE_FILAMENT_EVENT   = 'change_filament',
+        EDIT_HEAD_TEMPERATURE   = 'edit_head_temperature',
+        NOTIFY_RETRY            = 'retry',
+        NOTIFY_ABORT            = 'abort',
+        NOTIFY_YES              = 'yes',
+        NOTIFY_NO               = 'no',
+        NOTIFY_CANCEL           = 'cancel', // including the "no", "cancel", "ok" button fired
+        NOTIFY_CUSTOM           = 'custom',
+        NOTIFY_ANSWER           = 'answer',
         AlertStore;
 
     AlertStore = Object.assign(EventEmitter.prototype, {
 
         onChangeFilament(callback) {
             this.on(CHANGE_FILAMENT_EVENT, callback);
+        },
+
+        onShowHeadTemperature(callback) {
+            this.on(EDIT_HEAD_TEMPERATURE, callback);
         },
 
         onUpdate(callback) {
@@ -173,6 +178,10 @@ define([
 
                 'SHOW_POPUP_QUESTION': function() {
                     AlertStore.emit(POPUP_EVENT, AlertConstants.QUESTION, payload.id, payload.caption, payload.message);
+                },
+
+                'SHOW_HEAD_TEMPERATURE': function() {
+                    AlertStore.emit(EDIT_HEAD_TEMPERATURE, payload);
                 },
 
                 'NOTIFY_RETRY': function() {

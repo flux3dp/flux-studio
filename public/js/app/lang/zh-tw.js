@@ -99,7 +99,8 @@ define(function() {
                 set_to_origin_complete: 'Delta 已回歸原點',
                 scan_laser_complete: '掃描雷射已開啟，點擊 "完成" 以關閉雷射',
                 finish: '完成',
-                cancel: '取消'
+                cancel: '取消',
+                turn_on_head_temperature: '開啟噴頭溫度'
             },
             window: {
                 label: '視窗',
@@ -1142,6 +1143,13 @@ define(function() {
             maintain_head_type_error: '列印工具頭未正確安裝',
             maintain_zombie: '請重新啟動機器',
             toolhead_no_response: '#117 列印模組沒有回應 <a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/218347477">暸解更多</a>'
+        },
+        head_temperature: {
+            title: '開啟噴頭溫度',
+            done: '結束',
+            target_temperature: '目標溫度',
+            current_temperature: '目前溫度',
+            working: '工作中'
         },
         input_machine_password: {
             require_password: '"%s" 需要密碼',
