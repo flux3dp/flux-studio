@@ -56,7 +56,6 @@ var process = nw.process,
                     return;
                 }
                 console.log(type, str);
-
                 if (str.indexOf('Unhandled exception') >= 0) {
                     process.env.processPythonException(str);
                 }

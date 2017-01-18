@@ -4915,6 +4915,12 @@ input.switch:checked ~ label:after {
     .print-studio .object-dialogue .accordion .lock.unlock {
         background-image: url("../../img/unlock.svg");
         background-size: 24px 36px; }
+    .print-studio .object-dialogue .accordion .axis-red {
+        color: red; }
+    .print-studio .object-dialogue .accordion .axis-green {
+        color: green; }
+    .print-studio .object-dialogue .accordion .axis-blue {
+        color: blue; }
 
 .close {
     cursor: pointer;
