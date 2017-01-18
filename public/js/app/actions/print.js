@@ -2228,6 +2228,7 @@ define([
         src.size.z = src.scale.z * src.size.originalZ;
 
         syncObjectOutline(src);
+        setObjectDialoguePosition(src);
 
         reactSrc.setState({
             modelSelected: src
