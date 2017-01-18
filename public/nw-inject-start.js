@@ -30,7 +30,9 @@ var process = nw.process,
                 '--port',
                 port,
                 '--cura',
-                ''
+                '',
+                '--trace-pid',
+                process.pid
             ],
             ghostCmd = '',
             writeLog = function(message, mode) {
@@ -54,6 +56,7 @@ var process = nw.process,
                     return;
                 }
                 console.log(type, str);
+
                 if (str.indexOf('Unhandled exception') >= 0) {
                     process.env.processPythonException(str);
                 }
