@@ -4,12 +4,18 @@ define([
     'jsx!widgets/Modal',
     'jsx!widgets/Alert',
     'helpers/device-master',
+    'app/constants/device-constants',
+    'helpers/check-device-status',
+    'app/actions/alert-actions'
 ], function(
     React,
     i18n,
     Modal,
     Alert,
-    DeviceMaster
+    DeviceMaster,
+    DeviceConstants,
+    CheckDeviceStatus,
+    AlertActions
 ) {
     'use strict';
 
@@ -21,14 +27,37 @@ define([
         getInitialState: function() {
             return {
                 currentTemperature  : 0,
-                targetTemperature   : lang.head_temperature.target_temperature
+                enteredTemperature  : '',
+                targetTemperature   : ''
             };
         },
 
         componentDidMount: function() {
-            DeviceMaster.selectDevice(this.props.device).then(() => {
-                DeviceMaster.enterMaintainMode();
-                this._getDeviceStatus();
+            const readyMachine = () => {
+                DeviceMaster.enterMaintainMode()
+                .then(() => {
+                    return DeviceMaster.headInfo();
+                })
+                .then((info) => {
+                    if(info.TYPE === DeviceConstants.EXTRUDER) {
+                        this._startReport();
+                    }
+                    else {
+                        AlertActions.showPopupError(
+                            'HEAD-ERROR',
+                            lang.head_temperature.incorrect_toolhead
+                        );
+                        this.props.onClose();
+                    }
+                });
+            };
+
+            DeviceMaster.selectDevice(this.props.device).then((status) => {
+                if(status === DeviceConstants.CONNECTED) {
+                    CheckDeviceStatus(this.props.device).then(() => {
+                        readyMachine();
+                    });
+                }
             });
         },
 
@@ -37,7 +66,7 @@ define([
             clearInterval(this.report);
         },
 
-        _getDeviceStatus: function() {
+        _startReport: function() {
             this.report = setInterval(() => {
                 DeviceMaster.getHeadStatus().then((status) => {
                     if(status.rt) {
@@ -48,20 +77,29 @@ define([
         },
 
         _handleChangeTemperature: function(e) {
-            let targetTemperature = e.target.value
-            clearTimeout(this.setTemperature);
-            this.setTemperature = setTimeout(() => {
-                this.setState({
-                    targetTemperature
-                });
-                DeviceMaster.setHeadTemperature(targetTemperature);
-            }, 1500);
+            this.setState({ enteredTemperature: e.target.value });
+        },
+
+        _handleSetTemperature: function(e) {
+            e.preventDefault();
+            let t = parseInt(this.state.enteredTemperature);
+
+            if(t > 230) {
+                t = 230;
+            }
+            else if(t < 60) {
+                t = 60;
+            }
+
+            this.setState({ targetTemperature: t });
+            this.refs.temperature.getDOMNode().value = t;
+
+            DeviceMaster.setHeadTemperature(t);
         },
 
         render: function() {
-            var { currentTemperature, targetTemperature } = this.state,
-                buttons, content, className,
-                status = '';
+            let { currentTemperature, targetTemperature } = this.state,
+                temperature, buttons, content, className;
 
             buttons = [
                 {
@@ -71,13 +109,8 @@ define([
                 }
             ];
 
-            if(parseInt(currentTemperature) && parseInt(targetTemperature)) {
-                console.log(currentTemperature, targetTemperature);
-                status = currentTemperature == targetTemperature ?
-                    ''
-                    :
-                    `(${lang.head_temperature.working})`;
-            };
+            temperature = currentTemperature + (targetTemperature ? ` / ${targetTemperature}` : '');
+            temperature += ' °C';
 
             content = (
                 <div className="info">
@@ -88,8 +121,12 @@ define([
                         <div>
                             <input
                                 type="number"
+                                ref="temperature"
                                 onChange={this._handleChangeTemperature}
                             />
+                            <button className="btn-default" onClick={this._handleSetTemperature}>
+                                {lang.head_temperature.set}
+                            </button>
                         </div>
                     </div>
                     <div className="section">
@@ -98,7 +135,7 @@ define([
                         </div>
                         <div>
                             <label className="temperature">
-                                {`${currentTemperature} / ${targetTemperature} ${status}`}
+                                {temperature}
                             </label>
                         </div>
                     </div>

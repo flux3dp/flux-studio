@@ -100,7 +100,7 @@ define(function() {
                 scan_laser_complete: 'Delta has turned on its scanning laser. Click "Finish" to turn it off.',
                 finish: 'FINISH',
                 cancel: 'CANCEL',
-                turn_on_head_temperature: 'Turn on head temperature'
+                turn_on_head_temperature: 'Set toolhead temperature'
             },
             window: {
                 label: 'Window',
@@ -1133,11 +1133,12 @@ define(function() {
             NA: 'Toolhead is not connected'
         },
         head_temperature: {
-            title: 'Turn on head temperature',
-            done: 'DONE',
+            title: 'Set toolhead temperature',
+            done: 'FINISH',
             target_temperature: 'Target temperature',
             current_temperature: 'Current temperature',
-            working: 'working'
+            set: 'set',
+            incorrect_toolhead: 'Incorrect toolhead, please use printing toolhead'
         },
         input_machine_password: {
             require_password: '"%s" requires a password',

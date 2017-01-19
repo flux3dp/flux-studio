@@ -3544,7 +3544,9 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         width: 150px;
         display: inline-block; }
     .head-temperature .section input {
-        width: 150px; }
+        width: 50px; }
+    .head-temperature .section button {
+        margin-left: 20px; }
 
 .head-temperature label {
     color: #B3B3B3; }
