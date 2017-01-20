@@ -30,9 +30,7 @@ var process = nw.process,
                 '--port',
                 port,
                 '--cura',
-                '',
-                '--trace-pid',
-                process.pid
+                ''
             ],
             ghostCmd = '',
             writeLog = function(message, mode) {
