@@ -536,6 +536,7 @@ define([
                                 processSlicerError(r);
                             }
                             printPath = r;
+                            processPath(r);
                             _drawPath().then(function() {
                                 _resetPreviewLayerSlider();
                                 ProgressActions.close();
@@ -543,6 +544,9 @@ define([
                             });
                         });
                     }
+
+                    // notify gcode too big, only previewing
+                    AlertActions.showPopupError('', lang.message.gcode_area_too_big);
                 }
                 else {
                     _closeWait();

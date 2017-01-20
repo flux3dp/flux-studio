@@ -1072,7 +1072,8 @@ define(function() {
             need_password: 'Need Password to connect to FLUX Delta',
             new_app_downloading: 'Downloading',
             ask_for_upgrade: 'Do you wanna upgrade NOW?',
-            need_1_1_7_above: 'Please update Delta Firmware to v1.1.7+'
+            need_1_1_7_above: 'Please update Delta Firmware to v1.1.7+',
+            gcode_area_too_big: 'Imported gcode exceed the printable area.'
         },
         machine_status: {
             '-10': 'Raw mode',
