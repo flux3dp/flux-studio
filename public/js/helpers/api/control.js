@@ -546,6 +546,15 @@ define([
                 return d.promise();
             },
 
+            setHeadTemperature: (temperature) => {
+                console.log('setting head temperature', temperature);
+                return useDefaultResponse(`maintain set_heater 0 ${temperature}`);
+            },
+
+            getHeadStatus: () => {
+                return useDefaultResponse('maintain headstatus');
+            },
+
             /**
              * update firmware
              * @param {File} file - file

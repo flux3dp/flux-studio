@@ -1,3 +1,21 @@
+# FLUX Studio 0.6.3 Change log (20170124)
+
+### New Feature
+
+- Manually set printing toolhead temperature from menu > device > commands > set toolhead temperature
+
+### Bug Fixes
+
+- Fix possible .svg file import error that causes unable to engrave
+
+### Other Improvements
+
+- Confirm responses from the slicing engine (slic3r and cura) before allowing file import, which might cause error
+- Update 3D rendering engine (threejs) from r80 to r83
+- Add rotation color indicator (x,y,z) in object dialogue
+- Update object dialogue position during object transforming
+- Display errors when imported gcode is out of printing area
+
 # FLUX Studio 0.6.2 Change log
 
 ### New Features

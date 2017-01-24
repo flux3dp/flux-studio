@@ -904,6 +904,14 @@ define([
         return _device.actions.downloadErrorLog();
     }
 
+    function setHeadTemperature(temperature) {
+        return SocketMaster.addTask('setHeadTemperature', temperature);
+    }
+
+    function getHeadStatus() {
+        return SocketMaster.addTask('getHeadStatus');
+    }
+
     // Core
 
     function DeviceSingleton() {
@@ -959,6 +967,8 @@ define([
             this.getDeviceInfo          = getDeviceInfo;
             this.downloadErrorLog       = downloadErrorLog;
             this.killSelf               = killSelf;
+            this.setHeadTemperature     = setHeadTemperature;
+            this.getHeadStatus          = getHeadStatus;
 
             Discover(
                 'device-master',

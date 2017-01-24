@@ -289,7 +289,7 @@ define([
                         <label className="accordion-body">
 
                             <div className="control">
-                                <span className="text-center header">X</span>
+                                <span className="text-center header axis-red">X</span>
                                 <input
                                     id="x"
                                     type="text"
@@ -301,7 +301,7 @@ define([
                             </div>
 
                             <div className="control">
-                                <span className="text-center header">Y</span>
+                                <span className="text-center header axis-green">Y</span>
                                 <input
                                     id="y"
                                     type="text"
@@ -313,7 +313,7 @@ define([
                             </div>
 
                             <div className="control">
-                                <span className="text-center header">Z</span>
+                                <span className="text-center header axis-blue">Z</span>
                                 <input
                                     id="z"
                                     type="text"

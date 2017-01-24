@@ -99,7 +99,8 @@ define(function() {
                 set_to_origin_complete: 'Delta has calibrated its origin.',
                 scan_laser_complete: 'Delta has turned on its scanning laser. Click "Finish" to turn it off.',
                 finish: 'FINISH',
-                cancel: 'CANCEL'
+                cancel: 'CANCEL',
+                turn_on_head_temperature: 'Set toolhead temperature'
             },
             window: {
                 label: 'Window',
@@ -624,7 +625,7 @@ define(function() {
             },
             title: {
                 material: 'Select a proper material to have the best engraving result.',
-                object_height: 'A Raft are layers built under your part and help it stick to the base plate.',
+                object_height: 'Object height measured from the base plate to the max height of the object',
                 shading: 'Shading enables the gradient effect of laser engraving. It takes longer time.',
                 advanced: 'Custom settings for power and speed.'
             },
@@ -1062,6 +1063,7 @@ define(function() {
             brokenFcode: 'Unable to open %s',
             slicingFatalError: 'Error encountered during slicing. Kindly report STL file to customer support.',
             unknown_error: 'The application has encountered an unknown error, please use Help > Menu > Bug Report.',
+            unknown_device: 'Cannot connect to device, please make sure USB is attached to the machine',
             important_update: {
                 caption: 'Important Update',
                 message: 'Important Delta firmware update is available. Do you want to update now?',
@@ -1070,7 +1072,8 @@ define(function() {
             need_password: 'Need Password to connect to FLUX Delta',
             new_app_downloading: 'Downloading',
             ask_for_upgrade: 'Do you wanna upgrade NOW?',
-            need_1_1_7_above: 'Please update Delta Firmware to v1.1.7+'
+            need_1_1_7_above: 'Please update Delta Firmware to v1.1.7+',
+            gcode_area_too_big: 'Imported gcode exceed the printable area.'
         },
         machine_status: {
             '-10': 'Raw mode',
@@ -1129,6 +1132,14 @@ define(function() {
             maintain_zombie: 'Please restart the device',
             toolhead_no_response: '#117 Module no response <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/218347477">More</a>',
             NA: 'Toolhead is not connected'
+        },
+        head_temperature: {
+            title: 'Set toolhead temperature',
+            done: 'FINISH',
+            target_temperature: 'Target temperature',
+            current_temperature: 'Current temperature',
+            set: 'set',
+            incorrect_toolhead: 'Incorrect toolhead, please use printing toolhead'
         },
         input_machine_password: {
             require_password: '"%s" requires a password',

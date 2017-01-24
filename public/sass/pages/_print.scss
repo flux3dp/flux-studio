@@ -826,6 +826,15 @@ input.switch:checked ~ label:after {
                 background-image: url("../../img/unlock.svg");
                 background-size: 24px 36px;
             }
+            .axis-red {
+                color: red;
+            }
+            .axis-green {
+                color: green;
+            }
+            .axis-blue {
+                color: blue;
+            }
         }
     }
 }

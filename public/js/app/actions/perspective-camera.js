@@ -35,7 +35,7 @@ define([
 
         var geometry = new THREE.BoxGeometry(200, 200, 200),
             material = {},
-            meshFaceMaterial,
+            MultiMaterial,
             domEvents,
             cube;
 
@@ -70,9 +70,9 @@ define([
             material.bottom = m.bottom;
             material.top = m.top;
             material.hover = [m.frontOn, m.backOn, m.leftOn, m.rightOn, m.bottomOn, m.topOn];
-            meshFaceMaterial    = new THREE.MeshFaceMaterial([material.right, material.left, material.back, material.front, material.top, material.bottom]);
+            MultiMaterial = new THREE.MultiMaterial([material.right, material.left, material.back, material.front, material.top, material.bottom]);
 
-            cube = new THREE.Mesh(geometry, meshFaceMaterial);
+            cube = new THREE.Mesh(geometry, MultiMaterial);
             scene.add(cube);
 
             THREE.DefaultLoadingManager.onLoad = function () {
@@ -87,7 +87,6 @@ define([
 
             // renderer
             renderer = new THREE.WebGLRenderer({
-                preserveDrawingBuffer: true,
                 alpha: true
             });
             renderer.setClearColor(0x000000, 0);
@@ -101,9 +100,9 @@ define([
             orbitControl = new THREE.OrbitControls(camera, renderer.domElement);
             orbitControl.maxPolarAngle = Math.PI / 4 * 3;
             orbitControl.maxDistance = 300;
-            orbitControl.noKeys = true;
-            orbitControl.noZoom = true;
-            orbitControl.noPan = true;
+            orbitControl.enableKeys = false;
+            orbitControl.enableZoom = false;
+            orbitControl.enablePan = false;
             orbitControl.addEventListener('change', updateMainOrbitControl);
 
             var resetMeshMaterial = function() {
@@ -128,7 +127,7 @@ define([
 
     function setCameraPosition(refCamera) {
         if (!$.isEmptyObject(refCamera)) {
-            var p = refCamera.position.raw,
+            var p = refCamera.position,
                 r = refCamera.rotation;
 
             offsetRatio = Math.sqrt(Math.pow(p.x, 2) + Math.pow(p.y, 2) + Math.pow(p.z, 2)) / defaultDistance;

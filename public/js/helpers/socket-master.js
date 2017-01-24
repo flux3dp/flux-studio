@@ -7,7 +7,8 @@ define([
     function SocketMaster() {
         let _tasks = [],
             _task,
-            _ws;
+            _ws,
+            processing = false;
 
         const setWebSocket = (ws) => {
             _ws = ws;
@@ -18,7 +19,7 @@ define([
         const addTask = (command, ...args) => {
             let d = $.Deferred();
             _tasks.push({d, command, args});
-            if(!_task) {
+            if(!_task && !processing) {
                 doTask();
             }
 
@@ -27,13 +28,15 @@ define([
 
         const doTask = () => {
             _task = _tasks.shift();
-
+            processing = true;
             _ws[_task.command](..._task.args).then((result) => {
+                processing = false;
                 _task.d.resolve(result);
                 doNext();
             }).progress((result) => {
                 _task.d.notify(result);
             }).fail((result) => {
+                processing = false;
                 _task.d.reject(result);
                 doNext();
             });
