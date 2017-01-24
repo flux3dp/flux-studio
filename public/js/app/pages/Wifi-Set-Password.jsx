@@ -74,7 +74,10 @@ define([
                     checkNetworkStatus = function() {
                         var tryAgain = function(response) {
                             if (true === checkCountdown(response)) {
-                                usb.getMachineNetwork(deferred);
+                                clearTimeout(this.t);
+                                this.t = setTimeout(() => {
+                                    usb.getMachineNetwork(deferred);
+                                }, 1000)
                             }
                         },
                         deferred;

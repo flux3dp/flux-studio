@@ -54,20 +54,22 @@
                 var nodeProcess = process || {},
                     env = nodeProcess.env || {};
 
-                if ('undefined' !== typeof env.ghostPort &&
-                    'undefined' !== typeof env.osType &&
-                    'undefined' !== typeof env.arch
-                ) {
-                    window.FLUX.ghostPort = env.ghostPort;
-                    window.FLUX.osType = env.osType;
-                    window.FLUX.arch = env.arch;
-                    clearInterval(timer);
-                    getStarted(env.ghostPort);
-                }
-                else {
-                    if (30000 <= (new Date()).getTime() - window.FLUX.timestamp) {
-                        getStarted(env.ghostPort);
+                if(window.portReady) {
+                    if ('undefined' !== typeof env.ghostPort &&
+                        'undefined' !== typeof env.osType &&
+                        'undefined' !== typeof env.arch
+                    ) {
+                        window.FLUX.ghostPort = env.ghostPort;
+                        window.FLUX.osType = env.osType;
+                        window.FLUX.arch = env.arch;
                         clearInterval(timer);
+                        getStarted(env.ghostPort);
+                    }
+                    else {
+                        if (30000 <= (new Date()).getTime() - window.FLUX.timestamp) {
+                            getStarted(env.ghostPort);
+                            clearInterval(timer);
+                        }
                     }
                 }
             }, 100);

@@ -21,6 +21,7 @@ define([
     'jsx!widgets/Notification-Modal',
     'jsx!views/Update-Dialog',
     'jsx!views/Change-Filament',
+    'jsx!views/Head-Temperature',
     'app/actions/global-actions',
     'app/stores/global-store',
     'jsx!views/print/Monitor',
@@ -53,6 +54,7 @@ define([
     NotificationModal,
     UpdateDialog,
     ChangeFilament,
+    HeadTemperature,
     GlobalActions,
     GlobalStore,
     Monitor,
@@ -129,6 +131,10 @@ define([
                         device  : {},
                         onClose : function() {}
                     },
+                    headTemperature: {
+                        show        : false,
+                        device      : {}
+                    },
                     firstDevice: {
                         info: {}, // device info
                         apiResponse: {}, // device info
@@ -149,6 +155,7 @@ define([
                 AlertStore.onClosePopup(this._handleClosePopup);
                 AlertStore.onUpdate(this._showUpdate);
                 AlertStore.onChangeFilament(this._showChangeFilament);
+                AlertStore.onShowHeadTemperature(this._showHeadTemperature);
 
                 if (true === isUnsupportedMacOSX) {
                     AlertActions.showPopupError('unsupported_mac_osx', lang.message.unsupport_osx_version);
@@ -254,6 +261,14 @@ define([
                 });
             },
 
+            _closeHeadTemperature: function() {
+                this.setState({
+                    headTemperature: {
+                        show: false
+                    }
+                });
+            },
+
             _showUpdate: function(payload) {
                 var currentVersion = (
                     'software' === payload.type ?
@@ -272,6 +287,17 @@ define([
                         onInstall: payload.onInstall
                     }
                 });
+            },
+
+            _showHeadTemperature: function(payload) {
+                if(this.state.headTemperature.show === false) {
+                    this.setState({
+                        headTemperature: {
+                            show: true,
+                            device: payload.device
+                        }
+                    });
+                }
             },
 
             _handleUpdateClose: function() {
@@ -488,6 +514,10 @@ define([
                 this.setState({ slicingStatus: data.report });
             },
 
+            _handleSetHeadTemperature: function(e) {
+                DeviceMaster.setHeadTemperature(this.state.headTemperature.target);
+            },
+
             _renderMonitorPanel: function() {
                 var content = (
                     <Monitor
@@ -518,9 +548,19 @@ define([
                 );
             },
 
+            _renderHeadTemperature: function() {
+                return (
+                    <HeadTemperature
+                        device={this.state.headTemperature.device}
+                        onClose={this._closeHeadTemperature}
+                    />
+                );
+            },
+
             render : function() {
                 var monitorPanel = this.state.showMonitor ? this._renderMonitorPanel() : '',
                     filament = this.state.changeFilament.open ? this._renderChangeFilament() : '',
+                    headTemperature = this.state.headTemperature.show ? this._renderHeadTemperature() : '',
                     latestVersion = (
                         'toolhead' === this.state.application.type ?
                         this.state.application.device.toolhead_version :
@@ -555,6 +595,7 @@ define([
                         />
 
                         {filament}
+                        {headTemperature}
 
                         <NotificationModal
                             lang={lang}

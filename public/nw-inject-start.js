@@ -54,6 +54,13 @@ var process = nw.process,
                     return;
                 }
                 console.log(type, str);
+
+                // confirming ghost port
+                if(str.indexOf('Listen HTTP on') !== -1) {
+                    let i = str.indexOf('Listen HTTP on');
+                    process.env.ghostPort = str.slice(i).split(':')[1];
+                    window.portReady = true;
+                }
                 if (str.indexOf('Unhandled exception') >= 0) {
                     process.env.processPythonException(str);
                 }

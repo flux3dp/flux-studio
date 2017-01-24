@@ -201,6 +201,7 @@ define([
                 else {
                     ws.send(data);
                 }
+                keepAlive();
             },
             ws = null,
             readyState = {
@@ -213,11 +214,22 @@ define([
 
         ws = createWebSocket(socketOptions);
 
-        setInterval(function() {
-            if (null !== ws && readyState.OPEN === ws.readyState) {
-                sender('ping');
-            }
-        }, 60000);
+        // this.timer = setInterval(function() {
+        //     if (null !== ws && readyState.OPEN === ws.readyState) {
+        //         sender('ping');
+        //     }
+        // }, 1000);
+
+        const keepAlive = () => {
+            clearInterval(this.timer);
+            this.timer = setInterval(function() {
+                if (null !== ws && readyState.OPEN === ws.readyState) {
+                    sender('ping');
+                }
+            }, 60 * 1000 /* ms */);
+        };
+
+        keepAlive();
 
         var wsLog = {
                 url: '/ws/' + options.method,

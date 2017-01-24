@@ -125,7 +125,9 @@ define([
 
                     switch (nextAction) {
                     case 'SCAN_WIFI':
-                        getWifi();
+                        setTimeout(() => {
+                            getWifi();
+                        }, 5000);
                         break;
                     case 'STOP_SCAN':
                         ProgressActions.open(ProgressConstants.NONSTOP);

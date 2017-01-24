@@ -105,6 +105,7 @@ define([
 
                 self._toggleBlocker(true);
 
+                currentPrinter = currentPrinter || {};
                 currentPrinter.from = 'WIFI';
                 currentPrinter.apName = currentPrinter.name;
                 upnpMethods = upnpConfig(currentPrinter.uuid);

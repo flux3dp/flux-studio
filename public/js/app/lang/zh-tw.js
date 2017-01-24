@@ -99,7 +99,8 @@ define(function() {
                 set_to_origin_complete: 'Delta 已回歸原點',
                 scan_laser_complete: '掃描雷射已開啟，點擊 "完成" 以關閉雷射',
                 finish: '完成',
-                cancel: '取消'
+                cancel: '取消',
+                turn_on_head_temperature: '開啟噴頭溫度'
             },
             window: {
                 label: '視窗',
@@ -637,10 +638,10 @@ define(function() {
                 'NOT_SUPPORT': '非 SVG 格式'
             },
             title: {
-                material: 'Select proper material to have the best engraving result.',
-                object_height: 'A Raft are layers built under your part and help it stick to the base plate.',
-                shading: 'Shading enables gradient effect of laser engraving. It takes longer time.',
-                advanced: 'Custom settings for power and speed'
+                material: '選擇正確的材質來雕刻出最好的結果',
+                object_height: '物體高度，從底盤到物件最高點之距離',
+                shading: '使用雷射漸層效果，會增加雕刻時間',
+                advanced: '自行調整功率大小以及速度'
             },
             print_params: {
                 object_height: {
@@ -1076,6 +1077,7 @@ define(function() {
             brokenFcode: '無法開啟 %s',
             slicingFatalError: '切片時發生錯誤，請上傳模型檔案給 FLUX 客服',
             unknown_error: '無法與機器建立連線，請使用「功能表 > 說明 > 錯誤回報」',
+            unknown_device: '無法與機器建立連線，請確認 USB 有連接於機器',
             important_update: {
                 caption: '重要更新',
                 message: 'Delta 有重要韌體更新，是否要現在更新？',
@@ -1084,7 +1086,8 @@ define(function() {
             need_password: '需要密碼與 FLUX Delta 建立連線',
             new_app_downloading: '下載中',
             ask_for_upgrade: '馬上升級嗎?',
-            need_1_1_7_above: '請更新 Delta 韌體到 v1.1.7 以上'
+            need_1_1_7_above: '請更新 Delta 韌體到 v1.1.7 以上',
+            gcode_area_too_big: '匯入的 gcode 檔案超過列印範圍'
         },
         machine_status: {
             '-10': '原生模式',
@@ -1142,6 +1145,14 @@ define(function() {
             maintain_head_type_error: '列印工具頭未正確安裝',
             maintain_zombie: '請重新啟動機器',
             toolhead_no_response: '#117 列印模組沒有回應 <a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/218347477">暸解更多</a>'
+        },
+        head_temperature: {
+            title: '開啟噴頭溫度',
+            done: '結束',
+            target_temperature: '目標溫度',
+            current_temperature: '目前溫度',
+            set: '設定',
+            incorrect_toolhead: '錯誤工具頭，請使用列印工具頭'
         },
         input_machine_password: {
             require_password: '"%s" 需要密碼',

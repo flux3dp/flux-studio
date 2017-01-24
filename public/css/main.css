@@ -3313,7 +3313,8 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         font-size: 14px;
         overflow: hidden;
         text-overflow: ellipsis;
-        white-space: nowrap; }
+        white-space: nowrap;
+        text-transform: capitalize; }
     .modal-progress .spinner-roller {
         background: linear-gradient(to right, #DEDEDC 10%, rgba(255, 255, 255, 0) 42%);
         height: 5rem;
@@ -3534,6 +3535,21 @@ input[type=range]:focus::-webkit-slider-runnable-track {
 
 .modal-progress.modal-window .button-group button.btn-default {
     margin-bottom: 15px; }
+
+.head-temperature .section {
+    padding: 10px 0; }
+    .head-temperature .section > div {
+        display: inline-block; }
+    .head-temperature .section .title {
+        width: 150px;
+        display: inline-block; }
+    .head-temperature .section input {
+        width: 50px; }
+    .head-temperature .section button {
+        margin-left: 20px; }
+
+.head-temperature label {
+    color: #B3B3B3; }
 
 /**
  * the view of printer selector
@@ -4901,6 +4917,12 @@ input.switch:checked ~ label:after {
     .print-studio .object-dialogue .accordion .lock.unlock {
         background-image: url("../../img/unlock.svg");
         background-size: 24px 36px; }
+    .print-studio .object-dialogue .accordion .axis-red {
+        color: red; }
+    .print-studio .object-dialogue .accordion .axis-green {
+        color: green; }
+    .print-studio .object-dialogue .accordion .axis-blue {
+        color: blue; }
 
 .close {
     cursor: pointer;
