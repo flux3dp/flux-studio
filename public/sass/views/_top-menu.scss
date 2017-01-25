@@ -200,6 +200,16 @@
                             width: 130px;
                         }
 
+                        .type {
+                            line-height: 20px;
+
+                            img {
+                                margin-top: 10px;
+                                image-rendering: optimizeSpeed;
+                                image-rendering: -moz-crisp-edges;image-rendering: -webkit-optimize-contrast;image-rendering: optimize-contrast;image-rendering: pixelated; -ms-interpolation-mode: nearest-neighbor;
+                            }
+                        }
+
                         .progress {}
 
                         &:hover {

@@ -221,7 +221,7 @@ define([
                     options = deviceList.map(function(device) {
                         statusText = status[device.st_id] || status.UNKNOWN;
                         headText = headModule[device.head_module] || headModule.UNKNOWN;
-                        
+
                         if(device.st_prog === 0) {
                             progress = '';
                         }
@@ -239,6 +239,9 @@ define([
                                 <label className="name">{device.name}</label>
                                 <label className="status">{headText} {statusText}</label>
                                 <label className="progress">{progress}</label>
+                                <label className="type">
+                                    <img src={`/img/icon_${device.source === 'h2h' ? 'usb' : 'wifi'}.svg`} />
+                                </label>
                             </li>
                         );
                     }, this),

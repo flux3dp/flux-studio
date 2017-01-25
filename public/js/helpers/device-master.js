@@ -9,7 +9,6 @@ define([
     'app/constants/device-constants',
     'helpers/api/control',
     'helpers/api/3d-scan-control',
-    'helpers/api/usb-checker',
     'helpers/api/touch',
     'helpers/api/discover',
     'helpers/api/config',
@@ -17,7 +16,9 @@ define([
     'app/constants/input-lightbox-constants',
     'helpers/device-list',
     'helpers/api/camera',
+    'helpers/api/simple-websocket',
     'helpers/socket-master',
+    'helpers/usb-checker',
     'helpers/array-findindex'
 ], function(
     $,
@@ -30,7 +31,6 @@ define([
     DeviceConstants,
     DeviceController,
     ScanController,
-    UsbChecker,
     Touch,
     Discover,
     Config,
@@ -38,7 +38,9 @@ define([
     InputLightBoxConstants,
     DeviceList,
     Camera,
-    Sm
+    SimpleWebsocket,
+    Sm,
+    UsbChecker
 ) {
     'use strict';
 
@@ -54,10 +56,12 @@ define([
         _device,
         _cameraTimeoutTracker,
         nwConsole,
+        usbDeviceReport = {},
         _devices = [],
         _errors = {};
 
     function selectDevice(device, deferred) {
+        console.log('selected device', device);
         Object.assign(_selectedDevice, device);
         let d = deferred || $.Deferred(),
             uuid = device.uuid,
@@ -91,9 +95,16 @@ define([
                 });
             };
 
-        const createDeviceActions = (availableUsbChannel = -1) => (
-            DeviceController(uuid, {
-                availableUsbChannel,
+        ProgressActions.open(ProgressConstants.NONSTOP);
+        if(_existConnection(uuid)) {
+            _device = _switchDevice(uuid);
+            d.resolve(DeviceConstants.CONNECTED);
+        }
+        else {
+            _device = {};
+            _device.uuid = uuid;
+            _device.name = device.name;
+            _device.actions = DeviceController(uuid, {
                 onConnect: function(response) {
                     d.notify(response);
 
@@ -138,47 +149,38 @@ define([
                         );
                         break;
                     default:
-                        let message = lang.message.unknown_error;
-
-                        if(response.error === 'UNKNOWN_DEVICE') {
-                            message = lang.message.unknown_device;
-                        }
-
                         AlertActions.showPopupError(
                             'unhandle-exception',
-                            message
+                            lang.message.unknown_error
                         );
                     }
-                }
-            })
-        );
+                },
+                availableUsbChannel: device.source === 'h2h' ? device.addr : -1
+            });
+        }
 
-        ProgressActions.open(ProgressConstants.NONSTOP);
-        if(_existConnection(uuid)) {
-            _device = _switchDevice(uuid);
-            d.resolve(DeviceConstants.CONNECTED);
-        }
-        else {
-            _device = {};
-            _device.uuid = uuid;
-            _device.name = device.name;
-        }
+        const startUsbStatusReporter = () => {
+            this.usbReporter = setInterval(() => {
+                SocketMaster.addTask('report').then((report) => {
+                    console.log('usb device report', report);
+                    this.usbDeviceReport = report;
+                });
+            }, 2000);
+        };
 
         const initSocketMaster = () => {
             SocketMaster = new Sm();
+            SocketMaster.setWebSocket(_device.actions);
             // if availableUsbChannel has been defined
-            if(typeof this.availableUsbChannel !== 'undefined') {
-                _device.actions = createDeviceActions(this.availableUsbChannel);
-                SocketMaster.setWebSocket(_device.actions);
-            }
+            // if(typeof this.availableUsbChannel !== 'undefined') {
+            //     console.log(this.availableUsbChannel);
+            //     _device.actions = createDeviceActions(this.availableUsbChannel);
+            //     SocketMaster = new Sm();
+            //     SocketMaster.setWebSocket(_device.actions);
+            // }
         };
 
         initSocketMaster();
-
-        UsbChecker((availableUsbChannel) => {
-            this.availableUsbChannel = availableUsbChannel;
-            initSocketMaster();
-        });
 
         return d.always(() => {
             ProgressActions.close();
@@ -580,16 +582,10 @@ define([
 
     function streamCamera(uuid) {
         let cameraStream = new Rx.Subject(),
-            timeToReset = 20000,
-            opts;
-
-        opts = {
-            availableUsbChannel: this.availableUsbChannel,
-            onError: function(message) { console.log('error from camera ws', message); }
-        };
+            timeToReset = 20000;
 
         const initCamera = () => {
-            _device.camera = Camera(uuid, opts);
+            _device.camera = Camera(uuid);
             _device.camera.startStream((imageBlob) => {
                 processCameraResult(imageBlob);
             });
@@ -675,6 +671,7 @@ define([
         const step2 = () => {
             let _d = $.Deferred();
             SocketMaster.addTask('calibrate').then((response) => {
+                console.log("calibrate resp", response)
                 debug_data = response.debug;
                 return SocketMaster.addTask('endMaintainMode');
             }).then(() => {
@@ -729,6 +726,7 @@ define([
                     _d.reject(response);
                 }
             }).then((response) => {
+                console.log('task home', response);
                 response.status === 'ok' ? _d.resolve() : _d.reject();
             }).fail((error) => {
                 _d.reject(error);
@@ -941,6 +939,69 @@ define([
         return SocketMaster.addTask('getHeadStatus');
     }
 
+    function startMonitorUsb() {
+        let ws = {},
+            requestingReport,
+            deviceInfo = {};
+
+        const createWebSocket = (availableUsbChannel = -1) => {
+            if(availableUsbChannel === -1) { return; }
+            let url = `control/usb/${availableUsbChannel}`;
+
+            return SimpleWebsocket(url, handleMessage, handleError);
+        };
+
+        const handleMessage = (response) => {
+            if(response.cmd === 'play report') {
+                // specify nickname with usb
+                usbDeviceReport = Object.assign(deviceInfo, response.device_status);
+                requestingReport = setTimeout(() => {
+                    getUsbDeviceReport();
+                }, 2000);
+            }
+        };
+
+        const handleError = (error) => {
+            usbDeviceReport = {};
+            console.log('handle error', error);
+        };
+
+        const getUsbDeviceReport = () => {
+            ws.send('play report');
+        }
+
+        // returns the available channel, -1 otherwise
+        UsbChecker((availableUsbChannel, info) => {
+            console.log(`availableUsbChannel: ${availableUsbChannel}`, info);
+            this.availableUsbChannel = availableUsbChannel;
+            // deviceInfo = info;
+
+            // if(availableUsbChannel !== -1) {
+            //     createWebSocket(availableUsbChannel)
+            //     .then((websocket) => {
+            //         console.log('initailized', websocket);
+            //         ws = websocket;
+            //         getUsbDeviceReport();
+            //     })
+            //     .catch((error) => {
+            //         console.log(error);
+            //     });
+            // }
+            // else {
+            //     clearTimeout(requestingReport);
+            // }
+        });
+    }
+
+    function getAvailableUsbChannel() {
+        return this.availableUsbChannel;
+    }
+
+    function getUsbDeviceInfo() {
+        this.availableUsbChannel = this.availableUsbChannel || -1;
+        return this.availableUsbChannel === -1 ? {} : this.usbDeviceInfo;
+    }
+
     // Core
 
     function DeviceSingleton() {
@@ -998,14 +1059,16 @@ define([
             this.killSelf               = killSelf;
             this.setHeadTemperature     = setHeadTemperature;
             this.getHeadStatus          = getHeadStatus;
+            this.startMonitorUsb        = startMonitorUsb;
+            this.getUsbDeviceInfo       = getUsbDeviceInfo;
 
             Discover(
                 'device-master',
                 function(devices) {
                     devices = DeviceList(devices);
-                    for(let i in devices) {
-                        _deviceNameMap[devices[i].name] = devices[i];
-                    }
+                    devices.forEach(d => {
+                        _deviceNameMap[d.name] = d;
+                    });
                     _scanDeviceError(devices);
 
                 }

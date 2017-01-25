@@ -3777,6 +3777,16 @@ input[type=range]:focus::-webkit-slider-runnable-track {
                             width: 150px; }
                         .top-menu .device .menu .device-list ul li .status {
                             width: 130px; }
+                        .top-menu .device .menu .device-list ul li .type {
+                            line-height: 20px; }
+                            .top-menu .device .menu .device-list ul li .type img {
+                                margin-top: 10px;
+                                image-rendering: optimizeSpeed;
+                                image-rendering: -moz-crisp-edges;
+                                image-rendering: -webkit-optimize-contrast;
+                                image-rendering: optimize-contrast;
+                                image-rendering: pixelated;
+                                -ms-interpolation-mode: nearest-neighbor; }
                         .top-menu .device .menu .device-list ul li:hover {
                             background-color: #999;
                             color: #FFF; }
