@@ -4,11 +4,14 @@
  */
 define([
     'jquery',
+    'helpers/i18n',
     'helpers/websocket',
     'helpers/convertToTypedArray',
     'app/constants/device-constants',
-    'helpers/rsa-key'
-], function($, Websocket, convertToTypedArray, DeviceConstants, rsaKey) {
+    'helpers/rsa-key',
+    'app/actions/alert-actions',
+    'app/actions/progress-actions'
+], function($, i18n, Websocket, convertToTypedArray, DeviceConstants, rsaKey, AlertActions, ProgressActions) {
     'use strict';
 
     return function(uuid, opts) {
@@ -19,8 +22,8 @@ define([
         let timeout = 10000,
             timmer,
             isConnected = false,
+            lang = i18n.get(),
             ws,
-            lastOrder = '',
             dedicatedWs = [],
             fileInfoWsId = 0,
             events = {
@@ -37,8 +40,9 @@ define([
             };
 
         const createWs = () => {
+            let url = opts.availableUsbChannel >= 0 ? `usb/${opts.availableUsbChannel}` : uuid;
             let _ws = new Websocket({
-                method: 'control/' + uuid,
+                method: `control/${url}`,
                 onMessage: (data) => {
                     switch (data.status) {
                     case 'connecting':
@@ -68,6 +72,13 @@ define([
                 onFatal: (response) => {
                     if(response.error === 'REMOTE_IDENTIFY_ERROR') {
                         createWs();
+                    }
+                    else if(response.error === 'UNKNOWN_DEVICE') {
+                        ProgressActions.close();
+                        AlertActions.showPopupError(
+                            'unhandle-exception',
+                            lang.message.unknown_device
+                        );
                     }
                     else {
                         clearTimeout(timmer);
@@ -547,7 +558,6 @@ define([
             },
 
             setHeadTemperature: (temperature) => {
-                console.log('setting head temperature', temperature);
                 return useDefaultResponse(`maintain set_heater 0 ${temperature}`);
             },
 

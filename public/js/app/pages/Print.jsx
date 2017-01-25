@@ -447,9 +447,13 @@ define([
                         });
                     }.bind(this));
                     advancedSettings.raft = isOn ? 1 : 0;
+
+                    let {custom} = advancedSettings;
+
                     advancedSettings.custom = advancedSettings.custom.replace(
                         `raft = ${isOn ? 0 : 1}`,
                         `raft = ${isOn ? 1 : 0}`);
+
                     this._saveSetting();
                 },
 
