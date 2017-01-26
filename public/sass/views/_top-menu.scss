@@ -212,6 +212,10 @@
 
                         .progress {}
 
+                        .type {
+                            padding-top: 3px;
+                        }
+
                         &:hover {
                             background-color: $primaryColor;
                             color: #FFF;

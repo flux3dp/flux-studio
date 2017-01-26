@@ -154,9 +154,26 @@ define([
                             lang.message.unknown_error
                         );
                     }
+// <<<<<<< Updated upstream
                 },
                 availableUsbChannel: device.source === 'h2h' ? device.addr : -1
             });
+// =======
+// <<<<<<< Updated upstream
+//                 }
+//             })
+//         );
+//
+//         ProgressActions.open(ProgressConstants.NONSTOP);
+//         if(_existConnection(uuid)) {
+//             _device = _switchDevice(uuid);
+//             d.resolve(DeviceConstants.CONNECTED);
+//         }
+//         else {
+//             _device = {};
+//             _device.uuid = uuid;
+//             _device.name = device.name;
+// >>>>>>> Stashed changes
         }
 
         const startUsbStatusReporter = () => {
@@ -182,6 +199,43 @@ define([
 
         initSocketMaster();
 
+// <<<<<<< Updated upstream
+// =======
+        UsbChecker((availableUsbChannel) => {
+            this.availableUsbChannel = availableUsbChannel;
+            initSocketMaster();
+        });
+// =======
+//                 },
+//                 availableUsbChannel: device.source === 'h2h' ? device.addr : -1
+//             });
+//         }
+//
+//         const startUsbStatusReporter = () => {
+//             this.usbReporter = setInterval(() => {
+//                 SocketMaster.addTask('report').then((report) => {
+//                     console.log('usb device report', report);
+//                     this.usbDeviceReport = report;
+//                 });
+//             }, 2000);
+//         };
+//
+//         const initSocketMaster = () => {
+//             SocketMaster = new Sm();
+//             SocketMaster.setWebSocket(_device.actions);
+//             // if availableUsbChannel has been defined
+//             // if(typeof this.availableUsbChannel !== 'undefined') {
+//             //     console.log(this.availableUsbChannel);
+//             //     _device.actions = createDeviceActions(this.availableUsbChannel);
+//             //     SocketMaster = new Sm();
+//             //     SocketMaster.setWebSocket(_device.actions);
+//             // }
+//         };
+//
+//         initSocketMaster();
+// >>>>>>> Stashed changes
+
+// >>>>>>> Stashed changes
         return d.always(() => {
             ProgressActions.close();
         }).promise();
@@ -939,7 +993,7 @@ define([
         return SocketMaster.addTask('getHeadStatus');
     }
 
-    function startMonitorUsb() {
+    function startMonitoringUsb() {
         let ws = {},
             requestingReport,
             deviceInfo = {};
@@ -955,6 +1009,7 @@ define([
             if(response.cmd === 'play report') {
                 // specify nickname with usb
                 usbDeviceReport = Object.assign(deviceInfo, response.device_status);
+                clearTimeout(requestingReport);
                 requestingReport = setTimeout(() => {
                     getUsbDeviceReport();
                 }, 2000);
@@ -968,7 +1023,7 @@ define([
 
         const getUsbDeviceReport = () => {
             ws.send('play report');
-        }
+        };
 
         // returns the available channel, -1 otherwise
         UsbChecker((availableUsbChannel, info) => {
@@ -994,12 +1049,18 @@ define([
     }
 
     function getAvailableUsbChannel() {
-        return this.availableUsbChannel;
+        return this.availableUsbChannel || -1;
     }
 
     function getUsbDeviceInfo() {
-        this.availableUsbChannel = this.availableUsbChannel || -1;
-        return this.availableUsbChannel === -1 ? {} : this.usbDeviceInfo;
+        // this.availableUsbChannel = this.availableUsbChannel || -1;
+        // if(this.availableUsbChannel !== -1) {
+        //
+        // }
+        // else {
+        //     return {};
+        // }
+        // return this.availableUsbChannel === -1 ? {} : this.usbDeviceInfo;
     }
 
     // Core
@@ -1059,8 +1120,9 @@ define([
             this.killSelf               = killSelf;
             this.setHeadTemperature     = setHeadTemperature;
             this.getHeadStatus          = getHeadStatus;
-            this.startMonitorUsb        = startMonitorUsb;
+            this.startMonitoringUsb     = startMonitoringUsb;
             this.getUsbDeviceInfo       = getUsbDeviceInfo;
+            this.getAvailableUsbChannel = getAvailableUsbChannel;
 
             Discover(
                 'device-master',

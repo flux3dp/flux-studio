@@ -4,19 +4,34 @@
  */
 define([
     'jquery',
+    'helpers/device-master',
     'helpers/websocket',
     'helpers/api/config',
     'helpers/rsa-key'
-], function($, Websocket, Config, rsaKey) {
+], function($, DeviceMaster, Websocket, Config, rsaKey) {
     'use strict';
 
-    var ws = null;
+    let ws = null,
+        usbChannel = -1;
 
     return function(globalOpts) {
         globalOpts = globalOpts || {};
         globalOpts.onError = globalOpts.onError || function() {};
         globalOpts.onFatal = globalOpts.onFatal || function() {};
         globalOpts.onClose = globalOpts.onClose || function() {};
+
+        if(usbChannel !== DeviceMaster.getAvailableUsbChannel()) {
+            ws = null;
+            usbChannel = DeviceMaster.getAvailableUsbChannel();
+        }
+
+        const initializeWebSocket = () => {
+            let method = usbChannel === -1 ? 'usb-config' : `device-manager/usb/${usbChannel}`;
+            ws = new Websocket({
+                method: method,
+                autoReconnect: false
+            });
+        };
 
         var events = {
                 onMessage: function() {}
@@ -30,22 +45,17 @@ define([
             };
 
         if (null === ws) {
-            ws = new Websocket({
-                method: 'usb-config',
-                autoReconnect: false
-            });
+            initializeWebSocket();
         }
 
-        ws.onMessage(function(data) {
-
-            events.onMessage(data);
-
-        });
+        ws.onMessage(data => { events.onMessage(data); });
 
         // singleton object should reset events everytime.
         ws.onError(globalOpts.onError);
         ws.onFatal(globalOpts.onFatal);
         ws.onClose(globalOpts.onClose);
+
+
 
         return {
             connection: ws,
@@ -94,7 +104,22 @@ define([
 
                 };
 
-                ws.send('list');
+                if(usbChannel === -1) {
+                    ws.send('list');
+                }
+                else {
+                    console.log('device info', DeviceMaster.getUsbDeviceInfo());
+                    events.onMessage = (r) => {
+                        if(r.status === 'connected') {
+                            let deviceInfo = Object.assign({}, r);
+                            delete deviceInfo.status;
+                            console.log(deviceInfo);
+                            opts.onSuccess(deviceInfo);
+                        }
+                    };
+
+                    ws.send(rsaKey());
+                }
             },
 
             connect: function(port, opts) {
@@ -140,27 +165,28 @@ define([
                 events.onMessage = function(data) {
                     if ('ok' === data.status) {
                         data.items = data.items || [];
+                        let w = data.wifi || data.access_points || [];
 
-                        data.wifi.forEach(function(wifi, i) {
+                        w.forEach(function(wifi, i) {
                             wifi.rssi = Math.abs(wifi.rssi || 0);
 
                             if (75 < wifi.rssi) {
-                                data.wifi[i].strength = strength.BEST;
+                                wifi.strength = strength.BEST;
                             }
                             else if (50 < strength) {
-                                data.wifi[i].strength = strength.GOOD;
+                                wifi.strength = strength.GOOD;
                             }
                             else if (25 < strength) {
-                                data.wifi[i].strength = strength.POOR;
+                                wifi.strength = strength.POOR;
                             }
                             else {
-                                data.wifi[i].strength = strength.BAD;
+                                wifi.strength = strength.BAD;
                             }
 
                             data.items.push({
-                                security: data.wifi[i].security,
-                                ssid: data.wifi[i].ssid,
-                                password: ('' !== data.wifi[i].security),
+                                security: wifi.security,
+                                ssid: wifi.ssid,
+                                password: ('' !== wifi.security),
                                 rssi: wifi.rssi,
                                 strength: wifi.strength
                             });
@@ -175,7 +201,12 @@ define([
                     $deferred.fail(response);
                 });
 
-                ws.send('scan_wifi');
+                if(usbChannel === -1) {
+                    ws.send('scan_wifi');
+                }
+                else {
+                    ws.send('scan_wifi_access_points');
+                }
 
                 return $deferred.promise();
             },
@@ -216,7 +247,17 @@ define([
                     }
                 };
 
-                ws.send(args.join(' '));
+                if(usbChannel === -1) {
+                    ws.send(args.join(' '));
+                }
+                else {
+                    let params = [];
+                    Object.keys(wifiConfig).forEach(k => {
+                        params.push(`${k}="${wifiConfig[k]}"`);
+                    });
+
+                    ws.send(`set_network ${params.join(' ')}`);
+                }
             },
 
             getMachineNetwork: function(deferred) {
@@ -227,20 +268,38 @@ define([
                     response.ipaddr = response.ipaddr || [];
                     response.ssid = response.ssid || '';
 
-                    if ('ok' === response.status &&
-                        0 < response.ipaddr.length &&
-                        true === ipv4Pattern.test(response.ipaddr[0]) &&
-                        '' !== response.ssid
-                    ) {
-                        response.action = 'GOOD';
-                        $deferred.resolve(response);
+                    if(usbChannel === -1) {
+                        if ('ok' === response.status &&
+                            0 < response.ipaddr.length &&
+                            true === ipv4Pattern.test(response.ipaddr[0]) &&
+                            '' !== response.ssid
+                        ) {
+                            response.action = 'GOOD';
+                            $deferred.resolve(response);
+                        }
+                        else {
+                            $deferred.notify({ action: 'TRY_AGAIN' });
+                        }
                     }
                     else {
-                        $deferred.notify({ action: 'TRY_AGAIN' });
+                        if(response.status === 'ok' && response.ssid !== '') {
+                            $deferred.resolve(response);
+                        }
+                        else if(response.status === 'error') {
+                            $deferred.reject(response);
+                        }
+                        else {
+                            $deferred.notify({ action: 'TRY_AGAIN' });
+                        }
                     }
                 };
 
-                ws.send('get network');
+                if(usbChannel === -1) {
+                    ws.send('get network');
+                }
+                else {
+                    ws.send('get_wifi_ssid');
+                }
 
                 ws.onError(function(data) {
                     $deferred.notify({ action: 'ERROR' });
@@ -265,23 +324,33 @@ define([
                 return {
                     name: function(name, _opts) {
                         opts.onSuccess = _opts.onSuccess || function() {};
-                        args = [
-                            'set general',
-                            JSON.stringify({
-                                name: name
-                            })
-                        ];
-                        ws.send(args.join(' '));
+                        if(usbChannel === -1) {
+                            args = [
+                                'set general',
+                                JSON.stringify({
+                                    name: name
+                                })
+                            ];
+                            ws.send(args.join(' '));
+                        }
+                        else {
+                            ws.send(`set_nickname ${JSON.stringify(name)}`);
+                        }
                     },
                     password: function(password, _opts) {
                         opts.onSuccess = _opts.onSuccess || function() {};
-                        args = [
-                            'set password',
-                            password
-                        ];
 
                         if ('' !== password) {
-                            ws.send(args.join(' '));
+                            if(usbChannel === -1) {
+                                args = [
+                                    'set password',
+                                    password
+                                ];
+                                ws.send(args.join(' '));
+                            }
+                            else {
+                                ws.send(`reset_password ${JSON.stringify(password)}`);
+                            }
                         }
                         else {
                             opts.onSuccess();
@@ -293,16 +362,14 @@ define([
             setAPMode: function(ssid, pass, opts) {
                 opts = reorganizeOptions(opts);
 
-                var args = [
-                    'set network',
-                    JSON.stringify({
+                var args = [ 'set network' ],
+                    wifiConfig = {
                         ssid: ssid,
                         psk: pass,
                         security: 'WPA2-PSK',
                         wifi_mode: 'host',
                         method: 'dhcp'
-                    })
-                ];
+                    }
 
                 events.onMessage = function(data) {
                     if ('ok' === data.status) {
@@ -311,16 +378,26 @@ define([
                 };
 
                 ws.onError(opts.onError);
-                ws.send(args.join(' '));
+
+                if(usbChannel === -1) {
+                    args.push(JSON.stringify(wifiConfig));
+                    ws.send(args.join(' '));
+                }
+                else {
+                    let params = [];
+                    Object.keys(wifiConfig).forEach(k => {
+                        params.push(`${k}="${wifiConfig[k]}"`);
+                    });
+
+                    ws.send(`set_network ${params.join(' ')}`);
+                }
             },
 
             auth: function(password, opts) {
                 password = password || '';
                 opts = reorganizeOptions(opts);
 
-                var args = [
-                    'auth'
-                ];
+                var args = [ 'auth' ];
 
                 if ('' !== password) {
                     args.push(password);

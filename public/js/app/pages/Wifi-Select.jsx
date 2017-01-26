@@ -125,11 +125,13 @@ define([
 
                     switch (nextAction) {
                     case 'SCAN_WIFI':
-                        setTimeout(() => {
+                        clearTimeout(this.t);
+                        this.t = setTimeout(() => {
                             getWifi();
                         }, 5000);
                         break;
                     case 'STOP_SCAN':
+                        clearTimeout(this.t);
                         ProgressActions.open(ProgressConstants.NONSTOP);
                         self._afterStopWifiScanning({
                             action: self.action
@@ -137,8 +139,8 @@ define([
                         break;
                     }
 
-                }).
-                fail(function(response) {
+                })
+                .fail(function(response) {
                     AlertActions.showPopupError(
                         'wifi-scan-error',
                         response.error
@@ -303,6 +305,7 @@ define([
                 var settingWifi = initializeMachine.settingWifi.get();
 
                 if (true === settingWifi.password) {
+                    this._stopScan();
                     this.setState({
                         openPassword: true
                     });
@@ -372,6 +375,7 @@ define([
 
                 let wifi = { ssid, security };
                 initializeMachine.settingWifi.set(wifi);
+                this._stopScan();
                 globalWifiAPI.setWifiNetwork(wifi, wepkey, true).then((result) => {
                     if(result.status === 'ok') {
                         location.hash = '#initialize/wifi/notice-from-device';
@@ -401,7 +405,7 @@ define([
                         },
                         onClick: function(e) {
                             e.preventDefault();
-
+                            self._startScan();
                             self.setState({
                                 openPassword: false
                             });

@@ -118,11 +118,11 @@ define([
                     }
 
                     self._setSettingPrinter(currentPrinter);
-                }).
-                always(() => {
+                })
+                .always(() => {
                     self._toggleBlocker(false);
-                }).
-                progress(function(response) {
+                })
+                .progress(function(response) {
                     switch (response.status) {
                     case 'error':
                         lastError = response;
@@ -179,12 +179,20 @@ define([
                             <img className="brand-image" src="/img/menu/main_logo.svg"/>
                             <div className="connecting-means">
                                 <div className="btn-h-group">
-                                    <button className="btn btn-action btn-large" data-ga-event="next-via-usb" onClick={this._onWifiStartingSetUp}>
+                                    <button
+                                        className="btn btn-action btn-large"
+                                        data-ga-event="next-via-usb"
+                                        onClick={this._onWifiStartingSetUp}
+                                    >
                                         <h1 className="headline">{lang.initialize.connect_flux}</h1>
                                         <p className="subtitle">{lang.initialize.via_wifi}</p>
                                         <img className="scene" src="/img/via-wifi.png"/>
                                     </button>
-                                    <button className="btn btn-action btn-large" data-ga-event="next-via-wifi" onClick={this._onUsbStartingSetUp}>
+                                    <button
+                                        className="btn btn-action btn-large"
+                                        data-ga-event="next-via-wifi"
+                                        onClick={this._onUsbStartingSetUp}
+                                    >
                                         <h1 className="headline">{lang.initialize.connect_flux}</h1>
                                         <p className="subtitle">{lang.initialize.via_usb}</p>
                                         <img className="scene" src="/img/wifi-plug-01.png"/>

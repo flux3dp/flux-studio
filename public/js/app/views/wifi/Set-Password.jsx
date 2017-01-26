@@ -30,16 +30,16 @@ define([
         },
         _renderActions: function(lang) {
             return this.state.connecting ? (
-                    <div>
-                        <div><img className="loading" src="/img/ring.svg" /></div>
-                        <div>{lang.wifi.set_password.connecting}</div>
-                    </div>
-                ) : (
-                    <div className="btn-h-group">
-                        <a id="btn-cancel" className="btn" onClick={this._handleBack}>{lang.wifi.set_password.back}</a>
-                        <a id="btn-join" className="btn" onClick={this._handleJoin}>{lang.wifi.set_password.join}</a>
-                    </div>
-                );
+                <div>
+                    <div><img className="loading" src="/img/ring.svg" /></div>
+                    <div>{lang.wifi.set_password.connecting}</div>
+                </div>
+            ) : (
+                <div className="btn-h-group">
+                    <a id="btn-cancel" className="btn" onClick={this._handleBack}>{lang.wifi.set_password.back}</a>
+                    <a id="btn-join" className="btn" onClick={this._handleJoin}>{lang.wifi.set_password.join}</a>
+                </div>
+            );
         },
         render : function() {
             var lang = this.props.lang,
@@ -61,7 +61,7 @@ define([
                         {actions}
                     </div>
                 </div>
-            )
+            );
         }
 
     });

@@ -44,6 +44,7 @@ define([
             if (device.alive) {
                 device.uuid = device.addr ? device.addr : device.uuid;
                 _devices[device.uuid] = device;
+
                 //SmartUpnp.addSolidIP(device.ip);
             }
             else {
@@ -65,7 +66,7 @@ define([
             }, BUFFER);
         },
         poke = function(targetIP) {
-            _devices = [];
+            printers = [];
             ws.send(JSON.stringify({ 'cmd' : 'poke', 'ipaddr': targetIP }));
         },
         BUFFER = 100,
