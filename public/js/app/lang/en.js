@@ -204,7 +204,7 @@ define(function() {
 
                 keep_connect: {
                     caption: 'USB Device not found',
-                    content: 'Oops! Don\'t worry. We\'re here for you.\nMake sure your FLUX Delta has been powered \non, attached to Micro USB Cable and the driver \nis installed. <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/215327328">More Info</a>'
+                    content: 'Oops! Don\'t worry. We\'re here for you.\nMake sure\n1. Your FLUX Delta has been powered on\n2. Attached (or re-attach again) to USB Cable\n3. FLUX driver is installed.\n<a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/215327328">More Info</a>'
                 },
 
                 wifi_connection: {
@@ -1074,7 +1074,8 @@ define(function() {
             ask_for_upgrade: 'Do you wanna upgrade NOW?',
             need_1_1_7_above: 'Please update Delta Firmware to v1.1.7+',
             gcode_area_too_big: 'Imported gcode exceed the printable area.',
-            empty_file: 'File is empty'
+            empty_file: 'File is empty',
+            usb_unplugged: 'USB connection is lost, please check your USB connection'
         },
         machine_status: {
             '-10': 'Raw mode',

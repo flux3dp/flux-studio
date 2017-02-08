@@ -3590,14 +3590,18 @@ input[type=range]:focus::-webkit-slider-runnable-track {
             line-height: 2.8rem;
             overflow: hidden;
             text-overflow: ellipsis;
-            white-space: nowrap; }
+            white-space: nowrap;
+            text-align: left; }
         .select-printer .device .device-name {
-            padding: 0 0 0 1.7rem;
+            padding: 0 0 0 0.8rem;
             flex: calc(11 / 28.7 * 100%); }
         .select-printer .device .module {
-            flex: calc(3 / 28.7 * 100%); }
+            flex: calc(2 / 28.7 * 100%); }
         .select-printer .device .status {
-            flex: calc(5 / 28.7 * 100%); }
+            flex: calc(6 / 28.7 * 100%); }
+        .select-printer .device .connection-type {
+            flex: calc(1 / 28.7 * 100%);
+            padding-top: 3px; }
         .select-printer .device .close {
             cursor: pointer;
             position: absolute;
@@ -3776,17 +3780,22 @@ input[type=range]:focus::-webkit-slider-runnable-track {
                             padding-left: 5px;
                             width: 150px; }
                         .top-menu .device .menu .device-list ul li .status {
-                            width: 130px; }
-                        .top-menu .device .menu .device-list ul li .type {
-                            line-height: 20px; }
-                            .top-menu .device .menu .device-list ul li .type img {
-                                margin-top: 10px;
+                            width: 110px; }
+                        .top-menu .device .menu .device-list ul li .connection-type {
+                            line-height: 20px;
+                            padding-right: 10px; }
+                            .top-menu .device .menu .device-list ul li .connection-type img {
+                                margin-top: 7px;
                                 image-rendering: optimizeSpeed;
                                 image-rendering: -moz-crisp-edges;
                                 image-rendering: -webkit-optimize-contrast;
                                 image-rendering: optimize-contrast;
                                 image-rendering: pixelated;
                                 -ms-interpolation-mode: nearest-neighbor; }
+                        .top-menu .device .menu .device-list ul li .progress {
+                            width: 50px; }
+                        .top-menu .device .menu .device-list ul li .type {
+                            padding-top: 3px; }
                         .top-menu .device .menu .device-list ul li:hover {
                             background-color: #999;
                             color: #FFF; }

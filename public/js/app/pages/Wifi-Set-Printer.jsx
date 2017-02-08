@@ -7,6 +7,7 @@ define([
     'app/stores/alert-store',
     'helpers/api/config',
     'helpers/api/upnp-config',
+    'helpers/device-master',
     'app/actions/progress-actions',
     'app/constants/progress-constants'
 ], function(
@@ -18,6 +19,7 @@ define([
     AlertStore,
     Config,
     upnpConfig,
+    DeviceMaster,
     ProgressActions,
     ProgressConstants
 ) {
@@ -37,6 +39,17 @@ define([
                     validPrinterName     : true,
                     validPrinterPassword : true,
                     settingPrinter       : initializeMachine.settingPrinter.get()
+                };
+            },
+
+            componentDidMount: function() {
+                DeviceMaster.registerUsbEvent(this._monitorUsb);
+            },
+
+            _monitorUsb: function(usbOn) {
+                if(!usbOn) {
+                    AlertActions.showPopupError('USB_UNPLUGGED', this.state.lang.message.usb_unplugged);
+                    location.hash = '#initialize/wifi/connect-machine';
                 }
             },
 

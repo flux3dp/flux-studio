@@ -66,7 +66,6 @@ define([
                 },
 
                 componentDidMount: function() {
-                    console.log("Mount Laser!!!");
                     var self = this, lang = args.state.lang;
 
                     dndHandler.plug(document, self._onDropUpload);
@@ -89,9 +88,9 @@ define([
                     };
 
                     var laser_custom_bg = config().read('laser-custom-bg');
-                    if(laser_custom_bg)
+                    if(laser_custom_bg) {
                         $('.laser-object').css({background :'url(' + laser_custom_bg + ')', 'background-size': '100% 100%'});
-
+                    }
 
                     let setupPanelDefaults = config().read(storageDefaultKey) || {};
                     if ('laser' === self.props.page) {
@@ -105,20 +104,19 @@ define([
                             setupPanelDefaults.isShading :
                             true
                         );
-                    } else {
+                    }
+                    else {
                         setupPanelDefaults = {
                             liftHeight: setupPanelDefaults.liftHeight || 55,
                             drawHeight: setupPanelDefaults.drawHeight || 50,
                             speed: setupPanelDefaults.speed || 20
-                        }
+                        };
                     }
 
                     if ('' === setupPanelDefaults) {
                         config().write(storageDefaultKey, setupPanelDefaults);
                     }
 
-
-                    console.log(storageDefaultKey, setupPanelDefaults);
                     self.setState({
                         setupPanelDefaults
                     });

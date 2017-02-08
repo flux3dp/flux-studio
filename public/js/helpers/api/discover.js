@@ -7,20 +7,10 @@ define([
     'app/actions/initialize-machine',
     'helpers/api/config',
     'helpers/device-list',
-    // 'helpers/device-master',
     'helpers/logger',
     'helpers/smart-upnp',
     'helpers/array-findindex'
-], function(
-    Websocket,
-    initializeMachine,
-    config,
-    DeviceList,
-    // DeviceMaster,
-    Logger,
-    SmartUpnp,
-    ArrayFinxIndex
-) {
+], function(Websocket, initializeMachine, config, DeviceList, Logger, SmartUpnp, ArrayFinxIndex) {
     'use strict';
 
     var ws = ws || new Websocket({
@@ -33,16 +23,21 @@ define([
         _devices = {},
         sendFoundPrinter = function() {
             discoverLogger.clear().append(_devices);
+
             dispatchers.forEach(function(dispatcher) {
                 dispatcher.sender(_devices);
             });
         },
-        // findIndex = function(base, target) {
-        //     return base.uuid === target.uuid;
-        // },
+        findIndex = function(base, target) {
+            return base.uuid === target.uuid;
+        },
         onMessage = function(device) {
             if (device.alive) {
-                device.uuid = device.addr ? device.addr : device.uuid;
+                // console.log(device);
+                if(device.source === 'h2h') {
+                    device.uuid = device.addr.toString();
+                }
+                // console.log(device);
                 _devices[device.uuid] = device;
 
                 //SmartUpnp.addSolidIP(device.ip);
@@ -67,6 +62,7 @@ define([
         },
         poke = function(targetIP) {
             printers = [];
+            _devices = {};
             ws.send(JSON.stringify({ 'cmd' : 'poke', 'ipaddr': targetIP }));
         },
         BUFFER = 100,

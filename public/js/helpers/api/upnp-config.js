@@ -79,7 +79,7 @@ define([
                         AlertActions.showPopupError(response.error, lang.initialize.set_machine_generic.incorrect_password);
                     case 'UPNP_CONNECTION_FAIL':
                         InputLightboxActions.open('need_password', {
-                            type        : InputLightboxConstants.TEXT_INPUT,
+                            type        : InputLightboxConstants.TYPE_PASSWORD,
                             caption     : lang.message.need_password,
                             confirmText : lang.initialize.confirm,
                             onSubmit    : function(password) {

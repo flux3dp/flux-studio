@@ -115,6 +115,7 @@ define([
                         if(window.FLUX.allowTracking) {
                             window.Raven.captureException(data);
                         }
+                        console.log('sending fatal');
                         socketOptions.onFatal(data);
                         break;
                     // ignore below status

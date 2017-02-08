@@ -197,20 +197,23 @@
                         }
 
                         .status {
-                            width: 130px;
+                            width: 110px;
                         }
 
-                        .type {
+                        .connection-type {
                             line-height: 20px;
+                            padding-right: 10px;
 
                             img {
-                                margin-top: 10px;
+                                margin-top: 7px;
                                 image-rendering: optimizeSpeed;
                                 image-rendering: -moz-crisp-edges;image-rendering: -webkit-optimize-contrast;image-rendering: optimize-contrast;image-rendering: pixelated; -ms-interpolation-mode: nearest-neighbor;
                             }
                         }
 
-                        .progress {}
+                        .progress {
+                            width: 50px;
+                        }
 
                         .type {
                             padding-top: 3px;

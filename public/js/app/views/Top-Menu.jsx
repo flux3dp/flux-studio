@@ -99,6 +99,8 @@ define([
                 AlertStore.onCancel(this._toggleDeviceListBind);
                 AlertStore.onRetry(this._waitForPrinters);
                 GlobalStore.onMonitorClosed(this._toggleDeviceListBind);
+
+                DeviceMaster.startMonitoringUsb();
             },
 
             componentWillUnmount: function() {
@@ -232,6 +234,8 @@ define([
                             progress = '';
                         }
 
+                        let img = `/img/icon_${device.source === 'h2h' ? 'usb' : 'wifi' }.svg`;
+
                         return (
                             <li
                                 name={device.uuid}
@@ -239,8 +243,10 @@ define([
                                 <label className="name">{device.name}</label>
                                 <label className="status">{headText} {statusText}</label>
                                 <label className="progress">{progress}</label>
-                                <label className="type">
-                                    <img src={`/img/icon_${device.source === 'h2h' ? 'usb' : 'wifi'}.svg`} />
+                                <label className="connection-type">
+                                    <div className="type">
+                                        <img src={img} />
+                                    </div>
                                 </label>
                             </li>
                         );

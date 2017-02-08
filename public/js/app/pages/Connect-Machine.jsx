@@ -51,6 +51,7 @@ define([
 
                 usb.list({
                     onSuccess: function(response) {
+                        response = response || {};
                         self._toggleBlocker(false);
                         response.from = 'USB';
                         self._setSettingPrinter(response);

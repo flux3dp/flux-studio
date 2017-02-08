@@ -204,7 +204,7 @@ define(function() {
 
                 keep_connect: {
                     caption: '無法透過 USB 連接',
-                    content: '別擔心！請確認電源已被開啟及使用 Micro-Usb 連接機器，並正確安裝驅動程式。<a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/215327328">瞭解更多</a>'
+                    content: '別擔心！請確認電源已被開啟及使用 USB 連接（或重新接上）機器，並正確安裝驅動程式。<a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/215327328">瞭解更多</a>'
                 },
 
                 wifi_connection: {
@@ -1088,7 +1088,8 @@ define(function() {
             ask_for_upgrade: '馬上升級嗎?',
             need_1_1_7_above: '請更新 Delta 韌體到 v1.1.7 以上',
             gcode_area_too_big: '匯入的 gcode 檔案超過列印範圍',
-            empty_file: '檔案內容不存在'
+            empty_file: '檔案內容不存在',
+            usb_unplugged: 'USB 被拔除，請確認 USB 與機器的連接'
         },
         machine_status: {
             '-10': '原生模式',

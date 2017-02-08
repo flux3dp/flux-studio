@@ -30,6 +30,7 @@ define([
     'helpers/check-firmware',
     'helpers/firmware-updater',
     'helpers/device-list',
+    'helpers/device-master',
     'Raven',
 ], function(
     $,
@@ -63,6 +64,7 @@ define([
     checkFirmware,
     firmwareUpdater,
     DeviceList,
+    DeviceMaster,
     Raven
 ) {
     'use strict';
@@ -161,9 +163,9 @@ define([
                     AlertActions.showPopupError('unsupported_mac_osx', lang.message.unsupport_osx_version);
                 }
 
-                ProgressStore.onOpened(this._handleProgress).
-                    onUpdating(this._handleProgress).
-                    onClosed(this._handleProgressFinish);
+                ProgressStore.onOpened(this._handleProgress)
+                    .onUpdating(this._handleProgress)
+                    .onClosed(this._handleProgressFinish);
                 InputLightboxStore.onInputLightBoxOpened(this._handleInputLightBoxOpen);
 
                 GlobalStore.onShowMonitor(this._handleOpenMonitor);
@@ -208,6 +210,8 @@ define([
                 if(!window.FLUX.dev) {
                     Raven.setUserContext({ extra: { version: window.FLUX.version } });
                 }
+
+                DeviceMaster.registerUsbEvent(this._monitorUsb);
             },
 
             componentWillUnmount: function() {
@@ -228,6 +232,15 @@ define([
                 GlobalStore.removeCloseMonitorListener();
                 GlobalStore.removeCloseAllViewListener();
                 GlobalStore.removeSliceCompleteListener();
+            },
+
+            _monitorUsb: function(usbOn) {
+                if(this.state.showMonitor) {
+                    if(!usbOn) {
+                        this._handlecloseMonitor();
+                        AlertActions.showPopupError('USB_UNPLUGGED', lang.message.usb_unplugged);
+                    }
+                }
             },
 
             _onYes: function(id) {

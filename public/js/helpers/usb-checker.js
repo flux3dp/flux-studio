@@ -47,9 +47,11 @@ define([
                         hasError = true;
                     }
                 }
+
                 if(response.devopen) {
                     availableUsbChannel = response.devopen;
                     usbConnected = true;
+                    initialize = true;
                     callback(availableUsbChannel);
                 }
             }

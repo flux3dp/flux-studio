@@ -220,7 +220,6 @@ define([
 
                 componentDidMount: function() {
                     director.init(this);
-                    DeviceMaster.startMonitoringUsb();
 
                     // prevent user to operate before settings are set
                     this.showWait();
