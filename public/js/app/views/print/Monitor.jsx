@@ -700,6 +700,7 @@ define([
 
                 if(this._isAbortedOrCompleted()) {
                     DeviceMaster.quit();
+                    store.dispatch(MonitorActionCreator.changeMode(mode.PREVIEW));
                 }
             }
         },
