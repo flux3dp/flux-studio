@@ -23,10 +23,7 @@ define([
             },
 
             _onStart: function(e) {
-                var usb = usbConfig();
-                initializeMachine.completeSettingUp(true).always(() => {
-                    usb.close();
-                });                
+                initializeMachine.completeSettingUp(true);
             },
 
             _getArticle: function(lang) {

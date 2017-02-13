@@ -7,7 +7,8 @@ define([
         usbConnected = false,
         hasError = false,
         availableUsbChannel,
-        interval = 2000;
+        interval = 3000,
+        ws;
 
     // callback should receive opened usb channel, -1 if not available
     return function(callback) {
@@ -57,14 +58,17 @@ define([
             }
         };
 
-        let ws = new Websocket({
-            method: 'usb/interfaces',
-            onMessage: processResult,
-            onError: processResult,
-            onFatal: processResult
-        });
+        if(!ws) {
+            ws = new Websocket({
+                method: 'usb/interfaces',
+                onMessage: processResult,
+                onError: processResult,
+                onFatal: processResult
+            });
+        }
 
+        clearInterval(this.t);
         ws.send('list');
-        setInterval(() => { ws.send('list'); }, interval);
+        this.t = setInterval(() => { ws.send('list'); }, interval);
     };
 });

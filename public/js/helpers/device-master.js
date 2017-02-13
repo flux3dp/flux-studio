@@ -9,7 +9,7 @@ define([
     'app/constants/device-constants',
     'helpers/api/control',
     'helpers/api/3d-scan-control',
-    'helpers/api/usb-checker',
+    'helpers/usb-checker',
     'helpers/api/touch',
     'helpers/api/discover',
     'helpers/api/config',

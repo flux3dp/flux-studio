@@ -639,7 +639,9 @@ define([
                 let state = [
                     DeviceConstants.status.PAUSED_FROM_STARTING,
                     DeviceConstants.status.PAUSED_FROM_RUNNING,
-                    DeviceConstants.status.ABORTED
+                    DeviceConstants.status.ABORTED,
+                    DeviceConstants.status.PAUSING_FROM_RUNNING,
+                    DeviceConstants.status.PAUSING_FROM_STARTING
                 ];
 
                 // always process as error, hard fix for backend
@@ -666,6 +668,7 @@ define([
                             if(errorMessage === '') {
                                 if(error.length >= 2) {
                                     errorMessage = lang.monitor[error.slice(0,2).join('_')];
+                                    errorMessage = errorMessage || error.join('_');
                                 }
                                 else {
                                     errorMessage = error;

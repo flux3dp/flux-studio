@@ -22,7 +22,7 @@ define([
 
     var lang = i18n.get();
 
-    return function(printer) {
+    return function(printer, bypassPause) {
         var deferred = $.Deferred(),
             onYes = function(id) {
                 var timer;
