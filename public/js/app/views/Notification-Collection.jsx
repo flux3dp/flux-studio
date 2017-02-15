@@ -211,6 +211,8 @@ define([
                     Raven.setUserContext({ extra: { version: window.FLUX.version } });
                 }
 
+                this._checkOsxRequirement();
+
                 DeviceMaster.registerUsbEvent(this._monitorUsb);
             },
 
@@ -232,6 +234,27 @@ define([
                 GlobalStore.removeCloseMonitorListener();
                 GlobalStore.removeCloseAllViewListener();
                 GlobalStore.removeSliceCompleteListener();
+            },
+
+            _checkOsxRequirement: function() {
+                if(window.FLUX.isNW && localStorage.getItem('dev') !== '1') {
+                    if(process.env.osType === 'osx') {
+                        let pathArray = process.env.launched.split('/');
+                        if(pathArray[1] !== 'Applications') {
+                            AlertActions.showPopupError(
+                                'LAUNCHING_FROM_INSTALLER_WARNING',
+                                lang.message.launghing_from_installer_warning
+                            );
+                        }
+                    }
+
+
+                    console.log(
+                        process.env.launched,
+                        process.env.osType,
+                        localStorage.getItem('dev')
+                    );
+                }
             },
 
             _monitorUsb: function(usbOn) {

@@ -92,6 +92,7 @@ var process = nw.process,
             args[curaPathIndex] = libPath + '/lib/CuraEngine';
             ghostCmd = libPath + '/lib/flux_api/flux_api';
         }
+        process.env.launched = libPath;
 
         try {
             fs.chmodSync(args[slic3rPathIndex], 0777);
