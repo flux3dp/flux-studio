@@ -247,13 +247,6 @@ define([
                             );
                         }
                     }
-
-
-                    console.log(
-                        process.env.launched,
-                        process.env.osType,
-                        localStorage.getItem('dev')
-                    );
                 }
             },
 
