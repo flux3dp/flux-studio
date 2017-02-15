@@ -27,6 +27,8 @@ define([
     };
 
     const processImage = (imageBlob) => {
+        if(imageBlob.size > 90000) $('.camera-image').addClass('hd');
+        if(imageBlob.size < 70000) $('.camera-image').removeClass('hd');
         $('.camera-image').attr('src', URL.createObjectURL(imageBlob));
     };
 
