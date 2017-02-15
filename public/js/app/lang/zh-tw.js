@@ -901,6 +901,7 @@ define(function() {
             initiating: '啟動中',
             unknown: '未知狀態',
             pausedFromError: '發生錯誤暫停',
+            model_name: '型號',
             IP: 'IP',
             serial_number: '序號',
             firmware_version: '韌體版本',

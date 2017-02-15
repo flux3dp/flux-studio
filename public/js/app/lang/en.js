@@ -887,6 +887,7 @@ define(function() {
             initiating: 'Initiating',
             unknown: 'Unknown',
             pausedFromError: 'paused from error',
+            model_name: 'Model Name',
             IP: 'IP',
             serial_number: 'Serial Number',
             firmware_version: 'Firmware Version',

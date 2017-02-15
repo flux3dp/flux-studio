@@ -399,7 +399,7 @@ define([
                     var currentPrinter = discoverMethods.getLatestPrinter(printer),
                         lang = i18n.get();
 
-                    var deviceInfo = `${lang.device.IP}: ${currentPrinter.ipaddr}\n${lang.device.serial_number}: ${currentPrinter.serial}\n${lang.device.firmware_version}: ${currentPrinter.version}\n${lang.device.UUID}: ${currentPrinter.uuid}`;
+                    var deviceInfo = `${lang.device.model_name}: ${currentPrinter.model.toUpperCase()}\n${lang.device.IP}: ${currentPrinter.ipaddr}\n${lang.device.serial_number}: ${currentPrinter.serial}\n${lang.device.firmware_version}: ${currentPrinter.version}\n${lang.device.UUID}: ${currentPrinter.uuid}`;
                     AlertActions.showPopupInfo('', deviceInfo);
                 }
             });
@@ -622,22 +622,23 @@ define([
                 enabled: true,
                 type: 'checkbox',
                 onClick: function() {
-                    var _currentPrinters = menuMap.all[menuMap.parentIndex.DEVICE].subItems,
-                        targetPrinter;
+                    var _printerItems = menuMap.all[menuMap.parentIndex.DEVICE].subItems,
+                        _targetPrinterItem;
 
-                    _currentPrinters.forEach(function(_printer, i) {
+                    _printerItems.forEach(function(_printer, i) {
                         if (1 < i) {
-                            _currentPrinters[i].subItems[4].checked = false;
+                            _printerItems[i].subItems[4].checked = false;
 
-                            if (printer.uuid === _currentPrinters[i].uuid) {
-                                targetPrinter = _currentPrinters[i];
+                            if (printer.uuid === _printerItems[i].uuid) {
+                                _targetPrinterItem = _printerItems[i];
                             }
                         }
                     });
 
+                    _targetPrinterItem.subItems[6].checked = true;
                     initializeMachine.defaultPrinter.clear();
-                    targetPrinter.subItems[6].checked = true;
                     initializeMachine.defaultPrinter.set(printer);
+                    Object.assign(defaultDevice, printer);
                     methods.refresh();
                 },
                 parent: menuMap.parentIndex.DEVICE,
