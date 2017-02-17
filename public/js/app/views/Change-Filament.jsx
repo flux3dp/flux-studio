@@ -119,7 +119,6 @@ define([
 
             _handleCancelJob: function(e) {
                 e.preventDefault();
-                console.log('is changing filament during pause', this.isChangingFilamentDuringPause);
                 if(this.isChangingFilamentDuringPause !== true) {
                     DeviceMaster.killSelf();
                 }
@@ -133,11 +132,15 @@ define([
                 var self = this,
                     nextStep = (self.state.type === DeviceConstants.LOAD_FILAMENT ? steps.EMERGING : steps.UNLOADING),
                     progress = function(response) {
-                        switch (response.stage[0]) {
+                        switch (response.stage[1]) {
                         case 'WAITTING':
                         case 'WAITING':
                         case 'LOADING':
-                            self._next(steps.EMERGING);
+                            self._next(steps.EMERGING, DeviceConstants.LOAD_FILAMENT);
+                            if(self.state.loading_status !== response.stage[1]) {
+                                self.setState({ loading_status: response.stage[1] });
+                                self.forceUpdate();
+                            }
                             break;
                         case 'UNLOADING':
                             self._next(steps.UNLOADING);
@@ -145,7 +148,7 @@ define([
                         default:
                             if(response.error) {
                                 if(response.error[0] === 'KICKED') {
-                                    this.setState(this.getInitialState());
+                                    self.setState(self.getInitialState());
                                 }
                             }
                             else {
@@ -378,7 +381,7 @@ define([
             _sectionEmerging: function() {
                 var self = this,
                     activeLang = i18n.getActiveLang(),
-                    imageSrc;
+                    imageSrc, message, buttons;
 
                 imageSrc = (
                     'en' === activeLang ?
@@ -386,13 +389,14 @@ define([
                     '/img/press-to-accelerate-zh-tw.png'
                 );
 
-                return {
-                    message: (
-                        <div className="message-container">
-                            <img className="guide-image" src={imageSrc}/>
-                        </div>
-                    ),
-                    buttons: [{
+                message = (
+                    <div className="message-container">
+                        <img className="guide-image" src={imageSrc}/>
+                    </div>
+                );
+
+                buttons = [
+                    {
                         label: 'ok',
                         className: 'btn-default btn-alone-right',
                         onClick: function(e) {
@@ -412,8 +416,9 @@ define([
                     {
                         label: [
                             <span className="auto-emerging">
-                                {this.state.type === DeviceConstants.LOAD_FILAMENT ?
-                                    lang.change_filament.auto_emerging : ''
+                                {this.state.loading_status === 'WAITING' ?
+                                    lang.change_filament.auto_emerging :
+                                    lang.change_filament.loading_filament
                                 }
                             </span>,
                             <div className="spinner-roller spinner-roller-reverse"/>
@@ -423,8 +428,10 @@ define([
                         onClick: function(e) {
                             e.preventDefault();
                         }
-                    }]
-                };
+                    }
+                ];
+
+                return { message, buttons };
             },
 
             _sectionUnloading: function() {

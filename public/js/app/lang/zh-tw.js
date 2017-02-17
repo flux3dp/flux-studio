@@ -1147,6 +1147,7 @@ define(function() {
             unloaded: '退料完成',
             ok: '確定',
             auto_emerging: '請插入線料',
+            loading_filament: '進料中',
             maintain_head_type_error: '列印工具頭未正確安裝',
             maintain_zombie: '請重新啟動機器',
             toolhead_no_response: '#117 列印模組沒有回應 <a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/218347477">暸解更多</a>'
