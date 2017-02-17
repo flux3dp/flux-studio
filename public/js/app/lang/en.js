@@ -268,7 +268,7 @@ define(function() {
                 general: 'General',
                 device: 'Device'
             },
-            ip: 'Machine IP',
+            ip: 'Machine IP Address',
             wrong_ip_format: 'Wrong IP Formats',
             projection: 'View Projection',
             projection_perspective: 'Perspective',
@@ -276,6 +276,10 @@ define(function() {
             antialiasing: 'Anti-aliasing',
             language: 'Language',
             notifications: 'Notifications',
+            default_model: 'Default Model\n(For Print Settings)',
+            fd1: 'FLUX Delta',
+            fd1p: 'FLUX Delta+',
+            none: 'None',
             close: 'Close',
             cancel: 'CANCEL',
             done: 'DONE',
@@ -561,6 +565,10 @@ define(function() {
                 med: 'MEDIUM QUALITY',
                 low: 'LOW QUALITY',
                 custom: 'CUSTOM QUALITY'
+            },
+            model: {
+                fd1: 'DELTA',
+                fd1p: 'DELTA+'
             },
             scale: 'SCALE',
             rotate: 'ROTATE',

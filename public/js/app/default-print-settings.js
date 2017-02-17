@@ -129,6 +129,34 @@ use_volumetric_e = 0
 vibration_limit = 0
 wipe = 0
 xy_size_compensation = -0.07
-z_offset = 0`
-    };
+z_offset = 0`,
+    fd1p: {
+        high: {
+            "layer_height": 0.075,
+            "travel_speed": 120
+        },
+        med: {
+            "layer_height": 0.15,
+            "travel_speed": 200
+        },
+        low: {
+            "layer_height": 0.3,
+            "travel_speed": 200
+        }
+    },
+    fd1: {
+        high: {
+            "layer_height": 0.075,
+            "travel_speed": 80
+        },
+        med: {
+            "layer_height": 0.15,
+            "travel_speed": 100
+        },
+        low: {
+            "layer_height": 0.3,
+            "travel_speed": 120
+        }
+    }
+  }
 });

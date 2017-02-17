@@ -276,6 +276,10 @@ define(function() {
             antialiasing: '反鋸齒',
             language: '語言',
             notifications: '通知',
+            default_model: '預設型號（列印參數）',
+            fd1: 'FLUX Delta',
+            fd1p: 'FLUX Delta+',
+            none: '無',
             close: '關閉',
             printer: {
                 new_printer: '新增成型機',
@@ -575,6 +579,10 @@ define(function() {
                 med: '品質 中等',
                 low: '品質 快速',
                 custom: '品質 自訂'
+            },
+            model: {
+                fd1: 'Delta',
+                fd1p: 'Delta+'
             },
             scale: '尺寸',
             rotate: '旋轉',

@@ -31,7 +31,7 @@ define([
     'app/actions/input-lightbox-actions',
     'app/constants/input-lightbox-constants',
     'helpers/local-storage',
-    'helpers/api/cloud'
+    'helpers/api/cloud',
 ], function(
     $,
     React,
@@ -192,6 +192,8 @@ define([
                         layerHeight                 : 0.1,
                         raftOn                      : advancedSettings.raft === 1,
                         supportOn                   : advancedSettings.support_material === 1,
+                        model                       : Config().read('default-model') || Config().read('preferred-model') || 'fd1',
+                        quality                     : 'high',
                         mode                        : 'scale',
                         previewLayerCount           : 0,
                         progressMessage             : '',
@@ -363,6 +365,29 @@ define([
                     ProgressActions.close();
                 },
 
+                _updateAdvancedSettings: function(opts) {
+                    // load setting lines
+                    let custom = advancedSettings.custom.split('\n');
+                    // Iterate all update
+                    for(var key in opts) {
+                        let value = opts[key];
+                        director.setParameter(key, value);
+                        advancedSettings[key] = value;
+                        // update setting line ( using replace )
+                        for(var i = 0; i < custom.length; i++) {
+                            if(custom[i].indexOf(key + " ") == 0 || custom[i].indexOf(key + "=") == 0) {
+                                custom[i] = key + ' = ' +  value;
+                            }
+                        }
+                    }
+                    
+                    advancedSettings.custom = custom.join('\n');
+
+                    // update dom state
+                    this.setState(opts);
+                    this._saveSetting();
+                },
+
                 _handleYes: function(answer, args) {
                     console.log(answer, args);
                     if(answer === 'tour') {
@@ -532,17 +557,26 @@ define([
                 },
 
                 _handleApplyAdvancedSetting: function(setting) {
-                    let d = $.Deferred();
+                    let d = $.Deferred(), quality = 'custom';
                     Object.assign(advancedSettings, setting);
                     // remove old properties
                     delete advancedSettings.raft_on;
 
                     this._saveSetting();
 
+                    ['high', 'med', 'low'].forEach((q) => {
+                        // Do comparsion with default settings
+                        let params = DefaultPrintSettings[this.state.model][q];
+                        for(var i in params) { if(params[i] != advancedSettings[i]) return; }
+                        // No difference then quality equals q
+                        quality = q;
+                    });
+
                     this.setState({
                         supportOn: advancedSettings.support_material === 1,
                         layerHeight: advancedSettings.layer_height,
-                        raftOn:  advancedSettings.raft === 1
+                        raftOn:  advancedSettings.raft === 1,
+                        quality: quality
                     });
 
                     if(!setting) {
@@ -679,18 +713,11 @@ define([
                     }
                 },
 
-                _handleQualitySelected: function(layerHeight) {
-                    director.setParameter('layer_height', layerHeight);
-                    advancedSettings.layer_height = layerHeight;
-                    this.setState({ layerHeight: layerHeight });
-                    // update custom property
-                    var _settings = advancedSettings.custom.split('\n');
-                    for(var i = 0; i < _settings.length; i++) {
-                        if(_settings[i].substring(0, 12) === 'layer_height') {
-                            _settings[i] = 'layer_height = ' + layerHeight;
-                        }
-                    }
-                    advancedSettings.custom = _settings.join('\n');
+                _handleQualityQualityModelSelected: function(quality, machineModel) {
+                    var parameters = DefaultPrintSettings[machineModel || "fd1"][quality];
+                    this.setState({model: machineModel, quality: quality});
+                    Config().write('preferred-model', machineModel);
+                    this._updateAdvancedSettings(parameters);
                     this._saveSetting();
                 },
 
@@ -902,7 +929,7 @@ define([
                     );
                 },
 
-                _renderLeftPanel: function() {
+                _renderLeftPanel: function() { 
                     return (
                         <LeftPanel
                             lang                        = {lang}
@@ -915,8 +942,9 @@ define([
                             disablePreview              = {this.state.disablePreview}
                             raftOn                      = {this.state.raftOn}
                             supportOn                   = {this.state.supportOn}
-                            layerHeight                 = {this.state.layerHeight}
-                            onQualitySelected           = {this._handleQualitySelected}
+                            quality                     = {this.state.quality}
+                            model                       = {this.state.model}
+                            onQualityModelSelected      = {this._handleQualityQualityModelSelected}
                             onRaftClick                 = {this._handleRaftClick}
                             onSupportClick              = {this._handleSupportClick}
                             onPreviewClick              = {this._handlePreview}
