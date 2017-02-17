@@ -415,6 +415,103 @@ define([
         return d.promise();
     }
 
+    function changeFilamentDuringPause(type) {
+        let d = $.Deferred();
+
+        const initOperation = () => {
+            return new Promise(resolve => {
+                SocketMaster.addTask('startToolheadOperation').then(r => {
+                    resolve(r);
+                });
+            });
+        };
+
+        const waitForTemperature = () => {
+            return new Promise(resolve => {
+                let fluctuation = 3;
+                let t = setInterval(() => {
+                    SocketMaster.addTask('report').then(r => {
+                        d.notify(r, t);
+                        let { rt, tt } = r.device_status;
+                        if(rt[0] && tt[0]) {
+                            let current = Math.round(rt[0]),  // current temperature rounded
+                                target = tt[0];              // goal temperature
+
+                            if(
+                                current >= target - fluctuation &&  // min
+                                current <= target + fluctuation     // max
+                            ) {
+                                clearInterval(t);
+                                resolve();
+                            }
+                        };
+                    });
+                }, 2000);
+            });
+        };
+
+        const startOperation = () => {
+            return new Promise(resolve => {
+                SocketMaster.addTask('changeFilamentDuringPause', type).always(r => {
+                    resolve(r);
+                });
+            });
+        };
+
+        const endLoading = () => {
+            return new Promise(resolve => {
+                SocketMaster.addTask('endLoadingDuringPause').always(r => {
+                    resolve(r);
+                });
+            });
+        };
+
+        const monitorStatus = () => {
+            return new Promise(resolve => {
+                let t = setInterval(() => {
+                    getReport().then(r => {
+                        r.loading = true;
+                        // if button is pressed from the machine, status will change from LOAD_FILAMENT to PAUSE
+                        if(r.st_label === 'PAUSED') {
+                            clearInterval(t);
+                            resolve();
+                        }
+                        else {
+                            d.notify(r, t);
+                        }
+                    });
+                }, 2000);
+            });
+        };
+
+        const operation = () => {
+            initOperation().then(() => {
+                return waitForTemperature();
+            })
+            .then(() => {
+                return startOperation();
+            })
+            .then(() => {
+                return monitorStatus();
+            })
+            .then(() => {
+                d.resolve();
+            });
+        };
+
+        operation();
+
+        return d.promise();
+    }
+
+    function endToolheadOperation() {
+        return SocketMaster.addTask('endToolheadOperation');
+    }
+
+    function endLoadingDuringPause() {
+        return SocketMaster.addTask('endLoadingDuringPause');
+    }
+
     function detectHead() {
         let d = $.Deferred();
 
@@ -1021,55 +1118,58 @@ define([
 
     DeviceSingleton.prototype = {
         init: function() {
-            this.selectDevice           = selectDevice;
-            this.uploadToDirectory      = uploadToDirectory;
-            this.go                     = go;
-            this.goFromFile             = goFromFile;
-            this.resume                 = resume;
-            this.pause                  = pause;
-            this.stop                   = stop;
-            this.quit                   = quit;
-            this.quitTask               = quitTask;
-            this.kick                   = kick;
-            this.getReport              = getReport;
-            this.getSelectedDevice      = getSelectedDevice;
-            this.readyCamera            = readyCamera;
-            this.ls                     = ls;
-            this.fileInfo               = fileInfo;
-            this.deleteFile             = deleteFile;
-            this.downloadFile           = downloadFile;
-            this.getPreviewInfo         = getPreviewInfo;
-            this.changeFilament         = changeFilament;
-            this.reconnect              = reconnect;
-            this.getDeviceByName        = getDeviceByName;
-            this.getDeviceByNameAsync   = getDeviceByNameAsync;
-            this.getFirstDevice         = getFirstDevice;
-            this.updateFirmware         = updateFirmware;
-            this.updateToolhead         = updateToolhead;
-            this.headInfo               = headInfo;
-            this.closeConnection        = closeConnection;
-            this.streamCamera           = streamCamera;
-            this.stopStreamCamera       = stopStreamCamera;
-            this.calibrate              = calibrate;
-            this.home                   = home;
-            this.cleanCalibration       = cleanCalibration;
-            this.detectHead             = detectHead;
-            this.enterMaintainMode      = enterMaintainMode;
-            this.endMaintainMode        = endMaintainMode;
-            this.getDeviceList          = getDeviceList;
-            this.getDeviceSettings      = getDeviceSettings;
-            this.setDeviceSetting       = setDeviceSetting;
-            this.getCloudValidationCode = getCloudValidationCode;
-            this.enableCloud            = enableCloud;
-            this.getDeviceInfo          = getDeviceInfo;
-            this.downloadErrorLog       = downloadErrorLog;
-            this.killSelf               = killSelf;
-            this.setHeadTemperature     = setHeadTemperature;
-            this.getHeadStatus          = getHeadStatus;
-            this.startMonitoringUsb     = startMonitoringUsb;
-            this.getAvailableUsbChannel = getAvailableUsbChannel;
-            this.registerUsbEvent       = registerUsbEvent;
-            this.unregisterUsbEvent     = unregisterUsbEvent;
+            this.selectDevice               = selectDevice;
+            this.uploadToDirectory          = uploadToDirectory;
+            this.go                         = go;
+            this.goFromFile                 = goFromFile;
+            this.resume                     = resume;
+            this.pause                      = pause;
+            this.stop                       = stop;
+            this.quit                       = quit;
+            this.quitTask                   = quitTask;
+            this.kick                       = kick;
+            this.getReport                  = getReport;
+            this.getSelectedDevice          = getSelectedDevice;
+            this.readyCamera                = readyCamera;
+            this.ls                         = ls;
+            this.fileInfo                   = fileInfo;
+            this.deleteFile                 = deleteFile;
+            this.downloadFile               = downloadFile;
+            this.getPreviewInfo             = getPreviewInfo;
+            this.changeFilament             = changeFilament;
+            this.reconnect                  = reconnect;
+            this.getDeviceByName            = getDeviceByName;
+            this.getDeviceByNameAsync       = getDeviceByNameAsync;
+            this.getFirstDevice             = getFirstDevice;
+            this.updateFirmware             = updateFirmware;
+            this.updateToolhead             = updateToolhead;
+            this.headInfo                   = headInfo;
+            this.closeConnection            = closeConnection;
+            this.streamCamera               = streamCamera;
+            this.stopStreamCamera           = stopStreamCamera;
+            this.calibrate                  = calibrate;
+            this.home                       = home;
+            this.cleanCalibration           = cleanCalibration;
+            this.detectHead                 = detectHead;
+            this.enterMaintainMode          = enterMaintainMode;
+            this.endMaintainMode            = endMaintainMode;
+            this.getDeviceList              = getDeviceList;
+            this.getDeviceSettings          = getDeviceSettings;
+            this.setDeviceSetting           = setDeviceSetting;
+            this.getCloudValidationCode     = getCloudValidationCode;
+            this.enableCloud                = enableCloud;
+            this.getDeviceInfo              = getDeviceInfo;
+            this.downloadErrorLog           = downloadErrorLog;
+            this.killSelf                   = killSelf;
+            this.setHeadTemperature         = setHeadTemperature;
+            this.getHeadStatus              = getHeadStatus;
+            this.startMonitoringUsb         = startMonitoringUsb;
+            this.getAvailableUsbChannel     = getAvailableUsbChannel;
+            this.registerUsbEvent           = registerUsbEvent;
+            this.unregisterUsbEvent         = unregisterUsbEvent;
+            this.changeFilamentDuringPause  = changeFilamentDuringPause;
+            this.endToolheadOperation       = endToolheadOperation;
+            this.endLoadingDuringPause      = endLoadingDuringPause;
 
             Discover(
                 'device-master',
@@ -1078,7 +1178,6 @@ define([
                     devices.forEach(d => {
                         _deviceNameMap[d.name] = d;
                     });
-                    // console.log(_deviceNameMap);
                     _scanDeviceError(devices);
 
                 }

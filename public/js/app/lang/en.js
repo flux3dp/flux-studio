@@ -1077,7 +1077,8 @@ define(function() {
             gcode_area_too_big: 'Imported gcode exceed the printable area.',
             empty_file: 'File is empty',
             usb_unplugged: 'USB connection is lost, please check your USB connection',
-            launghing_from_installer_warning: 'You are launching FLUX Studio from the installer, and this may cause problems. Please move the FLUX Studio to the Application folder.'
+            launghing_from_installer_warning: 'You are launching FLUX Studio from the installer, and this may cause problems. Please move the FLUX Studio to the Application folder.',
+            uploading_fcode: 'Uploading fcode'
         },
         machine_status: {
             '-10': 'Raw mode',

@@ -521,6 +521,18 @@ define([
                 return useDefaultResponse('task quit');
             },
 
+            startToolheadOperation: () => {
+                return useDefaultResponse('play toolhead operation');
+            },
+
+            endToolheadOperation: () => {
+                return useDefaultResponse('play toolhead standby');
+            },
+
+            endLoadingDuringPause: () => {
+                return useDefaultResponse('play press_button');
+            },
+
             /**
              * maintain home
              *
@@ -555,6 +567,11 @@ define([
                 }, 3000);
 
                 return d.promise();
+            },
+
+            changeFilamentDuringPause: (type) => {
+                let cmd = type === 'LOAD' ? 'load_filament' : 'unload_filament';
+                return useDefaultResponse(`play ${cmd} 0`);
             },
 
             setHeadTemperature: (temperature) => {

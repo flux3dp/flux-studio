@@ -122,6 +122,7 @@ define([
                     source = self.props.page === 'draw' ? GlobalConstants.DRAW : GlobalConstants.LASER,
                     fcodeReaderMethods = fcodeReader(),
                     goToMonitor = function(thumbnailBlob) {
+                        ProgressActions.close();
                         DeviceMaster.selectDevice(self.state.selectedPrinter).then(function(status) {
                             if (status === DeviceConstants.CONNECTED) {
                                 GlobalActions.showMonitor(self.state.selectedPrinter, blob, blobUrl.createObjectURL(thumbnailBlob), source);
@@ -132,7 +133,7 @@ define([
                         });
                     },
                     parseFCode = function() {
-                        fcodeReaderMethods.getThumbnail().then((data) => {
+                            fcodeReaderMethods.getThumbnail().then((data) => {
                             goToMonitor(data);
                         });
                     },
@@ -142,6 +143,7 @@ define([
                         });
                     };
 
+                ProgressActions.updating(lang.message.uploading_fcode, 100);
                 uploadFCode();
             },
             ExportGCodeProgressing = function(data) {
@@ -342,7 +344,6 @@ define([
                     _callback = function() {
                         GlobalActions.sliceComplete({ time: arguments[2] });
                         callback.apply(null, arguments);
-                        ProgressActions.close();
                     },
                     getPoint = function($el) {
                         var containerOffset = $laser_platform.offset(),

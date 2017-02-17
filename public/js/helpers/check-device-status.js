@@ -28,6 +28,7 @@ define([
                 var timer;
 
                 DeviceMaster.selectDevice(printer).then(function() {
+                    console.log(printer);
                     switch (id) {
                     case 'kick':
                         DeviceMaster.kick().then(function() {
@@ -65,6 +66,7 @@ define([
             AlertStore.removeYesListener(onYes);
         });
 
+        console.log(printer.st_id);
         switch (printer.st_id) {
         // null for simulate
         case null:
@@ -93,10 +95,11 @@ define([
         case DeviceConstants.status.PAUSED:
         case DeviceConstants.status.PAUSED_FROM_STARTING:
         case DeviceConstants.status.PAUSED_FROM_RUNNING:
+            deferred.resolve('ok');
             // ask for abort
-            ProgressActions.close();
-            AlertActions.showPopupYesNo('abort', lang.message.device_is_used);
-            AlertStore.onYes(onYes);
+            // ProgressActions.close();
+            // AlertActions.showPopupYesNo('abort', lang.message.device_is_used);
+            // AlertStore.onYes(onYes);
             break;
         default:
             // device busy
