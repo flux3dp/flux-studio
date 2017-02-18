@@ -71,14 +71,6 @@ define([
                     onClick: this._onSaveAndApply
                 },
                 {
-                    label: lang.background,
-                    className: 'pull-left btn-default btn-apply',
-                    dataAttrs: {
-                        'ga-event': 'apply-laser-background'
-                    },
-                    onClick: this._onCustomBackground
-                },
-                {
                     label: lang.apply,
                     className: 'pull-right btn-default btn-apply',
                     dataAttrs: {
@@ -94,6 +86,30 @@ define([
                     },
                     onClick: this._onCancel
                 }];
+
+            return buttonGroup;
+        },
+
+        _getControlButtons: function(lang) {
+            var self = this,
+                buttonGroup = [
+                {
+                    label: lang.background,
+                    className: 'pull-left btn-default btn-cancel',
+                    dataAttrs: {
+                        'ga-event': 'apply-laser-background'
+                    },
+                    onClick: this._onCustomBackground
+                },
+                {
+                    label: lang.load_calibrate_image,
+                    className: 'pull-left btn-default btn-apply',
+                    dataAttrs: {
+                        'ga-event': 'apply-load-calibration-image'
+                    },
+                    onClick: self.props.onLoadCalibrationImage
+                }
+                ];
 
             return buttonGroup;
         },
@@ -204,10 +220,15 @@ define([
         _renderFooter: function(lang) {
             lang = lang.advanced;
 
-            var buttons = this._getFooterButtons(lang);
+            let buttons = this._getFooterButtons(lang),
+                ctrlButtons = this._getControlButtons(lang);
 
             return (
+                <div>
                 <ButtonGroup className="footer clearfix" buttons={buttons}/>
+                <hr className="clearfix" />
+                <ButtonGroup className="footer clearfix" buttons={ctrlButtons}/>
+                </div>
             );
         },
 
@@ -301,7 +322,6 @@ define([
 
         _handleImport: function(e) {
             var t = e.target;
-            console.log(t.files[0]);
              if (t.files.length) {
                 var fr = new FileReader();
                 fr.onload = function () {

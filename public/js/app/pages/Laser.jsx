@@ -99,6 +99,7 @@ define([
                         }
 
                         setupPanelDefaults.objectHeight = setupPanelDefaults.objectHeight || 0;
+                        setupPanelDefaults.heightOffset = setupPanelDefaults.heightOffset || (config().read('default-model') == 'fd1p' ? -2.3 : 0);
                         setupPanelDefaults.isShading = (
                             'boolean' === typeof setupPanelDefaults.isShading ?
                             setupPanelDefaults.isShading :
@@ -120,6 +121,20 @@ define([
                     self.setState({
                         setupPanelDefaults
                     });
+
+                    console.log('mounted');
+                    if(!config().read('laser-calibrated')) {
+                        // NOTE: only yes no support this kind of callback
+                        AlertActions.showPopupYesNo('do-calibrate', lang.laser.do_calibrate, "", null, {
+                            yes: function() {
+                                self._onLoadCalibrationImage();
+                                config().write('laser-calibrated', true);
+                            },
+                            no: function() {
+                                config().write('laser-calibrated', true);
+                            }
+                        });
+                    }
                 },
 
                 componentWillUnmount: function () {
@@ -149,6 +164,11 @@ define([
                     this.refs.fileUploader.readFiles(e, uploadedFiles);
                 },
 
+                _onLoadCalibrationImage: function(e) {
+                    this.state.laserEvents.uploadDefaultLaserImage();
+                    this.setState({debug: 1}); // Debug flag will be reset at laser.js/deleteImage
+                },
+
                 _onShadingChanged: function(e) {
                     var self = this,
                         $images = self.state.laserEvents.getCurrentImages();
@@ -170,7 +190,9 @@ define([
                     if ('laser' === self.props.page) {
                         data = {
                             object_height: defaultSettings.objectHeight,
+                            height_offset: defaultSettings.heightOffset,
                             laser_speed: defaultSettings.material.data.laser_speed,
+                            focus_by_color: self.state.debug || 0,
                             power: defaultSettings.material.data.power / max,
                             shading: (true === self.refs.setupPanel.isShading() ? 1 : 0)
                         };
@@ -237,6 +259,7 @@ define([
                             className="operating-panel"
                             imageFormat={this.state.fileFormat}
                             defaults={this.state.setupPanelDefaults}
+                            onLoadCalibrationImage = { this._onLoadCalibrationImage }
                             ref="setupPanel"
                             onShadingChanged={this._onShadingChanged}
                         /> :
@@ -341,7 +364,7 @@ define([
                             dataAttrs: {
                                 'ga-event': 'get-laser-fcode'
                             },
-                            onClick: this._onExport.bind(null, '-f')
+                            onClick: this._onExport.bind(null, '-g')
                         }, {
                             label: lang.monitor.start,
                             className: cx({

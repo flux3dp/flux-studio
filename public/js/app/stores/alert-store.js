@@ -52,16 +52,16 @@ define([
             this.on(NOTIFY_RETRY, callback);
         },
 
-        onYes(callback) {
-            this.on(NOTIFY_YES, callback);
+        onYes(callback, oneTime) {
+            oneTime === true ? this.once(NOTIFY_YES, callback) : this.on(NOTIFY_YES, callback);
         },
 
-        onNo(callback) {
-            this.on(NOTIFY_NO, callback);
+        onNo(callback, oneTime) {
+            oneTime === true ? this.once(NOTIFY_NO, callback) : this.on(NOTIFY_NO, callback);
         },
 
-        onCancel(callback) {
-            this.on(NOTIFY_CANCEL, callback);
+        onCancel(callback, oneTime) {
+            oneTime === true ? this.once(NOTIFY_CANCEL, callback) : this.on(NOTIFY_CANCEL, callback);
         },
 
         onAbort(callback) {

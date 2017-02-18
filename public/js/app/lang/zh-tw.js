@@ -632,6 +632,7 @@ define(function() {
             get_fcode: '儲存<br/>工作',
             name: '名稱',
             go: 'GO',
+            do_calibrate: '看起來您似乎第一次使用鐳射雕刻功能，是否要載入焦距校正圖片？（您亦可以於進階功能載入）',
             process_caption: '輸出中',
             laser_accepted_images: '雕刻支援格式：BMP/GIF/JPG/PNG/SVG',
             draw_accepted_images: '繪製支援格式：SVG',
@@ -648,12 +649,17 @@ define(function() {
             title: {
                 material: '選擇正確的材質來雕刻出最好的結果',
                 object_height: '物體高度，從底盤到物件最高點之距離',
+                height_offset: '雷射高度調整，包含磁吸底版跟焦距誤差，可根據焦距校正圖片調整數字',
                 shading: '使用雷射漸層效果，會增加雕刻時間',
                 advanced: '自行調整功率大小以及速度'
             },
             print_params: {
                 object_height: {
                     text: '物體高度',
+                    unit: 'mm'
+                },
+                height_offset: {
+                    text: '焦距調整',
                     unit: 'mm'
                 },
                 shading: {

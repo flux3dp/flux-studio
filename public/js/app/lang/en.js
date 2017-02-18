@@ -618,6 +618,7 @@ define(function() {
             get_fcode: 'Save<br/>Task',
             name: 'Name',
             go: 'GO',
+            do_calibrate: 'It seems you\'re using engraving for the first time, do you want to load focal length calibration image? ( You can load from "Advanced" later )',
             process_caption: 'Generating',
             laser_accepted_images: 'Supported formats: BMP/GIF/JPG/PNG/SVG',
             draw_accepted_images: 'Supported formats: SVG',
@@ -634,12 +635,17 @@ define(function() {
             title: {
                 material: 'Select a proper material to have the best engraving result.',
                 object_height: 'Object height measured from the base plate to the max height of the object',
+                height_offset: 'Adjust z position for best laser focusing',
                 shading: 'Shading enables the gradient effect of laser engraving. It takes longer time.',
                 advanced: 'Custom settings for power and speed.'
             },
             print_params: {
                 object_height: {
                     text: 'OBJECT HEIGHT',
+                    unit: 'mm'
+                },
+                height_offset: {
+                    text: 'FOCUS OFFSET',
                     unit: 'mm'
                 },
                 shading: {
@@ -737,6 +743,7 @@ define(function() {
                 save_as_preset_title: 'Save Config',
                 load_preset_title: 'Load Config',
                 background: 'Background',
+                load_calibrate_image: 'Load Calibration Image',
                 apply: 'APPLY',
                 cancel: 'CANCEL',
                 save: 'SAVE'
