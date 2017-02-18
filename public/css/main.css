@@ -2648,6 +2648,11 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         z-index: 999999;
         border-radius: 5px; }
 
+hr {
+    border-left: 0;
+    border-top: 2px solid #F0F0F0;
+    border-bottom: 0; }
+
 /**
  * ref: http://tobiasahlin.com/spinkit/
  */

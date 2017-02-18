@@ -585,3 +585,9 @@ input[type=range]:focus::-webkit-slider-runnable-track {
     }
 
 }
+
+hr {
+    border-left: 0;
+    border-top: 2px solid #F0F0F0;
+    border-bottom: 0;
+}
