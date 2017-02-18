@@ -192,6 +192,7 @@ define([
                         layerHeight                 : 0.1,
                         raftOn                      : advancedSettings.raft === 1,
                         supportOn                   : advancedSettings.support_material === 1,
+                        displayModelControl         : !Config().read('default-model'),
                         model                       : Config().read('default-model') || Config().read('preferred-model') || 'fd1',
                         quality                     : 'high',
                         mode                        : 'scale',
@@ -399,6 +400,8 @@ define([
                     }
                     else if(answer === 'set_default') {
                         Config().write('default-printer-name', Config().read('configured-printer'));
+                        Config().write('default-model', Config().read('configured-model'));
+                        this.setState({displayModelControl: false});
                         this.showWait();
 
                         DeviceMaster.getDeviceByNameAsync(
@@ -940,6 +943,7 @@ define([
                             previewModeOnly             = {this.state.previewModeOnly}
                             previewLayerCount           = {this.state.previewLayerCount}
                             disablePreview              = {this.state.disablePreview}
+                            displayModelControl         = {this.state.displayModelControl}
                             raftOn                      = {this.state.raftOn}
                             supportOn                   = {this.state.supportOn}
                             quality                     = {this.state.quality}

@@ -35,6 +35,7 @@ define([
             previewMode                 : React.PropTypes.bool,
             previewModeOnly             : React.PropTypes.bool,
             disablePreview              : React.PropTypes.bool,
+            displayModelControl         : React.PropTypes.bool,
             hasObject                   : React.PropTypes.bool,
             hasOutOfBoundsObject        : React.PropTypes.bool,
             previewLayerCount           : React.PropTypes.number,
@@ -57,6 +58,7 @@ define([
                 previewOn           : false,
                 previewCurrentLayer : 0,
                 previewLayerCount   : this.props.previewLayerCount,
+                displayModelControl : true,
                 quality             : DEFAULT_QUALITY,
                 model               : DEFAULT_MODEL,
                 color               : 'WHITE'
@@ -67,8 +69,7 @@ define([
             lang = this.props.lang.print.left_panel;
             lang.quality = this.props.lang.print.quality;
             lang.model = this.props.lang.print.model;
-            displayModelControl = !Config().read('default-model');
-            console.log("Display Model Control", displayModelControl);
+            console.log("Display Model Control", this.state.displayModelControl);
         },
 
         componentDidMount: function() {
@@ -87,6 +88,7 @@ define([
 
             this.setState({ quality: nextProps.quality });
             this.setState({ model: nextProps.model });
+            this.setState({ displayModelControl: nextProps.displayModelControl });
 
             if(nextProps.previewMode !== this.state.previewOn) {
                 this.setState({ previewOn: nextProps.previewMode });
@@ -296,7 +298,7 @@ define([
                 ],
                 mask = this.props.enable || this.props.previewModeOnly ? '' : (<div className="mask"></div>);
 
-            if (displayModelControl) items.unshift(this._renderModel());
+            if (this.state.displayModelControl) items.unshift(this._renderModel());
 
             return (
                 <div className='leftPanel'>
