@@ -533,6 +533,10 @@ define([
                 return useDefaultResponse('play press_button');
             },
 
+            setHeadTemperatureDuringPause: (temperature) => {
+                return useDefaultResponse(`play set_heater 0 ${temperature}`);
+            },
+
             /**
              * maintain home
              *

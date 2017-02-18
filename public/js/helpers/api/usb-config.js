@@ -67,43 +67,38 @@ define([
 
                 var self = this,
                     goNext = true,
-                    timer,
-                    reset = function() {
-                        clearInterval(timer);
-                        goNext = true;
-                    },
-                    checkPorts = function(ports) {
-                        if (true === goNext) {
-                            goNext = false;
+                    timer;
 
-                            self.connect(
-                                (ports.pop() || ''),
-                                {
-                                    onSuccess: function(response) {
-                                        opts.onSuccess(response);
-                                        reset();
-                                    },
-                                    onError: function(response) {
-                                        goNext = true;
+                const reset = () => {
+                    clearInterval(timer);
+                    goNext = true;
+                };
 
-                                        if (0 === ports.length) {
-                                            opts.onError(response);
-                                            reset();
-                                        }
-                                    }
-                                }
-                            );
+                const checkPorts = (ports) => {
+                    if(goNext !== true) { return; }
+                    goNext = false;
+
+                    const port = ports.pop() || '';
+                    const callback = {
+                        onSuccess: function(response) {
+                            opts.onSuccess(response);
+                            reset();
+                        },
+                        onError: function(response) {
+                            goNext = true;
+
+                            opts.onError(response);
+                            reset();
                         }
                     };
 
+                    self.connect(port, callback );
+                };
+
                 events.onMessage = function(data) {
-
                     if ('ok' === data.status) {
-                        timer = setInterval(function() {
-                            checkPorts(data.ports);
-                        }, 100);
+                        checkPorts(data.ports);
                     }
-
                 };
 
                 if(usbChannel === -1) {
@@ -287,7 +282,6 @@ define([
                 events.onError = (err) => { d.reject(err); };
                 events.onFatal = (err) => { d.reject(err); };
                 events.onMessage = response => {
-                    console.log(response);
                     d.resolve(response);
                 };
 

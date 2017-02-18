@@ -1040,6 +1040,10 @@ define([
         return SocketMaster.addTask('setHeadTemperature', temperature);
     }
 
+    function setHeadTemperatureDuringPause(temperature) {
+        return SocketMaster.addTask('setHeadTemperatureDuringPause', temperature);
+    }
+
     function getHeadStatus() {
         return SocketMaster.addTask('getHeadStatus');
     }
@@ -1118,58 +1122,59 @@ define([
 
     DeviceSingleton.prototype = {
         init: function() {
-            this.selectDevice               = selectDevice;
-            this.uploadToDirectory          = uploadToDirectory;
-            this.go                         = go;
-            this.goFromFile                 = goFromFile;
-            this.resume                     = resume;
-            this.pause                      = pause;
-            this.stop                       = stop;
-            this.quit                       = quit;
-            this.quitTask                   = quitTask;
-            this.kick                       = kick;
-            this.getReport                  = getReport;
-            this.getSelectedDevice          = getSelectedDevice;
-            this.readyCamera                = readyCamera;
-            this.ls                         = ls;
-            this.fileInfo                   = fileInfo;
-            this.deleteFile                 = deleteFile;
-            this.downloadFile               = downloadFile;
-            this.getPreviewInfo             = getPreviewInfo;
-            this.changeFilament             = changeFilament;
-            this.reconnect                  = reconnect;
-            this.getDeviceByName            = getDeviceByName;
-            this.getDeviceByNameAsync       = getDeviceByNameAsync;
-            this.getFirstDevice             = getFirstDevice;
-            this.updateFirmware             = updateFirmware;
-            this.updateToolhead             = updateToolhead;
-            this.headInfo                   = headInfo;
-            this.closeConnection            = closeConnection;
-            this.streamCamera               = streamCamera;
-            this.stopStreamCamera           = stopStreamCamera;
-            this.calibrate                  = calibrate;
-            this.home                       = home;
-            this.cleanCalibration           = cleanCalibration;
-            this.detectHead                 = detectHead;
-            this.enterMaintainMode          = enterMaintainMode;
-            this.endMaintainMode            = endMaintainMode;
-            this.getDeviceList              = getDeviceList;
-            this.getDeviceSettings          = getDeviceSettings;
-            this.setDeviceSetting           = setDeviceSetting;
-            this.getCloudValidationCode     = getCloudValidationCode;
-            this.enableCloud                = enableCloud;
-            this.getDeviceInfo              = getDeviceInfo;
-            this.downloadErrorLog           = downloadErrorLog;
-            this.killSelf                   = killSelf;
-            this.setHeadTemperature         = setHeadTemperature;
-            this.getHeadStatus              = getHeadStatus;
-            this.startMonitoringUsb         = startMonitoringUsb;
-            this.getAvailableUsbChannel     = getAvailableUsbChannel;
-            this.registerUsbEvent           = registerUsbEvent;
-            this.unregisterUsbEvent         = unregisterUsbEvent;
-            this.changeFilamentDuringPause  = changeFilamentDuringPause;
-            this.endToolheadOperation       = endToolheadOperation;
-            this.endLoadingDuringPause      = endLoadingDuringPause;
+            this.selectDevice                   = selectDevice;
+            this.uploadToDirectory              = uploadToDirectory;
+            this.go                             = go;
+            this.goFromFile                     = goFromFile;
+            this.resume                         = resume;
+            this.pause                          = pause;
+            this.stop                           = stop;
+            this.quit                           = quit;
+            this.quitTask                       = quitTask;
+            this.kick                           = kick;
+            this.getReport                      = getReport;
+            this.getSelectedDevice              = getSelectedDevice;
+            this.readyCamera                    = readyCamera;
+            this.ls                             = ls;
+            this.fileInfo                       = fileInfo;
+            this.deleteFile                     = deleteFile;
+            this.downloadFile                   = downloadFile;
+            this.getPreviewInfo                 = getPreviewInfo;
+            this.changeFilament                 = changeFilament;
+            this.reconnect                      = reconnect;
+            this.getDeviceByName                = getDeviceByName;
+            this.getDeviceByNameAsync           = getDeviceByNameAsync;
+            this.getFirstDevice                 = getFirstDevice;
+            this.updateFirmware                 = updateFirmware;
+            this.updateToolhead                 = updateToolhead;
+            this.headInfo                       = headInfo;
+            this.closeConnection                = closeConnection;
+            this.streamCamera                   = streamCamera;
+            this.stopStreamCamera               = stopStreamCamera;
+            this.calibrate                      = calibrate;
+            this.home                           = home;
+            this.cleanCalibration               = cleanCalibration;
+            this.detectHead                     = detectHead;
+            this.enterMaintainMode              = enterMaintainMode;
+            this.endMaintainMode                = endMaintainMode;
+            this.getDeviceList                  = getDeviceList;
+            this.getDeviceSettings              = getDeviceSettings;
+            this.setDeviceSetting               = setDeviceSetting;
+            this.getCloudValidationCode         = getCloudValidationCode;
+            this.enableCloud                    = enableCloud;
+            this.getDeviceInfo                  = getDeviceInfo;
+            this.downloadErrorLog               = downloadErrorLog;
+            this.killSelf                       = killSelf;
+            this.setHeadTemperature             = setHeadTemperature;
+            this.getHeadStatus                  = getHeadStatus;
+            this.startMonitoringUsb             = startMonitoringUsb;
+            this.getAvailableUsbChannel         = getAvailableUsbChannel;
+            this.registerUsbEvent               = registerUsbEvent;
+            this.unregisterUsbEvent             = unregisterUsbEvent;
+            this.changeFilamentDuringPause      = changeFilamentDuringPause;
+            this.endToolheadOperation           = endToolheadOperation;
+            this.endLoadingDuringPause          = endLoadingDuringPause;
+            this.setHeadTemperatureDuringPause  = setHeadTemperatureDuringPause;
 
             Discover(
                 'device-master',

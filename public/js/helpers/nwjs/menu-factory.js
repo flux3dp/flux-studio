@@ -577,10 +577,17 @@ define([
                         label: lang.device.turn_on_head_temperature,
                         enabled: true,
                         onClick: function() {
-                            var currentPrinter = discoverMethods.getLatestPrinter(printer),
-                                lang = i18n.get();
+                            var currentPrinter = discoverMethods.getLatestPrinter(printer);
 
-                            AlertActions.showHeadTemperature(currentPrinter);
+                            DeviceMaster.selectDevice(currentPrinter).then(status => {
+                                if(status === DeviceConstants.CONNECTED) {
+                                    AlertActions.showHeadTemperature(currentPrinter);
+                                }
+                                else if(status === DeviceConstants.TIMEOUT) {
+                                    AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
+                                }
+                            });
+
                         }
                     }
                 ]

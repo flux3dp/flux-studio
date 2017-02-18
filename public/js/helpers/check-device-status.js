@@ -95,7 +95,7 @@ define([
         case DeviceConstants.status.PAUSED:
         case DeviceConstants.status.PAUSED_FROM_STARTING:
         case DeviceConstants.status.PAUSED_FROM_RUNNING:
-            deferred.resolve('ok');
+            deferred.resolve('ok', printer.st_id);
             // ask for abort
             // ProgressActions.close();
             // AlertActions.showPopupYesNo('abort', lang.message.device_is_used);

@@ -33,12 +33,8 @@ define([
         },
 
         componentDidMount: function() {
-            const readyMachine = () => {
-                DeviceMaster.enterMaintainMode()
-                .then(() => {
-                    return DeviceMaster.headInfo();
-                })
-                .then((info) => {
+            const checkToolhead = () => {
+                DeviceMaster.headInfo().then((info) => {
                     if(info.TYPE === DeviceConstants.EXTRUDER) {
                         this._startReport();
                     }
@@ -52,17 +48,23 @@ define([
                 });
             };
 
-            DeviceMaster.selectDevice(this.props.device).then((status) => {
-                if(status === DeviceConstants.CONNECTED) {
-                    CheckDeviceStatus(this.props.device).then(() => {
-                        readyMachine();
+            CheckDeviceStatus(this.props.device).then((status, stId) => {
+                this.stId = stId;
+                if(stId !== 48) {
+                    DeviceMaster.enterMaintainMode().then(() => {
+                        checkToolhead();
                     });
+                }
+                else {
+                    checkToolhead();
                 }
             });
         },
 
         componentWillUnmount: function() {
-            DeviceMaster.quitTask();
+            if(this.stId !== 48) {
+                DeviceMaster.quitTask();
+            }
             clearInterval(this.report);
         },
 
@@ -94,7 +96,12 @@ define([
             this.setState({ targetTemperature: t });
             this.refs.temperature.getDOMNode().value = t;
 
-            DeviceMaster.setHeadTemperature(t);
+            if(this.stId === 48) {
+                DeviceMaster.setHeadTemperatureDuringPause(t);
+            }
+            else {
+                DeviceMaster.setHeadTemperature(t);
+            }
         },
 
         render: function() {
