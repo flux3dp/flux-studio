@@ -1693,9 +1693,7 @@ define([
             // Fix precision to .00001
             return val.toFixed ? Number(val.toFixed(5)) : val;
         });
-        console.log('PlaneBoundary:: Transformation ', transformation);
         if (sourceMesh.jTransformation === transformation) {
-            console.log('PlaneBoundary:: Skipping redundant calculation');
             return sourceMesh.plane_boundary;
         }
         sourceMesh.jTransformation = transformation;
@@ -1743,7 +1741,6 @@ define([
             }
 
             // delete redundant point(i.e., starting point)
-            console.log('PlaneBoundary:: Finished', + new Date());
             boundary.pop();
         }
         else{
@@ -1759,7 +1756,6 @@ define([
 
             let meshSize = vs.count / vs.itemSize;
 
-            console.log('PlaneBoundary:: Allocating', + new Date());
             stl_index = new Uint32Array(meshSize);
             for (let i = 0; i < meshSize; i += 1) {
                 stl_index[i] = i;
@@ -1779,7 +1775,6 @@ define([
                 boundary.push(stl_index[i]);
             }
 
-            console.log('PlaneBoundary:: Computing lower hull', + new Date());
             // compute lower hull
             let t = boundary.length + 1;
             for (let i = stl_index.length - 2 ; i >= 0; i -= 1) {
@@ -1789,7 +1784,6 @@ define([
                 boundary.push(stl_index[i]);
             }
             // delete redundant point(i.e., starting point)
-            console.log('PlaneBoundary:: Finished', + new Date());
             boundary.pop();
         };
         return boundary;

@@ -3836,6 +3836,11 @@ hr {
     font-size: 15px;
     margin: 0 0 0 10px;
     width: 140px; }
+    .accordion input.p66 {
+        width: 100px; }
+    .accordion input.p33 {
+        margin-left: 0;
+        width: 75px; }
 
 .accordion .caption:hover {
     cursor: pointer;
@@ -4875,7 +4880,7 @@ input.switch:checked ~ label:after {
     font-size: 20px;
     position: absolute;
     transition: all .1s ease;
-    width: 280px;
+    width: 260px;
     z-index: 1; }
     .print-studio .object-dialogue .accordion-body {
         overflow: visible;
@@ -4901,7 +4906,7 @@ input.switch:checked ~ label:after {
         display: block;
         margin: 0 0 3px 0;
         padding: 0 20px;
-        width: 230px; }
+        width: 260px; }
     .print-studio .object-dialogue .control {
         display: -webkit-box;
         /* OLD - iOS 6-, Safari 3.1-6 */
