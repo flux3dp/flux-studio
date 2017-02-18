@@ -190,7 +190,7 @@ define([
                     if ('laser' === self.props.page) {
                         data = {
                             object_height: defaultSettings.objectHeight,
-                            height_offset: defaultSettings.heightOffset,
+                            height_offset: defaultSettings.heightOffset || 0,
                             laser_speed: defaultSettings.material.data.laser_speed,
                             focus_by_color: self.state.debug || 0,
                             power: defaultSettings.material.data.power / max,
@@ -364,7 +364,7 @@ define([
                             dataAttrs: {
                                 'ga-event': 'get-laser-fcode'
                             },
-                            onClick: this._onExport.bind(null, '-g')
+                            onClick: this._onExport.bind(null, '-f')
                         }, {
                             label: lang.monitor.start,
                             className: cx({
