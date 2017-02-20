@@ -23,6 +23,7 @@ define([
     var lang = i18n.get();
 
     return function(printer, bypassPause) {
+        if(!printer) { return; }
         var deferred = $.Deferred(),
             onYes = function(id) {
                 var timer;
@@ -66,7 +67,6 @@ define([
             AlertStore.removeYesListener(onYes);
         });
 
-        console.log(printer.st_id);
         switch (printer.st_id) {
         // null for simulate
         case null:

@@ -80,8 +80,6 @@ define([
             },
 
             getInitialState: function() {
-                var self = this;
-
                 return {
                     sourceId        : '',
                     deviceList      : [],
@@ -167,8 +165,8 @@ define([
                     else if (status === DeviceConstants.TIMEOUT) {
                         AlertActions.showPopupError(_id, lang.message.connectionTimeout);
                     }
-                }).
-                fail(function(status) {
+                })
+                .fail(function(status) {
                     ProgressActions.close();
                     AlertActions.showPopupError('fatal-occurred', status);
                 });

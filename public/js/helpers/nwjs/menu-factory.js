@@ -654,10 +654,11 @@ define([
             return {
                 isPrinter: true,
                 uuid: printer.uuid,
-                label: printer.name,
+                label: printer.name + (printer.source === 'h2h' ? ' (USB)' : ''),
                 enabled: true,
                 isNew: printer.isNew,
-                subItems: subItems
+                subItems: subItems,
+                isUsb: printer.source === 'h2h'
             };
         };
 
@@ -666,7 +667,6 @@ define([
             printers.forEach(function(printer) {
                 _printers.push(createDevice(printer));
             });
-
             return _printers;
         };
 

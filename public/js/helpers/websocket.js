@@ -135,6 +135,11 @@ define([
                 };
 
                 _ws.onclose = function(result) {
+                    // if ws closed abruptly
+                    if(result.code === 1006) {
+                        socketOptions.onFatal(result);
+                        return;
+                    }
                     socketOptions.onClose(result);
 
                     var abnormallyId = 'abnormally-close',

@@ -886,7 +886,7 @@ define(function() {
             finishing: 'Finishing',
             initiating: 'Initiating',
             unknown: 'Unknown',
-            pausedFromError: 'paused from error',
+            pausedFromError: 'Paused from error',
             IP: 'IP',
             serial_number: 'Serial Number',
             firmware_version: 'Firmware Version',
@@ -1078,7 +1078,8 @@ define(function() {
             empty_file: 'File is empty',
             usb_unplugged: 'USB connection is lost, please check your USB connection',
             launghing_from_installer_warning: 'You are launching FLUX Studio from the installer, and this may cause problems. Please move the FLUX Studio to the Application folder.',
-            uploading_fcode: 'Uploading fcode'
+            uploading_fcode: 'Uploading fcode',
+            cant_connect_to_device: 'Cannot connect to device, please check your connection'
         },
         machine_status: {
             '-10': 'Raw mode',

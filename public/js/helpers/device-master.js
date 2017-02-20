@@ -46,8 +46,6 @@ define([
 
     let lang = i18n.get(),
         SocketMaster,
-        thisProgress,
-        lastProgress,
         defaultPrinter,
         defaultPrinterWarningShowed = false,
         _instance = null,
@@ -70,39 +68,47 @@ define([
         }
         Object.assign(_selectedDevice, device);
         let d = deferred || $.Deferred(),
-            uuid = device.uuid,
-            goAuth = function(uuid) {
-                ProgressActions.close();
-                InputLightboxActions.open('auth', {
-                    caption     : sprintf(lang.input_machine_password.require_password, _device.name),
-                    inputHeader : lang.input_machine_password.password,
-                    confirmText : lang.input_machine_password.connect,
-                    type        : InputLightBoxConstants.TYPE_PASSWORD,
-                    onSubmit    : function(password) {
-                        ProgressActions.open(ProgressConstants.NONSTOP);
+            uuid = device.uuid;
 
-                        auth(uuid, password).always(() => {
-                            ProgressActions.close();
-                        }).done((data) => {
-                            device.plaintext_password = password;
-                            selectDevice(device, d);
-                        }).fail((response) => {
-                            let message = (
-                                false === response.reachable ?
-                                lang.select_printer.unable_to_connect :
-                                lang.select_printer.auth_failure
-                            );
+        const goAuth = (uuid) => {
+            ProgressActions.close();
 
-                            goAuth(uuid);
+            const handleSubmit = (password) => {
+                ProgressActions.open(ProgressConstants.NONSTOP);
 
-                            AlertActions.showPopupError('device-auth-fail', message);
-                        });
-                    }
+                auth(uuid, password).always(() => {
+                    ProgressActions.close();
+                })
+                .done((data) => {
+                    device.plaintext_password = password;
+                    selectDevice(device, d);
+                })
+                .fail((response) => {
+                    let message = (
+                        false === response.reachable ?
+                        lang.select_printer.unable_to_connect :
+                        lang.select_printer.auth_failure
+                    );
+
+                    goAuth(uuid);
+
+                    AlertActions.showPopupError('device-auth-fail', message);
                 });
             };
 
-        const createDeviceActions = (availableUsbChannel = -1) => (
-            DeviceController(uuid, {
+            const callback = {
+                caption     : sprintf(lang.input_machine_password.require_password, _device.name),
+                inputHeader : lang.input_machine_password.password,
+                confirmText : lang.input_machine_password.connect,
+                type        : InputLightBoxConstants.TYPE_PASSWORD,
+                onSubmit    : handleSubmit
+            };
+
+            InputLightboxActions.open('auth', callback);
+        };
+
+        const createDeviceActions = (availableUsbChannel = -1) => {
+            return DeviceController(uuid, {
                 availableUsbChannel,
                 onConnect: function(response) {
                     d.notify(response);
@@ -130,9 +136,11 @@ define([
 
                             auth(_device.uuid, '').always(() => {
                                 ProgressActions.close();
-                            }).done((data) => {
+                            })
+                            .done((data) => {
                                 selectDevice(device, d);
-                            }).fail(() => {
+                            })
+                            .fail(() => {
                                 AlertActions.showPopupError(
                                     'auth-error-with-diff-computer',
                                     lang.message.need_1_1_7_above
@@ -159,9 +167,12 @@ define([
                             message
                         );
                     }
+                },
+                onFatal: function(e) {
+                    _selectedDevice = {};
                 }
-            })
-        );
+            });
+        };
 
         ProgressActions.open(ProgressConstants.NONSTOP);
         if(_existConnection(uuid)) {
@@ -1107,7 +1118,7 @@ define([
     }
 
     function unregisterUsbEvent(callback) {
-        console.log(callback);
+        // TODO: to be coded when ndeeded
     }
 
     // Core

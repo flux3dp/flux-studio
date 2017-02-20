@@ -67,6 +67,7 @@ define([
                     }
                 },
                 onError: (response) => {
+                    console.log('error 1');
                     events.onError(response);
                 },
                 onFatal: (response) => {
@@ -79,6 +80,14 @@ define([
                             'unhandle-exception',
                             lang.message.unknown_device
                         );
+                    }
+                    else if(response.code === 1006) {
+                        ProgressActions.close();
+                        AlertActions.showPopupError(
+                            'NO-CONNECTION',
+                            lang.message.cant_connect_to_device
+                        );
+                        opts.onFatal(response);
                     }
                     else {
                         clearTimeout(timmer);
