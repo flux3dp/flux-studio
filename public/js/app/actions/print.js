@@ -1328,6 +1328,8 @@ define([
             slicingStatus.showProgress = false;
 
             doSlicing();
+            syncObjectOutline(src);
+            setObjectDialoguePosition(src);
         }
     }
 
@@ -1670,8 +1672,10 @@ define([
                         outlineScene.add(mesh.outlineMesh);
                         objects.push(mesh);
 
-                        render();
                         doSlicing();
+                        syncObjectOutline(mesh);
+                        setObjectDialoguePosition(mesh);
+                        render();
                     }
                     else {
                         if(result.error === ErrorConstants.NAME_NOT_EXIST) {
