@@ -743,6 +743,7 @@ define(function() {
                 save_as_preset_title: 'Save Config',
                 load_preset_title: 'Load Config',
                 background: 'Background',
+                removeBackground: ' Remove Background',
                 load_calibrate_image: 'Load Calibration Image',
                 apply: 'APPLY',
                 cancel: 'CANCEL',
