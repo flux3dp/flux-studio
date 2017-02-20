@@ -80,12 +80,12 @@ raft_layers = 4
 resolution = 0.01
 retract_before_travel = 2
 retract_layer_change = 0
-retract_length = 7
+retract_length = 8
 retract_length_toolchange = 10
-retract_lift = 0.24
+retract_lift = 0.15
 retract_restart_extra = 0
 retract_restart_extra_toolchange = 0
-retract_speed = 70
+retract_speed = 80
 seam_position = aligned
 skirt_distance = 10
 skirt_height = 1
@@ -103,7 +103,7 @@ start_gcode = G1 Z5 F5000 ; lift nozzle;\\nG92 Z4.9
 support_everywhere = 0
 support_material = 0
 support_material_angle = 0
-support_material_contact_distance = 0.22
+support_material_contact_distance = 0.3
 support_material_enforce_layers = 0
 support_material_extruder = 1
 support_material_extrusion_width = 0.4
@@ -111,8 +111,8 @@ support_material_interface_extruder = 1
 support_material_interface_layers = 3
 support_material_interface_spacing = 0
 support_material_interface_speed = 100%
-support_material_pattern = rectilinear
-support_material_spacing = 2.7
+support_material_pattern = LINES
+support_material_spacing = 1.7
 support_material_speed = 40
 support_material_threshold = 37
 temperature = 215
@@ -133,29 +133,65 @@ z_offset = 0`,
     fd1p: {
         high: {
             "layer_height": 0.075,
-            "travel_speed": 120
+            "travel_speed": 120,
+            "infill_speed": 60,
+            "retract_lift" : 0.05,
+            "temperature": 200,
+            "perimeter_speed": 50,
+            "external_perimeter_speed": 35,
+            "first_layer_temperature": 230
         },
         med: {
             "layer_height": 0.15,
-            "travel_speed": 200
+            "travel_speed": 150,
+            "infill_speed": 60,
+            "retract_lift" : 0.05,
+            "temperature": 200,
+            "perimeter_speed": 50,
+            "external_perimeter_speed": 35,
+            "first_layer_temperature": 230
         },
         low: {
             "layer_height": 0.3,
-            "travel_speed": 200
+            "travel_speed": 150,
+            "infill_speed": 60,
+            "retract_lift" : 0.05,
+            "temperature": 200,
+            "perimeter_speed": 50,
+            "external_perimeter_speed": 35,
+            "first_layer_temperature": 230
         }
     },
     fd1: {
         high: {
             "layer_height": 0.075,
-            "travel_speed": 80
+            "travel_speed": 80,
+            "infill_speed": 60,
+            "retract_lift" : 0.24,
+            "temperature": 215,
+            "perimeter_speed": 40,
+            "external_perimeter_speed": 28,
+            "first_layer_temperature": 230
         },
         med: {
             "layer_height": 0.15,
-            "travel_speed": 100
+            "travel_speed": 100,
+            "infill_speed": 60,
+            "retract_lift" : 0.24,
+            "temperature": 215,
+            "perimeter_speed": 40,
+            "external_perimeter_speed": 28,
+            "first_layer_temperature": 230
         },
         low: {
             "layer_height": 0.3,
-            "travel_speed": 120
+            "travel_speed": 120,
+            "infill_speed": 30,
+            "retract_lift" : 0.24,
+            "temperature": 215,
+            "perimeter_speed": 40,
+            "external_perimeter_speed": 28,
+            "first_layer_temperature": 230
         }
     }
   }

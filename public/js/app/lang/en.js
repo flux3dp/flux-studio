@@ -399,8 +399,8 @@ define(function() {
                     concentric: 'CONCENTRIC'
                 },
                 curaSupport: {
-                    grid: 'GRID',
-                    lines: 'LINES'
+                    lines: 'LINES',
+                    grid: 'GRID'
                 },
                 blackMagic: 'Black Magic',
                 spiral: 'Spiral',
@@ -681,6 +681,14 @@ define(function() {
                         text: 'MATERIAL',
                         label: 'Object Options',
                         options: [
+                            {
+                                value: 'cardboard',
+                                label: 'Cardboard',
+                                data: {
+                                    laser_speed: 10,
+                                    power: 255
+                                }
+                            },
                             {
                                 value: 'wood',
                                 label: 'WOOD',

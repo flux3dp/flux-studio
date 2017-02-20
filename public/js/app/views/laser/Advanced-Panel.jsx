@@ -28,13 +28,11 @@ define([
     'use strict';
 
     var laserLang = i18n.lang.laser,
-        advancedLang = advancedLang;
+        advancedLang = laserLang.advanced;
     
     return React.createClass({
 
         getDefaultProps: function() {
-            var self = this;
-
             return {
                 lang: React.PropTypes.object,
                 defaultMaterial: React.PropTypes.object,
@@ -56,8 +54,7 @@ define([
 
         // Private methods
         _getFooterButtons: function() {
-            var self = this,
-                buttonGroup = [{
+            var buttonGroup = [{
                     className: 'pull-left btn-default fa fa-folder-open-o',
                     title: advancedLang.load_preset_title,
                     dataAttrs: {
@@ -135,7 +132,6 @@ define([
 
         _onSaveAndApply: function(e) {
             var self = this,
-                refs = self.refs,
                 material = {
                     data: self.state.defaultMaterial.data
                 };
@@ -174,8 +170,7 @@ define([
         },
 
         _onApply: function(e) {
-            var refs = this.refs,
-                material = {
+            var material = {
                     value: 'custom',
                     label: laserLang.custom,
                     data: this.state.defaultMaterial.data

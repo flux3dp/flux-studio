@@ -413,8 +413,8 @@ define(function() {
                     concentric: 'CONCENTRIC'
                 },
                 curaSupport: {
-                    grid: 'GRID',
-                    lines: 'LINES'
+                    lines: 'LINES',
+                    grid: 'GRID'
                 },
                 blackMagic: '黑魔法',
                 spiral: '螺旋',
@@ -695,6 +695,14 @@ define(function() {
                         text: '材質',
                         label: '材質選項',
                         options: [
+                            {
+                                value: 'CARDBOARD',
+                                label: '牛皮紙',
+                                data: {
+                                    laser_speed: 10,
+                                    power: 255
+                                }
+                            },
                             {
                                 value: 'wood',
                                 label: '木板',
