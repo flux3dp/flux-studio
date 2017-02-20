@@ -67,7 +67,6 @@ define([
                     }
                 },
                 onError: (response) => {
-                    console.log('error 1');
                     events.onError(response);
                 },
                 onFatal: (response) => {

@@ -265,7 +265,10 @@ define([
 
                     if(tutorialMode) {
                         //First time using, with usb-configured printer..
-                        AlertActions.showPopupYesNo('set_default', sprintf(lang.tutorial.set_first_default,Config().read('configured-printer')),lang.tutorial.set_first_default_caption);
+                        AlertActions.showPopupYesNo(
+                            'set_default',
+                            sprintf(lang.tutorial.set_first_default,Config().read('configured-printer')),
+                            lang.tutorial.set_first_default_caption);
                     }
 
                     AlertStore.onYes(this._handleYes);
@@ -293,21 +296,21 @@ define([
 
                 _registerKeyEvents: function() {
                     // delete event
-                    shortcuts.on(['del'], (e) => {
+                    shortcuts.on(['del'], () => {
                         if(allowDeleteObject && !this._isMonitorOn()) {
                             director.removeSelected();
                         }
                     });
 
-                    shortcuts.on(['cmd', 'z'], (e) => {
+                    shortcuts.on(['cmd', 'z'], () => {
                         director.undo();
                     });
 
-                    shortcuts.on(['cmd', 'shift', 'x'], (e) => {
+                    shortcuts.on(['cmd', 'shift', 'x'], () => {
                         this._handleClearScene();
                     });
 
-                    shortcuts.on(['cmd', 'shift', 'a'], (e) => {
+                    shortcuts.on(['cmd', 'shift', 'a'], () => {
                         LocalStorage.clearAllExceptIP();
                     });
 
@@ -329,7 +332,7 @@ define([
 
                 _registerTracking: function() {
                     let allowTracking = Config().read('allow-tracking');
-                    if(allowTracking == '') {
+                    if(allowTracking === '') {
                         AlertActions.showPopupYesNo('allow_tracking', lang.settings.allow_tracking);
                     }
                 },
@@ -364,7 +367,6 @@ define([
                 },
 
                 _handleYes: function(answer, args) {
-                    console.log(answer, args);
                     if(answer === 'tour') {
                         if(this.state.hasObject) {
                             director.clearScene();
@@ -743,7 +745,9 @@ define([
                                 var blob = oReq.response;
                                 var url = URL.createObjectURL(blob);
                                 blob.name = 'guide-example.stl';
-                                director.appendModel(url, blob);
+                                director.appendModel(url, blob, 'st', () => {
+                                    director.startSlicing();
+                                });
                             };
 
                             oReq.send();

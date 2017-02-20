@@ -98,7 +98,7 @@ define([
                                 else {
                                     goNext();
                                 }
-                                Config().write("configured-printer", name);
+                                Config().write('configured-printer', name);
                             }
                         });
                     },
@@ -110,11 +110,11 @@ define([
                         $.when(upnpMethods.name(name), upnpMethods.password(oldPassword, password)).
                         always(function() {
                             ProgressActions.close();
-                        }).
-                        done(function() {
+                        })
+                        .done(function() {
                             goNext();
-                        }).
-                        fail(function(response) {
+                        })
+                        .fail(function(response) {
                             AlertActions.showPopupError('set-machine-error', lang.initialize.set_machine_generic.incorrect_old_password);
                         });
 
@@ -225,9 +225,9 @@ define([
                     true === this.state.settingPrinter.password &&
                     '' === (this.state.settingPrinter.plaintext_password || '') &&
                     'WIFI' === this.state.settingPrinter.from ?
-                    <label className="control" for="printer-old-password">
-                        <h4 className="input-head padleft">{lang.initialize.set_machine_generic.old_password}</h4>
-                        <input ref="old_password" for="printer-old-password" type="password" className={printerPasswordClass}
+                    <label className='control' for='printer-old-password'>
+                        <h4 className='input-head padleft'>{lang.initialize.set_machine_generic.old_password}</h4>
+                        <input ref='old_password' for='printer-old-password' type='password' className={printerPasswordClass}
                         placeholder={lang.initialize.set_machine_generic.old_password}/>
                     </label> :
                     ''
@@ -238,35 +238,35 @@ define([
                 }
 
                 content = (
-                    <div className="set-machine-generic text-center">
-                        <img className="brand-image" src="/img/menu/main_logo.svg"/>
+                    <div className='set-machine-generic text-center'>
+                        <img className='brand-image' src='/img/menu/main_logo.svg'/>
 
-                        <form className="form h-form" onSubmit={this._handleSetPrinter}>
-                            <h1 className="headline">{lang.initialize.name_your_flux}</h1>
+                        <form className='form h-form' onSubmit={this._handleSetPrinter}>
+                            <h1 className='headline'>{lang.initialize.name_your_flux}</h1>
 
-                            <div className="controls">
-                                <label className="control" for="printer-name">
-                                    <h4 className="input-head">{lang.initialize.set_machine_generic.printer_name}</h4>
-                                    <input ref="name" id="printer-name" type="text" className={printerNameClass}
+                            <div className='controls'>
+                                <label className='control' for='printer-name'>
+                                    <h4 className='input-head'>{lang.initialize.set_machine_generic.printer_name}</h4>
+                                    <input ref='name' id='printer-name' type='text' className={printerNameClass}
                                         autoFocus={true}
-                                        autoComplete="off"
+                                        autoComplete='off'
                                         defaultValue={this.state.settingPrinter.name}
                                         placeholder={lang.initialize.set_machine_generic.printer_name_placeholder}
                                     />
                                     <span className={invalidPrinterNameClass}>{invalidPrinterNameMessage}</span>
                                 </label>
                                 {oldPassword}
-                                <label className="control" for="printer-password">
-                                    <h4 className="input-head">{lang.initialize.set_machine_generic.password}</h4>
-                                    <input ref="password" for="printer-password" type="password" className={printerPasswordClass}
+                                <label className='control' for='printer-password'>
+                                    <h4 className='input-head'>{lang.initialize.set_machine_generic.password}</h4>
+                                    <input ref='password' for='printer-password' type='password' className={printerPasswordClass}
                                     placeholder={lang.initialize.set_machine_generic.password_placeholder}/>
                                 </label>
                             </div>
-                            <div className="btn-v-group">
-                                <button type="submit" className="btn btn-action btn-large" data-ga-event="next">
+                            <div className='btn-v-group'>
+                                <button type='submit' className='btn btn-action btn-large' data-ga-event='next'>
                                     {lang.initialize.next}
                                 </button>
-                                <a href="#initialize/wifi/setup-complete/with-usb" data-ga-event="skip" className="btn btn-link btn-large">
+                                <a href='#initialize/wifi/setup-complete/with-usb' data-ga-event='skip' className='btn btn-link btn-large'>
                                     {lang.initialize.skip}
                                 </a>
                             </div>

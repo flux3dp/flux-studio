@@ -66,15 +66,26 @@ define([
 
             componentDidMount: function() {
                 if (true === this.props.open) {
-                    let selectedDevice = DeviceMaster.getSelectedDevice();
-                    if(selectedDevice.uuid !== this.props.device.uuid) {
-                        DeviceMaster.selectDevice(this.props.device).then(function(status) {
+                    if(this.props.src === 'TUTORIAL') {
+                        DeviceMaster.selectDevice(this.props.device).then((status) => {
                             if (status !== DeviceConstants.CONNECTED) {
                                 // alert and close
                                 AlertActions.showPopupError('change-filament', status);
                             }
                         });
                     }
+                    else {
+                        let selectedDevice = DeviceMaster.getSelectedDevice();
+                        if(selectedDevice.uuid !== this.props.device.uuid) {
+                            DeviceMaster.selectDevice(this.props.device).then(function(status) {
+                                if (status !== DeviceConstants.CONNECTED) {
+                                    // alert and close
+                                    AlertActions.showPopupError('change-filament', status);
+                                }
+                            });
+                        }
+                    }
+
 
                     if(this.props.src !== 'TUTORIAL') {
                         AlertStore.onCancel(this._onCancel);

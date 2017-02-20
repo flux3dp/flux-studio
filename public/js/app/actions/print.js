@@ -2936,6 +2936,7 @@ define([
         addHistory          : addHistory,
         clearScene          : clearScene,
         changeEngine        : changeEngine,
-        takeSnapShot        : takeSnapShot
+        takeSnapShot        : takeSnapShot,
+        startSlicing        : startSlicing
     };
 });
