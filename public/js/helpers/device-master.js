@@ -61,7 +61,7 @@ define([
         usbEventListeners = [];
 
     function selectDevice(device, deferred) {
-        if(_selectedDevice.serial === device.serial) {
+        if(_selectedDevice.uuid === device.uuid) {
             let d = $.Deferred();
             d.resolve(DeviceConstants.CONNECTED);
             return d.promise();
@@ -182,16 +182,20 @@ define([
         else {
             _device = {};
             _device.uuid = uuid;
+            _device.source = device.source;
             _device.name = device.name;
         }
 
         const initSocketMaster = () => {
             SocketMaster = new Sm();
             // if availableUsbChannel has been defined
-            if(typeof this.availableUsbChannel !== 'undefined') {
+            if(typeof this.availableUsbChannel !== 'undefined' && device.source === 'h2h') {
                 _device.actions = createDeviceActions(this.availableUsbChannel);
-                SocketMaster.setWebSocket(_device.actions);
             }
+            else {
+                _device.actions = createDeviceActions(device.uuid);
+            }
+            SocketMaster.setWebSocket(_device.actions);
         };
 
         initSocketMaster();
@@ -231,6 +235,7 @@ define([
     function reconnectWs() {
         let d = $.Deferred();
         _device.actions = DeviceController(_selectedDevice.uuid, {
+            availableUsbChannel: _selectedDevice.source === 'h2h' ? _selectedDevice.addr : -1,
             onConnect: function(response) {
                 d.notify(response);
 
@@ -278,6 +283,10 @@ define([
                         lang.message.unknown_error
                     );
                 }
+            },
+            onFatal: function(response) {
+                // if channel is not available, (opcode -1),
+                // default in createDeviceActions will catch first
             }
         });
 
@@ -366,8 +375,6 @@ define([
         let d = $.Deferred();
         _device.actions.killSelf().then(response => {
             d.resolve(response);
-        }).fail(error => {
-            d.resolve(error);
         }).always(() => {
             reconnectWs();
         });
@@ -668,9 +675,9 @@ define([
         }
     }
 
-    function _existConnection(uuid) {
+    function _existConnection(uuid, source) {
         return _devices.some(function(d) {
-            return d.uuid === uuid;
+            return d.uuid === uuid && d.source === source;
         });
     }
 

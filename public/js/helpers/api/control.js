@@ -338,13 +338,13 @@ define([
 
             killSelf: () => {
                 let d = $.Deferred();
-
-                events.onMessage = (response) => { d.resolve(response); };
-                events.onError = (response) => { d.reject(response); };
-                events.onFatal = (response) => { d.reject(response); };
-
                 dedicatedWs[fileInfoWsId].send('kick');
                 dedicatedWs[fileInfoWsId].close();
+                ws.send('kick');
+                ws.close();
+                setInterval(() => {
+                    d.resolve();
+                }, 500);
                 return d.promise();
             },
 
