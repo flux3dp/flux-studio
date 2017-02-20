@@ -220,11 +220,9 @@ define([
                 self._returnSelectedPrinter();
             }
             else {
-
-
                 DeviceMaster.selectDevice(self.selected_printer).done(function(status) {
                     if (status === DeviceConstants.CONNECTED) {
-                        printer = self.state.discoverMethods.getLatestPrinter(printer);
+                        printer = self.selected_printer;
                         checkDeviceStatus(printer).done(function() {
                             if (true === self.props.forceAuth && true === printer.password) {
                                 onError();
