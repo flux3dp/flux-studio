@@ -255,7 +255,9 @@ define([
             joinWifiNetwork: function(wifi, password, hiddenSSID) {
                 var d = $.Deferred(),
                     wifiConfig,
-                    command = ['set network'];
+                    command = [];
+
+                command.push(usbChannel === -1 ? 'set network' : 'set_network2');
 
                 wifiConfig = {
                     wifi_mode: 'client',
