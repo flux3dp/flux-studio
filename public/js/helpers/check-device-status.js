@@ -23,11 +23,13 @@ define([
     var lang = i18n.get();
 
     return function(printer, bypassPause) {
+        if(!printer) { return; }
         var deferred = $.Deferred(),
             onYes = function(id) {
                 var timer;
 
                 DeviceMaster.selectDevice(printer).then(function() {
+                    console.log(printer);
                     switch (id) {
                     case 'kick':
                         DeviceMaster.kick().then(function() {
@@ -93,10 +95,11 @@ define([
         case DeviceConstants.status.PAUSED:
         case DeviceConstants.status.PAUSED_FROM_STARTING:
         case DeviceConstants.status.PAUSED_FROM_RUNNING:
+            deferred.resolve('ok', printer.st_id);
             // ask for abort
-            ProgressActions.close();
-            AlertActions.showPopupYesNo('abort', lang.message.device_is_used);
-            AlertStore.onYes(onYes);
+            // ProgressActions.close();
+            // AlertActions.showPopupYesNo('abort', lang.message.device_is_used);
+            // AlertStore.onYes(onYes);
             break;
         default:
             // device busy

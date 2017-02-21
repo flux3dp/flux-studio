@@ -577,10 +577,17 @@ define([
                         label: lang.device.turn_on_head_temperature,
                         enabled: true,
                         onClick: function() {
-                            var currentPrinter = discoverMethods.getLatestPrinter(printer),
-                                lang = i18n.get();
+                            var currentPrinter = discoverMethods.getLatestPrinter(printer);
 
-                            AlertActions.showHeadTemperature(currentPrinter);
+                            DeviceMaster.selectDevice(currentPrinter).then(status => {
+                                if(status === DeviceConstants.CONNECTED) {
+                                    AlertActions.showHeadTemperature(currentPrinter);
+                                }
+                                else if(status === DeviceConstants.TIMEOUT) {
+                                    AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
+                                }
+                            });
+
                         }
                     }
                 ]
@@ -648,10 +655,11 @@ define([
             return {
                 isPrinter: true,
                 uuid: printer.uuid,
-                label: printer.name,
+                label: printer.name + (printer.source === 'h2h' ? ' (USB)' : ''),
                 enabled: true,
                 isNew: printer.isNew,
-                subItems: subItems
+                subItems: subItems,
+                isUsb: printer.source === 'h2h'
             };
         };
 
@@ -660,7 +668,6 @@ define([
             printers.forEach(function(printer) {
                 _printers.push(createDevice(printer));
             });
-
             return _printers;
         };
 

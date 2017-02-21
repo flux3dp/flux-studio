@@ -80,6 +80,14 @@ define([
                             lang.message.unknown_device
                         );
                     }
+                    else if(response.code === 1006) {
+                        ProgressActions.close();
+                        AlertActions.showPopupError(
+                            'NO-CONNECTION',
+                            lang.message.cant_connect_to_device
+                        );
+                        opts.onFatal(response);
+                    }
                     else {
                         clearTimeout(timmer);
                         events.onError(response);
@@ -330,13 +338,13 @@ define([
 
             killSelf: () => {
                 let d = $.Deferred();
-
-                events.onMessage = (response) => { d.resolve(response); };
-                events.onError = (response) => { d.reject(response); };
-                events.onFatal = (response) => { d.reject(response); };
-
                 dedicatedWs[fileInfoWsId].send('kick');
                 dedicatedWs[fileInfoWsId].close();
+                ws.send('kick');
+                ws.close();
+                setInterval(() => {
+                    d.resolve();
+                }, 500);
                 return d.promise();
             },
 
@@ -521,6 +529,22 @@ define([
                 return useDefaultResponse('task quit');
             },
 
+            startToolheadOperation: () => {
+                return useDefaultResponse('play toolhead operation');
+            },
+
+            endToolheadOperation: () => {
+                return useDefaultResponse('play toolhead standby');
+            },
+
+            endLoadingDuringPause: () => {
+                return useDefaultResponse('play press_button');
+            },
+
+            setHeadTemperatureDuringPause: (temperature) => {
+                return useDefaultResponse(`play set_heater 0 ${temperature}`);
+            },
+
             /**
              * maintain home
              *
@@ -555,6 +579,11 @@ define([
                 }, 3000);
 
                 return d.promise();
+            },
+
+            changeFilamentDuringPause: (type) => {
+                let cmd = type === 'LOAD' ? 'load_filament' : 'unload_filament';
+                return useDefaultResponse(`play ${cmd} 0`);
             },
 
             setHeadTemperature: (temperature) => {

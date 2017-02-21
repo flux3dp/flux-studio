@@ -1114,7 +1114,10 @@ define(function() {
             need_1_1_7_above: '請更新 Delta 韌體到 v1.1.7 以上',
             gcode_area_too_big: '匯入的 gcode 檔案超過列印範圍',
             empty_file: '檔案內容不存在',
-            usb_unplugged: 'USB 被拔除，請確認 USB 與機器的連接'
+            usb_unplugged: 'USB 被拔除，請確認 USB 與機器的連接',
+            launghing_from_installer_warning: 'FLUX Studio 不是從應用程式資料夾開啟，可能會產生問題。請將 FLUX Studio 移到應用程式資料夾再使用。',
+            uploading_fcode: '正在上傳 fcode',
+            cant_connect_to_device: '無語連結機器，請確認機器是否開啟，以及與機器的連結方式'
         },
         machine_status: {
             '-10': '原生模式',
@@ -1169,6 +1172,7 @@ define(function() {
             unloaded: '退料完成',
             ok: '確定',
             auto_emerging: '請插入線料',
+            loading_filament: '進料中',
             maintain_head_type_error: '列印工具頭未正確安裝',
             maintain_zombie: '請重新啟動機器',
             toolhead_no_response: '#117 列印模組沒有回應 <a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/218347477">暸解更多</a>'

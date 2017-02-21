@@ -910,7 +910,7 @@ define(function() {
             finishing: 'Finishing',
             initiating: 'Initiating',
             unknown: 'Unknown',
-            pausedFromError: 'paused from error',
+            pausedFromError: 'Paused from error',
             model_name: 'Model Name',
             IP: 'IP',
             serial_number: 'Serial Number',
@@ -1101,7 +1101,10 @@ define(function() {
             need_1_1_7_above: 'Please update Delta Firmware to v1.1.7+',
             gcode_area_too_big: 'Imported gcode exceed the printable area.',
             empty_file: 'File is empty',
-            usb_unplugged: 'USB connection is lost, please check your USB connection'
+            usb_unplugged: 'USB connection is lost, please check your USB connection',
+            launghing_from_installer_warning: 'You are launching FLUX Studio from the installer, and this may cause problems. Please move the FLUX Studio to the Application folder.',
+            uploading_fcode: 'Uploading fcode',
+            cant_connect_to_device: 'Cannot connect to device, please check your connection'
         },
         machine_status: {
             '-10': 'Raw mode',
@@ -1156,6 +1159,7 @@ define(function() {
             unloaded: 'Filament Unloaded',
             ok: 'OK',
             auto_emerging: 'Please insert filament',
+            loading_filament: 'Loading filament',
             maintain_head_type_error: 'Toolhead not installed correctly',
             maintain_zombie: 'Please restart the device',
             toolhead_no_response: '#117 Module no response <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/218347477">More</a>',

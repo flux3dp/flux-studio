@@ -505,7 +505,9 @@ define([
                 store.dispatch(MonitorActionCreator.changeMode(GlobalConstants.PRINT));
 
                 if(fCode) {
+                    this._stopReport();
                     DeviceMaster.go(fCode).then(() => {
+                        this._startReport();
                         store.dispatch(MonitorActionCreator.setUploadProgress(''));
                     }).progress((progress) => {
                         let p = parseInt(progress.step / progress.total * 100);
@@ -595,6 +597,7 @@ define([
 
         _startReport: function() {
             this.reporter = setInterval(() => {
+                // if(window.stopReport === true) { return; }
                 DeviceMaster.getReport().fail((error) => {
                     this._processReport(error);
                 }).then((result) => {
@@ -602,6 +605,10 @@ define([
                     this._processReport(result);
                 });
             }, refreshTime);
+        },
+
+        _stopReport: function() {
+            clearInterval(this.reporter);
         },
 
         _generatePreview: function(info) {

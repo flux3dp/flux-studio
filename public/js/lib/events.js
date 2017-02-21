@@ -34,7 +34,7 @@ define(function(require, exports, module) {
 
     // By default EventEmitters will print a warning if more than 10 listeners are
     // added to it. This is a useful default which helps finding memory leaks.
-    EventEmitter.defaultMaxListeners = 2;
+    EventEmitter.defaultMaxListeners = 5;
 
     // Obviously not all Emitters should be limited to 10. This function allows
     // that to be increased. Set to zero for unlimited.
