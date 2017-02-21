@@ -109,13 +109,14 @@ define([
                         if(window.FLUX.allowTracking) {
                             window.Raven.captureException(data);
                         }
+                        console.log('ws error', data);
                         socketOptions.onError(data);
                         break;
                     case 'fatal':
                         if(window.FLUX.allowTracking) {
                             window.Raven.captureException(data);
                         }
-                        console.log('sending fatal');
+                        console.log('ws fatal', data);
                         socketOptions.onFatal(data);
                         break;
                     // ignore below status

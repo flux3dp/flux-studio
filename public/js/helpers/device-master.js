@@ -72,6 +72,7 @@ define([
 
         const goAuth = (uuid) => {
             ProgressActions.close();
+            _selectedDevice = {};
 
             const handleSubmit = (password) => {
                 ProgressActions.open(ProgressConstants.NONSTOP);
@@ -188,8 +189,9 @@ define([
 
         const initSocketMaster = () => {
             SocketMaster = new Sm();
+
             // if availableUsbChannel has been defined
-            if(typeof this.availableUsbChannel !== 'undefined' && device.source === 'h2h') {
+            if(typeof this !== 'undefined' && typeof this.availableUsbChannel !== 'undefined' && device.source === 'h2h') {
                 _device.actions = createDeviceActions(this.availableUsbChannel);
             }
             else {
