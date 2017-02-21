@@ -731,8 +731,8 @@ define([
                     this.setState({ currentTutorialStep: this.state.currentTutorialStep + 1 }, function() {
                         if(this.state.currentTutorialStep === 1) {
                             var selectPrinterName =
-                                    Config().read('configured-printer') ||
                                     InitializeMachine.defaultPrinter.get().name ||
+                                    Config().read('configured-printer') ||
                                     DeviceMaster.getFirstDevice();
 
                             if(selectPrinterName){
@@ -809,6 +809,10 @@ define([
                     //Use setTimeout to avoid multiple modal display conflict
                     if(ans === 'set_default') {
                         AlertStore.removeYesListener(this._handleYes);
+
+                        setTimeout(function() {
+                            this._registerTutorial();
+                        }.bind(this), 10);
                     }
                     else if(ans === 'tour') {
                         this.setState({ tutorialOn: false });
@@ -826,10 +830,6 @@ define([
                         Config().write('allow-tracking', 'false');
                         window.location.reload();
                     }
-
-                    setTimeout(function() {
-                        this._registerTutorial();
-                    }.bind(this), 10);
                 },
 
                 _handleSliceReport: function(data) {

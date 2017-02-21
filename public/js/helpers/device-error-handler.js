@@ -37,8 +37,8 @@ define(['helpers/i18n'], function (i18n) {
                         errorOutput = (error.length >= 2) ? lang.monitor[error.slice(0, 2).join('_')] : error.join('_');
                     }
                 } else {
-                    if (lang.error[error[0]]) {
-                        return lang.error[error[0]];
+                    if (lang.generic_error[error[0]]) {
+                        return lang.generic_error[error[0]];
                     }
                     errorOutput = lang.monitor[error.slice(0, 2).join('_')];
                     if (errorOutput === '' || typeof errorOutput === 'undefined') {

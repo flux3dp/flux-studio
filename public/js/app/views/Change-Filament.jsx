@@ -8,7 +8,8 @@ define([
     'helpers/device-master',
     'app/constants/device-constants',
     'app/actions/alert-actions',
-    'app/stores/alert-store'
+    'app/stores/alert-store',
+    'helpers/device-error-handler'
 ], function(
     $,
     React,
@@ -19,7 +20,8 @@ define([
     DeviceMaster,
     DeviceConstants,
     AlertActions,
-    AlertStore
+    AlertStore,
+    DeviceErrorHandler
 ) {
     'use strict';
 
@@ -178,7 +180,6 @@ define([
                     },
                     errorMessageHandler = (response) => {
                         var messageMap = lang.monitor,
-                            subErrorIndex = 1,
                             allJoinedMessage = response.error.join('_'),
                             genericMessage = response.error.slice(0, 2).join('_');
 
@@ -187,8 +188,9 @@ define([
                         // has default
                         if (true === messageMap.hasOwnProperty(genericMessage)) {
                             if(response.error.length === 4) {
+                                // TODO FIX Toolhead not found
                                 if(response.error[3] === 'N/A') {
-                                    AlertActions.showPopupError('', lang.change_filament.NA);;
+                                    AlertActions.showPopupError('change-filament-device-error', DeviceErrorHandler.translate(['HEAD_ERROR','HEAD_OFFLINE']));
                                 }
                             }
                             else {
@@ -196,8 +198,8 @@ define([
                             }
                         }
                         // wrong toolhead
-                        else if ('TYPE_ERROR' === response.error[subErrorIndex]) {
-                            AlertActions.showPopupError(genericMessage, messageMap.HEAD_ERROR_TYPE_ERROR);
+                        else if ('TYPE_ERROR' === response.error[1]) {
+                            AlertActions.showPopupError('change-filament-device-error', DeviceErrorHandler.translate(['HEAD_ERROR','HEAD_OFFLINE']));
                         }
                         // default
                         else {
@@ -252,8 +254,12 @@ define([
                                 AlertActions.showPopupError('change-filament-toolhead-no-response', lang.change_filament.toolhead_no_response);
                                 self.props.onClose();
                             }
-                            else if (response.info === 'TYPE_ERROR') {
-                                AlertActions.showPopupError('change-filament-device-error', lang.change_filament.maintain_head_type_error);
+                            else if (response.error[1] === 'TYPE_ERROR' || response.info === 'TYPE_ERROR') {
+                                if (response.error[3] == 'N/A') {
+                                    AlertActions.showPopupError('change-filament-device-error', DeviceErrorHandler.translate(['HEAD_ERROR','HEAD_OFFLINE']));
+                                } else {
+                                    AlertActions.showPopupError('change-filament-device-error', DeviceErrorHandler.translate(['HEAD_ERROR','TYPE_ERROR']));
+                                }
                                 DeviceMaster.quitTask().then(function() {
                                     self.setState({ currentStep: steps.GUIDE });
                                 });

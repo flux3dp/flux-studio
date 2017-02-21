@@ -10,20 +10,27 @@ define(function() {
             no_vcredist: 'Please install Visual C++ Redistributable 2015',
             osx_10_9: 'OS X 10.9 is not supported. Please update to newer version'
         },
+        generic_error: {
+            UNKNOWN_ERROR: "[UE] Please restart FLUX Studio",
+            OPERATION_ERROR: "[OE] Please restart the machine",
+            SUBSYSTEM_ERROR: "[SE] Please restart the machine",
+            UNKNOWN_COMMAND: "[UC] Please update the Delta+/Delta Firmware",
+            RESOURCE_BUSY: "[RB] Please restart  the machine, or try again"
+        },
         device_selection: {
-            no_printers: 'Cannot detect FLUX Delta through Wi-Fi. Please check if your PC and FLUX Delta are under the same network. <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/215394548">More Info</a>',
+            no_printers: 'Cannot detect any machine through the Wi-Fi. Please check if your PC and machine are under the same network. <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/215394548">More Info</a>',
             module: 'MODULE',
             status: 'STATUS'
         },
         update: {
             release_note: 'Release Note:',
             firmware: {
-                caption: 'A Firmware Update to FLUX Delta is available',
+                caption: 'A Firmware Update to the machine is available',
                 message_pattern_1: '"%s" is now ready for firmware update.',
-                message_pattern_2: 'FLUX Delta Firmware v%s is now available - You have v%s.',
+                message_pattern_2: 'Machine Firmware v%s is now available - You have v%s.',
                 latest_firmware: {
-                    caption: 'Delta Firmware Update',
-                    message: 'You have the latest Delta firmware'
+                    caption: 'Machine firmware Update',
+                    message: 'You have the latest Machine firmware'
                 },
                 confirm: 'UPLOAD',
                 upload_file: 'Firmware upload (*.bin / *.fxfw)',
@@ -82,22 +89,22 @@ define(function() {
                 undo: 'Undo'
             },
             device: {
-                label: 'Devices',
-                new: 'Add a New Device',
+                label: 'Machines',
+                new: 'Add a New Machine',
                 device_monitor: 'Dashboard',
-                device_info: 'Device Info',
+                device_info: 'Machine Info',
                 change_filament: 'Change Printing Material',
                 default_device: 'Set as Default',
                 check_firmware_update: 'Update Firmware',
-                update_delta: 'Delta Firmware',
+                update_delta: 'Machine Firmware',
                 update_toolhead: 'Toolhead Firmware',
                 calibrate: 'Run Auto Leveling',
                 set_to_origin: 'Calibrate Origin ( Home )',
                 scan_laser_calibrate: 'Turn On Scanning Laser',
                 clean_calibration: 'Run Auto Leveling with Clean Data',
                 commands: 'Commands',
-                set_to_origin_complete: 'Delta has calibrated its origin.',
-                scan_laser_complete: 'Delta has turned on its scanning laser. Click "Finish" to turn it off.',
+                set_to_origin_complete: 'The machine has calibrated its origin.',
+                scan_laser_complete: 'The machine has turned on its scanning laser. Click "Finish" to turn it off.',
                 finish: 'FINISH',
                 cancel: 'CANCEL',
                 turn_on_head_temperature: 'Set toolhead temperature'
@@ -142,10 +149,10 @@ define(function() {
                 content: 'Are you sure to change the password?',
                 caption: 'Changing password'
             },
-            connect_flux: 'Connect FLUX Delta',
+            connect_flux: 'Connect the Machine',
             via_usb: 'Using USB Cable',
             via_wifi: 'Using Wi-Fi',
-            name_your_flux: 'Name Your FLUX Delta',
+            name_your_flux: 'Name Your Machine',
             wifi_setup: 'Wi-Fi Setup',
             select_preferred_wifi: 'Select your preferred network.',
             requires_wifi_password: 'requires a password.',
@@ -154,11 +161,11 @@ define(function() {
             // page specific
             set_machine_generic: {
                 printer_name: 'Name*',
-                printer_name_placeholder: 'Give your Delta an unique name',
+                printer_name_placeholder: 'Give your machine an unique name',
                 old_password: 'Current Password',
                 password: 'Password',
                 set_station_mode: 'Create a Network',
-                password_placeholder: 'Secure your Delta from bad people',
+                password_placeholder: 'Secure your machine with password',
                 incorrect_old_password: 'Incorrect Current Password',
                 incorrect_password: 'Incorrect Password',
                 ap_mode_name: 'Network Name',
@@ -175,23 +182,23 @@ define(function() {
             setting_completed: {
                 start: 'Start',
                 is_ready: '“%s” is ready',
-                station_ready_statement: 'Your FLUX Delta is now a Wi-Fi station, you can use your FLUX wirelessly by connect to Wi-Fi “%s”',
+                station_ready_statement: 'Your machine is now a Wi-Fi station, you can use your machine wirelessly by connect to Wi-Fi “%s”',
                 brilliant: 'Brilliant!',
-                begin_journey: 'You can now detach Micro USB Cable, and begin the journey with your FLUX Delta now.',
+                begin_journey: 'You can now detach Micro USB Cable, and begin the journey of creativity.',
                 great: 'Welcome to FLUX Studio',
-                upload_via_usb: 'You can setup device Wi-Fi later. <br/>If you don\'t have Wi-Fi, check <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/215998327-Connection-Guide-for-Desktop-PCs">Desktop Connection Guide</a>.',
+                upload_via_usb: 'You can setup Wi-Fi connection later. <br/>If you don\'t have Wi-Fi, check <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/215998327-Connection-Guide-for-Desktop-PCs">Desktop Connection Guide</a>.',
                 back: 'Back',
                 ok: 'START CREATING'
             },
 
             notice_from_device: {
-                headline: 'Check the Wi-Fi Indicator on FLUX Delta',
+                headline: 'Check the Wi-Fi Indicator on your machine',
                 subtitle: 'Please mind the status of Wi-Fi connection.',
                 light_on: 'Light On',
-                light_on_desc: 'FLUX Delta has connected to the Wi-Fi you assigned',
+                light_on_desc: 'The machine has connected to the Wi-Fi you assigned',
                 breathing: 'Breathing',
                 breathing_desc: 'Wi-Fi connection failed. Please try setting again.',
-                successfully: 'If FLUX Delta connect successfully',
+                successfully: 'If the machine connect successfully',
                 successfully_statement: 'Please go back to your Wi-Fi list and connect your PC to %s, then restart FLUX Studio',
                 restart: 'Restart FLUX Studio'
             },
@@ -200,11 +207,11 @@ define(function() {
             errors: {
                 error: 'Error',
                 not_found: 'Not Found',
-                not_support: 'Please update Delta Firmware to v1.1+',
+                not_support: 'Please update Machine Firmware to v1.6+, through USB',
 
                 keep_connect: {
-                    caption: 'USB Device not found',
-                    content: 'Oops! Don\'t worry. We\'re here for you.\nMake sure\n1. Your FLUX Delta has been powered on\n2. Attached (or re-attach again) to USB Cable\n3. FLUX driver is installed.\n4. If you\'ve tried several times, restart the machine and try again.\n<a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/215327328">More Info</a>'
+                    caption: 'USB Connection not found',
+                    content: 'Oops! Don\'t worry. We\'re here for you.\nMake sure\n1. Your machine has been powered on\n2. Attached (or re-attach again) to USB Cable\n\n3. If you\'ve tried several times, restart the machine and try again.\n<a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/215327328">More Info</a>'
                 },
 
                 wifi_connection: {
@@ -256,7 +263,7 @@ define(function() {
             laser: 'ENGRAVE',
             scan: 'SCAN',
             usb: 'USB',
-            device: 'Device',
+            device: 'Machine',
             setting: 'SETTING',
             draw: 'DRAW'
         },
@@ -266,7 +273,7 @@ define(function() {
             caption: 'Settings',
             tabs: {
                 general: 'General',
-                device: 'Device'
+                device: 'Machine'
             },
             ip: 'Machine IP Address',
             wrong_ip_format: 'Wrong IP Formats',
@@ -354,8 +361,8 @@ define(function() {
                 FORMAT_ERROR: 'Wrong password format',
                 submit: 'SAVE',
                 sign_out: 'Sign out',
-                not_supported_firmware: 'Please upgrade your FLUX Delta firmware\nto v1.5+ for cloud feature',
-                unbind_device: 'Would you like to unbind this device?'
+                not_supported_firmware: 'Please upgrade your machine firmware\nto v1.5+ for cloud feature',
+                unbind_device: 'Would you like to unbind this machine?'
             }
         },
         print: {
@@ -582,7 +589,7 @@ define(function() {
             importTitle: 'Import 3D models ( .stl )',
             getFcodeTitle: 'Save toolhead path and config into FCode file ( *.fc )',
             goTitle: 'Prepare to print',
-            deviceTitle: 'Show device monitor',
+            deviceTitle: 'Show machine monitor',
             rendering: 'Slicing',
             reRendering: 'Re-Slicing',
             finishingUp: 'Finishing up...',
@@ -867,7 +874,7 @@ define(function() {
             }
         },
         select_printer: {
-            choose_printer: 'Choose a device',
+            choose_printer: 'Choose a machine',
             notification: '"%s" requires a password',
             submit: 'SUBMIT',
             please_enter_password: 'Password',
@@ -902,7 +909,7 @@ define(function() {
             uploading: 'Uploading',
             processing: 'Processing',
             disconnectedError: {
-                caption: 'Device disconnected',
+                caption: 'Machine disconnected',
                 message: 'Please confirm if network access of %s is available'
             },
             noTask: 'There are currently no task to do',
@@ -917,7 +924,7 @@ define(function() {
             firmware_version: 'Firmware Version',
             UUID: 'UUID',
             select: 'Select',
-            deviceList: 'Device List',
+            deviceList: 'Machine List',
             calibration: {
                 title: 'Auto Calibration',
                 A: 'Leveling & Height',
@@ -991,14 +998,14 @@ define(function() {
             HARDWARE_ERROR_MAINBOARD_ERROR      : '#401 Critical Error: Mainboard offline. Please contact FLUX Support.',
             HARDWARE_ERROR_SUBSYSTEM_ERROR      : '#402 Critical Error: Subsystem no response. Please contact FLUX Support.',
             HARDWARE_ERROR_SENSOR_ERROR         : 'Hardware sensor error, please contact FLUX Support.~',
-            WRONG_HEAD                          : 'Device head is unknown, please connect to a correct toolhead',
+            WRONG_HEAD                          : 'Toolhead is unknown, please connect to a correct toolhead',
             USER_OPERATION                      : 'Machine is being operated by (other) user',
-            RESOURCE_BUSY                       : 'Device is busy\nIf the device is not running, please restart the device',
-            DEVICE_ERROR                        : 'Something went wrong\nPlease restart the device',
-            NO_RESPONSE                         : 'Something went wrong\nPlease restart the device',
+            RESOURCE_BUSY                       : 'The machine is busy\nIf it is not running, please restart the machine',
+            DEVICE_ERROR                        : 'Something went wrong\nPlease restart the machine',
+            NO_RESPONSE                         : 'Something went wrong\nPlease restart the machine',
             SUBSYSTEM_ERROR                     : '#402 Critical Error: Subsystem no response. Please contact FLUX Support.',
-            HARDWARE_FAILURE                    : 'Something went wrong\nPlease restart the device',
-            MAINBOARD_OFFLINE                   : 'Something went wrong\nPlease restart the device',
+            HARDWARE_FAILURE                    : 'Something went wrong\nPlease restart the machine',
+            MAINBOARD_OFFLINE                   : 'Something went wrong\nPlease restart the machine',
             G28_FAILED                          : '#124 Unable to calibrate origin (home)\nPlease remove obstacles on rails, and make sure toolhead cables are not caught by carriages.',
             FILAMENT_RUNOUT_0                   : '#121 Ran out of filament\nPlease insert new material <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/218931757">More Info</a>',
             USER_OPERATION_FROM_CODE            : 'Paused for operation (filament change)',
@@ -1057,16 +1064,16 @@ define(function() {
             machineNotConnected: 'Machine is not connected',
             notPrinting: 'Printing is not in progress',
             nothingToPrint: 'Nothing to print (source blob missing)',
-            connectionTimeout: 'Please check your network state and your Delta\'s Wi-Fi indicator.',
+            connectionTimeout: 'Please check your network state and your machine\'s Wi-Fi indicator.',
             device_not_found: {
-                caption: 'Default Device not found',
-                message: 'Please check your Delta\'s Wi-Fi indicator'
+                caption: 'Default Machine not found',
+                message: 'Please check your machine\'s Wi-Fi indicator'
             },
             device_busy: {
-                caption: 'Device Busy',
-                message: 'The device is executing another task, try again later. If it stops working, please restart the device.'
+                caption: 'Machine Busy',
+                message: 'The machine is executing another task, try again later. If it stops working, please restart the machine.'
             },
-            device_is_used: 'The device is being used, do you want to abort current task?',
+            device_is_used: 'The machine is being used, do you want to abort current task?',
             invalidFile: 'The file is not a valid STL file',
             failGeneratingPreview: 'Fail to generate preview',
             slicingFailed: 'slic3r is unable to slice this model',
@@ -1089,22 +1096,22 @@ define(function() {
             brokenFcode: 'Unable to open %s',
             slicingFatalError: 'Error encountered during slicing. Kindly report STL file to customer support.',
             unknown_error: 'The application has encountered an unknown error, please use Help > Menu > Bug Report.',
-            unknown_device: 'Cannot connect to device, please make sure USB is attached to the machine',
+            unknown_device: 'Cannot connect to the machine, please make sure USB is attached to the machine',
             important_update: {
                 caption: 'Important Update',
-                message: 'Important Delta firmware update is available. Do you want to update now?',
+                message: 'Important Machine firmware update is available. Do you want to update now?',
             },
             unsupport_osx_version: 'Unsupported Mac OS X Version Detected',
-            need_password: 'Need Password to connect to FLUX Delta',
+            need_password: 'Need Password to Connect to the Machine',
             new_app_downloading: 'Downloading',
             ask_for_upgrade: 'Do you wanna upgrade NOW?',
-            need_1_1_7_above: 'Please update Delta Firmware to v1.1.7+',
+            need_1_1_7_above: 'Please update Machine Firmware to v1.1.7+',
             gcode_area_too_big: 'Imported gcode exceed the printable area.',
             empty_file: 'File is empty',
             usb_unplugged: 'USB connection is lost, please check your USB connection',
             launghing_from_installer_warning: 'You are launching FLUX Studio from the installer, and this may cause problems. Please move the FLUX Studio to the Application folder.',
             uploading_fcode: 'Uploading fcode',
-            cant_connect_to_device: 'Cannot connect to device, please check your connection'
+            cant_connect_to_device: 'Cannot connect to the machine, please check your connection'
         },
         machine_status: {
             '-10': 'Raw mode',
@@ -1161,7 +1168,7 @@ define(function() {
             auto_emerging: 'Please insert filament',
             loading_filament: 'Loading filament',
             maintain_head_type_error: 'Toolhead not installed correctly',
-            maintain_zombie: 'Please restart the device',
+            maintain_zombie: 'Please restart the machine',
             toolhead_no_response: '#117 Module no response <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/218347477">More</a>',
             NA: 'Toolhead is not connected'
         },
