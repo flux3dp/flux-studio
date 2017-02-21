@@ -69,7 +69,6 @@ define(function() {
                 import: 'Import',
                 save_fcode: 'Export FLUX Task',
                 save_scene: 'Save Scene',
-                reset: 'Reset',
                 confirmReset: 'Are you sure you want to reset all settings?'
             },
             edit: {
@@ -77,9 +76,9 @@ define(function() {
                 duplicate: 'Duplicate',
                 rotate: 'Rotate',
                 scale: 'Scale',
-                reset: 'Reset',
                 clear: 'Clear Scene',
-                undo: 'Undo'
+                undo: 'Undo',
+                reset: 'Reset'
             },
             device: {
                 label: 'Devices',
@@ -274,6 +273,9 @@ define(function() {
             projection_perspective: 'Perspective',
             projection_orthographic: 'Orthographic',
             antialiasing: 'Anti-aliasing',
+            reset: 'Reset FS',
+            reset_now: 'Reset Now',
+            confirm_reset: 'Confirm reset FS?',
             language: 'Language',
             notifications: 'Notifications',
             close: 'Close',

@@ -69,7 +69,6 @@ define(function() {
                 import: '匯入',
                 save_fcode: '匯出工作',
                 save_scene: '匯出場景',
-                reset: '重置設定',
                 confirmReset: '是否確定要重置所有設定?'
             },
             edit: {
@@ -77,9 +76,9 @@ define(function() {
                 duplicate: '重製',
                 rotate: '旋轉',
                 scale: '縮放',
-                reset: '重置',
                 clear: '清除場景',
-                undo: '復原'
+                undo: '復原',
+                reset: '重設'
             },
             device: {
                 label: '機器',
@@ -274,6 +273,9 @@ define(function() {
             projection_perspective: '透視投影',
             projection_orthographic: '正投影',
             antialiasing: '反鋸齒',
+            reset: '重設 FS',
+            reset_now: '執行重設',
+            confirm_reset: '確認重設 FS?',
             language: '語言',
             notifications: '通知',
             close: '關閉',

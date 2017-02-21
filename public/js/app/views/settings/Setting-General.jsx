@@ -4,8 +4,9 @@ define([
     'helpers/i18n',
     'helpers/api/config',
     'jsx!widgets/Select',
-    'app/actions/alert-actions'
-], function($, React, i18n, config, SelectView, AlertActions) {
+    'app/actions/alert-actions',
+    'helpers/local-storage',
+], function($, React, i18n, config, SelectView, AlertActions, LocalStorage) {
     'use strict';
 
     let Controls = React.createClass({
@@ -76,6 +77,12 @@ define([
 
         _updateOptions: function(id, e) {
             config().write(id, e.target.value);
+        },
+
+        _resetFS: function() {
+            if(confirm(this.state.lang.settings.confirm_reset)) {
+                LocalStorage.clearAllExceptIP();
+            }
         },
 
         render: function() {
@@ -179,6 +186,12 @@ define([
                             options={antialiasingOptions}
                             onChange={this._updateOptions.bind(null, 'antialiasing')}
                         />
+                    </Controls>
+
+                    <Controls label={lang.settings.reset}>
+                        <a className="font3"
+                            onClick={this._resetFS}
+                        >{lang.settings.reset_now}</a>
                     </Controls>
 
                 </div>
