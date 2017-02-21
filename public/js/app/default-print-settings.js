@@ -33,7 +33,7 @@ fan_below_layer_time = 99
 filament_colour = #FFFFFF
 filament_diameter = 1.75
 fill_angle = 45
-fill_density = 20%
+fill_density = 10%
 fill_pattern = honeycomb
 first_layer_acceleration = 0
 first_layer_bed_temperature = 0
@@ -89,7 +89,7 @@ retract_speed = 80
 seam_position = aligned
 skirt_distance = 10
 skirt_height = 1
-skirts = 2
+skirts = 0
 slowdown_below_layer_time = 15
 small_perimeter_speed = 15
 solid_infill_below_area = 1
@@ -99,7 +99,7 @@ solid_infill_extrusion_width = 0.4
 solid_infill_speed = 20
 spiral_vase = 0
 standby_temperature_delta = -5
-start_gcode = G1 Z5 F5000 ; lift nozzle;\\nG92 Z4.9
+start_gcode = G1 F6000 Z50\\nG92 Z49.9\\nG92 E0 ;zero the extruded length\\nG1 F2400 E-4.50000\\nG0 F9000 X-63.184 Y-57.431\\nG0 F9000 Z0.800\\nG1 F2400 E0.00000\\nG1 F600 X-68.813 Y-50.551 E2.36528\\nG1 X-77.780 Y-35.227 E7.09590\\nG1 X-83.384 Y-18.380 E11.82647\\nG1 X-85.384 Y-0.738 E16.55716\\nG1 X-83.693 Y16.934 E21.28723\\nG1 X-78.383 Y33.877 E26.01807\\nG1 X-69.685 Y49.355 E30.74862\\nG1 X-57.975 Y62.701 E35.47929\\nG1 X-43.757 Y73.336 E40.21008\\nG1 X-27.649 Y80.802 E44.94053\\nG1 X-10.345 Y84.776 E49.67108\\nG1 X7.407 Y85.086 E54.40166\\nG1 X24.838 Y81.718 E59.13191\\nG1 X41.198 Y74.819 E63.86265\\nG1 X55.778 Y64.686 E68.59345\\nG1 X67.947 Y51.758 E73.32398\\nG1 X77.179 Y36.593 E78.05439\\nG1 X83.077 Y19.846 E82.78515\\nG1 X85.383 Y2.241 E87.51594\\nG1 X84.001 Y-15.458 E92.24605\\nG1 X78.988 Y-32.490 E96.97657\\nG1 X70.562 Y-48.119 E101.70744\\nG1 X59.086 Y-61.666 E106.43796\\nG1 X45.057 Y-72.548 E111.16858\\nG1 X29.081 Y-80.294 E115.89920\\nG1 X11.848 Y-84.570 E120.63003\\nG1 X3.392 Y-85.306 E122.88852\\nG92 E0
 support_everywhere = 0
 support_material = 0
 support_material_angle = 0
@@ -134,7 +134,7 @@ z_offset = 0`,
         high: {
             "layer_height": 0.075,
             "travel_speed": 120,
-            "infill_speed": 60,
+            "infill_speed": 100,
             "retract_lift" : 0.05,
             "temperature": 200,
             "perimeter_speed": 50,
@@ -154,7 +154,7 @@ z_offset = 0`,
         low: {
             "layer_height": 0.3,
             "travel_speed": 150,
-            "infill_speed": 60,
+            "infill_speed": 65,
             "retract_lift" : 0.05,
             "temperature": 200,
             "perimeter_speed": 50,
