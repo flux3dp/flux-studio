@@ -118,6 +118,10 @@
                     width: 100%;
                     height: 100%;
                     object-fit: cover;
+
+                    &.hd {
+                        transform: rotate(270deg);
+                    }
                 }
                 .status-info {
                     position: absolute;

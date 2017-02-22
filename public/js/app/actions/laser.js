@@ -60,12 +60,83 @@ define([
             lang = i18n.get(),
             $uploadDeferred = $.Deferred(),
             PLATFORM_DIAMETER_PIXEL,
+            _onUploadResponse = function(response) {
+                var url = window.URL,
+                    platformDiameter = $laser_platform.width(),
+                    ratio = 1,
+                    badFiles = [],
+                    messages = [];
+
+                // handle bad files
+                response.files.forEach((file, i) => {
+                    file.url = url.createObjectURL(file.blob, { type: file.type });
+                    file.imgSize = file.imgSize || { width: 0, height: 0 };
+
+                    // convert image size with 120dpi
+                    file.imgSize.width = file.imgSize.width / IMAGE_REAL_RATIO / DIAMETER * platformDiameter;
+                    file.imgSize.height = file.imgSize.height / IMAGE_REAL_RATIO / DIAMETER * platformDiameter;
+
+                    if (platformDiameter < Math.max(file.imgSize.width , file.imgSize.height)) {
+                        ratio = Math.min(360 / file.imgSize.width, 360 / file.imgSize.height);
+                        file.imgSize.width = file.imgSize.width * ratio;
+                        file.imgSize.height = file.imgSize.height * ratio;
+                    }
+
+                    if ('good' === file.status &&
+                        ACCEPTABLE_MIN_SIZE > file.imgSize.width * file.imgSize.height
+                    ) {
+                        file.status = 'bad';
+                        file.messages.push(lang.message.image_is_too_small);
+                        file.isBroken = true;
+                    }
+
+                    if ('bad' === file.status) {
+                        messages.push('[' + file.name + ']');
+
+                        file.messages.forEach((errorCode, i) => {
+                            messages.push(lang.laser.svg_fail_messages[errorCode] || lang.laser.svg_fail_messages.SVG_BROKEN);
+                        });
+                    }
+                });
+
+                if (0 < messages.length) {
+                    AlertActions.showPopupWarning('svg-parse-fail', messages.join('\n'));
+                }
+
+                ProgressActions.close();
+            },
+            _onUploaded = function(response) {
+                var goodFiles = response.files.filter((file) => {
+                        return false === file.isBroken;
+                    }),
+                    currentFileFormat = self.state.fileFormat,
+                    operationMode = ('svg' === currentFileFormat ? 'cut' : 'engrave'),
+                    hasImage = (0 < self.state.images.length + goodFiles.length);
+
+                self.state.images = self.state.images.concat(goodFiles);
+
+                menuFactory.items.execute.enabled = hasImage;
+                menuFactory.items.saveTask.enabled = hasImage;
+                menuFactory.methods.refresh();
+
+                self.setState({
+                    images: self.state.images,
+                    hasImage: hasImage,
+                    mode: operationMode,
+                    fileFormat: (0 < self.state.images.length ? currentFileFormat : undefined)
+                });
+
+                goodFiles.forEach(function(file) {
+                    handleUploadImage(file);
+                });
+            },
             deleteImage = function() {
                 var $img_container = $('.' + LASER_IMG_CLASS).not($target_image),
                     $img = $target_image,
                     reset_file_type = false,
                     state = {
-                        selectedImage: false
+                        selectedImage: false,
+                        debug: false
                     };
 
                 if (null !== $target_image) {
@@ -674,6 +745,32 @@ define([
                     fileFormat: undefined
                 });
             },
+            uploadDefaultLaserImage: function() {
+                // TODO make this work
+                var fileEntry = {};
+                fileEntry.name = 'laser-calibration.png';
+                fileEntry.toURL = function() {
+                    return '/laser-calibration.png';
+                };
+                var oReq = new XMLHttpRequest();
+                oReq.responseType = 'blob';
+                console.log('loading laser c');
+                bitmapWebSocket = bitmapWebSocket || bitmapLaserParser();
+                oReq.onload = function(oEvent) {
+                    console.log('on load laser c');
+                    var blob = oReq.response;
+                    blob.name = 'laser-calibration.png';
+                    var file = {
+                        blob: blob,
+                        name: 'laser-calibration.png',
+                        type: 'image/png'
+                    }
+                    bitmapWebSocket.upload([file]).always(_onUploadResponse).done(_onUploaded);
+                };
+
+                oReq.open('GET', '/laser-calibration.png', true);
+                oReq.send();
+            },
             onReadFileStarted: function(e) {
                 var firstFile = e.target.files.item(0),
                     setupPanel = self.refs.setupPanel,
@@ -717,75 +814,7 @@ define([
                     file.uploadName = file.url.split('/').pop();
                 });
 
-                parserSocket.upload(files).always(function(response) {
-                    var url = window.URL,
-                        platformDiameter = $laser_platform.width(),
-                        ratio = 1,
-                        badFiles = [],
-                        messages = [];
-
-                    // handle bad files
-                    response.files.forEach((file, i) => {
-                        file.url = url.createObjectURL(file.blob, { type: file.type });
-                        file.imgSize = file.imgSize || { width: 0, height: 0 };
-
-                        // convert image size with 120dpi
-                        file.imgSize.width = file.imgSize.width / IMAGE_REAL_RATIO / DIAMETER * platformDiameter;
-                        file.imgSize.height = file.imgSize.height / IMAGE_REAL_RATIO / DIAMETER * platformDiameter;
-
-                        if (platformDiameter < Math.max(file.imgSize.width , file.imgSize.height)) {
-                            ratio = Math.min(360 / file.imgSize.width, 360 / file.imgSize.height);
-                            file.imgSize.width = file.imgSize.width * ratio;
-                            file.imgSize.height = file.imgSize.height * ratio;
-                        }
-
-                        if ('good' === file.status &&
-                            ACCEPTABLE_MIN_SIZE > file.imgSize.width * file.imgSize.height
-                        ) {
-                            file.status = 'bad';
-                            file.messages.push(lang.message.image_is_too_small);
-                            file.isBroken = true;
-                        }
-
-                        if ('bad' === file.status) {
-                            messages.push('[' + file.name + ']');
-
-                            file.messages.forEach((errorCode, i) => {
-                                messages.push(lang.laser.svg_fail_messages[errorCode] || lang.laser.svg_fail_messages.SVG_BROKEN);
-                            });
-                        }
-                    });
-
-                    if (0 < messages.length) {
-                        AlertActions.showPopupWarning('svg-parse-fail', messages.join('\n'));
-                    }
-
-                    ProgressActions.close();
-                }).done(function(response) {
-                    var goodFiles = response.files.filter((file) => {
-                            return false === file.isBroken;
-                        }),
-                        currentFileFormat = self.state.fileFormat,
-                        operationMode = ('svg' === currentFileFormat ? 'cut' : 'engrave'),
-                        hasImage = (0 < self.state.images.length + goodFiles.length);
-
-                    self.state.images = self.state.images.concat(goodFiles);
-
-                    menuFactory.items.execute.enabled = hasImage;
-                    menuFactory.items.saveTask.enabled = hasImage;
-                    menuFactory.methods.refresh();
-
-                    self.setState({
-                        images: self.state.images,
-                        hasImage: hasImage,
-                        mode: operationMode,
-                        fileFormat: (0 < self.state.images.length ? currentFileFormat : undefined)
-                    });
-
-                    goodFiles.forEach(function(file) {
-                        handleUploadImage(file);
-                    });
-                });
+                parserSocket.upload(files).always(_onUploadResponse).done(_onUploaded);
             },
             thresholdChanged: function(threshold) {
                 var $el = $('.image-active:eq(0)');

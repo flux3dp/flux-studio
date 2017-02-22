@@ -2646,7 +2646,14 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         left: 30px;
         bottom: 30px;
         z-index: 999999;
-        border-radius: 5px; }
+        border-radius: 0;
+        border: 2px solid #555;
+        color: #555; }
+
+hr {
+    border-left: 0;
+    border-top: 2px solid #F0F0F0;
+    border-bottom: 0; }
 
 /**
  * ref: http://tobiasahlin.com/spinkit/
@@ -3831,6 +3838,11 @@ input[type=range]:focus::-webkit-slider-runnable-track {
     font-size: 15px;
     margin: 0 0 0 10px;
     width: 140px; }
+    .accordion input.p66 {
+        width: 100px; }
+    .accordion input.p33 {
+        margin-left: 0;
+        width: 75px; }
 
 .accordion .caption:hover {
     cursor: pointer;
@@ -4045,6 +4057,8 @@ input[type=range]:focus::-webkit-slider-runnable-track {
                     width: 100%;
                     height: 100%;
                     object-fit: cover; }
+                    .flux-monitor .main .body .device-content .camera-image.hd {
+                        transform: rotate(270deg); }
                 .flux-monitor .main .body .device-content .status-info {
                     position: absolute;
                     width: 332px;
@@ -4868,7 +4882,7 @@ input.switch:checked ~ label:after {
     font-size: 20px;
     position: absolute;
     transition: all .1s ease;
-    width: 280px;
+    width: 260px;
     z-index: 1; }
     .print-studio .object-dialogue .accordion-body {
         overflow: visible;
@@ -4894,7 +4908,7 @@ input.switch:checked ~ label:after {
         display: block;
         margin: 0 0 3px 0;
         padding: 0 20px;
-        width: 230px; }
+        width: 260px; }
     .print-studio .object-dialogue .control {
         display: -webkit-box;
         /* OLD - iOS 6-, Safari 3.1-6 */
@@ -5044,6 +5058,19 @@ input.switch:checked ~ label:after {
         height: 10px;
         background: #666;
         transition: width 0.5s; }
+
+img.img640x480 {
+    width: 640px;
+    height: 480px;
+    outline: 2px solid #333;
+    margin-bottom: 20px; }
+
+.modal-window .modal-alert.img640x480 {
+    width: auto !important; }
+    .modal-window .modal-alert.img640x480 .btn-h-group {
+        display: block; }
+    .modal-window .modal-alert.img640x480 .btn.pull-right {
+        float: right; }
 
 .settings-studio {
     background-color: #F5F5F5; }

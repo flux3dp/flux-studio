@@ -10,7 +10,8 @@ define([
     'app/actions/alert-actions',
     'app/stores/alert-store',
     'helpers/firmware-version-checker',
-    'app/version-requirement'
+    'app/version-requirement',
+    'helpers/device-error-handler'
 ], function(
     $,
     React,
@@ -23,7 +24,8 @@ define([
     AlertActions,
     AlertStore,
     FirmwareVersionChecker,
-    Requirement
+    Requirement,
+    DeviceErrorHandler
 ) {
     'use strict';
 
@@ -181,8 +183,9 @@ define([
                         });
                     },
                     errorMessageHandler = (response) => {
+                        if(typeof response.error == "string") response.error = [response.error];
+
                         var messageMap = lang.monitor,
-                            subErrorIndex = 1,
                             allJoinedMessage = response.error.join('_'),
                             genericMessage = response.error.slice(0, 2).join('_');
 
@@ -191,8 +194,9 @@ define([
                         // has default
                         if (true === messageMap.hasOwnProperty(genericMessage)) {
                             if(response.error.length === 4) {
+                                // TODO FIX Toolhead not found
                                 if(response.error[3] === 'N/A') {
-                                    AlertActions.showPopupError('', lang.change_filament.NA);;
+                                    AlertActions.showPopupError('change-filament-device-error', DeviceErrorHandler.translate(['HEAD_ERROR','HEAD_OFFLINE']));
                                 }
                             }
                             else {
@@ -200,8 +204,8 @@ define([
                             }
                         }
                         // wrong toolhead
-                        else if ('TYPE_ERROR' === response.error[subErrorIndex]) {
-                            AlertActions.showPopupError(genericMessage, messageMap.HEAD_ERROR_TYPE_ERROR);
+                        else if ('TYPE_ERROR' === response.error[1]) {
+                            AlertActions.showPopupError('change-filament-device-error', DeviceErrorHandler.translate(['HEAD_ERROR','HEAD_OFFLINE']));
                         }
                         // default
                         else {
@@ -210,15 +214,15 @@ define([
                     };
 
                 DeviceMaster.selectDevice(self.props.device).then(() => {
-                    return FirmwareVersionChecker(self.props.device, Requirement.operateDuringPauseRequiredVersion);
-                })
-                .then(metVersion => {
-                    this.metVersion = metVersion;
+                //     return FirmwareVersionChecker(self.props.device, Requirement.operateDuringPauseRequiredVersion);
+                // })
+                // .then(metVersion => {
+                //     this.metVersion = metVersion;
                     return DeviceMaster.getReport();
                 })
                 .then(report => {
                     // if changing filament during pause
-                    if(report.st_id === 48 && this.metVersion) {
+                    if(report.st_id === 48) {
                         this.isChangingFilamentDuringPause = true;
 
                         DeviceMaster.changeFilamentDuringPause(type)
@@ -260,8 +264,12 @@ define([
                                 AlertActions.showPopupError('change-filament-toolhead-no-response', lang.change_filament.toolhead_no_response);
                                 self.props.onClose();
                             }
-                            else if (response.info === 'TYPE_ERROR') {
-                                AlertActions.showPopupError('change-filament-device-error', lang.change_filament.maintain_head_type_error);
+                            else if (response.error[1] === 'TYPE_ERROR' || response.info === 'TYPE_ERROR') {
+                                if (response.error[3] === 'N/A') {
+                                    AlertActions.showPopupError('change-filament-device-error', DeviceErrorHandler.translate(['HEAD_ERROR','HEAD_OFFLINE']));
+                                } else {
+                                    AlertActions.showPopupError('change-filament-device-error', DeviceErrorHandler.translate(['HEAD_ERROR','TYPE_ERROR']));
+                                }
                                 DeviceMaster.quitTask().then(function() {
                                     self.setState({ currentStep: steps.GUIDE });
                                 });
@@ -375,8 +383,7 @@ define([
             },
 
             _sectionHeating: function() {
-                var self = this,
-                    { temperature, targetTemperature } = this.state;
+                let { temperature, targetTemperature } = this.state;
 
                 return {
                     message: (

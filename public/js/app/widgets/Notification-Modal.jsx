@@ -33,7 +33,9 @@ define([
                 onYes       : React.PropTypes.func,
                 onNo       : React.PropTypes.func,
                 onCustom    : React.PropTypes.func,
-                onClose     : React.PropTypes.func
+                onClose     : React.PropTypes.func,
+                displayImages   : React.PropTypes.bool,
+                images   : React.PropTypes.array
             },
 
             getDefaultProps: function() {
@@ -48,7 +50,9 @@ define([
                     onYes     : function() {},
                     onNo      : function() {},
                     onCustom  : function() {},
-                    onClose   : function() {}
+                    onClose   : function() {},
+                    displayImages: false,
+                    images: []
                 };
             },
 
@@ -217,6 +221,10 @@ define([
                             caption={typeTitle}
                             message={this.props.message}
                             buttons={buttons}
+                            imgClass={this.props.imgClass}
+                            images={this.props.images}
+                            displayImages={this.props.displayImages}
+                            onClose={this.props.onClose}
                         />
                     ),
                     className = {

@@ -98,7 +98,8 @@ define([
                                 else {
                                     goNext();
                                 }
-                                Config().write('configured-printer', name);
+                                Config().write("configured-printer", name);
+                                Config().write("configured-model", self.state.settingPrinter.model == "delta-1" ? "fd1" : "fd1p");
                             }
                         });
                     },

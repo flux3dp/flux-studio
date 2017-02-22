@@ -520,7 +520,7 @@ define([
                             label={lang.layer_height}
                             min={0.05}
                             max={0.3}
-                            step={0.05}
+                            step={0.025}
                             default={advancedSetting.layer_height}
                             onChange={this._handleControlValueChange} />
 
@@ -729,7 +729,7 @@ define([
                             key="travel_speed"
                             label={lang.traveling}
                             min={10}
-                            max={150}
+                            max={200}
                             step={1}
                             default={advancedSetting.travel_speed}
                             onChange={this._handleControlValueChange} />

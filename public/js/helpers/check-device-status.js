@@ -87,7 +87,10 @@ define([
             case DeviceConstants.status.COMPLETED:
             case DeviceConstants.status.ABORTED:
                 // quit
-                DeviceMaster.quit().done(function() {
+                DeviceMaster.selectDevice(printer).then(() => {
+                    return DeviceMaster.quit();
+                })
+                .done(() => {
                     deferred.resolve('ok');
                 });
                 break;

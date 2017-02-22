@@ -92,6 +92,7 @@ define([
                 notificationOptions = [],
                 projectionOptions = [],
                 antialiasingOptions = [],
+                defaultModelOptions = [],
                 options = [];
 
             Object.keys(supported_langs).map(l => {
@@ -141,6 +142,26 @@ define([
                 }
             ];
 
+
+            defaultModelOptions = [
+                {
+                    value: '',
+                    label: lang.settings.none,
+                    selected: config().read('default-model') === ''
+                },
+                {
+                    value: 'fd1',
+                    label: lang.settings.fd1,
+                    selected: config().read('default-model') === 'fd1'
+                },
+                {
+                    value: 'fd1p',
+                    label: lang.settings.fd1p,
+                    selected: config().read('default-model') === 'fd1p'
+                }
+            ];
+
+
             return (
                 <div className="form general">
 
@@ -185,6 +206,15 @@ define([
                             className="font3"
                             options={antialiasingOptions}
                             onChange={this._updateOptions.bind(null, 'antialiasing')}
+                        />
+                    </Controls>
+
+                    <Controls label={lang.settings.default_model}>
+                        <SelectView
+                            id="select-lang"
+                            className="font3"
+                            options={defaultModelOptions}
+                            onChange={this._updateOptions.bind(null, 'default-model')}
                         />
                     </Controls>
 

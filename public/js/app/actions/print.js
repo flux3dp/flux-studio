@@ -1697,9 +1697,7 @@ define([
             // Fix precision to .00001
             return val.toFixed ? Number(val.toFixed(5)) : val;
         });
-        console.log('PlaneBoundary:: Transformation ', transformation);
         if (sourceMesh.jTransformation === transformation) {
-            console.log('PlaneBoundary:: Skipping redundant calculation');
             return sourceMesh.plane_boundary;
         }
         sourceMesh.jTransformation = transformation;
@@ -1747,7 +1745,6 @@ define([
             }
 
             // delete redundant point(i.e., starting point)
-            console.log('PlaneBoundary:: Finished', + new Date());
             boundary.pop();
         }
         else{
@@ -1763,7 +1760,6 @@ define([
 
             let meshSize = vs.count / vs.itemSize;
 
-            console.log('PlaneBoundary:: Allocating', + new Date());
             stl_index = new Uint32Array(meshSize);
             for (let i = 0; i < meshSize; i += 1) {
                 stl_index[i] = i;
@@ -1783,7 +1779,6 @@ define([
                 boundary.push(stl_index[i]);
             }
 
-            console.log('PlaneBoundary:: Computing lower hull', + new Date());
             // compute lower hull
             let t = boundary.length + 1;
             for (let i = stl_index.length - 2 ; i >= 0; i -= 1) {
@@ -1793,7 +1788,6 @@ define([
                 boundary.push(stl_index[i]);
             }
             // delete redundant point(i.e., starting point)
-            console.log('PlaneBoundary:: Finished', + new Date());
             boundary.pop();
         };
         return boundary;
@@ -2036,47 +2030,59 @@ define([
             camera.lookAt(ol);
             toggleTransformControl(false);
             render();
-            d.resolve(blob);
+            cropImageUsingCanvas(blob).then((blob2) => {
+                d.resolve(blob2);
+            });
         });
 
         return d.promise();
     }
 
 
-    function cropImageUsingCanvas(data, is_image){
-        if(!is_image){
+    function cropImageUsingCanvas(data) {
+        if(data instanceof Blob) {
+            console.log("Loading blob", data);
+            // Blob to HTMLImage
             let newImg = document.createElement('img'),
-                url = URL.createObjectURL(blob),
+                url = URL.createObjectURL(data),
                 d = $.Deferred();
+
             newImg.onload = function() {
+                console.log("Loaded image", url, newImg.width, newImg.height);
                 URL.revokeObjectURL(url);
+
+                cropImageUsingCanvas(newImg, true).then(function(blob) {
+                    console.log("Resolved cropping", url);
+                    d.resolve(blob);
+                });
             };
-            cropImageUsingCanvas(newImage, true).then(function(blob) {
-                d.resolve(blob);
-            });
+
+            newImg.src = url;
+
             return d.promise();
         }
-
+        //HTMLImage to Canvas, Canvas to Blob
         let width = 640, height = 640,
             canvas = document.createElement('canvas'),
-            sh = image.height,
-            sw = image.width,
+            sh = data.height,
+            sw = data.width,
             sx = 0,
             sy = 0,
             d = $.Deferred();
 
-        if(image.width > image.height){
-            sx = (image.width - image.height)/2;
-            sw = image.height;
-        }else if(image.width < image.height){
-            sy = (image.height - image.width)/2;
-            sh = image.width;
+        if(data.width > data.height) {
+            sx = (data.width - data.height)/2;
+            sw = data.height;
+        }else if(data.width < data.height) {
+            sy = (data.height - data.width)/2;
+            sh = data.width;
         }
 
         canvas.width = width;
         canvas.height = height;
         let context = canvas.getContext('2d');
-        context.drawImage(this.image, sx, sy, sw, sh, 0, 0, width, height);
+        console.log("drawing image element", sx, sy, sw, sh);
+        context.drawImage(data, sx, sy, sw, sh, 0, 0, width, height);
         canvas.toBlob(function(blob) {
             d.resolve(blob);
         });

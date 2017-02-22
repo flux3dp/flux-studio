@@ -107,10 +107,11 @@ define([
                 else {
                     events.onMessage = (r) => {
                         if(r.status === 'connected') {
+                            ws.usbData = r;
                             ws.send('list_trust');
                         }
                         else if(r.status === 'ok') {
-                            opts.onSuccess();
+                            opts.onSuccess(ws.usbData);
                         }
                     };
 
