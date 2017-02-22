@@ -304,13 +304,10 @@ define([
 
         _handleSnapshot: function() {
             if(previewBlob == null) return;
-            let { Device } = this.context.store.getState(),
-                fileName = new Date().
-                    toLocaleString('en-us', {year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit'}).
-                    replace(/(\d+)\/(\d+)\/(\d+)/, '$3-$1-$2 $4:$5:$6');
-                    + ".jpg";
-                
-            console.log(Device);
+            let targetDevice = DeviceMaster.getSelectedDevice(),
+                fileName = (targetDevice ? targetDevice.name + ' ' : '') + new Date().
+                    toLocaleString('en-GB', {year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit'}).
+                    replace(/(\d+)\/(\d+)\/(\d+)\, (\d+):(\d+):(\d+)/, '$3-$1-$2 $4-$5-$6')+ ".jpg";
 
             saveAs(previewBlob, fileName);
         },
