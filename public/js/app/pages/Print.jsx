@@ -32,6 +32,7 @@ define([
     'app/constants/input-lightbox-constants',
     'helpers/local-storage',
     'helpers/api/cloud',
+    'helpers/i18n',
 ], function(
     $,
     React,
@@ -65,7 +66,8 @@ define([
     InputLightboxActions,
     InputLightboxConstants,
     LocalStorage,
-    CloudApi
+    CloudApi,
+    i18n
 ) {
 
     return function(args) {
@@ -394,9 +396,22 @@ define([
 
                 _handleYes: function(answer, args) {
                     if(answer === 'tour') {
+                        let activeLang = i18n.getActiveLang();
+
                         if(this.state.hasObject) {
                             director.clearScene();
                         }
+                        AlertActions.showPopupCustom('tutorial-images', 'Test Message', 'custom_text', null, {
+                            images: [
+                                '/img/tutorial/' + activeLang + '/n01.png',
+                                '/img/tutorial/' + activeLang + '/n02.png',
+                                '/img/tutorial/' + activeLang + '/n03.png',
+                                '/img/tutorial/' + activeLang + '/n04.png',
+                                '/img/tutorial/' + activeLang + '/n05.png',
+                                '/img/tutorial/' + activeLang + '/n06.png'
+                            ],
+                            imgClass: 'img640x480'
+                        });
                         this.setState({ tutorialOn: true });
                         tutorialMode = true;
                     }
@@ -735,7 +750,7 @@ define([
                                     Config().read('configured-printer') ||
                                     DeviceMaster.getFirstDevice();
 
-                            if(selectPrinterName){
+                            if(selectPrinterName) {
                                 DeviceMaster.getDeviceByNameAsync(
                                 selectPrinterName,
                                 {
@@ -744,10 +759,10 @@ define([
                                         function(printer){
                                             //Found ya default printer
                                             ProgressActions.close();
-                                            setTimeout(function(){AlertActions.showChangeFilament(printer, 'TUTORIAL'); }, 100);
+                                            setTimeout(function(){ AlertActions.showChangeFilament(printer, 'TUTORIAL'); }, 100);
                                         }.bind(this),
                                     onTimeout:
-                                        function(){
+                                        function() {
                                             //Unable to find configured printer...
                                             ProgressActions.close();
                                             setTimeout(function() {

@@ -5059,6 +5059,19 @@ input.switch:checked ~ label:after {
         background: #666;
         transition: width 0.5s; }
 
+img.img640x480 {
+    width: 640px;
+    height: 480px;
+    outline: 2px solid #333;
+    margin-bottom: 20px; }
+
+.modal-window .modal-alert.img640x480 {
+    width: auto !important; }
+    .modal-window .modal-alert.img640x480 .btn-h-group {
+        display: block; }
+    .modal-window .modal-alert.img640x480 .btn.pull-right {
+        float: right; }
+
 .settings-studio {
     background-color: #F5F5F5; }
 
