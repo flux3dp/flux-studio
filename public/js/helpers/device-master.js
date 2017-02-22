@@ -524,6 +524,10 @@ define([
         return d.promise();
     }
 
+    function startToolheadOperation() {
+        return SocketMaster.addTask('startToolheadOperation');
+    }
+
     function endToolheadOperation() {
         return SocketMaster.addTask('endToolheadOperation');
     }
@@ -1192,6 +1196,7 @@ define([
             this.registerUsbEvent               = registerUsbEvent;
             this.unregisterUsbEvent             = unregisterUsbEvent;
             this.changeFilamentDuringPause      = changeFilamentDuringPause;
+            this.startToolheadOperation         = startToolheadOperation;
             this.endToolheadOperation           = endToolheadOperation;
             this.endLoadingDuringPause          = endLoadingDuringPause;
             this.setHeadTemperatureDuringPause  = setHeadTemperatureDuringPause;

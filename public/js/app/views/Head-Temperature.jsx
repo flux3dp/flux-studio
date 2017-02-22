@@ -49,20 +49,26 @@ define([
             };
 
             CheckDeviceStatus(this.props.device).then((status, stId) => {
-                this.stId = stId;
-                if(stId !== 48) {
-                    DeviceMaster.enterMaintainMode().then(() => {
-                        checkToolhead();
+                this.operateDuringPause = stId === 48;
+
+                if(this.operateDuringPause) {
+                    DeviceMaster.startToolheadOperation().then(() => {
+                        this._startReport();
                     });
                 }
                 else {
-                    checkToolhead();
+                    DeviceMaster.enterMaintainMode().then(() => {
+                        checkToolhead();
+                    });
                 }
             });
         },
 
         componentWillUnmount: function() {
-            if(this.stId !== 48) {
+            if(this.operateDuringPause) {
+                DeviceMaster.endToolheadOperation();
+            }
+            else {
                 DeviceMaster.quitTask();
             }
             clearInterval(this.report);
@@ -70,9 +76,13 @@ define([
 
         _startReport: function() {
             this.report = setInterval(() => {
-                DeviceMaster.getHeadStatus().then((status) => {
+                const getStatus = () => {
+                    return this.operateDuringPause ? DeviceMaster.getReport() : DeviceMaster.getHeadStatus();
+                };
+
+                getStatus().then(status => {
                     if(status.rt) {
-                        this.setState({ currentTemperature: parseInt(status.rt[0]) });
+                        this.setState({ currentTemperature: Math.round(status.rt[0]) });
                     }
                 });
             }, 1500);
@@ -96,7 +106,7 @@ define([
             this.setState({ targetTemperature: t });
             this.refs.temperature.getDOMNode().value = t;
 
-            if(this.stId === 48) {
+            if(this.operateDuringPause) {
                 DeviceMaster.setHeadTemperatureDuringPause(t);
             }
             else {
