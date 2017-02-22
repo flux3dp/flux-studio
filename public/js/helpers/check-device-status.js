@@ -23,6 +23,7 @@ define([
     var lang = i18n.get();
 
     return function(printer, bypassPause) {
+        console.log("helpers/check-device-status", printer);
         if(!printer) { return; }
         var deferred = $.Deferred(),
             onYes = function(id) {
@@ -86,9 +87,13 @@ define([
             break;
         case DeviceConstants.status.COMPLETED:
         case DeviceConstants.status.ABORTED:
+
+            console.log("helpers/check-device-status", "should resolve paused with quit");
             // quit
-            DeviceMaster.quit().done(function() {
-                deferred.resolve('ok');
+            DeviceMaster.selectDevice(printer).then(() => {
+                DeviceMaster.quit().done(function() {
+                    deferred.resolve('ok');
+                });
             });
             break;
         case DeviceConstants.status.RUNNING:
