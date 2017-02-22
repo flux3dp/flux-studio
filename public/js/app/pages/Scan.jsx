@@ -1383,7 +1383,8 @@ define([
                             },
                             onReady: function() {
                                 self._refreshCamera();
-                            }
+                            },
+                            availableUsbChannel: printer.source === 'h2h' ? printer.addr : -1
                         };
 
                     self.setState({

@@ -20,13 +20,40 @@ define([
     const maxFileNameLength = 12;
 
     let selectedItem = '',
-        previewUrl = defaultImage;
+        previewUrl = defaultImage,
+        hdChecked = {};
 
     const findObjectContainsProperty = (infoArray = [], propertyName) => {
         return infoArray.filter((o) => Object.keys(o).some(n => n === propertyName));
     };
 
+    const getImageSize = (url, onSize) => {
+        var img = new Image();
+        img.onload = () => {
+            onSize([img.naturalWidth, img.naturalHeight]);
+        };
+        img.src = url;
+    };
+
     const processImage = (imageBlob) => {
+        let targetDevice = DeviceMaster.getSelectedDevice();
+        if (targetDevice) {
+            if (!hdChecked[targetDevice.name]) {
+                getImageSize(URL.createObjectURL(imageBlob), (size) => {
+                    if (size[0] > 720) {
+                        hdChecked[targetDevice.name] = 2;
+                    } else if (size[0] > 0) {
+                        hdChecked[targetDevice.name] = 1;
+                    }
+                });
+            }
+            else if(hdChecked[targetDevice.name] === 1) {
+                $('.camera-image').removeClass('hd');
+            }
+            else if(hdChecked[targetDevice.name] === 2) {
+                $('.camera-image').addClass('hd');
+            }
+        }
         $('.camera-image').attr('src', URL.createObjectURL(imageBlob));
     };
 

@@ -9,6 +9,7 @@ define([
     'app/constants/device-constants',
     'helpers/api/control',
     'helpers/api/3d-scan-control',
+    'helpers/usb-checker',
     'helpers/api/touch',
     'helpers/api/discover',
     'helpers/api/config',
@@ -16,6 +17,7 @@ define([
     'app/constants/input-lightbox-constants',
     'helpers/device-list',
     'helpers/api/camera',
+    'helpers/api/simple-websocket',
     'helpers/socket-master',
     'helpers/array-findindex'
 ], function(
@@ -29,6 +31,7 @@ define([
     DeviceConstants,
     DeviceController,
     ScanController,
+    UsbChecker,
     Touch,
     Discover,
     Config,
@@ -36,14 +39,13 @@ define([
     InputLightBoxConstants,
     DeviceList,
     Camera,
+    SimpleWebsocket,
     Sm
 ) {
     'use strict';
 
     let lang = i18n.get(),
         SocketMaster,
-        thisProgress,
-        lastProgress,
         defaultPrinter,
         defaultPrinterWarningShowed = false,
         _instance = null,
@@ -52,53 +54,63 @@ define([
         _device,
         _cameraTimeoutTracker,
         nwConsole,
+        usbDeviceReport = {},
         _devices = [],
-        _errors = {};
+        _errors = {},
+        availableUsbChannel = -1,
+        usbEventListeners = [];
 
     function selectDevice(device, deferred) {
+        if(_selectedDevice.uuid === device.uuid) {
+            let d = $.Deferred();
+            d.resolve(DeviceConstants.CONNECTED);
+            return d.promise();
+        }
         Object.assign(_selectedDevice, device);
         let d = deferred || $.Deferred(),
-            uuid = device.uuid,
-            goAuth = function(uuid) {
-                ProgressActions.close();
-                InputLightboxActions.open('auth', {
-                    caption      : sprintf(lang.input_machine_password.require_password, _device.name),
-                    inputHeader  : lang.input_machine_password.password,
-                    confirmText  : lang.input_machine_password.connect,
-                    type: InputLightBoxConstants.TYPE_PASSWORD,
-                    onSubmit     : function(password) {
-                        ProgressActions.open(ProgressConstants.NONSTOP);
+            uuid = device.uuid;
 
-                        auth(uuid, password).always(() => {
-                            ProgressActions.close();
-                        }).done((data) => {
-                            device.plaintext_password = password;
-                            selectDevice(device, d);
-                        }).fail((response) => {
-                            let message = (
-                                false === response.reachable ?
-                                lang.select_printer.unable_to_connect :
-                                lang.select_printer.auth_failure
-                            );
+        const goAuth = (uuid) => {
+            ProgressActions.close();
+            _selectedDevice = {};
 
-                            goAuth(uuid);
+            const handleSubmit = (password) => {
+                ProgressActions.open(ProgressConstants.NONSTOP);
 
-                            AlertActions.showPopupError('device-auth-fail', message);
-                        });
-                    }
+                auth(uuid, password).always(() => {
+                    ProgressActions.close();
+                })
+                .done((data) => {
+                    device.plaintext_password = password;
+                    selectDevice(device, d);
+                })
+                .fail((response) => {
+                    let message = (
+                        false === response.reachable ?
+                        lang.select_printer.unable_to_connect :
+                        lang.select_printer.auth_failure
+                    );
+
+                    goAuth(uuid);
+
+                    AlertActions.showPopupError('device-auth-fail', message);
                 });
             };
 
-        ProgressActions.open(ProgressConstants.NONSTOP);
-        if(_existConnection(uuid)) {
-            _device = _switchDevice(uuid);
-            d.resolve(DeviceConstants.CONNECTED);
-        }
-        else {
-            _device = {};
-            _device.uuid = uuid;
-            _device.name = device.name;
-            _device.actions = DeviceController(uuid, {
+            const callback = {
+                caption     : sprintf(lang.input_machine_password.require_password, _device.name),
+                inputHeader : lang.input_machine_password.password,
+                confirmText : lang.input_machine_password.connect,
+                type        : InputLightBoxConstants.TYPE_PASSWORD,
+                onSubmit    : handleSubmit
+            };
+
+            InputLightboxActions.open('auth', callback);
+        };
+
+        const createDeviceActions = (availableUsbChannel = -1) => {
+            return DeviceController(uuid, {
+                availableUsbChannel,
                 onConnect: function(response) {
                     d.notify(response);
 
@@ -125,9 +137,11 @@ define([
 
                             auth(_device.uuid, '').always(() => {
                                 ProgressActions.close();
-                            }).done((data) => {
+                            })
+                            .done((data) => {
                                 selectDevice(device, d);
-                            }).fail(() => {
+                            })
+                            .fail(() => {
                                 AlertActions.showPopupError(
                                     'auth-error-with-diff-computer',
                                     lang.message.need_1_1_7_above
@@ -143,17 +157,50 @@ define([
                         );
                         break;
                     default:
+                        let message = lang.message.unknown_error;
+
+                        if(response.error === 'UNKNOWN_DEVICE') {
+                            message = lang.message.unknown_device;
+                        }
+
                         AlertActions.showPopupError(
                             'unhandle-exception',
-                            lang.message.unknown_error
+                            message
                         );
                     }
+                },
+                onFatal: function(e) {
+                    _selectedDevice = {};
                 }
             });
+        };
+
+        ProgressActions.open(ProgressConstants.NONSTOP);
+        if(_existConnection(uuid)) {
+            _device = _switchDevice(uuid);
+            d.resolve(DeviceConstants.CONNECTED);
+        }
+        else {
+            _device = {};
+            _device.uuid = uuid;
+            _device.source = device.source;
+            _device.name = device.name;
         }
 
-        SocketMaster = new Sm();
-        SocketMaster.setWebSocket(_device.actions);
+        const initSocketMaster = () => {
+            SocketMaster = new Sm();
+
+            // if availableUsbChannel has been defined
+            if(typeof this !== 'undefined' && typeof this.availableUsbChannel !== 'undefined' && device.source === 'h2h') {
+                _device.actions = createDeviceActions(this.availableUsbChannel);
+            }
+            else {
+                _device.actions = createDeviceActions(device.uuid);
+            }
+            SocketMaster.setWebSocket(_device.actions);
+        };
+
+        initSocketMaster();
 
         return d.always(() => {
             ProgressActions.close();
@@ -190,6 +237,7 @@ define([
     function reconnectWs() {
         let d = $.Deferred();
         _device.actions = DeviceController(_selectedDevice.uuid, {
+            availableUsbChannel: _selectedDevice.source === 'h2h' ? _selectedDevice.addr : -1,
             onConnect: function(response) {
                 d.notify(response);
 
@@ -237,6 +285,10 @@ define([
                         lang.message.unknown_error
                     );
                 }
+            },
+            onFatal: function(response) {
+                // if channel is not available, (opcode -1),
+                // default in createDeviceActions will catch first
             }
         });
 
@@ -325,8 +377,6 @@ define([
         let d = $.Deferred();
         _device.actions.killSelf().then(response => {
             d.resolve(response);
-        }).fail(error => {
-            d.resolve(error);
         }).always(() => {
             reconnectWs();
         });
@@ -353,6 +403,7 @@ define([
     function readyCamera() {
         let d = $.Deferred();
         _device.scanController = ScanController(_device.uuid, {
+            availableUsbChannel: this.availableUsbChannel,
             onReady: function() {
                 d.resolve('');
             },
@@ -382,6 +433,107 @@ define([
         });
 
         return d.promise();
+    }
+
+    function changeFilamentDuringPause(type) {
+        let d = $.Deferred();
+
+        const initOperation = () => {
+            return new Promise(resolve => {
+                SocketMaster.addTask('startToolheadOperation').then(r => {
+                    resolve(r);
+                });
+            });
+        };
+
+        const waitForTemperature = () => {
+            return new Promise(resolve => {
+                let fluctuation = 3;
+                let t = setInterval(() => {
+                    SocketMaster.addTask('report').then(r => {
+                        d.notify(r, t);
+                        let { rt, tt } = r.device_status;
+                        if(rt[0] && tt[0]) {
+                            let current = Math.round(rt[0]),  // current temperature rounded
+                                target = tt[0];              // goal temperature
+
+                            if(
+                                current >= target - fluctuation &&  // min
+                                current <= target + fluctuation     // max
+                            ) {
+                                clearInterval(t);
+                                resolve();
+                            }
+                        };
+                    });
+                }, 2000);
+            });
+        };
+
+        const startOperation = () => {
+            return new Promise(resolve => {
+                SocketMaster.addTask('changeFilamentDuringPause', type).always(r => {
+                    resolve(r);
+                });
+            });
+        };
+
+        const endLoading = () => {
+            return new Promise(resolve => {
+                SocketMaster.addTask('endLoadingDuringPause').always(r => {
+                    resolve(r);
+                });
+            });
+        };
+
+        const monitorStatus = () => {
+            return new Promise(resolve => {
+                let t = setInterval(() => {
+                    getReport().then(r => {
+                        r.loading = true;
+                        // if button is pressed from the machine, status will change from LOAD_FILAMENT to PAUSE
+                        if(r.st_label === 'PAUSED') {
+                            clearInterval(t);
+                            resolve();
+                        }
+                        else {
+                            d.notify(r, t);
+                        }
+                    });
+                }, 2000);
+            });
+        };
+
+        const operation = () => {
+            initOperation().then(() => {
+                return waitForTemperature();
+            })
+            .then(() => {
+                return startOperation();
+            })
+            .then(() => {
+                return monitorStatus();
+            })
+            .then(() => {
+                d.resolve();
+            });
+        };
+
+        operation();
+
+        return d.promise();
+    }
+
+    function startToolheadOperation() {
+        return SocketMaster.addTask('startToolheadOperation');
+    }
+
+    function endToolheadOperation() {
+        return SocketMaster.addTask('endToolheadOperation');
+    }
+
+    function endLoadingDuringPause() {
+        return SocketMaster.addTask('endLoadingDuringPause');
     }
 
     function detectHead() {
@@ -529,9 +681,9 @@ define([
         }
     }
 
-    function _existConnection(uuid) {
+    function _existConnection(uuid, source) {
         return _devices.some(function(d) {
-            return d.uuid === uuid;
+            return d.uuid === uuid && d.source === source;
         });
     }
 
@@ -555,10 +707,16 @@ define([
 
     function streamCamera(uuid) {
         let cameraStream = new Rx.Subject(),
-            timeToReset = 20000;
+            timeToReset = 20000,
+            opts;
+
+        opts = {
+            availableUsbChannel: this.availableUsbChannel,
+            onError: function(message) { console.log('error from camera ws', message); }
+        };
 
         const initCamera = () => {
-            _device.camera = Camera(uuid);
+            _device.camera = Camera(uuid, opts);
             _device.camera.startStream((imageBlob) => {
                 processCameraResult(imageBlob);
             });
@@ -644,7 +802,6 @@ define([
         const step2 = () => {
             let _d = $.Deferred();
             SocketMaster.addTask('calibrate').then((response) => {
-                console.log("calibrate resp", response)
                 debug_data = response.debug;
                 return SocketMaster.addTask('endMaintainMode');
             }).then(() => {
@@ -699,7 +856,6 @@ define([
                     _d.reject(response);
                 }
             }).then((response) => {
-                console.log('task home', response);
                 response.status === 'ok' ? _d.resolve() : _d.reject();
             }).fail((error) => {
                 _d.reject(error);
@@ -908,8 +1064,74 @@ define([
         return SocketMaster.addTask('setHeadTemperature', temperature);
     }
 
+    function setHeadTemperatureDuringPause(temperature) {
+        return SocketMaster.addTask('setHeadTemperatureDuringPause', temperature);
+    }
+
     function getHeadStatus() {
         return SocketMaster.addTask('getHeadStatus');
+    }
+
+    function startMonitoringUsb() {
+        let ws = {},
+            requestingReport,
+            deviceInfo = {};
+
+        const createWebSocket = (availableUsbChannel = -1) => {
+            if(availableUsbChannel === -1) { return; }
+            let url = `control/usb/${availableUsbChannel}`;
+
+            return SimpleWebsocket(url, handleMessage, handleError);
+        };
+
+        const handleMessage = (response) => {
+            if(response.cmd === 'play report') {
+                // specify nickname with usb
+                usbDeviceReport = Object.assign(deviceInfo, response.device_status);
+                clearTimeout(requestingReport);
+                requestingReport = setTimeout(() => {
+                    getUsbDeviceReport();
+                }, 2000);
+            }
+        };
+
+        const handleError = (error) => {
+            usbDeviceReport = {};
+            console.log('handle error', error);
+        };
+
+        const getUsbDeviceReport = () => {
+            ws.send('play report');
+        };
+
+        // returns the available channel, -1 otherwise
+        this.availableUsbChannel = this.availableUsbChannel || -1;
+        UsbChecker((channel) => {
+            channel = parseInt(channel);
+            console.log(`availableUsbChannel: ${this.availableUsbChannel} ${channel}`);
+            this.availableUsbChannel = channel;
+
+            // to be replaced when redux is implemented
+            usbEventListeners.forEach(callback => {
+                callback(channel > 0);
+            });
+        });
+    }
+
+    function getAvailableUsbChannel() {
+        return this.availableUsbChannel;
+    }
+
+    function getAvailableUsbChannel() {
+        return this.availableUsbChannel;
+    }
+
+    function registerUsbEvent(callback) {
+        usbEventListeners.push(callback);
+    }
+
+    function unregisterUsbEvent(callback) {
+        // TODO: to be coded when ndeeded
     }
 
     // Core
@@ -924,59 +1146,68 @@ define([
 
     DeviceSingleton.prototype = {
         init: function() {
-            this.selectDevice           = selectDevice;
-            this.uploadToDirectory      = uploadToDirectory;
-            this.go                     = go;
-            this.goFromFile             = goFromFile;
-            this.resume                 = resume;
-            this.pause                  = pause;
-            this.stop                   = stop;
-            this.quit                   = quit;
-            this.quitTask               = quitTask;
-            this.kick                   = kick;
-            this.getReport              = getReport;
-            this.getSelectedDevice      = getSelectedDevice;
-            this.readyCamera            = readyCamera;
-            this.ls                     = ls;
-            this.fileInfo               = fileInfo;
-            this.deleteFile             = deleteFile;
-            this.downloadFile           = downloadFile;
-            this.getPreviewInfo         = getPreviewInfo;
-            this.changeFilament         = changeFilament;
-            this.reconnect              = reconnect;
-            this.getDeviceByName        = getDeviceByName;
-            this.getDeviceByNameAsync   = getDeviceByNameAsync;
-            this.getFirstDevice         = getFirstDevice;
-            this.updateFirmware         = updateFirmware;
-            this.updateToolhead         = updateToolhead;
-            this.headInfo               = headInfo;
-            this.closeConnection        = closeConnection;
-            this.streamCamera           = streamCamera;
-            this.stopStreamCamera       = stopStreamCamera;
-            this.calibrate              = calibrate;
-            this.home                   = home;
-            this.cleanCalibration       = cleanCalibration;
-            this.detectHead             = detectHead;
-            this.enterMaintainMode      = enterMaintainMode;
-            this.endMaintainMode        = endMaintainMode;
-            this.getDeviceList          = getDeviceList;
-            this.getDeviceSettings      = getDeviceSettings;
-            this.setDeviceSetting       = setDeviceSetting;
-            this.getCloudValidationCode = getCloudValidationCode;
-            this.enableCloud            = enableCloud;
-            this.getDeviceInfo          = getDeviceInfo;
-            this.downloadErrorLog       = downloadErrorLog;
-            this.killSelf               = killSelf;
-            this.setHeadTemperature     = setHeadTemperature;
-            this.getHeadStatus          = getHeadStatus;
+            this.selectDevice                   = selectDevice;
+            this.uploadToDirectory              = uploadToDirectory;
+            this.go                             = go;
+            this.goFromFile                     = goFromFile;
+            this.resume                         = resume;
+            this.pause                          = pause;
+            this.stop                           = stop;
+            this.quit                           = quit;
+            this.quitTask                       = quitTask;
+            this.kick                           = kick;
+            this.getReport                      = getReport;
+            this.getSelectedDevice              = getSelectedDevice;
+            this.readyCamera                    = readyCamera;
+            this.ls                             = ls;
+            this.fileInfo                       = fileInfo;
+            this.deleteFile                     = deleteFile;
+            this.downloadFile                   = downloadFile;
+            this.getPreviewInfo                 = getPreviewInfo;
+            this.changeFilament                 = changeFilament;
+            this.reconnect                      = reconnect;
+            this.getDeviceByName                = getDeviceByName;
+            this.getDeviceByNameAsync           = getDeviceByNameAsync;
+            this.getFirstDevice                 = getFirstDevice;
+            this.updateFirmware                 = updateFirmware;
+            this.updateToolhead                 = updateToolhead;
+            this.headInfo                       = headInfo;
+            this.closeConnection                = closeConnection;
+            this.streamCamera                   = streamCamera;
+            this.stopStreamCamera               = stopStreamCamera;
+            this.calibrate                      = calibrate;
+            this.home                           = home;
+            this.cleanCalibration               = cleanCalibration;
+            this.detectHead                     = detectHead;
+            this.enterMaintainMode              = enterMaintainMode;
+            this.endMaintainMode                = endMaintainMode;
+            this.getDeviceList                  = getDeviceList;
+            this.getDeviceSettings              = getDeviceSettings;
+            this.setDeviceSetting               = setDeviceSetting;
+            this.getCloudValidationCode         = getCloudValidationCode;
+            this.enableCloud                    = enableCloud;
+            this.getDeviceInfo                  = getDeviceInfo;
+            this.downloadErrorLog               = downloadErrorLog;
+            this.killSelf                       = killSelf;
+            this.setHeadTemperature             = setHeadTemperature;
+            this.getHeadStatus                  = getHeadStatus;
+            this.startMonitoringUsb             = startMonitoringUsb;
+            this.getAvailableUsbChannel         = getAvailableUsbChannel;
+            this.registerUsbEvent               = registerUsbEvent;
+            this.unregisterUsbEvent             = unregisterUsbEvent;
+            this.changeFilamentDuringPause      = changeFilamentDuringPause;
+            this.startToolheadOperation         = startToolheadOperation;
+            this.endToolheadOperation           = endToolheadOperation;
+            this.endLoadingDuringPause          = endLoadingDuringPause;
+            this.setHeadTemperatureDuringPause  = setHeadTemperatureDuringPause;
 
             Discover(
                 'device-master',
                 function(devices) {
                     devices = DeviceList(devices);
-                    for(let i in devices) {
-                        _deviceNameMap[devices[i].name] = devices[i];
-                    }
+                    devices.forEach(d => {
+                        _deviceNameMap[d.name] = d;
+                    });
                     _scanDeviceError(devices);
 
                 }

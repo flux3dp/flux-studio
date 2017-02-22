@@ -26,6 +26,8 @@ public/output.fcode
 public/output.gcode
 public/preprocess.svg
 public/preview.png
+public/stl.cache
+public/temp.transform
 
 # Thumbnail cache files
 ._*

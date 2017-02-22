@@ -11,7 +11,9 @@ define([
         _size,
         rotation = {},
         _ratio = 1,
-        _maxLength = 210;
+        _maxLength = 210,
+        cursors = {},
+        prevState = "";
 
     return React.createClass({
         propTypes: {
@@ -25,14 +27,14 @@ define([
             onResize        : React.PropTypes.func,
             onFocus         : React.PropTypes.func,
             onModeChange    : React.PropTypes.func,
-            isTransforming  : React.PropTypes.func,
+            isTransforming  : React.PropTypes.bool,
             style           : React.PropTypes.object
         },
 
         getInitialState: function() {
             this._updateSizeProperty(this.props.model.size);
             return ({
-                size: _size,
+                _size: _size,
                 scaleLocked: this.props.scaleLocked
             });
         },
@@ -50,6 +52,7 @@ define([
         componentDidMount: function() {
             this._openAccordion(this.props.mode);
             refSize = this.props.model.size.clone();
+            this._updateSizeProperty(refSize);
             this.props.onFocus(false);
         },
 
@@ -65,13 +68,27 @@ define([
         },
 
         componentWillUpdate: function(nextProp, nextState) {
-            // if update from transform control
+            // update from transform control
             if(!this._hasSameSize(nextProp.model.size, refSize)) {
                 refSize = nextProp.model.size.clone();
+                _size.originalX = refSize.originalX;
+                _size.originalY = refSize.originalY;
+                _size.originalZ = refSize.originalZ;
                 this._updateSizeProperty(nextProp.model.size);
             }
         },
-
+        
+        shouldComponentUpdate: function(nextProps, nextState) {
+            var tmp = Object.assign({}, rotation);
+            
+            Object.assign(tmp, nextState);
+            Object.assign(tmp, { isTransforming: nextProps.isTransforming, mode: nextProps.mode, size: nextProps.model.size, style: nextProps.style, scaleLocked: nextProps.scaleLocked });
+            var updateContent = JSON.stringify(tmp);
+            if (prevState == updateContent) return false;
+            prevState = updateContent;
+            return true;
+        },
+        
         _hasSameSize: function(size1, size2) {
             return (
                 size1.x === size2.x &&
@@ -81,12 +98,27 @@ define([
         },
 
         _updateSizeProperty: function(size) {
-            _size = size.clone();
+            if (_size == null) {
+                _size = size.clone();
+                _size['originalX'] = size.originalX;
+                _size['originalY'] = size.originalY;
+                _size['originalZ'] = size.originalZ;
+            } else {
+                Object.assign(_size, size);
+            }
+            
+            // calculate scale number
+            _size.sx = 100 * _size.x / _size.originalX;
+            _size.sy = 100 * _size.y / _size.originalY;
+            _size.sz = 100 * _size.z / _size.originalZ;
 
             Object.keys(_size).map(function(p) {
+                if(p.length > 1) return;
                 _size[p] = this._roundSizeToTwoDecimalPlace(_size[p]);
                 _size['entered' + p.toUpperCase()] = _size[p].toFixed(2) + 'mm';
             }.bind(this));
+
+            this.setState({_size: _size});
         },
 
         _openAccordion(name) {
@@ -116,12 +148,21 @@ define([
                 return;
             }
             var axis = $(src.target).attr('data-id');
+
+            console.log("handle resize 1", axis, value);
+            // scale control
+            if(axis.charAt(0) == 's') {
+                axis = axis.substring(1);
+                value = _size['original' + axis.toUpperCase()] * value / 100.0;
+            }
+
             lastModifiedAxis = axis;
+
+            console.log("handle resize 2", axis, value);
 
             if(this.state.scaleLocked) {
                 _ratio = value / _size[axis];
                 if(_ratio === 0) {
-                    this.setState({ size: this.state.size });
                     return;
                 }
 
@@ -235,40 +276,79 @@ define([
                             onClick={this._handleModeChange}/>
                         <p className="caption">
                             {lang.print.scale}
-                            <span className="value">{_size.x} x {_size.y} x {_size.z} mm</span>
+                            <span className="value">{this.state._size.x} x {this.state._size.y} x {this.state._size.z} mm</span>
                         </p>
                         <label className="accordion-body">
 
                             <div className="control">
                                 <span className="text-center header">X</span>
                                     <UnitInput
+                                        className={{"p66": true}}
                                         max={210}
-                                        min={0.05}
-                                        defaultValue={_size.x}
+                                        min={0.01}
+                                        defaultValue={this.state._size.x}
                                         dataAttrs={{id: 'x'}}
                                         getValue={this._handleResize}
+                                        ref = 'input-x'
+                                        onFocus={this._inputFocused} />
+                                    <UnitInput
+                                        className={{"p33": true}}
+                                        max={5000}
+                                        min={0.000001}
+                                        defaultUnit={'%'}
+                                        defaultUnitType={'percentage'}
+                                        defaultValue={this.state._size.sx}
+                                        dataAttrs={{id: 'sx'}}
+                                        getValue={this._handleResize}
+                                        ref = 'input-sx'
                                         onFocus={this._inputFocused} />
                             </div>
 
                             <div className="control">
                                 <span className="text-center header">Y</span>
                                     <UnitInput
+                                        className={{"p66": true}}
                                         max={210}
                                         min={0.05}
-                                        defaultValue={_size.y}
+                                        defaultValue={this.state._size.y}
                                         dataAttrs={{id: 'y'}}
                                         getValue={this._handleResize}
+                                        ref = 'input-y'
+                                        onFocus={this._inputFocused} />
+                                    <UnitInput
+                                        className={{"p33": true}}
+                                        max={100}
+                                        min={0.000001}
+                                        defaultUnit={'%'}
+                                        defaultUnitType={'percentage'}
+                                        defaultValue={this.state._size.sx}
+                                        dataAttrs={{id: 'sy'}}
+                                        getValue={this._handleResize}
+                                        ref = 'input-sy'
                                         onFocus={this._inputFocused} />
                             </div>
 
                             <div className="control">
                                 <span className="text-center header">Z</span>
                                     <UnitInput
+                                        className={{"p66": true}}
                                         max={210}
                                         min={0.05}
-                                        defaultValue={_size.z}
+                                        defaultValue={this.state._size.z}
                                         dataAttrs={{id: 'z'}}
                                         getValue={this._handleResize}
+                                        ref = 'input-z'
+                                        onFocus={this._inputFocused} />
+                                    <UnitInput
+                                        className={{"p33": true}}
+                                        max={100}
+                                        min={0.000001}
+                                        defaultUnit={'%'}
+                                        defaultUnitType={'percentage'}
+                                        defaultValue={_size.sx}
+                                        dataAttrs={{id: 'sz'}}
+                                        getValue={this._handleResize}
+                                        ref = 'input-sz'
                                         onFocus={this._inputFocused} />
                             </div>
 
@@ -297,6 +377,7 @@ define([
                                     onChange={this._handleRotationChange.bind(this)}
                                     onKeyUp={this._handleRotationChange.bind(this)}
                                     onBlur={this._handleRotationChange.bind(this)}
+                                    ref = 'input-rx'
                                     value={rotation.enteredX} />
                             </div>
 
@@ -309,6 +390,7 @@ define([
                                     onChange={this._handleRotationChange.bind(this)}
                                     onKeyUp={this._handleRotationChange.bind(this)}
                                     onBlur={this._handleRotationChange.bind(this)}
+                                    ref = 'input-ry'
                                     value={rotation.enteredY} />
                             </div>
 
@@ -321,6 +403,7 @@ define([
                                     onChange={this._handleRotationChange.bind(this)}
                                     onKeyUp={this._handleRotationChange.bind(this)}
                                     onBlur={this._handleRotationChange.bind(this)}
+                                    ref = 'input-rz'
                                     value={rotation.enteredZ} />
                             </div>
 

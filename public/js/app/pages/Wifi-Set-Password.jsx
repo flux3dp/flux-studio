@@ -40,6 +40,7 @@ define([
             // UI events
 
             _onCancelConnection: function(e) {
+                clearTimeout(this.t);
                 var wifi = initializeMachine.settingWifi.get();
 
                 delete wifi.plain_password;
@@ -56,7 +57,7 @@ define([
                     password = wifi.plain_password,
                     diffTime = 60000,    // check network within 60 secs
                     startTime = (new Date()).getTime(),
-                    checkCountdown = function(response) {
+                    checkCountdown = (response) => {
                         if (diffTime <= (new Date()).getTime() - startTime) {
                             genericFailureHandler();
                             return false;
@@ -64,32 +65,35 @@ define([
 
                         return true;
                     },
-                    genericFailureHandler = function() {
+                    genericFailureHandler = () => {
                         AlertActions.showPopupError(
                             'wifi-authenticate-fail',
                             lang.initialize.errors.wifi_connection.connecting_fail,
                             lang.initialize.errors.wifi_connection.caption
                         );
                     },
-                    checkNetworkStatus = function() {
-                        var tryAgain = function(response) {
+                    checkNetworkStatus = () => {
+                        var tryAgain = (response) => {
                             if (true === checkCountdown(response)) {
                                 clearTimeout(this.t);
                                 this.t = setTimeout(() => {
                                     usb.getMachineNetwork(deferred);
-                                }, 1000)
+                                }, 1000);
                             }
                         },
                         deferred;
 
                         // NOTICE: Wait for 2 sec due to the device may not refresh its IP.
-                        setTimeout(function() {
-                            deferred = usb.getMachineNetwork(deferred).fail(tryAgain).
-                                progress(tryAgain).
-                                done(function(response) {
-                                    config().write('poke-ip-addr', response.ipaddr[0]);
-                                    location.hash = '#initialize/wifi/setup-complete';
-                                });
+                        clearTimeout(this.t);
+                        this.t = setTimeout(() => {
+                            deferred = usb.getMachineNetwork(deferred)
+                            .fail(tryAgain)
+                            .progress(tryAgain)
+                            .done((response) => {
+                                config().write('poke-ip-addr', response.ipaddr[0]);
+                                location.hash = '#initialize/wifi/setup-complete';
+                                usb.close();
+                            });
                         }, 2000);
                     };
 
@@ -113,7 +117,13 @@ define([
                         <div className="connecting-wifi text-center">
                             <h1>{lang.initialize.connecting}</h1>
                             <div className="spinner-roller"/>
-                            <button className="btn btn-action btn-large" data-ga-event="cancel" onClick={this._onCancelConnection}>{lang.initialize.cancel}</button>
+                            <button
+                                className="btn btn-action btn-large"
+                                data-ga-event="cancel"
+                                onClick={this._onCancelConnection}
+                            >
+                                {lang.initialize.cancel}
+                            </button>
                         </div>
                     );
 

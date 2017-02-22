@@ -81,8 +81,9 @@ define([
 
         renewImageDeferred();
 
+        let url = opts.availableUsbChannel >= 0 ? `usb/${opts.availableUsbChannel}` : uuid;
         ws = new Websocket({
-            method: '3d-scan-control/' + uuid,
+            method: `3d-scan-control/${url}`,
             ignoreAbnormalDisconnect: true,
             autoReconnect: false,
             onMessage: function(data) {

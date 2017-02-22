@@ -4,11 +4,14 @@
  */
 define([
     'jquery',
+    'helpers/i18n',
     'helpers/websocket',
     'helpers/convertToTypedArray',
     'app/constants/device-constants',
-    'helpers/rsa-key'
-], function($, Websocket, convertToTypedArray, DeviceConstants, rsaKey) {
+    'helpers/rsa-key',
+    'app/actions/alert-actions',
+    'app/actions/progress-actions'
+], function($, i18n, Websocket, convertToTypedArray, DeviceConstants, rsaKey, AlertActions, ProgressActions) {
     'use strict';
 
     return function(uuid, opts) {
@@ -19,8 +22,8 @@ define([
         let timeout = 10000,
             timmer,
             isConnected = false,
+            lang = i18n.get(),
             ws,
-            lastOrder = '',
             dedicatedWs = [],
             fileInfoWsId = 0,
             events = {
@@ -37,8 +40,9 @@ define([
             };
 
         const createWs = () => {
+            let url = opts.availableUsbChannel >= 0 ? `usb/${opts.availableUsbChannel}` : uuid;
             let _ws = new Websocket({
-                method: 'control/' + uuid,
+                method: `control/${url}`,
                 onMessage: (data) => {
                     switch (data.status) {
                     case 'connecting':
@@ -68,6 +72,21 @@ define([
                 onFatal: (response) => {
                     if(response.error === 'REMOTE_IDENTIFY_ERROR') {
                         createWs();
+                    }
+                    else if(response.error === 'UNKNOWN_DEVICE') {
+                        ProgressActions.close();
+                        AlertActions.showPopupError(
+                            'unhandle-exception',
+                            lang.message.unknown_device
+                        );
+                    }
+                    else if(response.code === 1006) {
+                        ProgressActions.close();
+                        AlertActions.showPopupError(
+                            'NO-CONNECTION',
+                            lang.message.cant_connect_to_device
+                        );
+                        opts.onFatal(response);
                     }
                     else {
                         clearTimeout(timmer);
@@ -319,13 +338,13 @@ define([
 
             killSelf: () => {
                 let d = $.Deferred();
-
-                events.onMessage = (response) => { d.resolve(response); };
-                events.onError = (response) => { d.reject(response); };
-                events.onFatal = (response) => { d.reject(response); };
-
                 dedicatedWs[fileInfoWsId].send('kick');
                 dedicatedWs[fileInfoWsId].close();
+                ws.send('kick');
+                ws.close();
+                setInterval(() => {
+                    d.resolve();
+                }, 500);
                 return d.promise();
             },
 
@@ -510,6 +529,22 @@ define([
                 return useDefaultResponse('task quit');
             },
 
+            startToolheadOperation: () => {
+                return useDefaultResponse('play toolhead operation');
+            },
+
+            endToolheadOperation: () => {
+                return useDefaultResponse('play toolhead standby');
+            },
+
+            endLoadingDuringPause: () => {
+                return useDefaultResponse('play press_button');
+            },
+
+            setHeadTemperatureDuringPause: (temperature) => {
+                return useDefaultResponse(`play toolhead heater 0 ${temperature}`);
+            },
+
             /**
              * maintain home
              *
@@ -546,8 +581,12 @@ define([
                 return d.promise();
             },
 
+            changeFilamentDuringPause: (type) => {
+                let cmd = type === 'LOAD' ? 'load_filament' : 'unload_filament';
+                return useDefaultResponse(`play ${cmd} 0`);
+            },
+
             setHeadTemperature: (temperature) => {
-                console.log('setting head temperature', temperature);
                 return useDefaultResponse(`maintain set_heater 0 ${temperature}`);
             },
 

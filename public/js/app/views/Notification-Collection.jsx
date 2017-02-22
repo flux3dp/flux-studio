@@ -30,6 +30,7 @@ define([
     'helpers/check-firmware',
     'helpers/firmware-updater',
     'helpers/device-list',
+    'helpers/device-master',
     'Raven',
 ], function(
     $,
@@ -63,6 +64,7 @@ define([
     checkFirmware,
     firmwareUpdater,
     DeviceList,
+    DeviceMaster,
     Raven
 ) {
     'use strict';
@@ -138,7 +140,10 @@ define([
                     firstDevice: {
                         info: {}, // device info
                         apiResponse: {}, // device info
-                    }
+                    },
+                    // images
+                    displayImages: false,
+                    images: []
                 };
             },
 
@@ -161,9 +166,9 @@ define([
                     AlertActions.showPopupError('unsupported_mac_osx', lang.message.unsupport_osx_version);
                 }
 
-                ProgressStore.onOpened(this._handleProgress).
-                    onUpdating(this._handleProgress).
-                    onClosed(this._handleProgressFinish);
+                ProgressStore.onOpened(this._handleProgress)
+                    .onUpdating(this._handleProgress)
+                    .onClosed(this._handleProgressFinish);
                 InputLightboxStore.onInputLightBoxOpened(this._handleInputLightBoxOpen);
 
                 GlobalStore.onShowMonitor(this._handleOpenMonitor);
@@ -208,6 +213,10 @@ define([
                 if(!window.FLUX.dev) {
                     Raven.setUserContext({ extra: { version: window.FLUX.version } });
                 }
+
+                this._checkOsxRequirement();
+
+                DeviceMaster.registerUsbEvent(this._monitorUsb);
             },
 
             componentWillUnmount: function() {
@@ -228,6 +237,29 @@ define([
                 GlobalStore.removeCloseMonitorListener();
                 GlobalStore.removeCloseAllViewListener();
                 GlobalStore.removeSliceCompleteListener();
+            },
+
+            _checkOsxRequirement: function() {
+                if(window.FLUX.isNW && localStorage.getItem('dev') !== '1') {
+                    if(process.env.osType === 'osx') {
+                        let pathArray = process.env.launched.split('/');
+                        if(pathArray[1] !== 'Applications' && !window.FLUX.dev) {
+                            AlertActions.showPopupError(
+                                'LAUNCHING_FROM_INSTALLER_WARNING',
+                                lang.message.launghing_from_installer_warning
+                            );
+                        }
+                    }
+                }
+            },
+
+            _monitorUsb: function(usbOn) {
+                if(this.state.showMonitor) {
+                    if(!usbOn) {
+                        this._handlecloseMonitor();
+                        AlertActions.showPopupError('USB_UNPLUGGED', lang.message.usb_unplugged);
+                    }
+                }
             },
 
             _onYes: function(id) {
@@ -453,7 +485,10 @@ define([
                     caption               : caption,
                     message               : message,
                     customText            : customText,
-                    args                  : args
+                    args                  : args,
+                    displayImages         : (args && args.images != null),
+                    images                : (args && args.images != null ? args.images : [] ),
+                    imgClass              : (args && args.imgClass) ? args.imgClass : ''
                 });
             },
 
@@ -610,6 +645,9 @@ define([
                             onNo={this._handlePopupFeedBack.bind(null,'no')}
                             onCustom={this._handlePopupFeedBack.bind(null, 'custom')}
                             onClose={this._handleNotificationModalClose}
+                            images={this.state.images}
+                            displayImages={this.state.displayImages}
+                            imgClass={this.state.imgClass}
                         />
 
                         <Progress

@@ -33,7 +33,13 @@ define([
         },
         onMessage = function(device) {
             if (device.alive) {
+                // console.log(device);
+                if(device.source === 'h2h') {
+                    device.uuid = device.addr.toString();
+                }
+                // console.log(device);
                 _devices[device.uuid] = device;
+
                 //SmartUpnp.addSolidIP(device.ip);
             }
             else {
@@ -54,8 +60,10 @@ define([
                 sendFoundPrinter();
             }, BUFFER);
         },
-        poke = function(targetIP){
-            ws.send(JSON.stringify({ 'cmd' : 'poke', 'ipaddr': targetIP }))
+        poke = function(targetIP) {
+            printers = [];
+            _devices = {};
+            ws.send(JSON.stringify({ 'cmd' : 'poke', 'ipaddr': targetIP }));
         },
         BUFFER = 100,
         pokeIPs = config().read('poke-ip-addr').split(';'),

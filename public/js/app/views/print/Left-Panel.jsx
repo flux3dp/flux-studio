@@ -11,25 +11,15 @@ define([
 ], function($, React, printController, ClassNames, DeviceMaster, Config, DialogMenu, GlobalConstants, AlertActions) {
     'use strict';
 
+    var DEFAULT_QUALITY = 'high',
+        DEFAULT_MODEL  = 'fd1'
+
     var lang,
-        settings,
-        qualityLevel,
-        layerHeight,
-        defaultQuality = 'high',
-        constants;
-
-    qualityLevel = {
-        high: 0.05,
-        med: 0.15,
-        low: 0.25
-    };
-
-    settings = {
-        raftOn: true,
-        supportOn: true
-    };
+        constants,
+        displayModelControl;
 
     constants = {
+        MODEL       : 'MODEL',
         QUALITY     : 'QUALITY',
         RAFT_ON     : 'RAFT_ON',
         SUPPORT_ON  : 'SUPPORT_ON',
@@ -45,6 +35,7 @@ define([
             previewMode                 : React.PropTypes.bool,
             previewModeOnly             : React.PropTypes.bool,
             disablePreview              : React.PropTypes.bool,
+            displayModelControl         : React.PropTypes.bool,
             hasObject                   : React.PropTypes.bool,
             hasOutOfBoundsObject        : React.PropTypes.bool,
             previewLayerCount           : React.PropTypes.number,
@@ -61,16 +52,15 @@ define([
         },
 
         getInitialState: function() {
-            var s = Config().read('left-panel');
-            settings = !!s ? s : settings;
-
             return {
-                raftOn              : settings.raftOn,
-                supportOn           : settings.supportOn,
+                raftOn              : true,
+                supportOn           : true,
                 previewOn           : false,
                 previewCurrentLayer : 0,
                 previewLayerCount   : this.props.previewLayerCount,
-                quality             : this.props.lang.print.quality[defaultQuality],
+                displayModelControl : true,
+                quality             : DEFAULT_QUALITY,
+                model               : DEFAULT_MODEL,
                 color               : 'WHITE'
             };
         },
@@ -78,10 +68,11 @@ define([
         componentWillMount: function() {
             lang = this.props.lang.print.left_panel;
             lang.quality = this.props.lang.print.quality;
+            lang.model = this.props.lang.print.model;
+            console.log("Display Model Control", this.state.displayModelControl);
         },
 
         componentDidMount: function() {
-            layerHeight = qualityLevel[defaultQuality];
         },
 
         componentWillReceiveProps: function(nextProps) {
@@ -95,17 +86,9 @@ define([
                 });
             }
 
-            if(nextProps.layerHeight !== layerHeight) {
-                var _quality = {
-                    '0.05': lang.quality.high,
-                    '0.15': lang.quality.med,
-                    '0.25': lang.quality.low
-                };
-                if(nextProps.layerHeight) {
-                    layerHeight = nextProps.layerHeight;
-                    this.setState({ quality: _quality[nextProps.layerHeight.toString()] || lang.quality.custom });
-                }
-            }
+            this.setState({ quality: nextProps.quality });
+            this.setState({ model: nextProps.model });
+            this.setState({ displayModelControl: nextProps.displayModelControl });
 
             if(nextProps.previewMode !== this.state.previewOn) {
                 this.setState({ previewOn: nextProps.previewMode });
@@ -132,10 +115,13 @@ define([
             }
             var self = this,
                 actions = {
+                    'MODEL': function() {
+                        self.props.onQualityModelSelected(self.state.quality, arg);
+                        $('.dialog-opener').prop('checked', false);
+                    },
+ 
                     'QUALITY': function() {
-                        layerHeight = qualityLevel[arg];
-                        self.props.onQualitySelected(qualityLevel[arg]);
-                        self.setState({ quality: lang.quality[arg] });
+                        self.props.onQualityModelSelected(arg, self.state.model);
                         $('.dialog-opener').prop('checked', false);
                     },
 
@@ -192,7 +178,7 @@ define([
             this.props.onPreviewClick(false);
         },
 
-        _renderQuanlity: function() {
+        _renderQuality: function() {
             var _quality = ['high', 'med', 'low'],
                 _class = ClassNames('display-text quality-select', {'disable': this.props.previewModeOnly}),
                 qualitySelection;
@@ -208,12 +194,39 @@ define([
             return {
                 label: (
                     <div className={_class}>
-                        <span>{this.state.quality}</span>
+                        <span>{lang.quality[this.state.quality]}</span>
                     </div>
                 ),
                 content: (
                     <ul>
                         {qualitySelection}
+                    </ul>
+                ),
+                disable: this.props.previewModeOnly
+            };
+        },
+        
+        _renderModel: function() {
+            var _class = ClassNames('display-text model-select', {'disable': this.props.previewModeOnly}),
+                modelSelection;
+
+            modelSelection = ['fd1', 'fd1p'].map(function(model) {
+                return (
+                    <li onClick={this._handleActions.bind(null, constants.MODEL, model)}>
+                        {lang.model[model]}
+                    </li>
+                );
+            }.bind(this));
+
+            return {
+                label: (
+                    <div className={_class}>
+                        <span>{lang.model[this.state.model]}</span>
+                    </div>
+                ),
+                content: (
+                    <ul>
+                        {modelSelection}
                     </ul>
                 ),
                 disable: this.props.previewModeOnly
@@ -276,19 +289,16 @@ define([
         },
 
         render: function() {
-            var quality     = this._renderQuanlity(),
-                raft        = this._renderRaft(),
-                support     = this._renderSupport(),
-                advanced    = this._renderAdvanced(),
-                preview     = this._renderPreview(),
-                mask        = this.props.enable || this.props.previewModeOnly ? '' : (<div className="mask"></div>),
-                items = [
-                    quality,
-                    raft,
-                    support,
-                    advanced,
-                    preview
-                ];
+            let items = [
+                    this._renderQuality(),
+                    this._renderRaft(),
+                    this._renderSupport(),
+                    this._renderAdvanced(),
+                    this._renderPreview()
+                ],
+                mask = this.props.enable || this.props.previewModeOnly ? '' : (<div className="mask"></div>);
+
+            if (this.state.displayModelControl) items.unshift(this._renderModel());
 
             return (
                 <div className='leftPanel'>
