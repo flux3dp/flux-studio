@@ -179,6 +179,8 @@ define([
                         });
                     },
                     errorMessageHandler = (response) => {
+                        if(typeof response.error == "string") response.error = [response.error];
+
                         var messageMap = lang.monitor,
                             allJoinedMessage = response.error.join('_'),
                             genericMessage = response.error.slice(0, 2).join('_');
