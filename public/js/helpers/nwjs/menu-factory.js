@@ -327,11 +327,16 @@ define([
     if (true === window.FLUX.isNW) {
         createDevice = function(printer) {
             var subItems = [],
-                showPopup = function(currentPrinter) {
+                showPopup = function(currentPrinter, type) {
                     checkDeviceStatus(currentPrinter).done(function(status) {
                         switch (status) {
                         case 'ok':
-                            AlertActions.showChangeFilament(currentPrinter);
+                            if(type === 'SET_TEMPERATURE') {
+                                AlertActions.showHeadTemperature(currentPrinter);
+                            }
+                            else {
+                                AlertActions.showChangeFilament(currentPrinter);
+                            }
                             break;
                         case 'auth':
                             var opts = {
@@ -417,8 +422,6 @@ define([
                     var currentPrinter = discoverMethods.getLatestPrinter(printer);
 
                     DeviceMaster.selectDevice(currentPrinter).then(function(status) {
-                        var lang = i18n.get();
-
                         if (status === DeviceConstants.CONNECTED) {
                             showPopup(currentPrinter);
                         }
@@ -581,7 +584,7 @@ define([
 
                             DeviceMaster.selectDevice(currentPrinter).then(status => {
                                 if(status === DeviceConstants.CONNECTED) {
-                                    AlertActions.showHeadTemperature(currentPrinter);
+                                    showPopup(currentPrinter, 'SET_TEMPERATURE');
                                 }
                                 else if(status === DeviceConstants.TIMEOUT) {
                                     AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);

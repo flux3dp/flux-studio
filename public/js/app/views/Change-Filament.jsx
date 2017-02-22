@@ -9,6 +9,8 @@ define([
     'app/constants/device-constants',
     'app/actions/alert-actions',
     'app/stores/alert-store',
+    'helpers/firmware-version-checker',
+    'app/version-requirement',
     'helpers/device-error-handler'
 ], function(
     $,
@@ -21,6 +23,8 @@ define([
     DeviceConstants,
     AlertActions,
     AlertStore,
+    FirmwareVersionChecker,
+    Requirement,
     DeviceErrorHandler
 ) {
     'use strict';
@@ -210,6 +214,10 @@ define([
                     };
 
                 DeviceMaster.selectDevice(self.props.device).then(() => {
+                //     return FirmwareVersionChecker(self.props.device, Requirement.operateDuringPauseRequiredVersion);
+                // })
+                // .then(metVersion => {
+                //     this.metVersion = metVersion;
                     return DeviceMaster.getReport();
                 })
                 .then(report => {
@@ -257,7 +265,7 @@ define([
                                 self.props.onClose();
                             }
                             else if (response.error[1] === 'TYPE_ERROR' || response.info === 'TYPE_ERROR') {
-                                if (response.error[3] == 'N/A') {
+                                if (response.error[3] === 'N/A') {
                                     AlertActions.showPopupError('change-filament-device-error', DeviceErrorHandler.translate(['HEAD_ERROR','HEAD_OFFLINE']));
                                 } else {
                                     AlertActions.showPopupError('change-filament-device-error', DeviceErrorHandler.translate(['HEAD_ERROR','TYPE_ERROR']));
@@ -375,8 +383,7 @@ define([
             },
 
             _sectionHeating: function() {
-                var self = this,
-                    { temperature, targetTemperature } = this.state;
+                let { temperature, targetTemperature } = this.state;
 
                 return {
                     message: (

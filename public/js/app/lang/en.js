@@ -79,7 +79,6 @@ define(function() {
                 import: 'Import',
                 save_fcode: 'Export FLUX Task',
                 save_scene: 'Save Scene',
-                reset: 'Reset',
                 confirmReset: 'Are you sure you want to reset all settings?'
             },
             edit: {
@@ -87,9 +86,9 @@ define(function() {
                 duplicate: 'Duplicate',
                 rotate: 'Rotate',
                 scale: 'Scale',
-                reset: 'Reset',
                 clear: 'Clear Scene',
-                undo: 'Undo'
+                undo: 'Undo',
+                reset: 'Reset'
             },
             device: {
                 label: 'Machines',
@@ -284,6 +283,9 @@ define(function() {
             projection_perspective: 'Perspective',
             projection_orthographic: 'Orthographic',
             antialiasing: 'Anti-aliasing',
+            reset: 'Reset FS',
+            reset_now: 'Reset Now',
+            confirm_reset: 'Confirm reset FS?',
             language: 'Language',
             notifications: 'Notifications',
             default_model: 'Default Model\n(For Print Settings)',
@@ -1111,7 +1113,7 @@ define(function() {
             need_1_1_7_above: 'Please update Machine Firmware to v1.1.7+',
             gcode_area_too_big: 'Imported gcode exceed the printable area.',
             empty_file: 'File is empty',
-            usb_unplugged: 'USB connection is lost, please check your USB connection',
+            usb_unplugged: 'USB connection is lost. Please check your USB connection',
             launghing_from_installer_warning: 'You are launching FLUX Studio from the installer, and this may cause problems. Please move the FLUX Studio to the Application folder.',
             uploading_fcode: 'Uploading fcode',
             cant_connect_to_device: 'Cannot connect to the machine, please check your connection'

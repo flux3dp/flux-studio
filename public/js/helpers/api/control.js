@@ -542,7 +542,7 @@ define([
             },
 
             setHeadTemperatureDuringPause: (temperature) => {
-                return useDefaultResponse(`play set_heater 0 ${temperature}`);
+                return useDefaultResponse(`play toolhead heater 0 ${temperature}`);
             },
 
             /**

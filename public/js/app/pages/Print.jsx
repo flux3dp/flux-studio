@@ -245,12 +245,6 @@ define([
                     nwjsMenu.saveTask.onClick = this._handleDownloadFCode;
                     nwjsMenu.saveScene.onClick = this._handleDownloadScene;
                     nwjsMenu.clear.onClick = this._handleClearScene;
-                    nwjsMenu.clearLocalstorage.enabled = true;
-                    nwjsMenu.clearLocalstorage.onClick = () => {
-                        if(confirm(lang.topmenu.file.confirmReset)) {
-                            LocalStorage.clearAllExceptIP();
-                        }
-                    };
 
                     // to catch the tutorial click from menuMap
                     // this mod is implemented after menu-map refactored, using cache to reduce refresh, boot performance

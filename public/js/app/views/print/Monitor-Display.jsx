@@ -21,16 +21,40 @@ define([
 
     let selectedItem = '',
         previewUrl = defaultImage,
-        previewBlob = null;
+        previewBlob = null,
+        hdChecked = {};
 
     const findObjectContainsProperty = (infoArray = [], propertyName) => {
         return infoArray.filter((o) => Object.keys(o).some(n => n === propertyName));
     };
 
-    const processImage = (imageBlob) => {
-        if(imageBlob.size > 90000) $('.camera-image').addClass('hd');
-        if(imageBlob.size < 70000) $('.camera-image').removeClass('hd');
+    const getImageSize = (url, onSize) => {
+        var img = new Image();
+        img.onload = () => {
+            onSize([img.naturalWidth, img.naturalHeight]);
+        };
+        img.src = url;
+    };
 
+    const processImage = (imageBlob) => {
+        let targetDevice = DeviceMaster.getSelectedDevice();
+        if (targetDevice) {
+            if (!hdChecked[targetDevice.name]) {
+                getImageSize(URL.createObjectURL(imageBlob), (size) => {
+                    if (size[0] > 720) {
+                        hdChecked[targetDevice.name] = 2;
+                    } else if (size[0] > 0) {
+                        hdChecked[targetDevice.name] = 1;
+                    }
+                });
+            }
+            else if(hdChecked[targetDevice.name] === 1) {
+                $('.camera-image').removeClass('hd');
+            }
+            else if(hdChecked[targetDevice.name] === 2) {
+                $('.camera-image').addClass('hd');
+            }
+        }
         previewBlob = imageBlob;
         $('.camera-image').attr('src', URL.createObjectURL(imageBlob));
     };
