@@ -169,7 +169,7 @@ define([
                 },
 
                 'SHOW_POPUP_CUSTOM': function() {
-                    AlertStore.emit(POPUP_EVENT, AlertConstants.CUSTOM, payload.id, payload.caption, payload.message, payload.customText);
+                    AlertStore.emit(POPUP_EVENT, AlertConstants.CUSTOM, payload.id, payload.caption, payload.message, payload.customText, payload.args);
                 },
 
                 'SHOW_POPUP_CUSTOM_CANCEL': function() {

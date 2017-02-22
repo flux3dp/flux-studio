@@ -944,3 +944,22 @@ input.switch:checked ~ label:after {
         transition: width 0.5s;
     }
 }
+
+img.img640x480 {
+    width: 640px;
+    height: 480px;
+    outline: 2px solid #333;
+    margin-bottom: 20px;
+}
+
+.modal-window .modal-alert.img640x480 {
+    width: auto !important;
+
+    .btn-h-group {
+        display: block;
+    }
+
+    .btn.pull-right {
+        float: right;
+    }
+}

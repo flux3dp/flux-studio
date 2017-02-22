@@ -5,6 +5,9 @@ define(function() {
         general: {
             wait: 'Processing, please wait'
         },
+        buttons: {
+            next: 'NEXT'
+        },
         support: {
             no_webgl: 'WebGL is not supported. Please use other devices.',
             no_vcredist: 'Please install Visual C++ Redistributable 2015',

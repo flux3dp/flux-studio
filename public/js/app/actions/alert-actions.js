@@ -83,13 +83,14 @@ define([
             }
         },
 
-        showPopupCustom: function(id, message, customText, caption) {
+        showPopupCustom: function(id, message, customText, caption, args) {
             AlertDispatcher.dispatch({
                 actionType: AlertConstants.SHOW_POPUP_CUSTOM,
                 id: id,
                 caption: caption,
                 message: message,
-                customText: customText
+                customText: customText,
+                args: args
             });
         },
 

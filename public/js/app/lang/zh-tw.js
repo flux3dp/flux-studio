@@ -5,6 +5,9 @@ define(function() {
         general: {
             wait: '處理中，請稍待'
         },
+        buttons: {
+            next: '下一步'
+        },
         support: {
             no_webgl: '您的系統不支援 WebGL，建議您使用其他電腦開啟 FLUX Studio',
             no_vcredist: 'Please install Visual C++ Redistributable 2015',

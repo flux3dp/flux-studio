@@ -140,7 +140,10 @@ define([
                     firstDevice: {
                         info: {}, // device info
                         apiResponse: {}, // device info
-                    }
+                    },
+                    // images
+                    displayImages: false,
+                    images: []
                 };
             },
 
@@ -482,7 +485,10 @@ define([
                     caption               : caption,
                     message               : message,
                     customText            : customText,
-                    args                  : args
+                    args                  : args,
+                    displayImages         : (args && args.images != null),
+                    images                : (args && args.images != null ? args.images : [] ),
+                    imgClass              : (args && args.imgClass) ? args.imgClass : ''
                 });
             },
 
@@ -639,6 +645,9 @@ define([
                             onNo={this._handlePopupFeedBack.bind(null,'no')}
                             onCustom={this._handlePopupFeedBack.bind(null, 'custom')}
                             onClose={this._handleNotificationModalClose}
+                            images={this.state.images}
+                            displayImages={this.state.displayImages}
+                            imgClass={this.state.imgClass}
                         />
 
                         <Progress
