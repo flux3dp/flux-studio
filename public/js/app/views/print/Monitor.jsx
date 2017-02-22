@@ -658,7 +658,7 @@ define([
                 // only display error during these state
                 if(state.indexOf(report.st_id) >= 0) {
                     // jug down errors as main and sub error for later use
-                   
+
                     let errorMessage = DeviceErrorHandler.translate(error);
 
                     if(
