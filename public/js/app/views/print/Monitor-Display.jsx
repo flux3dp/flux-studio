@@ -21,6 +21,7 @@ define([
 
     let selectedItem = '',
         previewUrl = defaultImage,
+        previewBlob = null,
         hdChecked = {};
 
     const findObjectContainsProperty = (infoArray = [], propertyName) => {
@@ -54,6 +55,7 @@ define([
                 $('.camera-image').addClass('hd');
             }
         }
+        previewBlob = imageBlob;
         $('.camera-image').attr('src', URL.createObjectURL(imageBlob));
     };
 
@@ -300,6 +302,16 @@ define([
             );
         },
 
+        _handleSnapshot: function() {
+            if(previewBlob == null) return;
+            let targetDevice = DeviceMaster.getSelectedDevice(),
+                fileName = (targetDevice ? targetDevice.name + ' ' : '') + new Date().
+                    toLocaleString('en-GB', {year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit'}).
+                    replace(/(\d+)\/(\d+)\/(\d+)\, (\d+):(\d+):(\d+)/, '$3-$1-$2 $4-$5-$6')+ ".jpg";
+
+            saveAs(previewBlob, fileName);
+        },
+
         _renderSpinner: function() {
             return (
                 <div className="spinner-wrapper">
@@ -309,9 +321,12 @@ define([
         },
 
         render: function() {
-            let { Monitor, Device } = this.context.store.getState();
+            let { Monitor } = this.context.store.getState();
             let content = this._renderDisplay(Monitor.mode),
-                jobInfo = this._renderJobInfo();
+                jobInfo = this._renderJobInfo(),
+                specialBtn = Monitor.mode == GlobalConstants.CAMERA ? (<div className="btn-snap" onClick={this._handleSnapshot}>
+                    <i className="fa fa-camera"></i>
+                </div>) : "";
 
             if(Monitor.isWaiting) {
                 content = this._renderSpinner();
@@ -321,6 +336,7 @@ define([
             return (
                 <div className="body">
                     <div className="device-content">
+                        {specialBtn}
                         {content}
                         {jobInfo}
                     </div>
