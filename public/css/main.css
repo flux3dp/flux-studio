@@ -3995,6 +3995,7 @@ hr {
         .flux-monitor .main .body {
             height: 70%; }
             .flux-monitor .main .body .device-content {
+                position: relative;
                 padding: 0 20px;
                 overflow-y: auto;
                 height: 100%; }
@@ -4081,6 +4082,16 @@ hr {
                         color: #FFF; }
                 .flux-monitor .main .body .device-content .status-info.running {
                     background: linear-gradient(transparent, rgba(0, 0, 0, 0.5)); }
+                .flux-monitor .main .body .device-content .btn-snap {
+                    position: absolute;
+                    top: 10px;
+                    right: 28px;
+                    opacity: 0.5;
+                    color: white;
+                    cursor: pointer;
+                    z-index: 10; }
+                    .flux-monitor .main .body .device-content .btn-snap:hover {
+                        opacity: 1; }
             .flux-monitor .main .body .close {
                 right: 20px; }
         .flux-monitor .main .operation {
