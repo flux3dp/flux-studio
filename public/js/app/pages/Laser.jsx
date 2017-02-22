@@ -60,7 +60,7 @@ define([
                         size: {},
                         sizeLock: false,
                         angle: 0,
-                        threshold: 128,
+                        threshold: 255,
                         images: []
                     };
                 },
@@ -176,7 +176,7 @@ define([
                     $images.each(function(k, el) {
                         var $el = $(el);
 
-                        self.state.laserEvents.refreshImage($el, $el.data('threshold') || 128);
+                        self.state.laserEvents.refreshImage($el, $el.data('threshold') || 255);
                     });
                 },
 
