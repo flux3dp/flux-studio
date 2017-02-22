@@ -48,8 +48,8 @@ define([
                 });
             };
 
-            CheckDeviceStatus(this.props.device).then((status, stId) => {
-                this.operateDuringPause = stId === 48;
+            DeviceMaster.getReport().then(report => {
+                this.operateDuringPause = report.st_id === 48;
 
                 if(this.operateDuringPause) {
                     DeviceMaster.startToolheadOperation().then(() => {
@@ -73,6 +73,8 @@ define([
             }
             clearInterval(this.report);
         },
+
+
 
         _startReport: function() {
             this.report = setInterval(() => {

@@ -8,7 +8,9 @@ define([
     'helpers/device-master',
     'app/constants/device-constants',
     'app/actions/alert-actions',
-    'app/stores/alert-store'
+    'app/stores/alert-store',
+    'helpers/firmware-version-checker',
+    'app/version-requirement'
 ], function(
     $,
     React,
@@ -19,7 +21,9 @@ define([
     DeviceMaster,
     DeviceConstants,
     AlertActions,
-    AlertStore
+    AlertStore,
+    FirmwareVersionChecker,
+    Requirement
 ) {
     'use strict';
 
@@ -206,11 +210,15 @@ define([
                     };
 
                 DeviceMaster.selectDevice(self.props.device).then(() => {
+                    return FirmwareVersionChecker(self.props.device, Requirement.operateDuringPauseRequiredVersion);
+                })
+                .then(metVersion => {
+                    this.metVersion = metVersion;
                     return DeviceMaster.getReport();
                 })
                 .then(report => {
                     // if changing filament during pause
-                    if(report.st_id === 48) {
+                    if(report.st_id === 48 && this.metVersion) {
                         this.isChangingFilamentDuringPause = true;
 
                         DeviceMaster.changeFilamentDuringPause(type)
