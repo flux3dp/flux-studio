@@ -43,7 +43,7 @@ define([
                                     if (report.st_id === DeviceConstants.status.ABORTED) {
                                         setTimeout(function() {
                                             DeviceMaster.quit().then(function() {
-                                                deferred.resolve('ok');
+                                                deferred.resolve('ok', report.st_id);
                                             });
                                         }, 500);
 
@@ -51,7 +51,7 @@ define([
                                     }
                                     else if(report.st_id === DeviceConstants.status.IDLE) {
                                         clearInterval(timer);
-                                        deferred.resolve('ok');
+                                        deferred.resolve('ok', report.st_id);
                                     }
                                 });
                             }, 100);

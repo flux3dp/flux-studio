@@ -67,26 +67,31 @@ define([
 
             _onWifiStartingSetUp: function(e) {
                 var self = this,
-                    discoverMethods = discover('upnp-config', (printers) => {
-                        clearTimeout(timer);
+                    discoverMethods,
+                    timer;
 
-                        if (1 < printers.length) {
-                            self._toggleBlocker(false);
-                            self.setState({
-                                showPrinters: true
-                            });
-                        }
-                        else {
-                            self._onGettingPrinter(printers[0]);
-                        }
+                discoverMethods = discover('upnp-config', (printers) => {
+                    clearTimeout(timer);
 
-                        discoverMethods.removeListener('upnp-config');
-                    }),
-                    timer = setTimeout(function() {
-                        clearTimeout(timer);
+                    // if (1 < printers.length) {
+                    if (Object.keys(printers).length > 1) {
                         self._toggleBlocker(false);
-                        location.hash = '#initialize/wifi/not-found';
-                    }, 1000);
+                        self.setState({
+                            showPrinters: true
+                        });
+                    }
+                    else {
+                        self._onGettingPrinter(printers[0]);
+                    }
+
+                    discoverMethods.removeListener('upnp-config');
+                });
+
+                timer = setTimeout(function() {
+                    clearTimeout(timer);
+                    self._toggleBlocker(false);
+                    location.hash = '#initialize/wifi/not-found';
+                }, 1000);
 
                 self._toggleBlocker(true);
             },
@@ -158,6 +163,7 @@ define([
                         className="absolute-center"
                         lang={lang}
                         forceAuth={true}
+                        bypassDefaultPrinter={true}
                         onGettingPrinter={this._onGettingPrinter}
                     />
                 );
