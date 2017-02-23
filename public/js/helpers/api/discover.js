@@ -61,6 +61,7 @@ define([
             }, BUFFER);
         },
         poke = function(targetIP) {
+            if (targetIP == null) { return; };
             printers = [];
             _devices = {};
             ws.send(JSON.stringify({ 'cmd' : 'poke', 'ipaddr': targetIP }));

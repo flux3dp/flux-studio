@@ -9,6 +9,7 @@ define([
     'app/actions/alert-actions',
     'app/stores/alert-store',
     'app/actions/progress-actions',
+    'app/constants/progress-constants',
     'app/version-requirement',
     'helpers/firmware-version-checker'
 ], function(
@@ -19,6 +20,7 @@ define([
     AlertActions,
     AlertStore,
     ProgressActions,
+    ProgressConstants,
     Requirement,
     FirmwareVersionChecker
 ) {
@@ -40,6 +42,7 @@ define([
                         });
                         break;
                     case 'abort':
+                        ProgressActions.open(ProgressConstants.NONSTOP);
                         DeviceMaster.stop().then(function() {
                             timer = setInterval(function() {
                                 DeviceMaster.getReport().then(function(report) {
@@ -50,6 +53,7 @@ define([
                                     }
                                     else if(report.st_id === DeviceConstants.status.IDLE) {
                                         clearInterval(timer);
+                                        ProgressActions.close();
                                         deferred.resolve('ok', report.st_id);
                                     }
                                 });
@@ -107,7 +111,6 @@ define([
                         // ask for abort
                         ProgressActions.close();
                         if (forceAbort) {
-                            console.log("Force abort");
                             AlertStore.onYes(onYes);
                             onYes('abort');
                         } else {

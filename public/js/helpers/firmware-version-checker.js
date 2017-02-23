@@ -15,7 +15,6 @@ define([
             return DeviceMaster.getDeviceInfo();
         })
         .then(deviceInfo => {
-            console.log('device info', deviceInfo);
             let vc = VersionChecker(deviceInfo.version);
             d.resolve(vc.meetVersion(version));
         });

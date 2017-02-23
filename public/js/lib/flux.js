@@ -1,11 +1,8 @@
-/**
- * Flux v3.1.1
- */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
 	else if(typeof define === 'function' && define.amd)
-		define([], factory);
+		define(factory);
 	else if(typeof exports === 'object')
 		exports["Flux"] = factory();
 	else
@@ -315,16 +312,17 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
-	 * Copyright (c) 2013-present, Facebook, Inc.
+	 * Copyright 2013-2015, Facebook, Inc.
 	 * All rights reserved.
 	 *
 	 * This source code is licensed under the BSD-style license found in the
 	 * LICENSE file in the root directory of this source tree. An additional grant
 	 * of patent rights can be found in the PATENTS file in the same directory.
 	 *
+	 * @providesModule invariant
 	 */
 
-	'use strict';
+	"use strict";
 
 	/**
 	 * Use invariant() to assert state which your program assumes to be true.
@@ -337,7 +335,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * will remain to ensure logic does not differ in production.
 	 */
 
-	function invariant(condition, format, a, b, c, d, e, f) {
+	var invariant = function invariant(condition, format, a, b, c, d, e, f) {
 	  if (true) {
 	    if (format === undefined) {
 	      throw new Error('invariant requires an error message argument');
@@ -351,16 +349,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	    } else {
 	      var args = [a, b, c, d, e, f];
 	      var argIndex = 0;
-	      error = new Error(format.replace(/%s/g, function () {
+	      error = new Error('Invariant Violation: ' + format.replace(/%s/g, function () {
 	        return args[argIndex++];
 	      }));
-	      error.name = 'Invariant Violation';
 	    }
 
 	    error.framesToPop = 1; // we don't care about invariant's own frame
 	    throw error;
 	  }
-	}
+	};
 
 	module.exports = invariant;
 

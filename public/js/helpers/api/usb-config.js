@@ -111,7 +111,8 @@ define([
                             ws.send('list_trust');
                         }
                         else if(r.status === 'ok') {
-                            opts.onSuccess(ws.usbData);
+                            ws.usbData.addr = usbChannel;
+                            opts.onSuccess(ws.usbData);                            
                         }
                     };
 

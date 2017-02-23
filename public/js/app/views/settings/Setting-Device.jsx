@@ -147,6 +147,7 @@ define([
                 return s;
             };
             const mapNumberToTypeArray = (num) => {
+                if(num === 0) { return ['N']; }
                 let t = [],
                     configs;
 
@@ -171,6 +172,7 @@ define([
                 return DeviceMaster.getDeviceSettings(backlashAllowed);
             }).then((config) => {
                 config.head_error_level = config.head_error_level ? mapNumberToTypeArray(parseInt(config.head_error_level)) : null;
+                console.log(config.head_error_level);
                 this.setState({ config });
 
                 if(config['backlash']) {

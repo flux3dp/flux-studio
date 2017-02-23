@@ -58,7 +58,7 @@ define([
         _devices = [],
         _errors = {},
         availableUsbChannel = -1,
-        usbEventListeners = [];
+        usbEventListeners = {};
 
     function selectDevice(device, deferred) {
         if(_selectedDevice.uuid === device.uuid) {
@@ -380,7 +380,7 @@ define([
 
     function runMovementTests() {
         let d = $.Deferred();
-        
+
         fetch(DeviceConstants.MOVEMENT_TEST).then(res => res.blob()).then(blob => {
             go(blob).fail(() => {
                 // Error while uploading task
@@ -642,22 +642,6 @@ define([
 
     function getDeviceByName(name) {
         return _deviceNameMap[name];
-    }
-
-    function getDeviceByNameAsync(name, config) {
-        if(getDeviceByName(name)){
-            config.onSuccess(getDeviceByName(name));
-            return;
-        }
-        if(config.timeout > 0){
-            setTimeout(function(){
-                config.timeout -= 500;
-                getDeviceByNameAsync(name, config);
-            },500);
-        }
-        else{
-            config.onTimeout();
-        }
     }
 
     function updateFirmware(file) {
@@ -1164,8 +1148,8 @@ define([
             this.availableUsbChannel = channel;
 
             // to be replaced when redux is implemented
-            usbEventListeners.forEach(callback => {
-                callback(channel > 0);
+            Object.keys(usbEventListeners).forEach(id => {
+                usbEventListeners[id](channel > 0);
             });
         });
     }
@@ -1174,16 +1158,38 @@ define([
         return this.availableUsbChannel;
     }
 
-    function getAvailableUsbChannel() {
-        return this.availableUsbChannel;
+    // id    : string, required,
+    // event : function, required, will callback with ture || false
+    function registerUsbEvent(id, event) {
+        usbEventListeners[id] = event;
+        console.log('registering event');
     }
 
-    function registerUsbEvent(callback) {
-        usbEventListeners.push(callback);
+    function unregisterUsbEvent(id) {
+        delete usbEventListeners[id];
     }
 
-    function unregisterUsbEvent(callback) {
-        // TODO: to be coded when ndeeded
+    function getDeviceBySerial(serial, isUsb, callback) {
+        let d = _devices.filter(d => {
+            let a = d.serial === serial;
+            if (isUsb) { a = a && d.source === 'h2h'; };
+            return a;
+        });
+
+        if (d[0] !== null) {
+            callback.onSuccess(d[0]);
+            return;
+        }
+
+        if (callback.timeout > 0) {
+            setTimeout(function() {
+                callback.timeout -= 500;
+                getDeviceBySerial(name, isUsb, callback);
+            }, 500);
+        }
+        else {
+            callback.onTimeout();
+        }
     }
 
     // Core
@@ -1219,7 +1225,6 @@ define([
             this.changeFilament                 = changeFilament;
             this.reconnect                      = reconnect;
             this.getDeviceByName                = getDeviceByName;
-            this.getDeviceByNameAsync           = getDeviceByNameAsync;
             this.getFirstDevice                 = getFirstDevice;
             this.updateFirmware                 = updateFirmware;
             this.updateToolhead                 = updateToolhead;
@@ -1252,7 +1257,8 @@ define([
             this.endToolheadOperation           = endToolheadOperation;
             this.endLoadingDuringPause          = endLoadingDuringPause;
             this.setHeadTemperatureDuringPause  = setHeadTemperatureDuringPause;
-            this.runMovementTests                = runMovementTests;
+            this.runMovementTests               = runMovementTests;
+            this.getDeviceBySerial              = getDeviceBySerial;
 
             Discover(
                 'device-master',
@@ -1261,6 +1267,8 @@ define([
                     devices.forEach(d => {
                         _deviceNameMap[d.name] = d;
                     });
+                    _devices = devices;
+                    // console.log('devices', _devices);
                     _scanDeviceError(devices);
 
                 }
