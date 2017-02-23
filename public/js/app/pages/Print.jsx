@@ -397,70 +397,72 @@ define([
                         if(this.state.hasObject) {
                             director.clearScene();
                         }
-                        AlertActions.showPopupCustom('tutorial-images', 'Test Message', 'custom_text', null, {
-                            images: [
-                                '/img/tutorial/' + activeLang + '/n01.png',
-                                '/img/tutorial/' + activeLang + '/n02.png',
-                                '/img/tutorial/' + activeLang + '/n03.png',
-                                '/img/tutorial/' + activeLang + '/n04.png',
-                                '/img/tutorial/' + activeLang + '/n05.png',
-                                '/img/tutorial/' + activeLang + '/n06.png'
-                            ],
-                            imgClass: 'img640x480'
-                        }, () => {
-                            console.log("onCustom Event");
-                            let startTutorial = () => {
-                                this.setState({ tutorialOn: true });
-                                tutorialMode = true;
-                            };
+                        setTimeout(() => { 
+                            AlertActions.showPopupCustom('tutorial-images', 'Test Message', 'custom_text', null, {
+                                images: [
+                                    '/img/tutorial/' + activeLang + '/n01.png',
+                                    '/img/tutorial/' + activeLang + '/n02.png',
+                                    '/img/tutorial/' + activeLang + '/n03.png',
+                                    '/img/tutorial/' + activeLang + '/n04.png',
+                                    '/img/tutorial/' + activeLang + '/n05.png',
+                                    '/img/tutorial/' + activeLang + '/n06.png'
+                                ],
+                                imgClass: 'img640x480'
+                            }, () => {
+                                console.log("onCustom Event");
+                                let startTutorial = () => {
+                                    this.setState({ tutorialOn: true });
+                                    tutorialMode = true;
+                                };
 
-                            let tryMovementTest = () => {
-                                var selectedPrinterName =
-                                        InitializeMachine.defaultPrinter.get().name ||
-                                        Config().read('configured-printer') ||
-                                        DeviceMaster.getFirstDevice();
+                                let tryMovementTest = () => {
+                                    var selectedPrinterName =
+                                            InitializeMachine.defaultPrinter.get().name ||
+                                            Config().read('configured-printer') ||
+                                            DeviceMaster.getFirstDevice();
 
-                                if (selectedPrinterName) {
-                                    this.showSpinner(lang.tutorial.connectingMachine);
-                                    DeviceMaster.getDeviceByNameAsync(selectedPrinterName, {
-                                        timeout: 20000,
-                                        onSuccess: (printer)  => {
-                                                DeviceMaster.selectDevice(printer).then(() => {
-                                                    CheckDeviceStatus(printer, false, true).then(() => {
-                                                        this.showSpinner(lang.tutorial.runningMovementTests);
-                                                        console.log("good status", printer.st_id);
-                                                        DeviceMaster.runMovementTests().then(() => {
-                                                            console.log("ran movemnt test");
-                                                            this.hideSpinner();
-                                                            startTutorial();
-                                                        }).fail(() => {
-                                                            console.log("ran movemnt test failed");
-                                                            this.hideSpinner();
-                                                            AlertActions.showPopupYesNo("movement-try-again", lang.tutorial.movementTestFailed.message, lang.tutorial.movementTestFailed.caption, null, {
-                                                                yes: function() {
-                                                                    tryMovementTest();
-                                                                },
-                                                                no: function() {
-                                                                    // TODO 
-                                                                    this.hideSpinner();
-                                                                }
+                                    if (selectedPrinterName) {
+                                        this.showSpinner(lang.tutorial.connectingMachine);
+                                        DeviceMaster.getDeviceByNameAsync(selectedPrinterName, {
+                                            timeout: 20000,
+                                            onSuccess: (printer)  => {
+                                                    DeviceMaster.selectDevice(printer).then(() => {
+                                                        CheckDeviceStatus(printer, false, true).then(() => {
+                                                            this.showSpinner(lang.tutorial.runningMovementTests);
+                                                            console.log("good status", printer.st_id);
+                                                            DeviceMaster.runMovementTests().then(() => {
+                                                                console.log("ran movemnt test");
+                                                                this.hideSpinner();
+                                                                startTutorial();
+                                                            }).fail(() => {
+                                                                console.log("ran movemnt test failed");
+                                                                this.hideSpinner();
+                                                                AlertActions.showPopupYesNo("movement-try-again", lang.tutorial.movementTestFailed.message, lang.tutorial.movementTestFailed.caption, null, {
+                                                                    yes: function() {
+                                                                        tryMovementTest();
+                                                                    },
+                                                                    no: function() {
+                                                                        // TODO 
+                                                                        this.hideSpinner();
+                                                                    }
+                                                                });
                                                             });
                                                         });
                                                     });
-                                                });
-                                        },
-                                        onTimeout: () => {
-                                            console.log("Timeouut");
-                                            this.hideSpinner();
-                                            setTimeout(function() {
-                                                AlertActions.showWarning(sprintf("Unable to find printer %s", selectedPrinterName));
-                                            }, 100);
-                                        }
-                                    });
-                                }             
-                            };
-                            tryMovementTest();
-                        });
+                                            },
+                                            onTimeout: () => {
+                                                console.log("Timeouut");
+                                                this.hideSpinner();
+                                                setTimeout(function() {
+                                                    AlertActions.showWarning(sprintf("Unable to find printer %s", selectedPrinterName));
+                                                }, 100);
+                                            }
+                                        });
+                                    }             
+                                };
+                                tryMovementTest();
+                            });
+                        }, 0);
                     }
                     else if(answer === 'set_default') {
                         Config().write('default-printer-name', Config().read('configured-printer'));
