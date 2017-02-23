@@ -1216,7 +1216,11 @@ define(function() {
             selectQuality: '選擇列印品質',
             clickGo: '按下開始以準備列印',
             startPrint: '確定平台上沒有格線，並於平台上塗上足厚口紅膠待其乾燥，即可開始列印',
-            skip: '跳過教學'
+            skip: '跳過教學',
+            startPrintDeltaPlus: '確認將磁鐵列印版放上平台',
+            runningMovementTests: '進行運動測試',
+            connectingMachine: '連接機器中',
+            movementTestFailed: { caption: '無法通過運動測試',  message: '請確認工具頭連接線被正確拉直，再試一次？' }
         },
         slicer: {
             computing: '計算中',

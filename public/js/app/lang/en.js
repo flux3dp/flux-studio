@@ -1029,7 +1029,7 @@ define(function() {
             extensionNotSupported               : 'This file format is not supported',
             fileExistContinue                   : 'File already exists, do you want to replace it?',
             confirmGToF                         : 'The GCode will be converted to FCode, do you want to continue? ( will replace if exists )',
-            updatePrintPresetSetting            : 'FLUX STUDIO has new default printing parameters, do you want to update?\n( Current one will be overwritten )',
+            updatePrintPresetSetting            : 'FLUX Studio has new default printing parameters, do you want to update?\n( Current settings will be overwritten )',
             confirmFileDelete                   : 'Are you sure you want to delete this file?',
             task: {
                 EXTRUDER                        : 'Printing Task',
@@ -1197,14 +1197,18 @@ define(function() {
         tutorial: {
             set_first_default_caption: 'Welcome',
             set_first_default: 'Do you want to set "%s" as your default device?',
-            startWithFilament: 'Let\'s start with loading filament',
-            startWithModel: 'Next, let\'s import some 3D model',
+            startWithFilament: 'Now we\'re going to load the filament',
+            startWithModel: 'Next, let\'s import an example 3D model',
             startTour: 'Welcome!<br/>This is your first time printing,<br/>would you like to start printing tutorial?',
             clickToImport: 'Click here to import an example 3D model',
-            selectQuality: 'Select quality you preferred',
+            selectQuality: 'Select the quality you preferred',
             clickGo: 'Prepare to print',
-            startPrint: 'Apply glue on the plate with no-grid, wait till it\' dry, then you are ready to print',
-            skip: 'Skip Tutorial'
+            startPrint: 'Apply glue on the plate with no-grid, wait till it\' dry, then you are ready to print.',
+            skip: 'Skip',
+            startPrintDeltaPlus: 'Make sure you put on the magnetic print plate.',
+            runningMovementTests: 'Running movement tests',
+            connectingMachine: 'Connecting to the machine',
+            movementTestFailed: { caption: 'Unable to pass movement tests',  message: 'Make sure the toolhead cable is stretched correctly. Try again?' }
         },
         slicer: {
             computing: 'Computing',
