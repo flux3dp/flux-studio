@@ -378,9 +378,8 @@ define([
 
     function runMovementTests() {
         let d = $.Deferred();
-        let data = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg=="
-
-        fetch(data).then(res => res.blob()).then(blob => {
+        
+        fetch(DeviceConstants.MOVEMENT_TEST).then(res => res.blob()).then(blob => {
             go(blob).fail(() => {
                 // Error while uploading task
                 d.reject(["UPLOAD_FAILED"]);
@@ -517,7 +516,7 @@ define([
                             }
                         };
                     });
-                }, 2000);
+                }, 3000);
             });
         };
 

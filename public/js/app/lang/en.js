@@ -630,7 +630,7 @@ define(function() {
             get_fcode: 'Save<br/>Task',
             name: 'Name',
             go: 'GO',
-            do_calibrate: 'It seems you\'re using engraving for the first time, do you want to load focal length calibration image? ( You can load from "Advanced" later )',
+            do_calibrate: 'It seems you\'re using engraving for the first time, you can use the kraft card in the package to find the best focal length. Do you want to load the calibration image? You can also load it later in "Advanced".',
             process_caption: 'Generating',
             laser_accepted_images: 'Supported formats: BMP/GIF/JPG/PNG/SVG',
             draw_accepted_images: 'Supported formats: SVG',
@@ -695,7 +695,7 @@ define(function() {
                         options: [
                             {
                                 value: 'cardboard',
-                                label: 'Cardboard',
+                                label: 'Kraftpaper',
                                 data: {
                                     laser_speed: 10,
                                     power: 255

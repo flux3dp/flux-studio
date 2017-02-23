@@ -422,17 +422,13 @@ define([
 
                                 if (selectedPrinterName) {
                                     this.showSpinner(lang.tutorial.connectingMachine);
-                                    console.log("Connecting the machine", selectedPrinterName);
                                     DeviceMaster.getDeviceByNameAsync(selectedPrinterName, {
                                         timeout: 20000,
                                         onSuccess: (printer)  => {
-                                                console.log(lang.tutorial.runningMovementTests);
-                                                this.showSpinner('Running movement test');
                                                 DeviceMaster.selectDevice(printer).then(() => {
-                                                    this.showSpinner('Checking machine status');
                                                     CheckDeviceStatus(printer).then(() => {
+                                                        this.showSpinner(lang.tutorial.runningMovementTests);
                                                         DeviceMaster.runMovementTests().then(() => {
-                                                            console.log("Finished the movement test");
                                                             this.hideSpinner();
                                                             startTutorial();
                                                         }).fail(() => {

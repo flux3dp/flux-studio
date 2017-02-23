@@ -644,7 +644,7 @@ define(function() {
             get_fcode: '儲存<br/>工作',
             name: '名稱',
             go: 'GO',
-            do_calibrate: '看起來您似乎第一次使用鐳射雕刻功能，是否要載入焦距校正圖片？（您亦可以於進階功能載入）',
+            do_calibrate: '看起來您似乎第一次使用鐳射雕刻功能，可以透過包裝裡附的牛皮卡找到最佳的焦距，是否要載入焦距校正圖片？（稍後亦可以於進階面板中載入）',
             process_caption: '輸出中',
             laser_accepted_images: '雕刻支援格式：BMP/GIF/JPG/PNG/SVG',
             draw_accepted_images: '繪製支援格式：SVG',
@@ -708,7 +708,7 @@ define(function() {
                         label: '材質選項',
                         options: [
                             {
-                                value: 'CARDBOARD',
+                                value: 'cardboard',
                                 label: '牛皮紙',
                                 data: {
                                     laser_speed: 10,
