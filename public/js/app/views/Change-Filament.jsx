@@ -11,7 +11,8 @@ define([
     'app/stores/alert-store',
     'helpers/firmware-version-checker',
     'app/version-requirement',
-    'helpers/device-error-handler'
+    'helpers/device-error-handler',
+    'helpers/check-device-status'
 ], function(
     $,
     React,
@@ -25,7 +26,8 @@ define([
     AlertStore,
     FirmwareVersionChecker,
     Requirement,
-    DeviceErrorHandler
+    DeviceErrorHandler,
+    CheckDeviceStatus
 ) {
     'use strict';
 
@@ -209,11 +211,11 @@ define([
                         }
                         // default
                         else {
-                            AlertActions.showPopupError('change-filament-device-error', response.error + ':' + allJoinedMessage);
+                            AlertActions.showPopupError('change-filament-device-error', DeviceErrorHandler.translate(response.error));
                         }
                     };
 
-                DeviceMaster.selectDevice(self.props.device).then(() => {
+                DeviceMaster.selectDevice(self.props.device).then(CheckDeviceStatus(self.props.device)).then(() => {
                 //     return FirmwareVersionChecker(self.props.device, Requirement.operateDuringPauseRequiredVersion);
                 // })
                 // .then(metVersion => {

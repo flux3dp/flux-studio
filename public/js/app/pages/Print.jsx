@@ -135,14 +135,14 @@ define([
                 },
                 {
                     selector: '',
-                    text: lang.tutorial.startPrint,
+                    text: Config().read('configured-model') == 'fd1p' ? lang.tutorial.startPrintDeltaPlus : lang.tutorial.startPrint,
                     offset_y: 25,
                     r: 80,
                     position: 'top'
                 },
                 {
                     selector: '.flux-monitor .operation',
-                    text: lang.tutorial.startPrint,
+                    text: Config().read('configured-model') == 'fd1p' ? lang.tutorial.startPrintDeltaPlus : lang.tutorial.startPrint,
                     offset_y: 25,
                     r: 80,
                     position: 'top'
@@ -574,12 +574,14 @@ define([
                 },
 
                 _handleGoClick: function() {
+                    console.log("on handle go click");
                     AlertStore.removeCancelListener(this._handleDefaultCancel);
                     listeningToCancel = false;
                     finishedSnapshot = false;
                     director.takeSnapShot().then(() =>{
                         finishedSnapshot = true;
                         director.clearSelection();
+                        console.log("snapshot done", "clear selection");
                     });
                     this.setState({
                         openPrinterSelectorWindow: true
@@ -726,8 +728,10 @@ define([
                     this.setState({
                         openPrinterSelectorWindow: false
                     }, () => {
+                        console.log("Device selected");
                         let t = setInterval(() => {
                             if(director.getSlicingStatus().isComplete && finishedSnapshot) {
+                                console.log("Finished snapshot");
                                 clearInterval(t);
                                 director.getFCode().then((fcode, previewUrl) => {
                                     if(!(fcode instanceof Blob)) {

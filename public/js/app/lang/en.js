@@ -15,7 +15,7 @@ define(function() {
         },
         generic_error: {
             UNKNOWN_ERROR: "[UE] Please restart FLUX Studio",
-            OPERATION_ERROR: "[OE] Please restart the machine",
+            OPERATION_ERROR: "[OE] A status conflict occured, please retry the action.",
             SUBSYSTEM_ERROR: "[SE] Please restart the machine",
             UNKNOWN_COMMAND: "[UC] Please update the Delta+/Delta Firmware",
             RESOURCE_BUSY: "[RB] Please restart  the machine, or try again"

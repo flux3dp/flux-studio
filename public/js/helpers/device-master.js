@@ -356,9 +356,11 @@ define([
                 let { st_id, error } = r.device_status;
                 if (st_id == 64) {
                     clearInterval(t);
-                    quit();
-                    d.resolve();
-                } else if (( st_id == 48 || st_id == 36 ) && error && error.length > 0) { // Error occured
+                    setTimeout(() => {
+                        quit();
+                        d.resolve();
+                    }, 300);
+                } else if (( st_id == 128 || st_id == 48 || st_id == 36 ) && error && error.length > 0) { // Error occured
                     clearInterval(t);
                     d.reject(error);
                 } else if (st_id == 0) {

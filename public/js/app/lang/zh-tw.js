@@ -15,7 +15,7 @@ define(function() {
         },
         generic_error: {
             UNKNOWN_ERROR: "[UE] 請重啟 FLUX Studio",
-            OPERATION_ERROR: "[OE] 請重啟機器",
+            OPERATION_ERROR: "[OE] 機器發生狀態衝突，請再試一次",
             SUBSYSTEM_ERROR: "[SE] 請重啟機器",
             UNKNOWN_COMMAND: "[UC] 請更新機器韌體",
             RESOURCE_BUSY: "[RB] 請重新啟動 Delta, 或再試一次"
