@@ -345,6 +345,57 @@ define([
         return d.promise();
     }
 
+    function waitTillCompleted() {
+        let d = $.Deferred(),
+            statusChanged = false;
+
+        console.log("waiting status");
+        let t = setInterval(() => {
+            SocketMaster.addTask('report').then(r => {
+                d.notify(r, t);
+                let { st_id, error } = r.device_status;
+                if (st_id == 64) {
+                    clearInterval(t);
+                    quit();
+                    d.resolve();
+                } else if (st_id == 48 && error && error.length > 0) { // Error occured
+                    clearInterval(t);
+                    d.reject(error);
+                } else if (st_id == 0) {
+                    // Resolve if the status was running and some how skipped the completed part
+                    if (statusChanged) {
+                        clearInterval(t);
+                        d.resolve();
+                    }
+                } else {
+                    statusChanged = true;
+                }
+            });
+        }, 2000);
+
+        return d.promise();
+    }
+
+    function runMovementTests() {
+        let d = $.Deferred();
+        let data = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg=="
+
+        fetch(data).then(res => res.blob()).then(blob => {
+            go(blob).fail(() => {
+                // Error while uploading task
+                d.reject(["UPLOAD_FAILED"]);
+            }).then(waitTillCompleted).fail((error) => {
+                // Error while running test
+                d.reject(error);
+            }).then(() => {
+                // Completed
+                d.resolve();
+            });
+        });
+
+        return d.promise();
+    }
+
     function resume() {
         return _do(DeviceConstants.RESUME);
     }
@@ -1200,6 +1251,7 @@ define([
             this.endToolheadOperation           = endToolheadOperation;
             this.endLoadingDuringPause          = endLoadingDuringPause;
             this.setHeadTemperatureDuringPause  = setHeadTemperatureDuringPause;
+            this.runMovementTests                = runMovementTests;
 
             Discover(
                 'device-master',

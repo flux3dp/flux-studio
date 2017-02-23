@@ -33,6 +33,7 @@ define([
     'helpers/local-storage',
     'helpers/api/cloud',
     'helpers/i18n',
+    'helpers/check-device-status'
 ], function(
     $,
     React,
@@ -67,7 +68,8 @@ define([
     InputLightboxConstants,
     LocalStorage,
     CloudApi,
-    i18n
+    i18n,
+    CheckDeviceStatus
 ) {
 
     return function(args) {
@@ -227,9 +229,9 @@ define([
                     director.init(this);
 
                     // prevent user to operate before settings are set
-                    this.showWait();
+                    this.showSpinner();
                     this._handleApplyAdvancedSetting().then(() => {
-                        this.closeWait();
+                        this.hideSpinner();
                     });
 
                     // events
@@ -357,11 +359,11 @@ define([
                     menuFactory.methods.refresh();
                 },
 
-                showWait: function() {
-                    ProgressActions.open(ProgressConstants.NONSTOP);
+                showSpinner: function(caption) {
+                    ProgressActions.open(ProgressConstants.NONSTOP, caption);
                 },
 
-                closeWait: function() {
+                hideSpinner: function() {
                     ProgressActions.close();
                 },
 
@@ -405,22 +407,74 @@ define([
                                 '/img/tutorial/' + activeLang + '/n06.png'
                             ],
                             imgClass: 'img640x480'
+                        }, () => {
+                            console.log("onCustom Event");
+                            let startTutorial = () => {
+                                this.setState({ tutorialOn: true });
+                                tutorialMode = true;
+                            };
+
+                            let tryMovementTest = () => {
+                                var selectedPrinterName =
+                                        InitializeMachine.defaultPrinter.get().name ||
+                                        Config().read('configured-printer') ||
+                                        DeviceMaster.getFirstDevice();
+
+                                if (selectedPrinterName) {
+                                    this.showSpinner(lang.tutorial.connectingMachine);
+                                    console.log("Connecting the machine", selectedPrinterName);
+                                    DeviceMaster.getDeviceByNameAsync(selectedPrinterName, {
+                                        timeout: 20000,
+                                        onSuccess: (printer)  => {
+                                                console.log(lang.tutorial.runningMovementTests);
+                                                this.showSpinner('Running movement test');
+                                                DeviceMaster.selectDevice(printer).then(() => {
+                                                    this.showSpinner('Checking machine status');
+                                                    CheckDeviceStatus(printer).then(() => {
+                                                        DeviceMaster.runMovementTests().then(() => {
+                                                            console.log("Finished the movement test");
+                                                            this.hideSpinner();
+                                                            startTutorial();
+                                                        }).fail(() => {
+                                                            this.hideSpinner();
+                                                            AlertActions.showPopupYesNo("movement-try-again", lang.tutorial.movementTestFailed.message, lang.tutorial.movementTestFailed.caption, null, {
+                                                                yes: function() {
+                                                                    tryMovementTest();
+                                                                },
+                                                                no: function() {
+                                                                    // TODO 
+                                                                    this.hideSpinner();
+                                                                }
+                                                            });
+                                                        });
+                                                    });
+                                                });
+                                        },
+                                        onTimeout: () => {
+                                            console.log("Timeouut");
+                                            this.hideSpinner();
+                                            setTimeout(function() {
+                                                AlertActions.showWarning(sprintf("Unable to find printer %s", selectedPrinterName));
+                                            }, 100);
+                                        }
+                                    });
+                                }             
+                            };
+                            tryMovementTest();
                         });
-                        this.setState({ tutorialOn: true });
-                        tutorialMode = true;
                     }
                     else if(answer === 'set_default') {
                         Config().write('default-printer-name', Config().read('configured-printer'));
                         Config().write('default-model', Config().read('configured-model'));
                         this.setState({displayModelControl: false});
-                        this.showWait();
+                        this.showSpinner();
 
                         DeviceMaster.getDeviceByNameAsync(
                             Config().read('configured-printer'),
                             {
                                 timeout: 20000,
                                 onSuccess:
-                                    function(printer){
+                                    function(printer) {
                                         ProgressActions.close();
                                         InitializeMachine.defaultPrinter.set({
                                                   name: printer.name,

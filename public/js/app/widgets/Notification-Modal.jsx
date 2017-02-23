@@ -98,6 +98,7 @@ define([
             },
 
             _onCustom: function(e, reactid) {
+                console.log("fire onCustom");
                 this.props.onCustom(e);
                 this._onClose.apply(null, [e, reactid, 'custom']);
             },
@@ -224,6 +225,7 @@ define([
                             imgClass={this.props.imgClass}
                             images={this.props.images}
                             displayImages={this.props.displayImages}
+                            onCustom={this._onCustom}
                             onClose={this.props.onClose}
                         />
                     ),
