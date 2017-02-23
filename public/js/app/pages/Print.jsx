@@ -33,7 +33,8 @@ define([
     'helpers/local-storage',
     'helpers/api/cloud',
     'helpers/i18n',
-    'helpers/check-device-status'
+    'helpers/check-device-status',
+    'app/tutorial-steps'
 ], function(
     $,
     React,
@@ -69,7 +70,8 @@ define([
     LocalStorage,
     CloudApi,
     i18n,
-    CheckDeviceStatus
+    CheckDeviceStatus,
+    TutorialSteps
 ) {
 
     return function(args) {
@@ -97,57 +99,10 @@ define([
             listeningToCancel = false,
             defaultRaftLayer = 4,
             allowDeleteObject = true,
-            tutorialMode = false,
+            tutorialMode = true,
             nwjsMenu = menuFactory.items,
             defaultSlicingEngine = 'cura',
-            tourGuide = [
-                {
-                    selector: '.arrowBox',
-                    text: lang.tutorial.startWithFilament,
-                    r: 0,
-                    position: 'top'
-                },
-                {
-                    selector: '.arrowBox',
-                    text: lang.tutorial.startWithModel,
-                    r: 0,
-                    position: 'bottom'
-                },
-                {
-                    selector: '.arrowBox',
-                    text: lang.tutorial.clickToImport,
-                    r: 105,
-                    position: 'top'
-                },
-                {
-                    selector: '.quality-select',
-                    text: lang.tutorial.selectQuality,
-                    offset_x: -25,
-                    r: 90,
-                    position: 'right'
-                },
-                {
-                    selector: 'button.btn-go',
-                    text: lang.tutorial.clickGo,
-                    offset_x: 6,
-                    r: 80,
-                    position: 'left'
-                },
-                {
-                    selector: '',
-                    text: Config().read('configured-model') == 'fd1p' ? lang.tutorial.startPrintDeltaPlus : lang.tutorial.startPrint,
-                    offset_y: 25,
-                    r: 80,
-                    position: 'top'
-                },
-                {
-                    selector: '.flux-monitor .operation',
-                    text: Config().read('configured-model') == 'fd1p' ? lang.tutorial.startPrintDeltaPlus : lang.tutorial.startPrint,
-                    offset_y: 25,
-                    r: 80,
-                    position: 'top'
-                }
-            ],
+            tourGuide = TutorialSteps,
             view = React.createClass({
 
                 getInitialState: function() {
@@ -388,7 +343,7 @@ define([
                         advancedSettings[key] = value;
                         // update setting line ( using replace )
                         for(var i = 0; i < custom.length; i++) {
-                            if(custom[i].indexOf(key + " ") == 0 || custom[i].indexOf(key + "=") == 0) {
+                            if(custom[i].indexOf(key + ' ') == 0 || custom[i].indexOf(key + '=') == 0) {
                                 custom[i] = key + ' = ' +  value;
                             }
                         }
@@ -434,8 +389,63 @@ define([
                         if(this.state.hasObject) {
                             director.clearScene();
                         }
+
+                        const startTutorial = () => {
+                            this.setState({ tutorialOn: true });
+                            tutorialMode = true;
+                        };
+
+                        const tryMovementTest = () => {
+                            let device = this._getDevice();
+                            console.log('device to work is', device);
+                            if (device) {
+                                this.showSpinner(lang.tutorial.connectingMachine);
+                                let addr = parseInt(device.addr || '-1');
+                                console.log('addr is', addr);
+                                DeviceMaster.getDeviceBySerial(device.serial, addr > 0, {
+                                    timeout: 20000,
+                                    onSuccess: (printer)  => {
+                                        console.log('found printer', printer);
+                                        DeviceMaster.selectDevice(printer).then(() => {
+                                            return CheckDeviceStatus(printer, false, true);
+                                        })
+                                        .then(() => {
+                                            this.showSpinner(lang.tutorial.runningMovementTests);
+                                            console.log('good status', printer.st_id);
+                                            return DeviceMaster.runMovementTests();
+                                        })
+                                        .then(() => {
+                                            console.log('ran movemnt test');
+                                            this.hideSpinner();
+                                            startTutorial();
+                                        }).fail(() => {
+                                            console.log('ran movemnt test failed');
+                                            this.hideSpinner();
+                                            AlertActions.showPopupYesNo('movement-try-again', lang.tutorial.movementTestFailed.message, lang.tutorial.movementTestFailed.caption, null, {
+                                                yes: function() {
+                                                    tryMovementTest();
+                                                },
+                                                no: function() {
+                                                    // TODO
+                                                    this.hideSpinner();
+                                                }
+                                            });
+                                        });
+                                    },
+                                    onTimeout: () => {
+                                        console.log('Timeouut');
+                                        this.hideSpinner();
+                                        setTimeout(function() {
+                                            AlertActions.showWarning(sprintf('Unable to find printer %s', selectedPrinterName));
+                                        }, 100);
+                                    }
+                                });
+                            }
+                        };
+
                         setTimeout(() => {
-                            AlertActions.showPopupCustom('tutorial-images', 'Test Message', 'custom_text', null, {
+                            const callback = () => { tryMovementTest(); }
+                            const imageObject = {
                                 images: [
                                     '/img/tutorial/' + activeLang + '/n01.png',
                                     '/img/tutorial/' + activeLang + '/n02.png',
@@ -445,65 +455,20 @@ define([
                                     '/img/tutorial/' + activeLang + '/n06.png'
                                 ],
                                 imgClass: 'img640x480'
-                            }, () => {
-                                let startTutorial = () => {
-                                    this.setState({ tutorialOn: true });
-                                    tutorialMode = true;
-                                };
+                            };
 
-                                let tryMovementTest = () => {
-                                    let device = this._getDevice();
-                                    console.log('device to work is', device);
-                                    if (device) {
-                                        this.showSpinner(lang.tutorial.connectingMachine);
-                                        let addr = parseInt(device.addr || '-1');
-                                        console.log('addr is', addr);
-                                        DeviceMaster.getDeviceBySerial(device.serial, addr > 0, {
-                                            timeout: 20000,
-                                            onSuccess: (printer)  => {
-                                                console.log('found printer', printer);
-                                                DeviceMaster.selectDevice(printer).then(() => {
-                                                    return CheckDeviceStatus(printer, false, true);
-                                                })
-                                                .then(() => {
-                                                    this.showSpinner(lang.tutorial.runningMovementTests);
-                                                    console.log("good status", printer.st_id);
-                                                    return DeviceMaster.runMovementTests();
-                                                })
-                                                .then(() => {
-                                                    console.log("ran movemnt test");
-                                                    this.hideSpinner();
-                                                    startTutorial();
-                                                }).fail(() => {
-                                                    console.log("ran movemnt test failed");
-                                                    this.hideSpinner();
-                                                    AlertActions.showPopupYesNo("movement-try-again", lang.tutorial.movementTestFailed.message, lang.tutorial.movementTestFailed.caption, null, {
-                                                        yes: function() {
-                                                            tryMovementTest();
-                                                        },
-                                                        no: function() {
-                                                            // TODO
-                                                            this.hideSpinner();
-                                                        }
-                                                    });
-                                                });
-                                            },
-                                            onTimeout: () => {
-                                                console.log("Timeouut");
-                                                this.hideSpinner();
-                                                setTimeout(function() {
-                                                    AlertActions.showWarning(sprintf("Unable to find printer %s", selectedPrinterName));
-                                                }, 100);
-                                            }
-                                        });
-                                    }
-                                };
-                                tryMovementTest();
-                            });
+                            AlertActions.showPopupCustom(
+                                'tutorial-images',
+                                'Test Message',
+                                'custom_text',
+                                null,
+                                imageObject ,
+                                callback
+                            );
+
                         }, 0);
                     }
                     else if(answer === 'set_default') {
-                        // Config().write('default-printer-name', Config().read('configured-printer'));
                         Config().write('default-model', Config().read('configured-model'));
                         this.setState({displayModelControl: false});
                         this.showSpinner();
@@ -583,13 +548,12 @@ define([
                             raftOn: isOn
                         });
                     }.bind(this));
+
                     advancedSettings.raft = isOn ? 1 : 0;
-
-                    let {custom} = advancedSettings;
-
                     advancedSettings.custom = advancedSettings.custom.replace(
                         `raft = ${isOn ? 0 : 1}`,
-                        `raft = ${isOn ? 1 : 0}`);
+                        `raft = ${isOn ? 1 : 0}`
+                    );
 
                     this._saveSetting();
                 },
@@ -617,14 +581,14 @@ define([
                 },
 
                 _handleGoClick: function() {
-                    console.log("on handle go click");
+                    console.log('on handle go click');
                     AlertStore.removeCancelListener(this._handleDefaultCancel);
                     listeningToCancel = false;
                     finishedSnapshot = false;
                     director.takeSnapShot().then(() =>{
                         finishedSnapshot = true;
                         director.clearSelection();
-                        console.log("snapshot done", "clear selection");
+                        console.log('snapshot done', 'clear selection');
                     });
                     this.setState({
                         openPrinterSelectorWindow: true
@@ -771,10 +735,10 @@ define([
                     this.setState({
                         openPrinterSelectorWindow: false
                     }, () => {
-                        console.log("Device selected");
-                        let t = setInterval(() => {
+                        console.log('Device selected');
+                        let go = () => {
                             if(director.getSlicingStatus().isComplete && finishedSnapshot) {
-                                console.log("Finished snapshot");
+                                console.log('Finished snapshot');
                                 clearInterval(t);
                                 director.getFCode().then((fcode, previewUrl) => {
                                     if(!(fcode instanceof Blob)) {
@@ -784,7 +748,7 @@ define([
                                     AlertStore.removeCancelListener(this._handleDefaultCancel);
                                     GlobalActions.showMonitor(selectedPrinter, fcode, previewUrl, GlobalConstants.PRINT);
                                     //Tour popout after show monitor delay
-                                    setTimeout(() => {
+                                    const tour = () => {
                                         if(tutorialMode) {
                                             this.setState({
                                                 tutorialOn: true,
@@ -797,10 +761,13 @@ define([
                                                 this._handleTutorialComplete();
                                             });
                                         };
-                                    }, 1000);
+                                    };
+                                    setTimeout(tour, 1000);
                                 });
                             }
-                        }, 100);
+                        };
+
+                        let t = setInterval(go, 100);
                     });
                 },
 
@@ -829,8 +796,8 @@ define([
                     }
                 },
 
-                _handleQualityQualityModelSelected: function(quality, machineModel) {
-                    var parameters = DefaultPrintSettings[machineModel || "fd1"][quality];
+                _handleQualityModelSelected: function(quality, machineModel) {
+                    var parameters = DefaultPrintSettings[machineModel || 'fd1'][quality];
                     this.setState({model: machineModel, quality: quality});
                     Config().write('preferred-model', machineModel);
                     this._updateAdvancedSettings(parameters);
@@ -842,6 +809,7 @@ define([
                     this.setState({ currentTutorialStep: this.state.currentTutorialStep + 1 }, function() {
                         if (this.state.currentTutorialStep === 1) {
                             let selectedDevice = this._getDevice();
+                            const isNotEmptyObject = o => Object.keys(o).length > 0;
 
                             if (isNotEmptyObject(selectedDevice)) {
                                 let addr = parseInt(selectedDevice.addr || '-1'),
@@ -852,7 +820,9 @@ define([
                                     onSuccess: function(printer) {
                                         //Found ya default printer
                                         ProgressActions.close();
-                                        setTimeout(function() { AlertActions.showChangeFilament(printer, 'TUTORIAL'); }, 100);
+                                        setTimeout(function() {
+                                            AlertActions.showChangeFilament(printer, 'TUTORIAL');
+                                        }, 100);
                                     }.bind(this),
                                     onTimeout: function() {
                                         //Unable to find configured printer...
@@ -863,7 +833,7 @@ define([
                                     }
                                 };
 
-                                DeviceMaster.getDevice(selectedDevice.serial, addr !== -1);
+                                DeviceMaster.getDeviceBySerial(selectedDevice.serial, addr !== -1, callback);
                             }
                         }
                         else if(this.state.currentTutorialStep === 3) {
@@ -1014,7 +984,7 @@ define([
                 _renderPrinterSelectorWindow: function() {
                     var content = (
                         <PrinterSelector
-                            uniqleId="print"
+                            uniqleId='print'
                             lang={lang}
                             onClose={this._handlePrinterSelectorWindowClose}
                             onUnmount={this._handlePrinterSelectorUnmount}
@@ -1031,10 +1001,10 @@ define([
                     var importWindowClass = ClassNames('importWindow', {'hide': !this.state.openImportWindow});
                     return (
                         <div className={importWindowClass}>
-                            <div className="arrowBox" onClick={this._handleCloseAllView}>
-                                <div title={lang.print.importTitle} className="file-importer">
-                                    <div className="import-btn">{lang.print.import}</div>
-                                    <input ref="import" type="file" accept=".stl,.fc,.gcode,.obj" onChange={this._handleImport} multiple />
+                            <div className='arrowBox' onClick={this._handleCloseAllView}>
+                                <div title={lang.print.importTitle} className='file-importer'>
+                                    <div className='import-btn'>{lang.print.import}</div>
+                                    <input ref='import' type='file' accept='.stl,.fc,.gcode,.obj' onChange={this._handleImport} multiple />
                                 </div>
                             </div>
                         </div>
@@ -1057,7 +1027,7 @@ define([
                             supportOn                   = {this.state.supportOn}
                             quality                     = {this.state.quality}
                             model                       = {this.state.model}
-                            onQualityModelSelected      = {this._handleQualityQualityModelSelected}
+                            onQualityModelSelected      = {this._handleQualityModelSelected}
                             onRaftClick                 = {this._handleRaftClick}
                             onSupportClick              = {this._handleSupportClick}
                             onPreviewClick              = {this._handlePreview}
@@ -1102,7 +1072,7 @@ define([
                 },
 
                 _renderWaitWindow: function() {
-                    var spinner = <div className="spinner-flip spinner-reverse"/>;
+                    var spinner = <div className='spinner-flip spinner-reverse'/>;
                     return (
                         <Modal content={spinner} />
                     );
@@ -1110,11 +1080,11 @@ define([
 
                 _renderProgressWindow: function() {
                     var content = (
-                        <div className="progressWindow">
-                            <div className="message">
+                        <div className='progressWindow'>
+                            <div className='message'>
                                 {this.state.progressMessage}
                             </div>
-                            <div className="spinner-flip spinner-reverse"/>
+                            <div className='spinner-flip spinner-reverse'/>
                         </div>
                     );
                     return (
@@ -1131,8 +1101,8 @@ define([
                         width: (this.state.slicingPercentage*100 + '%')
                     };
                     return (
-                        <div className="slicingProgressBar">
-                            <div className="slicingProgressBarInner" style={computed_style}>
+                        <div className='slicingProgressBar'>
+                            <div className='slicingProgressBarInner' style={computed_style}>
                             </div>
                         </div>
                     );
@@ -1176,7 +1146,7 @@ define([
                     this._renderNwjsMenu();
 
                     return (
-                        <div className="studio-container print-studio">
+                        <div className='studio-container print-studio'>
 
                             {importWindow}
 
@@ -1199,10 +1169,10 @@ define([
                             {progressWindow}
 
 
-                            <div id="model-displayer" className="model-displayer">
-                                <div className="import-indicator"></div>
+                            <div id='model-displayer' className='model-displayer'>
+                                <div className='import-indicator'></div>
                             </div>
-                            <input className="hide" ref="importBtn" type="file" accept=".stl,.fc,.gcode,.obj" onChange={this._handleImport} multiple/>
+                            <input className='hide' ref='importBtn' type='file' accept='.stl,.fc,.gcode,.obj' onChange={this._handleImport} multiple/>
 
                             {tourGuideSection}
 

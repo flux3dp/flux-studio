@@ -94,7 +94,6 @@ define([
                         }
                     }
 
-
                     if(this.props.src !== 'TUTORIAL') {
                         AlertStore.onCancel(this._onCancel);
                     }
@@ -185,7 +184,9 @@ define([
                         });
                     },
                     errorMessageHandler = (response) => {
-                        if(typeof response.error == "string") response.error = [response.error];
+                        if(typeof response.error === 'string') {
+                            response.error = [response.error];
+                        }
 
                         var messageMap = lang.monitor,
                             allJoinedMessage = response.error.join('_'),
@@ -215,11 +216,7 @@ define([
                         }
                     };
 
-                DeviceMaster.selectDevice(self.props.device).then(CheckDeviceStatus(self.props.device)).then(() => {
-                //     return FirmwareVersionChecker(self.props.device, Requirement.operateDuringPauseRequiredVersion);
-                // })
-                // .then(metVersion => {
-                //     this.metVersion = metVersion;
+                DeviceMaster.selectDevice(self.props.device).then(() => {
                     return DeviceMaster.getReport();
                 })
                 .then(report => {

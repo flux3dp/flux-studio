@@ -349,6 +349,8 @@ define([
         let d = $.Deferred(),
             statusChanged = false;
 
+        ProgressActions.open(ProgressConstants.NONSTOP);
+
         console.log("waiting status");
         let t = setInterval(() => {
             SocketMaster.addTask('report').then(r => {
@@ -995,6 +997,7 @@ define([
                             }
                             else {
                                 message = `${lang.device.pausedFromError}`;
+                                message = device.error_label === '' ? '' : message;
                             }
 
                             if(device.st_id === DeviceConstants.status.COMPLETED) {
@@ -1006,12 +1009,14 @@ define([
                                 }, true);
                             }
                             else {
-                                AlertActions.showWarning(message, function(growl) {
-                                    growl.remove(function() {});
-                                    selectDevice(defaultPrinter).then(function() {
-                                        GlobalActions.showMonitor(defaultPrinter);
-                                    });
-                                }, true);
+                                if(message !== '') {
+                                    AlertActions.showWarning(message, function(growl) {
+                                        growl.remove(function() {});
+                                        selectDevice(defaultPrinter).then(function() {
+                                            GlobalActions.showMonitor(defaultPrinter);
+                                        });
+                                    }, true);
+                                }
                             }
 
                             defaultPrinterWarningShowed = true;
