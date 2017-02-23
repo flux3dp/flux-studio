@@ -426,12 +426,15 @@ define([
                                         timeout: 20000,
                                         onSuccess: (printer)  => {
                                                 DeviceMaster.selectDevice(printer).then(() => {
-                                                    CheckDeviceStatus(printer).then(() => {
+                                                    CheckDeviceStatus(printer, false, true).then(() => {
                                                         this.showSpinner(lang.tutorial.runningMovementTests);
+                                                        console.log("good status", printer.st_id);
                                                         DeviceMaster.runMovementTests().then(() => {
+                                                            console.log("ran movemnt test");
                                                             this.hideSpinner();
                                                             startTutorial();
                                                         }).fail(() => {
+                                                            console.log("ran movemnt test failed");
                                                             this.hideSpinner();
                                                             AlertActions.showPopupYesNo("movement-try-again", lang.tutorial.movementTestFailed.message, lang.tutorial.movementTestFailed.caption, null, {
                                                                 yes: function() {

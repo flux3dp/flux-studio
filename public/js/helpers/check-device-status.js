@@ -26,7 +26,7 @@ define([
 
     var lang = i18n.get();
 
-    return function(printer, bypassPause) {
+    return function(printer, bypassPause, forceAbort) {
         if(!printer) { return; }
         var deferred = $.Deferred(),
             onYes = function(id) {
@@ -66,60 +66,69 @@ define([
             AlertStore.removeYesListener(onYes);
         });
 
-        let go = (metVersion) => {
+        let doAction = () => {
             switch (printer.st_id) {
-            // null for simulate
-            case null:
-            // null for not found default device
-            case undefined:
-            case DeviceConstants.status.IDLE:
-                // no problem
-                deferred.resolve('ok');
-                break;
-            case DeviceConstants.status.RAW:
-            case DeviceConstants.status.SCAN:
-            case DeviceConstants.status.MAINTAIN:
-                // ask kick?
-                ProgressActions.close();
-                AlertActions.showPopupYesNo('kick', lang.message.device_is_used);
-                AlertStore.onYes(onYes);
-                break;
-            case DeviceConstants.status.COMPLETED:
-            case DeviceConstants.status.ABORTED:
-                // quit
-                DeviceMaster.selectDevice(printer).then(() => {
-                    return DeviceMaster.quit();
-                })
-                .done(() => {
+                // null for simulate
+                case null:
+                // null for not found default device
+                case undefined:
+                case DeviceConstants.status.IDLE:
+                    // no problem
                     deferred.resolve('ok');
-                });
-                break;
-            case DeviceConstants.status.RUNNING:
-            case DeviceConstants.status.PAUSED:
-            case DeviceConstants.status.PAUSED_FROM_STARTING:
-            case DeviceConstants.status.PAUSED_FROM_RUNNING:
-                if(metVersion) {
-                    deferred.resolve('ok', printer.st_id);
-                }
-                else {
-                    // ask for abort
+                    break;
+                case DeviceConstants.status.RAW:
+                case DeviceConstants.status.SCAN:
+                case DeviceConstants.status.MAINTAIN:
+                    // ask kick?
                     ProgressActions.close();
-                    AlertActions.showPopupYesNo('abort', lang.message.device_is_used);
+                    AlertActions.showPopupYesNo('kick', lang.message.device_is_used);
                     AlertStore.onYes(onYes);
-                }
-                break;
-            default:
-                // device busy
-                ProgressActions.close();
-                AlertActions.showDeviceBusyPopup('on-select-printer');
-                break;
-            }
+                    break;
+                case DeviceConstants.status.COMPLETED:
+                case DeviceConstants.status.ABORTED:
+                    // quit
+                    DeviceMaster.selectDevice(printer).then(() => {
+                        return DeviceMaster.quit();
+                    })
+                    .done(() => {
+                        deferred.resolve('ok');
+                    });
+                    break;
+                case DeviceConstants.status.RUNNING:
+                case DeviceConstants.status.PAUSED:
+                case DeviceConstants.status.PAUSED_FROM_STARTING:
+                case DeviceConstants.status.PAUSED_FROM_RUNNING:
+                case DeviceConstants.status.PAUSING_FROM_STARTING:
+                case DeviceConstants.status.PAUSING_FROM_RUNNING:
+                    if(bypassPause) {
+                        deferred.resolve('ok', printer.st_id);
+                    }
+                    else {
+                        // ask for abort
+                        ProgressActions.close();
+                        if (forceAbort) {
+                            console.log("Force abort");
+                            AlertStore.onYes(onYes);
+                            onYes('abort');
+                        } else {
+                            AlertActions.showPopupYesNo('abort', lang.message.device_is_used);
+                            AlertStore.onYes(onYes);
+                        }
+                    }
+                    break;
+                default:
+                    // device busy
+                    console.log("Device Busy ", printer.st_id);
+                    ProgressActions.close();
+                    AlertActions.showDeviceBusyPopup('on-select-printer');
+                    break;
+              }
         };
 
         FirmwareVersionChecker(printer, Requirement.operateDuringPauseRequiredVersion)
         .then((metVersion) => {
             console.log('met version from check-device-status', metVersion);
-            go(metVersion);
+            doAction();
         });
 
         return deferred.promise();

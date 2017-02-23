@@ -358,7 +358,7 @@ define([
                     clearInterval(t);
                     quit();
                     d.resolve();
-                } else if (st_id == 48 && error && error.length > 0) { // Error occured
+                } else if (( st_id == 48 || st_id == 36 ) && error && error.length > 0) { // Error occured
                     clearInterval(t);
                     d.reject(error);
                 } else if (st_id == 0) {
