@@ -83,7 +83,7 @@ define([
             }
         },
 
-        showPopupCustom: function(id, message, customText, caption, args) {
+        showPopupCustom: function(id, message, customText, caption, args, callback) {
             AlertDispatcher.dispatch({
                 actionType: AlertConstants.SHOW_POPUP_CUSTOM,
                 id: id,
@@ -92,6 +92,9 @@ define([
                 customText: customText,
                 args: args
             });
+            if (callback) {
+                AlertStore.onCustom(callback, true);
+            }
         },
 
         showPopupCustomCancel: function(id, message, customText, caption) {

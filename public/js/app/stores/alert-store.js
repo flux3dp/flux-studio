@@ -68,8 +68,8 @@ define([
             this.on(NOTIFY_ABORT, callback);
         },
 
-        onCustom(callback) {
-            this.on(NOTIFY_CUSTOM, callback);
+        onCustom(callback, oneTime) {
+            oneTime === true ? this.once(NOTIFY_CUSTOM, callback) : this.on(NOTIFY_CUSTOM, callback);
         },
 
         onAnswer(callback) {

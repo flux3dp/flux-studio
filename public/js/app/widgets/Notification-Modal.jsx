@@ -139,7 +139,7 @@ define([
 
             _getButtons: function() {
                 var buttons = [];
-                var onclose_bind_with_on_no = function(){
+                var onclose_bind_with_on_no = function() {
                     if(this._onNo){
                         this._onNo();
                     }
