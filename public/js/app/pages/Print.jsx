@@ -99,7 +99,7 @@ define([
             listeningToCancel = false,
             defaultRaftLayer = 4,
             allowDeleteObject = true,
-            tutorialMode = true,
+            tutorialMode = false,
             nwjsMenu = menuFactory.items,
             defaultSlicingEngine = 'cura',
             tourGuide = TutorialSteps,
