@@ -546,7 +546,7 @@ define([
                     getReport().then(r => {
                         r.loading = true;
                         // if button is pressed from the machine, status will change from LOAD_FILAMENT to PAUSE
-                        if(r.st_label === 'PAUSED') {
+                        if(r.st_label === 'PAUSED' || r.st_label === 'RESUMING') {
                             clearInterval(t);
                             resolve();
                         }
