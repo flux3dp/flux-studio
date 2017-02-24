@@ -39,4 +39,4 @@ if %OS%==32BIT (
    set FILE_NAME=dpinst_x64.exe
 )
 
-".\%FILE_NAME%" /install /q /norestart
+".\%FILE_NAME%"
