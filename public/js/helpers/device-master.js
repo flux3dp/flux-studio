@@ -1046,8 +1046,14 @@ define([
         });
     }
 
+    // device names are keys to _deviceNameMap object
     function getDeviceList() {
         return _deviceNameMap;
+    }
+
+    // device are stored in array _devices
+    function getAvailableDevices() {
+        return _devices;
     }
 
     function getDeviceSettings(withBacklash) {
@@ -1264,6 +1270,7 @@ define([
             this.setHeadTemperatureDuringPause  = setHeadTemperatureDuringPause;
             this.runMovementTests               = runMovementTests;
             this.getDeviceBySerial              = getDeviceBySerial;
+            this.getAvailableDevices            = getAvailableDevices;
 
             Discover(
                 'device-master',

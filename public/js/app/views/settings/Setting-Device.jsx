@@ -57,7 +57,8 @@ define([
                 return;
             }
             clearTimeout(this.t);
-            this._getDeviceConfig(deviceName);
+            let usingUSB = deviceName.indexOf('(USB)') !== -1;
+            this._getDeviceConfig(deviceName.replace(' (USB)', ''), usingUSB);
         },
 
         _handleComponentValueChange: function(id, value, source) {
@@ -114,10 +115,13 @@ define([
         },
 
         _getDeviceList: function() {
-            let devices = DeviceMaster.getDeviceList(),
-                nameList = (Object.keys(devices)).filter(o => o !== ''),
+            let devices = DeviceMaster.getAvailableDevices(),
+                nameList,
                 { lang } = this.props;
 
+            nameList = devices.map(d => {
+                return d.source === 'h2h' ? `${d.name} (USB)` : d.name;
+            });
             this.devices = devices;
 
             if(nameList.length === 0) {
@@ -137,7 +141,7 @@ define([
             );
         },
 
-        _getDeviceConfig: function(deviceName) {
+        _getDeviceConfig: function(deviceName, usingUSB) {
             const types = ['LASER_DOWN', 'FAN_FAILURE', 'TILT', 'SHAKE'];
             const pad = (num, size) => {
                 var s = num + '';
@@ -161,7 +165,15 @@ define([
                 return t;
             };
 
-            DeviceMaster.selectDevice(this.devices[deviceName]).then(() => {
+            let device = DeviceMaster.getAvailableDevices().filter(d => {
+                let a = d.name === deviceName;
+                if(usingUSB) {
+                    a = a && d.source === 'h2h';
+                };
+                return a;
+            })[0];
+
+            DeviceMaster.selectDevice(device).then(() => {
                 return DeviceMaster.getDeviceInfo();
             }).then((deviceInfo) => {
                 // using backlash feature requires firmware 1.5b12+
