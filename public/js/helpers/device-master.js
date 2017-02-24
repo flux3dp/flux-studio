@@ -61,12 +61,19 @@ define([
         usbEventListeners = {};
 
     function selectDevice(device, deferred) {
-        if(_selectedDevice.uuid === device.uuid) {
+        if (
+            _selectedDevice.serial === device.serial &&
+            _selectedDevice.source === device.source
+        ) {
             let d = $.Deferred();
             d.resolve(DeviceConstants.CONNECTED);
             return d.promise();
         }
-        Object.assign(_selectedDevice, device);
+
+        // match the device from the newest received device list
+        let latestDevice = _devices.filter(d => d.serial === device.serial && d.source === device.source);
+
+        Object.assign(_selectedDevice, latestDevice[0]);
         let d = deferred || $.Deferred(),
             uuid = device.uuid;
 
