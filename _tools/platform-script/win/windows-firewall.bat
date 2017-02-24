@@ -34,9 +34,9 @@ if %OS%==32BIT (
 ".\%FILE_NAME%" /install /q /norestart
 
 if %OS%==32BIT (
-   set FILE_NAME=FLUX_Link_Cable_driver\dpinst_x86.exe
+   set FILE_NAME=dpinst_x86.exe
 ) else (
-   set FILE_NAME=FLUX_Link_Cable_driver\dpinst_x64.exe
+   set FILE_NAME=dpinst_x64.exe
 )
 
 ".\%FILE_NAME%" /install /q /norestart
