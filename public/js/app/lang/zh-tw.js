@@ -778,6 +778,7 @@ define(function() {
                 load_preset_title: '載入',
                 background: '自訂背景',
                 removeBackground: '移除背景',
+                load_calibrate_image: '載入校正圖片',
                 apply: '套用',
                 cancel: '取消',
                 save: '儲存'
