@@ -36,29 +36,6 @@ define([
         img.src = url;
     };
 
-    const processImage = (imageBlob) => {
-        let targetDevice = DeviceMaster.getSelectedDevice();
-        if (targetDevice) {
-            if (!hdChecked[targetDevice.name]) {
-                getImageSize(URL.createObjectURL(imageBlob), (size) => {
-                    if (size[0] > 720) {
-                        hdChecked[targetDevice.name] = 2;
-                    } else if (size[0] > 0) {
-                        hdChecked[targetDevice.name] = 1;
-                    }
-                });
-            }
-            else if(hdChecked[targetDevice.name] === 1) {
-                $('.camera-image').removeClass('hd');
-            }
-            else if(hdChecked[targetDevice.name] === 2) {
-                $('.camera-image').addClass('hd');
-            }
-        }
-        previewBlob = imageBlob;
-        $('.camera-image').attr('src', URL.createObjectURL(imageBlob));
-    };
-
     return React.createClass({
         PropTypes: {
 
@@ -68,6 +45,12 @@ define([
             store: React.PropTypes.object,
             slicingResult: React.PropTypes.object,
             lang: React.PropTypes.object
+        },
+
+        getInitialState: function() {
+            return {
+                isHd: false
+            };
         },
 
         componentWillMount: function() {
@@ -192,12 +175,36 @@ define([
             if(!this.cameraStream) {
                 let { selectedDevice } = this.props;
                 this.cameraStream = DeviceMaster.streamCamera(selectedDevice.uuid);
-                this.cameraStream.subscribe(processImage);
+                this.cameraStream.subscribe(this._processImage);
             }
 
-            return(
-                <img className="camera-image" />
+            let cameraClass = ClassNames(
+                'camera-image',
+                {'hd': this.state.isHd}
             );
+            return(
+                <img className={cameraClass} />
+            );
+        },
+
+        _processImage: function(imageBlob) {
+            let targetDevice = DeviceMaster.getSelectedDevice();
+            if (targetDevice) {
+                if (!hdChecked[targetDevice.serial]) {
+                    getImageSize(URL.createObjectURL(imageBlob), (size) => {
+                        console.log('image size', size);
+                        if (size[0] > 720) {
+                            hdChecked[targetDevice.serial] = 2;
+                        } else if (size[0] > 0) {
+                            hdChecked[targetDevice.serial] = 1;
+                        }
+                    });
+                }
+
+                this.setState({ isHd: hdChecked[targetDevice.serial] !== 1 });
+            }
+            previewBlob = imageBlob;
+            $('.camera-image').attr('src', URL.createObjectURL(imageBlob));
         },
 
         _getJobType: function() {
