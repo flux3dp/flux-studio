@@ -11,6 +11,8 @@ define([
 ], function($, Websocket, fileSystem, PointCloudHelper, rsaKey) {
     'use strict';
 
+    let stopImage = false;
+
     return function(uuid, opts) {
         opts = opts || {};
         opts.onError = opts.onError || function() {};
@@ -28,6 +30,7 @@ define([
                 onMessage: function() {}
             },
             genericSender = function(command) {
+                if(stopImage && command === 'image') { return; }
                 return checkDeviceIsReady().then(function() {
                     ws.send(command);
                     isReady = false;
@@ -68,6 +71,7 @@ define([
             $scanDeferred = $.Deferred(),
             connectingTimer,
             stopGettingImage = function() {
+                stopImage = true;
                 return $imageDeferred.notify({ status: imageCommand.STOP });
             },
             renewImageDeferred = function() {
@@ -125,6 +129,7 @@ define([
         return {
             connection: ws,
             getImage: function() {
+                stopImage = false;
                 renewImageDeferred();
 
                 var goFetch = function() {
@@ -189,6 +194,7 @@ define([
             stopGettingImage: stopGettingImage,
 
             scan: function(resolution, steps, pointCloud, onRendering) {
+                console.log('steps', steps);
                 $scanDeferred = $.Deferred();
 
                 onRendering = onRendering || function() {};

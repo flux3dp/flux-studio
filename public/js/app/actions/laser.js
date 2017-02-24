@@ -725,7 +725,9 @@ define([
                             fileName = self.state.images[0].name.split('.').slice(0, -1).join(''),
                             fullName = fileName + '.' + extension;
 
+                        ProgressActions.close();
                         saveAs(blob, fullName);
+
                     },
                     ProgressConstants.STEPPING,
                     fileMode || '-f'

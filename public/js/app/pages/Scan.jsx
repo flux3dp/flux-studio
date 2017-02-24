@@ -813,37 +813,6 @@ define([
 
                 _handleScan: function(e) {
                     var self = this,
-                        openProgressBar = function(callback) {
-                            callback();
-
-                            self.setState({
-                                openProgressBar: true
-                            });
-                        },
-                        checkLenOpened = function() {
-                            self._openBlocker(true, ProgressConstants.NONSTOP);
-
-                            var onPass = function() {
-                                self._openBlocker(false);
-                                openProgressBar(onScan);
-                            };
-
-                            // Skip scan_check
-                            onPass();
-                            // self._handleCheck().done(function(data) {
-                            //     switch (data.message) {
-                            //     case 'good':
-                            //     case 'no object':
-                            //     case 'no laser':
-                            //         onPass();
-                            //         break;
-                            //     case 'not open':
-                            //     default:
-                            //         self._onCalibrateFail(data.message, AlertActions.showPopupError);
-                            //         break;
-                            //     }
-                            // });
-                        },
                         pointCloud = new PointCloudHelper(),
                         onScan = function() {
                             var scanResolution = self._getScanSpeed(),
@@ -885,10 +854,11 @@ define([
                         showCamera: false,
                         stage: stage,
                         currentSteps: 0,
-                        progressPercentage: 0
+                        progressPercentage: 0,
+                        openProgressBar: true
+                    }, () => {
+                        onScan();
                     });
-
-                    checkLenOpened();
                 },
 
                 _onScanAgain: function(e) {
@@ -905,9 +875,11 @@ define([
                 },
 
                 _onScanStop: function(e) {
+                    console.log('scan stop');
                     var self = this;
 
                     self.setState({
+                        currentSteps: 0,
                         openProgressBar: false,
                         hasMultiScan: false,
                         isScanStarted: false,
@@ -1224,6 +1196,7 @@ define([
                     // TODO: restore to the status before scan
 
                     self.setState({
+                        currentSteps: 0,
                         openProgressBar: false,
                         isScanStarted: false
                     });
