@@ -79,7 +79,7 @@ define([
             // Make one time listener
             if (callback) {
                 AlertStore.onYes(callback.yes, true);
-                AlertStore.onNo(callback.no, true);
+                AlertStore.onCancel(callback.no, true);
             }
         },
 
