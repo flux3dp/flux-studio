@@ -213,7 +213,7 @@ define(function() {
 
                 keep_connect: {
                     caption: 'USB Connection not found',
-                    content: 'Oops! Don\'t worry. We\'re here for you.\nMake sure\n1. Your machine has been powered on\n2. Attached (or re-attach again) to USB Cable\n\n3. If you\'ve tried several times, restart the machine and try again.\n<a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/215327328">More Info</a>'
+                    content: 'Oops! Don\'t worry. We\'re here for you.\nMake sure\n1. Your machine has been powered on\n2. The driver is correctly installed (check the link)\n<a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/215327328">More Info</a>'
                 },
 
                 wifi_connection: {
