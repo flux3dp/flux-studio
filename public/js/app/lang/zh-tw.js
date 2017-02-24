@@ -1129,7 +1129,7 @@ define(function() {
             usb_unplugged: 'USB 連線逾時，請確認與機器的連接',
             launghing_from_installer_warning: 'FLUX Studio 不是從應用程式資料夾開啟，可能會產生問題。請將 FLUX Studio 移到應用程式資料夾再使用。',
             uploading_fcode: '正在上傳 fcode',
-            cant_connect_to_device: '無語連結機器，請確認機器是否開啟，以及與機器的連結方式'
+            cant_connect_to_device: '無法連結機器，請確認機器是否開啟，以及與機器的連結方式'
         },
         machine_status: {
             '-10': '原生模式',

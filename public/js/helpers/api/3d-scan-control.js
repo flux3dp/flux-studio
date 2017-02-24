@@ -15,6 +15,7 @@ define([
         opts = opts || {};
         opts.onError = opts.onError || function() {};
         opts.onReady = opts.onReady || function() {};
+        opts.printer = opts.printer || {}
 
         var ws,
             errorHandler = function(data) {
@@ -97,6 +98,10 @@ define([
                 case 'ready':
                     clearTimeout(connectingTimer);
                     isReady = true;
+                    console.log("scan control on open ", opts.printer)
+                    if (opts.printer && opts.printer.model == "delta-1p") {
+                        ws.send('turn_on_hd');
+                    }
                     opts.onReady();
                     break;
                 case 'connected':
