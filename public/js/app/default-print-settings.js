@@ -6,7 +6,7 @@ bottom_solid_layers = 3
 bridge_acceleration = 0
 bridge_fan_speed = 100
 bridge_flow_ratio = 1
-bridge_speed = 60
+bridge_speed = 15
 brim_width = 0
 complete_objects = 0
 cooling = 1
@@ -140,6 +140,8 @@ z_offset = 0`,
             "temperature": 200,
             "perimeter_speed": 50,
             "external_perimeter_speed": 35,
+            "top_solid_layers": 8,
+            "bottom_solid_layers": 6,
             "first_layer_temperature": 230
         },
         med: {
@@ -150,6 +152,8 @@ z_offset = 0`,
             "temperature": 200,
             "perimeter_speed": 50,
             "external_perimeter_speed": 35,
+            "top_solid_layers": 5,
+            "bottom_solid_layers": 5,
             "first_layer_temperature": 230
         },
         low: {
@@ -160,6 +164,8 @@ z_offset = 0`,
             "temperature": 215,
             "perimeter_speed": 50,
             "external_perimeter_speed": 35,
+            "top_solid_layers": 3,
+            "bottom_solid_layers": 3,
             "first_layer_temperature": 230
         }
     },
@@ -172,6 +178,8 @@ z_offset = 0`,
             "temperature": 200,
             "perimeter_speed": 40,
             "external_perimeter_speed": 28,
+            "top_solid_layers": 8,
+            "bottom_solid_layers": 6,
             "first_layer_temperature": 230
         },
         med: {
@@ -182,6 +190,8 @@ z_offset = 0`,
             "temperature": 200,
             "perimeter_speed": 40,
             "external_perimeter_speed": 28,
+            "top_solid_layers": 5,
+            "bottom_solid_layers": 5,
             "first_layer_temperature": 230
         },
         low: {
@@ -192,6 +202,8 @@ z_offset = 0`,
             "temperature": 215,
             "perimeter_speed": 40,
             "external_perimeter_speed": 28,
+            "top_solid_layers": 3,
+            "bottom_solid_layers": 3,
             "first_layer_temperature": 230
         }
     }
