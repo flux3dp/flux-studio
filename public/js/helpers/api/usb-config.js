@@ -67,7 +67,9 @@ define([
 
                 var self = this,
                     goNext = true,
-                    timer;
+                    timer = setTimeout(() => {
+                        opts.onError("timeout");
+                    }, 30000);
 
                 const reset = () => {
                     clearInterval(timer);
@@ -112,18 +114,21 @@ define([
                         }
                         else if(r.status === 'ok') {
                             ws.usbData.addr = usbChannel;
-                            opts.onSuccess(ws.usbData);                            
+                            opts.onSuccess(ws.usbData);    
+                            reset();                        
                         }
                     };
 
                     ws.onFatal((r) => {
                         opts.onError(r);
                         ws.onFatal(globalOpts.onFatal);
+                        reset();
                     });
 
                     ws.onError((r) => {
                         opts.onError(r);
                         ws.onError(globalOpts.onError);
+                        reset();
                     });
 
                     ws.send(rsaKey());
