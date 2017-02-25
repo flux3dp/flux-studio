@@ -62,6 +62,7 @@ define([
 
     function selectDevice(device, deferred) {
         if (
+            _selectedDevice &&
             _selectedDevice.serial === device.serial &&
             _selectedDevice.source === device.source
         ) {
@@ -1198,6 +1199,7 @@ define([
         });
 
         if (d[0] !== null) {
+            console.log(d[0]);
             callback.onSuccess(d[0]);
             return;
         }
