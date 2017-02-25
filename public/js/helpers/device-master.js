@@ -372,6 +372,9 @@ define([
                 } else if (( st_id == 128 || st_id == 48 || st_id == 36 ) && error && error.length > 0) { // Error occured
                     clearInterval(t);
                     d.reject(error);
+                } else if(st_id == 128) {
+                    clearInterval(t);
+                    d.reject(error);
                 } else if (st_id == 0) {
                     // Resolve if the status was running and some how skipped the completed part
                     if (statusChanged) {
