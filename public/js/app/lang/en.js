@@ -1224,7 +1224,8 @@ define(function() {
                 '13': 'Slicing:: Duplication error\nThe selected ID does not exist. If the error is not resolved by restarting FLUX Studio, please report this error.',
                 '14': 'Slicing:: Error occurred while setting position. The source object is missing in slicer engine.',
                 '15': 'Slicing:: Uploaded file is corrupt, please check the file and try again.',
-                '16': 'Slicing:: Slicing engine exited abnormally, kindly slice again.'
+                '16': 'Slicing:: Slicing engine exited abnormally, kindly slice again.',
+                '1006': 'WS closed unexpectedly, please obtain the bug report from the help menu and sent it to us.'
             },
             pattern_not_supported_at_100_percent_infill: 'Slic3r only supports 100% infill with rectilinear infill pattern'
         },

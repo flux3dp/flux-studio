@@ -2871,6 +2871,9 @@ define([
         if (!message) {
             message = result.error;
         }
+        if (result.code === 1006) {
+            message = lang.slicer.error[result.code];
+        }
         AlertActions.showPopupError(id, message);
     }
 

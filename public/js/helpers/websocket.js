@@ -41,12 +41,13 @@ define([
     //      onOpen        - fired on connection connecting
     return function(options) {
         var lang = i18n.get(),
+            { dev } = window.FLUX,
             defaultCallback = function(result) {},
-            hostname = window.FLUX.isNW === true ? 'localhost' : location.hostname,
+            // hostname = dev ? 'localhost' : location.hostname,
             defaultOptions = {
-                hostname: window.FLUX.dev ? '127.0.0.1' : hostname,
+                hostname: dev ? '127.0.0.1' : location.hostname,
                 method: '',
-                port: window.FLUX.dev ? '8000' : window.FLUX.ghostPort,
+                port: dev ? '8000' : window.FLUX.ghostPort,
                 autoReconnect: true,
                 ignoreAbnormalDisconnect: false,
                 onMessage: defaultCallback,
