@@ -166,7 +166,7 @@ define([
                         default:
                             if(response.error) {
                                 if(response.error[0] === 'KICKED') {
-                                    self.setState(self.getInitialState());
+                                    this._onCancel();
                                 }
                             }
                             else {
@@ -187,33 +187,9 @@ define([
                         if(typeof response.error === 'string') {
                             response.error = [response.error];
                         }
-
-                        var messageMap = lang.monitor,
-                            allJoinedMessage = response.error.join('_'),
-                            genericMessage = response.error.slice(0, 2).join('_');
-
                         DeviceMaster.quitTask();
-
-                        // has default
-                        if (true === messageMap.hasOwnProperty(genericMessage)) {
-                            if(response.error.length === 4) {
-                                // TODO FIX Toolhead not found
-                                if(response.error[3] === 'N/A') {
-                                    AlertActions.showPopupError('change-filament-device-error', DeviceErrorHandler.translate(['HEAD_ERROR','HEAD_OFFLINE']));
-                                }
-                            }
-                            else {
-                                AlertActions.showPopupError(genericMessage, messageMap[genericMessage]);
-                            }
-                        }
-                        // wrong toolhead
-                        else if ('TYPE_ERROR' === response.error[1]) {
-                            AlertActions.showPopupError('change-filament-device-error', DeviceErrorHandler.translate(['HEAD_ERROR','HEAD_OFFLINE']));
-                        }
-                        // default
-                        else {
-                            AlertActions.showPopupError('change-filament-device-error', DeviceErrorHandler.translate(response.error));
-                        }
+                        
+                        AlertActions.showPopupError('change-filament-device-error', DeviceErrorHandler.translate(response.error));
                     };
 
                 DeviceMaster.selectDevice(self.props.device).then(() => {
@@ -255,32 +231,36 @@ define([
                     // regular change filament
                     else {
                         DeviceMaster.changeFilament(type).progress(progress).done(done).fail(function(response) {
-                            if ('RESOURCE_BUSY' === response.error[0]) {
-                                AlertActions.showDeviceBusyPopup('change-filament-device-busy');
-                            }
-                            else if ('TIMEOUT' === response.error[0]) {
-                                DeviceMaster.closeConnection();
-                                AlertActions.showPopupError('change-filament-toolhead-no-response', lang.change_filament.toolhead_no_response);
-                                self.props.onClose();
-                            }
-                            else if (response.error[1] === 'TYPE_ERROR' || response.info === 'TYPE_ERROR') {
-                                if (response.error[3] === 'N/A') {
-                                    AlertActions.showPopupError('change-filament-device-error', DeviceErrorHandler.translate(['HEAD_ERROR','HEAD_OFFLINE']));
-                                } else {
-                                    AlertActions.showPopupError('change-filament-device-error', DeviceErrorHandler.translate(['HEAD_ERROR','TYPE_ERROR']));
-                                }
-                                DeviceMaster.quitTask().then(function() {
-                                    self.setState({ currentStep: steps.GUIDE });
-                                });
-                            }
-                            else if ('UNKNOWN_COMMAND' === response.error[0]) {
-                                AlertActions.showDeviceBusyPopup('change-filament-zombie', lang.change_filament.maintain_zombie);
-                            }
-                            else if ('KICKED' === response.error[0]) {
-                                // self.props.onClose();
-                            }
-                            else {
-                                errorMessageHandler(response);
+                            // Regularize error message
+                            if (response && response.info === 'TYPE_ERROR') response.error = ["HEAD_ERROR", "TYPE_ERROR", "EXTRUDER", "N/A"];
+                            if (response && response.error[1] === 'TYPE_ERROR') response.error = ["TYPE_ERROR"];
+                            switch(response.error[0]) {
+                                case "RESOURCE_BUSY":
+                                    AlertActions.showDeviceBusyPopup('change-filament-device-busy');
+                                    break;
+                                case "TIMEOUT":
+                                    DeviceMaster.closeConnection();
+                                    AlertActions.showPopupError('change-filament-toolhead-no-response', lang.change_filament.toolhead_no_response);
+                                    self.props.onClose();
+                                    break;
+                                case "TYPE_ERROR":
+                                    if (response.error[3] === 'N/A') {
+                                        AlertActions.showPopupError('change-filament-device-error', DeviceErrorHandler.translate(['HEAD_ERROR','HEAD_OFFLINE']));
+                                    } else {
+                                        AlertActions.showPopupError('change-filament-device-error', DeviceErrorHandler.translate(['HEAD_ERROR','TYPE_ERROR']));
+                                    }
+                                    DeviceMaster.quitTask().then(function() {
+                                        self.setState({ currentStep: steps.GUIDE });
+                                    });
+                                    break;
+                                case 'UNKNOWN_COMMAND':
+                                    AlertActions.showDeviceBusyPopup('change-filament-zombie', lang.change_filament.maintain_zombie);
+                                    break;
+                                case 'KICKED':
+                                    this._onCancel();
+                                    break;
+                                default:
+                                    errorMessageHandler(response);
                             }
                         });
                     }
