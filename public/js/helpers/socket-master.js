@@ -29,7 +29,26 @@ define([
         const doTask = () => {
             _task = _tasks.shift();
             processing = true;
-            _ws[_task.command](..._task.args).then((result) => {
+
+            let fnName = _task.command.split('@')[0],
+                mode = _task.command.split('@')[1];
+            
+            if(mode == "maintain" && _ws.mode != 'maintain') { 
+              // Ensure maintain mode
+              _ws.enterMaintainMode().then(() => {
+                runTaskFunction(_task, fnName);
+              }).fail((result) => {
+                processing = false;
+                _task.d.reject(result);
+              });
+            } else {
+                runTaskFunction(_task, fnName);
+            }
+        };
+
+        const runTaskFunction = (_task, fnName) => {
+            // Do regular stuff
+            _ws[fnName](..._task.args).then((result) => {
                 processing = false;
                 _task.d.resolve(result);
                 doNext();
@@ -40,7 +59,7 @@ define([
                 _task.d.reject(result);
                 doNext();
             });
-        };
+        }
 
         const doNext = () => {
             _tasks.length > 0 ? doTask() : _task = null;
