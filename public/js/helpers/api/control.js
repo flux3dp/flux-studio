@@ -169,6 +169,7 @@ define([
 
         let ctrl = {
             connection: ws,
+            mode: '',
             ls: (path) => {
                 let d = $.Deferred();
                 events.onMessage = (response) => {
@@ -319,7 +320,10 @@ define([
 
             kick: () => { return useDefaultResponse('kick'); },
 
-            quitTask: () => { return useDefaultResponse('task quit'); },
+            quitTask: () => { 
+                ctrl.mode = '';
+                return useDefaultResponse('task quit'); 
+            },
 
             quit: () => {
                 let d = $.Deferred(),
@@ -528,7 +532,10 @@ define([
             enterMaintainMode: () => {
                 let d = $.Deferred();
 
-                events.onMessage = (response) => { setTimeout(() => {d.resolve(response);},3000); };
+                events.onMessage = (response) => { setTimeout(() => {
+                    ctrl.mode = 'maintain';
+                    d.resolve(response);
+                },3000); };
                 events.onError = (response) => { d.reject(response); };
                 events.onFatal = (response) => { d.reject(response); };
 
@@ -537,6 +544,7 @@ define([
             },
 
             endMaintainMode: () => {
+                ctrl.mode = '';
                 return useDefaultResponse('task quit');
             },
 
