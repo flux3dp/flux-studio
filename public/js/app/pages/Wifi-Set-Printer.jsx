@@ -114,6 +114,8 @@ define([
                             ProgressActions.close();
                         })
                         .done(function() {
+                            Config().write('configured-printer', JSON.stringify(self.state.settingPrinter));
+                            Config().write('configured-model', self.state.settingPrinter.model === 'delta-1' ? 'fd1' : 'fd1p');
                             goNext();
                         })
                         .fail(function(response) {

@@ -6,7 +6,7 @@ bottom_solid_layers = 3
 bridge_acceleration = 0
 bridge_fan_speed = 100
 bridge_flow_ratio = 1
-bridge_speed = 60
+bridge_speed = 15
 brim_width = 0
 complete_objects = 0
 cooling = 1
@@ -116,7 +116,7 @@ support_material_pattern = LINES
 support_material_spacing = 1.7
 support_material_speed = 40
 support_material_threshold = 37
-temperature = 215
+temperature = 200
 thin_walls = 1
 threads = 4
 toolchange_gcode =
@@ -138,8 +138,10 @@ z_offset = 0`,
             "infill_speed": 100,
             "retract_lift" : 0.05,
             "temperature": 200,
-            "perimeter_speed": 50,
-            "external_perimeter_speed": 35,
+            "perimeter_speed": 40,
+            "external_perimeter_speed": 28,
+            "top_solid_layers": 8,
+            "bottom_solid_layers": 6,
             "first_layer_temperature": 230
         },
         med: {
@@ -148,8 +150,10 @@ z_offset = 0`,
             "infill_speed": 60,
             "retract_lift" : 0.05,
             "temperature": 200,
-            "perimeter_speed": 50,
-            "external_perimeter_speed": 35,
+            "perimeter_speed": 40,
+            "external_perimeter_speed": 28,
+            "top_solid_layers": 5,
+            "bottom_solid_layers": 5,
             "first_layer_temperature": 230
         },
         low: {
@@ -157,9 +161,11 @@ z_offset = 0`,
             "travel_speed": 150,
             "infill_speed": 65,
             "retract_lift" : 0.05,
-            "temperature": 200,
-            "perimeter_speed": 50,
-            "external_perimeter_speed": 35,
+            "temperature": 215,
+            "perimeter_speed": 40,
+            "external_perimeter_speed": 28,
+            "top_solid_layers": 3,
+            "bottom_solid_layers": 3,
             "first_layer_temperature": 230
         }
     },
@@ -169,9 +175,11 @@ z_offset = 0`,
             "travel_speed": 80,
             "infill_speed": 60,
             "retract_lift" : 0.24,
-            "temperature": 215,
+            "temperature": 200,
             "perimeter_speed": 40,
             "external_perimeter_speed": 28,
+            "top_solid_layers": 8,
+            "bottom_solid_layers": 6,
             "first_layer_temperature": 230
         },
         med: {
@@ -179,9 +187,11 @@ z_offset = 0`,
             "travel_speed": 100,
             "infill_speed": 60,
             "retract_lift" : 0.24,
-            "temperature": 215,
+            "temperature": 200,
             "perimeter_speed": 40,
             "external_perimeter_speed": 28,
+            "top_solid_layers": 5,
+            "bottom_solid_layers": 5,
             "first_layer_temperature": 230
         },
         low: {
@@ -192,6 +202,8 @@ z_offset = 0`,
             "temperature": 215,
             "perimeter_speed": 40,
             "external_perimeter_speed": 28,
+            "top_solid_layers": 3,
+            "bottom_solid_layers": 3,
             "first_layer_temperature": 230
         }
     }

@@ -246,7 +246,7 @@ define([
                         if(
                             pathArray[1] !== 'Applications' &&
                             !window.FLUX.dev &&
-                            localStorage.getItem('mislaunch-warned') !== true
+                            !localStorage.getItem('mislaunch-warned')
                         ) {
                             AlertActions.showPopupError(
                                 'LAUNCHING_FROM_INSTALLER_WARNING',
