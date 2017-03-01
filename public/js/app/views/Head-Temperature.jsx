@@ -5,7 +5,6 @@ define([
     'jsx!widgets/Alert',
     'helpers/device-master',
     'app/constants/device-constants',
-    'helpers/check-device-status',
     'app/actions/alert-actions'
 ], function(
     React,
@@ -14,7 +13,6 @@ define([
     Alert,
     DeviceMaster,
     DeviceConstants,
-    CheckDeviceStatus,
     AlertActions
 ) {
     'use strict';
@@ -33,12 +31,8 @@ define([
         },
 
         componentDidMount: function() {
-            const readyMachine = () => {
-                DeviceMaster.enterMaintainMode()
-                .then(() => {
-                    return DeviceMaster.headInfo();
-                })
-                .then((info) => {
+            const checkToolhead = () => {
+                DeviceMaster.headInfo().then((info) => {
                     if(info.TYPE === DeviceConstants.EXTRUDER) {
                         this._startReport();
                     }
@@ -52,25 +46,43 @@ define([
                 });
             };
 
-            DeviceMaster.selectDevice(this.props.device).then((status) => {
-                if(status === DeviceConstants.CONNECTED) {
-                    CheckDeviceStatus(this.props.device).then(() => {
-                        readyMachine();
+            DeviceMaster.getReport().then(report => {
+                this.operateDuringPause = report.st_id === 48;
+
+                if(this.operateDuringPause) {
+                    DeviceMaster.startToolheadOperation().then(() => {
+                        this._startReport();
+                    });
+                }
+                else {
+                    DeviceMaster.enterMaintainMode().then(() => {
+                        checkToolhead();
                     });
                 }
             });
         },
 
         componentWillUnmount: function() {
-            DeviceMaster.quitTask();
+            if(this.operateDuringPause) {
+                DeviceMaster.endToolheadOperation();
+            }
+            else {
+                DeviceMaster.quitTask();
+            }
             clearInterval(this.report);
         },
 
+
+
         _startReport: function() {
             this.report = setInterval(() => {
-                DeviceMaster.getHeadStatus().then((status) => {
+                const getStatus = () => {
+                    return this.operateDuringPause ? DeviceMaster.getReport() : DeviceMaster.getHeadStatus();
+                };
+
+                getStatus().then(status => {
                     if(status.rt) {
-                        this.setState({ currentTemperature: parseInt(status.rt[0]) });
+                        this.setState({ currentTemperature: Math.round(status.rt[0]) });
                     }
                 });
             }, 1500);
@@ -94,7 +106,12 @@ define([
             this.setState({ targetTemperature: t });
             this.refs.temperature.getDOMNode().value = t;
 
-            DeviceMaster.setHeadTemperature(t);
+            if(this.operateDuringPause) {
+                DeviceMaster.setHeadTemperatureDuringPause(t);
+            }
+            else {
+                DeviceMaster.setHeadTemperature(t);
+            }
         },
 
         render: function() {

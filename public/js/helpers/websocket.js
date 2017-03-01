@@ -109,12 +109,14 @@ define([
                         if(window.FLUX.allowTracking) {
                             window.Raven.captureException(data);
                         }
+                        console.log('ws error', data);
                         socketOptions.onError(data);
                         break;
                     case 'fatal':
                         if(window.FLUX.allowTracking) {
                             window.Raven.captureException(data);
                         }
+                        console.log('ws fatal', data);
                         socketOptions.onFatal(data);
                         break;
                     // ignore below status
@@ -134,6 +136,11 @@ define([
                 };
 
                 _ws.onclose = function(result) {
+                    // if ws closed abruptly
+                    if(result.code === 1006) {
+                        socketOptions.onFatal(result);
+                        return;
+                    }
                     socketOptions.onClose(result);
 
                     var abnormallyId = 'abnormally-close',
@@ -213,12 +220,6 @@ define([
             socketOptions = origanizeOptions(options);
 
         ws = createWebSocket(socketOptions);
-
-        // this.timer = setInterval(function() {
-        //     if (null !== ws && readyState.OPEN === ws.readyState) {
-        //         sender('ping');
-        //     }
-        // }, 1000);
 
         const keepAlive = () => {
             clearInterval(this.timer);

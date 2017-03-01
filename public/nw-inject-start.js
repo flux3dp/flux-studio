@@ -67,7 +67,7 @@ var process = nw.process,
                 process.env.ghostPort = port;
             };
 
-            process.env.processPythonException = function(str){
+            process.env.processPythonException = function(str) {
                 //Note: this function might be replaced from globa.js, in order to interact with react component
                 console.log('Unhandled exception occured.', str);
                 process.env.ghostPort = port;
@@ -92,6 +92,7 @@ var process = nw.process,
             args[curaPathIndex] = libPath + '/lib/CuraEngine';
             ghostCmd = libPath + '/lib/flux_api/flux_api';
         }
+        process.env.launched = libPath;
 
         try {
             fs.chmodSync(args[slic3rPathIndex], 0777);

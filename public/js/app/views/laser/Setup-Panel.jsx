@@ -32,12 +32,12 @@ define([
     ClassNames
 ) {
     'use strict';
+    var lang = i18n.lang;
 
     return React.createClass({
 
         getDefaultProps: function() {
             return {
-                lang: i18n.get(),
                 defaults: {},
                 imageFormat: 'bitmap',  // svg, bitmap
                 onShadingChanged: function() {}
@@ -45,9 +45,6 @@ define([
         },
 
         getInitialState: function() {
-            var props = this.props,
-                lang = props.lang;
-
             return {
                 openAdvancedPanel: false,
                 openCustomPresets: false,
@@ -144,16 +141,12 @@ define([
             opts = opts || {};
             opts.material = opts.material || this.state.defaults.material;
             opts.objectHeight = ('number' === typeof opts.objectHeight ? opts.objectHeight : this.state.defaults.objectHeight);
+            opts.heightOffset = ('number' === typeof opts.heightOffset ? opts.heightOffset : this.state.defaults.heightOffset);
             opts.isShading = ('boolean' === typeof opts.isShading ? opts.isShading : this.state.defaults.isShading);
-
-            var self = this,
-                state = {
-                    defaults: opts
-                };
 
             config().write('laser-defaults', opts);
 
-            self.setState(state);
+            this.setState({ defaults: opts });
         },
 
         _onPickupMaterial: function(e) {
@@ -192,8 +185,13 @@ define([
             this.openSubPopup(e);
         },
 
+        _refreshHeightOffset: function(e, value) {
+            this._saveLastestSet({ heightOffset: value });
+            this.openSubPopup(e);
+        },
+
         // Lifecycle
-        _renderCustomPresets: function(lang) {
+        _renderCustomPresets: function() {
             var self = this,
                 customPresets = config().read('laser-custom-presets') || [],
                 buttons = [
@@ -310,13 +308,19 @@ define([
             );
         },
 
-        _renderAdvancedPanel: function(lang, default_material) {
+        _onLoadCalibrationImage() {
+            this.props.onLoadCalibrationImage();
+            this._togglePanel('advanced', false)();
+        },
+
+        _renderAdvancedPanel: function(default_material) {
             var content = (
                     <AdvancedPanel
                         lang={lang}
                         defaultMaterial={default_material}
                         onClose={this._togglePanel('advanced', false)}
                         onLoadPreset={this._togglePanel('customPresets', true)}
+                        onLoadCalibrationImage = {this._onLoadCalibrationImage}
                         onApply={this._onAdvanceDone}
                         onSave={this._onSaveCustomPreset}
                         ref="advancedPanel"
@@ -335,7 +339,30 @@ define([
             );
         },
 
-        _renderObjectHeight: function(lang) {
+        _renderHeightOffset: function() {
+            return {
+                label: (
+                    <div title={lang.laser.title.height_offset}>
+                        <span className="caption">{lang.laser.print_params.height_offset.text}</span>
+                        <span>{this.state.defaults.heightOffset}</span>
+                        <span>{lang.laser.print_params.height_offset.unit}</span>
+                    </div>
+                ),
+                content: (
+                    <div className="object-height-input">
+                        <UnitInput
+                            defaultUnit="mm"
+                            defaultValue={this.state.defaults.heightOffset}
+                            getValue={this._refreshHeightOffset}
+                            min={-10}
+                            max={10}
+                        />
+                    </div>
+                )
+            };
+        },
+
+        _renderObjectHeight: function() {
             return {
                 label: (
                     <div title={lang.laser.title.object_height}>
@@ -358,10 +385,8 @@ define([
             };
         },
 
-        _renderMaterialSelection: function(lang) {
-            var props = this.props,
-                state = this.state,
-                lang = props.lang,
+        _renderMaterialSelection: function() {
+            var state = this.state,
                 materialOptions = lang.laser.advanced.form.object_options.options,
                 defaultMaterial;
 
@@ -387,9 +412,8 @@ define([
             };
         },
 
-        _renderShading: function(lang) {
-            var props = this.props,
-                cx = React.addons.classSet,
+        _renderShading: function() {
+            var cx = React.addons.classSet,
                 checked = ('undefined' !== typeof this.props.imageFormat && 'svg' === this.props.imageFormat ? false : this.state.defaults.isShading),
                 classes = cx({
                     'display-text': true
@@ -414,7 +438,7 @@ define([
             };
         },
 
-        _renderAlert: function(lang) {
+        _renderAlert: function() {
             var buttons = [{
                 label: lang.laser.confirm,
                 dataAttrs: {
@@ -442,7 +466,7 @@ define([
             );
         },
 
-        _renderAdvancedButton: function(lang) {
+        _renderAdvancedButton: function() {
             return {
                 label: (
                     <button
@@ -459,21 +483,16 @@ define([
         },
 
         render: function() {
-            var props = this.props,
-                lang = props.lang,
-                cx = React.addons.classSet,
-                advancedPanel = this._renderAdvancedPanel(lang, this.state.defaults.material),
-                material = this._renderMaterialSelection(lang),
-                objectHeight = this._renderObjectHeight(lang),
-                shading = this._renderShading(lang),
-                advancedButton = this._renderAdvancedButton(lang),
-                customPresets = this._renderCustomPresets(lang),
-                alert = this._renderAlert(lang),
+            var cx = React.addons.classSet,
+                advancedPanel = this._renderAdvancedPanel(this.state.defaults.material),
+                customPresets = this._renderCustomPresets(),
+                alert = this._renderAlert(),
                 items = [
-                    material,
-                    shading,
-                    objectHeight,
-                    advancedButton
+                    this._renderMaterialSelection(),
+                    this._renderShading(),
+                    this._renderObjectHeight(),
+                    this._renderHeightOffset(),
+                    this._renderAdvancedButton()
                 ];
 
             return (

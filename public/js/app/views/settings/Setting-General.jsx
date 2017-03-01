@@ -4,8 +4,9 @@ define([
     'helpers/i18n',
     'helpers/api/config',
     'jsx!widgets/Select',
-    'app/actions/alert-actions'
-], function($, React, i18n, config, SelectView, AlertActions) {
+    'app/actions/alert-actions',
+    'helpers/local-storage',
+], function($, React, i18n, config, SelectView, AlertActions, LocalStorage) {
     'use strict';
 
     let Controls = React.createClass({
@@ -78,6 +79,12 @@ define([
             config().write(id, e.target.value);
         },
 
+        _resetFS: function() {
+            if(confirm(this.state.lang.settings.confirm_reset)) {
+                LocalStorage.clearAllExceptIP();
+            }
+        },
+
         render: function() {
             let { supported_langs } = this.props,
                 pokeIP = config().read('poke-ip-addr'),
@@ -85,6 +92,7 @@ define([
                 notificationOptions = [],
                 projectionOptions = [],
                 antialiasingOptions = [],
+                defaultModelOptions = [],
                 options = [];
 
             Object.keys(supported_langs).map(l => {
@@ -134,6 +142,26 @@ define([
                 }
             ];
 
+
+            defaultModelOptions = [
+                {
+                    value: '',
+                    label: lang.settings.none,
+                    selected: config().read('default-model') === ''
+                },
+                {
+                    value: 'fd1',
+                    label: lang.settings.fd1,
+                    selected: config().read('default-model') === 'fd1'
+                },
+                {
+                    value: 'fd1p',
+                    label: lang.settings.fd1p,
+                    selected: config().read('default-model') === 'fd1p'
+                }
+            ];
+
+
             return (
                 <div className="form general">
 
@@ -179,6 +207,21 @@ define([
                             options={antialiasingOptions}
                             onChange={this._updateOptions.bind(null, 'antialiasing')}
                         />
+                    </Controls>
+
+                    <Controls label={lang.settings.default_model}>
+                        <SelectView
+                            id="select-lang"
+                            className="font3"
+                            options={defaultModelOptions}
+                            onChange={this._updateOptions.bind(null, 'default-model')}
+                        />
+                    </Controls>
+
+                    <Controls label={lang.settings.reset}>
+                        <a className="font3"
+                            onClick={this._resetFS}
+                        >{lang.settings.reset_now}</a>
                     </Controls>
 
                 </div>

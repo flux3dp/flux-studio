@@ -33,7 +33,7 @@ define([
             AP_MODE                   : 'AP_MODE',
             SET_WIFI_WITHOUT_PASSWORD : 'SET_WIFI_WITHOUT_PASSWORD'
         },
-        wifiAPI,
+        usbSocket,
         globalWifiAPI;
 
     return function(args) {
@@ -78,7 +78,7 @@ define([
                     getWifi = function() {
                         wifiOptions = [];
 
-                        wifiAPI.getWifiNetwork().done(function(response) {
+                        usbSocket.getWifiNetwork().done(function(response) {
                             var item;
 
                             response.items = response.items.sort(function(a, b) {
@@ -125,11 +125,13 @@ define([
 
                     switch (nextAction) {
                     case 'SCAN_WIFI':
-                        setTimeout(() => {
+                        clearTimeout(this.t);
+                        this.t = setTimeout(() => {
                             getWifi();
                         }, 5000);
                         break;
                     case 'STOP_SCAN':
+                        clearTimeout(this.t);
                         ProgressActions.open(ProgressConstants.NONSTOP);
                         self._afterStopWifiScanning({
                             action: self.action
@@ -137,8 +139,8 @@ define([
                         break;
                     }
 
-                }).
-                fail(function(response) {
+                })
+                .fail(function(response) {
                     AlertActions.showPopupError(
                         'wifi-scan-error',
                         response.error
@@ -147,12 +149,12 @@ define([
 
 
                 if ('WIFI' === settingPrinter.from) {
-                    wifiAPI = upnpConfig(settingPrinter.uuid);
+                    usbSocket = upnpConfig(settingPrinter.uuid);
                     // defined at top
                     globalWifiAPI = upnpConfig(settingPrinter.uuid);
                 }
                 else {
-                    wifiAPI = usbConfig();
+                    usbSocket = usbConfig();
                 }
 
                 getWifi();
@@ -163,8 +165,8 @@ define([
             // Private methods
             _onCancel: function(id) {
                 if ('#initialize/wifi/select' === location.hash) {
-                    var usb = usbConfig();
-                    usb.close();
+                    var usbSocket = usbConfig();
+                    usbSocket.close();
                     location.hash = 'initialize/wifi/connect-machine';
                 }
             },
@@ -222,7 +224,7 @@ define([
                     lang = self.state.lang,
                     usb = usbConfig();
 
-                usb.setAPMode(
+                usbSocket.setAPMode(
                     name,
                     pass,
                     {
@@ -303,6 +305,7 @@ define([
                 var settingWifi = initializeMachine.settingWifi.get();
 
                 if (true === settingWifi.password) {
+                    this._stopScan();
                     this.setState({
                         openPassword: true
                     });
@@ -372,7 +375,8 @@ define([
 
                 let wifi = { ssid, security };
                 initializeMachine.settingWifi.set(wifi);
-                globalWifiAPI.setWifiNetwork(wifi, wepkey, true).then((result) => {
+                this._stopScan();
+                usbSocket.joinWifiNetwork(wifi, wepkey, true).then((result) => {
                     if(result.status === 'ok') {
                         location.hash = '#initialize/wifi/notice-from-device';
                     }
@@ -401,7 +405,7 @@ define([
                         },
                         onClick: function(e) {
                             e.preventDefault();
-
+                            self._startScan();
                             self.setState({
                                 openPassword: false
                             });
@@ -641,6 +645,7 @@ define([
                             'ga-event': 'set-as-station-mode'
                         },
                         onClick: function(e) {
+                            self._stopScan();
                             self.setState({
                                 openJoinNetworkForm: true,
                                 isFormSubmitted: false

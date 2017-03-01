@@ -65,12 +65,18 @@ define([
         },
 
         getInitialState: function() {
+            let hasDefaultPrinter = initializeMachine.defaultPrinter.exist() === true;
+
+            if(this.props.bypassDefaultPrinter === true) {
+                hasDefaultPrinter = false;
+            }
+
             return {
-                discoverId: 'printer-selector-' + (this.props.uniqleId || ''),
-                printOptions: [],
-                loadFinished: false,
-                hadDefaultPrinter: true === initializeMachine.defaultPrinter.exist(),
-                discoverMethods: {}
+                discoverId          : 'printer-selector-' + (this.props.uniqleId || ''),
+                printOptions        : [],
+                loadFinished        : false,
+                hasDefaultPrinter   : hasDefaultPrinter,
+                discoverMethods     : {}
             };
         },
 
@@ -88,7 +94,11 @@ define([
                             label: self._renderPrinterItem(el)
                         });
 
-                        if (true === self.hadDefaultPrinter && el.uuid === selectedPrinter.uuid) {
+                        if (
+                            true === self.hasDefaultPrinter &&
+                            el.uuid === selectedPrinter.uuid &&
+                            this.props.bypassDefaultPrinter !== true
+                        ) {
                             // update device stat
                             initializeMachine.defaultPrinter.set({
                                 name: el.name,
@@ -120,7 +130,7 @@ define([
                 var timer,
                     tryTimes = 20,
                     selectDefaultDevice = function() {
-                        if (true === self.state.hadDefaultPrinter) {
+                        if (true === self.state.hasDefaultPrinter) {
                             if (null !== currentPrinter) {
                                 self._selectPrinter(selectedPrinter);
                                 clearInterval(timer);
@@ -138,7 +148,7 @@ define([
                             else {
                                 self.setState({
                                     loadFinished: false,
-                                    hadDefaultPrinter: false
+                                    hasDefaultPrinter: false
                                 });
                             }
                         }
@@ -220,12 +230,12 @@ define([
                 self._returnSelectedPrinter();
             }
             else {
-
-
                 DeviceMaster.selectDevice(self.selected_printer).done(function(status) {
                     if (status === DeviceConstants.CONNECTED) {
-                        printer = self.state.discoverMethods.getLatestPrinter(printer);
-                        checkDeviceStatus(printer).done(function(status) {
+                        printer = self.selected_printer;
+                        ProgressActions.open(ProgressConstants.NONSTOP);
+                        checkDeviceStatus(printer).done(function() {
+                            ProgressActions.close();
                             if (true === self.props.forceAuth && true === printer.password) {
                                 onError();
                                 return;
@@ -236,7 +246,7 @@ define([
                     }
                     else if (status === DeviceConstants.TIMEOUT) {
                         // TODO: Check default printer
-                        if (self.state.hadDefaultPrinter) {
+                        if (self.state.hasDefaultPrinter) {
                             AlertActions.showPopupError(
                                 'printer-connection-timeout',
                                 sprintf(lang.message.device_not_found.message, self.selected_printer.name),
@@ -325,11 +335,16 @@ define([
                 console.log(ex, printer);
             }
 
+            let img = `/img/icon_${printer.source === 'h2h' ? 'usb' : 'wifi' }.svg`;
+
             return (
                 <div className="device printer-item" data-meta={meta} onClick={this._selectPrinter.bind(null, printer)}>
                     <div className="col device-name">{printer.name}</div>
                     <div className="col module">{headText}</div>
                     <div className="col status">{statusText}</div>
+                    <div className="col connection-type">
+                        <img src={img} />
+                    </div>
                 </div>
             );
         },
@@ -341,7 +356,7 @@ define([
                 cx = React.addons.classSet,
                 wrapperClass = ['select-printer'],
                 content = self._renderPrinterSelection(lang),
-                hadDefaultPrinter = self.state.hadDefaultPrinter;
+                hasDefaultPrinter = self.state.hasDefaultPrinter;
 
             if ('string' === typeof self.props.className) {
                 wrapperClass.push(self.props.className);
@@ -350,7 +365,7 @@ define([
             wrapperClass = cx.apply(null, wrapperClass);
 
             return (
-                true === hadDefaultPrinter ?
+                true === hasDefaultPrinter ?
                 <span/> :
                 <div className={wrapperClass}>
                     {content}
@@ -369,7 +384,7 @@ define([
 
             AlertStore.removeRetryListener(self._waitForPrinters);
 
-            if (0 === self.state.printOptions.length && false === self.state.hadDefaultPrinter) {
+            if (0 === self.state.printOptions.length && false === self.state.hasDefaultPrinter) {
                 AlertActions.showPopupRetry('no-printer', lang.device_selection.no_printers);
                 AlertStore.onRetry(self._waitForPrinters);
             }

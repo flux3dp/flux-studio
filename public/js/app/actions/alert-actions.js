@@ -1,10 +1,12 @@
 define([
     'app/constants/alert-constants',
     'app/dispatcher/alert-dispatcher',
+    'app/stores/alert-store',
     'helpers/i18n'
 ], function(
     AlertConstants,
     AlertDispatcher,
+    AlertStore,
     i18n
 ) {
     'use strict';
@@ -70,20 +72,29 @@ define([
             });
         },
 
-        showPopupYesNo: function(id, message, caption, args) {
+        showPopupYesNo: function(id, message, caption, args, callback) {
             AlertDispatcher.dispatch({
                 actionType: AlertConstants.SHOW_POPUP_YES_NO, caption, message, id, args
             });
+            // Make one time listener
+            if (callback) {
+                AlertStore.onYes(callback.yes, true);
+                AlertStore.onCancel(callback.no, true);
+            }
         },
 
-        showPopupCustom: function(id, message, customText, caption) {
+        showPopupCustom: function(id, message, customText, caption, args, callback) {
             AlertDispatcher.dispatch({
                 actionType: AlertConstants.SHOW_POPUP_CUSTOM,
                 id: id,
                 caption: caption,
                 message: message,
-                customText: customText
+                customText: customText,
+                args: args
             });
+            if (callback) {
+                AlertStore.onCustom(callback, true);
+            }
         },
 
         showPopupCustomCancel: function(id, message, customText, caption) {

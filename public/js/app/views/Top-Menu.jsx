@@ -80,8 +80,6 @@ define([
             },
 
             getInitialState: function() {
-                var self = this;
-
                 return {
                     sourceId        : '',
                     deviceList      : [],
@@ -99,6 +97,8 @@ define([
                 AlertStore.onCancel(this._toggleDeviceListBind);
                 AlertStore.onRetry(this._waitForPrinters);
                 GlobalStore.onMonitorClosed(this._toggleDeviceListBind);
+
+                DeviceMaster.startMonitoringUsb();
             },
 
             componentWillUnmount: function() {
@@ -165,8 +165,8 @@ define([
                     else if (status === DeviceConstants.TIMEOUT) {
                         AlertActions.showPopupError(_id, lang.message.connectionTimeout);
                     }
-                }).
-                fail(function(status) {
+                })
+                .fail(function(status) {
                     ProgressActions.close();
                     AlertActions.showPopupError('fatal-occurred', status);
                 });
@@ -221,7 +221,7 @@ define([
                     options = deviceList.map(function(device) {
                         statusText = status[device.st_id] || status.UNKNOWN;
                         headText = headModule[device.head_module] || headModule.UNKNOWN;
-                        
+
                         if(device.st_prog === 0) {
                             progress = '';
                         }
@@ -232,6 +232,8 @@ define([
                             progress = '';
                         }
 
+                        let img = `/img/icon_${device.source === 'h2h' ? 'usb' : 'wifi' }.svg`;
+
                         return (
                             <li
                                 name={device.uuid}
@@ -239,6 +241,11 @@ define([
                                 <label className="name">{device.name}</label>
                                 <label className="status">{headText} {statusText}</label>
                                 <label className="progress">{progress}</label>
+                                <label className="connection-type">
+                                    <div className="type">
+                                        <img src={img} />
+                                    </div>
+                                </label>
                             </li>
                         );
                     }, this),
