@@ -54,13 +54,20 @@ var process = nw.process,
                     return;
                 }
                 console.log(type, str);
+
+                // confirming ghost port
+                if(str.indexOf('Listen HTTP on') !== -1) {
+                    let i = str.indexOf('Listen HTTP on');
+                    process.env.ghostPort = str.slice(i).split(':')[1];
+                    window.portReady = true;
+                }
                 if (str.indexOf('Unhandled exception') >= 0) {
                     process.env.processPythonException(str);
                 }
                 process.env.ghostPort = port;
             };
 
-            process.env.processPythonException = function(str){
+            process.env.processPythonException = function(str) {
                 //Note: this function might be replaced from globa.js, in order to interact with react component
                 console.log('Unhandled exception occured.', str);
                 process.env.ghostPort = port;
@@ -85,6 +92,7 @@ var process = nw.process,
             args[curaPathIndex] = libPath + '/lib/CuraEngine';
             ghostCmd = libPath + '/lib/flux_api/flux_api';
         }
+        process.env.launched = libPath;
 
         try {
             fs.chmodSync(args[slic3rPathIndex], 0777);

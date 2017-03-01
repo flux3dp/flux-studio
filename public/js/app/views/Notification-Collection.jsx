@@ -21,6 +21,7 @@ define([
     'jsx!widgets/Notification-Modal',
     'jsx!views/Update-Dialog',
     'jsx!views/Change-Filament',
+    'jsx!views/Head-Temperature',
     'app/actions/global-actions',
     'app/stores/global-store',
     'jsx!views/print/Monitor',
@@ -29,6 +30,7 @@ define([
     'helpers/check-firmware',
     'helpers/firmware-updater',
     'helpers/device-list',
+    'helpers/device-master',
     'Raven',
 ], function(
     $,
@@ -53,6 +55,7 @@ define([
     NotificationModal,
     UpdateDialog,
     ChangeFilament,
+    HeadTemperature,
     GlobalActions,
     GlobalStore,
     Monitor,
@@ -61,6 +64,7 @@ define([
     checkFirmware,
     firmwareUpdater,
     DeviceList,
+    DeviceMaster,
     Raven
 ) {
     'use strict';
@@ -129,10 +133,17 @@ define([
                         device  : {},
                         onClose : function() {}
                     },
+                    headTemperature: {
+                        show        : false,
+                        device      : {}
+                    },
                     firstDevice: {
                         info: {}, // device info
                         apiResponse: {}, // device info
-                    }
+                    },
+                    // images
+                    displayImages: false,
+                    images: []
                 };
             },
 
@@ -149,14 +160,15 @@ define([
                 AlertStore.onClosePopup(this._handleClosePopup);
                 AlertStore.onUpdate(this._showUpdate);
                 AlertStore.onChangeFilament(this._showChangeFilament);
+                AlertStore.onShowHeadTemperature(this._showHeadTemperature);
 
                 if (true === isUnsupportedMacOSX) {
                     AlertActions.showPopupError('unsupported_mac_osx', lang.message.unsupport_osx_version);
                 }
 
-                ProgressStore.onOpened(this._handleProgress).
-                    onUpdating(this._handleProgress).
-                    onClosed(this._handleProgressFinish);
+                ProgressStore.onOpened(this._handleProgress)
+                    .onUpdating(this._handleProgress)
+                    .onClosed(this._handleProgressFinish);
                 InputLightboxStore.onInputLightBoxOpened(this._handleInputLightBoxOpen);
 
                 GlobalStore.onShowMonitor(this._handleOpenMonitor);
@@ -183,11 +195,13 @@ define([
                                     }
                                 });
 
-                                AlertActions.showPopupYesNo(
-                                    FIRST_DEVICE_UPDATE,
-                                    lang.message.important_update.message,
-                                    lang.message.important_update.caption
-                                );
+                                if(!window.FLUX.dev) {
+                                    AlertActions.showPopupYesNo(
+                                        FIRST_DEVICE_UPDATE,
+                                        lang.message.important_update.message,
+                                        lang.message.important_update.caption
+                                    );
+                                }
                             }
                         });
                     }
@@ -196,7 +210,13 @@ define([
                 AlertStore.onYes(self._onYes);
 
                 // add information for Raven, to be removed when root.js is implemented
-                Raven.setUserContext({ extra: { version: window.FLUX.version } });
+                if(!window.FLUX.dev) {
+                    Raven.setUserContext({ extra: { version: window.FLUX.version } });
+                }
+
+                this._checkOsxRequirement();
+
+                DeviceMaster.registerUsbEvent('DASHBOARD', this._monitorUsb);
             },
 
             componentWillUnmount: function() {
@@ -217,6 +237,34 @@ define([
                 GlobalStore.removeCloseMonitorListener();
                 GlobalStore.removeCloseAllViewListener();
                 GlobalStore.removeSliceCompleteListener();
+            },
+
+            _checkOsxRequirement: function() {
+                if(window.FLUX.isNW && localStorage.getItem('dev') !== '1') {
+                    if(process.env.osType === 'osx') {
+                        let pathArray = process.env.launched.split('/');
+                        if(
+                            pathArray[1] !== 'Applications' &&
+                            !window.FLUX.dev &&
+                            !localStorage.getItem('mislaunch-warned')
+                        ) {
+                            AlertActions.showPopupError(
+                                'LAUNCHING_FROM_INSTALLER_WARNING',
+                                lang.message.launghing_from_installer_warning
+                            );
+                            localStorage.setItem('mislaunch-warned', true);
+                        }
+                    }
+                }
+            },
+
+            _monitorUsb: function(usbOn) {
+                if(this.state.showMonitor) {
+                    if(!usbOn) {
+                        this._handlecloseMonitor();
+                        AlertActions.showPopupError('USB_UNPLUGGED', lang.message.usb_unplugged);
+                    }
+                }
             },
 
             _onYes: function(id) {
@@ -250,6 +298,14 @@ define([
                 });
             },
 
+            _closeHeadTemperature: function() {
+                this.setState({
+                    headTemperature: {
+                        show: false
+                    }
+                });
+            },
+
             _showUpdate: function(payload) {
                 var currentVersion = (
                     'software' === payload.type ?
@@ -268,6 +324,17 @@ define([
                         onInstall: payload.onInstall
                     }
                 });
+            },
+
+            _showHeadTemperature: function(payload) {
+                if(this.state.headTemperature.show === false) {
+                    this.setState({
+                        headTemperature: {
+                            show: true,
+                            device: payload.device
+                        }
+                    });
+                }
             },
 
             _handleUpdateClose: function() {
@@ -328,7 +395,6 @@ define([
                 else {
                     hasStop = ('boolean' === typeof payload.hasStop ? payload.hasStop : true);
                 }
-
                 this.setState({
                     progress: {
                         open: true,
@@ -337,8 +403,8 @@ define([
                         percentage: payload.percentage || 0,
                         type: payload.type || self.state.progress.type || ProgressConstants.WAITING,
                         hasStop: hasStop,
-                        onStop: payload.onStop || self.state.progress.onStop || function() {},
-                        onFinished: payload.onFinished || self.state.progress.onFinished || function() {}
+                        onStop: payload.onStop || function() {},
+                        onFinished: payload.onFinished || function() {}
                     }
                 }, function() {
                     if (typeof payload.onOpened === 'function') {
@@ -424,7 +490,10 @@ define([
                     caption               : caption,
                     message               : message,
                     customText            : customText,
-                    args                  : args
+                    args                  : args,
+                    displayImages         : (args && args.images != null),
+                    images                : (args && args.images != null ? args.images : [] ),
+                    imgClass              : (args && args.imgClass) ? args.imgClass : ''
                 });
             },
 
@@ -485,6 +554,10 @@ define([
                 this.setState({ slicingStatus: data.report });
             },
 
+            _handleSetHeadTemperature: function(e) {
+                DeviceMaster.setHeadTemperature(this.state.headTemperature.target);
+            },
+
             _renderMonitorPanel: function() {
                 var content = (
                     <Monitor
@@ -515,9 +588,19 @@ define([
                 );
             },
 
+            _renderHeadTemperature: function() {
+                return (
+                    <HeadTemperature
+                        device={this.state.headTemperature.device}
+                        onClose={this._closeHeadTemperature}
+                    />
+                );
+            },
+
             render : function() {
                 var monitorPanel = this.state.showMonitor ? this._renderMonitorPanel() : '',
                     filament = this.state.changeFilament.open ? this._renderChangeFilament() : '',
+                    headTemperature = this.state.headTemperature.show ? this._renderHeadTemperature() : '',
                     latestVersion = (
                         'toolhead' === this.state.application.type ?
                         this.state.application.device.toolhead_version :
@@ -552,6 +635,7 @@ define([
                         />
 
                         {filament}
+                        {headTemperature}
 
                         <NotificationModal
                             lang={lang}
@@ -563,8 +647,12 @@ define([
                             onRetry={this._handlePopupFeedBack.bind(null, 'retry')}
                             onAbort={this._handlePopupFeedBack.bind(null, 'abort')}
                             onYes={this._handlePopupFeedBack.bind(null, 'yes')}
+                            onNo={this._handlePopupFeedBack.bind(null,'no')}
                             onCustom={this._handlePopupFeedBack.bind(null, 'custom')}
                             onClose={this._handleNotificationModalClose}
+                            images={this.state.images}
+                            displayImages={this.state.displayImages}
+                            imgClass={this.state.imgClass}
                         />
 
                         <Progress

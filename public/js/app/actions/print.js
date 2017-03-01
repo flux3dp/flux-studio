@@ -21,6 +21,7 @@ define([
     'Rx',
     'app/app-settings',
     'helpers/local-storage',
+    'helpers/socket-master',
     // non-return value
     'threeOrbitControls',
     'threeTrackballControls',
@@ -53,32 +54,33 @@ define([
     packer,
     Rx,
     Settings,
-    localStorage
+    localStorage,
+    SocketMaster
 ) {
     'use strict';
 
-    var THREE = window.THREE || {},
+    let THREE = window.THREE || {},
         container, slicer, fcodeConsole;
 
-    var camera, scene, outlineScene;
-    var orbitControl, transformControl, reactSrc;
+    let camera, scene, outlineScene;
+    let orbitControl, transformControl, reactSrc;
 
-    var objects = [],
+    let objects = [],
         referenceMeshes = [],
         fullSliceParameters = {settings: {}},
         lastSliceParams = '',
-        enableAntiAlias = localStorage.get('antialias') === 'true';
+        enableAntiAlias = localStorage.get('antialiasing') === '1';
 
-    var raycaster = new THREE.Raycaster(),
+    let raycaster = new THREE.Raycaster(),
         mouse = new THREE.Vector2(),
         renderer = new THREE.WebGLRenderer({ antialias: enableAntiAlias });
 
-    var circularGridHelper, mouseDown, SELECTED;
+    let circularGridHelper, mouseDown, SELECTED;
 
-    var movingOffsetX, movingOffsetY, panningOffset, originalCameraPosition, originalCameraRotation,
+    let movingOffsetX, movingOffsetY, panningOffset, originalCameraPosition, originalCameraRotation,
         scaleBeforeTransformX, scaleBeforeTransformY, scaleBeforeTransformZ;
 
-    var _id = 'PRINT.JS',
+    let _id = 'PRINT.JS',
         responseBlob, printPath,
         previewScene,
         previewColors = [],
@@ -107,19 +109,20 @@ define([
         importedScene = {},
         objectBeforeTransform = {},
         slicingStatusStream,
+        sliceMaster,
         uploadProgress,
         fineSettings = {},
         history = [],
         lang = I18n.get();
 
-    var s = {
+    let s = {
         diameter: 170,
         radius: 85,
         height: 180,
         step: 10,
         upVector: new THREE.Vector3(0, 0, 1),
         color: Settings.print_config.color_base_plate,
-        opacity: 0.2,
+        opacity: 0.7,
         text: true,
         textColor: '#FFFFFF',
         textPosition: 'center',
@@ -131,18 +134,18 @@ define([
         allowedMin: 1       // (mm)
     };
 
-    var commonMaterial = new THREE.MeshPhongMaterial({
+    let commonMaterial = new THREE.MeshPhongMaterial({
         color: s.objectColor,
         specular: Settings.print_config.color_object,
         shininess: 1
     });
 
-    var slicingType = {
+    let slicingType = {
         F: 'f',
         G: 'g'
     };
 
-    var models = [];
+    let models = [];
 
     previewColors[0] = new THREE.Color(Settings.print_config.color_default);
     previewColors[1] = new THREE.Color(Settings.print_config.color_infill);
@@ -169,7 +172,7 @@ define([
 
         let width = container.offsetWidth, height = container.offsetHeight;
 
-        if (Config().read('camera-projection') == 'Orthographic') {
+        if (Config().read('camera-projection') === 'Orthographic') {
             camera = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, 1, 1000 );
             camera.position.set(0, -200, 100);
             camera.zoom = 4;
@@ -198,7 +201,7 @@ define([
         scene.add(circularGridHelper);
         previewScene = scene.clone();
 
-        var geometry = new THREE.PlaneBufferGeometry( 250, 250, 0, 0 ),
+        let geometry = new THREE.PlaneBufferGeometry( 250, 250, 0, 0 ),
             material = new THREE.MeshBasicMaterial({
                 color: 0xE0E0E0,
                 wireframe: true
@@ -237,7 +240,7 @@ define([
         orbitControl = new THREE.OrbitControls(camera, renderer.domElement);
         orbitControl.maxPolarAngle = Math.PI / 4 * 3;
         orbitControl.maxDistance = 1000;
-        orbitControl.noKeys = true;
+        orbitControl.enableKeys = false;
         orbitControl.addEventListener('change', updateOrbitControl);
 
         transformControl = new THREE.TransformControls(camera, renderer.domElement);
@@ -268,8 +271,9 @@ define([
         slicingStatus.inProgress = false;
         slicingStatusStream.onNext(slicingStatus);
 
-        if(!slicer) {
-            slicer = printSlicing();
+        if(!sliceMaster) {
+            sliceMaster = new SocketMaster();
+            sliceMaster.setWebSocket(printSlicing());
         }
 
         registerDragToImport();
@@ -281,25 +285,35 @@ define([
 
     function uploadStl(name, file, ext) {
         // pass to slicer
-        var d = $.Deferred();
-        var uploadCaller = file.path ? slicer.upload_via_path(name, file, ext, file.path) : slicer.upload(name,file,ext);
+        let d = $.Deferred();
+        let uploadCaller = file.path ?
+            sliceMaster.addTask('upload_via_path', name, file, ext, file.path)
+            :
+            sliceMaster.addTask('upload', name, file, ext);
+
         uploadCaller.then((result) => {
-            ProgressActions.updating('Finishing up', 100);
+            ProgressActions.updating(lang.print.finishingUp, 100);
             d.resolve(result);
-        }).progress(displayProgress)
-        .fail((error) => {
+        }).progress(
+            displayProgress
+        ).fail((error) => {
             d.reject(error);
         });
         return d.promise();
     }
 
     function appendModel(binary, file, ext, callback) {
-        var stlLoader = new THREE.STLLoader(),
+        if(binary.byteLength === 0) {
+            ProgressActions.close();
+            AlertActions.showPopupError('', lang.message.empty_file);
+            return;
+        }
+        let stlLoader = new THREE.STLLoader(),
             objLoader = new THREE.OBJLoader();
 
         callback = callback || function() {};
 
-        var loadGeometry = (geometry) => {
+        let loadGeometry = (geometry) => {
             if(geometry.vertices) {
                 if(geometry.vertices.length === 0) {
                     ProgressActions.close();
@@ -311,7 +325,7 @@ define([
                     return;
                 }
             }
-            var mesh = new THREE.Mesh(geometry, commonMaterial);
+            let mesh = new THREE.Mesh(geometry, commonMaterial);
             mesh.up = new THREE.Vector3(0, 0, 1);
 
             setTimeout(() => {
@@ -339,8 +353,8 @@ define([
                 geometry.center();
 
                 // normalize - resize, align
-                var box = new THREE.Box3().setFromObject(mesh),
-                    enlarge = parseInt(box.size().x) !== 0 && parseInt(box.size().y) !== 0 && parseInt(box.size().z) !== 0,
+                let box = new THREE.Box3().setFromObject(mesh),
+                    enlarge = parseInt(box.getSize().x) !== 0 && parseInt(box.getSize().y) !== 0 && parseInt(box.getSize().z) !== 0,
                     scale = 1;
 
                 mesh.scale.set(scale, scale, scale);
@@ -361,11 +375,6 @@ define([
                 mesh.position.isOutOfBounds = false;
                 mesh.scale.locked = true;
                 /* end customized property */
-
-                // if (mesh.geometry.type !== 'Geometry') {
-                //     console.log("Heavy ops:: ", "Buffer geometry to geometry");
-                //     mesh.geometry = new THREE.Geometry().fromBufferGeometry(mesh.geometry);
-                // }
 
                 mesh.name = 'custom';
                 mesh.file = file;
@@ -425,7 +434,7 @@ define([
 
         if(ext === 'obj') {
             objLoader.load(binary, (object) => {
-                var meshes = object.children.filter(c => c instanceof THREE.Mesh);
+                let meshes = object.children.filter(c => c instanceof THREE.Mesh);
                 if(meshes.length > 0) {
                     loadGeometry(new THREE.Geometry().fromBufferGeometry(meshes[0].geometry));
                 }
@@ -438,7 +447,7 @@ define([
             }, function() { }, (error) => {
                 throw error;
                 // on error
-                loadGeometry({vertices: []});
+                // loadGeometry({vertices: []});
             });
         }
     }
@@ -513,7 +522,7 @@ define([
     }
 
     function appendPreviewPath(file, callback, isGcode) {
-        var metadata,
+        let metadata,
             reader = new FileReader();
 
         reader.addEventListener('load', function() {
@@ -532,6 +541,7 @@ define([
                                 processSlicerError(r);
                             }
                             printPath = r;
+                            processPath(r);
                             _drawPath().then(function() {
                                 _resetPreviewLayerSlider();
                                 ProgressActions.close();
@@ -539,6 +549,9 @@ define([
                             });
                         });
                     }
+
+                    // notify gcode too big, only previewing
+                    AlertActions.showPopupError('', lang.message.gcode_area_too_big);
                 }
                 else {
                     _closeWait();
@@ -548,9 +561,9 @@ define([
             });
         });
 
-        var processMetadata = function(m) {
+        let processMetadata = function(m) {
             metadata = m;
-            var fcodeType = m.metadata.HEAD_TYPE;
+            let fcodeType = m.metadata.HEAD_TYPE;
             if(fcodeType === 'EXTRUDER') {
                 fcodeConsole.getPath().then((result) => {
                     if(result.error) {
@@ -561,7 +574,7 @@ define([
                 });
             }
             else {
-                var message = fcodeType === 'LASER' ? lang.message.fcodeForLaser : lang.message.fcodeForPen;
+                let message = fcodeType === 'LASER' ? lang.message.fcodeForLaser : lang.message.fcodeForPen;
                 ProgressActions.close();
                 importFromFCode = false;
                 importFromGCode = false;
@@ -571,7 +584,7 @@ define([
             }
         };
 
-        var processPath = function(path) {
+        let processPath = function(path) {
             previewMode = true;
             printPath = path;
             _drawPathFromFCode();
@@ -602,11 +615,14 @@ define([
         blobExpired                 = true;
         willReslice                 = false;
 
+        // disable go buttons, only enable when slice complete
+        reactSrc.setState({ disableGoButtons: true });
+
         slicingStatusStream.onNext(slicingStatus);
 
         if(objects.length === 0 || !blobExpired) { return; }
 
-        var ids = objects.filter(v => !v.position.isOutOfBounds).map(v => v.uuid);
+        let ids = objects.filter(v => !v.position.isOutOfBounds).map(v => v.uuid);
 
         if(previewMode) {
             _clearPath();
@@ -620,11 +636,11 @@ define([
             slicingStatus.inProgress = true;
             slicingStatusStream.onNext(slicingStatus);
 
-            slicer.beginSlicing(ids, slicingType.F).then(() => {
+            sliceMaster.addTask('beginSlicing', ids, slicingType.F).then(() => {
                 slicingStatus.percentage = 0.05;
                 reactSrc.setState({slicingPercentage: 0.05});
                 getSlicingReport(function(report) {
-                    if (report.status != 'ok') {
+                    if (report.status !== 'ok') {
                         slicingStatus.lastReport = report;
                     }
                     updateSlicingProgressFromReport(slicingStatus.lastReport);
@@ -637,7 +653,7 @@ define([
     }
 
     function takeSnapShot() {
-        var d = $.Deferred(),
+        let d = $.Deferred(),
             wasInPreviewMode = false;
 
         _checkNeedToShowProgress();
@@ -657,15 +673,15 @@ define([
             }
             previewUrl = URL.createObjectURL(blob);
 
-            var t = setInterval(() => {
+            let t = setInterval(() => {
                 if(slicingStatus.isComplete) {
                     slicingStatus.showProgress = false;
                     clearInterval(t);
                     if(slicingStatus.hasError) {
                         return;
                     }
-                    slicer.uploadPreviewImage(blob).then(() => {
-                        slicer.getSlicingResult().then((result) => {
+                    sliceMaster.addTask('uploadPreviewImage', blob).then(() => {
+                        sliceMaster.addTask('getSlicingResult').then((result) => {
                             responseBlob = result;
                             d.resolve(blob);
                         }).fail((error) => {
@@ -681,9 +697,8 @@ define([
     }
 
     function doSlicing() {
-
         // Check if slicing is necessary
-        fullSliceParameters.objs = {}
+        fullSliceParameters.objs = {};
         objects.forEach((o) => {
             fullSliceParameters.objs[o.uuid] = [
                 o.position.x,
@@ -695,7 +710,7 @@ define([
                 o.scale.x,
                 o.scale.y,
                 o.scale.z
-            ]
+            ];
         });
 
         let sliceParams = JSON.stringify(fullSliceParameters, (key, val) => {
@@ -703,10 +718,10 @@ define([
             return val.toFixed ? Number(val.toFixed(5)) : val;
         });
         if (sliceParams === lastSliceParams) {
-            console.log("Begin Slice:: Skipping redundant slicing");
+            console.log('Begin Slice:: Skipping redundant slicing');
             return;
         } else {
-            console.log("Begin Slice:: Remove sliced results");
+            console.log('Begin Slice:: Remove sliced results');
             lastSliceParams = sliceParams;
         }
 
@@ -717,6 +732,7 @@ define([
 
         if(slicingStatus.inProgress) {
             clearTimeout(slicingTimmer);
+            stopSlicing();
             startSlicing(slicingType.F);
         }
         else {
@@ -725,6 +741,7 @@ define([
     }
 
     function updateSlicingProgressFromReport(report) {
+        if(!report) { return; }
         slicingStatus.inProgress = true;
         slicingStatus.error = null;
         slicingStatusStream.onNext(slicingStatus);
@@ -734,13 +751,18 @@ define([
             slicingStatus.needToCloseWait = false;
         }
 
-        var progress = `${lang.slicer[report.slice_status]} - ${'\n' + parseInt(report.percentage * 100)}% - ${report.message}`,
+        let progress = `${lang.slicer[report.slice_status]} - ${'\n' + parseInt(report.percentage * 100)}% - ${report.message}`,
             complete = lang.print.finishingUp,
             show = slicingStatus.showProgress,
             monitorOn = $('.flux-monitor').length > 0;
 
-        if (report.slice_status === "complete") {
+        if (report.slice_status === 'complete') {
             report.percentage = 1;
+            // enable go buttons
+            reactSrc.setState({
+                disableGoButtons: false,
+                hasOutOfBoundsObject: false
+            });
         }
         if (report.percentage !== slicingStatus.percentage) {
             slicingStatus.percentage = report.percentage;
@@ -773,7 +795,7 @@ define([
             if(report.error === '6') {
                 slicingStatus.error = report;
                 if(previewMode) {
-                    slicer.getPath().then(function(result) {
+                    sliceMaster.addTask('getPath').then((result) => {
                         if(result.error) {
                             processSlicerError(result);
                         }
@@ -788,7 +810,10 @@ define([
 
                 ProgressActions.close();
                 AlertActions.showPopupError('', report.info, report.caption);
-                reactSrc.setState({ hasOutOfBoundsObject: true });
+                reactSrc.setState({
+                    hasOutOfBoundsObject: true,
+                    slicingPercentage: 0
+                });
                 slicingStatus.isComplete = true;
                 blobExpired = false;
             }
@@ -825,7 +850,7 @@ define([
         else {
             GlobalActions.sliceComplete(report);
             if(show) { ProgressActions.updating(complete, 100); }
-            slicer.getSlicingResult().then((result) => {
+            sliceMaster.addTask('getSlicingResult').then((result) => {
                 if(result.error) { return processSlicerError(result); }
                 setTimeout(function() {
                     if(needToShowMonitor) {
@@ -838,7 +863,7 @@ define([
                 responseBlob = result;
                 _handleSliceComplete();
             }).fail((error) => {
-                console.log("Slicining Error:: ", error);
+                console.log('Slicining Error:: ', error);
             });
         }
     }
@@ -851,7 +876,7 @@ define([
 
     function registerDragToImport() {
         if(window.FileReader) {
-            var zone = document.querySelector('.studio-container.print-studio');
+            let zone = document.querySelector('.studio-container.print-studio');
             zone.addEventListener('dragenter', onDragEnter);
             zone.addEventListener('dragover', onDragEnter);
             zone.addEventListener('dragleave', onDragLeave);
@@ -860,7 +885,7 @@ define([
     }
 
     function unregisterDragToImport() {
-        var zone = document.querySelector('.studio-container.print-studio');
+        let zone = document.querySelector('.studio-container.print-studio');
         zone.removeEventListener('dragenter', onDragEnter);
         zone.removeEventListener('dragover', onDragEnter);
         zone.removeEventListener('dragleave', onDragLeave);
@@ -871,7 +896,7 @@ define([
         e.preventDefault();
         $('.import-indicator').hide();
         if(previewMode) { return; }
-        var files = e.dataTransfer.files;
+        let files = e.dataTransfer.files;
         if(files.length > 0) {
             appendModels(files, 0, function() {
                 e.target.value = null;
@@ -920,12 +945,12 @@ define([
         });
 
         raycaster.setFromCamera(mouse, camera);
-        var intersects = raycaster.intersectObjects(objects);
+        let intersects = raycaster.intersectObjects(objects);
 
         if (intersects.length > 0) {
 
-            var target = intersects[0].object;
-            var location = getReferenceIntersectLocation(e);
+            let target = intersects[0].object;
+            let location = getReferenceIntersectLocation(e);
             selectObject(target);
 
             orbitControl.enabled = false;
@@ -954,9 +979,7 @@ define([
             }
         }
 
-        if(SELECTED.uuid) {
-            addHistory();
-        }
+        if(SELECTED.uuid) { addHistory(); }
     }
 
     function toggleTransformControl(hide) {
@@ -1014,7 +1037,7 @@ define([
         // if SELECTED and mouse down
         if (Object.keys(SELECTED).length > 0 && mouseDown) {
             if (!transformMode) {
-                var location = getReferenceIntersectLocation(e);
+                let location = getReferenceIntersectLocation(e);
                 if (SELECTED.position && location) {
                     SELECTED.position.x = location.x - movingOffsetX;
                     SELECTED.position.y = location.y - movingOffsetY;
@@ -1081,7 +1104,7 @@ define([
                         updateObjectSize(objectBeforeTransform);
                     }
                     else {
-                        var s = e.target.object.size;
+                        let s = e.target.object.size;
                         s.x = _round(s.x);
                         s.y = _round(s.y);
                         s.z = _round(s.z);
@@ -1128,17 +1151,18 @@ define([
     // calculate the distance from reference mesh
     function getReferenceDistance(mesh) {
         if (mesh) {
-            var ref = {},
+            let ref = {},
                 box = new THREE.Box3().setFromObject(mesh);
-            ref.x = box.center().x;
-            ref.y = box.center().y;
+
+            ref.x = box.getCenter().x;
+            ref.y = box.getCenter().y;
             ref.z = box.min.z;
             return ref;
         }
     }
 
     function getFCode() {
-        var d = $.Deferred();
+        let d = $.Deferred();
 
         if(importFromFCode) {
             d.resolve(responseBlob, previewUrl);
@@ -1160,11 +1184,11 @@ define([
             return d.promise();
         }
 
-        var execute = () => {
+        let execute = () => {
             if(slicingStatus.inProgress) {
                 _showWait(lang.print.gettingSlicingReport, !showStopButton);
                 slicingStatus.showProgress = true;
-                var subscriber = slicingStatusStream.subscribe((status) => {
+                let subscriber = slicingStatusStream.subscribe((status) => {
                     if(status.isComplete) {
                         subscriber.dispose();
                         d.resolve(responseBlob, previewUrl);
@@ -1177,7 +1201,7 @@ define([
         };
 
         if(willReslice) {
-            var t = setInterval(() => {
+            let t = setInterval(() => {
                 if(slicingStatus.inProgress) {
                     clearInterval(t);
                     willReslice = false;
@@ -1193,14 +1217,14 @@ define([
     }
 
     function getSlicingReport(callback) {
-        var reportTimmer = 1000; // 1 sec
+        let reportTimmer = 1000; // 1 sec
 
         slicingStatus.reporter = setInterval(function() {
             if (!slicingStatus.pauseReport) {
                 if(willReslice) {
                     return;
                 }
-                slicer.reportSlicing().then((report) => {
+                sliceMaster.addTask('reportSlicing').then((report) => {
                     if(!!report) {
                         if(report.slice_status === 'complete' || report.slice_status === 'error') {
                             clearInterval(slicingStatus.reporter);
@@ -1208,7 +1232,7 @@ define([
                         callback(report);
                     }
                 }).fail((error) => {
-                    console.log("Slice report", error);
+                    console.log('Slice report', error);
                 });
             }
         }, reportTimmer);
@@ -1223,7 +1247,7 @@ define([
 
     function resetObject() {
         if(SELECTED) {
-            var s = SELECTED.scale;
+            let s = SELECTED.scale;
             setScale(s._x, s._y, s._z, true, true);
             setRotation(0, 0, 0, true);
             groundIt(SELECTED);
@@ -1233,7 +1257,7 @@ define([
     }
 
     function setMousePosition(e) {
-        var offx = 0,
+        let offx = 0,
             offy = 0;
 
         mouse.x = ((e.offsetX - offx) / container.offsetWidth) * 2 - 1;
@@ -1241,10 +1265,10 @@ define([
     }
 
     function setScale(x, y, z, isLocked, center, src) {
-        src = src || SELECTED
-        var originalScaleX = src.scale._x;
-        var originalScaleY = src.scale._y;
-        var originalScaleZ = src.scale._z;
+        src = src || SELECTED;
+        let originalScaleX = src.scale._x;
+        let originalScaleY = src.scale._y;
+        let originalScaleZ = src.scale._z;
         if (x === '' || x <= 0) {
             x = scaleBeforeTransformX;
         }
@@ -1279,18 +1303,14 @@ define([
     }
 
     function setSize(size, isLocked, src) {
-        // if(!mouseDown) {
-        //     addHistory();
-        // }
-
-        var o = { size: {} };
+        let o = { size: {} };
         Object.assign(o.size, size);
 
         src = src || SELECTED;
-        var objectChanged = _objectChanged(src, o);
+        let objectChanged = _objectChanged(src, o);
         if(objectChanged) {
             isLocked = isLocked || true;
-            var sx = Math.round(size.x / src.size.originalX * 1000) / 1000,
+            let sx = Math.round(size.x / src.size.originalX * 1000) / 1000,
                 sy = Math.round(size.y / src.size.originalY * 1000) / 1000,
                 sz = Math.round(size.z / src.size.originalZ * 1000) / 1000,
                 _center = true;
@@ -1308,6 +1328,8 @@ define([
             slicingStatus.showProgress = false;
 
             doSlicing();
+            syncObjectOutline(src);
+            setObjectDialoguePosition(src);
         }
     }
 
@@ -1328,9 +1350,9 @@ define([
     }
 
     function setAdvanceParameter(settings) {
-        var deferred = $.Deferred();
+        let deferred = $.Deferred();
 
-        slicer.setParameter('advancedSettings', settings.custom).then((result) => {
+        sliceMaster.addTask('setParameter', 'advancedSettings', settings.custom).then(() => {
             Object.assign(fullSliceParameters.settings, settings);
             slicingStatus.showProgress = false;
             if(objects.length > 0) {
@@ -1350,11 +1372,11 @@ define([
     }
 
     function setParameter(name, value) {
-        var d = $.Deferred();
+        let d = $.Deferred();
         blobExpired = true;
         hasPreviewImage = false;
 
-        slicer.setParameter(name, value).then(() => {
+        sliceMaster.addTask('setParameter', name, value).then(() => {
             fullSliceParameters.settings[name] = value;
             slicingStatus.showProgress = false;
             if(objects.length > 0) {
@@ -1373,7 +1395,7 @@ define([
         src = src || SELECTED;
         syncObjectOutline(src);
 
-        var _x = parseInt(x) || 0,
+        let _x = parseInt(x) || 0,
             _y = parseInt(y) || 0,
             _z = parseInt(z) || 0;
         src.rotation.enteredX = x;
@@ -1403,7 +1425,7 @@ define([
 
     function setImportWindowPosition() {
         if (document.getElementsByClassName('arrowBox').length > 0) {
-            var position = toScreenPosition(referenceMeshes[0], camera),
+            let position = toScreenPosition(referenceMeshes[0], camera),
                 importWindow = document.getElementsByClassName('arrowBox')[0],
                 importWindowWidth = parseInt($(importWindow).css('width').replace('px', '')),
                 importWindowHeight = parseInt($(importWindow).css('height').replace('px', ''));
@@ -1416,32 +1438,36 @@ define([
     }
 
     function setObjectDialoguePosition(obj) {
-        var o = obj || SELECTED;
+        let o = obj || SELECTED;
 
         if (!$.isEmptyObject(o)) {
 
-            var box = new THREE.BoundingBoxHelper(o, s.colorSelected),
+            let box = new THREE.BoxHelper(o, s.colorSelected),
+                // box = new THREE.BoundingBoxHelper(o, s.colorSelected),
                 position = toScreenPosition(o, camera),
                 cameraDistance = 0,
                 objectDialogueDistance = 0;
 
-            box.update();
+            box.size = getBoundingBox(o).size;
+            box.update(o);
             cameraDistance = 320 / Math.sqrt(Math.pow(camera.position.x, 2) + Math.pow(camera.position.y, 2) + Math.pow(camera.position.z, 2));
-            objectDialogueDistance = cameraDistance * 1.2 * Math.sqrt(Math.pow(box.box.size().x, 2) + Math.pow(box.box.size().y, 2)) + 15;
+            objectDialogueDistance =
+                cameraDistance * 1.2 * Math.sqrt(Math.pow(box.size.x, 2) +
+                Math.pow(box.size.y, 2)) + 15;
             objectDialogueDistance = parseInt(objectDialogueDistance);
 
             reactSrc.setState({
                 modelSelected: o,
                 openObjectDialogue: true
             }, function() {
-                var objectDialogue = document.getElementsByClassName('object-dialogue')[0],
+                let objectDialogue = document.getElementsByClassName('object-dialogue')[0],
                     objectDialogueWidth = parseInt($(objectDialogue).width()),
                     objectDialogueHeight = parseInt($(objectDialogue).height()),
                     leftOffset = parseInt(position.x),
                     topOffset = (parseInt(position.y) - objectDialogueHeight / 2),
                     marginTop = container.offsetHeight / 2 - position.y;
 
-                var rightLimit = container.offsetWidth - objectDialogueWidth - leftOffset,
+                let rightLimit = container.offsetWidth - objectDialogueWidth - leftOffset,
                     topLimit = container.offsetHeight / 2 - objectDialogueHeight / 2;
 
                 if (objectDialogueDistance > rightLimit) {
@@ -1519,7 +1545,7 @@ define([
 
     function alignCenter() {
         if (!$.isEmptyObject(SELECTED)) {
-            var reference = getReferenceDistance(SELECTED);
+            let reference = getReferenceDistance(SELECTED);
             SELECTED.position.x -= reference.x;
             SELECTED.position.y -= reference.y;
             SELECTED.position.z -= reference.z;
@@ -1537,7 +1563,7 @@ define([
     function groundIt(mesh) {
         mesh = mesh || SELECTED;
         if (!$.isEmptyObject(mesh)) {
-            var reference = getReferenceDistance(mesh);
+            let reference = getReferenceDistance(mesh);
             mesh.position.z -= reference.z;
             if(mesh.outlineMesh) {
                 mesh.outlineMesh.position.z -= reference.z;
@@ -1557,7 +1583,7 @@ define([
             }
         }
         else {
-            var name = fileNameWithExtension.split('.');
+            let name = fileNameWithExtension.split('.');
             name.pop();
             name = name.join('.');
             defaultFileName = name;
@@ -1578,14 +1604,15 @@ define([
             if (index > -1) {
                 objects.splice(index, 1);
             } else {
-                console.log("Remove:: Object cannot find" , SELECTED);
+                console.log('Remove:: Object cannot find' , SELECTED);
             }
 
             transformControl.detach(SELECTED);
             selectObject(null);
 
-            slicer.stopSlicing();
+            stopSlicing();
             clearInterval(slicingStatus.reporter);
+            // remove progress bar
             reactSrc.setState({ slicingPercentage: 0 });
 
             setDefaultFileName();
@@ -1610,11 +1637,11 @@ define([
 
     function duplicateSelected() {
         if(SELECTED) {
-            var mesh = new THREE.Mesh(SELECTED.geometry, SELECTED.material);
+            let mesh = new THREE.Mesh(SELECTED.geometry, SELECTED.material);
             mesh.up = new THREE.Vector3(0, 0, 1);
 
             stopSlicing().then(() => {
-                slicer.duplicate(SELECTED.uuid, mesh.uuid).then(function(result) {
+                sliceMaster.addTask('duplicate', SELECTED.uuid, mesh.uuid).then((result) => {
                     if(result.status.toUpperCase() === DeviceConstants.OK) {
                         Object.assign(mesh.scale, SELECTED.scale);
                         mesh.rotation.enteredX = SELECTED.rotation.enteredX;
@@ -1645,8 +1672,10 @@ define([
                         outlineScene.add(mesh.outlineMesh);
                         objects.push(mesh);
 
-                        render();
                         doSlicing();
+                        syncObjectOutline(mesh);
+                        setObjectDialoguePosition(mesh);
+                        render();
                     }
                     else {
                         if(result.error === ErrorConstants.NAME_NOT_EXIST) {
@@ -1668,11 +1697,8 @@ define([
             // Fix precision to .00001
             return val.toFixed ? Number(val.toFixed(5)) : val;
         });
-        console.log("PlaneBoundary:: Transformation ", transformation);
-        if (sourceMesh.jTransformation == transformation) {
-            console.log("PlaneBoundary:: Skipping redundant calculation");
+        if (sourceMesh.jTransformation === transformation) {
             return sourceMesh.plane_boundary;
-        } else {
         }
         sourceMesh.jTransformation = transformation;
         // ref: http://www.csie.ntnu.edu.tw/~u91029/ConvexHull.html#4
@@ -1680,19 +1706,19 @@ define([
 
 
         // sort the index of each point in stl
-        var stl_index = [];
-        var boundary = [];
+        let stl_index = [];
+        let boundary = [];
 
         if (sourceMesh.geometry.type === 'Geometry') {
             // define Cross product function on 2d plane
             let vs = sourceMesh.geometry.vertices;
-            var cross = (function cross(p0, p1, p2) {
+            let cross = (function cross(p0, p1, p2) {
                 return ((p1.x - p0.x) * (p2.y - p0.y)) - ((p1.y - p0.y) * (p2.x - p0.x));
             });
 
             stl_index = new Uint32Array(vs.length);
 
-            for (var i = 0; i < vs.length; i += 1) {
+            for (let i = 0; i < vs.length; i += 1) {
                 stl_index[i] = i;
             }
 
@@ -1703,15 +1729,15 @@ define([
 
             // find boundary
             // compute upper hull
-            for (var i = 0; i < stl_index.length; i += 1) {
+            for (let i = 0; i < stl_index.length; i += 1) {
                 while( boundary.length >= 2 && cross(vs[boundary[boundary.length - 2]], vs[boundary[boundary.length - 1]], vs[stl_index[i]]) <= 0){
                     boundary.pop();
                 }
                 boundary.push(stl_index[i]);
             }
             // compute lower hull
-            var t = boundary.length + 1;
-            for (var i = stl_index.length - 2 ; i >= 0; i -= 1) {
+            let t = boundary.length + 1;
+            for (let i = stl_index.length - 2 ; i >= 0; i -= 1) {
                 while( boundary.length >= t && cross(vs[boundary[boundary.length - 2]], vs[boundary[boundary.length - 1]], vs[stl_index[i]]) <= 0){
                     boundary.pop();
                 }
@@ -1719,13 +1745,12 @@ define([
             }
 
             // delete redundant point(i.e., starting point)
-            console.log("PlaneBoundary:: Finished", + new Date());
             boundary.pop();
         }
         else{
             let vs = sourceMesh.geometry.getAttribute('position');
             // define Cross product function on 2d plane for BufferGeometry
-            var cross = (function cross(p0, p1, p2) {
+            let cross = (function cross(p0, p1, p2) {
 
                 return ((vs[p1 * 3 + 0] - vs[p0 * 3 + 0]) *
                         (vs[p2 * 3 + 1] - vs[p0 * 3 + 1])) -
@@ -1735,9 +1760,8 @@ define([
 
             let meshSize = vs.count / vs.itemSize;
 
-            console.log("PlaneBoundary:: Allocating", + new Date());
             stl_index = new Uint32Array(meshSize);
-            for (var i = 0; i < meshSize; i += 1) {
+            for (let i = 0; i < meshSize; i += 1) {
                 stl_index[i] = i;
             }
 
@@ -1748,33 +1772,31 @@ define([
 
             // find boundary
             // compute upper hull
-            for (var i = 0; i < stl_index.length; i += 1) {
+            for (let i = 0; i < stl_index.length; i += 1) {
                 while ( boundary.length >= 2 && cross(boundary[boundary.length - 2], boundary[boundary.length - 1], stl_index[i]) <= 0) {
                     boundary.pop();
                 }
                 boundary.push(stl_index[i]);
             }
 
-            console.log("PlaneBoundary:: Computing lower hull", + new Date());
             // compute lower hull
-            var t = boundary.length + 1;
-            for (var i = stl_index.length - 2 ; i >= 0; i -= 1) {
+            let t = boundary.length + 1;
+            for (let i = stl_index.length - 2 ; i >= 0; i -= 1) {
                 while( boundary.length >= t && cross(boundary[boundary.length - 2], boundary[boundary.length - 1], stl_index[i]) <= 0) {
                     boundary.pop();
                 }
                 boundary.push(stl_index[i]);
             }
             // delete redundant point(i.e., starting point)
-            console.log("PlaneBoundary:: Finished", + new Date());
             boundary.pop();
         };
         return boundary;
     }
 
     function checkOutOfBounds(sourceMesh) {
-        var d = $.Deferred();
+        let d = $.Deferred();
         if (!$.isEmptyObject(sourceMesh)) {
-            var vector = new THREE.Vector3();
+            let vector = new THREE.Vector3();
             sourceMesh.position.isOutOfBounds = sourceMesh.plane_boundary.some(function(v) {
                 if (sourceMesh.geometry.type === 'Geometry') {
                     vector = sourceMesh.geometry.vertices[v].clone();
@@ -1791,7 +1813,7 @@ define([
 
             sourceMesh.outlineMesh.material.color.setHex(sourceMesh.position.isOutOfBounds ? s.colorOutside : s.colorSelected);
 
-            var hasOutOfBoundsObject = objects.some(function(o) {
+            let hasOutOfBoundsObject = objects.some(function(o) {
                 return o.position.isOutOfBounds;
             });
 
@@ -1805,34 +1827,37 @@ define([
     }
 
     function checkCollisionWithAny(src, callback) {
-        var _objects,
+        let _objects,
             collided = false,
-            sourceBox;
+            sourceBox = new THREE.Box3();
 
         _objects = objects.filter(function(o) {
             return o.uuid !== src.uuid;
         });
 
-        sourceBox = new THREE.BoundingBoxHelper(src, s.colorSelected);
-        sourceBox.update();
-        sourceBox.box.intersectsBox = function ( box ) {
+        sourceBox.setFromObject(src);
+        // sourceBox = new THREE.BoundingBoxHelper(src, s.colorSelected);
+        // sourceBox.update(src);
+        // sourceBox.box.intersectsBox = function ( box ) {
+        //
+		// // using 6 splitting planes to rule out intersections.
+        //
+    	// 	if ( box.max.x < this.min.x || box.min.x > this.max.x ||
+		// 		 box.max.y < this.min.y || box.min.y > this.max.y ||
+		// 		 box.max.z < this.min.z || box.min.z > this.max.z ) {
+        //
+    	// 		return false;
+    	// 	}
+    	// 	return true;
+    	// };
 
-		// using 6 splitting planes to rule out intersections.
-
-    		if ( box.max.x < this.min.x || box.min.x > this.max.x ||
-				 box.max.y < this.min.y || box.min.y > this.max.y ||
-				 box.max.z < this.min.z || box.min.z > this.max.z ) {
-
-    			return false;
-    		}
-    		return true;
-    	};
-
-        for(var i = 0; i < _objects.length; i++) {
+        for(let i = 0; i < _objects.length; i++) {
             if(!collided) {
-                var box = new THREE.BoundingBoxHelper(_objects[i], s.colorSelected);
-                box.update();
-                if(sourceBox.box.intersectsBox(box.box)) {
+                let box = new THREE.Box3();
+                // let box = new THREE.BoundingBoxHelper(_objects[i], s.colorSelected);
+                // box.update(_objects[i]);
+                box.setFromObject(_objects[i]);
+                if(sourceBox.intersectsBox(box)) {
                     collided = true;
                     callback(box);
                 }
@@ -1845,10 +1870,11 @@ define([
     }
 
     function autoArrange(model) {
-        var level = 1,
+        let level = 1,
             spacing = 2,
             inserted = false,
-            target = new THREE.BoundingBoxHelper(model),
+            target = new THREE.BoxHelper(model),
+            // target = new THREE.BoundingBoxHelper(model),
             mover,
             arithmetic,
             spacingX,
@@ -1901,9 +1927,10 @@ define([
             }
         };
 
-        target.update();
+        target.update(model);
         mover = function(ref, method) {
-            var size = ref.box.size();
+            let size = getBoundingBox(ref).size;
+            // let size = ref.box.size();
             arithmetic[method.toString()](size);
             checkCollisionWithAny(model, function(collideObject) {
                 if(collideObject !== null) {
@@ -1918,8 +1945,9 @@ define([
 
         checkCollisionWithAny(model, function(collideObject) {
             if(collideObject !== null) {
-                var ref = new THREE.BoundingBoxHelper(collideObject, s.colorSelected);
-                ref.update();
+                let ref = new THREE.BoxHelper(collideObject, s.colorSelected);
+                // let ref = new THREE.BoundingBoxHelper(collideObject, s.colorSelected);
+                ref.update(collideObject);
                 mover(ref, 1);
             }
         });
@@ -1927,7 +1955,7 @@ define([
     }
 
     function syncObjectParameter() {
-        var d = $.Deferred();
+        let d = $.Deferred();
         _syncObjectParameter(objects, 0, () => {
             d.resolve('');
         });
@@ -1943,7 +1971,7 @@ define([
         fileName = fileName + '.fc';
 
         selectObject(null);
-        var d = $.Deferred();
+        let d = $.Deferred();
         if(objects.length > 0) {
             if (!blobExpired) {
                 if(hasPreviewImage) {
@@ -1983,7 +2011,7 @@ define([
     }
 
     function getBlobFromScene() {
-        var ccp = camera.position.clone(),
+        let ccp = camera.position.clone(),
             ccr = camera.rotation.clone(),
             d = $.Deferred(),
             ol = _getCameraLook(camera);
@@ -1993,7 +2021,7 @@ define([
         camera.lookAt(new THREE.Vector3(0,380,0));
         render();
 
-        // var s = SELECTED;
+        // let s = SELECTED;
         toggleTransformControl(true);
         renderer.domElement.toBlob(function(blob) {
             previewUrl = URL.createObjectURL(blob);
@@ -2002,47 +2030,59 @@ define([
             camera.lookAt(ol);
             toggleTransformControl(false);
             render();
-            d.resolve(blob);
+            cropImageUsingCanvas(blob).then((blob2) => {
+                d.resolve(blob2);
+            });
         });
 
         return d.promise();
     }
 
 
-    function cropImageUsingCanvas(data, is_image){
-        if(!is_image){
-            var newImg = document.createElement('img'),
-                url = URL.createObjectURL(blob),
+    function cropImageUsingCanvas(data) {
+        if(data instanceof Blob) {
+            console.log("Loading blob", data);
+            // Blob to HTMLImage
+            let newImg = document.createElement('img'),
+                url = URL.createObjectURL(data),
                 d = $.Deferred();
+
             newImg.onload = function() {
+                console.log("Loaded image", url, newImg.width, newImg.height);
                 URL.revokeObjectURL(url);
+
+                cropImageUsingCanvas(newImg, true).then(function(blob) {
+                    console.log("Resolved cropping", url);
+                    d.resolve(blob);
+                });
             };
-            cropImageUsingCanvas(newImage, true).then(function(blob) {
-                d.resolve(blob);
-            });
+
+            newImg.src = url;
+
             return d.promise();
         }
-
-        var width = 640, height = 640,
+        //HTMLImage to Canvas, Canvas to Blob
+        let width = 640, height = 640,
             canvas = document.createElement('canvas'),
-            sh = image.height,
-            sw = image.width,
+            sh = data.height,
+            sw = data.width,
             sx = 0,
             sy = 0,
             d = $.Deferred();
 
-        if(image.width > image.height){
-            sx = (image.width - image.height)/2;
-            sw = image.height;
-        }else if(image.width < image.height){
-            sy = (image.height - image.width)/2;
-            sh = image.width;
+        if(data.width > data.height) {
+            sx = (data.width - data.height)/2;
+            sw = data.height;
+        }else if(data.width < data.height) {
+            sy = (data.height - data.width)/2;
+            sh = data.width;
         }
 
         canvas.width = width;
         canvas.height = height;
-        var context = canvas.getContext('2d');
-        context.drawImage(this.image, sx, sy, sw, sh, 0, 0, width, height);
+        let context = canvas.getContext('2d');
+        console.log("drawing image element", sx, sy, sw, sh);
+        context.drawImage(data, sx, sy, sw, sh, 0, 0, width, height);
         canvas.toBlob(function(blob) {
             d.resolve(blob);
         });
@@ -2050,7 +2090,7 @@ define([
     }
 
     function removeFromScene(name) {
-        for (var i = scene.children.length - 1; i >= 0; i--) {
+        for (let i = scene.children.length - 1; i >= 0; i--) {
             if (scene.children[i].name === name) {
                 scene.children.splice(i, 1);
             }
@@ -2058,7 +2098,7 @@ define([
     }
 
     function updateFromScene(name) {
-        for (var i = scene.children.length - 1; i >= 0; i--) {
+        for (let i = scene.children.length - 1; i >= 0; i--) {
             if (scene.children[i].name === name) {
                 scene.children[i].update();
             }
@@ -2094,10 +2134,10 @@ define([
             layer = printPath[layerNumber];
 
         if ( layer && layer.length ) {
-            var positions = new Float32Array(layer.length * 3 * 2 - 6);
-            var colors = new Float32Array(layer.length * 3 * 2 - 6);
-            for (var p = 1; p < layer.length; p++) {
-                for (var tmp = 1; tmp >= 0; tmp--) {
+            let positions = new Float32Array(layer.length * 3 * 2 - 6);
+            let colors = new Float32Array(layer.length * 3 * 2 - 6);
+            for (let p = 1; p < layer.length; p++) {
+                for (let tmp = 1; tmp >= 0; tmp--) {
                     positions[i * 3] = layer[p - tmp][0];
                     positions[i * 3 + 1] = layer[p - tmp][1];
                     positions[i * 3 + 2] = layer[p - tmp][2];
@@ -2114,7 +2154,7 @@ define([
             g.computeBoundingSphere();
         }
 
-        let line = new THREE.Line(g, emphasizeLineMaterial); // A layer is a "continuos line"
+        let line = new THREE.Line(g, emphasizeLineMaterial); // A layer is a 'continuos line'
         line.name = 'line';
         previewScene.add(line);
 
@@ -2133,7 +2173,7 @@ define([
             camera: camera,
             updateCamera: true
         });
-        panningOffset = camera.position.clone().sub(camera.position.raw);
+        panningOffset = camera.position.clone().sub(camera.position);
 
         if(scene.cameraLight) {
             scene.cameraLight.position.copy(camera.position);
@@ -2160,21 +2200,22 @@ define([
 
     function addSizeProperty(obj) {
         if (!$.isEmptyObject(obj)) {
-            var boundingBox = new THREE.BoundingBoxHelper(obj);
-            boundingBox.update();
-            obj.size = boundingBox.box.size();
-            obj.size.enteredX = boundingBox.box.size().x;
-            obj.size.enteredY = boundingBox.box.size().y;
-            obj.size.enteredZ = boundingBox.box.size().z;
+            let boundingBox = getBoundingBox(obj);
+            // let boundingBox = new THREE.BoundingBoxHelper(obj);
+            // boundingBox.update();
+            obj.size = boundingBox.size;
+            obj.size.enteredX = boundingBox.size.x;
+            obj.size.enteredY = boundingBox.size.y;
+            obj.size.enteredZ = boundingBox.size.z;
 
-            obj.size.originalX = boundingBox.box.size().x;
-            obj.size.originalY = boundingBox.box.size().y;
-            obj.size.originalZ = boundingBox.box.size().z;
+            obj.size.originalX = boundingBox.size.x;
+            obj.size.originalY = boundingBox.size.y;
+            obj.size.originalZ = boundingBox.size.z;
 
             obj.size.transformedSize = {};
-            obj.size.transformedSize.x = boundingBox.box.size().x;
-            obj.size.transformedSize.y = boundingBox.box.size().y;
-            obj.size.transformedSize.z = boundingBox.box.size().z;
+            obj.size.transformedSize.x = boundingBox.size.x;
+            obj.size.transformedSize.y = boundingBox.size.y;
+            obj.size.transformedSize.z = boundingBox.size.z;
         }
     }
 
@@ -2192,7 +2233,7 @@ define([
         if (degree === 0) {
             return 0;
         }
-        var degreeStep = shiftPressed ? 15 : s.degreeStep;
+        let degreeStep = shiftPressed ? 15 : s.degreeStep;
         return (parseInt(degree / degreeStep) * degreeStep);
     }
 
@@ -2206,6 +2247,7 @@ define([
         src.size.z = src.scale.z * src.size.originalZ;
 
         syncObjectOutline(src);
+        setObjectDialoguePosition(src);
 
         reactSrc.setState({
             modelSelected: src
@@ -2214,6 +2256,8 @@ define([
     }
 
     function updateObjectRotation(src) {
+        // scale lock transforming is modified in TransformControls.js source
+        // search for keyword locked
         src.rotation.enteredX = updateDegreeWithStep(radianToDegree(src.rotation.x));
         src.rotation.enteredY = updateDegreeWithStep(radianToDegree(src.rotation.y));
         src.rotation.enteredZ = updateDegreeWithStep(radianToDegree(src.rotation.z));
@@ -2228,11 +2272,11 @@ define([
 
     function toScreenPosition(obj, cam) {
         if (!$.isEmptyObject(obj)) {
-            var vector = new THREE.Vector3();
+            let vector = new THREE.Vector3();
 
             // TODO: need to update this when resize window
-            var widthHalf = 0.5 * container.offsetWidth;
-            var heightHalf = 0.5 * container.offsetHeight;
+            let widthHalf = 0.5 * container.offsetWidth;
+            let heightHalf = 0.5 * container.offsetHeight;
 
             obj.updateMatrixWorld();
             vector.setFromMatrixPosition(obj.matrixWorld);
@@ -2251,23 +2295,22 @@ define([
     function createOutline(mesh) {
         var outlineMaterial = new THREE.MeshBasicMaterial({
             color: s.colorSelected,
-            side: THREE.BackSide,
-            wireframe: true,
-            wireframeLinewidth: 5
+            side: THREE.BackSide
         });
-        var outlineMesh = new THREE.Mesh(mesh.geometry, outlineMaterial);
-        outlineMesh.position.set(mesh.position.x, mesh.position.y, mesh.position.z);
-        outlineMesh.scale.set(mesh.scale.x, mesh.scale.y, mesh.scale.z);
-        outlineMesh.rotation.set(mesh.rotation.x, mesh.rotation.y, mesh.rotation.z);
+    	var outlineMesh = new THREE.Mesh( mesh.geometry, outlineMaterial ),
+            { x, y, z } = mesh.position;
+
+    	outlineMesh.position.set(x, y, z);
+    	outlineMesh.scale.multiplyScalar(1.05);
         outlineMesh.up = new THREE.Vector3(0, 0, 1);
         mesh.outlineMesh = outlineMesh;
-        outlineScene.add(outlineMesh);
-
+    	outlineScene.add(outlineMesh);
     }
 
     function syncObjectOutline(src) {
         src.outlineMesh.rotation.set(src.rotation.x, src.rotation.y, src.rotation.z, 'ZYX');
         src.outlineMesh.scale.set(src.scale.x, src.scale.y, src.scale.z);
+        src.outlineMesh.scale.multiplyScalar(1.05);
         render();
     }
 
@@ -2281,18 +2324,17 @@ define([
     }
 
     function stopSlicing() {
-        var d = $.Deferred();
+        let d = $.Deferred();
         clearInterval(slicingStatus.reporter);
-        slicingStatus.inProgress = false;
         if(slicingStatus.inProgress) {
-            slicer.stopSlicing().then(function() {
+            sliceMaster.addTask('stopSlicing').then(() => {
+                slicingStatus.inProgress = false;
                 slicingStatusStream.onNext(slicingStatus);
                 d.resolve('');
             });
         }
         else {
             d.resolve('');
-
         }
         return d.promise();
     }
@@ -2346,10 +2388,10 @@ define([
     }
 
     function _handleLoadScene(sceneFile) {
-        var packer = require('helpers/packer');
+        let packer = require('helpers/packer');
 
         packer.unpack(sceneFile).then(function(_sceneFile) {
-            var files = _sceneFile[0];
+            let files = _sceneFile[0];
 
             sceneFile = _sceneFile;
 
@@ -2358,10 +2400,10 @@ define([
             });
         });
 
-        var updateObject = function() {
+        let updateObject = function() {
             sceneFile.shift();
             objects.forEach(function(obj, i) {
-                var ref = sceneFile[i];
+                let ref = sceneFile[i];
 
                 obj.position.x = ref.position.x;
                 obj.position.y = ref.position.y;
@@ -2389,7 +2431,8 @@ define([
     function _syncObjectParameter(o, index, callback) {
         index = index || 0;
         if (index < o.length) {
-            slicer.set(
+            sliceMaster.addTask(
+                'set',
                 o[index].uuid,
                 o[index].position.x,
                 o[index].position.y,
@@ -2414,13 +2457,13 @@ define([
     }
 
     function _addShadowedLight(x, y, z, color, intensity) {
-        var directionalLight = new THREE.DirectionalLight(color, intensity);
+        let directionalLight = new THREE.DirectionalLight(color, intensity);
         directionalLight.position.set(x, y, z);
 
         scene.add(directionalLight);
         directionalLight.castShadow = true;
 
-        var d = 1;
+        let d = 1;
         directionalLight.shadow.camera.left = -d;
         directionalLight.shadow.camera.right = d;
         directionalLight.shadow.camera.top = d;
@@ -2450,7 +2493,7 @@ define([
         if(previewMode) {
             slicingStatus.isComplete = true;
             _showWait(lang.print.drawingPreview, !showStopButton);
-            slicer.getPath().then(function(result) {
+            sliceMaster.addTask('getPath').then((result) => {
                 printPath = result;
                 _drawPath().then(function() {
                     _resetPreviewLayerSlider();
@@ -2502,7 +2545,7 @@ define([
 
     function undo() {
         if(history.length > 0) {
-            var entry = history.pop();
+            let entry = history.pop();
             if(entry.cmd === 'DELETE') {
                 objects.push(entry.src);
                 scene.add(entry.src);
@@ -2531,7 +2574,7 @@ define([
     function clearScene() {
         objects.length = 0;
         outlineScene.children.length = 0;
-        for(var i = scene.children.length - 1; i >= 0; i--) {
+        for(let i = scene.children.length - 1; i >= 0; i--) {
             if(scene.children[i].name === 'custom') {
                 scene.children.splice(i, 1);
             }
@@ -2565,24 +2608,24 @@ define([
         }
 
         if(blobExpired) {
-            var progress;
+            let progress;
             slicingStatus.showProgress = true;
             slicingStatus.needToCloseWait = true;
 
             if(willReslice) {
                 progress = lang.print.reRendering;
+                if(!slicingStatus.isComplete) {
+                    _showWait(progress, !showStopButton);
+                }
             }
             else {
-                progress = lang.print.gettingSlicingReport;
-            }
-
-            if(!slicingStatus.isComplete) {
-                _showWait(progress, !showStopButton);
+                updateSlicingProgressFromReport(slicingStatus.lastReport);
             }
         }
         else {
             if(!printPath || printPath.length === 0) {
-                slicer.getPath().then((result) => {
+                _showWait(lang.print.drawingPreview, !showStopButton);
+                sliceMaster.addTask('getPath').then((result) => {
                     if(result.error) {
                         processSlicerError(result);
                     }
@@ -2593,6 +2636,8 @@ define([
                     });
                 }).fail((error) => {
                     processSlicerError(error);
+                }).always(() => {
+                    _closeWait();
                 });
             }
             else {
@@ -2628,7 +2673,7 @@ define([
     }
 
     function _drawPath() {
-        var d = $.Deferred(), lineMaterial, line;
+        let d = $.Deferred(), lineMaterial, line;
 
         previewScene.children.splice(1, previewScene.children.length - 1);
         lineMaterial = new THREE.LineBasicMaterial({
@@ -2638,16 +2683,16 @@ define([
             vertexColors: THREE.VertexColors
         });
 
-        for (var l = 0; l < printPath.length; l++) {
+        for (let l = 0; l < printPath.length; l++) {
             let g = new THREE.BufferGeometry(),
                 i = 0,
                 layer = printPath[l];
 
-            var positions = new Float32Array(layer.length * 3 * 2 - 6);
-            var colors = new Float32Array(layer.length * 3 * 2 - 6);
+            let positions = new Float32Array(layer.length * 3 * 2 - 6);
+            let colors = new Float32Array(layer.length * 3 * 2 - 6);
 
-            for (var p = 1; p < layer.length; p++) {
-                for (var tmp = 1; tmp >= 0; tmp--) {
+            for (let p = 1; p < layer.length; p++) {
+                for (let tmp = 1; tmp >= 0; tmp--) {
                     positions[i * 3] = layer[p - tmp][0];
                     positions[i * 3 + 1] = layer[p - tmp][1];
                     positions[i * 3 + 2] = layer[p - tmp][2];
@@ -2663,7 +2708,7 @@ define([
             g.addAttribute('color', new THREE.BufferAttribute(colors, 3));
             g.computeBoundingSphere();
 
-            line = new THREE.Line(g, lineMaterial); // A layer is a "continuos line"
+            line = new THREE.Line(g, lineMaterial); // A layer is a 'continuos line'
             line.name = 'line';
             previewScene.add(line);
         }
@@ -2714,8 +2759,8 @@ define([
     }
 
     function _getCameraLook(_camera) {
-        var vector = new THREE.Vector3(0, 0, -1);
-        vector.applyEuler(_camera.rotation, _camera.eulerOrder);
+        let vector = new THREE.Vector3(0, 0, -1);
+        vector.applyEuler(_camera.rotation, _camera.rotation.order);
         return vector;
     }
 
@@ -2752,13 +2797,13 @@ define([
         if(!ref.size) { ref.size = {}; }
         if(!ref.rotation) { ref.rotation = {}; }
 
-        var sizeChanged = (
+        let sizeChanged = (
             ref.size.x !== src.size.x ||
             ref.size.y !== src.size.y ||
             ref.size.z !== src.size.z
         );
 
-        var rotationChanged = (
+        let rotationChanged = (
             ref.rotation.enteredX !== ref.rotation.enteredX ||
             ref.rotation.enteredY !== ref.rotation.enteredY ||
             ref.rotation.enteredZ !== ref.rotation.enteredZ
@@ -2798,16 +2843,19 @@ define([
         return slicingStatus;
     }
 
-    function changeEngine(engine, path) {
-        var d = $.Deferred();
+    function changeEngine(engine) {
+        let d = $.Deferred(),
+            requireReslice = slicingStatus.inProgress;
 
-        slicer.changeEngine(engine).then((result) => {
-            if(result.error) {
-                processSlicerError(result);
-            }
-            d.resolve();
-        }).fail((error) => {
-            processSlicerError(error);
+        stopSlicing().then(() => {
+            sliceMaster.clearTasks();
+            sliceMaster.addTask('changeEngine', engine).then((result) => {
+                if(result.error) { processSlicerError(result); }
+                else if(requireReslice) { startSlicing(); }
+                d.resolve();
+            }).fail((error) => {
+                processSlicerError(error);
+            });
         });
 
         return d.promise();
@@ -2845,7 +2893,7 @@ define([
     }
 
     function getMousePosition( dom, x, y ) {
-        var rect = dom.getBoundingClientRect();
+        let rect = dom.getBoundingClientRect();
         return [ ( x - rect.left ) / rect.width, ( y - rect.top ) / rect.height ];
     }
 
@@ -2854,6 +2902,16 @@ define([
         raycaster.setFromCamera( mouse, camera );
         return raycaster.intersectObjects( o );
     };
+
+    function getBoundingBox(obj) {
+        let box3 = new THREE.Box3(),
+            size = new THREE.Vector3();
+
+        let boundingBox = new THREE.BoxHelper(obj);
+        box3.setFromObject(boundingBox);
+        box3.getSize(size);
+        return { box: box3, size };
+    }
 
     return {
         init                : init,
@@ -2888,6 +2946,7 @@ define([
         addHistory          : addHistory,
         clearScene          : clearScene,
         changeEngine        : changeEngine,
-        takeSnapShot        : takeSnapShot
+        takeSnapShot        : takeSnapShot,
+        startSlicing        : startSlicing
     };
 });

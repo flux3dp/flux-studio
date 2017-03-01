@@ -48,8 +48,8 @@
     background: -webkit-linear-gradient(left, #ffffff 10%, rgba(255, 255, 255, 0) 42%);
     background: linear-gradient(to right, #ffffff 10%, rgba(255, 255, 255, 0) 42%);
     position: relative;
-    -webkit-animation: load3 1s infinite linear;
-    animation: load3 1s infinite linear;
+    -webkit-animation: load3 0.5s infinite linear;
+    animation: load3 0.5s infinite linear;
     -webkit-transform: translateZ(0);
     transform: translateZ(0);
 

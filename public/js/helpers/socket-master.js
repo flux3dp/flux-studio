@@ -4,50 +4,62 @@ define([
     $
 ) => {
 
-    let _tasks = [],
-        _task,
-        _ws;
+    function SocketMaster() {
+        let _tasks = [],
+            _task,
+            _ws,
+            processing = false;
 
-    const setWebSocket = (ws) => {
-        _ws = ws;
-    };
+        const setWebSocket = (ws) => {
+            _ws = ws;
+            _task = null;
+            _tasks = [];
+        };
 
-    const addTask = (command, ...args) => {
-        let d = $.Deferred();
-        _tasks.push({d, command, args});
+        const addTask = (command, ...args) => {
+            let d = $.Deferred();
+            _tasks.push({d, command, args});
+            if(!_task && !processing) {
+                doTask();
+            }
 
-        if(!_task) {
-            doTask();
-        }
+            return d.promise();
+        };
 
-        return d.promise();
-    };
+        const doTask = () => {
+            _task = _tasks.shift();
+            processing = true;
+            _ws[_task.command](..._task.args).then((result) => {
+                processing = false;
+                _task.d.resolve(result);
+                doNext();
+            }).progress((result) => {
+                _task.d.notify(result);
+            }).fail((result) => {
+                processing = false;
+                _task.d.reject(result);
+                doNext();
+            });
+        };
 
-    const doTask = () => {
-        _task = _tasks.shift();
+        const doNext = () => {
+            _tasks.length > 0 ? doTask() : _task = null;
+        };
 
-        _ws[_task.command](..._task.args).then((result) => {
-            _task.d.resolve(result);
-            doNext();
-        }).progress((result) => {
-            _task.d.notify(result);
-        }).fail((result) => {
-            _task.d.reject(result);
-            doNext();
-        });
-    };
+        const nextTask = () => ( _tasks.length > 0 ? _tasks[0] : null);
 
-    const doNext = () => {
-        _tasks.length > 0 ? doTask() : _task = null;
-    };
+        const clearTasks = () => {
+            _tasks = [];
+        };
 
-    const nextTask = () => ( _tasks.length > 0 ? _tasks[0] : null);
+        return {
+            setWebSocket,
+            addTask,
+            doTask,
+            nextTask,
+            clearTasks
+        };
+    }
 
-    return {
-        setWebSocket,
-        addTask,
-        doTask,
-        nextTask
-    };
-
+    return SocketMaster;
 });

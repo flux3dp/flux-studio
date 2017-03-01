@@ -73,45 +73,61 @@ define([
         },
 
         _renderActionButtons: function(lang) {
-            var cx = React.addons.classSet,
-                buttons = [{
-                    label: lang.laser.get_fcode,
-                    className: cx({
-                        'btn-disabled': !this.props.hasObject || this.props.hasOutOfBoundsObject,
-                        'btn-default': true,
-                        'btn-hexagon': true,
-                        'btn-get-fcode': true
-                    }),
-                    title: lang.print.getFcodeTitle,
-                    dataAttrs: {
-                        'ga-event': 'get-print-fcode'
-                    },
-                    onClick: this._handleGetFCode
-                }, {
-                    label: lang.monitor.start,
-                    className: cx({
-                        'btn-disabled': !this.props.hasObject || this.props.hasOutOfBoundsObject,
-                        'btn-default': true,
-                        'btn-hexagon': true,
-                        'btn-go': true
-                    }),
-                    title: lang.print.goTitle,
-                    dataAttrs: {
-                        'ga-event': 'print-goto-monitor'
-                    },
-                    onClick: this._handleGo
-                }];
+            let { hasObject, hasOutOfBoundsObject, disableGoButtons } = this.props,
+                cx = React.addons.classSet,
+                buttons = [
+                    {
+                        label: lang.laser.get_fcode,
+                        className: cx({
+                            'btn-disabled': !hasObject || hasOutOfBoundsObject || disableGoButtons,
+                            'btn-default': true,
+                            'btn-hexagon': true,
+                            'btn-get-fcode': true
+                        }),
+                        title: lang.print.getFcodeTitle,
+                        dataAttrs: {
+                            'ga-event': 'get-print-fcode'
+                        },
+                        onClick: this._handleGetFCode
+                    }, {
+                        label: lang.monitor.start,
+                        className: cx({
+                            'btn-disabled': !hasObject || hasOutOfBoundsObject || disableGoButtons,
+                            'btn-default': true,
+                            'btn-hexagon': true,
+                            'btn-go': true
+                        }),
+                        title: lang.print.goTitle,
+                        dataAttrs: {
+                            'ga-event': 'print-goto-monitor'
+                        },
+                        onClick: this._handleGo
+                    }
+                ];
 
             return (
                 <ButtonGroup buttons={buttons} className="beehive-buttons action-buttons"/>
             );
         },
 
-        _renderTimeAndCost: function(lang){
-            let { slicingStatus, slicingPercentage, hasObject, hasOutOfBoundsObject} = this.props;
-            return slicingStatus && hasObject && !hasOutOfBoundsObject && slicingPercentage ==1 ? (
-                <div className="preview-time-cost">{Math.round(slicingStatus.filament_length*0.03)/10}{lang.print.gram} / {DurationFormatter(slicingStatus.time).split(' ').join('')}</div>
-            ): '';
+        _renderTimeAndCost: function(lang) {
+            let { slicingStatus, slicingPercentage, hasObject, hasOutOfBoundsObject } = this.props;
+            if(slicingStatus && hasObject && !hasOutOfBoundsObject && slicingPercentage === 1) {
+                if(!slicingStatus.filament_length) {
+                    return '';
+                }
+                else {
+                    return (
+                        <div className="preview-time-cost">
+                            {Math.round(slicingStatus.filament_length * 0.03) /10}
+                            {lang.print.gram} / {DurationFormatter(slicingStatus.time).split(' ').join('')}
+                        </div>
+                    );
+                }
+            }
+            else {
+                return '';
+            }
         },
 
         render: function() {

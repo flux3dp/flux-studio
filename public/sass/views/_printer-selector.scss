@@ -41,19 +41,25 @@
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
+            text-align: left;
         }
 
         .device-name {
-            padding: 0 0 0 1.7rem;
+            padding: 0 0 0 0.8rem;
             flex: calc(11 / 28.7 * 100%);
         }
 
         .module {
-            flex: calc(3 / 28.7 * 100%);
+            flex: calc(2 / 28.7 * 100%);
         }
 
         .status {
-            flex: calc(5 / 28.7 * 100%);
+            flex: calc(6 / 28.7 * 100%);
+        }
+
+        .connection-type {
+            flex: calc(1 / 28.7 * 100%);
+            padding-top: 3px;
         }
 
         .close {

@@ -44,60 +44,60 @@ define([
             queueLock = false,
             queuedCommands = [];
 
-        
-        // When the queue is free, resolve to run the next "Command", and send a wrapped "Psuedo - Promise" 
+
+        // When the queue is free, resolve to run the next "Command", and send a wrapped "Psuedo - Promise"
         setInterval(() => {
             // Check queue
             if (!queueLock && queuedCommands.length > 0) {
                 queueLock = true;
-                // Pop 1 command
-                let command = queuedCommands.splice(0,1)[0];
-                console.log("Pop Command", command.name);
+                // get 1 command (first in first out)
+                let command = queuedCommands.shift();
                 command.q.resolve(command.wrapped);
             }
         }, 10);
 
-        function getQueuePromise(api_name) {
-            let qPromise = $.Deferred();
-            
-            let jPromise = $.Deferred();
-            let wrapped = {
-                resolve: (...args) => {
-                    queueLock = false;
-                    console.log("Resolve:: ", args);
-                    jPromise.resolve.apply(jPromise, args);
-                },
-                reject: (...args) => {
-                    queueLock = false;
-                    jPromise.reject.apply(jPromise, args);
-                },
-                notify: (...args) => {
-                    jPromise.notify.apply(jPromise, args);
-                },
-                promise: () => {
-                    let promise = jPromise.promise();
-                    return {           
-                        then: (cb) => {
-                            return promise.then(cb);
-                        },
-                        fail: (cb) =>{
-                            return promise.fail(cb);
-                        },
-                        catch: (cb) => {
-                            console.log("WARNING:: ES2016 Promise catch is not supported")
-                            queueLock = false;
-                            return promise.fail(cb);
-                        },
-                        progress: (cb) => {
-                            return promise.progres(cb);
-                        }
-                    }
-                }
-            };
-            
-            queuedCommands.push({name: api_name, q: qPromise, wrapped: wrapped});
-            return { q: qPromise.promise(), wrapped: wrapped };
-        }
+        // function getQueuePromise(api_name) {
+        //     let qPromise = $.Deferred(),
+        //         jPromise = $.Deferred(),
+        //         wrapped;
+        //
+        //     wrapped = {
+        //         resolve: (...args) => {
+        //             queueLock = false;
+        //             // console.log("Resolve:: ", args);
+        //             jPromise.resolve.apply(jPromise, args);
+        //         },
+        //         reject: (...args) => {
+        //             queueLock = false;
+        //             jPromise.reject.apply(jPromise, args);
+        //         },
+        //         notify: (...args) => {
+        //             jPromise.notify.apply(jPromise, args);
+        //         },
+        //         promise: () => {
+        //             let promise = jPromise.promise();
+        //             return {
+        //                 then: (cb) => {
+        //                     return promise.then(cb);
+        //                 },
+        //                 fail: (cb) =>{
+        //                     return promise.fail(cb);
+        //                 },
+        //                 catch: (cb) => {
+        //                     console.log('WARNING:: ES2016 Promise catch is not supported');
+        //                     queueLock = false;
+        //                     return promise.fail(cb);
+        //                 },
+        //                 progress: (cb) => {
+        //                     return promise.progres(cb);
+        //                 }
+        //             };
+        //         }
+        //     };
+        //
+        //     queuedCommands.push({name: api_name, q: qPromise, wrapped: wrapped});
+        //     return { q: qPromise.promise(), wrapped: wrapped };
+        // }
 
         return {
 
@@ -108,8 +108,8 @@ define([
             },
 
             upload: (name, file, ext) => {
-                let queuedPromise = getQueuePromise('upload');
-                queuedPromise.q.then((d) => {
+                let d = $.Deferred();
+
                 let progress,
                 currentProgress;
 
@@ -117,7 +117,6 @@ define([
                 const nth = 5;
 
                 events.onMessage = (result) => {
-
                     switch (result.status) {
 
                     case 'ok':
@@ -167,28 +166,20 @@ define([
 
                 };
 
-                events.onError = (error) => {
-                    d.reject(error);
-                };
-
-                events.onFatal = (error) => {
-                    d.reject(error);
-                };
+                events.onError = (error) => { d.reject(error); };
+                events.onFatal = (error) => { d.reject(error); };
 
                 ext = ext === 'obj' ? ' ' + ext : '';
                 ws.send('upload ' + name + ' ' + file.size + ext);
-                });
-                return queuedPromise.wrapped.promise();
+
+                return d.promise();
             },
 
             upload_via_path: (name, file, ext, fileUrl) => {
-                let queuedPromise = getQueuePromise('upload_via_path');
-                queuedPromise.q.then((d) => {
-                let progress,
-                currentProgress;
+
+                let d = $.Deferred();
 
                 events.onMessage = (result) => {
-
                     switch (result.status) {
 
                     case 'ok':
@@ -206,160 +197,104 @@ define([
                         // TODO: do something?
                         break;
                     }
-
                 };
 
-                events.onError = (error) => {
-                    d.reject(error);
-                };
+                events.onError = (error) => { d.reject(error); };
+                events.onFatal = (error) => { d.reject(error); };
 
-                events.onFatal = (error) => {
-                    d.reject(error);
-                }
-                
                 fileUrl = encodeURI(fileUrl);
                 ext = ext === 'obj' ? ' ' + ext : '';
                 ws.send('load_stl_from_path ' + name + ' ' + fileUrl + ext);
 
                 return d.promise();
-                });
-                return queuedPromise.wrapped.promise();
             },
 
             set: (name, positionX, positionY, positionZ, rotationX, rotationY, rotationZ, scaleX, scaleY, scaleZ) => {
-                let queuedPromise = getQueuePromise('set');
-                queuedPromise.q.then((d) => {
-                events.onMessage = (result) => {
-                    d.resolve(result);
-                };
 
-                events.onError = (error) => {
-                    d.reject(error);
-                };
+                let d = $.Deferred();
 
-                events.onFatal = (error) => {
-                    d.reject(error);
-                };
+                events.onMessage = (result) => { d.resolve(result); };
+                events.onError = (error) => { d.reject(error); };
+                events.onFatal = (error) => { d.reject(error); };
 
                 let args = [name, positionX, positionY, positionZ, rotationX, rotationY, rotationZ, scaleX, scaleY, scaleZ];
                 ws.send('set ' + args.join(' '));
 
                 return d.promise();
-                });
-                return queuedPromise.wrapped.promise();
             },
 
             delete: (name) => {
 
-                let queuedPromise = getQueuePromise('delete');
-                queuedPromise.q.then((d) => {
+                let d = $.Deferred();
 
-                events.onMessage = (result) => {
-                    d.resolve(result);
-                };
-
-                events.onError = (error) => {
-                    d.reject(error);
-                };
-
-                events.onFatal = (error) => {
-                    d.reject(error);
-                };
+                events.onMessage = (result) => { d.resolve(result); };
+                events.onError = (error) => { d.reject(error); };
+                events.onFatal = (error) => { d.reject(error); };
 
                 ws.send('delete ' + name);
                 return d.promise();
-                });
-                return queuedPromise.wrapped.promise();
             },
 
             // need revisit
             goF: (nameArray) => {
 
-                let queuedPromise = getQueuePromise('goF');
-                queuedPromise.q.then((d) => {
+                let d = $.Deferred();
 
-                events.onMessage = (result) => {
-                    d.resolve(result);
-                };
-
-                events.onError = (error) => {
-                    d.reject(error);
-                };
-
-                events.onFatal = (error) => {
-                    d.reject(error);
-                };
+                events.onMessage = (result) => { d.resolve(result); };
+                events.onError = (error) => { d.reject(error); };
+                events.onFatal = (error) => { d.reject(error); };
 
                 ws.send('go ' + nameArray.join(' ') + ' -f');
                 return d.promise();
-                });
-                return queuedPromise.wrapped.promise();
             },
 
             beginSlicing: (nameArray, type) => {
 
-                let queuedPromise = getQueuePromise('beginSlicing');
-                queuedPromise.q.then((d) => {
+                let d = $.Deferred();
+
                 type = type || 'f';
 
-                events.onMessage = (result) => {
-                    d.resolve(result);
-                };
-
-                events.onError = (error) => {
-                    d.reject(error);
-                };
-
-                events.onFatal = (error) => {
-                    d.reject(error);
-                };
+                events.onMessage = (result) => { d.resolve(result); };
+                events.onError = (error) => { d.reject(error); };
+                events.onFatal = (error) => { d.reject(error); };
 
                 ws.send(`begin_slicing ${nameArray.join(' ')} -${type}`);
                 return d.promise();
-                });
-                return queuedPromise.wrapped.promise();
             },
 
             reportSlicing: () => {
-                let queuedPromise = getQueuePromise('reportSlicing');
-                queuedPromise.q.then((d) => {
-                    let progress = [];
 
-                    events.onMessage = (result) => {
-                        if(result.status === 'ok') {
-                            if(progress.length > 0) {
-                                // only care about the last progress
-                                let lastProgress = progress.pop();
-                                progress.length = 0;
-                                d.resolve(lastProgress);
-                            }
-                            else {
-                                d.resolve();
-                            }
+                let d = $.Deferred();
+
+                let progress = [];
+
+                events.onMessage = (result) => {
+                    if(result.status === 'ok') {
+                        if(progress.length > 0) {
+                            // only care about the last progress
+                            let lastProgress = progress.pop();
+                            progress.length = 0;
+                            d.resolve(lastProgress);
                         }
                         else {
-                            progress.push(result);
+                            d.resolve();
                         }
-                    };
+                    }
+                    else {
+                        progress.push(result);
+                    }
+                };
 
-                    events.onError = (error) => {
-                        d.reject(error);
-                    };
+                events.onError = (error) => { d.reject(error); };
+                events.onFatal = (error) => { d.reject(error); };
 
-                    events.onFatal = (error) => {
-                        d.reject(error);
-                    };
-
-                    ws.send(`report_slicing`);
-                    return d.promise();
-                });
-                return queuedPromise.wrapped.promise();
+                ws.send('report_slicing');
+                return d.promise();
             },
 
             getSlicingResult: () => {
 
-                let queuedPromise = getQueuePromise('getSlicingResult');
-                queuedPromise.q.then((d) => {
+                let d = $.Deferred();
 
                 events.onMessage = (result) => {
                     if(result instanceof Blob) {
@@ -367,63 +302,33 @@ define([
                     }
                 };
 
-                events.onError = (error) => {
-                    d.reject(error);
-                };
+                events.onError = (error) => { d.reject(error); };
+                events.onFatal = (error) => { d.reject(error); };
 
-                events.onFatal = (error) => {
-                    d.reject(error);
-                };
-
-                ws.send(`get_result`);
+                ws.send('get_result');
                 return d.promise();
-
-                });
-                return queuedPromise.wrapped.promise();
             },
 
             stopSlicing: () => {
 
-                let queuedPromise = getQueuePromise('stopSlicing');
-                queuedPromise.q.then((d) => {
+                let d = $.Deferred();
 
-                events.onMessage = (result) => {
-                    d.resolve(result);
-                };
-
-                events.onError = (error) => {
-                    d.reject(error);
-                };
-
-                events.onFatal = (error) => {
-                    d.reject(error);
-                };
-
-                ws.send(`end_slicing`);
+                events.onMessage = (result) => { d.resolve(result); };
+                events.onError = (error) => { d.reject(error); };
+                events.onFatal = (error) => { d.reject(error); };
+                ws.send('end_slicing');
                 return d.promise();
-
-                });
-                return queuedPromise.wrapped.promise();
             },
 
             setParameter: (name, value) => {
 
-                let queuedPromise = getQueuePromise('setParameter');
-                queuedPromise.q.then((d) => {
-                
+                let d = $.Deferred();
+
                 let errors = [];
 
-                events.onMessage = (result) => {
-                    d.resolve(result, errors);
-                };
-
-                events.onError = (error) => {
-                    d.reject(error);
-                };
-
-                events.onFatal = (error) => {
-                    d.reject(error);
-                };
+                events.onMessage = (result) => { d.resolve(result, errors); };
+                events.onError = (error) => { d.reject(error); };
+                events.onFatal = (error) => { d.reject(error); };
 
                 if(name === 'advancedSettings' && value !== '') {
                     ws.send(`advanced_setting ${value}`);
@@ -433,42 +338,25 @@ define([
                 }
 
                 return d.promise();
-
-                });
-                return queuedPromise.wrapped.promise();
             },
 
             getPath: () => {
 
-                let queuedPromise = getQueuePromise('getPath');
-                queuedPromise.q.then((d) => {
+                let d = $.Deferred();
 
-                events.onMessage = (result) => {
-                    d.resolve(result);
-                };
-
-                events.onError = (error) => {
-                    d.reject(error);
-                };
-
-                events.onFatal = (error) => {
-                    d.reject(error);
-                };
+                events.onMessage = (result) => { d.resolve(result); };
+                events.onError = (error) => { d.reject(error); };
+                events.onFatal = (error) => { d.reject(error); };
 
                 ws.send('get_path');
                 return d.promise();
-
-                });
-                return queuedPromise.wrapped.promise();
             },
 
             uploadPreviewImage: (file) => {
 
-                let queuedPromise = getQueuePromise('uploadPreviewImage');
-                queuedPromise.q.then((d) => {
+                let d = $.Deferred();
 
                 events.onMessage = (result) => {
-
                     switch (result.status) {
 
                     case 'ok':
@@ -485,68 +373,35 @@ define([
                     }
                 };
 
-                events.onError = (error) => {
-                    d.reject(error);
-                };
-
-                events.onFatal = (error) => {
-                    d.reject(error);
-                };
+                events.onError = (error) => { d.reject(error); };
+                events.onFatal = (error) => { d.reject(error); };
 
                 ws.send('upload_image ' + file.size);// + file.size);
                 return d.promise();
-
-                });
-                return queuedPromise.wrapped.promise();
             },
 
             duplicate: (oldName, newName) => {
 
-                let queuedPromise = getQueuePromise('duplicate');
-                queuedPromise.q.then((d) => {
+                let d = $.Deferred();
 
-                events.onMessage = (result) => {
-                    d.resolve(result);
-                };
-
-                events.onError = (error) => {
-                    d.reject(error);
-                };
-
-                events.onFatal = (error) => {
-                    d.reject(error);
-                };
+                events.onMessage = (result) => { d.resolve(result); };
+                events.onError = (error) => { d.reject(error); };
+                events.onFatal = (error) => { d.reject(error); };
 
                 ws.send(`duplicate ${oldName} ${newName}`);
-
                 return d.promise();
-
-                });
-                return queuedPromise.wrapped.promise();
             },
 
             changeEngine: (engine) => {
 
-                let queuedPromise = getQueuePromise('changeEngine');
-                queuedPromise.q.then((d) => {
+                let d = $.Deferred();
 
-                events.onMessage = (result) => {
-                    d.resolve(result);
-                };
-
-                events.onError = (error) => {
-                    d.reject(error);
-                };
-
-                events.onFatal = (error) => {
-                    d.reject(error);
-                };
+                events.onMessage = (result) => { d.resolve(result); };
+                events.onError = (error) => { d.reject(error); };
+                events.onFatal = (error) => { d.reject(error); };
 
                 ws.send(`change_engine ${engine} default`);
                 return d.promise();
-
-                });
-                return queuedPromise.wrapped.promise();
             },
 
             // this is a helper  for unit test

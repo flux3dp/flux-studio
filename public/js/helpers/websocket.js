@@ -42,10 +42,11 @@ define([
     return function(options) {
         var lang = i18n.get(),
             defaultCallback = function(result) {},
+            hostname = window.FLUX.isNW === true ? 'localhost' : location.hostname,
             defaultOptions = {
-                hostname: (true === window.FLUX.isNW ? 'localhost' : location.hostname),
+                hostname: window.FLUX.dev ? '127.0.0.1' : hostname,
                 method: '',
-                port: window.FLUX.ghostPort,
+                port: window.FLUX.dev ? '8000' : window.FLUX.ghostPort,
                 autoReconnect: true,
                 ignoreAbnormalDisconnect: false,
                 onMessage: defaultCallback,
@@ -108,12 +109,14 @@ define([
                         if(window.FLUX.allowTracking) {
                             window.Raven.captureException(data);
                         }
+                        console.log('ws error', data);
                         socketOptions.onError(data);
                         break;
                     case 'fatal':
                         if(window.FLUX.allowTracking) {
                             window.Raven.captureException(data);
                         }
+                        console.log('ws fatal', data);
                         socketOptions.onFatal(data);
                         break;
                     // ignore below status
@@ -133,6 +136,11 @@ define([
                 };
 
                 _ws.onclose = function(result) {
+                    // if ws closed abruptly
+                    if(result.code === 1006) {
+                        socketOptions.onFatal(result);
+                        return;
+                    }
                     socketOptions.onClose(result);
 
                     var abnormallyId = 'abnormally-close',
@@ -200,6 +208,7 @@ define([
                 else {
                     ws.send(data);
                 }
+                keepAlive();
             },
             ws = null,
             readyState = {
@@ -212,11 +221,16 @@ define([
 
         ws = createWebSocket(socketOptions);
 
-        setInterval(function() {
-            if (null !== ws && readyState.OPEN === ws.readyState) {
-                sender('ping');
-            }
-        }, 60000);
+        const keepAlive = () => {
+            clearInterval(this.timer);
+            this.timer = setInterval(function() {
+                if (null !== ws && readyState.OPEN === ws.readyState) {
+                    sender('ping');
+                }
+            }, 60 * 1000 /* ms */);
+        };
+
+        keepAlive();
 
         var wsLog = {
                 url: '/ws/' + options.method,
@@ -228,8 +242,6 @@ define([
                 url: '/ws/' + options.method,
                 log: wsLog.log,
                 send: function(data) {
-                    var self = this;
-
                     if (null === ws) {
                         ws = createWebSocket(socketOptions);
                     }

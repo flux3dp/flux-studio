@@ -7,6 +7,7 @@ define([
     'app/stores/alert-store',
     'helpers/api/config',
     'helpers/api/upnp-config',
+    'helpers/device-master',
     'app/actions/progress-actions',
     'app/constants/progress-constants'
 ], function(
@@ -18,6 +19,7 @@ define([
     AlertStore,
     Config,
     upnpConfig,
+    DeviceMaster,
     ProgressActions,
     ProgressConstants
 ) {
@@ -37,6 +39,18 @@ define([
                     validPrinterName     : true,
                     validPrinterPassword : true,
                     settingPrinter       : initializeMachine.settingPrinter.get()
+                };
+            },
+
+            componentDidMount: function() {
+                DeviceMaster.registerUsbEvent('SETUP', this._monitorUsb);
+                console.log('device to be set', this.state.settingPrinter);
+            },
+
+            _monitorUsb: function(usbOn) {
+                if(!usbOn) {
+                    AlertActions.showPopupError('USB_UNPLUGGED', this.state.lang.message.usb_unplugged);
+                    location.hash = '#initialize/wifi/connect-machine';
                 }
             },
 
@@ -85,7 +99,8 @@ define([
                                 else {
                                     goNext();
                                 }
-                                Config().write("configured-printer", name);
+                                Config().write('configured-printer', JSON.stringify(self.state.settingPrinter));
+                                Config().write('configured-model', self.state.settingPrinter.model === 'delta-1' ? 'fd1' : 'fd1p');
                             }
                         });
                     },
@@ -97,11 +112,13 @@ define([
                         $.when(upnpMethods.name(name), upnpMethods.password(oldPassword, password)).
                         always(function() {
                             ProgressActions.close();
-                        }).
-                        done(function() {
+                        })
+                        .done(function() {
+                            Config().write('configured-printer', JSON.stringify(self.state.settingPrinter));
+                            Config().write('configured-model', self.state.settingPrinter.model === 'delta-1' ? 'fd1' : 'fd1p');
                             goNext();
-                        }).
-                        fail(function(response) {
+                        })
+                        .fail(function(response) {
                             AlertActions.showPopupError('set-machine-error', lang.initialize.set_machine_generic.incorrect_old_password);
                         });
 
@@ -212,10 +229,15 @@ define([
                     true === this.state.settingPrinter.password &&
                     '' === (this.state.settingPrinter.plaintext_password || '') &&
                     'WIFI' === this.state.settingPrinter.from ?
-                    <label className="control" for="printer-old-password">
+                    <label className="control" htmlFor="printer-old-password">
                         <h4 className="input-head padleft">{lang.initialize.set_machine_generic.old_password}</h4>
-                        <input ref="old_password" for="printer-old-password" type="password" className={printerPasswordClass}
-                        placeholder={lang.initialize.set_machine_generic.old_password}/>
+                        <input
+                            ref="old_password"
+                            htmlFor="printer-old-password"
+                            type="password"
+                            className={printerPasswordClass}
+                            placeholder={lang.initialize.set_machine_generic.old_password}
+                        />
                     </label> :
                     ''
                 );
@@ -232,7 +254,7 @@ define([
                             <h1 className="headline">{lang.initialize.name_your_flux}</h1>
 
                             <div className="controls">
-                                <label className="control" for="printer-name">
+                                <label className="control" htmlFor="printer-name">
                                     <h4 className="input-head">{lang.initialize.set_machine_generic.printer_name}</h4>
                                     <input ref="name" id="printer-name" type="text" className={printerNameClass}
                                         autoFocus={true}
@@ -243,9 +265,9 @@ define([
                                     <span className={invalidPrinterNameClass}>{invalidPrinterNameMessage}</span>
                                 </label>
                                 {oldPassword}
-                                <label className="control" for="printer-password">
+                                <label className="control" htmlFor="printer-password">
                                     <h4 className="input-head">{lang.initialize.set_machine_generic.password}</h4>
-                                    <input ref="password" for="printer-password" type="password" className={printerPasswordClass}
+                                    <input ref="password" htmlFor="printer-password" type="password" className={printerPasswordClass}
                                     placeholder={lang.initialize.set_machine_generic.password_placeholder}/>
                                 </label>
                             </div>

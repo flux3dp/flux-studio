@@ -58,7 +58,11 @@ define([
             if(Boolean(Monitor.uploadProgress)) {
                 return this.lang.device.uploading;
             }
-            if(Device.status.st_label) {
+            if(
+                Device.status.st_label &&
+                Device.status.st_label !== 'LOAD_FILAMENT' &&
+                Device.status.st_label !== 'UNLOAD_FILAMENT'
+            ) {
                 let { displayStatus } = MonitorStatus[Device.status.st_label]();
                 return displayStatus;
             }

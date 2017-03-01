@@ -15,6 +15,7 @@ define([
         opts.onError = opts.onError || function() {};
         opts.onFatal = opts.onFatal || function() {};
         opts.onClose = opts.onClose || function() {};
+        opts.printer = opts.printer || {}
 
         var ws,
             events = {
@@ -43,6 +44,11 @@ define([
 
                 events.onMessage(data);
 
+            },
+            onOpen: function(data) {
+                if (opts.printer && opts.printer.model == "delta-1p") {
+                    ws.send('turn_on_hd');
+                }
             }
         });
         ws.onError(opts.onError).onFatal(opts.onFatal).onClose(opts.onClose);

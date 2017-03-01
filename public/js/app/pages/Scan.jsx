@@ -3,7 +3,7 @@ define([
     'react',
     'jsx!widgets/List',
     'jsx!widgets/Modal',
-    'app/actions/scaned-model',
+    'app/actions/scanned-model',
     'helpers/api/3d-scan-control',
     'helpers/api/3d-scan-modeling',
     'jsx!views/scan/Setup-Panel',
@@ -34,9 +34,9 @@ define([
     React,
     List,
     Modal,
-    scanedModel,
-    scanControl,
-    scanModeling,
+    ScannedModel,
+    ScanControl,
+    ScanModeling,
     SetupPanel,
     ManipulationPanel,
     PrinterSelector,
@@ -167,7 +167,7 @@ define([
                     dndHandler.plug(document, self._importPCD);
 
                     self.setState({
-                        stage: scanedModel.init()
+                        stage: ScannedModel.init()
                     });
 
                     menuFactory.items.undo.enabled = true;
@@ -200,7 +200,7 @@ define([
 
                     stopGettingImage();
 
-                    scanedModel.destroy();
+                    ScannedModel.destroy();
                     subscriber.dispose();
                     meshAddRemoveSubscriber.dispose();
                 },
@@ -248,7 +248,7 @@ define([
                                     typedArray = new Float32Array(this.result);
 
                                     // update point cloud
-                                    mesh.model = scanedModel.updateMesh(mesh.model, typedArray);
+                                    mesh.model = ScannedModel.updateMesh(mesh.model, typedArray);
 
                                     newMesh = self._newMesh({
                                         model: mesh.model,
@@ -256,7 +256,7 @@ define([
                                         index: mesh.index
                                     });
 
-                                    scanedModel.add(mesh.model);
+                                    ScannedModel.add(mesh.model);
                                     newMesh.isUndo = true;
                                     meshes.splice(mesh.arrayIndex, 0, newMesh);
                                     self.state.scanCtrlWebSocket.stopGettingImage();
@@ -275,7 +275,7 @@ define([
                                 mesh.model.material.opacity = 0.3;
                                 mesh.choose = false;
                                 mesh.isUndo = true;
-                                scanedModel.add(mesh.model);
+                                ScannedModel.add(mesh.model);
                                 self.state.meshes.splice(mesh.arrayIndex, 0, mesh);
                                 self.state.scanCtrlWebSocket.stopGettingImage();
                                 self.setState({
@@ -316,7 +316,7 @@ define([
                         break;
                     case 'scan-again':
                         self.setState(self.getInitialState());
-                        scanedModel.clear();
+                        ScannedModel.clear();
                         self.state.scanCtrlWebSocket.stopGettingImage().done(function() {
                            self.state.scanCtrlWebSocket.connection.close(false);
                         });
@@ -425,7 +425,7 @@ define([
 
                                 fileReader.onload = function() {
                                     typedArray = new Float32Array(this.result);
-                                    model = scanedModel.appendModel(typedArray);
+                                    model = ScannedModel.appendModel(typedArray);
 
                                     meshes.push(self._newMesh({
                                         name: fileName,
@@ -559,7 +559,7 @@ define([
                     });
 
                     if ('undefined' === typeof mesh) {
-                        model = scanedModel.appendModel(views);
+                        model = ScannedModel.appendModel(views);
                         var newMesh = self._newMesh({
                             name: 'scan-' + (new Date()).getTime(),
                             model: model,
@@ -577,7 +577,7 @@ define([
                         });
                     }
                     else {
-                        mesh.model = scanedModel.updateMesh(mesh.model, views);
+                        mesh.model = ScannedModel.updateMesh(mesh.model, views);
                     }
                 },
 
@@ -591,7 +591,7 @@ define([
                         mesh.model.material.opacity = 0.3;
                     });
 
-                    scanedModel.remove(self.state.stlMesh);
+                    ScannedModel.remove(self.state.stlMesh);
 
                     self.setState({
                         meshes: meshes,
@@ -640,7 +640,7 @@ define([
                                                 stlBlob: response.data
                                             });
 
-                                            scanedModel.loadStl(response.data, onClose);
+                                            ScannedModel.loadStl(response.data, onClose);
                                             break;
                                         case 'computing':
                                             endExportSTL(collectName);
@@ -723,6 +723,30 @@ define([
                     self._openBlocker(true, ProgressConstants.NONSTOP);
                 },
 
+                _onSaveASC: function() {
+                    var self = this,
+                        selectedMeshes = self.state.selectedMeshes,
+                        fileName = (new Date()).getTime() + '.asc';
+
+                    self._doManualMerge(
+                        selectedMeshes,
+                        function(outputName) {
+                            self.state.scanModelingWebSocket.export(
+                                outputName,
+                                'asc',
+                                {
+                                    onFinished: function(blob) {
+                                        saveAs(blob, fileName);
+                                        self._openBlocker(false);
+                                    }
+                                }
+                            );
+                        },
+                        false
+                    );
+                    self._openBlocker(true, ProgressConstants.NONSTOP);
+                },
+
                 _onSave: function(e) {
                     var self = this,
                         exportFile = function(outputName) {
@@ -789,56 +813,27 @@ define([
 
                 _handleScan: function(e) {
                     var self = this,
-                        openProgressBar = function(callback) {
-                            callback();
-
-                            self.setState({
-                                openProgressBar: true
-                            });
-                        },
-                        checkLenOpened = function() {
-                            self._openBlocker(true, ProgressConstants.NONSTOP);
-
-                            var onPass = function() {
-                                self._openBlocker(false);
-                                openProgressBar(onScan);
-                            };
-
-                            self._handleCheck().done(function(data) {
-                                switch (data.message) {
-                                case 'good':
-                                case 'no object':
-                                case 'no laser':
-                                    onPass();
-                                    break;
-                                case 'not open':
-                                default:
-                                    self._onCalibrateFail(data.message, AlertActions.showPopupError);
-                                    break;
-                                }
-                            });
-                        },
                         pointCloud = new PointCloudHelper(),
                         onScan = function() {
                             var scanResolution = self._getScanSpeed(),
                                 scanAction = self.state.scanCtrlWebSocket.scan,
-                                $scanDeferred = scanAction(scanResolution, self.state.currentSteps, pointCloud, self._onRendering),
-                                opts = {
-                                    onError: function(data) {
-                                        self.state.scanCtrlWebSocket.takeControl(function(response) {
-                                            self._openBlocker(false);
-                                        });
-                                    },
-                                    onReady: function() {
-                                        onScan();
-                                    }
-                                };
+                                $scanDeferred = scanAction(scanResolution, self.state.currentSteps, pointCloud, self._onRendering);
 
                             $scanDeferred.done(function(response) {
                                 self._onScanFinished(response.pointCloud);
                             }).fail(function(response) {
                                 self.setState({
-                                    scanCtrlWebSocket: scanControl(self.state.selectedPrinter.uuid, opts)
+                                    scanCtrlWebSocket: ScanControl(self.state.selectedPrinter.uuid, {
+                                        printer: self.state.selectedPrinter,
+                                        onError: function(error) {
+                                            self.state.scanCtrlWebSocket.takeControl(function(response) {
+                                                self._openBlocker(false);
+                                            });
+                                        },
+                                        onReady: function() {
+                                            onScan();
+                                        }
+                                    })
                                 });
 
                             });
@@ -859,10 +854,11 @@ define([
                         showCamera: false,
                         stage: stage,
                         currentSteps: 0,
-                        progressPercentage: 0
+                        progressPercentage: 0,
+                        openProgressBar: true
+                    }, () => {
+                        onScan();
                     });
-
-                    checkLenOpened();
                 },
 
                 _onScanAgain: function(e) {
@@ -870,7 +866,7 @@ define([
                         onYes = function(id) {
                             self.state.scanCtrlWebSocket.stopGettingImage();
                             self.setState(self.getInitialState());
-                            scanedModel.clear();
+                            ScannedModel.clear();
                             AlertStore.removeYesListener(onYes);
                         };
 
@@ -879,9 +875,11 @@ define([
                 },
 
                 _onScanStop: function(e) {
+                    console.log('scan stop');
                     var self = this;
 
                     self.setState({
+                        currentSteps: 0,
                         openProgressBar: false,
                         hasMultiScan: false,
                         isScanStarted: false,
@@ -896,7 +894,7 @@ define([
                     // on scanning or had point cloud
                     if (true === self.state.isScanStarted && 0 === self.state.meshes.length) {
                         self.setState(self.getInitialState());
-                        scanedModel.clear();
+                        ScannedModel.clear();
 
                         if ('undefined' !== typeof self.state.scanCtrlWebSocket) {
                             self.state.scanCtrlWebSocket.connection.close(false);
@@ -935,7 +933,7 @@ define([
                 _doCropOn: function(mesh) {
                     mesh.transformMethods.hide();
                     this.setState({
-                        cylinder: scanedModel.cylinder.create(mesh.model)
+                        cylinder: ScannedModel.cylinder.create(mesh.model)
                     });
                 },
 
@@ -979,7 +977,7 @@ define([
                 },
 
                 _removeCylinder: function(mesh) {
-                    scanedModel.cylinder.remove(mesh.model);
+                    ScannedModel.cylinder.remove(mesh.model);
                     this.setState({
                         cylinder: undefined
                     });
@@ -998,7 +996,7 @@ define([
                         doingApplyTransform = function() {
                             currentMesh = selectedMeshes[currentIndex];
 
-                            matrixValue = scanedModel.matrix(currentMesh.model);
+                            matrixValue = ScannedModel.matrix(currentMesh.model);
                             params = {
                                 pX: matrixValue.position.center.x,
                                 pY: matrixValue.position.center.y,
@@ -1075,7 +1073,7 @@ define([
                                         },
                                         onFinished: function(response) {
                                             self.state.selectedMeshes.forEach(function(selectedMesh, i) {
-                                                scanedModel.remove(selectedMesh.model);
+                                                ScannedModel.remove(selectedMesh.model);
                                             });
 
                                             for (var i = self.state.meshes.length - 1; i >= 0; i--) {
@@ -1198,6 +1196,7 @@ define([
                     // TODO: restore to the status before scan
 
                     self.setState({
+                        currentSteps: 0,
                         openProgressBar: false,
                         isScanStarted: false
                     });
@@ -1324,7 +1323,7 @@ define([
                     var self = this,
                         meshes = self.state.meshes;
 
-                    scanedModel.remove(mesh.model);
+                    ScannedModel.remove(mesh.model);
                     meshes.splice(index, 1);
 
                     self.setState({
@@ -1340,6 +1339,7 @@ define([
                 _connectToScanControl: function(printer) {
                     var self = this,
                         ctrlOpts = {
+                            printer: printer,
                             onError: function(data) {
                                 data.info = data.info || '';
 
@@ -1359,11 +1359,12 @@ define([
                             },
                             onReady: function() {
                                 self._refreshCamera();
-                            }
+                            },
+                            availableUsbChannel: printer.source === 'h2h' ? printer.addr : -1
                         };
 
                     self.setState({
-                        scanCtrlWebSocket: scanControl(printer.uuid, ctrlOpts)
+                        scanCtrlWebSocket: ScanControl(printer.uuid, ctrlOpts)
                     });
                 },
 
@@ -1387,7 +1388,7 @@ define([
                             mesh.model.position.set(matrix.position.x , matrix.position.y , matrix.position.z);
                             mesh.model.rotation.set(matrix.rotation.x , matrix.rotation.y , matrix.rotation.z);
 
-                            scanedModel.render();
+                            ScannedModel.render();
                         };
 
                     return (
@@ -1403,6 +1404,7 @@ define([
                             onCropOff={this._doCropOff}
                             onClearNoise={this._doClearNoise}
                             onSavePCD={this._onSavePCD}
+                            onSaveASC={this._onSaveASC}
                             onManualMerge={this._doManualMerge}
                             object={state.selectedObject}
                             position={state.objectDialogPosition}
@@ -1494,22 +1496,22 @@ define([
 
                 _renderPrinterSelectorWindow: function(lang) {
                     var self = this,
-                        ModelingOpts = {
-                            onError: function(data) {
-                                self._openBlocker(false);
-                                AlertActions.showPopupError('scan-modeling-error', data.error);
-                            },
-                            onFatal: function(data) {
-                                self._openBlocker(false);
-                                AlertActions.showPopupError('scan-fatal-error', data.error);
-                            }
-                        },
-                        onGettingPrinter = function(auth_printer) {
-                            self._connectToScanControl(auth_printer);
+                        onGettingPrinter = function(printer) {
+                            self._connectToScanControl(printer);
                             self.setState({
                                 gettingStarted: true,
-                                selectedPrinter: auth_printer,
-                                scanModelingWebSocket: scanModeling(ModelingOpts)
+                                selectedPrinter: printer,
+                                scanModelingWebSocket: ScanModeling({
+                                    printer: printer,
+                                    onError: function(data) {
+                                        self._openBlocker(false);
+                                        AlertActions.showPopupError('scan-modeling-error', data.error);
+                                    },
+                                    onFatal: function(data) {
+                                        self._openBlocker(false);
+                                        AlertActions.showPopupError('scan-fatal-error', data.error);
+                                    }
+                                })
                             });
 
                             menuFactory.items.import.enabled = true;
@@ -1552,8 +1554,8 @@ define([
 
                                 var me = e.currentTarget,
                                     mesh = self._getMesh(parseInt(me.dataset.index, 10)),
-                                    position = scanedModel.toScreenPosition(mesh.model),
-                                    transformMethods = scanedModel.attachControl(mesh.model, self._refreshObjectDialogPosition),
+                                    position = ScannedModel.toScreenPosition(mesh.model),
+                                    transformMethods = ScannedModel.attachControl(mesh.model, self._refreshObjectDialogPosition),
                                     selectedMeshes;
 
                                 mesh.transformMethods = transformMethods;
@@ -1584,13 +1586,13 @@ define([
 
                                 self.setState({
                                     selectedMeshes: selectedMeshes,
-                                    selectedObject: scanedModel.matrix(mesh.model),
+                                    selectedObject: ScannedModel.matrix(mesh.model),
                                     objectDialogPosition: {
                                         left: position.x,
                                         top: position.y
                                     }
                                 }, function() {
-                                    scanedModel.cylinder.remove();
+                                    ScannedModel.cylinder.remove();
 
                                     if (1 === selectedMeshes.length && true === mesh.choose) {
                                         mesh.transformMethods.show();
@@ -1599,7 +1601,7 @@ define([
                                         mesh.transformMethods.hide();
                                     }
 
-                                    scanedModel.render();
+                                    ScannedModel.render();
                                 });
                             };
 

@@ -12,7 +12,7 @@
         "sourceType": "module"
     },
     "rules": {
-        "indent": "warn",
+        "indent": "off",
         "no-const-assign": "warn",
         "no-this-before-super": "warn",
         "no-undef": "warn",

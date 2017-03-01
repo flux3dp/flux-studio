@@ -2,11 +2,13 @@
 .DS_Store
 Desktop.ini
 node_modules
+bower_components
 !/public/node_modules
 _tools/nwjs*
 _tools/build
 public/lib
 public/js/jsx
+public/node_modules/*
 
 osx-cache
 win-x86-cache
@@ -24,6 +26,8 @@ public/output.fcode
 public/output.gcode
 public/preprocess.svg
 public/preview.png
+public/stl.cache
+public/temp.transform
 
 # Thumbnail cache files
 ._*
@@ -41,3 +45,7 @@ public/output.fc
 public/output.ini
 public/output.stl
 public/js/jsx
+
+# other
+_tools/environment
+.eslintrc.json

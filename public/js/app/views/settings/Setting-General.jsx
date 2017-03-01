@@ -4,9 +4,30 @@ define([
     'helpers/i18n',
     'helpers/api/config',
     'jsx!widgets/Select',
-    'app/actions/alert-actions'
-], function($, React, i18n, config, SelectView, AlertActions) {
+    'app/actions/alert-actions',
+    'helpers/local-storage',
+], function($, React, i18n, config, SelectView, AlertActions, LocalStorage) {
     'use strict';
+
+    let Controls = React.createClass({
+        render: function() {
+            return (
+                <div className="row-fluid">
+
+                    <div className="span3 no-left-margin">
+                        <label className="font2">
+                            {this.props.label}
+                        </label>
+                    </div>
+
+                    <div className="span8 font3">
+                        {this.props.children}
+                    </div>
+
+                </div>
+            );
+        }
+    });
 
     return React.createClass({
         getDefaultProps: function() {
@@ -30,9 +51,9 @@ define([
                 ips = me.value.split(','),
                 ipv4Pattern = /^\d{1,3}[\.]\d{1,3}[\.]\d{1,3}[\.]\d{1,3}$/g,
                 isCorrectFormat = true;
-            
+
             ips.forEach((ip) => {
-                if ('' !== ip && typeof ips == 'string' && false === ipv4Pattern.test(ip)) { 
+                if ('' !== ip && typeof ips === 'string' && false === ipv4Pattern.test(ip)) {
                     me.value = originalIP;
                     AlertActions.showPopupError('wrong-ip-error', lang.settings.wrong_ip_format + '\n' + ip);
                     isCorrectFormat = false;
@@ -41,7 +62,7 @@ define([
             });
 
 
-            if(isCorrectFormat){
+            if(isCorrectFormat) {
                 config().write('poke-ip-addr', me.value);
             }
         },
@@ -54,28 +75,33 @@ define([
             this.props.onLangChange(e);
         },
 
-        _switchNotification: function(e) {
-            config().write('notification', e.currentTarget.value);
+        _updateOptions: function(id, e) {
+            config().write(id, e.target.value);
         },
 
-        _changeProjection: function(e) {
-            config().write('camera-projection', e.currentTarget.value);
+        _resetFS: function() {
+            if(confirm(this.state.lang.settings.confirm_reset)) {
+                LocalStorage.clearAllExceptIP();
+            }
         },
 
-        render : function() {
-            var pokeIP = config().read('poke-ip-addr'),
+        render: function() {
+            let { supported_langs } = this.props,
+                pokeIP = config().read('poke-ip-addr'),
                 lang = this.state.lang,
                 notificationOptions = [],
                 projectionOptions = [],
+                antialiasingOptions = [],
+                defaultModelOptions = [],
                 options = [];
 
-            for (var lang_code in this.props.supported_langs) {
+            Object.keys(supported_langs).map(l => {
                 options.push({
-                    value: lang_code,
-                    label: this.props.supported_langs[lang_code],
-                    selected: lang_code === i18n.getActiveLang()
+                    value: l,
+                    label: supported_langs[l],
+                    selected: l === i18n.getActiveLang()
                 });
-            }
+            });
 
             notificationOptions = [
                 {
@@ -103,64 +129,101 @@ define([
                 }
             ];
 
+            antialiasingOptions = [
+                {
+                    value: 0,
+                    label: lang.settings.off,
+                    selected: config().read('antialiasing') === '0'
+                },
+                {
+                    value: 1,
+                    label: lang.settings.on,
+                    selected: config().read('antialiasing') === '1'
+                }
+            ];
+
+
+            defaultModelOptions = [
+                {
+                    value: '',
+                    label: lang.settings.none,
+                    selected: config().read('default-model') === ''
+                },
+                {
+                    value: 'fd1',
+                    label: lang.settings.fd1,
+                    selected: config().read('default-model') === 'fd1'
+                },
+                {
+                    value: 'fd1p',
+                    label: lang.settings.fd1p,
+                    selected: config().read('default-model') === 'fd1p'
+                }
+            ];
+
+
             return (
                 <div className="form general">
 
-                    <div className="row-fluid">
+                    <Controls label={lang.settings.language}>
+                        <SelectView
+                            id="select-lang"
+                            className="font3"
+                            options={options}
+                            onChange={this._changeActiveLang}
+                        />
+                    </Controls>
 
-                        <div className="span3 no-left-margin">
-                            <label className="font2">
-                                {lang.settings.language}
-                            </label>
-                        </div>
+                    <Controls label={lang.settings.notifications}>
+                        <SelectView
+                            className="font3"
+                            options={notificationOptions}
+                            onChange={this._updateOptions.bind(null, 'notification')}
+                        />
+                    </Controls>
 
-                        <div className="span8">
-                            <SelectView id="select-lang" className="font3" options={options} onChange={this._changeActiveLang}/>
-                        </div>
+                    <Controls label={lang.settings.ip}>
+                        <input
+                            type="text"
+                            autoComplete="false"
+                            defaultValue={pokeIP}
+                            onBlur={this._checkIPFormat}
+                        />
+                    </Controls>
 
-                    </div>
+                    <Controls label={lang.settings.projection}>
+                        <SelectView
+                            id="select-lang"
+                            className="font3"
+                            options={projectionOptions}
+                            onChange={this._updateOptions.bind(null, 'camera-projection')}
+                        />
+                    </Controls>
 
-                    <div className="row-fluid">
+                    <Controls label={lang.settings.antialiasing}>
+                        <SelectView
+                            id="select-lang"
+                            className="font3"
+                            options={antialiasingOptions}
+                            onChange={this._updateOptions.bind(null, 'antialiasing')}
+                        />
+                    </Controls>
 
-                        <div className="span3 no-left-margin">
-                            <label className="font2">
-                                {lang.settings.notifications}
-                            </label>
-                        </div>
+                    <Controls label={lang.settings.default_model}>
+                        <SelectView
+                            id="select-lang"
+                            className="font3"
+                            options={defaultModelOptions}
+                            onChange={this._updateOptions.bind(null, 'default-model')}
+                        />
+                    </Controls>
 
-                        <div className="span8">
-                            <SelectView className="font3" options={notificationOptions} onChange={this._switchNotification}/>
-                        </div>
+                    <Controls label={lang.settings.reset}>
+                        <a className="font3"
+                            onClick={this._resetFS}
+                        >{lang.settings.reset_now}</a>
+                    </Controls>
 
-                    </div>
-
-                    <div className="row-fluid">
-
-                        <div className="span3 no-left-margin">
-                            <label className="font2">
-                                {lang.settings.ip}
-                            </label>
-                        </div>
-
-                        <div className="span8 font3">
-                            <input type="text" autoComplete="false" defaultValue={pokeIP} onBlur={this._checkIPFormat}/>
-                        </div>
-
-                    </div>
-
-                    <div className="row-fluid">
-
-                        <div className="span3 no-left-margin">
-                            <label className="font2">
-                                {lang.settings.projection}
-                            </label>
-                        </div>
-
-                        <div className="span8 font3">
-                            <SelectView id="select-lang" className="font3" options={projectionOptions} onChange={this._changeProjection}/>
-                        </div>
-
-                    </div>
                 </div>
             );
         }

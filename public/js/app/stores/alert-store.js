@@ -10,25 +10,30 @@ define([
 ) {
     'use strict';
 
-    var NOTIFY_EVENT          = 'notify',
-        POPUP_EVENT           = 'popup',
-        CLOSE_NOTIFICATION    = 'closeNotification',
-        CLOSE_POPUP           = 'closePopup',
-        UPDATE_EVENT          = 'update',
-        CHANGE_FILAMENT_EVENT = 'change_filament',
-        NOTIFY_RETRY          = 'retry',
-        NOTIFY_ABORT          = 'abort',
-        NOTIFY_YES            = 'yes',
-        NOTIFY_NO             = 'no',
-        NOTIFY_CANCEL         = 'cancel', // including the "no", "cancel", "ok" button fired
-        NOTIFY_CUSTOM         = 'custom',
-        NOTIFY_ANSWER         = 'answer',
+    var NOTIFY_EVENT            = 'notify',
+        POPUP_EVENT             = 'popup',
+        CLOSE_NOTIFICATION      = 'closeNotification',
+        CLOSE_POPUP             = 'closePopup',
+        UPDATE_EVENT            = 'update',
+        CHANGE_FILAMENT_EVENT   = 'change_filament',
+        EDIT_HEAD_TEMPERATURE   = 'edit_head_temperature',
+        NOTIFY_RETRY            = 'retry',
+        NOTIFY_ABORT            = 'abort',
+        NOTIFY_YES              = 'yes',
+        NOTIFY_NO               = 'no',
+        NOTIFY_CANCEL           = 'cancel', // including the "no", "cancel", "ok" button fired
+        NOTIFY_CUSTOM           = 'custom',
+        NOTIFY_ANSWER           = 'answer',
         AlertStore;
 
     AlertStore = Object.assign(EventEmitter.prototype, {
 
         onChangeFilament(callback) {
             this.on(CHANGE_FILAMENT_EVENT, callback);
+        },
+
+        onShowHeadTemperature(callback) {
+            this.on(EDIT_HEAD_TEMPERATURE, callback);
         },
 
         onUpdate(callback) {
@@ -47,24 +52,24 @@ define([
             this.on(NOTIFY_RETRY, callback);
         },
 
-        onYes(callback) {
-            this.on(NOTIFY_YES, callback);
+        onYes(callback, oneTime) {
+            oneTime === true ? this.once(NOTIFY_YES, callback) : this.on(NOTIFY_YES, callback);
         },
 
-        onNo(callback) {
-            this.on(NOTIFY_NO, callback);
+        onNo(callback, oneTime) {
+            oneTime === true ? this.once(NOTIFY_NO, callback) : this.on(NOTIFY_NO, callback);
         },
 
-        onCancel(callback) {
-            this.on(NOTIFY_CANCEL, callback);
+        onCancel(callback, oneTime) {
+            oneTime === true ? this.once(NOTIFY_CANCEL, callback) : this.on(NOTIFY_CANCEL, callback);
         },
 
         onAbort(callback) {
             this.on(NOTIFY_ABORT, callback);
         },
 
-        onCustom(callback) {
-            this.on(NOTIFY_CUSTOM, callback);
+        onCustom(callback, oneTime) {
+            oneTime === true ? this.once(NOTIFY_CUSTOM, callback) : this.on(NOTIFY_CUSTOM, callback);
         },
 
         onAnswer(callback) {
@@ -164,7 +169,7 @@ define([
                 },
 
                 'SHOW_POPUP_CUSTOM': function() {
-                    AlertStore.emit(POPUP_EVENT, AlertConstants.CUSTOM, payload.id, payload.caption, payload.message, payload.customText);
+                    AlertStore.emit(POPUP_EVENT, AlertConstants.CUSTOM, payload.id, payload.caption, payload.message, payload.customText, payload.args);
                 },
 
                 'SHOW_POPUP_CUSTOM_CANCEL': function() {
@@ -173,6 +178,10 @@ define([
 
                 'SHOW_POPUP_QUESTION': function() {
                     AlertStore.emit(POPUP_EVENT, AlertConstants.QUESTION, payload.id, payload.caption, payload.message);
+                },
+
+                'SHOW_HEAD_TEMPERATURE': function() {
+                    AlertStore.emit(EDIT_HEAD_TEMPERATURE, payload);
                 },
 
                 'NOTIFY_RETRY': function() {

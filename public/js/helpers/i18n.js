@@ -1,36 +1,18 @@
 define([
     'helpers/local-storage',
-    'helpers/sprintf',
-    'app/app-settings'
-], function(localStorage, sprintf, settings) {
+    'app/app-settings',
+    'app/lang/en',
+    'app/lang/zh-tw'
+], function(localStorage, AppSettings, LangEn, LangZHTW) {
     'use strict';
 
-    var path = 'app/lang',
-        key_active_lang = 'active-lang',
-        prefix_key = 'lang-',
-        lastest_lang_code = '',
-        storeIntoLocalStrorage = function() {
-
-            var supported_langs = settings.i18n.supported_langs,
-                paths = [],
-                storeLang = function(lang_code) {
-
-                    return function(lang_file) {
-                        key = prefix_key + lang_code;
-                        localStorage.set(key, lang_file);
-                    };
-                },
-                key;
-
-            for (var name in supported_langs) {
-                if (true === supported_langs.hasOwnProperty(name)) {
-                    requirejs([path + '/' + name], storeLang(name));
-                }
-            }
+    var ACTIVE_LANG = 'active-lang',
+        langCache = {
+            'en': LangEn,
+            'zh-tw': LangZHTW
         },
-        current_langfile;
-
-    storeIntoLocalStrorage();
+        activeLang = localStorage.get(ACTIVE_LANG) || AppSettings.i18n.default_lang,
+        currentLang;
 
     return {
         /**
@@ -41,7 +23,7 @@ define([
          * @return string
          */
         getActiveLang : function() {
-            return localStorage.get(key_active_lang) || settings.i18n.default_lang;
+            return localStorage.get(ACTIVE_LANG) || AppSettings.i18n.default_lang;
         },
 
         /**
@@ -52,8 +34,9 @@ define([
          * @return this
          */
         setActiveLang : function(lang) {
-            current_langfile = undefined;
-            localStorage.set(key_active_lang, lang);
+            currentLang = undefined;
+            activeLang = lang;
+            localStorage.set(ACTIVE_LANG, lang);
 
             return this;
         },
@@ -70,15 +53,15 @@ define([
             key = key || '';
 
             var keys = key.split('.'),
-                current_lang_code = this.getActiveLang(),
+                currentLangCode = this.getActiveLang(),
                 temp, line;
 
             // caching
-            if ('undefined' === typeof current_langfile) {
-                current_langfile = localStorage.get(prefix_key + current_lang_code);
+            if ('undefined' === typeof currentLang) {
+                currentLang = langCache[currentLangCode];
             }
 
-            temp = line = current_langfile;
+            temp = line = currentLang;
 
             keys.forEach(function(key, i) {
                 if ('' !== key) {
@@ -92,6 +75,9 @@ define([
             });
 
             return line;
+        },
+        get lang() {
+            return langCache[activeLang]
         }
     };
 });
