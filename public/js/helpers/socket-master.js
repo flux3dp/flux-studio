@@ -34,13 +34,8 @@ define([
                 mode = _task.command.split('@')[1];
             
             if(mode == "maintain" && _ws.mode != 'maintain') { 
-              // Ensure maintain mode
-              _ws.enterMaintainMode().then(() => {
-                runTaskFunction(_task, fnName);
-              }).fail((result) => {
-                processing = false;
-                _task.d.reject(result);
-              });
+              // Ensure maintain mode, if not then reject with "edge case" error
+              _task.d.reject({status: 'error', error: ['EDGE_CASE', 'MODE_ERROR']});
             } else {
                 runTaskFunction(_task, fnName);
             }

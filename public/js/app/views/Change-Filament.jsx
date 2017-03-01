@@ -131,7 +131,7 @@ define([
                     DeviceMaster.endToolheadOperation();
                 }
                 else {
-                    DeviceMaster.quitTask();
+                    DeviceMaster.quitTask('maintain');
                 }
             },
 
@@ -179,7 +179,7 @@ define([
                         }
                     },
                     done = function(response) {
-                        DeviceMaster.quitTask().done(function() {
+                        DeviceMaster.quitTask('maintain').done(function() {
                             self._next(steps.COMPLETED);
                         });
                     },
@@ -187,7 +187,7 @@ define([
                         if(typeof response.error === 'string') {
                             response.error = [response.error];
                         }
-                        DeviceMaster.quitTask();
+                        DeviceMaster.quitTask('maintain');
                         
                         AlertActions.showPopupError('change-filament-device-error', DeviceErrorHandler.translate(response.error));
                     };
@@ -249,7 +249,7 @@ define([
                                     } else {
                                         AlertActions.showPopupError('change-filament-device-error', DeviceErrorHandler.translate(['HEAD_ERROR','TYPE_ERROR']));
                                     }
-                                    DeviceMaster.quitTask().then(function() {
+                                    DeviceMaster.quitTask('maintain').then(function() {
                                         self.setState({ currentStep: steps.GUIDE });
                                     });
                                     break;

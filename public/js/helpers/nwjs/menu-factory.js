@@ -25,7 +25,8 @@ define([
     'helpers/api/3d-scan-control',
     'helpers/api/cloud',
     'app/version-requirement',
-    'helpers/firmware-version-checker'
+    'helpers/firmware-version-checker',
+    'helpers/device-error-handler'
 ], function(
     gui,
     menuMap,
@@ -50,7 +51,8 @@ define([
     ScanControl,
     CloudApi,
     Requirement,
-    FirmwareVersionChecker
+    FirmwareVersionChecker,
+    DeviceErrorHandler
 ) {
     'use strict';
 
@@ -469,20 +471,15 @@ define([
                                     setTimeout(() => {
                                         AlertActions.showPopupInfo('calibrated', JSON.stringify(debug_message), lang.calibration.calibrated);
                                     }, 100);
-                                }).fail((error) => {
-                                    console.log("THe error", error);
-                                    if(error.module === 'LASER') {
+                                }).fail((resp) => {
+                                    console.log("THe error", resp);
+                                    if (resp.error[0] == "EDGE_CASE") return;
+                                    if (resp.module === 'LASER') {
                                         AlertActions.showPopupError('calibrate-fail', lang.calibration.extruderOnly);
                                     }
                                     else {
-                                        let message = '';
-                                        if(error.module === null) {
-                                            message = lang.monitor.HEAD_OFFLINE;
-                                        }
-                                        else {
-                                            message = error.error ? lang.monitor[error.error.join('_')] : lang.monitor[error.join('_')];
-                                        }
-                                        AlertActions.showPopupError('calibrate-fail', message || error.error.join(' '));
+                                        DeviceErrorHandler.processDeviceMasterResponse(resp);
+                                        AlertActions.showPopupError('calibrate-fail', DeviceErrorHandler.translate(resp.error));
                                     }
                                 }).always(() => {
                                     ProgressActions.close();

@@ -448,8 +448,12 @@ define([
         return _do(DeviceConstants.QUIT);
     }
 
-    function quitTask() {
-        return _do(DeviceConstants.QUIT_TASK);
+    function quitTask(mode) {
+        if (typeof mode == 'string') {
+            SocketMaster.addTask('quitTask@' + mode);
+        } else {
+            SocketMaster.addTask('quitTask');
+        }
     }
 
     function kick() {
@@ -818,6 +822,7 @@ define([
         let debug_data = {};
 
         const processError = (resp = {}) => {
+            if (resp.error[0] == "EDGE_CASE") return;
             DeviceErrorHandler.processDeviceMasterResponse(resp);
             AlertActions.showPopupError('device-busy', DeviceErrorHandler.translate(resp.error));
             SocketMaster.addTask('endMaintainMode');
@@ -852,7 +857,7 @@ define([
 
         const step2 = () => {
             let _d = $.Deferred();
-            SocketMaster.addTask('calibrate').then((response) => {
+            SocketMaster.addTask('calibrate@maintain').then((response) => {
                 debug_data = response.debug;
                 return SocketMaster.addTask('endMaintainMode');
             }).then(() => {
