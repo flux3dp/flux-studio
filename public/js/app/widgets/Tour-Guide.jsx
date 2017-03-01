@@ -30,7 +30,7 @@ define([
             lang = this.props.lang;
         },
 
-        _handletourNavigation: function(e) {
+        _handleTourNavigation: function(e) {
             e.preventDefault();
             this.props.onNextClick();
             if(this.props.step === this.props.guides.length - 1) {
@@ -115,7 +115,7 @@ define([
 
 
             return (
-                <div className="tour" onClick={this._handletourNavigation}>
+                <div className="tour" onClick={this._handleTourNavigation}>
                     <div>
                         <a className="btn btn-default btn-tutorial" onClick={this.props.onComplete}>{lang.tutorial.skip}</a>
                     </div>

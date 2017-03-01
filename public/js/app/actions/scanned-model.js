@@ -378,18 +378,17 @@ define([
         orbitControl.zoomSpeed = 1.2;
         orbitControl.panSpeed = 1.8;
 
-        orbitControl.noZoom = false;
+        orbitControl.enableZoom = true;
         orbitControl.enabled = true;
-        orbitControl.noKeys = false;
-        orbitControl.noPan = false;
-        orbitControl.noRotate = false;
+        orbitControl.enablePan = true;
+        orbitControl.enableRotate = true;
         orbitControl.maxDistance = 300;
         orbitControl.minDistance = 40;
         orbitControl.maxPolarAngle = Math.PI/2;
 
-        orbitControl.staticMoving = true;
-        orbitControl.noKeys = true;
-        orbitControl.dynamicDampingFactor = 0.3;
+        orbitControl.enableDamping = true;
+        orbitControl.enableKeys = true;
+        orbitControl.dampingFactor = 0.3;
 
         orbitControl.addEventListener('change', function(e) {
             if (true === orbitControl.enabled) {

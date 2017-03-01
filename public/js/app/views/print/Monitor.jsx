@@ -17,7 +17,8 @@ define([
     'jsx!app/views/print/Monitor-Control',
     'jsx!app/views/print/Monitor-Info',
     'app/action-creators/monitor',
-    'app/action-creators/device'
+    'app/action-creators/device',
+    'helpers/device-error-handler'
 ], function(
     $,
     React,
@@ -37,7 +38,8 @@ define([
     MonitorControl,
     MonitorInfo,
     MonitorActionCreator,
-    DeviceActionCreator
+    DeviceActionCreator,
+    DeviceErrorHandler
 ) {
     'use strict';
 
@@ -45,7 +47,6 @@ define([
         start,
         scrollSize = 1,
         _history = [],
-        status,
         usbExist = false,
         showingPopup = false,
         messageViewed = false,
@@ -55,17 +56,10 @@ define([
         lastAction,
         fileToBeUpload = {},
         openedFrom,
-
-        // error display
-        errorMessage = '',
-
         currentDirectoryContent,
         socketStatus = {},
 
-        timmer,
-
         statusId = 0,
-
         refreshTime = 3000;
 
     let mode = {
@@ -511,7 +505,9 @@ define([
                 store.dispatch(MonitorActionCreator.changeMode(GlobalConstants.PRINT));
 
                 if(fCode) {
+                    this._stopReport();
                     DeviceMaster.go(fCode).then(() => {
+                        this._startReport();
                         store.dispatch(MonitorActionCreator.setUploadProgress(''));
                     }).progress((progress) => {
                         let p = parseInt(progress.step / progress.total * 100);
@@ -601,6 +597,7 @@ define([
 
         _startReport: function() {
             this.reporter = setInterval(() => {
+                // if(window.stopReport === true) { return; }
                 DeviceMaster.getReport().fail((error) => {
                     this._processReport(error);
                 }).then((result) => {
@@ -608,6 +605,10 @@ define([
                     this._processReport(result);
                 });
             }, refreshTime);
+        },
+
+        _stopReport: function() {
+            clearInterval(this.reporter);
         },
 
         _generatePreview: function(info) {
@@ -639,7 +640,9 @@ define([
                 let state = [
                     DeviceConstants.status.PAUSED_FROM_STARTING,
                     DeviceConstants.status.PAUSED_FROM_RUNNING,
-                    DeviceConstants.status.ABORTED
+                    DeviceConstants.status.ABORTED,
+                    DeviceConstants.status.PAUSING_FROM_RUNNING,
+                    DeviceConstants.status.PAUSING_FROM_STARTING
                 ];
 
                 // always process as error, hard fix for backend
@@ -655,35 +658,8 @@ define([
                 // only display error during these state
                 if(state.indexOf(report.st_id) >= 0) {
                     // jug down errors as main and sub error for later use
-                    if(error.length > 0) {
-                        if(error[2]) {
-                            errorMessage = this._processErrorCode(error[2]);
-                            // for wrong type of head
-                            if(error[1] === 'TYPE_ERROR') {
-                                errorMessage = lang.monitor[error.slice(0,2).join('_')];
-                            }
 
-                            if(errorMessage === '') {
-                                if(error.length >= 2) {
-                                    errorMessage = lang.monitor[error.slice(0,2).join('_')];
-                                }
-                                else {
-                                    errorMessage = error;
-                                }
-                            }
-                        }
-                        else {
-                            errorMessage = lang.monitor[error.slice(0,2).join('_')];
-                            if(errorMessage === '' || typeof errorMessage === 'undefined') {
-                                errorMessage = error.join(' ');
-                            }
-                        }
-                    }
-                    else {
-                        errorMessage = '';
-                    }
-
-                    errorMessage = errorMessage || '';
+                    let errorMessage = DeviceErrorHandler.translate(error);
 
                     if(
                         !messageViewed &&
@@ -697,6 +673,7 @@ define([
 
                 if(this._isAbortedOrCompleted()) {
                     DeviceMaster.quit();
+                    store.dispatch(MonitorActionCreator.changeMode(mode.PREVIEW));
                 }
             }
         },
@@ -819,20 +796,6 @@ define([
             });
 
             return d.promise();
-        },
-
-        _processErrorCode: function(errorCode) {
-            // map error code to binary, and use index to identify error
-            if(Number(errorCode) === parseInt(errorCode, 10)) {
-                let m = parseInt(errorCode).toString(2).split('').reverse();
-                let message = m.map((flag, index) => {
-                    return flag === '1' ? lang.head_module.error[index] : '';
-                });
-                return message.filter(entry => entry !== '').join('\n');
-            }
-            else {
-                return '';
-            }
         },
 
         _findObjectContainsProperty: function(infoArray, propertyName) {

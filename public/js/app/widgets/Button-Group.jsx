@@ -33,6 +33,10 @@ define(['react'], function(React){
                         className += ' btn-default';
                     }
 
+                    if(opt.right) {
+                        className += ' pull-right';
+                    }
+
                     if ('link' === opt.type) {
                         content = (
                             <a className={className} href={opt.href} {...attrs} onClick={opt.onClick} >{opt.label}</a>

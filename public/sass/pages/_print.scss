@@ -748,7 +748,7 @@ input.switch:checked ~ label:after {
         font-size: 20px;
         position: absolute;
         transition: all .1s ease;
-        width: 280px;
+        width: 260px;
         z-index: 1;
 
         .accordion-body {
@@ -785,7 +785,7 @@ input.switch:checked ~ label:after {
             display: block;
             margin: 0 0 3px 0;
             padding: 0 20px;
-            width: 230px;
+            width: 260px;
         }
 
         .control {
@@ -841,10 +841,10 @@ input.switch:checked ~ label:after {
 
 .close {
     cursor:pointer;
-    height: 32px;
-    opacity: 0.3;
+    height: 25px;
+    opacity: 0.5;
     position: absolute;
-    width: 32px;
+    width: 25px;
 }
 .close:hover {
     opacity: 1;
@@ -852,10 +852,10 @@ input.switch:checked ~ label:after {
 .close:before, .close:after {
     background-color: #333;
     content: ' ';
-    height: 33px;
+    height: 25px;
     left: 15px;
     position: absolute;
-    width: 2px;
+    width: 2.5px;
 }
 .close:before {
     transform: rotate(45deg);
@@ -942,5 +942,24 @@ input.switch:checked ~ label:after {
         height: 10px;
         background: #666;
         transition: width 0.5s;
+    }
+}
+
+img.img640x480 {
+    width: 640px;
+    height: 480px;
+    outline: 2px solid #333;
+    margin-bottom: 20px;
+}
+
+.modal-window .modal-alert.img640x480 {
+    width: auto !important;
+
+    .btn-h-group {
+        display: block;
+    }
+
+    .btn.pull-right {
+        float: right;
     }
 }

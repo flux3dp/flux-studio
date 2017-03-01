@@ -11,12 +11,14 @@ define([
                 onSetPrinter: React.PropTypes.func
             };
         },
+
         getInitialState: function() {
             return {
                 validPrinterName    : true,
                 validPrinterPassword: true
-            }
+            };
         },
+
         _handleSetPrinter: function() {
             var name     = this.refs.name.getDOMNode().value,
                 password = this.refs.password.getDOMNode().value;
@@ -26,10 +28,11 @@ define([
                 validPrinterPassword: (password !== '')
             });
 
-            if(name != "") {
+            if(name !== '') {
                 this.props.onSetPrinter(name, password);
             }
         },
+
         render : function() {
             var lang = this.props.lang,
                 cx = React.addons.classSet,

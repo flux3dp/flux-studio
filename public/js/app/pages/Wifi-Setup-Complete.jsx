@@ -4,8 +4,9 @@ define([
     'app/actions/initialize-machine',
     'helpers/api/config',
     'helpers/api/usb-config',
-    'jsx!widgets/Modal'
-], function(React, sprintf, initializeMachine, config, usbConfig, Modal) {
+    'jsx!widgets/Modal',
+    'helpers/device-master'
+], function(React, sprintf, initializeMachine, config, usbConfig, Modal, DeviceMaster) {
     'use strict';
 
     return function(args) {
@@ -18,15 +19,20 @@ define([
                 return args.state;
             },
 
+            componentDidMount: function() {
+                if ('with-usb' !== this.props.other) {
+                    initializeMachine.completeSettingUp(false);
+                }
+
+                DeviceMaster.unregisterUsbEvent('SETUP');
+            },
+
             _goBack: function(e) {
                 history.go(-1);
             },
 
             _onStart: function(e) {
-                var usb = usbConfig();
-                initializeMachine.completeSettingUp(true).always(() => {
-                    usb.close();
-                });                
+                initializeMachine.completeSettingUp(true);
             },
 
             _getArticle: function(lang) {
@@ -98,13 +104,7 @@ define([
                 return (
                     <Modal className={wrapperClassName} content={content}/>
                 );
-            },
-
-            componentDidMount: function() {
-                if ('with-usb' !== this.props.other) {
-                    initializeMachine.completeSettingUp(false);
-                }
-            },
+            }
         });
     };
 });

@@ -5,20 +5,30 @@ define(function() {
         general: {
             wait: '處理中，請稍待'
         },
+        buttons: {
+            next: '下一步'
+        },
         support: {
             no_webgl: '您的系統不支援 WebGL，建議您使用其他電腦開啟 FLUX Studio',
             no_vcredist: 'Please install Visual C++ Redistributable 2015',
             osx_10_9: 'FLUX Studio 目前不支援 OS X 10.9，敬請更新至更新的版本。'
         },
+        generic_error: {
+            UNKNOWN_ERROR: "[UE] 請重啟 FLUX Studio",
+            OPERATION_ERROR: "[OE] 機器發生狀態衝突，請再試一次",
+            SUBSYSTEM_ERROR: "[SE] 請重啟機器",
+            UNKNOWN_COMMAND: "[UC] 請更新機器韌體",
+            RESOURCE_BUSY: "[RB] 請重新啟動 Delta, 或再試一次"
+        },
         device_selection: {
-            no_printers: '無法透過 Wi-Fi 偵測到 FLUX Delta，請檢查您與機器的網路連線是否在同個網路下 <a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/215394548">暸解更多</a>',
+            no_printers: '無法透過 Wi-Fi 偵測到機器，請檢查您與機器的網路連線是否在同個網路下 <a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/215394548">暸解更多</a>',
             module: 'MODULE',
             status: 'STATUS'
         },
         update: {
             release_note: '版本訊息:',
             firmware: {
-                caption: 'FLUX Delta 有新的韌體更新',
+                caption: '有新的機器韌體更新',
                 message_pattern_1: '"%s" 有新的韌體更新。',
                 message_pattern_2: 'FLUX 韌體 v%s 可使用 - 你的版本為 v%s.',
                 latest_firmware: {
@@ -47,7 +57,7 @@ define(function() {
                 upload_file: '韌體上傳',
                 update_success: '韌體更新上傳成功',
                 update_fail: '更新失敗',
-                waiting: '請確認已裝置工具頭'
+                waiting: '請確認已安裝工具頭'
             },
             updating: '更新中...',
             skip: '跳過此版本',
@@ -69,7 +79,6 @@ define(function() {
                 import: '匯入',
                 save_fcode: '匯出工作',
                 save_scene: '匯出場景',
-                reset: '重置設定',
                 confirmReset: '是否確定要重置所有設定?'
             },
             edit: {
@@ -77,9 +86,9 @@ define(function() {
                 duplicate: '重製',
                 rotate: '旋轉',
                 scale: '縮放',
-                reset: '重置',
                 clear: '清除場景',
-                undo: '復原'
+                undo: '復原',
+                reset: '重設'
             },
             device: {
                 label: '機器',
@@ -89,15 +98,18 @@ define(function() {
                 change_filament: '更換線料',
                 default_device: '設為預設',
                 check_firmware_update: '韌體更新',
-                update_delta: 'Delta 韌體',
+                update_delta: '機器韌體',
                 update_toolhead: '工具頭韌體',
                 calibrate: '校正平台',
                 set_to_origin: '回歸原點',
+                movement_tests: '執行運動測試',
                 scan_laser_calibrate: '打開掃描雷射',
                 clean_calibration: '校正平台（清除原始資料）',
                 commands: '指令',
-                set_to_origin_complete: 'Delta 已回歸原點',
+                set_to_origin_complete: '機器已回歸原點',
                 scan_laser_complete: '掃描雷射已開啟，點擊 "完成" 以關閉雷射',
+                movement_tests_complete: '運動測試完成',
+                movement_tests_failed: '運動測試失敗，請確認模組傳輸線有被拉直',
                 finish: '完成',
                 cancel: '取消',
                 turn_on_head_temperature: '開啟噴頭溫度'
@@ -142,10 +154,10 @@ define(function() {
                 caption: '密碼更改',
                 content: '確定要更改密碼嗎?'
             },
-            connect_flux: '連接 FLUX Delta',
+            connect_flux: '連接機器',
             via_usb: '使用 USB',
             via_wifi: '使用 WiFi',
-            name_your_flux: '為你的 FLUX Delta 取一個獨特的名字',
+            name_your_flux: '為你的機器取一個獨特的名字',
             wifi_setup: '設定無線網路',
             select_preferred_wifi: '選擇你偏好的網路',
             requires_wifi_password: '需要密碼',
@@ -158,7 +170,7 @@ define(function() {
                 old_password: '舊密碼',
                 password: '機器密碼',
                 set_station_mode: '設定成無線基地台',
-                password_placeholder: '從壞人手上保護你的 Delta',
+                password_placeholder: '使用密碼保護你的機器',
                 incorrect_old_password: '舊密碼錯誤',
                 incorrect_password: '密碼錯誤',
                 ap_mode_name: '網路名稱',
@@ -175,9 +187,9 @@ define(function() {
             setting_completed: {
                 start: '開始使用',
                 is_ready: '“%s” 準備完成',
-                station_ready_statement: '你的 FLUX Delta 已成為 Wi-Fi 熱點，你可以藉由無線連接 “%s” 這個熱點操作 FLUX',
+                station_ready_statement: '你的機器已成為 Wi-Fi 熱點，你可以藉由無線連接 “%s” 這個熱點操作 FLUX',
                 brilliant: '太棒了!',
-                begin_journey: '你可以拔除 Micro USB 傳輸線, 開始使用 FLUX Delta 隨心所欲地進行創作囉！',
+                begin_journey: '你可以拔除 Micro USB 傳輸線, 開始使用機器隨心所欲地進行創作囉！',
                 great: '歡迎使用 FLUX Studio',
                 upload_via_usb: '你可以稍後再設定 Wi-Fi 選項。<br/>如果你沒有 Wi-Fi 環境，請參考<a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/215998327-Connection-Guide-for-Desktop-PCs">PC連線指南</a>',
                 back: '回到 Wi-Fi 設定',
@@ -186,12 +198,12 @@ define(function() {
 
             notice_from_device: {
                 headline: '檢查 WiFi 指示燈',
-                subtitle: '機器上的綠燈表示了 FLUX Delta 的連線狀態',
+                subtitle: '機器上的綠燈表示了機器的連線狀態',
                 light_on: 'Light On: 綠燈恆亮',
-                light_on_desc: 'FLUX Delta 已經連上了指定網路',
+                light_on_desc: '機器已經連上了指定網路',
                 breathing: 'Breathing: 呼吸燈',
                 breathing_desc: '無線網路設定失敗，請嘗試重新設定',
-                successfully: '如果 FLUX Delta 連線成功',
+                successfully: '如果機器連線成功',
                 successfully_statement: '請將無線網路連線至(%s)，並且重新啟動 FLUX Studio',
                 restart: '重啟 FLUX Studio'
             },
@@ -204,7 +216,7 @@ define(function() {
 
                 keep_connect: {
                     caption: '無法透過 USB 連接',
-                    content: '別擔心！請確認電源已被開啟及使用 Micro-Usb 連接機器，並正確安裝驅動程式。<a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/215327328">瞭解更多</a>'
+                    content: '別擔心！請確認電源已被開啟及使用 USB 連接（或重新接上）機器，並正確安裝驅動程式。無法安裝驅動程式，請查看 <a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/215327328">說明</a>'
                 },
 
                 wifi_connection: {
@@ -274,8 +286,15 @@ define(function() {
             projection_perspective: '透視投影',
             projection_orthographic: '正投影',
             antialiasing: '反鋸齒',
+            reset: '重置所有設定',
+            reset_now: '重置所有設定',
+            confirm_reset: '確認要重置 FLUX Studio?',
             language: '語言',
             notifications: '通知',
+            default_model: '預設型號（列印參數）',
+            fd1: 'FLUX Delta',
+            fd1p: 'FLUX Delta+',
+            none: '無',
             close: '關閉',
             printer: {
                 new_printer: '新增成型機',
@@ -363,7 +382,7 @@ define(function() {
                 FORMAT_ERROR: '密碼格式錯誤',
                 submit: '儲存',
                 sign_out: '登出',
-                not_supported_firmware: '支援 FLUX cloud 需要 FLUX Delta 韌體 v1.5＋',
+                not_supported_firmware: '支援 FLUX cloud 需要機器韌體 v1.5＋',
                 unbind_device: '確認要不再綁定此機器?'
             }
         },
@@ -409,8 +428,8 @@ define(function() {
                     concentric: 'CONCENTRIC'
                 },
                 curaSupport: {
-                    grid: 'GRID',
-                    lines: 'LINES'
+                    lines: 'LINES',
+                    grid: 'GRID'
                 },
                 blackMagic: '黑魔法',
                 spiral: '螺旋',
@@ -576,6 +595,10 @@ define(function() {
                 low: '品質 快速',
                 custom: '品質 自訂'
             },
+            model: {
+                fd1: 'Delta',
+                fd1p: 'Delta+'
+            },
             scale: '尺寸',
             rotate: '旋轉',
             delete: '刪除',
@@ -624,6 +647,7 @@ define(function() {
             get_fcode: '儲存<br/>工作',
             name: '名稱',
             go: 'GO',
+            do_calibrate: '看起來您似乎第一次使用鐳射雕刻功能，可以透過包裝裡附的牛皮卡找到最佳的焦距，是否要載入焦距校正圖片？（稍後亦可以於進階面板中載入）',
             process_caption: '輸出中',
             laser_accepted_images: '雕刻支援格式：BMP/GIF/JPG/PNG/SVG',
             draw_accepted_images: '繪製支援格式：SVG',
@@ -640,12 +664,17 @@ define(function() {
             title: {
                 material: '選擇正確的材質來雕刻出最好的結果',
                 object_height: '物體高度，從底盤到物件最高點之距離',
+                height_offset: '雷射高度調整，包含磁吸底版跟焦距誤差，可根據焦距校正圖片調整數字',
                 shading: '使用雷射漸層效果，會增加雕刻時間',
                 advanced: '自行調整功率大小以及速度'
             },
             print_params: {
                 object_height: {
                     text: '物體高度',
+                    unit: 'mm'
+                },
+                height_offset: {
+                    text: '焦距調整',
                     unit: 'mm'
                 },
                 shading: {
@@ -681,6 +710,14 @@ define(function() {
                         text: '材質',
                         label: '材質選項',
                         options: [
+                            {
+                                value: 'cardboard',
+                                label: '牛皮紙',
+                                data: {
+                                    laser_speed: 10,
+                                    power: 255
+                                }
+                            },
                             {
                                 value: 'wood',
                                 label: '木板',
@@ -743,6 +780,8 @@ define(function() {
                 save_as_preset_title: '儲存預設',
                 load_preset_title: '載入',
                 background: '自訂背景',
+                removeBackground: '移除背景',
+                load_calibrate_image: '載入校正圖片',
                 apply: '套用',
                 cancel: '取消',
                 save: '儲存'
@@ -887,7 +926,7 @@ define(function() {
             starting: '啟動中',
             resuming: '恢復中',
             scanning: '掃描',
-            occupied: '裝置被佔用',
+            occupied: '機器被佔用',
             running: '工作中',
             uploading: '上傳中',
             processing: '處理中',
@@ -901,6 +940,7 @@ define(function() {
             initiating: '啟動中',
             unknown: '未知狀態',
             pausedFromError: '發生錯誤暫停',
+            model_name: '型號',
             IP: 'IP',
             serial_number: '序號',
             firmware_version: '韌體版本',
@@ -979,14 +1019,15 @@ define(function() {
             HARDWARE_ERROR_HOME_FAILED          : '#124 原點校正失敗\n請排除軌道上異物，確定傳輸線不會被夾到 <a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/218931807">暸解更多</a>',
             HARDWARE_ERROR_MAINBOARD_ERROR      : '#401 主板沒有回應。請聯繫 FLUX 客服。',
             HARDWARE_ERROR_SUBSYSTEM_ERROR      : '#402 子系統沒有回應。請聯繫 FLUX 客服。',
+            HARDWARE_ERROR_SENSOR_ERROR         : '溫度偵測器發生問題。請聯繫 FLUX 客服。',
             WRONG_HEAD                          : '請更換成列印工具頭',
             USER_OPERATION                      : '別的使用者正在佔用機器',
             RESOURCE_BUSY                       : '機器忙碌中\n如果機器沒有在進行動作， 請重新啟動機器',
-            DEVICE_ERROR                        : '裝置錯誤\n請重新啟動機器',
-            NO_RESPONSE                         : '裝置錯誤\n請重新啟動機器',
+            DEVICE_ERROR                        : '機器錯誤\n請重新啟動機器',
+            NO_RESPONSE                         : '機器錯誤\n請重新啟動機器',
             SUBSYSTEM_ERROR                     : '#402 子系統沒有回應。請聯繫 FLUX 客服。',
-            HARDWARE_FAILURE                    : '裝置錯誤\n請重新啟動機器',
-            MAINBOARD_OFFLINE                   : '裝置錯誤\n請重新啟動機器',
+            HARDWARE_FAILURE                    : '機器錯誤\n請重新啟動機器',
+            MAINBOARD_OFFLINE                   : '機器錯誤\n請重新啟動機器',
             G28_FAILED                          : '#124 原點校正失敗\n請排除軌道上異物，並重新插拔工具頭連接線 <a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/218931807">暸解更多</a>',
             FILAMENT_RUNOUT_0                   : '#121 沒有偵測到線料\n請重新插入新的線料 <a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/218931757">瞭解更多</a>',
             USER_OPERATION_FROM_CODE            : '使用操作暫停（更換線料）',
@@ -1045,14 +1086,14 @@ define(function() {
             machineNotConnected: 'Machine is not connected',
             notPrinting: 'Printing is not in progress',
             nothingToPrint: 'Nothing to print (source blob missing)',
-            connectionTimeout: '請確認你的網路狀態和 FLUX Delta 的 Wi-Fi 指示燈是否為恆亮',
+            connectionTimeout: '請確認你的網路狀態和機器的 Wi-Fi 指示燈是否為恆亮',
             device_not_found: {
                 caption: '找不到預設機器',
-                message: '請確認預設機器的 Wi-Fi 指示燈，或取消設定預設裝置'
+                message: '請確認預設機器的 Wi-Fi 指示燈，或取消設定預設機器'
             },
             device_busy: {
                 caption: '機器忙碌中',
-                message: '機器正在進行另外一項工作，請稍候再試。如果裝置持續沒有回應，請將裝置重新啟動。'
+                message: '機器正在進行另外一項工作，請稍候再試。如果機器持續沒有回應，請將機器重新啟動。'
             },
             device_is_used: '機器正被使用中，是否要終止現在任務？',
             invalidFile: '檔案不是正確的 STL 格式',
@@ -1083,11 +1124,16 @@ define(function() {
                 message: 'Delta 有重要韌體更新，是否要現在更新？',
             },
             unsupport_osx_version: '不支援此 Mac OS X 版本',
-            need_password: '需要密碼與 FLUX Delta 建立連線',
+            need_password: '需要密碼與機器建立連線',
             new_app_downloading: '下載中',
             ask_for_upgrade: '馬上升級嗎?',
             need_1_1_7_above: '請更新 Delta 韌體到 v1.1.7 以上',
-            gcode_area_too_big: '匯入的 gcode 檔案超過列印範圍'
+            gcode_area_too_big: '匯入的 gcode 檔案超過列印範圍',
+            empty_file: '檔案內容不存在',
+            usb_unplugged: 'USB 連線逾時，請確認與機器的連接',
+            launghing_from_installer_warning: 'FLUX Studio 不是從應用程式資料夾開啟，可能會產生問題。請將 FLUX Studio 移到應用程式資料夾再使用。',
+            uploading_fcode: '正在上傳 fcode',
+            cant_connect_to_device: '無法連結機器，請確認機器是否開啟，以及與機器的連結方式'
         },
         machine_status: {
             '-10': '原生模式',
@@ -1142,6 +1188,7 @@ define(function() {
             unloaded: '退料完成',
             ok: '確定',
             auto_emerging: '請插入線料',
+            loading_filament: '進料中',
             maintain_head_type_error: '列印工具頭未正確安裝',
             maintain_zombie: '請重新啟動機器',
             toolhead_no_response: '#117 列印模組沒有回應 <a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/218347477">暸解更多</a>'
@@ -1173,7 +1220,11 @@ define(function() {
             selectQuality: '選擇列印品質',
             clickGo: '按下開始以準備列印',
             startPrint: '確定平台上沒有格線，並於平台上塗上足厚口紅膠待其乾燥，即可開始列印',
-            skip: '跳過教學'
+            skip: '跳過教學',
+            startPrintDeltaPlus: '確認將磁鐵列印版放上平台',
+            runningMovementTests: '進行運動測試',
+            connectingMachine: '連接機器中',
+            movementTestFailed: { caption: '無法通過運動測試',  message: '請確認工具頭連接線被正確拉直，再試一次？' }
         },
         slicer: {
             computing: '計算中',

@@ -8,9 +8,10 @@ define([
     'plugins/classnames/index',
     'helpers/round',
     'app/actions/input-lightbox-actions',
+    'jsx!widgets/File-Uploader',
+    'helpers/i18n',
     'plugins/jquery/serializeObject',
     'helpers/array-findindex', 
-    'jsx!widgets/File-Uploader',
 ], function(
     React,
     SelectView,
@@ -21,15 +22,17 @@ define([
     classNames,
     round,
     InputLightboxActions,
-    FileUploader
+    FileUploader,
+    i18n
 ) {
     'use strict';
 
+    var laserLang = i18n.lang.laser,
+        advancedLang = laserLang.advanced;
+    
     return React.createClass({
 
         getDefaultProps: function() {
-            var self = this;
-
             return {
                 lang: React.PropTypes.object,
                 defaultMaterial: React.PropTypes.object,
@@ -44,16 +47,16 @@ define([
             return {
                 defaultMaterial: this.props.defaultMaterial,
                 materialHasChanged: false,
-                openSaveWindow: false
+                openSaveWindow: false,
+                customBg: !!config().read('laser-custom-bg')
             };
         },
 
         // Private methods
-        _getFooterButtons: function(lang) {
-            var self = this,
-                buttonGroup = [{
+        _getFooterButtons: function() {
+            var buttonGroup = [{
                     className: 'pull-left btn-default fa fa-folder-open-o',
-                    title: lang.load_preset_title,
+                    title: advancedLang.load_preset_title,
                     dataAttrs: {
                         'ga-event': 'load-laser-preset'
                     },
@@ -64,22 +67,14 @@ define([
                         'pull-left btn-default fa fa-floppy-o': true,
                         'btn-disabled': false === this.state.materialHasChanged
                     }),
-                    title: lang.save_as_preset_title,
+                    title: advancedLang.save_as_preset_title,
                     dataAttrs: {
                         'ga-event': 'save-as-preset'
                     },
                     onClick: this._onSaveAndApply
                 },
                 {
-                    label: lang.background,
-                    className: 'pull-left btn-default btn-apply',
-                    dataAttrs: {
-                        'ga-event': 'apply-laser-background'
-                    },
-                    onClick: this._onCustomBackground
-                },
-                {
-                    label: lang.apply,
+                    label: advancedLang.apply,
                     className: 'pull-right btn-default btn-apply',
                     dataAttrs: {
                         'ga-event': 'apply-laser-preset'
@@ -87,13 +82,37 @@ define([
                     onClick: this._onApply
                 },
                 {
-                    label: lang.cancel,
+                    label: advancedLang.cancel,
                     className: 'pull-right btn-default btn-cancel',
                     dataAttrs: {
                         'ga-event': 'cancel-current-preset'
                     },
                     onClick: this._onCancel
                 }];
+
+            return buttonGroup;
+        },
+
+        _getControlButtons: function() {
+            var self = this,
+                buttonGroup = [
+                {
+                    label: (this.state.customBg ? advancedLang.removeBackground : advancedLang.background),
+                    className: 'pull-left btn-default btn-cancel',
+                    dataAttrs: {
+                        'ga-event': 'apply-laser-background'
+                    },
+                    onClick: this._onCustomBackground
+                },
+                {
+                    label: advancedLang.load_calibrate_image,
+                    className: 'pull-left btn-default btn-apply',
+                    dataAttrs: {
+                        'ga-event': 'apply-load-calibration-image'
+                    },
+                    onClick: self.props.onLoadCalibrationImage
+                }
+                ];
 
             return buttonGroup;
         },
@@ -113,16 +132,14 @@ define([
 
         _onSaveAndApply: function(e) {
             var self = this,
-                lang = self.props.lang,
-                refs = self.refs,
                 material = {
                     data: self.state.defaultMaterial.data
                 };
 
             InputLightboxActions.open('save-laser-preset', {
-                caption      : lang.laser.save_as_preset,
-                inputHeader  : lang.laser.name,
-                confirmText  : lang.laser.advanced.save,
+                caption      : laserLang.save_as_preset,
+                inputHeader  : laserLang.name,
+                confirmText  : advancedLang.save,
                 maxLength    : 20,
                 onSubmit     : function(presetName) {
                     var canSave = ('' !== presetName);
@@ -142,15 +159,20 @@ define([
         },
 
         _onCustomBackground: function(e) {
-            $('input[data-ref=importBg]').click();
+            var self = this;
+            if (this.state.customBg) {
+                config().write('laser-custom-bg', '');
+                $('.laser-object').css({background :'url(/img/laser-platform.png)', 'background-size': '100% 100%'});
+                self.setState({customBg: false });
+            }else {
+                $('input[data-ref=importBg]').click();
+            }
         },
 
         _onApply: function(e) {
-            var lang = this.props.lang,
-                refs = this.refs,
-                material = {
+            var material = {
                     value: 'custom',
-                    label: lang.laser.custom,
+                    label: laserLang.custom,
                     data: this.state.defaultMaterial.data
                 };
 
@@ -159,7 +181,6 @@ define([
 
         _changeInputNumber: function() {
             var self = this,
-                lang = self.props.lang.laser.advanced,
                 speed = self.refs.speed,
                 power = self.refs.power,
                 defaultMaterial;
@@ -167,7 +188,7 @@ define([
             defaultMaterial = {
                 data: {
                     laser_speed: speed.value(),
-                    power: power.value() / 100 * lang.form.power.max
+                    power: power.value() / 100 * advancedLang.form.power.max
                 }
             };
 
@@ -201,24 +222,28 @@ define([
         },
 
         // Lifecycle
-        _renderFooter: function(lang) {
-            lang = lang.advanced;
+        _renderFooter: function() {
 
-            var buttons = this._getFooterButtons(lang);
+            let buttons = this._getFooterButtons(),
+                ctrlButtons = this._getControlButtons();
 
             return (
+                <div>
                 <ButtonGroup className="footer clearfix" buttons={buttons}/>
+                <hr className="clearfix" />
+                <ButtonGroup className="footer clearfix" buttons={ctrlButtons}/>
+                </div>
             );
         },
 
-        _renderSaveForm: function(lang) {
+        _renderSaveForm: function() {
             var maxLength = 10;
             return (
                 <div className="form">
-                    <header class="header">{lang.save_as_preset}</header>
+                    <header class="header">{advancedLang.save_as_preset}</header>
                     <div className="controls">
                         <div className="control">
-                            <label className="label">{lang.name}</label>
+                            <label className="label">{advancedLang.name}</label>
                             <TextInput ref="presetName" maxLength={maxLength}/>
                         </div>
                     </div>
@@ -226,22 +251,20 @@ define([
             );
         },
 
-        _renderDefaultForm: function(lang) {
-            lang = lang.advanced;
-
+        _renderDefaultForm: function() {
             return (
                 <form ref="advancedForm" className="form">
                     <div className="controls clearfix">
                         <div className="control">
-                            <label className="label">{lang.form.laser_speed.text}</label>
+                            <label className="label">{advancedLang.form.laser_speed.text}</label>
                             <input
                                 type="range"
                                 ref="speedRange"
-                                data-min-text={lang.form.laser_speed.slow}
-                                data-max-text={lang.form.laser_speed.fast}
-                                min={lang.form.laser_speed.min}
-                                max={lang.form.laser_speed.max}
-                                step={lang.form.laser_speed.step}
+                                data-min-text={advancedLang.form.laser_speed.slow}
+                                data-max-text={advancedLang.form.laser_speed.fast}
+                                min={advancedLang.form.laser_speed.min}
+                                max={advancedLang.form.laser_speed.max}
+                                step={advancedLang.form.laser_speed.step}
                                 defaultValue={this.state.defaultMaterial.data.laser_speed}
                                 value={this.state.defaultMaterial.data.laser_speed}
                                 onChange={this._changeRangeNumber}
@@ -250,8 +273,8 @@ define([
                                 ref="speed"
                                 className={{ 'value-text': true }}
                                 step={0.8}
-                                min={lang.form.laser_speed.min}
-                                max={lang.form.laser_speed.max}
+                                min={advancedLang.form.laser_speed.min}
+                                max={advancedLang.form.laser_speed.max}
                                 defaultUnit="mm/s"
                                 defaultUnitType="speed"
                                 operators={['+', '-', '*']}
@@ -262,15 +285,15 @@ define([
                     </div>
                     <div className="controls clearfix">
                         <div className="control">
-                            <label className="label">{lang.form.power.text}</label>
+                            <label className="label">{advancedLang.form.power.text}</label>
                             <input
                                 type="range"
                                 ref="powerRange"
-                                data-min-text={lang.form.power.low}
-                                data-max-text={lang.form.power.high}
-                                min={lang.form.power.min}
-                                max={lang.form.power.max}
-                                step={lang.form.power.step}
+                                data-min-text={advancedLang.form.power.low}
+                                data-max-text={advancedLang.form.power.high}
+                                min={advancedLang.form.power.min}
+                                max={advancedLang.form.power.max}
+                                step={advancedLang.form.power.step}
                                 defaultValue={this.state.defaultMaterial.data.power}
                                 value={this.state.defaultMaterial.data.power}
                                 onChange={this._changeRangeNumber}
@@ -283,7 +306,7 @@ define([
                                 step={1}
                                 defaultUnit="%"
                                 defaultUnitType="percentage"
-                                defaultValue={round(this.state.defaultMaterial.data.power / lang.form.power.max * 100, -2)}
+                                defaultValue={round(this.state.defaultMaterial.data.power / advancedLang.form.power.max * 100, -2)}
                                 getValue={this._changeInputNumber}
                             />
                         </div>
@@ -300,13 +323,14 @@ define([
         },
 
         _handleImport: function(e) {
-            var t = e.target;
-            console.log(t.files[0]);
+            var t = e.target,
+                self = this;
              if (t.files.length) {
                 var fr = new FileReader();
                 fr.onload = function () {
                     $('.laser-object').css({background :'url(' + fr.result + ')', 'background-size': '100% 100%'});
                     config().write('laser-custom-bg', fr.result);
+                    self.setState({'customBg': true});
                 };
                 fr.readAsDataURL(t.files[0]);
             }
@@ -314,14 +338,12 @@ define([
         },
 
         render: function() {
-            var self = this,
-                lang = this.props.lang.laser,
-                form = (
+            var form = (
                     false === this.state.openSaveWindow ?
-                    this._renderDefaultForm(lang) :
-                    this._renderSaveForm(lang)
+                    this._renderDefaultForm() :
+                    this._renderSaveForm()
                 ),
-                footer = this._renderFooter(lang),
+                footer = this._renderFooter(),
                 fileUploader = this._renderFileUploader();
 
             return (
