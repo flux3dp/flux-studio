@@ -112,7 +112,7 @@ define(function() {
                 movement_tests_failed: '運動測試失敗，請確認模組傳輸線有被拉直',
                 finish: '完成',
                 cancel: '取消',
-                turn_on_head_temperature: '開啟噴頭溫度'
+                turn_on_head_temperature: '設定列印模組溫度'
             },
             window: {
                 label: '視窗',
