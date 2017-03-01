@@ -524,6 +524,32 @@ define([
                         }
                     },
                     {
+                        label: lang.device.movement_tests,
+                        enabled: true,
+                        onClick: function() {
+                            var currentPrinter = discoverMethods.getLatestPrinter(printer);
+                            DeviceMaster.selectDevice(currentPrinter).then((status) => {
+                                if (status === DeviceConstants.CONNECTED) {
+                                    checkDeviceStatus(currentPrinter).then(() => {
+                                        ProgressActions.open(ProgressConstants.NONSTOP);
+                                        DeviceMaster.runMovementTests().then(() => {
+                                            console.log('ran movemnt test');
+                                            ProgressActions.close();
+                                            AlertActions.showPopupInfo('movement-tests', lang.device.movement_tests_complete);
+                                        }).fail(() => {
+                                            console.log('ran movemnt test failed');
+                                            ProgressActions.close();
+                                            AlertActions.showPopupInfo('movement-tests', lang.device.movement_tests_failed);
+                                        });
+                                    });
+                                }
+                                else if (status === DeviceConstants.TIMEOUT) {
+                                    AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
+                                }
+                            });
+                        }
+                    },
+                    {
                         label: lang.device.scan_laser_calibrate,
                         enabled: true,
                         onClick: function() {

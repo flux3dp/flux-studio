@@ -188,7 +188,7 @@ define([
                                 <div className="btn-h-group">
                                     <button
                                         className="btn btn-action btn-large"
-                                        data-ga-event="next-via-usb"
+                                        data-ga-event="next-via-wifi"
                                         onClick={this._onWifiStartingSetUp}
                                     >
                                         <h1 className="headline">{lang.initialize.connect_flux}</h1>
@@ -197,7 +197,7 @@ define([
                                     </button>
                                     <button
                                         className="btn btn-action btn-large"
-                                        data-ga-event="next-via-wifi"
+                                        data-ga-event="next-via-usb"
                                         onClick={this._onUsbStartingSetUp}
                                     >
                                         <h1 className="headline">{lang.initialize.connect_flux}</h1>

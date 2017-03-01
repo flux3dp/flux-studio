@@ -62,6 +62,7 @@ define([
 
     function selectDevice(device, deferred) {
         if (
+            _selectedDevice &&
             _selectedDevice.serial === device.serial &&
             _selectedDevice.source === device.source
         ) {
@@ -370,6 +371,9 @@ define([
                         d.resolve();
                     }, 300);
                 } else if (( st_id == 128 || st_id == 48 || st_id == 36 ) && error && error.length > 0) { // Error occured
+                    clearInterval(t);
+                    d.reject(error);
+                } else if(st_id == 128) {
                     clearInterval(t);
                     d.reject(error);
                 } else if (st_id == 0) {
@@ -1195,6 +1199,7 @@ define([
         });
 
         if (d[0] !== null) {
+            console.log(d[0]);
             callback.onSuccess(d[0]);
             return;
         }
