@@ -11,10 +11,13 @@ define([
 ], function($, Websocket, fileSystem, PointCloudHelper, rsaKey) {
     'use strict';
 
+    let stopImage = false;
+
     return function(uuid, opts) {
         opts = opts || {};
         opts.onError = opts.onError || function() {};
         opts.onReady = opts.onReady || function() {};
+        opts.printer = opts.printer || {}
 
         var ws,
             errorHandler = function(data) {
@@ -27,6 +30,7 @@ define([
                 onMessage: function() {}
             },
             genericSender = function(command) {
+                if(stopImage && command === 'image') { return; }
                 return checkDeviceIsReady().then(function() {
                     ws.send(command);
                     isReady = false;
@@ -67,6 +71,7 @@ define([
             $scanDeferred = $.Deferred(),
             connectingTimer,
             stopGettingImage = function() {
+                stopImage = true;
                 return $imageDeferred.notify({ status: imageCommand.STOP });
             },
             renewImageDeferred = function() {
@@ -97,6 +102,10 @@ define([
                 case 'ready':
                     clearTimeout(connectingTimer);
                     isReady = true;
+                    console.log("scan control on open ", opts.printer)
+                    if (opts.printer && opts.printer.model == "delta-1p") {
+                        ws.send('turn_on_hd');
+                    }
                     opts.onReady();
                     break;
                 case 'connected':
@@ -120,6 +129,7 @@ define([
         return {
             connection: ws,
             getImage: function() {
+                stopImage = false;
                 renewImageDeferred();
 
                 var goFetch = function() {
@@ -184,6 +194,7 @@ define([
             stopGettingImage: stopGettingImage,
 
             scan: function(resolution, steps, pointCloud, onRendering) {
+                console.log('steps', steps);
                 $scanDeferred = $.Deferred();
 
                 onRendering = onRendering || function() {};

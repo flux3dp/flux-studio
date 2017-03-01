@@ -15,7 +15,7 @@ define(function() {
         },
         generic_error: {
             UNKNOWN_ERROR: "[UE] 請重啟 FLUX Studio",
-            OPERATION_ERROR: "[OE] 請重啟機器",
+            OPERATION_ERROR: "[OE] 機器發生狀態衝突，請再試一次",
             SUBSYSTEM_ERROR: "[SE] 請重啟機器",
             UNKNOWN_COMMAND: "[UC] 請更新機器韌體",
             RESOURCE_BUSY: "[RB] 請重新啟動 Delta, 或再試一次"
@@ -213,7 +213,7 @@ define(function() {
 
                 keep_connect: {
                     caption: '無法透過 USB 連接',
-                    content: '別擔心！請確認電源已被開啟及使用 USB 連接（或重新接上）機器，並正確安裝驅動程式。（如已嘗試多次，請重新開啟機器）<a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/215327328">瞭解更多</a>'
+                    content: '別擔心！請確認電源已被開啟及使用 USB 連接（或重新接上）機器，並正確安裝驅動程式。無法安裝驅動程式，請查看 <a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/215327328">說明</a>'
                 },
 
                 wifi_connection: {
@@ -283,9 +283,9 @@ define(function() {
             projection_perspective: '透視投影',
             projection_orthographic: '正投影',
             antialiasing: '反鋸齒',
-            reset: '重設 FS',
-            reset_now: '執行重設',
-            confirm_reset: '確認重設 FS?',
+            reset: '重置所有設定',
+            reset_now: '重置所有設定',
+            confirm_reset: '確認要重置 FLUX Studio?',
             language: '語言',
             notifications: '通知',
             default_model: '預設型號（列印參數）',
@@ -644,7 +644,7 @@ define(function() {
             get_fcode: '儲存<br/>工作',
             name: '名稱',
             go: 'GO',
-            do_calibrate: '看起來您似乎第一次使用鐳射雕刻功能，是否要載入焦距校正圖片？（您亦可以於進階功能載入）',
+            do_calibrate: '看起來您似乎第一次使用鐳射雕刻功能，可以透過包裝裡附的牛皮卡找到最佳的焦距，是否要載入焦距校正圖片？（稍後亦可以於進階面板中載入）',
             process_caption: '輸出中',
             laser_accepted_images: '雕刻支援格式：BMP/GIF/JPG/PNG/SVG',
             draw_accepted_images: '繪製支援格式：SVG',
@@ -708,7 +708,7 @@ define(function() {
                         label: '材質選項',
                         options: [
                             {
-                                value: 'CARDBOARD',
+                                value: 'cardboard',
                                 label: '牛皮紙',
                                 data: {
                                     laser_speed: 10,
@@ -778,6 +778,7 @@ define(function() {
                 load_preset_title: '載入',
                 background: '自訂背景',
                 removeBackground: '移除背景',
+                load_calibrate_image: '載入校正圖片',
                 apply: '套用',
                 cancel: '取消',
                 save: '儲存'
@@ -1129,7 +1130,7 @@ define(function() {
             usb_unplugged: 'USB 連線逾時，請確認與機器的連接',
             launghing_from_installer_warning: 'FLUX Studio 不是從應用程式資料夾開啟，可能會產生問題。請將 FLUX Studio 移到應用程式資料夾再使用。',
             uploading_fcode: '正在上傳 fcode',
-            cant_connect_to_device: '無語連結機器，請確認機器是否開啟，以及與機器的連結方式'
+            cant_connect_to_device: '無法連結機器，請確認機器是否開啟，以及與機器的連結方式'
         },
         machine_status: {
             '-10': '原生模式',
@@ -1216,7 +1217,11 @@ define(function() {
             selectQuality: '選擇列印品質',
             clickGo: '按下開始以準備列印',
             startPrint: '確定平台上沒有格線，並於平台上塗上足厚口紅膠待其乾燥，即可開始列印',
-            skip: '跳過教學'
+            skip: '跳過教學',
+            startPrintDeltaPlus: '確認將磁鐵列印版放上平台',
+            runningMovementTests: '進行運動測試',
+            connectingMachine: '連接機器中',
+            movementTestFailed: { caption: '無法通過運動測試',  message: '請確認工具頭連接線被正確拉直，再試一次？' }
         },
         slicer: {
             computing: '計算中',

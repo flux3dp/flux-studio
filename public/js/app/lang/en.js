@@ -15,7 +15,7 @@ define(function() {
         },
         generic_error: {
             UNKNOWN_ERROR: "[UE] Please restart FLUX Studio",
-            OPERATION_ERROR: "[OE] Please restart the machine",
+            OPERATION_ERROR: "[OE] A status conflict occured, please retry the action.",
             SUBSYSTEM_ERROR: "[SE] Please restart the machine",
             UNKNOWN_COMMAND: "[UC] Please update the Delta+/Delta Firmware",
             RESOURCE_BUSY: "[RB] Please restart  the machine, or try again"
@@ -213,7 +213,7 @@ define(function() {
 
                 keep_connect: {
                     caption: 'USB Connection not found',
-                    content: 'Oops! Don\'t worry. We\'re here for you.\nMake sure\n1. Your machine has been powered on\n2. Attached (or re-attach again) to USB Cable\n\n3. If you\'ve tried several times, restart the machine and try again.\n<a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/215327328">More Info</a>'
+                    content: 'Oops! Don\'t worry. We\'re here for you.\nMake sure\n1. Your machine has been powered on\n2. The driver is correctly installed (check the link)\n<a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/215327328">More Info</a>'
                 },
 
                 wifi_connection: {
@@ -630,7 +630,7 @@ define(function() {
             get_fcode: 'Save<br/>Task',
             name: 'Name',
             go: 'GO',
-            do_calibrate: 'It seems you\'re using engraving for the first time, do you want to load focal length calibration image? ( You can load from "Advanced" later )',
+            do_calibrate: 'It seems you\'re using engraving for the first time, you can use the kraft card in the package to find the best focal length. Do you want to load the calibration image? You can also load it later in "Advanced".',
             process_caption: 'Generating',
             laser_accepted_images: 'Supported formats: BMP/GIF/JPG/PNG/SVG',
             draw_accepted_images: 'Supported formats: SVG',
@@ -695,7 +695,7 @@ define(function() {
                         options: [
                             {
                                 value: 'cardboard',
-                                label: 'Cardboard',
+                                label: 'Kraftpaper',
                                 data: {
                                     laser_speed: 10,
                                     power: 255
@@ -1029,7 +1029,7 @@ define(function() {
             extensionNotSupported               : 'This file format is not supported',
             fileExistContinue                   : 'File already exists, do you want to replace it?',
             confirmGToF                         : 'The GCode will be converted to FCode, do you want to continue? ( will replace if exists )',
-            updatePrintPresetSetting            : 'FLUX STUDIO has new default printing parameters, do you want to update?\n( Current one will be overwritten )',
+            updatePrintPresetSetting            : 'FLUX Studio has new default printing parameters, do you want to update?\n( Current settings will be overwritten )',
             confirmFileDelete                   : 'Are you sure you want to delete this file?',
             task: {
                 EXTRUDER                        : 'Printing Task',
@@ -1197,14 +1197,18 @@ define(function() {
         tutorial: {
             set_first_default_caption: 'Welcome',
             set_first_default: 'Do you want to set "%s" as your default device?',
-            startWithFilament: 'Let\'s start with loading filament',
-            startWithModel: 'Next, let\'s import some 3D model',
+            startWithFilament: 'Now we\'re going to load the filament',
+            startWithModel: 'Next, let\'s import an example 3D model',
             startTour: 'Welcome!<br/>This is your first time printing,<br/>would you like to start printing tutorial?',
             clickToImport: 'Click here to import an example 3D model',
-            selectQuality: 'Select quality you preferred',
+            selectQuality: 'Select the quality you preferred',
             clickGo: 'Prepare to print',
-            startPrint: 'Apply glue on the plate with no-grid, wait till it\' dry, then you are ready to print',
-            skip: 'Skip Tutorial'
+            startPrint: 'Apply glue on the plate with no-grid, wait till it\' dry, then you are ready to print.',
+            skip: 'Skip',
+            startPrintDeltaPlus: 'Make sure you put on the magnetic print plate.',
+            runningMovementTests: 'Running movement tests',
+            connectingMachine: 'Connecting to the machine',
+            movementTestFailed: { caption: 'Unable to pass movement tests',  message: 'Make sure the toolhead cable is stretched correctly. Try again?' }
         },
         slicer: {
             computing: 'Computing',

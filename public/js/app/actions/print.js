@@ -292,7 +292,7 @@ define([
             sliceMaster.addTask('upload', name, file, ext);
 
         uploadCaller.then((result) => {
-            ProgressActions.updating('Finishing up', 100);
+            ProgressActions.updating(lang.print.finishingUp, 100);
             d.resolve(result);
         }).progress(
             displayProgress

@@ -13,6 +13,7 @@ define(['react', 'jsx!widgets/Button-Group', 'helpers/i18n'], function(React, Bu
                 images: [],
                 imgClass: '',
                 displayImages: false,
+                onCustom: function() {},
                 onClose: function() {}
             };
         },
@@ -50,6 +51,7 @@ define(['react', 'jsx!widgets/Button-Group', 'helpers/i18n'], function(React, Bu
                         right: true,
                         onClick: () => {
                             self.setState({imgIndex: 0});
+                            this.props.onCustom();
                             self.props.onClose();
                         }
                     }]}/>

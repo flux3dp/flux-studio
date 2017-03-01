@@ -5,7 +5,6 @@ define([
     'jsx!widgets/Alert',
     'helpers/device-master',
     'app/constants/device-constants',
-    'helpers/check-device-status',
     'app/actions/alert-actions'
 ], function(
     React,
@@ -14,7 +13,6 @@ define([
     Alert,
     DeviceMaster,
     DeviceConstants,
-    CheckDeviceStatus,
     AlertActions
 ) {
     'use strict';

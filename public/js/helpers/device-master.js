@@ -58,15 +58,22 @@ define([
         _devices = [],
         _errors = {},
         availableUsbChannel = -1,
-        usbEventListeners = [];
+        usbEventListeners = {};
 
     function selectDevice(device, deferred) {
-        if(_selectedDevice.uuid === device.uuid) {
+        if (
+            _selectedDevice.serial === device.serial &&
+            _selectedDevice.source === device.source
+        ) {
             let d = $.Deferred();
             d.resolve(DeviceConstants.CONNECTED);
             return d.promise();
         }
-        Object.assign(_selectedDevice, device);
+
+        // match the device from the newest received device list
+        let latestDevice = _devices.filter(d => d.serial === device.serial && d.source === device.source);
+
+        Object.assign(_selectedDevice, latestDevice[0]);
         let d = deferred || $.Deferred(),
             uuid = device.uuid;
 
@@ -345,6 +352,60 @@ define([
         return d.promise();
     }
 
+    function waitTillCompleted() {
+        let d = $.Deferred(),
+            statusChanged = false;
+
+        ProgressActions.open(ProgressConstants.NONSTOP);
+
+        console.log("waiting status");
+        let t = setInterval(() => {
+            SocketMaster.addTask('report').then(r => {
+                d.notify(r, t);
+                let { st_id, error } = r.device_status;
+                if (st_id == 64) {
+                    clearInterval(t);
+                    setTimeout(() => {
+                        quit();
+                        d.resolve();
+                    }, 300);
+                } else if (( st_id == 128 || st_id == 48 || st_id == 36 ) && error && error.length > 0) { // Error occured
+                    clearInterval(t);
+                    d.reject(error);
+                } else if (st_id == 0) {
+                    // Resolve if the status was running and some how skipped the completed part
+                    if (statusChanged) {
+                        clearInterval(t);
+                        d.resolve();
+                    }
+                } else {
+                    statusChanged = true;
+                }
+            });
+        }, 2000);
+
+        return d.promise();
+    }
+
+    function runMovementTests() {
+        let d = $.Deferred();
+
+        fetch(DeviceConstants.MOVEMENT_TEST).then(res => res.blob()).then(blob => {
+            go(blob).fail(() => {
+                // Error while uploading task
+                d.reject(["UPLOAD_FAILED"]);
+            }).then(waitTillCompleted).fail((error) => {
+                // Error while running test
+                d.reject(error);
+            }).then(() => {
+                // Completed
+                d.resolve();
+            });
+        });
+
+        return d.promise();
+    }
+
     function resume() {
         return _do(DeviceConstants.RESUME);
     }
@@ -466,7 +527,7 @@ define([
                             }
                         };
                     });
-                }, 2000);
+                }, 3000);
             });
         };
 
@@ -492,7 +553,7 @@ define([
                     getReport().then(r => {
                         r.loading = true;
                         // if button is pressed from the machine, status will change from LOAD_FILAMENT to PAUSE
-                        if(r.st_label === 'PAUSED') {
+                        if(r.st_label === 'PAUSED' || r.st_label === 'RESUMING') {
                             clearInterval(t);
                             resolve();
                         }
@@ -590,22 +651,6 @@ define([
 
     function getDeviceByName(name) {
         return _deviceNameMap[name];
-    }
-
-    function getDeviceByNameAsync(name, config) {
-        if(getDeviceByName(name)){
-            config.onSuccess(getDeviceByName(name));
-            return;
-        }
-        if(config.timeout > 0){
-            setTimeout(function(){
-                config.timeout -= 500;
-                getDeviceByNameAsync(name, config);
-            },500);
-        }
-        else{
-            config.onTimeout();
-        }
     }
 
     function updateFirmware(file) {
@@ -711,7 +756,7 @@ define([
             opts;
 
         opts = {
-            availableUsbChannel: this.availableUsbChannel,
+            availableUsbChannel: _device.source === 'h2h' ? parseInt(_device.uuid) : -1,
             onError: function(message) { console.log('error from camera ws', message); }
         };
 
@@ -959,6 +1004,7 @@ define([
                             }
                             else {
                                 message = `${lang.device.pausedFromError}`;
+                                message = device.error_label === '' ? '' : message;
                             }
 
                             if(device.st_id === DeviceConstants.status.COMPLETED) {
@@ -970,12 +1016,14 @@ define([
                                 }, true);
                             }
                             else {
-                                AlertActions.showWarning(message, function(growl) {
-                                    growl.remove(function() {});
-                                    selectDevice(defaultPrinter).then(function() {
-                                        GlobalActions.showMonitor(defaultPrinter);
-                                    });
-                                }, true);
+                                if(message !== '') {
+                                    AlertActions.showWarning(message, function(growl) {
+                                        growl.remove(function() {});
+                                        selectDevice(defaultPrinter).then(function() {
+                                            GlobalActions.showMonitor(defaultPrinter);
+                                        });
+                                    }, true);
+                                }
                             }
 
                             defaultPrinterWarningShowed = true;
@@ -1005,8 +1053,14 @@ define([
         });
     }
 
+    // device names are keys to _deviceNameMap object
     function getDeviceList() {
         return _deviceNameMap;
+    }
+
+    // device are stored in array _devices
+    function getAvailableDevices() {
+        return _devices;
     }
 
     function getDeviceSettings(withBacklash) {
@@ -1112,8 +1166,8 @@ define([
             this.availableUsbChannel = channel;
 
             // to be replaced when redux is implemented
-            usbEventListeners.forEach(callback => {
-                callback(channel > 0);
+            Object.keys(usbEventListeners).forEach(id => {
+                usbEventListeners[id](channel > 0);
             });
         });
     }
@@ -1122,16 +1176,38 @@ define([
         return this.availableUsbChannel;
     }
 
-    function getAvailableUsbChannel() {
-        return this.availableUsbChannel;
+    // id    : string, required,
+    // event : function, required, will callback with ture || false
+    function registerUsbEvent(id, event) {
+        usbEventListeners[id] = event;
+        console.log('registering event');
     }
 
-    function registerUsbEvent(callback) {
-        usbEventListeners.push(callback);
+    function unregisterUsbEvent(id) {
+        delete usbEventListeners[id];
     }
 
-    function unregisterUsbEvent(callback) {
-        // TODO: to be coded when ndeeded
+    function getDeviceBySerial(serial, isUsb, callback) {
+        let d = _devices.filter(d => {
+            let a = d.serial === serial;
+            if (isUsb) { a = a && d.source === 'h2h'; };
+            return a;
+        });
+
+        if (d[0] !== null) {
+            callback.onSuccess(d[0]);
+            return;
+        }
+
+        if (callback.timeout > 0) {
+            setTimeout(function() {
+                callback.timeout -= 500;
+                getDeviceBySerial(name, isUsb, callback);
+            }, 500);
+        }
+        else {
+            callback.onTimeout();
+        }
     }
 
     // Core
@@ -1167,7 +1243,6 @@ define([
             this.changeFilament                 = changeFilament;
             this.reconnect                      = reconnect;
             this.getDeviceByName                = getDeviceByName;
-            this.getDeviceByNameAsync           = getDeviceByNameAsync;
             this.getFirstDevice                 = getFirstDevice;
             this.updateFirmware                 = updateFirmware;
             this.updateToolhead                 = updateToolhead;
@@ -1200,6 +1275,9 @@ define([
             this.endToolheadOperation           = endToolheadOperation;
             this.endLoadingDuringPause          = endLoadingDuringPause;
             this.setHeadTemperatureDuringPause  = setHeadTemperatureDuringPause;
+            this.runMovementTests               = runMovementTests;
+            this.getDeviceBySerial              = getDeviceBySerial;
+            this.getAvailableDevices            = getAvailableDevices;
 
             Discover(
                 'device-master',
@@ -1208,6 +1286,8 @@ define([
                     devices.forEach(d => {
                         _deviceNameMap[d.name] = d;
                     });
+                    _devices = devices;
+                    // console.log('devices', _devices);
                     _scanDeviceError(devices);
 
                 }

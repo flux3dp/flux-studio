@@ -9,6 +9,7 @@ define([
     'app/actions/alert-actions',
     'app/stores/alert-store',
     'app/actions/progress-actions',
+    'app/constants/progress-constants',
     'app/version-requirement',
     'helpers/firmware-version-checker'
 ], function(
@@ -19,6 +20,7 @@ define([
     AlertActions,
     AlertStore,
     ProgressActions,
+    ProgressConstants,
     Requirement,
     FirmwareVersionChecker
 ) {
@@ -26,7 +28,7 @@ define([
 
     var lang = i18n.get();
 
-    return function(printer, bypassPause) {
+    return function(printer, allowPause, forceAbort) {
         if(!printer) { return; }
         var deferred = $.Deferred(),
             onYes = function(id) {
@@ -40,6 +42,7 @@ define([
                         });
                         break;
                     case 'abort':
+                        ProgressActions.open(ProgressConstants.NONSTOP);
                         DeviceMaster.stop().then(function() {
                             timer = setInterval(function() {
                                 DeviceMaster.getReport().then(function(report) {
@@ -50,6 +53,7 @@ define([
                                     }
                                     else if(report.st_id === DeviceConstants.status.IDLE) {
                                         clearInterval(timer);
+                                        ProgressActions.close();
                                         deferred.resolve('ok', report.st_id);
                                     }
                                 });
@@ -66,8 +70,7 @@ define([
             AlertStore.removeYesListener(onYes);
         });
 
-        let go = (metVersion) => {
-            switch (printer.st_id) {
+        switch (printer.st_id) {
             // null for simulate
             case null:
             // null for not found default device
@@ -98,29 +101,30 @@ define([
             case DeviceConstants.status.PAUSED:
             case DeviceConstants.status.PAUSED_FROM_STARTING:
             case DeviceConstants.status.PAUSED_FROM_RUNNING:
-                if(metVersion) {
+            case DeviceConstants.status.PAUSING_FROM_STARTING:
+            case DeviceConstants.status.PAUSING_FROM_RUNNING:
+                if(allowPause) {
                     deferred.resolve('ok', printer.st_id);
                 }
                 else {
                     // ask for abort
                     ProgressActions.close();
-                    AlertActions.showPopupYesNo('abort', lang.message.device_is_used);
-                    AlertStore.onYes(onYes);
+                    if (forceAbort) {
+                        AlertStore.onYes(onYes);
+                        onYes('abort');
+                    } else {
+                        AlertActions.showPopupYesNo('abort', lang.message.device_is_used);
+                        AlertStore.onYes(onYes);
+                    }
                 }
                 break;
             default:
                 // device busy
+                console.log('Device Busy ', printer.st_id);
                 ProgressActions.close();
                 AlertActions.showDeviceBusyPopup('on-select-printer');
                 break;
-            }
-        };
-
-        FirmwareVersionChecker(printer, Requirement.operateDuringPauseRequiredVersion)
-        .then((metVersion) => {
-            console.log('met version from check-device-status', metVersion);
-            go(metVersion);
-        });
+        }
 
         return deferred.promise();
     };

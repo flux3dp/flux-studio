@@ -276,7 +276,7 @@ define([
 
                 const isAborted = (response) => {
                     response.device_status = response.device_status || {};
-                    return response.device_status.st_id === 128;
+                    return response.device_status.st_id === 128 || response.device_status === 0;
                 };
 
                 const retry = (needsQuit) => {
@@ -289,6 +289,17 @@ define([
                 events.onMessage = (response) => {
                     if(counter >= 3) {
                         console.log('tried 3 times');
+                        if(response.cmd === 'play report') {
+                            switch(response.device_status.st_id) {
+                                case 0:
+                                    d.resolve();
+                                    break;
+                                case 64:
+                                    ws.send('play quit');
+                                    break;
+                            }
+                        }
+
                         d.reject(response);
                     }
                     isAborted(response) ? d.resolve() : retry(response.status !== 'ok');

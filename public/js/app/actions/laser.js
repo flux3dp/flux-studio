@@ -50,7 +50,7 @@ define([
         args = args || {};
 
         var self = this,    // react component
-            IMAGE_REAL_RATIO = 4.72, // 1mm = 4.72px
+            IMAGE_REAL_RATIO = 4.7244094488, // 1mm = 4.72px
             DIAMETER = 170,    // 170mm
             ACCEPTABLE_MIN_SIZE = 1, // width * height > 1
             bitmapWebSocket,
@@ -376,7 +376,7 @@ define([
                         height: round(el_position.height * DIAMETER / PLATFORM_DIAMETER_PIXEL, -2)
                     };
                     angle = elementAngle($el[0]);
-                    threshold = $el.data('threshold') || 128;
+                    threshold = $el.data('threshold') || 255;
 
                     if ('scale' === e.freetransEventType) {
                         refreshImage($el, threshold);
@@ -449,7 +449,7 @@ define([
                                     br_position_x: convertToRealCoordinate(bottom_right.x, 'x'),
                                     br_position_y: convertToRealCoordinate(bottom_right.y, 'y'),
                                     rotate: (Math.PI * elementAngle(el) / 180) * -1,
-                                    threshold: $img.data('threshold') || 128
+                                    threshold: $img.data('threshold') || 255
                                 },
                                 grayscaleOpts = {
                                     is_svg: ('svg' === self.state.fileFormat),
@@ -627,7 +627,7 @@ define([
                 grayscale: {
                     is_rgba: true,
                     is_shading: self.refs.setupPanel.isShading(),
-                    threshold: 128,
+                    threshold: 255,
                     is_svg: ('svg' === self.state.fileFormat)
                 },
                 onComplete: function(result) {
@@ -725,7 +725,9 @@ define([
                             fileName = self.state.images[0].name.split('.').slice(0, -1).join(''),
                             fullName = fileName + '.' + extension;
 
+                        ProgressActions.close();
                         saveAs(blob, fullName);
+
                     },
                     ProgressConstants.STEPPING,
                     fileMode || '-f'

@@ -42,6 +42,7 @@ define([
                     // if port has been opened
                     if(response.error.join('') === 'RESOURCE_BUSY') {
                         usbConnected = true;
+                        console.log('usb connected and opened!');
                         callback(availableUsbChannel);
                     }
                     else if(!hasError) {
@@ -52,7 +53,7 @@ define([
                 if(response.devopen) {
                     availableUsbChannel = response.devopen;
                     usbConnected = true;
-                    initialize = true;
+                    initialized = true;
                     callback(availableUsbChannel);
                 }
             }

@@ -23,7 +23,9 @@ define([
     'helpers/firmware-updater',
     'helpers/device-list',
     'helpers/api/3d-scan-control',
-    'helpers/api/cloud'
+    'helpers/api/cloud',
+    'app/version-requirement',
+    'helpers/firmware-version-checker'
 ], function(
     gui,
     menuMap,
@@ -46,7 +48,9 @@ define([
     firmwareUpdater,
     DeviceList,
     ScanControl,
-    CloudApi
+    CloudApi,
+    Requirement,
+    FirmwareVersionChecker
 ) {
     'use strict';
 
@@ -327,48 +331,57 @@ define([
     if (true === window.FLUX.isNW) {
         createDevice = function(printer) {
             var subItems = [],
-                showPopup = function(currentPrinter, type) {
-                    checkDeviceStatus(currentPrinter).done(function(status) {
-                        switch (status) {
-                        case 'ok':
-                            if(type === 'SET_TEMPERATURE') {
-                                AlertActions.showHeadTemperature(currentPrinter);
-                            }
-                            else {
-                                AlertActions.showChangeFilament(currentPrinter);
-                            }
-                            break;
-                        case 'auth':
-                            var opts = {
-                                onSuccess: function() {
-                                    AlertActions.showChangeFilament(currentPrinter);
-                                },
-                                onError: function() {
-                                    InputLightboxActions.open('auth-device', {
-                                        type         : InputLightboxConstants.TYPE_PASSWORD,
-                                        caption      : lang.select_printer.notification,
-                                        inputHeader  : lang.select_printer.please_enter_password,
-                                        confirmText  : lang.select_printer.submit,
-                                        onSubmit     : function(password) {
-                                            _auth(printer.uuid, password, {
-                                                onError: function(response) {
-                                                    var message = (
-                                                        false === response.reachable ?
-                                                        lang.select_printer.unable_to_connect :
-                                                        lang.select_printer.auth_failure
-                                                    );
-                                                    AlertActions.showPopupError('device-auth-fail', message);
-                                                }
-                                            });
-                                        }
-                                    });
-                                }
-                            };
-                            _auth(currentPrinter.uuid, '', opts);
-                            break;
+                showPopup;
+
+            // type = CHANGE_FILAMENT || SET_TEMPERATURE
+            showPopup = (currentPrinter, type) => {
+
+                FirmwareVersionChecker(printer, Requirement.operateDuringPauseRequiredVersion)
+                .then((allowPause) => {
+                    return checkDeviceStatus(currentPrinter, allowPause);
+                })
+                .done((status) => {
+                    switch (status) {
+                    case 'ok':
+                        if(type === 'SET_TEMPERATURE') {
+                            AlertActions.showHeadTemperature(currentPrinter);
                         }
-                    });
-                };
+                        else {
+                            AlertActions.showChangeFilament(currentPrinter);
+                        }
+                        break;
+                    case 'auth':
+                        let callback = {
+                            onSuccess: function() {
+                                AlertActions.showChangeFilament(currentPrinter);
+                            },
+                            onError: function() {
+                                InputLightboxActions.open('auth-device', {
+                                    type         : InputLightboxConstants.TYPE_PASSWORD,
+                                    caption      : lang.select_printer.notification,
+                                    inputHeader  : lang.select_printer.please_enter_password,
+                                    confirmText  : lang.select_printer.submit,
+                                    onSubmit     : function(password) {
+                                        _auth(printer.uuid, password, {
+                                            onError: function(response) {
+                                                var message = (
+                                                    false === response.reachable ?
+                                                    lang.select_printer.unable_to_connect :
+                                                    lang.select_printer.auth_failure
+                                                );
+                                                AlertActions.showPopupError('device-auth-fail', message);
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+                        };
+                        _auth(currentPrinter.uuid, '', callback);
+                        break;
+                    }
+                });
+
+            };
 
             defaultDevice = initializeMachine.defaultPrinter.get();
 
@@ -423,7 +436,7 @@ define([
 
                     DeviceMaster.selectDevice(currentPrinter).then(function(status) {
                         if (status === DeviceConstants.CONNECTED) {
-                            showPopup(currentPrinter);
+                            showPopup(currentPrinter, 'CHANGE_FILAMENT');
                         }
                         else if (status === DeviceConstants.TIMEOUT) {
                             AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);

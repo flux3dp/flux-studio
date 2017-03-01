@@ -2695,8 +2695,8 @@ hr {
     background: -webkit-linear-gradient(left, #ffffff 10%, rgba(255, 255, 255, 0) 42%);
     background: linear-gradient(to right, #ffffff 10%, rgba(255, 255, 255, 0) 42%);
     position: relative;
-    -webkit-animation: load3 1s infinite linear;
-    animation: load3 1s infinite linear;
+    -webkit-animation: load3 0.5s infinite linear;
+    animation: load3 0.5s infinite linear;
     -webkit-transform: translateZ(0);
     transform: translateZ(0); }
     .spinner-roller:before {
@@ -3349,8 +3349,8 @@ hr {
     width: 4rem; }
 
 .modal-progress-nonstop .modal-body {
-    width: 130px;
-    height: 120px; }
+    width: 160px;
+    height: 160px; }
 
 .modal-progress-nonstop .modal-alert {
     height: 8rem;
@@ -3988,13 +3988,14 @@ hr {
             .flux-monitor .main .title .back:hover {
                 color: #333; }
             .flux-monitor .main .title .close {
-                width: 28px;
-                height: 28px;
-                right: 20px;
-                top: 12px; }
+                width: 26px;
+                height: 26px;
+                right: 18px;
+                top: 10px; }
         .flux-monitor .main .body {
             height: 70%; }
             .flux-monitor .main .body .device-content {
+                position: relative;
                 padding: 0 20px;
                 overflow-y: auto;
                 height: 100%; }
@@ -4063,7 +4064,7 @@ hr {
                     position: absolute;
                     width: 332px;
                     height: 100px;
-                    bottom: 84px;
+                    bottom: 0px;
                     padding: 35px 10px 10px 10px;
                     text-shadow: 0 2px 5px rgba(0, 0, 0, 0.15); }
                     .flux-monitor .main .body .device-content .status-info .verticle-align {
@@ -4081,6 +4082,16 @@ hr {
                         color: #FFF; }
                 .flux-monitor .main .body .device-content .status-info.running {
                     background: linear-gradient(transparent, rgba(0, 0, 0, 0.5)); }
+                .flux-monitor .main .body .device-content .btn-snap {
+                    position: absolute;
+                    top: 10px;
+                    right: 28px;
+                    opacity: 0.5;
+                    color: white;
+                    cursor: pointer;
+                    z-index: 10; }
+                    .flux-monitor .main .body .device-content .btn-snap:hover {
+                        opacity: 1; }
             .flux-monitor .main .body .close {
                 right: 20px; }
         .flux-monitor .main .operation {
@@ -4959,10 +4970,10 @@ input.switch:checked ~ label:after {
 
 .close {
     cursor: pointer;
-    height: 32px;
-    opacity: 0.3;
+    height: 25px;
+    opacity: 0.5;
     position: absolute;
-    width: 32px; }
+    width: 25px; }
 
 .close:hover {
     opacity: 1; }
@@ -4970,10 +4981,10 @@ input.switch:checked ~ label:after {
 .close:before, .close:after {
     background-color: #333;
     content: ' ';
-    height: 33px;
+    height: 25px;
     left: 15px;
     position: absolute;
-    width: 2px; }
+    width: 2.5px; }
 
 .close:before {
     transform: rotate(45deg); }
