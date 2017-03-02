@@ -9,7 +9,8 @@ define([
     'helpers/version-checker',
     'jsx!widgets/Dropdown-Control',
     'jsx!widgets/Radio-Control',
-    'jsx!widgets/Checkbox-Control'
+    'jsx!widgets/Checkbox-Control',
+    'helpers/firmware-version-checker'
 ], function(
     $,
     React,
@@ -21,7 +22,8 @@ define([
     VersionChecker,
     DropdownControl,
     RadioControl,
-    CheckboxControl
+    CheckboxControl,
+    FirmwareVersionChecker
 ) {
     'use strict';
 
@@ -37,13 +39,28 @@ define([
         getInitialState: function() {
             return {
                 config: {},
-                showBacklash: false
+                showBacklash: false,
+                postbackUrl: 'http://your-domain/flux-status-changed?st_id=%(st_id)',
             };
+        },
+
+        componentWillMount: function() {
+            this.devices = [];
         },
 
         componentDidMount: function() {
             this.t = setInterval(() => {
-                this.forceUpdate();
+                let d = DeviceMaster.getAvailableDevices();
+
+                if(this.devices.length !== d.length) {
+                    this.devices = [];
+                    this.forceUpdate(() => {
+                        this.devices = d;
+                        this.setState({
+                            config: {}
+                        });
+                    });
+                }
             }, 3000);
         },
 
@@ -56,7 +73,7 @@ define([
                 this.setState({ config: {} });
                 return;
             }
-            clearTimeout(this.t);
+            // clearTimeout(this.t);
             let usingUSB = deviceName.indexOf('(USB)') !== -1;
             this._getDeviceConfig(deviceName.replace(' (USB)', ''), usingUSB);
         },
@@ -114,15 +131,21 @@ define([
             }
         },
 
+        _updatePostBackUrl: function(e) {
+            let url = e.target.value || this.getInitialState().postbackUrl;
+            this.setState({ postbackUrl: url });
+            if(e.type === 'blur') {
+                DeviceMaster.setDeviceSetting('player_postback_url', url);
+            }
+        },
+
         _getDeviceList: function() {
-            let devices = DeviceMaster.getAvailableDevices(),
-                nameList,
+            let nameList,
                 { lang } = this.props;
 
-            nameList = devices.map(d => {
+            nameList = this.devices.map(d => {
                 return d.source === 'h2h' ? `${d.name} (USB)` : d.name;
             });
-            this.devices = devices;
 
             if(nameList.length === 0) {
                 return (
@@ -139,6 +162,8 @@ define([
                     onChange={this._handleDeviceChange}
                     options={nameList}/>
             );
+
+
         },
 
         _getDeviceConfig: function(deviceName, usingUSB) {
@@ -173,18 +198,18 @@ define([
                 return a;
             })[0];
 
-            DeviceMaster.selectDevice(device).then(() => {
-                return DeviceMaster.getDeviceInfo();
-            }).then((deviceInfo) => {
-                // using backlash feature requires firmware 1.5b12+
-                let vc = VersionChecker(deviceInfo.version),
-                    backlashAllowed = vc.meetVersion('1.5b12') || vc.meetVersion('1.6.4');
+            this.setState({ device });
 
-                this.setState({ showBacklash: backlashAllowed });
-                return DeviceMaster.getDeviceSettings(backlashAllowed);
+            FirmwareVersionChecker.check(device, 'UPGRADE_KIT_PROFILE_SETTING').then(allowUpgradeKit => {
+                allowUpgradeKit = allowUpgradeKit && device.model === 'delta-1';
+                this.setState({ allowUpgradeKit });
+                this.allowUpgradeKit = allowUpgradeKit;
+                return FirmwareVersionChecker.check(device, 'BACKLASH');
+            }).then((allowBacklash) => {
+                this.setState({ showBacklash: allowBacklash });
+                return DeviceMaster.getDeviceSettings(allowBacklash, this.allowUpgradeKit);
             }).then((config) => {
                 config.head_error_level = config.head_error_level ? mapNumberToTypeArray(parseInt(config.head_error_level)) : null;
-                console.log(config.head_error_level);
                 this.setState({ config });
 
                 if(config['backlash']) {
@@ -374,6 +399,91 @@ define([
             return (this.state.showBacklash && Object.keys(this.state.config).length > 0) ? content : '';
         },
 
+        _renderCamera: function() {
+            if(this.state.allowUpgradeKit) {
+                let { lang } = this.props,
+                    options,
+                    content;
+
+                options = [
+                    { id: '0', name: lang.device.disable},
+                    { id: '1', name: lang.device.enable}
+                ];
+
+                content = (
+                    <div className="controls">
+                        <div className="label">{lang.device.plus_camera}</div>
+                        <RadioControl
+                            id="camera_version"
+                            options={options}
+                            default={this.state.config['camera_version'] || '0'}
+                            onChange={this._handleComponentValueChange}
+                        />
+                    </div>
+                );
+
+                return Object.keys(this.state.config).length > 0 ? content : '';
+            }
+            else {
+                return (<div></div>);
+            }
+        },
+
+        _renderPlusExtrusion: function() {
+            if(this.state.allowUpgradeKit) {
+                let { lang } = this.props,
+                    options,
+                    content;
+
+                options = [
+                    { id: 'N', name: lang.device.disable},
+                    { id: 'Y', name: lang.device.enable}
+                ];
+
+                content = (
+                    <div className="controls">
+                        <div className="label">{lang.device.plus_extrusion}</div>
+                        <RadioControl
+                            id="plus_extrusion"
+                            options={options}
+                            default={this.state.config['plus_extrusion'] || 'N'}
+                            onChange={this._handleComponentValueChange}
+                        />
+                    </div>
+                );
+
+                return Object.keys(this.state.config).length > 0 ? content : '';
+            }
+            else {
+                return (<div></div>);
+            }
+        },
+
+        _renderPlayerPostBack: function() {
+            if(this.state.allowUpgradeKit) {
+                let { lang } = this.props,
+                    content;
+
+                content = (
+                    <div className="controls">
+                        <div className="label">{lang.device.postback_url}</div>
+                        <input
+                            className="url"
+                            id="player_postback_url"
+                            value={this.state.postbackUrl}
+                            onChange={this._updatePostBackUrl}
+                            onBlur={this._updatePostBackUrl}
+                        />
+                    </div>
+                );
+
+                return Object.keys(this.state.config).length > 0 ? content : '';
+            }
+            else {
+                return (<div></div>);
+            }
+        },
+
         render : function() {
             let deviceList      = this._getDeviceList(),
                 correction      = this._renderCorrectionSetting(),
@@ -382,7 +492,10 @@ define([
                 autoResume      = this._renderAutoResumeSetting(),
                 broadcast       = this._renderBroadcast(),
                 cloud           = this._renderEnableCloud(),
-                backlash        = this._renderBackLash();
+                backlash        = this._renderBackLash(),
+                camera          = this._renderCamera(),
+                plusExtrusion   = this._renderPlusExtrusion(),
+                playerPostBack  = this._renderPlayerPostBack();
 
             return (
                 <div className="form general">
@@ -394,6 +507,9 @@ define([
                     {broadcast}
                     {cloud}
                     {backlash}
+                    {camera}
+                    {plusExtrusion}
+                    {playerPostBack}
                 </div>
             );
         }

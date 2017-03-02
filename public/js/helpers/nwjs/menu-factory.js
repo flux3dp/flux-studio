@@ -24,7 +24,6 @@ define([
     'helpers/device-list',
     'helpers/api/3d-scan-control',
     'helpers/api/cloud',
-    'app/version-requirement',
     'helpers/firmware-version-checker'
 ], function(
     gui,
@@ -49,7 +48,6 @@ define([
     DeviceList,
     ScanControl,
     CloudApi,
-    Requirement,
     FirmwareVersionChecker
 ) {
     'use strict';
@@ -336,7 +334,7 @@ define([
             // type = CHANGE_FILAMENT || SET_TEMPERATURE
             showPopup = (currentPrinter, type) => {
 
-                FirmwareVersionChecker(printer, Requirement.operateDuringPauseRequiredVersion)
+                FirmwareVersionChecker.check(printer, 'OPERATE_DURING_PAUSE')
                 .then((allowPause) => {
                     return checkDeviceStatus(currentPrinter, allowPause);
                 })

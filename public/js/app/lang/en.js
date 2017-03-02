@@ -111,8 +111,7 @@ define(function() {
                 movement_tests_complete: 'Movement tests completed',
                 movement_tests_failed: 'Movement tests failed, make sure the toolhead cable is stretched correctly.',
                 finish: 'FINISH',
-                cancel: 'CANCEL',
-                turn_on_head_temperature: 'Set toolhead temperature'
+                cancel: 'CANCEL'
             },
             window: {
                 label: 'Window',
@@ -971,7 +970,13 @@ define(function() {
                 A: 'Active',
                 N: 'No'
             },
-            backlash: 'Geometric Error Correction'
+            backlash: 'Geometric Error Correction',
+            turn_on_head_temperature: 'Set toolhead temperature',
+            plus_camera: 'Upgrade Kits Camera',
+            plus_extrusion: 'Upgrade Kits Extruder',
+            postback_url: 'Status callback URL',
+            disable: 'Disable',
+            enable: 'Enable'
         },
         monitor: {
             change_filament                     : 'CHANGE FILAMENT',

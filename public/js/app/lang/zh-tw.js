@@ -111,8 +111,7 @@ define(function() {
                 movement_tests_complete: '運動測試完成',
                 movement_tests_failed: '運動測試失敗，請確認模組傳輸線有被拉直',
                 finish: '完成',
-                cancel: '取消',
-                turn_on_head_temperature: '開啟噴頭溫度'
+                cancel: '取消'
             },
             window: {
                 label: '視窗',
@@ -985,7 +984,13 @@ define(function() {
                 A: '開啟',
                 N: '關閉'
             },
-            backlash: '路徑幾何誤差補正'
+            backlash: '路徑幾何誤差補正',
+            turn_on_head_temperature: '開啟噴頭溫度',
+            plus_camera: '升級包鏡頭',
+            plus_extrusion: '升級包擠出馬達',
+            postback_url: '狀態回傳URL',
+            disable: '關閉',
+            enable: '開啟'
         },
         monitor: {
             change_filament                     : 'CHANGE FILLAMENT',
