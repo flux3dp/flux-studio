@@ -986,7 +986,13 @@ define(function() {
                 A: '開啟',
                 N: '關閉'
             },
-            backlash: '路徑幾何誤差補正'
+            backlash: '路徑幾何誤差補正',
+            turn_on_head_temperature: '開啟噴頭溫度',
+            plus_camera: '升級包鏡頭',
+            plus_extrusion: '升級包擠出馬達',
+            postback_url: '狀態回傳URL',
+            disable: '關閉',
+            enable: '開啟'
         },
         monitor: {
             change_filament                     : 'CHANGE FILLAMENT',

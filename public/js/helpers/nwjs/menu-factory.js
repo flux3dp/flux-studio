@@ -338,7 +338,7 @@ define([
             // type = CHANGE_FILAMENT || SET_TEMPERATURE
             showPopup = (currentPrinter, type) => {
 
-                FirmwareVersionChecker(printer, Requirement.operateDuringPauseRequiredVersion)
+                FirmwareVersionChecker.check(printer, 'OPERATE_DURING_PAUSE')
                 .then((allowPause) => {
                     return checkDeviceStatus(currentPrinter, allowPause);
                 })

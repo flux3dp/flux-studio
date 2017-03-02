@@ -9,8 +9,6 @@ define([
     'app/constants/device-constants',
     'app/actions/alert-actions',
     'app/stores/alert-store',
-    'helpers/firmware-version-checker',
-    'app/version-requirement',
     'helpers/device-error-handler',
     'helpers/check-device-status'
 ], function(
@@ -24,8 +22,6 @@ define([
     DeviceConstants,
     AlertActions,
     AlertStore,
-    FirmwareVersionChecker,
-    Requirement,
     DeviceErrorHandler,
     CheckDeviceStatus
 ) {

@@ -141,7 +141,7 @@ define([
 
                     if (response.status.toUpperCase() === DeviceConstants.CONNECTED) {
                         d.resolve(DeviceConstants.CONNECTED);
-                        _devices.push(_device);
+                        // _devices.push(_device);
                     }
                 },
                 onError: function(response) {
@@ -1048,13 +1048,22 @@ define([
         return _devices;
     }
 
-    function getDeviceSettings(withBacklash) {
+    function getDeviceSettings(withBacklash, withUpgradeKit) {
         let d = $.Deferred(),
             settings = {},
             _settings = ['correction', 'filament_detect', 'head_error_level', 'autoresume', 'broadcast', 'enable_cloud'];
 
         if(withBacklash === true) {
             _settings.push('backlash');
+        }
+
+        if(withUpgradeKit) {
+            _settings = [
+                ..._settings,
+                'camera_version',
+                'plus_extrusion',
+                'player_postback_url'
+            ];
         }
 
         const worker = function*() {
