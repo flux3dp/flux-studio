@@ -18,7 +18,7 @@ define(function() {
             }
         },
 
-        default_engine: 'cura',
+        default_engine: 'cura2',
 
         print_config: {
             color_border_out_side: 0xFF0000,

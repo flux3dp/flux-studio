@@ -388,6 +388,7 @@ define(function() {
                 slicingEngine: 'Slicing Engine',
                 slic3r: 'Slic3r',
                 cura: 'Cura',
+                cura2: 'Cura2',
                 filament: 'Filament',
                 temperature: 'Temperature',
                 detect_filament_runout: 'Filament Detection',
