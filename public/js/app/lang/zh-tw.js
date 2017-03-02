@@ -1237,7 +1237,8 @@ define(function() {
                 '13': '切片:: 重制錯誤，複製原始ID不存在，需重啟 FLUX Studio',
                 '14': '切片:: 無法設定物件位置及相關資訊，需重啟 FLUX Studio',
                 '15': '切片:: 模型檔案內容無法解析',
-                '16': '切片:: 切片引擎異常結束，建議調整設定'
+                '16': '切片:: 切片引擎異常結束，建議調整設定',
+                '1006': 'WS 已被強制關閉, 請於menu上方取得錯誤回報，寄送回FLUX'
             },
             pattern_not_supported_at_100_percent_infill: 'Slic3r 的 rectilinear 填充圖樣只支援 100% 的填充密度'
         },

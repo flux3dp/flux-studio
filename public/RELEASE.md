@@ -1,3 +1,43 @@
+# FLUX Studio 0.7.0 Change log
+
+### New Features
+
+-   Supports direct USB connection for FLUX Delta+ and Upgrade Kits
+-   Supports HD camera for FLUX Delta+ and Upgrade Kits
+-   Supports CuraEngine 2.4 ( You can disable it by setting cura2 = 0 )
+-   Parameter "xy_size_compensation" now works with CuraEngine 2.4, which might alter the size of your printing results.
+-   Allows changing filaments in pausing state
+-   Allows changing toolhead temperature in pausing state
+-   Device list will now indicate the type of connection
+-   Supports switching machine profile for Delta+
+-   Adds scale inputs in object properties dialog
+-   Adds a snapshot button in camera monitoring interface
+-   Adds a height offset parameter to engraving interface
+-   Adds a built-in calibration image in laser advanced-settings
+-   The new default skirt will circle the work area
+
+### Bug Fixes
+
+-   Fixed the software being unable to cancel load filament in the tutorial
+-   Fixed "changing filaments, updating firmware" features for machines in completed / aborted status
+-   Fixed displaying the button for removing laser background
+-   Fixed object border not being synced after resize or duplicating in printing interface
+-   Fixed task thumbnails scaling ratio
+-   Fixed the masking of out-ranged engraving image
+-   Fixed raft interface printing temperature is too high
+-   Fixed the power setting for bitmap engraving, now it's working
+
+### Change
+
+-   New default printing parameters
+-   Rename all "device" and "Delta" into "machine" and "the machine"
+-   Move configuration reset button into preferences interface
+-   Display device model name in Machine Info
+
+### Other Improvements
+
+- Adds new tutorial guiding images for FLUX Delta+ / Upgrade Kits
+
 # FLUX Studio 0.6.3 Change log (20170124)
 
 ### New Feature
