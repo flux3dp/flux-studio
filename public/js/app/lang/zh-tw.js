@@ -402,6 +402,7 @@ define(function() {
                 slicingEngine: '切片引擎',
                 slic3r: 'Slic3r',
                 cura: 'Cura',
+                cura2: 'Cura2',
                 filament: '線料',
                 temperature: '溫度',
                 detect_filament_runout: '偵測線料',

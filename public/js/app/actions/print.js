@@ -1350,9 +1350,16 @@ define([
     }
 
     function setAdvanceParameter(settings) {
-        let deferred = $.Deferred();
-
-        sliceMaster.addTask('setParameter', 'advancedSettings', settings.custom).then(() => {
+        let deferred = $.Deferred(),
+            updateTask = null;
+        switch(settings.engine) {
+            case 'cura2':
+                updateTask = sliceMaster.addTask('setParameter', 'advancedSettingsCura2', settings.customCura2);
+                break;
+            default:
+                updateTask = sliceMaster.addTask('setParameter', 'advancedSettings', settings.custom);
+        }
+        updateTask.then(() => {
             Object.assign(fullSliceParameters.settings, settings);
             slicingStatus.showProgress = false;
             if(objects.length > 0) {
