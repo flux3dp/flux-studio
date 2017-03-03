@@ -24,7 +24,6 @@ define([
     'helpers/device-list',
     'helpers/api/3d-scan-control',
     'helpers/api/cloud',
-    'app/version-requirement',
     'helpers/firmware-version-checker',
     'helpers/device-error-handler'
 ], function(
@@ -50,7 +49,6 @@ define([
     DeviceList,
     ScanControl,
     CloudApi,
-    Requirement,
     FirmwareVersionChecker,
     DeviceErrorHandler
 ) {
