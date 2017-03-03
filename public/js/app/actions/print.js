@@ -2862,6 +2862,7 @@ define([
                 d.resolve();
             }).fail((error) => {
                 processSlicerError(error);
+                d.reject(error);
             });
         });
 

@@ -111,7 +111,7 @@ define([
                     var _settings            = Config().read('advanced-settings'),
                         tutorialFinished    = Config().read('tutorial-finished'),
                         configuredPrinter   = Config().read('configured-printer');
-                        
+
                     this._checkDefaultPrintSettingsVersion();
 
                     if (!_settings) {
@@ -181,7 +181,7 @@ define([
 
                     // prevent user to operate before settings are set
                     this.showSpinner();
-                    this._handleApplyAdvancedSetting().then(() => {
+                    this._handleApplyAdvancedSetting().always(() => {
                         this.hideSpinner();
                     });
 
@@ -535,7 +535,7 @@ define([
                             raftOn: isOn
                         });
                     }.bind(this));
-                    
+
                     advancedSettings.set('raft', isOn ? 1 : 0, true);
 
                     this._saveSetting();
@@ -618,7 +618,7 @@ define([
                 _handleApplyAdvancedSetting: function(setting) {
                     let d = $.Deferred(), quality = 'custom';
                     advancedSettings.load(setting || {}, true);
-                    console.log("_____", "After applied ", advancedSettings);
+                    console.log('_____', 'After applied ', advancedSettings);
                     // remove old properties
                     delete advancedSettings.raft_on;
 
@@ -627,7 +627,9 @@ define([
                     ['high', 'med', 'low'].forEach((q) => {
                         // Do comparsion with default settings
                         let params = DefaultPrintSettings[this.state.model][q];
-                        for(var i in params) { if(params[i] != advancedSettings[i]) return; }
+                        for(var i in params) {
+                            if(params[i] !== advancedSettings[i]) { return; }
+                        }
                         // No difference then quality equals q
                         quality = q;
                     });
@@ -644,7 +646,6 @@ define([
                             director.setAdvanceParameter(advancedSettings.deepClone()).then(() => {
                                 Object.assign(fineAdvancedSettings, advancedSettings);
                                 advancedSettings.engine = advancedSettings.engine || defaultSlicingEngine;
-                                
                             }).fail(() => {
                                 advancedSettings.load(fineAdvancedSettings);
                                 director.setAdvanceParameter(advancedSettings);
@@ -652,15 +653,19 @@ define([
                             }).always(() => {
                                 d.resolve();
                             });
-                        }
+                        };
 
                         if(advancedSettings.engine !== 'slic3r') {
-                            this._handleSlicingEngineChange(advancedSettings.engine).then(uploadSettings);
+                            this._handleSlicingEngineChange(advancedSettings.engine)
+                            .then(uploadSettings)
+                            .fail(() => {
+                                d.reject();
+                            });
                         } else {
-                            uploadSettings()
+                            uploadSettings();
                         }
                     }
-                    
+
                     else {
                         this._handleSlicingEngineChange(advancedSettings.engine).then(() => {
                             director.setAdvanceParameter(advancedSettings).then(() => {
@@ -924,10 +929,14 @@ define([
                     };
 
                     director.changeEngine(engineName).then((error) => {
+                        console.log('error is', error);
                         if(error) {
                             setDefaultEngine(error);
                         }
                         d.resolve();
+                    }).fail((error) => {
+                        setDefaultEngine(error);
+                        d.reject(error);
                     });
 
                     return d.promise();
