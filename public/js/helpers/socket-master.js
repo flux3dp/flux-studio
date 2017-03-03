@@ -38,7 +38,7 @@ define([
             let fnName = _task.command.split('@')[0],
                 mode = _task.command.split('@')[1];
 
-            if(mode == "maintain" && _ws.mode != 'maintain') {
+            if(mode === 'maintain' && _ws.mode !== 'maintain') {
               // Ensure maintain mode, if not then reject with "edge case" error
               _task.d.reject({status: 'error', error: ['EDGE_CASE', 'MODE_ERROR']});
             } else {
@@ -48,6 +48,11 @@ define([
 
         const runTaskFunction = (_task, fnName) => {
             // Do regular stuff
+            let t = setTimeout(() => {
+                _task.d.reject('TIMEOUT');
+                doNext();
+            }, 20 * 1000);
+
             _ws[fnName](..._task.args).then((result) => {
                 processing = false;
                 _task.d.resolve(result);
@@ -58,8 +63,10 @@ define([
                 processing = false;
                 _task.d.reject(result);
                 doNext();
+            }).always(() => {
+                clearTimeout(t);
             });
-        }
+        };
 
         const doNext = () => {
             _tasks.length > 0 ? doTask() : _task = null;
@@ -69,6 +76,7 @@ define([
 
         const clearTasks = () => {
             _tasks = [];
+            _task = null;
         };
 
         return {
