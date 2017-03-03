@@ -19,33 +19,41 @@ define([
 
                 if(hasAvailableChannel) {
                     // try to connect
-                    if(!usbConnected) {
-                        availableUsbChannel = Object.keys(response.h2h)[0];
+                    availableUsbChannel = Object.keys(response.h2h)[0];
+
+                    if (!response.h2h[availableUsbChannel]) {
+                        // Channel not connected
+                        usbConnected = false;
                         ws.send(`open ${availableUsbChannel}`);
+                    } else {
+                        // Connected, do nothing
+                        usbConnected = true;
                     }
+                
                 }
                 else {
                     // if usb is unplugged
                     if(usbConnected) {
                         availableUsbChannel = null;
                         usbConnected = false;
-                        callback(-1);
+                        callback(-1, hasError);
                     }
                     else if(!initialized) {
                         initialized = true;
-                        callback(-1);
+                        callback(-1, hasError);
                     }
                 }
             }
             else if(response.cmd === 'open') {
                 if(response.status === 'error') {
                     // if port has been opened
-                    if(response.error.join('') === 'RESOURCE_BUSY') {
+                    let error = response.error.join('');
+                    if(error === 'RESOURCE_BUSY') { // weird logic. need to fix
                         usbConnected = true;
                         console.log('usb connected and opened!');
-                        callback(availableUsbChannel);
-                    }
-                    else if(!hasError) {
+                        hasError = false;
+                        callback(availableUsbChannel, false);
+                    } else {
                         hasError = true;
                     }
                 }
@@ -54,7 +62,8 @@ define([
                     availableUsbChannel = response.devopen;
                     usbConnected = true;
                     initialized = true;
-                    callback(availableUsbChannel);
+                    hasError = false;
+                    callback(availableUsbChannel, false);
                 }
             }
         };

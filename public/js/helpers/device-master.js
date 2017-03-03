@@ -19,6 +19,7 @@ define([
     'helpers/api/camera',
     'helpers/api/simple-websocket',
     'helpers/socket-master',
+    'helpers/device-error-handler',
     'helpers/array-findindex'
 ], function(
     $,
@@ -40,7 +41,8 @@ define([
     DeviceList,
     Camera,
     SimpleWebsocket,
-    Sm
+    Sm,
+    DeviceErrorHandler
 ) {
     'use strict';
 
@@ -59,7 +61,22 @@ define([
         _errors = {},
         availableUsbChannel = -1,
         usbEventListeners = {};
+    
+    // Better select device
+    function select(device, opts) {
+        let d = $.Deferred();
+        selectDevice(device).then((result) => {
+            if (result == DeviceConstants.CONNECTED) {
+                d.resolve();
+            } else {
+                d.reject();
+            }
+        });
 
+        return d.promise();
+    }
+
+    // Deprecated!
     function selectDevice(device, deferred) {
         if (
             _selectedDevice &&
@@ -133,6 +150,7 @@ define([
                     response.error = response.error.replace(/^.*\:\s+(\w+)$/g, '$1');
                     switch (response.error.toUpperCase()) {
                     case DeviceConstants.TIMEOUT:
+                        // TODO d.reject, come on...
                         d.resolve(DeviceConstants.TIMEOUT);
                         break;
                     case DeviceConstants.AUTH_ERROR:
@@ -430,8 +448,12 @@ define([
         return _do(DeviceConstants.QUIT);
     }
 
-    function quitTask() {
-        return _do(DeviceConstants.QUIT_TASK);
+    function quitTask(mode) {
+        if (typeof mode == 'string') {
+            SocketMaster.addTask('quitTask@' + mode);
+        } else {
+            SocketMaster.addTask('quitTask');
+        }
     }
 
     function kick() {
@@ -604,7 +626,7 @@ define([
     function detectHead() {
         let d = $.Deferred();
 
-        SocketMaster.addTask('getHeadInfo').then((response) => {
+        SocketMaster.addTask('getHeadInfo@maintain').then((response) => {
             response.module ? d.resolve() : d.reject(response);
         }).fail(() => {
             d.reject();
@@ -666,7 +688,7 @@ define([
     }
 
     function headInfo() {
-        return SocketMaster.addTask('getHeadInfo');
+        return SocketMaster.addTask('getHeadInfo@maintain');
     }
 
     function closeConnection() {
@@ -799,25 +821,10 @@ define([
         let d = $.Deferred();
         let debug_data = {};
 
-        const processError = (error = {}) => {
-            let message = '';
-            if(error.status === 'error') {
-                message = lang.monitor[error.error.join('_')];
-            }
-            else if(error.info === DeviceConstants.RESOURCE_BUSY) {
-                message = lang.calibration.RESOURCE_BUSY;
-            }
-            else if(error.module === 'LASER') {
-                message = lang.calibration.extruderOnly;
-            }
-            else if(!error.module) {
-                message = lang.calibration.headMissing;
-            }
-            else {
-                message = error.error.join(' ');
-            }
-
-            AlertActions.showPopupError('device-busy', message);
+        const processError = (resp = {}) => {
+            if (resp.error[0] == "EDGE_CASE") return;
+            DeviceErrorHandler.processDeviceMasterResponse(resp);
+            AlertActions.showPopupError('device-busy', DeviceErrorHandler.translate(resp.error));
             SocketMaster.addTask('endMaintainMode');
         };
 
@@ -825,7 +832,7 @@ define([
             let _d = $.Deferred();
             SocketMaster.addTask('enterMaintainMode').then((response) => {
                 if(response.status === 'ok') {
-                    return SocketMaster.addTask('getHeadInfo');
+                    return SocketMaster.addTask('getHeadInfo@maintain');
                 }
                 else {
                     _d.reject(response);
@@ -850,7 +857,7 @@ define([
 
         const step2 = () => {
             let _d = $.Deferred();
-            SocketMaster.addTask('calibrate').then((response) => {
+            SocketMaster.addTask('calibrate@maintain').then((response) => {
                 debug_data = response.debug;
                 return SocketMaster.addTask('endMaintainMode');
             }).then(() => {
@@ -876,22 +883,9 @@ define([
     function home() {
         let d = $.Deferred();
 
-        const processError = (error = {}) => {
-            let message = '';
-            if(error.status === 'error') {
-                message = lang.monitor[error.error.join('_')];
-            }
-            else if(error.info === DeviceConstants.RESOURCE_BUSY) {
-                message = lang.calibration.RESOURCE_BUSY;
-            }
-            else if(!error.module) {
-                message = lang.calibration.headMissing;
-            }
-            else {
-                message = error.error.join(' ');
-            }
-
-            AlertActions.showPopupError('device-busy', message);
+        const processError = (resp = {}) => {
+            DeviceErrorHandler.processDeviceMasterResponse(resp);
+            AlertActions.showPopupError('device-busy', DeviceErrorHandler.translate(resp.error));
             SocketMaster.addTask('endMaintainMode');
         };
 
@@ -927,22 +921,9 @@ define([
     function cleanCalibration() {
         let d = $.Deferred();
 
-        const processError = (error = {}) => {
-            let message = '';
-            if(error.status === 'error') {
-                message = lang.monitor[error.error.join('_')];
-            }
-            else if(error.info === DeviceConstants.RESOURCE_BUSY) {
-                message = lang.calibration.RESOURCE_BUSY;
-            }
-            else if(!error.module) {
-                message = lang.calibration.headMissing;
-            }
-            else {
-                message = error.error.join(' ');
-            }
-
-            AlertActions.showPopupError('device-busy', message);
+        const processError = (resp = {}) => {
+            DeviceErrorHandler.processDeviceMasterResponse(resp);
+            AlertActions.showPopupError('device-busy', DeviceErrorHandler.translate(resp.error));
             SocketMaster.addTask('endMaintainMode');
         };
 
@@ -1236,6 +1217,7 @@ define([
 
     DeviceSingleton.prototype = {
         init: function() {
+            this.select                         = select;
             this.selectDevice                   = selectDevice;
             this.uploadToDirectory              = uploadToDirectory;
             this.go                             = go;

@@ -24,7 +24,8 @@ define([
     'helpers/device-list',
     'helpers/api/3d-scan-control',
     'helpers/api/cloud',
-    'helpers/firmware-version-checker'
+    'helpers/firmware-version-checker',
+    'helpers/device-error-handler'
 ], function(
     gui,
     menuMap,
@@ -48,7 +49,8 @@ define([
     DeviceList,
     ScanControl,
     CloudApi,
-    FirmwareVersionChecker
+    FirmwareVersionChecker,
+    DeviceErrorHandler
 ) {
     'use strict';
 
@@ -467,19 +469,15 @@ define([
                                     setTimeout(() => {
                                         AlertActions.showPopupInfo('calibrated', JSON.stringify(debug_message), lang.calibration.calibrated);
                                     }, 100);
-                                }).fail((error) => {
-                                    if(error.module === 'LASER') {
+                                }).fail((resp) => {
+                                    console.log('THe error', resp);
+                                    if (resp.error[0] === 'EDGE_CASE') { return; }
+                                    if (resp.module === 'LASER') {
                                         AlertActions.showPopupError('calibrate-fail', lang.calibration.extruderOnly);
                                     }
                                     else {
-                                        let message = '';
-                                        if(error.module === null) {
-                                            message = lang.monitor.HEAD_OFFLINE;
-                                        }
-                                        else {
-                                            message = error.error ? lang.monitor[error.error.join('_')] : lang.monitor[error.join('_')];
-                                        }
-                                        AlertActions.showPopupError('calibrate-fail', message || error.error.join(' '));
+                                        DeviceErrorHandler.processDeviceMasterResponse(resp);
+                                        AlertActions.showPopupError('calibrate-fail', DeviceErrorHandler.translate(resp.error));
                                     }
                                 }).always(() => {
                                     ProgressActions.close();
@@ -501,23 +499,22 @@ define([
                         enabled: true,
                         onClick: function() {
                             var currentPrinter = discoverMethods.getLatestPrinter(printer);
-                            DeviceMaster.selectDevice(currentPrinter).then((status) => {
-                                if (status === DeviceConstants.CONNECTED) {
-                                    checkDeviceStatus(currentPrinter).then(() => {
-                                        ProgressActions.open(ProgressConstants.NONSTOP);
-                                        DeviceMaster.home().done(() => {
-                                            ProgressActions.close();
-                                            setTimeout(() => {
-                                                AlertActions.showPopupInfo('set-to-origined', lang.device.set_to_origin_complete);
-                                            }, 100);
-                                        }).always(() => {
-                                            ProgressActions.close();
-                                        });
+                            ProgressActions.open(ProgressConstants.NONSTOP, i18n.lang.message.connecting);
+                            DeviceMaster.select(currentPrinter).then(() => {
+                                checkDeviceStatus(currentPrinter).then(() => {
+                                    ProgressActions.open(ProgressConstants.NONSTOP);
+                                    DeviceMaster.home().done(() => {
+                                        ProgressActions.close();
+                                        setTimeout(() => {
+                                            AlertActions.showPopupInfo('set-to-origined', lang.device.set_to_origin_complete);
+                                        }, 100);
+                                    }).always(() => {
+                                        ProgressActions.close();
                                     });
-                                }
-                                else if (status === DeviceConstants.TIMEOUT) {
-                                    AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
-                                }
+                                });
+                            }).fail(() => {
+                                ProgressActions.close();
+                                AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
                             });
                         }
                     },
@@ -525,25 +522,24 @@ define([
                         label: lang.device.movement_tests,
                         enabled: true,
                         onClick: function() {
+                            ProgressActions.open(ProgressConstants.NONSTOP, i18n.lang.message.connecting);
                             var currentPrinter = discoverMethods.getLatestPrinter(printer);
-                            DeviceMaster.selectDevice(currentPrinter).then((status) => {
-                                if (status === DeviceConstants.CONNECTED) {
-                                    checkDeviceStatus(currentPrinter).then(() => {
-                                        ProgressActions.open(ProgressConstants.NONSTOP);
-                                        DeviceMaster.runMovementTests().then(() => {
-                                            console.log('ran movemnt test');
-                                            ProgressActions.close();
-                                            AlertActions.showPopupInfo('movement-tests', lang.device.movement_tests_complete);
-                                        }).fail(() => {
-                                            console.log('ran movemnt test failed');
-                                            ProgressActions.close();
-                                            AlertActions.showPopupInfo('movement-tests', lang.device.movement_tests_failed);
-                                        });
+                            DeviceMaster.select(currentPrinter).then(() => {
+                                ProgressActions.open(ProgressConstants.NONSTOP, i18n.lang.tutorial.runningMovementTests);
+                                checkDeviceStatus(currentPrinter).then(() => {
+                                    DeviceMaster.runMovementTests().then(() => {
+                                        console.log('ran movemnt test');
+                                        ProgressActions.close();
+                                        AlertActions.showPopupInfo('movement-tests', lang.device.movement_tests_complete);
+                                    }).fail(() => {
+                                        console.log('ran movemnt test failed');
+                                        ProgressActions.close();
+                                        AlertActions.showPopupInfo('movement-tests', lang.device.movement_tests_failed);
                                     });
-                                }
-                                else if (status === DeviceConstants.TIMEOUT) {
-                                    AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
-                                }
+                                });
+                            }).fail(() => {
+                                ProgressActions.close();
+                                AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
                             });
                         }
                     },
@@ -552,38 +548,37 @@ define([
                         enabled: true,
                         onClick: function() {
                             var currentPrinter = discoverMethods.getLatestPrinter(printer);
-                            DeviceMaster.selectDevice(currentPrinter).then((status) => {
-                                if (status === DeviceConstants.CONNECTED) {
-                                    ProgressActions.open(ProgressConstants.WAITING);
-                                    checkDeviceStatus(currentPrinter).then(() => {
-                                        ProgressActions.open(ProgressConstants.WAITING, lang.device.calibrating, lang.device.pleaseWait, false);
-                                        var scan_control,
-                                            opts = {
-                                                onError: (data) => {
-                                                    scan_control.takeControl(function(response) {
-                                                        self._openBlocker(false);
-                                                    });
-                                                },
-                                                onReady: () => {
+                            ProgressActions.open(ProgressConstants.WAITING, i18n.lang.message.connecting);
+                            DeviceMaster.select(currentPrinter).then(() => {
+                                ProgressActions.open(ProgressConstants.WAITING);
+                                checkDeviceStatus(currentPrinter).then(() => {
+                                    ProgressActions.open(ProgressConstants.WAITING, lang.device.calibrating, lang.device.pleaseWait, false);
+                                    var scan_control,
+                                        opts = {
+                                            onError: (data) => {
+                                                scan_control.takeControl(function(response) {
                                                     ProgressActions.close();
-                                                    scan_control.turnLaser(true).then(() => {
-                                                        AlertActions.showPopupCustom('scan-laser-turned-on', lang.device.scan_laser_complete, lang.device.finish, '');
-                                                        var _handleFinish = (dialog_name) => {
-                                                            scan_control.turnLaser(false).then(() => {
-                                                                scan_control.quit();
-                                                            });
-                                                            AlertStore.removeCustomListener(_handleFinish);
-                                                        };
-                                                        AlertStore.onCustom(_handleFinish);
-                                                    });
-                                                }
-                                            };
-                                        scan_control = ScanControl(currentPrinter.uuid, opts);
-                                    });
-                                }
-                                else if (status === DeviceConstants.TIMEOUT) {
-                                    AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
-                                }
+                                                });
+                                            },
+                                            onReady: () => {
+                                                ProgressActions.close();
+                                                scan_control.turnLaser(true).then(() => {
+                                                    AlertActions.showPopupCustom('scan-laser-turned-on', lang.device.scan_laser_complete, lang.device.finish, '');
+                                                    var _handleFinish = (dialog_name) => {
+                                                        scan_control.turnLaser(false).then(() => {
+                                                            scan_control.quit();
+                                                        });
+                                                        AlertStore.removeCustomListener(_handleFinish);
+                                                    };
+                                                    AlertStore.onCustom(_handleFinish);
+                                                });
+                                            }
+                                        };
+                                    scan_control = ScanControl(currentPrinter.uuid, opts);
+                                });
+                            }).fail(() => {
+                                ProgressActions.close();
+                                AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
                             });
                         }
                     },
@@ -593,23 +588,21 @@ define([
                         onClick: function() {
                             var currentPrinter = discoverMethods.getLatestPrinter(printer),
                                 lang = i18n.get();
-
-                            DeviceMaster.selectDevice(currentPrinter).then((status) => {
-                                if (status === DeviceConstants.CONNECTED) {
-                                    checkDeviceStatus(currentPrinter).then(() => {
-                                        ProgressActions.open(ProgressConstants.WAITING, lang.device.calibrating, lang.device.pleaseWait, false);
-                                        DeviceMaster.cleanCalibration().done(() => {
-                                            setTimeout(() => {
-                                                AlertActions.showPopupInfo('calibrated', lang.calibration.calibrated);
-                                            }, 100);
-                                        }).always(() => {
-                                            ProgressActions.close();
-                                        });
+                            ProgressActions.open(ProgressConstants.WAITING, lang.message.connecting);
+                            DeviceMaster.select(currentPrinter).then(() => {
+                                checkDeviceStatus(currentPrinter).then(() => {
+                                    ProgressActions.open(ProgressConstants.WAITING, lang.device.calibrating, lang.device.pleaseWait, false);
+                                    DeviceMaster.cleanCalibration().done(() => {
+                                        setTimeout(() => {
+                                            AlertActions.showPopupInfo('calibrated', lang.calibration.calibrated);
+                                        }, 100);
+                                    }).always(() => {
+                                        ProgressActions.close();
                                     });
-                                }
-                                else if (status === DeviceConstants.TIMEOUT) {
-                                    AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
-                                }
+                                });
+                            }).fail(() => {
+                                ProgressActions.close();
+                                AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
                             });
                         }
                     },
@@ -619,15 +612,11 @@ define([
                         onClick: function() {
                             var currentPrinter = discoverMethods.getLatestPrinter(printer);
 
-                            DeviceMaster.selectDevice(currentPrinter).then(status => {
-                                if(status === DeviceConstants.CONNECTED) {
-                                    showPopup(currentPrinter, 'SET_TEMPERATURE');
-                                }
-                                else if(status === DeviceConstants.TIMEOUT) {
-                                    AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
-                                }
+                            DeviceMaster.select(currentPrinter).then(() => {
+                                showPopup(currentPrinter, 'SET_TEMPERATURE');
+                            }).fail(() => {
+                                AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
                             });
-
                         }
                     }
                 ]

@@ -111,7 +111,8 @@ define(function() {
                 movement_tests_complete: 'Movement tests completed',
                 movement_tests_failed: 'Movement tests failed, make sure the toolhead cable is stretched correctly.',
                 finish: 'FINISH',
-                cancel: 'CANCEL'
+                cancel: 'CANCEL',
+                turn_on_head_temperature: 'Turn on head temperature'
             },
             window: {
                 label: 'Window',

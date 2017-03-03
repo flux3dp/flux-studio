@@ -9,7 +9,8 @@ define([
     'helpers/api/upnp-config',
     'helpers/device-master',
     'app/actions/progress-actions',
-    'app/constants/progress-constants'
+    'app/constants/progress-constants',
+    'helpers/device-error-handler'
 ], function(
     React,
     initializeMachine,
@@ -21,7 +22,8 @@ define([
     upnpConfig,
     DeviceMaster,
     ProgressActions,
-    ProgressConstants
+    ProgressConstants,
+    DeviceErrorHandler
 ) {
     'use strict';
 
@@ -70,7 +72,7 @@ define([
                     lang        = self.state.lang,
                     onError     = function(response) {
                         ProgressActions.close();
-                        AlertActions.showPopupError('set-machine-error', response.error);
+                        AlertActions.showPopupError('set-machine-error', DeviceErrorHandler.translate(response.error));
                     },
                     goNext = function() {
                         self.state.settingPrinter.name = name;
