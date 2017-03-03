@@ -41,12 +41,13 @@ define([
     //      onOpen        - fired on connection connecting
     return function(options) {
         var lang = i18n.get(),
+            { dev } = window.FLUX,
             defaultCallback = function(result) {},
-            hostname = window.FLUX.isNW === true ? 'localhost' : location.hostname,
+            // hostname = dev ? 'localhost' : location.hostname,
             defaultOptions = {
-                hostname: window.FLUX.dev ? '127.0.0.1' : hostname,
+                hostname: dev ? '127.0.0.1' : location.hostname,
                 method: '',
-                port: window.FLUX.dev ? '8000' : window.FLUX.ghostPort,
+                port: dev ? '8000' : window.FLUX.ghostPort,
                 autoReconnect: true,
                 ignoreAbnormalDisconnect: false,
                 onMessage: defaultCallback,
@@ -113,7 +114,14 @@ define([
                         socketOptions.onError(data);
                         break;
                     case 'fatal':
-                        if(window.FLUX.allowTracking) {
+                        // if identify error, reconnect again
+                        if (data.error === 'REMOTE_IDENTIFY_ERROR') {
+                            setTimeout(() => {
+                                ws = createWebSocket(options);
+                            }, 1000);
+                            return;
+                        }
+                        else if (window.FLUX.allowTracking) {
                             window.Raven.captureException(data);
                         }
                         console.log('ws fatal', data);
@@ -136,16 +144,9 @@ define([
                 };
 
                 _ws.onclose = function(result) {
-                    // if ws closed abruptly
-                    if(result.code === 1006) {
-                        socketOptions.onFatal(result);
-                        return;
-                    }
                     socketOptions.onClose(result);
 
-                    var abnormallyId = 'abnormally-close',
-                        message = '',
-                        outputLog = function() {
+                    var outputLog = function() {
                             outputError().done(onCancel);
                         },
                         onCancel = function() {
@@ -159,31 +160,9 @@ define([
 
                     // The connection was closed abnormally without sending or receving data
                     // ref: http://tools.ietf.org/html/rfc6455#section-7.4.1
-                    if (1006 === result.code &&
-                        60000 <= (new Date()).getTime() - window.FLUX.timestamp
-                    ) {
+                    if(result.code === 1006) {
                         wsLog.log.push(['**abnormal disconnection**'].join(' '));
-                    }
-
-                    if (1006 === result.code &&
-                        60000 <= (new Date()).getTime() - window.FLUX.timestamp &&
-                        false === options.ignoreAbnormalDisconnect &&
-                        true === showProgramErrorPopup
-                    ) {
-                        if (false === hadConnected) {
-                            message = lang.message.cant_establish_connection;
-                        }
-                        else {
-                            message = lang.message.application_occurs_error;
-                        }
-
-                        showProgramErrorPopup = false;
-                        // this is a hack to counter flux-ghost backened bug with opcode = -1
-                        if(location.hash.split('/')[1] !== 'print' || options.method !== 'usb-config') {
-                            AlertActions.showPopupCustomCancel(abnormallyId, message, lang.message.error_log);
-                            AlertStore.onCustom(outputLog);
-                            AlertStore.onCancel(onCancel);
-                        }
+                        socketOptions.onFatal(result);
                     }
 
                     if (true === socketOptions.autoReconnect) {

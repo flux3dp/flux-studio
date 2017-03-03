@@ -112,7 +112,7 @@ define(function() {
                 movement_tests_failed: 'Movement tests failed, make sure the toolhead cable is stretched correctly.',
                 finish: 'FINISH',
                 cancel: 'CANCEL',
-                turn_on_head_temperature: 'Set toolhead temperature'
+                turn_on_head_temperature: 'Turn on head temperature'
             },
             window: {
                 label: 'Window',
@@ -388,6 +388,7 @@ define(function() {
                 slicingEngine: 'Slicing Engine',
                 slic3r: 'Slic3r',
                 cura: 'Cura',
+                cura2: 'Cura2',
                 filament: 'Filament',
                 temperature: 'Temperature',
                 detect_filament_runout: 'Filament Detection',
@@ -971,7 +972,13 @@ define(function() {
                 A: 'Active',
                 N: 'No'
             },
-            backlash: 'Geometric Error Correction'
+            backlash: 'Geometric Error Correction',
+            turn_on_head_temperature: 'Set toolhead temperature',
+            plus_camera: 'Upgrade Kits Camera',
+            plus_extrusion: 'Upgrade Kits Extruder',
+            postback_url: 'Status callback URL',
+            disable: 'Disable',
+            enable: 'Enable'
         },
         monitor: {
             change_filament                     : 'CHANGE FILAMENT',
@@ -1224,7 +1231,8 @@ define(function() {
                 '13': 'Slicing:: Duplication error\nThe selected ID does not exist. If the error is not resolved by restarting FLUX Studio, please report this error.',
                 '14': 'Slicing:: Error occurred while setting position. The source object is missing in slicer engine.',
                 '15': 'Slicing:: Uploaded file is corrupt, please check the file and try again.',
-                '16': 'Slicing:: Slicing engine exited abnormally, kindly slice again.'
+                '16': 'Slicing:: Slicing engine exited abnormally, kindly slice again.',
+                '1006': 'WS closed unexpectedly, please obtain the bug report from the help menu and sent it to us.'
             },
             pattern_not_supported_at_100_percent_infill: 'Slic3r only supports 100% infill with rectilinear infill pattern'
         },

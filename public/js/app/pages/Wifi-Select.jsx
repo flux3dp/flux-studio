@@ -25,7 +25,8 @@ define([
     ProgressActions,
     ProgressConstants,
     AlertActions,
-    AlertStore
+    AlertStore,
+    DeviceErrorHandler
 ) {
     'use strict';
     var actionMap = {
@@ -143,7 +144,7 @@ define([
                 .fail(function(response) {
                     AlertActions.showPopupError(
                         'wifi-scan-error',
-                        response.error
+                        DeviceErrorHandler.translate(response.error)
                     );
                 });
 
@@ -190,8 +191,7 @@ define([
             },
 
             _goToSetPassword: function() {
-                var settingPrinter = this.state.settingPrinter,
-                    settingWifi = initializeMachine.settingWifi.get();
+                // var settingWifi = initializeMachine.settingWifi.get();
 
                 if ('WIFI' === this.state.settingPrinter.from) {
                     this._settingWifiViaWifi();
@@ -203,7 +203,6 @@ define([
 
             _setApMode: function() {
                 var self = this,
-                    lang = self.state.lang,
                     settingPrinter = self.state.settingPrinter,
                     apName = self.state.apName,
                     apPass = self.state.apPass;

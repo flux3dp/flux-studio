@@ -9,9 +9,7 @@ define([
     'app/actions/alert-actions',
     'app/stores/alert-store',
     'app/actions/progress-actions',
-    'app/constants/progress-constants',
-    'app/version-requirement',
-    'helpers/firmware-version-checker'
+    'app/constants/progress-constants'
 ], function(
     $,
     i18n,
@@ -20,9 +18,7 @@ define([
     AlertActions,
     AlertStore,
     ProgressActions,
-    ProgressConstants,
-    Requirement,
-    FirmwareVersionChecker
+    ProgressConstants
 ) {
     'use strict';
 

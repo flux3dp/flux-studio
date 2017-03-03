@@ -7,77 +7,71 @@ define(function() {
     // sub version: 12
     return function(sourceVersion) {
 
-        let vRegex = /([\d.]+)(a|b)?(\d*)?/g,
-            has = vRegex.exec(sourceVersion);
+        const vRegex = /([\d]+)[.]([\d]+)?(a|b|.)(\d+)?[.]?([\d]+)?/g;
+        let has = vRegex.exec(sourceVersion);
+        has = [
+            ...has.slice(1, 5)
+        ];
 
-
-        const isLetter = (str) => {
+        const result = {
+            UNSURE: 'UNSURE',
+            OK: 'OK',
+            YES: 'YES'
+        };
+        const isLetter = (str = '') => {
             return str.length === 1 && str.match(/[a-z]/ig);
         };
 
-        const isWholeNumber = (str) => {
+        const isWholeNumber = (str = 0) => {
+            str = str || '';
             return str.indexOf('.') === -1 && parseFloat(str) % 1 === 0;
         };
 
-        let compareArray = (array_need, array_has) => {
+        const met = (need, has) => {
+            // if both missing
+            if((!need && !has) || (need === has)) { return result.UNSURE; }
+            else if(need === '.' || has === '.') {
+                return has === '.' ? result.YES : result.NO;
+            }
 
-            for (let i = 0; i < array_has.length; i++) {
-
-                if (!Boolean(array_need[i])) {
-                    return true;
+            if(isLetter(need) && isLetter(has)) {
+                if(!need || !has) {
+                    // if has need and don't have
+                    if(need && !has) { return result.YES; }
+                    if(!need && has) { return result.NO; }
                 }
-
-                let n = parseInt(array_need[i]),
-                    h = parseInt(array_has[i]);
-
-                // if everything is the same and at the last comparer
-                if (i === array_has.length - 1) {
-                    if (n === h) {
-                        return array_need.length <= array_has.length;
-                    } else {
-                        return n <= h;
-                    }
+                else if(need.toLowerCase() === 'a') { return result.YES; }
+                else { return result.NO; }
+            }
+            else if(isWholeNumber(need) && isWholeNumber(has)) {
+                if(!need || !has) {
+                    // if has need and don't have
+                    if(need && !has) { return result.NO; }
+                    if(!need && has) { return result.YES; }
                 }
-                else if (n !== h) {
-                    return n <= h;
-                }
+                else if(parseInt(need) < parseInt(has)) { return result.YES; }
+                else { return result.NO; }
             }
-        };
 
-        const _meetVersion = (_need = '', _has = '') => {
-
-            if(!_need && !_has) { return true; }
-
-            if (isLetter(_need) && isLetter(_has)) {
-                return _need.charCodeAt(0) <= _has.charCodeAt(0);
-            }
-            else if (isWholeNumber(_need) && isWholeNumber(_has)) {
-                return parseInt(_need) <= parseInt(_has);
-            }
-            else if (Boolean(_need) && Boolean(_has)) {
-                _need = _need.split('.');
-                _has = _has.split('.');
-                return compareArray(_need, _has);
-            }
-            else {
-                return Boolean(_has);
-            }
         };
 
         const meetVersion = (neededVersion) => {
-            let regex = vRegex = /([\d.]+)(a|b)?(\d*)?/g;
-            let need = regex.exec(neededVersion).splice(1, 3);
+            let regex = /([\d]+)[.]([\d]+)?(a|b|.)(\d+)?[.]?([\d]+)?/g;
+            let need = regex.exec(neededVersion);
+            need = [
+                ...need.slice(1, 5)
+            ];
 
             for (let i = 0; i < need.length; i++) {
+                let r = met(need[i], has[i]);
 
-                let met = _meetVersion(need[i], has[i]);
-
-                if (!met) { return false; }
-
-                if (i === need.length - 1) {
-                    return _meetVersion(need[i], has[i]);
+                if(r !== result.UNSURE) {
+                    return r === result.YES;
                 }
             }
+
+            // if they're the same
+            return true;
         };
 
         return {

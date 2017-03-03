@@ -112,7 +112,7 @@ define(function() {
                 movement_tests_failed: '運動測試失敗，請確認模組傳輸線有被拉直',
                 finish: '完成',
                 cancel: '取消',
-                turn_on_head_temperature: '開啟噴頭溫度'
+                turn_on_head_temperature: '設定列印模組溫度'
             },
             window: {
                 label: '視窗',
@@ -402,6 +402,7 @@ define(function() {
                 slicingEngine: '切片引擎',
                 slic3r: 'Slic3r',
                 cura: 'Cura',
+                cura2: 'Cura2',
                 filament: '線料',
                 temperature: '溫度',
                 detect_filament_runout: '偵測線料',
@@ -985,7 +986,13 @@ define(function() {
                 A: '開啟',
                 N: '關閉'
             },
-            backlash: '路徑幾何誤差補正'
+            backlash: '路徑幾何誤差補正',
+            turn_on_head_temperature: '開啟噴頭溫度',
+            plus_camera: '升級包鏡頭',
+            plus_extrusion: '升級包擠出馬達',
+            postback_url: '狀態回傳URL',
+            disable: '關閉',
+            enable: '開啟'
         },
         monitor: {
             change_filament                     : 'CHANGE FILLAMENT',
@@ -1237,7 +1244,8 @@ define(function() {
                 '13': '切片:: 重制錯誤，複製原始ID不存在，需重啟 FLUX Studio',
                 '14': '切片:: 無法設定物件位置及相關資訊，需重啟 FLUX Studio',
                 '15': '切片:: 模型檔案內容無法解析',
-                '16': '切片:: 切片引擎異常結束，建議調整設定'
+                '16': '切片:: 切片引擎異常結束，建議調整設定',
+                '1006': 'WS 已被強制關閉, 請於menu上方取得錯誤回報，寄送回FLUX'
             },
             pattern_not_supported_at_100_percent_infill: 'Slic3r 的 rectilinear 填充圖樣只支援 100% 的填充密度'
         },
