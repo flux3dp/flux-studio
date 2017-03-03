@@ -71,6 +71,7 @@ define([
                 selectedTab         : 1,
                 custom              : this.props.setting.custom || '',
                 customCura2         : this.props.setting.customCura2 || '',
+                showBridgeSpeed     : this.props.setting.engine !== 'cura2',
 
                 // Presets
                 selectedPreset      : '',
@@ -103,7 +104,7 @@ define([
         _validateValue: function(e) {
             e.preventDefault();
             if(!this._isValidValue(currentKey, this.state[currentKey])) {
-                console.log("validate ", this.state);
+                console.log('validate ', this.state);
                 this.setState(this._createState(currentKey, lastValidValue));
             }
         },
@@ -116,7 +117,7 @@ define([
         },
 
         _updateCustomField: function() {
-            this.setState({ custom: advancedSetting.toExpert(this.state.custom, 'slic3r'), 
+            this.setState({ custom: advancedSetting.toExpert(this.state.custom, 'slic3r'),
                             customCura2: advancedSetting.toExpert(this.state.customCura2, 'cura2') });
         },
 
@@ -274,6 +275,7 @@ define([
 
             if(id === 'engine') {
                 fill_pattern = value === 'slic3r' ? 'rectilinear' : 'AUTOMATIC';
+                this.setState({ showBridgeSpeed: value !== 'cura2' });
             }
             else if(id === 'fill_pattern' && value !== 'rectilinear') {
                 if(engine === 'slic3r' && fill_density === '100') {
@@ -609,7 +611,7 @@ define([
                             id="raft"
                             label={lang.raft}
                             default={advancedSetting.raft === 1}
-                            onChange={this._handleControlValueChange} />                        
+                            onChange={this._handleControlValueChange} />
 
                         <SliderControl
                             id="raft_layers"
@@ -644,6 +646,18 @@ define([
         },
 
         _renderSpeedSection: function() {
+            let bridgeSpeed = (
+                <SliderControl
+                    id="bridge_speed"
+                    key="bridge_speed"
+                    label={lang.bridge}
+                    min={1}
+                    max={100}
+                    step={1}
+                    default={advancedSetting.bridge_speed}
+                    onChange={this._handleControlValueChange} />
+            );
+            bridgeSpeed = this.state.showBridgeSpeed ? bridgeSpeed : '';
             return (
                 <div className="content-wrapper">
 
@@ -728,15 +742,7 @@ define([
                             default={advancedSetting.external_perimeter_speed}
                             onChange={this._handleControlValueChange} />
 
-                        <SliderControl
-                            id="bridge_speed"
-                            key="bridge_speed"
-                            label={lang.bridge}
-                            min={1}
-                            max={100}
-                            step={1}
-                            default={advancedSetting.bridge_speed}
-                            onChange={this._handleControlValueChange} />
+                        {bridgeSpeed}
 
                     </div>
 
@@ -745,7 +751,7 @@ define([
         },
 
         _renderCustomSection: function() {
-            console.log("render ", this.state);
+            console.log('render ', this.state);
             return (
                 <div className="content-wrapper">
 
@@ -879,7 +885,7 @@ define([
                 presetContent = JSON.parse(preset),
                 custom = preset.engine === 'cura2' ? presetContent.customCura2 : presetContent.custom;
 
-            console.log("preset.engine", preset.engine)
+            console.log('preset.engine', preset.engine);
 
             return (
                 <div id="advanced-panel" className="advanced-panel">
