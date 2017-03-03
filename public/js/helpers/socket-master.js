@@ -17,6 +17,11 @@ define([
         };
 
         const addTask = (command, ...args) => {
+            // if traffic is jammed, reset
+            if(_tasks.length > 50) {
+                _tasks = [];
+                _task = null;
+            }
             let d = $.Deferred();
             _tasks.push({d, command, args});
             if(!_task && !processing) {
@@ -32,8 +37,8 @@ define([
 
             let fnName = _task.command.split('@')[0],
                 mode = _task.command.split('@')[1];
-            
-            if(mode == "maintain" && _ws.mode != 'maintain') { 
+
+            if(mode == "maintain" && _ws.mode != 'maintain') {
               // Ensure maintain mode, if not then reject with "edge case" error
               _task.d.reject({status: 'error', error: ['EDGE_CASE', 'MODE_ERROR']});
             } else {
