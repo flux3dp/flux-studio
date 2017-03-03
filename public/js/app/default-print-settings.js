@@ -3,7 +3,7 @@ define(function() {
         defaultSetting: true,
         custom: `avoid_crossing_perimeters = 0
 before_layer_gcode =
-bottom_solid_layers = 3
+bottom_solid_layers = 5
 bridge_acceleration = 0
 bridge_fan_speed = 100
 bridge_flow_ratio = 1
@@ -124,8 +124,8 @@ threads = 4
 toolchange_gcode =
 top_infill_extrusion_width = 0.27
 top_solid_infill_speed = 15
-top_solid_layers = 4
-travel_speed = 80
+top_solid_layers = 5
+travel_speed = 150
 use_firmware_retraction = 0
 use_relative_e_distances = 0
 use_volumetric_e = 0
@@ -150,7 +150,7 @@ adhesion_type = brim
 alternate_carve_order = true
 alternate_extra_perimeter = false
 anti_overhang_mesh = false
-bottom_layers = 6
+bottom_layers = 5
 brim_line_count = 20
 brim_outside_only = true
 carve_multiple_volumes = true
@@ -169,7 +169,7 @@ cool_lift_head = false
 cool_min_layer_time = 5
 cool_min_layer_time_fan_speed_max = 10
 cool_min_speed = 10
-default_material_print_temperature = 210
+default_material_print_temperature = 205
 draft_shield_dist = 10
 draft_shield_enabled = false
 draft_shield_height = 10
@@ -205,7 +205,7 @@ jerk_travel_layer_0 = 20
 jerk_wall_0 = 20
 jerk_wall_x = 20
 layer_0_z_overlap = 0.22
-layer_height = 0.1
+layer_height = 0.15
 layer_height_0 = 0.3
 layer_start_x = 0
 layer_start_y = 0
@@ -287,7 +287,7 @@ retraction_count_max = 90
 retraction_enable = true
 retraction_extra_prime_amount = 0
 retraction_extrusion_window = 4.5
-retraction_hop = 1
+retraction_hop = 0.05
 retraction_hop_after_extruder_switch = true
 retraction_hop_enabled = true
 retraction_hop_only_when_collides = false
@@ -313,14 +313,14 @@ speed_slowdown_layers = 2
 speed_support_infill = 60
 speed_support_interface = 40
 speed_topbottom = 30
-speed_travel = 120
+speed_travel = 150
 speed_travel_layer_0 = 60
-speed_wall_0 = 30
-speed_wall_x = 60
+speed_wall_0 = 28
+speed_wall_x = 40
 start_layers_at_same_position = false
 sub_div_rad_add = 0.4
 sub_div_rad_mult = 100
-support_angle = 50
+support_angle = 53
 support_bottom_distance = 0.1
 support_bottom_height = 1
 support_bottom_stair_step_height = 0.3
@@ -343,9 +343,9 @@ support_line_width = 0.4
 support_mesh = false
 support_minimal_diameter = 3
 support_offset = 0.2
-support_pattern = zigzag
+support_pattern = lines
 support_roof_height = 1
-support_top_distance = 0.1
+support_top_distance = 0.15
 support_tower_diameter = 3
 support_tower_roof_angle = 65
 support_type = everywhere
@@ -358,7 +358,7 @@ switch_extruder_retraction_amount = 20
 switch_extruder_retraction_speed = 20
 top_bottom_pattern = lines
 top_bottom_pattern_0 = lines
-top_layers = 8
+top_layers = 5
 travel_avoid_distance = 0.625
 travel_avoid_other_parts = true
 travel_compensate_overlapping_walls_0_enabled = true
@@ -393,7 +393,14 @@ wireframe_up_half_speed = 0.3
 xy_offset = 0
 z_seam_type = shortest
 z_seam_x = 100
-z_seam_y = 100`,
+z_seam_y = 100
+# FLUX Machine Parameters
+temperature = 200		
+detect_filament_runout = 1		
+flux_calibration = 1		
+detect_head_tilt = 1
+cut_bottom = 0
+z_offset = 0`,
     fd1p: {
         high: {
             "layer_height": 0.075,
@@ -470,7 +477,7 @@ z_seam_y = 100`,
         low: {
             "layer_height": 0.3,
             "travel_speed": 120,
-            "infill_speed": 30,
+            "infill_speed": 50,
             "retract_lift" : 0.24,
             "temperature": 215,
             "perimeter_speed": 40,
