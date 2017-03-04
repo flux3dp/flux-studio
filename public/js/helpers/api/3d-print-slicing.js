@@ -42,7 +42,7 @@ define([
                 onError: () => {}
             };
 
-        return {
+        let slicingApi =  {
 
             connection: ws,
             upload: (name, file, ext) => {
@@ -259,9 +259,20 @@ define([
             },
 
             setParameter: (name, value) => {
+                // Support multiple name & value
+                // console.log("set pa", name, value);
                 if (name instanceof Array) {
-                    return setParameter(name, value).then(setParameter(name, value)).fail(setParameter(name, value));
+                    if (name.length > 1 ) {
+                        return slicingApi.setParameter(name[0], value[0]).then(() => {
+                        //    console.log('then');
+                            slicingApi.setParameter(name.slice(1), value.slice(1));
+                        }).fail(() => { slicingApi.setParameter(name.slice(1), value.slice(1)); });
+                    } else if (name.length === 1) {
+                      //  console.log('run end');
+                        return slicingApi.setParameter(name[0], value[0]);
+                    }
                 }
+//                console.log('realdo');
 
                 let d = $.Deferred();
 
@@ -359,5 +370,6 @@ define([
                 }
             }
         };
+        return slicingApi;
     };
 });
