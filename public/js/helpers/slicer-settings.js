@@ -239,7 +239,7 @@ define([
                 param.key = item.key;
                 param.value = [];
                 item.key.map((v, i) => {
-                    param.value[i] = item.fn ? item.fn(param.value)[i] : param.value;
+                    param.value[i] = item.fn ? item.fn(p0.value)[i] : p0.value;
                 });
             } else {
                 param.key = item.key;
