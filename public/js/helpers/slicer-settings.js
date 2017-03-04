@@ -10,10 +10,10 @@ define([
         perimeters                          : { key: 'wall_line_count' },
         top_solid_layers                    : { key: 'top_layers' },
         bottom_solid_layers                 : { key: 'bottom_layers' },
-        fill_density                        : { key: 'infill_line_distance', fn: (v) => { v = v || '20%'; return  v === '0%' ? 0 : (0.4 * 100 * 2 / parseFloat(v.toString().replace('%', ''))); } },
+        fill_density                        : { key: 'infill_line_distance', fn: (v, settings) => { v = v || '10%'; return  v === '0%' ? 0 : (0.4 * 100 / parseFloat(v.toString().replace('%', ''))); } },
         fill_pattern                        : { key: 'infill_pattern', fn: (v) => { 
                                                                             v = v.toUpperCase();
-                                                                            return (['AUTOMATIC', 'ZIGZAG', 'GRID', 'LINES', 'CONCENTRIC'].indexOf(v) >= 0 ? v : 'ZIGZAG').toLowerCase();
+                                                                            return (['ZIGZAG', 'GRID', 'LINES', 'CONCENTRIC'].indexOf(v) >= 0 ? v : 'ZIGZAG').toLowerCase();
                                                                        } },
         support_material                    : { key: 'support_enable', fn: (v) => { return !!v; } },
         support_material_spacing            : { key: 'support_xy_distance' },
@@ -51,7 +51,7 @@ define([
     cura2revMapping.support_angle.fn = (v) => { return 90 - v; }
     cura2revMapping.support_enable.fn = (v) => { return v ? 1 : 0; }
     cura2revMapping.speed_support_infill = { key: 'support_material_speed' };
-    cura2revMapping.infill_line_distance.fn = (v) => { return (80/v) + '%' };
+    cura2revMapping.infill_line_distance = { key: 'fill_density', fn: (v, settings) => { return Math.min(100, 40/parseFloat(v)) } };
 
     cura2revMapping.support_pattern.fn = (v) => { return v.toUpperCase() };
     cura2revMapping.infill_pattern.fn =(v) => { return v.toUpperCase() };
@@ -106,14 +106,14 @@ define([
         this.spiral_vase                         = 0;
         
         // Support
-        this.support_material                    = 1;
+        this.support_material                    = 0;
         this.support_material_spacing            = 2.7;
         this.support_material_threshold          = 37;
         this.support_material_pattern            = 'rectilinear';
         this.support_material_contact_distance   = 0.06;
         this.brim_width                          = 0;
         this.skirts                              = 2;
-        this.raft                                = 1;
+        this.raft                                = 0;
         this.raft_layers                         = 4;
         
         // Speed
@@ -152,13 +152,13 @@ define([
                     let item = cura2mapping[key];
                     if (item.key instanceof Array) {
                         item.key.map((v, i) => {
-                            value = item.fn ? item.fn(value)[i] : value;
+                            value = item.fn ? item.fn(value, self)[i] : value;
                             insertConfig(customCura2, v, value);
                         });
                         return;
                     } else {
                         key = item.key;
-                        value = item.fn ? item.fn(value) : value;
+                        value = item.fn ? item.fn(value, self) : value;
                     }
                 }   
                 insertConfig(customCura2, key, value);
@@ -207,7 +207,7 @@ define([
                     if (this.engine == 'cura2') {
                         let rev = cura2revMapping[_key];
                         if (rev && this.hasOwnProperty(rev.key)) {
-                            this[rev.key] = rev.fn ? rev.fn(_value) : _value;
+                            this[rev.key] = rev.fn ? rev.fn(_value, self) : _value;
                         } else if (this.hasOwnProperty(_key)) {
                             this[_key] = parseFloat(_value) || _value;
                         }
@@ -232,6 +232,7 @@ define([
     }
 
     SlicerSettings.prototype.filter = function(p0) {
+        let self = this;
         var param = { key: p0.key, value: p0.value };
         if (cura2mapping[param.key] && cura2mapping[param.key].key) {
             let item = cura2mapping[param.key];
@@ -239,11 +240,11 @@ define([
                 param.key = item.key;
                 param.value = [];
                 item.key.map((v, i) => {
-                    param.value[i] = item.fn ? item.fn(p0.value)[i] : p0.value;
+                    param.value[i] = item.fn ? item.fn(p0.value, self)[i] : p0.value;
                 });
             } else {
                 param.key = item.key;
-                param.value = item.fn ? item.fn(param.value) : param.value;
+                param.value = item.fn ? item.fn(param.value, self) : param.value;
             }
         }
         return param;
