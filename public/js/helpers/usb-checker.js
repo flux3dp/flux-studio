@@ -15,9 +15,7 @@ define([
 
         const processResult = (response) => {
             if(response.cmd === 'list') {
-                let hasAvailableChannel = Object.keys(response.h2h) > 0;
-
-                if(hasAvailableChannel) {
+                if(Object.keys(response.h2h) > 0) {
                     // try to connect
                     availableUsbChannel = Object.keys(response.h2h)[0];
 
@@ -28,6 +26,7 @@ define([
                     } else {
                         // Connected, do nothing
                         usbConnected = true;
+                        callback(availableUsbChannel, false);
                     }
                 
                 }

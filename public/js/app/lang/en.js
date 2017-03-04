@@ -109,7 +109,7 @@ define(function() {
                 set_to_origin_complete: 'The machine has calibrated its origin.',
                 scan_laser_complete: 'The machine has turned on its scanning laser. Click "Finish" to turn it off.',
                 movement_tests_complete: 'Movement tests completed',
-                movement_tests_failed: 'Movement tests failed, make sure the toolhead cable is stretched correctly.',
+                movement_tests_failed: 'Movement tests failed, make sure the toolhead cable is stretched correctly, or check <a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/115003674128-%E5%A6%82%E4%BD%95%E9%A0%86%E5%88%A9%E9%80%9A%E9%81%8E%E9%81%8B%E5%8B%95%E6%B8%AC%E8%A9%A6">this article</a>.',
                 finish: 'FINISH',
                 cancel: 'CANCEL',
                 turn_on_head_temperature: 'Turn on head temperature'
