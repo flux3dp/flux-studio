@@ -220,8 +220,7 @@ define([
 
             _setApModeViaUsb: function(name, pass) {
                 var self = this,
-                    lang = self.state.lang,
-                    usb = usbConfig();
+                    lang = self.state.lang;
 
                 usbSocket.setAPMode(
                     name,

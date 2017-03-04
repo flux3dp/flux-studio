@@ -72,7 +72,7 @@ define([
                     }, 30000);
 
                 const reset = () => {
-                    clearInterval(timer);
+                    clearTimeout(timer);
                     goNext = true;
                 };
 
@@ -114,8 +114,8 @@ define([
                         }
                         else if(r.status === 'ok') {
                             ws.usbData.addr = usbChannel;
-                            opts.onSuccess(ws.usbData);    
-                            reset();                        
+                            opts.onSuccess(ws.usbData);
+                            reset();
                         }
                     };
 
