@@ -337,8 +337,8 @@ define([
             _checkApModeSetting: function(e) {
                 var name = this.refs.ap_mode_name.getDOMNode().value,
                     pass = this.refs.ap_mode_password.getDOMNode().value,
-                    apModeNameIsVaild = /^[a-zA-Z0-9 \-\.\_\!]+$/g.test(name),
-                    apModePassIsVaild = /^[a-zA-Z0-9 \-\.\_\!]{8,}$/g.test(pass);
+                    apModeNameIsVaild = /^[a-zA-Z0-9 \-\.\_\!\,\[\]\(\)]+$/g.test(name),
+                    apModePassIsVaild = /^[a-zA-Z0-9 \-\.\_\!\,\[\]\(\)]{8,}$/g.test(pass);
 
                 this.setState({
                     apName: name,
@@ -464,7 +464,7 @@ define([
                                     defaultValue={self.state.settingPrinter.name}
                                     autoFocus={true}
                                     required={true}
-                                    pattern="^[a-zA-Z0-9 \-_\.!]+$"
+                                    pattern="^[a-zA-Z0-9_! \-\.\,\[\]\(\)]+$"
                                     maxLength="32"
                                     title={lang.initialize.set_machine_generic.ap_mode_name_format}
                                     placeholder={lang.initialize.set_machine_generic.ap_mode_name_placeholder}
@@ -482,7 +482,7 @@ define([
                                     placeholder=""
                                     defaultValue=""
                                     required={true}
-                                    pattern="^[a-zA-Z0-9 \-_\.!]{8,}$"
+                                    pattern="^[a-zA-Z0-9_! \-\.\,\[\]\(\)]{8,}$"
                                     title={lang.initialize.set_machine_generic.ap_mode_pass_format}
                                     placeholder={lang.initialize.set_machine_generic.ap_mode_pass_placeholder}
                                     onKeyUp={self._checkApModeSetting}
@@ -533,7 +533,7 @@ define([
                                     className={nameClass}
                                     autoFocus={true}
                                     required={true}
-                                    pattern="^[a-zA-Z0-9 \-\_\.\!]+$"
+                                    pattern="^[a-zA-Z0-9_! \-\.\,\[\]\(\)]+$"
                                     maxLength="32"
                                 />
                             </label>
@@ -546,7 +546,7 @@ define([
                                     type="password"
                                     className={passClass}
                                     required={true}
-                                    pattern="^[a-zA-Z0-9 \-\_\.\!\,]{8,}$"
+                                    pattern="^[a-zA-Z0-9_! \-\.\,\[\]\(\)]{8,}$"
                                 />
                             </label>
                             <label className="h-control">
