@@ -259,6 +259,9 @@ define([
             },
 
             setParameter: (name, value) => {
+                if (name instanceof Array) {
+                    return setParameter(name, value).then(setParameter(name, value)).fail(setParameter(name, value));
+                }
 
                 let d = $.Deferred();
 

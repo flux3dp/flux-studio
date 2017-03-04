@@ -235,8 +235,16 @@ define([
         var param = { key: p0.key, value: p0.value };
         if (cura2mapping[param.key] && cura2mapping[param.key].key) {
             let item = cura2mapping[param.key];
-            param.key = item.key;
-            param.value = item.fn ? item.fn(param.value) : param.value;
+            if (item.key instanceof Array) {
+                param.key = item.key;
+                param.value = [];
+                item.key.map((v, i) => {
+                    param.value[i] = item.fn ? item.fn(param.value)[i] : param.value;
+                });
+            } else {
+                param.key = item.key;
+                param.value = item.fn ? item.fn(param.value) : param.value;
+            }
         }
         return param;
     }
