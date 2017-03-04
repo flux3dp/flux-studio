@@ -46,22 +46,27 @@ define([
             }
         };
 
-        const runTaskFunction = (_task, fnName) => {
+        const runTaskFunction = (task, fnName) => {
             // Do regular stuff
             let t = setTimeout(() => {
-                _task.d.reject('TIMEOUT');
+                task.d.reject('TIMEOUT');
                 doNext();
             }, 20 * 1000);
 
-            _ws[fnName](..._task.args).then((result) => {
+            // timeout only for play and maintain commands
+            if(task.command.indexOf('play') === -1 && task.command.indexOf('maintain') === -1) {
+                clearTimeout(t);
+            }
+
+            _ws[fnName](...task.args).then((result) => {
                 processing = false;
-                _task.d.resolve(result);
+                task.d.resolve(result);
                 doNext();
             }).progress((result) => {
-                _task.d.notify(result);
+                task.d.notify(result);
             }).fail((result) => {
                 processing = false;
-                _task.d.reject(result);
+                task.d.reject(result);
                 doNext();
             }).always(() => {
                 clearTimeout(t);
