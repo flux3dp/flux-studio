@@ -120,6 +120,11 @@ define([
                     else {
                         console.log("____", "load localstorage", _settings);
                         advancedSettings.load(_settings, true);
+                        // Load new default cura2 config
+                        if (!_settings.customCura2) {
+                            advancedSettings.customCura2 = DefaultPrintSettings.customCura2;
+                            advancedSettings.customCura2 = advancedSettings.toExpert(advancedSettings.customCura2, 'cura2');
+                        }
                     }
 
                     if(tutorialFinished !== 'true' && configuredPrinter !== '') {
