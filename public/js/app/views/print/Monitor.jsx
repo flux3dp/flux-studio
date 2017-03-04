@@ -636,7 +636,7 @@ define([
                 }
             }
             else {
-                let { error } = report;
+                let { error } = report.error;
                 let state = [
                     DeviceConstants.status.PAUSED_FROM_STARTING,
                     DeviceConstants.status.PAUSED_FROM_RUNNING,

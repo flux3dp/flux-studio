@@ -449,10 +449,10 @@ define([
     }
 
     function quitTask(mode) {
-        if (typeof mode == 'string') {
-            SocketMaster.addTask('quitTask@' + mode);
+        if (typeof mode === 'string') {
+            return SocketMaster.addTask('quitTask@' + mode);
         } else {
-            SocketMaster.addTask('quitTask');
+            return SocketMaster.addTask('quitTask');
         }
     }
 
