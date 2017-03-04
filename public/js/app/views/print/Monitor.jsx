@@ -636,7 +636,7 @@ define([
                 }
             }
             else {
-                let { error } = report.error;
+                let error = report.error;
                 let state = [
                     DeviceConstants.status.PAUSED_FROM_STARTING,
                     DeviceConstants.status.PAUSED_FROM_RUNNING,
@@ -660,6 +660,7 @@ define([
                     // jug down errors as main and sub error for later use
 
                     let errorMessage = DeviceErrorHandler.translate(error);
+                    console.log("ERR ", errorMessage, error);
 
                     if(
                         !messageViewed &&
