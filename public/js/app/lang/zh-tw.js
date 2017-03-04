@@ -216,7 +216,7 @@ define(function() {
 
                 keep_connect: {
                     caption: '無法透過 USB 連接',
-                    content: '別擔心！請確認電源已被開啟及使用 USB 連接（或重新接上）機器，並正確安裝驅動程式。無法安裝驅動程式，請查看 <a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/215327328">說明</a>\n3. 或重新插拔 USB'
+                    content: '別擔心！請確認電源已被開啟及使用 USB 連接（或重新接上）機器，並正確安裝驅動程式。無法安裝驅動程式，請查看 <a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/215327328">說明</a>'
                 },
 
                 wifi_connection: {
