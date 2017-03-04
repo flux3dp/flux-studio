@@ -764,7 +764,9 @@ define([
                 hasOutOfBoundsObject: false
             });
         }
-        if (report.percentage !== slicingStatus.percentage) {
+        if (report.percentage !== slicingStatus.percentage &&
+            report.percentage <= 1
+        ) {
             slicingStatus.percentage = report.percentage;
             reactSrc.setState({slicingPercentage: slicingStatus.percentage});
         }
