@@ -15,7 +15,7 @@ define([
                                                                             v = v.toUpperCase();
                                                                             return (['ZIGZAG', 'GRID', 'LINES', 'CONCENTRIC'].indexOf(v) >= 0 ? v : 'ZIGZAG').toLowerCase();
                                                                        } },
-        support_material                    : { key: 'support_enable', fn: (v) => { return !!v; } },
+        support_material                    : { key: 'support_enable', fn: (v) => { return !!parseInt(v); } },
         support_material_spacing            : { key: 'support_xy_distance' },
         support_material_threshold          : { key: 'support_angle', fn: (v) => { return 90.0 - parseFloat(v); } },
         support_material_pattern            : { key: 'support_pattern', fn: (v) => { 
@@ -234,7 +234,7 @@ define([
     SlicerSettings.prototype.filter = function(p0) {
         let self = this;
         var param = { key: p0.key, value: p0.value };
-        if (cura2mapping[param.key] && cura2mapping[param.key].key) {
+        if (cura2mapping[param.key] && cura2mapping[param.key].key && self.engine == "cura2") {
             let item = cura2mapping[param.key];
             if (item.key instanceof Array) {
                 param.key = item.key;
