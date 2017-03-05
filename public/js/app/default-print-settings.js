@@ -192,7 +192,7 @@ infill_mesh_order = 0
 infill_overlap_mm = 0.04
 infill_pattern = zigzag
 infill_sparse_thickness = 0.15
-infill_wipe_dist = 0.1
+infill_wipe_dist = 0.04
 jerk_enabled = false
 jerk_infill = 20
 jerk_prime_tower = 20
@@ -282,19 +282,19 @@ raft_surface_line_width = 0.4
 raft_surface_speed = 20
 raft_surface_thickness = 0.1
 retract_at_layer_change = false
-retraction_amount = 8
+retraction_amount = 5.7
 retraction_combing = all
 retraction_count_max = 90
 retraction_enable = true
 retraction_extra_prime_amount = 0
-retraction_extrusion_window = 8
+retraction_extrusion_window = 2.65
 retraction_hop = 0.05
 retraction_hop_after_extruder_switch = true
 retraction_hop_enabled = true
 retraction_hop_only_when_collides = false
 retraction_min_travel = 0.8
-retraction_prime_speed = 60
-retraction_retract_speed = 60
+retraction_prime_speed = 30
+retraction_retract_speed = 40
 skin_alternate_rotation = false
 skin_line_width = 0.4
 skin_no_small_gaps_heuristic = true
@@ -304,19 +304,19 @@ skirt_brim_line_width = 0.4
 skirt_brim_minimal_length = 250
 skirt_brim_speed = 30
 skirt_gap = 3
-skirt_line_count = 1
+skirt_line_count = 0
 speed_equalize_flow_enabled = false
 speed_equalize_flow_max = 150
 speed_infill = 80
 speed_prime_tower = 60
-speed_print_layer_0 = 30
+speed_print_layer_0 = 20
 speed_slowdown_layers = 2
 speed_support_infill = 80
 speed_support_interface = 40
 speed_topbottom = 15
 speed_travel = 150
 speed_travel_layer_0 = 56.25
-speed_wall_0 = 28
+speed_wall_0 = 20
 speed_wall_x = 40
 start_layers_at_same_position = true
 sub_div_rad_add = 0.4
@@ -415,7 +415,7 @@ z_offset = 0`,
             "retract_lift" : 0.05,
             "temperature": 200,
             "perimeter_speed": 40,
-            "external_perimeter_speed": 28,
+            "external_perimeter_speed": 20,
             "top_solid_layers": 8,
             "bottom_solid_layers": 6,
             "first_layer_temperature": 230,
@@ -430,7 +430,7 @@ z_offset = 0`,
             "retract_lift" : 0.05,
             "temperature": 200,
             "perimeter_speed": 40,
-            "external_perimeter_speed": 28,
+            "external_perimeter_speed": 20,
             "top_solid_layers": 5,
             "bottom_solid_layers": 5,
             "first_layer_temperature": 230,
@@ -445,7 +445,7 @@ z_offset = 0`,
             "retract_lift" : 0.05,
             "temperature": 215,
             "perimeter_speed": 40,
-            "external_perimeter_speed": 28,
+            "external_perimeter_speed": 20,
             "top_solid_layers": 3,
             "bottom_solid_layers": 3,
             "first_layer_temperature": 230,
@@ -462,7 +462,7 @@ z_offset = 0`,
             "retract_lift" : 0.24,
             "temperature": 200,
             "perimeter_speed": 40,
-            "external_perimeter_speed": 28,
+            "external_perimeter_speed": 20,
             "top_solid_layers": 8,
             "bottom_solid_layers": 6,
             "first_layer_temperature": 230,
@@ -477,7 +477,7 @@ z_offset = 0`,
             "retract_lift" : 0.24,
             "temperature": 200,
             "perimeter_speed": 40,
-            "external_perimeter_speed": 28,
+            "external_perimeter_speed": 20,
             "top_solid_layers": 5,
             "bottom_solid_layers": 5,
             "first_layer_temperature": 230,
@@ -492,7 +492,7 @@ z_offset = 0`,
             "retract_lift" : 0.24,
             "temperature": 215,
             "perimeter_speed": 40,
-            "external_perimeter_speed": 28,
+            "external_perimeter_speed": 20,
             "top_solid_layers": 3,
             "bottom_solid_layers": 3,
             "first_layer_temperature": 230,

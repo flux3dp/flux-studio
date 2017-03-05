@@ -418,19 +418,25 @@ define(function() {
                 density: '填充密度',
                 pattern: '填充圖樣',
                 auto: 'auto',                       // do not change
-                line: 'line',                       // do not change
-                rectilinear: 'rectilinear',         // do not change
-                rectilinearGrid: 'rectilinear-grid',// do not change
-                honeycomb: 'honeycomb',             // do not change
+                line: '線狀',                       // do not change
+                rectilinear: '直線',         // do not change
+                rectilinearGrid: '直線格狀',// do not change
+                honeycomb: '蜂巢狀',             // do not change
                 curaInfill: {
-                    automatic: 'AUTOMATIC',
-                    grid: 'GRID',
-                    lines: 'LINES',
-                    concentric: 'CONCENTRIC'
+                    automatic: '自動',
+                    grid: '格狀',
+                    lines: '線狀',
+                    concentric: '同心',
+                    concentric_3d: '立體同心',
+                    cubic: '立方',
+                    cubicsubdiv: '立方細分',
+                    tetrahedral: '四面體',
+                    triangles: '三角形',
+                    zigzag: '鋸齒'
                 },
                 curaSupport: {
-                    lines: 'LINES',
-                    grid: 'GRID'
+                    lines: '線狀',
+                    grid: '格狀'
                 },
                 blackMagic: '黑魔法',
                 spiral: '螺旋',

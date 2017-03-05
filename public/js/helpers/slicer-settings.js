@@ -12,14 +12,14 @@ define([
         bottom_solid_layers                 : { key: 'bottom_layers' },
         fill_density                        : { key: 'infill_line_distance', fn: (v, settings) => { v = v || '10%'; return  v === '0%' ? 0 : (0.4 * 100 / parseFloat(v.toString().replace('%', ''))); } },
         fill_pattern                        : { key: 'infill_pattern', fn: (v) => { 
-                                                                            v = v.toUpperCase();
-                                                                            return (['ZIGZAG', 'GRID', 'LINES', 'CONCENTRIC'].indexOf(v) >= 0 ? v : 'ZIGZAG').toLowerCase();
+                                                                            v = v.toLowerCase();
+                                                                            return (['automatic','grid','lines','concentric','concentric_3d','cubic','cubicsubdiv','tetrahedral','triangles','zigzag',].indexOf(v) >= 0 ? v : 'ZIGZAG').toLowerCase();
                                                                        } },
         support_material                    : { key: 'support_enable', fn: (v) => { return !!parseInt(v); } },
         support_material_spacing            : { key: 'support_xy_distance' },
         support_material_threshold          : { key: 'support_angle', fn: (v) => { return 90.0 - parseFloat(v); } },
         support_material_pattern            : { key: 'support_pattern', fn: (v) => { 
-                                                                            v = v.toUpperCase();
+                                                                            v = v.toLowerCase();
                                                                             return (['ZIGZAG', 'GRID', 'LINES'].indexOf(v) >= 0 ? v : 'ZIGZAG').toLowerCase();
                                                                        } },
         support_material_contact_distance   : { key: 'support_top_distance' },
@@ -57,8 +57,6 @@ define([
     cura2revMapping.infill_pattern.fn =(v) => { return v.toUpperCase() };
 
     function insertConfig(lines, key, value) {
-        if (ALL_CURA2_KEYS.indexOf(key) < 0) return;
-
         let keyValue = key + ' = ' + value,
             lineNumber = -1;
 
@@ -112,7 +110,7 @@ define([
         this.support_material_pattern            = 'rectilinear';
         this.support_material_contact_distance   = 0.06;
         this.brim_width                          = 0;
-        this.skirts                              = 2;
+        this.skirts                              = 0;
         this.raft                                = 0;
         this.raft_layers                         = 4;
         
@@ -136,8 +134,9 @@ define([
     SlicerSettings.prototype.toExpert = function(customString = '', slicer = 'slic3r') {
         let self = this;
         function slic3r() {
+            console.log("TO exprt", self);
             var custom = ( customString || self.custom ).split('\n');
-            Object.keys(self).filter((key) => hiddenPresets.indexOf(key) === -1 || typeof self[key] !== 'function').map((key) => {
+            Object.keys(self).filter(((key) => hiddenPresets.indexOf(key) === -1 && typeof self[key] !== 'function')).map((key) => {
                 insertConfig(custom, key, self[key]);
             });
             return custom.join('\n');
@@ -146,7 +145,7 @@ define([
         function cura2() {
             var customCura2 = ( customString || self.customCura2 ).split('\n');
 
-            Object.keys(self).filter((key) => hiddenPresets.indexOf(key) === -1 || typeof self[key] !== 'function').map((key) => {
+            Object.keys(self).filter(((key) => hiddenPresets.indexOf(key) === -1 && typeof self[key] !== 'function')).map((key) => {
                 let value = self[key];
                 if (cura2mapping[key] && cura2mapping[key].key) {
                     let item = cura2mapping[key];
@@ -161,7 +160,8 @@ define([
                         value = item.fn ? item.fn(value, self) : value;
                     }
                 }   
-                insertConfig(customCura2, key, value);
+                
+                if (ALL_CURA2_KEYS.indexOf(key) >= 0) insertConfig(customCura2, key, value);
             })
             return customCura2.join('\n');
         }
@@ -172,7 +172,7 @@ define([
 
     SlicerSettings.prototype.load = function (settings, withCustom = false) {
         if (typeof settings == "object") {
-            
+            console.log("Loading object", settings);
             if (settings.defaultSetting) {
                 this.custom = settings.custom;
                 this.customCura2 = settings.customCura2;

@@ -404,19 +404,25 @@ define(function() {
                 density: 'Density',
                 pattern: 'Pattern',
                 auto: 'auto',                       // do not change
-                line: 'line',                       // do not change
-                rectilinear: 'rectilinear',         // do not change
-                rectilinearGrid: 'rectilinear-grid',// do not change
-                honeycomb: 'honeycomb',             // do not change
+                line: 'Line',                       // do not change
+                rectilinear: 'Rectilinear',         // do not change
+                rectilinearGrid: 'Rectilinear Grid',// do not change
+                honeycomb: 'Honeycomb',             // do not change
                 curaInfill: {
-                    automatic: 'AUTOMATIC',
-                    grid: 'GRID',
-                    lines: 'LINES',
-                    concentric: 'CONCENTRIC'
+                    automatic: 'Automatic',
+                    grid: 'Grid',
+                    lines: 'Lines',
+                    concentric: 'Concentric',
+                    concentric_3d: 'Concentric 3D',
+                    cubic: 'Cubic',
+                    cubicsubdiv: 'Cubic Subdivison',
+                    tetrahedral: 'Tetrahedral',
+                    triangles: 'Triangles',
+                    zigzag: 'Zigzag'
                 },
                 curaSupport: {
-                    lines: 'LINES',
-                    grid: 'GRID'
+                    lines: 'Lines',
+                    grid: 'Grid'
                 },
                 blackMagic: 'Black Magic',
                 spiral: 'Spiral',
