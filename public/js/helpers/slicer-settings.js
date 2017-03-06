@@ -84,11 +84,11 @@ define([
         this.id = id || ( s4() + s4() + '-' + s4() + '-' + s4() + '-' +
             s4() + '-' + s4() + s4() + s4());
 
-        console.log("New Slicer Settings", this.id);
+        console.log('New Slicer Settings', this.id);
 
         // General
-        this.engine                              = '';
-        this.temperature                         = 215;
+        this.engine                              = 'cura';
+        this.temperature                         = 200;
         this.first_layer_temperature             = 230;
         this.detect_filament_runout              = 1;
         this.flux_calibration                    = 1;
@@ -102,15 +102,15 @@ define([
         this.bottom_solid_layers                 = 4;
 
         // Infill
-        this.fill_density                        = 20;
-        this.fill_pattern                        = 'honeycomb';
+        this.fill_density                        = 10;
+        this.fill_pattern                        = 'LINES';
         this.spiral_vase                         = 0;
 
         // Support
         this.support_material                    = 0;
         this.support_material_spacing            = 2.7;
         this.support_material_threshold          = 37;
-        this.support_material_pattern            = 'rectilinear';
+        this.support_material_pattern            = 'LINES';
         this.support_material_contact_distance   = 0.06;
         this.brim_width                          = 0;
         this.skirts                              = 0;
@@ -122,7 +122,7 @@ define([
         this.support_material_speed              = 40;
         this.infill_speed                        = 60;
         this.first_layer_speed                   = 20;
-        this.solid_infill_speed                  = 20;
+        this.solid_infill_speed                  = 30;
         this.perimeter_speed                     = 40;
         this.external_perimeter_speed            = 28;
         this.bridge_speed                        = 60;
@@ -137,7 +137,6 @@ define([
     SlicerSettings.prototype.toExpert = function(customString = '', slicer = 'slic3r') {
         let self = this;
         function slic3r() {
-            console.log("TO exprt", self);
             var custom = ( customString || self.custom ).split('\n');
             Object.keys(self).filter(((key) => hiddenPresets.indexOf(key) === -1 && typeof self[key] !== 'function')).map((key) => {
                 insertConfig(custom, key, self[key]);

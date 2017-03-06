@@ -116,9 +116,10 @@ define([
 
                     if (!_settings) {
                         advancedSettings.load(DefaultPrintSettings);
+                        var defaultMedium = DefaultPrintSettings[Config().read('default-model') || Config().read('preferred-model') || 'fd1']['med'];
+                        advancedSettings.update(defaultMedium, 'slic3r');
                     }
                     else {
-                        console.log("____", "load localstorage", _settings);
                         advancedSettings.load(_settings, true);
                         // Load new default cura2 config
                         if (!_settings.customCura2) {
@@ -335,12 +336,11 @@ define([
                 },
 
                 _updateAdvancedSettings: function(opts) {
-                    for(var key in opts) {
-                        if (!opts.hasOwnProperty(key)) return;
+                    Object.keys(opts).map((key) => {
                         let value = opts[key];
                         let filteredParam = advancedSettings.filter({key: key, value: value});
-                        if (filteredParam) { director.setParameter(filteredParam.key, filteredParam.value) };
-                    }
+                        if (filteredParam) { director.setParameter(filteredParam.key, filteredParam.value); };
+                    });
                     advancedSettings.update(opts, 'slic3r');
 
                     // update dom state
@@ -948,7 +948,7 @@ define([
                 },
 
                 _saveSetting: function() {
-                    console.log("____", "saveSettings", advancedSettings);
+                    console.log('____', 'saveSettings', advancedSettings);
                     Config().write('advanced-settings', advancedSettings.toString());
                 },
 
