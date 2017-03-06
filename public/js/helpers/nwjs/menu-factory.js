@@ -531,7 +531,7 @@ define([
                                         console.log('ran movemnt test');
                                         ProgressActions.close();
                                         AlertActions.showPopupInfo('movement-tests', lang.device.movement_tests_complete);
-                                    }).fail(() => {
+                                    }).fail((resp) => {
                                         console.log('ran movemnt test failed');
                                         ProgressActions.close();
                                         AlertActions.showPopupInfo('movement-tests', lang.device.movement_tests_failed);
