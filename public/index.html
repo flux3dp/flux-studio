@@ -24,7 +24,7 @@
             cssLink = document.createElement('link'),
             head = document.querySelector('head'),
             body = document.querySelector('body'),
-            dev = localStorage['dev'] === true,
+            dev = localStorage['dev'] === 'true',
             getStarted = function(ghostPort) {
                 script.setAttribute('src', 'js/require.js');
                 script.dataset.main = 'js/main.js?v=' + (dev ? '' : window.FLUX.timestamp);

@@ -730,14 +730,17 @@ define([
         hasPreviewImage = false;
         willReslice = true;
 
-        if(slicingStatus.inProgress) {
-            clearTimeout(slicingTimmer);
-            stopSlicing();
-            startSlicing(slicingType.F);
-        }
-        else {
-            startSlicing(slicingType.F);
-        }
+        clearTimeout(slicingTimmer);
+        slicingTimmer = setTimeout(() => {
+            if(slicingStatus.inProgress) {
+                stopSlicing();
+                startSlicing(slicingType.F);
+            }
+            else {
+                startSlicing(slicingType.F);
+            }
+        }, 100);
+
     }
 
     function updateSlicingProgressFromReport(report) {
@@ -1221,7 +1224,7 @@ define([
 
     function getSlicingReport(callback) {
         let reportTimmer = 1000; // 1 sec
-
+        clearInterval(slicingStatus.reporter);
         slicingStatus.reporter = setInterval(function() {
             if (!slicingStatus.pauseReport) {
                 if(willReslice) {
@@ -1628,7 +1631,6 @@ define([
             setDefaultFileName();
             render();
             if(objects.length === 0) {
-                clearTimeout(slicingTimmer);
                 registerDragToImport();
                 reactSrc.setState({
                     openImportWindow: true,
