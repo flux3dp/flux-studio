@@ -807,6 +807,7 @@ define(function() {
             estimating: 'Estimating the time...',
             calibrate_fail: 'Calibration Failed',
             calibration_is_running: 'Calibrating for Scanning',
+            calibration_firmware_requirement: 'Please upgrade your firmware to 1.6.25+',
             resolution: [{
                 id: 'best',
                 text: 'Best',
