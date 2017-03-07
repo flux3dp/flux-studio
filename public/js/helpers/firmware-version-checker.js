@@ -24,7 +24,8 @@ define([
     const requirement = {
         BACKLASH                    : '1.5b12',
         OPERATE_DURING_PAUSE        : '1.6.20',
-        UPGRADE_KIT_PROFILE_SETTING : '1.6.20'
+        UPGRADE_KIT_PROFILE_SETTING : '1.6.20',
+        SCAN_CALIBRATION            : '1.6.25'
     };
 
     return {

@@ -821,6 +821,7 @@ define(function() {
             estimating: '估計中...',
             calibrate_fail: '校正失敗',
             calibration_is_running: '掃描校正中',
+            calibration_firmware_requirement: '請更新至韌體以使用此功能 (1.6.25+)',
             resolution: [{
                 id: 'best',
                 text: '最佳',
