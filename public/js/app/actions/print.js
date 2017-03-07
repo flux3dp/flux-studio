@@ -1404,6 +1404,10 @@ define([
         return d.promise();
     }
 
+    function setParameters(keyValueObject) {
+        return sliceMaster.addTask('setParameters', keyValueObject);
+    }
+
     function setRotation(x, y, z, needRender, src) {
         src = src || SELECTED;
         syncObjectOutline(src);
@@ -2944,6 +2948,7 @@ define([
         setScaleMode        : setScaleMode,
         setAdvanceParameter : setAdvanceParameter,
         setParameter        : setParameter,
+        setParameters       : setParameters,
         getFCode            : getFCode,
         getModelCount       : getModelCount,
         togglePreview       : togglePreview,

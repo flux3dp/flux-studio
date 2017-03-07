@@ -19,6 +19,7 @@ define([
         const addTask = (command, ...args) => {
             // if traffic is jammed, reset
             if(_tasks.length > 10) {
+                console.log('==== more than 10 ws tasks!');
                 _tasks = [];
                 _task = null;
                 processing = false;

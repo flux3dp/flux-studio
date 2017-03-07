@@ -61,7 +61,7 @@ define([
         _errors = {},
         availableUsbChannel = -1,
         usbEventListeners = {};
-    
+
     // Better select device
     function select(device, opts) {
         let d = $.Deferred();
@@ -1174,7 +1174,6 @@ define([
     // event : function, required, will callback with ture || false
     function registerUsbEvent(id, event) {
         usbEventListeners[id] = event;
-        console.log('registering event');
     }
 
     function unregisterUsbEvent(id) {

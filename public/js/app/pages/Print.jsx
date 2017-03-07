@@ -335,11 +335,22 @@ define([
                 },
 
                 _updateAdvancedSettings: function(opts) {
+                    let settings = {};
                     Object.keys(opts).map((key) => {
                         let value = opts[key];
                         let filteredParam = advancedSettings.filter({key: key, value: value});
-                        if (filteredParam) { director.setParameter(filteredParam.key, filteredParam.value); };
+                        if (filteredParam) {
+                            if(filteredParam.key instanceof Array) {
+                                for(let i = 0; i < filteredParam.key.length; i ++) {
+                                    settings[filteredParam.key[i]] = filteredParam.value[i];
+                                }
+                            }
+                            else {
+                                settings[filteredParam.key] = filteredParam.value;
+                            }
+                        };
                     });
+                    director.setParameters(settings);
                     advancedSettings.update(opts, 'slic3r');
 
                     // update dom state
@@ -921,7 +932,6 @@ define([
                     };
 
                     director.changeEngine(engineName).then((error) => {
-                        console.log('error is', error);
                         if(error) {
                             setDefaultEngine(error);
                         }

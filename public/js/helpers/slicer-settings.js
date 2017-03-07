@@ -84,8 +84,6 @@ define([
         this.id = id || ( s4() + s4() + '-' + s4() + '-' + s4() + '-' +
             s4() + '-' + s4() + s4() + s4());
 
-        console.log('New Slicer Settings', this.id);
-
         // General
         this.engine                              = 'cura';
         this.temperature                         = 200;
@@ -174,15 +172,15 @@ define([
 
     SlicerSettings.prototype.load = function (settings, withCustom = false) {
         if (typeof settings === 'object') {
-            console.log('Loading object', settings);
             if (settings.defaultSetting) {
                 this.custom = settings.custom;
                 this.customCura2 = settings.customCura2;
                 this.load(this.custom);
                 this.customCura2 = this.toExpert('', 'cura2');
-                if(this.custom == null) throw new Error('null custom error');
-            } else {
-                let holdAttrs = { id: settings.id }
+                if(this.custom === null) throw new Error('null custom error');
+            }
+            else {
+                let holdAttrs = { id: settings.id };
                 if (!withCustom) {
                     holdAttrs = {
                         id: settings.id,
@@ -196,7 +194,8 @@ define([
                 Object.assign(this, settings);
                 Object.assign(settings, holdAttrs);
             }
-        } else {
+        }
+        else {
             var settings = settings.split('\n');
 
             settings.forEach(function(line) {
@@ -222,9 +221,9 @@ define([
             }.bind(this));
 
             this[this.getExpertKey()] = settings.join('\n');
-            if(this.custom == null) throw new Error('null custom error');
+            if(this.custom == null) { throw new Error('null custom error'); }
         }
-        if(this.custom == null) throw new Error('null custom error');
+        if(this.custom == null) { throw new Error('null custom error'); }
     };
 
     SlicerSettings.prototype.set = function (id, value, updateCustom = false) {
