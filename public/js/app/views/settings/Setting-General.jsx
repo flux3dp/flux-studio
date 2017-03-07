@@ -82,6 +82,7 @@ define([
         _resetFS: function() {
             if(confirm(this.state.lang.settings.confirm_reset)) {
                 LocalStorage.clearAllExceptIP();
+                location.hash = '#';
             }
         },
 

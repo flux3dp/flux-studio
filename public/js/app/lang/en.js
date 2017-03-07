@@ -109,7 +109,7 @@ define(function() {
                 set_to_origin_complete: 'The machine has calibrated its origin.',
                 scan_laser_complete: 'The machine has turned on its scanning laser. Click "Finish" to turn it off.',
                 movement_tests_complete: 'Movement tests completed',
-                movement_tests_failed: 'Movement tests failed, make sure the toolhead cable is stretched correctly, or check <a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/115003674128-%E5%A6%82%E4%BD%95%E9%A0%86%E5%88%A9%E9%80%9A%E9%81%8E%E9%81%8B%E5%8B%95%E6%B8%AC%E8%A9%A6">this article</a>.',
+                movement_tests_failed: 'Movement tests failed. <br/>1. Make sure the toolhead cable is stretched correctly.<br/>2. Make sure the connector of toolhead cable to the machine has inserted about half into the machine.<br/>3. Try to turn the connector on the printing toolhead 180 degrees.<br/>4. Check <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/115003674128">this article</a>.',
                 finish: 'FINISH',
                 cancel: 'CANCEL',
                 turn_on_head_temperature: 'Turn on head temperature'
@@ -1224,7 +1224,7 @@ define(function() {
             startPrintDeltaPlus: 'Make sure you put on the magnetic print plate.',
             runningMovementTests: 'Running movement tests',
             connectingMachine: 'Connecting to the machine',
-            movementTestFailed: { caption: 'Unable to pass movement tests',  message: 'Make sure the toolhead cable is stretched correctly. Try again?' }
+            movementTestFailed: { caption: 'Unable to pass movement tests',  message: '1. Make sure the toolhead cable is stretched correctly.<br/>2. Make sure the connector of toolhead cable to the machine has inserted about half into the machine.<br/>3. Try to turn the connector on the printing toolhead 180 degrees.<br/>4. Check <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/115003674128">this article</a>.<br/> Try again?' }
         },
         slicer: {
             computing: 'Computing',

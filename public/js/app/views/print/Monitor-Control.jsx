@@ -273,6 +273,11 @@ define([
                 }
             }
 
+            if(Object.keys(Device.status).length === 0) {
+                leftButtonOn = false;
+                middleButtonOn = false;
+            }
+
             let leftButton = Monitor.mode === GlobalConstants.FILE ? this._operation().upload : this._operation().stop,
                 middleButton = Monitor.mode === GlobalConstants.FILE ? this._operation().download : action,
                 rightButton = this._operation().camera;
@@ -305,7 +310,7 @@ define([
                     {middleButton}
                     {rightButton}
                 </div>
-            )
+            );
         }
 
     });

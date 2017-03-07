@@ -109,7 +109,7 @@ define(function() {
                 set_to_origin_complete: '機器已回歸原點',
                 scan_laser_complete: '掃描雷射已開啟，點擊 "完成" 以關閉雷射',
                 movement_tests_complete: '運動測試完成',
-                movement_tests_failed: '運動測試失敗，請確認模組傳輸線有被拉直，或參考<a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/115003674128-%E5%A6%82%E4%BD%95%E9%A0%86%E5%88%A9%E9%80%9A%E9%81%8E%E9%81%8B%E5%8B%95%E6%B8%AC%E8%A9%A6">此篇文章</a>',
+                movement_tests_failed: '運動測試失敗。<br/>1. 請確工具頭連接線被正確拉直<br/>2. 上蓋工具頭連接線接頭沒入約一半<br/>3. 可嘗試將工具頭連接線順時針或逆時針旋轉 180 度再插入<br/>4. 參考 <a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/115003674128">此篇文章</a>',
                 finish: '完成',
                 cancel: '取消',
                 turn_on_head_temperature: '設定列印模組溫度'
@@ -1237,7 +1237,7 @@ define(function() {
             startPrintDeltaPlus: '確認將磁鐵列印版放上平台',
             runningMovementTests: '進行運動測試',
             connectingMachine: '連接機器中',
-            movementTestFailed: { caption: '無法通過運動測試',  message: '請確認工具頭連接線被正確拉直，再試一次？' }
+            movementTestFailed: { caption: '無法通過運動測試',  message: '1. 請確工具頭連接線被正確拉直<br/>2. 上蓋工具頭連接線接頭沒入約一半<br/>3. 可嘗試將工具頭連接線順時針或逆時針旋轉 180 度再插入<br/>4. 參考 <a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/115003674128">此篇文章</a><br/>再試一次？' }
         },
         slicer: {
             computing: '計算中',

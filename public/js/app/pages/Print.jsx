@@ -116,9 +116,10 @@ define([
 
                     if (!_settings) {
                         advancedSettings.load(DefaultPrintSettings);
+                        var defaultMedium = DefaultPrintSettings[Config().read('default-model') || Config().read('preferred-model') || 'fd1']['med'];
+                        advancedSettings.update(defaultMedium, 'slic3r');
                     }
                     else {
-                        console.log("____", "load localstorage", _settings);
                         advancedSettings.load(_settings, true);
                         // Load new default cura2 config
                         if (!_settings.customCura2) {
@@ -315,7 +316,6 @@ define([
                     nwjsMenu.clear.onClick = this._handleClearScene;
                     nwjsMenu.tutorial.enabled = true;
                     nwjsMenu.tutorial.onClick = () => {
-                        console.log('tour on');
                         this._handleYes('tour');
                     };
                     nwjsMenu.undo.enabled = false;
@@ -335,12 +335,22 @@ define([
                 },
 
                 _updateAdvancedSettings: function(opts) {
-                    for(var key in opts) {
-                        if (!opts.hasOwnProperty(key)) return;
+                    let settings = {};
+                    Object.keys(opts).map((key) => {
                         let value = opts[key];
                         let filteredParam = advancedSettings.filter({key: key, value: value});
-                        if (filteredParam) { director.setParameter(filteredParam.key, filteredParam.value) };
-                    }
+                        if (filteredParam) {
+                            if(filteredParam.key instanceof Array) {
+                                for(let i = 0; i < filteredParam.key.length; i ++) {
+                                    settings[filteredParam.key[i]] = filteredParam.value[i];
+                                }
+                            }
+                            else {
+                                settings[filteredParam.key] = filteredParam.value;
+                            }
+                        };
+                    });
+                    director.setParameters(settings);
                     advancedSettings.update(opts, 'slic3r');
 
                     // update dom state
@@ -389,29 +399,23 @@ define([
 
                         const tryMovementTest = () => {
                             let device = this._getDevice();
-                            console.log('device to work is', device);
                             if (device) {
                                 this.showSpinner(lang.tutorial.connectingMachine);
                                 let addr = parseInt(device.addr || '-1');
-                                console.log('addr is', addr);
                                 DeviceMaster.getDeviceBySerial(device.serial, addr > 0, {
                                     timeout: 20000,
                                     onSuccess: (printer)  => {
-                                        console.log('found printer', printer);
                                         DeviceMaster.selectDevice(printer).then(() => {
                                             return CheckDeviceStatus(printer, false, true);
                                         })
                                         .then(() => {
                                             this.showSpinner(lang.tutorial.runningMovementTests);
-                                            console.log('good status', printer.st_id);
                                             return DeviceMaster.runMovementTests();
                                         })
                                         .then(() => {
-                                            console.log('ran movemnt test');
                                             this.hideSpinner();
                                             startTutorial();
                                         }).fail(() => {
-                                            console.log('ran movemnt test failed');
                                             this.hideSpinner();
                                             AlertActions.showPopupYesNo('movement-try-again', lang.tutorial.movementTestFailed.message, lang.tutorial.movementTestFailed.caption, null, {
                                                 yes: function() {
@@ -425,7 +429,6 @@ define([
                                         });
                                     },
                                     onTimeout: () => {
-                                        console.log('Timeouut');
                                         this.hideSpinner();
                                         setTimeout(function() {
                                             AlertActions.showWarning(sprintf('Unable to find printer %s', selectedPrinterName));
@@ -567,14 +570,12 @@ define([
                 },
 
                 _handleGoClick: function() {
-                    console.log('on handle go click');
                     AlertStore.removeCancelListener(this._handleDefaultCancel);
                     listeningToCancel = false;
                     finishedSnapshot = false;
                     director.takeSnapShot().then(() =>{
                         finishedSnapshot = true;
                         director.clearSelection();
-                        console.log('snapshot done', 'clear selection');
                     });
                     this.setState({
                         openPrinterSelectorWindow: true
@@ -623,7 +624,6 @@ define([
                 _handleApplyAdvancedSetting: function(setting) {
                     let d = $.Deferred(), quality = 'custom';
                     advancedSettings.load(setting || {}, true);
-                    console.log('_____', 'After applied ', advancedSettings);
                     // remove old properties
                     delete advancedSettings.raft_on;
 
@@ -734,10 +734,8 @@ define([
                     this.setState({
                         openPrinterSelectorWindow: false
                     }, () => {
-                        console.log('Device selected');
                         let go = () => {
                             if(director.getSlicingStatus().isComplete && finishedSnapshot) {
-                                console.log('Finished snapshot');
                                 clearInterval(t);
                                 director.getFCode().then((fcode, previewUrl) => {
                                     if(!(fcode instanceof Blob)) {
@@ -934,7 +932,6 @@ define([
                     };
 
                     director.changeEngine(engineName).then((error) => {
-                        console.log('error is', error);
                         if(error) {
                             setDefaultEngine(error);
                         }
@@ -948,7 +945,6 @@ define([
                 },
 
                 _saveSetting: function() {
-                    console.log("____", "saveSettings", advancedSettings);
                     Config().write('advanced-settings', advancedSettings.toString());
                 },
 

@@ -258,21 +258,34 @@ define([
                 return d.promise();
             },
 
+            setParameters: (keyValueObject) => {
+                let d = $.Deferred();
+
+                let keyValue = Object.keys(keyValueObject).map(o => {
+                    return `${o} = ${keyValueObject[o]}`;
+                });
+
+                events.onMessage = (result) => { d.resolve(result); };
+                events.onError = (error) => { d.resolve(error); };
+                events.onFatal = (error) => { d.resolve(error); };
+
+                ws.send(`advanced_setting ${keyValue.join('\n')}`);
+
+                return d.promise();
+            },
+
             setParameter: (name, value) => {
                 // Support multiple name & value
                 // console.log("set pa", name, value);
                 if (name instanceof Array) {
                     if (name.length > 1 ) {
                         return slicingApi.setParameter(name[0], value[0]).then(() => {
-                        //    console.log('then');
                             slicingApi.setParameter(name.slice(1), value.slice(1));
                         }).fail(() => { slicingApi.setParameter(name.slice(1), value.slice(1)); });
                     } else if (name.length === 1) {
-                      //  console.log('run end');
                         return slicingApi.setParameter(name[0], value[0]);
                     }
                 }
-//                console.log('realdo');
 
                 let d = $.Deferred();
 
@@ -284,11 +297,13 @@ define([
 
                 if(name === 'advancedSettings' && value !== '') {
                     ws.send(`advanced_setting ${value}`);
-                } else if(name === 'advancedSettingsCura2' && value !== '') {
+                }
+                else if(name === 'advancedSettingsCura2' && value !== '') {
                     ws.send(`advanced_setting # slicer = cura2\n${value}`);
                     //ws.send(`advanced_setting raft = 1`);
                     // console.error("Not yet implement Cura2");
-                } else if(name != 'advancedSettings') {
+                }
+                else if(name !== 'advancedSettings') {
                     ws.send(`advanced_setting ${name} = ${value}`);
                 }
 
