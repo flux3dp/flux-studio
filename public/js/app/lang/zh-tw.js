@@ -1110,6 +1110,7 @@ define(function() {
                 message: '機器正在進行另外一項工作，請稍候再試。如果機器持續沒有回應，請將機器重新啟動。'
             },
             device_is_used: '機器正被使用中，是否要終止現在任務？',
+            device_in_use: '機器正被使用中，請停止或暫停目前的任務',
             invalidFile: '檔案不是正確的 STL 格式',
             failGeneratingPreview: '無法儲存預覽圖',
             slicingFailed: 'Slic3r 切片錯誤',

@@ -435,12 +435,17 @@ define([
                     var currentPrinter = discoverMethods.getLatestPrinter(printer);
 
                     DeviceMaster.selectDevice(currentPrinter).then(function(status) {
-                        if (status === DeviceConstants.CONNECTED) {
-                            showPopup(currentPrinter, 'CHANGE_FILAMENT');
-                        }
-                        else if (status === DeviceConstants.TIMEOUT) {
-                            AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
-                        }
+                        DeviceMaster.getReport(report => {
+                            if(report.st_id === 16 || report.st_id === 2) {
+                                AlertActions.showPopupError('OCCUPIED', lang.message.device_in_use);
+                            }
+                            else if (status === DeviceConstants.CONNECTED) {
+                                showPopup(currentPrinter, 'CHANGE_FILAMENT');
+                            }
+                            else if (status === DeviceConstants.TIMEOUT) {
+                                AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
+                            }
+                        });
                     });
                 }
             });

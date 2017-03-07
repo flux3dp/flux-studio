@@ -1096,6 +1096,7 @@ define(function() {
                 message: 'The machine is executing another task, try again later. If it stops working, please restart the machine.'
             },
             device_is_used: 'The machine is being used, do you want to abort current task?',
+            device_in_use: 'The machine is being used, please stop or pause current task.',
             invalidFile: 'The file is not a valid STL file',
             failGeneratingPreview: 'Fail to generate preview',
             slicingFailed: 'slic3r is unable to slice this model',
