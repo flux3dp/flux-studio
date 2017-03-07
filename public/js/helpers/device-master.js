@@ -1204,6 +1204,25 @@ define([
         }
     }
 
+    function usbDefaultDeviceCheck(device) {
+        // console.log('---', device.source, this.availableUsbChannel != device.addr);
+        if(device.source !== 'h2h') {
+            return device;
+        }
+
+        if(this.availableUsbChannel !== device.addr) {
+            // get wifi version instead of h2h
+            let dev = _devices.filter(_dev => _dev.serial === device.serial);
+            if(dev[0]) {
+                console.log(dev[0]);
+                return dev[0];
+            }
+        }
+        else {
+            return device;
+        }
+    }
+
     // Core
 
     function DeviceSingleton() {
@@ -1273,6 +1292,7 @@ define([
             this.runMovementTests               = runMovementTests;
             this.getDeviceBySerial              = getDeviceBySerial;
             this.getAvailableDevices            = getAvailableDevices;
+            this.usbDefaultDeviceCheck          = usbDefaultDeviceCheck;
 
             Discover(
                 'device-master',
@@ -1284,7 +1304,6 @@ define([
                     _devices = devices;
                     // console.log('devices', _devices);
                     _scanDeviceError(devices);
-
                 }
             );
         }

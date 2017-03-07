@@ -25,10 +25,11 @@ define([
                         ws.send(`open ${availableUsbChannel}`);
                     } else {
                         // Connected, do nothing
+                        if(!usbConnected) {
+                            callback(availableUsbChannel, false);
+                        }
                         usbConnected = true;
-                        callback(availableUsbChannel, false);
                     }
-                
                 }
                 else {
                     // if usb is unplugged

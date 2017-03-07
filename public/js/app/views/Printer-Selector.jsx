@@ -224,6 +224,7 @@ define([
                 }
             };
 
+            printer = DeviceMaster.usbDefaultDeviceCheck(printer);
             self.selected_printer = printer;
 
             if ('00000000000000000000000000000000' === self.selected_printer.uuid) {
