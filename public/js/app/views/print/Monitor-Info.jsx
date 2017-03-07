@@ -93,6 +93,10 @@ define([
             let { Monitor, Device } = this.context.store.getState(),
                 lang = this.lang.monitor;
 
+            if(Object.keys(Device.status).length === 0) {
+                return lang.connecting;
+            }
+
             if(Number.isInteger(Monitor.uploadProgress)) {
                 return `${lang.processing} ${Monitor.uploadProgress}%`;
             }

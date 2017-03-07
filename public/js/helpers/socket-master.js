@@ -18,9 +18,10 @@ define([
 
         const addTask = (command, ...args) => {
             // if traffic is jammed, reset
-            if(_tasks.length > 50) {
+            if(_tasks.length > 10) {
                 _tasks = [];
                 _task = null;
+                processing = false;
             }
             let d = $.Deferred();
             _tasks.push({d, command, args});
