@@ -23,7 +23,7 @@ if not ERRORLEVEL 1 (
     netsh advfirewall firewall add rule name=FLUX_API dir=in action=allow protocol=ANY program="%cd%\lib\flux_api\flux_api.exe"
 )
 
-reg Query "HKLM\Hardware\Description\System\CentralProcessor\0" | find /i "x32" > NUL && set OS=32BIT || set OS=64BIT
+reg Query "HKLM\Hardware\Description\System\CentralProcessor\0" | find /i "x32" > NUL && set OS=32BIT ||  find /i "x86" > NUL && set OS=32BIT  || set OS=64BIT
 
 if %OS%==32BIT (
     set FILE_NAME=VC_redist.x86.exe
