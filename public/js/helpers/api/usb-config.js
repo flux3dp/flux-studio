@@ -307,7 +307,7 @@ define([
                     response.ipaddr = response.ipaddr || [];
                     response.ssid = response.ssid || '';
 
-                    if (response.status === 'ok' && response.ssid !== '') {
+                    if (response.status === 'ok' && response.ssid !== '' && response.ipaddr.length > 0) {
                         response.action = 'GOOD';
                         $deferred.resolve(response);
                     }
@@ -324,7 +324,7 @@ define([
                     }
                 };
 
-                let cmd = usbChannel === -1 ? 'get network' : 'get_wifi_ssid';
+                let cmd = usbChannel === -1 ? 'get network' : 'get_network_status';
                 ws.send(cmd);
 
                 ws.onError(function(data) {
