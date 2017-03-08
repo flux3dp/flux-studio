@@ -1405,6 +1405,12 @@ define([
     }
 
     function setParameters(keyValueObject) {
+        blobExpired = true;
+        hasPreviewImage = false;
+        lastSliceParams = '';
+        if(objects.length > 0) {
+            doSlicing();
+        }
         return sliceMaster.addTask('setParameters', keyValueObject);
     }
 

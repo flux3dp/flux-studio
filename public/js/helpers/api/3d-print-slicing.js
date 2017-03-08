@@ -275,18 +275,6 @@ define([
             },
 
             setParameter: (name, value) => {
-                // Support multiple name & value
-                // console.log("set pa", name, value);
-                if (name instanceof Array) {
-                    if (name.length > 1 ) {
-                        return slicingApi.setParameter(name[0], value[0]).then(() => {
-                            slicingApi.setParameter(name.slice(1), value.slice(1));
-                        }).fail(() => { slicingApi.setParameter(name.slice(1), value.slice(1)); });
-                    } else if (name.length === 1) {
-                        return slicingApi.setParameter(name[0], value[0]);
-                    }
-                }
-
                 let d = $.Deferred();
 
                 let errors = [];
