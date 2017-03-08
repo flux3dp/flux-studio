@@ -11,6 +11,7 @@ define([
     'helpers/api/config',
     'app/actions/alert-actions',
     'app/default-print-settings',
+    'helpers/slicer-settings',
     'helpers/object-assign'
 ], function(
     $,
@@ -24,7 +25,8 @@ define([
     ClassNames,
     Config,
     AlertActions,
-    DefaultPrintSettings
+    DefaultPrintSettings,
+    SlicerSettings
 ) {
     'use strict';
 
@@ -49,53 +51,10 @@ define([
         slic3rInfill,
         slic3rSupport,
         curaInfill,
+        cura2Infill,
         curaSupport,
         configs = ['avoid_crossing_perimeters','bed_shape','bed_temperature','before_layer_gcode','bottom_solid_layers','bridge_acceleration','bridge_fan_speed','bridge_flow_ratio','bridge_speed','brim_width','complete_objects','cooling','default_acceleration','disable_fan_first_layers','dont_support_bridges','duplicate_distance','end_gcode','external_fill_pattern','external_perimeter_extrusion_width','external_perimeter_speed','external_perimeters_first','extra_perimeters','extruder_clearance_height','extruder_clearance_radius','extruder_offset','extrusion_axis','extrusion_multiplier','extrusion_width','fan_always_on','fan_below_layer_time','filament_colour','filament_diameter','fill_angle','fill_density','fill_pattern','first_layer_acceleration','first_layer_bed_temperature','first_layer_extrusion_width','first_layer_height','first_layer_speed','first_layer_temperature','gap_fill_speed','gcode_arcs','gcode_comments','gcode_flavor','infill_acceleration','infill_every_layers','infill_extruder','infill_extrusion_width','infill_first','infill_only_where_needed','infill_overlap','infill_speed','interface_shells','layer_gcode','layer_height','max_fan_speed','max_print_speed','max_volumetric_speed','min_fan_speed','min_print_speed','min_skirt_length','notes','nozzle_diameter','octoprint_apikey','octoprint_host','only_retract_when_crossing_perimeters','ooze_prevention','output_filename_format','overhangs','perimeter_acceleration','perimeter_extruder','perimeter_extrusion_width','perimeter_speed','perimeters','post_process','pressure_advance','raft', 'raft_layers','resolution','retract_before_travel','retract_layer_change','retract_length','retract_length_toolchange','retract_lift','retract_restart_extra','retract_restart_extra_toolchange','retract_speed','seam_position','skirt_distance','skirt_height','skirts','slowdown_below_layer_time','small_perimeter_speed','solid_infill_below_area','solid_infill_every_layers','solid_infill_extruder','solid_infill_extrusion_width','solid_infill_speed','spiral_vase','standby_temperature_delta','start_gcode','support_material','support_material_angle','support_material_contact_distance','support_material_enforce_layers','support_material_extruder','support_material_extrusion_width','support_material_interface_extruder','support_material_interface_layers','support_material_interface_spacing','support_material_interface_speed','support_material_pattern','support_material_spacing','support_material_speed','support_material_threshold','temperature','thin_walls','threads','toolchange_gcode','top_infill_extrusion_width','top_solid_infill_speed','top_solid_layers','travel_speed','use_firmware_retraction','use_relative_e_distances','use_volumetric_e','vibration_limit','wipe','xy_size_compensation','z_offset'],
-        advancedSetting = {
-            // General
-            engine                              : '',
-            temperature                         : 215,
-            first_layer_temperature             : 230,
-            detect_filament_runout              : 1,
-            flux_calibration                    : 1,
-            detect_head_tilt                    : 1,
-
-            // Layers
-            layer_height                        : 0.15,
-            first_layer_height                  : 0.25,
-            perimeters                          : 3,
-            top_solid_layers                    : 4,
-            bottom_solid_layers                 : 4,
-
-            // Infill
-            fill_density                        : 20,
-            fill_pattern                        : 'honeycomb',
-            spiral_vase                         : 0,
-
-            // Support
-            support_material                    : 1,
-            support_material_spacing            : 2.7,
-            support_material_threshold          : 37,
-            support_material_pattern            : 'rectilinear',
-            support_material_contact_distance   : 0.06,
-            brim_width                          : 0,
-            skirts                              : 2,
-            raft                                : 1,
-            raft_layers                         : 4,
-
-            // Speed
-            travel_speed                        : 80,
-            support_material_speed              : 40,
-            infill_speed                        : 60,
-            first_layer_speed                   : 20,
-            solid_infill_speed                  : 20,
-            perimeter_speed                     : 40,
-            external_perimeter_speed            : 28,
-            bridge_speed                        : 60,
-
-            // Custom
-            custom                              : ''
-        };
+        advancedSetting = new SlicerSettings('advanced');
 
     return React.createClass({
 
@@ -111,6 +70,8 @@ define([
                 mode                : 1,
                 selectedTab         : 1,
                 custom              : this.props.setting.custom || '',
+                customCura2         : this.props.setting.customCura2 || '',
+                showBridgeSpeed     : this.props.setting.engine !== 'cura2',
 
                 // Presets
                 selectedPreset      : '',
@@ -120,16 +81,41 @@ define([
 
         componentWillMount: function() {
             lang = this.props.lang.print.advanced;
-            slic3rInfill = [lang.rectilinear, lang.line, lang.honeycomb];
-            slic3rSupport = [lang.rectilinearGrid, lang.line, lang.rectilinear, lang.honeycomb];
-            curaInfill = [
-                lang.curaInfill.automatic,
-                lang.curaInfill.grid,
-                lang.curaInfill.lines,
-                lang.curaInfill.concentric
+            slic3rInfill = [
+                { label: lang.rectilinear, value: 'rectilinear' }, 
+                { label: lang.line, value: 'line' }, 
+                { label: lang.honeycomb, value: 'honeycomb' }
             ];
-            curaSupport = [lang.curaSupport.grid, lang.curaSupport.lines];
-            Object.assign(advancedSetting, this.props.setting);
+            slic3rSupport = [
+                { label: lang.rectilinearGrid, value: 'rectilinear-grid' },
+                { label: lang.line, value: 'line' },
+                { label: lang.rectilinear, value: 'rectilinear' }, 
+                { label: lang.honeycomb, value: 'honeycomb' } 
+            ];
+            curaInfill = [
+                { label: lang.curaInfill.automatic, value: 'AUTOMATIC' },
+                { label: lang.curaInfill.grid, value: 'GRID' },
+                { label: lang.curaInfill.lines, value: 'LINES' },
+                { label: lang.curaInfill.concentric, value: 'CONCENTRIC' }
+            ];
+            cura2Infill = [
+                { label: lang.curaInfill.automatic, value: 'automatic' },
+                { label: lang.curaInfill.grid, value: 'grid' },
+                { label: lang.curaInfill.lines, value: 'lines' },
+                { label: lang.curaInfill.concentric, value: 'concentric' },
+                { label: lang.curaInfill.concentric_3d, value: 'concentric_3d' },
+                { label: lang.curaInfill.cubic, value: 'cubic' },
+                { label: lang.curaInfill.cubicsubdiv, value: 'cubicsubdiv' },
+                { label: lang.curaInfill.tetrahedral, value: 'tetrahedral' },
+                { label: lang.curaInfill.triangles, value: 'triangles' },
+                { label: lang.curaInfill.zigzag, value: 'zigzag' },
+            ];
+            curaSupport = [
+                { label: lang.curaSupport.grid, value: 'GRID' },
+                { label: lang.curaSupport.lines, value: 'LINES' }
+            ];
+            advancedSetting.load(this.props.setting, true);
+
             this._updateCustomField();
         },
 
@@ -142,6 +128,7 @@ define([
         _validateValue: function(e) {
             e.preventDefault();
             if(!this._isValidValue(currentKey, this.state[currentKey])) {
+                console.log('validate ', this.state);
                 this.setState(this._createState(currentKey, lastValidValue));
             }
         },
@@ -154,28 +141,8 @@ define([
         },
 
         _updateCustomField: function() {
-            var keys = Object.keys(advancedSetting),
-                custom = this.state.custom.length === 0 ? [] : this.state.custom.split('\n'),
-                _entry, _keys, lineNumber;
-
-            keys = keys.filter((key) => hiddenPresets.indexOf(key) === -1);
-
-            for(var i = 0; i < keys.length; i++) {
-                _keys = keys[i];
-                _entry = _keys + ' = ' + advancedSetting[_keys];
-
-                lineNumber = this._getLineNumber(custom, _keys);
-
-                if(lineNumber >= 0) {
-                    custom[lineNumber] = _entry;
-                }
-                else {
-                    if(hiddenPresets.indexOf(_keys) === -1) {
-                        custom.push(_entry);
-                    }
-                }
-            }
-            this.setState({ custom: custom.join('\n') });
+            this.setState({ custom: advancedSetting.toExpert(this.state.custom, 'slic3r'),
+                            customCura2: advancedSetting.toExpert(this.state.customCura2, 'cura2') });
         },
 
         _getLineNumber: function(array, key) {
@@ -207,7 +174,7 @@ define([
             var self = this,
                 p = presets === '' ? {} : presets;
 
-            p[presetName] = JSON.stringify(advancedSetting);
+            p[presetName] = advancedSetting.toString();
 
             Config().write('preset-settings', JSON.stringify(p), {
                 onFinished: function() {
@@ -245,27 +212,7 @@ define([
         },
 
         _processCustomInput: function() {
-            var settings = this.state.custom.split('\n');
-            var _key, _value;
-
-            settings.forEach(function(line) {
-                var setting = line.split('=');
-
-                if(setting.length === 2) {
-                    _key = setting[0].replace(/ /g, '');
-                    _value = setting[1].trim();
-
-                    if(this._isPartOfAdvancedSetting(_key)) {
-                        advancedSetting[_key] = parseFloat(_value) || _value;
-                    }
-                }
-            }.bind(this));
-
-            advancedSetting.custom = this.state.custom;
-        },
-
-        _isPartOfAdvancedSetting: function(property) {
-            return Object.keys(advancedSetting).indexOf(property) >= 0;
+            advancedSetting.load(this.state[advancedSetting.getExpertKey()]);
         },
 
         _handleNavigate: function(selectedTab, e) {
@@ -291,7 +238,6 @@ define([
             if(e.target.type === 'checkbox') {
                 value = e.target.checked;
             }
-
             this.setState(this._createState(key, value));
         },
 
@@ -336,14 +282,14 @@ define([
                 if(id === 'skirts') {
                     onValue = 2;
                 }
-                advancedSetting[id] = value ? onValue : 0;
+                advancedSetting.set(id, value ? onValue : 0);
             }
             else {
-                advancedSetting[id] = value;
+                advancedSetting.set(id, value);
             }
 
             const setFillPatternToRectilinear = () => {
-                advancedSetting.fill_pattern = 'rectilinear';
+                advancedSetting.set('fill_pattern', 'rectilinear');
                 this.removeInfillSection = true;
                 this.forceUpdate();
                 setTimeout(() => { this.forceUpdate(); }, 10);
@@ -353,6 +299,7 @@ define([
 
             if(id === 'engine') {
                 fill_pattern = value === 'slic3r' ? 'rectilinear' : 'AUTOMATIC';
+                this.setState({ showBridgeSpeed: value !== 'cura2' });
             }
             else if(id === 'fill_pattern' && value !== 'rectilinear') {
                 if(engine === 'slic3r' && fill_density === '100') {
@@ -365,14 +312,16 @@ define([
                 }
             }
 
+            console.log("end of fillpattern", fill_pattern);
 
             this._updateCustomField();
         },
 
         _handleApplyPreset: function() {
             var p = this.state.presets[this.state.selectedPreset];
-            advancedSetting = JSON.parse(p);
-            this.setState({ custom: advancedSetting.custom }, function() {
+            advancedSetting.load(JSON.parse(p));
+            var customKey = advancedSetting.getExpertKey();
+            this.setState({ [customKey]: advancedSetting[customKey] }, function() {
                 this._updateCustomField();
                 this._handleBackToSetting();
             });
@@ -381,8 +330,7 @@ define([
         _handleApply: function(showAdvancedSetting) {
             this._processCustomInput();
 
-            var _settings = {};
-            Object.assign(_settings, advancedSetting)
+            var _settings = advancedSetting.deepClone();
             this.props.onApply(_settings);
             if(!showAdvancedSetting) {
                 this.props.onClose();
@@ -401,7 +349,6 @@ define([
             });
 
             Config().write('preset-settings', JSON.stringify(presets));
-            console.log(presets);
         },
 
         _handleCloseAdvancedSetting: function(e) {
@@ -410,7 +357,8 @@ define([
         },
 
         _handleLoadPreset: function() {
-            this.setState({ custom: DefaultPrintSettings.custom });
+            this.setState({ custom: DefaultPrintSettings.custom,
+                            customCura2: DefaultPrintSettings.customCura2  });
         },
 
         _renderTabs: function() {
@@ -444,6 +392,10 @@ define([
                 {
                     id: 'cura',
                     name: lang.cura
+                },
+                {
+                    id: 'cura2',
+                    name: lang.cura2
                 }
             ];
             return (
@@ -581,8 +533,11 @@ define([
                 return <div></div>;
             }
             var infillPattern;
+            console.log("Infill engine", advancedSetting.engine);
             if(advancedSetting.engine === 'cura') {
                 infillPattern = curaInfill;
+            } else if(advancedSetting.engine === 'cura2') {
+                infillPattern = cura2Infill; 
             }
             else {
                 infillPattern = slic3rInfill;
@@ -619,7 +574,7 @@ define([
 
         _renderSupportSection: function() {
             var supportPattern;
-            if(advancedSetting.engine === 'cura') {
+            if(advancedSetting.engine === 'cura' || advancedSetting.engine === 'cura2') {
                 supportPattern = curaSupport;
             }
             else {
@@ -684,7 +639,7 @@ define([
                             id="raft"
                             label={lang.raft}
                             default={advancedSetting.raft === 1}
-                            onChange={this._handleControlValueChange} />                        
+                            onChange={this._handleControlValueChange} />
 
                         <SliderControl
                             id="raft_layers"
@@ -719,6 +674,18 @@ define([
         },
 
         _renderSpeedSection: function() {
+            let bridgeSpeed = (
+                <SliderControl
+                    id="bridge_speed"
+                    key="bridge_speed"
+                    label={lang.bridge}
+                    min={1}
+                    max={100}
+                    step={1}
+                    default={advancedSetting.bridge_speed}
+                    onChange={this._handleControlValueChange} />
+            );
+            bridgeSpeed = this.state.showBridgeSpeed ? bridgeSpeed : '';
             return (
                 <div className="content-wrapper">
 
@@ -803,15 +770,7 @@ define([
                             default={advancedSetting.external_perimeter_speed}
                             onChange={this._handleControlValueChange} />
 
-                        <SliderControl
-                            id="bridge_speed"
-                            key="bridge_speed"
-                            label={lang.bridge}
-                            min={1}
-                            max={100}
-                            step={1}
-                            default={advancedSetting.bridge_speed}
-                            onChange={this._handleControlValueChange} />
+                        {bridgeSpeed}
 
                     </div>
 
@@ -820,6 +779,7 @@ define([
         },
 
         _renderCustomSection: function() {
+            console.log('render ', this.state);
             return (
                 <div className="content-wrapper">
 
@@ -835,9 +795,9 @@ define([
                                     <textarea
                                         rows="20"
                                         cols="50"
-                                        value={this.state.custom}
-                                        onChange={this._handleParameterChange.bind(null, 'custom')}
-                                        onKeyUp={this._handleParameterChange.bind(null, 'custom')} />
+                                        value={this.state[advancedSetting.getExpertKey()]}
+                                        onChange={this._handleParameterChange.bind(null, advancedSetting.engine === 'cura2' ? 'customCura2' : 'custom')}
+                                        onKeyUp={this._handleParameterChange.bind(null, advancedSetting.engine === 'cura2' ? 'customCura2' : 'custom')} />
                                 </div>
                             </div>
                         </div>
@@ -950,7 +910,10 @@ define([
             });
 
             var preset = this.state.presets[this.state.selectedPreset] || '{}',
-                presetContent = JSON.parse(preset);
+                presetContent = JSON.parse(preset),
+                custom = preset.engine === 'cura2' ? presetContent.customCura2 : presetContent.custom;
+
+            console.log('preset.engine', preset.engine);
 
             return (
                 <div id="advanced-panel" className="advanced-panel">
@@ -959,7 +922,7 @@ define([
                         <div className="preset-list">
                             {entries}
                         </div>
-                        <textarea className="preset-content" value={presetContent.custom} disabled />
+                        <textarea className="preset-content" value={custom} disabled />
                         {footer}
                     </div>
                 </div>

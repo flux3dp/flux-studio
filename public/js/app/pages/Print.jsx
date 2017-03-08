@@ -34,7 +34,8 @@ define([
     'helpers/api/cloud',
     'helpers/i18n',
     'helpers/check-device-status',
-    'app/tutorial-steps'
+    'app/tutorial-steps',
+    'helpers/slicer-settings'
 ], function(
     $,
     React,
@@ -71,7 +72,8 @@ define([
     CloudApi,
     i18n,
     CheckDeviceStatus,
-    TutorialSteps
+    TutorialSteps,
+    SlicerSettings
 ) {
 
     return function(args) {
@@ -79,7 +81,7 @@ define([
 
         args = args || {};
 
-        var advancedSettings = {},
+        var advancedSettings = new SlicerSettings('main'),
             fineAdvancedSettings = {},
             _scale = {
                 locked  : true,
@@ -101,28 +103,28 @@ define([
             allowDeleteObject = true,
             tutorialMode = false,
             nwjsMenu = menuFactory.items,
-            defaultSlicingEngine = 'cura',
+            defaultSlicingEngine = 'cura2',
             tourGuide = TutorialSteps,
             view = React.createClass({
 
                 getInitialState: function() {
-                    var _setting            = Config().read('advanced-settings'),
+                    var _settings            = Config().read('advanced-settings'),
                         tutorialFinished    = Config().read('tutorial-finished'),
-                        configuredPrinter   = Config().read('configured-printer'),
-                        _raftLayers;
+                        configuredPrinter   = Config().read('configured-printer');
 
                     this._checkDefaultPrintSettingsVersion();
 
-                    if(!_setting) {
-                        advancedSettings = {};
-                        advancedSettings.raft = 1;
-                        advancedSettings.support_material = 0;
-                        advancedSettings.custom = DefaultPrintSettings.custom;
+                    if (!_settings) {
+                        advancedSettings.load(DefaultPrintSettings);
+                        var defaultMedium = DefaultPrintSettings[Config().read('default-model') || Config().read('preferred-model') || 'fd1']['med'];
+                        advancedSettings.update(defaultMedium, 'slic3r');
                     }
                     else {
-                        advancedSettings = _setting;
-                        if (advancedSettings.raft == null) {
-                            advancedSettings.raft = 1;
+                        advancedSettings.load(_settings, true);
+                        // Load new default cura2 config
+                        if (!_settings.customCura2) {
+                            advancedSettings.customCura2 = DefaultPrintSettings.customCura2;
+                            advancedSettings.customCura2 = advancedSettings.toExpert(advancedSettings.customCura2, 'cura2');
                         }
                     }
 
@@ -185,7 +187,7 @@ define([
 
                     // prevent user to operate before settings are set
                     this.showSpinner();
-                    this._handleApplyAdvancedSetting().then(() => {
+                    this._handleApplyAdvancedSetting().always(() => {
                         this.hideSpinner();
                     });
 
@@ -314,7 +316,6 @@ define([
                     nwjsMenu.clear.onClick = this._handleClearScene;
                     nwjsMenu.tutorial.enabled = true;
                     nwjsMenu.tutorial.onClick = () => {
-                        console.log('tour on');
                         this._handleYes('tour');
                     };
                     nwjsMenu.undo.enabled = false;
@@ -334,22 +335,23 @@ define([
                 },
 
                 _updateAdvancedSettings: function(opts) {
-                    // load setting lines
-                    let custom = advancedSettings.custom.split('\n');
-                    // Iterate all update
-                    for(var key in opts) {
+                    let settings = {};
+                    Object.keys(opts).map((key) => {
                         let value = opts[key];
-                        director.setParameter(key, value);
-                        advancedSettings[key] = value;
-                        // update setting line ( using replace )
-                        for(var i = 0; i < custom.length; i++) {
-                            if(custom[i].indexOf(key + ' ') == 0 || custom[i].indexOf(key + '=') == 0) {
-                                custom[i] = key + ' = ' +  value;
+                        let filteredParam = advancedSettings.filter({key: key, value: value});
+                        if (filteredParam) {
+                            if(filteredParam.key instanceof Array) {
+                                for(let i = 0; i < filteredParam.key.length; i ++) {
+                                    settings[filteredParam.key[i]] = filteredParam.value[i];
+                                }
                             }
-                        }
-                    }
-
-                    advancedSettings.custom = custom.join('\n');
+                            else {
+                                settings[filteredParam.key] = filteredParam.value;
+                            }
+                        };
+                    });
+                    director.setParameters(settings);
+                    advancedSettings.update(opts, 'slic3r');
 
                     // update dom state
                     this.setState(opts);
@@ -397,29 +399,23 @@ define([
 
                         const tryMovementTest = () => {
                             let device = this._getDevice();
-                            console.log('device to work is', device);
                             if (device) {
                                 this.showSpinner(lang.tutorial.connectingMachine);
                                 let addr = parseInt(device.addr || '-1');
-                                console.log('addr is', addr);
                                 DeviceMaster.getDeviceBySerial(device.serial, addr > 0, {
                                     timeout: 20000,
                                     onSuccess: (printer)  => {
-                                        console.log('found printer', printer);
                                         DeviceMaster.selectDevice(printer).then(() => {
                                             return CheckDeviceStatus(printer, false, true);
                                         })
                                         .then(() => {
                                             this.showSpinner(lang.tutorial.runningMovementTests);
-                                            console.log('good status', printer.st_id);
                                             return DeviceMaster.runMovementTests();
                                         })
                                         .then(() => {
-                                            console.log('ran movemnt test');
                                             this.hideSpinner();
                                             startTutorial();
                                         }).fail(() => {
-                                            console.log('ran movemnt test failed');
                                             this.hideSpinner();
                                             AlertActions.showPopupYesNo('movement-try-again', lang.tutorial.movementTestFailed.message, lang.tutorial.movementTestFailed.caption, null, {
                                                 yes: function() {
@@ -433,7 +429,6 @@ define([
                                         });
                                     },
                                     onTimeout: () => {
-                                        console.log('Timeouut');
                                         this.hideSpinner();
                                         setTimeout(function() {
                                             AlertActions.showWarning(sprintf('Unable to find printer %s', selectedPrinterName));
@@ -509,8 +504,8 @@ define([
                         DeviceMaster.getDeviceBySerial(device.serial, addr > 0, callback);
                     }
                     else if(answer === 'print-setting-version') {
-                        advancedSettings.custom = DefaultPrintSettings.custom;
-                        Config().write('advanced-settings', JSON.stringify(advancedSettings));
+                        advancedSettings.load(DefaultPrintSettings);
+                        Config().write('advanced-settings', advancedSettings.toString());
                         Config().write('print-setting-version', GlobalConstants.DEFAULT_PRINT_SETTING_VERSION);
                     }
                     else if(answer === GlobalConstants.EXIT_PREVIEW) {
@@ -549,11 +544,7 @@ define([
                         });
                     }.bind(this));
 
-                    advancedSettings.raft = isOn ? 1 : 0;
-                    advancedSettings.custom = advancedSettings.custom.replace(
-                        `raft = ${isOn ? 0 : 1}`,
-                        `raft = ${isOn ? 1 : 0}`
-                    );
+                    advancedSettings.set('raft', isOn ? 1 : 0, true);
 
                     this._saveSetting();
                 },
@@ -561,16 +552,14 @@ define([
                 _handleSupportClick: function() {
                     this.setState({ leftPanelReady: false });
                     var isOn = !this.state.supportOn;
-                    director.setParameter('support_material', isOn ? '1' : '0').then(function() {
+                    let filteredItem = advancedSettings.filter({ key: 'support_material', value: isOn ? 1 : 0 });
+                    director.setParameter(filteredItem.key, filteredItem.value).then(function() {
                         this.setState({
                             leftPanelReady: true,
                             supportOn: isOn
                         });
                     }.bind(this));
-                    advancedSettings.support_material = isOn ? 1 : 0;
-                    advancedSettings.custom = advancedSettings.custom.replace(
-                        `support_material = ${isOn ? 0 : 1}`,
-                        `support_material = ${isOn ? 1 : 0}`);
+                    advancedSettings.set('support_material', isOn ? 1 : 0);
                     this._saveSetting();
                 },
 
@@ -581,14 +570,12 @@ define([
                 },
 
                 _handleGoClick: function() {
-                    console.log('on handle go click');
                     AlertStore.removeCancelListener(this._handleDefaultCancel);
                     listeningToCancel = false;
                     finishedSnapshot = false;
                     director.takeSnapShot().then(() =>{
                         finishedSnapshot = true;
                         director.clearSelection();
-                        console.log('snapshot done', 'clear selection');
                     });
                     this.setState({
                         openPrinterSelectorWindow: true
@@ -636,7 +623,7 @@ define([
 
                 _handleApplyAdvancedSetting: function(setting) {
                     let d = $.Deferred(), quality = 'custom';
-                    Object.assign(advancedSettings, setting);
+                    advancedSettings.load(setting || {}, true);
                     // remove old properties
                     delete advancedSettings.raft_on;
 
@@ -645,7 +632,9 @@ define([
                     ['high', 'med', 'low'].forEach((q) => {
                         // Do comparsion with default settings
                         let params = DefaultPrintSettings[this.state.model][q];
-                        for(var i in params) { if(params[i] != advancedSettings[i]) return; }
+                        for(var i in params) {
+                            if(params[i] !== advancedSettings[i]) { return; }
+                        }
                         // No difference then quality equals q
                         quality = q;
                     });
@@ -656,28 +645,38 @@ define([
                         raftOn:  advancedSettings.raft === 1,
                         quality: quality
                     });
+                    if (!setting) {
+                        let self = this;
+                        let uploadSettings = () => {
+                            director.setAdvanceParameter(advancedSettings.deepClone()).then(() => {
+                                Object.assign(fineAdvancedSettings, advancedSettings);
+                                advancedSettings.engine = advancedSettings.engine || defaultSlicingEngine;
+                            }).fail(() => {
+                                advancedSettings.load(fineAdvancedSettings);
+                                director.setAdvanceParameter(advancedSettings);
+                                self._saveSetting();
+                            }).always(() => {
+                                d.resolve();
+                            });
+                        };
 
-                    if(!setting) {
-                        director.setAdvanceParameter(advancedSettings).then(() => {
-                            Object.assign(fineAdvancedSettings, advancedSettings);
-                            advancedSettings.engine = advancedSettings.engine || defaultSlicingEngine;
-                            if(advancedSettings.engine !== 'slic3r') {
-                                this._handleSlicingEngineChange(advancedSettings.engine);
-                            }
-                        }).fail(() => {
-                            Object.assign(advancedSettings, fineAdvancedSettings);
-                            director.setAdvanceParameter(advancedSettings);
-                            this._saveSetting();
-                        }).always(() => {
-                            d.resolve();
-                        });
+                        if(advancedSettings.engine !== 'slic3r') {
+                            this._handleSlicingEngineChange(advancedSettings.engine)
+                            .then(uploadSettings)
+                            .fail(() => {
+                                d.reject();
+                            });
+                        } else {
+                            uploadSettings();
+                        }
                     }
+
                     else {
                         this._handleSlicingEngineChange(advancedSettings.engine).then(() => {
                             director.setAdvanceParameter(advancedSettings).then(() => {
                                 Object.assign(fineAdvancedSettings, advancedSettings);
                             }).fail(() => {
-                                Object.assign(advancedSettings, fineAdvancedSettings);
+                                advancedSettings.load(fineAdvancedSettings);
                                 director.setAdvanceParameter(advancedSettings);
                                 this._saveSetting();
                             }).always(() => {
@@ -735,10 +734,8 @@ define([
                     this.setState({
                         openPrinterSelectorWindow: false
                     }, () => {
-                        console.log('Device selected');
                         let go = () => {
                             if(director.getSlicingStatus().isComplete && finishedSnapshot) {
-                                console.log('Finished snapshot');
                                 clearInterval(t);
                                 director.getFCode().then((fcode, previewUrl) => {
                                     if(!(fcode instanceof Blob)) {
@@ -939,23 +936,16 @@ define([
                             setDefaultEngine(error);
                         }
                         d.resolve();
+                    }).fail((error) => {
+                        setDefaultEngine(error);
+                        d.reject(error);
                     });
 
                     return d.promise();
                 },
 
                 _saveSetting: function() {
-                    Config().write('advanced-settings', JSON.stringify(advancedSettings));
-                },
-
-                _getLineFromAdvancedCustomSetting: function(key) {
-                    var start = advancedSettings.custom.indexOf(key);
-                    var end = advancedSettings.custom.indexOf('\n', start);
-                    return advancedSettings.custom.substring(start, end);
-                },
-
-                _getValueFromAdvancedCustomSettings: function(key) {
-                    return this._getLineFromAdvancedCustomSetting(key).split('=')[1].replace(/ /g, '');
+                    Config().write('advanced-settings', advancedSettings.toString());
                 },
 
                 _checkDefaultPrintSettingsVersion: function() {

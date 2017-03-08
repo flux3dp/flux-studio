@@ -12,7 +12,7 @@ define([
     'use strict';
 
     var DEFAULT_QUALITY = 'high',
-        DEFAULT_MODEL  = 'fd1'
+        DEFAULT_MODEL  = 'fd1';
 
     var lang,
         constants,
@@ -69,7 +69,6 @@ define([
             lang = this.props.lang.print.left_panel;
             lang.quality = this.props.lang.print.quality;
             lang.model = this.props.lang.print.model;
-            console.log("Display Model Control", this.state.displayModelControl);
         },
 
         componentDidMount: function() {

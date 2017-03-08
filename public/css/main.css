@@ -2992,6 +2992,8 @@ hr {
         height: 30px;
         font-size: 15px;
         color: #B3B3B3; }
+    .controls input.url {
+        width: 400px; }
     .controls input[type="text"],
     .controls input[type="password"],
     .controls input[type="number"] {

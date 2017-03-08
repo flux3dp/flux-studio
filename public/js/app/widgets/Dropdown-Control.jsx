@@ -50,7 +50,12 @@ define([
 
             _options = this.props.options.map(function(option) {
                 var isSelected = option === self.props.default ? 'selected' : '';
-                return (<option value={option} selected={isSelected}>{option}</option>);
+                if (typeof option === 'object') {
+                    isSelected = option.value === self.props.default ? 'selected' : '';
+                    return (<option value={option.value} selected={isSelected}>{option.label}</option>);
+                } else {
+                    return (<option value={option} selected={isSelected}>{option}</option>);
+                }
             });
 
             return (

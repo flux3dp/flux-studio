@@ -7,8 +7,7 @@ define([
     VersionChecker,
     DeviceMaster
 ) {
-    return function(device, version) {
-
+    const check = (device, key) => {
         let d = $.Deferred();
 
         DeviceMaster.selectDevice(device).then(() => {
@@ -16,9 +15,20 @@ define([
         })
         .then(deviceInfo => {
             let vc = VersionChecker(deviceInfo.version);
-            d.resolve(vc.meetVersion(version));
+            d.resolve(vc.meetVersion(requirement[key]));
         });
 
         return d.promise();
+    };
+
+    const requirement = {
+        BACKLASH                    : '1.5b12',
+        OPERATE_DURING_PAUSE        : '1.6.20',
+        UPGRADE_KIT_PROFILE_SETTING : '1.6.20',
+        SCAN_CALIBRATION            : '1.6.25'
+    };
+
+    return {
+        check
     };
 });

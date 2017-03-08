@@ -109,10 +109,10 @@ define(function() {
                 set_to_origin_complete: '機器已回歸原點',
                 scan_laser_complete: '掃描雷射已開啟，點擊 "完成" 以關閉雷射',
                 movement_tests_complete: '運動測試完成',
-                movement_tests_failed: '運動測試失敗，請確認模組傳輸線有被拉直',
+                movement_tests_failed: '運動測試失敗。<br/>1. 請確工具頭連接線被正確拉直<br/>2. 上蓋工具頭連接線接頭沒入約一半<br/>3. 可嘗試將工具頭連接線順時針或逆時針旋轉 180 度再插入<br/>4. 參考 <a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/115003674128">此篇文章</a>',
                 finish: '完成',
                 cancel: '取消',
-                turn_on_head_temperature: '開啟噴頭溫度'
+                turn_on_head_temperature: '設定列印模組溫度'
             },
             window: {
                 label: '視窗',
@@ -189,7 +189,7 @@ define(function() {
                 is_ready: '“%s” 準備完成',
                 station_ready_statement: '你的機器已成為 Wi-Fi 熱點，你可以藉由無線連接 “%s” 這個熱點操作 FLUX',
                 brilliant: '太棒了!',
-                begin_journey: '你可以拔除 Micro USB 傳輸線, 開始使用機器隨心所欲地進行創作囉！',
+                begin_journey: '你可以拔除 USB / Micro USB 傳輸線, 開始使用機器隨心所欲地進行創作囉！',
                 great: '歡迎使用 FLUX Studio',
                 upload_via_usb: '你可以稍後再設定 Wi-Fi 選項。<br/>如果你沒有 Wi-Fi 環境，請參考<a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/215998327-Connection-Guide-for-Desktop-PCs">PC連線指南</a>',
                 back: '回到 Wi-Fi 設定',
@@ -402,6 +402,7 @@ define(function() {
                 slicingEngine: '切片引擎',
                 slic3r: 'Slic3r',
                 cura: 'Cura',
+                cura2: 'Cura2',
                 filament: '線料',
                 temperature: '溫度',
                 detect_filament_runout: '偵測線料',
@@ -417,19 +418,25 @@ define(function() {
                 density: '填充密度',
                 pattern: '填充圖樣',
                 auto: 'auto',                       // do not change
-                line: 'line',                       // do not change
-                rectilinear: 'rectilinear',         // do not change
-                rectilinearGrid: 'rectilinear-grid',// do not change
-                honeycomb: 'honeycomb',             // do not change
+                line: '線狀',                       // do not change
+                rectilinear: '直線',         // do not change
+                rectilinearGrid: '直線格狀',// do not change
+                honeycomb: '蜂巢狀',             // do not change
                 curaInfill: {
-                    automatic: 'AUTOMATIC',
-                    grid: 'GRID',
-                    lines: 'LINES',
-                    concentric: 'CONCENTRIC'
+                    automatic: '自動',
+                    grid: '格狀',
+                    lines: '線狀',
+                    concentric: '同心',
+                    concentric_3d: '立體同心',
+                    cubic: '立方',
+                    cubicsubdiv: '立方細分',
+                    tetrahedral: '四面體',
+                    triangles: '三角形',
+                    zigzag: '鋸齒'
                 },
                 curaSupport: {
-                    lines: 'LINES',
-                    grid: 'GRID'
+                    lines: '線狀',
+                    grid: '格狀'
                 },
                 blackMagic: '黑魔法',
                 spiral: '螺旋',
@@ -814,6 +821,7 @@ define(function() {
             estimating: '估計中...',
             calibrate_fail: '校正失敗',
             calibration_is_running: '掃描校正中',
+            calibration_firmware_requirement: '請更新至韌體以使用此功能 (1.6.25+)',
             resolution: [{
                 id: 'best',
                 text: '最佳',
@@ -985,7 +993,13 @@ define(function() {
                 A: '開啟',
                 N: '關閉'
             },
-            backlash: '路徑幾何誤差補正'
+            backlash: '路徑幾何誤差補正',
+            turn_on_head_temperature: '開啟噴頭溫度',
+            plus_camera: '升級包鏡頭',
+            plus_extrusion: '升級包擠出馬達',
+            postback_url: '狀態回傳URL',
+            disable: '關閉',
+            enable: '開啟'
         },
         monitor: {
             change_filament                     : 'CHANGE FILLAMENT',
@@ -1096,6 +1110,7 @@ define(function() {
                 message: '機器正在進行另外一項工作，請稍候再試。如果機器持續沒有回應，請將機器重新啟動。'
             },
             device_is_used: '機器正被使用中，是否要終止現在任務？',
+            device_in_use: '機器正被使用中，請停止或暫停目前的任務',
             invalidFile: '檔案不是正確的 STL 格式',
             failGeneratingPreview: '無法儲存預覽圖',
             slicingFailed: 'Slic3r 切片錯誤',
@@ -1224,7 +1239,7 @@ define(function() {
             startPrintDeltaPlus: '確認將磁鐵列印版放上平台',
             runningMovementTests: '進行運動測試',
             connectingMachine: '連接機器中',
-            movementTestFailed: { caption: '無法通過運動測試',  message: '請確認工具頭連接線被正確拉直，再試一次？' }
+            movementTestFailed: { caption: '無法通過運動測試',  message: '1. 請確工具頭連接線被正確拉直<br/>2. 上蓋工具頭連接線接頭沒入約一半<br/>3. 可嘗試將工具頭連接線順時針或逆時針旋轉 180 度再插入<br/>4. 參考 <a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/115003674128">此篇文章</a><br/>再試一次？' }
         },
         slicer: {
             computing: '計算中',
@@ -1237,7 +1252,8 @@ define(function() {
                 '13': '切片:: 重制錯誤，複製原始ID不存在，需重啟 FLUX Studio',
                 '14': '切片:: 無法設定物件位置及相關資訊，需重啟 FLUX Studio',
                 '15': '切片:: 模型檔案內容無法解析',
-                '16': '切片:: 切片引擎異常結束，建議調整設定'
+                '16': '切片:: 切片引擎異常結束，建議調整設定',
+                '1006': 'WS 已被強制關閉, 請於menu上方取得錯誤回報，寄送回FLUX'
             },
             pattern_not_supported_at_100_percent_infill: 'Slic3r 的 rectilinear 填充圖樣只支援 100% 的填充密度'
         },

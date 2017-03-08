@@ -109,10 +109,10 @@ define(function() {
                 set_to_origin_complete: 'The machine has calibrated its origin.',
                 scan_laser_complete: 'The machine has turned on its scanning laser. Click "Finish" to turn it off.',
                 movement_tests_complete: 'Movement tests completed',
-                movement_tests_failed: 'Movement tests failed, make sure the toolhead cable is stretched correctly.',
+                movement_tests_failed: 'Movement tests failed. <br/>1. Make sure the toolhead cable is stretched correctly.<br/>2. Make sure the connector of toolhead cable to the machine has inserted about half into the machine.<br/>3. Try to turn the connector on the printing toolhead 180 degrees.<br/>4. Check <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/115003674128">this article</a>.',
                 finish: 'FINISH',
                 cancel: 'CANCEL',
-                turn_on_head_temperature: 'Set toolhead temperature'
+                turn_on_head_temperature: 'Turn on head temperature'
             },
             window: {
                 label: 'Window',
@@ -189,7 +189,7 @@ define(function() {
                 is_ready: '“%s” is ready',
                 station_ready_statement: 'Your machine is now a Wi-Fi station, you can use your machine wirelessly by connect to Wi-Fi “%s”',
                 brilliant: 'Brilliant!',
-                begin_journey: 'You can now detach Micro USB Cable, and begin the journey of creativity.',
+                begin_journey: 'You can now detach USB / Micro USB Cable, and begin the journey of creativity.',
                 great: 'Welcome to FLUX Studio',
                 upload_via_usb: 'You can setup Wi-Fi connection later. <br/>If you don\'t have Wi-Fi, check <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/215998327-Connection-Guide-for-Desktop-PCs">Desktop Connection Guide</a>.',
                 back: 'Back',
@@ -216,7 +216,7 @@ define(function() {
 
                 keep_connect: {
                     caption: 'USB Connection not found',
-                    content: 'Oops! Don\'t worry. We\'re here for you.\nMake sure\n1. Your machine has been powered on\n2. The driver is correctly installed (check the link)\n<a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/215327328">More Info</a>'
+                    content: 'Oops! Don\'t worry. We\'re here for you.\nMake sure\n1. Your machine has been powered on.\n2. The driver is correctly installed. <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/215327328">(More Info)</a>\n3. Try unplug and plug it back in again.'
                 },
 
                 wifi_connection: {
@@ -388,6 +388,7 @@ define(function() {
                 slicingEngine: 'Slicing Engine',
                 slic3r: 'Slic3r',
                 cura: 'Cura',
+                cura2: 'Cura2',
                 filament: 'Filament',
                 temperature: 'Temperature',
                 detect_filament_runout: 'Filament Detection',
@@ -403,19 +404,25 @@ define(function() {
                 density: 'Density',
                 pattern: 'Pattern',
                 auto: 'auto',                       // do not change
-                line: 'line',                       // do not change
-                rectilinear: 'rectilinear',         // do not change
-                rectilinearGrid: 'rectilinear-grid',// do not change
-                honeycomb: 'honeycomb',             // do not change
+                line: 'Line',                       // do not change
+                rectilinear: 'Rectilinear',         // do not change
+                rectilinearGrid: 'Rectilinear Grid',// do not change
+                honeycomb: 'Honeycomb',             // do not change
                 curaInfill: {
-                    automatic: 'AUTOMATIC',
-                    grid: 'GRID',
-                    lines: 'LINES',
-                    concentric: 'CONCENTRIC'
+                    automatic: 'Automatic',
+                    grid: 'Grid',
+                    lines: 'Lines',
+                    concentric: 'Concentric',
+                    concentric_3d: 'Concentric 3D',
+                    cubic: 'Cubic',
+                    cubicsubdiv: 'Cubic Subdivison',
+                    tetrahedral: 'Tetrahedral',
+                    triangles: 'Triangles',
+                    zigzag: 'Zigzag'
                 },
                 curaSupport: {
-                    lines: 'LINES',
-                    grid: 'GRID'
+                    lines: 'Lines',
+                    grid: 'Grid'
                 },
                 blackMagic: 'Black Magic',
                 spiral: 'Spiral',
@@ -800,6 +807,7 @@ define(function() {
             estimating: 'Estimating the time...',
             calibrate_fail: 'Calibration Failed',
             calibration_is_running: 'Calibrating for Scanning',
+            calibration_firmware_requirement: 'Please upgrade your firmware to 1.6.25+',
             resolution: [{
                 id: 'best',
                 text: 'Best',
@@ -971,7 +979,13 @@ define(function() {
                 A: 'Active',
                 N: 'No'
             },
-            backlash: 'Geometric Error Correction'
+            backlash: 'Geometric Error Correction',
+            turn_on_head_temperature: 'Set toolhead temperature',
+            plus_camera: 'Upgrade Kits Camera',
+            plus_extrusion: 'Upgrade Kits Extruder',
+            postback_url: 'Status callback URL',
+            disable: 'Disable',
+            enable: 'Enable'
         },
         monitor: {
             change_filament                     : 'CHANGE FILAMENT',
@@ -1082,6 +1096,7 @@ define(function() {
                 message: 'The machine is executing another task, try again later. If it stops working, please restart the machine.'
             },
             device_is_used: 'The machine is being used, do you want to abort current task?',
+            device_in_use: 'The machine is being used, please stop or pause current task.',
             invalidFile: 'The file is not a valid STL file',
             failGeneratingPreview: 'Fail to generate preview',
             slicingFailed: 'slic3r is unable to slice this model',
@@ -1211,7 +1226,7 @@ define(function() {
             startPrintDeltaPlus: 'Make sure you put on the magnetic print plate.',
             runningMovementTests: 'Running movement tests',
             connectingMachine: 'Connecting to the machine',
-            movementTestFailed: { caption: 'Unable to pass movement tests',  message: 'Make sure the toolhead cable is stretched correctly. Try again?' }
+            movementTestFailed: { caption: 'Unable to pass movement tests',  message: '1. Make sure the toolhead cable is stretched correctly.<br/>2. Make sure the connector of toolhead cable to the machine has inserted about half into the machine.<br/>3. Try to turn the connector on the printing toolhead 180 degrees.<br/>4. Check <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/115003674128">this article</a>.<br/> Try again?' }
         },
         slicer: {
             computing: 'Computing',
@@ -1224,7 +1239,8 @@ define(function() {
                 '13': 'Slicing:: Duplication error\nThe selected ID does not exist. If the error is not resolved by restarting FLUX Studio, please report this error.',
                 '14': 'Slicing:: Error occurred while setting position. The source object is missing in slicer engine.',
                 '15': 'Slicing:: Uploaded file is corrupt, please check the file and try again.',
-                '16': 'Slicing:: Slicing engine exited abnormally, kindly slice again.'
+                '16': 'Slicing:: Slicing engine exited abnormally, kindly slice again.',
+                '1006': 'WS closed unexpectedly, please obtain the bug report from the help menu and sent it to us.'
             },
             pattern_not_supported_at_100_percent_infill: 'Slic3r only supports 100% infill with rectilinear infill pattern'
         },

@@ -20,6 +20,7 @@ define([
         opts.printer = opts.printer || {}
 
         var ws,
+            timeoutTimer,
             errorHandler = function(data) {
                 isReady = true;
                 clearTimeout(connectingTimer);
@@ -90,7 +91,7 @@ define([
         ws = new Websocket({
             method: `3d-scan-control/${url}`,
             ignoreAbnormalDisconnect: true,
-            autoReconnect: false,
+            autoReconnect: true,
             onMessage: function(data) {
                 switch (data.status) {
                 case 'connecting':
@@ -102,8 +103,8 @@ define([
                 case 'ready':
                     clearTimeout(connectingTimer);
                     isReady = true;
-                    console.log("scan control on open ", opts.printer)
-                    if (opts.printer && opts.printer.model == "delta-1p") {
+                    console.log('scan control on open ', opts.printer);
+                    if (opts.printer && opts.printer.model == 'delta-1p') {
                         ws.send('turn_on_hd');
                     }
                     opts.onReady();
@@ -154,7 +155,14 @@ define([
                     }
                 });
 
+                console.log('set timeout');
+                timeoutTimer = setTimeout(() => {
+                    alert('time out');
+                }, 10 * 1000);
+
                 goFetch().done(function() {
+                    console.log('clear timeout');
+                    clearTimeout(timeoutTimer);
                     events.onMessage = function(data) {
                         switch (data.status) {
                         case 'binary':
@@ -325,6 +333,7 @@ define([
                         }
                     };
 
+                    stopGettingImage();
                     genericSender('calibrate');
                 });
 

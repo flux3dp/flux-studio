@@ -730,14 +730,17 @@ define([
         hasPreviewImage = false;
         willReslice = true;
 
-        if(slicingStatus.inProgress) {
-            clearTimeout(slicingTimmer);
-            stopSlicing();
-            startSlicing(slicingType.F);
-        }
-        else {
-            startSlicing(slicingType.F);
-        }
+        clearTimeout(slicingTimmer);
+        slicingTimmer = setTimeout(() => {
+            if(slicingStatus.inProgress) {
+                stopSlicing();
+                startSlicing(slicingType.F);
+            }
+            else {
+                startSlicing(slicingType.F);
+            }
+        }, 100);
+
     }
 
     function updateSlicingProgressFromReport(report) {
@@ -765,6 +768,9 @@ define([
             });
         }
         if (report.percentage !== slicingStatus.percentage) {
+            if(report.percentage > 1) {
+                report.percentage = report.percentage * 0.6;
+            }
             slicingStatus.percentage = report.percentage;
             reactSrc.setState({slicingPercentage: slicingStatus.percentage});
         }
@@ -1218,7 +1224,7 @@ define([
 
     function getSlicingReport(callback) {
         let reportTimmer = 1000; // 1 sec
-
+        clearInterval(slicingStatus.reporter);
         slicingStatus.reporter = setInterval(function() {
             if (!slicingStatus.pauseReport) {
                 if(willReslice) {
@@ -1350,9 +1356,16 @@ define([
     }
 
     function setAdvanceParameter(settings) {
-        let deferred = $.Deferred();
-
-        sliceMaster.addTask('setParameter', 'advancedSettings', settings.custom).then(() => {
+        let deferred = $.Deferred(),
+            updateTask = null;
+        switch(settings.engine) {
+            case 'cura2':
+                updateTask = sliceMaster.addTask('setParameter', 'advancedSettingsCura2', settings.customCura2);
+                break;
+            default:
+                updateTask = sliceMaster.addTask('setParameter', 'advancedSettings', settings.custom);
+        }
+        updateTask.then(() => {
             Object.assign(fullSliceParameters.settings, settings);
             slicingStatus.showProgress = false;
             if(objects.length > 0) {
@@ -1389,6 +1402,10 @@ define([
         });
 
         return d.promise();
+    }
+
+    function setParameters(keyValueObject) {
+        return sliceMaster.addTask('setParameters', keyValueObject);
     }
 
     function setRotation(x, y, z, needRender, src) {
@@ -1618,7 +1635,6 @@ define([
             setDefaultFileName();
             render();
             if(objects.length === 0) {
-                clearTimeout(slicingTimmer);
                 registerDragToImport();
                 reactSrc.setState({
                     openImportWindow: true,
@@ -2855,6 +2871,7 @@ define([
                 d.resolve();
             }).fail((error) => {
                 processSlicerError(error);
+                d.reject(error);
             });
         });
 
@@ -2870,6 +2887,9 @@ define([
         }
         if (!message) {
             message = result.error;
+        }
+        if (result.code === 1006) {
+            message = lang.slicer.error[result.code];
         }
         AlertActions.showPopupError(id, message);
     }
@@ -2928,6 +2948,7 @@ define([
         setScaleMode        : setScaleMode,
         setAdvanceParameter : setAdvanceParameter,
         setParameter        : setParameter,
+        setParameters       : setParameters,
         getFCode            : getFCode,
         getModelCount       : getModelCount,
         togglePreview       : togglePreview,
