@@ -435,7 +435,7 @@ define([
                     var currentPrinter = discoverMethods.getLatestPrinter(printer);
 
                     DeviceMaster.selectDevice(currentPrinter).then(function(status) {
-                        DeviceMaster.getReport(report => {
+                        DeviceMaster.getReport().then(report => {
                             if(report.st_id === 16 || report.st_id === 2) {
                                 AlertActions.showPopupError('OCCUPIED', lang.message.device_in_use);
                             }
