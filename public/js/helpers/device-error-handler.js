@@ -30,11 +30,17 @@ define(['helpers/i18n'], function (i18n) {
                     if(error[3] === 'N/A') {
                         errorOutput = this.translate(['HEAD_ERROR','HEAD_OFFLINE']);
                     }
+                    // for wrong toolhead type;
+                    if (error[1] === 'TYPE_ERROR') {
+                        errorOutput = lang.monitor[error.slice(0, 2).join('_')];
+                    }
+                    if (errorOutput === '') {
+                        errorOutput = (error.length >= 2) ? lang.monitor[error.slice(0, 2).join('_')] : error.join('_');
+                    }
                 } else if (error.length == 3) {
                     errorOutput = self.processToolheadErrorCode(error[2]);
                     // for wrong toolhead type;
                     if (error[1] === 'TYPE_ERROR') {
-                        error.slice()
                         errorOutput = lang.monitor[error.slice(0, 2).join('_')];
                     }
                     if (errorOutput === '') {

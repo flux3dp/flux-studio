@@ -15,9 +15,7 @@ define([
 
         const processResult = (response) => {
             if(response.cmd === 'list') {
-                let hasAvailableChannel = Object.keys(response.h2h) > 0;
-
-                if(hasAvailableChannel) {
+                if(Object.keys(response.h2h) > 0) {
                     // try to connect
                     availableUsbChannel = Object.keys(response.h2h)[0];
 
@@ -27,9 +25,11 @@ define([
                         ws.send(`open ${availableUsbChannel}`);
                     } else {
                         // Connected, do nothing
+                        if(!usbConnected) {
+                            callback(availableUsbChannel, false);
+                        }
                         usbConnected = true;
                     }
-                
                 }
                 else {
                     // if usb is unplugged

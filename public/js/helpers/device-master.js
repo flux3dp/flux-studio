@@ -61,7 +61,7 @@ define([
         _errors = {},
         availableUsbChannel = -1,
         usbEventListeners = {};
-    
+
     // Better select device
     function select(device, opts) {
         let d = $.Deferred();
@@ -449,10 +449,10 @@ define([
     }
 
     function quitTask(mode) {
-        if (typeof mode == 'string') {
-            SocketMaster.addTask('quitTask@' + mode);
+        if (typeof mode === 'string') {
+            return SocketMaster.addTask('quitTask@' + mode);
         } else {
-            SocketMaster.addTask('quitTask');
+            return SocketMaster.addTask('quitTask');
         }
     }
 
@@ -1174,7 +1174,6 @@ define([
     // event : function, required, will callback with ture || false
     function registerUsbEvent(id, event) {
         usbEventListeners[id] = event;
-        console.log('registering event');
     }
 
     function unregisterUsbEvent(id) {
@@ -1202,6 +1201,25 @@ define([
         }
         else {
             callback.onTimeout();
+        }
+    }
+
+    function usbDefaultDeviceCheck(device) {
+        // console.log('---', device.source, this.availableUsbChannel != device.addr);
+        if(device.source !== 'h2h') {
+            return device;
+        }
+
+        if(this.availableUsbChannel !== device.addr) {
+            // get wifi version instead of h2h
+            let dev = _devices.filter(_dev => _dev.serial === device.serial);
+            if(dev[0]) {
+                console.log(dev[0]);
+                return dev[0];
+            }
+        }
+        else {
+            return device;
         }
     }
 
@@ -1274,6 +1292,7 @@ define([
             this.runMovementTests               = runMovementTests;
             this.getDeviceBySerial              = getDeviceBySerial;
             this.getAvailableDevices            = getAvailableDevices;
+            this.usbDefaultDeviceCheck          = usbDefaultDeviceCheck;
 
             Discover(
                 'device-master',
@@ -1285,7 +1304,6 @@ define([
                     _devices = devices;
                     // console.log('devices', _devices);
                     _scanDeviceError(devices);
-
                 }
             );
         }

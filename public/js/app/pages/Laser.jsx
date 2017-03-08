@@ -116,7 +116,7 @@ define([
                         };
                     }
 
-                    if ('' === setupPanelDefaults) {
+                    if (!Config.read(storageDefaultKey)) {
                         Config.write(storageDefaultKey, setupPanelDefaults);
                     }
 

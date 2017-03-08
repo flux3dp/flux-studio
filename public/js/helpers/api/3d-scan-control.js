@@ -333,6 +333,7 @@ define([
                         }
                     };
 
+                    stopGettingImage();
                     genericSender('calibrate');
                 });
 

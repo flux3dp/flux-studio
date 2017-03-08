@@ -730,14 +730,17 @@ define([
         hasPreviewImage = false;
         willReslice = true;
 
-        if(slicingStatus.inProgress) {
-            clearTimeout(slicingTimmer);
-            stopSlicing();
-            startSlicing(slicingType.F);
-        }
-        else {
-            startSlicing(slicingType.F);
-        }
+        clearTimeout(slicingTimmer);
+        slicingTimmer = setTimeout(() => {
+            if(slicingStatus.inProgress) {
+                stopSlicing();
+                startSlicing(slicingType.F);
+            }
+            else {
+                startSlicing(slicingType.F);
+            }
+        }, 100);
+
     }
 
     function updateSlicingProgressFromReport(report) {
@@ -765,6 +768,9 @@ define([
             });
         }
         if (report.percentage !== slicingStatus.percentage) {
+            if(report.percentage > 1) {
+                report.percentage = report.percentage * 0.6;
+            }
             slicingStatus.percentage = report.percentage;
             reactSrc.setState({slicingPercentage: slicingStatus.percentage});
         }
@@ -1218,7 +1224,7 @@ define([
 
     function getSlicingReport(callback) {
         let reportTimmer = 1000; // 1 sec
-
+        clearInterval(slicingStatus.reporter);
         slicingStatus.reporter = setInterval(function() {
             if (!slicingStatus.pauseReport) {
                 if(willReslice) {
@@ -1396,6 +1402,10 @@ define([
         });
 
         return d.promise();
+    }
+
+    function setParameters(keyValueObject) {
+        return sliceMaster.addTask('setParameters', keyValueObject);
     }
 
     function setRotation(x, y, z, needRender, src) {
@@ -1625,7 +1635,6 @@ define([
             setDefaultFileName();
             render();
             if(objects.length === 0) {
-                clearTimeout(slicingTimmer);
                 registerDragToImport();
                 reactSrc.setState({
                     openImportWindow: true,
@@ -2939,6 +2948,7 @@ define([
         setScaleMode        : setScaleMode,
         setAdvanceParameter : setAdvanceParameter,
         setParameter        : setParameter,
+        setParameters       : setParameters,
         getFCode            : getFCode,
         getModelCount       : getModelCount,
         togglePreview       : togglePreview,

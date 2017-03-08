@@ -775,7 +775,6 @@ define([
             },
             onReadFileStarted: function(e) {
                 var firstFile = e.target.files.item(0),
-                    setupPanel = self.refs.setupPanel,
                     extension = self.refs.fileUploader.getFileExtension(firstFile.name),
                     currentFileFormat = self.state.fileFormat;
 
@@ -790,7 +789,7 @@ define([
                     });
                 }
 
-                if ('svg' === currentFileFormat) {
+                if (extension === 'svg') {
                     svgWebSocket = svgWebSocket || svgLaserParser({
                         isLaser: 'laser' === self.props.page
                     });
@@ -801,9 +800,11 @@ define([
             },
             onFileReadEnd: function(e, files) {
                 var parserSocket;
+                var firstFile = e.target.files.item(0),
+                    extension = self.refs.fileUploader.getFileExtension(firstFile.name);
 
                 // go svg process
-                if ('svg' === self.state.fileFormat) {
+                if (extension === 'svg') {
                     parserSocket = svgWebSocket;
                 }
                 // go bitmap process

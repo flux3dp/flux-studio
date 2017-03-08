@@ -25,6 +25,7 @@ define([
     'helpers/point-cloud',
     'Rx',
     'helpers/duration-formatter',
+    'helpers/firmware-version-checker',
     // non-return
     'helpers/array-findindex',
     'helpers/object-assign',
@@ -55,7 +56,8 @@ define([
     menuFactory,
     PointCloudHelper,
     Rx,
-    FormatDuration
+    FormatDuration,
+    FirmwareVersionChecker
 ) {
     'use strict';
 
@@ -1276,21 +1278,35 @@ define([
                             calibrateDeferred.done(done).fail(fail);
                         };
 
-                    self._handleCheck().done(function(data) {
-                        switch (data.message) {
-                        case 'good':
-                            onPass();
-                            break;
-                        case 'no object':
-                        case 'not open':
-                        case 'no laser':
-                        default:
-                            self._refreshCamera();
-                            self._onCalibrateFail(data.message, AlertActions.showPopupRetry);
+                    const next = () => {
+                        self._handleCheck().done(function(data) {
+                            switch (data.message) {
+                            case 'good':
+                                onPass();
+                                break;
+                            case 'no object':
+                            case 'not open':
+                            case 'no laser':
+                            default:
+                                self._refreshCamera();
+                                self._onCalibrateFail(data.message, AlertActions.showPopupRetry);
+                            }
+                        });
+
+                        self._openBlocker(true, ProgressConstants.WAITING, '', false, self.state.lang.scan.calibration_is_running);
+                    };
+
+                    FirmwareVersionChecker.check(self.state.selectedPrinter, 'SCAN_CALIBRATION')
+                    .then(allowCalibration => {
+                        if(allowCalibration) {
+                            next();
+                        }
+                        else {
+                            AlertActions.showPopupError('SCAN_REQUIREMENT', self.state.lang.scan.calibration_firmware_requirement);
                         }
                     });
 
-                    self._openBlocker(true, ProgressConstants.WAITING, '', false, self.state.lang.scan.calibration_is_running);
+
                 },
 
                 _onDeletingMesh: function(mesh, arrayIndex) {
