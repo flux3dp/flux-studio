@@ -299,15 +299,18 @@ define([
                 return d.promise();
             },
 
-            getMachineNetwork: function(deferred) {
+            getMachineNetwork: function(deferred, name) {
                 var $deferred = deferred || $.Deferred(),
                     ipv4Pattern = /^\d{1,3}[.]\d{1,3}[.]\d{1,3}[.]\d{1,3}$/g;
 
                 events.onMessage = function(response) {
                     response.ipaddr = response.ipaddr || [];
                     response.ssid = response.ssid || '';
-
-                    if (response.status === 'ok' && response.ssid !== '' && response.ipaddr.length > 0) {
+                    if (
+                        response.status === 'ok' &&
+                        response.ssid === name &&
+                        response.ipaddr.length > 0
+                    ) {
                         response.action = 'GOOD';
                         $deferred.resolve(response);
                     }

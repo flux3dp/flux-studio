@@ -77,7 +77,8 @@ define([
                             if (true === checkCountdown(response)) {
                                 clearTimeout(this.t);
                                 this.t = setTimeout(() => {
-                                    usb.getMachineNetwork(deferred);
+                                    let d = initializeMachine.settingWifi.get();
+                                    usb.getMachineNetwork(deferred, d.ssid);
                                 }, 1000);
                             }
                         },
@@ -86,7 +87,8 @@ define([
                         // NOTICE: Wait for 2 sec due to the device may not refresh its IP.
                         clearTimeout(this.t);
                         this.t = setTimeout(() => {
-                            deferred = usb.getMachineNetwork(deferred)
+                            let d = initializeMachine.settingWifi.get();
+                            deferred = usb.getMachineNetwork(deferred, d.ssid)
                             .fail(tryAgain)
                             .progress(tryAgain)
                             .done((response) => {
