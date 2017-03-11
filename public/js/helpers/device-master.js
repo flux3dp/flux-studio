@@ -102,14 +102,12 @@ define([
             const handleSubmit = (password) => {
                 ProgressActions.open(ProgressConstants.NONSTOP);
 
-                auth(uuid, password).always(() => {
-                    ProgressActions.close();
-                })
-                .done((data) => {
+                auth(uuid, password).done((data) => {
                     device.plaintext_password = password;
                     selectDevice(device, d);
                 })
                 .fail((response) => {
+                    ProgressActions.close();
                     let message = (
                         false === response.reachable ?
                         lang.select_printer.unable_to_connect :
@@ -155,19 +153,19 @@ define([
                         break;
                     case DeviceConstants.AUTH_ERROR:
                     case DeviceConstants.AUTH_FAILED:
-                        if (true === device.password) {
+                        _selectedDevice = {};
+                        
+                        if (device.password) {
                             goAuth(_device.uuid);
                         }
                         else {
-                            ProgressActions.open(ProgressConstants.NONSTOP);
+                            ProgressActions.open(ProgressConstants.NONSTOP, sprintf(lang.message.connectingMachine, _device.name));
 
-                            auth(_device.uuid, '').always(() => {
-                                ProgressActions.close();
-                            })
-                            .done((data) => {
+                            auth(_device.uuid, '').done((data) => {
                                 selectDevice(device, d);
                             })
                             .fail(() => {
+                                ProgressActions.close();
                                 AlertActions.showPopupError(
                                     'auth-error-with-diff-computer',
                                     lang.message.need_1_1_7_above
@@ -197,11 +195,12 @@ define([
                 },
                 onFatal: function(e) {
                     _selectedDevice = {};
+
                 }
             });
         };
 
-        ProgressActions.open(ProgressConstants.NONSTOP);
+        ProgressActions.open(ProgressConstants.NONSTOP, sprintf(lang.message.connectingMachine, device.name));
         if(_existConnection(uuid)) {
             _device = _switchDevice(uuid);
             d.resolve(DeviceConstants.CONNECTED);
@@ -234,24 +233,21 @@ define([
     }
 
     function auth(uuid, password) {
-        ProgressActions.open(ProgressConstants.NONSTOP);
+        ProgressActions.open(ProgressConstants.NONSTOP, lang.message.authenticating);
 
         let d = $.Deferred(),
-            closeProgress = function() {
-                ProgressActions.close();
-            },
             opts = {
                 onError: function(data) {
+                    ProgressActions.close();
                     d.reject(data);
-                    closeProgress();
                 },
                 onSuccess: function(data) {
+                    ProgressActions.close();
                     d.resolve(data);
-                    closeProgress();
                 },
                 onFail: function(data) {
+                    ProgressActions.close();
                     d.reject(data);
-                    closeProgress();
                 }
             };
 
@@ -280,30 +276,22 @@ define([
                     break;
                 case DeviceConstants.AUTH_ERROR:
                 case DeviceConstants.AUTH_FAILED:
-                    if (true === device.password) {
+                    if (device.password) {
                         goAuth(_device.uuid);
                     }
                     else {
                         ProgressActions.open(ProgressConstants.NONSTOP);
-
-                        auth(_device.uuid, '').always(() => {
-                            ProgressActions.close();
-                        }).done((data) => {
+                        auth(_device.uuid, '').then((data) => {
+                            ProgressActions.open(ProgressConstants.NONSTOP, sprintf(lang.message.connectingMachine, _device.name));
                             selectDevice(device, d);
                         }).fail(() => {
+                            ProgressActions.close();
                             AlertActions.showPopupError(
                                 'auth-error-with-diff-computer',
                                 lang.message.need_1_1_7_above
                             );
                         });
                     }
-                    break;
-                case DeviceConstants.MONITOR_TOO_OLD:
-                    AlertActions.showPopupError(
-                        'fatal-occurred',
-                        lang.message.monitor_too_old.content,
-                        lang.message.monitor_too_old.caption
-                    );
                     break;
                 default:
                     AlertActions.showPopupError(

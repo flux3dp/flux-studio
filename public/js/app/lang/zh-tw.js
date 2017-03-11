@@ -1096,7 +1096,9 @@ define(function() {
         },
         message: {
             connecting: '連線中...',
+            connectingMachine: '連接 %s 中...',
             connected: '已連線',
+            authenticating: '密碼驗證中...',
             machineNotConnected: 'Machine is not connected',
             notPrinting: 'Printing is not in progress',
             nothingToPrint: 'Nothing to print (source blob missing)',

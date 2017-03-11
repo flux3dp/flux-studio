@@ -53,3 +53,5 @@ _tools/environment
 _test/selenium-debug.log
 
 _test/tests_output/CHROME_57.0.2987.98_MAC_googleTest.xml
+
+_test/tests_output/CHROME_57.0.2987.98_MAC_dashboard.xml

@@ -1082,7 +1082,9 @@ define(function() {
         },
         message: {
             connecting: 'Connecting...',
+            connectingMachine: 'Connecting %s...',
             connected: 'Connected',
+            authenticating: 'Authenticating...',
             machineNotConnected: 'Machine is not connected',
             notPrinting: 'Printing is not in progress',
             nothingToPrint: 'Nothing to print (source blob missing)',
