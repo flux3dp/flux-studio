@@ -3,9 +3,9 @@
 
   "selenium" : {
     "start_process" : true,
-    "server_path" : "/Users/simon/Dev/nwjs/selenium.jar",
+    "server_path" : "nwjs/selenium.jar",
     "cli_args" : {
-      "webdriver.chrome.driver" : "/Users/simon/Dev/nwjs/chromedriver"
+      "webdriver.chrome.driver" : "nwjs/chromedriver"
     }
   },
 
@@ -15,7 +15,7 @@
       "selenium_host"  : "localhost",
       "desiredCapabilities": {
 	"chromeOptions" : {
-	  "args" : [ "nwapp=/Users/simon/Dev/web-panel/public" ] 
+	  "args" : [ "nwapp=../public" ] 
 	}, 
         "browserName": "chrome",
         "javascriptEnabled": true,

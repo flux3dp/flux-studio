@@ -49,3 +49,7 @@ public/js/jsx
 # other
 _tools/environment
 .eslintrc.json
+
+_test/selenium-debug.log
+
+_test/tests_output/CHROME_57.0.2987.98_MAC_googleTest.xml
