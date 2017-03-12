@@ -1176,15 +1176,15 @@ define([
     }
 
     function getDeviceBySerial(serial, isUsb, callback) {
-        let d = _devices.filter(d => {
+        let matchedDevice = _devices.filter(d => {
             let a = d.serial === serial;
             if (isUsb) { a = a && d.source === 'h2h'; };
             return a;
         });
 
-        if (d[0] !== null) {
-            console.log(d[0]);
-            callback.onSuccess(d[0]);
+        if (matchedDevice.length > 0) {
+            console.log('Found serial device' , matchedDevice[0], matchedDevice);
+            callback.onSuccess(matchedDevice[0]);
             return;
         }
 

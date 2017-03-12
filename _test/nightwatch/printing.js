@@ -1,5 +1,5 @@
 module.exports = {
-  'Printing UI Testing' : function (browser) {
+  'Printing Basic Testing' : function (browser) {
     const filePath = require('path').resolve(__dirname + '/../example_files/guide-example.stl');
     browser.waitForElementVisible('body', 6000)
       .waitForElementVisible('div.modal-alert', 10000)
@@ -19,15 +19,27 @@ module.exports = {
       .waitForElementNotPresent('button.btn-disabled[data-ga-event=print-goto-monitor]', 30000)
       .click('button[data-ga-event=print-goto-monitor]') // Click GO
       .pause(500)
-      .waitForElementVisible('div.printer-item[data-status=st0]', 5000)
+      .waitForElementVisible('div.printer-item[data-status=st0]', 20000)
       .click('div.printer-item[data-status=st0]') // Select Idle printer
-      .waitForElementVisible('div.modal-alert', 5000)
-      .waitForElementVisible('.modal-alert input', 30000)
-      .setValue('.modal-alert input', 'flux')
-      .click('button[data-ga-event=confirm]') // Input default password
+      .waitForElementVisible('div.modal-alert', 5000, false, function(result){
+          // Input password if needed
+          if (result.value) {
+              browser.waitForElementVisible('.modal-alert input', 30000)
+              .setValue('.modal-alert input', 'flux')
+              .click('button[data-ga-event=confirm]'); // Input default password
+          } else {
+              // No password needed
+          }
+      })
       .waitForElementVisible('div.flux-monitor', 30000) // Display dashboard
       .waitForElementVisible('.operation .controls.center .description', 10000) // Get start button
       .assert.containsText('.operation .controls.center .description', 'Start')
+      .click('.operation .controls.center')
+      .waitForElementNotPresent('.operation .controls.left.disabled', 300000) // Wait til we can abort
+      .click('.operation .controls.left') // Abort
       .end();
   }
+  // TODO: Test switch slicing engine to slic3r, cura, cura2
+  // TODO: Test if raft, support is working
+  // TODO: Test if save test is working
 };

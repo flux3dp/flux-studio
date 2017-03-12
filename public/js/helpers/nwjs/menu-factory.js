@@ -245,16 +245,15 @@ define([
         },
 
         refresh: function() {
-            if(!window.FLUX.isNW) return;
+            if (!window.FLUX.isNW) { return; }
             menuMap.all = menuMap.refresh();
             initialize(menuMap.all);
         },
 
         updateMenu: function(menu, parentIndex) {
-            var menuItem = topMenu.items[parentIndex],
-                subMenu = methods.createSubMenu(menu.subItems);
+            var menuItem = topMenu.items[parentIndex];
 
-            menuItem.subMenu = subMenu;
+            menuItem.subMenu = methods.createSubMenu(menu.subItems);
         },
 
         updateAccountDisplay: function(name) {
@@ -267,7 +266,8 @@ define([
     function initialize(menuMap) {
         if(!window.FLUX.isNW) { return; }
         topMenu = topMenu ? NWjsWindow.menu : new Menu({ type: 'menubar', title: 'FLUX Studio', label: 'FLUX Studio' });
-        let initialLength = topMenu.items.length;
+        window.FLUX.menuMap = menuMap; // Make menuMap global accessable
+
         let updateMenu = topMenu.items.length === 0;
 
         updateAccountMenu(menuMap);
@@ -324,11 +324,11 @@ define([
         return menuMap;
     }
 
-    if (true === window.FLUX.isNW) {
+    if (window.FLUX.isNW) {
         initialize(menuMap.all);
     }
 
-    if (true === window.FLUX.isNW) {
+    if (window.FLUX.isNW) {
         createDevice = function(printer) {
             var subItems = [],
                 showPopup;
@@ -429,6 +429,7 @@ define([
 
             // change filament
             subItems.push({
+                id: 'change_filament',
                 label: lang.device.change_filament,
                 enabled: true,
                 onClick: function() {
@@ -451,6 +452,7 @@ define([
             });
 
             subItems.push({
+                id: 'calibrate',
                 label: lang.device.calibrate,
                 onClick: () => {
                     var currentPrinter = discoverMethods.getLatestPrinter(printer),
