@@ -79,6 +79,10 @@
         cssLink.setAttribute('href', 'css/main.css?v=' + window.FLUX.timestamp);
         head.appendChild(cssLink);
         head.appendChild(cssLink);
+
+        if(localStorage.getItem('poke-ip-addr') == 'undefined') {
+            localStorage.setItem('poke-ip-addr', '192.168.1.1')
+        }
     })();
 </script>
 

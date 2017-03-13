@@ -1,0 +1,20 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Attach",
+            "type": "nwjs",
+            "request": "attach",
+            "port": 9222,
+            "nwjsVersion": "any",
+            "webRoot": "${workspaceRoot}"
+        },
+        {
+            "name": "Launch",
+            "type": "nwjs",
+            "request": "launch",
+            "webRoot": "${workspaceRoot}/public",
+            "nwjsVersion": "0.18.7"
+        }
+    ]
+}

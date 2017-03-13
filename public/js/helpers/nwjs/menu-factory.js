@@ -59,11 +59,10 @@ define([
         },
         executeFirmwareUpdate = function(printer, type) {
             var currentPrinter = discoverMethods.getLatestPrinter(printer),
-                lang = i18n.get(),
                 checkToolheadFirmware = function() {
                     var $deferred = $.Deferred();
 
-                    ProgressActions.open(ProgressConstants.NONSTOP);
+                    ProgressActions.open(ProgressConstants.NONSTOP, lang0.update.checkingHeadinfo);
 
                     if ('toolhead' === type) {
                         DeviceMaster.headInfo().done(function(response) {
@@ -75,6 +74,8 @@ define([
                             else {
                                 $deferred.resolve({ status: 'ok' });
                             }
+                        }).fail(() => {
+                            $deferred.reject();
                         });
                     }
                     else {
@@ -86,16 +87,16 @@ define([
                 updateFirmware = function() {
                     checkFirmware(currentPrinter, type).done(function(response) {
                         var latestVersion = currentPrinter.version,
-                            caption = lang.update.firmware.latest_firmware.caption,
-                            message = lang.update.firmware.latest_firmware.message;
+                            caption = lang0.update.firmware.latest_firmware.caption,
+                            message = lang0.update.firmware.latest_firmware.message;
 
                         if ('toolhead' === type) {
                             latestVersion = currentPrinter.toolhead_version;
-                            caption = lang.update.toolhead.latest_firmware.caption;
-                            message = lang.update.toolhead.latest_firmware.message;
+                            caption = lang0.update.toolhead.latest_firmware.caption;
+                            message = lang0.update.toolhead.latest_firmware.message;
                         }
 
-                        if (false === response.needUpdate) {
+                        if (!response.needUpdate) {
                             AlertActions.showPopupInfo(
                                 'latest-firmware',
                                 message + ' (v' + latestVersion + ')',
@@ -109,19 +110,17 @@ define([
                         firmwareUpdater(response, currentPrinter, type);
                         AlertActions.showPopupInfo(
                             'latest-firmware',
-                            lang.monitor.cant_get_toolhead_version
+                            lang0.monitor.cant_get_toolhead_version
                         );
                     });
                 },
                 checkStatus = function() {
-                    let informHeadMissing = false;
-
                     const processUpdate = () => {
                         checkToolheadFirmware().always(function() {
                             ProgressActions.close();
                             updateFirmware();
                         }).fail(function() {
-                            AlertActions.showPopupError('toolhead-offline', lang.monitor.cant_get_toolhead_version);
+                            AlertActions.showPopupError('toolhead-offline', lang0.monitor.cant_get_toolhead_version);
                         });
                     };
 
@@ -142,7 +141,7 @@ define([
                     AlertStore.onRetry(handleYes);
                     AlertStore.onCancel(handleCancel);
 
-                    ProgressActions.open(ProgressConstants.NONSTOP);
+                    ProgressActions.open(ProgressConstants.NONSTOP, lang0.update.preparing);
                     if(type === 'toolhead') {
                         DeviceMaster.enterMaintainMode().then(() => {
                             setTimeout(() => {
@@ -156,19 +155,14 @@ define([
                     }
                 };
 
-            DeviceMaster.selectDevice(printer).then(function(status) {
-                var lang = i18n.get();
-
-                if (status === DeviceConstants.CONNECTED) {
-                    checkStatus();
-                }
-                else if (status === DeviceConstants.TIMEOUT) {
-                    AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
-                }
+            DeviceMaster.select(printer).then(function(status) {
+                checkStatus();
+            }).fail((resp) => {
+                AlertActions.showPopupError('menu-item', lang0.message.connectionTimeout);
             });
         },
-        originalMenuMap = JSON.parse(JSON.stringify(menuMap)),
         lang = i18n.get().topmenu,
+        lang0 = i18n.get(),
         NWjsWindow,
         topMenu,
         Menu,
@@ -245,16 +239,15 @@ define([
         },
 
         refresh: function() {
-            if(!window.FLUX.isNW) return;
+            if (!window.FLUX.isNW) { return; }
             menuMap.all = menuMap.refresh();
             initialize(menuMap.all);
         },
 
         updateMenu: function(menu, parentIndex) {
-            var menuItem = topMenu.items[parentIndex],
-                subMenu = methods.createSubMenu(menu.subItems);
+            var menuItem = topMenu.items[parentIndex];
 
-            menuItem.subMenu = subMenu;
+            menuItem.subMenu = methods.createSubMenu(menu.subItems);
         },
 
         updateAccountDisplay: function(name) {
@@ -267,7 +260,8 @@ define([
     function initialize(menuMap) {
         if(!window.FLUX.isNW) { return; }
         topMenu = topMenu ? NWjsWindow.menu : new Menu({ type: 'menubar', title: 'FLUX Studio', label: 'FLUX Studio' });
-        let initialLength = topMenu.items.length;
+        window.FLUX.menuMap = menuMap; // Make menuMap global accessable
+
         let updateMenu = topMenu.items.length === 0;
 
         updateAccountMenu(menuMap);
@@ -324,11 +318,11 @@ define([
         return menuMap;
     }
 
-    if (true === window.FLUX.isNW) {
+    if (window.FLUX.isNW) {
         initialize(menuMap.all);
     }
 
-    if (true === window.FLUX.isNW) {
+    if (window.FLUX.isNW) {
         createDevice = function(printer) {
             var subItems = [],
                 showPopup;
@@ -429,6 +423,7 @@ define([
 
             // change filament
             subItems.push({
+                id: 'change_filament',
                 label: lang.device.change_filament,
                 enabled: true,
                 onClick: function() {
@@ -451,6 +446,7 @@ define([
             });
 
             subItems.push({
+                id: 'calibrate',
                 label: lang.device.calibrate,
                 onClick: () => {
                     var currentPrinter = discoverMethods.getLatestPrinter(printer),
@@ -558,20 +554,24 @@ define([
                                 ProgressActions.open(ProgressConstants.WAITING);
                                 checkDeviceStatus(currentPrinter).then(() => {
                                     ProgressActions.open(ProgressConstants.WAITING, lang.device.calibrating, lang.device.pleaseWait, false);
-                                    var scan_control,
+                                    var scanControl,
                                         opts = {
                                             onError: (data) => {
-                                                scan_control.takeControl(function(response) {
+                                                scanControl.takeControl(function(response) {
                                                     ProgressActions.close();
                                                 });
                                             },
                                             onReady: () => {
                                                 ProgressActions.close();
-                                                scan_control.turnLaser(true).then(() => {
+                                                scanControl.turnLaser(true).then(() => {
                                                     AlertActions.showPopupCustom('scan-laser-turned-on', lang.device.scan_laser_complete, lang.device.finish, '');
                                                     var _handleFinish = (dialog_name) => {
-                                                        scan_control.turnLaser(false).then(() => {
-                                                            scan_control.quit();
+                                                        scanControl.turnLaser(false).then(() => {
+                                                            scanControl.quit(true).then(() => {
+                                                                opts.onReady = function() {};
+                                                            }).fail(() => {
+                                                                ProgressActions.close();
+                                                            });
                                                         });
                                                         AlertStore.removeCustomListener(_handleFinish);
                                                     };
@@ -579,7 +579,7 @@ define([
                                                 });
                                             }
                                         };
-                                    scan_control = ScanControl(currentPrinter.uuid, opts);
+                                    scanControl = ScanControl(currentPrinter.uuid, opts);
                                 });
                             }).fail(() => {
                                 ProgressActions.close();

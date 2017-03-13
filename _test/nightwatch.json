@@ -1,0 +1,26 @@
+{
+  "src_folders" : ["nightwatch/"],
+
+  "selenium" : {
+    "start_process" : true,
+    "server_path" : "nwjs/selenium.jar",
+    "cli_args" : {
+      "webdriver.chrome.driver" : "nwjs/chromedriver"
+    }
+  },
+
+  "test_settings" : {
+    "default" : {
+      "selenium_port"  : 4444,
+      "selenium_host"  : "localhost",
+      "desiredCapabilities": {
+	"chromeOptions" : {
+	  "args" : [ "nwapp=../public" ] 
+	}, 
+        "browserName": "chrome",
+        "javascriptEnabled": true,
+        "acceptSslCerts": true
+      }
+    }
+  }
+}

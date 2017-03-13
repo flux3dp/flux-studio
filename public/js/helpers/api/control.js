@@ -39,7 +39,7 @@ define([
                 opts.onError(error);
             };
 
-        const createWs = () => {
+        const createWs = (wsOptions) => {
             let url = opts.availableUsbChannel >= 0 ? `usb/${opts.availableUsbChannel}` : uuid;
             let _ws = new Websocket({
                 method: `control/${url}`,
@@ -53,7 +53,7 @@ define([
                     case 'connected':
                         clearTimeout(timmer);
                         createDedicatedWs(fileInfoWsId);
-                        opts.onConnect(data);
+                        opts.onConnect(data, wsOptions);
                         break;
                     default:
                         isConnected = true;
@@ -108,7 +108,7 @@ define([
         // id is int
         const createDedicatedWs = (id) => {
             if(!dedicatedWs[id]) {
-                dedicatedWs[id] = createWs();
+                dedicatedWs[id] = createWs({dedicated: true});
             }
             return dedicatedWs[id];
         };
@@ -320,9 +320,9 @@ define([
 
             kick: () => { return useDefaultResponse('kick'); },
 
-            quitTask: () => { 
+            quitTask: () => {
                 ctrl.mode = '';
-                return useDefaultResponse('task quit'); 
+                return useDefaultResponse('task quit');
             },
 
             quit: () => {
@@ -455,13 +455,14 @@ define([
                         }
                     }else if(response.status === 'operating'){
                         temp.operation_info = response;
+                        d.notify(response);
                     }
                 };
 
                 events.onDebug = (response) => {
                     if(response.log){
                         if(temp.operation_info){
-                            if(typeof temp.operation_info.pos !== 'undefined'){
+                            if(typeof temp.operation_info.pos !== 'undefined') {
                                 response.log += ' POS ' + temp.operation_info.pos;
                             }
                             else{
@@ -495,7 +496,8 @@ define([
                 };
                 events.onFatal = (response) => { d.resolve(response); };
 
-                ws.send('maintain calibrating');
+                let cmd = 'maintain calibrating' + (clean ? ' clean' : '');
+                ws.send(cmd);
                 return d.promise();
             },
 
@@ -535,7 +537,7 @@ define([
                 events.onMessage = (response) => { setTimeout(() => {
                     ctrl.mode = 'maintain';
                     d.resolve(response);
-                },3000); };
+                }, 3000); };
                 events.onError = (response) => { d.reject(response); };
                 events.onFatal = (response) => { d.reject(response); };
 

@@ -39,7 +39,7 @@ fill_density = 10%
 fill_pattern = honeycomb
 first_layer_acceleration = 0
 first_layer_bed_temperature = 0
-first_layer_extrusion_width = 125%
+first_layer_extrusion_width = 100%
 first_layer_height = 0.4
 first_layer_speed = 20
 first_layer_temperature = 230
@@ -148,7 +148,7 @@ acceleration_wall_x = 3000
 adhesion_extruder_nr = 0
 adhesion_type = brim
 alternate_carve_order = true
-alternate_extra_perimeter = false
+alternate_extra_perimeter = true
 anti_overhang_mesh = false
 bottom_layers = 5
 brim_line_count = 0
@@ -340,11 +340,11 @@ support_interface_pattern = concentric
 support_interface_skip_height = 0.3
 support_join_distance = 2
 support_line_distance = 2.66
-support_line_width = 0.4
+support_line_width = 0.35
 support_mesh = false
 support_minimal_diameter = 3
 support_offset = 0.2
-support_pattern = lines
+support_pattern = zigzag
 support_roof_height = 1
 support_top_distance = 0.15
 support_tower_diameter = 3
@@ -415,7 +415,7 @@ z_offset = 0`,
             "retract_lift" : 0.05,
             "temperature": 200,
             "perimeter_speed": 40,
-            "external_perimeter_speed": 20,
+            "external_perimeter_speed": 15,
             "top_solid_layers": 8,
             "bottom_solid_layers": 6,
             "first_layer_temperature": 230,
@@ -430,7 +430,7 @@ z_offset = 0`,
             "retract_lift" : 0.05,
             "temperature": 200,
             "perimeter_speed": 40,
-            "external_perimeter_speed": 20,
+            "external_perimeter_speed": 15,
             "top_solid_layers": 5,
             "bottom_solid_layers": 5,
             "first_layer_temperature": 230,
@@ -445,7 +445,7 @@ z_offset = 0`,
             "retract_lift" : 0.05,
             "temperature": 215,
             "perimeter_speed": 40,
-            "external_perimeter_speed": 20,
+            "external_perimeter_speed": 15,
             "top_solid_layers": 3,
             "bottom_solid_layers": 3,
             "first_layer_temperature": 230,
@@ -462,7 +462,7 @@ z_offset = 0`,
             "retract_lift" : 0.24,
             "temperature": 200,
             "perimeter_speed": 40,
-            "external_perimeter_speed": 20,
+            "external_perimeter_speed": 15,
             "top_solid_layers": 8,
             "bottom_solid_layers": 6,
             "first_layer_temperature": 230,
@@ -477,7 +477,7 @@ z_offset = 0`,
             "retract_lift" : 0.24,
             "temperature": 200,
             "perimeter_speed": 40,
-            "external_perimeter_speed": 20,
+            "external_perimeter_speed": 15,
             "top_solid_layers": 5,
             "bottom_solid_layers": 5,
             "first_layer_temperature": 230,
@@ -492,7 +492,7 @@ z_offset = 0`,
             "retract_lift" : 0.24,
             "temperature": 215,
             "perimeter_speed": 40,
-            "external_perimeter_speed": 20,
+            "external_perimeter_speed": 15,
             "top_solid_layers": 3,
             "bottom_solid_layers": 3,
             "first_layer_temperature": 230,
