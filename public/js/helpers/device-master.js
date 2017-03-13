@@ -84,6 +84,7 @@ define([
             _selectedDevice.source === device.source
         ) {
             let d = $.Deferred();
+            ProgressActions.close();
             d.resolve(DeviceConstants.CONNECTED);
             return d.promise();
         }
@@ -107,7 +108,6 @@ define([
                     selectDevice(device, d);
                 })
                 .fail((response) => {
-                    ProgressActions.close();
                     let message = (
                         false === response.reachable ?
                         lang.select_printer.unable_to_connect :
@@ -134,10 +134,13 @@ define([
         const createDeviceActions = (availableUsbChannel = -1) => {
             return DeviceController(uuid, {
                 availableUsbChannel,
-                onConnect: function(response) {
+                onConnect: function(response, options) {
                     d.notify(response);
 
                     if (response.status.toUpperCase() === DeviceConstants.CONNECTED) {
+                        if (options == null || (options && !options.dedicated)) {
+                            ProgressActions.close();
+                        }
                         d.resolve(DeviceConstants.CONNECTED);
                         // _devices.push(_device);
                     }
@@ -201,7 +204,9 @@ define([
         };
 
         ProgressActions.open(ProgressConstants.NONSTOP, sprintf(lang.message.connectingMachine, device.name));
+
         if(_existConnection(uuid)) {
+            ProgressActions.close();
             _device = _switchDevice(uuid);
             d.resolve(DeviceConstants.CONNECTED);
         }
@@ -227,9 +232,7 @@ define([
 
         initSocketMaster();
 
-        return d.always(() => {
-            ProgressActions.close();
-        }).promise();
+        return d.promise();
     }
 
     function auth(uuid, password) {
@@ -268,6 +271,7 @@ define([
                 }
             },
             onError: function(response) {
+                ProgressActions.close();
                 // TODO: shouldn't do replace
                 response.error = response.error.replace(/^.*\:\s+(\w+)$/g, '$1');
                 switch (response.error.toUpperCase()) {
@@ -294,6 +298,7 @@ define([
                     }
                     break;
                 case DeviceConstants.MONITOR_TOO_OLD:
+                    ProgressActions.close();
                     AlertActions.showPopupError(
                         'fatal-occurred',
                         lang.message.monitor_too_old.content,
@@ -817,7 +822,8 @@ define([
         let debug_data = {};
 
         const processError = (resp = {}) => {
-            if (resp.error[0] == "EDGE_CASE") return;
+            if (typeof resp == 'string') resp = { error: [resp] };
+            if (resp.error && resp.error === 'EDGE_CASE') { return; }
             DeviceErrorHandler.processDeviceMasterResponse(resp);
             AlertActions.showPopupError('device-busy', DeviceErrorHandler.translate(resp.error));
             SocketMaster.addTask('endMaintainMode');
@@ -834,10 +840,10 @@ define([
                 }
             }).then((headInfo) => {
                 if(headInfo.module === null) {
-                    return $.Deferred().reject({module:null});
+                    return $.Deferred().reject({module:null, error: ["HEAD_ERROR", "HEAD_OFFLINE"]});
                 }
                 else if(headInfo.module !== 'EXTRUDER') {
-                    return $.Deferred().reject({module:'LASER'});
+                    return $.Deferred().reject({module:'LASER', error: ["HEAD_ERROR", "TYPE_ERROR"]});
                 }
                 else {
                     return SocketMaster.addTask('maintainHome');
@@ -868,6 +874,7 @@ define([
         }).then(() => {
             d.resolve(debug_data);
         }).fail((error) => {
+            console.log(error);
             processError(error);
             d.reject(error);
         });

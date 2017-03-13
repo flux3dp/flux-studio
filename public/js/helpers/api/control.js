@@ -39,7 +39,7 @@ define([
                 opts.onError(error);
             };
 
-        const createWs = () => {
+        const createWs = (wsOptions) => {
             let url = opts.availableUsbChannel >= 0 ? `usb/${opts.availableUsbChannel}` : uuid;
             let _ws = new Websocket({
                 method: `control/${url}`,
@@ -53,7 +53,7 @@ define([
                     case 'connected':
                         clearTimeout(timmer);
                         createDedicatedWs(fileInfoWsId);
-                        opts.onConnect(data);
+                        opts.onConnect(data, wsOptions);
                         break;
                     default:
                         isConnected = true;
@@ -108,7 +108,7 @@ define([
         // id is int
         const createDedicatedWs = (id) => {
             if(!dedicatedWs[id]) {
-                dedicatedWs[id] = createWs();
+                dedicatedWs[id] = createWs({dedicated: true});
             }
             return dedicatedWs[id];
         };
@@ -455,6 +455,7 @@ define([
                         }
                     }else if(response.status === 'operating'){
                         temp.operation_info = response;
+                        d.notify(response);
                     }
                 };
 
