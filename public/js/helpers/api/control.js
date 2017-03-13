@@ -320,9 +320,9 @@ define([
 
             kick: () => { return useDefaultResponse('kick'); },
 
-            quitTask: () => { 
+            quitTask: () => {
                 ctrl.mode = '';
-                return useDefaultResponse('task quit'); 
+                return useDefaultResponse('task quit');
             },
 
             quit: () => {
@@ -536,7 +536,7 @@ define([
                 events.onMessage = (response) => { setTimeout(() => {
                     ctrl.mode = 'maintain';
                     d.resolve(response);
-                },3000); };
+                }, 3000); };
                 events.onError = (response) => { d.reject(response); };
                 events.onFatal = (response) => { d.reject(response); };
 

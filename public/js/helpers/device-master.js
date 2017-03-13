@@ -51,6 +51,8 @@ define([
         defaultPrinter,
         defaultPrinterWarningShowed = false,
         _instance = null,
+        _stopChangingFilament = false,
+        _stopChangingFilamentCallback,
         _selectedDevice = {},
         _deviceNameMap = {},
         _device,
@@ -157,7 +159,7 @@ define([
                     case DeviceConstants.AUTH_ERROR:
                     case DeviceConstants.AUTH_FAILED:
                         _selectedDevice = {};
-                        
+
                         if (device.password) {
                             goAuth(_device.uuid);
                         }
@@ -503,23 +505,54 @@ define([
     }
 
     function changeFilament(type) {
+        _stopChangingFilament = false;
         let d = $.Deferred();
-        SocketMaster.addTask('enterMaintainMode').then((response) => {
-            return SocketMaster.addTask('maintainHome');
-        }).then((response) => {
-            return SocketMaster.addTask('changeFilament', type);
-        }).then((response) => {
-            d.resolve();
-        }).progress((response) => {
-            d.notify(response);
-        }).fail((response) => {
-            if(response.error[0] === 'KICKED') {
-                reconnectWs();
+        SocketMaster.addTask('enterMaintainMode').then(() => {
+            console.log(_stopChangingFilament);
+            if(!_stopChangingFilament) {
+                return SocketMaster.addTask('maintainHome');
             }
+        })
+        .then(() => {
+            console.log(_stopChangingFilament);
+            if(!_stopChangingFilament) {
+                return SocketMaster.addTask('changeFilament', type);
+            }
+        })
+        .then(() => {
+            console.log(_stopChangingFilament);
+            if(_stopChangingFilament) {
+                d.reject({ error: ['CANCEL'] });
+                _stopChangingFilamentCallback();
+            }
+            else {
+                d.resolve();
+            }
+        })
+        .progress((response) => {
+            console.log(_stopChangingFilament);
+            if(_stopChangingFilament) {
+                _stopChangingFilamentCallback();
+            }
+            else {
+                d.notify(response);
+            }
+        })
+        .fail((response) => {
             d.reject(response);
         });
 
         return d.promise();
+    }
+
+    function stopChangingFilament() {
+        let d = $.Deferred();
+        _stopChangingFilamentCallback = () => {
+            d.resolve();
+        };
+        _stopChangingFilament = true;
+        return d.promise();
+
     }
 
     function changeFilamentDuringPause(type) {
@@ -640,6 +673,7 @@ define([
     }
 
     function endMaintainMode() {
+        console.log('end maintain mode');
         return SocketMaster.addTask('endMaintainMode');
     }
 
@@ -1295,6 +1329,7 @@ define([
             this.getDeviceBySerial              = getDeviceBySerial;
             this.getAvailableDevices            = getAvailableDevices;
             this.usbDefaultDeviceCheck          = usbDefaultDeviceCheck;
+            this.stopChangingFilament           = stopChangingFilament;
 
             Discover(
                 'device-master',
@@ -1304,7 +1339,6 @@ define([
                         _deviceNameMap[d.name] = d;
                     });
                     _devices = devices;
-                    // console.log('devices', _devices);
                     _scanDeviceError(devices);
                 }
             );

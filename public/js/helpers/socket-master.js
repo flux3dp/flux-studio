@@ -51,7 +51,7 @@ define([
         const runTaskFunction = (task, fnName) => {
             // Do regular stuff
             let t = setTimeout(() => {
-                task.d.reject('TIMEOUT');
+                task.d.reject({ error: ['TIMEOUT'] });
                 doNext();
             }, 20 * 1000);
 
