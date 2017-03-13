@@ -259,6 +259,10 @@ define([
                     }
                 },
 
+                setOptions: function(sockOpts) {
+                    Object.assign(socketOptions, sockOpts);
+                },
+
                 // events
                 onOpen: function(callback) {
                     socketOptions.onOpen = callback;

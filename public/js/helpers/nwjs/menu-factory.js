@@ -554,20 +554,24 @@ define([
                                 ProgressActions.open(ProgressConstants.WAITING);
                                 checkDeviceStatus(currentPrinter).then(() => {
                                     ProgressActions.open(ProgressConstants.WAITING, lang.device.calibrating, lang.device.pleaseWait, false);
-                                    var scan_control,
+                                    var scanControl,
                                         opts = {
                                             onError: (data) => {
-                                                scan_control.takeControl(function(response) {
+                                                scanControl.takeControl(function(response) {
                                                     ProgressActions.close();
                                                 });
                                             },
                                             onReady: () => {
                                                 ProgressActions.close();
-                                                scan_control.turnLaser(true).then(() => {
+                                                scanControl.turnLaser(true).then(() => {
                                                     AlertActions.showPopupCustom('scan-laser-turned-on', lang.device.scan_laser_complete, lang.device.finish, '');
                                                     var _handleFinish = (dialog_name) => {
-                                                        scan_control.turnLaser(false).then(() => {
-                                                            scan_control.quit();
+                                                        scanControl.turnLaser(false).then(() => {
+                                                            scanControl.quit(true).then(() => {
+                                                                opts.onReady = function() {};
+                                                            }).fail(() => {
+                                                                ProgressActions.close();
+                                                            });
                                                         });
                                                         AlertStore.removeCustomListener(_handleFinish);
                                                     };
@@ -575,7 +579,7 @@ define([
                                                 });
                                             }
                                         };
-                                    scan_control = ScanControl(currentPrinter.uuid, opts);
+                                    scanControl = ScanControl(currentPrinter.uuid, opts);
                                 });
                             }).fail(() => {
                                 ProgressActions.close();
