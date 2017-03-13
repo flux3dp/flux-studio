@@ -104,7 +104,7 @@ define([
                     clearTimeout(connectingTimer);
                     isReady = true;
                     console.log('scan control on open ', opts.printer);
-                    if (opts.printer && opts.printer.model == 'delta-1p') {
+                    if (opts.printer && opts.printer.model === 'delta-1p') {
                         ws.send('turn_on_hd');
                     }
                     opts.onReady();
@@ -388,7 +388,7 @@ define([
                 });
             },
 
-            quit: function(opts) {
+            quit: function(doNotReconnect) {
                 var $deferred = $.Deferred();
 
                 checkDeviceIsReady().done(function() {
@@ -399,6 +399,10 @@ define([
                     events.onError = function(result) {
                         $deferred.resolve(result);
                     };
+
+                    if (doNotReconnect) {
+                        ws.setOptions({autoReconnect: false});
+                    }
 
                     genericSender('quit');
                 });

@@ -62,7 +62,7 @@ define([
                 checkToolheadFirmware = function() {
                     var $deferred = $.Deferred();
 
-                    ProgressActions.open(ProgressConstants.NONSTOP, lang.update.checkingHeadinfo);
+                    ProgressActions.open(ProgressConstants.NONSTOP, lang0.update.checkingHeadinfo);
 
                     if ('toolhead' === type) {
                         DeviceMaster.headInfo().done(function(response) {
@@ -87,13 +87,13 @@ define([
                 updateFirmware = function() {
                     checkFirmware(currentPrinter, type).done(function(response) {
                         var latestVersion = currentPrinter.version,
-                            caption = lang.update.firmware.latest_firmware.caption,
-                            message = lang.update.firmware.latest_firmware.message;
+                            caption = lang0.update.firmware.latest_firmware.caption,
+                            message = lang0.update.firmware.latest_firmware.message;
 
                         if ('toolhead' === type) {
                             latestVersion = currentPrinter.toolhead_version;
-                            caption = lang.update.toolhead.latest_firmware.caption;
-                            message = lang.update.toolhead.latest_firmware.message;
+                            caption = lang0.update.toolhead.latest_firmware.caption;
+                            message = lang0.update.toolhead.latest_firmware.message;
                         }
 
                         if (!response.needUpdate) {
@@ -110,7 +110,7 @@ define([
                         firmwareUpdater(response, currentPrinter, type);
                         AlertActions.showPopupInfo(
                             'latest-firmware',
-                            lang.monitor.cant_get_toolhead_version
+                            lang0.monitor.cant_get_toolhead_version
                         );
                     });
                 },
@@ -120,7 +120,7 @@ define([
                             ProgressActions.close();
                             updateFirmware();
                         }).fail(function() {
-                            AlertActions.showPopupError('toolhead-offline', lang.monitor.cant_get_toolhead_version);
+                            AlertActions.showPopupError('toolhead-offline', lang0.monitor.cant_get_toolhead_version);
                         });
                     };
 
@@ -141,7 +141,7 @@ define([
                     AlertStore.onRetry(handleYes);
                     AlertStore.onCancel(handleCancel);
 
-                    ProgressActions.open(ProgressConstants.NONSTOP, lang.update.preparing);
+                    ProgressActions.open(ProgressConstants.NONSTOP, lang0.update.preparing);
                     if(type === 'toolhead') {
                         DeviceMaster.enterMaintainMode().then(() => {
                             setTimeout(() => {
@@ -158,11 +158,11 @@ define([
             DeviceMaster.select(printer).then(function(status) {
                 checkStatus();
             }).fail((resp) => {
-                AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
+                AlertActions.showPopupError('menu-item', lang0.message.connectionTimeout);
             });
         },
-        topMenuLang = i18n.get().topmenu,
-        lang = i18n.get(),
+        lang = i18n.get().topmenu,
+        lang0 = i18n.get(),
         NWjsWindow,
         topMenu,
         Menu,
@@ -297,12 +297,12 @@ define([
 
     function updateAccountMenu(menuMap) {
         if(!menuMap) { return; }
-        let accountMenu = menuMap.filter(v => v.label === topMenuLang.account.label)[0];
+        let accountMenu = menuMap.filter(v => v.label === lang.account.label)[0];
         if(!accountMenu) { return; }
         if(accountDisplayName === '' || typeof accountDisplayName === 'undefined') {
             accountMenu.subItems.splice(1,2);
         } else {
-            accountMenu.subItems[0].label = accountDisplayName || topMenuLang.account.sign_in;
+            accountMenu.subItems[0].label = accountDisplayName || lang.account.sign_in;
         }
 
         if(accountMenu.subItems.length >= 3) {
@@ -352,16 +352,16 @@ define([
                             onError: function() {
                                 InputLightboxActions.open('auth-device', {
                                     type         : InputLightboxConstants.TYPE_PASSWORD,
-                                    caption      : topMenuLang.select_printer.notification,
-                                    inputHeader  : topMenuLang.select_printer.please_enter_password,
-                                    confirmText  : topMenuLang.select_printer.submit,
+                                    caption      : lang.select_printer.notification,
+                                    inputHeader  : lang.select_printer.please_enter_password,
+                                    confirmText  : lang.select_printer.submit,
                                     onSubmit     : function(password) {
                                         _auth(printer.uuid, password, {
                                             onError: function(response) {
                                                 var message = (
                                                     false === response.reachable ?
-                                                    topMenuLang.select_printer.unable_to_connect :
-                                                    topMenuLang.select_printer.auth_failure
+                                                    lang.select_printer.unable_to_connect :
+                                                    lang.select_printer.auth_failure
                                                 );
                                                 AlertActions.showPopupError('device-auth-fail', message);
                                             }
@@ -381,7 +381,7 @@ define([
 
             // device monitor
             subItems.push({
-                label: topMenuLang.device.device_monitor,
+                label: lang.device.device_monitor,
                 enabled: true,
                 onClick: function() {
                     var currentPrinter = discoverMethods.getLatestPrinter(printer),
@@ -393,7 +393,7 @@ define([
                             GlobalActions.showMonitor(currentPrinter, '', '', GlobalConstants.DEVICE_LIST);
                         }
                         else if (status === DeviceConstants.TIMEOUT) {
-                            AlertActions.showPopupError('menu-item', topMenuLang.message.connectionTimeout);
+                            AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
                         }
                     }).
                     fail(function(status) {
@@ -405,13 +405,13 @@ define([
 
             // device info
             subItems.push({
-                label: topMenuLang.device.device_info,
+                label: lang.device.device_info,
                 enabled: true,
                 onClick: function() {
                     var currentPrinter = discoverMethods.getLatestPrinter(printer),
                         lang = i18n.get();
 
-                    var deviceInfo = `${topMenuLang.device.model_name}: ${currentPrinter.model.toUpperCase()}\n${topMenuLang.device.IP}: ${currentPrinter.ipaddr}\n${topMenuLang.device.serial_number}: ${currentPrinter.serial}\n${topMenuLang.device.firmware_version}: ${currentPrinter.version}\n${topMenuLang.device.UUID}: ${currentPrinter.uuid}`;
+                    var deviceInfo = `${lang.device.model_name}: ${currentPrinter.model.toUpperCase()}\n${lang.device.IP}: ${currentPrinter.ipaddr}\n${lang.device.serial_number}: ${currentPrinter.serial}\n${lang.device.firmware_version}: ${currentPrinter.version}\n${lang.device.UUID}: ${currentPrinter.uuid}`;
                     AlertActions.showPopupInfo('', deviceInfo);
                 }
             });
@@ -424,7 +424,7 @@ define([
             // change filament
             subItems.push({
                 id: 'change_filament',
-                label: topMenuLang.device.change_filament,
+                label: lang.device.change_filament,
                 enabled: true,
                 onClick: function() {
                     var currentPrinter = discoverMethods.getLatestPrinter(printer);
@@ -432,13 +432,13 @@ define([
                     DeviceMaster.selectDevice(currentPrinter).then(function(status) {
                         DeviceMaster.getReport().then(report => {
                             if(report.st_id === 16 || report.st_id === 2) {
-                                AlertActions.showPopupError('OCCUPIED', topMenuLang.message.device_in_use);
+                                AlertActions.showPopupError('OCCUPIED', lang.message.device_in_use);
                             }
                             else if (status === DeviceConstants.CONNECTED) {
                                 showPopup(currentPrinter, 'CHANGE_FILAMENT');
                             }
                             else if (status === DeviceConstants.TIMEOUT) {
-                                AlertActions.showPopupError('menu-item', topMenuLang.message.connectionTimeout);
+                                AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
                             }
                         });
                     });
@@ -447,7 +447,7 @@ define([
 
             subItems.push({
                 id: 'calibrate',
-                label: topMenuLang.device.calibrate,
+                label: lang.device.calibrate,
                 onClick: () => {
                     var currentPrinter = discoverMethods.getLatestPrinter(printer),
                         lang = i18n.get();
@@ -459,8 +459,8 @@ define([
                             checkDeviceStatus(currentPrinter).then(() => {
                                 ProgressActions.open(
                                     ProgressConstants.WAITING,
-                                    topMenuLang.device.calibrating,
-                                    topMenuLang.device.pleaseWait,
+                                    lang.device.calibrating,
+                                    lang.device.pleaseWait,
                                     true,
                                     emptyFunction,
                                     emptyFunction,
@@ -468,13 +468,13 @@ define([
                                 );
                                 DeviceMaster.calibrate().done((debug_message) => {
                                     setTimeout(() => {
-                                        AlertActions.showPopupInfo('calibrated', JSON.stringify(debug_message), topMenuLang.calibration.calibrated);
+                                        AlertActions.showPopupInfo('calibrated', JSON.stringify(debug_message), lang.calibration.calibrated);
                                     }, 100);
                                 }).fail((resp) => {
                                     console.log('THe error', resp);
                                     if (resp.error[0] === 'EDGE_CASE') { return; }
                                     if (resp.module === 'LASER') {
-                                        AlertActions.showPopupError('calibrate-fail', topMenuLang.calibration.extruderOnly);
+                                        AlertActions.showPopupError('calibrate-fail', lang.calibration.extruderOnly);
                                     }
                                     else {
                                         DeviceErrorHandler.processDeviceMasterResponse(resp);
@@ -486,28 +486,28 @@ define([
                             });
                         }
                         else if (status === DeviceConstants.TIMEOUT) {
-                            AlertActions.showPopupError('menu-item', topMenuLang.message.connectionTimeout);
+                            AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
                         }
                     });
                 }
             });
 
             subItems.push({
-                label: topMenuLang.device.commands,
+                label: lang.device.commands,
                 subItems: [
                     {
-                        label: topMenuLang.device.set_to_origin,
+                        label: lang.device.set_to_origin,
                         enabled: true,
                         onClick: function() {
                             var currentPrinter = discoverMethods.getLatestPrinter(printer);
-                            ProgressActions.open(ProgressConstants.NONSTOP, i18n.topMenuLang.message.connecting);
+                            ProgressActions.open(ProgressConstants.NONSTOP, i18n.lang.message.connecting);
                             DeviceMaster.select(currentPrinter).then(() => {
                                 checkDeviceStatus(currentPrinter).then(() => {
                                     ProgressActions.open(ProgressConstants.NONSTOP);
                                     DeviceMaster.home().done(() => {
                                         ProgressActions.close();
                                         setTimeout(() => {
-                                            AlertActions.showPopupInfo('set-to-origined', topMenuLang.device.set_to_origin_complete);
+                                            AlertActions.showPopupInfo('set-to-origined', lang.device.set_to_origin_complete);
                                         }, 100);
                                     }).always(() => {
                                         ProgressActions.close();
@@ -515,59 +515,63 @@ define([
                                 });
                             }).fail(() => {
                                 ProgressActions.close();
-                                AlertActions.showPopupError('menu-item', topMenuLang.message.connectionTimeout);
+                                AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
                             });
                         }
                     },
                     {
-                        label: topMenuLang.device.movement_tests,
+                        label: lang.device.movement_tests,
                         enabled: true,
                         onClick: function() {
-                            ProgressActions.open(ProgressConstants.NONSTOP, i18n.topMenuLang.message.connecting);
+                            ProgressActions.open(ProgressConstants.NONSTOP, i18n.lang.message.connecting);
                             var currentPrinter = discoverMethods.getLatestPrinter(printer);
                             DeviceMaster.select(currentPrinter).then(() => {
-                                ProgressActions.open(ProgressConstants.NONSTOP, i18n.topMenuLang.tutorial.runningMovementTests);
+                                ProgressActions.open(ProgressConstants.NONSTOP, i18n.lang.tutorial.runningMovementTests);
                                 checkDeviceStatus(currentPrinter).then(() => {
                                     DeviceMaster.runMovementTests().then(() => {
                                         console.log('ran movemnt test');
                                         ProgressActions.close();
-                                        AlertActions.showPopupInfo('movement-tests', topMenuLang.device.movement_tests_complete);
+                                        AlertActions.showPopupInfo('movement-tests', lang.device.movement_tests_complete);
                                     }).fail((resp) => {
                                         console.log('ran movemnt test failed');
                                         ProgressActions.close();
-                                        AlertActions.showPopupInfo('movement-tests', topMenuLang.device.movement_tests_failed);
+                                        AlertActions.showPopupInfo('movement-tests', lang.device.movement_tests_failed);
                                     });
                                 });
                             }).fail(() => {
                                 ProgressActions.close();
-                                AlertActions.showPopupError('menu-item', topMenuLang.message.connectionTimeout);
+                                AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
                             });
                         }
                     },
                     {
-                        label: topMenuLang.device.scan_laser_calibrate,
+                        label: lang.device.scan_laser_calibrate,
                         enabled: true,
                         onClick: function() {
                             var currentPrinter = discoverMethods.getLatestPrinter(printer);
-                            ProgressActions.open(ProgressConstants.WAITING, i18n.topMenuLang.message.connecting);
+                            ProgressActions.open(ProgressConstants.WAITING, i18n.lang.message.connecting);
                             DeviceMaster.select(currentPrinter).then(() => {
                                 ProgressActions.open(ProgressConstants.WAITING);
                                 checkDeviceStatus(currentPrinter).then(() => {
-                                    ProgressActions.open(ProgressConstants.WAITING, topMenuLang.device.calibrating, topMenuLang.device.pleaseWait, false);
-                                    var scan_control,
+                                    ProgressActions.open(ProgressConstants.WAITING, lang.device.calibrating, lang.device.pleaseWait, false);
+                                    var scanControl,
                                         opts = {
                                             onError: (data) => {
-                                                scan_control.takeControl(function(response) {
+                                                scanControl.takeControl(function(response) {
                                                     ProgressActions.close();
                                                 });
                                             },
                                             onReady: () => {
                                                 ProgressActions.close();
-                                                scan_control.turnLaser(true).then(() => {
-                                                    AlertActions.showPopupCustom('scan-laser-turned-on', topMenuLang.device.scan_laser_complete, topMenuLang.device.finish, '');
+                                                scanControl.turnLaser(true).then(() => {
+                                                    AlertActions.showPopupCustom('scan-laser-turned-on', lang.device.scan_laser_complete, lang.device.finish, '');
                                                     var _handleFinish = (dialog_name) => {
-                                                        scan_control.turnLaser(false).then(() => {
-                                                            scan_control.quit();
+                                                        scanControl.turnLaser(false).then(() => {
+                                                            scanControl.quit(true).then(() => {
+                                                                opts.onReady = function() {};
+                                                            }).fail(() => {
+                                                                ProgressActions.close();
+                                                            });
                                                         });
                                                         AlertStore.removeCustomListener(_handleFinish);
                                                     };
@@ -575,27 +579,27 @@ define([
                                                 });
                                             }
                                         };
-                                    scan_control = ScanControl(currentPrinter.uuid, opts);
+                                    scanControl = ScanControl(currentPrinter.uuid, opts);
                                 });
                             }).fail(() => {
                                 ProgressActions.close();
-                                AlertActions.showPopupError('menu-item', topMenuLang.message.connectionTimeout);
+                                AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
                             });
                         }
                     },
                     {
-                        label: topMenuLang.device.clean_calibration,
+                        label: lang.device.clean_calibration,
                         enabled: true,
                         onClick: function() {
                             var currentPrinter = discoverMethods.getLatestPrinter(printer),
                                 lang = i18n.get();
-                            ProgressActions.open(ProgressConstants.WAITING, topMenuLang.message.connecting);
+                            ProgressActions.open(ProgressConstants.WAITING, lang.message.connecting);
                             DeviceMaster.select(currentPrinter).then(() => {
                                 checkDeviceStatus(currentPrinter).then(() => {
-                                    ProgressActions.open(ProgressConstants.WAITING, topMenuLang.device.calibrating, topMenuLang.device.pleaseWait, false);
+                                    ProgressActions.open(ProgressConstants.WAITING, lang.device.calibrating, lang.device.pleaseWait, false);
                                     DeviceMaster.cleanCalibration().done(() => {
                                         setTimeout(() => {
-                                            AlertActions.showPopupInfo('calibrated', topMenuLang.calibration.calibrated);
+                                            AlertActions.showPopupInfo('calibrated', lang.calibration.calibrated);
                                         }, 100);
                                     }).always(() => {
                                         ProgressActions.close();
@@ -603,12 +607,12 @@ define([
                                 });
                             }).fail(() => {
                                 ProgressActions.close();
-                                AlertActions.showPopupError('menu-item', topMenuLang.message.connectionTimeout);
+                                AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
                             });
                         }
                     },
                     {
-                        label: topMenuLang.device.turn_on_head_temperature,
+                        label: lang.device.turn_on_head_temperature,
                         enabled: true,
                         onClick: function() {
                             var currentPrinter = discoverMethods.getLatestPrinter(printer);
@@ -616,7 +620,7 @@ define([
                             DeviceMaster.select(currentPrinter).then(() => {
                                 showPopup(currentPrinter, 'SET_TEMPERATURE');
                             }).fail(() => {
-                                AlertActions.showPopupError('menu-item', topMenuLang.message.connectionTimeout);
+                                AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
                             });
                         }
                     }
@@ -630,10 +634,10 @@ define([
 
             // firmware update (delta/toolhead)
             subItems.push({
-                label: topMenuLang.device.check_firmware_update,
+                label: lang.device.check_firmware_update,
                 subItems: [
                     {
-                        label: topMenuLang.device.update_delta,
+                        label: lang.device.update_delta,
                         enabled: true,
                         onClick: function() {
                             checkDeviceStatus(printer).then(() => {
@@ -642,7 +646,7 @@ define([
                         }
                     },
                     {
-                        label: topMenuLang.device.update_toolhead,
+                        label: lang.device.update_toolhead,
                         enabled: true,
                         onClick: function() {
                             checkDeviceStatus(printer).then(() => {
@@ -655,7 +659,7 @@ define([
 
             // default device
             subItems.push({
-                label: topMenuLang.device.default_device,
+                label: lang.device.default_device,
                 enabled: true,
                 type: 'checkbox',
                 onClick: function() {
