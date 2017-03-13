@@ -436,7 +436,8 @@ define(function() {
                 },
                 curaSupport: {
                     lines: '線狀',
-                    grid: '格狀'
+                    grid: '格狀',
+                    zigzag: '鋸齒'
                 },
                 blackMagic: '黑魔法',
                 spiral: '螺旋',

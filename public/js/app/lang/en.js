@@ -422,7 +422,8 @@ define(function() {
                 },
                 curaSupport: {
                     lines: 'Lines',
-                    grid: 'Grid'
+                    grid: 'Grid',
+                    zigzag: 'Zigzag'
                 },
                 blackMagic: 'Black Magic',
                 spiral: 'Spiral',

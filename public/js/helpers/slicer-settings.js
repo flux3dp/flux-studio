@@ -13,14 +13,14 @@ define([
         fill_density                        : { key: 'infill_line_distance', fn: (v, settings) => { v = v || '10%'; return  v === '0%' ? 0 : (0.4 * 100 / parseFloat(v.toString().replace('%', ''))); } },
         fill_pattern                        : { key: 'infill_pattern', fn: (v) => {
                                                                             v = v.toLowerCase();
-                                                                            return (['automatic','grid','lines','concentric','concentric_3d','cubic','cubicsubdiv','tetrahedral','triangles','zigzag',].indexOf(v) >= 0 ? v : 'ZIGZAG').toLowerCase();
+                                                                            return (['automatic','grid','lines','concentric','concentric_3d','cubic','cubicsubdiv','tetrahedral','triangles','zigzag',].indexOf(v) >= 0 ? v : 'zigzag').toLowerCase();
                                                                        } },
         support_material                    : { key: 'support_enable', fn: (v) => { return !!parseInt(v); } },
         support_material_spacing            : { key: 'support_xy_distance' },
         support_material_threshold          : { key: 'support_angle', fn: (v) => { return 90.0 - parseFloat(v); } },
         support_material_pattern            : { key: 'support_pattern', fn: (v) => {
                                                                             v = v.toLowerCase();
-                                                                            return (['ZIGZAG', 'GRID', 'LINES'].indexOf(v) >= 0 ? v : 'ZIGZAG').toLowerCase();
+                                                                            return (['zigzag', 'grid', 'lines'].indexOf(v) >= 0 ? v : 'zigzag').toLowerCase();
                                                                        } },
         support_material_contact_distance   : { key: 'support_top_distance' },
         brim_width                          : { key: 'brim_line_count' },
@@ -47,7 +47,7 @@ define([
         let item = cura2mapping[i];
         cura2revMapping[item.key] = {key: i};
         if(item.fn) {
-            cura2revMapping[item.key] = logError;
+            cura2revMapping[item.key].fn = logError;
         }
     }
 
@@ -207,6 +207,9 @@ define([
 
                     if (this.engine === 'cura2') {
                         let rev = cura2revMapping[_key];
+                        if (_key == 'support_angle') {
+                            console.log(rev);   
+                        }
                         if (rev && this.hasOwnProperty(rev.key)) {
                             this[rev.key] = rev.fn ? rev.fn(_value, self) : _value;
                         } else if (this.hasOwnProperty(_key)) {
