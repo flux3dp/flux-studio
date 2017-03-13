@@ -104,7 +104,7 @@ define(function() {
                 update_toolhead: 'Toolhead Firmware',
                 calibrate: 'Run Auto Leveling',
                 set_to_origin: 'Calibrate Origin ( Home )',
-                movement_tests: 'Run movement tests',
+                movement_tests: 'Run Movement Tests',
                 scan_laser_calibrate: 'Turn On Scanning Laser',
                 clean_calibration: 'Run Auto Leveling with Clean Data',
                 commands: 'Commands',
@@ -114,7 +114,7 @@ define(function() {
                 movement_tests_failed: 'Movement tests failed. <br/>1. Make sure the toolhead cable is stretched correctly.<br/>2. Make sure the connector of toolhead cable to the machine has inserted about half into the machine.<br/>3. Try to turn the connector on the printing toolhead 180 degrees.<br/>4. Check <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/115003674128">this article</a>.',
                 finish: 'FINISH',
                 cancel: 'CANCEL',
-                turn_on_head_temperature: 'Turn on head temperature'
+                turn_on_head_temperature: 'Set Toolhead Temperature'
             },
             window: {
                 label: 'Window',

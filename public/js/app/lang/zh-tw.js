@@ -114,7 +114,7 @@ define(function() {
                 movement_tests_failed: '運動測試失敗。<br/>1. 請確工具頭連接線被正確拉直<br/>2. 上蓋工具頭連接線接頭沒入約一半<br/>3. 可嘗試將工具頭連接線順時針或逆時針旋轉 180 度再插入<br/>4. 參考 <a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/115003674128">此篇文章</a>',
                 finish: '完成',
                 cancel: '取消',
-                turn_on_head_temperature: '設定列印模組溫度'
+                turn_on_head_temperature: '設定列印工具頭溫度'
             },
             window: {
                 label: '視窗',
@@ -1212,7 +1212,7 @@ define(function() {
             loading_filament: '進料中',
             maintain_head_type_error: '列印工具頭未正確安裝',
             maintain_zombie: '請重新啟動機器',
-            toolhead_no_response: '#117 列印模組沒有回應 <a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/218347477">暸解更多</a>'
+            toolhead_no_response: '#117 列印工具頭沒有回應 <a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/218347477">暸解更多</a>'
         },
         head_temperature: {
             title: '開啟噴頭溫度',
