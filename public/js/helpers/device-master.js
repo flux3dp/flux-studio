@@ -964,7 +964,10 @@ define([
 
         const step1 = () => {
             let _d = $.Deferred();
-            SocketMaster.addTask('enterMaintainMode').then((response) => {
+            SocketMaster.addTask('enterMaintainMode').then(() => {
+                return SocketMaster.addTask('maintainHome');
+            })
+            .then((response) => {
                 if(response.status === 'ok') {
                     return SocketMaster.addTask('maintainClean');
                 }
