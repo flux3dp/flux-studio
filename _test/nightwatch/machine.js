@@ -14,7 +14,7 @@ module.exports = {
       .waitForElementNotPresent('div.modal-alert .spinner-roller', 30000) // Wait slicing service loaded
       .waitForElementVisible('button[data-ga-event=yes]', 8000)
       .click('button[data-ga-event=yes]') /// Say will send usage info
-      .pause(15000)
+      .pause(20000)
       .execute(function(data) {
         let menuMap = window.FLUX.menuMap,
             result = 404;
@@ -22,6 +22,7 @@ module.exports = {
             if (menu.label !== 'Machines') { return; }
             menu.subItems.map((machineMenu) => {
                 if (!machineMenu.subItems) { return; }
+                if (machineMenu.label !== 'Nightwatch') { return; }
                 machineMenu.subItems.map((machineCommand) => {
                     console.log(machineCommand);
                     if (machineCommand.id === 'calibrate') {
@@ -32,10 +33,19 @@ module.exports = {
             });
         });
         return result;
-      }, [], (menuMap) => {
-        console.log('End of execute', menuMap);
+      }, [], (result) => {
+        console.log('End of execute', result.value);
       })
-      .pause(15000)
+      .waitForElementVisible('div.modal-alert', 5000, false, function(result){ // Input password if needed
+          if (result.value) {
+              browser.waitForElementVisible('.modal-alert input', 30000)
+              .setValue('.modal-alert input', 'flux')
+              .click('button[data-ga-event=confirm]'); // Input default password
+          } else {
+              // No password needed
+          }
+      })
+      .pause(60000)
       .end();
   }
 };
