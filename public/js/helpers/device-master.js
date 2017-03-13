@@ -378,7 +378,7 @@ define([
             statusChanged = false;
 
         ProgressActions.open(ProgressConstants.NONSTOP, lang.message.runningTests);
-        
+
         let t = setInterval(() => {
             SocketMaster.addTask('report').then(r => {
                 d.notify(r, t);
@@ -969,7 +969,7 @@ define([
             })
             .then((response) => {
                 if(response.status === 'ok') {
-                    return SocketMaster.addTask('maintainClean');
+                    return SocketMaster.addTask('calibrate', true);
                 }
                 else {
                     _d.reject(response);

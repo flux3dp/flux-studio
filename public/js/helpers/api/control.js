@@ -462,7 +462,7 @@ define([
                 events.onDebug = (response) => {
                     if(response.log){
                         if(temp.operation_info){
-                            if(typeof temp.operation_info.pos !== 'undefined'){
+                            if(typeof temp.operation_info.pos !== 'undefined') {
                                 response.log += ' POS ' + temp.operation_info.pos;
                             }
                             else{
@@ -496,7 +496,8 @@ define([
                 };
                 events.onFatal = (response) => { d.resolve(response); };
 
-                ws.send('maintain calibrating');
+                let cmd = 'maintain calibrating' + (clean ? ' clean' : '');
+                ws.send(cmd);
                 return d.promise();
             },
 
