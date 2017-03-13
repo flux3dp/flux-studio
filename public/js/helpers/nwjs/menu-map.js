@@ -57,7 +57,14 @@ define([
             import: {
                 label: lang.file.import,
                 enabled: true,
-                onClick: function() { $('input[type="file"].hide').click(); },
+                onClick: function() {
+                    if($('input[type="file"].hide').length > 0) {
+                        $('input[type="file"].hide').click();
+                    }
+                    else {
+                        $('input[type="file"]').click();
+                    }
+                },
                 key: 'i',
                 modifiers: 'cmd',
                 parent: parentIndex.FILE
