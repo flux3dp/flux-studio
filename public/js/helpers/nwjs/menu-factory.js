@@ -59,11 +59,10 @@ define([
         },
         executeFirmwareUpdate = function(printer, type) {
             var currentPrinter = discoverMethods.getLatestPrinter(printer),
-                lang = i18n.get(),
                 checkToolheadFirmware = function() {
                     var $deferred = $.Deferred();
 
-                    ProgressActions.open(ProgressConstants.NONSTOP);
+                    ProgressActions.open(ProgressConstants.NONSTOP, lang0.update.checkingHeadinfo);
 
                     if ('toolhead' === type) {
                         DeviceMaster.headInfo().done(function(response) {
@@ -75,6 +74,8 @@ define([
                             else {
                                 $deferred.resolve({ status: 'ok' });
                             }
+                        }).fail(() => {
+                            $deferred.reject();
                         });
                     }
                     else {
@@ -86,16 +87,16 @@ define([
                 updateFirmware = function() {
                     checkFirmware(currentPrinter, type).done(function(response) {
                         var latestVersion = currentPrinter.version,
-                            caption = lang.update.firmware.latest_firmware.caption,
-                            message = lang.update.firmware.latest_firmware.message;
+                            caption = lang0.update.firmware.latest_firmware.caption,
+                            message = lang0.update.firmware.latest_firmware.message;
 
                         if ('toolhead' === type) {
                             latestVersion = currentPrinter.toolhead_version;
-                            caption = lang.update.toolhead.latest_firmware.caption;
-                            message = lang.update.toolhead.latest_firmware.message;
+                            caption = lang0.update.toolhead.latest_firmware.caption;
+                            message = lang0.update.toolhead.latest_firmware.message;
                         }
 
-                        if (false === response.needUpdate) {
+                        if (!response.needUpdate) {
                             AlertActions.showPopupInfo(
                                 'latest-firmware',
                                 message + ' (v' + latestVersion + ')',
@@ -109,19 +110,17 @@ define([
                         firmwareUpdater(response, currentPrinter, type);
                         AlertActions.showPopupInfo(
                             'latest-firmware',
-                            lang.monitor.cant_get_toolhead_version
+                            lang0.monitor.cant_get_toolhead_version
                         );
                     });
                 },
                 checkStatus = function() {
-                    let informHeadMissing = false;
-
                     const processUpdate = () => {
                         checkToolheadFirmware().always(function() {
                             ProgressActions.close();
                             updateFirmware();
                         }).fail(function() {
-                            AlertActions.showPopupError('toolhead-offline', lang.monitor.cant_get_toolhead_version);
+                            AlertActions.showPopupError('toolhead-offline', lang0.monitor.cant_get_toolhead_version);
                         });
                     };
 
@@ -142,7 +141,7 @@ define([
                     AlertStore.onRetry(handleYes);
                     AlertStore.onCancel(handleCancel);
 
-                    ProgressActions.open(ProgressConstants.NONSTOP);
+                    ProgressActions.open(ProgressConstants.NONSTOP, lang0.update.preparing);
                     if(type === 'toolhead') {
                         DeviceMaster.enterMaintainMode().then(() => {
                             setTimeout(() => {
@@ -156,19 +155,14 @@ define([
                     }
                 };
 
-            DeviceMaster.selectDevice(printer).then(function(status) {
-                var lang = i18n.get();
-
-                if (status === DeviceConstants.CONNECTED) {
-                    checkStatus();
-                }
-                else if (status === DeviceConstants.TIMEOUT) {
-                    AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
-                }
+            DeviceMaster.select(printer).then(function(status) {
+                checkStatus();
+            }).fail((resp) => {
+                AlertActions.showPopupError('menu-item', lang0.message.connectionTimeout);
             });
         },
-        originalMenuMap = JSON.parse(JSON.stringify(menuMap)),
         lang = i18n.get().topmenu,
+        lang0 = i18n.get(),
         NWjsWindow,
         topMenu,
         Menu,

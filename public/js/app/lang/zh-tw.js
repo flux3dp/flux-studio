@@ -61,6 +61,8 @@ define(function() {
             },
             updating: '更新中...',
             skip: '跳過此版本',
+            checkingHeadinfo: '檢查工具頭資訊',
+            preparing: '準備中...',
             later: '稍候',
             install: '下載',
             upload: '上傳'
@@ -1100,6 +1102,7 @@ define(function() {
             connectingMachine: '連接 %s 中...',
             connected: '已連線',
             authenticating: '密碼驗證中...',
+            runningTests: '運動測試中...',
             machineNotConnected: 'Machine is not connected',
             notPrinting: 'Printing is not in progress',
             nothingToPrint: 'Nothing to print (source blob missing)',

@@ -103,7 +103,7 @@ define([
             _selectedDevice = {};
 
             const handleSubmit = (password) => {
-                ProgressActions.open(ProgressConstants.NONSTOP);
+                ProgressActions.open(ProgressConstants.NONSTOP_WITH_MESSAGE, lang.message.authenticating);
 
                 auth(uuid, password).done((data) => {
                     device.plaintext_password = password;
@@ -286,9 +286,9 @@ define([
                         goAuth(_device.uuid);
                     }
                     else {
-                        ProgressActions.open(ProgressConstants.NONSTOP);
+                        ProgressActions.open(ProgressConstants.NONSTOP_WITH_MESSAGE, lang.message.authenticating);
                         auth(_device.uuid, '').then((data) => {
-                            ProgressActions.open(ProgressConstants.NONSTOP, sprintf(lang.message.connectingMachine, _device.name));
+                            ProgressActions.open(ProgressConstants.NONSTOP_WITH_MESSAGE, sprintf(lang.message.connectingMachine, _device.name));
                             selectDevice(device, d);
                         }).fail(() => {
                             ProgressActions.close();
@@ -377,9 +377,8 @@ define([
         let d = $.Deferred(),
             statusChanged = false;
 
-        ProgressActions.open(ProgressConstants.NONSTOP);
-
-        console.log("waiting status");
+        ProgressActions.open(ProgressConstants.NONSTOP, lang.message.runningTests);
+        
         let t = setInterval(() => {
             SocketMaster.addTask('report').then(r => {
                 d.notify(r, t);

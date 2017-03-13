@@ -61,6 +61,8 @@ define(function() {
             },
             updating: 'Updating...',
             skip: 'Skip This Version',
+            checkingHeadinfo: 'Checking Toolhead Information',
+            preparing: 'Preparing...',
             later: 'LATER',
             install: 'INSTALL',
             upload: 'UPLOAD'
@@ -1086,6 +1088,7 @@ define(function() {
             connectingMachine: 'Connecting %s...',
             connected: 'Connected',
             authenticating: 'Authenticating...',
+            runningTests: 'Running tests...',
             machineNotConnected: 'Machine is not connected',
             notPrinting: 'Printing is not in progress',
             nothingToPrint: 'Nothing to print (source blob missing)',

@@ -794,6 +794,7 @@ define([
                 },
 
                 _handleQualityModelSelected: function(quality, machineModel) {
+                    if ( ['high', 'med', 'low'].indexOf(quality) < 0 ) { quality = 'med'; }
                     var parameters = DefaultPrintSettings[machineModel || 'fd1'][quality];
                     this.setState({model: machineModel, quality: quality});
                     Config().write('preferred-model', machineModel);
