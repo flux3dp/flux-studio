@@ -983,7 +983,7 @@ define(function() {
                 N: 'No'
             },
             backlash: 'Geometric Error Correction',
-            turn_on_head_temperature: 'Set toolhead temperature',
+            turn_on_head_temperature: 'Set Toolhead Temperature',
             plus_camera: 'Upgrade Kits Camera',
             plus_extrusion: 'Upgrade Kits Extruder',
             postback_url: 'Status callback URL',
