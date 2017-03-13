@@ -65,6 +65,7 @@ define([
                 task.d.resolve(result);
                 doNext();
             }).progress((result) => {
+                clearTimeout(t);
                 task.d.notify(result);
             }).fail((result) => {
                 processing = false;

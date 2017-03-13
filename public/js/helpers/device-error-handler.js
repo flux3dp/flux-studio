@@ -83,19 +83,19 @@ define(['helpers/i18n'], function (i18n) {
                 return self.Errors.DEFAULT;
             }
             else if ('TIMEOUT' === response.error[0]) {
-                return self.Errors.TIMEOUT
+                return self.Errors.TIMEOUT;
             }
             else if (response.info === 'TYPE_ERROR') {
-                return self.Errors.TYPE_ERROR
+                return self.Errors.TYPE_ERROR;
             }
             else if ('UNKNOWN_COMMAND' === response.error[0]) {
-                return self.Errors.UNKNOWN_COMMAND
+                return self.Errors.UNKNOWN_COMMAND;
             }
             else if ('KICKED' === response.error[0]) {
-                return self.Errors.KICKED
+                return self.Errors.KICKED;
             }
             else {
-                return self.Errors.DEFAULT
+                return self.Errors.DEFAULT;
             }
         },
         /**
