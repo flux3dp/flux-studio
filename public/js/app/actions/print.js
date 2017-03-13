@@ -816,10 +816,7 @@ define([
 
                 ProgressActions.close();
                 AlertActions.showPopupError('', report.info, report.caption);
-                reactSrc.setState({
-                    hasOutOfBoundsObject: true,
-                    slicingPercentage: 0
-                });
+
                 slicingStatus.isComplete = true;
                 blobExpired = false;
             }
@@ -835,8 +832,9 @@ define([
                 }
                 AlertActions.showPopupError('', slicingStatus.lastReport.info, slicingStatus.lastReport.caption);
                 slicingStatus.lastProgress = '';
-                reactSrc.setState({ hasOutOfBoundsObject: true });
             }
+
+            reactSrc.setState({ hasOutOfBoundsObject: true, slicingPercentage: 0 });
         }
         else if(report.slice_status === 'warning') {
             AlertActions.showWarning(report.message);
