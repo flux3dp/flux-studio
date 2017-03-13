@@ -13,7 +13,9 @@ define([
     'app/stores/alert-store',
     'app/actions/global-actions',
     'app/stores/global-store',
-    'helpers/device-list'
+    'helpers/device-list',
+    'app/actions/progress-actions',
+    'app/constants/progress-constants'
 ], function(
     $,
     React,
@@ -29,7 +31,9 @@ define([
     AlertStore,
     GlobalActions,
     GlobalStore,
-    DeviceList
+    DeviceList,
+    ProgressActions,
+    ProgressConstants
 ) {
     'use strict';
 
@@ -158,11 +162,15 @@ define([
             _handleSelectDevice: function(device, e) {
                 e.preventDefault();
                 AlertStore.removeCancelListener(this._toggleDeviceListBind);
+                ProgressActions.open(ProgressConstants.NONSTOP_WITH_MESSAGE, lang.initialize.connecting);
                 DeviceMaster.selectDevice(device).then(function(status) {
+                    console.log('Select device ', status);
                     if (status === DeviceConstants.CONNECTED) {
+                        ProgressActions.close();
                         GlobalActions.showMonitor(device);
                     }
                     else if (status === DeviceConstants.TIMEOUT) {
+                        ProgressActions.close();
                         AlertActions.showPopupError(_id, lang.message.connectionTimeout);
                     }
                 })

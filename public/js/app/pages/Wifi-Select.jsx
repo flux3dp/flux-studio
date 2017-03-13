@@ -653,6 +653,9 @@ define([
                         dataAttrs: {
                             'ga-event': 'use-device-with-usb'
                         },
+                        onClick: (e) => {
+                            this._stopScan();
+                        },
                         href: '#initialize/wifi/setup-complete/with-usb'
                     }],
                     passwordForm = this._renderPasswordForm(lang),

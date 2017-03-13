@@ -402,7 +402,7 @@ define([
                             if (device) {
                                 this.showSpinner(lang.tutorial.connectingMachine);
                                 let addr = parseInt(device.addr || '-1');
-                                DeviceMaster.getDeviceBySerial(device.serial, addr > 0, {
+                                DeviceMaster.getDeviceBySerial(device.serial, false, {
                                     timeout: 20000,
                                     onSuccess: (printer)  => {
                                         DeviceMaster.selectDevice(printer).then(() => {
@@ -501,7 +501,7 @@ define([
                         };
 
                         let addr = parseInt(device.addr || '-1');
-                        DeviceMaster.getDeviceBySerial(device.serial, addr > 0, callback);
+                        DeviceMaster.getDeviceBySerial(device.serial, false, callback);
                     }
                     else if(answer === 'print-setting-version') {
                         advancedSettings.load(DefaultPrintSettings);
@@ -794,6 +794,7 @@ define([
                 },
 
                 _handleQualityModelSelected: function(quality, machineModel) {
+                    if ( ['high', 'med', 'low'].indexOf(quality) < 0 ) { quality = 'med'; }
                     var parameters = DefaultPrintSettings[machineModel || 'fd1'][quality];
                     this.setState({model: machineModel, quality: quality});
                     Config().write('preferred-model', machineModel);
@@ -830,7 +831,7 @@ define([
                                     }
                                 };
 
-                                DeviceMaster.getDeviceBySerial(selectedDevice.serial, addr !== -1, callback);
+                                DeviceMaster.getDeviceBySerial(selectedDevice.serial, false, callback);
                             }
                         }
                         else if(this.state.currentTutorialStep === 3) {

@@ -322,6 +322,7 @@ define([
                 lang = this.props.lang,
                 status = lang.machine_status,
                 headModule = lang.head_module,
+                statusId = 'st' + printer.st_id,
                 statusText = status[printer.st_id] || status.UNKNOWN,
                 headText = headModule[printer.head_module] || headModule.UNKNOWN;
 
@@ -339,7 +340,7 @@ define([
             let img = `/img/icon_${printer.source === 'h2h' ? 'usb' : 'wifi' }.svg`;
 
             return (
-                <div className="device printer-item" data-meta={meta} onClick={this._selectPrinter.bind(null, printer)}>
+                <div className="device printer-item" data-status={statusId} data-meta={meta} onClick={this._selectPrinter.bind(null, printer)}>
                     <div className="col device-name">{printer.name}</div>
                     <div className="col module">{headText}</div>
                     <div className="col status">{statusText}</div>

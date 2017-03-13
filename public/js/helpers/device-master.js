@@ -51,6 +51,8 @@ define([
         defaultPrinter,
         defaultPrinterWarningShowed = false,
         _instance = null,
+        _stopChangingFilament = false,
+        _stopChangingFilamentCallback,
         _selectedDevice = {},
         _deviceNameMap = {},
         _device,
@@ -84,6 +86,7 @@ define([
             _selectedDevice.source === device.source
         ) {
             let d = $.Deferred();
+            ProgressActions.close();
             d.resolve(DeviceConstants.CONNECTED);
             return d.promise();
         }
@@ -100,12 +103,9 @@ define([
             _selectedDevice = {};
 
             const handleSubmit = (password) => {
-                ProgressActions.open(ProgressConstants.NONSTOP);
+                ProgressActions.open(ProgressConstants.NONSTOP_WITH_MESSAGE, lang.message.authenticating);
 
-                auth(uuid, password).always(() => {
-                    ProgressActions.close();
-                })
-                .done((data) => {
+                auth(uuid, password).done((data) => {
                     device.plaintext_password = password;
                     selectDevice(device, d);
                 })
@@ -136,10 +136,13 @@ define([
         const createDeviceActions = (availableUsbChannel = -1) => {
             return DeviceController(uuid, {
                 availableUsbChannel,
-                onConnect: function(response) {
+                onConnect: function(response, options) {
                     d.notify(response);
 
                     if (response.status.toUpperCase() === DeviceConstants.CONNECTED) {
+                        if (options == null || (options && !options.dedicated)) {
+                            ProgressActions.close();
+                        }
                         d.resolve(DeviceConstants.CONNECTED);
                         // _devices.push(_device);
                     }
@@ -155,19 +158,19 @@ define([
                         break;
                     case DeviceConstants.AUTH_ERROR:
                     case DeviceConstants.AUTH_FAILED:
-                        if (true === device.password) {
+                        _selectedDevice = {};
+
+                        if (device.password) {
                             goAuth(_device.uuid);
                         }
                         else {
-                            ProgressActions.open(ProgressConstants.NONSTOP);
+                            ProgressActions.open(ProgressConstants.NONSTOP, sprintf(lang.message.connectingMachine, _device.name));
 
-                            auth(_device.uuid, '').always(() => {
-                                ProgressActions.close();
-                            })
-                            .done((data) => {
+                            auth(_device.uuid, '').done((data) => {
                                 selectDevice(device, d);
                             })
                             .fail(() => {
+                                ProgressActions.close();
                                 AlertActions.showPopupError(
                                     'auth-error-with-diff-computer',
                                     lang.message.need_1_1_7_above
@@ -197,12 +200,15 @@ define([
                 },
                 onFatal: function(e) {
                     _selectedDevice = {};
+
                 }
             });
         };
 
-        ProgressActions.open(ProgressConstants.NONSTOP);
+        ProgressActions.open(ProgressConstants.NONSTOP, sprintf(lang.message.connectingMachine, device.name));
+
         if(_existConnection(uuid)) {
+            ProgressActions.close();
             _device = _switchDevice(uuid);
             d.resolve(DeviceConstants.CONNECTED);
         }
@@ -228,30 +234,25 @@ define([
 
         initSocketMaster();
 
-        return d.always(() => {
-            ProgressActions.close();
-        }).promise();
+        return d.promise();
     }
 
     function auth(uuid, password) {
-        ProgressActions.open(ProgressConstants.NONSTOP);
+        ProgressActions.open(ProgressConstants.NONSTOP, lang.message.authenticating);
 
         let d = $.Deferred(),
-            closeProgress = function() {
-                ProgressActions.close();
-            },
             opts = {
                 onError: function(data) {
+                    ProgressActions.close();
                     d.reject(data);
-                    closeProgress();
                 },
                 onSuccess: function(data) {
+                    ProgressActions.close();
                     d.resolve(data);
-                    closeProgress();
                 },
                 onFail: function(data) {
+                    ProgressActions.close();
                     d.reject(data);
-                    closeProgress();
                 }
             };
 
@@ -272,6 +273,7 @@ define([
                 }
             },
             onError: function(response) {
+                ProgressActions.close();
                 // TODO: shouldn't do replace
                 response.error = response.error.replace(/^.*\:\s+(\w+)$/g, '$1');
                 switch (response.error.toUpperCase()) {
@@ -280,17 +282,16 @@ define([
                     break;
                 case DeviceConstants.AUTH_ERROR:
                 case DeviceConstants.AUTH_FAILED:
-                    if (true === device.password) {
+                    if (device.password) {
                         goAuth(_device.uuid);
                     }
                     else {
-                        ProgressActions.open(ProgressConstants.NONSTOP);
-
-                        auth(_device.uuid, '').always(() => {
-                            ProgressActions.close();
-                        }).done((data) => {
+                        ProgressActions.open(ProgressConstants.NONSTOP_WITH_MESSAGE, lang.message.authenticating);
+                        auth(_device.uuid, '').then((data) => {
+                            ProgressActions.open(ProgressConstants.NONSTOP_WITH_MESSAGE, sprintf(lang.message.connectingMachine, _device.name));
                             selectDevice(device, d);
                         }).fail(() => {
+                            ProgressActions.close();
                             AlertActions.showPopupError(
                                 'auth-error-with-diff-computer',
                                 lang.message.need_1_1_7_above
@@ -299,6 +300,7 @@ define([
                     }
                     break;
                 case DeviceConstants.MONITOR_TOO_OLD:
+                    ProgressActions.close();
                     AlertActions.showPopupError(
                         'fatal-occurred',
                         lang.message.monitor_too_old.content,
@@ -375,9 +377,8 @@ define([
         let d = $.Deferred(),
             statusChanged = false;
 
-        ProgressActions.open(ProgressConstants.NONSTOP);
+        ProgressActions.open(ProgressConstants.NONSTOP, lang.message.runningTests);
 
-        console.log("waiting status");
         let t = setInterval(() => {
             SocketMaster.addTask('report').then(r => {
                 d.notify(r, t);
@@ -503,23 +504,54 @@ define([
     }
 
     function changeFilament(type) {
+        _stopChangingFilament = false;
         let d = $.Deferred();
-        SocketMaster.addTask('enterMaintainMode').then((response) => {
-            return SocketMaster.addTask('maintainHome');
-        }).then((response) => {
-            return SocketMaster.addTask('changeFilament', type);
-        }).then((response) => {
-            d.resolve();
-        }).progress((response) => {
-            d.notify(response);
-        }).fail((response) => {
-            if(response.error[0] === 'KICKED') {
-                reconnectWs();
+        SocketMaster.addTask('enterMaintainMode').then(() => {
+            console.log(_stopChangingFilament);
+            if(!_stopChangingFilament) {
+                return SocketMaster.addTask('maintainHome');
             }
+        })
+        .then(() => {
+            console.log(_stopChangingFilament);
+            if(!_stopChangingFilament) {
+                return SocketMaster.addTask('changeFilament', type);
+            }
+        })
+        .then(() => {
+            console.log(_stopChangingFilament);
+            if(_stopChangingFilament) {
+                d.reject({ error: ['CANCEL'] });
+                _stopChangingFilamentCallback();
+            }
+            else {
+                d.resolve();
+            }
+        })
+        .progress((response) => {
+            console.log(_stopChangingFilament);
+            if(_stopChangingFilament) {
+                _stopChangingFilamentCallback();
+            }
+            else {
+                d.notify(response);
+            }
+        })
+        .fail((response) => {
             d.reject(response);
         });
 
         return d.promise();
+    }
+
+    function stopChangingFilament() {
+        let d = $.Deferred();
+        _stopChangingFilamentCallback = () => {
+            d.resolve();
+        };
+        _stopChangingFilament = true;
+        return d.promise();
+
     }
 
     function changeFilamentDuringPause(type) {
@@ -640,6 +672,7 @@ define([
     }
 
     function endMaintainMode() {
+        console.log('end maintain mode');
         return SocketMaster.addTask('endMaintainMode');
     }
 
@@ -822,7 +855,8 @@ define([
         let debug_data = {};
 
         const processError = (resp = {}) => {
-            if (resp.error[0] == "EDGE_CASE") return;
+            if (typeof resp == 'string') resp = { error: [resp] };
+            if (resp.error && resp.error === 'EDGE_CASE') { return; }
             DeviceErrorHandler.processDeviceMasterResponse(resp);
             AlertActions.showPopupError('device-busy', DeviceErrorHandler.translate(resp.error));
             SocketMaster.addTask('endMaintainMode');
@@ -839,10 +873,10 @@ define([
                 }
             }).then((headInfo) => {
                 if(headInfo.module === null) {
-                    return $.Deferred().reject({module:null});
+                    return $.Deferred().reject({module:null, error: ["HEAD_ERROR", "HEAD_OFFLINE"]});
                 }
                 else if(headInfo.module !== 'EXTRUDER') {
-                    return $.Deferred().reject({module:'LASER'});
+                    return $.Deferred().reject({module:'LASER', error: ["HEAD_ERROR", "TYPE_ERROR"]});
                 }
                 else {
                     return SocketMaster.addTask('maintainHome');
@@ -873,6 +907,7 @@ define([
         }).then(() => {
             d.resolve(debug_data);
         }).fail((error) => {
+            console.log(error);
             processError(error);
             d.reject(error);
         });
@@ -929,9 +964,12 @@ define([
 
         const step1 = () => {
             let _d = $.Deferred();
-            SocketMaster.addTask('enterMaintainMode').then((response) => {
+            SocketMaster.addTask('enterMaintainMode').then(() => {
+                return SocketMaster.addTask('maintainHome');
+            })
+            .then((response) => {
                 if(response.status === 'ok') {
-                    return SocketMaster.addTask('maintainClean');
+                    return SocketMaster.addTask('calibrate', true);
                 }
                 else {
                     _d.reject(response);
@@ -1181,15 +1219,15 @@ define([
     }
 
     function getDeviceBySerial(serial, isUsb, callback) {
-        let d = _devices.filter(d => {
+        let matchedDevice = _devices.filter(d => {
             let a = d.serial === serial;
             if (isUsb) { a = a && d.source === 'h2h'; };
             return a;
         });
 
-        if (d[0] !== null) {
-            console.log(d[0]);
-            callback.onSuccess(d[0]);
+        if (matchedDevice.length > 0) {
+            console.log('Found serial device' , matchedDevice[0], matchedDevice);
+            callback.onSuccess(matchedDevice[0]);
             return;
         }
 
@@ -1293,6 +1331,7 @@ define([
             this.getDeviceBySerial              = getDeviceBySerial;
             this.getAvailableDevices            = getAvailableDevices;
             this.usbDefaultDeviceCheck          = usbDefaultDeviceCheck;
+            this.stopChangingFilament           = stopChangingFilament;
 
             Discover(
                 'device-master',
@@ -1302,7 +1341,6 @@ define([
                         _deviceNameMap[d.name] = d;
                     });
                     _devices = devices;
-                    // console.log('devices', _devices);
                     _scanDeviceError(devices);
                 }
             );

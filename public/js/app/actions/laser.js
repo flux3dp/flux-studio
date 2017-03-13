@@ -800,7 +800,7 @@ define([
             },
             onFileReadEnd: function(e, files) {
                 var parserSocket;
-                var firstFile = e.target.files.item(0),
+                var firstFile = e.target ? e.target.files.item(0) : files[0],
                     extension = self.refs.fileUploader.getFileExtension(firstFile.name);
 
                 // go svg process

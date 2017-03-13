@@ -51,7 +51,7 @@ define([
         const runTaskFunction = (task, fnName) => {
             // Do regular stuff
             let t = setTimeout(() => {
-                task.d.reject('TIMEOUT');
+                task.d.reject({ error: ['TIMEOUT'] });
                 doNext();
             }, 20 * 1000);
 
@@ -65,6 +65,7 @@ define([
                 task.d.resolve(result);
                 doNext();
             }).progress((result) => {
+                clearTimeout(t);
                 task.d.notify(result);
             }).fail((result) => {
                 processing = false;

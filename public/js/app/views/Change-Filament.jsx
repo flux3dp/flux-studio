@@ -99,7 +99,6 @@ define([
             componentWillUnmount: function() {
                 AlertStore.removeCancelListener(this._onCancel);
                 this._onClose();
-                this._checkAndStopChangeFilamentDuringPause();
             },
 
             shouldComponentUpdate: function(nextProps, nextState) {
@@ -114,84 +113,75 @@ define([
                 return true;
             },
 
-            _onCancel: function(id) {
-                // go back to the beginning
-                this.setState(this.getInitialState());
-                this._checkAndStopChangeFilamentDuringPause();
-            },
-
-            _checkAndStopChangeFilamentDuringPause: function() {
+            _onCancel: function(e) {
                 // if change filament during pause operation
                 if(this.isChangingFilamentDuringPause === true) {
                     clearInterval(this.changeFilamentDuringPauseTimer);
-                    DeviceMaster.endToolheadOperation();
+                    DeviceMaster.endToolheadOperation().then(() => {
+                        this.setState(this.getInitialState());
+                    });
                 }
                 else {
-                    DeviceMaster.quitTask('maintain');
+                    DeviceMaster.stopChangingFilament().then(() => {
+                        DeviceMaster.killSelf();
+                        this.setState(this.getInitialState());
+                    });
                 }
-            },
-
-            _handleCancelJob: function(e) {
-                e.preventDefault();
-                if(this.isChangingFilamentDuringPause !== true) {
-                    DeviceMaster.killSelf();
-                }
-                else {
-                    DeviceMaster.endLoadingDuringPause();
-                }
-                this._onCancel(e);
             },
 
             _goMaintain: function(type) {
                 var self = this,
-                    nextStep = (self.state.type === DeviceConstants.LOAD_FILAMENT ? steps.EMERGING : steps.UNLOADING),
-                    progress = function(response) {
-                        switch (response.stage[1]) {
-                        case 'WAITTING':
-                        case 'WAITING':
-                        case 'LOADING':
-                            self._next(steps.EMERGING, DeviceConstants.LOAD_FILAMENT);
-                            if(self.state.loading_status !== response.stage[1]) {
-                                self.setState({ loading_status: response.stage[1] });
-                                self.forceUpdate();
-                            }
-                            break;
-                        case 'UNLOADING':
-                            self._next(steps.UNLOADING);
-                            break;
-                        default:
-                            if(response.error) {
-                                if(response.error[0] === 'KICKED') {
-                                    this._onCancel();
-                                }
-                            }
-                            else {
-                                // update temperature
-                                self.setState({
-                                    temperature: response.temperature || 220
-                                });
-                            }
-                            break;
-                        }
-                    },
-                    done = function(response) {
-                        DeviceMaster.quitTask('maintain').done(function() {
-                            self._next(steps.COMPLETED);
-                        });
-                    },
-                    errorMessageHandler = (response) => {
-                        if(typeof response.error === 'string') {
-                            response.error = [response.error];
-                        }
-                        DeviceMaster.quitTask('maintain');
-                        
-                        AlertActions.showPopupError('change-filament-device-error', DeviceErrorHandler.translate(response.error));
-                    };
+                    nextStep = (self.state.type === DeviceConstants.LOAD_FILAMENT ? steps.EMERGING : steps.UNLOADING);
 
-                DeviceMaster.selectDevice(self.props.device).then(() => {
-                    return DeviceMaster.getReport();
-                })
-                .then(report => {
+                const progress = function(response) {
+                    console.log('changing filament progress', response);
+                    let status = response.stage[1];
+                    switch (status) {
+                    case 'WAITTING':
+                    case 'WAITING':
+                    case 'LOADING':
+                        self._next(steps.EMERGING, DeviceConstants.LOAD_FILAMENT);
+                        if(self.state.loading_status !== response.stage[1]) {
+                            self.setState({ loading_status: response.stage[1] });
+                            self.forceUpdate();
+                        }
+                        break;
+                    case 'UNLOADING':
+                        self._next(steps.UNLOADING);
+                        break;
+                    default:
+                        if(response.error) {
+                            if(response.error[0] === 'KICKED') {
+                                this._onCancel();
+                            }
+                        }
+                        else {
+                            // update temperature
+                            self.setState({
+                                temperature: response.temperature || 220
+                            });
+                        }
+                        break;
+                    }
+                };
+
+                const done = function(response) {
+                    DeviceMaster.quitTask('maintain').done(function() {
+                        self._next(steps.COMPLETED);
+                    });
+                };
+
+                const errorMessageHandler = (response) => {
+                    if(typeof response.error === 'string') {
+                        response.error = [response.error];
+                    }
+                    DeviceMaster.quitTask('maintain');
+
+                    AlertActions.showPopupError('change-filament-device-error', DeviceErrorHandler.translate(response.error));
+                };
+
+                const processReport = (report) => {
+                    console.log('processing report', report);
                     // if changing filament during pause
                     if(report.st_id === 48) {
                         this.isChangingFilamentDuringPause = true;
@@ -226,20 +216,29 @@ define([
                     }
                     // regular change filament
                     else {
-                        DeviceMaster.changeFilament(type).progress(progress).done(done).fail(function(response) {
+                        console.log('changing filament');
+                        DeviceMaster.changeFilament(type)
+                        .progress(progress)
+                        .done(done)
+                        .fail(function(response) {
                             // Regularize error message
-                            if (response && response.info === 'TYPE_ERROR') response.error = ["HEAD_ERROR", "TYPE_ERROR", "EXTRUDER", "N/A"];
-                            if (response && response.error[1] === 'TYPE_ERROR') response.error = ["TYPE_ERROR"];
+                            if (response && response.info === 'TYPE_ERROR') {
+                                response.error = ['HEAD_ERROR', 'TYPE_ERROR', 'EXTRUDER', 'N/A'];
+                            }
+                            if (response && response.error[1] === 'TYPE_ERROR') {
+                                response.error = ['TYPE_ERROR'];
+                            }
+
                             switch(response.error[0]) {
-                                case "RESOURCE_BUSY":
+                                case 'RESOURCE_BUSY':
                                     AlertActions.showDeviceBusyPopup('change-filament-device-busy');
                                     break;
-                                case "TIMEOUT":
+                                case 'TIMEOUT':
                                     DeviceMaster.closeConnection();
                                     AlertActions.showPopupError('change-filament-toolhead-no-response', lang.change_filament.toolhead_no_response);
                                     self.props.onClose();
                                     break;
-                                case "TYPE_ERROR":
+                                case 'TYPE_ERROR':
                                     if (response.error[3] === 'N/A') {
                                         AlertActions.showPopupError('change-filament-device-error', DeviceErrorHandler.translate(['HEAD_ERROR','HEAD_OFFLINE']));
                                     } else {
@@ -255,12 +254,20 @@ define([
                                 case 'KICKED':
                                     this._onCancel();
                                     break;
+                                case 'CANCEL': break;
                                 default:
                                     errorMessageHandler(response);
                             }
                         });
                     }
-                });
+                };
+
+                console.log('selecting device');
+                DeviceMaster.selectDevice(self.props.device).then(() => {
+                    console.log('getting report');
+                    return DeviceMaster.getReport();
+                })
+                .then(processReport);
             },
 
             _onClose: function(e) {
@@ -373,7 +380,7 @@ define([
                     buttons: [
                         {
                             label: lang.change_filament.cancel,
-                            onClick: this._handleCancelJob
+                            onClick: this._onCancel
                         }
                     ]
                 };
@@ -410,9 +417,7 @@ define([
                     {
                         label: lang.change_filament.cancel,
                         className: 'btn-default btn-alone-left',
-                        onClick: function(e) {
-                            self._handleCancelJob(e);
-                        }
+                        onClick: this._onCancel
                     },
                     {
                         label: [
@@ -535,6 +540,7 @@ define([
                 return (
                     <div className="always-top" ref="modal">
                         <Modal className={className} content={content} disabledEscapeOnBackground={false}/>
+                        please wait
                     </div>
                 );
             }
