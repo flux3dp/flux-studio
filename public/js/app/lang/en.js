@@ -372,7 +372,9 @@ define(function() {
                 submit: 'SAVE',
                 sign_out: 'Sign out',
                 not_supported_firmware: 'Please upgrade your machine firmware\nto v1.5+ for cloud feature',
-                unbind_device: 'Would you like to unbind this machine?'
+                unbind_device: 'Would you like to unbind this machine?',
+                CLOUD_SESSION_CONNECTION_ERROR: 'The machine is unable to access to the cloud server. Please reboot the machine.',
+                CLOUD_UNKNOWN_ERROR: 'The machine is unable to connected to the cloud server. Please reboot the machine.',
             }
         },
         print: {

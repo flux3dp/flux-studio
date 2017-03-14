@@ -26,7 +26,11 @@ define(['helpers/i18n'], function (i18n) {
             let errorOutput = '';
 
             if (error.length) {
-                if (error.length === 4) {
+                if (error[0] === 'CLOUD') {
+                    console.log('device error handler', error);
+                    errorOutput = lang.settings.flux_cloud[error.join('_')];
+                }
+                else if (error.length === 4) {
                     if(error[3] === 'N/A') {
                         errorOutput = this.translate(['HEAD_ERROR','HEAD_OFFLINE']);
                     }
@@ -61,7 +65,7 @@ define(['helpers/i18n'], function (i18n) {
         },
         /**
          *  Process error code ( mostly for toolhead error )
-         *  @param {String} argument - The error code 
+         *  @param {String} argument - The error code
          */
         processToolheadErrorCode: (errorCode) => {
             if (Number(errorCode) === parseInt(errorCode)) {
@@ -75,8 +79,8 @@ define(['helpers/i18n'], function (i18n) {
             }
         },
         /**
-         * Process change filament response 
-         * @param {Object} response - Error response from change filament command 
+         * Process change filament response
+         * @param {Object} response - Error response from change filament command
          */
         processChangeFilamentResponse: (response) => {
             if ('RESOURCE_BUSY' === response.error[0]) {

@@ -15,7 +15,6 @@ define([
             e.preventDefault();
 
             DeviceMaster.downloadErrorLog().then(info => {
-                console.log(info);
                 saveAs(info[1], 'error-log.txt');
             });
         },

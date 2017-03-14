@@ -19,7 +19,7 @@ define([
         opts.onError = opts.onError || function() {};
         opts.onConnect = opts.onConnect || function() {};
 
-        let timeout = 10000,
+        let timeout = 12 * 1000,
             timmer,
             isConnected = false,
             lang = i18n.get(),
