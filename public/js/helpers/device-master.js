@@ -693,7 +693,10 @@ define([
     }
 
     function getSelectedDevice() {
-        return _device;
+        // retrieve the whole device information from discover.js
+        let foundDevices = _devices.filter(d => d.uuid === _device.uuid);
+
+        return foundDevices.length > 0 ? foundDevices[0] : _device;
     }
 
     function getPreviewInfo() {

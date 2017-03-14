@@ -188,7 +188,7 @@ define([
         },
 
         _processImage: function(imageBlob) {
-            let targetDevice = DeviceMaster.getSelectedDevice();
+            let targetDevice = this.props.selectedDevice;
             if (targetDevice) {
                 if (!hdChecked[targetDevice.serial]) {
                     getImageSize(URL.createObjectURL(imageBlob), (size) => {
