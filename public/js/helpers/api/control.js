@@ -95,6 +95,7 @@ define([
                 },
                 onClose: (response) => {
                     isConnected = false;
+                    opts.onFatal(response);
                 },
                 onOpen: () => {
                     _ws.send(rsaKey());

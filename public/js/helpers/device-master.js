@@ -189,6 +189,11 @@ define([
                     default:
                         let message = lang.message.unknown_error;
 
+                        if(response.error === 'NOT_FOUND') {
+                            d.reject(response);
+                            return;
+                        }
+
                         if(response.error === 'UNKNOWN_DEVICE') {
                             message = lang.message.unknown_device;
                         }
@@ -199,7 +204,7 @@ define([
                         );
                     }
                 },
-                onFatal: function(e) {
+                onFatal: function(response) {
                     _selectedDevice = {};
 
                 }
@@ -218,6 +223,7 @@ define([
             _device.uuid = uuid;
             _device.source = device.source;
             _device.name = device.name;
+            delete _actionMap[device.uuid];
         }
 
         const initSocketMaster = () => {

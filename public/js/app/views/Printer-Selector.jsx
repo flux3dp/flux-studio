@@ -76,7 +76,8 @@ define([
                 printOptions        : [],
                 loadFinished        : false,
                 hasDefaultPrinter   : hasDefaultPrinter,
-                discoverMethods     : {}
+                discoverMethods     : {},
+                componentReady      : false
             };
         },
 
@@ -118,48 +119,61 @@ define([
 
             AlertStore.onCancel(self._onCancel);
 
-            self.setState({
-                discoverMethods: discover(
-                    self.state.discoverId,
-                    function(printers) {
-                        printers = DeviceList(printers);
-                        refreshOption(printers);
-                    }
-                )
-            }, function() {
-                var timer,
-                    tryTimes = 20,
-                    selectDefaultDevice = function() {
-                        if (true === self.state.hasDefaultPrinter) {
-                            if (null !== currentPrinter) {
-                                self._selectPrinter(selectedPrinter);
+            const next = () => {
+                self.setState({
+                    discoverMethods: discover(
+                        self.state.discoverId,
+                        function(printers) {
+                            printers = DeviceList(printers);
+                            refreshOption(printers);
+                        }
+                    )
+                }, function() {
+                    var timer,
+                        tryTimes = 20,
+                        selectDefaultDevice = function() {
+                            if (true === self.state.hasDefaultPrinter) {
+                                if (null !== currentPrinter) {
+                                    self._selectPrinter(selectedPrinter);
+                                    clearInterval(timer);
+                                }
+                                else {
+                                    tryTimes--;
+                                }
+                            }
+
+                            if (0 > tryTimes) {
                                 clearInterval(timer);
+                                if(self.state.printOptions.length === 0) {
+                                    AlertActions.showPopupError('device-not-found', lang.message.device_not_found.message, lang.message.device_not_found.caption);
+                                }
+                                else {
+                                    self.setState({
+                                        loadFinished: false,
+                                        hasDefaultPrinter: false
+                                    });
+                                }
                             }
-                            else {
-                                tryTimes--;
-                            }
-                        }
+                        };
 
-                        if (0 > tryTimes) {
-                            clearInterval(timer);
-                            if(self.state.printOptions.length === 0) {
-                                AlertActions.showPopupError('device-not-found', lang.message.device_not_found.message, lang.message.device_not_found.caption);
-                            }
-                            else {
-                                self.setState({
-                                    loadFinished: false,
-                                    hasDefaultPrinter: false
-                                });
-                            }
-                        }
-                    };
+                    currentPrinter = self.state.discoverMethods.getLatestPrinter(selectedPrinter);
 
-                currentPrinter = self.state.discoverMethods.getLatestPrinter(selectedPrinter);
+                    timer = setInterval(selectDefaultDevice, 100);
+                });
 
-                timer = setInterval(selectDefaultDevice, 100);
+                self._waitForPrinters();
+            };
+
+            //check for default printer availablity
+            DeviceMaster.selectDevice(initializeMachine.defaultPrinter.get())
+            .then(next)
+            .fail(() => {
+                console.log('[print selector] select device failed');
+                self.setState({
+                    loadFinished: false,
+                    hasDefaultPrinter: false
+                }, next);
             });
-
-            self._waitForPrinters();
         },
 
         componentWillUnmount: function() {
