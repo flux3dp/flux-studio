@@ -55,6 +55,7 @@ define([
         _stopChangingFilamentCallback,
         _selectedDevice = {},
         _deviceNameMap = {},
+        _actionMap = {},
         _device,
         _cameraTimeoutTracker,
         nwConsole,
@@ -207,7 +208,7 @@ define([
 
         ProgressActions.open(ProgressConstants.NONSTOP, sprintf(lang.message.connectingMachine, device.name));
 
-        if(_existConnection(uuid)) {
+        if(_existConnection(uuid, device.source)) {
             ProgressActions.close();
             _device = _switchDevice(uuid);
             d.resolve(DeviceConstants.CONNECTED);
@@ -220,15 +221,27 @@ define([
         }
 
         const initSocketMaster = () => {
+
+            if(typeof _actionMap[device.uuid] !== 'undefined') {
+                _device.actions = _actionMap[device.uuid];
+                return;
+            }
+
             SocketMaster = new Sm();
 
             // if availableUsbChannel has been defined
-            if(typeof this !== 'undefined' && typeof this.availableUsbChannel !== 'undefined' && device.source === 'h2h') {
+            if(
+                typeof this !== 'undefined' &&
+                typeof this.availableUsbChannel !== 'undefined' &&
+                device.source === 'h2h'
+            ) {
                 _device.actions = createDeviceActions(this.availableUsbChannel);
             }
             else {
                 _device.actions = createDeviceActions(device.uuid);
             }
+
+            _actionMap[device.uuid] = _device.actions;
             SocketMaster.setWebSocket(_device.actions);
         };
 
