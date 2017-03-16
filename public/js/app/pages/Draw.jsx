@@ -54,7 +54,7 @@ define([
                     this.setState({options});
                 },
 
-                fetchFormalSettings: function(holder) {
+                _fetchFormalSettings: function(holder) {
                     let options = Config.read('draw-defaults') || {};
                     return {
                         lift_height: options.liftHeight || 0.1,
@@ -63,7 +63,7 @@ define([
                     };;
                 },
 
-                renderSetupPanel: function(holder) {
+                _renderSetupPanel: function(holder) {
                     return <HolderSetupPanel
                         page={holder.props.page}
                         className="operating-panel"
@@ -81,8 +81,8 @@ define([
                         page={this.props.page}
                         acceptFormat={'image/svg'}
                         panelOptions={this.state.options}
-                        fetchFormalSettings={this.fetchFormalSettings}
-                        renderSetupPanel={this.renderSetupPanel}
+                        fetchFormalSettings={this._fetchFormalSettings}
+                        renderSetupPanel={this._renderSetupPanel}
                     />;
                 }
         });

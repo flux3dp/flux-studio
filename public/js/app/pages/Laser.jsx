@@ -57,7 +57,7 @@ define([
                     this.setState({options});
                 },
 
-                fetchFormalSettings: function(holder) {
+                _fetchFormalSettings: function(holder) {
                     let options = Config.read('laser-defaults') || {},
                         max = lang.laser.advanced.form.power.max;
                     return {
@@ -70,7 +70,7 @@ define([
                     };
                 },
 
-                renderSetupPanel: function(holder) {
+                _renderSetupPanel: function(holder) {
                     return <LaserSetupPanel
                         page={holder.props.page}
                         className="operating-panel"
@@ -90,8 +90,8 @@ define([
                         page={this.props.page}
                         acceptFormat={'image/*'}
                         panelOptions={this.state.options}
-                        fetchFormalSettings={this.fetchFormalSettings}
-                        renderSetupPanel={this.renderSetupPanel}
+                        fetchFormalSettings={this._fetchFormalSettings}
+                        renderSetupPanel={this._renderSetupPanel}
                     />;
                 }
         });

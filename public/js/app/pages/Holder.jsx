@@ -70,13 +70,11 @@ define([
                 },
 
                 componentDidMount: function() {
-                    var self = this,
-                        storageDefaultKey = this.props.page.toLowerCase() + '-defaults';
+                    var self = this;
 
                     dndHandler.plug(document, self._onDropUpload);
 
                     self.state.laserEvents.setPlatform(self.refs.laserObject.getDOMNode());
-
 
                     self.state.laserEvents.menuFactory.items.import.onClick = function() {
                         self.refs.fileUploader.getDOMNode().click();
@@ -92,8 +90,8 @@ define([
                         self._onExport('-f');
                     };
 
-                    var laser_custom_bg = Config.read('laser-custom-bg');
-                    if(laser_custom_bg) {
+                    var laser_custom_bg = Config.read('laser-custom-bg') && this.props.page === 'laser';
+                    if (laser_custom_bg) {
                         $('.laser-object').css({background :'url(' + laser_custom_bg + ')', 'background-size': '100% 100%'});
                     }
 
@@ -102,9 +100,9 @@ define([
                     });
 
                     console.log('mounted');
-                    if(!Config.read('laser-calibrated') && Config.read('configured-model') == 'fd1p') {
+                    if(!Config.read('laser-calibrated') && Config.read('configured-model') === 'fd1p' && this.props.page === 'laser') {
                         // NOTE: only yes no support this kind of callback
-                        AlertActions.showPopupYesNo('do-calibrate', lang.laser.do_calibrate, "", null, {
+                        AlertActions.showPopupYesNo('do-calibrate', lang.laser.do_calibrate, '', null, {
                             yes: function() {
                                 self._onLoadCalibrationImage();
                                 Config.write('laser-calibrated', true);
@@ -325,13 +323,8 @@ define([
                 },
 
                 render: function() {
-                    var self = this,
-                        stageSection = this._renderStageSection(),
-                        printerSelector = (
-                            true === this.state.openPrinterSelectorWindow ?
-                            this._renderPrinterSelectorWindow() :
-                            ''
-                        ),
+                    var stageSection = this._renderStageSection(),
+                        printerSelector = this.state.openPrinterSelectorWindow ? this._renderPrinterSelectorWindow() : '',
                         uploader = this._renderFileUploader(),
                         actionButtons = this._renderActionButtons();
 
