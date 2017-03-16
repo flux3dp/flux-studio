@@ -57,6 +57,7 @@ define([
             var buttonGroup = [{
                     className: 'pull-left btn-default fa fa-folder-open-o',
                     title: advancedLang.load_preset_title,
+                    label: '',
                     dataAttrs: {
                         'ga-event': 'load-laser-preset'
                     },
@@ -68,6 +69,7 @@ define([
                         'btn-disabled': false === this.state.materialHasChanged
                     }),
                     title: advancedLang.save_as_preset_title,
+                    label: '',
                     dataAttrs: {
                         'ga-event': 'save-as-preset'
                     },

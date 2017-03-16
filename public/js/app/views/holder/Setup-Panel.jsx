@@ -33,20 +33,18 @@ define([
 ) {
     'use strict';
 
+    let lang = i18n.lang;
+
     return React.createClass({
 
         getDefaultProps: function() {
             return {
-                lang: i18n.get(),
                 defaults: {},
                 imageFormat: 'svg'  // svg, bitmap
             };
         },
 
         getInitialState: function() {
-            var props = this.props,
-                lang = props.lang;
-
             return {
                 defaults: this.props.defaults
             };
@@ -84,7 +82,7 @@ define([
         },
 
         // Lifecycle
-        _renderLiftHeight: function(lang) {
+        _renderLiftHeight: function() {
             var min = Math.max(5, this.state.defaults.drawHeight);
 
             return {
@@ -110,7 +108,7 @@ define([
             };
         },
 
-        _renderDrawHeight: function(lang) {
+        _renderDrawHeight: function() {
             var max = Math.min(150, this.state.defaults.liftHeight);
 
             return {
@@ -136,7 +134,7 @@ define([
             };
         },
 
-        _renderSpeed: function(lang) {
+        _renderSpeed: function() {
             return {
                 label: (
                     <div title={lang.draw.speed_title}>
@@ -162,12 +160,9 @@ define([
         },
 
         render: function() {
-            var props = this.props,
-                lang = props.lang,
-                cx = React.addons.classSet,
-                liftHeight = this._renderLiftHeight(lang),
-                drawHeight = this._renderDrawHeight(lang),
-                speed = this._renderSpeed(lang),
+            var liftHeight = this._renderLiftHeight(),
+                drawHeight = this._renderDrawHeight(),
+                speed = this._renderSpeed(),
                 items = [
                     liftHeight,
                     drawHeight,
