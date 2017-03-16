@@ -272,7 +272,8 @@ define(function() {
             usb: 'USB',
             device: 'Machine',
             setting: 'SETTING',
-            draw: 'DRAW'
+            draw: 'DRAW',
+            cut: 'CUT',
         },
         settings: {
             on: 'On',
@@ -628,6 +629,21 @@ define(function() {
             pen_up_title: 'The height that your pen won\'t contact drawing surface',
             pen_down_title: 'The height that your pen will contact drawing surface, must be lower than moving height',
             speed_title: 'The drawing speed',
+            units: {
+                mms: 'mm/s',
+                mm: 'mm'
+            }
+        },
+        cut: {
+            zOffset: 'Cutting Height',
+            overcut: 'Overcut',
+            speed: 'Speed',
+            bladeRadius: 'Blade Radius',
+            backlash: 'Backlash Compensation',
+            zOffsetTip: 'Adjust cutting height for thicker vinyl and to prevent cutting too hard or too light',
+            overcutTip: 'Overcut loops for peeling off easier',
+            speedTip: 'The cutting speed',
+            backlashTip: 'Adjust the value if straight lines is not straight enough',
             units: {
                 mms: 'mm/s',
                 mm: 'mm'
