@@ -165,15 +165,27 @@ define([
             };
 
             //check for default printer availablity
-            DeviceMaster.selectDevice(initializeMachine.defaultPrinter.get())
-            .then(next)
-            .fail(() => {
-                console.log('[print selector] select device failed');
+            let device = initializeMachine.defaultPrinter.get();
+
+            const noDefaultPrinter = () => {
                 self.setState({
                     loadFinished: false,
                     hasDefaultPrinter: false
                 }, next);
-            });
+            };
+
+            if(Object.keys(device).length === 0) {
+                noDefaultPrinter();
+            }
+            else {
+                DeviceMaster.selectDevice(initializeMachine.defaultPrinter.get())
+                .then(next)
+                .fail(() => {
+                    console.log('[print selector] select device failed');
+                    noDefaultPrinter();
+                });
+            }
+
         },
 
         componentWillUnmount: function() {
