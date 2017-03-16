@@ -1,12 +1,12 @@
 define([
     'jquery',
     'react',
-    'jsx!views/laser/Setup-Panel',
+    'jsx!views/holder/Setup-Panel',
     'jsx!pages/Holder'
 ], function(
     $,
     React,
-    LaserSetupPanel,
+    HolderSetupPanel,
     HolderGenerator
 ) {
     'use strict';
@@ -24,14 +24,12 @@ define([
                 },
 
                 renderSetupPanel: function(holder) {
-                    return <LaserSetupPanel
+                    return <HolderSetupPanel
                         page={holder.props.page}
                         className="operating-panel"
                         imageFormat={holder.state.fileFormat}
                         defaults={holder.state.setupPanelDefaults}
-                        onLoadCalibrationImage = { holder._onLoadCalibrationImage }
                         ref="setupPanel"
-                        onShadingChanged={holder._onShadingChanged}
                     />;
                 },
 
