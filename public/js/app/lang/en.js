@@ -97,6 +97,7 @@ define(function() {
                 new: 'Add a New Machine',
                 device_monitor: 'Dashboard',
                 device_info: 'Machine Info',
+                head_info: 'Toolhead Info',
                 change_filament: 'Change Printing Material',
                 default_device: 'Set as Default',
                 check_firmware_update: 'Update Firmware',
@@ -1257,6 +1258,17 @@ define(function() {
             headMissing: 'Cannot retrieve head module information, please make sure it\'s attached',
             calibrated: 'Auto Leveling Completed',
             extruderOnly: 'Please use the printing toolhead for calibration'
+        },
+        head_info: {
+            ID                  : 'ID',
+            VERSION             : 'Firmware Version',
+            HEAD_MODULE         : 'Toolhead Type',
+            EXTRUDER            : 'Printing Toolhead',
+            LASER               : 'Engraving Toolhead',
+            USED                : 'Used',
+            HARDWARE_VERSION    : 'Hardware Version',
+            FOCAL_LENGTH        : 'Focal Length',
+            hours               : 'Hours'
         }
     };
 });

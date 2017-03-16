@@ -61,6 +61,7 @@ define([
         nwConsole,
         usbDeviceReport = {},
         _devices = [],
+        _availableDevices = [],
         _errors = {},
         availableUsbChannel = -1,
         usbEventListeners = {};
@@ -93,7 +94,7 @@ define([
         }
 
         // match the device from the newest received device list
-        let latestDevice = _devices.filter(d => d.serial === device.serial && d.source === device.source);
+        let latestDevice = _availableDevices.filter(d => d.serial === device.serial && d.source === device.source);
 
         Object.assign(_selectedDevice, latestDevice[0]);
         let d = deferred || $.Deferred(),
@@ -143,6 +144,10 @@ define([
                     if (response.status.toUpperCase() === DeviceConstants.CONNECTED) {
                         if (options == null || (options && !options.dedicated)) {
                             ProgressActions.close();
+                        }
+                        let exist = _devices.some(dev => { dev.uuid === device.uuid; });
+                        if(!exist) {
+                            _devices.push(device);
                         }
                         d.resolve(DeviceConstants.CONNECTED);
                         // _devices.push(_device);
@@ -713,7 +718,7 @@ define([
 
     function getSelectedDevice() {
         // retrieve the whole device information from discover.js
-        let foundDevices = _devices.filter(d => d.uuid === _device.uuid);
+        let foundDevices = _availableDevices.filter(d => d.uuid === _device.uuid);
 
         return foundDevices.length > 0 ? foundDevices[0] : _device;
     }
@@ -1105,7 +1110,7 @@ define([
 
     // device are stored in array _devices
     function getAvailableDevices() {
-        return _devices;
+        return _availableDevices;
     }
 
     function getDeviceSettings(withBacklash, withUpgradeKit) {
@@ -1241,7 +1246,7 @@ define([
     }
 
     function getDeviceBySerial(serial, isUsb, callback) {
-        let matchedDevice = _devices.filter(d => {
+        let matchedDevice = _availableDevices.filter(d => {
             let a = d.serial === serial;
             if (isUsb) { a = a && d.source === 'h2h'; };
             return a;
@@ -1272,7 +1277,7 @@ define([
 
         if(this.availableUsbChannel !== device.addr) {
             // get wifi version instead of h2h
-            let dev = _devices.filter(_dev => _dev.serial === device.serial);
+            let dev = _availableDevices.filter(_dev => _dev.serial === device.serial);
             if(dev[0]) {
                 console.log(dev[0]);
                 return dev[0];
@@ -1362,7 +1367,7 @@ define([
                     devices.forEach(d => {
                         _deviceNameMap[d.name] = d;
                     });
-                    _devices = devices;
+                    _availableDevices = devices;
                     _scanDeviceError(devices);
                 }
             );

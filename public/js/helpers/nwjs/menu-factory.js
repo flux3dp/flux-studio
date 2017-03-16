@@ -416,6 +416,57 @@ define([
                 }
             });
 
+            // head info
+            subItems.push({
+                label: lang.device.head_info,
+                enabled: true,
+                onClick: function() {
+                    var currentPrinter = discoverMethods.getLatestPrinter(printer),
+                        lang = i18n.get();
+
+                    DeviceMaster.selectDevice(currentPrinter).then(function(status) {
+                        if (status === DeviceConstants.TIMEOUT) {
+                            AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
+                        }
+                        else {
+                            ProgressActions.open(ProgressConstants.NONSTOP, lang.message.connecting);
+                            checkDeviceStatus(currentPrinter)
+                            .then(() => {
+                                DeviceMaster.enterMaintainMode().then(() => {
+                                    DeviceMaster.headInfo().then(info => {
+                                        ProgressActions.close();
+                                        DeviceMaster.endMaintainMode();
+
+                                        let fields = ['ID', 'VERSION', 'HEAD_MODULE', 'USED', 'HARDWARE_VERSION', 'FOCAL_LENGTH'];
+
+                                        let displayInfo = fields.map(field => {
+                                            let k = info[field];
+                                            if(field.toUpperCase() === 'HEAD_MODULE') {
+                                                k = lang.head_info[info[field.toLowerCase()]];
+                                            }
+                                            else if(field === 'USED') {
+                                                k = `${parseInt(info[field] / 60)} ${lang.head_info.hours}`;
+                                            }
+                                            return `${lang.head_info[field]}: ${k}`;
+                                        });
+
+                                        // remove focal length if it's not laser
+                                        if(info.head_module === 'EXTRUDER') {
+                                            displayInfo.splice(5, 1);
+                                        }
+                                        else if(info.head_module === 'LASER') {
+                                            displayInfo.splice(4, 1);
+                                        }
+
+                                        AlertActions.showPopupInfo('', displayInfo.join('\n'));
+                                    });
+                                });
+                            });
+                        }
+                    });
+                }
+            });
+
             subItems.push({
                 label: '',
                 type: 'separator'
@@ -427,7 +478,8 @@ define([
                 label: lang.device.change_filament,
                 enabled: true,
                 onClick: function() {
-                    var currentPrinter = discoverMethods.getLatestPrinter(printer);
+                    var currentPrinter = discoverMethods.getLatestPrinter(printer),
+                        lang = i18n.get();
 
                     DeviceMaster.selectDevice(currentPrinter).then(function(status) {
                         DeviceMaster.getReport().then(report => {

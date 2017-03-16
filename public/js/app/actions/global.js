@@ -85,10 +85,12 @@ define([
             shortcuts.on(['cmd', 'a'], function() { window.document.execCommand('selectAll'); });
             shortcuts.on(['cmd', 'x'], function() { window.document.execCommand('cut'); });
             shortcuts.on(['cmd', 'v'], function() { window.document.execCommand('paste'); });
-            shortcuts.on(['cmd', 'h'], () => { nw.Window.get().hide(); });
 
-            // for unhide / show app
-            window.nw.App.onReopen.addListener(function() { nw.Window.get().show(); });
+            if(window.nw) {
+                shortcuts.on(['cmd', 'h'], () => { nw.Window.get().hide(); });
+                // for unhide / show app
+                window.nw.App.onReopen.addListener(function() { nw.Window.get().show(); });
+            }            
 
             if (true === window.FLUX.debug && true === window.FLUX.isNW) {
                 shortcuts.on(['ctrl', 'alt', 'd'], function(e) {

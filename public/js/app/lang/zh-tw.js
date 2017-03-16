@@ -97,6 +97,7 @@ define(function() {
                 new: '新增機器',
                 device_monitor: '儀表板',
                 device_info: '機器資訊',
+                head_info: '工具頭資訊',
                 change_filament: '更換線料',
                 default_device: '設為預設',
                 check_firmware_update: '韌體更新',
@@ -1270,6 +1271,17 @@ define(function() {
             headMissing: '無法取得工具頭資訊，請確認工具頭是否連接於機器',
             calibrated: '平台校正完成',
             extruderOnly: '請使用列印工具頭來做校正'
+        },
+        head_info: {
+            ID                  : 'ID',
+            VERSION             : '工具頭韌體版本',
+            HEAD_MODULE         : '工具頭種類',
+            EXTRUDER            : '列印模組',
+            LASER               : '鐳刻模組',
+            USED                : '使用時間',
+            HARDWARE_VERSION    : '硬體版本',
+            FOCAL_LENGTH        : '焦距調整',
+            hour                : '小時'
         }
     };
 });
