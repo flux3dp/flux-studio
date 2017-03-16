@@ -31,12 +31,12 @@ define([
     ButtonGroup,
     ConfigHelper,
     i18n,
-    dndHandler
+    DnDHandler
 ) {
     'use strict';
 
-    let Config = ConfigHelper();
-    let lang = i18n.lang;
+    let Config = ConfigHelper(),
+        lang = i18n.lang;
 
     return function(args) {
         args = args || {};
@@ -72,7 +72,7 @@ define([
                 componentDidMount: function() {
                     var self = this;
 
-                    dndHandler.plug(document, self._onDropUpload);
+                    DnDHandler.plug(document, self._handleDragAndDrop);
 
                     self.state.laserEvents.setPlatform(self.refs.laserObject.getDOMNode());
 
@@ -82,12 +82,12 @@ define([
 
                     self.state.laserEvents.menuFactory.items.execute.enabled = false;
                     self.state.laserEvents.menuFactory.items.execute.onClick = function() {
-                        self._onRunLaser();
+                        self._handleStartClick();
                     };
 
                     self.state.laserEvents.menuFactory.items.saveTask.enabled = false;
                     self.state.laserEvents.menuFactory.items.saveTask.onClick = function() {
-                        self._onExport('-f');
+                        self._handleExportClick('-f');
                     };
 
                     var laser_custom_bg = Config.read('laser-custom-bg') && this.props.page === 'laser';
@@ -117,7 +117,7 @@ define([
                 componentWillUnmount: function () {
                     this.state.laserEvents.destroySocket();
                     this.state.laserEvents.destroy();
-                    dndHandler.unplug(document);
+                    DnDHandler.unplug(document);
                 },
 
                 componentWillReceiveProps(nextProps) {
@@ -127,18 +127,18 @@ define([
                 },
 
                 // UI events
-                _onRunLaser: function() {
+                _handleStartClick: function() {
                     this.setState({
                         openPrinterSelectorWindow: true,
                         settings: this._fetchFormalSettings()
                     });
                 },
 
-                _onExport: function(filemode) {
+                _handleExportClick: function(filemode) {
                     this.state.laserEvents.exportTaskCode(this._fetchFormalSettings(), filemode);
                 },
 
-                _onDropUpload: function(e) {
+                _handleDragAndDrop: function(e) {
                     e.preventDefault();
 
                     var uploadedFiles = e.originalEvent.dataTransfer.files;
@@ -182,7 +182,7 @@ define([
                             'panel object-position': true
                         }),
                         imagePanel = (
-                            true === this.state.selectedImage ?
+                            this.state.selectedImage ?
                             <ImagePanel
                                 lang={lang}
                                 initialPosition={this.state.initialPosition}
@@ -224,6 +224,7 @@ define([
                 },
 
                 _renderPrinterSelectorWindow: function() {
+                    if (!this.state.openPrinterSelectorWindow) { return ''; }
                     var self = this,
                         onGettingPrinter = function(auth_printer) {
                             self.setState({
@@ -257,9 +258,9 @@ define([
                     var self = this,
                         cx = React.addons.classSet,
                         uploadStyle = cx({
-                            'file-importer': false === self.state.hasImage,
-                            'absolute-center': false === self.state.hasImage,
-                            'hide': true === self.state.hasImage
+                            'file-importer': !self.state.hasImage,
+                            'absolute-center': !self.state.hasImage,
+                            'hide': self.state.hasImage
 
                         }),
                         accept = self.props.acceptFormat,
@@ -302,7 +303,7 @@ define([
                             dataAttrs: {
                                 'ga-event': 'get-laser-fcode'
                             },
-                            onClick: this._onExport.bind(null, '-f')
+                            onClick: this._handleExportClick.bind(null, '-f')
                         }, {
                             label: lang.monitor.start,
                             className: cx({
@@ -314,7 +315,7 @@ define([
                             dataAttrs: {
                                 'ga-event': 'laser-goto-monitor'
                             },
-                            onClick: this._onRunLaser
+                            onClick: this._handleStartClick
                         }];
 
                     return (
@@ -324,7 +325,7 @@ define([
 
                 render: function() {
                     var stageSection = this._renderStageSection(),
-                        printerSelector = this.state.openPrinterSelectorWindow ? this._renderPrinterSelectorWindow() : '',
+                        printerSelector = this._renderPrinterSelectorWindow(),
                         uploader = this._renderFileUploader(),
                         actionButtons = this._renderActionButtons();
 
