@@ -60,6 +60,7 @@ define([
             lang = i18n.get(),
             $uploadDeferred = $.Deferred(),
             PLATFORM_DIAMETER_PIXEL,
+            fileFormat = '',
             _onUploadResponse = function(response) {
                 var url = window.URL,
                     platformDiameter = $laser_platform.width(),
@@ -109,7 +110,7 @@ define([
                 var goodFiles = response.files.filter((file) => {
                         return false === file.isBroken;
                     }),
-                    currentFileFormat = self.state.fileFormat,
+                    currentFileFormat = fileFormat,
                     operationMode = ('svg' === currentFileFormat ? 'cut' : 'engrave'),
                     hasImage = (0 < self.state.images.length + goodFiles.length);
 
@@ -133,7 +134,7 @@ define([
             deleteImage = function() {
                 var $img_container = $('.' + LASER_IMG_CLASS).not($target_image),
                     $img = $target_image,
-                    reset_file_type = false,
+                    // reset_file_type = false,
                     state = {
                         selectedImage: false,
                         debug: false
@@ -141,7 +142,7 @@ define([
 
                 if (null !== $target_image) {
                     // delete svg blob from history
-                    if ('svg' === self.state.fileFormat && true === $img.hasClass('svg')) {
+                    if (fileFormat === 'svg' && true === $img.hasClass('svg')) {
                         svgWebSocket.History.deleteAt($img.data('name'));
                     }
 
@@ -155,7 +156,7 @@ define([
                         menuFactory.items.execute.enabled = false;
                         menuFactory.items.saveTask.enabled = false;
                         menuFactory.methods.refresh();
-                        self.state.fileFormat = undefined;
+                        fileFormat = undefined;
                     }
                     else {
                         $target_image = $img_container[0];
@@ -180,7 +181,7 @@ define([
                             is_rgba: true,
                             is_shading: self.refs.setupPanel.isShading(),
                             threshold: parseInt(threshold, 10),
-                            is_svg: ('svg' === self.state.fileFormat)
+                            is_svg: (fileFormat === 'svg')
                         },
                         onComplete: function(result) {
                             $img.attr('src', result.canvas.toDataURL('image/png'));
@@ -452,13 +453,13 @@ define([
                                     threshold: $img.data('threshold') || 255
                                 },
                                 grayscaleOpts = {
-                                    is_svg: ('svg' === self.state.fileFormat),
+                                    is_svg: (fileFormat === 'svg'),
                                     threshold: 255
                                 },
                                 src = $img.data('base'),
                                 previewImageSize;
 
-                            if ('svg' === self.state.fileFormat) {
+                            if (fileFormat === 'svg') {
                                 previewImageSize = svgWebSocket.computePreviewImageSize({
                                     width: box.width,
                                     height: box.height
@@ -475,12 +476,12 @@ define([
                                     height: height,
                                     width: width,
                                     grayscale: grayscaleOpts,
-                                    onComplete: function(result) {
+                                    onComplete: (result) => {
                                         sub_data.image_data = result.imageBinary;
                                         sub_data.height = result.size.height;
                                         sub_data.width = result.size.width;
 
-                                        if ('svg' === self.state.fileFormat) {
+                                        if (fileFormat === 'svg') {
                                             sub_data.svg_data = svgWebSocket.History.findByName($img.data('name'))[0].data;
                                         }
 
@@ -491,7 +492,7 @@ define([
 
                                         if (args.length === $ft_controls.length) {
                                             // sending data
-                                            if ('svg' === self.state.fileFormat) {
+                                            if (fileFormat === 'svg') {
                                                 sendToSVGAPI(args, settings, _callback, fileMode);
                                             }
                                             else {
@@ -585,10 +586,6 @@ define([
                             $target_image = $img;
                             let objectParamState = refreshObjectParams({ freetransEventType: 'move' }, $img, true);
 
-                            // $img.on('transitionend', function(e) {
-                            //     refreshImagePanelPos();
-                            // });
-
                             self.setState(Object.assign({
                                 selectedImage: true,
                                 sizeLock: $img.data('sizeLock')
@@ -617,8 +614,7 @@ define([
         function handleUploadImage(file) {
             // if this is svg file that does provide a bigger enough image
             var width = file.imgSize.width,
-                height = file.imgSize.height,
-                ratio;
+                height = file.imgSize.height;
 
             imageData(file.blob, {
                 width: width,
@@ -628,7 +624,7 @@ define([
                     is_rgba: true,
                     is_shading: self.refs.setupPanel.isShading(),
                     threshold: 255,
-                    is_svg: ('svg' === self.state.fileFormat)
+                    is_svg: (fileFormat === 'svg')
                 },
                 onComplete: function(result) {
                     var originalUrl = file.url;
@@ -660,7 +656,7 @@ define([
                         selectedImage: false
                     });
                 } else {
-                    return { selectedImage: false }
+                    return { selectedImage: false };
                 }
             }
         }
@@ -766,8 +762,8 @@ define([
                         blob: blob,
                         name: 'laser-calibration.png',
                         type: 'image/png'
-                    }
-                    bitmapWebSocket.upload([file]).always(_onUploadResponse).done(_onUploaded);
+                    };
+                    bitmapWebSocket.upload([file]).always(_onUploadResponse).then(_onUploaded);
                 };
 
                 oReq.open('GET', '/laser-calibration.png', true);
@@ -775,19 +771,11 @@ define([
             },
             onReadFileStarted: function(e) {
                 var firstFile = e.target.files.item(0),
-                    extension = self.refs.fileUploader.getFileExtension(firstFile.name),
-                    currentFileFormat = self.state.fileFormat;
+                    extension = self.refs.fileUploader.getFileExtension(firstFile.name);
+
+                fileFormat = extension;
 
                 ProgressActions.open(ProgressConstants.NONSTOP);
-
-                if ('string' !== typeof currentFileFormat) {
-                    currentFileFormat = ('svg' === extension ? 'svg' : 'bitmap');
-                    // in draw mode. only svg files are acceptable.
-                    currentFileFormat = (self.props.page === 'draw' ? 'svg' : currentFileFormat);
-                    self.setState({
-                        fileFormat: currentFileFormat
-                    });
-                }
 
                 if (extension === 'svg') {
                     svgWebSocket = svgWebSocket || svgLaserParser({
@@ -800,11 +788,9 @@ define([
             },
             onFileReadEnd: function(e, files) {
                 var parserSocket;
-                var firstFile = e.target ? e.target.files.item(0) : files[0],
-                    extension = self.refs.fileUploader.getFileExtension(firstFile.name);
 
                 // go svg process
-                if (extension === 'svg') {
+                if (fileFormat === 'svg') {
                     parserSocket = svgWebSocket;
                 }
                 // go bitmap process
@@ -829,12 +815,7 @@ define([
             imageTransform: function(e, params) {
                 var $el = $(e.currentTarget),
                     type = $el.data('type'),
-                    box = $el.box(),
-                    val = $el.val(),
-                    freetrans = $target_image.data('freetrans'),
-                    args = {
-                        maintainAspectRatio: params.sizeLock
-                    };
+                    val = $el.val();
 
                 $target_image.data('sizeLock', params.sizeLock);
                 val = parseFloat(val, 10);
