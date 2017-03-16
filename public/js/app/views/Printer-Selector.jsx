@@ -211,6 +211,7 @@ define([
         },
 
         _selectPrinter: function(printer, e) {
+            this.setState({ processing: true });
             var self = this,
                 lang = self.props.lang,
                 onError;
@@ -334,6 +335,12 @@ define([
                     </div>
                 );
 
+            if(this.state.processing) {
+                content = (
+                    <div className="spinner-roller invert"/>
+                );
+            }
+
             return content;
         },
 
@@ -341,6 +348,22 @@ define([
             var self = this;
 
             self.props.onGettingPrinter(self.selected_printer);
+        },
+
+        _waitForPrinters: function() {
+            setTimeout(this._openAlertWithnoPrinters, 5000);
+        },
+
+        _openAlertWithnoPrinters: function() {
+            var self = this,
+                lang = self.props.lang;
+
+            AlertStore.removeRetryListener(self._waitForPrinters);
+
+            if (0 === self.state.printOptions.length && false === self.state.hasDefaultPrinter) {
+                AlertActions.showPopupRetry('no-printer', lang.device_selection.no_printers);
+                AlertStore.onRetry(self._waitForPrinters);
+            }
         },
 
         _renderPrinterItem: function(printer) {
@@ -400,23 +423,8 @@ define([
                     <div className="arrow arrow-right"/>
                 </div>
             );
-        },
-
-        _waitForPrinters: function() {
-            setTimeout(this._openAlertWithnoPrinters, 5000);
-        },
-
-        _openAlertWithnoPrinters: function() {
-            var self = this,
-                lang = self.props.lang;
-
-            AlertStore.removeRetryListener(self._waitForPrinters);
-
-            if (0 === self.state.printOptions.length && false === self.state.hasDefaultPrinter) {
-                AlertActions.showPopupRetry('no-printer', lang.device_selection.no_printers);
-                AlertStore.onRetry(self._waitForPrinters);
-            }
         }
+
     });
 
     return View;

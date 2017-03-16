@@ -2721,6 +2721,12 @@ hr {
         bottom: 0;
         right: 0; }
 
+.invert:before {
+    background: #E0E0E0 !important; }
+
+.invert:after {
+    background: #FFFFFF !important; }
+
 .spinner-roller-reverse {
     background: linear-gradient(to right, #E0E0E0 10%, rgba(255, 255, 255, 0) 42%); }
     .spinner-roller-reverse::before {
