@@ -97,34 +97,8 @@ define([
                         $('.laser-object').css({background :'url(' + laser_custom_bg + ')', 'background-size': '100% 100%'});
                     }
 
-                    let setupPanelDefaults = Config.read(storageDefaultKey) || {};
-                    if ('laser' === self.props.page) {
-                        if ('undefined' === typeof setupPanelDefaults.material) {
-                            setupPanelDefaults.material = lang.laser.advanced.form.object_options.options[0];
-                        }
-
-                        setupPanelDefaults.objectHeight = setupPanelDefaults.objectHeight || 0;
-                        setupPanelDefaults.heightOffset = setupPanelDefaults.heightOffset || (Config.read('default-model') == 'fd1p' ? -2.3 : 0);
-                        setupPanelDefaults.isShading = (
-                            'boolean' === typeof setupPanelDefaults.isShading ?
-                            setupPanelDefaults.isShading :
-                            true
-                        );
-                    }
-                    else {
-                        setupPanelDefaults = {
-                            liftHeight: setupPanelDefaults.liftHeight || 55,
-                            drawHeight: setupPanelDefaults.drawHeight || 50,
-                            speed: setupPanelDefaults.speed || 20
-                        };
-                    }
-
-                    if (!Config.read(storageDefaultKey)) {
-                        Config.write(storageDefaultKey, setupPanelDefaults);
-                    }
-
                     self.setState({
-                        setupPanelDefaults
+                        setupPanelDefaults: this.props.panelOptions
                     });
 
                     console.log('mounted');
@@ -146,6 +120,12 @@ define([
                     this.state.laserEvents.destroySocket();
                     this.state.laserEvents.destroy();
                     dndHandler.unplug(document);
+                },
+
+                componentWillReceiveProps(nextProps) {
+                    this.setState({
+                        panelOptions: nextProps.panelOptions
+                    });
                 },
 
                 // UI events
@@ -187,31 +167,7 @@ define([
 
                 // Private events
                 _fetchFormalSettings: function() {
-                    var self = this,
-                        storageDefaultKey = this.props.page.toLowerCase() + '-defaults',
-                        defaultSettings = Config.read(storageDefaultKey),
-                        max = lang.laser.advanced.form.power.max,
-                        data;
-
-                    if ('laser' === self.props.page) {
-                        data = {
-                            object_height: defaultSettings.objectHeight,
-                            height_offset: defaultSettings.heightOffset || 0,
-                            laser_speed: defaultSettings.material.data.laser_speed,
-                            focus_by_color: self.state.debug || 0,
-                            power: defaultSettings.material.data.power / max,
-                            shading: (true === self.refs.setupPanel.isShading() ? 1 : 0)
-                        };
-                    }
-                    else {
-                        data = {
-                            lift_height: defaultSettings.liftHeight || 0.1,
-                            draw_height: defaultSettings.drawHeight || 0.1,
-                            speed: defaultSettings.speed || 20
-                        };
-                    }
-
-                    return data;
+                    return this.props.fetchFormalSettings(this);
                 },
 
                 _inactiveSelectImage: function(e) {
@@ -256,7 +212,7 @@ define([
                         },
                         paramPanel;
 
-                    paramPanel = this.state.setupPanelDefaults ? this.props.renderSetupPanel(this) : null;
+                    paramPanel = this.state.panelOptions ? this.props.renderSetupPanel(this) : null;
 
                     return (
                         <div ref="laserStage" className="laser-stage">
@@ -269,7 +225,7 @@ define([
                     );
                 },
 
-                _renderPrinterSelectorWindow: function(lang) {
+                _renderPrinterSelectorWindow: function() {
                     var self = this,
                         onGettingPrinter = function(auth_printer) {
                             self.setState({
@@ -299,7 +255,7 @@ define([
                     );
                 },
 
-                _renderFileUploader: function(lang) {
+                _renderFileUploader: function() {
                     var self = this,
                         cx = React.addons.classSet,
                         uploadStyle = cx({
@@ -308,7 +264,7 @@ define([
                             'hide': true === self.state.hasImage
 
                         }),
-                        accept = ('laser' === self.props.page ? 'image/*' : 'image/svg'),
+                        accept = self.props.acceptFormat,
                         onError = function(msg) {
                             ProgressActions.close();
                             AlertActions.showPopupError('laser-upload-error', msg);
@@ -335,7 +291,7 @@ define([
                     );
                 },
 
-                _renderActionButtons: function(lang) {
+                _renderActionButtons: function() {
                     var cx = React.addons.classSet,
                         buttons = [{
                             label: lang.laser.get_fcode,
@@ -373,11 +329,11 @@ define([
                         stageSection = this._renderStageSection(),
                         printerSelector = (
                             true === this.state.openPrinterSelectorWindow ?
-                            this._renderPrinterSelectorWindow(lang) :
+                            this._renderPrinterSelectorWindow() :
                             ''
                         ),
-                        uploader = this._renderFileUploader(lang),
-                        actionButtons = this._renderActionButtons(lang);
+                        uploader = this._renderFileUploader(),
+                        actionButtons = this._renderActionButtons();
 
                     return (
                         <div className="studio-container laser-studio">

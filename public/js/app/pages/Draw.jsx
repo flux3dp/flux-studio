@@ -2,13 +2,21 @@ define([
     'jquery',
     'react',
     'jsx!views/holder/Setup-Panel',
-    'jsx!pages/Holder'
+    'jsx!pages/Holder',
+    'helpers/api/config',
+    'helpers/i18n',
 ], function(
     $,
     React,
     HolderSetupPanel,
-    HolderGenerator
+    HolderGenerator,
+    ConfigHelper,
+    i18n
 ) {
+
+    let Config = ConfigHelper(),
+        lang = i18n.lang;
+
     'use strict';
     
     return function(args) {
@@ -23,12 +31,44 @@ define([
                     };
                 },
 
+                getInitialState: function() {
+                    return {
+                        options: {
+                            liftHeight: 55,
+                            drawHeight: 50,
+                            speed: 20
+                        }
+                    };
+                },
+
+                componentDidMount: function() {
+                    let options = Config.read('draw-defaults') || {};
+                    options = {
+                        liftHeight: options.liftHeight || 55,
+                        drawHeight: options.drawHeight || 50,
+                        speed: options.speed || 20
+                    };
+                    if (!Config.read('draw-defaults')) {
+                        Config.write('draw-defaults', options);
+                    }
+                    this.setState({options});
+                },
+
+                fetchFormalSettings: function(holder) {
+                    let options = Config.read('draw-defaults') || {};
+                    return {
+                        lift_height: options.liftHeight || 0.1,
+                        draw_height: options.drawHeight || 0.1,
+                        speed: options.speed || 20
+                    };;
+                },
+
                 renderSetupPanel: function(holder) {
                     return <HolderSetupPanel
                         page={holder.props.page}
                         className="operating-panel"
                         imageFormat={holder.state.fileFormat}
-                        defaults={holder.state.setupPanelDefaults}
+                        defaults={holder.state.panelOptions}
                         ref="setupPanel"
                     />;
                 },
@@ -37,7 +77,13 @@ define([
                     console.log('Load Holder', Holder);
                     // return <div />;
                     
-                    return <Holder page={this.props.page} renderSetupPanel={this.renderSetupPanel} />;
+                    return <Holder
+                        page={this.props.page}
+                        acceptFormat={'image/svg'}
+                        panelOptions={this.state.options}
+                        fetchFormalSettings={this.fetchFormalSettings}
+                        renderSetupPanel={this.renderSetupPanel}
+                    />;
                 }
         });
 
