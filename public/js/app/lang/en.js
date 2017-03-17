@@ -14,11 +14,11 @@ define(function() {
             osx_10_9: 'OS X 10.9 is not supported. Please update to newer version'
         },
         generic_error: {
-            UNKNOWN_ERROR: "[UE] Please restart FLUX Studio",
-            OPERATION_ERROR: "[OE] A status conflict occured, please retry the action.",
-            SUBSYSTEM_ERROR: "[SE] Please restart the machine",
-            UNKNOWN_COMMAND: "[UC] Please update the Delta+/Delta Firmware",
-            RESOURCE_BUSY: "[RB] Please restart  the machine, or try again"
+            UNKNOWN_ERROR: '[UE] Please restart FLUX Studio',
+            OPERATION_ERROR: '[OE] A status conflict occured, please retry the action.',
+            SUBSYSTEM_ERROR: '[SE] Please restart the machine',
+            UNKNOWN_COMMAND: '[UC] Please update the Delta+/Delta Firmware',
+            RESOURCE_BUSY: '[RB] Please restart  the machine, or try again'
         },
         device_selection: {
             no_printers: 'Cannot detect any machine through the Wi-Fi. Please check if your PC and machine are under the same network. <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/215394548">More Info</a>',
@@ -1143,7 +1143,8 @@ define(function() {
             usb_unplugged: 'USB connection is lost. Please check your USB connection',
             launghing_from_installer_warning: 'You are launching FLUX Studio from the installer, and this may cause problems. Please move the FLUX Studio to the Application folder.',
             uploading_fcode: 'Uploading fcode',
-            cant_connect_to_device: 'Cannot connect to the machine, please check your connection'
+            cant_connect_to_device: 'Cannot connect to the machine, please check your connection',
+            unable_to_find_machine: 'Unable to find machine '
         },
         machine_status: {
             '-10': 'Raw mode',
