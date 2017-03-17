@@ -649,6 +649,7 @@ define(function() {
             }
         },
         cut: {
+            calibrate: '校正',
             zOffset: '切割高度',
             overcut: '閉環過切',
             speed: '速度',
@@ -673,6 +674,7 @@ define(function() {
             get_fcode: '儲存<br/>工作',
             name: '名稱',
             go: 'GO',
+            showOutline: '顯示\n輪廓',
             do_calibrate: '看起來您似乎第一次使用鐳射雕刻功能，可以透過包裝裡附的牛皮卡找到最佳的焦距，是否要載入焦距校正圖片？（稍後亦可以於進階面板中載入）',
             process_caption: '輸出中',
             laser_accepted_images: '雕刻支援格式：BMP/GIF/JPG/PNG/SVG',

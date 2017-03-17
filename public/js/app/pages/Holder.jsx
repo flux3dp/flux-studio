@@ -317,6 +317,38 @@ define([
                             },
                             onClick: this._handleStartClick
                         }];
+                    
+                    if (this.props.page === 'laser') {
+                        buttons = [{
+                            label: lang.laser.showOutline,
+                            className: cx({
+                                'btn-disabled': false,
+                                'btn-default': true,
+                                'btn-hexagon': true,
+                                'btn-go': true
+                            }),
+                            dataAttrs: {
+                                'ga-event': 'laser-outline'
+                            },
+                            onClick: this._handleStartClick
+                        }].concat(buttons);
+                    }
+
+                    if (this.props.page === 'cut') {
+                        buttons = [{
+                            label: lang.cut.calibrate,
+                            className: cx({
+                                'btn-disabled': false,
+                                'btn-default': true,
+                                'btn-hexagon': true,
+                                'btn-go': true
+                            }),
+                            dataAttrs: {
+                                'ga-event': 'laser-calibrate'
+                            },
+                            onClick: this._handleStartClick
+                        }].concat(buttons);
+                    }
 
                     return (
                         <ButtonGroup buttons={buttons} className="beehive-buttons action-buttons"/>

@@ -58,13 +58,11 @@ define([
             LASER_IMG_CLASS = 'img-container',
             $laser_platform,
             lang = i18n.get(),
-            $uploadDeferred = $.Deferred(),
             PLATFORM_DIAMETER_PIXEL,
             _onUploadResponse = function(response) {
                 var url = window.URL,
                     platformDiameter = $laser_platform.width(),
                     ratio = 1,
-                    badFiles = [],
                     messages = [];
 
                 // handle bad files
@@ -133,7 +131,6 @@ define([
             deleteImage = function() {
                 var $img_container = $('.' + LASER_IMG_CLASS).not($target_image),
                     $img = $target_image,
-                    reset_file_type = false,
                     state = {
                         selectedImage: false,
                         debug: false
@@ -319,7 +316,6 @@ define([
 
                 return range > limit;
             },
-            sleep,
             resetPosition = function($target) {
                 var $img_container = $target || $('.' + LASER_IMG_CLASS),
                     platform_pos = $laser_platform.box(true),
@@ -404,9 +400,7 @@ define([
                 }
             },
             $target_image = null, // changing when image clicked
-            printer = null,
             resetPosTimer = null,
-            printer_selecting = false,
             handleLaser = function(settings, callback, progressType, fileMode) {
                 fileMode = fileMode || '-f';
                 progressType = progressType || ProgressConstants.NONSTOP;
@@ -434,12 +428,10 @@ define([
 
                         $ft_controls.each(function(k, el) {
                             var $el = $(el),
-                                image = new Image(),
                                 top_left = getPoint($el.find('.ft-scaler-top.ft-scaler-left')),
                                 bottom_right = getPoint($el.find('.ft-scaler-bottom.ft-scaler-right')),
                                 $img = $el.parents('.ft-container').find('img'),
                                 box = $img.box(),
-                                isShading = self.refs.setupPanel.isShading(),
                                 width = 0,
                                 height = 0,
                                 sub_data = {
@@ -617,8 +609,7 @@ define([
         function handleUploadImage(file) {
             // if this is svg file that does provide a bigger enough image
             var width = file.imgSize.width,
-                height = file.imgSize.height,
-                ratio;
+                height = file.imgSize.height;
 
             imageData(file.blob, {
                 width: width,
@@ -829,7 +820,6 @@ define([
             imageTransform: function(e, params) {
                 var $el = $(e.currentTarget),
                     type = $el.data('type'),
-                    box = $el.box(),
                     val = $el.val(),
                     freetrans = $target_image.data('freetrans'),
                     args = {
