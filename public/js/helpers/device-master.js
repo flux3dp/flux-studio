@@ -58,6 +58,7 @@ define([
         _actionMap = {},
         _device,
         _cameraTimeoutTracker,
+        _wasKilled = false,
         nwConsole,
         usbDeviceReport = {},
         _devices = [],
@@ -210,8 +211,12 @@ define([
                     }
                 },
                 onFatal: function(response) {
-                    _selectedDevice = {};
-
+                    // process fatal
+                    if(!_wasKilled) {
+                        _selectedDevice = {};
+                        _wasKilled = false;
+                    }
+                    console.log('process fatal');
                 }
             });
         };
@@ -486,6 +491,7 @@ define([
     }
 
     function killSelf() {
+        _wasKilled = true;
         let d = $.Deferred();
         _device.actions.killSelf().then(response => {
             d.resolve(response);
