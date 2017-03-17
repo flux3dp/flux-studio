@@ -200,10 +200,7 @@ define([
                 _ws = createDedicatedWs(fileInfoWsId);
 
                 events.onMessage = (response) => {
-                    if(response instanceof Blob || data.length === 2) {
-                        data.push(response);
-                    }
-
+                    data.push(response);
                     if(response.status === 'ok') {
                         d.resolve(data);
                     }
