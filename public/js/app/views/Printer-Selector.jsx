@@ -200,6 +200,7 @@ define([
         },
 
         _onCancel: function(id) {
+            this.setState({ processing: false });
             switch (id) {
             case 'no-printer':
             case 'printer-connection-timeout':
@@ -258,11 +259,12 @@ define([
                 self._returnSelectedPrinter();
             }
             else {
-                DeviceMaster.selectDevice(self.selected_printer).done(function(status) {
+                DeviceMaster.selectDevice(self.selected_printer).done((status) => {
                     if (status === DeviceConstants.CONNECTED) {
                         printer = self.selected_printer;
                         ProgressActions.open(ProgressConstants.NONSTOP);
-                        checkDeviceStatus(printer).done(function() {
+
+                        const next = () => {
                             ProgressActions.close();
                             if (true === self.props.forceAuth && true === printer.password) {
                                 onError();
@@ -270,7 +272,15 @@ define([
                             }
 
                             self._returnSelectedPrinter();
-                        });
+                        }
+                        if(this.props.bypassCheck === true) {
+                            next();
+                        }
+                        else {
+                            checkDeviceStatus(printer).done(() => {
+                                next();
+                            });
+                        }
                     }
                     else if (status === DeviceConstants.TIMEOUT) {
                         // TODO: Check default printer
@@ -287,7 +297,7 @@ define([
                     }
                 }).always(() => {
                     ProgressActions.close();
-                }).fail(function(status) {
+                }).fail((status) => {
                     AlertActions.showPopupError('fatal-occurred', status);
                 });
             }
