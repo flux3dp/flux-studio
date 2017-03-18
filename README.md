@@ -7,11 +7,11 @@ FLUX Studio is the companion application for [FLUX Delta Series](http://flux3dp.
 
 ## Requirement
 
-* Unix-like OS
-* [Nodejs and npm](https://docs.npmjs.com/getting-started/installing-node)
-* Clone [FLUXGhost](https://github.com/flux3dp/fluxghost)
-* Install [FLUXClient](https://github.com/flux3dp/fluxclient)
-* [Slic3r](http://slic3r.org/) and [Cura v15.04.5](https://ultimaker.com/en/products/cura-software/list) binary file
+* Unix-like OS.
+* [Nodejs and npm](https://docs.npmjs.com/getting-started/installing-node).
+* FLUX Studio requires websocket api to run. Clone [FLUXGhost](https://github.com/flux3dp/fluxghost) as your build.
+* Install [FLUXClient](https://github.com/flux3dp/fluxclient).
+* [Slic3r](http://slic3r.org/) and [Cura v15.04.5](https://ultimaker.com/en/products/cura-software/list) binary files. For OS X users, you can also find them in /Applications/FLUX\ Studio.app folder.
 
 ## Installation
 
@@ -29,7 +29,12 @@ FLUX Studio is the companion application for [FLUX Delta Series](http://flux3dp.
 
 1. Start the gulp service `$> gulp dev`
 
-1. Open http://localhost:8111 in Chrome, open devtool, goto console, run command `localStorage.setItem('dev','true')` and refresh the page.
+1. Open http://localhost:8111 in Chrome
+
+If you are using FLUX Studio for the first time:
+1. Open up devtool and then go to console. 
+
+1. Run the command `localStorage.setItem('dev','true')` then refresh the page, your flux-studio will use port 8000 for websocket api.
 
 ## Building for distribution
 
