@@ -59,10 +59,10 @@ define([
                 _fetchFormalSettings: function() {
                     let options = Config.read('cut-defaults') || {};
                     return {
-                        zOffset: options.zOffset || 0.1,
+                        cutting_zheight: options.zOffset || 0.1,
                         overcut: options.overcut || 2,
                         speed: options.speed || 10,
-                        bladeRadius: options.bladeRadius || 0.24,
+                        blade_radius: options.bladeRadius || 0.24,
                     };
                 },
 

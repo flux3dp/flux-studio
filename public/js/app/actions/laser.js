@@ -187,7 +187,7 @@ define([
             },
             sendToMachine = function(blob) {
                 var blobUrl = window.URL,
-                    source = self.props.page === 'draw' ? GlobalConstants.DRAW : GlobalConstants.LASER,
+                    source = (self.props.page || '').toUpperCase(),
                     fcodeReaderMethods = fcodeReader(),
                     goToMonitor = function(thumbnailBlob) {
                         ProgressActions.close();
@@ -774,7 +774,7 @@ define([
                 if ('string' !== typeof currentFileFormat) {
                     currentFileFormat = ('svg' === extension ? 'svg' : 'bitmap');
                     // in draw mode. only svg files are acceptable.
-                    currentFileFormat = (self.props.page === 'draw' ? 'svg' : currentFileFormat);
+                    currentFileFormat = ((self.props.page === 'draw' || self.props.page === 'cut') ? 'svg' : currentFileFormat);
                     self.setState({
                         fileFormat: currentFileFormat
                     });
@@ -782,7 +782,7 @@ define([
 
                 if (extension === 'svg') {
                     svgWebSocket = svgWebSocket || svgLaserParser({
-                        isLaser: 'laser' === self.props.page
+                        type: self.props.page
                     });
                 }
                 else {
