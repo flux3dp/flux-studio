@@ -9,7 +9,7 @@ FLUX Studio is the companion application for [FLUX Delta Series](http://flux3dp.
 
 * Unix-like OS.
 * [Nodejs and npm](https://docs.npmjs.com/getting-started/installing-node).
-* FLUX Studio requires websocket api to run. Clone [FLUXGhost](https://github.com/flux3dp/fluxghost) as your build.
+* FLUX Studio requires websocket api to run. Dowload the source code of [FLUXGhost](https://github.com/flux3dp/fluxghost).
 * Install [FLUXClient](https://github.com/flux3dp/fluxclient).
 * [Slic3r](http://slic3r.org/) and [Cura v15.04.5](https://ultimaker.com/en/products/cura-software/list) binary files. For OS X users, you can also find them in /Applications/FLUX\ Studio.app folder.
 
