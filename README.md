@@ -3,7 +3,7 @@
 
 ## Introduction
 
-FLUX Studio is the companion application for [FLUX Delta](http://flux3dp.com). It gives creators an intuitive interface to control over every function of the machine.
+FLUX Studio is the companion application for [FLUX Delta Series](http://flux3dp.com). It gives creators an intuitive interface to control over every function of the machine.
 
 ## Requirement
 
@@ -12,11 +12,16 @@ FLUX Studio is the companion application for [FLUX Delta](http://flux3dp.com). I
 * Clone [fluxghost](https://github.com/flux3dp/fluxghost) and [fluxclient](https://github.com/flux3dp/fluxclient)
 * Download [slic3r](http://slic3r.org/) and [Cura v15.04.5](https://ultimaker.com/en/products/cura-software/list)
 
-## Setup
-`$> npm install --save-dev`
+## Installation
+
+1. Install necessary node packages `$> npm i --save-dev`
+
+1. Install [FLUXClient](https://github.com/flux3dp/fluxclient/blob/master/README.md)
+
+1. Download [FLUXGhost](https://github.com/flux3dp/fluxghost/blob/master/README.md) for websocket API
 
 ## Running
-Install FLUXClient first (See [fluxclient](https://github.com/flux3dp/fluxclient/blob/master/README.md) and Download [fluxghost](https://github.com/flux3dp/fluxghost/blob/master/README.md))
+
 
 1. `$> cd /path/to/fluxghost`
 
@@ -28,7 +33,7 @@ Install FLUXClient first (See [fluxclient](https://github.com/flux3dp/fluxclient
 
 1. Open http://localhost:8111 in Chrome, open devtool, goto console, run command `localStorage.setItem('dev','true')` and refresh the page.
 
-## Build
+## Building
 
 1. `$> [PATH]/_tools/nwjs-shell-builder/nwjs-build.sh`
     > More detail please see [nwjs-shell-builder](https://github.com/Gisto/nwjs-shell-builder)
