@@ -196,8 +196,7 @@ define([
                         let message = lang.message.unknown_error;
 
                         if(response.error === 'NOT_FOUND') {
-                            d.reject(response);
-                            return;
+                            message = lang.message.unable_to_find_machine;
                         }
 
                         if(response.error === 'UNKNOWN_DEVICE') {
