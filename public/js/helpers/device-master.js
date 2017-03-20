@@ -412,22 +412,23 @@ define([
         ProgressActions.open(ProgressConstants.NONSTOP, lang.message.runningTests);
 
         let t = setInterval(() => {
-            SocketMaster.addTask('report').then(r => {
+            SocketMaster.addTask('report')
+            .then(r => {
                 d.notify(r, t);
                 let { st_id, error } = r.device_status;
-                if (st_id == 64) {
+                if (st_id === 64) {
                     clearInterval(t);
                     setTimeout(() => {
                         quit();
                         d.resolve();
                     }, 300);
-                } else if (( st_id == 128 || st_id == 48 || st_id == 36 ) && error && error.length > 0) { // Error occured
+                } else if (( st_id === 128 || st_id === 48 || st_id === 36 ) && error && error.length > 0) { // Error occured
                     clearInterval(t);
                     d.reject(error);
-                } else if(st_id == 128) {
+                } else if(st_id === 128) {
                     clearInterval(t);
                     d.reject(error);
-                } else if (st_id == 0) {
+                } else if (st_id === 0) {
                     // Resolve if the status was running and some how skipped the completed part
                     if (statusChanged) {
                         clearInterval(t);
@@ -716,7 +717,9 @@ define([
             }
         });
 
-        return selectDevice(_selectedDevice);
+        killSelf().always(() => {
+            selectDevice(_selectedDevice);
+        });
     }
 
     // get functions
@@ -785,7 +788,14 @@ define([
             'QUIT_TASK' : () => SocketMaster.addTask('quitTask'),
 
             'REPORT'    : () => {
-                let d = $.Deferred();
+                let d = $.Deferred(),
+                    timeout;
+
+                timeout = setTimeout(() => {
+                    console.log('play report timeout');
+                    d.reject({ status: 'fata', error: ['TIMEOUT'] });
+                }, 10 * 1000);
+
                 SocketMaster.addTask('report').then((result) => {
                     // force update st_label for a backend inconsistancy
                     let s = result.device_status;
@@ -795,6 +805,8 @@ define([
                     d.resolve(s);
                 }).fail((error) => {
                     d.reject(error);
+                }).always(() => {
+                    clearTimeout(timeout);
                 });
                 return d.promise();
             }
@@ -1289,7 +1301,6 @@ define([
     }
 
     function usbDefaultDeviceCheck(device) {
-        // console.log('---', device.source, this.availableUsbChannel != device.addr);
         if(device.source !== 'h2h') {
             return device;
         }

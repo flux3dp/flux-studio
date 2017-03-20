@@ -41,7 +41,7 @@ define(['helpers/i18n'], function (i18n) {
                     if (errorOutput === '') {
                         errorOutput = (error.length >= 2) ? lang.monitor[error.slice(0, 2).join('_')] : error.join('_');
                     }
-                } else if (error.length == 3) {
+                } else if (error.length === 3) {
                     errorOutput = self.processToolheadErrorCode(error[2]);
                     // for wrong toolhead type;
                     if (error[1] === 'TYPE_ERROR') {
@@ -106,9 +106,9 @@ define(['helpers/i18n'], function (i18n) {
          * Regularize error message
          */
         processDeviceMasterResponse: (response) => {
-            if (response.info === "RESOURCE_BUSY") { response.error = ["RESOURCE_BUSY"]; }
-            if (response.module === 'LASER') { response.error = ["HEAD_ERROR", "TYPE_ERROR"]; }
-            // if (!response.module) { response.error = ["HEAD_ERROR", "HEAD_OFFLINE"]; }
+            if (response.info === 'RESOURCE_BUSY') { response.error = ['RESOURCE_BUSY']; }
+            if (response.module === 'LASER') { response.error = ['HEAD_ERROR', 'TYPE_ERROR']; }
+            // if (!response.module) { response.error = ['HEAD_ERROR', "HEAD_OFFLINE"]; }
             return response;
         }
     };
